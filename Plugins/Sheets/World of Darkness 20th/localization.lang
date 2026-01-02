@@ -131,6 +131,7 @@ wod.PunchDamamge=Força / C
 wod.INCITE DELIRIUM=INCITA DELÍRIO
 wod.IN HUMANS=EM HUMANOS
 wod.Maneuver       Roll               Diff     Damage=Manobra        Rolagem          Dif.     Dano
+wod.Rank=Posto
 
 [en]
 wod.name=Name
@@ -245,3 +246,4 @@ wod.PunchDamamge=Strength / B
 wod.INCITE DELIRIUM=INCITE DELIRIUM
 wod.IN HUMANS=IN HUMANS
 wod.Maneuver       Roll               Diff     Damage=Maneuver       Roll               Diff     Damage
+wod.Rank=Rank
