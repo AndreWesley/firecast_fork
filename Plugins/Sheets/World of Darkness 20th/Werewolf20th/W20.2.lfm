@@ -35,7 +35,7 @@
 			</layout>
 		</layout>
 
-		<layout left="0" top="215" width="255" height="355">
+		<layout left="0" top="215" width="255" height="455">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 			<label left="5" top="0" width="240" height="20" text="GIFTS" horzTextAlign="center"/>
 
@@ -75,40 +75,73 @@
 			<layout left="15" top="300" width="225" height="25" >
 				<edit left="0" top="5" width="255" height="20" field="gift_12"/>
 			</layout>
+			<layout left="15" top="325" width="225" height="25" >
+				<edit left="0" top="5" width="255" height="20" field="gift_13"/>
+			</layout>
+				<layout left="15" top="350" width="225" height="25" >
+				<edit left="0" top="5" width="255" height="20" field="gift_14"/>
+			</layout>
+				<layout left="15" top="375" width="225" height="25" >
+				<edit left="0" top="5" width="255" height="20" field="gift_15"/>
+			</layout>
+				<layout left="15" top="400" width="225" height="25" >
+				<edit left="0" top="5" width="255" height="20" field="gift_16"/>
+			</layout>
 		</layout>
 
 		<layout left="265" top="0" width="690" height="205">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 
 			<layout left="15" top="0" width="125" height="175" >
-				<radioButton left="25" top="0" width="75" height="20" text="HOMID" horzTextAlign="center" groupName="form" field="shape"/>
+				<radioButton left="15" top="0" width="75" height="20" text="HOMID" horzTextAlign="leading" groupName="form" field="shape"/>
 
 				<label left="0" top="70" width="125" height="20" text="No Change" horzTextAlign="center"/>
-
-				<label left="0" top="130" width="125" height="20" text="Difficulty: 6" horzTextAlign="center"/>
+			
+				<label left="0" top="130" width="125" height="20" text="Difficulty" horzTextAlign="center"/>
+				<label left="90" top="130" width="25" height="20" text="6" horzTextAlign="center"/>
 			</layout>
 
 			<layout left="150" top="0" width="125" height="190" >
 				<radioButton left="25" top="0" width="75" height="20" text="GLABRO" horzTextAlign="center" groupName="form" field="shape"/>
 
-				<label left="0" top="30" width="125" height="20" text="Strength (+2)" horzTextAlign="center"/>
-				<label left="0" top="50" width="125" height="20" text="Stamina (+2)" horzTextAlign="center"/>
-				<label left="0" top="70" width="125" height="20" text="Appearance (-1)" horzTextAlign="center"/>
-				<label left="0" top="90" width="125" height="20" text="Manipulation (-2)" horzTextAlign="center"/>
+				<label left="30" top="30" autoSize="true" height="20" text="Strength" horzTextAlign="leading"/>
+				<label right="120" top="30" autoSize="true" height="20" text="(+2)" horzTextAlign="trailing"/>
+				
+				<label left="30" top="50" width="125" height="20" text="Stamina" horzTextAlign="leading"/>
+				<label right="120" top="50" autoSize="true" height="20" text="(+2)" horzTextAlign="trailing"/>
 
-				<label left="0" top="130" width="125" height="20" text="Difficulty: 7" horzTextAlign="center"/>
+				<label left="30" top="70" width="125" height="20" text="Appearance" horzTextAlign="leading"/>
+				<label right="120" top="70" autoSize="true" height="20" text="(-1)" horzTextAlign="trailing"/>
+				
+				<label left="30" top="90" width="125" height="20" text="Manipul." horzTextAlign="leading"/>
+				<label right="120" top="90" autoSize="true" height="20" text="(-2)" horzTextAlign="trailing"/>
+
+				<label left="0" top="130" width="125" height="20" text="Difficulty" horzTextAlign="center"/>
+				<label left="90" top="130" width="25" height="20" text="7" horzTextAlign="center"/>
+
 			</layout>
 
 			<layout left="285" top="0" width="125" height="190" >
 				<radioButton left="25" top="0" width="75" height="20" text="CRINOS" horzTextAlign="center" groupName="form" field="shape"/>
 
-				<label left="0" top="30" width="125" height="20" text="Strength (+4)" horzTextAlign="center"/>
-				<label left="0" top="50" width="125" height="20" text="Dextery (+1)" horzTextAlign="center"/>
-				<label left="0" top="70" width="125" height="20" text="Stamina (+3)" horzTextAlign="center"/>
-				<label left="0" top="90" width="125" height="20" text="Manipulation (-3)" horzTextAlign="center"/>
-				<label left="0" top="110" width="125" height="20" text="Appearance 0" horzTextAlign="center"/>
+				<label left="30" top="30" width="125" height="20" text="Strength" horzTextAlign="leading"/>
+				<label right="120" top="30" autoSize="true" height="20" text="(+4)" horzTextAlign="trailing"/>
+				
+				<label left="30" top="50" width="125" height="20" text="Dextery" horzTextAlign="leading"/>
+				<label right="120" top="50" autoSize="true" height="20" text="(+1)" horzTextAlign="trailing"/>
 
-				<label left="0" top="130" width="125" height="20" text="Difficulty: 6" horzTextAlign="center"/>
+				<label left="30" top="70" width="125" height="20" text="Stamina" horzTextAlign="leading"/>
+				<label right="120" top="70" autoSize="true" height="20" text="(+3)" horzTextAlign="trailing"/>
+
+				<label left="30" top="90" width="125" height="20" text="Manipul." horzTextAlign="leading"/>
+				<label right="120" top="90" autoSize="true" height="20" text="(-3)" horzTextAlign="trailing"/>
+
+				<label left="30" top="110" width="125" height="20" text="Appearance" horzTextAlign="leading"/>
+				<label right="120" top="110" autoSize="true" height="20" text="0" horzTextAlign="trailing"/>
+
+				<label left="0" top="130" width="125" height="20" text="Difficulty" horzTextAlign="center"/>
+				<label left="90" top="130" width="25" height="20" text="6" horzTextAlign="center"/>
+
 				<label left="0" top="150" width="125" height="20" text="INCITE DELIRIUM" horzTextAlign="center"/>
 				<label left="0" top="170" width="125" height="20" text="IN HUMANS" horzTextAlign="center"/>
 			</layout>
@@ -116,29 +149,48 @@
 			<layout left="420" top="0" width="125" height="190" >
 				<radioButton left="25" top="0" width="75" height="20" text="HISPO" horzTextAlign="center" groupName="form" field="shape"/>
 
-				<label left="0" top="30" width="125" height="20" text="Strength (+3)" horzTextAlign="center"/>
-				<label left="0" top="50" width="125" height="20" text="Dexterity (+2)" horzTextAlign="center"/>
-				<label left="0" top="70" width="125" height="20" text="Stamina (+3)" horzTextAlign="center"/>
-				<label left="0" top="90" width="125" height="20" text="Manipulation (-3)" horzTextAlign="center"/>
-				<label left="0" top="110" width="125" height="20" text="+1 Die to Bite Damage" horzTextAlign="center" fontSize="11"/>
+				<label left="30" top="30" width="125" height="20" text="Strength" horzTextAlign="leading"/>
+				<label right="120" top="30" autoSize="true" height="20" text="(+3)" horzTextAlign="trailing"/>
 
-				<label left="0" top="130" width="125" height="20" text="Difficulty: 7" horzTextAlign="center"/>
+				<label left="30" top="50" width="125" height="20" text="Dexterity" horzTextAlign="leading"/>
+				<label right="120" top="50" autoSize="true" height="20" text="(+2)" horzTextAlign="trailing"/>
+
+				<label left="30" top="70" width="125" height="20" text="Stamina" horzTextAlign="leading"/>
+				<label right="120" top="70" autoSize="true" height="20" text="(+3)" horzTextAlign="trailing"/>
+
+				<label left="30" top="90" width="125" height="20" text="Manipul." horzTextAlign="leading"/>
+				<label right="120" top="90" autoSize="true" height="20" text="(-3)" horzTextAlign="trailing"/>
+
+				<label left="0" top="110" width="125" height="20" text="Bite Dmg +1 die" horzTextAlign="center" fontSize="11"/>
+
+				<label left="0" top="130" width="125" height="20" text="Difficulty" horzTextAlign="center"/>
+				<label left="90" top="130" width="25" height="20" text="7" horzTextAlign="center"/>
+
 			</layout>
 
 			<layout left="555" top="0" width="125" height="190" >
 				<radioButton left="25" top="0" width="75" height="20" text="LUPUS" horzTextAlign="center" groupName="form" field="shape"/>
 
-				<label left="0" top="30" width="125" height="20" text="Strength (+1)" horzTextAlign="center"/>
-				<label left="0" top="50" width="125" height="20" text="Dexterity (+2)" horzTextAlign="center"/>
-				<label left="0" top="70" width="125" height="20" text="Stamina (+2)" horzTextAlign="center"/>
-				<label left="0" top="90" width="125" height="20" text="Manipulation (-3)" horzTextAlign="center"/>
-				<label left="0" top="110" width="125" height="20" text="-2 Perception Diff" horzTextAlign="center" fontSize="11"/>
+				<label left="30" top="30" width="125" height="20" text="Strength" horzTextAlign="leading"/>
+				<label right="120" top="30" autoSize="true" height="20" text="(+1)" horzTextAlign="trailing"/>
 
-				<label left="0" top="130" width="125" height="20" text="Difficulty: 6" horzTextAlign="center"/>
+				<label left="30" top="50" width="125" height="20" text="Dexterity" horzTextAlign="leading"/>
+				<label right="120" top="50" autoSize="true" height="20" text="(+2)" horzTextAlign="trailing"/>
+
+				<label left="30" top="70" width="125" height="20" text="Stamina" horzTextAlign="leading"/>
+				<label right="120" top="70" autoSize="true" height="20" text="(+2)" horzTextAlign="trailing"/>
+
+				<label left="30" top="90" width="125" height="20" text="Manipul." horzTextAlign="leading"/>
+				<label right="120" top="90" autoSize="true" height="20" text="(-3)" horzTextAlign="trailing"/>
+
+				<label left="0" top="110" width="125" height="20" text="Perception Diff. -2" horzTextAlign="center" fontSize="11"/>
+
+				<label left="0" top="130" width="125" height="20" text="Difficulty" horzTextAlign="center"/>
+				<label left="90" top="130" width="25" height="20" text="6" horzTextAlign="center"/>
 			</layout>
 		</layout>
 
-		<layout left="265" top="215" width="255" height="355">
+		<layout left="265" top="215" width="255" height="455">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 			<label left="5" top="0" width="240" height="20" text="OTHER TRAITS" horzTextAlign="center"/>
 
@@ -178,9 +230,21 @@
 			<layout left="15" top="300" width="225" height="25" >
 				<Background field="trait_12"/>
 			</layout>
+			<layout left="15" top="325" width="225" height="25" >
+				<Background field="trait_13"/>
+			</layout>
+			<layout left="15" top="350" width="225" height="25" >
+				<Background field="trait_14"/>
+			</layout>
+			<layout left="15" top="375" width="225" height="25" >
+				<Background field="trait_15"/>
+			</layout>
+			<layout left="15" top="400" width="225" height="25" >
+				<Background field="trait_16"/>
+			</layout>
 		</layout>
 
-		<layout left="530" top="215" width="255" height="355">
+		<layout left="530" top="215" width="255" height="455">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 			<label left="5" top="0" width="240" height="20" text="RITES" horzTextAlign="center"/>
 
@@ -219,6 +283,18 @@
 			</layout>
 			<layout left="15" top="300" width="225" height="25" >
 				<edit left="0" top="5" width="255" height="20" field="rites_12"/>
+			</layout>
+			<layout left="15" top="325" width="225" height="25" >
+				<edit left="0" top="5" width="255" height="20" field="rites_13"/>
+			</layout>
+			<layout left="15" top="350" width="225" height="25" >
+				<edit left="0" top="5" width="255" height="20" field="rites_14"/>
+			</layout>
+			<layout left="15" top="375" width="225" height="25" >
+				<edit left="0" top="5" width="255" height="20" field="rites_15"/>
+			</layout>
+			<layout left="15" top="400" width="225" height="25" >
+				<edit left="0" top="5" width="255" height="20" field="rites_16"/>
 			</layout>
 		</layout>
 

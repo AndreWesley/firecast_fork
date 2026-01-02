@@ -21,7 +21,13 @@
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 			<label left="5" top="0" width="610" height="20" text="COMBAT" horzTextAlign="center"/>
 
-			<label left="15" top="25" width="610" height="20" text="Weapon/Attack                                          Roll              Diff.    Damage   Range     Rate        Clip"/>
+			<label left="15" top="25" width="610" height="20" text="Weapon/Attack"/>
+			<label left="215" top="25" width="610" height="20" text="Roll"/>
+			<label left="320" top="25" width="610" height="20" text="Diff."/>
+			<label left="365" top="25" width="610" height="20" text="Damage"/>
+			<label left="415" top="25" width="610" height="20" text="Range"/>
+			<label left="465" top="25" width="610" height="20" text="Rate"/>
+			<label left="515" top="25" width="610" height="20" text="Clip"/>
 
 			<layout left="15" top="50" width="550" height="25" >
 				<Attack num="1"/>
@@ -59,7 +65,10 @@
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 			<label left="5" top="0" width="610" height="20" text="FETISHES" horzTextAlign="center"/>
 
-			<label left="15" top="25" width="610" height="20" text="Item                                                    Level    Gnosis                                Power"/>
+			<label left="15" top="25" width="610" height="20" text="Item"/>
+			<label left="215" top="25" width="610" height="20" text="Level"/>
+			<label left="267" top="25" width="610" height="20" text="Gnosis"/>
+			<label left="320" top="25" width="610" height="20" text="Power"/>
 
 			<layout left="15" top="50" width="550" height="25" >
 				<Fetish num="1"/>
@@ -104,10 +113,10 @@
 			<label left="15" top="120" width="300" height="20" text="Grapple          Dex + Brawl    6        Strength/B"/>
 			<label left="15" top="140" width="300" height="20" text="Kick                Dex + Brawl    7        Strength + 1/B"/>
 			<label left="15" top="160" width="300" height="20" text="Punch             Dex + Brawl    6        Strength/B"/>
-			<label left="15" top="180" width="300" height="20" text="A=Aggravated Damage B=Bashing Damage" fontSize="11"/>
+			<label left="15" top="180" width="300" height="20" text="A = Aggravated Damage / B = Bashing Damage" fontSize="11"/>
 
-			<label left="15" top="210" width="50" height="20" text="Armor" horzTextAlign="center"/>
-			<edit left="65" top="210" width="250" height="20" field="armor"/>
+			<label left="10" top="210" width="70" height="20" text="Armor" horzTextAlign="center"/>
+			<edit left="85" top="210" width="230" height="20" field="armor"/>
 		</layout>
 
 		<layout left="590" top="255" width="330" height="415">
