@@ -4,11 +4,11 @@
 
 		<template name="Background">
 			<edit left="0" top="5" width="95" height="20" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
+			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
 		</template>
 
 		<layout left="0" top="0" width="255" height="205">

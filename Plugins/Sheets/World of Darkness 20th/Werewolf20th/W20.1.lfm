@@ -7,40 +7,40 @@
 		</template>
 		<template name="Attribute">
 			<label left="0" top="5" width="80" height="20" text="$(nome)"/>
-			<image left="80" top="0" width="25" height="25" style="autoFit" src="images/paw_on.png"/>
-			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
+			<image left="80" top="0" width="25" height="25" style="autoFit" src="images/claws_on.png"/>
+			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
 		</template>
 		<template name="Ability">
 			<label left="0" top="5" width="80" height="20" text="$(nome)"/>
-			<imageCheckBox left="80" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
+			<imageCheckBox left="80" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
 		</template>
 		<template name="OpenAbility">
 			<edit left="0" top="5" width="75" height="20" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="80" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
+			<imageCheckBox left="80" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
 		</template>
 		<template name="Renown">
 			<label left="0" top="15" width="60" height="20" text="$(nome)" horzTextAlign="center" fontSize="$(font)"/>
-			<imageCheckBox left="60" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="85" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="110" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="135" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="160" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="185" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="210" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="235" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
-			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/paw_on.png" uncheckedImage="images/paw_off.png"/>
+			<imageCheckBox left="60" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="85" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="110" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="135" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="160" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="185" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="210" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="235" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
 
 			<checkBox left="62" top="20" width="25" height="25" field="$(field)_c1"/>
 			<checkBox left="87" top="20" width="25" height="25" field="$(field)_c2"/>
