@@ -14,20 +14,20 @@
 			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
 		</template>
 		<template name="Ability">
-			<label left="0" top="5" width="80" height="20" text="$(nome)"/>
-			<imageCheckBox left="80" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
-			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
-			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
-			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
-			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<label left="0" top="5" width="100" height="20" text="$(nome)"/>
+			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
 		</template>
 		<template name="OpenAbility">
-			<edit left="0" top="5" width="75" height="20" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="80" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
-			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
-			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
-			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
-			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<edit left="0" top="5" width="95" height="20" field="$(field)" fontSize="12"/>
+			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/claws_on.png" uncheckedImage="images/claws_off.png"/>
 		</template>
 		<template name="Renown">
 			<label left="0" top="15" width="60" height="20" text="$(nome)" horzTextAlign="center" fontSize="$(font)"/>
@@ -140,136 +140,136 @@
 				<Attribute field="wits" nome="Wits"/>
 			</layout>
 		</layout>
-
+275
 		<rectangle left="0" top="405" width="270" height="270" color="DimGray" xradius="5" yradius="5" cornerType="innerLine"/>
 		<image left="0" top="405" width="270" height="270" field="avatar" editable="true" style="autoFit"/>
 
-		<layout left="280" top="110" width="760" height="380">
+		<layout left="280" top="110" width="870" height="380">
 			<rectangle align="client" color="#FFFFFF00" strokeColor="black" strokeSize="1" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="5" top="1" width="760" height="20" text="ABILITIES" horzTextAlign="center"/>
+			<label left="5" top="1" width="870" height="20" text="ABILITIES" horzTextAlign="center"/>
 
-			<layout left="10" top="30" width="240" height="340">
+			<layout left="10" top="30" width="275" height="340">
 				<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 				<label left="5" top="0" width="240" height="20" text="TALENTS" horzTextAlign="center"/>
 
-				<layout left="15" top="25" width="205" height="25" >
+				<layout left="15" top="25" width="275" height="25" >
 					<Ability field="alertness" nome="Alertness"/>
 				</layout>
-				<layout left="15" top="50" width="205" height="25" >
+				<layout left="15" top="50" width="275" height="25" >
 					<Ability field="athetics" nome="Athetics"/>
 				</layout>
-				<layout left="15" top="75" width="205" height="25" >
+				<layout left="15" top="75" width="275" height="25" >
 					<Ability field="brawl" nome="Brawl"/>
 				</layout>
-				<layout left="15" top="100" width="205" height="25" >
+				<layout left="15" top="100" width="275" height="25" >
 					<Ability field="empathy" nome="Empathy"/>
 				</layout>
-				<layout left="15" top="125" width="205" height="25" >
+				<layout left="15" top="125" width="275" height="25" >
 					<Ability field="expression" nome="Expression"/>
 				</layout>
-				<layout left="15" top="150" width="205" height="25" >
+				<layout left="15" top="150" width="275" height="25" >
 					<Ability field="leadership" nome="Leadership"/>
 				</layout>
-				<layout left="15" top="175" width="205" height="25" >
+				<layout left="15" top="175" width="275" height="25" >
 					<Ability field="intimidation" nome="Intimidation"/>
 				</layout>
-				<layout left="15" top="200" width="205" height="25" >
+				<layout left="15" top="200" width="275" height="25" >
 					<Ability field="primal_urge" nome="Primal-Urge"/>
 				</layout>
-				<layout left="15" top="225" width="205" height="25" >
+				<layout left="15" top="225" width="275" height="25" >
 					<Ability field="streetwise" nome="Streetwise"/>
 				</layout>
-				<layout left="15" top="250" width="205" height="25" >
+				<layout left="15" top="250" width="275" height="25" >
 					<Ability field="subterfuge" nome="Subterfuge"/>
 				</layout>
-				<layout left="15" top="275" width="205" height="25" >
+				<layout left="15" top="275" width="275" height="25" >
 					<OpenAbility field="talent_11"/>
 				</layout>
-				<layout left="15" top="300" width="205" height="25" >
+				<layout left="15" top="300" width="275" height="25" >
 					<OpenAbility field="talent_12"/>
 				</layout>
 			</layout>
 
-			<layout left="260" top="30" width="240" height="340">
+			<layout left="295" top="30" width="275" height="340">
 				<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 				<label left="5" top="0" width="240" height="20" text="SKILLS" horzTextAlign="center"/>
 
-				<layout left="15" top="25" width="205" height="25" >
+				<layout left="15" top="25" width="275" height="25" >
 					<Ability field="animal_ken" nome="Animal-Ken"/>
 				</layout>
-				<layout left="15" top="50" width="205" height="25" >
+				<layout left="15" top="50" width="275" height="25" >
 					<Ability field="crafts" nome="Crafts"/>
 				</layout>
-				<layout left="15" top="75" width="205" height="25" >
+				<layout left="15" top="75" width="275" height="25" >
 					<Ability field="drive" nome="Drive"/>
 				</layout>
-				<layout left="15" top="100" width="205" height="25" >
+				<layout left="15" top="100" width="275" height="25" >
 					<Ability field="etiquette" nome="Etiquette"/>
 				</layout>
-				<layout left="15" top="125" width="205" height="25" >
-					<Ability field="firearms" nome="Firearms"/>
+				<layout left="15" top="125" width="305" height="25" >
+					<Ability field="firearms" nome="Firearms" width="30"/>
 				</layout>
-				<layout left="15" top="150" width="205" height="25" >
+				<layout left="15" top="150" width="275" height="25" >
 					<Ability field="larceny" nome="Larceny"/>
 				</layout>
-				<layout left="15" top="175" width="205" height="25" >
+				<layout left="15" top="175" width="275" height="25" >
 					<Ability field="melee" nome="Melee"/>
 				</layout>
-				<layout left="15" top="200" width="205" height="25" >
+				<layout left="15" top="200" width="275" height="25" >
 					<Ability field="performance" nome="Performance"/>
 				</layout>
-				<layout left="15" top="225" width="205" height="25" >
+				<layout left="15" top="225" width="275" height="25" >
 					<Ability field="stealth" nome="Stealth"/>
 				</layout>
-				<layout left="15" top="250" width="205" height="25" >
+				<layout left="15" top="250" width="275" height="25" >
 					<Ability field="survival" nome="Survival"/>
 				</layout>
-				<layout left="15" top="275" width="205" height="25" >
+				<layout left="15" top="275" width="275" height="25" >
 					<OpenAbility field="skill_11"/>
 				</layout>
-				<layout left="15" top="300" width="205" height="25" >
+				<layout left="15" top="300" width="275" height="25" >
 					<OpenAbility field="skill_12"/>
 				</layout>
 			</layout>
 
-			<layout left="510" top="30" width="240" height="340">
+			<layout left="580" top="30" width="275" height="340">
 				<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 				<label left="5" top="0" width="240" height="20" text="KNOWLEDGES" horzTextAlign="center"/>
 
-				<layout left="15" top="25" width="205" height="25" >
+				<layout left="15" top="25" width="275" height="25" >
 					<Ability field="academics" nome="Academics"/>
 				</layout>
-				<layout left="15" top="50" width="205" height="25" >
+				<layout left="15" top="50" width="275" height="25" >
 					<Ability field="computer" nome="Computer"/>
 				</layout>
-				<layout left="15" top="75" width="205" height="25" >
+				<layout left="15" top="75" width="275" height="25" >
 					<Ability field="enigmas" nome="Enigmas"/>
 				</layout>
-				<layout left="15" top="100" width="205" height="25" >
+				<layout left="15" top="100" width="275" height="25" >
 					<Ability field="investigation" nome="Investigation"/>
 				</layout>
-				<layout left="15" top="125" width="205" height="25" >
+				<layout left="15" top="125" width="275" height="25" >
 					<Ability field="law" nome="Law"/>
 				</layout>
-				<layout left="15" top="150" width="205" height="25" >
+				<layout left="15" top="150" width="275" height="25" >
 					<Ability field="medicine" nome="Medicine"/>
 				</layout>
-				<layout left="15" top="175" width="205" height="25" >
+				<layout left="15" top="175" width="275" height="25" >
 					<Ability field="occult" nome="Occult"/>
 				</layout>
-				<layout left="15" top="200" width="205" height="25" >
+				<layout left="15" top="200" width="275" height="25" >
 					<Ability field="rituals" nome="Rituals"/>
 				</layout>
-				<layout left="15" top="225" width="205" height="25" >
+				<layout left="15" top="225" width="275" height="25" >
 					<Ability field="science" nome="Science"/>
 				</layout>
-				<layout left="15" top="250" width="205" height="25" >
+				<layout left="15" top="250" width="275" height="25" >
 					<Ability field="technology" nome="Technology"/>
 				</layout>
-				<layout left="15" top="275" width="205" height="25" >
+				<layout left="15" top="275" width="275" height="25" >
 					<OpenAbility field="knowledge_11"/>
 				</layout>
-				<layout left="15" top="300" width="205" height="25" >
+				<layout left="15" top="300" width="275" height="25" >
 					<OpenAbility field="knowledge_12"/>
 				</layout>
 			</layout>
