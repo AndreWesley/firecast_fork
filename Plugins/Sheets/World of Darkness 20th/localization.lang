@@ -132,6 +132,8 @@ wod.INCITE DELIRIUM=INCITA DELÍRIO
 wod.IN HUMANS=EM HUMANOS
 wod.Maneuver       Roll               Diff     Damage=Manobra        Rolagem          Dif.     Dano
 wod.Rank=POSTO
+wod.Total XP=XP Total
+wod.Current XP=XP Atual
 
 [en]
 wod.name=Name
@@ -247,3 +249,5 @@ wod.INCITE DELIRIUM=INCITE DELIRIUM
 wod.IN HUMANS=IN HUMANS
 wod.Maneuver       Roll               Diff     Damage=Maneuver       Roll               Diff     Damage
 wod.Rank=RANK
+wod.Total XP=Total XP
+wod.Current XP=Current XP
