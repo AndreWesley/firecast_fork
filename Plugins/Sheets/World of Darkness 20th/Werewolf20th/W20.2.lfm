@@ -93,7 +93,7 @@
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 
 			<layout left="15" top="0" width="125" height="175" >
-				<radioButton left="15" top="0" width="75" height="20" text="HOMID" horzTextAlign="leading" groupName="form" field="shape"/>
+				<radioButton left="15" top="0" width="75" height="20" text="HOMID" horzTextAlign="leading" groupName="form" field="shape" fieldValue="HOMID"/>
 
 				<label left="0" top="70" width="125" height="20" text="No Change" horzTextAlign="center"/>
 			
@@ -102,7 +102,7 @@
 			</layout>
 
 			<layout left="150" top="0" width="125" height="190" >
-				<radioButton left="25" top="0" width="75" height="20" text="GLABRO" horzTextAlign="center" groupName="form" field="shape"/>
+				<radioButton left="25" top="0" width="75" height="20" text="GLABRO" horzTextAlign="center" groupName="form" field="shape" fieldValue="GLABRO"/>
 
 				<label left="30" top="30" autoSize="true" height="20" text="Strength" horzTextAlign="leading"/>
 				<label right="120" top="30" autoSize="true" height="20" text="(+2)" horzTextAlign="trailing"/>
@@ -122,7 +122,7 @@
 			</layout>
 
 			<layout left="285" top="0" width="125" height="190" >
-				<radioButton left="25" top="0" width="75" height="20" text="CRINOS" horzTextAlign="center" groupName="form" field="shape"/>
+				<radioButton left="25" top="0" width="75" height="20" text="CRINOS" horzTextAlign="center" groupName="form" field="shape" fieldValue="CRINOS"/>
 
 				<label left="30" top="30" width="125" height="20" text="Strength" horzTextAlign="leading"/>
 				<label right="120" top="30" autoSize="true" height="20" text="(+4)" horzTextAlign="trailing"/>
@@ -147,7 +147,7 @@
 			</layout>
 
 			<layout left="420" top="0" width="125" height="190" >
-				<radioButton left="25" top="0" width="75" height="20" text="HISPO" horzTextAlign="center" groupName="form" field="shape"/>
+				<radioButton left="25" top="0" width="75" height="20" text="HISPO" horzTextAlign="center" groupName="form" field="shape" fieldValue="HISPO"/>
 
 				<label left="30" top="30" width="125" height="20" text="Strength" horzTextAlign="leading"/>
 				<label right="120" top="30" autoSize="true" height="20" text="(+3)" horzTextAlign="trailing"/>
@@ -169,7 +169,7 @@
 			</layout>
 
 			<layout left="555" top="0" width="125" height="190" >
-				<radioButton left="25" top="0" width="75" height="20" text="LUPUS" horzTextAlign="center" groupName="form" field="shape"/>
+				<radioButton left="25" top="0" width="75" height="20" text="LUPUS" horzTextAlign="center" groupName="form" field="shape" fieldValue="LUPUS"/>
 
 				<label left="30" top="30" width="125" height="20" text="Strength" horzTextAlign="leading"/>
 				<label right="120" top="30" autoSize="true" height="20" text="(+1)" horzTextAlign="trailing"/>
@@ -312,4 +312,103 @@
 			<textEditor left="15" top="25" width="225" height="130" field="deformity"/>
 		</layout>
 	</scrollBox>
+	<dataLink field="shape">
+		<event name="onChange">
+			local strValue = 1;
+			local dexValue = 1;
+			local staValue = 1;
+			local manValue = 1;
+			local appValue = 1;
+
+			local strMod = 0;
+			local dexMod = 0;
+			local staMod = 0;
+			local manMod = 0;
+			local appMod = 0;
+
+			if (sheet.shape == "GLABRO") then
+				strMod = 2;
+				staMod = 2;
+				manMod = -2;
+				appMod = -1;
+			end;
+			
+			if (sheet.shape == "CRINOS") then
+				strMod = 4;
+				dexMod = 1;
+				staMod = 3;
+				manMod = -3;
+				appMod = -99;
+			end;
+			
+			if (sheet.shape == "HISPO") then
+				strMod = 3;
+				dexMod = 2;
+				staMod = 3;
+				manMod = -3;
+			end;
+			
+			if (sheet.shape == "LUPUS") then
+				strMod = 1;
+				dexMod = 2;
+				staMod = 2;
+				manMod = -3;
+			end;
+	
+			if sheet.strength_2==true then strValue=strValue+1 end;
+			if sheet.strength_3==true then strValue=strValue+1 end;
+			if sheet.strength_4==true then strValue=strValue+1 end;
+			if sheet.strength_5==true then strValue=strValue+1 end;
+			if sheet.strength_6==true then strValue=strValue+1 end;
+			if sheet.strength_7==true then strValue=strValue+1 end;
+			if sheet.strength_8==true then strValue=strValue+1 end;
+			if sheet.strength_9==true then strValue=strValue+1 end;
+			if sheet.strength_10==true then strValue=strValue+1 end;
+			sheet.strengthValue = strValue + strMod;
+
+			if sheet.dexterity_2==true then dexValue=dexValue+1 end;
+			if sheet.dexterity_3==true then dexValue=dexValue+1 end;
+			if sheet.dexterity_4==true then dexValue=dexValue+1 end;
+			if sheet.dexterity_5==true then dexValue=dexValue+1 end;
+			if sheet.dexterity_6==true then dexValue=dexValue+1 end;
+			if sheet.dexterity_7==true then dexValue=dexValue+1 end;
+			if sheet.dexterity_8==true then dexValue=dexValue+1 end;
+			if sheet.dexterity_9==true then dexValue=dexValue+1 end;
+			if sheet.dexterity_10==true then dexValue=dexValue+1 end;
+			sheet.dexterityValue = dexValue + dexMod;
+
+			if sheet.stamina_2==true then staValue=staValue+1 end;
+			if sheet.stamina_3==true then staValue=staValue+1 end;
+			if sheet.stamina_4==true then staValue=staValue+1 end;
+			if sheet.stamina_5==true then staValue=staValue+1 end;
+			if sheet.stamina_6==true then staValue=staValue+1 end;
+			if sheet.stamina_7==true then staValue=staValue+1 end;
+			if sheet.stamina_8==true then staValue=staValue+1 end;
+			if sheet.stamina_9==true then staValue=staValue+1 end;
+			if sheet.stamina_10==true then staValue=staValue+1 end;
+			sheet.staminaValue = staValue + staMod;
+
+			if sheet.manipulation_2==true then manValue=manValue+1 end;
+			if sheet.manipulation_3==true then manValue=manValue+1 end;
+			if sheet.manipulation_4==true then manValue=manValue+1 end;
+			if sheet.manipulation_5==true then manValue=manValue+1 end;
+			if sheet.manipulation_6==true then manValue=manValue+1 end;
+			if sheet.manipulation_7==true then manValue=manValue+1 end;
+			if sheet.manipulation_8==true then manValue=manValue+1 end;
+			if sheet.manipulation_9==true then manValue=manValue+1 end;
+			if sheet.manipulation_10==true then manValue=manValue+1 end;
+			sheet.manipulationValue = math.max(0, manValue + manMod)
+
+			if sheet.appearance_2==true then appValue=appValue+1 end;
+			if sheet.appearance_3==true then appValue=appValue+1 end;
+			if sheet.appearance_4==true then appValue=appValue+1 end;
+			if sheet.appearance_5==true then appValue=appValue+1 end;
+			if sheet.appearance_6==true then appValue=appValue+1 end;
+			if sheet.appearance_7==true then appValue=appValue+1 end;
+			if sheet.appearance_8==true then appValue=appValue+1 end;
+			if sheet.appearance_9==true then appValue=appValue+1 end;
+			if sheet.appearance_10==true then appValue=appValue+1 end;
+			sheet.appearanceValue = math.max(0, appValue + appMod)
+		</event>
+	</dataLink>
 </form>
