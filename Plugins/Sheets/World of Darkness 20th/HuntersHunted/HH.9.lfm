@@ -20,6 +20,8 @@
 		]]>
 	</script>
 	<scrollBox align="client">
+		<!-- Theme backdrop, same arrangement as HH.1 (SPEC T158, V56, V57). -->
+		<image name="themePaper9" align="client" style="stretch" hitTest="false" visible="false"/>
 		<!--
 			Progress tab (SPEC T106). Current Experience is a MIRROR of the box on the Main tab -
 			the same `field="experience"`, so the NDB keeps both in step with no Lua (SPEC V36,

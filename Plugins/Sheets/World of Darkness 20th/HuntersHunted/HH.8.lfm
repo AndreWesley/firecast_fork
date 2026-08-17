@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form name="frmHH_8" align="client" theme="dark">
 	<scrollBox align="client">
+		<!-- Theme backdrop, same arrangement as HH.1 (SPEC T158, V56, V57). -->
+		<image name="themePaper8" align="client" style="stretch" hitTest="false" visible="false"/>
 		<!--
 			Inventory tab. Six boxes, 380x300 on a 20px gutter, so the row ends at x=1180 -
 			inside the ~1210 the other tabs already use (SPEC R.15). All six share one shape:

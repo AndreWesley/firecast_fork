@@ -1958,6 +1958,8 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 	</script>
 
 	<scrollBox align="client">
+		<!-- Theme backdrop, same arrangement as HH.1 (SPEC T158, V56, V57). -->
+		<image name="themePaper7" align="client" style="stretch" hitTest="false" visible="false"/>
 		<!--
 			Powers tab. Two numina tables + one read-only description block (SPEC T56-T60).
 

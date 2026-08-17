@@ -379,7 +379,8 @@
 				["Vampire: Dark Ages"] = "Vampiro: Idade das Trevas",
 				["Vampire: The Masquerade"] = "Vampiro: A Máscara",
 				["Version"] = "Versão Atual",
-				["Victorian Era"] = "Era Vitoriana",
+				["Victorian Era (Light)"] = "Era Vitoriana (Claro)",
+				["Victorian Era (Dark)"] = "Era Vitoriana (Escuro)",
 				["VIRTUES"] = "VIRTUDES",
 				["Visionary"] = "Visionário",
 				["Visit the Table:"] = "Conheça a Mesa:",
@@ -487,6 +488,246 @@
 					end;
 				end;
 			end;
+
+			-- ---- Theme (SPEC I5/I6, 14th round) --------------------------------------
+			--
+			-- The sheet ships three looks. `Modern` is the sheet exactly as authored; the two
+			-- Victorian variants repaint it at runtime. Every property involved has a setter
+			-- (SPEC R22), so there is no second .lfm per theme and no field but `sheetTheme`.
+			--
+			-- Modern deliberately has NO palette below (SPEC V54): going back restores the
+			-- snapshot taken before the first repaint, so the "modern" look cannot drift from
+			-- what the XML declares. Same reason the translation keeps the authored English
+			-- instead of a second table (SPEC V22).
+			--
+			-- Colour keys are the literals AUTHORED in the nine .lfm files, spelled as they
+			-- appear there. The gate greps color=/strokeColor=/fontColor= out of those files
+			-- and asserts every literal is a key here (SPEC V53) - a new box painted with a
+			-- new colour turns the gate red instead of sitting black in the parchment.
+			local THEMES = {
+				["Victorian Era (Light)"] = {
+					form       = "light",
+					fontFamily = "Georgia",
+					corner     = 0,
+					strokeSize = 2,
+					fill = {
+						["black"]     = "#E8DCC0",    -- aged paper
+						["DimGray"]   = "#8A6A3B",    -- brass avatar frame
+						["#00000000"] = "#00000000",  -- health mark box: the cut-out IS the effect (SPEC V48)
+					},
+					stroke = {
+						["white"]   = "#6B4F2A",
+						["#FFFFFF"] = "#6B4F2A",
+						["black"]   = "#6B4F2A",
+					},
+					font = {
+						["white"] = "#2E2015",        -- iron gall ink
+					},
+					-- Plugin-absolute, NOT the relative form the XML uses. The rdk resolves
+					-- src=/checkedImage= at COMPILE time - the generated Lua reads
+					-- setImageChecked("/HuntersHunted/images/prime_on.png") - so a relative
+					-- path handed to a setter at runtime resolves to nothing and the art
+					-- silently fails to load (SPEC B20 / V60 / R26).
+					dotOn  = "/HuntersHunted/images/prime_on_ink.png",
+					dotOff = "/HuntersHunted/images/prime_off_ink.png",
+					paper  = "/HuntersHunted/images/paper_light.png",
+				},
+
+				["Victorian Era (Dark)"] = {
+					form       = "dark",
+					fontFamily = "Georgia",
+					corner     = 0,
+					strokeSize = 2,
+					fill = {
+						["black"]     = "#1C1310",    -- mahogany
+						["DimGray"]   = "#6B4F2A",
+						["#00000000"] = "#00000000",
+					},
+					stroke = {
+						["white"]   = "#C2A14D",      -- aged gold
+						["#FFFFFF"] = "#C2A14D",
+						["black"]   = "#C2A14D",
+					},
+					font = {
+						["white"] = "#E8DCC0",        -- cream
+					},
+					dotOn  = "/HuntersHunted/images/prime_on_gold.png",
+					dotOff = "/HuntersHunted/images/prime_off_gold.png",
+					paper  = "/HuntersHunted/images/paper_dark.png",
+				},
+			};
+
+			local NAMED_COLORS = {
+				["black"]   = "#FF000000",
+				["white"]   = "#FFFFFFFF",
+				["dimgray"] = "#FF696969",
+			};
+
+			-- The colour getter is native, so it may hand back the literal the XML authored
+			-- ("black") or a normalised value ("#FF000000"), and that cannot be settled without
+			-- running Firecast (SPEC R25). Canonicalise both sides instead - the palette keys
+			-- once at load, every snapshot on the way in - and the question stops mattering.
+			local function normColor(v)
+				if v == nil then return nil; end;
+				if type(v) == "number" then return string.format("#%08X", v); end;
+
+				local s = tostring(v);
+				local named = NAMED_COLORS[string.lower(s)];
+
+				if named ~= nil then return named; end;
+				if string.sub(s, 1, 1) ~= "#" then return string.upper(s); end;
+
+				local hex = string.upper(string.sub(s, 2));
+
+				if string.len(hex) == 6 then hex = "FF" .. hex; end;
+
+				return "#" .. hex;
+			end;
+
+			for _, t in pairs(THEMES) do
+				local fill, stroke, font = {}, {}, {};
+
+				for k, v in pairs(t.fill)   do fill[normColor(k)]   = v; end;
+				for k, v in pairs(t.stroke) do stroke[normColor(k)] = v; end;
+				for k, v in pairs(t.font)   do font[normColor(k)]   = v; end;
+
+				t.fill, t.stroke, t.font = fill, stroke, font;
+			end;
+
+			local THEME_SHAPES = { rectangle = true };
+			local THEME_TEXTS  = { label = true, checkBox = true, button = true, comboBox = true,
+			                       edit = true, textEditor = true, radioButton = true };
+
+			-- The ledger: handle -> { prop = the value the XML authored }. A property appears
+			-- here only once it has actually been REPAINTED, and it holds the original, not
+			-- the current value.
+			--
+			-- SPEC B21: the first version snapshotted every control at load and wrote the
+			-- snapshot straight back under Modern, on the assumption that writing a value
+			-- equal to the one just read costs nothing. It does not. Every font setter runs
+			-- _gui_prepareForFontColorChange / ...FontFamilyChange BEFORE it writes, and that
+			-- step detaches the control from the font it inherits through the form theme. The
+			-- whole sheet came back wrong on all three options, Modern included - the one that
+			-- had not changed in the XML at all.
+			--
+			-- Hence the two rules below: never write a property without a mapped target
+			-- (SPEC V61), and put back only what was actually painted (SPEC V62). A sheet
+			-- opened on Modern that was never repainted writes nothing whatsoever.
+			local themePainted = {};
+
+			-- What the control had before any theme touched it. Switching straight from one
+			-- Victorian variant to the other must map from the ORIGINAL colour, not from the
+			-- one the previous variant left behind.
+			local function authored(c, prop)
+				local rec = themePainted[c.handle];
+
+				if rec ~= nil and rec[prop] ~= nil then return rec[prop]; end;
+
+				return c[prop];
+			end;
+
+			local function paint(c, prop, value, original)
+				-- No mapped target: leave it alone. A colour the palettes do not know keeps
+				-- its Modern value, and the gate turns red for it statically (SPEC V53).
+				if value == nil then return; end;
+
+				-- No original to record: the XML never authored this property, so painting it
+				-- would be a change nothing could undo. This is the guard B21 was missing.
+				if original == nil then return; end;
+
+				local h = c.handle;
+				local rec = themePainted[h];
+
+				if rec == nil then rec = {}; themePainted[h] = rec; end;
+				if rec[prop] == nil then rec[prop] = original; end;
+
+				c[prop] = value;
+			end;
+
+			local function restore(c)
+				local rec = themePainted[c.handle];
+
+				if rec == nil then return; end;
+
+				for prop, original in pairs(rec) do
+					c[prop] = original;
+				end;
+
+				themePainted[c.handle] = nil;
+			end;
+
+			-- SPEC V55 / R21 / B9: `findClass`, which the rdk generates into every .lfm, starts
+			-- from `self` - it reaches the tab it runs on and nothing else, which is why the
+			-- theme and colour pickers on the five base sheets only ever painted their own
+			-- Credits tab. Walk up to the sheet root first, exactly like applyLanguage.
+			--
+			-- Nothing here writes left/top/width/height (SPEC V57): the gate keeps measuring
+			-- the static XML for overlap, and no theme can invent a collision at runtime.
+			local function applyTheme(v, from)
+				-- nil for `Modern` and for anything a sheet saved before this round carries
+				-- (the 11th round wrote a plain "Victorian Era" that painted nothing) - both
+				-- land on the authored look (SPEC V52).
+				local t = THEMES[v];
+				local root = rootOf(from);
+				local all = {root};
+
+				collect(root, all);
+
+				for i = 1, #all, 1 do
+					local c = all[i];
+					local cls = c:getClassName();
+					local nm = c:getName();
+
+					-- The backdrop exists only for the theme, so it is deliberately OUTSIDE the
+					-- ledger: its authored state is "no image, hidden" and Modern simply hides it
+					-- again. Matched by PREFIX, like the `dyn` and `cbo` conventions above,
+					-- because a control `name` is global across the sheet's .lfm files - eight
+					-- tabs sharing one "themePaper" made the rdk exit 1 with no message at all
+					-- and delete the .rpk (SPEC B19 / V59).
+					if cls == "image" and nm ~= nil and string.sub(nm, 1, 10) == "themePaper" then
+						-- An ornament that is not there degrades to no ornament, never to a
+						-- half-painted sheet (SPEC V56).
+						if t == nil or t.paper == nil then
+							-- Guarded so Modern on an untouched sheet still writes nothing (V61).
+							if c.visible then c.visible = false; end;
+						else
+							c.src = t.paper;
+							c.visible = true;
+						end;
+					elseif t == nil then
+						restore(c);
+					elseif cls == "form" then
+						paint(c, "theme", t.form, authored(c, "theme"));
+					elseif THEME_SHAPES[cls] then
+						local fill = authored(c, "color");
+						local line = authored(c, "strokeColor");
+
+						paint(c, "color", t.fill[normColor(fill)], fill);
+						paint(c, "strokeColor", t.stroke[normColor(line)], line);
+						paint(c, "strokeSize", t.strokeSize, authored(c, "strokeSize"));
+						paint(c, "xradius", t.corner, authored(c, "xradius"));
+						paint(c, "yradius", t.corner, authored(c, "yradius"));
+					elseif THEME_TEXTS[cls] then
+						local fc = authored(c, "fontColor");
+
+						paint(c, "fontColor", t.font[normColor(fc)], fc);
+
+						-- Only where the control reports a real family. What the getter returns
+						-- for a control that never authored a font is unknown (SPEC R27), and a
+						-- font property cannot be un-written - the setter detaches it from the
+						-- theme for good. If it reports nothing usable, that control keeps its
+						-- font and the serif simply does not reach it.
+						local ff = authored(c, "fontFamily");
+
+						if type(ff) == "string" and ff ~= "" then
+							paint(c, "fontFamily", t.fontFamily, ff);
+						end;
+					elseif cls == "imageCheckBox" then
+						paint(c, "checkedImage", t.dotOn, authored(c, "checkedImage"));
+						paint(c, "uncheckedImage", t.dotOff, authored(c, "uncheckedImage"));
+					end;
+				end;
+			end;
 		]]>
 	</script>
 	<scrollBox align="client">
@@ -522,12 +763,24 @@
 				plugin still carry theme="Dark", and reusing the name would put that value in a
 				combo that never offered it.
 
-				Not named cbo*, so it stays out of the picker checks the same way `healthLevels`
-				does: a value combo with a real default, not prose with an empty first row.
+				Named cbo* ON PURPOSE: only those combos get their `items` rebuilt when the
+				language changes, and without the prefix a [pt] sheet would still read
+				"Victorian Era (Light)". `values` stay canonical English (SPEC V24). It is the
+				one declared exception to V15 - a state combo with a real default has no empty
+				first row to clear.
+
+				As of the 14th round this combo PAINTS (SPEC I5/I6): the three values are the
+				keys the palette table is looked up by, so changing this list means changing
+				THEMES and defaultValue in the same commit (SPEC V12).
 			-->
 			<label left="0" top="90" width="90" height="20" text="Theme" horzTextAlign="center"/>
-			<comboBox name="cboSheetTheme" left="95" top="90" width="220" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern', 'Victorian Era'}" values="{'Modern', 'Victorian Era'}"/>
-			<dataLink field="sheetTheme" defaultValue="Modern"/>
+			<comboBox name="cboSheetTheme" left="95" top="90" width="220" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern', 'Victorian Era (Light)', 'Victorian Era (Dark)'}" values="{'Modern', 'Victorian Era (Light)', 'Victorian Era (Dark)'}"/>
+			<dataLink field="sheetTheme" defaultValue="Modern">
+				<event name="onChange">
+					if sheet == nil then return end;
+					applyTheme(sheet.sheetTheme or "Modern", self);
+				</event>
+			</dataLink>
 		</layout>
 
 		<!--

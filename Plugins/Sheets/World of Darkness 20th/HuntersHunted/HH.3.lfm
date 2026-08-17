@@ -50,6 +50,8 @@
 		]]>
 	</script>
 	<scrollBox align="client">
+		<!-- Theme backdrop, same arrangement as HH.1 (SPEC T158, V56, V57). -->
+		<image name="themePaper3" align="client" style="stretch" hitTest="false" visible="false"/>
 		<!-- Same geometry as the Attribute template on the Main tab, so the virtues keep the
 		     label width and the x=125 dot column (SPEC V26).
 

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form name="frmHH_4" align="client" theme="dark">
 	<scrollBox align="client">
+		<!-- Theme backdrop, same arrangement as HH.1 (SPEC T158, V56, V57). -->
+		<image name="themePaper4" align="client" style="stretch" hitTest="false" visible="false"/>
 	   <template name="Descricao">
         	<label left="0" top="5" width="100" height="20" text="$(nome)" horzTextAlign="trailing"/>
         	<edit left="110" top="0" width="200" height="25" field="desc_$(field)"/>

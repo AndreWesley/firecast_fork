@@ -49,6 +49,27 @@ $tplDupes = @($tplOwners.GetEnumerator() | Where-Object { $_.Value.Count -gt 1 }
 if ($tplDupes) { foreach ($d in $tplDupes) { Fail "template '$($d.Key)' is defined in $($d.Value -join ' and ') - rdk exits 1 with no message" } }
 else { Pass "template names unique across files ($($tplOwners.Count) templates)" }
 
+# ---- V59: a control name is global across the sheet's files ---------------------
+# B19: the theme backdrop shipped with one shared name="themePaper" on eight tabs. rdk
+# printed "Compilando..." exited 1 with no message and DELETED the .rpk - the same silent
+# death as a duplicated <template name>, which is checked just above, in another family.
+# Template and event names are excluded (templates have their own check; <event name="onClick">
+# is an event id, not a control), and so is any name holding $( ): those expand per call.
+$ctrlNames = @{}
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//*[@name]")) {
+        if ($n.LocalName -in @('template','event','form')) { continue }
+        $nm = $n.GetAttribute("name")
+        if ($nm -like '*$(*') { continue }
+        if (-not $ctrlNames.ContainsKey($nm)) { $ctrlNames[$nm] = New-Object System.Collections.Generic.HashSet[string] }
+        [void]$ctrlNames[$nm].Add($f.Name)
+    }
+}
+$nameDupes = @($ctrlNames.GetEnumerator() | Where-Object { $_.Value.Count -gt 1 })
+if ($nameDupes.Count -gt 0) {
+    foreach ($d in $nameDupes) { Fail "V59 control name '$($d.Key)' is declared in $(($d.Value | Sort-Object) -join ', ') - rdk dies with no message (SPEC B19)" }
+} else { Pass "V59 all $($ctrlNames.Count) control names are unique across the sheet's files" }
+
 # ---- localization.lang, parsed once -------------------------------------------
 # Ordinal dictionaries on purpose: PowerShell's default hashtable is case-insensitive,
 # which silently collapsed Armor/ARMOR and Experience/EXPERIENCE (20 keys masked).
@@ -344,7 +365,10 @@ if ($pickerBad) { foreach ($b in $pickerBad) { Fail "V13 $b" } } else { Pass "V1
 foreach ($l in $listReport) {
     $dupe = $l.Items | Group-Object | Where-Object Count -gt 1
     if ($dupe) { Fail "V14 $($l.Name) has duplicates: $(($dupe | ForEach-Object { $_.Name }) -join ', ')" }
-    else { Pass "V14 $($l.Name) has $($l.Items.Count - 1) unique entries" }
+    # Most pickers carry a leading empty entry that is not an option; cboSheetTheme is the
+    # declared exception and has none, so counting it the same way under-reported it by one.
+    elseif ($l.Items[0] -eq '') { Pass "V14 $($l.Name) has $($l.Items.Count - 1) unique entries" }
+    else { Pass "V14 $($l.Name) has $($l.Items.Count) unique entries" }
     # cboSheetTheme is the declared exception (SPEC V15, 11th round): a state combo with a real
     # default, not prose to be cleared - there is no such thing as a sheet with no theme.
     if ($l.Name -like '*cboSheetTheme*') { Pass "V15 $($l.Name) n/a - state combo with a default (declared exception)" }
@@ -354,7 +378,7 @@ foreach ($l in $listReport) {
 # The three checks above are only worth as much as what the collector saw: a picker named
 # without the `cbo` prefix, or one that lost its inline `items=`, drops out of $listReport
 # and every check on it becomes a silent no-op (SPEC V20 / B.7). Name the new ones.
-foreach ($must in @('HH.6.lfm/cboGame','HH.7.lfm/cboFaith')) {
+foreach ($must in @('HH.6.lfm/cboGame','HH.7.lfm/cboFaith','HH.6.lfm/cboSheetTheme')) {
     if ($listReport | Where-Object { $_.Name -eq $must }) { Pass "V14/V15/V17 $must reaches the list checks" }
     else { Fail "V14/V15/V17 $must was never collected - its list is unchecked" }
 }
@@ -1079,6 +1103,176 @@ foreach ($p in (@($files | ForEach-Object { $_.FullName }) + @($langFile))) {
     }
 }
 if ($bannedHits -eq 0) { Pass "V34 no banned hedge-magic wording in the .lfm files or the .lang" }
+
+# ---- V52..V58: the sheet theme (SPEC 14th round) --------------------------------
+# The Theme combo stopped being dead state in the 14th round: its three values are the keys
+# a palette table is looked up by, and picking one repaints the whole sheet at runtime.
+# Everything below reads the real artifacts - the XML attributes and the Lua source - rather
+# than any intermediate the code could be refactored away from (SPEC V20 / B.7).
+
+$themeFn = [regex]::Match($hh6, 'local function applyTheme\(v, from\)(.*?)\n\t\t\tend;', 'Singleline')
+if (-not $themeFn.Success) { Fail "V52..V58 applyTheme not found in HH.6.lfm - every theme check below is a no-op" }
+else {
+    $body = $themeFn.Groups[1].Value
+
+    # V52: the three values, the table that answers them, and the fallback.
+    $themeCb = @($listReport | Where-Object { $_.Name -eq 'HH.6.lfm/cboSheetTheme' })
+    $wantThemes = @('Modern', 'Victorian Era (Light)', 'Victorian Era (Dark)')
+    if ($themeCb.Count -ne 1) { Fail "V52 cboSheetTheme was never collected - its value list is unchecked" }
+    elseif (Compare-Object $themeCb[0].Items $wantThemes) {
+        Fail "V52 cboSheetTheme offers {$($themeCb[0].Items -join ', ')}, expected {$($wantThemes -join ', ')}"
+    } else { Pass "V52 cboSheetTheme offers the three declared themes" }
+
+    # The combo saves what it shows, so items and values must not drift apart (SPEC V24).
+    $themeNode = (Doc (Join-Path $dir "HH.6.lfm")).SelectSingleNode("//comboBox[@name='cboSheetTheme']")
+    if ($null -eq $themeNode) { Fail "V52 cboSheetTheme node missing" }
+    elseif ($themeNode.GetAttribute("items") -ne $themeNode.GetAttribute("values")) {
+        Fail "V52 cboSheetTheme items and values differ - a [pt] sheet would save a translated theme name"
+    } else { Pass "V52 cboSheetTheme items and values agree" }
+
+    $themeKeys = @([regex]::Matches($hh6, '\["(Modern|Victorian Era \([^"]+\))"\]\s*=\s*\{') | ForEach-Object { $_.Groups[1].Value })
+    foreach ($w in @('Victorian Era (Light)', 'Victorian Era (Dark)')) {
+        if ($themeKeys -contains $w) { Pass "V52 THEMES answers '$w'" }
+        else { Fail "V52 '$w' is offered by the combo but has no THEMES entry - picking it would do nothing" }
+    }
+
+    # V54: Modern is the absence of a palette, not a second description of one. If someone
+    # ever writes a Modern entry here, the authored look and the table can silently disagree.
+    if ($themeKeys -contains 'Modern') { Fail "V54 THEMES has a 'Modern' palette - Modern must be the restored snapshot, not a copy of the XML" }
+    else { Pass "V54 Modern has no palette (it restores the snapshot)" }
+
+    if ($hh6 -notmatch 'local themePainted = \{\}') { Fail "V54 no ledger - the theme could not be undone" }
+    elseif ($hh6 -notmatch 'if rec\[prop\] == nil then rec\[prop\] = original; end;') { Fail "V54 the ledger is overwritten on repaint - it would record Victorian and call it Modern" }
+    elseif ($body -notmatch 'restore\(c\)') { Fail "V54 applyTheme has no restore branch" }
+    else { Pass "V54 the authored value is recorded once and restoring it is the Modern path" }
+
+    # V61: writing a property is NOT free - every font setter detaches the control from the
+    # theme before it writes, so writing back a value just read still changes the sheet. That
+    # assumption cost B21: Modern rewrote every text control at load and came back wrong.
+    if ($hh6 -match 'local function put\(') { Fail "V61 the old unconditional put() is back - it writes properties the XML never authored (SPEC B21)" }
+    elseif ($hh6 -notmatch 'if value == nil then return; end;') { Fail "V61 paint() does not refuse an unmapped target - it would write over an unknown colour" }
+    elseif ($hh6 -notmatch 'if original == nil then return; end;') { Fail "V61 paint() does not refuse a property the XML never authored - that write could not be undone (SPEC B21)" }
+    else { Pass "V61 paint() writes only a mapped value over an authored one" }
+
+    # Everything the repaint does must go through paint(), or the ledger has holes. The backdrop
+    # is the one exception: it exists only for the theme, so its authored state is known.
+    $direct = @([regex]::Matches($body, 'c\.(\w+)\s*=[^=]') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+    $allowedDirect = @('src','visible')
+    $strayDirect = @($direct | Where-Object { $allowedDirect -notcontains $_ })
+    if ($strayDirect.Count -gt 0) { Fail "V61 applyTheme writes $($strayDirect -join ', ') outside paint() - those changes are not in the ledger" }
+    else { Pass "V61 every repaint goes through paint(), only the backdrop is written directly" }
+
+    # V62: restoring reads the ledger, and the ORIGINAL value is what a repaint maps from -
+    # otherwise Light -> Dark would look its palette up in a colour Light had already written.
+    if ($hh6 -notmatch 'local rec = themePainted\[c\.handle\];[\s\S]{0,200}for prop, original in pairs\(rec\)') { Fail "V62 restore() does not walk the ledger" }
+    elseif ($hh6 -notmatch 'if rec ~= nil and rec\[prop\] ~= nil then return rec\[prop\]; end;') { Fail "V62 authored() does not prefer the ledger - a second theme would map from the first theme's colours" }
+    elseif ($body -notmatch 'authored\(c, "color"\)') { Fail "V62 the repaint maps from the live value, not the authored one" }
+    else { Pass "V62 restore walks the ledger and repaints map from the authored value" }
+
+    if ($body -match 'local t = THEMES\[v\]') { Pass "V52 an unknown value (a sheet saved with the old 'Victorian Era') falls back to the authored look" }
+    else { Fail "V52 applyTheme does not look the value up in THEMES - there is no fallback" }
+
+    # V55: the rdk generates findClass starting from `self`, so it only ever reaches the tab
+    # it runs on - which is why the five base sheets only ever painted their Credits tab
+    # (SPEC R21 / B.9). The theme must use the same root walk the translation does.
+    # Match the CALL, not the word: the code comments name findClass to explain why it is not
+    # used, and a check that cannot tell those apart is a check nobody can keep green.
+    if ($hh6 -match 'findClass\s*\(') { Fail "V55 HH.6 calls findClass - it stops at this tab (SPEC R21/B.9)" }
+    elseif ($body -notmatch 'rootOf\(from\)') { Fail "V55 applyTheme does not walk to the sheet root - eight tabs would stay unpainted" }
+    else { Pass "V55 the repaint walks from the sheet root" }
+
+    # V57: no geometry. The overlap checks above measure the static XML; if the theme moved or
+    # resized anything, a sheet could collide at runtime with the gate still green.
+    $geo = [regex]::Matches($body, '"(left|top|width|height)"|\.(left|top|width|height)\s*=')
+    if ($geo.Count -gt 0) { Fail "V57 applyTheme writes geometry ($($geo.Count) hit(s)) - V37/V40/V49 only measure the static XML" }
+    else { Pass "V57 applyTheme writes no geometry" }
+
+    # V56: an ornament that is not there must degrade to no ornament, never to a sheet that is
+    # half painted or covered by a backdrop it cannot switch off.
+    if ($body -notmatch 't\.paper == nil') { Fail "V56 applyTheme does not handle a palette with no backdrop" }
+    elseif ($body -notmatch 'c\.visible = false') { Fail "V56 the backdrop is never hidden - Modern would keep the paper" }
+    else { Pass "V56 a missing backdrop degrades to no backdrop" }
+}
+
+# V53: every colour the XML authors must be a key in BOTH Victorian palettes. Without this a
+# box added later keeps its black fill in the middle of the parchment and nothing complains -
+# the same blind spot that let ABILITIES ship translucent (SPEC B18).
+$paletteOk = $true
+foreach ($section in @(
+    @{ Attr = 'color';       Lua = 'fill';   Nodes = "//rectangle[@color]" },
+    @{ Attr = 'strokeColor'; Lua = 'stroke'; Nodes = "//*[@strokeColor]" },
+    @{ Attr = 'fontColor';   Lua = 'font';   Nodes = "//*[@fontColor]" })) {
+
+    $authored = New-Object System.Collections.Generic.HashSet[string]
+    foreach ($f in $files) {
+        foreach ($n in (Doc $f.FullName).SelectNodes($section.Nodes)) {
+            [void]$authored.Add($n.GetAttribute($section.Attr))
+        }
+    }
+
+    # Anchored to the start of a line: the normaliser below the table declares
+    # `local fill, stroke, font = {}, {}, {}` and an unanchored pattern counted that as a map.
+    $blocks = @([regex]::Matches($hh6, "(?m)^\s*$($section.Lua)\s*=\s*\{(.*?)\}", 'Singleline'))
+    if ($blocks.Count -ne 2) {
+        Fail "V53 expected one '$($section.Lua)' map per Victorian theme, found $($blocks.Count) - the check cannot see the palette"
+        $paletteOk = $false
+        continue
+    }
+
+    foreach ($b in $blocks) {
+        $keys = @([regex]::Matches($b.Groups[1].Value, '\["([^"]+)"\]') | ForEach-Object { $_.Groups[1].Value })
+        foreach ($a in $authored) {
+            if ($keys -notcontains $a) {
+                Fail "V53 '$a' is authored as $($section.Attr)= but is not a key in one of the '$($section.Lua)' maps - it would keep its Modern colour"
+                $paletteOk = $false
+            }
+        }
+    }
+}
+if ($paletteOk) { Pass "V53 every authored colour is mapped by both Victorian palettes" }
+
+# V58: V3 walks the XML for src=/checkedImage=, so art a palette points at from Lua never got
+# checked. A typo there is a dot that silently stops rendering the moment a theme is picked.
+#
+# V60: and it must be the PLUGIN-ABSOLUTE path. The rdk rewrites src=/checkedImage= at compile
+# time - the generated Lua carries "/HuntersHunted/images/prime_on.png" - so a relative path
+# handed to a setter at runtime resolves to nothing and the art quietly fails to load. This
+# check measures the FORM of the path; V58 below measures the file. B20 passed V58 green while
+# every dot in both Victorian themes was broken, because only the file was ever checked.
+$artPrefix = '/HuntersHunted/images/'
+$themeArt = @([regex]::Matches($hh6, '(?:dotOn|dotOff|paper)\s*=\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+if ($themeArt.Count -eq 0) { Fail "V58/V60 no theme art referenced - the palettes point at nothing" }
+else {
+    foreach ($img in $themeArt) {
+        if (-not $img.StartsWith($artPrefix)) {
+            Fail "V60 palette path '$img' is not plugin-absolute - the rdk only resolves the relative form at compile time (SPEC B20)"
+            continue
+        }
+        # Strip only the sheet folder: what is left ("images/x.png") is the path on disk.
+        $onDisk = Join-Path $dir ($img.Substring('/HuntersHunted/'.Length))
+        if (Test-Path -LiteralPath $onDisk) { Pass "V58/V60 theme art $img" }
+        else { Fail "V58 theme art $img is referenced by a palette but missing from images/" }
+    }
+}
+
+# The backdrop is declared per tab, and Settings is left out ON PURPOSE: if the draw order or
+# hitTest ever behaved differently than assumed, a full-tab image over the Settings tab would
+# cover the very combo used to switch back to Modern.
+$paperTabs = @()
+foreach ($f in $files) {
+    $n = (Doc $f.FullName).SelectSingleNode("//image[starts-with(@name,'themePaper')]")
+    if ($null -ne $n) {
+        $paperTabs += $f.Name
+        if ($n.GetAttribute("hitTest") -ne 'false') { Fail "V56 $($f.Name) backdrop does not set hitTest=false - it would eat clicks" }
+        if ($n.GetAttribute("visible") -ne 'false') { Fail "V56 $($f.Name) backdrop is not hidden - Modern would ship with paper" }
+        foreach ($g in @('left','top','width','height')) {
+            if ($n.HasAttribute($g)) { Fail "V57 $($f.Name) backdrop declares $g - it must be align=client so the box checks stay meaningful" }
+        }
+    }
+}
+if ($paperTabs -contains 'HH.6.lfm') { Fail "V56 the Settings tab has a backdrop - a covered theme combo cannot be switched back" }
+elseif ($paperTabs.Count -ne 8) { Fail "V56 found $($paperTabs.Count) backdrops, expected 8 (every tab but Settings)" }
+else { Pass "V56 all 8 content tabs carry a hidden, click-through backdrop; Settings has none" }
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.

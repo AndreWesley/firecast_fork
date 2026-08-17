@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form name="frmHH_2" align="client" theme="dark">
 	<scrollBox align="client">
+		<!-- Theme backdrop, same arrangement as HH.1 (SPEC T158, V56, V57). -->
+		<image name="themePaper2" align="client" style="stretch" hitTest="false" visible="false"/>
 		<!--
 			Traits grid (SPEC T45). Numina moved to the Powers tab, so merits/flaws and
 			derangements moved up into the space they left. Everything closes on x=1040.

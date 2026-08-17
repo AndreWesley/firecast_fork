@@ -2,6 +2,21 @@
 <form name="frmHH_1" align="client" theme="dark">
 	<scrollBox align="client">
 		<!--
+			Theme backdrop (SPEC T158). Declared FIRST so it paints behind the boxes, and
+			hitTest="false" so it can never eat a click. It carries no field and no
+			left/top/width/height: it is not part of the data contract and the gate keeps
+			measuring the real boxes for overlap (SPEC V57).
+
+			Hidden here and switched on only by a Victorian theme - and if the art is ever
+			missing it simply stays hidden, which is a sheet without an ornament rather than
+			a half-painted one (SPEC V56).
+
+			The name carries the tab number because a control name is global across the
+			sheet's files: eight tabs sharing one name killed the compile with no message at
+			all (SPEC B19 / V59). The Lua matches on the prefix.
+		-->
+		<image name="themePaper1" align="client" style="stretch" hitTest="false" visible="false"/>
+		<!--
 			Layout grid (SPEC T41, V26, V27). Everything closes on x=1210 / y=810.
 
 			  header  0..1100      EXPERIENCE 1110..1210          y   0..100

@@ -146,11 +146,37 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - (2) `EXPERIENCE` (Progress): título colado no topo (top=0) → top=10 ∴ margem interna em cima; dados sobem de 45 p/ 38 ∴ distância título↔dados cai de 25 p/ 8
 - (3) os 3 pares viram COLUNA: rótulo em cima (`horzTextAlign="center"`), valor ABAIXO & centrado sob ele — era rótulo à esquerda + valor ao lado. 3 colunas de 336 @ left 15 · 352 · 689; `edit` 90 largo centrado em cada (+123)
 - (3) empilhar CRESCE a caixa: 75→95 alto (título 10..30 · rótulos 38..58 · valores 60..85 · 10 de folga). REVOGA em parte a 12ª rodada (que encolheu p/ 75) — pedido novo do user manda. `EXPERIENCE LOG` (0,85,1040,555)→(0,105,1040,535) ∴ fim da aba segue 640
+- 14ª rodada 2026-08-17 ↓ (tema visual — o combo `sheetTheme` deixa de ser só estado & passa a PINTAR)
+- combo `cboSheetTheme` 2→3 itens: `Modern` · `Victorian Era (Light)` · `Victorian Era (Dark)`. Pedido user 2026-08-17 — as 2 direções que ofereci como alternativa viraram as 2 opções
+- `Modern` = a ficha de HOJE & ⊥ tem paleta escrita à mão: snapshot dos props ANTES da 1ª pintura & voltar = RESTAURAR o snapshot ∴ ⊥ 2ª descrição do visual atual p/ divergir do XML (≡ §V22 p/ tradução)
+- valor velho `Victorian Era` (gravado na 11ª rodada, quando o combo era só estado) ∉ lista nova → cai no fallback `Modern`. ⊥ perda: aquele valor nunca pintou nada
+- §V12 aplica: a tabela `THEMES` (chaveada pelos `values`) É a comparação Lua ∴ mudar `items` & mudar `THEMES` & mudar `defaultValue` = 1 commit
+- tema ⊥ escreve geometria (`left` `top` `width` `height`) de NADA ∴ §V37 §V40 §V49 seguem medindo o XML estático & runtime ⊥ inventa sobreposição
+- pintura ⊥ usa `findClass`: o rdk gera essa função partindo de `self` ∴ ela alcança só a aba onde roda — é o §B9 por outro caminho (§R21). Reusa `rootOf`+`collect` do `applyLanguage` (`HH.6`)
+- mapa de cor chaveado no valor AUTORADO (`black` `white` `#FFFFFF` `#00000000` `DimGray`) ∴ ⊥ preciso nomear ~50 `<rectangle>`; cor nova sem entrada no mapa = gate vermelho (§V53), ⊥ caixa preta calada no meio do pergaminho
+- `#00000000` (caixa de marca de vitalidade) segue transparente nas 3 opções — o vazado é o efeito (≡ exceção declarada em §V48)
+- PALETA Claro: form `light` · fundo `#E8DCC0` · filete `#6B4F2A` · texto `#2E2015` · moldura do avatar `#8A6A3B`. PALETA Escuro: form `dark` · fundo `#1C1310` · filete `#C2A14D` · texto `#E8DCC0` · moldura do avatar `#6B4F2A`
+- ⊥ cor própria p/ título de seção (ouro): separar título de label comum pediria nome por widget | detecção por `left=0`+`horzTextAlign` ∴ hierarquia segue vindo do `fontSize` que já ∃. CORTE declarado, ⊥ esquecimento
+- moldura: `xradius`/`yradius` 10→0 & `strokeSize`→2 nas 2 vitorianas ∴ canto reto + filete grosso ≡ documento impresso. Tamanho de caixa ⊥ muda
+- fonte serifada por `fontFamily`. Família vem do host — ⊥ dá p/ embarcar arquivo de fonte no `.rpk` ∴ candidatas + fallback = §R24
+- bolinha: `prime_on.png` de hoje é BRANCA ∴ sumiria no pergaminho. Claro ganha par tinta, Escuro ganha par dourado ∴ as 3 opções ⊥ ficam iguais
+- ornamento = geometria PROCEDURAL (círculo, filete, canto, grão de papel) que eu gero por comando. Filigrana/arabesco vitoriano de verdade = ARTE, ⊥ sei desenhar ∴ `?` — user fornece PNG se quiser trocar
+- `gui.Image` ⊥ tem `tile` (§R23) ∴ textura = 1 PNG grande em `style="stretch"` por aba, `hitTest="false"` & sem `field` (≡ §V29: ∉ contrato de dados)
+- textura ATRÁS do conteúdo depende de ordem de declaração — ⊥ ∃ `bringToFront`/`sendToBack` no SDK (§R23) ∴ T153 testa ANTES; ⊥ resolvido → tema segue SEM textura (§V56), ⊥ para
+- 6 PNGs novos gerados 1× por comando inline ∴ ⊥ script de geração no repo (regerar = raro; arquivo a mais só p/ isso ⊥ se paga)
+- backdrop tem nome POR ABA (`themePaper1`…`themePaper9`, ⊥ em `HH.6`) & o Lua casa por PREFIXO ≡ `dyn`/`cbo` — `name=` de controle é global entre os `.lfm` da ficha (§V59, §B19). Achado @ build
+- correção 2026-08-17 ↓ (teste do user: as 3 opções renderizaram erradas, `Modern` incluído — que ⊥ mudou no XML)
+- caminho de imagem gravado em RUNTIME ! absoluto do plugin (`/HuntersHunted/images/x.png`). Relativo vale só no XML, que o rdk resolve @ COMPILE ∴ paleta c/ relativo = arte que ⊥ carrega (§B20, §R26)
+- gravar prop ⊥ é no-op: ∀ setter de fonte chama `_gui_prepareForFont*Change` ANTES de gravar ∴ desacopla o controle da fonte herdada do tema mesmo gravando o valor que acabou de ler (§B21, §R27)
+- ∴ snapshot-e-restaura em ∀ controle morreu. Fix = LEDGER: `applyTheme` só grava prop c/ destino MAPEADO & registra o valor autorado; `Modern` restaura só o registrado ∴ ficha recém-aberta em Modern grava ZERO prop (§V61, §V62)
+- ledger guarda o valor AUTORADO ∴ Claro→Escuro direto mapeia da cor ORIGINAL, ⊥ da que o tema anterior deixou. Valor autorado = nil (prop que o XML nunca setou) → ⊥ pinta, pois ⊥ teria como desfazer
+- backdrop fica FORA do ledger: é controle que só existe p/ o tema, estado autorado = sem `src` & escondido ∴ `Modern` só re-esconde (e só se já ⊥ estiver escondido, p/ ⊥ furar §V61)
+- `fontFamily` só onde o snapshot devolve família REAL (string ⊥ vazia) ∴ restauro sempre grava família válida. Controle que HERDA fonte fica sem serifa & isso ! ser observado no teste (§R27)
 
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
-- I2 arquivos: `Plugins/Sheets/World of Darkness 20th/HuntersHunted/` → `HuntersHunted.lfm` (raiz) + `HH.1.lfm`…`HH.9.lfm` (`HH.8` = aba Inventory, `HH.9` = aba Progress) + `images/`
+- I2 arquivos: `Plugins/Sheets/World of Darkness 20th/HuntersHunted/` → `HuntersHunted.lfm` (raiz) + `HH.1.lfm`…`HH.9.lfm` (`HH.8` = aba Inventory, `HH.9` = aba Progress) + `images/` = `prime_on.png` `prime_off.png` + (14ª rodada) `prime_on_ink.png` `prime_off_ink.png` `prime_on_gold.png` `prime_off_gold.png` `paper_light.png` `paper_dark.png`
 - I1b ordem das abas (9): Main · Traits · Powers · Combat · Inventory · Background · Progress · Notes · Settings
 - I3 campos NDB (contrato de dados — ⊥ renomear pós-release):
   - header: `name` `player` `chronicle` `nature` `demeanor` `concept` `motivation` `occupation` `residence`
@@ -177,9 +203,11 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - ESPELHOS declarados (>1 widget de entrada no MESMO `field`, §V36 — ⊥ é violação de §V1): `health_1`…`_10` em `HH.1`+`HH.3` · `willpower_c1`…`_c10` em `HH.1`+`HH.3` (11ª rodada) · `experience` em `HH.1`+`HH.9`. Virtudes SAÍRAM daqui na 12ª rodada — viraram só-leitura ↓
   - SÓ-LEITURA em `HH.3` (espelho ⊥ editável, ⊥ conta como dono): `alertness` `athletics` `awareness` `brawl` `firearms` `melee` `stealth` (+`_1`…`_5`) · `strength` `dexterity` `stamina` `perception` (+`_2`…`_5`) · `willpower_1`…`_10` (bolinhas da caixa WILLPOWER nova — 11ª rodada; os `_c1`…`_c10` do MESMO bloco são espelho editável ↑) · `conscience` `selfControl` `courage` (+`_2`…`_5`) — 12ª rodada, virtudes deixaram de ser editáveis aqui
   - ÓRFÃOS declarados (∈ NDB de ficha salva, ⊥ widget em nenhum `.lfm`): `transportation` `other` (3ª rodada) · `bruised` `hurt` `injured` `wounded` `mauled` `crippled` `incapacitated` (4ª rodada — vitalidade virou posicional, §C) · `personalidade` `natureza` (9ª rodada — caixas Concept & Nature removidas a pedido). ⊥ reusar estes nomes p/ campo novo ∴ ficha velha ⊥ ressuscita dado em caixa errada
-  - settings (aba Settings, `HH.6`): `language` · `game` (novo 2026-08-17, 5 jogos + vazio) · `sheetTheme` (novo 11ª rodada — `Modern`\|`Victorian Era`, default `Modern`, só estado)
+  - settings (aba Settings, `HH.6`): `language` · `game` (novo 2026-08-17, 5 jogos + vazio) · `sheetTheme` (11ª rodada; 14ª rodada = 3 valores `Modern`\|`Victorian Era (Light)`\|`Victorian Era (Dark)`, default `Modern`, agora PINTA — §I5 §I6)
   - `experience` · `avatar`
 - I4 build: `rdk -l` @ raiz do plugin → compile + lint fonte → `output/World of Darkness 20th.rpk`. `rdk -c` = só compile. `rdk p` = PREPARE, ⊥ build.
+- I5 `THEMES` — tabela Lua @ `HH.6.lfm`, chave = `values` do `cboSheetTheme`. `Modern` ⊥ tem entrada (= restaurar snapshot, §V54). ∀ variante vitoriana: `{ form = light\|dark, fill = {<cor autorada> → <cor nova>}, stroke = {…}, font = {…}, fontFamily, xradius, strokeSize, dotOn, dotOff, paper }`
+- I6 `applyTheme(v, from)` — @ `HH.6.lfm`, MESMA forma de `applyLanguage`: `rootOf(from)` + `collect` da raiz, snapshot 1× por handle antes da 1ª pintura, depois pinta `THEMES[v]` | restaura snapshot. Chamado pelo `<dataLink field="sheetTheme">` ∴ roda no load & em ∀ troca
 
 ## §R RESEARCH
 
@@ -204,6 +232,13 @@ R17|widget de texto clicável|`gui.Button` & `gui.Label` herdam `gui.TextControl
 R18|botão direito|`gui.Control.eves["onMenu"] = 'x, y, event'` ∴ ∀ controle tem hook de clique-direito, ⊥ só `button`. Precedente real em ficha: `<rectangle hitTest="true" onMenu="self:exibirMenuDoAtor();">` ∴ `rectangle` c/ `hitTest` recebe evento de mouse|`SDK3/API/rrpgGUI.lua:280` · `Plugins/Core/rrpginlua/turnos/AtorCombatTracker.lfm:237` · `Plugins/Sheets/Ficha 4D&T/Ficha4D&T/Examples.lfm:16`
 R19|ciclo por clique|precedente de N estados em ficha: `<button onClick>` faz `sheet.imageCounter = (sheet.imageCounter + 1) % #pics` & escreve o valor no campo ∴ ciclo = contador + módulo, estado mora no NDB, ⊥ em variável de form|`Plugins/Sheets/Ficha Exalted 3rd/Ficha Exalted 3rd/MultImageCheckbox.lfm:27-36`
 R20|altura em runtime|`gui.Control.props["height"]` tem setter (`setHeight` → `_gui_setHeight`) ∴ Lua muda altura de `layout` em runtime. Precedente em ficha: `self.height = h` no item de equipamento de 5+ fichas do repo|`SDK3/API/rrpgGUI.lua:99,236` · `Plugins/Sheets/Ficha D&D Next/equipamentoItem.lfm:33`
+R21|escopo de `findClass`|rdk gera `findClass` como função LOCAL por `.lfm`: `findAllControls()` = `{self}` + `recursiveFindControls(self,…)` ∴ alcança só a aba onde roda. ∴ o tema Escuro/Claro & os color pickers das 5 fichas base pintam SÓ a aba Credits desde 2017 (≡ §B9, outro caminho). Tema novo ! usar `rootOf` (§R10)|`output/rdkObjs/Mage20th/M20.6.lfm.lua:40-98` · `Mage20th/M20.6.lfm:101-135`
+R22|props pintáveis em runtime|têm setter: `Shape.color` `strokeColor` `strokeSize` · `TextControl.fontColor` `fontFamily` `fontSize` `fontStyle` · `ImageCheckBox.checkedImage` `uncheckedImage` · `Image.src` `style` · `Form.theme` (enum `default\|light\|dark\|firecast`) ∴ tema inteiro = setter, ⊥ `.lfm` duplicado por variante|`sdk/rrpgGUI.lua:471,631-634,781-783,835-841,1057-1059`
+R23|imagem de fundo|`gui.Image.style` ∈ `proportional\|autoFit\|originalSize\|stretch` — ⊥ `tile` ∴ textura = 1 PNG grande esticado por aba. `bringToFront`/`sendToBack`/`zorder` ⊥ ∃ no SDK ∴ ficar ATRÁS do conteúdo = ordem de declaração `?`, ! testar (T153)|`sdk/rrpgGUI.lua:837-841` · grep `bringToFront\|sendToBack` = 0 hits
+R24|`?` fontFamily|serifada vem do host (⊥ dá p/ embarcar fonte no `.rpk`). Candidatas Windows: `Georgia` `Book Antiqua` `Palatino Linotype` `Times New Roman`. Comportamento c/ família ausente = `?` ∴ ! testar & fixar a 1ª que ∃|`sdk/rrpgGUI.lua:632`
+R25|`?` getter de cor|`Shape:getColor` = `_obj_getProp(handle,"Color")`, nativo ∴ ⊥ sei se devolve o literal autorado (`black`) ou normalizado (`#FF000000`). Decide se o mapa de §I5 casa direto | precisa de `normColor()` ∴ ! testar antes de T155|`sdk/rrpgGUI.lua:1050-1059`
+R26|caminho de imagem @ runtime|rdk resolve `src=`/`checkedImage=`/`uncheckedImage=` relativo p/ ABSOLUTO do plugin @ compile: `images/prime_on.png` → `setImageChecked("/HuntersHunted/images/prime_on.png")` ∴ gravação em runtime ! usar a forma absoluta, a relativa ⊥ resolve|`output/rdkObjs/HuntersHunted/HH.1.lfm.lua:410,420-421`
+R27|`?` fonte herdada|`getFontFamily` = `_obj_getProp(handle,"Font.Family")` — ⊥ sei o que devolve p/ controle que nunca autorou fonte (`""` \| nil \| família efetiva) nem se gravar de volta RE-acopla ao tema. CERTO: ∀ setter de fonte passa por `_gui_prepareForFont*Change` ∴ 1ª gravação DESACOPLA p/ sempre, mesmo gravando o valor lido (§B21)|`sdk/rrpgGUI.lua:617-621`
 
 ## §V INVARIANTS
 
@@ -258,6 +293,17 @@ V48: ∀ caixa de SEÇÃO (`<layout>` c/ `<rectangle>` + `<label>` de título `h
 V49: altura da caixa HEALTH em runtime = `healthLevels`·`HEALTH_ROW_PITCH` + `HEALTH_BOX_PAD` & ≤ altura declarada no XML ∴ Lua só ENCOLHE & §V40 (estático) segue medindo o pior caso. `HEALTH_ROW_PITCH` ! = pitch REAL das linhas no XML (`top` da linha 2 − da linha 1) nas 2 abas ∴ ⊥ deriva Lua × XML (§B12, §B16)
 V50: linha `faith` da aba Powers → bloco mostra `DESC['True Faith']` ∀ item do `cboFaith` ∴ trocar de religião ⊥ muda o texto & os 4 itens ∉ §V32 (⊥ têm entrada própria em `DESC`)
 V51: ∀ grupo SÓ-LEITURA de `HH.3` — traços de combate · `willpower_1`…`_10` · virtudes `conscience` `selfControl` `courage` (+`_2`…`_5`, 12ª rodada) — ⊥ tem `field` & tem `autoChange="false"`, valor pintado por Lua ∴ ⊥ 2º dono (§V1). Editáveis na aba = SÓ `health_1`…`_10` & `willpower_c1`…`_c10`, os 2 espelhos declarados (§V36)
+V52: `sheetTheme` ∈ os 3 `values` do `cboSheetTheme`. Valor ∉ os 3 (ficha velha c/ `Victorian Era`, nil, lixo) → `Modern` ∴ ⊥ ficha sem tema & ⊥ meio-pintada (§V19, §V33)
+V53: ∀ literal de `color=` `strokeColor=` `fontColor=` nos 9 `.lfm` → ∃ chave correspondente nas 2 paletas de §I5 ∴ caixa nova c/ cor nova ⊥ fica preta no meio do pergaminho — falha VISÍVEL vira gate vermelho antes de virar bug
+V54: `Modern` ⊥ tem paleta — voltar = restaurar o snapshot tirado ANTES da 1ª pintura ∴ troca reversível & idempotente & ⊥ 2ª descrição do visual de hoje p/ divergir do XML (≡ §V22)
+V55: pintura parte da RAIZ (`rootOf`+`collect`), ⊥ de `findClass` ∴ alcança as 9 abas (§R21, §B9)
+V56: ornamento ausente (PNG ⊥ ∃ | textura ⊥ pôde ir atrás do conteúdo) → cor & fonte & filete seguem aplicados & a `<image>` fica `visible=false` ∴ ⊥ ficha meio-vitoriana & ⊥ textura por cima do conteúdo
+V57: `applyTheme` ⊥ escreve `left` `top` `width` `height` de NADA ∴ §V37 §V40 §V49 seguem medindo o XML estático & tema ⊥ cria sobreposição em runtime
+V58: ∀ PNG citado por paleta de §I5 ! ∃ em `HuntersHunted/images/`. §V3 lê `src=` do XML & a paleta aponta em RUNTIME ∴ escapava do check
+V59: `name=` de controle é GLOBAL entre os `.lfm` da ficha ∴ ∀ `name` único nos 10 arquivos (⊥ conta `<template name=>` — já checado à parte — nem `<event name=>` nem nome c/ `$(`, que expande por chamada). 2 arquivos c/ o mesmo `name` → `rdk` sai 1 SEM mensagem & APAGA o `.rpk` (§B19)
+V60: ∀ caminho de imagem gravado em RUNTIME (`dotOn` `dotOff` `paper` de §I5) = absoluto do plugin `/HuntersHunted/images/…` ∴ ⊥ arte muda. Forma relativa vale só no XML (§B20, §R26). §V58 mede TAMBÉM a forma, ⊥ só a existência do arquivo
+V61: `applyTheme` só grava prop c/ destino MAPEADO & c/ valor autorado ⊥ nil (senão ⊥ teria como desfazer) ∴ ficha aberta em `Modern` sem pintura anterior grava ZERO prop. Gravar ⊥ é no-op — setter de fonte desacopla do tema (§B21, §R27)
+V62: restaurar = só as props REGISTRADAS no ledger daquele handle, c/ o valor AUTORADO ∴ `Modern` ⊥ grava valor que o XML nunca autorou & Claro→Escuro mapeia da cor ORIGINAL, ⊥ da que o tema anterior deixou
 
 ## §T TASKS
 
@@ -414,6 +460,23 @@ T149|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) —
 T150|x|(1) `HH.3.lfm` — `ARMOR` `VIRTUES` `dynHealth3_box` top 350→330 & `WILLPOWER` 470→450 ∴ vão p/ `COMBAT` cai de 30 p/ 10; alturas intactas|V37,V40
 T151|x|(2+3) `HH.9.lfm` — `EXPERIENCE` 75→95: título top 10, rótulos top 38 centrados, `edit` top 60 centrado SOB o rótulo, 3 colunas @ 15\|352\|689 (336 cada, edit +123); `EXPERIENCE LOG` → (0,105,1040,535)|V16,V25,V26,V27,V37,V40
 T152|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T153|~|`?` testar em Firecast: (a) `<image>` declarado 1º no `scrollBox` fica ATRÁS do conteúdo (b) `hitTest="false"` na textura ⊥ come clique (c) getter de `color` devolve `black` ou `#FF000000` (d) qual serifada ∃ no host. (c) BLOQUEIA T155 · (a)(b) BLOQUEIAM T158 · (d) BLOQUEIA T157|R23,R24,R25
+T154|x|`HH.6.lfm` — `cboSheetTheme` `items`=`values`=`{'Modern','Victorian Era (Light)','Victorian Era (Dark)'}` & `dataLink defaultValue="Modern"`; corrigir o comentário XML que ainda diz "Not named cbo*" (mentira desde a 11ª rodada). MESMO commit que T155 (§V12)|I3,V12,V52
+T155|x|`HH.6.lfm` — `THEMES` (§I5) + `applyTheme` (§I6): snapshot 1× por handle antes da 1ª pintura, `rootOf`+`collect` da raiz, `Modern` = restaurar, valor ∉ lista → `Modern`; `<dataLink field="sheetTheme" onChange>` chama ∴ roda no load & na troca|I5,I6,V52,V54,V55,V57,R21,R22,T153
+T156|x|`images/` — 4 bolinhas novas 100×100 ≡ geometria de `prime_on/off.png`: `prime_on_ink.png` `prime_off_ink.png` (Claro) & `prime_on_gold.png` `prime_off_gold.png` (Escuro); paletas de §I5 apontam p/ elas|V3,V58
+T157|x|paletas ganham `fontFamily` serifada & `xradius`/`yradius`=0 & `strokeSize`=2 ∴ serifa + canto reto + filete grosso nas 2 vitorianas. Tamanho de caixa ⊥ muda|V57,R24,T153
+T158|x|textura — `paper_light.png` `paper_dark.png` + `<image name="themePaper" style="stretch" hitTest="false" visible="false">` como 1º filho do `scrollBox` das 9 abas; paleta liga & troca `src`, `Modern` desliga. T153(a)(b) negativo → PULAR & tema segue sem textura (§V56), ⊥ trava a rodada|V56,V58,R23,T153
+T159|.|`?` moldura ornamental do avatar (`HH.1`) — 1 PNG por variante sobre o `<rectangle>` `DimGray`. Só entra se o traço procedural ficar apresentável; senão o avatar segue só com o filete da paleta (§V56)|V56,V58
+T160|x|`localization.lang` [pt]+[en] & mapa `PT` de `HH.6` — `Victorian Era (Light)`=`Era Vitoriana (Claro)` · `Victorian Era (Dark)`=`Era Vitoriana (Escuro)`; chave `Victorian Era` velha SAI (⊥ mais ∈ `values`)|V10,V17,V22,V24,V28
+T161|x|`verify-hunters-hunted.ps1` — checks NOVOS §V52 (3 valores & fallback) §V53 (∀ literal de cor dos 9 `.lfm` ∈ mapa das 2 paletas) §V54 (`Modern` ⊥ tem paleta & restaura snapshot) §V55 (⊥ `findClass` no tema) §V56 (ornamento ausente ⊥ aborta a pintura) §V57 (tema ⊥ escreve geometria) §V58 (PNG de paleta ∈ `images/`)|V52,V53,V54,V55,V56,V57,V58,V20
+T162|x|`module.xml` version `1.0` → `1.1`|-
+T163|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T164|x|`verify-hunters-hunted.ps1` — check §V59: ∀ `name=` de controle único entre os 10 `.lfm` (⊥ `<template>`, ⊥ `<event>`, ⊥ nome c/ `$(`). Mesmo tipo de morte muda que o check de template já cobre|V59,V20
+T165|x|`HH.6.lfm` — `dotOn`/`dotOff`/`paper` das 2 paletas p/ `/HuntersHunted/images/…` (absoluto)|I5,V60,R26
+T166|x|`HH.6.lfm` — LEDGER: `paint(c,prop,valor,autorado)` grava só c/ destino mapeado & registra o autorado; `authored(c,prop)` lê do ledger antes do controle; `Modern` = `restore(c)` do registrado. `themeSnap`/`put` SAEM|I6,V61,V62,R27
+T167|x|`HH.6.lfm` — `fontFamily` só onde o autorado é string ⊥ vazia; backdrop fora do ledger (re-esconde só se visível) ∴ Modern segue gravando 0|V61,R27
+T168|x|`verify-hunters-hunted.ps1` — checks NOVOS §V60 (forma do caminho) §V61 (⊥ gravação direta fora de `paint`, exceto o backdrop; `paint` recusa nil) §V62 (`restore` lê o ledger & `Modern` chama). §V58 resolve o prefixo antes de procurar em disco|V58,V60,V61,V62,V20
+T169|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
 
 ## §B BUGS
 
@@ -436,3 +499,6 @@ B15|2026-08-17|T62/T68 traduziram `hedge magic`/`magician`/`wizard` ad-hoc por e
 B16|2026-08-17|`HH.4` grid de descritores: template `Descricao` = 310 largo mas colunas em `left=5`\|`320`\|`585` ∴ 320+310=630 > 585, 3ª coluna desenha 45px DENTRO do `edit` da 2ª. 2 linhas afetadas (Height×Eyes, Weight×Hair). Gate media texto-vs-largura (§V16) mas nunca posição-vs-irmão ∴ passava verde|V37
 B17|2026-08-17|§V16 mede só `//label[@text][@width]` ∴ `checkBox` c/ `text=` nunca checado: `Wounded (-2)` = `Ferido Gravemente (-2)` (~143px) num `checkBox` de 125px, cortando em [pt] desde T3. Achado à mão ao alargar HEALTH, ⊥ pelo gate ≡ §B4 (mesmo ponto cego, outra família)|V38
 B18|2026-08-17|caixa `ABILITIES` (`HH.1`) ficou c/ `color="#FFFFFF00"` copiado do `M20.1` ∴ fundo da aba passa através & ela lê CINZA ao lado das caixas pretas. Gate media posição, largura & texto — nunca COR ∴ ia ficar assim p/ sempre|V48
+B19|2026-08-17|backdrop do tema declarado c/ o MESMO `name="themePaper"` nas 8 abas → `rdk -l` exit 1 SEM mensagem & `.rpk` APAGADO. Bisect: ∀ atributo isolado compila; 2 arquivos c/ `name` igual ⊥ compila. Gate cobria `<template name=>` mas ⊥ `name=` de controle ∴ mesma morte muda, outra família (≡ §B4/§B17)|V59
+B20|2026-08-17|paleta apontava `images/prime_on_ink.png` (relativo). rdk resolve relativo @ COMPILE (`/HuntersHunted/images/…`) ∴ gravar em runtime ⊥ resolve & bolinhas + papel dos 2 temas vitorianos ⊥ carregam. §V58 checava o arquivo EM DISCO, ⊥ a FORMA do caminho ∴ gate verde|V60
+B21|2026-08-17|snapshot-e-restaura gravava `fontColor`+`fontFamily` em ∀ controle de texto no load, `Modern` incluído. Setter de fonte chama `_gui_prepareForFont*Change` ANTES ∴ 1ª gravação desacopla o controle da fonte do tema & fixa o valor CRU do getter — a ficha inteira renderizou errada nas 3 opções, inclusive a que ⊥ mudou no XML. "Gravar o mesmo valor = no-op" era premissa MINHA, ⊥ do SDK|V61,V62
