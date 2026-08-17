@@ -144,6 +144,46 @@ foreach ($f in $files) {
     }
     # runtime strings built in Lua go through the t() helper
     [regex]::Matches($raw, 't\("([^"]+)"\)') | ForEach-Object { [void]$visible.Add($_.Groups[1].Value) }
+    # picker items are user-visible too (SPEC V17)
+    # Picker items are user-visible too (SPEC V17). Read them off the XML `items=` attribute,
+    # NOT out of a Lua table: the lists live inline in the templates now, and a checker that
+    # greps for the old Lua form would pass silently while verifying nothing.
+    # Only `cbo*` pickers count — the colour and theme combos are values, not prose.
+    foreach ($cb in $xml.SelectNodes("//comboBox[@name][@items]")) {
+        if ($cb.GetAttribute("name") -notlike 'cbo*') { continue }
+        # [^']* not [^']+ — with + the leading empty entry ('') fails to match and the engine
+        # slides forward, capturing the separator ', ' as if it were a list item.
+        [regex]::Matches($cb.GetAttribute("items"), "'([^']*)'") |
+            ForEach-Object { $it = $_.Groups[1].Value; if ($it -ne '') { [void]$visible.Add($it) } }
+    }
+}
+
+# ---- V13/V14/V15: the picker pattern (SPEC R.4) -------------------------------
+# The free-text `edit` was dropped by request on 2026-08-17, so the picker comboBox IS the
+# field now. A picker without a field would render fine and silently save nothing.
+$pickerBad = @()
+$listReport = @()
+foreach ($f in $files) {
+    $raw = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f.FullName))
+    $xml = New-Object System.Xml.XmlDocument; $xml.LoadXml($raw)
+    foreach ($n in $xml.SelectNodes("//comboBox")) {
+        $nm = $n.GetAttribute("name")
+        if ($nm -like 'cbo*' -and -not $n.HasAttribute("field")) { $pickerBad += "$($f.Name): picker '$nm' owns no field - it would save nothing" }
+    }
+    foreach ($cb in $xml.SelectNodes("//comboBox[@name][@items]")) {
+        $nm = $cb.GetAttribute("name")
+        if ($nm -notlike 'cbo*') { continue }
+        $items = @([regex]::Matches($cb.GetAttribute("items"), "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
+        $listReport += [pscustomobject]@{ Name = "$($f.Name)/$nm"; Items = $items }
+    }
+}
+if ($pickerBad) { foreach ($b in $pickerBad) { Fail "V13 $b" } } else { Pass "V13 every picker comboBox owns its field" }
+
+foreach ($l in $listReport) {
+    $dupe = $l.Items | Group-Object | Where-Object Count -gt 1
+    if ($dupe) { Fail "V14 $($l.Name) has duplicates: $(($dupe | ForEach-Object { $_.Name }) -join ', ')" }
+    else { Pass "V14 $($l.Name) has $($l.Items.Count - 1) unique entries" }
+    if ($l.Items[0] -eq '') { Pass "V15 $($l.Name) starts empty" } else { Fail "V15 $($l.Name) first entry is '$($l.Items[0])', expected empty" }
 }
 
 # ---- V9: source language is English - no non-ASCII in authored strings -------
@@ -173,6 +213,30 @@ $noPt = @($visible | Where-Object { -not $ptK.Contains($_) })
 $noEn = @($visible | Where-Object { -not $enK.Contains($_) })
 if ($noPt) { foreach ($s in $noPt) { Fail "V10 no [pt] key for '$s'" } } else { Pass "V10 all visible strings have a [pt] key" }
 if ($noEn) { foreach ($s in $noEn) { Fail "V10 no [en] key for '$s'" } } else { Pass "V10 all visible strings have an [en] key" }
+
+# ---- V16: a label must be wide enough for the LONGER of its EN and PT text ----
+# Crude on purpose: no font metrics available offline, so estimate at ~6.5px/char for the
+# default proportional font. Only flags clear overflow, not tight fits.
+$PX_PER_CHAR = 6.5
+$tooNarrow = @()
+foreach ($f in $files) {
+    $xml = New-Object System.Xml.XmlDocument
+    $xml.LoadXml([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f.FullName)))
+    foreach ($n in $xml.SelectNodes("//label[@text][@width]")) {
+        $txt = $n.GetAttribute("text").Trim()
+        if (-not $txt -or $txt -match '\$\(') { continue }
+        $w = 0; if (-not [int]::TryParse($n.GetAttribute("width"), [ref]$w)) { continue }
+        $pt = $null
+        foreach ($l in ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($langFile)) -split "`r?`n")) {
+            if ($l -match "^wod\.$([regex]::Escape($txt))=(.*)$") { $pt = $Matches[1]; break }
+        }
+        $longest = $txt.Length
+        if ($pt -and $pt.Length -gt $longest) { $longest = $pt.Length }
+        $need = [math]::Ceiling($longest * $PX_PER_CHAR)
+        if ($need -gt $w) { $tooNarrow += "$($f.Name): '$txt' (pt '$pt') needs ~${need}px, width=${w}px" }
+    }
+}
+if ($tooNarrow) { foreach ($t in $tooNarrow) { Fail "V16 $t" } } else { Pass "V16 every label fits its longest translation" }
 
 # ---- V12: combo items are values - items must agree with the Lua comparison ---
 $hh6 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.6.lfm")))

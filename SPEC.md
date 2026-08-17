@@ -13,6 +13,9 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - Mage-only ⊥ portar: Spheres, Rotes, Focus, Arete, Quintessence, Paradox, Wonders.
 - Sheet novo ∈ plugin `World of Darkness 20th` existente ∴ reusa build, autoupdater, tema, `.lang`. Plugin separado = 1 `module.xml` novo + `.rpk` novo ?
 - idioma-fonte de ∀ string visível = inglês; `.lang` [pt] traduz. ⊥ autorar string em PT (§B.4).
+- listas de conteúdo (arquétipo/antecedente/númina) ⊥ no repo ∴ ⊥ escrever como fato sem validação do user (§R.8).
+- HERD & HAVEN & FEEDING GROUNDS = vampiro-only ∴ ⊥ portar p/ ficha mortal.
+- forma do picker = `comboBox` sozinho, na posição onde ficava o `edit`. DECIDIDA pelo user 2026-08-17. ⊥ texto livre ∴ valor fora da lista ! virar item da lista (§V.14 §V.17).
 - Merits & Flaws ⊥ no PDF ?
 - Abas Background & Notes ⊥ no PDF, herdadas da base Mage ?
 - Numina = 11 linhas abertas ?
@@ -42,6 +45,11 @@ id|topic|finding|src
 R1|Locale fallback|`Locale.tryLang` → `_system_locale_tryLang`, nativo do host, ⊥ visível no SDK ∴ fallback [pt]↔[en] = `?`. Mitigado por [en] identidade → pergunta vira irrelevante|`sdk/localeCore.dlua:8`
 R2|alcance da tradução|rotina do sheet traduz só `findClass("label")` & `radioButton`. `checkBox` `button` `tab.title` `form.title` ⊥ alcançados. Ficha ⊥ tem radioButton|`HuntersHunted/HH.6.lfm`
 R3|combo tema|`items` do combo `theme` = valor, ⊥ rótulo — Lua compara `theme == "Claro"` ∴ traduzir item quebra troca de tema|`HuntersHunted/HH.6.lfm`
+R4|ComboBox ⊥ editável|`gui.ComboBox.props` = `transparent` `field` `frameRegion` `items` `values` `text` `value` + fonte/estilo. ⊥ `editable`, ⊥ freeText ∴ "digitar por cima" ! `edit` (dono do field) + `comboBox` picker sem field|`sdk/rrpgGUI.lua:952-958`
+R5|items i18n|`ComboBox:getItems` → prop nativa `ItemsI18N` ∴ items `?` já passam pelo locale — ⊥ confirmado, ! testar|`sdk/rrpgGUI.lua:944`
+R6|VTM combate+inventário|`V20.3.lfm`: COMBAT = 8 col (`attack` `roll` `difficulty` `damage` `range` `rate` `clip` `conceal`) × 10 linhas; inventário = ARMOR (`armorClass` `armorRating` `armorPenalty` + desc) + GEAR + EQUIPMENT + TRANSPORTATION + HAVEN + FEEDING GROUNDS|`VampireMasquerade20th/V20.3.lfm`
+R7|VTM traits|`V20.4.lfm`: template `Merit` (`merit_N`\|`type_N`\|`costy_N`) × 8 merits + 8 flaws; DERANGEMENTS = 1 textEditor; XP (`totalXP` `spentXP` `xpList`); 10 caixas de antecedente c/ descrição (ALLIES MENTOR CONTACTS RESOURCES FAME RETAINERS HERD STATUS INFLUENCE OTHER)|`VampireMasquerade20th/V20.4.lfm`
+R8|listas de conteúdo|arquétipos, antecedentes & núminas ⊥ existem em nenhum plugin do repo (grep 0 hits) ∴ ! vir de fora, `?` até user validar|grep `Plugins/Sheets`
 
 ## §V INVARIANTS
 
@@ -57,6 +65,14 @@ V9: ∀ string visível ! autorada em inglês ∴ tradução one-way EN→[pt] (
 V10: ∀ string visível ∈ {`label`, `checkBox`, `button`} → ∃ `wod.<txt>` em [pt] & [en]
 V11: ⊥ label com padding p/ alinhar coluna — 1 label por coluna ∴ cada um traduzível (§B.5)
 V12: `items` de combo = valor ⊥ rótulo ∴ mudar item ! mudar comparação Lua & `defaultValue` no mesmo commit (§R.3)
+V13: campo c/ picker = `comboBox` dono do `field`, ⊥ `edit` ao lado ∴ só escolha da lista. Combo sem `field` renderiza mas ⊥ salva (decisão user 2026-08-17)
+V14: ∀ lista de picker ⊥ item duplicado
+V15: 1º item de ∀ picker = vazio
+V16: ∀ `label` & `edit` & picker: `width` ! ≥ largura do texto mais longo entre [en] & [pt] ∴ ⊥ corta em nenhum idioma
+V17: ∀ item de picker → ∃ chave `wod.<item>` em [pt] & [en] (§V.10 estendido a `items`)
+V18: `items` de picker ! declarado inline no XML do template (padrão `colorSelection`) ⊥ populado por Lua @ runtime (§B.6)
+V19: ⊥ `if x ~= nil then <efeito> end` como único caminho de inicialização — falha silenciosa. Precedente ⊥ vale sem ∃ o alvo (§B.6)
+V20: check do gate ! ler do artefato real (XML `items=`), ⊥ de forma intermediária ∴ refactor ⊥ transforma check em no-op (§B.7)
 
 ## §T TASKS
 
@@ -81,6 +97,19 @@ T17|x|`HH.6.lfm` combo tema — `items` `{'Escuro','Claro'}`→`{'Dark','Light'}
 T18|x|`localization.lang` — [pt] p/ ∀ string visível nova; [en] identidade p/ ∀ string que a ficha renderiza ∴ §R.1 vira irrelevante|V10,R1
 T19|x|`verify-hunters-hunted.ps1` — check §V.10 (chave [pt] & [en] p/ todo label/checkBox/button) & §V.11 (⊥ padding em label)|V10,V11
 T20|.|`?` testar em Firecast: `findClass("tab")` alcança & `tab.title` gravável → sim: traduzir 6 abas; ⊥: registrar limite em §C|R2
+T21|x|`HH.2.lfm` MERITS AND FLAWS — template `Merit` (nome\|tipo\|custo) × 8 merits + 8 flaws ← `V20.4.lfm`|R7,V1
+T22|x|`HH.2.lfm` DERANGEMENTS — 1 textEditor ← `V20.4.lfm`|R7
+T23|x|`HH.2.lfm` (Traits) 9 caixas de descrição nome-fixo ← `V20.4.lfm`: ALLIES MENTOR CONTACTS RESOURCES FAME RETAINERS STATUS INFLUENCE OTHER. HERD ⊥ (vampiro-only). ≠ T28 — aquilo é picker na aba Main|R7
+T24|x|`?` LISTA arquétipos Nature/Demeanor — M20 primeiro, depois VTM, depois resto, ⊥ duplicata. ! user validar antes de T27|V14,R8
+T25|x|`?` LISTA antecedentes — VTM + M20 + W20, ⊥ duplicata. ! user validar antes de T28|V14,R8
+T26|.|BLOQUEADO — lista de núminas vem do user (Hunters Hunted II + M20 Sorcerer, Fé Verdadeira ⊥). ⊥ tenho fonte ∴ ⊥ inventar|V14,R8
+T27|x|`HH.1.lfm` (Main) Nature & Demeanor → `edit` + picker, mesma lista, valores independentes, 1ª opção vazia|V13,V15,T24
+T28|x|`HH.1.lfm` (Main) BACKGROUNDS 5 linhas → `edit` + picker por linha, mesma lista, valores independentes. ≠ T23|V13,V15,T25
+T29|.|BLOQUEADO por T26 — `HH.2.lfm` NUMINA 11 linhas → `edit` + picker por linha|V13,V15,T26
+T30|x|`HH.3.lfm` COMBAT → 8 col × 10 linhas ← `V20.3.lfm`|R6,V1
+T31|x|`HH.3.lfm` inventário → ARMOR (class\|rating\|penalty\|desc) + GEAR + EQUIPMENT + TRANSPORTATION ← `V20.3.lfm`; HAVEN & FEEDING ⊥|R6,V1
+T32|x|`localization.lang` — [pt] & [en] p/ ∀ string & ∀ item de picker novo|V10,V17
+T33|x|`verify-hunters-hunted.ps1` — checks §V.13 §V.14 §V.15 §V.16 §V.17|V13,V14,V15,V16,V17
 
 ## §B BUGS
 
@@ -90,3 +119,5 @@ B2|2026-08-15|§C travou `sdkVersion` que o rdk possui & reescreve (`3.6c`→`3.
 B3|2026-08-15|§V1 contou `<dataLink field>` como dono de campo; base `M20.6.lfm` usa por design|V1,V8
 B4|2026-08-16|tradução cobre só `label` ∴ 7 níveis Health (`checkBox`) c/ chave [pt] ⊥ aplicada; Credits autorado em PT ⊥ traduzível p/ EN|V9,V10
 B5|2026-08-16|header COMBAT = 1 label c/ padding p/ alinhar colunas ∴ ⊥ utilizável como chave|V11
+B6|2026-08-17|picker populado via `<script>` local + `onNodeReady` + `findControlByName`, tudo guardado por `if ~= nil` ∴ dropdown vazio & ⊥ erro. Precedente citado (`M20.2.1.lfm` busca `"rclName"`, real = `"rclWonders"`) = código morto que nunca rodou|V18,V19
+B7|2026-08-17|gate lia listas de picker de `local X = {}` no Lua; ao mover p/ `items=` inline os checks §V14/§V15/§V17 passariam sem verificar nada|V20

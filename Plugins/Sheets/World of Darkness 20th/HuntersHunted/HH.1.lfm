@@ -5,6 +5,11 @@
 			<label left="0" top="5" width="80" height="20" text="$(nome)" horzTextAlign="trailing"/>
         	<edit left="90" top="0" width="200" height="25" field="$(field)"/>
 		</template>
+		<template name="HeaderPicker">
+			<label left="0" top="5" width="105" height="20" text="$(nome)" horzTextAlign="trailing"/>
+			<comboBox left="112" top="0" width="140" height="25" name="cbo$(field)" field="$(field)" items="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}" values="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}">
+			</comboBox>
+		</template>
 		<template name="Attribute">
 			<label left="0" top="5" width="80" height="20" text="$(nome)"/>
 			<image left="80" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
@@ -22,12 +27,13 @@
 			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 		<template name="OpenAbility">
-			<edit left="0" top="5" width="75" height="20" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="80" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="165" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<comboBox left="0" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Avatar', 'Backup', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}" values="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Avatar', 'Backup', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}">
+			</comboBox>
 		</template>
 		<template name="Advantages">
 			<label left="0" top="5" width="60" height="20" text="$(nome)" horzTextAlign="center" fontSize="$(font)"/>
@@ -75,7 +81,7 @@
 				<Header field="name" nome="Name"/>
 			</layout>
 			<layout left="290" top="5" width="290" height="25" >
-				<Header field="nature" nome="Nature"/>
+				<HeaderPicker field="nature" nome="Nature"/>
 			</layout>
 			<layout left="580" top="5" width="290" height="25" >
 				<Header field="motivation" nome="Motivation"/>
@@ -85,7 +91,7 @@
 				<Header field="player" nome="Player"/>
 			</layout>
 			<layout left="290" top="35" width="290" height="25" >
-				<Header field="demeanor" nome="Demeanor"/>
+				<HeaderPicker field="demeanor" nome="Demeanor"/>
 			</layout>
 			<layout left="580" top="35" width="290" height="25" >
 				<Header field="occupation" nome="Occupation"/>
@@ -308,23 +314,23 @@
 			<checkBox left="20" top="145" width="125" height="20" field="incapacitated" text="Incapacitated"/>
 		</layout>
 
-		<layout left="800" top="460" width="255" height="175">
+		<layout left="800" top="460" width="360" height="175">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="5" top="0" width="240" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
+			<label left="5" top="0" width="350" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
 
-			<layout left="15" top="25" width="225" height="25" >
+			<layout left="15" top="25" width="330" height="25" >
 				<OpenAbility field="background_1"/>
 			</layout>
-			<layout left="15" top="50" width="225" height="25" >
+			<layout left="15" top="50" width="330" height="25" >
 				<OpenAbility field="background_2"/>
 			</layout>
-			<layout left="15" top="75" width="225" height="25" >
+			<layout left="15" top="75" width="330" height="25" >
 				<OpenAbility field="background_3"/>
 			</layout>
-			<layout left="15" top="100" width="225" height="25" >
+			<layout left="15" top="100" width="330" height="25" >
 				<OpenAbility field="background_4"/>
 			</layout>
-			<layout left="15" top="125" width="225" height="25" >
+			<layout left="15" top="125" width="330" height="25" >
 				<OpenAbility field="background_5"/>
 			</layout>
 		</layout>
