@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module sdkVersion="3.7b" originalPluginFileName="World of Darkness 20th.rpk">
 	<id>Ambesek.WoD.20th</id>
-	<version>0.7</version>
+	<version>1.0</version>
 	
 	
 	
@@ -13,6 +13,5 @@
         <description>Plugin de ficha para Werewolf the Apocalypse, Vampíre the Dark Ages, Vampire the Masquerade, Mage Dark Ages, Mage the Ascension e Hunters Hunted (Mortal) of the 20th Anniversary Edition</description>
         <author>Ambesek</author>
         <site/>
-        <contact>vinnyrpgmeister@gmail.com</contact>
     </info>
 </module>

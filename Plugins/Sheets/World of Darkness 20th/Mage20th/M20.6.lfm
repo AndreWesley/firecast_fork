@@ -80,7 +80,6 @@
 	</template>
 	<scrollBox align="client">
 		<image left="0" top="0" width="500" height="175" style="autoFit" src="images/mage.png"/>
-		<image left="550" top="0" width="250" height="250" style="autoFit" src="images/RPGmeister.jpg"/>
 
 		<layout left="850" top="0" width="200" height="250">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
@@ -207,6 +206,5 @@
 		<button left="667" top="350" width="100" text="Atualizar" onClick="GUI.openInBrowser('https://github.com/rrpgfirecast/firecast/blob/master/Plugins/Sheets/World%20of%20Darkness%2020th/output/World%20of%20Darkness%2020th.rpk?raw=true')" />
 		
 		<label left="555" top="400" width="200" height="20" text="Conheça a Mesa:"/>
-		<button left="555" top="425" width="100" text="RPGmeister" onClick="GUI.openInBrowser('https://my.firecastrpg.com/a?a=pagRWEMesaInfo.actInfoMesa&amp;mesaid=64070');" />
 	</scrollBox>
 </form>

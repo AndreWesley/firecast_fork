@@ -1,44 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form name="frmHuntersHunted" formType="sheetTemplate" dataType="Ambesek.HuntersHunted.20th" title="Hunters Hunted - Mortal" align="client" theme="dark">
-    <script>
-        <![CDATA[
-        local function isNewVersion(installed, downloaded)
-            local installedVersion = {};
-            local installedIndex = 0;
-            for i in string.gmatch(installed, "[^%.]+") do
-                installedIndex = installedIndex +1;
-                installedVersion[installedIndex] = i;
-            end
+	<script>
+		<![CDATA[
+			-- Health track, shared by the Main tab and its mirror on the Combat tab.
+			--
+			-- It lives on the ROOT form on purpose: this script is parsed before the <import>
+			-- of any tab, so both tabs can call into it without depending on which sibling tab
+			-- happened to load first. SPEC R.9 / B.9 is the same lesson from the other side -
+			-- a tab form cannot reach its siblings, so anything two tabs share belongs here.
 
-            local downloadedVersion = {};
-            local downloadedIndex = 0;
-            for i in string.gmatch(downloaded, "[^%.]+") do
-                downloadedIndex = downloadedIndex +1;
-                downloadedVersion[downloadedIndex] = i;
-            end
+			-- The 10 lists are LITERAL from the user (SPEC C, V39). They are NOT derivable:
+			-- 6 is 7 minus Bruised and 5 is that minus Hurt, but 4 skips Crippled instead of
+			-- continuing to trim from the top. Do not "simplify" this into a loop.
+			HEALTH_LEVELS = {
+				[1]  = {"Incapacitated"},
+				[2]  = {"Injured (-1)", "Incapacitated"},
+				[3]  = {"Injured (-1)", "Wounded (-2)", "Incapacitated"},
+				[4]  = {"Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Incapacitated"},
+				[5]  = {"Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[6]  = {"Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[7]  = {"Bruised", "Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[8]  = {"Bruised", "Bruised", "Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[9]  = {"Bruised", "Bruised", "Bruised", "Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[10] = {"Bruised", "Bruised", "Bruised", "Bruised", "Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+			};
 
-            for i=1, math.min(installedIndex, downloadedIndex), 1 do
-                if (tonumber(installedVersion[i]) or 0) > (tonumber(downloadedVersion[i]) or 0) then
-                    return false;
-                elseif (tonumber(installedVersion[i]) or 0) < (tonumber(downloadedVersion[i]) or 0) then
-                    return true;
-                end;
-            end;
+			-- These labels are written by Lua, so they never pass through the HH.6 translation
+			-- traversal - that routine snapshots the authored English once and would restore a
+			-- stale snapshot the moment the track length changed. Same arrangement as the numina
+			-- description block (SPEC V31): whoever writes the text owns both languages.
+			-- The gate checks this table against localization.lang, like it does the PT map.
+			HEALTH_PT = {
+				["Bruised"]        = "Escoriado",
+				["Hurt (-1)"]      = "Machucado (-1)",
+				["Injured (-1)"]   = "Ferido (-1)",
+				["Wounded (-2)"]   = "Ferido Gravemente (-2)",
+				["Mauled (-2)"]    = " Espancado (-2)",
+				["Crippled (-5)"]  = "Aleijado (-5)",
+				["Incapacitated"]  = "Incapacitado",
+			};
 
-            if downloadedIndex > installedIndex then
-                return true;
-            else
-                return false;
-            end;
-        end;
+			-- `form` is the tab form; `prefix` names its ten checkBoxes (dynHealth_1 .. _10).
+			-- The `dyn` prefix is what tells the HH.6 traversal to leave them alone.
+			function renderHealthTrack(form, prefix)
+				if sheet == nil then return; end;
 
-        -- Runtime strings are built in Lua, so the sheet's "Translate" checkbox
-        -- never reaches them. Resolve them against the user's locale instead.
-        local function t(txt)
-            return Locale.tryLang("wod." .. txt) or txt;
-        end;
-        ]]>
-    </script>
+				local n = tonumber(sheet.healthLevels) or 7;
+				local levels = HEALTH_LEVELS[n];
+				local lang = sheet.language or "en";
+
+				for i = 1, 10, 1 do
+					local box = form[prefix .. i];
+
+					if box ~= nil then
+						local canon = nil;
+
+						if levels ~= nil then canon = levels[i]; end;
+
+						if canon == nil then
+							-- Rows past the chosen length, or an out-of-range value: hide the row
+							-- instead of leaving a checkBox with a stale label next to it.
+							box.visible = false;
+						else
+							box.visible = true;
+
+							if lang == "pt" then
+								box.text = HEALTH_PT[canon] or canon;
+							else
+								box.text = canon;
+							end;
+						end;
+					end;
+				end;
+			end;
+		]]>
+	</script>
 	<tabControl align="client">
 		<tab title="Main">
 			<import file="HH.1.lfm"/>
@@ -46,53 +82,26 @@
 		<tab title="Traits">
 			<import file="HH.2.lfm"/>
 		</tab>
-		<tab title="Combat &amp; Items">
+		<tab title="Powers">
+			<import file="HH.7.lfm"/>
+		</tab>
+		<tab title="Combat">
 			<import file="HH.3.lfm"/>
+		</tab>
+		<tab title="Inventory">
+			<import file="HH.8.lfm"/>
 		</tab>
 		<tab title="Background">
 			<import file="HH.4.lfm"/>
 		</tab>
+		<tab title="Progress">
+			<import file="HH.9.lfm"/>
+		</tab>
 		<tab title="Notes">
 			<import file="HH.5.lfm"/>
 		</tab>
-		<tab title="Credits">
+		<tab title="Settings">
 			<import file="HH.6.lfm"/>
 		</tab>
 	</tabControl>
-    <event name="onNodeReady">
-        Internet.download("https://github.com/rrpgfirecast/firecast/blob/master/Plugins/Sheets/World%20of%20Darkness%2020th/output/World%20of%20Darkness%2020th.rpk?raw=true",
-            function(stream, contentType)
-                local info = Firecast.Plugins.getRPKDetails(stream);
-                sheet.versionDownloaded = t("AVAILABLE VERSION:") .. " " .. info.version;
-
-                local installed = Firecast.Plugins.getInstalledPlugins();
-                local myself;
-                for i=1, #installed, 1 do
-                    if installed[i].moduleId == info.moduleId then
-                        myself = installed[i];
-                        sheet.versionInstalled = t("INSTALLED VERSION:") .. " " .. installed[i].version;
-                    end;
-                end;
-
-                if sheet.noUpdate==true then return end;
-                if myself~= nil and isNewVersion(myself.version, info.version) then
-                    Dialogs.choose(t("There is a new version of this plugin. Install it?"),
-                        {t("Yes"), t("No"), t("Don't ask again.")},
-                        function(selected, selectedIndex, selectedText)
-                            if selected and selectedIndex == 1 then
-                                GUI.openInBrowser('https://github.com/rrpgfirecast/firecast/blob/master/Plugins/Sheets/World%20of%20Darkness%2020th/output/World%20of%20Darkness%2020th.rpk?raw=true');
-                            elseif selected and selectedIndex == 3 then
-                                sheet.noUpdate = true;
-                            end;
-                        end);
-                end;
-            end,
-            function (errorMsg)
-                --showMessage(errorMsg);
-            end,
-            function (downloaded, total)
-                -- esta função será chamada constantemente.
-                -- dividir "downloaded" por "total" lhe dará uma porcentagem do download.
-            end);
-    </event>
 </form>

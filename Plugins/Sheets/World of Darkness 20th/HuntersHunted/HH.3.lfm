@@ -1,6 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form name="frmHH_3" align="client" theme="dark">
+	<script>
+		<![CDATA[
+			-- Display-only trait dots (SPEC T101). Two groups because attributes have no `_1`
+			-- field - dot 1 is a fixed image in the Attribute template - while abilities do.
+			local RO_ATTRS     = {"strength", "dexterity", "stamina", "perception"};
+			local RO_ABILITIES = {"alertness", "athletics", "awareness", "brawl", "firearms", "melee", "stealth"};
+
+			local function paint(form, field, firstDot)
+				for d = 1, 5, 1 do
+					local dot = form["ro_" .. field .. "_" .. d];
+
+					if dot ~= nil then
+						if d < firstDot then
+							dot.checked = true;          -- the fixed dot an attribute always has
+						else
+							dot.checked = sheet[field .. "_" .. d] == true;
+						end;
+					end;
+				end;
+			end;
+
+			function renderCombatTraits(form)
+				if sheet == nil then return; end;
+
+				for i = 1, #RO_ATTRS, 1 do paint(form, RO_ATTRS[i], 2); end;
+				for i = 1, #RO_ABILITIES, 1 do paint(form, RO_ABILITIES[i], 1); end;
+			end;
+		]]>
+	</script>
 	<scrollBox align="client">
+		<!-- Same geometry as the Attribute template on the Main tab, so the virtues mirror below
+		     keeps the label width and the x=125 dot column (SPEC V26). -->
+		<template name="VirtueMirror">
+			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<image left="125" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</template>
+
+		<!-- No `field=` anywhere: these dots are painted by renderCombatTraits() and own nothing,
+		     so they cannot collide with the real widgets on Main (SPEC I3 SO-LEITURA, V1). -->
+		<template name="ReadOnlyTrait">
+			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<imageCheckBox name="ro_$(field)_1" left="125" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_2" left="150" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_3" left="175" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_4" left="200" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_5" left="225" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</template>
+
 		<template name="Attack">
 			<edit left="0" top="0" width="200" height="24" field="attack_$(num)"/>
 			<edit left="200" top="0" width="100" height="24" field="roll_$(num)"/>
@@ -56,61 +107,125 @@
 				<Attack num="10"/>
 			</layout>
 		</layout>
+		<!--
+			ARMOR belongs on this tab, not on Inventory: armour is combat gear. It went to
+			HH.8 in T76/T77 and came back on 2026-08-17, field names untouched both times
+			(SPEC T87 / V35).
 
-		<layout left="660" top="0" width="230" height="170">
+			One input column: all three rows put their edit at x=75 (SPEC V26 / B.12).
+		-->
+		<layout left="0" top="350" width="380" height="300">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="380" height="20" text="ARMOR" horzTextAlign="center"/>
 
-			<label left="0" top="0" width="230" height="20" text="ITEMS" horzTextAlign="center"/>
-
-			<textEditor left="15" top="25" width="200" height="130" field="items"/>
-		</layout>
-
-		<layout left="660" top="180" width="230" height="230">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-
-			<label left="0" top="0" width="230" height="20" text="ARMOR" horzTextAlign="center"/>
-
-			<layout left="15" top="25" width="200" height="25" >
-				<label left="0" top="5" width="50" height="20" text="Class" horzTextAlign="trailing"/>
-				<edit left="55" top="0" width="145" height="25" field="armorClass"/>
+			<layout left="15" top="25" width="350" height="25" >
+				<label left="0" top="5" width="70" height="20" text="Class" horzTextAlign="trailing"/>
+				<edit left="75" top="0" width="275" height="25" field="armorClass"/>
 			</layout>
-			<layout left="15" top="50" width="200" height="25" >
-				<label left="0" top="5" width="50" height="20" text="Rating" horzTextAlign="trailing"/>
-				<edit left="55" top="0" width="145" height="25" field="armorRating"/>
+			<layout left="15" top="50" width="350" height="25" >
+				<label left="0" top="5" width="70" height="20" text="Rating" horzTextAlign="trailing"/>
+				<edit left="75" top="0" width="275" height="25" field="armorRating"/>
 			</layout>
-			<layout left="15" top="75" width="200" height="25" >
+			<layout left="15" top="75" width="350" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Penalty" horzTextAlign="trailing"/>
-				<edit left="75" top="0" width="125" height="25" field="armorPenalty"/>
+				<edit left="75" top="0" width="275" height="25" field="armorPenalty"/>
 			</layout>
-			<textEditor left="15" top="100" width="200" height="115" field="armorDescription"/>
+
+			<textEditor left="15" top="105" width="350" height="180" field="armorDescription"/>
 		</layout>
 
-		<layout left="0" top="420" width="230" height="230">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="0" top="0" width="230" height="20" text="GEAR (CARRIED)" horzTextAlign="center"/>
+		<!-- ITEMS / GEAR / EQUIPMENT / TRANSPORTATION / OTHER moved to the Inventory tab
+		     (HH.8.lfm) with their field names untouched - SPEC T77 / V35. -->
 
-			<textEditor left="15" top="25" width="200" height="190" field="gear"/>
+		<!--
+			HEALTH and VIRTUES here are MIRRORS, not copies (SPEC T100 / V36): the widgets carry
+			the same `field=` as the ones on the Main tab, and the NDB is the single source of
+			truth, so editing either side updates both with no Lua involved. SPEC V1 normally
+			forbids two input widgets on one field - these are the declared exception, listed
+			under ESPELHOS in SPEC I3.
+
+			5th round (SPEC T111): the right column now reads COMBAT TRAITS then HEALTH, and
+			VIRTUES left it to sit beside ARMOR. Only left/top/width moved - the three blocks keep
+			their file order because the Lua finds widgets by name (dynHealth3_N, ro_<field>_N),
+			never by position.
+		-->
+		<layout left="670" top="330" width="280" height="300">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="205" height="20" text="HEALTH" horzTextAlign="center"/>
+			<comboBox name="cmbHealthLevels3" left="212" top="0" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+
+			<checkBox name="dynHealth3_1" left="20" top="28" width="245" height="20" field="health_1"/>
+			<checkBox name="dynHealth3_2" left="20" top="55" width="245" height="20" field="health_2"/>
+			<checkBox name="dynHealth3_3" left="20" top="82" width="245" height="20" field="health_3"/>
+			<checkBox name="dynHealth3_4" left="20" top="109" width="245" height="20" field="health_4"/>
+			<checkBox name="dynHealth3_5" left="20" top="136" width="245" height="20" field="health_5"/>
+			<checkBox name="dynHealth3_6" left="20" top="163" width="245" height="20" field="health_6"/>
+			<checkBox name="dynHealth3_7" left="20" top="190" width="245" height="20" field="health_7"/>
+			<checkBox name="dynHealth3_8" left="20" top="217" width="245" height="20" field="health_8"/>
+			<checkBox name="dynHealth3_9" left="20" top="244" width="245" height="20" field="health_9"/>
+			<checkBox name="dynHealth3_10" left="20" top="271" width="245" height="20" field="health_10"/>
 		</layout>
 
-		<layout left="240" top="420" width="230" height="230">
+		<!--
+			VIRTUES sits in the gap between ARMOR (ends at x=380) and the right column (starts at
+			x=670), so it is 270 wide, not 280: 390+270 leaves the same 10px gutter on both sides.
+			The rows lose 5px of indent to keep the 250px template inside the narrower box.
+		-->
+		<layout left="390" top="350" width="270" height="110">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="0" top="0" width="230" height="20" text="EQUIPMENT (OWNED)" horzTextAlign="center"/>
+			<label left="0" top="0" width="270" height="20" text="VIRTUES" horzTextAlign="center"/>
 
-			<textEditor left="15" top="25" width="200" height="190" field="equipment"/>
+			<layout left="10" top="25" width="250" height="25" >
+				<VirtueMirror field="conscience" nome="Conscience"/>
+			</layout>
+			<layout left="10" top="50" width="250" height="25" >
+				<VirtueMirror field="selfControl" nome="Self-Control"/>
+			</layout>
+			<layout left="10" top="75" width="250" height="25" >
+				<VirtueMirror field="courage" nome="Courage"/>
+			</layout>
 		</layout>
 
-		<layout left="480" top="420" width="230" height="230">
+		<!--
+			Combat-relevant traits, DISPLAY ONLY (SPEC T101). These dots carry no `field=` at all,
+			so they own nothing and cannot be a second owner of anything (SPEC I3 lists them under
+			SO-LEITURA, deliberately outside the mirror list). renderCombatTraits() reads the real
+			fields and pushes `checked` into them; `autoChange="false"` is what stops a click from
+			toggling one - it is an ImageCheckBox property, not the greying-out `enabled=false`,
+			so these read as normal dots (sdk/rrpgGUI.lua:776-777,786).
+
+			Attributes show five dots with the first always lit, matching the Attribute template
+			where dot 1 is a fixed image and only `_2`..`_5` are real fields.
+		-->
+		<layout left="670" top="0" width="280" height="320">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="0" top="0" width="230" height="20" text="TRANSPORTATION" horzTextAlign="center"/>
+			<label left="0" top="0" width="280" height="20" text="COMBAT TRAITS" horzTextAlign="center"/>
 
-			<textEditor left="15" top="25" width="200" height="190" field="transportation"/>
-		</layout>
+			<layout left="15" top="25" width="250" height="25" ><ReadOnlyTrait field="strength" nome="Strength"/></layout>
+			<layout left="15" top="50" width="250" height="25" ><ReadOnlyTrait field="dexterity" nome="Dexterity"/></layout>
+			<layout left="15" top="75" width="250" height="25" ><ReadOnlyTrait field="stamina" nome="Stamina"/></layout>
+			<layout left="15" top="100" width="250" height="25" ><ReadOnlyTrait field="perception" nome="Perception"/></layout>
 
-		<layout left="720" top="420" width="230" height="230">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="0" top="0" width="230" height="20" text="OTHER" horzTextAlign="center"/>
+			<horzLine left="10" top="130" width="260" strokeColor="white"/>
 
-			<textEditor left="15" top="25" width="200" height="190" field="other"/>
+			<layout left="15" top="140" width="250" height="25" ><ReadOnlyTrait field="alertness" nome="Alertness"/></layout>
+			<layout left="15" top="165" width="250" height="25" ><ReadOnlyTrait field="athletics" nome="Athletics"/></layout>
+			<layout left="15" top="190" width="250" height="25" ><ReadOnlyTrait field="awareness" nome="Awareness"/></layout>
+			<layout left="15" top="215" width="250" height="25" ><ReadOnlyTrait field="brawl" nome="Brawl"/></layout>
+			<layout left="15" top="240" width="250" height="25" ><ReadOnlyTrait field="firearms" nome="Firearms"/></layout>
+			<layout left="15" top="265" width="250" height="25" ><ReadOnlyTrait field="melee" nome="Melee"/></layout>
+			<layout left="15" top="290" width="250" height="25" ><ReadOnlyTrait field="stealth" nome="Stealth"/></layout>
 		</layout>
 	</scrollBox>
+
+	<!--
+		Two entry points, same reason as the Main tab: the dataLink catches later edits, the
+		onNodeReady catches the sheet being opened (SPEC V19 / V33).
+	-->
+	<dataLink fields="{'healthLevels', 'language', 'strength_2', 'strength_3', 'strength_4', 'strength_5', 'dexterity_2', 'dexterity_3', 'dexterity_4', 'dexterity_5', 'stamina_2', 'stamina_3', 'stamina_4', 'stamina_5', 'perception_2', 'perception_3', 'perception_4', 'perception_5', 'alertness_1', 'alertness_2', 'alertness_3', 'alertness_4', 'alertness_5', 'athletics_1', 'athletics_2', 'athletics_3', 'athletics_4', 'athletics_5', 'awareness_1', 'awareness_2', 'awareness_3', 'awareness_4', 'awareness_5', 'brawl_1', 'brawl_2', 'brawl_3', 'brawl_4', 'brawl_5', 'firearms_1', 'firearms_2', 'firearms_3', 'firearms_4', 'firearms_5', 'melee_1', 'melee_2', 'melee_3', 'melee_4', 'melee_5', 'stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'stealth_5'}" onChange="renderHealthTrack(self, 'dynHealth3_'); renderCombatTraits(self);"/>
+
+	<event name="onNodeReady">
+		renderHealthTrack(self, 'dynHealth3_');
+		renderCombatTraits(self);
+	</event>
 </form>

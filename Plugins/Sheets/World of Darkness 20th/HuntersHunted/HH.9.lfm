@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmHH_9" align="client" theme="dark">
+	<script>
+		<![CDATA[
+			-- Total is the only computed value on this sheet. SPEC C forbids derived numbers as a
+			-- rule - the sheet is paper and the player adds up - and revokes that for this field
+			-- only, because the player asked for a running total.
+			--
+			-- It owns no `field=` (SPEC I3, same arrangement as the numina description block in
+			-- V29): a stored third number could drift away from the two that produce it, and it
+			-- can always be recomputed from them.
+			function renderTotalXP(form)
+				if sheet == nil then return; end;
+
+				local spent   = tonumber(sheet.spentXP) or 0;
+				local current = tonumber(sheet.experience) or 0;
+
+				form.edtTotalXP.text = tostring(spent + current);
+			end;
+		]]>
+	</script>
+	<scrollBox align="client">
+		<!--
+			Progress tab (SPEC T106). Current Experience is a MIRROR of the box on the Main tab -
+			the same `field="experience"`, so the NDB keeps both in step with no Lua (SPEC V36,
+			declared under ESPELHOS in I3). SPEC V1 otherwise forbids two owners of one field.
+		-->
+		<layout left="0" top="0" width="420" height="150">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="420" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+
+			<label left="15" top="33" width="215" height="20" text="Total Experience" horzTextAlign="trailing"/>
+			<edit name="edtTotalXP" left="240" top="28" width="90" height="25" readOnly="true" horzTextAlign="center" fontSize="14"/>
+
+			<label left="15" top="68" width="215" height="20" text="Spent Experience" horzTextAlign="trailing"/>
+			<edit left="240" top="63" width="90" height="25" field="spentXP" horzTextAlign="center" fontSize="14"/>
+
+			<label left="15" top="103" width="215" height="20" text="Current Experience" horzTextAlign="trailing"/>
+			<edit left="240" top="98" width="90" height="25" field="experience" horzTextAlign="center" fontSize="14"/>
+		</layout>
+
+		<layout left="0" top="160" width="1040" height="480">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="1040" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
+
+			<textEditor left="15" top="25" width="1010" height="440" field="xpLog"/>
+		</layout>
+	</scrollBox>
+
+	<!-- Two entry points, as everywhere else on this sheet: the link catches later edits, the
+	     onNodeReady catches the sheet being opened (SPEC V19 / V33). -->
+	<dataLink fields="{'spentXP', 'experience'}" onChange="renderTotalXP(self);"/>
+
+	<event name="onNodeReady">
+		renderTotalXP(self);
+	</event>
+</form>

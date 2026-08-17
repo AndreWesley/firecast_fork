@@ -6,7 +6,13 @@
         	<edit left="110" top="0" width="200" height="25" field="desc_$(field)"/>
         </template>
 
-		<layout left="0" top="0" width="960" height="95">
+		<!--
+			Descriptor grid. The third column sits at x=635, not 585: the Descricao template is
+			310 wide (a 100px label plus a 200px edit at x=110), so a column starting at 585 drew
+			45px INSIDE the previous column's edit. It hit two rows, Height x Eyes and Weight x
+			Hair - SPEC B16, now covered by V37. 5 / 320 / 635 closes at 945, inside the 960 box.
+		-->
+		<layout left="0" top="0" width="960" height="125">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 
 			<layout left="5" top="5" width="310" height="25" >
@@ -15,7 +21,7 @@
 			<layout left="320" top="5" width="310" height="25" >
 				<Descricao field="altura" nome="Height"/>
 			</layout>
-			<layout left="585" top="5" width="310" height="25" >
+			<layout left="635" top="5" width="310" height="25" >
 				<Descricao field="olhos" nome="Eyes"/>
 			</layout>
 
@@ -25,46 +31,69 @@
 			<layout left="320" top="35" width="310" height="25" >
 				<Descricao field="peso" nome="Weight"/>
 			</layout>
-			<layout left="585" top="35" width="310" height="25" >
+			<layout left="635" top="35" width="310" height="25" >
 				<Descricao field="cabelo" nome="Hair"/>
 			</layout>
 
 			<layout left="5" top="65" width="310" height="25" >
 				<Descricao field="idadeAparente" nome="Apparent Age"/>
 			</layout>
-
-			<layout left="585" top="65" width="310" height="25" >
+			<!-- Nationality sits under Weight, as requested (SPEC T105). -->
+			<layout left="320" top="65" width="310" height="25" >
+				<Descricao field="nacionalidade" nome="Nationality"/>
+			</layout>
+			<layout left="635" top="65" width="310" height="25" >
 				<Descricao field="etinicidade" nome="Ethnicity"/>
 			</layout>
 		</layout>
 
-		<layout left="0" top="105" width="400" height="175">
+		<!--
+			Label renames on request (SPEC T104). The FIELDS are untouched: renaming one drops
+			whatever an existing sheet already saved (SPEC V2), which is the same call made for
+			`retainers` rendering GUIDES. The cost is that two field names now lie about their
+			contents - `aparencia` holds languages and `idiomas` holds goals. Recorded in SPEC C
+			so nobody "fixes" the names later and silently drops player text.
+		-->
+		<layout left="0" top="135" width="400" height="175">
 			<rectangle left="0" top="0" width="400" height="175" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-	        <label left="0" top="0" width="400" height="20" text="Appearance" horzTextAlign="center"/>
+	        <label left="0" top="0" width="400" height="20" text="Languages" horzTextAlign="center"/>
 			<textEditor left="10" top="25" width="380" height="135" field="aparencia"/>
         </layout>
 
-		<layout left="0" top="285" width="195" height="175">
+		<layout left="0" top="315" width="195" height="175">
 			<rectangle left="0" top="0" width="195" height="175" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 	        <label left="0" top="0" width="195" height="20" text="Concept" horzTextAlign="center"/>
 			<textEditor left="15" top="25" width="165" height="135" field="personalidade"/>
         </layout>
-        <layout left="205" top="285" width="195" height="175">
+        <layout left="205" top="315" width="195" height="175">
 			<rectangle left="0" top="0" width="195" height="175" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 	        <label left="0" top="0" width="195" height="20" text="Nature" horzTextAlign="center"/>
 			<textEditor left="15" top="25" width="165" height="135" field="natureza"/>
         </layout>
 
-		<layout left="0" top="465" width="400" height="175">
+		<layout left="0" top="495" width="400" height="175">
 			<rectangle left="0" top="0" width="400" height="175" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-	        <label left="0" top="0" width="400" height="20" text="Languages" horzTextAlign="center"/>
+	        <label left="0" top="0" width="400" height="20" text="Goals" horzTextAlign="center"/>
 			<textEditor left="10" top="25" width="380" height="135" field="idiomas"/>
         </layout>
 
-		<layout left="410" top="105" width="630" height="535">
+		<!-- New boxes, not renames: the tab never had a Goals box to rename onward from, so
+		     Moral Flaws and Fears get their own fields (SPEC C, confirmed with the user). -->
+		<layout left="0" top="675" width="195" height="175">
+			<rectangle left="0" top="0" width="195" height="175" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+	        <label left="0" top="0" width="195" height="20" text="Moral Flaws" horzTextAlign="center"/>
+			<textEditor left="15" top="25" width="165" height="135" field="moralFlaws"/>
+        </layout>
+        <layout left="205" top="675" width="195" height="175">
+			<rectangle left="0" top="0" width="195" height="175" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+	        <label left="0" top="0" width="195" height="20" text="Fears" horzTextAlign="center"/>
+			<textEditor left="15" top="25" width="165" height="135" field="fears"/>
+        </layout>
+
+		<layout left="410" top="135" width="630" height="715">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 	        <label left="0" top="0" width="630" height="20" text="Prelude" horzTextAlign="center"/>
-			<richEdit left="10" top="25" width="610" height="495" field="background" backgroundColor="#333333" defaultFontSize="12" defaultFontColor="white"/>
+			<richEdit left="10" top="25" width="610" height="675" field="background" backgroundColor="#333333" defaultFontSize="12" defaultFontColor="white"/>
         </layout>
 	</scrollBox>
 </form>

@@ -1,338 +1,468 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form name="frmHH_1" align="client" theme="dark">
 	<scrollBox align="client">
+		<!--
+			Layout grid (SPEC T41, V26, V27). Everything closes on x=1210 / y=780.
+
+			  header  0..1100      EXPERIENCE 1110..1210          y   0..100
+			  ATTRIBUTES 0..300    ABILITIES  310..1210           y 110..500
+			  avatar     0..300                                   y 405..780
+			                       VIRTUES 310..590
+			                       HEALTH  600..880
+			                       BACKGROUNDS 890..1210          y 510..780
+
+			Label widths are sized for the LONGER of [en] and [pt]: "Animal Ken" is
+			"Empatia com Animais" (19 chars) in pt, so the ability label is 125px, not 80.
+			Attribute / Ability / CustomAbility put their first dot at x=125, past that label,
+			so those dot columns line up with each other. Advantages / Willpower carry no label
+			and start at x=0 - they live alone in their own box and are centred by the caller.
+		-->
 		<template name="Header">
-			<label left="0" top="5" width="80" height="20" text="$(nome)" horzTextAlign="trailing"/>
-        	<edit left="90" top="0" width="200" height="25" field="$(field)"/>
+			<label left="0" top="5" width="105" height="20" text="$(nome)" horzTextAlign="trailing"/>
+			<edit left="112" top="0" width="235" height="25" field="$(field)"/>
 		</template>
 		<template name="HeaderPicker">
 			<label left="0" top="5" width="105" height="20" text="$(nome)" horzTextAlign="trailing"/>
-			<comboBox left="112" top="0" width="140" height="25" name="cbo$(field)" field="$(field)" items="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}" values="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}">
+			<comboBox left="112" top="0" width="235" height="25" name="cbo$(field)" field="$(field)" items="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}" values="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}">
 			</comboBox>
 		</template>
 		<template name="Attribute">
-			<label left="0" top="5" width="80" height="20" text="$(nome)"/>
-			<image left="80" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
-			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<image left="125" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</template>
+		<!-- Attribute, but dot 1 is a real checkbox instead of a fixed image, so the rating can
+		     drop to zero. Only Appearance uses it (SPEC T95). -->
+		<template name="AttributeZeroable">
+			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 		<template name="Ability">
-			<label left="0" top="5" width="80" height="20" text="$(nome)"/>
-			<imageCheckBox left="80" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="105" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="130" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="155" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="180" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</template>
+		<!-- Blank rows at the bottom of each ability column, for abilities the book does not list. -->
+		<template name="CustomAbility">
+			<edit left="0" top="2" width="122" height="21" field="$(field)" fontSize="12"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 		<template name="OpenAbility">
+			<comboBox left="0" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Armory', 'Avatar', 'Backup', 'Base of Operations', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Guide', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}" values="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Armory', 'Avatar', 'Backup', 'Base of Operations', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Guide', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}">
+			</comboBox>
 			<imageCheckBox left="165" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<comboBox left="0" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Avatar', 'Backup', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}" values="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Avatar', 'Backup', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}">
-			</comboBox>
 		</template>
+		<!-- No label: HUMANITY / WILLPOWER are titled above the track, so "FORCA DE VONTADE"
+		     cannot be clipped.
+
+		     The dots start at x=0, not x=125. That 125 origin existed only to line these two
+		     tracks up with the 125px row label of Attribute/Ability, back when Virtues and
+		     Humanity shared a single box (SPEC B12, T41). T79 split them into separate boxes,
+		     so nothing sits to the left of these tracks any more and the offset survived as
+		     125px of dead space that pushed the dots against the right edge. The track is now
+		     250px wide and the caller centres it with its own left margin. -->
 		<template name="Advantages">
-			<label left="0" top="5" width="60" height="20" text="$(nome)" horzTextAlign="center" fontSize="$(font)"/>
-			<imageCheckBox left="60" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="85" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="110" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="135" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="160" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="185" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="210" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="235" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="0" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="25" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="50" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="75" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 		<template name="Willpower">
-			<label left="0" top="15" width="60" height="20" text="$(nome)" horzTextAlign="center" fontSize="$(font)"/>
-			<imageCheckBox left="60" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="85" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="110" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="135" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="160" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="185" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="210" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="235" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="0" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="25" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="50" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="75" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 
-			<checkBox left="62" top="20" width="25" height="25" field="$(field)_c1"/>
-			<checkBox left="87" top="20" width="25" height="25" field="$(field)_c2"/>
-			<checkBox left="112" top="20" width="25" height="25" field="$(field)_c3"/>
-			<checkBox left="137" top="20" width="25" height="25" field="$(field)_c4"/>
-			<checkBox left="162" top="20" width="25" height="25" field="$(field)_c5"/>
-			<checkBox left="187" top="20" width="25" height="25" field="$(field)_c6"/>
-			<checkBox left="212" top="20" width="25" height="25" field="$(field)_c7"/>
-			<checkBox left="237" top="20" width="25" height="25" field="$(field)_c8"/>
-			<checkBox left="262" top="20" width="25" height="25" field="$(field)_c9"/>
-			<checkBox left="287" top="20" width="25" height="25" field="$(field)_c10"/>
+			<checkBox left="2" top="20" width="25" height="25" field="$(field)_c1"/>
+			<checkBox left="27" top="20" width="25" height="25" field="$(field)_c2"/>
+			<checkBox left="52" top="20" width="25" height="25" field="$(field)_c3"/>
+			<checkBox left="77" top="20" width="25" height="25" field="$(field)_c4"/>
+			<checkBox left="102" top="20" width="25" height="25" field="$(field)_c5"/>
+			<checkBox left="127" top="20" width="25" height="25" field="$(field)_c6"/>
+			<checkBox left="152" top="20" width="25" height="25" field="$(field)_c7"/>
+			<checkBox left="177" top="20" width="25" height="25" field="$(field)_c8"/>
+			<checkBox left="202" top="20" width="25" height="25" field="$(field)_c9"/>
+			<checkBox left="227" top="20" width="25" height="25" field="$(field)_c10"/>
 		</template>
 
 
-		<layout left="0" top="0" width="900" height="100">
+		<layout left="0" top="0" width="1100" height="100">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 
-			<layout left="5" top="5" width="290" height="25" >
+			<layout left="5" top="5" width="355" height="25" >
 				<Header field="name" nome="Name"/>
 			</layout>
-			<layout left="290" top="5" width="290" height="25" >
+			<layout left="370" top="5" width="355" height="25" >
 				<HeaderPicker field="nature" nome="Nature"/>
 			</layout>
-			<layout left="580" top="5" width="290" height="25" >
+			<layout left="735" top="5" width="355" height="25" >
 				<Header field="motivation" nome="Motivation"/>
 			</layout>
 
-			<layout left="5" top="35" width="290" height="25" >
+			<layout left="5" top="35" width="355" height="25" >
 				<Header field="player" nome="Player"/>
 			</layout>
-			<layout left="290" top="35" width="290" height="25" >
+			<layout left="370" top="35" width="355" height="25" >
 				<HeaderPicker field="demeanor" nome="Demeanor"/>
 			</layout>
-			<layout left="580" top="35" width="290" height="25" >
+			<layout left="735" top="35" width="355" height="25" >
 				<Header field="occupation" nome="Occupation"/>
 			</layout>
 
-			<layout left="5" top="65" width="290" height="25" >
+			<layout left="5" top="65" width="355" height="25" >
 				<Header field="chronicle" nome="Chronicle"/>
 			</layout>
-			<layout left="290" top="65" width="290" height="25" >
+			<layout left="370" top="65" width="355" height="25" >
 				<Header field="concept" nome="Concept"/>
 			</layout>
-			<layout left="580" top="65" width="290" height="25" >
+			<layout left="735" top="65" width="355" height="25" >
 				<Header field="residence" nome="Residence"/>
 			</layout>
 		</layout>
 
-		<layout left="910" top="0" width="100" height="100">
+		<layout left="1110" top="0" width="100" height="100">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 			<label left="0" top="0" width="100" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
 			<edit left="20" top="25" width="60" height="60" fontSize="20" horzTextAlign="center" field="experience"/>
 		</layout>
 
-		<layout left="0" top="110" width="270" height="285">
+		<layout left="0" top="110" width="300" height="285">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="5" top="0" width="270" height="20" text="ATTRIBUTES" horzTextAlign="center"/>
+			<label left="0" top="0" width="300" height="20" text="ATTRIBUTES" horzTextAlign="center"/>
 
-			<label left="-35" top="60" width="100" height="20" text="Physical" horzTextAlign="center" rotationAngle="270"/>
+			<label left="-40" top="60" width="100" height="20" text="Physical" horzTextAlign="center" rotationAngle="270"/>
 
-			<layout left="50" top="25" width="205" height="25" >
+			<layout left="35" top="25" width="250" height="25" >
 				<Attribute field="strength" nome="Strength"/>
 			</layout>
-			<layout left="50" top="50" width="205" height="25" >
+			<layout left="35" top="50" width="250" height="25" >
 				<Attribute field="dexterity" nome="Dexterity"/>
 			</layout>
-			<layout left="50" top="75" width="205" height="25" >
+			<layout left="35" top="75" width="250" height="25" >
 				<Attribute field="stamina" nome="Stamina"/>
 			</layout>
 
-			<horzLine left="5" top="105" width="255" strokeColor="white"/>
+			<horzLine left="10" top="105" width="280" strokeColor="white"/>
 
-			<label left="-35" top="145" width="100" height="20" text="Social" horzTextAlign="center" rotationAngle="270"/>
+			<label left="-40" top="145" width="100" height="20" text="Social" horzTextAlign="center" rotationAngle="270"/>
 
-			<layout left="50" top="110" width="205" height="25" >
+			<layout left="35" top="110" width="250" height="25" >
 				<Attribute field="charisma" nome="Charisma"/>
 			</layout>
-			<layout left="50" top="135" width="205" height="25" >
+			<layout left="35" top="135" width="250" height="25" >
 				<Attribute field="manipulation" nome="Manipulation"/>
 			</layout>
-			<layout left="50" top="160" width="205" height="25" >
-				<Attribute field="appearance" nome="Appearance"/>
+			<!-- Appearance is the one attribute whose first dot can be switched off, by request
+			     (SPEC T95). Every other attribute keeps dot 1 as a fixed <image>. Same x for
+			     the first dot as the Attribute template, so the column still lines up (V26). -->
+			<layout left="35" top="160" width="250" height="25" >
+				<AttributeZeroable field="appearance" nome="Appearance"/>
 			</layout>
 
-			<horzLine left="5" top="190" width="255" strokeColor="white"/>
+			<horzLine left="10" top="190" width="280" strokeColor="white"/>
 
-			<label left="-35" top="230" width="100" height="20" text="Mental" horzTextAlign="center" rotationAngle="270"/>
+			<label left="-40" top="230" width="100" height="20" text="Mental" horzTextAlign="center" rotationAngle="270"/>
 
-			<layout left="50" top="195" width="205" height="25" >
+			<layout left="35" top="195" width="250" height="25" >
 				<Attribute field="perception" nome="Perception"/>
 			</layout>
-			<layout left="50" top="220" width="205" height="25" >
+			<layout left="35" top="220" width="250" height="25" >
 				<Attribute field="inteligence" nome="Intelligence"/>
 			</layout>
-			<layout left="50" top="245" width="205" height="25" >
+			<layout left="35" top="245" width="250" height="25" >
 				<Attribute field="wits" nome="Wits"/>
 			</layout>
 		</layout>
 
-		<rectangle left="0" top="405" width="270" height="270" color="DimGray" xradius="5" yradius="5" cornerType="innerLine"/>
-		<image left="0" top="405" width="270" height="270" field="avatar" editable="true" style="autoFit"/>
+		<rectangle left="0" top="405" width="300" height="375" color="DimGray" xradius="5" yradius="5" cornerType="innerLine"/>
+		<image left="0" top="405" width="300" height="375" field="avatar" editable="true" style="autoFit"/>
 
-		<layout left="280" top="110" width="760" height="340">
+		<layout left="310" top="110" width="900" height="390">
 			<rectangle align="client" color="#FFFFFF00" strokeColor="black" strokeSize="1" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="5" top="1" width="760" height="20" text="ABILITIES" horzTextAlign="center"/>
+			<label left="0" top="1" width="900" height="20" text="ABILITIES" horzTextAlign="center"/>
 
-			<layout left="10" top="30" width="240" height="300">
+			<layout left="15" top="30" width="280" height="350">
 				<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-				<label left="5" top="0" width="240" height="20" text="TALENTS" horzTextAlign="center"/>
+				<label left="0" top="0" width="280" height="20" text="TALENTS" horzTextAlign="center"/>
 
-				<layout left="15" top="25" width="205" height="25" >
+				<layout left="15" top="25" width="250" height="25" >
 					<Ability field="alertness" nome="Alertness"/>
 				</layout>
-				<layout left="15" top="50" width="205" height="25" >
+				<layout left="15" top="50" width="250" height="25" >
 					<Ability field="athletics" nome="Athletics"/>
 				</layout>
-				<layout left="15" top="75" width="205" height="25" >
+				<layout left="15" top="75" width="250" height="25" >
 					<Ability field="awareness" nome="Awareness"/>
 				</layout>
-				<layout left="15" top="100" width="205" height="25" >
+				<layout left="15" top="100" width="250" height="25" >
 					<Ability field="brawl" nome="Brawl"/>
 				</layout>
-				<layout left="15" top="125" width="205" height="25" >
+				<layout left="15" top="125" width="250" height="25" >
 					<Ability field="empathy" nome="Empathy"/>
 				</layout>
-				<layout left="15" top="150" width="205" height="25" >
+				<layout left="15" top="150" width="250" height="25" >
 					<Ability field="expression" nome="Expression"/>
 				</layout>
-				<layout left="15" top="175" width="205" height="25" >
+				<layout left="15" top="175" width="250" height="25" >
 					<Ability field="intimidation" nome="Intimidation"/>
 				</layout>
-				<layout left="15" top="200" width="205" height="25" >
+				<layout left="15" top="200" width="250" height="25" >
 					<Ability field="leadership" nome="Leadership"/>
 				</layout>
-				<layout left="15" top="225" width="205" height="25" >
+				<layout left="15" top="225" width="250" height="25" >
 					<Ability field="streetwise" nome="Streetwise"/>
 				</layout>
-				<layout left="15" top="250" width="205" height="25" >
+				<layout left="15" top="250" width="250" height="25" >
 					<Ability field="subterfuge" nome="Subterfuge"/>
 				</layout>
+				<layout left="15" top="275" width="250" height="25" >
+					<CustomAbility field="customTalent_1"/>
+				</layout>
+				<layout left="15" top="300" width="250" height="25" >
+					<CustomAbility field="customTalent_2"/>
+				</layout>
 			</layout>
 
-			<layout left="260" top="30" width="240" height="300">
+			<layout left="310" top="30" width="280" height="350">
 				<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-				<label left="5" top="0" width="240" height="20" text="SKILLS" horzTextAlign="center"/>
+				<label left="0" top="0" width="280" height="20" text="SKILLS" horzTextAlign="center"/>
 
-				<layout left="15" top="25" width="205" height="25" >
+				<layout left="15" top="25" width="250" height="25" >
 					<Ability field="animalKen" nome="Animal Ken"/>
 				</layout>
-				<layout left="15" top="50" width="205" height="25" >
+				<layout left="15" top="50" width="250" height="25" >
 					<Ability field="crafts" nome="Crafts"/>
 				</layout>
-				<layout left="15" top="75" width="205" height="25" >
+				<layout left="15" top="75" width="250" height="25" >
 					<Ability field="etiquette" nome="Etiquette"/>
 				</layout>
-				<layout left="15" top="100" width="205" height="25" >
+				<layout left="15" top="100" width="250" height="25" >
 					<Ability field="firearms" nome="Firearms"/>
 				</layout>
-				<layout left="15" top="125" width="205" height="25" >
+				<layout left="15" top="125" width="250" height="25" >
 					<Ability field="larceny" nome="Larceny"/>
 				</layout>
-				<layout left="15" top="150" width="205" height="25" >
+				<layout left="15" top="150" width="250" height="25" >
 					<Ability field="melee" nome="Melee"/>
 				</layout>
-				<layout left="15" top="175" width="205" height="25" >
+				<layout left="15" top="175" width="250" height="25" >
 					<Ability field="performance" nome="Performance"/>
 				</layout>
-				<layout left="15" top="200" width="205" height="25" >
+				<layout left="15" top="200" width="250" height="25" >
 					<Ability field="ride" nome="Ride"/>
 				</layout>
-				<layout left="15" top="225" width="205" height="25" >
+				<layout left="15" top="225" width="250" height="25" >
 					<Ability field="stealth" nome="Stealth"/>
 				</layout>
-				<layout left="15" top="250" width="205" height="25" >
+				<layout left="15" top="250" width="250" height="25" >
 					<Ability field="survival" nome="Survival"/>
 				</layout>
+				<layout left="15" top="275" width="250" height="25" >
+					<CustomAbility field="customSkill_1"/>
+				</layout>
+				<layout left="15" top="300" width="250" height="25" >
+					<CustomAbility field="customSkill_2"/>
+				</layout>
 			</layout>
 
-			<layout left="510" top="30" width="240" height="300">
+			<layout left="605" top="30" width="280" height="350">
 				<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-				<label left="5" top="0" width="240" height="20" text="KNOWLEDGES" horzTextAlign="center"/>
+				<label left="0" top="0" width="280" height="20" text="KNOWLEDGES" horzTextAlign="center"/>
 
-				<layout left="15" top="25" width="205" height="25" >
+				<layout left="15" top="25" width="250" height="25" >
 					<Ability field="academics" nome="Academics"/>
 				</layout>
-				<layout left="15" top="50" width="205" height="25" >
+				<layout left="15" top="50" width="250" height="25" >
 					<Ability field="enigmas" nome="Enigmas"/>
 				</layout>
-				<layout left="15" top="75" width="205" height="25" >
+				<layout left="15" top="75" width="250" height="25" >
 					<Ability field="finance" nome="Finance"/>
 				</layout>
-				<layout left="15" top="100" width="205" height="25" >
+				<layout left="15" top="100" width="250" height="25" >
 					<Ability field="investigation" nome="Investigation"/>
 				</layout>
-				<layout left="15" top="125" width="205" height="25" >
+				<layout left="15" top="125" width="250" height="25" >
 					<Ability field="law" nome="Law"/>
 				</layout>
-				<layout left="15" top="150" width="205" height="25" >
+				<layout left="15" top="150" width="250" height="25" >
 					<Ability field="medicine" nome="Medicine"/>
 				</layout>
-				<layout left="15" top="175" width="205" height="25" >
+				<layout left="15" top="175" width="250" height="25" >
 					<Ability field="occult" nome="Occult"/>
 				</layout>
-				<layout left="15" top="200" width="205" height="25" >
+				<layout left="15" top="200" width="250" height="25" >
 					<Ability field="politics" nome="Politics"/>
 				</layout>
-				<layout left="15" top="225" width="205" height="25" >
+				<layout left="15" top="225" width="250" height="25" >
 					<Ability field="science" nome="Science"/>
 				</layout>
-				<layout left="15" top="250" width="205" height="25" >
+				<layout left="15" top="250" width="250" height="25" >
 					<Ability field="technology" nome="Technology"/>
+				</layout>
+				<layout left="15" top="275" width="250" height="25" >
+					<CustomAbility field="customKnowledge_1"/>
+				</layout>
+				<layout left="15" top="300" width="250" height="25" >
+					<CustomAbility field="customKnowledge_2"/>
 				</layout>
 			</layout>
 		</layout>
 
-		<layout left="280" top="460" width="350" height="220">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="5" top="0" width="340" height="20" text="VIRTUES" horzTextAlign="center"/>
+		<!--
+			Bottom row, three columns, all ending at y=810 (SPEC T78/T79):
+			  VIRTUES (310-590, y 510-620) over HUMANITY & WILLPOWER (310-590, y 630-810)
+			  HEALTH (600-880) | BACKGROUNDS (890-1210)
 
-			<layout left="15" top="25" width="205" height="25" >
+			Virtues and Humanity are 280 wide, not 410: their content is a 250px track (a 125px
+			label plus 5 dots, or 10 bare dots), so 410 left a wide empty margin and made the
+			Humanity/Willpower dots read as right-aligned. 280 = 250 + a 15px margin each side,
+			which centres both tracks. The 130px freed went to HEALTH.
+
+			HEALTH is 280 wide because 150 was not enough for its own labels: "Wounded (-2)" is
+			"Ferido Gravemente (-2)" in pt, ~143px in a 125px checkBox. V16 only measures
+			<label>, never <checkBox>, so that overflow was never flagged by the gate.
+
+			Faith is gone from this tab on purpose: `faith_1`..`_5` are now the dots of the
+			TRUE FAITH row on the Powers tab, so a saved sheet keeps its rating (SPEC V35).
+		-->
+		<layout left="310" top="510" width="280" height="110">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="280" height="20" text="VIRTUES" horzTextAlign="center"/>
+
+			<layout left="15" top="25" width="250" height="25" >
 				<Attribute field="conscience" nome="Conscience"/>
 			</layout>
-			<layout left="15" top="50" width="205" height="25" >
+			<layout left="15" top="50" width="250" height="25" >
 				<Attribute field="selfControl" nome="Self-Control"/>
 			</layout>
-			<layout left="15" top="75" width="205" height="25" >
+			<layout left="15" top="75" width="250" height="25" >
 				<Attribute field="courage" nome="Courage"/>
 			</layout>
+		</layout>
 
-			<layout left="15" top="105" width="305" height="25" >
-				<Advantages field="humanity" nome="Humanity" font="10"/>
+		<layout left="310" top="630" width="280" height="180">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+
+			<label left="0" top="15" width="280" height="20" text="HUMANITY" horzTextAlign="center"/>
+			<layout left="15" top="40" width="250" height="25" >
+				<Advantages field="humanity"/>
 			</layout>
-			<layout left="15" top="135" width="350" height="45" >
-				<Willpower field="willpower" nome="WILLPOWER" font="10"/>
-			</layout>
-			<layout left="15" top="185" width="205" height="25" >
-				<Ability field="faith" nome="Faith"/>
+
+			<label left="0" top="85" width="280" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<layout left="15" top="110" width="250" height="45" >
+				<Willpower field="willpower"/>
 			</layout>
 		</layout>
 
-		<layout left="640" top="460" width="150" height="175">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="0" top="0" width="150" height="20" text="HEALTH" horzTextAlign="center"/>
+		<!--
+			HEALTH is positional now (SPEC T96): row N is the Nth damage box, `health_1`..`_10`.
+			The old semantic names (bruised/hurt/injured/...) are gone - they could not express a
+			track where the label repeats (four "Bruised" rows at 10 levels), so they are declared
+			orphans in SPEC I3 and a sheet saved before this loses its health marks. Requested.
 
-			<checkBox left="20" top="25" width="125" height="20" field="bruised" text="Bruised"/>
-			<checkBox left="20" top="45" width="125" height="20" field="hurt" text="Hurt (-1)"/>
-			<checkBox left="20" top="65" width="125" height="20" field="injured" text="Injured (-1)"/>
-			<checkBox left="20" top="85" width="125" height="20" field="wounded" text="Wounded (-2)"/>
-			<checkBox left="20" top="105" width="125" height="20" field="mauled" text="Mauled (-2)"/>
-			<checkBox left="20" top="125" width="125" height="20" field="crippled" text="Crippled (-5)"/>
-			<checkBox left="20" top="145" width="125" height="20" field="incapacitated" text="Incapacitated"/>
+			The labels carry NO text= here: renderHealthTrack() on the root form writes them from
+			HEALTH_LEVELS, already translated, and hides the rows past the chosen length. The
+			`dyn` name prefix is what keeps the HH.6 language traversal off them - it snapshots
+			authored English once, and would restore a stale label after a length change (V31).
+
+			Title is 205 wide, not 280, to leave room for the level combo. That is under the 80%
+			the gate treats as a full-width section title, so V27 still holds for this box.
+			245px per row because "Wounded (-2)" is "Ferido Gravemente (-2)" in pt (V38 / B17).
+		-->
+		<layout left="600" top="510" width="280" height="300">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="205" height="20" text="HEALTH" horzTextAlign="center"/>
+			<comboBox name="cmbHealthLevels" left="212" top="0" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+			<dataLink field="healthLevels" defaultValue="7"/>
+
+			<checkBox name="dynHealth_1" left="20" top="28" width="245" height="20" field="health_1"/>
+			<checkBox name="dynHealth_2" left="20" top="55" width="245" height="20" field="health_2"/>
+			<checkBox name="dynHealth_3" left="20" top="82" width="245" height="20" field="health_3"/>
+			<checkBox name="dynHealth_4" left="20" top="109" width="245" height="20" field="health_4"/>
+			<checkBox name="dynHealth_5" left="20" top="136" width="245" height="20" field="health_5"/>
+			<checkBox name="dynHealth_6" left="20" top="163" width="245" height="20" field="health_6"/>
+			<checkBox name="dynHealth_7" left="20" top="190" width="245" height="20" field="health_7"/>
+			<checkBox name="dynHealth_8" left="20" top="217" width="245" height="20" field="health_8"/>
+			<checkBox name="dynHealth_9" left="20" top="244" width="245" height="20" field="health_9"/>
+			<checkBox name="dynHealth_10" left="20" top="271" width="245" height="20" field="health_10"/>
 		</layout>
 
-		<layout left="800" top="460" width="360" height="175">
+		<!-- 9 rows in the same 300px box: the pitch drops 40 -> 30 so the bottom edge still
+		     lines up with HEALTH and WILLPOWER at y=810. Rows are 25 tall, so this leaves a 5px
+		     gap - the box is full. A 10th row does not fit without growing the whole band. -->
+		<layout left="890" top="510" width="320" height="300">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="5" top="0" width="350" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
+			<label left="0" top="0" width="320" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
 
-			<layout left="15" top="25" width="330" height="25" >
+			<layout left="15" top="25" width="290" height="25" >
 				<OpenAbility field="background_1"/>
 			</layout>
-			<layout left="15" top="50" width="330" height="25" >
+			<layout left="15" top="55" width="290" height="25" >
 				<OpenAbility field="background_2"/>
 			</layout>
-			<layout left="15" top="75" width="330" height="25" >
+			<layout left="15" top="85" width="290" height="25" >
 				<OpenAbility field="background_3"/>
 			</layout>
-			<layout left="15" top="100" width="330" height="25" >
+			<layout left="15" top="115" width="290" height="25" >
 				<OpenAbility field="background_4"/>
 			</layout>
-			<layout left="15" top="125" width="330" height="25" >
+			<layout left="15" top="145" width="290" height="25" >
 				<OpenAbility field="background_5"/>
+			</layout>
+			<layout left="15" top="175" width="290" height="25" >
+				<OpenAbility field="background_6"/>
+			</layout>
+			<layout left="15" top="205" width="290" height="25" >
+				<OpenAbility field="background_7"/>
+			</layout>
+			<layout left="15" top="235" width="290" height="25" >
+				<OpenAbility field="background_8"/>
+			</layout>
+			<layout left="15" top="265" width="290" height="25" >
+				<OpenAbility field="background_9"/>
 			</layout>
 		</layout>
 	</scrollBox>
+
+	<!--
+		The health labels are written by Lua, so they need re-rendering whenever the track length
+		or the language changes. Two independent entry points on purpose (SPEC V19 / V33): the
+		dataLink covers later edits, onNodeReady covers the sheet simply being opened.
+	-->
+	<dataLink fields="{'healthLevels', 'language'}" onChange="renderHealthTrack(self, 'dynHealth_');"/>
+
+	<event name="onNodeReady">
+		renderHealthTrack(self, 'dynHealth_');
+	</event>
 </form>
