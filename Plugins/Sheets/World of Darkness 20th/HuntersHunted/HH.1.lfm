@@ -91,6 +91,25 @@
 			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
+		<!--
+			One health row: level name on the left, damage mark box on the right edge (SPEC T116).
+
+			The mark is NOT a checkBox any more - it holds one of four symbols and cycles on
+			click, back to the first on right-click (SPEC C, V41/V43). The box is a `rectangle`
+			with `hitTest="true"` so it takes mouse events, and the `label` inside carries
+			`field=` so the NDB renders the stored symbol with no Lua involved - which is also
+			what keeps this row and its Combat-tab twin in sync (SPEC V36).
+
+			The level label is 215 wide: the longest pt level is "Ferido Gravemente (-2)"
+			(~143px), so it fits with room to spare (SPEC V16 / B17).
+		-->
+		<template name="HealthRow">
+			<label name="dynHealth_$(num)" left="0" top="0" width="215" height="20"/>
+			<rectangle left="223" top="0" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="cycleHealthMark($(num));" onMenu="resetHealthMark($(num));">
+				<label align="client" field="health_$(num)" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+		</template>
+
 		<template name="Willpower">
 			<imageCheckBox left="0" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox left="25" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
@@ -396,6 +415,9 @@
 			`dyn` name prefix is what keeps the HH.6 language traversal off them - it snapshots
 			authored English once, and would restore a stale label after a length change (V31).
 
+			Each row is a named layout so the renderer can hide label and mark box together; the
+			mark itself is a four-symbol box, see the HealthRow template (SPEC T116).
+
 			Title is 205 wide, not 280, to leave room for the level combo. That is under the 80%
 			the gate treats as a full-width section title, so V27 still holds for this box.
 			245px per row because "Wounded (-2)" is "Ferido Gravemente (-2)" in pt (V38 / B17).
@@ -406,16 +428,16 @@
 			<comboBox name="cmbHealthLevels" left="212" top="0" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
 			<dataLink field="healthLevels" defaultValue="7"/>
 
-			<checkBox name="dynHealth_1" left="20" top="28" width="245" height="20" field="health_1"/>
-			<checkBox name="dynHealth_2" left="20" top="55" width="245" height="20" field="health_2"/>
-			<checkBox name="dynHealth_3" left="20" top="82" width="245" height="20" field="health_3"/>
-			<checkBox name="dynHealth_4" left="20" top="109" width="245" height="20" field="health_4"/>
-			<checkBox name="dynHealth_5" left="20" top="136" width="245" height="20" field="health_5"/>
-			<checkBox name="dynHealth_6" left="20" top="163" width="245" height="20" field="health_6"/>
-			<checkBox name="dynHealth_7" left="20" top="190" width="245" height="20" field="health_7"/>
-			<checkBox name="dynHealth_8" left="20" top="217" width="245" height="20" field="health_8"/>
-			<checkBox name="dynHealth_9" left="20" top="244" width="245" height="20" field="health_9"/>
-			<checkBox name="dynHealth_10" left="20" top="271" width="245" height="20" field="health_10"/>
+			<layout name="dynHealth_row1" left="20" top="28" width="245" height="20"><HealthRow num="1"/></layout>
+			<layout name="dynHealth_row2" left="20" top="55" width="245" height="20"><HealthRow num="2"/></layout>
+			<layout name="dynHealth_row3" left="20" top="82" width="245" height="20"><HealthRow num="3"/></layout>
+			<layout name="dynHealth_row4" left="20" top="109" width="245" height="20"><HealthRow num="4"/></layout>
+			<layout name="dynHealth_row5" left="20" top="136" width="245" height="20"><HealthRow num="5"/></layout>
+			<layout name="dynHealth_row6" left="20" top="163" width="245" height="20"><HealthRow num="6"/></layout>
+			<layout name="dynHealth_row7" left="20" top="190" width="245" height="20"><HealthRow num="7"/></layout>
+			<layout name="dynHealth_row8" left="20" top="217" width="245" height="20"><HealthRow num="8"/></layout>
+			<layout name="dynHealth_row9" left="20" top="244" width="245" height="20"><HealthRow num="9"/></layout>
+			<layout name="dynHealth_row10" left="20" top="271" width="245" height="20"><HealthRow num="10"/></layout>
 		</layout>
 
 		<!-- 9 rows in the same 300px box: the pitch drops 40 -> 30 so the bottom edge still

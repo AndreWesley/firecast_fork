@@ -635,6 +635,53 @@ else {
     else { Fail "V31/V39 HH.6 traversal has no dyn* guard - it would restore stale health labels" }
 }
 
+# ---- V41 - V43: the four-symbol damage mark (SPEC C 6th round) -------------------
+# The health box stopped being a checkBox: it holds " ", "/", "X" or "*", cycles on click and
+# resets on right-click. Three things can rot silently - a second copy of the list drifting from
+# the first, a mark box wired for click but not for right-click, and the normalisation that keeps
+# a pre-6th-round boolean from rendering as "true" in the box.
+$markMatches = [regex]::Matches($root, 'HEALTH_MARKS\s*=\s*\{([^}]*)\}')
+if ($markMatches.Count -ne 1) { Fail "V41 HEALTH_MARKS declared $($markMatches.Count)x on the root form, expected exactly 1" }
+else {
+    $marks = @([regex]::Matches($markMatches[0].Groups[1].Value, '"([^"]*)"') | ForEach-Object { $_.Groups[1].Value })
+    $wantMarks = @(' ', '/', 'X', '*')
+    $sameOrder = $marks.Count -eq $wantMarks.Count
+    if ($sameOrder) { for ($i = 0; $i -lt $marks.Count; $i++) { if ($marks[$i] -cne $wantMarks[$i]) { $sameOrder = $false } } }
+    if ($sameOrder) { Pass "V41 HEALTH_MARKS = the four symbols, space first, in cycle order" }
+    else { Fail "V41 HEALTH_MARKS = {'$($marks -join "','")'} - expected {' ','/','X','*'} in that order" }
+}
+$strayMarks = @($files | Where-Object { $_.Name -ne 'HuntersHunted.lfm' } |
+                Where-Object { [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($_.FullName)) -match 'HEALTH_MARKS\s*=' })
+if ($strayMarks) { foreach ($s in $strayMarks) { Fail "V41 $($s.Name) declares its own HEALTH_MARKS - the two tabs would drift" } }
+else { Pass "V41 the mark list lives only on the root form" }
+
+# V42: an unknown value (boolean, nil, junk) must be written back as the empty mark by the
+# renderer, or the box shows "true" until someone clicks it.
+if ($root -match 'markIndex\(mark\)\s*==\s*1' -and $root -match 'sheet\["health_"\s*\.\.\s*i\]\s*=\s*HEALTH_MARKS\[1\]') {
+    Pass "V42 renderHealthTrack normalises an unknown mark to the empty one"
+} else {
+    Fail "V42 no normalisation in renderHealthTrack - a pre-6th-round boolean would render as 'true'"
+}
+
+# V43: every mark box answers BOTH buttons. Checked on the template, which is where the box is
+# declared once per tab; the ten rows per tab are template calls and are counted by V5.
+$markBoxes = 0
+foreach ($f in $files) {
+    $xml = Doc $f.FullName
+    foreach ($t in $xml.SelectNodes("//template")) {
+        $lbl = $t.SelectSingleNode(".//label[@field]")
+        if ($null -eq $lbl -or $lbl.GetAttribute("field") -notmatch '^health_') { continue }
+        $markBoxes++
+        $box = $lbl.ParentNode
+        $where = "$($f.Name) <template $($t.GetAttribute('name'))>"
+        if ($box.GetAttribute("onClick") -notmatch 'cycleHealthMark') { Fail "V43 $where mark box has no cycleHealthMark on onClick" }
+        if ($box.GetAttribute("onMenu") -notmatch 'resetHealthMark') { Fail "V43 $where mark box has no resetHealthMark on onMenu - right-click would do nothing" }
+        if ($box.GetAttribute("hitTest") -ne 'true') { Fail "V43 $where mark box has no hitTest - it would never see a click" }
+    }
+}
+if ($markBoxes -eq 0) { Fail "V43 no health mark box found - the check reads nothing (SPEC V20)" }
+else { Pass "V43 all $markBoxes mark boxes answer click and right-click" }
+
 # ---- V27: a section title spanning its box must actually be centred on it -----
 # `horzTextAlign="center"` centres inside the label, not inside the box, so a title with
 # left="5" and width=<box width> sits 5px right of centre (SPEC B.13). Column headers are

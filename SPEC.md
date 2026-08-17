@@ -80,6 +80,14 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - 5ª rodada = geometria PURA: ⊥ campo novo, ⊥ rename, ⊥ Lua. `renderHealthTrack(self,'dynHealth3_')` & `renderCombatTraits` acham widget por NOME (`dynHealth3_N`, `ro_<field>_N`), ⊥ por posição ∴ mover caixa ⊥ toca script & espelhos de §I3 seguem iguais (§V36)
 - coluna direita FECHA o vão que `VIRTUES` deixou: `COMBAT TRAITS` @ top 0 & `HEALTH` @ top 330 (gap 10 ≡ resto do arquivo) ∴ ⊥ buraco de 110px no meio. JULGAMENTO meu — user pediu troca, ⊥ pediu vão
 - `VIRTUES` ! caber entre borda de `ARMOR` (x=380) & coluna direita (x=670) ∴ caixa 280→270 larga @ left 390 (gap 10 dos 2 lados) & layouts internos left 15→10. Conteúdo = label 125 + 5 dots = 250 ∴ cabe c/ folga; título acompanha `width` da caixa (§V27)
+- 6ª rodada 2026-08-17 ↓
+- marca de vitalidade deixa de ser bool: 4 ESTADOS `" "` `"/"` `"X"` `"*"` (1º = espaço), clique avança 1, depois do 4º volta ao 1º, botão DIREITO volta ao 1º de qualquer estado. Símbolos LITERAIS do user
+- caixa da marca vai p/ a DIREITA do texto do nível & encostada na borda direita da caixa HEALTH (era `checkBox` = box à esquerda + texto embutido) ∴ o nome do nível vira `label` próprio & o Lua passa a pintar esse label, ⊥ mais o `text` do `checkBox`
+- forma = `rectangle` `hitTest="true"` (a moldura da caixinha) + `label field="health_N"` dentro ∴ o valor GRAVADO é o próprio símbolo & aparece sem render de Lua; clique = `onClick`, botão direito = `onMenu` (§R17 §R18 §R19). JULGAMENTO meu: user chamou de "caixa de marcação" ∴ mantém box visível, ⊥ `button` do precedente
+- `health_1`…`_10` mudam de DOMÍNIO (bool → 1 dos 4 símbolos), ⊥ de nome ∴ §V2 intacto. Ficha salva c/ `true` normaliza p/ `" "` no 1º render (1 linha em `renderHealthTrack`, ⊥ migração) ∴ marcas velhas caem — ≡ perda já aceita na 4ª rodada, ⊥ pedida de novo ?
+- símbolos ⊥ traduzem (`/` `X` `*` = grafia, ⊥ idioma) ∴ FORA de §V9 §V10 §V17 ≡ exceção já aberta p/ o combo `healthLevels`
+- lista dos 4 símbolos + funções de ciclo/reset declaradas 1× no form RAIZ (≡ `HEALTH_LEVELS`) & as 2 abas chamam a mesma ∴ ⊥ drift Main × Combat (§V41)
+- espelho Main↔Combat segue de graça: a marca mora num `label field="health_N"` ∴ NDB sincroniza as 2 abas sem Lua (§V36). `dataLink` p/ `health_*` ⊥ criado — observador sem efeito. CORREÇÃO 2026-08-17 do §C que pedia o contrário (contradizia §V36), achada @ build
 
 ## §I INTERFACES
 
@@ -134,6 +142,9 @@ R13|reatividade sem botão|`dataLink.eves["onChange"] = "field, oldValue, newVal
 R14|listas canônicas de númina|cap.1 Hedge Magic Paths (21): Alchemy · Conjuration · Conveyance · Divination · Ephemera · Enchantment · Fascination · Fortune · Healing · Hellfire · Illusion · Maelstroms · Necromancy · Necronics · Oneiromancy · Quintessence Manipulation · Shadows · Shapeshifting · Starlight · Summoning, Binding, and Warding · Weather Control. cap.2 Psychic Phenomena (22): Animal Psychics · Anti-Psychic · Astral Projection · Biocontrol · Channeling · Clairvoyance · Cyberkinesis · Cyberpathy · Ectoplasmic Generation · Mind Shields · Precognition · Psychic Healing · Psychic Hypnosis · Psychic Invisibility · Psychic Vampirism · Psychokinesis · Psychometry · Psychoportation · Pyrokinesis · Shadow · Synergy · Telepathy. Total 43 ∴ §R.8 resolvido p/ núminas (arquétipos & antecedentes seguem `?`)|`M20 Sorcerer` TOC p.4 · cap.1 p.18-51 · cap.2 p.54-77 (PDF anexado pelo user 2026-08-17)
 R15|canvas da aba|fichas HH usam até x≈1210 (`HH.1`: layout `left=890 width=320`) ∴ 2 tabelas ~350 à esquerda + bloco de descrição ~800 à direita cabem sem estourar|`HuntersHunted/HH.1.lfm`
 R16|conteúdo True Faith|3 seções nos 2 prints do user: `Systems for True Faith` (Path ÚNICO ≠ demais Numina · cada nível = +1 Willpower · cada ponto = dado de proteção divina vs Numina & Disciplinas, dif. 7, subtrai sucessos da ativação, só poder que afeta direto & exige rolagem, ⊥ vs Aura Perception/Fortitude · rating 1-5) · `True Faith Levels` (• repelir criatura c/ símbolo/oração: gasta Willpower & rola Faith vs Willpower permanente, sucessos = turnos de fuga, botch = avança livre, símbolo no corpo = 1 agravado por sucesso · •• sentir presença de vampiro em ambiente calmo · ••• imune a Chimerstry/Dementation/Dominate/Obfuscate · •••• ⊥ pode virar ghoul, imune a Presence · ••••• presença causa auto-ódio/nojo/terror/dor, Rötschreck dif. 9) · `Miracles of True Faith` (≤1 por história, sempre dramático, ⊥ sistema mecânico, motivação examinada pelo ST) + exemplos. Fim da lista de exemplos ⊥ cabe no print ∴ `?` — sessão de build sem os prints ! pedir reenvio, ⊥ escrever de memória (≡ §R.8)|prints do user 2026-08-17
+R17|widget de texto clicável|`gui.Button` & `gui.Label` herdam `gui.TextControl` ∴ os 2 têm `text`; só `Label` tem prop `field` ∴ label ligado a campo renderiza o valor cru sem Lua. `Button` ⊥ tem `field` — precedente grava por Lua (`sheet.<campo> = …`)|`SDK3/API/rrpgGUI.lua:681-712`
+R18|botão direito|`gui.Control.eves["onMenu"] = 'x, y, event'` ∴ ∀ controle tem hook de clique-direito, ⊥ só `button`. Precedente real em ficha: `<rectangle hitTest="true" onMenu="self:exibirMenuDoAtor();">` ∴ `rectangle` c/ `hitTest` recebe evento de mouse|`SDK3/API/rrpgGUI.lua:280` · `Plugins/Core/rrpginlua/turnos/AtorCombatTracker.lfm:237` · `Plugins/Sheets/Ficha 4D&T/Ficha4D&T/Examples.lfm:16`
+R19|ciclo por clique|precedente de N estados em ficha: `<button onClick>` faz `sheet.imageCounter = (sheet.imageCounter + 1) % #pics` & escreve o valor no campo ∴ ciclo = contador + módulo, estado mora no NDB, ⊥ em variável de form|`Plugins/Sheets/Ficha Exalted 3rd/Ficha Exalted 3rd/MultImageCheckbox.lfm:27-36`
 
 ## §V INVARIANTS
 
@@ -177,6 +188,9 @@ V37: ∀ `<layout>` irmãos na MESMA caixa & mesmo `top` ! ⊥ sobrepõem em x �
 V38: §V16 estendido a `checkBox` c/ `text=` — `width` ! ≥ largura do texto mais longo entre [en] & [pt]. §V16 media só `//label` ∴ família inteira escapava (§B17)
 V39: tabela de vitalidade: ∀ n ∈ 1…10 → ∃ lista `LEVELS[n]`, `#LEVELS[n]` = n, último item = `Incapacitated`, ∀ item ∈ os 7 rótulos canônicos ∴ combo ⊥ abre linha sem rótulo (§V33, §V19)
 V40: caixas irmãs (`<layout>` c/ `left top width height` filhas do mesmo `scrollBox`) ! retângulos DISJUNTOS ∴ caixa ⊥ desenha por cima de caixa. §V37 mede linha vs linha DENTRO da caixa; isto mede CAIXA vs caixa — ponto cego aberto desde que ∃ coluna lado a lado (`COMBAT` 0..650 vs coluna 670). JULGAMENTO meu, ⊥ pedido: 5ª rodada aperta `VIRTUES` num vão de 280px ∴ erro de 10px passaria verde
+V41: lista de marcas = `{" ", "/", "X", "*"}` NESSA ordem, 1º = `" "`, declarada 1× no form raiz (`HuntersHunted.lfm`) ∴ Main & Combat ciclam igual & ⊥ 2ª lista p/ divergir
+V42: ∀ valor gravado em `health_1`…`_10` ∈ os 4 símbolos. Valor ∉ lista (bool de ficha velha, nil, lixo) → render normaliza p/ `" "` & clique recomeça do 1º ∴ ciclo ⊥ trava (§V19, §V33)
+V43: ∀ caixa de marca de vitalidade declara `onClick` (avança 1) & `onMenu` (volta ao 1º) ∴ ⊥ caixa que só avança & ⊥ estado alcançável só dando 3 voltas
 
 ## §T TASKS
 
@@ -294,6 +308,12 @@ T110|x|`rdk -l` @ raiz do plugin → exit 0 & mtime\|size do `.rpk` mudou|V6,V7
 T111|x|`HH.3.lfm` relayout — `COMBAT TRAITS` (670,430)→(670,0), 280×320; `HEALTH` (670,0)→(670,330), 280×300; `VIRTUES` (670,310,280,110)→(390,350,270,110) c/ layouts internos left 15→10 & título `width` 280→270. Só `left top width`: ⊥ campo, ⊥ nome de widget, ⊥ Lua, ⊥ `.lang`|V27,V36,V37,V40
 T112|x|`verify-hunters-hunted.ps1` — check §V40: caixas irmãs do `scrollBox` c/ `left top width height` ⊥ se cruzam ∴ o lado-a-lado novo (`ARMOR`\|`VIRTUES`\|coluna direita) tem gate|V40
 T113|x|`rdk -l` @ raiz do plugin → exit 0 & mtime\|size do `.rpk` mudou|V6,V7
+T114|.|`?` testar em Firecast: `onMenu` dispara em `rectangle hitTest="true"` dentro da ficha & ⊥ abre menu nativo por cima. ⊥ → cair p/ `button` (§R19) \| `onDblClick` como reset. BLOQUEIA T115|R18,V43
+T115|x|`HuntersHunted.lfm` (form raiz) — `HEALTH_MARKS = {" ", "/", "X", "*"}` + `cycleHealthMark(sheet, n)` (avança, volta ao 1º após o 4º) & `resetHealthMark(sheet, n)`; `renderHealthTrack` normaliza valor ∉ lista → `" "`|V41,V42,V19,R19
+T116|x|`HH.1.lfm` HEALTH — cada linha vira `label` do nível (esquerda, pintado pelo Lua ≡ hoje) + caixa de marca `rectangle hitTest="true"` c/ `label field="health_N"` dentro, encostada na borda direita da caixa; `onClick`→`cycleHealthMark`, `onMenu`→`resetHealthMark`. `checkBox` `dynHealth1_N` some|V1,V16,V25,V41,V43,T115
+T117|x|`HH.3.lfm` — mesma troca no espelho (`dynHealth3_`). Sincronia entre abas = NDB via `label field=` ∴ ⊥ mexe em `dataLink` (§V36). MESMO commit que T116 ∴ ⊥ 2 formas de vitalidade convivendo|V1,V36,V41,V43,T116
+T118|x|`verify-hunters-hunted.ps1` — §V5 conta as 10 linhas de vitalidade pela forma nova (⊥ mais `checkBox field="health_N"`); checks NOVOS §V41 (lista 1× no raiz, 4 símbolos, ordem) §V42 (normalização no render) §V43 (`onClick` & `onMenu` em ∀ caixa de marca); §V38 ⊥ mede mais os níveis (viraram `label` ∴ §V16/§V25 assumem)|V5,V16,V38,V41,V42,V43
+T119|x|`rdk -l` → exit 0 & `.rpk` mudou; depois `rdk -i` → `.rpk` instalado em `%APPDATA%\Firecast\Plugins\ambesek.wod.20th.rpk` c/ mesmo size (CLAUDE.md)|V6,V7
 
 ## §B BUGS
 

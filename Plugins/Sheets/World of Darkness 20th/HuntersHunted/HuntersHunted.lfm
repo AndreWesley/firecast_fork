@@ -40,7 +40,37 @@
 				["Incapacitated"]  = "Incapacitado",
 			};
 
-			-- `form` is the tab form; `prefix` names its ten checkBoxes (dynHealth_1 .. _10).
+			-- The four damage marks, LITERAL from the user (SPEC C, V41), in cycle order. Mark 1
+			-- is a single space, not "": the sheet stores exactly what the box shows.
+			HEALTH_MARKS = {" ", "/", "X", "*"};
+
+			local function markIndex(v)
+				for i = 1, #HEALTH_MARKS, 1 do
+					if HEALTH_MARKS[i] == v then return i; end;
+				end;
+
+				-- nil, a boolean from a sheet saved before the 6th round, or anything else:
+				-- reads as the empty mark, so a click always continues the cycle (SPEC V42).
+				return 1;
+			end;
+
+			-- Both tabs call these. The argument is the row number because the field name is
+			-- positional (health_1 .. health_10, SPEC I3) - the row IS the identity.
+			function cycleHealthMark(n)
+				if sheet == nil then return; end;
+
+				local at = markIndex(sheet["health_" .. n]);
+				sheet["health_" .. n] = HEALTH_MARKS[(at % #HEALTH_MARKS) + 1];
+			end;
+
+			function resetHealthMark(n)
+				if sheet == nil then return; end;
+
+				sheet["health_" .. n] = HEALTH_MARKS[1];
+			end;
+
+			-- `form` is the tab form; `prefix` names its ten rows: the layout `<prefix>rowN`
+			-- holds the level label `<prefix>N` and the clickable mark box.
 			-- The `dyn` prefix is what tells the HH.6 traversal to leave them alone.
 			function renderHealthTrack(form, prefix)
 				if sheet == nil then return; end;
@@ -50,24 +80,35 @@
 				local lang = sheet.language or "en";
 
 				for i = 1, 10, 1 do
-					local box = form[prefix .. i];
+					-- A sheet saved before the 6th round has a boolean here, which the mark
+					-- label would render as "true". Normalise it once, on the first render that
+					-- sees it (SPEC V42). Hidden rows are normalised too, so growing the track
+					-- later cannot expose a stale value.
+					local mark = sheet["health_" .. i];
 
-					if box ~= nil then
+					if mark ~= nil and mark ~= HEALTH_MARKS[1] and markIndex(mark) == 1 then
+						sheet["health_" .. i] = HEALTH_MARKS[1];
+					end;
+
+					local row = form[prefix .. "row" .. i];
+					local text = form[prefix .. i];
+
+					if row ~= nil and text ~= nil then
 						local canon = nil;
 
 						if levels ~= nil then canon = levels[i]; end;
 
 						if canon == nil then
-							-- Rows past the chosen length, or an out-of-range value: hide the row
-							-- instead of leaving a checkBox with a stale label next to it.
-							box.visible = false;
+							-- Rows past the chosen length, or an out-of-range value: hide the
+							-- whole row, label and mark box together.
+							row.visible = false;
 						else
-							box.visible = true;
+							row.visible = true;
 
 							if lang == "pt" then
-								box.text = HEALTH_PT[canon] or canon;
+								text.text = HEALTH_PT[canon] or canon;
 							else
-								box.text = canon;
+								text.text = canon;
 							end;
 						end;
 					end;
