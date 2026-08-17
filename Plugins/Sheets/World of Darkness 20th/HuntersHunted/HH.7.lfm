@@ -1931,6 +1931,13 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 					return pick(EMPTY_ROW, lang);
 				end;
 
+				-- The TRUE FAITH row picks a RELIGION, not a numina. True Faith is one Path
+				-- whatever faith the character holds, so every choice opens the same text and
+				-- the religions need no DESC entries of their own (SPEC V50).
+				if selected == "faith" then
+					value = "True Faith";
+				end;
+
 				local entry = DESC[value];
 
 				if entry == nil then
@@ -2073,7 +2080,7 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 
 			<layout left="12" top="25" width="315" height="25">
 				<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="faith" groupName="numinaSel"/>
-				<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cboFaith" field="faith" items="{'', 'True Faith'}" values="{'', 'True Faith'}">
+				<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cboFaith" field="faith" items="{'', 'Christianity', 'Judaism', 'Islam', 'Other'}" values="{'', 'Christianity', 'Judaism', 'Islam', 'Other'}">
 				</comboBox>
 				<imageCheckBox left="190" top="0" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 				<imageCheckBox left="215" top="0" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>

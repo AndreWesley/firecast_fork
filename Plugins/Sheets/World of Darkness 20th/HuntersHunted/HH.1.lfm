@@ -2,14 +2,19 @@
 <form name="frmHH_1" align="client" theme="dark">
 	<scrollBox align="client">
 		<!--
-			Layout grid (SPEC T41, V26, V27). Everything closes on x=1210 / y=780.
+			Layout grid (SPEC T41, V26, V27). Everything closes on x=1210 / y=810.
 
 			  header  0..1100      EXPERIENCE 1110..1210          y   0..100
 			  ATTRIBUTES 0..300    ABILITIES  310..1210           y 110..500
-			  avatar     0..300                                   y 405..780
-			                       VIRTUES 310..590
-			                       HEALTH  600..880
-			                       BACKGROUNDS 890..1210          y 510..780
+			  avatar     0..300                                   y 405..810
+			                       VIRTUES 310..590               y 510..620
+			                       HUMANITY+WILLPOWER 310..590     y 630..810
+			                       HEALTH  600..880               y 510..816 at ten rows
+			                       BACKGROUNDS 890..1210          y 510..810
+
+			HEALTH is the one box that does not end on 810: its height is the ten-row case and
+			the renderer shrinks it to the chosen track length (SPEC V49), so at the default of
+			seven rows it ends at 735 and only a player who picks ten pushes 6px past the rest.
 
 			Label widths are sized for the LONGER of [en] and [pt]: "Animal Ken" is
 			"Empatia com Animais" (19 chars) in pt, so the ability label is 125px, not 80.
@@ -95,7 +100,8 @@
 			One health row: level name on the left, damage mark box on the right edge (SPEC T116).
 
 			The mark is NOT a checkBox any more - it holds one of four symbols and cycles on
-			click, back to the first on right-click (SPEC C, V41/V43). The box is a `rectangle`
+			click. Emptying a box is healing, so both the wrap and the right-click clear the
+			BOTTOM-most marked row, not this one (SPEC V44). The box is a `rectangle`
 			with `hitTest="true"` so it takes mouse events, and the `label` inside carries
 			`field=` so the NDB renders the stored symbol with no Lua involved - which is also
 			what keeps this row and its Combat-tab twin in sync (SPEC V36).
@@ -105,7 +111,7 @@
 		-->
 		<template name="HealthRow">
 			<label name="dynHealth_$(num)" left="0" top="0" width="215" height="20"/>
-			<rectangle left="223" top="0" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="cycleHealthMark($(num));" onMenu="resetHealthMark($(num));">
+			<rectangle left="223" top="0" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="cycleHealthMark($(num));" onMenu="healHealthMark();">
 				<label align="client" field="health_$(num)" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
 		</template>
@@ -224,11 +230,16 @@
 			</layout>
 		</layout>
 
-		<rectangle left="0" top="405" width="300" height="375" color="DimGray" xradius="5" yradius="5" cornerType="innerLine"/>
-		<image left="0" top="405" width="300" height="375" field="avatar" editable="true" style="autoFit"/>
+		<!-- 405 tall, not 375: the preview now ends on y=810 with BACKGROUNDS and the
+		     HUMANITY box, which is where the column closes (SPEC T134). -->
+		<rectangle left="0" top="405" width="300" height="405" color="DimGray" xradius="5" yradius="5" cornerType="innerLine"/>
+		<image left="0" top="405" width="300" height="405" field="avatar" editable="true" style="autoFit"/>
 
 		<layout left="310" top="110" width="900" height="390">
-			<rectangle align="client" color="#FFFFFF00" strokeColor="black" strokeSize="1" xradius="10" yradius="10" cornerType="innerLine"/>
+			<!-- Filled black like every other section box. It shipped with the Mage sheet's
+			     transparent fill (#FFFFFF00), which let the tab background through and read as
+			     grey next to its black siblings - SPEC B18, now covered by V48. -->
+			<rectangle align="client" color="black" strokeColor="black" strokeSize="1" xradius="10" yradius="10" cornerType="innerLine"/>
 			<label left="0" top="1" width="900" height="20" text="ABILITIES" horzTextAlign="center"/>
 
 			<layout left="15" top="30" width="280" height="350">
@@ -418,11 +429,16 @@
 			Each row is a named layout so the renderer can hide label and mark box together; the
 			mark itself is a four-symbol box, see the HealthRow template (SPEC T116).
 
+			height=306 is the TEN-row case on purpose (SPEC V49): the renderer shrinks the box to
+			fit the chosen track length, so the file always declares the tallest it can ever be
+			and the box-overlap check (V40), which reads this file and not the running sheet,
+			keeps measuring the worst case.
+
 			Title is 205 wide, not 280, to leave room for the level combo. That is under the 80%
 			the gate treats as a full-width section title, so V27 still holds for this box.
 			245px per row because "Wounded (-2)" is "Ferido Gravemente (-2)" in pt (V38 / B17).
 		-->
-		<layout left="600" top="510" width="280" height="300">
+		<layout name="dynHealth_box" left="600" top="510" width="280" height="306">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 			<label left="0" top="0" width="205" height="20" text="HEALTH" horzTextAlign="center"/>
 			<comboBox name="cmbHealthLevels" left="212" top="0" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>

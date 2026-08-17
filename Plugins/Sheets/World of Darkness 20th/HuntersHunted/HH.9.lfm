@@ -25,25 +25,38 @@
 			the same `field="experience"`, so the NDB keeps both in step with no Lua (SPEC V36,
 			declared under ESPELHOS in I3). SPEC V1 otherwise forbids two owners of one field.
 		-->
-		<layout left="0" top="0" width="420" height="150">
+		<!--
+			The three numbers sit side by side (SPEC T140): one column each, same label width and
+			same edit column, so the three edits line up (SPEC V26). The box spans the full tab
+			width, which is what the log box below is aligned to.
+		-->
+		<!--
+			Three columns of 336, each holding its label with the number CENTRED UNDER IT rather than
+			beside it (SPEC T151). The title sits 10 off the top edge and the data starts 8 under it:
+			room above the heading, none wasted between the heading and what it names.
+
+			Stacking costs height - the box went 75 -> 95 - which is why the log below starts at 105
+			and still closes the tab on 640.
+		-->
+		<layout left="0" top="0" width="1040" height="95">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="0" top="0" width="420" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+			<label left="0" top="10" width="1040" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<label left="15" top="33" width="215" height="20" text="Total Experience" horzTextAlign="trailing"/>
-			<edit name="edtTotalXP" left="240" top="28" width="90" height="25" readOnly="true" horzTextAlign="center" fontSize="14"/>
+			<label left="15" top="38" width="336" height="20" text="Total Experience" horzTextAlign="center"/>
+			<edit name="edtTotalXP" left="138" top="60" width="90" height="25" readOnly="true" horzTextAlign="center" fontSize="14"/>
 
-			<label left="15" top="68" width="215" height="20" text="Spent Experience" horzTextAlign="trailing"/>
-			<edit left="240" top="63" width="90" height="25" field="spentXP" horzTextAlign="center" fontSize="14"/>
+			<label left="352" top="38" width="336" height="20" text="Spent Experience" horzTextAlign="center"/>
+			<edit left="475" top="60" width="90" height="25" field="spentXP" horzTextAlign="center" fontSize="14"/>
 
-			<label left="15" top="103" width="215" height="20" text="Current Experience" horzTextAlign="trailing"/>
-			<edit left="240" top="98" width="90" height="25" field="experience" horzTextAlign="center" fontSize="14"/>
+			<label left="689" top="38" width="336" height="20" text="Current Experience" horzTextAlign="center"/>
+			<edit left="812" top="60" width="90" height="25" field="experience" horzTextAlign="center" fontSize="14"/>
 		</layout>
 
-		<layout left="0" top="160" width="1040" height="480">
+		<layout left="0" top="105" width="1040" height="535">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 			<label left="0" top="0" width="1040" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
 
-			<textEditor left="15" top="25" width="1010" height="440" field="xpLog"/>
+			<textEditor left="15" top="25" width="1010" height="495" field="xpLog"/>
 		</layout>
 	</scrollBox>
 

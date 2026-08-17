@@ -88,6 +88,64 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - símbolos ⊥ traduzem (`/` `X` `*` = grafia, ⊥ idioma) ∴ FORA de §V9 §V10 §V17 ≡ exceção já aberta p/ o combo `healthLevels`
 - lista dos 4 símbolos + funções de ciclo/reset declaradas 1× no form RAIZ (≡ `HEALTH_LEVELS`) & as 2 abas chamam a mesma ∴ ⊥ drift Main × Combat (§V41)
 - espelho Main↔Combat segue de graça: a marca mora num `label field="health_N"` ∴ NDB sincroniza as 2 abas sem Lua (§V36). `dataLink` p/ `health_*` ⊥ criado — observador sem efeito. CORREÇÃO 2026-08-17 do §C que pedia o contrário (contradizia §V36), achada @ build
+- 7ª rodada 2026-08-17 ↓
+- LIMPAR marca = CURA ∴ ⊥ zera a linha clicada: zera a ÚLTIMA linha marcada (maior índice). Ex. do user: 3 marcadas (1 2 3), clique p/ limpar a 1 → quem zera é a 3 & a 1 SEGUE marcada. Dano entra por qualquer linha, cura sai sempre de baixo
+- clique esquerdo em `*` (wrap p/ `" "`) & clique DIREITO caem os 2 na mesma rotina de cura ∴ 1 regra só, ⊥ 2 caminhos p/ divergir. Direito vira "cura 1 nível" de qualquer linha. JULGAMENTO meu — user disse "se um ponto de vida for limpo", ⊥ separou os 2 botões ?
+- alvo da cura ∈ linhas 1…`healthLevels` (as VISÍVEIS) ∴ marca presa em linha escondida (track encolheu depois de marcar) ⊥ vira alvo — senão o clique some sem efeito visível (§V45)
+- normalização do render (valor ∉ lista → `" "`, §V42) ⊥ é cura: limpeza de dado velho, ⊥ clique ∴ ⊥ passa pela rotina de cura
+- ⊥ downgrade de gravidade na cura (`*`→`X`→`/`): user pediu LIMPAR o nível. Regra de livro (agravado cura diferente) ⊥ entra — ficha = papel (§C ↑)
+- 8ª rodada 2026-08-17 ↓
+- track SEMPRE AGRUPADO: marcas ordenadas por gravidade decrescente `*` > `X` > `/` > vazio nas linhas 1…`healthLevels`, ⊥ buraco entre elas ∴ dano mais forte sobe sozinho & empurra o mais fraco p/ baixo. Pedido user 2026-08-17 c/ 2 exemplos
+- ordem de gravidade = a própria ordem de `HEALTH_MARKS` (índice ↑ = mais grave) ∴ ⊥ 2ª lista p/ divergir de §V41
+- entrada de dano segue sendo o CICLO na caixa (" "→`/`→`X`→`*`) ∴ registrar 1 agravado = clicar a ferida & seguir ela subindo. Exemplos do user fecham: `X X /` + clique em vazio → `X X / /`; clique na nova `/` → `X X X /`; clique nessa `X` (que subiu p/ linha 3) → `* X X /`. Depois +2 cliques numa vazia → `* X X X /`
+- reagrupar roda DEPOIS de ∀ mutação que pode quebrar a ordem: upgrade no meio da pilha (`* X X /` + clique na 2ª `X` → `* X * /`) & marca criada em caixa vazia longe do bloco (buraco). Cura ⊥ precisa — tirar a última de lista ordenada mantém ordem
+- render também reagrupa: ficha marcada nas rodadas 6/7 tem ordem arbitrária ∴ 1ª abertura já mostra agrupado. Contagem preservada ∴ ⊥ é perda de dado, ≠ cura (§V45)
+- ⊥ estouro: marca NOVA só nasce clicando caixa vazia ∴ total ≤ `healthLevels` sempre; upgrade troca tipo, ⊥ cria marca
+- 9ª rodada 2026-08-17 ↓
+- caixa `ABILITIES` (Main) herdou fill `#FFFFFF00` (transparente) do `M20.1` ∴ fundo da aba passa através & ela lê CINZA ao lado das irmãs pretas. Fix = `color="black"` ≡ demais caixas de seção (§B18)
+- fills ⊥ pretos que FICAM: moldura do avatar (`DimGray` — ⊥ é caixa de seção, ⊥ tem título) & caixinha de marca de vitalidade (`#00000000` — mora DENTRO de caixa preta, o vazado é o efeito) ∴ §V48 mede só caixa de SEÇÃO
+- aba História: caixas `Concept` (campo `personalidade`) & `Nature` (campo `natureza`) SAEM; `Moral Flaws` & `Fears` ocupam as posições delas — (0,315) & (205,315). Pedido user 2026-08-17
+- `personalidade` & `natureza` viram ÓRFÃOS declarados (∃ dado em ficha salva, ⊥ widget) ∴ remoção PEDIDA ≠ rename acidental, §V2 ⊥ se aplica ≡ precedente `transportation`/`other`
+- chaves `.lang` `Concept` & `Nature` FICAM: header da Main renderiza `Concept` & os pickers renderizam `Nature` ∴ ⊥ sair do `.lang` nem do mapa `PT`
+- slot de baixo (0,675)+(205,675) fica VAZIO & `Prelude` segue 715 alto ∴ coluna esquerda fecha em 670 & sobra vão de 180px. Reflow ⊥ pedido ≡ precedente das 5 fichas base ?
+- 10ª rodada 2026-08-17 ↓
+- fundo preto da caixa HEALTH acompanha `healthLevels`: altura = `n`·PITCH + PAD. Geometria real das 2 abas: 1ª linha @ top 28, pitch 27, linha 20 alta ∴ PITCH=27 & PAD=30 → n=10 dá 300 (= altura de hoje) & n=7 dá 219. Pedido user 2026-08-17
+- XML declara o MÁXIMO (n=10 → 300) & o Lua só ENCOLHE ∴ §V40 (caixa × caixa) mede o PIOR caso no arquivo estático & runtime ⊥ pode estourar vizinho. Crescer ⊥ existe: 10 é o teto do combo
+- PITCH & PAD = constantes nomeadas no form raiz, ⊥ número solto no meio do render ∴ gate compara PITCH c/ o pitch REAL medido nas linhas do XML (§V49) — mesmo tipo de deriva que causou §B12 & §B16
+- caixa ganha nome (`<prefix>box`) p/ o render achá-la ≡ `<prefix>row<N>` & `<prefix><N>` ∴ ⊥ 3ª convenção
+- encolher deixa vão embaixo da caixa nas 2 abas. Reflow do que está em volta ⊥ pedido ∴ ⊥ mexe (≡ precedente da 9ª rodada)
+- 11ª rodada 2026-08-17 ↓ (8 pedidos do user, 1 por item)
+- (1) Main: preview do avatar 375→405 alto ∴ fecha em y=810 ≡ `BACKGROUNDS` & `HUMANITY`. Caixa `HUMANITY & WILLPOWER` ⊥ MUDA — user confirmou 2026-08-17 que só o avatar estava fora (ela já fechava em 810)
+- (2) `HEALTH_BOX_PAD` 30→36 ∴ +6px embaixo da última linha & altura declarada da caixa HEALTH 300→306 nas 2 abas (§V49 = caso n=10). Canto ACEITO: só em n=10 a caixa passa 6px abaixo de `BACKGROUNDS` na Main
+- (3) Traits, alvos de alinhamento do user: `Merit` fecha ≡ `MENTOR` (x=410) · `Flaw` fecha ≡ `FAME` (x=830) · `DERANGEMENTS` abre ≡ `BASE OF OPERATIONS` (x=840) ∴ Merit 0..410 & Flaw 420..830 & DERANGEMENTS 840..1040, todos c/ gutter 10
+- (3) largura extra vai p/ a coluna do NOME no template `Merit` (200→230; `Page` & `Cost` ⊥ mudam) ∴ template 350→380 & labels de cabeçalho acompanham
+- (4) `cboFaith` items = `{'', 'Christianity', 'Judaism', 'Islam', 'Other'}` — user escreveu em PT, mas §V9 manda autorar em EN & traduzir no `.lang` (`Cristianismo` `Judaísmo` `Islamismo` `Outro`). 1º item vazio MANTIDO (§V15)
+- (4) descrição da linha `faith` = SEMPRE `DESC['True Faith']`, ∀ item escolhido ∴ os 4 itens ⊥ pedem entrada própria em `DESC` (§V50) & §V32 ⊥ se aplica a eles
+- (5) Combat: `ARMOR` encolhe p/ fechar ≡ HEALTH em n=7 → altura 225 (= 7·27+36) & `armorDescription` 180→110; HEALTH sobe de top 330 p/ 350 ∴ as 3 caixas (`ARMOR` `VIRTUES` HEALTH) ABREM na mesma linha y=350
+- (5) caixa `WILLPOWER` NOVA na Combat, abaixo de `VIRTUES` @ (390,470,270,105) ∴ fecha em 575 ≡ ARMOR & HEALTH(n=7)
+- (5) bolinhas `willpower_1`…`_10` na Combat = SÓ-LEITURA (⊥ `field`, pintadas por Lua ≡ mecanismo de T101); `willpower_c1`…`_c10` = ESPELHO EDITÁVEL ∴ marcar na Combat muda a Main (§V36, §V51)
+- (6) História: `Prelude` fecha ≡ `Goals`; caixa do grid de descritores 125→100 (conteúdo fecha em 90) & tudo abaixo sobe 25 ∴ `Languages` 110 · `Moral Flaws`/`Fears` 290 · `Goals` 470..645 · `Prelude` (410,110,630,535) fecha 645
+- (7) Progress: os 3 campos de XP viram 3 colunas na horizontal, caixa `EXPERIENCE` (0,0,1040,90); `EXPERIENCE LOG` (0,100,1040,540) ∴ mesma borda direita 1040 & mesmo fim 640
+- (8) Settings: caixa de opções sobe p/ o TOPO & créditos vão p/ o FIM (hoje é o contrário)
+- (8) créditos separam autoria: `Andre (Styllern)` = Developer desta ficha; demais nomes & papéis VERBATIM sob "Based on the RPGmeister sheet plugin, by:". ⊥ inventar papel — crédito de pessoa real (§C ↑ RPGmeister)
+- (8) combo `Theme` NOVO logo abaixo de `Game`: items `{'Modern', 'Victorian Era'}`, default `Modern`, ⊥ 1º item vazio. Campo = `sheetTheme`, ⊥ `theme`: nome velho carrega `Dark`/`Escuro` de ficha salva do Mage & o check §V12 casa em `field="theme"` ∴ reusar mentiria
+- (8) combo do tema = `cboSheetTheme` (nome `cbo*` DE PROPÓSITO): a troca de idioma só reconstrói items de `cbo*` ∴ sem o prefixo o user veria `Modern`/`Victorian Era` num sheet [pt], contra o pedido. `values` seguem EN canônico (§V24) & items mostram [pt]. CORREÇÃO 2026-08-17 do §C que mandava ficar fora dos checks — achada @ build
+- (8) ∴ `cboSheetTheme` ∈ §V14 & §V17, mas EXCEÇÃO declarada em §V15: 1º item ⊥ vazio, pois é combo de ESTADO c/ default real (`Modern`), ⊥ picker de prosa que precisa ser limpável
+- (8) `sheetTheme` só estado, ⊥ dispara lógica ≡ `game` ?
+- 12ª rodada 2026-08-17 ↓
+- (1+3) as 2 bordas pedidas fecham 1 retângulo só: `COMBAT` (0,0,650,330) → (0,0,660,320) — direita ≡ `VIRTUES` (x=660), baixo ≡ `COMBAT TRAITS` (y=320). 10 linhas de ataque fecham em 300 ∴ cabe c/ 20 de folga
+- (1) coluna `Damage` 50→90. Os +40 saem de: +10 da caixa que alargou & −30 de `Weapon/Attack` (200→170, segue a coluna mais larga). Demais colunas ⊥ mudam. JULGAMENTO meu — user pediu ampliar dano & ⊥ disse de onde tirar
+- (1) grade nova do template `Attack`: 0..170 attack · 170..270 roll · 270..320 diff · 320..410 damage · 410..460 range · 460..510 rate · 510..560 clip · 560..630 conceal (630 = 660 − 15 de margem ×2)
+- (1) os 8 labels do cabeçalho ganham `horzTextAlign="center"` & `width` = largura da coluna ∴ centralizados SOBRE a coluna, ⊥ encostados à esquerda. §V11 intacto (1 label por coluna, ⊥ padding)
+- (2) `VIRTUES` da Combat vira SÓ-LEITURA: bolinhas perdem `field`, viram `roVirtue_*` c/ `autoChange="false"` & Lua pinta ≡ traços/willpower. `conscience` `selfControl` `courage` (+`_2`…`_5`) SAEM de ESPELHOS & entram em SÓ-LEITURA no §I3
+- (2) ∴ na Combat sobram editáveis só `health_*` (marca) & `willpower_c*` (caixas) — o resto da aba é vitrine. §V51 ampliado p/ cobrir os 3 grupos
+- (4) `EXPERIENCE` da aba Progress 90→75 alto (conteúdo fecha em 65) & `EXPERIENCE LOG` (0,100,1040,540)→(0,85,1040,555) ∴ fim da aba segue 640
+- 13ª rodada 2026-08-17 ↓
+- (1) Combat: a fileira `ARMOR` · `VIRTUES` · HEALTH abre em 350 & `COMBAT` fecha em 320 ∴ vão de 30, contra os 10 que a ficha usa em ∀ outro lugar. Fileira inteira sobe 20 → top 330; `WILLPOWER` acompanha (470→450) ∴ tudo que estava na linha da armadura ou abaixo dela sobe junto
+- (1) ⊥ mexe em altura nenhuma: `ARMOR` 225 & HEALTH n=7 225 seguem fechando juntos (330+225 = 555) & `WILLPOWER` fecha em 555 igual
+- (2) `EXPERIENCE` (Progress): título colado no topo (top=0) → top=10 ∴ margem interna em cima; dados sobem de 45 p/ 38 ∴ distância título↔dados cai de 25 p/ 8
+- (3) os 3 pares viram COLUNA: rótulo em cima (`horzTextAlign="center"`), valor ABAIXO & centrado sob ele — era rótulo à esquerda + valor ao lado. 3 colunas de 336 @ left 15 · 352 · 689; `edit` 90 largo centrado em cada (+123)
+- (3) empilhar CRESCE a caixa: 75→95 alto (título 10..30 · rótulos 38..58 · valores 60..85 · 10 de folga). REVOGA em parte a 12ª rodada (que encolheu p/ 75) — pedido novo do user manda. `EXPERIENCE LOG` (0,85,1040,555)→(0,105,1040,535) ∴ fim da aba segue 640
 
 ## §I INTERFACES
 
@@ -114,12 +172,12 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - traits (aba Traits): `merit_m1`…`_m10` & `merit_f1`…`_f10` (+ `type_` `costy_` cada; `_m9` `_m10` `_f9` `_f10` novos 4ª rodada) · `derangements` · caixas `allies` `mentor` `contacts` `resources` `fame` `retainers` `status` `influence` `bgOther` + `baseOfOperation` (novo)
   - combat (aba Combat, `HH.3`): `attack_N` `roll_N` `difficulty_N` `damage_N` `range_N` `rate_N` `clip_N` `conceal_N`, N=1…10 (era `attack`\|`damage`\|`difficulty` N=1…4 antes de T30) + `armorClass` `armorRating` `armorPenalty` `armorDescription` (VOLTARAM de `HH.8` na 3ª rodada — §V35)
   - inventory (aba Inventory, `HH.8`): `gear` · `equipment` · `items` (RÓTULO = `TRANSPORTATION`, ⊥ `ITEMS` — §C) · `baseDefenses` `baseArmaments` `baseOther` (novos 2026-08-17)
-  - história (aba Background, `HH.4`): `desc_sexo` `desc_altura` `desc_olhos` `desc_idade` `desc_peso` `desc_cabelo` `desc_idadeAparente` `desc_etinicidade` + `desc_nacionalidade` (novo) · `aparencia` (RÓTULO = `Languages`) · `idiomas` (RÓTULO = `Goals`) · `moralFlaws` `fears` (novos) · `personalidade` `natureza` `background`
+  - história (aba Background, `HH.4`): `desc_sexo` `desc_altura` `desc_olhos` `desc_idade` `desc_peso` `desc_cabelo` `desc_idadeAparente` `desc_etinicidade` + `desc_nacionalidade` (novo) · `aparencia` (RÓTULO = `Languages`) · `idiomas` (RÓTULO = `Goals`) · `moralFlaws` `fears` (novos) · `background`. `personalidade` & `natureza` SAÍRAM na 9ª rodada ∴ órfãos ↓
   - progress (aba Progress, `HH.9`): `spentXP` · `xpLog`. `experience` = ESPELHO do da Main (§V36). `totalXP` ⊥ tem `field` ∴ ∉ contrato, ⊥ salvo (§C, ≡ §V29)
-  - ESPELHOS declarados (>1 widget de entrada no MESMO `field`, §V36 — ⊥ é violação de §V1): `health_1`…`_10` & `conscience` `selfControl` `courage` (+`_2`…`_5`) em `HH.1`+`HH.3` · `experience` em `HH.1`+`HH.9`
-  - SÓ-LEITURA em `HH.3` (espelho ⊥ editável, ⊥ conta como dono): `alertness` `athletics` `awareness` `brawl` `firearms` `melee` `stealth` (+`_1`…`_5`) · `strength` `dexterity` `stamina` `perception` (+`_2`…`_5`)
-  - ÓRFÃOS declarados (∈ NDB de ficha salva, ⊥ widget em nenhum `.lfm`): `transportation` `other` (3ª rodada) · `bruised` `hurt` `injured` `wounded` `mauled` `crippled` `incapacitated` (4ª rodada — vitalidade virou posicional, §C). ⊥ reusar estes nomes p/ campo novo ∴ ficha velha ⊥ ressuscita dado em caixa errada
-  - settings (aba Settings, `HH.6`): `language` · `game` (novo 2026-08-17, 5 jogos + vazio)
+  - ESPELHOS declarados (>1 widget de entrada no MESMO `field`, §V36 — ⊥ é violação de §V1): `health_1`…`_10` em `HH.1`+`HH.3` · `willpower_c1`…`_c10` em `HH.1`+`HH.3` (11ª rodada) · `experience` em `HH.1`+`HH.9`. Virtudes SAÍRAM daqui na 12ª rodada — viraram só-leitura ↓
+  - SÓ-LEITURA em `HH.3` (espelho ⊥ editável, ⊥ conta como dono): `alertness` `athletics` `awareness` `brawl` `firearms` `melee` `stealth` (+`_1`…`_5`) · `strength` `dexterity` `stamina` `perception` (+`_2`…`_5`) · `willpower_1`…`_10` (bolinhas da caixa WILLPOWER nova — 11ª rodada; os `_c1`…`_c10` do MESMO bloco são espelho editável ↑) · `conscience` `selfControl` `courage` (+`_2`…`_5`) — 12ª rodada, virtudes deixaram de ser editáveis aqui
+  - ÓRFÃOS declarados (∈ NDB de ficha salva, ⊥ widget em nenhum `.lfm`): `transportation` `other` (3ª rodada) · `bruised` `hurt` `injured` `wounded` `mauled` `crippled` `incapacitated` (4ª rodada — vitalidade virou posicional, §C) · `personalidade` `natureza` (9ª rodada — caixas Concept & Nature removidas a pedido). ⊥ reusar estes nomes p/ campo novo ∴ ficha velha ⊥ ressuscita dado em caixa errada
+  - settings (aba Settings, `HH.6`): `language` · `game` (novo 2026-08-17, 5 jogos + vazio) · `sheetTheme` (novo 11ª rodada — `Modern`\|`Victorian Era`, default `Modern`, só estado)
   - `experience` · `avatar`
 - I4 build: `rdk -l` @ raiz do plugin → compile + lint fonte → `output/World of Darkness 20th.rpk`. `rdk -c` = só compile. `rdk p` = PREPARE, ⊥ build.
 
@@ -145,6 +203,7 @@ R16|conteúdo True Faith|3 seções nos 2 prints do user: `Systems for True Fait
 R17|widget de texto clicável|`gui.Button` & `gui.Label` herdam `gui.TextControl` ∴ os 2 têm `text`; só `Label` tem prop `field` ∴ label ligado a campo renderiza o valor cru sem Lua. `Button` ⊥ tem `field` — precedente grava por Lua (`sheet.<campo> = …`)|`SDK3/API/rrpgGUI.lua:681-712`
 R18|botão direito|`gui.Control.eves["onMenu"] = 'x, y, event'` ∴ ∀ controle tem hook de clique-direito, ⊥ só `button`. Precedente real em ficha: `<rectangle hitTest="true" onMenu="self:exibirMenuDoAtor();">` ∴ `rectangle` c/ `hitTest` recebe evento de mouse|`SDK3/API/rrpgGUI.lua:280` · `Plugins/Core/rrpginlua/turnos/AtorCombatTracker.lfm:237` · `Plugins/Sheets/Ficha 4D&T/Ficha4D&T/Examples.lfm:16`
 R19|ciclo por clique|precedente de N estados em ficha: `<button onClick>` faz `sheet.imageCounter = (sheet.imageCounter + 1) % #pics` & escreve o valor no campo ∴ ciclo = contador + módulo, estado mora no NDB, ⊥ em variável de form|`Plugins/Sheets/Ficha Exalted 3rd/Ficha Exalted 3rd/MultImageCheckbox.lfm:27-36`
+R20|altura em runtime|`gui.Control.props["height"]` tem setter (`setHeight` → `_gui_setHeight`) ∴ Lua muda altura de `layout` em runtime. Precedente em ficha: `self.height = h` no item de equipamento de 5+ fichas do repo|`SDK3/API/rrpgGUI.lua:99,236` · `Plugins/Sheets/Ficha D&D Next/equipamentoItem.lfm:33`
 
 ## §V INVARIANTS
 
@@ -162,7 +221,7 @@ V11: ⊥ label com padding p/ alinhar coluna — 1 label por coluna ∴ cada um 
 V12: `items` de combo = valor ⊥ rótulo ∴ mudar item ! mudar comparação Lua & `defaultValue` no mesmo commit (§R.3)
 V13: campo c/ picker = `comboBox` dono do `field`, ⊥ `edit` ao lado ∴ só escolha da lista. Combo sem `field` renderiza mas ⊥ salva (decisão user 2026-08-17)
 V14: ∀ lista de picker ⊥ item duplicado
-V15: 1º item de ∀ picker = vazio
+V15: 1º item de ∀ picker = vazio. EXCEÇÃO declarada: `cboSheetTheme` — combo de ESTADO c/ default real (`Modern`), ⊥ existe "tema vazio" ∴ ⊥ precisa ser limpável (11ª rodada)
 V16: ∀ `label` & `edit` & picker: `width` ! ≥ largura do texto mais longo entre [en] & [pt] ∴ ⊥ corta em nenhum idioma
 V17: ∀ item de picker → ∃ chave `wod.<item>` em [pt] & [en] (§V.10 estendido a `items`)
 V18: `items` de picker ! declarado inline no XML do template (padrão `colorSelection`) ⊥ populado por Lua @ runtime (§B.6)
@@ -190,7 +249,15 @@ V39: tabela de vitalidade: ∀ n ∈ 1…10 → ∃ lista `LEVELS[n]`, `#LEVELS[
 V40: caixas irmãs (`<layout>` c/ `left top width height` filhas do mesmo `scrollBox`) ! retângulos DISJUNTOS ∴ caixa ⊥ desenha por cima de caixa. §V37 mede linha vs linha DENTRO da caixa; isto mede CAIXA vs caixa — ponto cego aberto desde que ∃ coluna lado a lado (`COMBAT` 0..650 vs coluna 670). JULGAMENTO meu, ⊥ pedido: 5ª rodada aperta `VIRTUES` num vão de 280px ∴ erro de 10px passaria verde
 V41: lista de marcas = `{" ", "/", "X", "*"}` NESSA ordem, 1º = `" "`, declarada 1× no form raiz (`HuntersHunted.lfm`) ∴ Main & Combat ciclam igual & ⊥ 2ª lista p/ divergir
 V42: ∀ valor gravado em `health_1`…`_10` ∈ os 4 símbolos. Valor ∉ lista (bool de ficha velha, nil, lixo) → render normaliza p/ `" "` & clique recomeça do 1º ∴ ciclo ⊥ trava (§V19, §V33)
-V43: ∀ caixa de marca de vitalidade declara `onClick` (avança 1) & `onMenu` (volta ao 1º) ∴ ⊥ caixa que só avança & ⊥ estado alcançável só dando 3 voltas
+V43: ∀ caixa de marca de vitalidade declara `onClick` (avança 1) & `onMenu` (cura, §V44) ∴ ⊥ caixa que só avança & ⊥ estado alcançável só dando 3 voltas
+V44: limpar ⊥ acontece na linha clicada: ∀ operação que zeraria `health_N` → zera a MAIOR linha marcada ∈ 1…`healthLevels` & `health_N` fica como está. ∃ ≥1 marcada sempre que a cura roda (a própria clicada) ∴ ⊥ no-op silencioso
+V45: alvo da cura ∈ 1…`healthLevels` ∴ marca em linha escondida (track encolheu) ⊥ é curada & ⊥ engole o clique. Render ⊥ chama cura — normalização de valor velho (§V42) ≠ cura
+V46: pós-mutação, linhas 1…`healthLevels` = marcas em gravidade DECRESCENTE (`*` antes de `X` antes de `/`) & ⊥ vazio entre 2 marcas ∴ ⊥ estado exibido fora de ordem
+V47: reagrupar preserva a CONTAGEM por tipo (só reposiciona) ∴ ⊥ vira cura nem dano escondido; ordem de gravidade lida de `HEALTH_MARKS` (§V41), ⊥ de lista própria
+V48: ∀ caixa de SEÇÃO (`<layout>` c/ `<rectangle>` + `<label>` de título `horzTextAlign="center"`) tem fill `black` ∴ ⊥ caixa translúcida lendo cinza ao lado das irmãs (§B18). ∉ regra: moldura sem título (avatar `DimGray`) & `rectangle` ∈ template (marca de vitalidade `#00000000`, vazado é o efeito)
+V49: altura da caixa HEALTH em runtime = `healthLevels`·`HEALTH_ROW_PITCH` + `HEALTH_BOX_PAD` & ≤ altura declarada no XML ∴ Lua só ENCOLHE & §V40 (estático) segue medindo o pior caso. `HEALTH_ROW_PITCH` ! = pitch REAL das linhas no XML (`top` da linha 2 − da linha 1) nas 2 abas ∴ ⊥ deriva Lua × XML (§B12, §B16)
+V50: linha `faith` da aba Powers → bloco mostra `DESC['True Faith']` ∀ item do `cboFaith` ∴ trocar de religião ⊥ muda o texto & os 4 itens ∉ §V32 (⊥ têm entrada própria em `DESC`)
+V51: ∀ grupo SÓ-LEITURA de `HH.3` — traços de combate · `willpower_1`…`_10` · virtudes `conscience` `selfControl` `courage` (+`_2`…`_5`, 12ª rodada) — ⊥ tem `field` & tem `autoChange="false"`, valor pintado por Lua ∴ ⊥ 2º dono (§V1). Editáveis na aba = SÓ `health_1`…`_10` & `willpower_c1`…`_c10`, os 2 espelhos declarados (§V36)
 
 ## §T TASKS
 
@@ -314,6 +381,39 @@ T116|x|`HH.1.lfm` HEALTH — cada linha vira `label` do nível (esquerda, pintad
 T117|x|`HH.3.lfm` — mesma troca no espelho (`dynHealth3_`). Sincronia entre abas = NDB via `label field=` ∴ ⊥ mexe em `dataLink` (§V36). MESMO commit que T116 ∴ ⊥ 2 formas de vitalidade convivendo|V1,V36,V41,V43,T116
 T118|x|`verify-hunters-hunted.ps1` — §V5 conta as 10 linhas de vitalidade pela forma nova (⊥ mais `checkBox field="health_N"`); checks NOVOS §V41 (lista 1× no raiz, 4 símbolos, ordem) §V42 (normalização no render) §V43 (`onClick` & `onMenu` em ∀ caixa de marca); §V38 ⊥ mede mais os níveis (viraram `label` ∴ §V16/§V25 assumem)|V5,V16,V38,V41,V42,V43
 T119|x|`rdk -l` → exit 0 & `.rpk` mudou; depois `rdk -i` → `.rpk` instalado em `%APPDATA%\Firecast\Plugins\ambesek.wod.20th.rpk` c/ mesmo size (CLAUDE.md)|V6,V7
+T120|x|`HuntersHunted.lfm` — `healHealthMark()`: acha a maior linha marcada ∈ 1…`healthLevels` & zera SÓ ela. `cycleHealthMark(n)` chama quando o próximo símbolo seria `" "` (⊥ escreve em `n`); `resetHealthMark(n)` vira chamada direta da cura ∴ 1 rotina só|V41,V44,V45
+T121|x|`verify-hunters-hunted.ps1` — checks NOVOS §V44 (`cycleHealthMark` ⊥ escreve `HEALTH_MARKS[1]` em `n`; wrap → `healHealthMark`) & §V45 (busca limitada por `healthLevels`; render ⊥ chama cura)|V44,V45,V20
+T122|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T123|x|`HuntersHunted.lfm` — `regroupHealthMarks()`: conta marcas por tipo ∈ 1…`healthLevels` & reescreve as linhas do mais grave p/ o menos, vazias no fim. Ordem vem de `HEALTH_MARKS` (⊥ lista nova). Chamada no fim de `cycleHealthMark` & dentro de `renderHealthTrack` (após normalização §V42)|V41,V42,V46,V47
+T124|x|`verify-hunters-hunted.ps1` — checks NOVOS §V46 (`regroupHealthMarks` ∃, varre gravidade do topo, chamada por `cycleHealthMark` & `renderHealthTrack`) & §V47 (limitada por `healthLevels`, lê `HEALTH_MARKS`, ⊥ escreve `HEALTH_MARKS[1]` fora do bloco de vazias)|V46,V47,V20
+T125|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T126|x|`HH.1.lfm` — caixa `ABILITIES`: `color="#FFFFFF00"` → `color="black"` ∴ para de ler cinza (§B18). `strokeColor`/`strokeSize` ficam|V48
+T127|x|`HH.4.lfm` — remover caixas `Concept` (`personalidade`) & `Nature` (`natureza`); `Moral Flaws` & `Fears` descem p/ (0,315) & (205,315). Slot (0,675)+(205,675) vaga; `Prelude` ⊥ muda|I3,V1,V2,V27
+T128|x|`verify-hunters-hunted.ps1` — check NOVO §V48 (fill de caixa de seção = black, c/ as 2 exceções); órfãos += `personalidade` `natureza`|V48,I3
+T129|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T130|x|`HH.1.lfm` + `HH.3.lfm` — caixa HEALTH ganha `name="dynHealth_box"` \| `name="dynHealth3_box"`; `height` XML segue 300 = MÁXIMO (n=10) ∴ §V40 mede pior caso|V40,V49
+T131|x|`HuntersHunted.lfm` — `HEALTH_ROW_PITCH = 27` & `HEALTH_BOX_PAD = 30` + `renderHealthTrack` faz `box.height = n * HEALTH_ROW_PITCH + HEALTH_BOX_PAD` (`box = form[prefix .. "box"]`), guardado p/ box nil|V19,V49,R20
+T132|x|`verify-hunters-hunted.ps1` — check NOVO §V49: pitch do XML (linha2.top − linha1.top) = `HEALTH_ROW_PITCH` nas 2 abas; `height` XML = 10·pitch + PAD; render ajusta `height` a partir de `healthLevels`|V49,V20
+T133|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T134|x|(1) `HH.1.lfm` — avatar `<rectangle>` + `<image>` 375→405 alto ∴ fecham em y=810 ≡ `BACKGROUNDS`. Caixa `HUMANITY & WILLPOWER` ⊥ tocada|V48
+T135|x|(2) `HuntersHunted.lfm` `HEALTH_BOX_PAD` 30→36 + altura declarada da caixa HEALTH 300→306 em `HH.1` & `HH.3` (§V49 = caso n=10)|V49
+T136|x|(3) `HH.2.lfm` — `Merit` box 380→410 (0..410) · `Flaw` box (390,380)→(420,410) ∴ 420..830 · `DERANGEMENTS` (810,230)→(840,200); template `Merit` 350→380 c/ coluna do nome 200→230 & 3 labels de cabeçalho acompanham|V16,V25,V26,V37,V40
+T137|x|(4) `HH.7.lfm` — `cboFaith` items & values `{'', 'Christianity', 'Judaism', 'Islam', 'Other'}`; renderer da linha `faith` usa chave FIXA `True Faith` ∴ ∀ item abre o mesmo texto|V13,V15,V24,V32,V50
+T138|x|(5) `HH.3.lfm` — `ARMOR` altura 300→225 & `armorDescription` 180→110; HEALTH box top 330→350; caixa `WILLPOWER` NOVA (390,470,270,105): bolinhas SÓ-LEITURA `willpower_1`…`_10` + `checkBox` espelho `willpower_c1`…`_c10`; Lua de pintura junto de `renderCombatTraits`|I3,V1,V27,V36,V40,V51
+T139|x|(6) `HH.4.lfm` — grid de descritores 125→100; `Languages` 135→110 · `Moral Flaws`/`Fears` 315→290 · `Goals` 495→470 · `Prelude` (410,135,630,715)→(410,110,630,535) ∴ fecha 645 ≡ `Goals`|V27,V37,V40
+T140|x|(7) `HH.9.lfm` — `EXPERIENCE` (0,0,420,150)→(0,0,1040,90) c/ os 3 pares label+edit em 3 colunas; `EXPERIENCE LOG` (0,160,1040,480)→(0,100,1040,540)|V16,V25,V27,V37,V40
+T141|x|(8) `HH.6.lfm` — caixa de opções p/ o topo & créditos p/ o fim; `Andre (Styllern)` = Developer separado, demais nomes/papéis VERBATIM sob "Based on the RPGmeister sheet plugin, by:"; combo `Theme` (`sheetTheme`, `{'Modern','Victorian Era'}`, default `Modern`) abaixo de `Game`|I3,V9,V10,V16,V27
+T142|x|(8+4) `localization.lang` [pt]+[en] & mapa `PT` de `HH.6` — `Theme`=Tema · `Modern`=Moderno · `Victorian Era`=Era Vitoriana · `Developer`=Desenvolvedor · `Based on the RPGmeister sheet plugin, by:` · `Christianity`=Cristianismo · `Judaism`=Judaísmo · `Islam`=Islamismo · `Other`=Outro|V10,V17,V22,V24,V28
+T143|x|`verify-hunters-hunted.ps1` — checks NOVOS §V50 (itens do `cboFaith` ∉ §V32 & chave fixa no renderer) & §V51 (bolinhas de willpower ⊥ `field` em `HH.3` & `_c*` = espelho); §I3 espelhos += `willpower_c*`; §V49 altura 306|V49,V50,V51,I3,V20
+T144|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T145|x|(1+3) `HH.3.lfm` — `COMBAT` (0,0,650,330)→(0,0,660,320); template `Attack` c/ grade nova (weapon 170, damage 90, resto igual); linhas de ataque 620→630 largas; 8 labels do cabeçalho c/ `horzTextAlign="center"` & `width` da coluna|V11,V16,V25,V26,V37,V40
+T146|x|(2) `HH.3.lfm` — `VirtueMirror` só-leitura: bolinhas `roVirtue_$(field)_N` SEM `field` + `autoChange="false"`, pintadas em `renderCombatTraits` (dot1 segue `<image>` fixa); `dataLink` += `conscience_2`…`courage_5`|I3,V1,V36,V51
+T147|x|(4) `HH.9.lfm` — `EXPERIENCE` 90→75 & `EXPERIENCE LOG` (0,100,1040,540)→(0,85,1040,555) ∴ fim 640 mantido|V27,V37,V40
+T148|x|`verify-hunters-hunted.ps1` — §V51 estendido às virtudes (⊥ `field` em `VirtueMirror`, `autoChange="false"`, Lua pinta); `$mirrors` −`conscience`/`selfControl`/`courage`|V1,V36,V51,V20
+T149|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T150|x|(1) `HH.3.lfm` — `ARMOR` `VIRTUES` `dynHealth3_box` top 350→330 & `WILLPOWER` 470→450 ∴ vão p/ `COMBAT` cai de 30 p/ 10; alturas intactas|V37,V40
+T151|x|(2+3) `HH.9.lfm` — `EXPERIENCE` 75→95: título top 10, rótulos top 38 centrados, `edit` top 60 centrado SOB o rótulo, 3 colunas @ 15\|352\|689 (336 cada, edit +123); `EXPERIENCE LOG` → (0,105,1040,535)|V16,V25,V26,V27,V37,V40
+T152|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
 
 ## §B BUGS
 
@@ -335,3 +435,4 @@ B14|2026-08-17|§V22 checa mapa `PT` ⊆ `.lang` mas ⊥ o inverso ∴ string vi
 B15|2026-08-17|T62/T68 traduziram `hedge magic`/`magician`/`wizard` ad-hoc por entrada: `magia menor`×3 `mago menor`×9 `magos menores`×8 `bruxo menor`×1 (Enchantment) ∴ 4 renderizações p/ 1 termo & 0 uso do canônico `magia estática`; `.lang` + mapa `PT` levavam `CAMINHOS DE MAGIA MENOR`. Glossário ⊥ existia no spec ∴ nada p/ o gate checar|V34
 B16|2026-08-17|`HH.4` grid de descritores: template `Descricao` = 310 largo mas colunas em `left=5`\|`320`\|`585` ∴ 320+310=630 > 585, 3ª coluna desenha 45px DENTRO do `edit` da 2ª. 2 linhas afetadas (Height×Eyes, Weight×Hair). Gate media texto-vs-largura (§V16) mas nunca posição-vs-irmão ∴ passava verde|V37
 B17|2026-08-17|§V16 mede só `//label[@text][@width]` ∴ `checkBox` c/ `text=` nunca checado: `Wounded (-2)` = `Ferido Gravemente (-2)` (~143px) num `checkBox` de 125px, cortando em [pt] desde T3. Achado à mão ao alargar HEALTH, ⊥ pelo gate ≡ §B4 (mesmo ponto cego, outra família)|V38
+B18|2026-08-17|caixa `ABILITIES` (`HH.1`) ficou c/ `color="#FFFFFF00"` copiado do `M20.1` ∴ fundo da aba passa através & ela lê CINZA ao lado das caixas pretas. Gate media posição, largura & texto — nunca COR ∴ ia ficar assim p/ sempre|V48

@@ -149,7 +149,9 @@ foreach ($rf in ($radios | ForEach-Object { $_.Field } | Sort-Object -Unique)) {
 $mirrors = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
 foreach ($m in @('healthLevels','experience')) { [void]$mirrors.Add($m) }
 1..10 | ForEach-Object { [void]$mirrors.Add("health_$_") }
-foreach ($v in @('conscience','selfControl','courage')) { 2..5 | ForEach-Object { [void]$mirrors.Add("${v}_$_") } }
+1..10 | ForEach-Object { [void]$mirrors.Add("willpower_c$_") }
+# Virtues were a mirror until the 12th round; they are display-only on the Combat tab now
+# (SPEC V51), so the Main tab owns them alone and they must NOT be listed here.
 
 $dupes = @($allFields.GetEnumerator() | Where-Object { $_.Value.Count -gt 1 })
 $undeclared = @($dupes | Where-Object { -not $mirrors.Contains($_.Key) })
@@ -266,7 +268,7 @@ else { Pass "V35 all $movedSeen migrated fields sit exactly once, in their new f
 # Their text is still sitting in already-saved sheets. If either name were reused for a new
 # field, an old sheet would silently pour stale content into an unrelated box - so the names
 # stay burned, and SPEC I3 lists them as orphans. This is the check that keeps that promise.
-foreach ($orphan in @('transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated')) {
+foreach ($orphan in @('transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated','personalidade','natureza')) {
     if ($allFields.ContainsKey($orphan)) {
         Fail "I3 '$orphan' is a declared orphan but $($allFields[$orphan] -join ', ') owns it - choose a different field name"
     } else { Pass "I3 declared orphan '$orphan' owns no widget" }
@@ -343,7 +345,10 @@ foreach ($l in $listReport) {
     $dupe = $l.Items | Group-Object | Where-Object Count -gt 1
     if ($dupe) { Fail "V14 $($l.Name) has duplicates: $(($dupe | ForEach-Object { $_.Name }) -join ', ')" }
     else { Pass "V14 $($l.Name) has $($l.Items.Count - 1) unique entries" }
-    if ($l.Items[0] -eq '') { Pass "V15 $($l.Name) starts empty" } else { Fail "V15 $($l.Name) first entry is '$($l.Items[0])', expected empty" }
+    # cboSheetTheme is the declared exception (SPEC V15, 11th round): a state combo with a real
+    # default, not prose to be cleared - there is no such thing as a sheet with no theme.
+    if ($l.Name -like '*cboSheetTheme*') { Pass "V15 $($l.Name) n/a - state combo with a default (declared exception)" }
+    elseif ($l.Items[0] -eq '') { Pass "V15 $($l.Name) starts empty" } else { Fail "V15 $($l.Name) first entry is '$($l.Items[0])', expected empty" }
 }
 
 # The three checks above are only worth as much as what the collector saw: a picker named
@@ -675,12 +680,64 @@ foreach ($f in $files) {
         $box = $lbl.ParentNode
         $where = "$($f.Name) <template $($t.GetAttribute('name'))>"
         if ($box.GetAttribute("onClick") -notmatch 'cycleHealthMark') { Fail "V43 $where mark box has no cycleHealthMark on onClick" }
-        if ($box.GetAttribute("onMenu") -notmatch 'resetHealthMark') { Fail "V43 $where mark box has no resetHealthMark on onMenu - right-click would do nothing" }
+        if ($box.GetAttribute("onMenu") -notmatch 'healHealthMark') { Fail "V43 $where mark box has no healHealthMark on onMenu - right-click would do nothing" }
         if ($box.GetAttribute("hitTest") -ne 'true') { Fail "V43 $where mark box has no hitTest - it would never see a click" }
     }
 }
 if ($markBoxes -eq 0) { Fail "V43 no health mark box found - the check reads nothing (SPEC V20)" }
 else { Pass "V43 all $markBoxes mark boxes answer click and right-click" }
+
+# ---- V44 + V45: clearing a mark heals the BOTTOM of the track (SPEC C 7th round) --
+# The click the player makes and the row that empties are deliberately different rows, so the
+# two ways to get it wrong are: cycleHealthMark emptying the row it was handed, and the heal
+# scanning rows the player cannot see (a mark left above a shortened track eats the click).
+function LuaFn($txt, $name) {
+    $m = [regex]::Match($txt, "(?ms)function\s+$name\s*\(.*?\r?\n\t\t\tend;")
+    if ($m.Success) { return $m.Value }
+    return ''
+}
+$cycFn  = LuaFn $root 'cycleHealthMark'
+$healFn = LuaFn $root 'healHealthMark'
+$rendFn = LuaFn $root 'renderHealthTrack'
+
+if (-not $cycFn) { Fail "V44 cycleHealthMark not found on the root form" }
+elseif ($cycFn -match 'HEALTH_MARKS\[1\]') { Fail "V44 cycleHealthMark can still write the empty mark - it would clear the clicked row instead of healing" }
+elseif ($cycFn -notmatch 'healHealthMark\(') { Fail "V44 cycleHealthMark never calls healHealthMark - the fourth click would do nothing" }
+else { Pass "V44 cycleHealthMark heals instead of emptying the clicked row" }
+
+if (-not $healFn) { Fail "V44 healHealthMark not found on the root form" }
+else {
+    if ($healFn -notmatch 'for\s+\w+\s*=\s*\w+\s*,\s*1\s*,\s*-1') { Fail "V44 healHealthMark does not scan the track downwards - it would clear the topmost mark, not the last" }
+    else { Pass "V44 healHealthMark clears the bottom-most mark" }
+
+    if ($healFn -notmatch 'healthLevels') { Fail "V45 healHealthMark is not bounded by healthLevels - a mark on a hidden row would eat the click" }
+    else { Pass "V45 healHealthMark only looks at rows the player can see" }
+}
+
+if ($rendFn -match 'healHealthMark\(') { Fail "V45 renderHealthTrack calls healHealthMark - normalising an old value is not healing" }
+else { Pass "V45 the renderer never heals" }
+
+# ---- V46 + V47: marks stay grouped, worst first (SPEC C 8th round) ---------------
+# Upgrading a mark in the middle of the stack leaves the track out of order, and a new mark
+# started on a far-down empty row leaves a gap. Both are fixed by regrouping, so the checks are:
+# the routine exists, it walks severity downwards, it is called from the two paths that can
+# break the order, and it takes its severity order from HEALTH_MARKS rather than a copy.
+$regroupFn = LuaFn $root 'regroupHealthMarks'
+if (-not $regroupFn) { Fail "V46 regroupHealthMarks not found on the root form" }
+else {
+    if ($regroupFn -notmatch 'for\s+\w+\s*=\s*#HEALTH_MARKS\s*,\s*2\s*,\s*-1') { Fail "V46 regroupHealthMarks does not walk HEALTH_MARKS from the worst down - the grouping order would not be severity" }
+    else { Pass "V46 regroupHealthMarks lays marks out worst-first" }
+
+    if ($regroupFn -notmatch 'healthLevels') { Fail "V47 regroupHealthMarks is not bounded by healthLevels - it would shuffle rows the player cannot see" }
+    else { Pass "V47 regroupHealthMarks only touches visible rows" }
+
+    if ($regroupFn -match '\{\s*"') { Fail "V47 regroupHealthMarks declares its own symbol list - it must read HEALTH_MARKS (SPEC V41)" }
+    else { Pass "V47 regroupHealthMarks reads the one symbol list" }
+}
+if ($cycFn -notmatch 'regroupHealthMarks\(') { Fail "V46 cycleHealthMark never regroups - an upgrade in the middle of the stack would stay out of order" }
+else { Pass "V46 cycleHealthMark regroups after changing a mark" }
+if ($rendFn -notmatch 'regroupHealthMarks\(') { Fail "V46 renderHealthTrack never regroups - a sheet marked before the 8th round would open out of order" }
+else { Pass "V46 the renderer groups what it finds on an older sheet" }
 
 # ---- V27: a section title spanning its box must actually be centred on it -----
 # `horzTextAlign="center"` centres inside the label, not inside the box, so a title with
@@ -702,6 +759,123 @@ foreach ($f in $files) {
     }
 }
 if ($offCentre) { foreach ($o in $offCentre) { Fail "V27 $o" } } else { Pass "V27 every section title is centred on its box" }
+
+# ---- V48: a section box is filled black (SPEC B18) -------------------------------
+# ABILITIES shipped with the Mage sheet's transparent fill, so the tab background showed
+# through and it read as grey beside its black siblings. Nothing measured colour until now.
+# A section box is a layout holding a rectangle AND a centred title - which is exactly what
+# leaves out the two deliberate non-black rectangles: the avatar frame (DimGray, no title) and
+# the health mark box (#00000000, declared inside a template and sitting on a black box).
+$greyBoxes = 0
+$litBoxes = 0
+foreach ($f in $files) {
+    $xml = Doc $f.FullName
+    foreach ($box in $xml.SelectNodes("//layout")) {
+        $rect = $box.SelectSingleNode("rectangle")
+        if ($null -eq $rect) { continue }
+        $title = $null
+        foreach ($lb in $box.SelectNodes("label")) {
+            if ($lb.GetAttribute("horzTextAlign") -eq "center") { $title = $lb; break }
+        }
+        if ($null -eq $title) { continue }
+        $litBoxes++
+        $fill = $rect.GetAttribute("color")
+        if ($fill -ne 'black') {
+            $greyBoxes++
+            Fail "V48 $($f.Name): box '$($title.GetAttribute('text'))' is filled '$fill', not black - the tab shows through it"
+        }
+    }
+}
+if ($litBoxes -eq 0) { Fail "V48 no section box found - the check reads nothing (SPEC V20)" }
+elseif ($greyBoxes -eq 0) { Pass "V48 all $litBoxes section boxes are filled black" }
+
+# ---- V51: willpower on the Combat tab - dots read-only, boxes editable -----------
+# The point of the box is spending willpower mid-fight without letting anyone raise the
+# permanent rating from here, so the two halves must stay split: dots with no field at all
+# (painted from the real values) over boxes that own willpower_c* and mirror the Main tab.
+$hh3x = Doc (($files | Where-Object { $_.Name -eq 'HH.3.lfm' }).FullName)
+$hh3t = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.3.lfm")))
+$wpTpl = $hh3x.SelectSingleNode("//template[@name='WillpowerMirror']")
+if ($null -eq $wpTpl) { Fail "V51 HH.3 has no WillpowerMirror template" }
+else {
+    $wpDots = @($wpTpl.SelectNodes("imageCheckBox"))
+    $wpBoxes = @($wpTpl.SelectNodes("checkBox"))
+    $owning = @($wpDots | Where-Object { $_.HasAttribute("field") })
+    $clickable = @($wpDots | Where-Object { $_.GetAttribute("autoChange") -ne 'false' })
+
+    if ($wpDots.Count -ne 10) { Fail "V51 WillpowerMirror has $($wpDots.Count) dots, expected 10" }
+    elseif ($owning.Count -gt 0) { Fail "V51 $($owning.Count) willpower dots own a field - they would be a second owner of the Main tab rating (V1)" }
+    elseif ($clickable.Count -gt 0) { Fail "V51 $($clickable.Count) willpower dots lack autoChange='false' - a click would toggle a display-only dot" }
+    else { Pass "V51 all 10 willpower dots are display only" }
+
+    $boxFields = @($wpBoxes | ForEach-Object { $_.GetAttribute("field") } | Where-Object { $_ -match '^willpower_c\d+$' })
+    if ($boxFields.Count -ne 10) { Fail "V51 WillpowerMirror has $($boxFields.Count) willpower_c* boxes, expected 10" }
+    else { Pass "V51 all 10 willpower boxes mirror the Main tab" }
+
+    if ($hh3t -notmatch 'paintWillpower') { Fail "V51 HH.3 never paints the willpower dots - they would stay empty" }
+    elseif ($hh3t -notmatch "'willpower_1'") { Fail "V51 the HH.3 dataLink does not observe willpower_* - the dots would not follow the Main tab" }
+    else { Pass "V51 the dots are painted and follow the Main tab" }
+}
+
+# Virtues joined the display-only side in the 12th round: same rule, same two ways to break it.
+$vTpl = $hh3x.SelectSingleNode("//template[@name='VirtueMirror']")
+if ($null -eq $vTpl) { Fail "V51 HH.3 has no VirtueMirror template" }
+else {
+    $vDots = @($vTpl.SelectNodes("imageCheckBox"))
+    $vOwning = @($vDots | Where-Object { $_.HasAttribute("field") })
+    $vClickable = @($vDots | Where-Object { $_.GetAttribute("autoChange") -ne 'false' })
+
+    if ($vDots.Count -eq 0) { Fail "V51 VirtueMirror has no dots to check" }
+    elseif ($vOwning.Count -gt 0) { Fail "V51 $($vOwning.Count) virtue dots own a field - virtues are display-only on this tab since the 12th round" }
+    elseif ($vClickable.Count -gt 0) { Fail "V51 $($vClickable.Count) virtue dots lack autoChange='false' - a click would toggle a display-only dot" }
+    else { Pass "V51 all $($vDots.Count) virtue dots are display only" }
+
+    # Anchored on the paint CALL, not just the name: the list can be renamed or emptied while
+    # the token still appears somewhere in the file.
+    if ($hh3t -notmatch 'paint\(form,\s*RO_VIRTUES\[') { Fail "V51 HH.3 never paints the virtue dots - they would stay empty" }
+    elseif ($hh3t -notmatch 'RO_VIRTUES\s*=\s*\{\s*"conscience"') { Fail "V51 RO_VIRTUES does not list the three virtues" }
+    elseif ($hh3t -notmatch "'conscience_2'") { Fail "V51 the HH.3 dataLink does not observe the virtue fields - the dots would not follow the Main tab" }
+    else { Pass "V51 the virtue dots are painted and follow the Main tab" }
+}
+
+# ---- V49: the health box height follows the track length (SPEC C 10th round) -----
+# The renderer computes the height from a pitch that lives in Lua while the rows themselves are
+# positioned in the .lfm files. Measure the real spacing and compare - if someone re-spaces the
+# rows, the Lua constant has to move with them. The declared height must be the TEN-row case:
+# the renderer only shrinks, so the file stays the worst case for the box-overlap check (V40).
+$pitchLua = 0; $padLua = 0
+if ($root -match 'HEALTH_ROW_PITCH\s*=\s*(\d+)') { $pitchLua = [int]$Matches[1] }
+if ($root -match 'HEALTH_BOX_PAD\s*=\s*(\d+)')   { $padLua   = [int]$Matches[1] }
+if ($pitchLua -eq 0 -or $padLua -eq 0) { Fail "V49 HEALTH_ROW_PITCH / HEALTH_BOX_PAD not found on the root form" }
+else {
+    $measured = 0
+    foreach ($pair in @(@('HH.1.lfm','dynHealth_'), @('HH.3.lfm','dynHealth3_'))) {
+        $fx = $files | Where-Object { $_.Name -eq $pair[0] }
+        if (-not $fx) { Fail "V49 $($pair[0]) missing"; continue }
+        $xml = Doc $fx.FullName
+
+        $r1 = $xml.SelectSingleNode("//layout[@name='$($pair[1])row1']")
+        $r2 = $xml.SelectSingleNode("//layout[@name='$($pair[1])row2']")
+        $bx = $xml.SelectSingleNode("//layout[@name='$($pair[1])box']")
+        if ($null -eq $r1 -or $null -eq $r2) { Fail "V49 $($pair[0]) has no $($pair[1])row1/row2 - the renderer could not find its rows"; continue }
+        if ($null -eq $bx) { Fail "V49 $($pair[0]) has no <layout name='$($pair[1])box'> - the renderer cannot resize the box"; continue }
+
+        $measured++
+        $pitchXml = [int]$r2.GetAttribute("top") - [int]$r1.GetAttribute("top")
+        $hXml = [int]$bx.GetAttribute("height")
+        if ($pitchXml -ne $pitchLua) { Fail "V49 $($pair[0]) rows are $pitchXml apart but HEALTH_ROW_PITCH is $pitchLua - the box would not end under the last row" }
+        else { Pass "V49 $($pair[0]) row pitch ($pitchXml) matches HEALTH_ROW_PITCH" }
+
+        $hMax = 10 * $pitchLua + $padLua
+        if ($hXml -ne $hMax) { Fail "V49 $($pair[0]) box height=$hXml but the ten-row case is $hMax - the file must declare the tallest it can get (V40 reads this file)" }
+        else { Pass "V49 $($pair[0]) box declares the ten-row height ($hXml)" }
+    }
+    if ($measured -eq 0) { Fail "V49 no health box measured - the check reads nothing (SPEC V20)" }
+
+    if ($rendFn -notmatch 'height\s*=.*HEALTH_ROW_PITCH') { Fail "V49 renderHealthTrack never sets the box height from the pitch - the box would stay ten rows tall" }
+    elseif ($rendFn -notmatch 'healthLevels') { Fail "V49 renderHealthTrack does not read healthLevels for the height" }
+    else { Pass "V49 the renderer sizes the box from the chosen track length" }
+}
 
 # ---- V12: combo items are values - items must agree with the Lua comparison ---
 # The theme combo was removed on 2026-08-17. Absent is fine; present-but-inconsistent is not.
@@ -843,6 +1017,9 @@ else {
         $numinaItems = @()
         foreach ($cb in $hh7x.SelectNodes("//comboBox[@name][@items]")) {
             if ($cb.GetAttribute("name") -notlike 'cbo*') { continue }
+            # The TRUE FAITH row picks a religion and always shows the True Faith text, so its
+            # items are deliberately outside this check (SPEC V50, checked on its own below).
+            if ($cb.GetAttribute("name") -eq 'cboFaith') { continue }
             foreach ($m in [regex]::Matches($cb.GetAttribute("items"), "'([^']*)'")) {
                 $it = $m.Groups[1].Value
                 if ($it -ne '' -and $numinaItems -notcontains $it) { $numinaItems += $it }
@@ -852,8 +1029,24 @@ else {
         if ($missing) { foreach ($m in $missing) { Fail "V32 picker offers '$m' but DESC has no entry - its radio would open an empty block" } }
         elseif ($numinaItems.Count -eq 0) { Fail "V32 no numina picker items found to check" }
         else { Pass "V32 all $($numinaItems.Count) picker items have en+pt descriptions ($($descKeys.Count) DESC entries)" }
-        $orphans = @($descKeys | Where-Object { $numinaItems -notcontains $_ })
+        # 'True Faith' is reached by the fixed key the faith row uses, not by a picker item
+        # (SPEC V50), so it is not dead text.
+        $orphans = @($descKeys | Where-Object { $numinaItems -notcontains $_ -and $_ -ne 'True Faith' })
         if ($orphans) { foreach ($o in $orphans) { Fail "V32 DESC entry '$o' matches no picker item - dead text or a spelling drift" } }
+
+        # ---- V50: every religion opens the True Faith text ----------------------------
+        if ($hh7 -notmatch 'selected\s*==\s*"faith"') { Fail "V50 HH.7 does not special-case the faith row - a religion would open the NO_ENTRY message" }
+        elseif ($hh7 -notmatch 'value\s*=\s*"True Faith"') { Fail "V50 the faith row does not resolve to the True Faith entry" }
+        elseif (-not $descKeys.Contains('True Faith')) { Fail "V50 DESC has no 'True Faith' entry - the row would open empty" }
+        else { Pass "V50 every religion on the faith row opens the True Faith description" }
+
+        $faithCb = $hh7x.SelectSingleNode("//comboBox[@name='cboFaith']")
+        if ($null -eq $faithCb) { Fail "V50 cboFaith not found" }
+        else {
+            $faithItems = @([regex]::Matches($faithCb.GetAttribute("items"), "'([^']*)'") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -ne '' })
+            if ($faithItems.Count -eq 0) { Fail "V50 cboFaith offers nothing" }
+            else { Pass "V50 cboFaith offers $($faithItems.Count) religions, none needing a DESC entry" }
+        }
     }
 
     # V33: no silent blank - each unresolved path must produce its own visible text

@@ -5,7 +5,7 @@
 			Traits grid (SPEC T45). Numina moved to the Powers tab, so merits/flaws and
 			derangements moved up into the space they left. Everything closes on x=1040.
 
-			  MERITS 0..380   FLAWS 390..770   DERANGEMENTS 810..1040   y   0..290
+			  MERITS 0..410   FLAWS 420..830   DERANGEMENTS 840..1040   y   0..290
 			  background boxes, 5 per row, 200 wide, pitch 210         y 300..640
 
 			The outer MERITS AND FLAWS frame was removed on request (SPEC T102). The two tables
@@ -13,94 +13,94 @@
 			to 10 rows inside the space the frame's title and margins gave back.
 		-->
 		<template name="Merit">
-			<edit left="0" top="0" width="200" height="24" field="merit_$(num)"/>
-			<edit left="200" top="0" width="100" height="24" field="type_$(num)"/>
-			<edit left="300" top="0" width="50" height="24" field="costy_$(num)"/>
+			<edit left="0" top="0" width="230" height="24" field="merit_$(num)"/>
+			<edit left="230" top="0" width="100" height="24" field="type_$(num)"/>
+			<edit left="330" top="0" width="50" height="24" field="costy_$(num)"/>
 		</template>
 
-		<layout left="0" top="0" width="380" height="290">
+		<layout left="0" top="0" width="410" height="290">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="15" top="0" width="200" height="20" text="Merit" horzTextAlign="center"/>
+			<label left="15" top="0" width="230" height="20" text="Merit" horzTextAlign="center"/>
 			<!-- Column renamed to Page on request. The field is still type_* : renaming a
 			     field drops what is already saved in existing sheets (SPEC V2). -->
-			<label left="215" top="0" width="100" height="20" text="Page" horzTextAlign="center"/>
-			<label left="315" top="0" width="50" height="20" text="Cost" horzTextAlign="center"/>
+			<label left="245" top="0" width="100" height="20" text="Page" horzTextAlign="center"/>
+			<label left="345" top="0" width="50" height="20" text="Cost" horzTextAlign="center"/>
 
-			<layout left="15" top="25" width="350" height="25" >
+			<layout left="15" top="25" width="380" height="25" >
 				<Merit num="m1"/>
 			</layout>
-			<layout left="15" top="50" width="350" height="25" >
+			<layout left="15" top="50" width="380" height="25" >
 				<Merit num="m2"/>
 			</layout>
-			<layout left="15" top="75" width="350" height="25" >
+			<layout left="15" top="75" width="380" height="25" >
 				<Merit num="m3"/>
 			</layout>
-			<layout left="15" top="100" width="350" height="25" >
+			<layout left="15" top="100" width="380" height="25" >
 				<Merit num="m4"/>
 			</layout>
-			<layout left="15" top="125" width="350" height="25" >
+			<layout left="15" top="125" width="380" height="25" >
 				<Merit num="m5"/>
 			</layout>
-			<layout left="15" top="150" width="350" height="25" >
+			<layout left="15" top="150" width="380" height="25" >
 				<Merit num="m6"/>
 			</layout>
-			<layout left="15" top="175" width="350" height="25" >
+			<layout left="15" top="175" width="380" height="25" >
 				<Merit num="m7"/>
 			</layout>
-			<layout left="15" top="200" width="350" height="25" >
+			<layout left="15" top="200" width="380" height="25" >
 				<Merit num="m8"/>
 			</layout>
-			<layout left="15" top="225" width="350" height="25" >
+			<layout left="15" top="225" width="380" height="25" >
 				<Merit num="m9"/>
 			</layout>
-			<layout left="15" top="250" width="350" height="25" >
+			<layout left="15" top="250" width="380" height="25" >
 				<Merit num="m10"/>
 			</layout>
 		</layout>
 
-		<layout left="390" top="0" width="380" height="290">
+		<layout left="420" top="0" width="410" height="290">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="15" top="0" width="200" height="20" text="Flaw" horzTextAlign="center"/>
-			<label left="215" top="0" width="100" height="20" text="Page" horzTextAlign="center"/>
-			<label left="315" top="0" width="50" height="20" text="Cost" horzTextAlign="center"/>
+			<label left="15" top="0" width="230" height="20" text="Flaw" horzTextAlign="center"/>
+			<label left="245" top="0" width="100" height="20" text="Page" horzTextAlign="center"/>
+			<label left="345" top="0" width="50" height="20" text="Cost" horzTextAlign="center"/>
 
-			<layout left="15" top="25" width="350" height="25" >
+			<layout left="15" top="25" width="380" height="25" >
 				<Merit num="f1"/>
 			</layout>
-			<layout left="15" top="50" width="350" height="25" >
+			<layout left="15" top="50" width="380" height="25" >
 				<Merit num="f2"/>
 			</layout>
-			<layout left="15" top="75" width="350" height="25" >
+			<layout left="15" top="75" width="380" height="25" >
 				<Merit num="f3"/>
 			</layout>
-			<layout left="15" top="100" width="350" height="25" >
+			<layout left="15" top="100" width="380" height="25" >
 				<Merit num="f4"/>
 			</layout>
-			<layout left="15" top="125" width="350" height="25" >
+			<layout left="15" top="125" width="380" height="25" >
 				<Merit num="f5"/>
 			</layout>
-			<layout left="15" top="150" width="350" height="25" >
+			<layout left="15" top="150" width="380" height="25" >
 				<Merit num="f6"/>
 			</layout>
-			<layout left="15" top="175" width="350" height="25" >
+			<layout left="15" top="175" width="380" height="25" >
 				<Merit num="f7"/>
 			</layout>
-			<layout left="15" top="200" width="350" height="25" >
+			<layout left="15" top="200" width="380" height="25" >
 				<Merit num="f8"/>
 			</layout>
-			<layout left="15" top="225" width="350" height="25" >
+			<layout left="15" top="225" width="380" height="25" >
 				<Merit num="f9"/>
 			</layout>
-			<layout left="15" top="250" width="350" height="25" >
+			<layout left="15" top="250" width="380" height="25" >
 				<Merit num="f10"/>
 			</layout>
 		</layout>
 
-		<layout left="810" top="0" width="230" height="290">
+		<layout left="840" top="0" width="200" height="290">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="0" top="0" width="230" height="20" text="DERANGEMENTS" horzTextAlign="center"/>
+			<label left="0" top="0" width="200" height="20" text="DERANGEMENTS" horzTextAlign="center"/>
 
-			<textEditor left="15" top="25" width="200" height="250" field="derangements"/>
+			<textEditor left="15" top="25" width="170" height="250" field="derangements"/>
 		</layout>
 
 		<layout left="0" top="300" width="200" height="165">

@@ -44,6 +44,14 @@
 			-- is a single space, not "": the sheet stores exactly what the box shows.
 			HEALTH_MARKS = {" ", "/", "X", "*"};
 
+			-- Box geometry, named rather than written into the height sum further down: PITCH is
+			-- the distance between two rows in the .lfm files and PAD is the room above the first
+			-- row plus the room under the last. The gate measures the real row spacing in the XML
+			-- and fails if it stops matching PITCH (SPEC V49) - the same Lua-vs-XML drift that
+			-- produced B12 and B16.
+			HEALTH_ROW_PITCH = 27;
+			HEALTH_BOX_PAD   = 36;
+
 			local function markIndex(v)
 				for i = 1, #HEALTH_MARKS, 1 do
 					if HEALTH_MARKS[i] == v then return i; end;
@@ -54,19 +62,82 @@
 				return 1;
 			end;
 
-			-- Both tabs call these. The argument is the row number because the field name is
+			-- The track is always grouped, worst damage first (SPEC V46): every aggravated, then
+			-- every lethal, then every bashing, then the empty rows - and never a gap between
+			-- two marks. HEALTH_MARKS runs from empty to worst, so walking it backwards IS the
+			-- severity order and there is no second list to drift from it (SPEC V47).
+			--
+			-- This only ever moves marks around: the count of each symbol before and after is
+			-- the same, so regrouping is not healing and cannot hide damage.
+			function regroupHealthMarks()
+				if sheet == nil then return; end;
+
+				local n = tonumber(sheet.healthLevels) or 7;
+				local counts = {};
+
+				for m = 1, #HEALTH_MARKS, 1 do counts[m] = 0; end;
+
+				for i = 1, n, 1 do
+					local at = markIndex(sheet["health_" .. i]);
+					counts[at] = counts[at] + 1;
+				end;
+
+				local row = 1;
+
+				for m = #HEALTH_MARKS, 2, -1 do
+					for k = 1, counts[m], 1 do
+						sheet["health_" .. row] = HEALTH_MARKS[m];
+						row = row + 1;
+					end;
+				end;
+
+				while row <= n do
+					sheet["health_" .. row] = HEALTH_MARKS[1];
+					row = row + 1;
+				end;
+			end;
+
+			-- Clearing a mark is HEALING, and healing always comes off the BOTTOM of the track
+			-- (SPEC V44): whatever row the player clicks, the last marked row is the one that
+			-- empties, and the clicked row keeps what it was showing. Damage goes in anywhere,
+			-- healing only ever comes off the end.
+			--
+			-- Only rows the player can see are eligible (SPEC V45). A mark stranded above the
+			-- current track length - marked at 10 levels, then the track shortened to 7 - would
+			-- otherwise eat the click and look like nothing happened.
+			function healHealthMark()
+				if sheet == nil then return; end;
+
+				local n = tonumber(sheet.healthLevels) or 7;
+
+				for i = n, 1, -1 do
+					if markIndex(sheet["health_" .. i]) > 1 then
+						sheet["health_" .. i] = HEALTH_MARKS[1];
+						return;
+					end;
+				end;
+			end;
+
+			-- Both tabs call this. The argument is the row number because the field name is
 			-- positional (health_1 .. health_10, SPEC I3) - the row IS the identity.
 			function cycleHealthMark(n)
 				if sheet == nil then return; end;
 
 				local at = markIndex(sheet["health_" .. n]);
-				sheet["health_" .. n] = HEALTH_MARKS[(at % #HEALTH_MARKS) + 1];
-			end;
 
-			function resetHealthMark(n)
-				if sheet == nil then return; end;
+				if at == #HEALTH_MARKS then
+					-- Next symbol would be the empty one, so this click is a heal: the clicked
+					-- row is left alone and the bottom-most mark goes instead (SPEC V44).
+					healHealthMark();
+				else
+					sheet["health_" .. n] = HEALTH_MARKS[at + 1];
+				end;
 
-				sheet["health_" .. n] = HEALTH_MARKS[1];
+				-- Upgrading a mark in the middle of the stack, or starting a new one on an empty
+				-- row further down, leaves the track out of order - regroup puts the worse
+				-- damage back on top (SPEC V46). Healing cannot break the order: dropping the
+				-- last mark of a sorted list leaves it sorted.
+				regroupHealthMarks();
 			end;
 
 			-- `form` is the tab form; `prefix` names its ten rows: the layout `<prefix>rowN`
@@ -79,6 +150,15 @@
 				local levels = HEALTH_LEVELS[n];
 				local lang = sheet.language or "en";
 
+				-- The black box ends right under the last visible row instead of always being
+				-- ten rows tall (SPEC V49). It only ever shrinks: the .lfm declares the ten-row
+				-- height, and ten is the top of the combo.
+				local box = form[prefix .. "box"];
+
+				if box ~= nil then
+					box.height = n * HEALTH_ROW_PITCH + HEALTH_BOX_PAD;
+				end;
+
 				for i = 1, 10, 1 do
 					-- A sheet saved before the 6th round has a boolean here, which the mark
 					-- label would render as "true". Normalise it once, on the first render that
@@ -89,7 +169,14 @@
 					if mark ~= nil and mark ~= HEALTH_MARKS[1] and markIndex(mark) == 1 then
 						sheet["health_" .. i] = HEALTH_MARKS[1];
 					end;
+				end;
 
+				-- A sheet marked before the 8th round has its marks in click order, so the first
+				-- render groups them (SPEC V46). Normalisation runs first: a leftover boolean
+				-- would otherwise be counted as a mark. This only moves marks, never drops one.
+				regroupHealthMarks();
+
+				for i = 1, 10, 1 do
 					local row = form[prefix .. "row" .. i];
 					local text = form[prefix .. i];
 

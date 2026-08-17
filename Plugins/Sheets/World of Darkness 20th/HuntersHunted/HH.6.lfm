@@ -11,22 +11,26 @@
 				["Academics"] = "Acadêmicos",
 				["Activist"] = "Ativista",
 				["Age"] = "Idade",
+				["Alchemy"] = "Alquimia",
 				["Alertness"] = "Prontidão",
-				["Allies"] = "Aliados",
 				["ALLIES"] = "ALIADOS",
+				["Allies"] = "Aliados",
 				["Alternate Identity"] = "Identidade Alternativa",
 				["Ancestors"] = "Ancestrais",
 				["Animal Ken"] = "Empatia com Animais",
+				["Animal Psychics"] = "Psiquismo Animal",
 				["Animal-Ken"] = "Emp.Animais",
+				["Anti-Psychic"] = "Antipsíquico",
 				["Apparent Age"] = "Idade Aparente",
 				["Appearance"] = "Aparência",
 				["Appearence"] = "Aparência",
 				["Arcane"] = "Arcano",
 				["Architect"] = "Arquiteto",
-				["Armor"] = "Armadura",
 				["ARMOR"] = "ARMADURA",
+				["Armor"] = "Armadura",
 				["Armory"] = "Arsenal",
 				["Art: Nefer (Nefertyne)"] = "Arte: Nefer (Nefertyne)",
+				["Astral Projection"] = "Projeção Astral",
 				["Athetics"] = "Esportes",
 				["Athletics"] = "Esportes",
 				["ATTRIBUTES"] = "ATRIBUTOS",
@@ -40,10 +44,15 @@
 				["Background"] = "História",
 				["BACKGROUNDS"] = "ANTECEDENTES",
 				["Backup"] = "Reforços",
-				["Base of Operations"] = "Base de Operações",
 				["BASE OF OPERATIONS"] = "BASE DE OPERAÇÕES",
+				["Base of Operations"] = "Base de Operações",
+				["BASE OF OPERATIONS (ARMAMENTS)"] = "BASE DE OPERAÇÕES (ARMAMENTOS)",
+				["BASE OF OPERATIONS (DEFENSES)"] = "BASE DE OPERAÇÕES (DEFESAS)",
+				["BASE OF OPERATIONS (OTHER)"] = "BASE DE OPERAÇÕES (OUTROS)",
+				["Based on the RPGmeister sheet plugin, by:"] = "Baseado no plugin de fichas do RPGmeister, por:",
 				["Battle Scars"] = "Cicatrizes de Batalhas",
 				["Benefactor"] = "Benfeitor",
+				["Biocontrol"] = "Biocontrole",
 				["Bon Vivant"] = "Bon Vivant",
 				["Bravo"] = "Valentão",
 				["Brawl"] = "Briga",
@@ -56,28 +65,35 @@
 				["Certification"] = "Certificação",
 				["Chameleon"] = "Camaleão",
 				["Change Log"] = "Notas da Versão",
+				["Channeling"] = "Canalização",
 				["Chantry"] = "Capela",
 				["Charisma"] = "Carisma",
 				["Child"] = "Criança",
+				["Christianity"] = "Cristianismo",
 				["Chronicle"] = "Crônica",
+				["Clairvoyance"] = "Clarividência",
 				["Class"] = "Classe",
 				["Clip"] = "Pente",
 				["Colors"] = "Cores",
+				["Combat"] = "Combate",
 				["COMBAT"] = "COMBATE",
 				["Combat & Items"] = "Combate e Itens",
+				["COMBAT TRAITS"] = "TRAÇOS DE COMBATE",
 				["Comedian"] = "Comediante",
 				["Competitor"] = "Competidor",
 				["Computer"] = "Computador",
 				["Conceal"] = "Ocultação",
 				["Concept"] = "Conceito",
 				["Conformist"] = "Conformista",
+				["Conjuration"] = "Conjuração",
 				["Conniver"] = "Conspirador",
 				["Conscience"] = "Consciência",
 				["Consultant: Nautilus"] = "Consultor: Nautilus",
-				["Contacts"] = "Contatos",
 				["CONTACTS"] = "CONTATOS",
+				["Contacts"] = "Contatos",
 				["Contrary"] = "Contrário",
 				["Contributors:"] = "Colaboradores:",
+				["Conveyance"] = "Transporte",
 				["Cost"] = "Custo",
 				["Courage"] = "Coragem",
 				["Crafts"] = "Ofícios",
@@ -88,36 +104,46 @@
 				["Crusader"] = "Cruzado",
 				["Cult"] = "Culto",
 				["Curmudgeon"] = "Rabugento",
+				["Current Experience"] = "Experiência Atual",
 				["Current Version:"] = "Versão Atual:",
+				["Cyberkinesis"] = "Cibercinese",
+				["Cyberpathy"] = "Ciberpatia",
 				["Dabbler"] = "Diletante",
-				["damage"] = "Dano",
 				["Damage"] = "Dano",
+				["damage"] = "Dano",
 				["Defender"] = "Defensor",
 				["Demeanor"] = "Comportamento",
 				["Demesne"] = "Domínio Onírico",
 				["DERANGEMENTS"] = "PERTURBAÇÕES",
+				["DESCRIPTION"] = "DESCRIÇÃO",
 				["Destiny"] = "Destino",
+				["Developer: Andre (Styllern)"] = "Desenvolvedor: Andre (Styllern)",
 				["Deviant"] = "Divergente",
 				["dexterity"] = "Destreza",
 				["Dexterity"] = "Destreza",
 				["Diff."] = "Dif.",
 				["Director"] = "Diretor",
+				["Divination"] = "Divinação",
 				["Dodge"] = "Esquiva",
 				["Domain"] = "Domínio",
 				["Don't ask again."] = "Não perguntar novamente.",
 				["Don't ask to update."] = "Não pedir para atualizar.",
 				["Dream"] = "Sonho",
 				["Drive"] = "Condução",
+				["Ectoplasmic Generation"] = "Geração Ectoplásmica",
 				["Empathy"] = "Empatia",
+				["Enchantment"] = "Encantamento",
 				["English"] = "English",
 				["Enhancement"] = "Aprimoramento",
 				["Enigma"] = "Enigma",
 				["Enigmas"] = "Enigmas",
+				["Ephemera"] = "Efêmera",
 				["EQUIPMENT (OWNED)"] = "EQUIPAMENTO (POSSUÍDO)",
 				["Ethnicity"] = "Etnia",
 				["Etiquette"] = "Etiqueta",
-				["Experience"] = "Experiência",
 				["EXPERIENCE"] = "EXPERIÊNCIA",
+				["Experience"] = "Experiência",
+				["EXPERIENCE LOG"] = "REGISTRO DE EXPERIÊNCIA",
 				["Explorer"] = "Explorador",
 				["Expression"] = "Expressão",
 				["Eye of the Storm"] = "Olho do Furacão",
@@ -127,6 +153,8 @@
 				["FAME"] = "FAMA",
 				["Familiar"] = "Familiar",
 				["Fanatic"] = "Fanático",
+				["Fascination"] = "Fascinação",
+				["Fears"] = "Medos",
 				["Fetish"] = "Fetiche",
 				["FETISHES"] = "FETICHES",
 				["Finance"] = "Finanças",
@@ -134,40 +162,50 @@
 				["Flaw"] = "Defeito",
 				["Follower"] = "Seguidor",
 				["Font"] = "Fonte",
+				["Fortune"] = "Fortuna",
 				["Gallant"] = "Galante",
 				["Gallo"] = "Gallo",
 				["Gambler"] = "Jogador",
+				["Game"] = "Jogo",
 				["GEAR (CARRIED)"] = "EQUIPAMENTO (CARREGADO)",
 				["Generation"] = "Geração",
 				["Gifts"] = "Presentes",
 				["Glory"] = "Glória",
 				["Gnosis"] = "Gnose",
+				["Goals"] = "Metas",
 				["Grifter"] = "Esperto",
 				["Guide"] = "Guia",
 				["GUIDES"] = "GUIAS",
 				["Guru"] = "Guru",
 				["Hacker"] = "Hacker",
 				["Hair"] = "Cabelos",
+				["Healing"] = "Cura",
 				["HEALTH"] = "VITALIDADE",
 				["Height"] = "Altura",
+				["Hellfire"] = "Fogo do Inferno",
 				["Herd"] = "Rebanho",
 				["Honor"] = "Honra",
-				["Humanity"] = "Humanidade",
 				["HUMANITY"] = "HUMANIDADE",
+				["Humanity"] = "Humanidade",
+				["Hunters Hunted"] = "Caçadores Caçados",
 				["Hurt (-1)"] = "Machucado (-1)",
 				["Idealist"] = "Idealista",
+				["Illusion"] = "Ilusão",
 				["Incapacitated"] = "Incapacitado",
-				["Influence"] = "Influência",
 				["INFLUENCE"] = "INFLUÊNCIA",
+				["Influence"] = "Influência",
 				["Injured (-1)"] = "Ferido (-1)",
 				["Innovator"] = "Inovador",
 				["INSTALLED VERSION:"] = "VERSÃO INSTALADA:",
 				["Inteligence"] = "Inteligência",
 				["Intelligence"] = "Inteligência",
 				["Intimidation"] = "Intimidação",
+				["Inventory"] = "Inventário",
 				["Investigation"] = "Investigação",
+				["Islam"] = "Islamismo",
 				["ITEMS"] = "ITENS",
 				["Jester"] = "Bobo da Corte",
+				["Judaism"] = "Judaísmo",
 				["Judge"] = "Juiz",
 				["Kinfolk"] = "Parentes",
 				["KNOWLEDGES"] = "CONHECIMENTOS",
@@ -183,14 +221,16 @@
 				["Loner"] = "Solitário",
 				["Machine"] = "Máquina",
 				["Mad Scientist"] = "Cientista Louco",
+				["Maelstroms"] = "Maelstroms",
+				["Mage: The Ascension"] = "Mago: A Ascensão",
 				["Main"] = "Principal",
 				["Manipulation"] = "Manipulação",
 				["Martyr"] = "Mártir",
 				["Masochist"] = "Masoquista",
 				["Mauled (-2)"] = " Espancado (-2)",
 				["Mediator"] = "Mediador",
-				["medicine"] = "Medicina",
 				["Medicine"] = "Medicina",
+				["medicine"] = "Medicina",
 				["Melee"] = "Armas Brancas",
 				["Mental"] = "Mentais",
 				["Mentor"] = "Mentor",
@@ -199,20 +239,30 @@
 				["Merit"] = "Qualidade",
 				["MERITS AND FLAWS"] = "QUALIDADES E DEFEITOS",
 				["Metis Deformity"] = "Deformidade de Impuro",
+				["Mind Shields"] = "Escudos Mentais",
+				["Modern"] = "Moderno",
 				["Monster"] = "Monstro",
+				["Moral Flaws"] = "Falhas Morais",
 				["Motivation"] = "Motivação",
-				["name"] = "Nome",
 				["Name"] = "Nome",
+				["name"] = "Nome",
+				["Nationality"] = "Nacionalidade",
 				["Nature"] = "Natureza",
 				["Nautilus"] = "Nautilus",
+				["Necromancy"] = "Necromancia",
+				["Necronics"] = "Necrônica",
 				["No"] = "Não",
 				["Node"] = "Nódulo",
 				["Notes"] = "Anotações",
 				["NUMINA"] = "NÚMINAS",
 				["NUMINA & OTHER TRAITS"] = "NUMINA E OUTROS TRAÇOS",
+				["NUMINA: HEDGE MAGIC PATHS"] = "NÚMINAS: CAMINHOS DE MAGIA ESTÁTICA",
+				["NUMINA: PSYCHIC PHENOMENA"] = "NÚMINAS: FENÔMENOS PSÍQUICOS",
 				["Occult"] = "Ocultismo",
 				["Occupation"] = "Ocupação",
+				["Oneiromancy"] = "Oniromancia",
 				["Optimist"] = "Otimista",
+				["Other"] = "Outro",
 				["OTHER"] = "OUTROS",
 				["Other Traits"] = "Outros Traços",
 				["Pack Name"] = "Matilha",
@@ -234,26 +284,37 @@
 				["power"] = "Poder",
 				["Powers"] = "Poderes",
 				["Pragmatist"] = "Pragmático",
+				["Precognition"] = "Precognição",
 				["Prelude"] = "Prelúdio",
 				["Primal-Urge"] = "Inst. Primitivo",
 				["Programmer: Andre (Styllern)"] = "Programador: André (Styllern)",
 				["Programmer: Vinny (Ambesek)"] = "Programador: Vinny (Ambesek)",
+				["Progress"] = "Progresso",
 				["Prophet"] = "Profeta",
+				["Psychic Healing"] = "Cura Psíquica",
+				["Psychic Hypnosis"] = "Hipnose Psíquica",
+				["Psychic Invisibility"] = "Invisibilidade Psíquica",
+				["Psychic Vampirism"] = "Vampirismo Psíquico",
+				["Psychokinesis"] = "Psicocinese",
+				["Psychometry"] = "Psicometria",
+				["Psychoportation"] = "Psicoportação",
 				["Pure Breed"] = "Puro-Sangue",
+				["Pyrokinesis"] = "Pirocinese",
+				["Quintessence Manipulation"] = "Manipulação de Quintessência",
 				["Rage"] = "Fúria",
-				["range"] = "Alcance",
 				["Range"] = "Alcance",
+				["range"] = "Alcance",
 				["Rank"] = "Posto",
-				["rate"] = "Taxa",
 				["Rate"] = "Taxa",
+				["rate"] = "Taxa",
 				["Rating"] = "Índice",
 				["Rebel"] = "Rebelde",
 				["Requisitions"] = "Requisições",
 				["Residence"] = "Residência",
 				["Resources"] = "Recursos",
 				["RESOURCES"] = "RECURSOS",
-				["Retainers"] = "Lacaios",
 				["RETAINERS"] = "LACAIOS",
+				["Retainers"] = "Lacaios",
 				["Ride"] = "Cavalgar",
 				["Rites"] = "Ritos",
 				["Rituais"] = "Rituais",
@@ -269,29 +330,39 @@
 				["Secret Weapons"] = "Armas Secretas",
 				["Self-Control"] = "Autocontrole",
 				["Sensualist"] = "Sensualista",
+				["Settings"] = "Configurações",
 				["Sex"] = "Sexo",
+				["Shadow"] = "Sombra",
+				["Shadows"] = "Sombras",
+				["Shapeshifting"] = "Metamorfose",
 				["Sheet made for the table"] = "Ficha feita para a mesa",
 				["SKILLS"] = "PERÍCIAS",
 				["Social"] = "Sociais",
 				["Soldier"] = "Soldado",
+				["Spent Experience"] = "Experiência Gasta",
 				["Spies"] = "Espiões",
 				["Stamina"] = "Vigor",
-				["Status"] = "Status",
+				["Starlight"] = "Luz das Estrelas",
 				["STATUS"] = "STATUS",
+				["Status"] = "Status",
 				["Stealth"] = "Furtividade",
 				["Streetwise"] = "Manha",
-				["strength"] = "Força",
 				["Strength"] = "Força",
+				["strength"] = "Força",
 				["Subterfuge"] = "Lábia",
+				["Summoning, Binding, and Warding"] = "Invocação, Vínculo e Proteção",
 				["Survival"] = "Sobrevivência",
 				["Survivor"] = "Sobrevivente",
+				["Synergy"] = "Sinergia",
 				["System: Storyteller"] = "Sistema: Storyteller",
 				["TALENTS"] = "TALENTOS",
 				["Technology"] = "Tecnologia",
+				["Telepathy"] = "Telepatia",
 				["Theme"] = "Tema",
 				["Theme:"] = "Tema:",
 				["There is a new version of this plugin. Install it?"] = "Há uma nova versão desse plugin. Deseja instalar?",
 				["Thrill-Seeker"] = "Aventureiro",
+				["Total Experience"] = "Experiência Total",
 				["Totem"] = "Totem",
 				["Traditionalist"] = "Tradicionalista",
 				["Traits"] = "Traços",
@@ -300,15 +371,22 @@
 				["Trendsetter"] = "Vanguardista",
 				["Tribe"] = "Tribo",
 				["Trickster"] = "Trapaceiro",
+				["True Faith"] = "Fé Verdadeira",
+				["TRUE FAITH"] = "FÉ VERDADEIRA",
 				["Type"] = "Tipo",
 				["Tyrant"] = "Tirano",
 				["Update"] = "Atualizar",
+				["Vampire: Dark Ages"] = "Vampiro: Idade das Trevas",
+				["Vampire: The Masquerade"] = "Vampiro: A Máscara",
 				["Version"] = "Versão Atual",
+				["Victorian Era"] = "Era Vitoriana",
 				["VIRTUES"] = "VIRTUDES",
 				["Visionary"] = "Visionário",
 				["Visit the Table:"] = "Conheça a Mesa:",
 				["Weapon/Attack"] = "Arma/Ataque",
+				["Weather Control"] = "Controle do Clima",
 				["Weight"] = "Peso",
+				["Werewolf: The Apocalypse"] = "Lobisomem: O Apocalipse",
 				["Willpower"] = "Força-de-Vontade",
 				["WILLPOWER"] = "FORÇA DE VONTADE",
 				["Wisdom"] = "Sabedoria",
@@ -316,95 +394,6 @@
 				["Wonder"] = "Maravilha",
 				["Wounded (-2)"] = "Ferido Gravemente (-2)",
 				["Yes"] = "Sim",
-
-				-- Powers tab: box titles and the 43 numina picker items (SPEC T63, T64, T68).
-				-- Only the NAMES live here. The description texts are NOT translated by the
-				-- traversal: they are re-rendered from the DESC table in HH.7 (SPEC V28, V31).
-				-- The pt wording of these 43 is mine, not an official edition - flagged for
-				-- validation in SPEC T68.
-				["NUMINA: HEDGE MAGIC PATHS"] = "NÚMINAS: CAMINHOS DE MAGIA ESTÁTICA",
-				["NUMINA: PSYCHIC PHENOMENA"] = "NÚMINAS: FENÔMENOS PSÍQUICOS",
-				["DESCRIPTION"] = "DESCRIÇÃO",
-				["Alchemy"] = "Alquimia",
-				["Conjuration"] = "Conjuração",
-				["Conveyance"] = "Transporte",
-				["Divination"] = "Divinação",
-				["Ephemera"] = "Efêmera",
-				["Enchantment"] = "Encantamento",
-				["Fascination"] = "Fascinação",
-				["Fortune"] = "Fortuna",
-				["Healing"] = "Cura",
-				["Hellfire"] = "Fogo do Inferno",
-				["Illusion"] = "Ilusão",
-				["Maelstroms"] = "Maelstroms",
-				["Necromancy"] = "Necromancia",
-				["Necronics"] = "Necrônica",
-				["Oneiromancy"] = "Oniromancia",
-				["Quintessence Manipulation"] = "Manipulação de Quintessência",
-				["Shadows"] = "Sombras",
-				["Shapeshifting"] = "Metamorfose",
-				["Starlight"] = "Luz das Estrelas",
-				["Summoning, Binding, and Warding"] = "Invocação, Vínculo e Proteção",
-				["Weather Control"] = "Controle do Clima",
-				["Animal Psychics"] = "Psiquismo Animal",
-				["Anti-Psychic"] = "Antipsíquico",
-				["Astral Projection"] = "Projeção Astral",
-				["Biocontrol"] = "Biocontrole",
-				["Channeling"] = "Canalização",
-				["Clairvoyance"] = "Clarividência",
-				["Cyberkinesis"] = "Cibercinese",
-				["Cyberpathy"] = "Ciberpatia",
-				["Ectoplasmic Generation"] = "Geração Ectoplásmica",
-				["Mind Shields"] = "Escudos Mentais",
-				["Precognition"] = "Precognição",
-				["Psychic Healing"] = "Cura Psíquica",
-				["Psychic Hypnosis"] = "Hipnose Psíquica",
-				["Psychic Invisibility"] = "Invisibilidade Psíquica",
-				["Psychic Vampirism"] = "Vampirismo Psíquico",
-				["Psychokinesis"] = "Psicocinese",
-				["Psychometry"] = "Psicometria",
-				["Psychoportation"] = "Psicoportação",
-				["Pyrokinesis"] = "Pirocinese",
-				["Shadow"] = "Sombra",
-				["Synergy"] = "Sinergia",
-				["Telepathy"] = "Telepatia",
-
-				-- Tab renames, the Game selector and the third numina table (SPEC T83).
-				-- `Credits` and `Combat & Items` stay above: the other five sheets in this
-				-- plugin still render those titles.
-				["Combat"] = "Combate",
-				["Inventory"] = "Inventário",
-				["Settings"] = "Configurações",
-				["Game"] = "Jogo",
-				["Vampire: The Masquerade"] = "Vampiro: A Máscara",
-				["Vampire: Dark Ages"] = "Vampiro: Idade das Trevas",
-				["Werewolf: The Apocalypse"] = "Lobisomem: O Apocalipse",
-				["Mage: The Ascension"] = "Mago: A Ascensão",
-				["TRUE FAITH"] = "FÉ VERDADEIRA",
-				["True Faith"] = "Fé Verdadeira",
-
-				-- 3rd round (SPEC T90/T91): the 5th game, and the three Base of Operations
-				-- boxes on the Inventory tab. The ITEMS title is gone from that tab - its box
-				-- renders TRANSPORTATION now - but the key stays above, harmless and unused.
-				["Hunters Hunted"] = "Caçadores Caçados",
-				["BASE OF OPERATIONS (DEFENSES)"] = "BASE DE OPERAÇÕES (DEFESAS)",
-				["BASE OF OPERATIONS (ARMAMENTS)"] = "BASE DE OPERAÇÕES (ARMAMENTOS)",
-				["BASE OF OPERATIONS (OTHER)"] = "BASE DE OPERAÇÕES (OUTROS)",
-
-				-- 4th round (SPEC T108): Progress tab, the History renames and the Combat mirror.
-				-- The seven health level names are NOT here: renderHealthTrack on the root form
-				-- writes those labels itself, in both languages, and the traversal below skips
-				-- them (see the `dyn` guard) - HEALTH_PT is their translation table.
-				["Progress"] = "Progresso",
-				["Goals"] = "Metas",
-				["Moral Flaws"] = "Falhas Morais",
-				["Fears"] = "Medos",
-				["Nationality"] = "Nacionalidade",
-				["EXPERIENCE LOG"] = "REGISTRO DE EXPERIÊNCIA",
-				["Total Experience"] = "Experiência Total",
-				["Spent Experience"] = "Experiência Gasta",
-				["Current Experience"] = "Experiência Atual",
-				["COMBAT TRAITS"] = "TRAÇOS DE COMBATE",
 			};
 
 			-- SPEC V21 / B.9: a form's getChildren() returns only its own declared children,
@@ -501,23 +490,14 @@
 		]]>
 	</script>
 	<scrollBox align="client">
-		<!-- Settings tab (ex-Credits, SPEC T73/T74). The sponsor image that used to fill the
-		     right-hand column is gone for good, so both boxes sit at x=0. -->
-		<layout left="0" top="0" width="200" height="275">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
-			<label left="0" top="10" width="200" height="20" text="Programmer: Andre (Styllern)" horzTextAlign="center"/>
-			<label left="0" top="35" width="200" height="20" text="Programmer: Vinny (Ambesek)" horzTextAlign="center"/>
-			<label left="0" top="60" width="200" height="20" text="Art: Nefer (Nefertyne)" horzTextAlign="center"/>
-			<label left="0" top="85" width="200" height="20" text="Consultant: Nautilus" horzTextAlign="center" fontSize="13"/>
-			<label left="0" top="110" width="200" height="20" text="Sheet made for the table" horzTextAlign="center"/>
-			<label left="0" top="135" width="200" height="20" text="System: Storyteller" horzTextAlign="center"/>
+		<!--
+			Settings tab (ex-Credits, SPEC T73/T74). The sponsor image that used to fill the
+			right-hand column is gone for good, so both boxes sit at x=0.
 
-			<label left="0" top="185" width="200" height="20" text="Contributors:" horzTextAlign="center"/>
-			<label left="0" top="210" width="200" height="20" text="Nautilus" horzTextAlign="center"/>
-			<label left="0" top="235" width="200" height="20" text="Gallo" horzTextAlign="center"/>
-		</layout>
-
-		<layout left="0" top="285" width="330" height="105">
+			Options first, credits last (SPEC T141): the settings are what a player opens this
+			tab to change; the credits are a signature.
+		-->
+		<layout left="0" top="0" width="330" height="145">
 			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
 
 			<label left="0" top="10" width="90" height="20" text="Language" horzTextAlign="center"/>
@@ -535,6 +515,41 @@
 			<label left="0" top="50" width="90" height="20" text="Game" horzTextAlign="center"/>
 			<comboBox left="95" top="50" width="220" height="25" name="cboGame" field="game" fontColor="white" horzTextAlign="center" items="{'', 'Vampire: The Masquerade', 'Vampire: Dark Ages', 'Werewolf: The Apocalypse', 'Mage: The Ascension', 'Hunters Hunted'}" values="{'', 'Vampire: The Masquerade', 'Vampire: Dark Ages', 'Werewolf: The Apocalypse', 'Mage: The Ascension', 'Hunters Hunted'}">
 			</comboBox>
+
+			<!--
+				`Theme` is the era the table plays in and, like `Game`, only stores state today
+				(SPEC C, T141). The field is `sheetTheme`, NOT `theme`: sheets saved from the Mage
+				plugin still carry theme="Dark", and reusing the name would put that value in a
+				combo that never offered it.
+
+				Not named cbo*, so it stays out of the picker checks the same way `healthLevels`
+				does: a value combo with a real default, not prose with an empty first row.
+			-->
+			<label left="0" top="90" width="90" height="20" text="Theme" horzTextAlign="center"/>
+			<comboBox name="cboSheetTheme" left="95" top="90" width="220" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern', 'Victorian Era'}" values="{'Modern', 'Victorian Era'}"/>
+			<dataLink field="sheetTheme" defaultValue="Modern"/>
+		</layout>
+
+		<!--
+			Credits (SPEC T141). Andre wrote this sheet; the plugin it grew out of is the
+			RPGmeister one, and the names under that heading are its authors, with the roles
+			left exactly as the original credits box had them.
+		-->
+		<layout left="0" top="155" width="330" height="265">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+
+			<label left="0" top="10" width="330" height="20" text="Developer: Andre (Styllern)" horzTextAlign="center"/>
+
+			<label left="0" top="50" width="330" height="20" text="Based on the RPGmeister sheet plugin, by:" horzTextAlign="center" fontSize="12"/>
+			<label left="0" top="75" width="330" height="20" text="Programmer: Vinny (Ambesek)" horzTextAlign="center"/>
+			<label left="0" top="100" width="330" height="20" text="Art: Nefer (Nefertyne)" horzTextAlign="center"/>
+			<label left="0" top="125" width="330" height="20" text="Consultant: Nautilus" horzTextAlign="center" fontSize="13"/>
+
+			<label left="0" top="165" width="330" height="20" text="Contributors:" horzTextAlign="center"/>
+			<label left="0" top="190" width="330" height="20" text="Nautilus" horzTextAlign="center"/>
+			<label left="0" top="215" width="330" height="20" text="Gallo" horzTextAlign="center"/>
+
+			<label left="0" top="240" width="330" height="20" text="System: Storyteller" horzTextAlign="center"/>
 		</layout>
 	</scrollBox>
 </form>
