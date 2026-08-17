@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmHH_3" align="client" theme="dark">
+	<scrollBox align="client">
+		<template name="Attack">
+			<edit left="0" top="0" width="200" height="24" field="attack_$(num)"/>
+			<edit left="200" top="0" width="50" height="24" field="damage_$(num)"/>
+			<edit left="250" top="0" width="50" height="24" field="difficulty_$(num)"/>
+		</template>
+
+		<layout left="0" top="0" width="320" height="170">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="320" height="20" text="COMBAT" horzTextAlign="center"/>
+
+			<label left="15" top="25" width="200" height="20" text="Weapon/Attack"/>
+			<label left="215" top="25" width="50" height="20" text="Damage"/>
+			<label left="265" top="25" width="50" height="20" text="Diff."/>
+
+			<layout left="15" top="50" width="300" height="25" >
+				<Attack num="1"/>
+			</layout>
+			<layout left="15" top="75" width="300" height="25" >
+				<Attack num="2"/>
+			</layout>
+			<layout left="15" top="100" width="300" height="25" >
+				<Attack num="3"/>
+			</layout>
+			<layout left="15" top="125" width="300" height="25" >
+				<Attack num="4"/>
+			</layout>
+		</layout>
+
+		<layout left="330" top="0" width="230" height="170">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+
+			<label left="0" top="0" width="230" height="20" text="ITEMS" horzTextAlign="center"/>
+
+			<textEditor left="15" top="25" width="200" height="130" field="items"/>
+		</layout>
+
+		<layout left="0" top="180" width="230" height="230">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="230" height="20" text="GEAR (CARRIED)" horzTextAlign="center"/>
+
+			<textEditor left="15" top="25" width="200" height="190" field="gear"/>
+		</layout>
+
+		<layout left="240" top="180" width="230" height="230">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="230" height="20" text="EQUIPMENT (OWNED)" horzTextAlign="center"/>
+
+			<textEditor left="15" top="25" width="200" height="190" field="equipment"/>
+		</layout>
+
+		<layout left="480" top="180" width="230" height="230">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="0" top="0" width="230" height="20" text="OTHER" horzTextAlign="center"/>
+
+			<textEditor left="15" top="25" width="200" height="190" field="other"/>
+		</layout>
+	</scrollBox>
+</form>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmHH_2" align="client" theme="dark">
+	<scrollBox align="client">
+
+		<template name="Trait">
+			<edit left="0" top="5" width="95" height="20" field="$(field)" fontSize="12"/>
+			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</template>
+
+		<layout left="0" top="0" width="255" height="330">
+			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<label left="5" top="0" width="240" height="20" text="NUMINA &amp; OTHER TRAITS" horzTextAlign="center"/>
+
+			<layout left="15" top="25" width="225" height="25" >
+				<Trait field="numina_1"/>
+			</layout>
+			<layout left="15" top="50" width="225" height="25" >
+				<Trait field="numina_2"/>
+			</layout>
+			<layout left="15" top="75" width="225" height="25" >
+				<Trait field="numina_3"/>
+			</layout>
+			<layout left="15" top="100" width="225" height="25" >
+				<Trait field="numina_4"/>
+			</layout>
+			<layout left="15" top="125" width="225" height="25" >
+				<Trait field="numina_5"/>
+			</layout>
+			<layout left="15" top="150" width="225" height="25" >
+				<Trait field="numina_6"/>
+			</layout>
+			<layout left="15" top="175" width="225" height="25" >
+				<Trait field="numina_7"/>
+			</layout>
+			<layout left="15" top="200" width="225" height="25" >
+				<Trait field="numina_8"/>
+			</layout>
+			<layout left="15" top="225" width="225" height="25" >
+				<Trait field="numina_9"/>
+			</layout>
+			<layout left="15" top="250" width="225" height="25" >
+				<Trait field="numina_10"/>
+			</layout>
+			<layout left="15" top="275" width="225" height="25" >
+				<Trait field="numina_11"/>
+			</layout>
+		</layout>
+
+		<textEditor left="0" top="340" width="255" height="200" field="numinaNotes"/>
+
+	</scrollBox>
+</form>
