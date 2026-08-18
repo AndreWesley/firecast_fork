@@ -887,6 +887,12 @@
 		-- a tab that is plainly there.
 		if sheet ~= nil and sheet.stShowNumina == nil then sheet.stShowNumina = true; end;
 
+		-- Appearance is the one attribute drawn without a fixed first dot, so that a character
+		-- can be at zero (SPEC I3). Zero is not the DEFAULT though - a new sheet starts at one
+		-- like the other eight (SPEC V104), and only a dot the player switched off keeps it at
+		-- zero. nil means nobody has touched it yet; false is a decision and is left alone.
+		if sheet ~= nil and sheet.appearance_1 == nil then sheet.appearance_1 = true; end;
+
 		applyTabVisibility(self);
 	</event>
 </form>
