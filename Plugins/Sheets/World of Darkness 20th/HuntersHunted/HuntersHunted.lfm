@@ -476,6 +476,11 @@
 			-- the Disciplines and Magika tabs are empty, so no field can produce that row and
 			-- a cost nothing can reach is dead code.
 			local function xpCost(kind, from, ctx)
+				-- While the storyteller has free-buy on, nothing costs anything (SPEC V105).
+				-- It sits above every rule rather than inside them: the mode is not a price,
+				-- and this way no rule below can charge behind its back.
+				if ctx.free then return 0; end;
+
 				if kind == "Attribute" then return from * 4; end;
 				if kind == "Ability"   then if from == 0 then return 3; end; return from * 2; end;
 				if kind == "Virtue"    then return from * 2; end;
@@ -603,7 +608,7 @@
 
 				if base == nil then return nil; end;
 
-				local ctx  = { backgroundsXP = sheet.stBackgroundsXP == true };
+				local ctx  = { backgroundsXP = sheet.stBackgroundsXP == true, free = sheet.stFreeDots == true };
 				local rows = {};
 
 				for i = 1, #XP_ATTRS, 1 do

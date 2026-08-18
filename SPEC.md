@@ -842,8 +842,8 @@ T280|x|`verify-hunters-hunted.ps1` — check NOVO §V104 (semente ∃ & só disp
 T281|~|`module.xml` version `2.8` → `2.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Fecha SÓ T278…T280 — se a 31ª rodada inteira sair em 1 build, PULAR este & fechar em §T288|V6,V7
 T282|.|teste no Firecast (RESOLVE §R36): ficha NOVA nasce Aparência 1 · desmarcar o 1º dot, fechar & reabrir a ficha → segue 0 (se voltar a 1, §R36 = APAGA & a semente cai, junto c/ a de `stShowNumina`) · FdV 4→5 cobra 4 no log|R36,V104,I9
 T283|x|`HH.10.lfm` — 5º `checkBox` `Allow Buy Dots For Free` (`stFreeDots`) @ `top=210` & caixa `520×240` → `520×270`|I8,V38,V40,V106
-T284|~|`HuntersHunted.lfm` — `ctx.free = sheet.stFreeDots == true` em `xpLedgerRows`; `xpCost` devolve 0 na 1ª linha quando `ctx.free` ∴ 1 lugar só (§V86 intacto)|I9,V105
-T285|.|`HH.9.lfm` — coluna `Cost` escreve `FREE` traduzido quando `stFreeDots` ligada + `dataLink` do ledger passa a observar `stFreeDots`|V105,V70,V97
+T284|x|`HuntersHunted.lfm` — `ctx.free = sheet.stFreeDots == true` em `xpLedgerRows`; `xpCost` devolve 0 na 1ª linha quando `ctx.free` ∴ 1 lugar só (§V86 intacto)|I9,V105
+T285|~|`HH.9.lfm` — coluna `Cost` escreve `FREE` traduzido quando `stFreeDots` ligada + `dataLink` do ledger passa a observar `stFreeDots`|V105,V70,V97
 T286|x|`localization.lang` + mapa `PT` de `HH.6` — `Allow Buy Dots For Free` & `FREE` (pt `Grátis`)|V10,V22,V28
 T287|.|`verify-hunters-hunted.ps1` — `$wantFlags` += `stFreeDots` & checks NOVOS §V105 §V106. Mutação antes de aceitar|V20,V89,V105,V106
 T288|.|`module.xml` version `2.9` → `3.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Se T278…T287 forem buildados de uma vez, ESTE bump é o único ∴ T281 vira no-op declarado|V6,V7
