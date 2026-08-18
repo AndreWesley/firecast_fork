@@ -441,6 +441,8 @@ R35|`?` `onShow` em aba|`gui.Form.eves["onShow"]` ∃ (§R34) mas ⊥ ∃ preced
 
 R36|`?` desmarcar guarda `false`?|`imageCheckBox`/`checkBox` gravam o `field` sozinhos (`autoChange`), mas ⊥ se sabe se DESMARCAR grava `false` ou APAGA o atributo — `_ndb_setAttribute` é nativo. Se apagar: "default 1" torna Aparência 0 INALCANÇÁVEL (o load semeia de novo a ∀ abertura) & `stShowNumina` desligado volta ligado (§V89) ∴ as 2 sementes caem juntas. §T282 resolve|`SDK3/API/ndb.lua:60` `:310`
 
+R37|`onUserChange` por controle|`gui.Edit` `gui.ColorComboBox` & `gui.DataLink` têm `onUserChange`; `gui.CheckBox` `gui.ImageCheckBox` `gui.ComboBox` `gui.RadioButton` têm SÓ `onChange` ∴ dot ⊥ sabe por EVENTO se quem escreveu foi a mão do jogador \| o próprio Lua — separar exige FLAG no código (§V107)|`SDK3/API/rrpgGUI.lua:788` `:730` `:919` `:1176`
+
 ## §V INVARIANTS
 
 V1: ∀ `field=` de widget de entrada único na árvore do sheetTemplate ∴ ⊥ 2 inputs no mesmo dado. `<dataLink>` ∉ contagem — observa, ⊥ possui (§B.3). `radioButton` do MESMO grupo compartilha `field` POR DESIGN (exclusão mútua) ∴ exceção declarada, ⊥ conta como 2 donos — distinção fica em `fieldValue` (§V.30)
@@ -552,6 +554,8 @@ V103: desfazer ponto só vale p/ ponto QUE ESTÁ NO LOG ∴ nível ⊥ desce aba
 V104: `appearance_1` == nil (nunca tocado) → load semeia `true` ∴ ficha nova nasce c/ Aparência 1 ≡ os outros 8 atributos. `false` EXPLÍCITO ⊥ é tocado por semente nenhuma ∴ Aparência 0 ∃ & sobrevive ao load — vale enquanto §R36 disser que desmarcar grava `false`
 V105: `stFreeDots` ligada → ∀ `cost` do log = 0 & ∀ célula da coluna `Cost` = `FREE` traduzido ∴ `xpSpent()` = 0 & compra nenhuma é barrada por saldo (§I12). LENTE: ⊥ ∃ campo marcando ponto como grátis ∴ desligar re-preça TUDO desde o baseline & o saldo pode ficar negativo (§C) — jornalizar seria o único jeito de carimbar & §V100 proíbe
 V106: `stFreeDots` nil (ficha velha \| nunca tocada) = DESLIGADA ∴ ⊥ ∃ ficha que compre de graça por omissão — fail-closed ≡ §V80 & ≡ `stShowDisciplines`/`stShowMagika` (§V89). Distinto de `stShowNumina`, que é o único default ON
+V107: escrita de campo feita pelo PRÓPRIO Lua (re-ligação de época §V76, semente de §V104, migração de §I11) ⊥ dispara guarda nem re-render ∴ abrir a ficha ⊥ paga 1 varredura de ledger POR dot. Flag global ligada em volta do lote & 1 render depois dele (§R37 — ⊥ ∃ `onUserChange` em `imageCheckBox` p/ separar por evento)
+V108: 1 clique de dot = no MÁXIMO 1 varredura de `xpLedgerRows` ∴ guarda & caixas compartilham o resultado. Eram 2 (guarda chamava `xpSpent()` & `renderXPBoxes` varria de novo)
 
 ## §T TASKS
 
@@ -848,6 +852,13 @@ T286|x|`localization.lang` + mapa `PT` de `HH.6` — `Allow Buy Dots For Free` &
 T287|x|`verify-hunters-hunted.ps1` — `$wantFlags` += `stFreeDots` & checks NOVOS §V105 §V106. Mutação antes de aceitar|V20,V89,V105,V106
 T288|x|`module.xml` version `2.9` → `3.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Se T278…T287 forem buildados de uma vez, ESTE bump é o único ∴ T281 vira no-op declarado|V6,V7
 T289|.|teste no Firecast: ligar `Allow Buy Dots For Free` → comprar 3 pontos → 3 linhas no log c/ `Cost` = `FREE` & `Current` PARADO · desligar → as 3 linhas voltam a mostrar preço & `Current` cai (pode ficar negativo, §C)|I8,V105,V106
+T290|.|`HuntersHunted.lfm` — flag global `xpQuiet`: `xpGuard` & `renderXPBoxes` saem cedo enquanto ligada|V107
+T291|.|`HH.6.lfm` — `renderAbilityLabels` liga `xpQuiet` antes do laço de re-ligação & desliga no fim; 1 `renderXPBoxes` depois do lote|V107,V76
+T292|.|`HuntersHunted.lfm` — semente de `appearance_1` (§V104) & migração de `xpTotal` (§I11) rodam sob `xpQuiet`|V107,V104,I11
+T293|.|`HuntersHunted.lfm` `HH.1.lfm` `HH.7.lfm` — `xpGuard(field, form)` chama `renderXPBoxes` 1× no fim & devolve o `xpSpent()` que já calculou; `onChange` do dot vira só `xpGuard('…', self)`|V108,V99
+T294|.|`verify-hunters-hunted.ps1` — checks NOVOS §V107 §V108 (& §V99 aceita a assinatura nova). Mutação antes de aceitar|V20,V99,V107,V108
+T295|.|`module.xml` version `3.0` → `3.1` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T296|.|teste no Firecast: ficha abre em tempo NORMAL (§B30) & o guarda segue barrando compra sem saldo (≡ §T277)|V107,V108
 
 ## §B BUGS
 
@@ -881,3 +892,4 @@ B26|2026-08-18|12 abas autoradas VISÍVEIS + gatilho de `applyTabVisibility` mor
 B27|2026-08-18|`applyTabVisibility` só disparava no `onNodeReady` do form RAIZ & no `dataLink` dos 3 flags ∴ trocar de papel na mesa ⊥ re-avaliava: a decisão tomada como JOGADOR congelava & o mestre voltava p/ a ficha sem a aba `Storyteller`. Até a 27ª rodada a aba nascia `visible="true"` ∴ o estado estático mascarava a falta de re-avaliação; §V94 fechou o default & EXPÔS. Agravante: os 3 checkbox que disparam o `dataLink` moram DENTRO da aba escondida ∴ ⊥ ∃ caminho de volta pelo próprio cliente|V96
 B28|2026-08-18|corretude do log de XP dependia de `ndb.newObserver` p/ os ~458 dots — API do SDK sem precedente em FICHA (só ChatMod) & nunca testada (§T252 ficou `~`). Os únicos gatilhos PROVADOS eram `onNodeReady` (1×/carga) & `dataLink` de 3 campos ∴ log congela no estado do load. Somado: `rows` vazio escrevia 4 colunas EM BRANCO (§V33 só cobria baseline ausente) ∴ baseline recém-salvo + ponto novo = tela vazia que ⊥ diz nada|V97,V98
 B29|2026-08-18|custo de Força de Vontade escrito `n×2` em §I9 desde a 27ª rodada, SEM fonte citada (§I9 ⊥ tem linha de §R p/ nenhum preço) ∴ o ledger cobrava o DOBRO em toda compra de FdV — FdV 4→5 aparecia por 8 em vez de 4. Achado pelo user 2026-08-18. §V86 amarra tabela↔código, ⊥ tabela↔livro ∴ preço errado passava verde nos 2 lados|I9
+B30|2026-08-18|abrir a ficha TRAVA. `onChange` de ∀ dot (T272/T273, versão 2.8) chama `xpGuard` **&** `renderXPBoxes` — cada um varre o LEDGER INTEIRO (~91 traços × 2 nós ≈ 1.1k leituras de NDB). O renderer de época re-liga 150 dots (30 linhas × 5) escrevendo `c.field` & `c.checked`, & roda 2× no load (`dataLink` de `language` & de `sheetTheme`, ambos c/ `defaultValue` ∴ disparam na abertura) ∴ ≈ 300 varreduras & ~660k leituras nativas ANTES da ficha aparecer. Escrita PROGRAMÁTICA ⊥ era separada de clique do jogador & `imageCheckBox` ⊥ tem `onUserChange` (§R37) ∴ nada distinguia as duas|V107,V108
