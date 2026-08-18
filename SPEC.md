@@ -310,6 +310,14 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - papel na mesa muda SEM avisar a ficha: `jogador`/`mesa` ⊥ têm evento nenhum no SDK, só getters (§R34) ∴ a ficha ⊥ pode esperar ser avisada — ! reperguntar a ∀ exibição (`onShow`, §V96)
 - §V93 reescrito p/ o que o SDK deixa fazer (§R33): "aba ATIVA ∈ proibidas" ⊥ é legível ∴ o gatilho vira a TRANSIÇÃO visível→escondida. Custo DECLARADO por mim, ⊥ pedido pelo user: mestre desligando 1 flag manda p/ `Main` também quem estava em aba permitida
 
+- 30ª rodada (2026-08-18) — XP vira REGRA, ⊥ papel. Pedido do user. ↓ ∀ decisão desta rodada
+- ficha BARRA compra sem saldo & só devolve XP de ponto que está no log. REVOGA "⊥ derivados calculados / ficha = papel" p/ os 3 números de XP (a 27ª já tinha revogado p/ o Total)
+- jogador digita SÓ o Current. Único número GRAVADO = `xpTotal` (novo, só-Lua): Spent = Σ log, Current = `xpTotal` − Spent ∴ subir ponto desconta & tirar ponto devolve, sem 1 linha de desconto — é subtração, ⊥ evento
+- `experience` & `spentXP` viram ÓRFÃOS: lidos 1× p/ semear `xpTotal` (= `experience` + Σ log no 1º render) & nunca mais ∴ o saldo que o jogador via ⊥ muda na virada
+- guarda DORME enquanto ⊥ ∃ baseline ∴ criação de personagem ⊥ é barrada por saldo — a regra só vale depois que o mestre congela a ficha
+- ponto do personagem INICIAL ⊥ pode ser vendido (§V103): o dot volta sozinho. Só ponto comprado (∈ log) sai & devolve
+- 2 clientes editando a MESMA ficha ao mesmo tempo ⊥ tratado — mas ⊥ ∃ cache p/ divergir: tudo deriva do NDB a ∀ render ∴ o pior caso é 1 render velho, ⊥ 1 número errado gravado
+
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
@@ -367,6 +375,17 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - `Type` & `Trait` renderizados por Lua ∴ passam por `tryTranslate` (≡ §V70): `Attribute`=`Atributo` · `Ability`=`Habilidade` · `Virtue`=`Virtude` · `Humanity`=`Humanidade` · `Willpower`=`Força de Vontade` · `Background`=`Antecedente` · `Numina`=`Númina` (+ dormentes `Discipline` `Sphere` `Arete`)
   - `baseline` vazio → bloco mostra texto de estado EXPLÍCITO (`initial character not saved yet`), ⊥ tabela em branco (§V33)
 
+- I11 os 3 números de XP (30ª rodada) — 1 GRAVADO, 2 derivados. Valem na aba Progress (`HH.9`) & no espelho da Main (`HH.1`)
+  - `xpTotal` = campo só-Lua (≡ `baseline`, §I3): XP total ganho. Único número salvo
+  - `Total` = `xpTotal`, só-leitura · `Spent` = Σ `cost` do log, só-leitura · `Current` = `xpTotal` − `Spent`, EDITÁVEL
+  - digitar X no `Current` → `xpTotal = X + Spent` (`onUserChange` do `edit`, ⊥ `field`) ∴ o jogador mexe no saldo & o total se ajusta
+  - migração 1×: `xpTotal` nil → `xpTotal = (`experience` \| 0) + Σ log ∴ o `Current` renderizado = o que o jogador via antes
+- I12 `xpGuard(field)` @ form RAIZ — `onChange` de ∀ dot que custa XP chama. ⊥ escreve XP nenhum (Current é derivado ∴ ⊥ ∃ o que descontar \| devolver)
+  - `baseline` vazio → sai (§V101). `base` = `field` sem `_N`; `XP_TRAIT[base]` nil → sai
+  - dot LIGOU & `xpTotal` − Σ log < 0 → DESFAZ (dot volta a `false`) ∴ ⊥ compra sem saldo
+  - dot DESLIGOU & nível resultante < nível no `baseline` → DESFAZ (dot volta a `true`) ∴ ponto do personagem inicial ⊥ é vendido (§V103)
+  - desfazer re-dispara o `onChange` — o 2º passe acha estado legal & para ∴ ⊥ ∃ laço
+
 ## §R RESEARCH
 
 id|topic|finding|src
@@ -407,6 +426,8 @@ R32|snapshot do NDB|`ndb.exportXML(nodeObj)` → string XML do nó inteiro; volt
 R33|`?` troca de aba|`gui.TabControl` expõe SÓ `tabIndex` (get/set) & `gui.TabItem:activate()`; `eves` ⊥ tem `onChange`/`onTabIndexChange` — `Control.eves` só oferece mouse/teclado/foco ∴ ⊥ dá p/ interceptar o clique no botão de aba. Sobra recalcular & PULAR p/ `Main` (§V93) + esconder o conteúdo (§V92)|`SDK3/API/rrpgGUI.lua:1010` `:1025` `:268`
 
 R34|exibição de form|`gui.Form.eves["onShow"]` existe (par de `onHide`) ∴ dá p/ recalcular a ∀ vez que a ficha aparece, ⊥ só no `onNodeReady` (1×/nó). Precedente: 15 `.lfm` do repo, incl. ficha (`Sheets/Ficha de Reinos d20/FichaReinosD20/DockNPCs.lfm:73`). `jogador` & `mesa` ⊥ expõem evento nenhum em `rrpgWrappers` — só getters ∴ `onShow` é o gancho que ∃|`SDK3/API/rrpgGUI.lua:480` `SDK3/API/rrpgWrappers.lua:370` `:444`
+
+R35|`?` `onShow` em aba|`gui.Form.eves["onShow"]` ∃ (§R34) mas ⊥ ∃ precedente no repo de form IMPORTADO em `<tab>` usando `onShow` — os 15 usos são popup, dock & form raiz ∴ ⊥ confirmado que TROCAR DE ABA dispara o `onShow` do form de dentro. `?` até §T269. Se ⊥ disparar, sobra: (a) `onChange` nos dots dos templates chamando o render por referência global \| (b) campo-contador escrito pelo dot & `dataLink` em `HH.9` (custa 1 nome de campo p/ sempre, §V2)|`SDK3/API/rrpgGUI.lua:480`
 
 ## §V INVARIANTS
 
@@ -509,6 +530,13 @@ V94: estado autorado no XML de aba manejada = default do flag/gate — `Discipli
 V95: gatilho de §I8b mora no form RAIZ ∴ aba nenhuma é dona do gatilho que a esconde — `HH.10` está escondida p/ o jogador & ⊥ pode ser quem decide isso (§B26)
 
 V96: visibilidade de aba = DERIVADA, recalculada a ∀ EXIBIÇÃO do form raiz (`onShow`, §R34) & ⊥ só 1× no `onNodeReady` ∴ papel que muda na mesa (jogador↔mestre) se conserta saindo & voltando p/ a ficha. ⊥ ∃ estado de visibilidade que sobreviva a uma re-exibição (§B27)
+V97: relatório da aba Progress recalculado a ∀ EXIBIÇÃO da aba (`onShow`) & ⊥ depende de observer de NDB p/ ficar correto ∴ voltar p/ a aba mostra o estado de AGORA. Observer, se disparar, é só atalho p/ atualizar com a aba já aberta — ⊥ é o gatilho de que a corretude depende (§B28)
+V98: `rows` VAZIO ⊥ = 4 colunas em branco — o log DIZ que nada foi comprado ainda (≡ §V33, que só cobria baseline ausente) ∴ ficha certa ⊥ parece quebrada
+V99: ∀ `imageCheckBox` cujo `field` = dot de traço que custa XP (§I9) chama `xpGuard` no `onChange` ∴ ⊥ ∃ caminho de compra que escape da regra. Dot de ESPELHO só-leitura (§V51) & `willpower_c*` (pontos gastos, ⊥ nível) ⊥ contam
+V100: XP ⊥ é jornalizado — `Spent` & `Current` DERIVAM de `xpTotal` & do log a ∀ render ∴ ⊥ ∃ número gravado que possa divergir do log (≡ §V83 §V84). `xpTotal` é o ÚNICO gravado & só muda quando o jogador digita o saldo
+V101: `xpGuard` DORME enquanto `baseline` vazio ∴ montar personagem ⊥ é barrado por saldo — a regra nasce quando o mestre congela a ficha (§I8c)
+V102: `experience` & `spentXP` ∈ ÓRFÃOS de §I3 depois da migração — lidos 1× p/ semear `xpTotal`, ⊥ reusados por widget nenhum (≡ §V91)
+V103: desfazer ponto só vale p/ ponto QUE ESTÁ NO LOG ∴ nível ⊥ desce abaixo do `baseline`; devolução = a própria subtração (§V100), ⊥ ∃ crédito escrito
 
 ## §T TASKS
 
@@ -780,6 +808,19 @@ T261|x|`HuntersHunted.lfm` — `<event name="onShow">` no form RAIZ → `applyTa
 T262|x|`verify-hunters-hunted.ps1` — check NOVO §V96 (form raiz tem `onShow` chamando `applyTabVisibility`). Mutação antes de aceitar|V20,V96
 T263|x|`module.xml` version `2.5` → `2.6` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 T264|.|teste no Firecast: mestre → jogador → mestre, sair da ficha & voltar → aba `Storyteller` REAPARECE. Se ⊥ reaparecer, a causa ⊥ é o gatilho & sim §R29 (`meuJogador` ⊥ populado) ∴ backprop de novo|R29,V96
+T265|.|`HH.9.lfm` — `<event name="onShow">` → `renderTotalXP(self)` + `renderXPLedger(self)` ∴ voltar p/ a aba redesenha|V97,R34,R35
+T266|.|`HH.9.lfm` — `#rows == 0` escreve estado "Nothing bought yet" na 1ª coluna (≡ §V33) + chave [pt] & [en]|V98,V33,V10
+T267|.|`verify-hunters-hunted.ps1` — checks NOVOS §V97 §V98. Mutação antes de aceitar|V20,V97,V98
+T268|.|`module.xml` version `2.6` → `2.7` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T269|.|teste no Firecast (RESOLVE §R35 & §T252): baseline salvo → +1 em `dexterity` → ir p/ Progress → linha `Attribute\|Dexterity\|3\|8`; desmarcar REMOVE a linha. Se ⊥ aparecer ao trocar de aba, `onShow` ⊥ dispara em form de aba & o gatilho vira (a) \| (b) de §R35|R35,V97,V83
+T270|.|`HuntersHunted.lfm` — `XP_TRAIT[base] = {kind, first, fixed}` p/ ∀ traço de §I9, montado das MESMAS listas que `xpLedgerRows` usa (⊥ 2ª lista, §V86) + `xpSpent()` = Σ `cost` do log|I12,V86
+T271|.|`HuntersHunted.lfm` — `xpGuard(field)` conforme §I12 (dorme sem baseline · barra compra sem saldo · barra venda de ponto do baseline · desfaz escrevendo o campo de volta)|I12,V99,V101,V103
+T272|.|`HH.1.lfm` `HH.7.lfm` — `onChange="xpGuard('$(field)_N'); renderXPBoxes(self);"` em ∀ dot de traço que custa XP (templates)|V99
+T273|.|`HuntersHunted.lfm` — `renderXPBoxes(form)` (≡ `renderHealthTrack`, §R9): escreve `Total` `Spent` `Current` + migração de `xpTotal` (§I11). `HH.9` & `HH.1` chamam|I11,V100,V102
+T274|.|`HH.9.lfm` & `HH.1.lfm` — 3 caixas de XP perdem `field`; `Current` ganha `onUserChange` → `xpTotal = digitado + Spent`. `spentXP` & `experience` saem de §I3 ESPELHOS p/ ÓRFÃOS|I11,V1,V36,V102
+T275|.|`verify-hunters-hunted.ps1` — checks NOVOS §V99 §V100 §V101 §V102 §V103. Mutação antes de aceitar|V20,V99,V100,V101,V102,V103
+T276|.|`module.xml` version `2.7` → `2.8` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T277|.|teste no Firecast: baseline salvo & `Current` = 10 → subir `dexterity` 3→4 (custa 12) BARRA & o dot volta · `Current` = 20 → mesma compra passa & `Current` cai p/ 8 · desmarcar o dot devolve os 12 · desmarcar dot do baseline ⊥ funciona|I11,I12,V99,V101,V103
 
 ## §B BUGS
 
@@ -811,3 +852,4 @@ B24|2026-08-17|20ª rodada deu campo canônico por NOME mas deixou 1 campo carre
 B25|2026-08-18|`baseline` = campo só-Lua (⊥ widget — é o dado escondido do jogador) ∴ `<dataLink field="baseline">` de `HH.10` caiu em §V8 como link morto. Invariante ⊥ previa dono-Lua; gate ⊥ lê `fields=` de link múltiplo ∴ o mesmo campo em `HH.9` passou despercebido (gap ANTERIOR, ⊥ regressão desta rodada)|V8
 B26|2026-08-18|12 abas autoradas VISÍVEIS + gatilho de `applyTabVisibility` morando em `HH.10` (a própria aba escondida) ∴ ficha nova c/ os 3 flags desligados abria com `Disciplines` `Magika` & `Storyteller` à vista p/ o JOGADOR. §V80 fez o gate fail-closed na LÓGICA, mas o estado ESTÁTICO seguia fail-open & §R31 (`visible` tira o botão?) segue `?` ∴ 2 causas possíveis, 1 sintoma|V92,V93,V94,V95
 B27|2026-08-18|`applyTabVisibility` só disparava no `onNodeReady` do form RAIZ & no `dataLink` dos 3 flags ∴ trocar de papel na mesa ⊥ re-avaliava: a decisão tomada como JOGADOR congelava & o mestre voltava p/ a ficha sem a aba `Storyteller`. Até a 27ª rodada a aba nascia `visible="true"` ∴ o estado estático mascarava a falta de re-avaliação; §V94 fechou o default & EXPÔS. Agravante: os 3 checkbox que disparam o `dataLink` moram DENTRO da aba escondida ∴ ⊥ ∃ caminho de volta pelo próprio cliente|V96
+B28|2026-08-18|corretude do log de XP dependia de `ndb.newObserver` p/ os ~458 dots — API do SDK sem precedente em FICHA (só ChatMod) & nunca testada (§T252 ficou `~`). Os únicos gatilhos PROVADOS eram `onNodeReady` (1×/carga) & `dataLink` de 3 campos ∴ log congela no estado do load. Somado: `rows` vazio escrevia 4 colunas EM BRANCO (§V33 só cobria baseline ausente) ∴ baseline recém-salvo + ponto novo = tela vazia que ⊥ diz nada|V97,V98
