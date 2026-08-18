@@ -696,4 +696,26 @@
 			<import file="HH.10.lfm"/>
 		</tab>
 	</tabControl>
+
+	<!--
+		The tab switch is driven from HERE, though the checkboxes that feed it live on the
+		Storyteller tab (SPEC V95, 28th round). That tab is one of the four this hides, and a
+		hidden tab cannot be trusted to run the code that hides its neighbours - that is how a
+		fresh sheet came up with all three power tabs on show (SPEC B26).
+	-->
+	<dataLink fields="{'stShowNumina', 'stShowDisciplines', 'stShowMagika'}">
+		<event name="onChange">
+			applyTabVisibility(self);
+		</event>
+	</dataLink>
+
+	<event name="onNodeReady">
+		-- A sheet saved before the 27th round has nil here and was showing Numina all along,
+		-- so the flag is written true once rather than left nil: the renderer already treats
+		-- nil as visible (SPEC V89), and this keeps the checkbox from reading unticked beside
+		-- a tab that is plainly there.
+		if sheet ~= nil and sheet.stShowNumina == nil then sheet.stShowNumina = true; end;
+
+		applyTabVisibility(self);
+	</event>
 </form>
