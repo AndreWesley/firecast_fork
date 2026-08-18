@@ -404,6 +404,16 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - 2º caminho de saldo negativo: a semente da migração de §I11 repassa `experience` negativo de ficha velha ∴ fecha na MESMA linha (`math.max(0, …)`). Sem isso §V131 nasceria falsa em ficha migrada
 - 3º caminho, DECLARADO & ⊥ FECHADO: mestre liga `stBackgroundsXP` c/ antecedentes já comprados → linhas que custavam `0` passam a custar (§I9) ∴ `Spent` sobe sozinho & `Current` vai a negativo SEM clique nenhum. Guarda ⊥ roda (⊥ ∃ dot) & `xpTotal` ⊥ é escrito ∴ FORA de §V131. Fechar = barrar a flag | escrever XP (⊥ §V100) ∴ `?` p/ o user, ⊥ conserto calado
 
+- 41ª rodada 2026-08-18 ↓ (§T354 RODOU no Firecast v3.9 & voltou c/ 2 bugs)
+- §T354 respondeu §R39 pela METADE, & na direção BOA: o pop-up APARECEU ∴ (a) `xpGuard` roda no clique do dot & (b) `sheet[field]` já reflete o clique quando o `onChange` dispara. São as 2 premissas que 4 rodadas (33ª…36ª) ⊥ conseguiram observar & que §B33 (b) deu como possivelmente falsas ∴ o guarda ⊥ está morto (§R42)
+- MAS o desfazer ⊥ pega: bolinha segue ACESA & a compra entra no LOG ∴ depois que o handler volta, `sheet[field]` é `true` de novo (§B36). Escrever o NDB de dentro do `onChange` do PRÓPRIO controle ⊥ sobrevive ao fim do dispatch
+- fix = escrever TAMBÉM o `checked` do controle que disparou, sob `xpQuiet` — quem re-afirmava o valor era a VIEW. Cobre as 2 mecânicas possíveis (controle re-afirma o estado dele depois do handler | controle ignora escrita no NDB durante o próprio dispatch) sem precisar saber QUAL é ∴ §R43 segue `?` de propósito
+- achar o controle = varrer a árvore do FORM CLICADO (o dot mora nele, §R9 basta) atrás de `field` igual, ⊥ nomear as 64 bolinhas no XML. Varredura só no clique RECUSADO (raro), ⊥ em ∀ clique. JULGAMENTO meu: nomear as bolinhas mexeria em ~10 templates & arrisca §V59 (nome único entre arquivos)
+- alternativa ⊥ escolhida & guardada: adiar o desfazer c/ `setTimeout(fn, 1)` (§R44) ∴ a escrita cairia FORA do dispatch. Fica de RESERVA — se escrever o controle ⊥ bastar, o próximo passo é esse, ⊥ um 3º caminho inventado do zero (≡ lição de §B33: 1 hipótese por rodada, testada)
+- 2º bug (saldo ⊥ atualiza na hora da compra): as caixas de XP são repintadas SÓ no form do dot clicado. `HH.7` (Numina) tem 20 bolinhas guardadas & ZERO caixa ∴ comprar númina ⊥ atualiza número nenhum; `HH.1` tem bolinha & caixa ∴ compra de atributo atualiza — daí o "às vezes" do relato
+- fix = registro dos forms que TÊM caixa (`HH.1` & `HH.9`), ≡ precedente `xpLedgerForm` da 39ª rodada (§V125): o guarda repinta TODAS as registradas c/ o `spent` que já calculou ∴ ⊥ depende de §R35 (`onShow` de aba importada segue `?`) & segue 1 varredura de ledger por clique
+- o pop-up (§V129, 40ª rodada) foi o que PRODUZIU essa evidência: sem ele o relato seria "compra ⊥ é barrada" & a causa seguiria indistinguível de guarda morto. Sonda declarada na 40ª rodada, cumprida na 41ª
+
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
@@ -469,12 +479,14 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - digitar X no `Current` → `xpTotal = X + Spent` (`onUserChange` do `edit`, ⊥ `field`) ∴ o jogador mexe no saldo & o total se ajusta
   - migração 1×: `xpTotal` nil → `xpTotal = (`experience` \| 0) + Σ log ∴ o `Current` renderizado = o que o jogador via antes
   - 40ª rodada: `Current` digitado < 0 → RECUSA (⊥ grava `xpTotal`) + pop-up + re-render ∴ a caixa volta ao valor gravado & nada se perde. Semente da migração passa por `math.max(0, experience)` (§V131, §B35)
+  - 41ª rodada: as caixas de XP são repintadas em TODOS os forms registrados em `xpBoxForms` (`HH.1` & `HH.9`), ⊥ só no form do dot clicado ∴ compra de númina em `HH.7` (⊥ tem caixa) atualiza o saldo da Main (§V133, §B37)
 - I12 `xpGuard(field)` @ form RAIZ — `onChange` de ∀ dot que custa XP chama. ⊥ escreve XP nenhum (Current é derivado ∴ ⊥ ∃ o que descontar \| devolver)
   - `baseline` vazio → sai (§V101). `base` = `field` sem `_N`; `XP_TRAIT[base]` nil → sai
   - dot LIGOU & `xpTotal` − Σ log < 0 → DESFAZ (dot volta a `false`) ∴ ⊥ compra sem saldo
   - dot DESLIGOU & nível resultante < nível no `baseline` → DESFAZ (dot volta a `true`) ∴ ponto do personagem inicial ⊥ é vendido (§V103)
   - desfazer re-dispara o `onChange` — o 2º passe acha estado legal & para ∴ ⊥ ∃ laço
   - 40ª rodada: desfazer do ramo `on` (falta de saldo) levanta 1 pop-up — `Dialogs.showMessage(translateSheetText("Not enough experience to buy that dot", lang))` (§V129, §R41). Desfazer do ramo de §V103 (venda abaixo do baseline) segue MUDO ∴ a mensagem ⊥ mente o motivo
+  - 41ª rodada: desfazer escreve o NDB **&** o `checked` do controle que disparou (achado varrendo o form clicado por `field` igual), os 2 sob `xpQuiet` ∴ a view ⊥ re-afirma o valor recusado (§V132, §B36)
 
 
 ## §R RESEARCH
@@ -533,6 +545,11 @@ R40|`?` escrita programática acorda `dataLink`?|`c.field = X` & `c.checked = v`
 
 
 R41|pop-up de aviso|`Dialogs.showMessage(msg, callback)` = `showMessageDlg(msg, DT_INFORMATION, {DB_OK}, …)`; irmãs `alert` (DT_WARNING) & `showErrorMessage` (DT_ERROR) diferem SÓ no ícone ∴ escolha = estética, ⊥ contrato. `Dialogs` é global dentro de `.lfm` de ficha — precedente NO PRÓPRIO sheet: `Dialogs.confirmOkCancel` (§R30, §I8c). ⊥ ∃ precedente de `showMessage` em `.lfm` de ficha no repo (1 hit, COMENTADO, em ChatMod) ∴ modal aberto DE DENTRO de `onChange` (o dialog volta por callback & o handler segue) = `?` até §T354|`SDK3/API/rrpgDialogs.lua:85` `:94` `:103` · `HuntersHunted/HH.10.lfm:23` · grep `Dialogs.showMessage` em `Plugins/**/*.lfm` = 1 hit comentado
+
+
+R42|`onChange` de dot dispara DEPOIS do NDB|pop-up de §V129 apareceu ao clicar bolinha sem saldo (Firecast v3.9) & ele mora atrás de `if undo then` + `if on then`, c/ `on = sheet[field] == true` ∴ quando o handler roda, o NDB JÁ tem o valor do clique. Responde a metade de ORDEM de §R39 (a outra metade — evento ⊥ passa valor — segue verdadeira). Derruba a suspeita de §B33 (b): o guarda roda & lê o estado certo|teste do user no Firecast 2026-08-18 (v3.9) · `HuntersHunted.lfm` `xpGuard`
+R43|`?` escrita no NDB de dentro do `onChange` do próprio controle|o desfazer grava `sheet[field] = false` & o campo volta a `true` depois do handler (§B36). 2 mecânicas cabem: (a) o controle re-afirma o `checked` dele quando o dispatch acaba; (b) o controle ignora a escrita enquanto despacha. ⊥ ∃ como separar as 2 sem instrumentar o host ∴ segue `?` — o conserto (escrever o `checked` do controle) cobre as 2|observação do user 2026-08-18 · ≡ §R40 (mesma família, outra ponta)
+R44|adiar p/ fora do dispatch|`setTimeout(callback, interval)` = global do SDK; `interval <= 0` roda SÍNCRONO ∴ adiar exige `> 0`. Precedente em `.lfm` do repo (dock de mesas, tracker de turnos, macros). RESERVA de §B36: se escrever o `checked` ⊥ bastar, o desfazer vai p/ `setTimeout(fn, 1)` & cai fora do dispatch do controle|`SDK3/API/rrpgUtil.lua:161` `:184` · `Plugins/Core/rrpginlua/turnos/AtorCombatTracker.lfm:123` · `Plugins/Core/rrpginlua/GerTablesDock/GerTablesDockItem.lfm:44`
 
 ## §V INVARIANTS
 
@@ -676,6 +693,9 @@ V128: abas MANEJADAS = EXATAMENTE 3 (`tabNumina` `tabDisciplines` `tabStorytelle
 V129: recusa por SALDO fala — o ramo `on` do desfazer de `xpGuard` levanta EXATAMENTE 1 pop-up por clique recusado, texto EN autorado passado por `translateSheetText` ∴ ⊥ ∃ recusa muda por falta de XP & ⊥ ∃ literal PT no código (§V9). O ramo de §V103 (venda abaixo do baseline) ⊥ levanta pop-up nenhum ∴ mensagem ⊥ pode mentir o motivo. Pop-up ABRE DEPOIS do desfazer estar escrito ∴ o modal ⊥ cobre estado ilegal
 V130: ∀ string de pop-up ∈ `.lang` [pt] & [en] & ∈ mapa `PT` de `HH.6` ∴ string que só existe em Lua ⊥ escapa dos checks que leem o XML (≡ §V70, mesmo ponto cego de §B11 §B17). §V10 & §V28 medem `label`/`checkBox`/`button` ∴ ⊥ alcançam mensagem de modal
 V131: ∀ caminho que ESCREVE `xpTotal` deixa `xpTotal` − Σ log ≥ 0 — são 2 & só 2 (§V100 conta as escritas): digitado em `xpSetCurrent` (negativo → RECUSA, ⊥ grava) & semente da migração de §I11 (`math.max(0, experience)`). Flip de `stBackgroundsXP` ⊥ escreve `xpTotal` ∴ ∉ este invariante — buraco declarado em §C, ⊥ esquecido
+
+V132: desfazer do `xpGuard` ⊥ é só NDB — escreve `setField(field, not on)` **&** o `checked` do CONTROLE que disparou, no mesmo passo & sob o mesmo `xpQuiet` ∴ ⊥ ∃ bolinha acesa por cima de campo falso, nem campo que a view re-afirma quando o dispatch acaba (§B36). Controle achado varrendo o form CLICADO por `field` igual; ⊥ achar ⊥ é erro (escreve só o NDB) ∴ falha degrada, ⊥ explode
+V133: ∀ clique de dot repinta as caixas de XP de TODOS os forms registrados em `xpBoxForms`, ⊥ só a do form clicado ∴ comprar númina em `HH.7` (⊥ tem caixa) atualiza o saldo que o jogador lê. Registro no `onNodeReady` de quem TEM caixa (≡ `xpLedgerForm`, §V125) & o `spent` já calculado é passado adiante ∴ segue 1 varredura de ledger por clique (§V108 §V125 intactos)
 
 ## §T TASKS
 
@@ -1047,6 +1067,13 @@ T352|x|`verify-hunters-hunted.ps1` — checks NOVOS §V129 §V130 §V131. Mutaç
 T353|x|`module.xml` version `3.8` → `3.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (Firecast FECHADO, instalado c/ mesmo size)|V6,V7
 T354|.|teste no Firecast — RESOLVE §T277 §T296 & RESPONDE §R39: baseline salvo & `Current` = 0 → clicar bolinha nova → POP-UP aparece · bolinha volta sozinha · `Current` segue 0. Pop-up ⊥ aparecer & bolinha FICAR = §R39 NEGATIVA ∴ guarda morto (§B33 b) & vira §B novo, ⊥ 4ª rodada de conserto às cegas. 2º caso: digitar `-5` no `Current` → pop-up & a caixa volta ao valor de antes|R39,V129,V131,B33
 
+
+T355|.|`HuntersHunted.lfm` — `xpGuard`: no ramo do desfazer, achar o dot no form CLICADO (varredura recursiva por `field` igual) & escrever `.checked = not on` junto do `setField`, os 2 sob `xpQuiet`. ⊥ achou → só NDB, sem erro|V132,B36,I12
+T356|.|`HuntersHunted.lfm` + `HH.1.lfm` + `HH.9.lfm` — `xpBoxForms` registrado no `onNodeReady` de quem tem caixa; `xpGuard` repinta TODAS c/ o `spent` que já calculou (inclui o caminho de saída c/ `baseline` vazio). `renderXPBoxes(form, spent)` segue igual p/ os `dataLink`|V133,I11,V125
+T357|.|`verify-hunters-hunted.ps1` — checks NOVOS §V132 §V133 + ajustar o check de §V125 (o guarda passa a chamar o repintor de TODAS as caixas). Mutação antes de aceitar (§V20): tirar a escrita do `checked` · tirar o `xpQuiet` de volta · repintar só o form clicado · ⊥ registrar `HH.1`|V20,V132,V133,V125
+T358|.|`module.xml` version `3.9` → `4.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (Firecast FECHADO, instalado c/ mesmo size)|V6,V7
+T359|.|teste no Firecast — SUPERSEDE §T354: baseline salvo & `Current` = 0 → clicar bolinha nova → pop-up **&** bolinha VOLTA a apagar **&** log SEM linha nova (§B36 fechado). Depois, c/ saldo: comprar númina em `HH.7` → `Current` da Main muda NA HORA (§V133). Bolinha ainda acesa depois do pop-up = §R43 resolvida p/ (b) ∴ vai p/ a reserva de §R44, ⊥ 3º caminho novo|V132,V133,B36,R43,R44
+
 ## §B BUGS
 
 id|date|cause|fix
@@ -1090,3 +1117,6 @@ B33|2026-08-18|FECHAMENTO de §B32: causa NUNCA isolada. O user removeu a funcio
 B34|2026-08-18|abrir ficha ANTIGA trava o Firecast. `ndb.newObserver(sheet)` de `HH.9` (conserto de §B28) redesenha o ledger a ∀ atributo gravado & ⊥ passa por `xpQuiet` ∴ o escudo de §V107 (conserto de §B30) ⊥ o cobre. No load quem mais grava é o próprio Lua: `renderAbilityLabels` religa 150 dots ×2 (os 2 `dataLink` c/ `defaultValue` disparam na abertura) · `regroupHealthMarks` grava as 7-10 linhas de vitalidade a ∀ render · o `dataLink` de ~80 traços de `HH.3` chama `renderHealthTrack` junto ∴ 1 dot escrito ≈ 10 escritas de vitalidade ≈ 10 varreduras de ~91 traços × 2 nós. Ficha NOVA ⊥ trava: sem `baseline` o `xpLedgerRows` sai em 1 linha ∴ o custo é exclusivo de ficha já salva. Gate lê o FONTE & ⊥ conta chamada em runtime (≡ §B30, §B33)|V121,V122,V123,V124,V125
 
 B35|2026-08-18|`xpSetCurrent` grava `xpTotal = (tonumber(typed) or 0) + xpSpent()` SEM piso ∴ digitar `-5` no `Current` deixa a ficha c/ saldo NEGATIVO & o guarda ⊥ vê (ele só corre em `onChange` de dot, §I12). 2º caminho: a semente da migração de §I11 repassa `experience` negativo de ficha velha. §V100 amarrava o número a ⊥ divergir do log, NUNCA a ⊥ ser negativo ∴ os 2 caminhos passavam verde. Achado lendo o código na 40ª rodada, ⊥ relatado pelo user|V131
+
+B36|2026-08-18|desfazer do `xpGuard` ⊥ pega: pop-up aparece (guarda RODOU & leu `on = true` ∴ §R42), mas a bolinha segue acesa & a compra entra no log ∴ `sheet[field]` volta a `true` depois do handler. `setField(field, false)` escreve o NDB de dentro do `onChange` do PRÓPRIO controle — caminho sem precedente no repo (§R39, grep 0) que ⊥ sobrevive ao fim do dispatch: ou o controle re-afirma o `checked` dele, ou ignora a escrita enquanto despacha (§R43). O guarda vivia dessa premissa desde a v2.8 & 4 rodadas passaram por cima dela (§B32 §B33); o gate lê o FONTE ∴ ⊥ alcança contrato de evento. Achado pelo user 2026-08-18 no PRIMEIRO teste que o pop-up tornou possível|V132
+B37|2026-08-18|saldo de XP ⊥ atualiza na hora da compra: `xpGuard` repinta as caixas só no form do dot CLICADO & `HH.7` (Numina) tem 20 bolinhas guardadas & ZERO caixa ∴ comprar númina ⊥ move número nenhum; `HH.1` tem as 2 coisas ∴ compra de atributo atualiza — o "às vezes" do relato é essa divisão. O LEDGER virou global na 39ª rodada (`xpLedgerForm`, §V125) & as CAIXAS ficaram para trás ∴ meia-correção. §V97 cobria a aba Progress por `onShow` (§R35 `?`), nunca a Main|V133
