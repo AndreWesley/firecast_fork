@@ -394,9 +394,20 @@
 				};
 
 				for i = 1, #tabs, 1 do
-					local want = shown[tabs[i]:getName()];
+					local tab  = tabs[i];
+					local want = shown[tab:getName()];
 
-					if want ~= nil then tabs[i].visible = want; end;
+					if want ~= nil then
+						tab.visible = want;
+
+						-- Nothing confirms that the host takes the tab BUTTON away with the
+						-- tab (SPEC R31), so the contents are hidden as well (SPEC V92):
+						-- whoever still reaches a denied tab finds nothing on it. One level
+						-- down is the form the <tab> imports, which is all it holds.
+						local kids = tab:getChildren();
+
+						for j = 1, #kids, 1 do kids[j].visible = want; end;
+					end;
 				end;
 			end;
 
