@@ -393,11 +393,26 @@
 					tabStoryteller = isStoryteller(),
 				};
 
+				-- SPEC V93: a player must not be left sitting on a tab that was just denied.
+				-- There is no event for the active tab and no reading of tabIndex that can be
+				-- trusted here (SPEC R33): the index is an int with no name attached, and
+				-- whether it counts the hidden tabs decides which tab it points at - guessing
+				-- wrong would throw players off Numina on every load. So the sheet watches the
+				-- one thing it can see for certain, a tab going from shown to hidden, and
+				-- moves everyone to Main when it happens. Nothing moves on load: the tabs are
+				-- authored in their default state (SPEC V94), so there is no transition.
+				local tabMain, denied;
+
 				for i = 1, #tabs, 1 do
 					local tab  = tabs[i];
-					local want = shown[tab:getName()];
+					local name = tab:getName();
+					local want = shown[name];
+
+					if name == "tabMain" then tabMain = tab; end;
 
 					if want ~= nil then
+						if tab.visible and not want then denied = true; end;
+
 						tab.visible = want;
 
 						-- Nothing confirms that the host takes the tab BUTTON away with the
@@ -409,6 +424,8 @@
 						for j = 1, #kids, 1 do kids[j].visible = want; end;
 					end;
 				end;
+
+				if denied and tabMain ~= nil then tabMain:activate(); end;
 			end;
 
 			-- ---- Experience ledger (SPEC I9 / I10 / V83 / V85 / V86, 27th round) --------

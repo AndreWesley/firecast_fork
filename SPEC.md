@@ -763,8 +763,8 @@ T253|x|`HH.7.lfm` — label `*` da linha `numina_1` SAI (negrito fica); `["*"]` 
 T254|x|`HuntersHunted.lfm` — `<tab>` `Disciplines` `Magika` `Storyteller` autoradas `visible="false"`; `Numina` segue visível|V89,V94
 T255|x|`HuntersHunted.lfm` — `onNodeReady` + `dataLink` dos 3 flags MIGRAM de `HH.10` p/ o form RAIZ; `HH.10` fica só c/ `renderBaselineState`|I8,V95
 T256|x|`HuntersHunted.lfm` — `applyTabVisibility` esconde ABA & CONTEÚDO (filhos da `<tab>`)|I8,V92
-T257|~|`HuntersHunted.lfm` — pós-recálculo, aba ativa proibida → `Main` (`tabIndex = 0` \| `tabMain:activate()`)|I8,V93,R33
-T258|.|`verify-hunters-hunted.ps1` — checks NOVOS §V92 §V93 §V94 §V95; §V88 passa a exigir negrito SEM `*`. Mutação antes de aceitar|V20,V88,V92,V93,V94,V95
+T257|x|`HuntersHunted.lfm` — pós-recálculo, aba ativa proibida → `Main` (`tabIndex = 0` \| `tabMain:activate()`)|I8,V93,R33
+T258|~|`verify-hunters-hunted.ps1` — checks NOVOS §V92 §V93 §V94 §V95; §V88 passa a exigir negrito SEM `*`. Mutação antes de aceitar|V20,V88,V92,V93,V94,V95
 T259|.|`module.xml` version `2.4` → `2.5` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 T260|.|teste no Firecast (RESOLVE §R31 & §T239): ficha nova como JOGADOR → `Disciplines` `Magika` `Storyteller` ⊥ aparecem; ST liga `Show Numina` → aparece p/ o jogador; jogador na aba & ST desliga → pula p/ `Main`. Se o botão da aba SOBREVIVER ao `visible=false`, §R31 vira `⊥` & §V92 é o que segura|R31,V92,V93,V94
 
