@@ -2,21 +2,11 @@
 <form name="frmHH_9" align="client" theme="dark">
 	<script>
 		<![CDATA[
-			-- Total is the only computed value on this sheet. SPEC C forbids derived numbers as a
-			-- rule - the sheet is paper and the player adds up - and revokes that for this field
-			-- only, because the player asked for a running total.
-			--
-			-- It owns no `field=` (SPEC I3, same arrangement as the numina description block in
-			-- V29): a stored third number could drift away from the two that produce it, and it
-			-- can always be recomputed from them.
-			function renderTotalXP(form)
-				if sheet == nil then return; end;
-
-				local spent   = tonumber(sheet.spentXP) or 0;
-				local current = tonumber(sheet.experience) or 0;
-
-				form.edtTotalXP.text = tostring(spent + current);
-			end;
+			-- The three experience numbers are drawn by renderXPBoxes on the root form (SPEC
+			-- I11): the Main tab shows the balance too, so the routine that writes it cannot
+			-- live on either tab (SPEC R.9 / B.9). None of the three owns a `field=` any more -
+			-- only the total behind them is saved, and Spent and the balance are worked out
+			-- from it and the log (SPEC V100).
 
 			-- The log box grows with the rows instead of scrolling four columns apart from
 			-- each other: the tab's scrollBox does the scrolling, so line N stays line N in
@@ -89,9 +79,10 @@
 		<!-- Theme backdrop, same arrangement as HH.1 (SPEC T158, V56, V57). -->
 		<image name="themePaper9" align="client" style="stretch" hitTest="false" visible="false"/>
 		<!--
-			Progress tab (SPEC T106). Current Experience is a MIRROR of the box on the Main tab -
-			the same `field="experience"`, so the NDB keeps both in step with no Lua (SPEC V36,
-			declared under ESPELHOS in I3). SPEC V1 otherwise forbids two owners of one field.
+			Progress tab (SPEC T106). Current Experience used to be an NDB mirror of the box on
+			the Main tab, both owning `field="experience"`. Neither owns a field now (SPEC I11):
+			both are written by renderXPBoxes and both hand what the player types to
+			xpSetCurrent, so they stay in step through the one number that IS saved.
 		-->
 		<!--
 			The three numbers sit side by side (SPEC T140): one column each, same label width and
@@ -114,10 +105,10 @@
 			<edit name="edtTotalXP" left="138" top="60" width="90" height="25" readOnly="true" horzTextAlign="center" fontSize="14"/>
 
 			<label left="352" top="38" width="336" height="20" text="Spent Experience" horzTextAlign="center"/>
-			<edit left="475" top="60" width="90" height="25" field="spentXP" horzTextAlign="center" fontSize="14"/>
+			<edit name="edtSpentXP" left="475" top="60" width="90" height="25" readOnly="true" horzTextAlign="center" fontSize="14"/>
 
 			<label left="689" top="38" width="336" height="20" text="Current Experience" horzTextAlign="center"/>
-			<edit left="812" top="60" width="90" height="25" field="experience" horzTextAlign="center" fontSize="14"/>
+			<edit name="edtCurrentXP" left="812" top="60" width="90" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);"/>
 		</layout>
 
 		<!--
@@ -148,7 +139,7 @@
 
 	<!-- Two entry points, as everywhere else on this sheet: the link catches later edits, the
 	     onNodeReady catches the sheet being opened (SPEC V19 / V33). -->
-	<dataLink fields="{'spentXP', 'experience'}" onChange="renderTotalXP(self);"/>
+	<dataLink field="xpTotal" onChange="renderXPBoxes(self);"/>
 
 	<!-- What the ledger reads directly: the snapshot itself, the rule that prices backgrounds,
 	     and the language its two text columns are written in. This tab watches `language`
@@ -165,12 +156,12 @@
 	     it showed when the sheet loaded - four blank columns (SPEC B28). Correctness hangs on
 	     this event, not on the observer. -->
 	<event name="onShow">
-		renderTotalXP(self);
+		renderXPBoxes(self);
 		renderXPLedger(self);
 	</event>
 
 	<event name="onNodeReady">
-		renderTotalXP(self);
+		renderXPBoxes(self);
 		renderXPLedger(self);
 
 		-- One observer for the whole sheet: every dot on every tab feeds this table, so the

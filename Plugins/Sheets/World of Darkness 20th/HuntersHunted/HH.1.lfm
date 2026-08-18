@@ -204,7 +204,7 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="160" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<edit left="50" top="25" width="60" height="60" fontSize="20" horzTextAlign="center" field="experience"/>
+			<edit name="edtCurrentXPMain" left="50" top="25" width="60" height="60" fontSize="20" horzTextAlign="center" onUserChange="xpSetCurrent(self, self.edtCurrentXPMain.text);"/>
 		</layout>
 
 		<layout left="0" top="110" width="300" height="285">
@@ -525,7 +525,16 @@
 	-->
 	<dataLink fields="{'healthLevels', 'language'}" onChange="renderHealthTrack(self, 'dynHealth_');"/>
 
+	<!-- The experience box is worked out, not stored (SPEC I11): it follows the one saved
+	     number, and every dot on this tab redraws it through the guard. -->
+	<dataLink field="xpTotal" onChange="renderXPBoxes(self);"/>
+
+	<event name="onShow">
+		renderXPBoxes(self);
+	</event>
+
 	<event name="onNodeReady">
 		renderHealthTrack(self, 'dynHealth_');
+		renderXPBoxes(self);
 	</event>
 </form>

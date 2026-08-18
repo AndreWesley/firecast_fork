@@ -168,7 +168,7 @@ foreach ($rf in ($radios | ForEach-Object { $_.Field } | Sort-Object -Unique)) {
 # The list is the declaration from SPEC I3 - anything multi-owned and NOT here is the accident
 # V1 exists to catch, and anything here that is NOT multi-owned is a declaration gone stale.
 $mirrors = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
-foreach ($m in @('healthLevels','experience')) { [void]$mirrors.Add($m) }
+foreach ($m in @('healthLevels')) { [void]$mirrors.Add($m) }
 1..10 | ForEach-Object { [void]$mirrors.Add("health_$_") }
 1..10 | ForEach-Object { [void]$mirrors.Add("willpower_c$_") }
 # Virtues were a mirror until the 12th round; they are display-only on the Combat tab now
@@ -189,7 +189,7 @@ else { Pass "V36 all $($mirrors.Count) declared mirrors really are mirrored" }
 # player by having no widget at all, so the usual "some input owns it" test reads it as a dead
 # link (SPEC B25). The list is closed and declared in SPEC I3 - a name has to be put here on
 # purpose, which is not the same as letting any unowned field through.
-$luaOwned = @('baseline')
+$luaOwned = @('baseline', 'xpTotal')
 foreach ($l in $linkFields) {
     if ($allFields.ContainsKey($l.Field)) { Pass "V8 dataLink '$($l.Field)' observes a real field" }
     elseif ($luaOwned -contains $l.Field) { Pass "V8 dataLink '$($l.Field)' observes a declared Lua-owned field (SPEC I3)" }
@@ -295,7 +295,7 @@ else { Pass "V35 all $movedSeen migrated fields sit exactly once, in their new f
 # Their text is still sitting in already-saved sheets. If either name were reused for a new
 # field, an old sheet would silently pour stale content into an unrelated box - so the names
 # stay burned, and SPEC I3 lists them as orphans. This is the check that keeps that promise.
-foreach ($orphan in @('transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated','personalidade','natureza')) {
+foreach ($orphan in @('transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated','personalidade','natureza','experience','spentXP')) {
     if ($allFields.ContainsKey($orphan)) {
         Fail "I3 '$orphan' is a declared orphan but $($allFields[$orphan] -join ', ') owns it - choose a different field name"
     } else { Pass "I3 declared orphan '$orphan' owns no widget" }
@@ -1798,7 +1798,7 @@ else { Pass "V83 xpLedgerRows starts empty and reports a missing baseline" }
 $progShow = [regex]::Match($progTxt, '<event name="onShow">(.*?)</event>', 'Singleline')
 if (-not $progShow.Success) { Fail "V97 HH.9 has no onShow - the report would be built once and then frozen (SPEC B28)" }
 elseif ($progShow.Groups[1].Value -notmatch 'renderXPLedger\(') { Fail "V97 HH.9's onShow does not rebuild the ledger" }
-elseif ($progShow.Groups[1].Value -notmatch 'renderTotalXP\(') { Fail "V97 HH.9's onShow does not rebuild the three numbers" }
+elseif ($progShow.Groups[1].Value -notmatch 'renderXPBoxes\(') { Fail "V97 HH.9's onShow does not rebuild the three numbers" }
 else { Pass "V97 the Progress report is rebuilt on every show" }
 
 # ---- V98: an empty log says WHY it is empty ---------------------------------------
