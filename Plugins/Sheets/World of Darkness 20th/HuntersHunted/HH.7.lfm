@@ -2102,9 +2102,7 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			`faith_1`..`_5` are the dots that used to live on the Main tab. They moved here in
 			the same change that removed them there, so a saved sheet keeps its rating (V35).
 		-->
-		<!-- 30px taller than the single row needs: the affinity note goes at the bottom of the
-		     left-hand column, after True Faith, where the user asked for it. -->
-		<layout left="0" top="620" width="340" height="90">
+		<layout left="0" top="620" width="340" height="60">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="340" height="20" text="TRUE FAITH" horzTextAlign="center"/>
 
@@ -2118,9 +2116,13 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 				<imageCheckBox left="265" top="0" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 				<imageCheckBox left="290" top="0" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			</layout>
-
-			<label left="12" top="58" width="315" height="20" text="* The first path is the Affinity Path" fontSize="12"/>
 		</layout>
+
+		<!-- Outside the box on purpose (user, 27th round): it is a footnote to the whole
+		     left-hand column, not a line of the True Faith table, so it sits under the box on
+		     the tab itself. It is a bare label, not a section box, so V40 and V48 - which
+		     measure boxes - have nothing to say about it. -->
+		<label left="12" top="686" width="315" height="20" text="* The first path is the Affinity Path" fontSize="12"/>
 
 		<!--
 			Read-only on purpose: this block displays book text, it is not a note field. No
