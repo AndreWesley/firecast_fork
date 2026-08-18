@@ -819,7 +819,7 @@ T272|x|`HH.1.lfm` `HH.7.lfm` — `onChange="xpGuard('$(field)_N'); renderXPBoxes
 T273|x|`HuntersHunted.lfm` — `renderXPBoxes(form)` (≡ `renderHealthTrack`, §R9): escreve `Total` `Spent` `Current` + migração de `xpTotal` (§I11). `HH.9` & `HH.1` chamam|I11,V100,V102
 T274|x|`HH.9.lfm` & `HH.1.lfm` — 3 caixas de XP perdem `field`; `Current` ganha `onUserChange` → `xpTotal = digitado + Spent`. `spentXP` & `experience` saem de §I3 ESPELHOS p/ ÓRFÃOS|I11,V1,V36,V102
 T275|x|`verify-hunters-hunted.ps1` — checks NOVOS §V99 §V100 §V101 §V102 §V103. Mutação antes de aceitar|V20,V99,V100,V101,V102,V103
-T276|~|`module.xml` version `2.7` → `2.8` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T276|x|`module.xml` version `2.7` → `2.8` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 T277|.|teste no Firecast: baseline salvo & `Current` = 10 → subir `dexterity` 3→4 (custa 12) BARRA & o dot volta · `Current` = 20 → mesma compra passa & `Current` cai p/ 8 · desmarcar o dot devolve os 12 · desmarcar dot do baseline ⊥ funciona|I11,I12,V99,V101,V103
 
 ## §B BUGS
