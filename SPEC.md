@@ -323,6 +323,9 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - custo de Força de Vontade = `n` (nível ATUAL), ⊥ `n×2` (§B29). O log é DERIVADO ∴ ⊥ ∃ migração: linhas velhas passam a mostrar o preço certo sozinhas
 - consequência declarada da semente: ficha JÁ congelada c/ `appearance_1` nil ganha o ponto ∴ nasce 1 linha `Attribute\|Appearance\|1\|0` no log — custo 0 (§I9, `n×4` c/ n=0) ∴ barulho cosmético, ⊥ cobra nada
 - `?` a semente inteira depende de o NDB GRAVAR `false` ao desmarcar (⊥ apagar o atributo) — §R36. Mesma dúvida derruba a semente de `stShowNumina` (§V89) ∴ 1 teste resolve as 2
+- checkBox `Allow Buy Dots For Free` (`stFreeDots`, default OFF) na aba Storyteller: enquanto LIGADA ∀ ponto sai por 0 & a coluna `Cost` do log mostra `FREE`. Pedido do user 2026-08-18
+- é LENTE, ⊥ CARIMBO: o log é DERIVADO (§V83 §V100) ∴ desligar a flag RE-PREÇA tudo que foi comprado desde o baseline & o saldo PODE FICAR NEGATIVO. Lembrar quais pontos saíram de graça exigiria jornalizar — §V100 proíbe ∴ custo aceito & declarado. ≡ como `stBackgroundsXP` já se comporta (§I9)
+- saldo negativo ⊥ é travado nem escondido: o guarda simplesmente barra compra NOVA (§I12) até o mestre dar XP | o jogador devolver ponto ∴ o número na tela é a verdade, ⊥ um 0 mentiroso
 
 ## §I INTERFACES
 
@@ -364,13 +367,14 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - I6 `applyTheme(v, from)` — @ `HH.6.lfm`, MESMA forma de `applyLanguage`: `rootOf(from)` + `collect` da raiz, snapshot 1× por handle antes da 1ª pintura, depois pinta `THEMES[v]` | restaura snapshot. Chamado pelo `<dataLink field="sheetTheme">` ∴ roda no load & em ∀ troca
 - I7 `ABILITY_FIELD` & `ERA_ABILITIES` — tabelas Lua @ `HuntersHunted.lfm` (form RAIZ, ≡ `HEALTH_MARKS`/§V41). `ABILITY_FIELD[nome]` = campo do traço (41 nomes, bijeção §V74). `ERA_ABILITIES[t][coluna]` = os 10 nomes daquela coluna naquela época, na ordem de leitura; `coluna` ∈ `talents` `skills` `knowledges`; chave `t` = `values` do `cboSheetTheme`. `THEME_LABELS` (19ª/20ª rodada) & `THEME_COMBAT` (19ª) ⊥ ∃ mais
 
-- I8 aba `Storyteller` (`HH.10.lfm`, 27ª rodada) — caixa `STORYTELLER SETTINGS`: linha `Save Initial Character` + `<button>` `Save` & 4 `checkBox` — `Can Buy Backgrounds With Experience` (`stBackgroundsXP`, default OFF) · `Show Numina` (`stShowNumina`, default ON) · `Show Disciplines` (`stShowDisciplines`, default OFF) · `Show Magika` (`stShowMagika`, default OFF)
+- I8 aba `Storyteller` (`HH.10.lfm`, 27ª rodada) — caixa `STORYTELLER SETTINGS`: linha `Save Initial Character` + `<button>` `Save` & 5 `checkBox` — `Can Buy Backgrounds With Experience` (`stBackgroundsXP`, default OFF) · `Show Numina` (`stShowNumina`, default ON) · `Show Disciplines` (`stShowDisciplines`, default OFF) · `Show Magika` (`stShowMagika`, default OFF) · `Allow Buy Dots For Free` (`stFreeDots`, default OFF, 31ª rodada §V105)
   - I8a `isStoryteller()` @ form RAIZ = `Firecast.getMesaDe(sheet)` ⊥ nil & `.meuJogador` ⊥ nil & `.isMestre == true`; ∀ outro caminho → false (fail-closed, §V80). ⊥ mesa → false ∴ ficha fora de mesa ⊥ mostra a aba (§C)
   - I8b `applyTabVisibility(from)` @ form RAIZ (≡ `HEALTH_LEVELS`/§V41): `Storyteller`.visible = `isStoryteller()`; `Numina`/`Disciplines`/`Magika`.visible = flag de §I8. REESCRITO na 28ª rodada (§B26): gatilho mora no form RAIZ (`onNodeReady` + `dataLink` dos 3 flags) ⊥ em `HH.10` ∴ ⊥ depende do ciclo de vida de aba nenhuma; esconde ABA **&** CONTEÚDO da aba (§V92); depois de recalcular, aba ativa proibida → volta p/ `Main` (§V93)
   - I8c `Save` → `Dialogs.confirmOkCancel` (aviso de ação SEM VOLTA, §R30) → OK → `sheet.baseline = ndb.exportXML(sheet)` (§R32). `baseline` ⊥ vazio ⟺ personagem inicial salvo ∴ ⊥ precisa de 2º campo de estado
 - I9 tabela de custo de XP (custo p/ ir do nível `n` → `n+1`; `n` = nível ATUAL, §V85). ∀ custo em pontos de Experiência
   - Atributo `n×4` · Habilidade `n×2` (`n=0` → 3) · Virtude `n×2` · Humanidade `n×2` · Força de Vontade `n` (SEM ×2 — correção do user 2026-08-18, §B29: FdV 4 → 5 custa 4; `n` = bolinhas `willpower_1`…`_10`, ⊥ `willpower_c*`)
   - Antecedente `n×3` (`n=0` → 3) SÓ c/ `stBackgroundsXP` ligado; flag desligada → linha entra c/ custo `0` (§C)
+  - MODO GRÁTIS (`stFreeDots` ligada, §I8, 31ª rodada): ∀ custo = 0 & a coluna `Cost` do log mostra `FREE` (pt `Grátis`) em TODA linha ∴ `xpSpent()` = 0 & o guarda ⊥ barra compra por saldo. É LENTE, ⊥ carimbo — desligar re-preça tudo desde o baseline (§V105)
   - Númina `n×7` (`n=0` → 7); 1º ponto de TIPO ∉ baseline → 21 (§V87). Númina de afinidade (`numina_1`) `n×6`, `n=0` segue 7 (| 21 se tipo novo)
   - tipos de númina (3): `hedge` = `numina_1`…`_10` (Magia Estática) · `psychic` = `psychic_1`…`_10` (Fenômenos Psíquicos) · `faith` = `faith` (Fé Verdadeira)
   - DORMENTES — regra declarada, ⊥ ∃ campo p/ diffar enquanto `Disciplines`/`Magika` estiverem vazias (§C): Disciplina de clã `n×5` (`n=0` → 10) · Disciplina fora do clã `n×7` (`n=0` → 10) · Trilha (Necromancy Path \| Thaumaturgy Path) `n×4` (`n=0` → 7) · Esfera de afinidade `n×7` (`n=0` → 10) · Esfera sem afinidade `n×8` (`n=0` → 10) · Arete `n×8`
@@ -546,6 +550,8 @@ V101: `xpGuard` DORME enquanto `baseline` vazio ∴ montar personagem ⊥ é bar
 V102: `experience` & `spentXP` ∈ ÓRFÃOS de §I3 depois da migração — lidos 1× p/ semear `xpTotal`, ⊥ reusados por widget nenhum (≡ §V91)
 V103: desfazer ponto só vale p/ ponto QUE ESTÁ NO LOG ∴ nível ⊥ desce abaixo do `baseline`; devolução = a própria subtração (§V100), ⊥ ∃ crédito escrito
 V104: `appearance_1` == nil (nunca tocado) → load semeia `true` ∴ ficha nova nasce c/ Aparência 1 ≡ os outros 8 atributos. `false` EXPLÍCITO ⊥ é tocado por semente nenhuma ∴ Aparência 0 ∃ & sobrevive ao load — vale enquanto §R36 disser que desmarcar grava `false`
+V105: `stFreeDots` ligada → ∀ `cost` do log = 0 & ∀ célula da coluna `Cost` = `FREE` traduzido ∴ `xpSpent()` = 0 & compra nenhuma é barrada por saldo (§I12). LENTE: ⊥ ∃ campo marcando ponto como grátis ∴ desligar re-preça TUDO desde o baseline & o saldo pode ficar negativo (§C) — jornalizar seria o único jeito de carimbar & §V100 proíbe
+V106: `stFreeDots` nil (ficha velha \| nunca tocada) = DESLIGADA ∴ ⊥ ∃ ficha que compre de graça por omissão — fail-closed ≡ §V80 & ≡ `stShowDisciplines`/`stShowMagika` (§V89). Distinto de `stShowNumina`, que é o único default ON
 
 ## §T TASKS
 
@@ -833,8 +839,15 @@ T277|.|teste no Firecast: baseline salvo & `Current` = 10 → subir `dexterity` 
 T278|.|`HuntersHunted.lfm` — `onNodeReady` semeia `appearance_1 = true` quando nil (≡ semente de `stShowNumina`, 28ª rodada)|V104,R36
 T279|.|`HuntersHunted.lfm` `xpCost` — `Willpower` devolve `from` (⊥ `from * 2`) & `verify-hunters-hunted.ps1` `$costWant` muda no MESMO commit (o gate trava a fórmula, §V86)|I9,V86,B29
 T280|.|`verify-hunters-hunted.ps1` — check NOVO §V104 (semente ∃ & só dispara em nil). Mutação antes de aceitar|V20,V104
-T281|.|`module.xml` version `2.8` → `2.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T281|.|`module.xml` version `2.8` → `2.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Fecha SÓ T278…T280 — se a 31ª rodada inteira sair em 1 build, PULAR este & fechar em §T288|V6,V7
 T282|.|teste no Firecast (RESOLVE §R36): ficha NOVA nasce Aparência 1 · desmarcar o 1º dot, fechar & reabrir a ficha → segue 0 (se voltar a 1, §R36 = APAGA & a semente cai, junto c/ a de `stShowNumina`) · FdV 4→5 cobra 4 no log|R36,V104,I9
+T283|.|`HH.10.lfm` — 5º `checkBox` `Allow Buy Dots For Free` (`stFreeDots`) @ `top=210` & caixa `520×240` → `520×270`|I8,V38,V40,V106
+T284|.|`HuntersHunted.lfm` — `ctx.free = sheet.stFreeDots == true` em `xpLedgerRows`; `xpCost` devolve 0 na 1ª linha quando `ctx.free` ∴ 1 lugar só (§V86 intacto)|I9,V105
+T285|.|`HH.9.lfm` — coluna `Cost` escreve `FREE` traduzido quando `stFreeDots` ligada + `dataLink` do ledger passa a observar `stFreeDots`|V105,V70,V97
+T286|.|`localization.lang` + mapa `PT` de `HH.6` — `Allow Buy Dots For Free` & `FREE` (pt `Grátis`)|V10,V22,V28
+T287|.|`verify-hunters-hunted.ps1` — `$wantFlags` += `stFreeDots` & checks NOVOS §V105 §V106. Mutação antes de aceitar|V20,V89,V105,V106
+T288|.|`module.xml` version `2.9` → `3.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Se T278…T287 forem buildados de uma vez, ESTE bump é o único ∴ T281 vira no-op declarado|V6,V7
+T289|.|teste no Firecast: ligar `Allow Buy Dots For Free` → comprar 3 pontos → 3 linhas no log c/ `Cost` = `FREE` & `Current` PARADO · desligar → as 3 linhas voltam a mostrar preço & `Current` cai (pode ficar negativo, §C)|I8,V105,V106
 
 ## §B BUGS
 
