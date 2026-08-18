@@ -750,8 +750,12 @@
 			--
 			-- The undo writes the field again, so this runs a second time. That pass finds a
 			-- legal state and stops - there is no loop and no flag to keep.
+			-- The ability rows hand in the field their dot is bound to RIGHT NOW, because the
+			-- era rebinds those five dots to another ability's field (SPEC V76) - the name
+			-- written in the .lfm is only the Victorian one. Everywhere else the authored name
+			-- is the name for good.
 			function xpGuard(field)
-				if sheet == nil then return; end;
+				if sheet == nil or field == nil or field == "" then return; end;
 
 				-- Nothing is enforced while the character is being built: the rule starts when
 				-- the storyteller freezes the sheet (SPEC V101).
