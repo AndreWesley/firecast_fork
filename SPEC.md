@@ -1013,7 +1013,7 @@ T345|x|APAGAR `HH.12.lfm`; `HH.10.lfm` — REMOVER `chkShowMagika` & o comentár
 T346|x|`localization.lang` — REMOVER `wod.Magika` & `wod.Show Magika` de [pt] & [en]; mapa `PT` de `HH.6` no MESMO commit|V10,V22,V28
 T347|x|`verify-hunters-hunted.ps1` — `$wantFlags` 4→3 · `stShowMagika` entra nos ÓRFÃOS de §I3 · `HH.12` sai da lista de arquivos · check NOVO §V128. Mutação antes de aceitar|V20,V128,V2
 T340|x|`verify-hunters-hunted.ps1` — checks NOVOS §V121…§V128. Mutação antes de aceitar|V20,V121,V122,V123,V124,V125,V126,V127,V128
-T341|~|`module.xml` version `3.7` → `3.8` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (Firecast FECHADO, instalado c/ mesmo size)|V6,V7
+T341|x|`module.xml` version `3.7` → `3.8` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (Firecast FECHADO, instalado c/ mesmo size)|V6,V7
 T342|.|teste no Firecast (RESOLVE §B34): ficha ANTIGA c/ `baseline` salvo abre em tempo normal · aba Progress mostra o log · comprar 1 ponto → linha nova SEM trocar de aba · saldo 0 & traço abaixo do baseline → clique ⊥ trava (§V127)|B34,V121,V127
 T343|x|2ª varredura de ⊥-usado DEPOIS do build (pedido 5 do user): template · identificador de script · PNG · campo órfão · chave `.lang` exclusiva de `HuntersHunted/`. O que sobrar vira §T próprio — remoção calada ⊥|V64,V2
 
