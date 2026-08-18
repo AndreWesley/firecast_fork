@@ -327,6 +327,10 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - é LENTE, ⊥ CARIMBO: o log é DERIVADO (§V83 §V100) ∴ desligar a flag RE-PREÇA tudo que foi comprado desde o baseline & o saldo PODE FICAR NEGATIVO. Lembrar quais pontos saíram de graça exigiria jornalizar — §V100 proíbe ∴ custo aceito & declarado. ≡ como `stBackgroundsXP` já se comporta (§I9)
 - saldo negativo ⊥ é travado nem escondido: o guarda simplesmente barra compra NOVA (§I12) até o mestre dar XP | o jogador devolver ponto ∴ o número na tela é a verdade, ⊥ um 0 mentiroso
 
+- 32ª rodada (2026-08-18) — `Game` da aba Settings nasce `Hunters Hunted`. Pedido do user
+- mecanismo = `<dataLink field="game" defaultValue="Hunters Hunted"/>` ≡ `cboSheetTheme` do mesmo arquivo & precedente `Sheets/Avatar Legends/Background.lfm:16` (combo pilotado por `defaultValue`)
+- a 1ª opção VAZIA fica: o user pediu default, ⊥ pediu tirar escolha ∴ §V15 segue valendo sem exceção nova & mesa que ⊥ joga nenhum dos 5 ainda pode limpar o campo
+
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
@@ -556,6 +560,7 @@ V105: `stFreeDots` ligada → ∀ `cost` do log = 0 & ∀ célula da coluna `Cos
 V106: `stFreeDots` nil (ficha velha \| nunca tocada) = DESLIGADA ∴ ⊥ ∃ ficha que compre de graça por omissão — fail-closed ≡ §V80 & ≡ `stShowDisciplines`/`stShowMagika` (§V89). Distinto de `stShowNumina`, que é o único default ON
 V107: escrita de campo feita pelo PRÓPRIO Lua (re-ligação de época §V76, semente de §V104, migração de §I11) ⊥ dispara guarda nem re-render ∴ abrir a ficha ⊥ paga 1 varredura de ledger POR dot. Flag global ligada em volta do lote & 1 render depois dele (§R37 — ⊥ ∃ `onUserChange` em `imageCheckBox` p/ separar por evento)
 V108: 1 clique de dot = no MÁXIMO 1 varredura de `xpLedgerRows` ∴ guarda & caixas compartilham o resultado. Eram 2 (guarda chamava `xpSpent()` & `renderXPBoxes` varria de novo)
+V109: `cboGame` nasce em `Hunters Hunted` por `<dataLink field="game" defaultValue=…>` & MANTÉM a 1ª opção vazia ∴ §V15 vale sem exceção nova (≠ `cboSheetTheme`, que perdeu a vazia). Ficha que já escolheu — inclusive o vazio — ⊥ é tocada: `defaultValue` só preenche campo nil
 
 ## §T TASKS
 
@@ -857,8 +862,10 @@ T291|.|`HH.6.lfm` — `renderAbilityLabels` liga `xpQuiet` antes do laço de re-
 T292|.|`HuntersHunted.lfm` — semente de `appearance_1` (§V104) & migração de `xpTotal` (§I11) rodam sob `xpQuiet`|V107,V104,I11
 T293|.|`HuntersHunted.lfm` `HH.1.lfm` `HH.7.lfm` — `xpGuard(field, form)` chama `renderXPBoxes` 1× no fim & devolve o `xpSpent()` que já calculou; `onChange` do dot vira só `xpGuard('…', self)`|V108,V99
 T294|.|`verify-hunters-hunted.ps1` — checks NOVOS §V107 §V108 (& §V99 aceita a assinatura nova). Mutação antes de aceitar|V20,V99,V107,V108
-T295|.|`module.xml` version `3.0` → `3.1` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T295|.|`module.xml` version `3.0` → `3.1` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Rodar DEPOIS de §T297 & §T298 — 1 build fecha as duas rodadas|V6,V7
 T296|.|teste no Firecast: ficha abre em tempo NORMAL (§B30) & o guarda segue barrando compra sem saldo (≡ §T277)|V107,V108
+T297|.|`HH.6.lfm` — `<dataLink field="game" defaultValue="Hunters Hunted"/>` ao lado do `cboGame` (≡ `sheetTheme` do mesmo arquivo)|V109,V15
+T298|.|`verify-hunters-hunted.ps1` — check NOVO §V109 (default ∃ & 1ª opção segue vazia). Mutação antes de aceitar|V20,V109,V15
 
 ## §B BUGS
 
