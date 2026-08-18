@@ -1993,7 +1993,7 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 		</template>
 
 		<layout left="0" top="0" width="340" height="300">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="340" height="20" text="NUMINA: HEDGE MAGIC PATHS" horzTextAlign="center"/>
 
 			<layout left="12" top="25" width="315" height="25">
@@ -2029,7 +2029,7 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 		</layout>
 
 		<layout left="0" top="310" width="340" height="300">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="340" height="20" text="NUMINA: PSYCHIC PHENOMENA" horzTextAlign="center"/>
 
 			<layout left="12" top="25" width="315" height="25">
@@ -2077,7 +2077,7 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			the same change that removed them there, so a saved sheet keeps its rating (V35).
 		-->
 		<layout left="0" top="620" width="340" height="60">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="340" height="20" text="TRUE FAITH" horzTextAlign="center"/>
 
 			<layout left="12" top="25" width="315" height="25">
@@ -2099,7 +2099,7 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			Height tracks the three tables on the left, which now end at y=680 (SPEC T81).
 		-->
 		<layout left="350" top="0" width="850" height="680">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
 			<textEditor name="edtNuminaDesc" left="10" top="25" width="830" height="645" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>

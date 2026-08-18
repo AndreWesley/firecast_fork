@@ -41,7 +41,7 @@
 			and still closes the tab on 640.
 		-->
 		<layout left="0" top="0" width="1040" height="95">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="1040" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
 			<label left="15" top="38" width="336" height="20" text="Total Experience" horzTextAlign="center"/>
@@ -55,7 +55,7 @@
 		</layout>
 
 		<layout left="0" top="105" width="1040" height="535">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="1040" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="1010" height="495" field="xpLog"/>

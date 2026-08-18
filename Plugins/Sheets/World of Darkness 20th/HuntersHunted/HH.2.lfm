@@ -21,7 +21,7 @@
 		</template>
 
 		<layout left="0" top="0" width="410" height="290">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="15" top="0" width="230" height="20" text="Merit" horzTextAlign="center"/>
 			<!-- Column renamed to Page on request. The field is still type_* : renaming a
 			     field drops what is already saved in existing sheets (SPEC V2). -->
@@ -61,7 +61,7 @@
 		</layout>
 
 		<layout left="420" top="0" width="410" height="290">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="15" top="0" width="230" height="20" text="Flaw" horzTextAlign="center"/>
 			<label left="245" top="0" width="100" height="20" text="Page" horzTextAlign="center"/>
 			<label left="345" top="0" width="50" height="20" text="Cost" horzTextAlign="center"/>
@@ -99,56 +99,56 @@
 		</layout>
 
 		<layout left="840" top="0" width="200" height="290">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="DERANGEMENTS" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="170" height="250" field="derangements"/>
 		</layout>
 
 		<layout left="0" top="300" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="ALLIES" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="170" height="125" field="allies"/>
 		</layout>
 
 		<layout left="210" top="300" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="MENTOR" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="170" height="125" field="mentor"/>
 		</layout>
 
 		<layout left="420" top="300" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="CONTACTS" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="170" height="125" field="contacts"/>
 		</layout>
 
 		<layout left="630" top="300" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="FAME" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="170" height="125" field="fame"/>
 		</layout>
 
 		<layout left="840" top="300" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="BASE OF OPERATIONS" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="170" height="125" field="baseOfOperation"/>
 		</layout>
 
 		<layout left="0" top="475" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="RESOURCES" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="170" height="125" field="resources"/>
 		</layout>
 
 		<layout left="210" top="475" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- Retainers was renamed to Guides on request. The field is still `retainers`:
 			     renaming it would drop what is already saved in existing sheets (SPEC V2). -->
 			<label left="0" top="0" width="200" height="20" text="GUIDES" horzTextAlign="center"/>
@@ -157,21 +157,21 @@
 		</layout>
 
 		<layout left="420" top="475" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="STATUS" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="170" height="125" field="status"/>
 		</layout>
 
 		<layout left="630" top="475" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="INFLUENCE" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="170" height="125" field="influence"/>
 		</layout>
 
 		<layout left="840" top="475" width="200" height="165">
-			<rectangle align="client" color="black" xradius="10" yradius="10" cornerType="innerLine"/>
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="200" height="20" text="OTHER" horzTextAlign="center"/>
 
 			<!-- ponytail: the plain "other" field name is already owned by HH.3.lfm sheet-wide; renamed to bgOther per SPEC V1 -->

@@ -201,6 +201,83 @@
 					end;
 				end;
 			end;
+
+			-- ---- Era ability lists (SPEC I7, 19th round) -------------------------------
+			--
+			-- The theme stopped being paint alone: each era renames rows on the Main tab. The
+			-- FIELD never moves, only the label over it (SPEC V2 is untouched), which is also
+			-- the cost the user accepted - the same dots read as a different ability once you
+			-- switch era.
+			--
+			-- These live on the ROOT form for the same reason the health track does: the Combat
+			-- tab reads THEME_COMBAT and a local in HH.6 does not cross forms (SPEC R.9 / B.9).
+			--
+			-- Only the rows that CHANGE are listed; a field with no entry keeps the English
+			-- authored in the XML and goes through the normal translation. Victorian Era has no
+			-- list of its own - the user did not ask for one.
+			THEME_DEFAULT = "Modern Nights";
+
+			THEME_LABELS = {
+				["Modern Nights"] = {
+					etiquette   = "Drive",
+					firearms    = "Etiquette",
+					larceny     = "Firearms",
+					melee       = "Larceny",
+					performance = "Melee",
+					ride        = "Performance",
+					enigmas     = "Computer",
+				},
+				["Victorian Era"] = {},
+				["Dark Ages"] = {
+					streetwise = "Legerdemain",
+					crafts     = "Archery",
+					etiquette  = "Commerce",
+					firearms   = "Crafts",
+					larceny    = "Etiquette",
+					finance    = "Hearth Wisdom",
+					science    = "Seneschal",
+					technology = "Theology",
+				},
+				["Classical Age"] = {
+					etiquette     = "Archery",
+					firearms      = "Commerce",
+					larceny       = "Etiquette",
+					melee         = "Performance",
+					performance   = "Melee",
+					enigmas       = "Hearth Wisdom",
+					finance       = "Investigation",
+					investigation = "Law",
+					law           = "Medicine",
+					medicine      = "Occult",
+					occult        = "Politics",
+					politics      = "Philosophy",
+					science       = "Ritual",
+					technology    = "Religion",
+				},
+			};
+
+			-- Which field the two variable rows of COMBAT TRAITS mirror (SPEC V71). The user's
+			-- rule: label and dots stay a pair, so a period without Firearms shows its own
+			-- ranged skill instead - Dark Ages fights with Archery, and Archery is the label
+			-- this era puts on `crafts`.
+			THEME_COMBAT = {
+				["Modern Nights"] = { ranged = "larceny",   close = "performance" },
+				["Victorian Era"] = { ranged = "firearms",  close = "melee"       },
+				["Dark Ages"]     = { ranged = "crafts",    close = "melee"       },
+				["Classical Age"] = { ranged = "etiquette", close = "performance" },
+			};
+
+			-- The era in force, with the same fallback the palette uses (SPEC V52): a sheet
+			-- saved before the 19th round carries `Modern` or `Classical Era`, neither of which
+			-- is a key any more.
+			function currentTheme()
+				local v = nil;
+
+				if sheet ~= nil then v = sheet.sheetTheme; end;
+				if v == nil or THEME_LABELS[v] == nil then return THEME_DEFAULT; end;
+
+				return v;
+			end;
 		]]>
 	</script>
 	<tabControl align="client">

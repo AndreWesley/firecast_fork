@@ -784,6 +784,58 @@ foreach ($f in $files) {
 }
 if ($offCentre) { foreach ($o in $offCentre) { Fail "V27 $o" } } else { Pass "V27 every section title is centred on its box" }
 
+# ---- V68: and every section box carries the SAME corner ---------------------------
+# The corner detail - cornerType over a radius - lives in the XML rather than in the palettes
+# (SPEC V66), so it is authored 53 times and nothing kept those 53 in step. A box copied from
+# an older file would sit among its siblings with a different corner and read as a mistake.
+# Exactly the drift that produced B18, on another property.
+#
+# The two deliberate outliers are excluded the same way V48 excludes them: they are not black.
+# The avatar frame is DimGray and keeps its own radius; the health mark box is transparent.
+$corners = @{}
+foreach ($f in $files) {
+    foreach ($r in (Doc $f.FullName).SelectNodes("//rectangle[@color='black']")) {
+        $key = "{0}|{1}|{2}" -f $r.GetAttribute("cornerType"), $r.GetAttribute("xradius"), $r.GetAttribute("yradius")
+        if (-not $corners.ContainsKey($key)) { $corners[$key] = New-Object System.Collections.Generic.HashSet[string] }
+        [void]$corners[$key].Add($f.Name)
+    }
+}
+if ($corners.Count -eq 0) { Fail "V68 no black section box found - the check has nothing to measure" }
+elseif ($corners.Count -gt 1) {
+    foreach ($k in $corners.Keys) {
+        $p = $k -split '\|'
+        Fail "V68 section boxes with cornerType='$($p[0])' radius $($p[1])/$($p[2]) in $(($corners[$k] | Sort-Object) -join ', ') - the corner must match across every box"
+    }
+} else {
+    $p = ($corners.Keys | Select-Object -First 1) -split '\|'
+    Pass "V68 every section box shares cornerType='$($p[0])' radius $($p[1])/$($p[2])"
+}
+
+
+# ---- V69: the Main bottom row closes on one line (SPEC V69, T193) -----------------
+# V40 only asks that two boxes never overlap, so growing VIRTUES and shrinking the
+# HUMANITY/WILLPOWER box under it by the wrong amount would leave the middle column
+# ending short of BACKGROUNDS and still pass green - the 18th round moves both, and this
+# is what keeps the two columns closing together.
+# HEALTH is out of it on purpose: its declared height is the ten-row case (816) and the
+# renderer shrinks it to the chosen track (V49), an exception taken in the 11th round.
+$mainBottom = @{}
+foreach ($bx in (Doc (Join-Path $dir "HH.1.lfm")).SelectNodes("//scrollBox/layout")) {
+    $bt = 0; $bh = 0
+    if (-not ([int]::TryParse($bx.GetAttribute("top"), [ref]$bt) -and
+              [int]::TryParse($bx.GetAttribute("height"), [ref]$bh))) { continue }
+    foreach ($lb in $bx.SelectNodes("label")) {
+        $t = $lb.GetAttribute("text")
+        if ($t) { $mainBottom[$t] = $bt + $bh }
+    }
+}
+if (-not ($mainBottom.ContainsKey("HUMANITY") -and $mainBottom.ContainsKey("BACKGROUNDS"))) {
+    Fail "V69 HUMANITY or BACKGROUNDS not found on HH.1 - the check measured nothing (SPEC V20)"
+} elseif ($mainBottom["HUMANITY"] -ne $mainBottom["BACKGROUNDS"]) {
+    Fail "V69 the HUMANITY/WILLPOWER box ends at y=$($mainBottom['HUMANITY']) but BACKGROUNDS ends at y=$($mainBottom['BACKGROUNDS']) - the Main bottom row must close on one line"
+} else {
+    Pass "V69 Main bottom row closes together on y=$($mainBottom['BACKGROUNDS'])"
+}
 # ---- V48: a section box is filled black (SPEC B18) -------------------------------
 # ABILITIES shipped with the Mage sheet's transparent fill, so the tab background showed
 # through and it read as grey beside its black siblings. Nothing measured colour until now.
@@ -1110,6 +1162,16 @@ if ($bannedHits -eq 0) { Pass "V34 no banned hedge-magic wording in the .lfm fil
 # Everything below reads the real artifacts - the XML attributes and the Lua source - rather
 # than any intermediate the code could be refactored away from (SPEC V20 / B.7).
 
+# The palette table itself, and the names it declares. Everything downstream counts from this
+# rather than from a number written into the gate, so a fifth period added later cannot slip
+# past a check that still expects four (SPEC V20 / B.7).
+$themesMatch = [regex]::Match($hh6, 'local THEMES = \{(.*?)\n\t\t\t\};', 'Singleline')
+if (-not $themesMatch.Success) { Fail "V52/V53/V63 THEMES block not found - every palette check is a no-op" }
+$themesBlock = $themesMatch.Groups[1].Value
+$themeKeys = @([regex]::Matches($themesBlock, '(?m)^\t{4}\["([^"]+)"\] = \{') | ForEach-Object { $_.Groups[1].Value })
+if ($themeKeys.Count -eq 0) { Fail "V52/V53/V63 no palette found inside THEMES" }
+else { Pass "V52 THEMES declares $($themeKeys.Count) palettes: $($themeKeys -join ', ')" }
+
 $themeFn = [regex]::Match($hh6, 'local function applyTheme\(v, from\)(.*?)\n\t\t\tend;', 'Singleline')
 if (-not $themeFn.Success) { Fail "V52..V58 applyTheme not found in HH.6.lfm - every theme check below is a no-op" }
 else {
@@ -1117,11 +1179,11 @@ else {
 
     # V52: the three values, the table that answers them, and the fallback.
     $themeCb = @($listReport | Where-Object { $_.Name -eq 'HH.6.lfm/cboSheetTheme' })
-    $wantThemes = @('Modern', 'Victorian Era (Light)', 'Victorian Era (Dark)')
+    $wantThemes = @('Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age')
     if ($themeCb.Count -ne 1) { Fail "V52 cboSheetTheme was never collected - its value list is unchecked" }
     elseif (Compare-Object $themeCb[0].Items $wantThemes) {
         Fail "V52 cboSheetTheme offers {$($themeCb[0].Items -join ', ')}, expected {$($wantThemes -join ', ')}"
-    } else { Pass "V52 cboSheetTheme offers the three declared themes" }
+    } else { Pass "V52 cboSheetTheme offers the $($wantThemes.Count) declared themes" }
 
     # The combo saves what it shows, so items and values must not drift apart (SPEC V24).
     $themeNode = (Doc (Join-Path $dir "HH.6.lfm")).SelectSingleNode("//comboBox[@name='cboSheetTheme']")
@@ -1130,21 +1192,59 @@ else {
         Fail "V52 cboSheetTheme items and values differ - a [pt] sheet would save a translated theme name"
     } else { Pass "V52 cboSheetTheme items and values agree" }
 
-    $themeKeys = @([regex]::Matches($hh6, '\["(Modern|Victorian Era \([^"]+\))"\]\s*=\s*\{') | ForEach-Object { $_.Groups[1].Value })
-    foreach ($w in @('Victorian Era (Light)', 'Victorian Era (Dark)')) {
+    # Palette names are read out of the THEMES block at its own indent level, not from a list
+    # written here: adding a period to the combo and forgetting its palette has to fail, and so
+    # does a palette nothing can reach. Both directions are checked below.
+    foreach ($w in $wantThemes) {
         if ($themeKeys -contains $w) { Pass "V52 THEMES answers '$w'" }
         else { Fail "V52 '$w' is offered by the combo but has no THEMES entry - picking it would do nothing" }
     }
+    $strayThemes = @($themeKeys | Where-Object { $wantThemes -notcontains $_ })
+    if ($strayThemes.Count -gt 0) { Fail "V52 THEMES declares $($strayThemes -join ', ') - the combo does not offer it, so it can never be picked" }
+    else { Pass "V52 no palette is stranded outside the combo" }
 
-    # V54: Modern is the absence of a palette, not a second description of one. If someone
-    # ever writes a Modern entry here, the authored look and the table can silently disagree.
-    if ($themeKeys -contains 'Modern') { Fail "V54 THEMES has a 'Modern' palette - Modern must be the restored snapshot, not a copy of the XML" }
-    else { Pass "V54 Modern has no palette (it restores the snapshot)" }
+    # V63: a period declares the whole shape or none of it. With four palettes hand-written,
+    # a missing `paper` or `corner` is a sheet painted halfway (SPEC I5).
+    # Eight keys since the 16th round: `corner` went away entirely (V66) and `strokeSize`
+    # became one shared constant (V67), so neither belongs to a period any more.
+    $required = @('form','fill','stroke','font','fontFamily','dotOn','dotOff','paper')
+    foreach ($k in $themeKeys) {
+        $pal = [regex]::Match($themesBlock, "(?ms)^\t{4}\[""$([regex]::Escape($k))""\] = \{(.*?)^\t{4}\},")
+        if (-not $pal.Success) { Fail "V63 palette '$k' could not be read - its shape is unchecked"; continue }
+        $missing = @($required | Where-Object { $pal.Groups[1].Value -notmatch "(?m)^\t{5}$_\s*=" })
+        if ($missing.Count -gt 0) { Fail "V63 palette '$k' is missing $($missing -join ', ')" }
+        else { Pass "V63 palette '$k' declares all $($required.Count) keys" }
+    }
 
-    if ($hh6 -notmatch 'local themePainted = \{\}') { Fail "V54 no ledger - the theme could not be undone" }
+    # V54: the ledger records the value the XML authored, once, before that property is first
+    # painted. Overwriting it on a later repaint would record Victorian and call it authored -
+    # and every later period would then map from the wrong original.
+    #
+    # The other half of V54 was retired in the 16th round: there is no palette-less option left
+    # to restore to, so `Modern` naming a real palette is now correct rather than a violation.
+    if ($hh6 -notmatch 'local themePainted = \{\}') { Fail "V54 no ledger - the authored values are not recorded" }
     elseif ($hh6 -notmatch 'if rec\[prop\] == nil then rec\[prop\] = original; end;') { Fail "V54 the ledger is overwritten on repaint - it would record Victorian and call it Modern" }
-    elseif ($body -notmatch 'restore\(c\)') { Fail "V54 applyTheme has no restore branch" }
-    else { Pass "V54 the authored value is recorded once and restoring it is the Modern path" }
+    else { Pass "V54 the authored value is recorded once and never overwritten" }
+
+    # V66: the corner detail belongs to the XML. cornerType="innerLine" over a radius is
+    # authored on 53 boxes, so it already holds in every period - three palettes were writing
+    # corner = 0 over it and flattening it. Three rectangles carry a radius of their own (the
+    # health mark box, the avatar frame), which a single theme-wide radius would deform.
+    if ($themesBlock -match '(?m)^\s+corner\s*=') { Fail "V66 a palette declares `corner` again - a theme-wide radius flattens the boxes that set their own" }
+    elseif ($body -match '"(xradius|yradius)"') { Fail "V66 applyTheme writes a corner radius - the XML owns that detail (SPEC C, 16th round)" }
+    else { Pass "V66 no palette touches the corner radius" }
+
+    # V67: one outline width, declared once. The requirement is that the four MATCH, and four
+    # copies that agree today can drift tomorrow - so the equality is structural, like
+    # HEALTH_MARKS on the root form (SPEC V41).
+    if ($themesBlock -match '(?m)^\s+strokeSize\s*=') { Fail "V67 a palette declares its own strokeSize - the outlines must be one shared width" }
+    elseif ($hh6 -notmatch 'local THEME_STROKE = (\d+);') { Fail "V67 THEME_STROKE is not declared" }
+    else {
+        $null = $hh6 -match 'local THEME_STROKE = (\d+);'
+        $strokeVal = $Matches[1]
+        if ($body -notmatch 'paint\(c, "strokeSize", THEME_STROKE') { Fail "V67 applyTheme does not paint the shared width" }
+        else { Pass "V67 one shared outline width ($strokeVal) for all $($themeKeys.Count) periods" }
+    }
 
     # V61: writing a property is NOT free - every font setter detaches the control from the
     # theme before it writes, so writing back a value just read still changes the sheet. That
@@ -1164,13 +1264,17 @@ else {
 
     # V62: restoring reads the ledger, and the ORIGINAL value is what a repaint maps from -
     # otherwise Light -> Dark would look its palette up in a colour Light had already written.
-    if ($hh6 -notmatch 'local rec = themePainted\[c\.handle\];[\s\S]{0,200}for prop, original in pairs\(rec\)') { Fail "V62 restore() does not walk the ledger" }
-    elseif ($hh6 -notmatch 'if rec ~= nil and rec\[prop\] ~= nil then return rec\[prop\]; end;') { Fail "V62 authored() does not prefer the ledger - a second theme would map from the first theme's colours" }
+    # V62: restore() went with the palette-less baseline in the 16th round, but the ledger did
+    # not - it is what makes Victorian -> Classical map from the ORIGINAL colour instead of the
+    # one Victorian left behind.
+    if ($hh6 -notmatch 'if rec ~= nil and rec\[prop\] ~= nil then return rec\[prop\]; end;') { Fail "V62 authored() does not prefer the ledger - a second period would map from the first period's colours" }
     elseif ($body -notmatch 'authored\(c, "color"\)') { Fail "V62 the repaint maps from the live value, not the authored one" }
-    else { Pass "V62 restore walks the ledger and repaints map from the authored value" }
+    else { Pass "V62 repaints map from the authored value, not the previous period" }
 
-    if ($body -match 'local t = THEMES\[v\]') { Pass "V52 an unknown value (a sheet saved with the old 'Victorian Era') falls back to the authored look" }
-    else { Fail "V52 applyTheme does not look the value up in THEMES - there is no fallback" }
+    # And with no palette-less option left, the lookup must never resolve to nil.
+    if ($body -notmatch 'THEMES\[v\] or THEMES\[THEME_DEFAULT\]') { Fail "V52 applyTheme can still resolve to nil - a stale saved value would leave the sheet unpainted" }
+    else { Pass "V52 an unknown saved value falls back to the default palette" }
+
 
     # V55: the rdk generates findClass starting from `self`, so it only ever reaches the tab
     # it runs on - which is why the five base sheets only ever painted their Credits tab
@@ -1194,7 +1298,7 @@ else {
     else { Pass "V56 a missing backdrop degrades to no backdrop" }
 }
 
-# V53: every colour the XML authors must be a key in BOTH Victorian palettes. Without this a
+# V53: every colour the XML authors must be a key in EVERY palette. Without this a
 # box added later keeps its black fill in the middle of the parchment and nothing complains -
 # the same blind spot that let ABILITIES ship translucent (SPEC B18).
 $paletteOk = $true
@@ -1213,8 +1317,8 @@ foreach ($section in @(
     # Anchored to the start of a line: the normaliser below the table declares
     # `local fill, stroke, font = {}, {}, {}` and an unanchored pattern counted that as a map.
     $blocks = @([regex]::Matches($hh6, "(?m)^\s*$($section.Lua)\s*=\s*\{(.*?)\}", 'Singleline'))
-    if ($blocks.Count -ne 2) {
-        Fail "V53 expected one '$($section.Lua)' map per Victorian theme, found $($blocks.Count) - the check cannot see the palette"
+    if ($blocks.Count -ne $themeKeys.Count) {
+        Fail "V53 expected one '$($section.Lua)' map per palette ($($themeKeys.Count)), found $($blocks.Count) - the check cannot see them all"
         $paletteOk = $false
         continue
     }
@@ -1229,7 +1333,7 @@ foreach ($section in @(
         }
     }
 }
-if ($paletteOk) { Pass "V53 every authored colour is mapped by both Victorian palettes" }
+if ($paletteOk) { Pass "V53 every authored colour is mapped by all $($themeKeys.Count) palettes" }
 
 # V58: V3 walks the XML for src=/checkedImage=, so art a palette points at from Lua never got
 # checked. A typo there is a dot that silently stops rendering the moment a theme is picked.
@@ -1255,6 +1359,46 @@ else {
     }
 }
 
+# V65: fixed art follows the palette too. The first dot of an attribute or a virtue cannot be
+# switched off, so it is a plain <image> rather than an imageCheckBox - and being neither a
+# colour nor a checkbox, it fell through every net and stayed white in all four periods (B22).
+# V53 makes this promise for every colour the XML authors; this is the same promise for art.
+$fixedArt = @()
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//image[@src]")) {
+        if ($n.GetAttribute("name") -like 'themePaper*') { continue }
+        $fixedArt += [pscustomobject]@{ File = $f.Name; Leaf = (Split-Path $n.GetAttribute("src") -Leaf) }
+    }
+}
+if ($fixedArt.Count -eq 0) { Fail "V65 no fixed <image src> found - the check has nothing to measure, so it proves nothing" }
+else {
+    $unmapped = @($fixedArt | Where-Object { @('prime_on.png','prime_off.png') -notcontains $_.Leaf })
+    if ($unmapped.Count -gt 0) {
+        foreach ($u in $unmapped) { Fail "V65 $($u.File) shows fixed art '$($u.Leaf)' that no palette remaps - it would stay Modern inside every period" }
+    } else { Pass "V65 all $($fixedArt.Count) fixed <image src> use art the palettes remap" }
+}
+if ($hh6 -notmatch 'local DOT_ON\s+= "prime_on\.png";') { Fail "V65 the base dot name is gone - applyTheme cannot recognise the fixed dot" }
+elseif ($themeFn.Success -and $themeFn.Groups[1].Value -notmatch 'art == DOT_ON') { Fail "V65 applyTheme no longer remaps the fixed dot (SPEC B22)" }
+else { Pass "V65 applyTheme remaps the fixed dot to the palette" }
+
+# V64: and nothing else lives in images/. Art belongs to a theme; when a theme is dropped its
+# art has to go with it, or the folder turns into a graveyard that still ships inside the .rpk.
+# The 15th round deleted the light Victorian, and its three files with it.
+$referencedArt = New-Object System.Collections.Generic.HashSet[string]
+foreach ($img in $themeArt) { [void]$referencedArt.Add((Split-Path $img -Leaf)) }
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//*[@src] | //*[@checkedImage] | //*[@uncheckedImage]")) {
+        foreach ($a in @('src','checkedImage','uncheckedImage')) {
+            if ($n.HasAttribute($a)) { [void]$referencedArt.Add((Split-Path $n.GetAttribute($a) -Leaf)) }
+        }
+    }
+}
+$orphanArt = @(Get-ChildItem -LiteralPath (Join-Path $dir "images") -Filter *.png |
+                Where-Object { -not $referencedArt.Contains($_.Name) })
+if ($orphanArt.Count -gt 0) {
+    foreach ($o in $orphanArt) { Fail "V64 images/$($o.Name) is referenced by nothing - art of a dropped theme still shipping in the .rpk" }
+} else { Pass "V64 all $($referencedArt.Count) images in images/ are referenced by the XML or a palette" }
+
 # The backdrop is declared per tab, and Settings is left out ON PURPOSE: if the draw order or
 # hitTest ever behaved differently than assumed, a full-tab image over the Settings tab would
 # cover the very combo used to switch back to Modern.
@@ -1273,6 +1417,146 @@ foreach ($f in $files) {
 if ($paperTabs -contains 'HH.6.lfm') { Fail "V56 the Settings tab has a backdrop - a covered theme combo cannot be switched back" }
 elseif ($paperTabs.Count -ne 8) { Fail "V56 found $($paperTabs.Count) backdrops, expected 8 (every tab but Settings)" }
 else { Pass "V56 all 8 content tabs carry a hidden, click-through backdrop; Settings has none" }
+
+# ---- V70..V73: the era ability lists (SPEC I7, 19th round) -----------------------
+# The theme stopped being paint alone: each era renames rows on the Main tab, and those
+# strings live in Lua, not in the XML. Every width and translation check above reads the
+# .lfm files, so an era label was invisible to all of them - the same blind spot that let
+# B11 (template labels) and B17 (checkBox text) through, one family further out.
+$rootLfm = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HuntersHunted.lfm")))
+
+# THEME_LABELS: era -> field -> label. Read out of the root form at its own indent level so a
+# new era cannot be added without the checks below seeing it.
+$eraLabels = @{}
+$labelsBlock = [regex]::Match($rootLfm, 'THEME_LABELS = \{(.*?)\n\t{3}\};', 'Singleline')
+if (-not $labelsBlock.Success) { Fail "V70 THEME_LABELS not found on the root form - every era check is a no-op (SPEC V20)" }
+else {
+    foreach ($m in [regex]::Matches($labelsBlock.Groups[1].Value, '\["([^"]+)"\]\s*=\s*\{(.*?)\}', 'Singleline')) {
+        $era = $m.Groups[1].Value
+        $map = @{}
+        foreach ($e in [regex]::Matches($m.Groups[2].Value, '(\w+)\s*=\s*"([^"]+)"')) { $map[$e.Groups[1].Value] = $e.Groups[2].Value }
+        $eraLabels[$era] = $map
+    }
+}
+
+# THEME_COMBAT: era -> the two Combat rows that follow the era instead of a fixed field.
+$eraCombat = @{}
+$combatBlock = [regex]::Match($rootLfm, 'THEME_COMBAT = \{(.*?)\n\t{3}\};', 'Singleline')
+if (-not $combatBlock.Success) { Fail "V71 THEME_COMBAT not found on the root form - the slot check is a no-op (SPEC V20)" }
+else {
+    foreach ($m in [regex]::Matches($combatBlock.Groups[1].Value, '\["([^"]+)"\]\s*=\s*\{\s*ranged\s*=\s*"(\w+)",\s*close\s*=\s*"(\w+)"')) {
+        $eraCombat[$m.Groups[1].Value] = @{ ranged = $m.Groups[2].Value; close = $m.Groups[3].Value }
+    }
+}
+
+# The English authored in the XML is the fallback for every field an era does not rename, and
+# it is also what the ability columns are read from: field -> authored label, grouped by the
+# column layout it sits in, so V73 can compare row against row inside one column.
+$authoredAbility = @{}
+$abilityColumns = @{}
+$mainDoc = Doc (Join-Path $dir "HH.1.lfm")
+foreach ($col in $mainDoc.SelectNodes("//scrollBox/layout/layout")) {
+    $rows = @($col.SelectNodes(".//Ability"))
+    if ($rows.Count -eq 0) { continue }
+    $ttl = $col.SelectSingleNode("label")
+    $name = if ($ttl) { $ttl.GetAttribute("text") } else { "column" }
+    $fields = @()
+    foreach ($r in $rows) {
+        $fields += $r.GetAttribute("field")
+        $authoredAbility[$r.GetAttribute("field")] = $r.GetAttribute("nome")
+    }
+    $abilityColumns[$name] = $fields
+}
+
+if ($eraLabels.Count -eq 0) { Fail "V70 no era read out of THEME_LABELS" }
+elseif ($abilityColumns.Count -eq 0) { Fail "V70/V73 no ability column found on HH.1 - the era checks measure nothing (SPEC V20)" }
+else {
+    # V70: an era label is a visible string like any other - it needs both keys, the embedded
+    # map that actually translates at runtime, and a width that fits the 125px template label.
+    $eraBad = @()
+    $eraStrings = New-Object System.Collections.Generic.HashSet[string]
+    foreach ($era in $eraLabels.Keys) {
+        foreach ($f in $eraLabels[$era].Keys) {
+            $txt = $eraLabels[$era][$f]
+            [void]$eraStrings.Add($txt)
+            if (-not $authoredAbility.ContainsKey($f)) { $eraBad += "$era renames '$f', which is not an ability row on HH.1" }
+        }
+    }
+    foreach ($txt in $eraStrings) {
+        if (-not $ptK.Contains($txt)) { $eraBad += "'$txt' has no [pt] key" }
+        if (-not $enK.Contains($txt)) { $eraBad += "'$txt' has no [en] key" }
+        if (-not $embedded.ContainsKey($txt)) { $eraBad += "'$txt' is missing from the PT map - it would never translate at runtime" }
+        $need = NeededPx $txt
+        if ($need -gt 125) { $eraBad += "'$txt' (pt '$($ptVal[$txt])') needs ~${need}px, the Ability label is 125px" }
+    }
+    if ($eraBad) { foreach ($b in $eraBad) { Fail "V70 $b" } }
+    else { Pass "V70 all $($eraStrings.Count) era labels translate and fit the row" }
+
+    # V73: a permutation is exactly where one entry goes missing, and the result is two rows
+    # with the same name in one column - unreadable, and nothing else would catch it.
+    $dupes = @()
+    foreach ($era in $eraLabels.Keys) {
+        $map = $eraLabels[$era]
+        foreach ($col in $abilityColumns.Keys) {
+            $seen = @{}
+            foreach ($f in $abilityColumns[$col]) {
+                $shown = if ($map.ContainsKey($f)) { $map[$f] } else { $authoredAbility[$f] }
+                if ($seen.ContainsKey($shown)) { $dupes += "$era shows '$shown' twice in $col ($($seen[$shown]) and $f)" }
+                else { $seen[$shown] = $f }
+            }
+        }
+    }
+    if ($dupes) { foreach ($d in $dupes) { Fail "V73 $d" } }
+    else { Pass "V73 every era keeps its $($abilityColumns.Count) columns free of repeated labels" }
+
+    # V71: label and dots are one pair. The Combat tab mirrors a SLOT, so the field behind the
+    # ranged row has to be the one THIS era labels Firearms or Archery, and the close row the
+    # one it labels Melee. Get that wrong and the tab shows one ability over another's dots.
+    $slotBad = @()
+    foreach ($era in $eraLabels.Keys) {
+        if (-not $eraCombat.ContainsKey($era)) { $slotBad += "$era has no THEME_COMBAT entry - renderCombatTraits would index nil"; continue }
+        foreach ($pair in @(@('ranged', @('Firearms', 'Archery')), @('close', @('Melee')))) {
+            $f = $eraCombat[$era][$pair[0]]
+            $shown = if ($eraLabels[$era].ContainsKey($f)) { $eraLabels[$era][$f] } else { $authoredAbility[$f] }
+            if ($pair[1] -notcontains $shown) {
+                $slotBad += "$era mirrors '$f' on the $($pair[0]) row, but this era calls it '$shown' - expected $($pair[1] -join ' or ')"
+            }
+        }
+    }
+    foreach ($era in $eraCombat.Keys) { if (-not $eraLabels.ContainsKey($era)) { $slotBad += "THEME_COMBAT declares $era, THEME_LABELS does not" } }
+    if ($slotBad) { foreach ($b in $slotBad) { Fail "V71 $b" } }
+    else { Pass "V71 every era mirrors its own ranged and close skill on the Combat tab" }
+}
+
+# The two Combat rows must actually BE slots in the XML, and the dots must be painted from the
+# era field rather than from the row name.
+$hh3Text = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.3.lfm")))
+if ($hh3Text -notmatch 'ReadOnlyTrait field="ranged"' -or $hh3Text -notmatch 'ReadOnlyTrait field="close"') {
+    Fail "V71 HH.3 still mirrors a fixed field - the ranged/close rows are not slots"
+} elseif ($hh3Text -notmatch 'paintAs\(form, "ranged", slots\.ranged' -or $hh3Text -notmatch 'paintAs\(form, "close", slots\.close') {
+    Fail "V71 renderCombatTraits does not paint the slots from THEME_COMBAT - the dots would stay empty"
+} elseif ($hh3Text -notmatch "'sheetTheme'") {
+    Fail "V71 the HH.3 dataLink does not observe sheetTheme - switching era would leave the old dots on screen"
+} else { Pass "V71 the Combat slots are wired to the era and repaint when it changes" }
+
+# V72: the labels are dyn*, so the language traversal skips them (V31). That makes the renderer
+# the ONLY thing that writes them, and it has to run on both switches - hanging it off the era
+# alone leaves a [pt] sheet in English until the era is touched.
+if ($hh6 -notmatch 'local function renderAbilityLabels\(') { Fail "V72 renderAbilityLabels is missing - the era labels would never be written" }
+else {
+    $langEvt = [regex]::Match($hh6, '<dataLink field="language".*?</dataLink>', 'Singleline')
+    $themeEvt = [regex]::Match($hh6, '<dataLink field="sheetTheme".*?</dataLink>', 'Singleline')
+    if (-not $langEvt.Success -or $langEvt.Value -notmatch 'renderAbilityLabels\(') { Fail "V72 the language dataLink does not call renderAbilityLabels - era labels would fall back to English on a [pt] sheet" }
+    elseif (-not $themeEvt.Success -or $themeEvt.Value -notmatch 'renderAbilityLabels\(') { Fail "V72 the sheetTheme dataLink does not call renderAbilityLabels - switching era would repaint but not rename" }
+    else { Pass "V72 the era labels are rendered on load and on both switches" }
+}
+
+# And the labels themselves have to carry the dyn* names the renderer looks for.
+$abilityLbl = $mainDoc.SelectSingleNode("//template[@name='Ability']/label")
+$roLbl = (Doc (Join-Path $dir "HH.3.lfm")).SelectSingleNode("//template[@name='ReadOnlyTrait']/label")
+if ($null -eq $abilityLbl -or $abilityLbl.GetAttribute("name") -ne 'dynAbil$(field)') { Fail "V72 the Ability label is not named dynAbil - the renderer cannot find it and the translation would fight it" }
+elseif ($null -eq $roLbl -or $roLbl.GetAttribute("name") -ne 'dynRo$(field)') { Fail "V72 the ReadOnlyTrait label is not named dynRo - the Combat rows would keep their authored name" }
+else { Pass "V72 both row templates hand their label to the renderer" }
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.

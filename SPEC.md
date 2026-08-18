@@ -172,11 +172,70 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - ledger guarda o valor AUTORADO ∴ Claro→Escuro direto mapeia da cor ORIGINAL, ⊥ da que o tema anterior deixou. Valor autorado = nil (prop que o XML nunca setou) → ⊥ pinta, pois ⊥ teria como desfazer
 - backdrop fica FORA do ledger: é controle que só existe p/ o tema, estado autorado = sem `src` & escondido ∴ `Modern` só re-esconde (e só se já ⊥ estiver escondido, p/ ⊥ furar §V61)
 - `fontFamily` só onde o snapshot devolve família REAL (string ⊥ vazia) ∴ restauro sempre grava família válida. Controle que HERDA fonte fica sem serifa & isso ! ser observado no teste (§R27)
+- 15ª rodada 2026-08-17 ↓ (4 épocas; pedido user)
+- combo 3→5: `Modern` · `Present Day` · `Victorian Era` · `Dark Ages` · `Classical Era`. Ordem = base primeiro, depois voltando no tempo
+- `Victorian Era (Light)` SAI inteiro (paleta + arte). User ⊥ gostou ∴ ⊥ ∃ mais variante clara
+- sufixo `(Dark)`/`(Light)` CAI de todos: c/ 1 variante por época ele ⊥ distingue nada. `Victorian Era (Dark)` → `Victorian Era`
+- ∴ o valor `Victorian Era` da 11ª rodada VOLTA a ser válido (era fallback desde a 14ª) ∴ ficha salva daquela época passa a pintar Vitoriano em vez de cair no base — o que ela queria dizer. Benigno, ⊥ é reuso de órfão (§I3 fala de nome de CAMPO, isto é VALOR)
+- `Modern` fica c/ o nome de hoje (decisão user): segue sendo a ficha CRUA, ⊥ tem paleta & é o único caminho de volta + a garantia de zero escrita (§V54, §V61). Custo aceito: "Moderno" & "Atual" convivem na lista
+- PALETA `Present Day` (vampiro 2025/26, noturno urbano): form `dark` · fundo `#12141A` · filete `#3A4150` · texto `#E6E8EC` · avatar `#2A2F3A` · `Segoe UI` · canto **10** (ÚNICO tema que ⊥ zera — UI atual é arredondada) · filete **1** · bolinha carmim
+- PALETA `Dark Ages` (Europa ~1300, pedra & carvalho à luz de vela): form `dark` · fundo `#1A1512` · filete `#8A7A5C` (ferro/latão fosco) · texto `#E3D8BE` · avatar `#5A4A32` · `Book Antiqua` · canto 0 · filete **3** (banda de ferro) · bolinha sangue
+- PALETA `Classical Era` (Roma ~200 a.C., República): form `dark` · fundo `#171218` (basalto) · filete `#BFA05A` (ouro de louro) · texto `#F0EAD9` (marfim) · avatar `#6B2A4A` (púrpura tíria) · `Times New Roman` · canto 0 · filete 2 · bolinha OURO reusada do Vitoriano ∴ ⊥ 2 PNGs a mais
+- `paper_dark.png` → `paper_victorian.png`: c/ 4 papéis por época, `paper_dark` ao lado de `paper_dark_ages` mente. Renome de arquivo, ⊥ de campo
+- arte: +7 PNG (`prime_on_crimson` `prime_off_slate` `prime_on_blood` `prime_off_iron` `paper_present` `paper_dark_ages` `paper_classical`) · −3 (`prime_on_ink` `prime_off_ink` `paper_light`) ∴ tema removido leva a arte junto (§V64)
+- ⊥ resolvido segue ⊥ resolvido: T153(a)(b) (papel atrás do conteúdo & `hitTest`) & §R27 (família herdada) agora carregam 4 papéis & 3 famílias ∴ o teste no Firecast pesa MAIS, ⊥ menos
+- correção 2026-08-17 (2ª) ↓ (teste do user: bolinha fixa BRANCA em ∀ tema)
+- dot1 fixo de `Attribute` (`HH.1`, 8 attrs + 3 virtudes) & `VirtueMirror` (`HH.3`) = `<image src="images/prime_on.png">`, ⊥ `imageCheckBox` ∴ ficava fora da troca de arte — o ramo `image` do `applyTheme` só olhava `themePaper*`. Corte declarado por MIM na 14ª rodada ("arte fixa ⊥ é assunto do tema"), ERRADO: é a MESMA arte da caixa marcada ∴ ! seguir `dotOn` (§B22)
+- casamento por LEAF do caminho (`prime_on.png`) c/ `normPath` ≡ `normColor`: XML autora relativo & runtime devolve absoluto (§R26) ∴ comparar o nome do arquivo resolve os 2
+- ⊥ chave nova de paleta: a bolinha fixa mostra o mesmo que a caixa marcada ∴ reusa `dotOn`/`dotOff` que já ∃ & §V63 segue em 10 chaves
+- avatar (`<image>` SEM `src`, `field="avatar"`) segue FORA: é a foto do jogador, ⊥ arte de tema
+- 16ª rodada 2026-08-17 ↓ (4 pedidos do user)
+- (1) tema base `Modern` (sem paleta) SAI ∴ 4 valores, ∀ um c/ paleta & a ficha SEMPRE é pintada. Perde-se a volta p/ a ficha crua & a garantia de "zero escrita" — custo que EU declarei na 15ª rodada e o user aceita agora
+- (2) `Present Day` → `Modern` (PT `Atual` → `Moderno`). `wod.Modern`=`Moderno` já ∃ ∴ ⊥ chave nova; `wod.Present Day` sai
+- ficha salva c/ o `Modern` VELHO (= ficha crua) cai no `Modern` NOVO (contemporâneo estilizado): mesma string, outro sentido. ⊥ ∃ mais opção crua p/ onde mandar ∴ benigno. `Present Day` salvo → desconhecido → default = o MESMO tema c/ outro nome ∴ sem perda
+- (1) ⊥ ∃ arte usada SÓ pelo `Modern` velho: ele ⊥ tem paleta ∴ ⊥ referencia arte nenhuma. `prime_on.png` & `prime_off.png` são autorados no XML em ∀ template & são as CHAVES que ∀ paleta remapeia (§V65) ∴ FICAM. Nada a apagar — §V64 prova
+- (3) "borda diferenciada nas pontas" = `cornerType="innerLine"` + raio 10, autorado no XML em 53 caixas ∴ JÁ vale em ∀ época. As outras 3 paletas estavam DESTRUINDO o detalhe c/ `corner = 0` ∴ fix = parar de escrever raio, ⊥ adicionar nada
+- (3) ∴ `corner` SAI das paletas & `applyTheme` ⊥ escreve `xradius`/`yradius` (§V66). Melhor que forçar 10: 3 `rectangle` autoram raio PRÓPRIO (2 & 5 — caixa de marca de vitalidade & moldura do avatar) & seriam deformados
+- (4) outline hoje: 1 (`Present Day`) · 2 (`Victorian Era`) · 3 (`Dark Ages`) · 2 (`Classical Era`) → mais largo = **3** ∴ ∀ um 3
+- (4) ∴ `strokeSize` SAI das paletas → constante ÚNICA `THEME_STROKE = 3` (§V67): "todos iguais" vira ESTRUTURAL, ⊥ 4 cópias que podem divergir. §V63 10→8 chaves
+- `restore()` & o ramo `t == nil` viram código MORTO (⊥ ∃ mais opção sem paleta) ∴ SAEM. Ledger FICA — é ele que faz época→época mapear da cor ORIGINAL (§V62)
+- canto arredondado numa ficha medieval | vitoriana lê menos "de época" — pedido EXPLÍCITO do user, custo aceito
+- 17ª rodada 2026-08-17 ↓ (1 pedido: canto mais arredondado)
+- `cornerType` `innerLine` → `innerRound` nas 54 ocorrências & raio 10 → 14 nas 53 caixas de seção ∴ o corte RETO do canto vira CURVA, um pouco maior. Decisão do user entre 4 opções (`round` RECUSADO: perderia o recorte & a moldura viraria caixa comum)
+- moldura do avatar acompanha o `cornerType` mas MANTÉM raio 5; caixa de marca de vitalidade INTACTA (raio 2, sem `cornerType`) — as 2 são deliberadamente diferentes & uniformizar deformaria (≡ lógica de §V66)
+- canto mora no XML (§V66) ∴ muda 1× & vale nas 4 épocas ao mesmo tempo
+- 18ª rodada 2026-08-17 ↓ (4 pedidos do user)
+- (1) Main, caixa `VIRTUES`: título desce de `top` 0 → 8 ∴ respiro entre a borda de cima & a palavra. Demais títulos de seção ⊥ mudam — pedido é só desta caixa
+- (2) pitch das 3 virtudes 25 → 29 (linhas @ 33 · 62 · 91) ∴ +4px entre `Conscience` `Self-Control` `Courage`. Caixa 110 → 126 alto (fecha 636, gap 10 p/ a de baixo ≡ resto do arquivo)
+- (3) `HUMANITY & WILLPOWER` absorve os 16px: top 630→646 & height 180→164 ∴ fim segue em 810 ≡ `BACKGROUNDS` (§V69). Internos ⊥ mudam — conteúdo fecha em 155, folga de baixo 25→9
+- (3) folga de baixo (9) < folga de cima (15) na caixa apertada. Reflow interno ⊥ pedido ∴ ⊥ mexe (≡ precedente da 9ª & 10ª rodada)
+- `VIRTUES` da aba Combat (`HH.3`, 390,330,270,110) ⊥ acompanha: user pediu "aba main" & lá a caixa fecha em 440 c/ `WILLPOWER` @ 450 ∴ +16 colidiria & pediria reflow da coluna inteira. As 2 abas ficam c/ pitch DIFERENTE — custo declarado, ⊥ esquecimento
+- (4) paleta `Dark Ages`: `stroke` `#8A7A5C` (ferro fosco) → `#C0C6CC` (prata) nas 3 entradas & `fill["black"]` `#1A1512` → `#0E0B09` ∴ filete claro sobre interior mais escuro. Hex = JULGAMENTO meu — user disse "prateada" & "mais escura", ⊥ deu valor
+- (4) `fill["DimGray"]` (moldura do avatar, `#5A4A32`) & `#00000000` & `font` & arte de bolinha (`prime_on_blood` `prime_off_iron`) ⊥ mudam: pedido fala de outline & interior de CAIXA. Moldura marrom ao lado de filete prateado = escolha, ⊥ deriva ?
+- (4) ⊥ chave nova em paleta nenhuma — só VALOR ∴ §V53 & §V63 seguem verdes sem tocar no gate
+- 19ª rodada 2026-08-17 ↓ (6 pedidos do user — tema deixa de ser só pintura & passa a RENOMEAR perícia)
+- (1)(4)(6) cada época traz sua LISTA de perícias: o RÓTULO da linha passa a depender do tema & o CAMPO ⊥ muda (§V2 intacto). Mapa por época, chaveado no campo:
+  - `Dark Ages`: `streetwise`→`Legerdemain` · `crafts`→`Archery` · `etiquette`→`Commerce` · `firearms`→`Crafts` · `larceny`→`Etiquette` · `finance`→`Hearth Wisdom` · `science`→`Seneschal` · `technology`→`Theology`
+  - `Modern Nights`: `etiquette`→`Drive` · `firearms`→`Etiquette` · `larceny`→`Firearms` · `melee`→`Larceny` · `performance`→`Melee` · `ride`→`Performance` · `enigmas`→`Computer`
+  - `Classical Age`: `etiquette`→`Archery` · `firearms`→`Commerce` · `larceny`→`Etiquette` · `melee`→`Performance` · `performance`→`Melee` · `enigmas`→`Hearth Wisdom` · `finance`→`Investigation` · `investigation`→`Law` · `law`→`Medicine` · `medicine`→`Occult` · `occult`→`Politics` · `politics`→`Philosophy` · `science`→`Ritual` · `technology`→`Religion`
+  - `Victorian Era` ⊥ tem mapa ∴ segue c/ o rótulo autorado no XML — user ⊥ pediu lista vitoriana ?
+- user escreveu 4 rótulos em PT (`Computador` `Etiqueta` `Filosofia` `Religião`) ∴ autoro EN (`Computer` `Etiquette` `Philosophy` `Religion`) & traduzo no `.lang` (§V9 §V24)
+- trocar de época RE-INTERPRETA as bolinhas: dado ⊥ move, mas a linha que dizia `Firearms` passa a dizer `Etiquette` ∴ ficha montada numa época & lida em outra mostra OUTRA perícia no mesmo ponto. Custo INERENTE ao pedido, ⊥ contornável sem migrar dado
+- rótulo de perícia vira Lua-owned: label do template ganha `name="dynAbil$(field)"` & o renderer escreve `tryTranslate(MAPA[campo] | autorado)` ∴ FORA da travessia de idioma (≡ `dyn` da vitalidade, §V31) & roda no load & na troca de tema & na troca de idioma (§V72)
+- EN autorado no XML segue sendo a fonte do caso SEM mapa ∴ snapshot 1× no 1º render (≡ §V22), ⊥ 2ª lista de rótulos-base p/ divergir
+- (2) `Dark Ages`: bolinha ligada & desligada na MESMA prata do outline (`#C0C6CC`) ∴ arte nova `prime_on_silver.png` (cheia) + `prime_off_silver.png` (anel), 100×100 ≡ geometria do par base; `prime_on_blood.png` & `prime_off_iron.png` SAEM (§V64). Bolinha só-leitura & dot1 fixo já seguem `dotOn`/`dotOff` (§V65) ∴ "incluindo as que o user ⊥ muda" ⊥ pede código novo
+- (3) `Modern` → `Modern Nights` ([pt] `Noites Modernas`) & (5) `Classical Era` → `Classical Age` ([pt] `Idade Clássica`). `values` = EN canônico (§V24) ∴ "Noites Modernas" é display, ⊥ valor
+- `Modern Nights` segue default & fallback (§V52) ∴ ficha salva c/ `Modern` cai no MESMO tema, só o nome mudou. Ficha salva c/ `Classical Era` cai no default ∴ PERDE a época — alias ⊥ criado (≡ precedente `Present Day`), custo declarado ?
+- DECISÃO user 2026-08-17: espelho de combate segue o PAR rótulo↔bolinha — se a época ⊥ tem `Firearms`, a linha mostra a perícia de ataque à distância DAQUELA época & espelha o CAMPO dela ∴ `Dark Ages` = `Archery` (campo `crafts`) · `Modern Nights` = `Firearms` (campo `larceny`) · `Classical Age` = `Archery` (campo `etiquette`) · `Victorian Era` = `Firearms` (campo `firearms`)
+- idem corpo-a-corpo: `Melee` mora em `melee` (Trevas · Vitoriano) | `performance` (Moderno · Clássico) ∴ 2 das 7 linhas de perícia da caixa `COMBAT TRAITS` viram SLOTS
+- os 2 slots perdem o nome por campo & viram POSICIONAIS (`ro_ranged_*` `ro_close_*`) ≡ precedente da vitalidade (4ª rodada): nome por campo mentiria em 2 das 4 épocas. As outras 5 linhas ⊥ trocam de campo, mas o RÓTULO delas passa pelo MESMO renderer ∴ 1 caminho só, ⊥ 2 p/ divergir
+- as 4 linhas de ATRIBUTO de `HH.3` compartilham o template `ReadOnlyTrait` ∴ entram no renderer de graça (sem mapa = rótulo autorado traduzido). Separar o template p/ poupar 4 labels = complexidade sem ganho — JULGAMENTO meu
+- rótulo de perícia ⊥ é dado: §I3 ⊥ ganha campo novo & os slots seguem sem `field=` ∴ §V1 §V36 §V51 intactos
 
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
-- I2 arquivos: `Plugins/Sheets/World of Darkness 20th/HuntersHunted/` → `HuntersHunted.lfm` (raiz) + `HH.1.lfm`…`HH.9.lfm` (`HH.8` = aba Inventory, `HH.9` = aba Progress) + `images/` = `prime_on.png` `prime_off.png` + (14ª rodada) `prime_on_ink.png` `prime_off_ink.png` `prime_on_gold.png` `prime_off_gold.png` `paper_light.png` `paper_dark.png`
+- I2 arquivos: `Plugins/Sheets/World of Darkness 20th/HuntersHunted/` → `HuntersHunted.lfm` (raiz) + `HH.1.lfm`…`HH.9.lfm` (`HH.8` = aba Inventory, `HH.9` = aba Progress) + `images/` = `prime_on.png` `prime_off.png` (XML, tema base) + arte de paleta (15ª rodada): `prime_on_gold.png` `prime_off_gold.png` (Vitoriano & Clássico) · `prime_on_crimson.png` `prime_off_slate.png` (Atual) · `prime_on_silver.png` `prime_off_silver.png` (Idade das Trevas — prata do outline, 19ª rodada; par `blood`/`iron` saiu) · `paper_present.png` `paper_victorian.png` `paper_dark_ages.png` `paper_classical.png`
 - I1b ordem das abas (9): Main · Traits · Powers · Combat · Inventory · Background · Progress · Notes · Settings
 - I3 campos NDB (contrato de dados — ⊥ renomear pós-release):
   - header: `name` `player` `chronicle` `nature` `demeanor` `concept` `motivation` `occupation` `residence`
@@ -201,13 +260,14 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - história (aba Background, `HH.4`): `desc_sexo` `desc_altura` `desc_olhos` `desc_idade` `desc_peso` `desc_cabelo` `desc_idadeAparente` `desc_etinicidade` + `desc_nacionalidade` (novo) · `aparencia` (RÓTULO = `Languages`) · `idiomas` (RÓTULO = `Goals`) · `moralFlaws` `fears` (novos) · `background`. `personalidade` & `natureza` SAÍRAM na 9ª rodada ∴ órfãos ↓
   - progress (aba Progress, `HH.9`): `spentXP` · `xpLog`. `experience` = ESPELHO do da Main (§V36). `totalXP` ⊥ tem `field` ∴ ∉ contrato, ⊥ salvo (§C, ≡ §V29)
   - ESPELHOS declarados (>1 widget de entrada no MESMO `field`, §V36 — ⊥ é violação de §V1): `health_1`…`_10` em `HH.1`+`HH.3` · `willpower_c1`…`_c10` em `HH.1`+`HH.3` (11ª rodada) · `experience` em `HH.1`+`HH.9`. Virtudes SAÍRAM daqui na 12ª rodada — viraram só-leitura ↓
-  - SÓ-LEITURA em `HH.3` (espelho ⊥ editável, ⊥ conta como dono): `alertness` `athletics` `awareness` `brawl` `firearms` `melee` `stealth` (+`_1`…`_5`) · `strength` `dexterity` `stamina` `perception` (+`_2`…`_5`) · `willpower_1`…`_10` (bolinhas da caixa WILLPOWER nova — 11ª rodada; os `_c1`…`_c10` do MESMO bloco são espelho editável ↑) · `conscience` `selfControl` `courage` (+`_2`…`_5`) — 12ª rodada, virtudes deixaram de ser editáveis aqui
+  - SÓ-LEITURA em `HH.3` (espelho ⊥ editável, ⊥ conta como dono): 5 perícias FIXAS `alertness` `athletics` `awareness` `brawl` `stealth` + 2 SLOTS por época (§I7: `ranged` ∈ `firearms`|`crafts`|`etiquette` · `close` ∈ `melee`|`performance`) — 19ª rodada, era lista fixa de 7 (+`_1`…`_5`) · `strength` `dexterity` `stamina` `perception` (+`_2`…`_5`) · `willpower_1`…`_10` (bolinhas da caixa WILLPOWER nova — 11ª rodada; os `_c1`…`_c10` do MESMO bloco são espelho editável ↑) · `conscience` `selfControl` `courage` (+`_2`…`_5`) — 12ª rodada, virtudes deixaram de ser editáveis aqui
   - ÓRFÃOS declarados (∈ NDB de ficha salva, ⊥ widget em nenhum `.lfm`): `transportation` `other` (3ª rodada) · `bruised` `hurt` `injured` `wounded` `mauled` `crippled` `incapacitated` (4ª rodada — vitalidade virou posicional, §C) · `personalidade` `natureza` (9ª rodada — caixas Concept & Nature removidas a pedido). ⊥ reusar estes nomes p/ campo novo ∴ ficha velha ⊥ ressuscita dado em caixa errada
-  - settings (aba Settings, `HH.6`): `language` · `game` (novo 2026-08-17, 5 jogos + vazio) · `sheetTheme` (11ª rodada; 14ª rodada = 3 valores `Modern`\|`Victorian Era (Light)`\|`Victorian Era (Dark)`, default `Modern`, agora PINTA — §I5 §I6)
+  - settings (aba Settings, `HH.6`): `language` · `game` (novo 2026-08-17, 5 jogos + vazio) · `sheetTheme` (11ª rodada; 16ª rodada = 4 valores `Modern`\|`Victorian Era`\|`Dark Ages`\|`Classical Era`, ∀ um c/ paleta, default `Modern`, PINTA — §I5 §I6)
   - `experience` · `avatar`
 - I4 build: `rdk -l` @ raiz do plugin → compile + lint fonte → `output/World of Darkness 20th.rpk`. `rdk -c` = só compile. `rdk p` = PREPARE, ⊥ build.
-- I5 `THEMES` — tabela Lua @ `HH.6.lfm`, chave = `values` do `cboSheetTheme`. `Modern` ⊥ tem entrada (= restaurar snapshot, §V54). ∀ variante vitoriana: `{ form = light\|dark, fill = {<cor autorada> → <cor nova>}, stroke = {…}, font = {…}, fontFamily, xradius, strokeSize, dotOn, dotOff, paper }`
+- I5 `THEMES` — tabela Lua @ `HH.6.lfm`, chave = `values` do `cboSheetTheme` (16ª rodada: ∀ valor tem paleta, ⊥ ∃ mais entrada ausente). ∀ época: `{ form, fill = {<cor autorada> → <cor nova>}, stroke = {…}, font = {…}, fontFamily, dotOn, dotOff, paper }` — 8 chaves, todas obrigatórias (§V63). `corner` REMOVIDO (§V66) & `strokeSize` virou constante `THEME_STROKE` (§V67)
 - I6 `applyTheme(v, from)` — @ `HH.6.lfm`, MESMA forma de `applyLanguage`: `rootOf(from)` + `collect` da raiz, snapshot 1× por handle antes da 1ª pintura, depois pinta `THEMES[v]` | restaura snapshot. Chamado pelo `<dataLink field="sheetTheme">` ∴ roda no load & em ∀ troca
+- I7 `THEME_LABELS` & `THEME_COMBAT` — tabelas Lua @ `HuntersHunted.lfm` (form RAIZ, ≡ `HEALTH_MARKS`/§V41: `HH.3` ! ler `THEME_COMBAT` & local de `HH.6` ⊥ cruza form — achado @ build), chave = `values` do `cboSheetTheme` (19ª rodada). `THEME_LABELS[t][campo]` = rótulo da época, SÓ os que mudam (ausente = rótulo autorado no XML, traduzido). `THEME_COMBAT[t] = { ranged = <campo>, close = <campo> }` = os 2 slots de perícia da caixa `COMBAT TRAITS` de `HH.3`. `Victorian Era` = mapa vazio & slots `firearms`/`melee`
 
 ## §R RESEARCH
 
@@ -293,17 +353,28 @@ V48: ∀ caixa de SEÇÃO (`<layout>` c/ `<rectangle>` + `<label>` de título `h
 V49: altura da caixa HEALTH em runtime = `healthLevels`·`HEALTH_ROW_PITCH` + `HEALTH_BOX_PAD` & ≤ altura declarada no XML ∴ Lua só ENCOLHE & §V40 (estático) segue medindo o pior caso. `HEALTH_ROW_PITCH` ! = pitch REAL das linhas no XML (`top` da linha 2 − da linha 1) nas 2 abas ∴ ⊥ deriva Lua × XML (§B12, §B16)
 V50: linha `faith` da aba Powers → bloco mostra `DESC['True Faith']` ∀ item do `cboFaith` ∴ trocar de religião ⊥ muda o texto & os 4 itens ∉ §V32 (⊥ têm entrada própria em `DESC`)
 V51: ∀ grupo SÓ-LEITURA de `HH.3` — traços de combate · `willpower_1`…`_10` · virtudes `conscience` `selfControl` `courage` (+`_2`…`_5`, 12ª rodada) — ⊥ tem `field` & tem `autoChange="false"`, valor pintado por Lua ∴ ⊥ 2º dono (§V1). Editáveis na aba = SÓ `health_1`…`_10` & `willpower_c1`…`_c10`, os 2 espelhos declarados (§V36)
-V52: `sheetTheme` ∈ os 3 `values` do `cboSheetTheme`. Valor ∉ os 3 (ficha velha c/ `Victorian Era`, nil, lixo) → `Modern` ∴ ⊥ ficha sem tema & ⊥ meio-pintada (§V19, §V33)
-V53: ∀ literal de `color=` `strokeColor=` `fontColor=` nos 9 `.lfm` → ∃ chave correspondente nas 2 paletas de §I5 ∴ caixa nova c/ cor nova ⊥ fica preta no meio do pergaminho — falha VISÍVEL vira gate vermelho antes de virar bug
-V54: `Modern` ⊥ tem paleta — voltar = restaurar o snapshot tirado ANTES da 1ª pintura ∴ troca reversível & idempotente & ⊥ 2ª descrição do visual de hoje p/ divergir do XML (≡ §V22)
+V52: `sheetTheme` ∈ os 4 `values` do `cboSheetTheme` (16ª rodada; era 5). Valor ∉ os 4 (nil, lixo, `Present Day` de ficha velha) → paleta DEFAULT (`Modern`) ∴ `THEMES[v]` NUNCA resolve nil & ⊥ ficha sem tema | meio-pintada (§V19, §V33)
+V53: ∀ literal de `color=` `strokeColor=` `fontColor=` nos 9 `.lfm` → ∃ chave correspondente em CADA paleta de §I5 (15ª rodada: 4 paletas, ⊥ 2 — o check conta 1 mapa POR paleta declarada, ⊥ número fixo) ∴ caixa nova c/ cor nova ⊥ fica preta no meio da época — falha VISÍVEL vira gate vermelho antes de virar bug
+V54: ledger grava o valor AUTORADO 1× por prop, ANTES da 1ª pintura daquela prop ∴ ⊥ é reescrito por pintura posterior. RETIRADA na 16ª rodada a outra metade ("`Modern` ⊥ tem paleta, voltar = restaurar"): ⊥ ∃ mais opção sem paleta ∴ `restore()` saiu. O que sobra é o que faz §V62 funcionar
 V55: pintura parte da RAIZ (`rootOf`+`collect`), ⊥ de `findClass` ∴ alcança as 9 abas (§R21, §B9)
 V56: ornamento ausente (PNG ⊥ ∃ | textura ⊥ pôde ir atrás do conteúdo) → cor & fonte & filete seguem aplicados & a `<image>` fica `visible=false` ∴ ⊥ ficha meio-vitoriana & ⊥ textura por cima do conteúdo
 V57: `applyTheme` ⊥ escreve `left` `top` `width` `height` de NADA ∴ §V37 §V40 §V49 seguem medindo o XML estático & tema ⊥ cria sobreposição em runtime
 V58: ∀ PNG citado por paleta de §I5 ! ∃ em `HuntersHunted/images/`. §V3 lê `src=` do XML & a paleta aponta em RUNTIME ∴ escapava do check
 V59: `name=` de controle é GLOBAL entre os `.lfm` da ficha ∴ ∀ `name` único nos 10 arquivos (⊥ conta `<template name=>` — já checado à parte — nem `<event name=>` nem nome c/ `$(`, que expande por chamada). 2 arquivos c/ o mesmo `name` → `rdk` sai 1 SEM mensagem & APAGA o `.rpk` (§B19)
 V60: ∀ caminho de imagem gravado em RUNTIME (`dotOn` `dotOff` `paper` de §I5) = absoluto do plugin `/HuntersHunted/images/…` ∴ ⊥ arte muda. Forma relativa vale só no XML (§B20, §R26). §V58 mede TAMBÉM a forma, ⊥ só a existência do arquivo
-V61: `applyTheme` só grava prop c/ destino MAPEADO & c/ valor autorado ⊥ nil (senão ⊥ teria como desfazer) ∴ ficha aberta em `Modern` sem pintura anterior grava ZERO prop. Gravar ⊥ é no-op — setter de fonte desacopla do tema (§B21, §R27)
-V62: restaurar = só as props REGISTRADAS no ledger daquele handle, c/ o valor AUTORADO ∴ `Modern` ⊥ grava valor que o XML nunca autorou & Claro→Escuro mapeia da cor ORIGINAL, ⊥ da que o tema anterior deixou
+V61: `applyTheme` só grava prop c/ destino MAPEADO & c/ valor autorado ⊥ nil (prop que o XML nunca setou ⊥ é pintada — ⊥ teria como voltar). Gravar ⊥ é no-op: setter de fonte desacopla do tema mesmo gravando o valor lido (§B21, §R27). RETIRADA na 16ª rodada a cláusula "`Modern` grava ZERO prop" — ⊥ ∃ mais opção sem paleta
+V62: ∀ repintura mapeia do valor AUTORADO (ledger antes do controle), ⊥ do que a época anterior deixou ∴ Vitoriano→Clássico lê a cor ORIGINAL & ⊥ acumula. `restore()` saiu na 16ª rodada; o ledger FICA — é o que garante isto
+V63: ∀ paleta de §I5 declara as 8 chaves (`form` `fill` `stroke` `font` `fontFamily` `dotOn` `dotOff` `paper`) ∴ época nova incompleta = gate vermelho, ⊥ ficha meio pintada. 16ª rodada: eram 10 — `corner` saiu (§V66) & `strokeSize` virou constante (§V67)
+V64: ∀ PNG em `HuntersHunted/images/` ! referenciado pelo XML (§V3) | por paleta (§I5) ∴ tema removido leva a arte junto & `images/` ⊥ vira depósito de arte morta
+V65: ∀ `<image>` c/ `src=` autorado no XML (⊥ `themePaper*`) → leaf ∈ {`prime_on.png`, `prime_off.png`} & `applyTheme` remapeia p/ `dotOn`/`dotOff` da paleta ∴ arte FIXA acompanha a época. §V53 dá essa garantia p/ COR autorada; ARTE autorada ⊥ tinha equivalente (§B22)
+V66: `applyTheme` ⊥ escreve `xradius`/`yradius` de NADA ∴ o detalhe de canto (`cornerType="innerLine"` + raio) é do XML & vale igual em ∀ época; as 3 caixas c/ raio próprio (2 & 5) ⊥ são achatadas p/ um raio único. Era `corner = 0` em 3 paletas que MATAVA o detalhe (§C 16ª rodada)
+V67: `strokeSize` declarado 1× (`THEME_STROKE`), ⊥ por paleta ∴ "∀ outline igual" é estrutural & ⊥ 4 cópias p/ divergir (≡ §V41 p/ `HEALTH_MARKS`). Valor = o mais largo entre as paletas na hora da mudança (3)
+V68: ∀ caixa de SEÇÃO (`<rectangle color="black">`, §V48) compartilha `cornerType` & `xradius` & `yradius` c/ as irmãs ∴ caixa nova c/ canto copiado de arquivo velho = gate vermelho, ⊥ um canto fora de sintonia no meio dos 52. EXCEÇÕES declaradas: moldura do avatar (`DimGray`, raio 5) & caixa de marca (`#00000000`, raio 2). ≡ deriva do §B18, outra propriedade
+V69: fim da coluna do meio da Main (`HUMANITY & WILLPOWER`, `top`+`height`) = fim de `BACKGROUNDS` (810) ∴ crescer `VIRTUES` ⊥ desalinha a fileira de baixo. EXCEÇÃO declarada: HEALTH n=10 fecha em 816 (canto aceito na 11ª rodada). §V40 mede SOBREPOSIÇÃO, ⊥ alinhamento ∴ caixa apertada de menos passava verde
+V70: ∀ string de `THEME_LABELS` → ∃ `wod.<txt>` em [pt] & [en] & ∈ mapa `PT` de `HH.6` & largura ≤ label do template `Ability` (125px, ~6.5px/char ∴ ≤19 chars) ∴ rótulo que só existe no Lua ⊥ escapa dos checks que leem o XML (≡ ponto cego de §B11 §B17)
+V71: ∀ época, o par rótulo↔bolinha = o MESMO campo nas 2 abas: `THEME_COMBAT[t].ranged` = campo cujo rótulo NA ÉPOCA ∈ {`Firearms`, `Archery`} & `.close` = campo cujo rótulo na época = `Melee` ∴ ⊥ ∃ época em que a Combat mostra o nome de uma perícia sobre as bolinhas de outra
+V72: renderer de rótulo roda no load & no `dataLink sheetTheme` & no `dataLink language` ∴ ⊥ ficha aberta c/ rótulo da época errada & ⊥ rótulo que volta ao EN na troca de idioma (§V19, ≡ `renderHealthTrack`)
+V73: ∀ época, rótulos DISTINTOS dentro da mesma coluna (talents · skills · knowledges) ∴ mapa c/ entrada faltando ⊥ produz 2 linhas de mesmo nome — permutação é exatamente onde 1 entrada some calada
 
 ## §T TASKS
 
@@ -477,6 +548,46 @@ T166|x|`HH.6.lfm` — LEDGER: `paint(c,prop,valor,autorado)` grava só c/ destin
 T167|x|`HH.6.lfm` — `fontFamily` só onde o autorado é string ⊥ vazia; backdrop fora do ledger (re-esconde só se visível) ∴ Modern segue gravando 0|V61,R27
 T168|x|`verify-hunters-hunted.ps1` — checks NOVOS §V60 (forma do caminho) §V61 (⊥ gravação direta fora de `paint`, exceto o backdrop; `paint` recusa nil) §V62 (`restore` lê o ledger & `Modern` chama). §V58 resolve o prefixo antes de procurar em disco|V58,V60,V61,V62,V20
 T169|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T170|x|`HH.6.lfm` — `cboSheetTheme` `items`=`values` 3→5: `Modern` `Present Day` `Victorian Era` `Dark Ages` `Classical Era`. MESMO commit que T171 (§V12)|I3,V12,V52
+T171|x|`HH.6.lfm` `THEMES` — apagar paleta `Victorian Era (Light)`; `(Dark)` → `Victorian Era` (paleta intacta, só a chave); +3 paletas `Present Day` `Dark Ages` `Classical Era` c/ os valores de §C. Caminhos absolutos (§V60) & 10 chaves cada (§V63)|I5,V53,V60,V63
+T172|x|`images/` — +7 PNG (`prime_on_crimson` `prime_off_slate` `prime_on_blood` `prime_off_iron` `paper_present` `paper_dark_ages` `paper_classical`), −3 (`prime_on_ink` `prime_off_ink` `paper_light`), renomear `paper_dark.png`→`paper_victorian.png`. Bolinha 100×100 ≡ geometria das ∃|I2,V3,V58,V64
+T173|x|`localization.lang` [pt]+[en] & mapa `PT` de `HH.6` — +`Present Day`=Atual · `Dark Ages`=Idade das Trevas · `Classical Era`=Era Clássica · `Victorian Era`=Era Vitoriana (volta); −`Victorian Era (Light)` −`Victorian Era (Dark)`|V10,V17,V22,V24,V28
+T174|x|`verify-hunters-hunted.ps1` — §V52 3→5 valores; §V53 conta 1 mapa POR paleta declarada (⊥ número fixo) ∴ 5ª época futura ⊥ escapa; checks NOVOS §V63 (10 chaves por paleta) §V64 (⊥ PNG órfão em `images/`)|V52,V53,V63,V64,V20
+T175|x|`module.xml` version `1.1` → `1.2`|-
+T176|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T177|x|`HH.6.lfm` — `normPath` (leaf, minúsculas) + ramo `image` do `applyTheme`: leaf `prime_on.png`→`t.dotOn` & `prime_off.png`→`t.dotOff`, via `paint` ∴ entra no ledger & `Modern` restaura|I6,V61,V62,V65,R26
+T178|x|`verify-hunters-hunted.ps1` — check NOVO §V65: ∀ `//image[@src]` (⊥ `themePaper*`) tem leaf remapeável & `applyTheme` contém o remapeamento|V65,V20
+T179|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T180|x|`HH.6.lfm` — `cboSheetTheme` `items`=`values` 5→4 (`Modern` `Victorian Era` `Dark Ages` `Classical Era`) & paleta `Present Day` renomeada p/ `Modern`. MESMO commit (§V12)|I3,V12,V52
+T181|x|`HH.6.lfm` — `restore()` & o ramo `t == nil` SAEM (código morto); `local t = THEMES[v] or THEMES["Modern"]` ∴ nunca nil. Ledger FICA (§V62)|I6,V52,V54,V61,V62
+T182|x|`HH.6.lfm` — `corner` sai das 4 paletas & `applyTheme` ⊥ escreve `xradius`/`yradius` ∴ detalhe de canto do XML vale em ∀ época|I5,V63,V66
+T183|x|`HH.6.lfm` — `strokeSize` sai das paletas → constante `THEME_STROKE = 3` (o mais largo dos 4)|I5,V63,V67
+T184|x|`localization.lang` [pt]+[en] & mapa `PT` — `Present Day`/`Atual` SAI. `Modern`=`Moderno` já ∃ ∴ ⊥ chave nova|V10,V17,V22,V24,V28
+T185|x|`verify-hunters-hunted.ps1` — §V52 5→4 & fallback = paleta default; §V63 10→8 chaves; §V54/§V61/§V62 conforme texto novo (⊥ mais `restore`); checks NOVOS §V66 (⊥ escreve raio) §V67 (`THEME_STROKE` 1×, ⊥ `strokeSize` em paleta)|V52,V54,V61,V62,V63,V66,V67,V20
+T186|x|`module.xml` version `1.2` → `1.3`|-
+T187|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T188|x|9 `.lfm` — `cornerType="innerLine"`→`innerRound` (54×) & `xradius`/`yradius` `10`→`14` (53 caixas de seção). Avatar mantém raio 5; marca de vitalidade INTACTA|V66,V68
+T189|x|`verify-hunters-hunted.ps1` — check NOVO §V68: caixas de seção compartilham `cornerType` & raio; as 2 exceções ficam de fora|V48,V68,V20
+T190|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T191|x|`HH.1.lfm` caixa `VIRTUES` — título `top` 0→8; linhas 25/50/75 → 33/62/91 (pitch 29); caixa 110→126 alto ∴ 510..636|V27,V40,V68
+T192|x|`HH.1.lfm` caixa `HUMANITY & WILLPOWER` — top 630→646 & height 180→164 ∴ fecha em 810 ≡ `BACKGROUNDS`. Internos INTACTOS|V40,V69
+T193|x|`verify-hunters-hunted.ps1` — check NOVO §V69: fim da caixa `HUMANITY`/`WILLPOWER` = fim de `BACKGROUNDS`; HEALTH fora (exceção n=10). Mutação: mexer 1px no height ! ficar vermelho|V69,V20
+T194|x|`HH.6.lfm` paleta `Dark Ages` — `stroke` 3 entradas `#8A7A5C`→`#C0C6CC` & `fill["black"]` `#1A1512`→`#0E0B09`. `DimGray` `#00000000` `font` `dot*` `paper` ⊥ mudam|I5,V53,V63
+T195|x|`module.xml` version `1.3` → `1.4`|-
+T196|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T197|x|`images/` — `prime_on_silver.png` (cheia) + `prime_off_silver.png` (anel) em `#C0C6CC`, 100×100 ≡ par base; `prime_on_blood.png` & `prime_off_iron.png` SAEM|I2,V3,V58,V64
+T198|x|`HH.6.lfm` paleta `Dark Ages` — `dotOn`/`dotOff` p/ os PNG prata, caminho absoluto do plugin|I5,V58,V60,V63
+T199|x|`HH.6.lfm` — `cboSheetTheme` items=values `Modern`→`Modern Nights` & `Classical Era`→`Classical Age`; chaves de `THEMES` & `dataLink defaultValue` & fallback no MESMO commit|I3,V12,V52
+T200|x|`localization.lang` [pt]+[en] & mapa `PT` — +`Modern Nights`=`Noites Modernas` · `Classical Age`=`Idade Clássica`; −`Modern` −`Classical Era`|V10,V17,V22,V24,V28
+T201|x|`localization.lang` [pt]+[en] & mapa `PT` — 9 rótulos NOVOS: `Legerdemain`=`Prestidigitação` · `Archery`=`Arquearia` · `Commerce`=`Comércio` · `Hearth Wisdom`=`Sabedoria Popular` · `Seneschal`=`Senescal` · `Theology`=`Teologia` · `Philosophy`=`Filosofia` · `Ritual`=`Ritual` · `Religion`=`Religião`. `Computer`=`Computador` & `Drive`=`Condução` já ∃|V9,V10,V17,V28,V70
+T202|x|`HuntersHunted.lfm` (raiz) — `THEME_LABELS` (§I7) c/ as 3 listas de §C & `Victorian Era` vazio|I7,V70,V73
+T203|x|`HH.1.lfm` — label do template `Ability` ganha `name="dynAbil$(field)"`|I7,V59,V72
+T204|x|`HH.6.lfm` — `renderAbilityLabels(from)`: `rootOf`+`collect` da raiz, snapshot 1× do EN autorado por label, escreve `tryTranslate(THEME_LABELS[t][campo] \| autorado)`; chamado no load & pelos 2 `dataLink` (`sheetTheme` & `language`)|I6,I7,V21,V22,V31,V70,V72
+T205|x|`HH.3.lfm` — 2 linhas de perícia viram slots (`ReadOnlyTrait field="ranged"` & `field="close"` ∴ `ro_ranged_*` `ro_close_*`) & label do `ReadOnlyTrait` ganha `name="dynRo$(field)"` ∴ as 11 linhas da aba entram no renderer|I3,V51,V59,V71
+T206|x|`HuntersHunted.lfm` + `HH.3.lfm` — `THEME_COMBAT` (§I7) & `renderCombatTraits` pinta os 2 slots do campo DA ÉPOCA; rótulo dos slots sai do renderer de T204|I7,V51,V71,V72
+T207|x|`verify-hunters-hunted.ps1` — checks NOVOS §V70 (tradução & largura das strings de tema) §V71 (par rótulo↔campo nas 2 abas) §V72 (renderer nos 3 gatilhos) §V73 (rótulo único por coluna por época); §V52 c/ `Modern Nights` & `Classical Age`. Mutação antes de aceitar|V52,V70,V71,V72,V73,V20
+T208|x|`module.xml` version `1.4` → `1.5`|-
+T209|x|`rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
 
 ## §B BUGS
 
@@ -502,3 +613,4 @@ B18|2026-08-17|caixa `ABILITIES` (`HH.1`) ficou c/ `color="#FFFFFF00"` copiado d
 B19|2026-08-17|backdrop do tema declarado c/ o MESMO `name="themePaper"` nas 8 abas → `rdk -l` exit 1 SEM mensagem & `.rpk` APAGADO. Bisect: ∀ atributo isolado compila; 2 arquivos c/ `name` igual ⊥ compila. Gate cobria `<template name=>` mas ⊥ `name=` de controle ∴ mesma morte muda, outra família (≡ §B4/§B17)|V59
 B20|2026-08-17|paleta apontava `images/prime_on_ink.png` (relativo). rdk resolve relativo @ COMPILE (`/HuntersHunted/images/…`) ∴ gravar em runtime ⊥ resolve & bolinhas + papel dos 2 temas vitorianos ⊥ carregam. §V58 checava o arquivo EM DISCO, ⊥ a FORMA do caminho ∴ gate verde|V60
 B21|2026-08-17|snapshot-e-restaura gravava `fontColor`+`fontFamily` em ∀ controle de texto no load, `Modern` incluído. Setter de fonte chama `_gui_prepareForFont*Change` ANTES ∴ 1ª gravação desacopla o controle da fonte do tema & fixa o valor CRU do getter — a ficha inteira renderizou errada nas 3 opções, inclusive a que ⊥ mudou no XML. "Gravar o mesmo valor = no-op" era premissa MINHA, ⊥ do SDK|V61,V62
+B22|2026-08-17|dot1 fixo de atributo & virtude = `<image src=>`, ⊥ `imageCheckBox` ∴ ⊥ passava pelo ramo de troca de arte & ficava BRANCO ao lado das bolinhas douradas/carmim/sangue em ∀ tema. Ramo `image` do `applyTheme` só olhava `themePaper*` — corte declarado por mim na 14ª rodada. §V53 cobria COR autorada; ⊥ ∃ equivalente p/ ARTE autorada|V65
