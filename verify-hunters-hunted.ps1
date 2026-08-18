@@ -1808,6 +1808,75 @@ if ($ledFn -notmatch '#rows == 0') { Fail "V98 an empty ledger writes four blank
 elseif ($ledFn -notmatch '#rows == 0[^\r\n]*translateSheetText') { Fail "V98 the empty-log text is not translated (SPEC V70)" }
 else { Pass "V98 an empty log says nothing was bought yet" }
 
+# ---- V99: every rating dot goes through the guard ---------------------------------
+# One dot wired straight to its field is one trait that can be raised with an empty pocket,
+# and nothing would show it: the log would price the point and the balance would go negative.
+# Every imageCheckBox on this sheet IS a rating dot - the willpower boxes are checkBoxes and
+# the Combat mirror is images - so the rule is simply all of them.
+$dots = @()
+$dotsUnguarded = @()
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//imageCheckBox")) {
+        if (-not $n.GetAttribute("field")) { continue }   # display-only mirror (V51): owns nothing, buys nothing
+        $dots += $n
+        if ($n.GetAttribute("onChange") -notmatch 'xpGuard\(') { $dotsUnguarded += "$($f.Name) $($n.GetAttribute('field'))" }
+    }
+}
+if ($dotsUnguarded) { foreach ($d in $dotsUnguarded) { Fail "V99 dot '$d' does not call xpGuard - that trait could be raised with no experience left" } }
+else { Pass "V99 all $($dots.Count) rating dots call the guard" }
+
+# The guard only knows the traits XP_TRAIT declares, and it is built from the ledger's own
+# lists so the two cannot disagree (SPEC V86). A dropped category would leave those dots
+# silently unguarded - the call is there, the table just says nothing about them.
+$traitTbl = [regex]::Match($root, 'XP_TRAIT = \{\};(.*?)local function numinaTypeInUse', 'Singleline')
+$catMiss = @()
+if (-not $traitTbl.Success) { Fail "V99 XP_TRAIT is not declared on the root form" }
+else {
+    foreach ($cat in @('XP_ATTRS', '"appearance"', 'ABILITY_FIELD', 'XP_CUSTOM', 'XP_VIRTUES', '"humanity"', '"willpower"', '"background_"', 'XP_NUMINA', '"faith"')) {
+        if ($traitTbl.Groups[1].Value -notmatch [regex]::Escape($cat)) { $catMiss += $cat }
+    }
+    if ($catMiss) { foreach ($c in $catMiss) { Fail "V99 XP_TRAIT never declares $c - dots of that kind would pass the guard untouched" } }
+    else { Pass "V99 XP_TRAIT covers all ten trait kinds the ledger prices" }
+}
+
+# ---- V100: experience is worked out, never booked ---------------------------------
+# The balance is xpTotal minus the log. A deducted balance would be a second count of the
+# same purchases, and the two would part company the first time a click was missed.
+$guardFn = LuaFn $root 'xpGuard'
+$boxesFn = LuaFn $root 'renderXPBoxes'
+$writes = @([regex]::Matches($root, 'sheet\.xpTotal\s*=(?!=)')).Count
+if (-not $guardFn) { Fail "V100 xpGuard not found on the root form" }
+elseif (-not $boxesFn) { Fail "V100 renderXPBoxes not found on the root form" }
+elseif ($guardFn -match 'sheet\.xpTotal\s*=') { Fail "V100 the guard writes experience - a purchase would be counted twice (SPEC V83)" }
+elseif ($writes -ne 2) { Fail "V100 xpTotal is written in $writes places - it may only be seeded once and set by the player (SPEC I11)" }
+elseif ($boxesFn -notmatch 'xpSpent\(\)') { Fail "V100 the boxes do not read the log - Spent would be a stored number" }
+else { Pass "V100 experience is derived: one number saved, two worked out" }
+
+# ---- V101: the guard sleeps until the character is frozen -------------------------
+# Building a character spends nothing, so a balance of zero must not stop the first dot.
+if ($guardFn -notmatch 'baselineOf\(\)') { Fail "V101 the guard does not look for a baseline - a character could not be built at all" }
+elseif ($guardFn -notmatch 'if base == nil then return') { Fail "V101 the guard does not stand down without a baseline (SPEC I8c)" }
+else { Pass "V101 the guard sleeps until the storyteller freezes the character" }
+
+# ---- V103: only a point that is IN the log can be sold back -----------------------
+if ($guardFn -notmatch 'traitLevel\(base,') { Fail "V103 the guard never reads the baseline rating - it would let a frozen point be sold" }
+elseif ($guardFn -notmatch 'sheet\[field\] = not on') { Fail "V103 the guard has no way to put a refused dot back" }
+else { Pass "V103 a point the storyteller froze cannot be sold back" }
+
+# ---- V102: the three experience boxes own no field --------------------------------
+# The orphan check above already refuses `experience` and `spentXP` anywhere; this is the
+# other half - the boxes that replaced them must not have quietly taken a field of their own.
+$xpBoxes = @('edtTotalXP', 'edtSpentXP', 'edtCurrentXP', 'edtCurrentXPMain')
+$xpOwning = @()
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//edit")) {
+        if ($xpBoxes -contains $n.GetAttribute("name") -and $n.GetAttribute("field")) { $xpOwning += $n.GetAttribute("name") }
+    }
+}
+if ($xpOwning) { foreach ($b in $xpOwning) { Fail "V102 '$b' owns a field - a derived number would be stored beside the log that produces it" } }
+elseif ($boxesFn -notmatch 'sheet\.experience') { Fail "V102 nothing seeds xpTotal from the old balance - every sheet would come back to zero (SPEC I11)" }
+else { Pass "V102 the four experience boxes own no field, and the old balance seeds the total" }
+
 # ---- V91: xpLog is gone, and stays gone ------------------------------------------
 # The free-text box the ledger replaced. Reusing the name would bring a player's old notes
 # back up inside a column that means something else now (SPEC I3, orphans).
