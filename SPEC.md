@@ -810,8 +810,8 @@ T263|x|`module.xml` version `2.5` → `2.6` + `rdk -l` (exit 0 & `.rpk` mudou) +
 T264|.|teste no Firecast: mestre → jogador → mestre, sair da ficha & voltar → aba `Storyteller` REAPARECE. Se ⊥ reaparecer, a causa ⊥ é o gatilho & sim §R29 (`meuJogador` ⊥ populado) ∴ backprop de novo|R29,V96
 T265|x|`HH.9.lfm` — `<event name="onShow">` → `renderTotalXP(self)` + `renderXPLedger(self)` ∴ voltar p/ a aba redesenha|V97,R34,R35
 T266|x|`HH.9.lfm` — `#rows == 0` escreve estado "Nothing bought yet" na 1ª coluna (≡ §V33) + chave [pt] & [en]|V98,V33,V10
-T267|~|`verify-hunters-hunted.ps1` — checks NOVOS §V97 §V98. Mutação antes de aceitar|V20,V97,V98
-T268|.|`module.xml` version `2.6` → `2.7` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T267|x|`verify-hunters-hunted.ps1` — checks NOVOS §V97 §V98. Mutação antes de aceitar|V20,V97,V98
+T268|~|`module.xml` version `2.6` → `2.7` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 T269|.|teste no Firecast (RESOLVE §R35 & §T252): baseline salvo → +1 em `dexterity` → ir p/ Progress → linha `Attribute\|Dexterity\|3\|8`; desmarcar REMOVE a linha. Se ⊥ aparecer ao trocar de aba, `onShow` ⊥ dispara em form de aba & o gatilho vira (a) \| (b) de §R35|R35,V97,V83
 T270|.|`HuntersHunted.lfm` — `XP_TRAIT[base] = {kind, first, fixed}` p/ ∀ traço de §I9, montado das MESMAS listas que `xpLedgerRows` usa (⊥ 2ª lista, §V86) + `xpSpent()` = Σ `cost` do log|I12,V86
 T271|.|`HuntersHunted.lfm` — `xpGuard(field)` conforme §I12 (dorme sem baseline · barra compra sem saldo · barra venda de ponto do baseline · desfaz escrevendo o campo de volta)|I12,V99,V101,V103

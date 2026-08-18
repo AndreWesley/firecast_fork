@@ -1791,6 +1791,23 @@ elseif ($rowsFn -notmatch 'local rows = \{\};') { Fail "V83 xpLedgerRows does no
 elseif ($rowsFn -notmatch 'if base == nil then return nil; end;') { Fail "V83 xpLedgerRows does not report a missing baseline" }
 else { Pass "V83 xpLedgerRows starts empty and reports a missing baseline" }
 
+# ---- V97: the report is rebuilt every time the tab is shown -----------------------
+# What feeds the log is ~460 dots on other tabs. The only thing watching them was an SDK
+# observer with no precedent in any sheet in this repo; while it silently did nothing, the
+# report stayed frozen at whatever it showed when the sheet loaded (SPEC B28).
+$progShow = [regex]::Match($progTxt, '<event name="onShow">(.*?)</event>', 'Singleline')
+if (-not $progShow.Success) { Fail "V97 HH.9 has no onShow - the report would be built once and then frozen (SPEC B28)" }
+elseif ($progShow.Groups[1].Value -notmatch 'renderXPLedger\(') { Fail "V97 HH.9's onShow does not rebuild the ledger" }
+elseif ($progShow.Groups[1].Value -notmatch 'renderTotalXP\(') { Fail "V97 HH.9's onShow does not rebuild the three numbers" }
+else { Pass "V97 the Progress report is rebuilt on every show" }
+
+# ---- V98: an empty log says WHY it is empty ---------------------------------------
+# A saved character with nothing bought on top of it wrote four blank columns, which reads
+# like a tab that failed - the same call V33 makes for the no-baseline case.
+if ($ledFn -notmatch '#rows == 0') { Fail "V98 an empty ledger writes four blank columns - indistinguishable from a broken tab" }
+elseif ($ledFn -notmatch '#rows == 0[^\r\n]*translateSheetText') { Fail "V98 the empty-log text is not translated (SPEC V70)" }
+else { Pass "V98 an empty log says nothing was bought yet" }
+
 # ---- V91: xpLog is gone, and stays gone ------------------------------------------
 # The free-text box the ledger replaced. Reusing the name would bring a player's old notes
 # back up inside a column that means something else now (SPEC I3, orphans).
