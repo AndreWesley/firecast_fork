@@ -1725,10 +1725,10 @@ else {
 
     # No field of the ledger's own may be edited from here, and the flags must be real fields.
     $stFields = @((Doc $stDoc).SelectNodes("//*[@field]") | ForEach-Object { $_.GetAttribute("field") })
-    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines', 'stShowMagika')
+    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines', 'stShowMagika', 'stFreeDots')
     $missFlags = @($wantFlags | Where-Object { $stFields -notcontains $_ })
     if ($missFlags) { foreach ($f in $missFlags) { Fail "V89 HH.10 has no widget for $f" } }
-    else { Pass "V89 all four storyteller flags are owned by HH.10" }
+    else { Pass "V89 all $($wantFlags.Count) storyteller flags are owned by HH.10" }
 }
 
 # ---- V94: a switched tab is AUTHORED in the state its flag defaults to ------------
@@ -1944,6 +1944,25 @@ else {
     if ($costBad) { foreach ($b in $costBad) { Fail "V86 $b" } }
     else { Pass "V86 every active cost rule written once, every dormant one left out" }
 }
+
+# ---- V105: free-buy is a LENS over the prices, not a mark on the points -----------
+# While the storyteller has it on, every price is zero and the whole Cost column reads FREE.
+# Nothing records that a point was free, so switching it back off prices everything bought
+# since the baseline all over again - that is the declared cost of keeping the log derived
+# (SPEC C, V100). What must hold is that the flag reaches all three places.
+if ($costFn -notmatch 'if ctx\.free then return 0') { Fail "V105 free-buy does not zero the price - points would still be charged (SPEC I9)" }
+elseif ($rowsFn -notmatch 'free = sheet\.stFreeDots == true') { Fail "V105 the ledger never reads the free-buy flag" }
+elseif ($progTxt -notmatch 'translateSheetText\("FREE"') { Fail "V105 the Cost column never says FREE - a free point would read as a plain 0" }
+elseif ($progTxt -notmatch 'dataLink fields="[^"]*stFreeDots') { Fail "V105 the ledger does not follow stFreeDots - flipping the switch would leave stale prices on screen" }
+else { Pass "V105 free-buy zeroes the prices, says FREE, and the log follows the switch" }
+
+# ---- V106: free-buy is OFF until the storyteller ticks it -------------------------
+# The one flag on this sheet that hands out something for nothing, so nil must read as off -
+# the same call V80 makes for the storyteller gate. `~= false` is how stShowNumina defaults ON
+# and is exactly what must NOT appear here.
+if (($root + $progTxt) -match 'stFreeDots\s*~=\s*false') { Fail "V106 free-buy defaults to ON - a sheet that never saw the flag would buy for nothing" }
+elseif ($rowsFn -notmatch 'stFreeDots == true') { Fail "V106 the free-buy flag is not read as an explicit true" }
+else { Pass "V106 free-buy is off until the storyteller ticks it" }
 
 # ---- V87: 21 buys the first point of a KIND, not of a numina ---------------------
 # A character with static magic paying for their first psychic phenomenon pays 21 once; the

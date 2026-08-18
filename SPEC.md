@@ -845,8 +845,8 @@ T283|x|`HH.10.lfm` — 5º `checkBox` `Allow Buy Dots For Free` (`stFreeDots`) @
 T284|x|`HuntersHunted.lfm` — `ctx.free = sheet.stFreeDots == true` em `xpLedgerRows`; `xpCost` devolve 0 na 1ª linha quando `ctx.free` ∴ 1 lugar só (§V86 intacto)|I9,V105
 T285|x|`HH.9.lfm` — coluna `Cost` escreve `FREE` traduzido quando `stFreeDots` ligada + `dataLink` do ledger passa a observar `stFreeDots`|V105,V70,V97
 T286|x|`localization.lang` + mapa `PT` de `HH.6` — `Allow Buy Dots For Free` & `FREE` (pt `Grátis`)|V10,V22,V28
-T287|~|`verify-hunters-hunted.ps1` — `$wantFlags` += `stFreeDots` & checks NOVOS §V105 §V106. Mutação antes de aceitar|V20,V89,V105,V106
-T288|.|`module.xml` version `2.9` → `3.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Se T278…T287 forem buildados de uma vez, ESTE bump é o único ∴ T281 vira no-op declarado|V6,V7
+T287|x|`verify-hunters-hunted.ps1` — `$wantFlags` += `stFreeDots` & checks NOVOS §V105 §V106. Mutação antes de aceitar|V20,V89,V105,V106
+T288|~|`module.xml` version `2.9` → `3.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Se T278…T287 forem buildados de uma vez, ESTE bump é o único ∴ T281 vira no-op declarado|V6,V7
 T289|.|teste no Firecast: ligar `Allow Buy Dots For Free` → comprar 3 pontos → 3 linhas no log c/ `Cost` = `FREE` & `Current` PARADO · desligar → as 3 linhas voltam a mostrar preço & `Current` cai (pode ficar negativo, §C)|I8,V105,V106
 
 ## §B BUGS
