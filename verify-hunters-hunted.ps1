@@ -1903,6 +1903,16 @@ if ($rowsFn -notmatch 'traitLevel\(base, field, 2, 5, 1\)') { Fail "V85 virtues 
 elseif ($rowsFn -notmatch 'if field == "appearance" then first, fixed = 1, 0; end;') { Fail "V85 Appearance is not read as the exception it is (its first dot can be switched off)" }
 else { Pass "V85 fixed first dots and the Appearance exception are read correctly" }
 
+# ---- V104: Appearance starts at one, and only when untouched ----------------------
+# It is the one attribute drawn without a fixed first dot, so a character CAN be at zero -
+# but zero was never the default. nil is nobody having touched the dot; false is the player's
+# decision, and a seed that ignored that would put the dot back on at every load.
+$rootReady2 = [regex]::Match($root, '<event name="onNodeReady">(.*?)</event>', 'Singleline')
+if (-not $rootReady2.Success) { Fail "V104 the root form has no onNodeReady - nothing would seed Appearance" }
+elseif ($rootReady2.Groups[1].Value -notmatch 'sheet\.appearance_1 == nil') { Fail "V104 the Appearance seed is not guarded by nil - a dot the player switched off would come back on every load" }
+elseif ($rootReady2.Groups[1].Value -notmatch 'sheet\.appearance_1 = true') { Fail "V104 nothing seeds appearance_1 - a new sheet would read Appearance 0" }
+else { Pass "V104 Appearance is seeded to one, and only when nobody has touched it" }
+
 # ---- V86: the cost table, once, and the dormant rules NOT written -----------------
 # Every active rule from SPEC I9 exactly once. The dormant ones - Discipline, Path, Sphere,
 # Arete - have no field to read while those tabs are empty, so writing them would be code that

@@ -838,10 +838,10 @@ T276|x|`module.xml` version `2.7` → `2.8` + `rdk -l` (exit 0 & `.rpk` mudou) +
 T277|.|teste no Firecast: baseline salvo & `Current` = 10 → subir `dexterity` 3→4 (custa 12) BARRA & o dot volta · `Current` = 20 → mesma compra passa & `Current` cai p/ 8 · desmarcar o dot devolve os 12 · desmarcar dot do baseline ⊥ funciona|I11,I12,V99,V101,V103
 T278|x|`HuntersHunted.lfm` — `onNodeReady` semeia `appearance_1 = true` quando nil (≡ semente de `stShowNumina`, 28ª rodada)|V104,R36
 T279|x|`HuntersHunted.lfm` `xpCost` — `Willpower` devolve `from` (⊥ `from * 2`) & `verify-hunters-hunted.ps1` `$costWant` muda no MESMO commit (o gate trava a fórmula, §V86)|I9,V86,B29
-T280|~|`verify-hunters-hunted.ps1` — check NOVO §V104 (semente ∃ & só dispara em nil). Mutação antes de aceitar|V20,V104
-T281|.|`module.xml` version `2.8` → `2.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Fecha SÓ T278…T280 — se a 31ª rodada inteira sair em 1 build, PULAR este & fechar em §T288|V6,V7
+T280|x|`verify-hunters-hunted.ps1` — check NOVO §V104 (semente ∃ & só dispara em nil). Mutação antes de aceitar|V20,V104
+T281|~|`module.xml` version `2.8` → `2.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Fecha SÓ T278…T280 — se a 31ª rodada inteira sair em 1 build, PULAR este & fechar em §T288|V6,V7
 T282|.|teste no Firecast (RESOLVE §R36): ficha NOVA nasce Aparência 1 · desmarcar o 1º dot, fechar & reabrir a ficha → segue 0 (se voltar a 1, §R36 = APAGA & a semente cai, junto c/ a de `stShowNumina`) · FdV 4→5 cobra 4 no log|R36,V104,I9
-T283|.|`HH.10.lfm` — 5º `checkBox` `Allow Buy Dots For Free` (`stFreeDots`) @ `top=210` & caixa `520×240` → `520×270`|I8,V38,V40,V106
+T283|~|`HH.10.lfm` — 5º `checkBox` `Allow Buy Dots For Free` (`stFreeDots`) @ `top=210` & caixa `520×240` → `520×270`|I8,V38,V40,V106
 T284|.|`HuntersHunted.lfm` — `ctx.free = sheet.stFreeDots == true` em `xpLedgerRows`; `xpCost` devolve 0 na 1ª linha quando `ctx.free` ∴ 1 lugar só (§V86 intacto)|I9,V105
 T285|.|`HH.9.lfm` — coluna `Cost` escreve `FREE` traduzido quando `stFreeDots` ligada + `dataLink` do ledger passa a observar `stFreeDots`|V105,V70,V97
 T286|.|`localization.lang` + mapa `PT` de `HH.6` — `Allow Buy Dots For Free` & `FREE` (pt `Grátis`)|V10,V22,V28
