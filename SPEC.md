@@ -318,6 +318,12 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - ponto do personagem INICIAL ⊥ pode ser vendido (§V103): o dot volta sozinho. Só ponto comprado (∈ log) sai & devolve
 - 2 clientes editando a MESMA ficha ao mesmo tempo ⊥ tratado — mas ⊥ ∃ cache p/ divergir: tudo deriva do NDB a ∀ render ∴ o pior caso é 1 render velho, ⊥ 1 número errado gravado
 
+- 31ª rodada (2026-08-18) — 2 correções de REGRA pedidas pelo user. ↓ ∀ decisão desta rodada
+- Aparência nasce 1: `appearance_1` nil (nunca tocado) → semeado `true` no load ∴ ficha nova ≡ os outros 8 atributos. O dot segue desligável — Aparência 0 ∃, só ⊥ é mais o default (§V104)
+- custo de Força de Vontade = `n` (nível ATUAL), ⊥ `n×2` (§B29). O log é DERIVADO ∴ ⊥ ∃ migração: linhas velhas passam a mostrar o preço certo sozinhas
+- consequência declarada da semente: ficha JÁ congelada c/ `appearance_1` nil ganha o ponto ∴ nasce 1 linha `Attribute\|Appearance\|1\|0` no log — custo 0 (§I9, `n×4` c/ n=0) ∴ barulho cosmético, ⊥ cobra nada
+- `?` a semente inteira depende de o NDB GRAVAR `false` ao desmarcar (⊥ apagar o atributo) — §R36. Mesma dúvida derruba a semente de `stShowNumina` (§V89) ∴ 1 teste resolve as 2
+
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
@@ -363,7 +369,7 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - I8b `applyTabVisibility(from)` @ form RAIZ (≡ `HEALTH_LEVELS`/§V41): `Storyteller`.visible = `isStoryteller()`; `Numina`/`Disciplines`/`Magika`.visible = flag de §I8. REESCRITO na 28ª rodada (§B26): gatilho mora no form RAIZ (`onNodeReady` + `dataLink` dos 3 flags) ⊥ em `HH.10` ∴ ⊥ depende do ciclo de vida de aba nenhuma; esconde ABA **&** CONTEÚDO da aba (§V92); depois de recalcular, aba ativa proibida → volta p/ `Main` (§V93)
   - I8c `Save` → `Dialogs.confirmOkCancel` (aviso de ação SEM VOLTA, §R30) → OK → `sheet.baseline = ndb.exportXML(sheet)` (§R32). `baseline` ⊥ vazio ⟺ personagem inicial salvo ∴ ⊥ precisa de 2º campo de estado
 - I9 tabela de custo de XP (custo p/ ir do nível `n` → `n+1`; `n` = nível ATUAL, §V85). ∀ custo em pontos de Experiência
-  - Atributo `n×4` · Habilidade `n×2` (`n=0` → 3) · Virtude `n×2` · Humanidade `n×2` · Força de Vontade `n×2` (`n` = bolinhas `willpower_1`…`_10`, ⊥ `willpower_c*`)
+  - Atributo `n×4` · Habilidade `n×2` (`n=0` → 3) · Virtude `n×2` · Humanidade `n×2` · Força de Vontade `n` (SEM ×2 — correção do user 2026-08-18, §B29: FdV 4 → 5 custa 4; `n` = bolinhas `willpower_1`…`_10`, ⊥ `willpower_c*`)
   - Antecedente `n×3` (`n=0` → 3) SÓ c/ `stBackgroundsXP` ligado; flag desligada → linha entra c/ custo `0` (§C)
   - Númina `n×7` (`n=0` → 7); 1º ponto de TIPO ∉ baseline → 21 (§V87). Númina de afinidade (`numina_1`) `n×6`, `n=0` segue 7 (| 21 se tipo novo)
   - tipos de númina (3): `hedge` = `numina_1`…`_10` (Magia Estática) · `psychic` = `psychic_1`…`_10` (Fenômenos Psíquicos) · `faith` = `faith` (Fé Verdadeira)
@@ -428,6 +434,8 @@ R33|`?` troca de aba|`gui.TabControl` expõe SÓ `tabIndex` (get/set) & `gui.Tab
 R34|exibição de form|`gui.Form.eves["onShow"]` existe (par de `onHide`) ∴ dá p/ recalcular a ∀ vez que a ficha aparece, ⊥ só no `onNodeReady` (1×/nó). Precedente: 15 `.lfm` do repo, incl. ficha (`Sheets/Ficha de Reinos d20/FichaReinosD20/DockNPCs.lfm:73`). `jogador` & `mesa` ⊥ expõem evento nenhum em `rrpgWrappers` — só getters ∴ `onShow` é o gancho que ∃|`SDK3/API/rrpgGUI.lua:480` `SDK3/API/rrpgWrappers.lua:370` `:444`
 
 R35|`?` `onShow` em aba|`gui.Form.eves["onShow"]` ∃ (§R34) mas ⊥ ∃ precedente no repo de form IMPORTADO em `<tab>` usando `onShow` — os 15 usos são popup, dock & form raiz ∴ ⊥ confirmado que TROCAR DE ABA dispara o `onShow` do form de dentro. `?` até §T269. Se ⊥ disparar, sobra: (a) `onChange` nos dots dos templates chamando o render por referência global \| (b) campo-contador escrito pelo dot & `dataLink` em `HH.9` (custa 1 nome de campo p/ sempre, §V2)|`SDK3/API/rrpgGUI.lua:480`
+
+R36|`?` desmarcar guarda `false`?|`imageCheckBox`/`checkBox` gravam o `field` sozinhos (`autoChange`), mas ⊥ se sabe se DESMARCAR grava `false` ou APAGA o atributo — `_ndb_setAttribute` é nativo. Se apagar: "default 1" torna Aparência 0 INALCANÇÁVEL (o load semeia de novo a ∀ abertura) & `stShowNumina` desligado volta ligado (§V89) ∴ as 2 sementes caem juntas. §T282 resolve|`SDK3/API/ndb.lua:60` `:310`
 
 ## §V INVARIANTS
 
@@ -537,6 +545,7 @@ V100: XP ⊥ é jornalizado — `Spent` & `Current` DERIVAM de `xpTotal` & do lo
 V101: `xpGuard` DORME enquanto `baseline` vazio ∴ montar personagem ⊥ é barrado por saldo — a regra nasce quando o mestre congela a ficha (§I8c)
 V102: `experience` & `spentXP` ∈ ÓRFÃOS de §I3 depois da migração — lidos 1× p/ semear `xpTotal`, ⊥ reusados por widget nenhum (≡ §V91)
 V103: desfazer ponto só vale p/ ponto QUE ESTÁ NO LOG ∴ nível ⊥ desce abaixo do `baseline`; devolução = a própria subtração (§V100), ⊥ ∃ crédito escrito
+V104: `appearance_1` == nil (nunca tocado) → load semeia `true` ∴ ficha nova nasce c/ Aparência 1 ≡ os outros 8 atributos. `false` EXPLÍCITO ⊥ é tocado por semente nenhuma ∴ Aparência 0 ∃ & sobrevive ao load — vale enquanto §R36 disser que desmarcar grava `false`
 
 ## §T TASKS
 
@@ -821,6 +830,11 @@ T274|x|`HH.9.lfm` & `HH.1.lfm` — 3 caixas de XP perdem `field`; `Current` ganh
 T275|x|`verify-hunters-hunted.ps1` — checks NOVOS §V99 §V100 §V101 §V102 §V103. Mutação antes de aceitar|V20,V99,V100,V101,V102,V103
 T276|x|`module.xml` version `2.7` → `2.8` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 T277|.|teste no Firecast: baseline salvo & `Current` = 10 → subir `dexterity` 3→4 (custa 12) BARRA & o dot volta · `Current` = 20 → mesma compra passa & `Current` cai p/ 8 · desmarcar o dot devolve os 12 · desmarcar dot do baseline ⊥ funciona|I11,I12,V99,V101,V103
+T278|.|`HuntersHunted.lfm` — `onNodeReady` semeia `appearance_1 = true` quando nil (≡ semente de `stShowNumina`, 28ª rodada)|V104,R36
+T279|.|`HuntersHunted.lfm` `xpCost` — `Willpower` devolve `from` (⊥ `from * 2`) & `verify-hunters-hunted.ps1` `$costWant` muda no MESMO commit (o gate trava a fórmula, §V86)|I9,V86,B29
+T280|.|`verify-hunters-hunted.ps1` — check NOVO §V104 (semente ∃ & só dispara em nil). Mutação antes de aceitar|V20,V104
+T281|.|`module.xml` version `2.8` → `2.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T282|.|teste no Firecast (RESOLVE §R36): ficha NOVA nasce Aparência 1 · desmarcar o 1º dot, fechar & reabrir a ficha → segue 0 (se voltar a 1, §R36 = APAGA & a semente cai, junto c/ a de `stShowNumina`) · FdV 4→5 cobra 4 no log|R36,V104,I9
 
 ## §B BUGS
 
@@ -853,3 +867,4 @@ B25|2026-08-18|`baseline` = campo só-Lua (⊥ widget — é o dado escondido do
 B26|2026-08-18|12 abas autoradas VISÍVEIS + gatilho de `applyTabVisibility` morando em `HH.10` (a própria aba escondida) ∴ ficha nova c/ os 3 flags desligados abria com `Disciplines` `Magika` & `Storyteller` à vista p/ o JOGADOR. §V80 fez o gate fail-closed na LÓGICA, mas o estado ESTÁTICO seguia fail-open & §R31 (`visible` tira o botão?) segue `?` ∴ 2 causas possíveis, 1 sintoma|V92,V93,V94,V95
 B27|2026-08-18|`applyTabVisibility` só disparava no `onNodeReady` do form RAIZ & no `dataLink` dos 3 flags ∴ trocar de papel na mesa ⊥ re-avaliava: a decisão tomada como JOGADOR congelava & o mestre voltava p/ a ficha sem a aba `Storyteller`. Até a 27ª rodada a aba nascia `visible="true"` ∴ o estado estático mascarava a falta de re-avaliação; §V94 fechou o default & EXPÔS. Agravante: os 3 checkbox que disparam o `dataLink` moram DENTRO da aba escondida ∴ ⊥ ∃ caminho de volta pelo próprio cliente|V96
 B28|2026-08-18|corretude do log de XP dependia de `ndb.newObserver` p/ os ~458 dots — API do SDK sem precedente em FICHA (só ChatMod) & nunca testada (§T252 ficou `~`). Os únicos gatilhos PROVADOS eram `onNodeReady` (1×/carga) & `dataLink` de 3 campos ∴ log congela no estado do load. Somado: `rows` vazio escrevia 4 colunas EM BRANCO (§V33 só cobria baseline ausente) ∴ baseline recém-salvo + ponto novo = tela vazia que ⊥ diz nada|V97,V98
+B29|2026-08-18|custo de Força de Vontade escrito `n×2` em §I9 desde a 27ª rodada, SEM fonte citada (§I9 ⊥ tem linha de §R p/ nenhum preço) ∴ o ledger cobrava o DOBRO em toda compra de FdV — FdV 4→5 aparecia por 8 em vez de 4. Achado pelo user 2026-08-18. §V86 amarra tabela↔código, ⊥ tabela↔livro ∴ preço errado passava verde nos 2 lados|I9
