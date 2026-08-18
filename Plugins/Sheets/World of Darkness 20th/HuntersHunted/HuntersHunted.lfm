@@ -704,6 +704,47 @@
 				return rows;
 			end;
 
+			-- Every dot that costs experience calls this after it changes (SPEC I12/V99). It
+			-- writes no experience at all: the balance is xpTotal minus the log (SPEC V100),
+			-- so a purchase pays for itself the moment the dot reaches the log and taking the
+			-- dot back off refunds by the same subtraction. All this does is refuse the two
+			-- moves the rules do not allow, by putting the dot back where it was.
+			--
+			-- The undo writes the field again, so this runs a second time. That pass finds a
+			-- legal state and stops - there is no loop and no flag to keep.
+			function xpGuard(field)
+				if sheet == nil then return; end;
+
+				-- Nothing is enforced while the character is being built: the rule starts when
+				-- the storyteller freezes the sheet (SPEC V101).
+				local base = baselineOf();
+
+				if base == nil then return; end;
+
+				local trait = string.match(field, "^(.+)_%d+$");
+				local t     = trait ~= nil and XP_TRAIT[trait] or nil;
+
+				-- Willpower's spent boxes (willpower_c1..c10) and anything else that is not a
+				-- rating land here.
+				if t == nil then return; end;
+
+				local on  = sheet[field] == true;
+				local now = traitLevel(sheet, trait, t.first, t.last, t.fixed);
+				local undo;
+
+				if on then
+					-- The log already counts the point, so this is the balance the player
+					-- would be left holding.
+					undo = ((tonumber(sheet.xpTotal) or 0) - xpSpent()) < 0;
+				else
+					-- SPEC V103: only a point that is IN the log can be sold back. Below the
+					-- baseline is the storyteller's character, not the player's purchase.
+					undo = now < traitLevel(base, trait, t.first, t.last, t.fixed);
+				end;
+
+				if undo then sheet[field] = not on; end;
+			end;
+
 			-- What the character has spent, straight off the log (SPEC I11). Not stored: a
 			-- second copy of this number is the one thing that could disagree with the lines
 			-- the player is reading (SPEC V100).
