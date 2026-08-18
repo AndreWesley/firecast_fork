@@ -25,42 +25,42 @@
 		-->
 		<layout left="0" top="0" width="380" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="380" height="20" text="GEAR (CARRIED)" horzTextAlign="center"/>
+			<label left="0" top="4" width="380" height="20" text="GEAR (CARRIED)" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="350" height="260" field="gear"/>
 		</layout>
 
 		<layout left="400" top="0" width="380" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="380" height="20" text="EQUIPMENT (OWNED)" horzTextAlign="center"/>
+			<label left="0" top="4" width="380" height="20" text="EQUIPMENT (OWNED)" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="350" height="260" field="equipment"/>
 		</layout>
 
 		<layout left="800" top="0" width="380" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="380" height="20" text="TRANSPORTATION" horzTextAlign="center"/>
+			<label left="0" top="4" width="380" height="20" text="TRANSPORTATION" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="350" height="260" field="items"/>
 		</layout>
 
 		<layout left="0" top="320" width="380" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="380" height="20" text="BASE OF OPERATIONS (DEFENSES)" horzTextAlign="center"/>
+			<label left="0" top="4" width="380" height="20" text="BASE OF OPERATIONS (DEFENSES)" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="350" height="260" field="baseDefenses"/>
 		</layout>
 
 		<layout left="400" top="320" width="380" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="380" height="20" text="BASE OF OPERATIONS (ARMAMENTS)" horzTextAlign="center"/>
+			<label left="0" top="4" width="380" height="20" text="BASE OF OPERATIONS (ARMAMENTS)" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="350" height="260" field="baseArmaments"/>
 		</layout>
 
 		<layout left="800" top="320" width="380" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="380" height="20" text="BASE OF OPERATIONS (OTHER)" horzTextAlign="center"/>
+			<label left="0" top="4" width="380" height="20" text="BASE OF OPERATIONS (OTHER)" horzTextAlign="center"/>
 
 			<textEditor left="15" top="25" width="350" height="260" field="baseOther"/>
 		</layout>

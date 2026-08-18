@@ -5,19 +5,19 @@
         <image name="themePaper5" align="client" style="stretch" hitTest="false" visible="false"/>
        <layout left="0" top="0" width="400" height="580">
 			<rectangle left="0" top="0" width="400" height="580" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="0" top="0" width="400" height="20" text="Notes" horzTextAlign="center"/>
+	        <label left="0" top="4" width="400" height="20" text="Notes" horzTextAlign="center"/>
 			<textEditor left="10" top="25" width="380" height="540" field="anotacoes1"/>
         </layout>
 
 		<layout left="410" top="0" width="400" height="580">
 			<rectangle left="0" top="0" width="400" height="580" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="0" top="0" width="400" height="20" text="Notes" horzTextAlign="center"/>
+	        <label left="0" top="4" width="400" height="20" text="Notes" horzTextAlign="center"/>
 			<textEditor left="10" top="25" width="380" height="540" field="anotacoes2"/>
         </layout>
 
 		<layout left="820" top="0" width="400" height="580">
 			<rectangle left="0" top="0" width="400" height="580" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="0" top="0" width="400" height="20" text="Notes" horzTextAlign="center"/>
+	        <label left="0" top="4" width="400" height="20" text="Notes" horzTextAlign="center"/>
 			<textEditor left="10" top="25" width="380" height="540" field="anotacoes3"/>
         </layout>
     </scrollBox>

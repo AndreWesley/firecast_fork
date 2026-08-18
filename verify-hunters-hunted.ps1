@@ -784,6 +784,28 @@ foreach ($f in $files) {
 }
 if ($offCentre) { foreach ($o in $offCentre) { Fail "V27 $o" } } else { Pass "V27 every section title is centred on its box" }
 
+# ---- V77: a section title is not glued to the box border (SPEC 26th round) --------
+# The outline is 3px thick (THEME_STROKE), so a title at top=0 sits on the border itself.
+# 44 titles were shifted to 4 in one sweep; without a check the next box copied from an
+# older file goes straight back to 0, exactly the drift V68 exists for on the corner.
+# The Progress tab is out by request - the user asked for every tab but that one.
+$titleTop = @()
+$titleCount = 0
+foreach ($f in $files) {
+    if ($f.Name -eq 'HH.9.lfm') { continue }
+    foreach ($box in (Doc $f.FullName).SelectNodes("//layout[rectangle[@color='black']]")) {
+        $ttl = $box.SelectSingleNode("label[@horzTextAlign='center']")
+        if ($null -eq $ttl) { continue }
+        $t = 0
+        if (-not [int]::TryParse($ttl.GetAttribute("top"), [ref]$t)) { continue }
+        $titleCount++
+        if ($t -lt 4) { $titleTop += "$($f.Name): '$($ttl.GetAttribute('text'))' sits at top=$t - the title would touch the 3px outline" }
+    }
+}
+if ($titleCount -eq 0) { Fail "V77 no section title found - the check reads nothing (SPEC V20)" }
+elseif ($titleTop) { foreach ($t in $titleTop) { Fail "V77 $t" } }
+else { Pass "V77 all $titleCount section titles clear the box border" }
+
 # ---- V68: and every section box carries the SAME corner ---------------------------
 # The corner detail - cornerType over a radius - lives in the XML rather than in the palettes
 # (SPEC V66), so it is authored 53 times and nothing kept those 53 in step. A box copied from
@@ -1418,70 +1440,101 @@ if ($paperTabs -contains 'HH.6.lfm') { Fail "V56 the Settings tab has a backdrop
 elseif ($paperTabs.Count -ne 8) { Fail "V56 found $($paperTabs.Count) backdrops, expected 8 (every tab but Settings)" }
 else { Pass "V56 all 8 content tabs carry a hidden, click-through backdrop; Settings has none" }
 
-# ---- V70..V73: the era ability lists (SPEC I7, 19th round) -----------------------
-# The theme stopped being paint alone: each era renames rows on the Main tab, and those
-# strings live in Lua, not in the XML. Every width and translation check above reads the
-# .lfm files, so an era label was invisible to all of them - the same blind spot that let
-# B11 (template labels) and B17 (checkBox text) through, one family further out.
+# ---- V70/V74/V75/V76: the era ability lists (SPEC I7, 21st round) ----------------
+# A row on the Main tab is a slot: the era decides which ability sits there and the renderer
+# rebinds the dots to that ability's field. Two bugs came out of getting this wrong - B23 (a
+# name changing field between eras) and B24 (one field carrying several names) - so what is
+# checked here is the shape that makes both impossible: one name, one field, both ways.
+#
+# None of these strings live in the XML, which is why the width and translation checks further
+# up cannot see them - the same blind spot as B11 and B17, one family further out.
 $rootLfm = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HuntersHunted.lfm")))
 
-# THEME_LABELS: era -> field -> label. Read out of the root form at its own indent level so a
-# new era cannot be added without the checks below seeing it.
-$eraLabels = @{}
-$labelsBlock = [regex]::Match($rootLfm, 'THEME_LABELS = \{(.*?)\n\t{3}\};', 'Singleline')
-if (-not $labelsBlock.Success) { Fail "V70 THEME_LABELS not found on the root form - every era check is a no-op (SPEC V20)" }
+# ABILITY_FIELD: name -> field.
+$abilityField = @{}
+$afBlock = [regex]::Match($rootLfm, 'ABILITY_FIELD = \{(.*?)\n\t{3}\};', 'Singleline')
+if (-not $afBlock.Success) { Fail "V74 ABILITY_FIELD not found on the root form - every era check is a no-op (SPEC V20)" }
 else {
-    foreach ($m in [regex]::Matches($labelsBlock.Groups[1].Value, '\["([^"]+)"\]\s*=\s*\{(.*?)\}', 'Singleline')) {
-        $era = $m.Groups[1].Value
-        $map = @{}
-        foreach ($e in [regex]::Matches($m.Groups[2].Value, '(\w+)\s*=\s*"([^"]+)"')) { $map[$e.Groups[1].Value] = $e.Groups[2].Value }
-        $eraLabels[$era] = $map
+    foreach ($m in [regex]::Matches($afBlock.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"(\w+)"')) { $abilityField[$m.Groups[1].Value] = $m.Groups[2].Value }
+}
+
+# ERA_ABILITIES: era -> column -> ten names. A column may point at a shared list declared just
+# above it (BASE_TALENTS), so those are resolved first - the alternative is writing the same ten
+# names four times, which is exactly how lists drift apart.
+$sharedLists = @{}
+foreach ($m in [regex]::Matches($rootLfm, 'local ([A-Z_]+) = \{("[^}]*")\};')) {
+    $names = @()
+    foreach ($s in [regex]::Matches($m.Groups[2].Value, '"([^"]+)"')) { $names += $s.Groups[1].Value }
+    $sharedLists[$m.Groups[1].Value] = $names
+}
+$eraLists = @{}
+$eaBlock = [regex]::Match($rootLfm, 'ERA_ABILITIES = \{(.*?)\n\t{3}\};', 'Singleline')
+if (-not $eaBlock.Success) { Fail "V75 ERA_ABILITIES not found on the root form - the era lists are unchecked (SPEC V20)" }
+else {
+    foreach ($m in [regex]::Matches($eaBlock.Groups[1].Value, '\["([^"]+)"\]\s*=\s*\{(.*?)\n\t{4}\}', 'Singleline')) {
+        $cols = @{}
+        foreach ($c in [regex]::Matches($m.Groups[2].Value, '(\w+)\s*=\s*(\{[^}]*\}|[A-Z_]+)')) {
+            $raw = $c.Groups[2].Value
+            if ($raw -match '^[A-Z_]+$') {
+                if ($sharedLists.ContainsKey($raw)) { $cols[$c.Groups[1].Value] = $sharedLists[$raw] }
+                else { Fail "V75 $($m.Groups[1].Value)/$($c.Groups[1].Value) points at $raw, which is not a list declared on the root form" }
+            } else {
+                $names = @()
+                foreach ($s in [regex]::Matches($raw, '"([^"]+)"')) { $names += $s.Groups[1].Value }
+                $cols[$c.Groups[1].Value] = $names
+            }
+        }
+        $eraLists[$m.Groups[1].Value] = $cols
     }
 }
 
-# THEME_COMBAT: era -> the two Combat rows that follow the era instead of a fixed field.
-$eraCombat = @{}
-$combatBlock = [regex]::Match($rootLfm, 'THEME_COMBAT = \{(.*?)\n\t{3}\};', 'Singleline')
-if (-not $combatBlock.Success) { Fail "V71 THEME_COMBAT not found on the root form - the slot check is a no-op (SPEC V20)" }
-else {
-    foreach ($m in [regex]::Matches($combatBlock.Groups[1].Value, '\["([^"]+)"\]\s*=\s*\{\s*ranged\s*=\s*"(\w+)",\s*close\s*=\s*"(\w+)"')) {
-        $eraCombat[$m.Groups[1].Value] = @{ ranged = $m.Groups[2].Value; close = $m.Groups[3].Value }
-    }
-}
-
-# The English authored in the XML is the fallback for every field an era does not rename, and
-# it is also what the ability columns are read from: field -> authored label, grouped by the
-# column layout it sits in, so V73 can compare row against row inside one column.
-$authoredAbility = @{}
-$abilityColumns = @{}
+# The Main tab authors the Victorian list: a sheet whose renderer never ran shows the base era,
+# coherent rather than half-bound. field= and nome= per row are read here for that comparison.
+$authoredRows = @{}
 $mainDoc = Doc (Join-Path $dir "HH.1.lfm")
-foreach ($col in $mainDoc.SelectNodes("//scrollBox/layout/layout")) {
-    $rows = @($col.SelectNodes(".//Ability"))
-    if ($rows.Count -eq 0) { continue }
-    $ttl = $col.SelectSingleNode("label")
-    $name = if ($ttl) { $ttl.GetAttribute("text") } else { "column" }
-    $fields = @()
-    foreach ($r in $rows) {
-        $fields += $r.GetAttribute("field")
-        $authoredAbility[$r.GetAttribute("field")] = $r.GetAttribute("nome")
-    }
-    $abilityColumns[$name] = $fields
+foreach ($r in $mainDoc.SelectNodes("//Ability")) {
+    $col = $r.GetAttribute("col"); $num = $r.GetAttribute("num")
+    if (-not $col -or -not $num) { Fail "V76 an <Ability> row has no col/num - the renderer addresses rows by slot"; continue }
+    $authoredRows["$col/$num"] = @{ Field = $r.GetAttribute("field"); Name = $r.GetAttribute("nome") }
 }
 
-if ($eraLabels.Count -eq 0) { Fail "V70 no era read out of THEME_LABELS" }
-elseif ($abilityColumns.Count -eq 0) { Fail "V70/V73 no ability column found on HH.1 - the era checks measure nothing (SPEC V20)" }
+if ($abilityField.Count -eq 0 -or $eraLists.Count -eq 0) { Fail "V74/V75 the era tables read empty - the checks below measure nothing (SPEC V20)" }
 else {
-    # V70: an era label is a visible string like any other - it needs both keys, the embedded
-    # map that actually translates at runtime, and a width that fits the 125px template label.
-    $eraBad = @()
-    $eraStrings = New-Object System.Collections.Generic.HashSet[string]
-    foreach ($era in $eraLabels.Keys) {
-        foreach ($f in $eraLabels[$era].Keys) {
-            $txt = $eraLabels[$era][$f]
-            [void]$eraStrings.Add($txt)
-            if (-not $authoredAbility.ContainsKey($f)) { $eraBad += "$era renames '$f', which is not an ability row on HH.1" }
+    # V74: one name, one field - and the other way round too. B24 was the reverse direction
+    # going unchecked: `enigmas` carried Enigmas, Computer and Philosophy, so two dots in one
+    # surfaced as two dots in another the moment the era changed.
+    $fieldOwner = @{}
+    $bijection = @()
+    foreach ($n in $abilityField.Keys) {
+        $f = $abilityField[$n]
+        if ($fieldOwner.ContainsKey($f)) { $bijection += "'$f' is the field of both '$($fieldOwner[$f])' and '$n' - a rating would surface under the other name (SPEC B24)" }
+        else { $fieldOwner[$f] = $n }
+    }
+    if ($bijection) { foreach ($b in ($bijection | Sort-Object -Unique)) { Fail "V74 $b" } }
+    else { Pass "V74 all $($abilityField.Count) ability names own a field of their own" }
+
+    # V75: ten names per column per era, all distinct, all with a field.
+    $listBad = @()
+    foreach ($era in $eraLists.Keys) {
+        foreach ($col in @('talents', 'skills', 'knowledges')) {
+            if (-not $eraLists[$era].ContainsKey($col)) { $listBad += "$era has no $col list"; continue }
+            $names = $eraLists[$era][$col]
+            if ($names.Count -ne 10) { $listBad += "$era/$col has $($names.Count) names, the column has 10 slots" }
+            $seen = @{}
+            foreach ($n in $names) {
+                if (-not $abilityField.ContainsKey($n)) { $listBad += "$era/$col lists '$n', which has no field in ABILITY_FIELD" }
+                if ($seen.ContainsKey($n)) { $listBad += "$era/$col lists '$n' twice" } else { $seen[$n] = $true }
+            }
         }
     }
+    if ($listBad) { foreach ($b in ($listBad | Sort-Object -Unique)) { Fail "V75 $b" } }
+    else { Pass "V75 all $($eraLists.Count) eras fill their 3 columns with 10 named abilities" }
+
+    # V70: an era name is a visible string like any other - both keys, the embedded map that
+    # actually translates at runtime, and a width that fits the 125px template label.
+    $eraBad = @()
+    $eraStrings = New-Object System.Collections.Generic.HashSet[string]
+    foreach ($era in $eraLists.Keys) { foreach ($col in $eraLists[$era].Keys) { foreach ($n in $eraLists[$era][$col]) { [void]$eraStrings.Add($n) } } }
     foreach ($txt in $eraStrings) {
         if (-not $ptK.Contains($txt)) { $eraBad += "'$txt' has no [pt] key" }
         if (-not $enK.Contains($txt)) { $eraBad += "'$txt' has no [en] key" }
@@ -1489,55 +1542,44 @@ else {
         $need = NeededPx $txt
         if ($need -gt 125) { $eraBad += "'$txt' (pt '$($ptVal[$txt])') needs ~${need}px, the Ability label is 125px" }
     }
-    if ($eraBad) { foreach ($b in $eraBad) { Fail "V70 $b" } }
-    else { Pass "V70 all $($eraStrings.Count) era labels translate and fit the row" }
+    if ($eraBad) { foreach ($b in ($eraBad | Sort-Object -Unique)) { Fail "V70 $b" } }
+    else { Pass "V70 all $($eraStrings.Count) ability names translate and fit the row" }
 
-    # V73: a permutation is exactly where one entry goes missing, and the result is two rows
-    # with the same name in one column - unreadable, and nothing else would catch it.
-    $dupes = @()
-    foreach ($era in $eraLabels.Keys) {
-        $map = $eraLabels[$era]
-        foreach ($col in $abilityColumns.Keys) {
-            $seen = @{}
-            foreach ($f in $abilityColumns[$col]) {
-                $shown = if ($map.ContainsKey($f)) { $map[$f] } else { $authoredAbility[$f] }
-                if ($seen.ContainsKey($shown)) { $dupes += "$era shows '$shown' twice in $col ($($seen[$shown]) and $f)" }
-                else { $seen[$shown] = $f }
+    # V76, static half: what the XML authors has to BE an era - the Victorian one - with each
+    # row bound to the field its own name owns. Otherwise a sheet whose renderer never ran shows
+    # a mix no era ever had.
+    $authBad = @()
+    $vic = $eraLists['Victorian Era']
+    if ($null -eq $vic) { $authBad += "Victorian Era has no list, so the authored rows cannot be checked against it" }
+    else {
+        foreach ($col in @('talents', 'skills', 'knowledges')) {
+            for ($i = 1; $i -le 10; $i++) {
+                $row = $authoredRows["$col/$i"]
+                if ($null -eq $row) { $authBad += "$col slot $i is not authored on HH.1"; continue }
+                $want = $vic[$col][$i - 1]
+                if ($row.Name -cne $want) { $authBad += "$col slot $i authors '$($row.Name)', the Victorian list says '$want'" }
+                elseif ($abilityField[$want] -cne $row.Field) { $authBad += "$col slot $i authors field='$($row.Field)' for '$want', which owns '$($abilityField[$want])'" }
             }
         }
     }
-    if ($dupes) { foreach ($d in $dupes) { Fail "V73 $d" } }
-    else { Pass "V73 every era keeps its $($abilityColumns.Count) columns free of repeated labels" }
-
-    # V71: label and dots are one pair. The Combat tab mirrors a SLOT, so the field behind the
-    # ranged row has to be the one THIS era labels Firearms or Archery, and the close row the
-    # one it labels Melee. Get that wrong and the tab shows one ability over another's dots.
-    $slotBad = @()
-    foreach ($era in $eraLabels.Keys) {
-        if (-not $eraCombat.ContainsKey($era)) { $slotBad += "$era has no THEME_COMBAT entry - renderCombatTraits would index nil"; continue }
-        foreach ($pair in @(@('ranged', @('Firearms', 'Archery')), @('close', @('Melee')))) {
-            $f = $eraCombat[$era][$pair[0]]
-            $shown = if ($eraLabels[$era].ContainsKey($f)) { $eraLabels[$era][$f] } else { $authoredAbility[$f] }
-            if ($pair[1] -notcontains $shown) {
-                $slotBad += "$era mirrors '$f' on the $($pair[0]) row, but this era calls it '$shown' - expected $($pair[1] -join ' or ')"
-            }
-        }
-    }
-    foreach ($era in $eraCombat.Keys) { if (-not $eraLabels.ContainsKey($era)) { $slotBad += "THEME_COMBAT declares $era, THEME_LABELS does not" } }
-    if ($slotBad) { foreach ($b in $slotBad) { Fail "V71 $b" } }
-    else { Pass "V71 every era mirrors its own ranged and close skill on the Combat tab" }
+    if ($authBad) { foreach ($b in $authBad) { Fail "V76 $b" } }
+    else { Pass "V76 the authored rows are the Victorian era, each bound to its own field" }
 }
 
-# The two Combat rows must actually BE slots in the XML, and the dots must be painted from the
-# era field rather than from the row name.
+# V76, runtime half: rebinding without reloading would leave the dot showing the previous
+# field's state, which looks exactly like the bug this round was opened for.
+if ($hh6 -notmatch 'c\.field = full;') { Fail "V76 the renderer never rebinds a dot - the slots would keep the authored field" }
+elseif ($hh6 -notmatch 'c\.checked = sheet\[full\] == true;') { Fail "V76 the renderer rebinds without reloading checked - the dot would show the old field's state" }
+else { Pass "V76 the renderer rebinds each dot and reloads it from the NDB" }
+
+# The Combat mirror: one row follows the era, and it resolves the name off the era's own list
+# instead of a second table that could drift (the reason HEALTH_MARKS is declared once, V41).
 $hh3Text = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.3.lfm")))
-if ($hh3Text -notmatch 'ReadOnlyTrait field="ranged"' -or $hh3Text -notmatch 'ReadOnlyTrait field="close"') {
-    Fail "V71 HH.3 still mirrors a fixed field - the ranged/close rows are not slots"
-} elseif ($hh3Text -notmatch 'paintAs\(form, "ranged", slots\.ranged' -or $hh3Text -notmatch 'paintAs\(form, "close", slots\.close') {
-    Fail "V71 renderCombatTraits does not paint the slots from THEME_COMBAT - the dots would stay empty"
-} elseif ($hh3Text -notmatch "'sheetTheme'") {
-    Fail "V71 the HH.3 dataLink does not observe sheetTheme - switching era would leave the old dots on screen"
-} else { Pass "V71 the Combat slots are wired to the era and repaint when it changes" }
+if ($rootLfm -notmatch 'function eraRangedName\(') { Fail "V74 eraRangedName is missing - the Combat mirror cannot follow the era" }
+elseif ($hh3Text -notmatch 'ReadOnlyTrait field="ranged"') { Fail "V74 the Combat ranged row is not a slot - Archery has its own field now" }
+elseif ($hh3Text -notmatch 'paintAs\(form, "ranged", ABILITY_FIELD\[eraRangedName\(\)\], 1\)') { Fail "V74 the ranged row is not painted from the era's own ranged skill" }
+elseif ($hh3Text -notmatch "'archery_1'" -or $hh3Text -notmatch "'sheetTheme'") { Fail "V74 the HH.3 dataLink does not observe archery_* and sheetTheme - the mirror would go stale" }
+else { Pass "V74 the Combat mirror follows the era's ranged skill" }
 
 # V72: the labels are dyn*, so the language traversal skips them (V31). That makes the renderer
 # the ONLY thing that writes them, and it has to run on both switches - hanging it off the era
@@ -1551,12 +1593,14 @@ else {
     else { Pass "V72 the era labels are rendered on load and on both switches" }
 }
 
-# And the labels themselves have to carry the dyn* names the renderer looks for.
+# And the templates have to carry the dyn* / slot names the renderer looks for.
 $abilityLbl = $mainDoc.SelectSingleNode("//template[@name='Ability']/label")
+$abilityDot = $mainDoc.SelectSingleNode("//template[@name='Ability']/imageCheckBox")
 $roLbl = (Doc (Join-Path $dir "HH.3.lfm")).SelectSingleNode("//template[@name='ReadOnlyTrait']/label")
-if ($null -eq $abilityLbl -or $abilityLbl.GetAttribute("name") -ne 'dynAbil$(field)') { Fail "V72 the Ability label is not named dynAbil - the renderer cannot find it and the translation would fight it" }
+if ($null -eq $abilityLbl -or $abilityLbl.GetAttribute("name") -ne 'dynAbil$(col)$(num)') { Fail "V76 the Ability label is not named per slot - the renderer cannot find it and the translation would fight it" }
+elseif ($null -eq $abilityDot -or $abilityDot.GetAttribute("name") -ne 'abil$(col)$(num)_1') { Fail "V76 the Ability dots are not named per slot - nothing could rebind them" }
 elseif ($null -eq $roLbl -or $roLbl.GetAttribute("name") -ne 'dynRo$(field)') { Fail "V72 the ReadOnlyTrait label is not named dynRo - the Combat rows would keep their authored name" }
-else { Pass "V72 both row templates hand their label to the renderer" }
+else { Pass "V72/V76 both row templates hand their label and dots to the renderer" }
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.

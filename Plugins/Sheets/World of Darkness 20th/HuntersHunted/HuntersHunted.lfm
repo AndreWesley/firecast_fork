@@ -202,69 +202,99 @@
 				end;
 			end;
 
-			-- ---- Era ability lists (SPEC I7, 19th round) -------------------------------
+			-- ---- Era ability lists (SPEC I7 / V74 / V75, 21st round) --------------------
 			--
-			-- The theme stopped being paint alone: each era renames rows on the Main tab. The
-			-- FIELD never moves, only the label over it (SPEC V2 is untouched), which is also
-			-- the cost the user accepted - the same dots read as a different ability once you
-			-- switch era.
+			-- Each era shows its own ten abilities per column. A NAME is a trait: it owns one
+			-- field and no other name shares it (SPEC V74), so two dots in Enigmas can never
+			-- surface as two dots in Computer - that was B24, and before it B23.
+			--
+			-- The row is a SLOT. The renderer puts the era's name on it and rebinds the five
+			-- dots to that name's field (SPEC V76); `imageCheckBox.field` has a setter in the
+			-- SDK (SPEC R28), so nothing here needs Lua-owned dots or hidden rows.
+			--
+			-- Eleven of these fields are new in the 21st round and exist only at runtime: the
+			-- XML authors the Victorian list, which is what a sheet shows if the renderer never
+			-- runs - the base era, coherent, rather than half-bound (SPEC V19).
 			--
 			-- These live on the ROOT form for the same reason the health track does: the Combat
-			-- tab reads THEME_COMBAT and a local in HH.6 does not cross forms (SPEC R.9 / B.9).
-			--
-			-- Only the rows that CHANGE are listed; a field with no entry keeps the English
-			-- authored in the XML and goes through the normal translation. Victorian Era has no
-			-- list of its own - the user did not ask for one.
+			-- tab reads them too, and a local in HH.6 does not cross forms (SPEC R.9 / B.9).
 			THEME_DEFAULT = "Modern Nights";
 
-			THEME_LABELS = {
-				["Modern Nights"] = {
-					etiquette   = "Drive",
-					firearms    = "Etiquette",
-					larceny     = "Firearms",
-					melee       = "Larceny",
-					performance = "Melee",
-					ride        = "Performance",
-					enigmas     = "Computer",
-				},
-				["Victorian Era"] = {},
-				["Dark Ages"] = {
-					streetwise = "Legerdemain",
-					crafts     = "Archery",
-					etiquette  = "Commerce",
-					firearms   = "Crafts",
-					larceny    = "Etiquette",
-					finance    = "Hearth Wisdom",
-					science    = "Seneschal",
-					technology = "Theology",
-				},
-				["Classical Age"] = {
-					etiquette     = "Archery",
-					firearms      = "Commerce",
-					larceny       = "Etiquette",
-					melee         = "Performance",
-					performance   = "Melee",
-					enigmas       = "Hearth Wisdom",
-					finance       = "Investigation",
-					investigation = "Law",
-					law           = "Medicine",
-					medicine      = "Occult",
-					occult        = "Politics",
-					politics      = "Philosophy",
-					science       = "Ritual",
-					technology    = "Religion",
-				},
+			ABILITY_FIELD = {
+				-- talents
+				["Alertness"]     = "alertness",
+				["Athletics"]     = "athletics",
+				["Awareness"]     = "awareness",
+				["Brawl"]         = "brawl",
+				["Empathy"]       = "empathy",
+				["Expression"]    = "expression",
+				["Intimidation"]  = "intimidation",
+				["Leadership"]    = "leadership",
+				["Legerdemain"]   = "legerdemain",
+				["Streetwise"]    = "streetwise",
+				["Subterfuge"]    = "subterfuge",
+
+				-- skills
+				["Animal Ken"]    = "animalKen",
+				["Archery"]       = "archery",
+				["Commerce"]      = "commerce",
+				["Crafts"]        = "crafts",
+				["Drive"]         = "drive",
+				["Etiquette"]     = "etiquette",
+				["Firearms"]      = "firearms",
+				["Larceny"]       = "larceny",
+				["Melee"]         = "melee",
+				["Performance"]   = "performance",
+				["Ride"]          = "ride",
+				["Stealth"]       = "stealth",
+				["Survival"]      = "survival",
+
+				-- knowledges
+				["Academics"]     = "academics",
+				["Computer"]      = "computer",
+				["Enigmas"]       = "enigmas",
+				["Finance"]       = "finance",
+				["Hearth Wisdom"] = "hearthWisdom",
+				["Investigation"] = "investigation",
+				["Law"]           = "law",
+				["Medicine"]      = "medicine",
+				["Occult"]        = "occult",
+				["Philosophy"]    = "philosophy",
+				["Politics"]      = "politics",
+				["Religion"]      = "religion",
+				["Ritual"]        = "ritual",
+				["Science"]       = "science",
+				["Seneschal"]     = "seneschal",
+				["Technology"]    = "technology",
+				["Theology"]      = "theology",
 			};
 
-			-- Which field the two variable rows of COMBAT TRAITS mirror (SPEC V71). The user's
-			-- rule: label and dots stay a pair, so a period without Firearms shows its own
-			-- ranged skill instead - Dark Ages fights with Archery, and Archery is the label
-			-- this era puts on `crafts`.
-			THEME_COMBAT = {
-				["Modern Nights"] = { ranged = "larceny",   close = "performance" },
-				["Victorian Era"] = { ranged = "firearms",  close = "melee"       },
-				["Dark Ages"]     = { ranged = "crafts",    close = "melee"       },
-				["Classical Age"] = { ranged = "etiquette", close = "performance" },
+			-- Ten names per column per era, in reading order (alphabetical). The lists are the
+			-- user's, from the 19th round; the 21st only stopped expressing them as renames of
+			-- rows, which is what made ratings walk between traits.
+			local BASE_TALENTS = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Streetwise", "Subterfuge"};
+
+			ERA_ABILITIES = {
+				["Modern Nights"] = {
+					talents    = BASE_TALENTS,
+					skills     = {"Animal Ken", "Crafts", "Drive", "Etiquette", "Firearms", "Larceny", "Melee", "Performance", "Stealth", "Survival"},
+					knowledges = {"Academics", "Computer", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
+				},
+				["Victorian Era"] = {
+					talents    = BASE_TALENTS,
+					skills     = {"Animal Ken", "Crafts", "Etiquette", "Firearms", "Larceny", "Melee", "Performance", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Enigmas", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
+				},
+				["Dark Ages"] = {
+					talents    = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Legerdemain", "Subterfuge"},
+					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Melee", "Performance", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Enigmas", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Politics", "Seneschal", "Theology"},
+				},
+				["Classical Age"] = {
+					talents    = BASE_TALENTS,
+					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Melee", "Performance", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Philosophy", "Politics", "Religion", "Ritual"},
+				},
 			};
 
 			-- The era in force, with the same fallback the palette uses (SPEC V52): a sheet
@@ -274,9 +304,23 @@
 				local v = nil;
 
 				if sheet ~= nil then v = sheet.sheetTheme; end;
-				if v == nil or THEME_LABELS[v] == nil then return THEME_DEFAULT; end;
+				if v == nil or ERA_ABILITIES[v] == nil then return THEME_DEFAULT; end;
 
 				return v;
+			end;
+
+			-- The ranged skill of the era in force. Read off the era's own list rather than
+			-- from a second table, so there is nothing to fall out of step with it (the same
+			-- reason HEALTH_MARKS is declared once, SPEC V41). Dark Ages and the Classical Age
+			-- fight with Archery; the other two carry Firearms.
+			function eraRangedName()
+				local list = ERA_ABILITIES[currentTheme()].skills;
+
+				for i = 1, #list, 1 do
+					if list[i] == "Firearms" or list[i] == "Archery" then return list[i]; end;
+				end;
+
+				return "Firearms";
 			end;
 		]]>
 	</script>
@@ -287,7 +331,7 @@
 		<tab title="Traits">
 			<import file="HH.2.lfm"/>
 		</tab>
-		<tab title="Powers">
+		<tab title="Numina">
 			<import file="HH.7.lfm"/>
 		</tab>
 		<tab title="Combat">

@@ -260,8 +260,8 @@
 				["Notes"] = "Anotações",
 				["NUMINA"] = "NÚMINAS",
 				["NUMINA & OTHER TRAITS"] = "NUMINA E OUTROS TRAÇOS",
-				["NUMINA: HEDGE MAGIC PATHS"] = "NÚMINAS: CAMINHOS DE MAGIA ESTÁTICA",
-				["NUMINA: PSYCHIC PHENOMENA"] = "NÚMINAS: FENÔMENOS PSÍQUICOS",
+				["HEDGE MAGIC PATHS"] = "CAMINHOS DE MAGIA ESTÁTICA",
+				["PSYCHIC PHENOMENA"] = "FENÔMENOS PSÍQUICOS",
 				["Occult"] = "Ocultismo",
 				["Occupation"] = "Ocupação",
 				["Oneiromancy"] = "Oniromancia",
@@ -287,7 +287,7 @@
 				["Politics"] = "Política",
 				["Português BR"] = "Português BR",
 				["power"] = "Poder",
-				["Powers"] = "Poderes",
+				["Numina"] = "Númina",
 				["Pragmatist"] = "Pragmático",
 				["Precognition"] = "Precognição",
 				["Prelude"] = "Prelúdio",
@@ -498,40 +498,35 @@
 					end;
 				end;
 			end;
-
-			-- ---- Era ability labels (SPEC I7 / V70 / V72, 19th round) -------------------
+			-- ---- Era abilities (SPEC I7 / V70 / V72 / V74 / V76, rewritten in the 21st) -
 			--
-			-- Each era renames rows on the Main tab, and the two variable rows of COMBAT TRAITS
-			-- follow the same map. The labels are named dyn* so the traversal above leaves them
-			-- alone (SPEC V31): whoever writes a text owns both languages for it, and here even
-			-- the English depends on the era, so it has to be resolved before translating.
+			-- A row on the Main tab is a SLOT: the era says which ability sits there, and the
+			-- five dots are rebound to THAT ability's field before they are repainted. A name
+			-- owns one field and shares it with nothing (SPEC V74), so switching era can no
+			-- longer show one trait's dots under another trait's name (SPEC B24 / B23).
 			--
-			-- Runs on load and on BOTH switches, era and language (SPEC V72). Hanging it off the
-			-- era switch alone would leave a [pt] sheet showing the era labels in English.
-			local function eraFieldOf(name, slots)
-				if name == nil then return nil; end;
+			-- The labels are named dyn* so the language traversal above leaves them alone
+			-- (SPEC V31): whoever writes a text owns both languages for it, and here even the
+			-- English depends on the era, so it is resolved before translating.
+			--
+			-- Runs on load and on BOTH switches, era and language (SPEC V72).
+			local function renderAbilityLabels(lang, from)
+				local lists = ERA_ABILITIES[currentTheme()];
 
-				if string.sub(name, 1, 7) == "dynAbil" then return string.sub(name, 8); end;
+				-- field -> name, rebuilt here rather than at load: this file is a tab, and the
+				-- root form's tables are not guaranteed to be in place while it parses.
+				local nameOf = {};
 
-				if string.sub(name, 1, 5) == "dynRo" then
-					local f = string.sub(name, 6);
+				for n, f in pairs(ABILITY_FIELD) do nameOf[f] = n; end;
 
-					-- The two Combat rows that follow the era instead of a fixed field: label and
-					-- dots stay a pair, so a period with no Firearms shows its own ranged skill
-					-- over the dots of the field that era puts it on (SPEC V71).
-					if f == "ranged" then return slots.ranged; end;
-					if f == "close" then return slots.close; end;
-
-					return f;
+				local function show(c, text)
+					if lang == "pt" then
+						c.text = PT[text] or text;
+					else
+						c.text = text;
+					end;
 				end;
 
-				return nil;
-			end;
-
-			local function renderAbilityLabels(lang, from)
-				local era = currentTheme();
-				local map = THEME_LABELS[era];
-				local slots = THEME_COMBAT[era];
 				local root = rootOf(from);
 				local all = {root};
 
@@ -539,27 +534,62 @@
 
 				for i = 1, #all, 1 do
 					local c = all[i];
+					local cls = c:getClassName();
+					local nm = c:getName();
 
-					if c:getClassName() == "label" then
-						local field = eraFieldOf(c:getName(), slots);
+					if nm == nil then
+						-- unnamed control: nothing here addresses it
+					elseif cls == "label" and string.sub(nm, 1, 7) == "dynAbil" then
+						local col, num = string.match(string.sub(nm, 8), "^(%a+)(%d+)$");
 
-						if field ~= nil then
-							local h = c.handle;
+						if col ~= nil and lists[col] ~= nil then
+							local name = lists[col][tonumber(num)];
 
-							-- Same rule as the translation (SPEC V22): the authored English is
-							-- snapshotted once and is the fallback for every field the era does
-							-- not rename. Taken before the first write, so it is never an era
-							-- label that got stored as the original.
-							if originalText[h] == nil then originalText[h] = c.text or ""; end;
+							if name ~= nil then show(c, name); end;
+						end;
+					elseif cls == "imageCheckBox" and string.sub(nm, 1, 4) == "abil" then
+						local col, num, dot = string.match(string.sub(nm, 5), "^(%a+)(%d+)_(%d+)$");
 
-							local en = map[field] or originalText[h];
+						if col ~= nil and lists[col] ~= nil then
+							local name = lists[col][tonumber(num)];
+							local field = nil;
 
-							if lang == "pt" then
-								c.text = PT[en] or en;
-							else
-								c.text = en;
+							if name ~= nil then field = ABILITY_FIELD[name]; end;
+
+							if field ~= nil then
+								-- Rebinding does not repaint by itself, so the state is reloaded
+								-- in the same step - otherwise the dot would keep showing what
+								-- the PREVIOUS field had (SPEC V76).
+								local full = field .. "_" .. dot;
+
+								c.field = full;
+
+								if sheet ~= nil then c.checked = sheet[full] == true; end;
 							end;
 						end;
+					elseif cls == "label" and string.sub(nm, 1, 5) == "dynRo" then
+						-- The Combat mirror. Its rows are fixed fields except the ranged one,
+						-- which is Firearms or Archery depending on the era (SPEC V74).
+						local f = string.sub(nm, 6);
+						local text = nil;
+
+						if f == "ranged" then
+							text = eraRangedName();
+						else
+							text = nameOf[f];
+						end;
+
+						if text == nil then
+							-- An attribute row: no era ever renames it, so the authored English
+							-- stands, snapshotted once like the translation does (SPEC V22).
+							local h = c.handle;
+
+							if originalText[h] == nil then originalText[h] = c.text or ""; end;
+
+							text = originalText[h];
+						end;
+
+						if text ~= "" then show(c, text); end;
 					end;
 				end;
 			end;

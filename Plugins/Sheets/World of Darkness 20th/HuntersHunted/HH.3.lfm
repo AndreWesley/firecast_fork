@@ -6,13 +6,10 @@
 			-- field - dot 1 is a fixed image in the Attribute template - while abilities do.
 			local RO_ATTRS     = {"strength", "dexterity", "stamina", "perception"};
 
-			-- Five of the seven ability rows always mirror the same field. The other two follow
-			-- the era (SPEC I7 / V71): the user's rule is that label and dots stay a pair, so a
-			-- period with no Firearms shows its own ranged skill - Dark Ages fights with Archery,
-			-- and Archery is what that era calls `crafts`. The two rows are named for the SLOT
-			-- (ro_ranged_*, ro_close_*) rather than for a field, the same way the health track
-			-- went positional in the 4th round: a field name would lie in two eras out of four.
-			local RO_ABILITIES = {"alertness", "athletics", "awareness", "brawl", "stealth"};
+			-- Six ability rows mirror a fixed field. The seventh is the era's ranged skill: with
+			-- one field per name (SPEC V74), Archery is `archery` and Firearms is `firearms`, so
+			-- the row is a slot again and the era's own list decides which one it shows.
+			local RO_ABILITIES = {"alertness", "athletics", "awareness", "brawl", "melee", "stealth"};
 
 			-- Virtues joined the display-only side in the 12th round (SPEC V51). Their dot 1 is
 			-- a fixed image, like an attribute, so they take the same firstDot = 2.
@@ -56,12 +53,10 @@
 				for i = 1, #RO_ABILITIES, 1 do paint(form, RO_ABILITIES[i], 1); end;
 				for i = 1, #RO_VIRTUES, 1 do paint(form, RO_VIRTUES[i], 2); end;
 
-				-- The two era slots (SPEC I7 / V71). currentTheme() already falls back for a
-				-- sheet saved before the rename, so this never indexes nil.
-				local slots = THEME_COMBAT[currentTheme()];
-
-				paintAs(form, "ranged", slots.ranged, 1);
-				paintAs(form, "close", slots.close, 1);
+				-- The ranged row follows the era: Firearms in the modern and Victorian lists,
+				-- Archery in the medieval and classical ones, each with its own field (SPEC V74).
+				-- The name comes off the era's own list, so there is no second table to drift.
+				paintAs(form, "ranged", ABILITY_FIELD[eraRangedName()], 1);
 
 				paintWillpower(form);
 			end;
@@ -156,7 +151,7 @@
 		     fields instead of hugging their left edge. One label per column, no padding runs (V11). -->
 		<layout left="0" top="0" width="660" height="320">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="660" height="20" text="COMBAT" horzTextAlign="center"/>
+			<label left="0" top="4" width="660" height="20" text="COMBAT" horzTextAlign="center"/>
 
 			<label left="15" top="25" width="170" height="20" text="Weapon/Attack" horzTextAlign="center"/>
 			<label left="185" top="25" width="100" height="20" text="Roll" horzTextAlign="center"/>
@@ -207,7 +202,7 @@
 		-->
 		<layout left="0" top="330" width="380" height="225">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="380" height="20" text="ARMOR" horzTextAlign="center"/>
+			<label left="0" top="4" width="380" height="20" text="ARMOR" horzTextAlign="center"/>
 
 			<layout left="15" top="25" width="350" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Class" horzTextAlign="trailing"/>
@@ -235,7 +230,7 @@
 		-->
 		<layout left="390" top="450" width="270" height="105">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="270" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<label left="0" top="4" width="270" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
 			<layout left="10" top="30" width="250" height="45">
 				<WillpowerMirror/>
@@ -262,8 +257,8 @@
 		     top=330 lines this box up with ARMOR and VIRTUES; the row sits 10 under COMBAT (T150). -->
 		<layout name="dynHealth3_box" left="670" top="330" width="280" height="306">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="205" height="20" text="HEALTH" horzTextAlign="center"/>
-			<comboBox name="cmbHealthLevels3" left="212" top="0" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+			<label left="0" top="4" width="205" height="20" text="HEALTH" horzTextAlign="center"/>
+			<comboBox name="cmbHealthLevels3" left="212" top="4" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
 
 			<layout name="dynHealth3_row1" left="20" top="28" width="245" height="20"><HealthRowMirror num="1"/></layout>
 			<layout name="dynHealth3_row2" left="20" top="55" width="245" height="20"><HealthRowMirror num="2"/></layout>
@@ -284,7 +279,7 @@
 		-->
 		<layout left="390" top="330" width="270" height="110">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="270" height="20" text="VIRTUES" horzTextAlign="center"/>
+			<label left="0" top="4" width="270" height="20" text="VIRTUES" horzTextAlign="center"/>
 
 			<layout left="10" top="25" width="250" height="25" >
 				<VirtueMirror field="conscience" nome="Conscience"/>
@@ -310,7 +305,7 @@
 		-->
 		<layout left="670" top="0" width="280" height="320">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="280" height="20" text="COMBAT TRAITS" horzTextAlign="center"/>
+			<label left="0" top="4" width="280" height="20" text="COMBAT TRAITS" horzTextAlign="center"/>
 
 			<layout left="15" top="25" width="250" height="25" ><ReadOnlyTrait field="strength" nome="Strength"/></layout>
 			<layout left="15" top="50" width="250" height="25" ><ReadOnlyTrait field="dexterity" nome="Dexterity"/></layout>
@@ -324,7 +319,7 @@
 			<layout left="15" top="190" width="250" height="25" ><ReadOnlyTrait field="awareness" nome="Awareness"/></layout>
 			<layout left="15" top="215" width="250" height="25" ><ReadOnlyTrait field="brawl" nome="Brawl"/></layout>
 			<layout left="15" top="240" width="250" height="25" ><ReadOnlyTrait field="ranged" nome="Firearms"/></layout>
-			<layout left="15" top="265" width="250" height="25" ><ReadOnlyTrait field="close" nome="Melee"/></layout>
+			<layout left="15" top="265" width="250" height="25" ><ReadOnlyTrait field="melee" nome="Melee"/></layout>
 			<layout left="15" top="290" width="250" height="25" ><ReadOnlyTrait field="stealth" nome="Stealth"/></layout>
 		</layout>
 	</scrollBox>
@@ -333,7 +328,7 @@
 		Two entry points, same reason as the Main tab: the dataLink catches later edits, the
 		onNodeReady catches the sheet being opened (SPEC V19 / V33).
 	-->
-	<dataLink fields="{'healthLevels', 'language', 'strength_2', 'strength_3', 'strength_4', 'strength_5', 'dexterity_2', 'dexterity_3', 'dexterity_4', 'dexterity_5', 'stamina_2', 'stamina_3', 'stamina_4', 'stamina_5', 'perception_2', 'perception_3', 'perception_4', 'perception_5', 'alertness_1', 'alertness_2', 'alertness_3', 'alertness_4', 'alertness_5', 'athletics_1', 'athletics_2', 'athletics_3', 'athletics_4', 'athletics_5', 'awareness_1', 'awareness_2', 'awareness_3', 'awareness_4', 'awareness_5', 'brawl_1', 'brawl_2', 'brawl_3', 'brawl_4', 'brawl_5', 'firearms_1', 'firearms_2', 'firearms_3', 'firearms_4', 'firearms_5', 'melee_1', 'melee_2', 'melee_3', 'melee_4', 'melee_5', 'stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'stealth_5', 'crafts_1', 'crafts_2', 'crafts_3', 'crafts_4', 'crafts_5', 'etiquette_1', 'etiquette_2', 'etiquette_3', 'etiquette_4', 'etiquette_5', 'performance_1', 'performance_2', 'performance_3', 'performance_4', 'performance_5', 'sheetTheme', 'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'conscience_2', 'conscience_3', 'conscience_4', 'conscience_5', 'selfControl_2', 'selfControl_3', 'selfControl_4', 'selfControl_5', 'courage_2', 'courage_3', 'courage_4', 'courage_5'}" onChange="renderHealthTrack(self, 'dynHealth3_'); renderCombatTraits(self);"/>
+	<dataLink fields="{'healthLevels', 'language', 'strength_2', 'strength_3', 'strength_4', 'strength_5', 'dexterity_2', 'dexterity_3', 'dexterity_4', 'dexterity_5', 'stamina_2', 'stamina_3', 'stamina_4', 'stamina_5', 'perception_2', 'perception_3', 'perception_4', 'perception_5', 'alertness_1', 'alertness_2', 'alertness_3', 'alertness_4', 'alertness_5', 'athletics_1', 'athletics_2', 'athletics_3', 'athletics_4', 'athletics_5', 'awareness_1', 'awareness_2', 'awareness_3', 'awareness_4', 'awareness_5', 'brawl_1', 'brawl_2', 'brawl_3', 'brawl_4', 'brawl_5', 'firearms_1', 'firearms_2', 'firearms_3', 'firearms_4', 'firearms_5', 'melee_1', 'melee_2', 'melee_3', 'melee_4', 'melee_5', 'stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'stealth_5', 'archery_1', 'archery_2', 'archery_3', 'archery_4', 'archery_5', 'sheetTheme', 'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'conscience_2', 'conscience_3', 'conscience_4', 'conscience_5', 'selfControl_2', 'selfControl_3', 'selfControl_4', 'selfControl_5', 'courage_2', 'courage_3', 'courage_4', 'courage_5'}" onChange="renderHealthTrack(self, 'dynHealth3_'); renderCombatTraits(self);"/>
 
 	<event name="onNodeReady">
 		renderHealthTrack(self, 'dynHealth3_');

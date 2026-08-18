@@ -39,11 +39,21 @@
 		-->
 		<template name="Header">
 			<label left="0" top="5" width="105" height="20" text="$(nome)" horzTextAlign="trailing"/>
-			<edit left="112" top="0" width="235" height="25" field="$(field)"/>
+			<edit left="112" top="0" width="215" height="25" field="$(field)"/>
+		</template>
+		<!-- Same row, shorter label. The 105px of `Header` is what `Demeanor` needs in pt
+		     ("Comportamento", ~86px) and Demeanor lives in the middle column - keeping that
+		     width in the first one is what pushed Nome / Jogador / Cronica to the right.
+		     Here the longest pt label is "Jogador", so 75 is room to spare (SPEC V16/V25).
+		     V26 compares rows that share a `left`, i.e. rows of the same column, so columns
+		     may carry different label widths; all three rows of column one use this one. -->
+		<template name="HeaderNarrow">
+			<label left="0" top="5" width="75" height="20" text="$(nome)" horzTextAlign="trailing"/>
+			<edit left="82" top="0" width="215" height="25" field="$(field)"/>
 		</template>
 		<template name="HeaderPicker">
 			<label left="0" top="5" width="105" height="20" text="$(nome)" horzTextAlign="trailing"/>
-			<comboBox left="112" top="0" width="235" height="25" name="cbo$(field)" field="$(field)" items="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}" values="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}">
+			<comboBox left="112" top="0" width="215" height="25" name="cbo$(field)" field="$(field)" items="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}" values="{'', 'Activist', 'Architect', 'Autocrat', 'Benefactor', 'Bon Vivant', 'Bravo', 'Bureaucrat', 'Caregiver', 'Celebrant', 'Chameleon', 'Child', 'Comedian', 'Competitor', 'Conformist', 'Conniver', 'Contrary', 'Creep Show', 'Critic', 'Crusader', 'Curmudgeon', 'Dabbler', 'Defender', 'Deviant', 'Director', 'Enigma', 'Explorer', 'Eye of the Storm', 'Fanatic', 'Follower', 'Gallant', 'Gambler', 'Grifter', 'Guru', 'Hacker', 'Idealist', 'Innovator', 'Jester', 'Judge', 'Leader', 'Loner', 'Machine', 'Mad Scientist', 'Martyr', 'Masochist', 'Mediator', 'Mercenary', 'Monster', 'Optimist', 'Pedagogue', 'Penitent', 'Perfectionist', 'Philosopher', 'Pragmatist', 'Prophet', 'Rebel', 'Rogue', 'Sadist', 'Samaritan', 'Scientist', 'Sensualist', 'Soldier', 'Survivor', 'Thrill-Seeker', 'Traditionalist', 'Trendsetter', 'Trickster', 'Tyrant', 'Visionary'}">
 			</comboBox>
 		</template>
 		<template name="Attribute">
@@ -65,12 +75,12 @@
 			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 		<template name="Ability">
-			<label name="dynAbil$(field)" left="0" top="5" width="125" height="20" text="$(nome)"/>
-			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<label name="dynAbil$(col)$(num)" left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<imageCheckBox name="abil$(col)$(num)_1" left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="abil$(col)$(num)_2" left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="abil$(col)$(num)_3" left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="abil$(col)$(num)_4" left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="abil$(col)$(num)_5" left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 		<!-- Blank rows at the bottom of each ability column, for abilities the book does not list. -->
 		<template name="CustomAbility">
@@ -156,50 +166,50 @@
 		</template>
 
 
-		<layout left="0" top="0" width="1100" height="100">
+		<layout left="0" top="0" width="1030" height="100">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<layout left="5" top="5" width="355" height="25" >
-				<Header field="name" nome="Name"/>
+			<layout left="5" top="5" width="297" height="25" >
+				<HeaderNarrow field="name" nome="Name"/>
 			</layout>
-			<layout left="370" top="5" width="355" height="25" >
+			<layout left="320" top="5" width="327" height="25" >
 				<HeaderPicker field="nature" nome="Nature"/>
 			</layout>
-			<layout left="735" top="5" width="355" height="25" >
+			<layout left="665" top="5" width="327" height="25" >
 				<Header field="motivation" nome="Motivation"/>
 			</layout>
 
-			<layout left="5" top="35" width="355" height="25" >
-				<Header field="player" nome="Player"/>
+			<layout left="5" top="35" width="297" height="25" >
+				<HeaderNarrow field="player" nome="Player"/>
 			</layout>
-			<layout left="370" top="35" width="355" height="25" >
+			<layout left="320" top="35" width="327" height="25" >
 				<HeaderPicker field="demeanor" nome="Demeanor"/>
 			</layout>
-			<layout left="735" top="35" width="355" height="25" >
+			<layout left="665" top="35" width="327" height="25" >
 				<Header field="occupation" nome="Occupation"/>
 			</layout>
 
-			<layout left="5" top="65" width="355" height="25" >
-				<Header field="chronicle" nome="Chronicle"/>
+			<layout left="5" top="65" width="297" height="25" >
+				<HeaderNarrow field="chronicle" nome="Chronicle"/>
 			</layout>
-			<layout left="370" top="65" width="355" height="25" >
+			<layout left="320" top="65" width="327" height="25" >
 				<Header field="concept" nome="Concept"/>
 			</layout>
-			<layout left="735" top="65" width="355" height="25" >
+			<layout left="665" top="65" width="327" height="25" >
 				<Header field="residence" nome="Residence"/>
 			</layout>
 		</layout>
 
-		<layout left="1110" top="0" width="100" height="100">
+		<layout left="1050" top="0" width="160" height="100">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="100" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+			<label left="0" top="4" width="160" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<edit left="20" top="25" width="60" height="60" fontSize="20" horzTextAlign="center" field="experience"/>
+			<edit left="50" top="25" width="60" height="60" fontSize="20" horzTextAlign="center" field="experience"/>
 		</layout>
 
 		<layout left="0" top="110" width="300" height="285">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="300" height="20" text="ATTRIBUTES" horzTextAlign="center"/>
+			<label left="0" top="4" width="300" height="20" text="ATTRIBUTES" horzTextAlign="center"/>
 
 			<label left="-40" top="60" width="100" height="20" text="Physical" horzTextAlign="center" rotationAngle="270"/>
 
@@ -255,41 +265,41 @@
 			     transparent fill (#FFFFFF00), which let the tab background through and read as
 			     grey next to its black siblings - SPEC B18, now covered by V48. -->
 			<rectangle align="client" color="black" strokeColor="black" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="1" width="900" height="20" text="ABILITIES" horzTextAlign="center"/>
+			<label left="0" top="4" width="900" height="20" text="ABILITIES" horzTextAlign="center"/>
 
 			<layout left="15" top="30" width="280" height="350">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="0" top="0" width="280" height="20" text="TALENTS" horzTextAlign="center"/>
+				<label left="0" top="4" width="280" height="20" text="TALENTS" horzTextAlign="center"/>
 
 				<layout left="15" top="25" width="250" height="25" >
-					<Ability field="alertness" nome="Alertness"/>
+					<Ability col="talents" num="1" field="alertness" nome="Alertness"/>
 				</layout>
 				<layout left="15" top="50" width="250" height="25" >
-					<Ability field="athletics" nome="Athletics"/>
+					<Ability col="talents" num="2" field="athletics" nome="Athletics"/>
 				</layout>
 				<layout left="15" top="75" width="250" height="25" >
-					<Ability field="awareness" nome="Awareness"/>
+					<Ability col="talents" num="3" field="awareness" nome="Awareness"/>
 				</layout>
 				<layout left="15" top="100" width="250" height="25" >
-					<Ability field="brawl" nome="Brawl"/>
+					<Ability col="talents" num="4" field="brawl" nome="Brawl"/>
 				</layout>
 				<layout left="15" top="125" width="250" height="25" >
-					<Ability field="empathy" nome="Empathy"/>
+					<Ability col="talents" num="5" field="empathy" nome="Empathy"/>
 				</layout>
 				<layout left="15" top="150" width="250" height="25" >
-					<Ability field="expression" nome="Expression"/>
+					<Ability col="talents" num="6" field="expression" nome="Expression"/>
 				</layout>
 				<layout left="15" top="175" width="250" height="25" >
-					<Ability field="intimidation" nome="Intimidation"/>
+					<Ability col="talents" num="7" field="intimidation" nome="Intimidation"/>
 				</layout>
 				<layout left="15" top="200" width="250" height="25" >
-					<Ability field="leadership" nome="Leadership"/>
+					<Ability col="talents" num="8" field="leadership" nome="Leadership"/>
 				</layout>
 				<layout left="15" top="225" width="250" height="25" >
-					<Ability field="streetwise" nome="Streetwise"/>
+					<Ability col="talents" num="9" field="streetwise" nome="Streetwise"/>
 				</layout>
 				<layout left="15" top="250" width="250" height="25" >
-					<Ability field="subterfuge" nome="Subterfuge"/>
+					<Ability col="talents" num="10" field="subterfuge" nome="Subterfuge"/>
 				</layout>
 				<layout left="15" top="275" width="250" height="25" >
 					<CustomAbility field="customTalent_1"/>
@@ -301,37 +311,37 @@
 
 			<layout left="310" top="30" width="280" height="350">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="0" top="0" width="280" height="20" text="SKILLS" horzTextAlign="center"/>
+				<label left="0" top="4" width="280" height="20" text="SKILLS" horzTextAlign="center"/>
 
 				<layout left="15" top="25" width="250" height="25" >
-					<Ability field="animalKen" nome="Animal Ken"/>
+					<Ability col="skills" num="1" field="animalKen" nome="Animal Ken"/>
 				</layout>
 				<layout left="15" top="50" width="250" height="25" >
-					<Ability field="crafts" nome="Crafts"/>
+					<Ability col="skills" num="2" field="crafts" nome="Crafts"/>
 				</layout>
 				<layout left="15" top="75" width="250" height="25" >
-					<Ability field="etiquette" nome="Etiquette"/>
+					<Ability col="skills" num="3" field="etiquette" nome="Etiquette"/>
 				</layout>
 				<layout left="15" top="100" width="250" height="25" >
-					<Ability field="firearms" nome="Firearms"/>
+					<Ability col="skills" num="4" field="firearms" nome="Firearms"/>
 				</layout>
 				<layout left="15" top="125" width="250" height="25" >
-					<Ability field="larceny" nome="Larceny"/>
+					<Ability col="skills" num="5" field="larceny" nome="Larceny"/>
 				</layout>
 				<layout left="15" top="150" width="250" height="25" >
-					<Ability field="melee" nome="Melee"/>
+					<Ability col="skills" num="6" field="melee" nome="Melee"/>
 				</layout>
 				<layout left="15" top="175" width="250" height="25" >
-					<Ability field="performance" nome="Performance"/>
+					<Ability col="skills" num="7" field="performance" nome="Performance"/>
 				</layout>
 				<layout left="15" top="200" width="250" height="25" >
-					<Ability field="ride" nome="Ride"/>
+					<Ability col="skills" num="8" field="ride" nome="Ride"/>
 				</layout>
 				<layout left="15" top="225" width="250" height="25" >
-					<Ability field="stealth" nome="Stealth"/>
+					<Ability col="skills" num="9" field="stealth" nome="Stealth"/>
 				</layout>
 				<layout left="15" top="250" width="250" height="25" >
-					<Ability field="survival" nome="Survival"/>
+					<Ability col="skills" num="10" field="survival" nome="Survival"/>
 				</layout>
 				<layout left="15" top="275" width="250" height="25" >
 					<CustomAbility field="customSkill_1"/>
@@ -343,37 +353,37 @@
 
 			<layout left="605" top="30" width="280" height="350">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="0" top="0" width="280" height="20" text="KNOWLEDGES" horzTextAlign="center"/>
+				<label left="0" top="4" width="280" height="20" text="KNOWLEDGES" horzTextAlign="center"/>
 
 				<layout left="15" top="25" width="250" height="25" >
-					<Ability field="academics" nome="Academics"/>
+					<Ability col="knowledges" num="1" field="academics" nome="Academics"/>
 				</layout>
 				<layout left="15" top="50" width="250" height="25" >
-					<Ability field="enigmas" nome="Enigmas"/>
+					<Ability col="knowledges" num="2" field="enigmas" nome="Enigmas"/>
 				</layout>
 				<layout left="15" top="75" width="250" height="25" >
-					<Ability field="finance" nome="Finance"/>
+					<Ability col="knowledges" num="3" field="finance" nome="Finance"/>
 				</layout>
 				<layout left="15" top="100" width="250" height="25" >
-					<Ability field="investigation" nome="Investigation"/>
+					<Ability col="knowledges" num="4" field="investigation" nome="Investigation"/>
 				</layout>
 				<layout left="15" top="125" width="250" height="25" >
-					<Ability field="law" nome="Law"/>
+					<Ability col="knowledges" num="5" field="law" nome="Law"/>
 				</layout>
 				<layout left="15" top="150" width="250" height="25" >
-					<Ability field="medicine" nome="Medicine"/>
+					<Ability col="knowledges" num="6" field="medicine" nome="Medicine"/>
 				</layout>
 				<layout left="15" top="175" width="250" height="25" >
-					<Ability field="occult" nome="Occult"/>
+					<Ability col="knowledges" num="7" field="occult" nome="Occult"/>
 				</layout>
 				<layout left="15" top="200" width="250" height="25" >
-					<Ability field="politics" nome="Politics"/>
+					<Ability col="knowledges" num="8" field="politics" nome="Politics"/>
 				</layout>
 				<layout left="15" top="225" width="250" height="25" >
-					<Ability field="science" nome="Science"/>
+					<Ability col="knowledges" num="9" field="science" nome="Science"/>
 				</layout>
 				<layout left="15" top="250" width="250" height="25" >
-					<Ability field="technology" nome="Technology"/>
+					<Ability col="knowledges" num="10" field="technology" nome="Technology"/>
 				</layout>
 				<layout left="15" top="275" width="250" height="25" >
 					<CustomAbility field="customKnowledge_1"/>
@@ -455,8 +465,8 @@
 		-->
 		<layout name="dynHealth_box" left="600" top="510" width="280" height="306">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="205" height="20" text="HEALTH" horzTextAlign="center"/>
-			<comboBox name="cmbHealthLevels" left="212" top="0" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+			<label left="0" top="4" width="205" height="20" text="HEALTH" horzTextAlign="center"/>
+			<comboBox name="cmbHealthLevels" left="212" top="4" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
 			<dataLink field="healthLevels" defaultValue="7"/>
 
 			<layout name="dynHealth_row1" left="20" top="28" width="245" height="20"><HealthRow num="1"/></layout>
@@ -476,7 +486,7 @@
 		     gap - the box is full. A 10th row does not fit without growing the whole band. -->
 		<layout left="890" top="510" width="320" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="320" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
+			<label left="0" top="4" width="320" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
 
 			<layout left="15" top="25" width="290" height="25" >
 				<OpenAbility field="background_1"/>
