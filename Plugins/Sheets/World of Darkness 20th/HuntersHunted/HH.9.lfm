@@ -29,6 +29,7 @@
 
 				local lang = sheet.language or "en";
 				local rows = xpLedgerRows();
+				local free = sheet.stFreeDots == true;
 
 				if rows == nil then
 					-- SPEC V33: say WHY it is empty rather than show four blank columns.
@@ -50,7 +51,15 @@
 					kinds[i]  = translateSheetText(r.kind, lang);
 					traits[i] = translateSheetText(r.name, lang);
 					levels[i] = tostring(r.level);
-					costs[i]  = tostring(r.cost);
+
+					-- While free-buy is on the whole column reads FREE rather than a row of
+					-- zeroes (SPEC V105): the point was taken, it just was not paid for. It is
+					-- a word written by Lua, so it is translated here like the two above it.
+					if free then
+						costs[i] = translateSheetText("FREE", lang);
+					else
+						costs[i] = tostring(r.cost);
+					end;
 				end;
 
 				-- A saved character nobody has spent on yet. Four blank columns read as a broken
@@ -141,13 +150,16 @@
 	     onNodeReady catches the sheet being opened (SPEC V19 / V33). -->
 	<dataLink field="xpTotal" onChange="renderXPBoxes(self);"/>
 
-	<!-- What the ledger reads directly: the snapshot itself, the rule that prices backgrounds,
+	<!-- Every one of these four moves the prices, so the three numbers are rebuilt with the log:
+	     free-buy and the backgrounds rule change what a point costs, the snapshot changes what
+	     counts as bought at all, and the language changes the two text columns.
+	     What the ledger reads directly: the snapshot itself, the rule that prices backgrounds,
 	     and the language its two text columns are written in. This tab watches `language`
 	     itself rather than being called from HH.6, because the four columns are declared here
 	     and only this form can address them. Dots are watched by the observer below - there
 	     are some five hundred of them, and naming every one here would be a list nobody could
 	     keep correct. -->
-	<dataLink fields="{'baseline', 'stBackgroundsXP', 'language'}" onChange="renderXPLedger(self);"/>
+	<dataLink fields="{'baseline', 'stBackgroundsXP', 'stFreeDots', 'language'}" onChange="renderXPLedger(self); renderXPBoxes(self);"/>
 
 	<!-- The tab is a REPORT, so it is rebuilt every time it comes up (SPEC V97). The dots that
 	     feed it live on other tabs and there are some four hundred and sixty of them: the
