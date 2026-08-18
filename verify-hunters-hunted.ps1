@@ -295,7 +295,7 @@ else { Pass "V35 all $movedSeen migrated fields sit exactly once, in their new f
 # Their text is still sitting in already-saved sheets. If either name were reused for a new
 # field, an old sheet would silently pour stale content into an unrelated box - so the names
 # stay burned, and SPEC I3 lists them as orphans. This is the check that keeps that promise.
-foreach ($orphan in @('transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated','personalidade','natureza','experience','spentXP')) {
+foreach ($orphan in @('transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated','personalidade','natureza','experience','spentXP','stFreeDots','freeDots')) {
     if ($allFields.ContainsKey($orphan)) {
         Fail "I3 '$orphan' is a declared orphan but $($allFields[$orphan] -join ', ') owns it - choose a different field name"
     } else { Pass "I3 declared orphan '$orphan' owns no widget" }
@@ -1740,7 +1740,7 @@ else {
 
     # No field of the ledger's own may be edited from here, and the flags must be real fields.
     $stFields = @((Doc $stDoc).SelectNodes("//*[@field]") | ForEach-Object { $_.GetAttribute("field") })
-    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines', 'stShowMagika', 'stFreeDots')
+    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines', 'stShowMagika')
     $missFlags = @($wantFlags | Where-Object { $stFields -notcontains $_ })
     if ($missFlags) { foreach ($f in $missFlags) { Fail "V89 HH.10 has no widget for $f" } }
     else { Pass "V89 all $($wantFlags.Count) storyteller flags are owned by HH.10" }
@@ -1982,25 +1982,6 @@ else {
     else { Pass "V86 every active cost rule written once, every dormant one left out" }
 }
 
-# ---- V105: free-buy is a LENS over the prices, not a mark on the points -----------
-# While the storyteller has it on, every price is zero and the whole Cost column reads FREE.
-# Nothing records that a point was free, so switching it back off prices everything bought
-# since the baseline all over again - that is the declared cost of keeping the log derived
-# (SPEC C, V100). What must hold is that the flag reaches all three places.
-if ($costFn -notmatch 'if ctx\.free then return 0') { Fail "V105 free-buy does not zero the price - points would still be charged (SPEC I9)" }
-elseif ($rowsFn -notmatch 'free = sheet\.stFreeDots == true') { Fail "V105 the ledger never reads the free-buy flag" }
-elseif ($progTxt -notmatch 'translateSheetText\("FREE"') { Fail "V105 the Cost column never says FREE - a free point would read as a plain 0" }
-elseif ($progTxt -notmatch 'dataLink fields="[^"]*stFreeDots') { Fail "V105 the ledger does not follow stFreeDots - flipping the switch would leave stale prices on screen" }
-else { Pass "V105 free-buy zeroes the prices, says FREE, and the log follows the switch" }
-
-# ---- V106: free-buy is OFF until the storyteller ticks it -------------------------
-# The one flag on this sheet that hands out something for nothing, so nil must read as off -
-# the same call V80 makes for the storyteller gate. `~= false` is how stShowNumina defaults ON
-# and is exactly what must NOT appear here.
-if (($root + $progTxt) -match 'stFreeDots\s*~=\s*false') { Fail "V106 free-buy defaults to ON - a sheet that never saw the flag would buy for nothing" }
-elseif ($rowsFn -notmatch 'stFreeDots == true') { Fail "V106 the free-buy flag is not read as an explicit true" }
-else { Pass "V106 free-buy is off until the storyteller ticks it" }
-
 # ---- V87: 21 buys the first point of a KIND, not of a numina ---------------------
 # A character with static magic paying for their first psychic phenomenon pays 21 once; the
 # next psychic numina costs the ordinary 7. Pricing it per numina would charge 21 every time.
@@ -2033,6 +2014,57 @@ foreach ($empty in @('HH.11.lfm', 'HH.12.lfm')) {
     if ($eFields.Count) { Fail "V90 $empty declares $($eFields.Count) field(s) before it has content" }
     else { Pass "V90 $empty declares no field" }
 }
+
+
+# ---- V111: dimmed <=> read-only, in both directions -------------------------------
+# The sheet has no other way to say "look, do not touch": a mirror dot and a real dot are the
+# same art, and a read-only edit is the same box as an editable one. Opacity is the whole of
+# the signal (SPEC C, 33rd round), so it has to be exact and it has to be exclusive - a live
+# field wearing 0.55 lies in the other direction and would teach the player to ignore it.
+# The theme never writes opacity (V57/V66 family), so what the XML says is what renders in
+# all four eras.
+$DIM     = '0.55'
+$dimSeen = 0
+$dimBefore = $fail
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//edit | //textEditor | //comboBox | //checkBox | //imageCheckBox")) {
+        $ro = ($n.GetAttribute("readOnly") -eq 'true') -or
+              ($n.GetAttribute("enabled")  -eq 'false') -or
+              ($n.LocalName -eq 'imageCheckBox' -and $n.GetAttribute("autoChange") -eq 'false')
+        $op = $n.GetAttribute("opacity")
+        $id = $n.GetAttribute("name"); if (-not $id) { $id = $n.GetAttribute("field") }; if (-not $id) { $id = $n.LocalName }
+
+        if ($ro) {
+            $dimSeen++
+            if ($op -ne $DIM) { Fail "V111 $($f.Name) $id is read-only but reads live (opacity '$op', expected $DIM)" }
+        } elseif ($op -ne '') {
+            Fail "V111 $($f.Name) $id is editable but reads locked (opacity '$op')"
+        }
+    }
+}
+if ($fail -eq $dimBefore) { Pass "V111 $dimSeen read-only widgets dimmed at $DIM, every editable one left bright" }
+
+# The fixed first dot of a virtue is an <image>, not an input, so the sweep above cannot see
+# it - and a bright dot beside four dimmed ones is exactly the row reading half-locked (SPEC C).
+# Only the Combat mirror has one; the same art on Main belongs to an editable row.
+$imgBefore = $fail
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//image[@src]")) {
+        $op   = $n.GetAttribute("opacity")
+        $want = ($f.Name -eq 'HH.3.lfm')
+        if ($want -and $op -ne $DIM) { Fail "V111 $($f.Name) mirror dot1 reads live (opacity '$op', expected $DIM)" }
+        elseif (-not $want -and $op -ne '') { Fail "V111 $($f.Name) a dot on an editable row is dimmed (opacity '$op')" }
+    }
+}
+if ($fail -eq $imgBefore) { Pass "V111 the fixed dot1 art is dimmed on the mirror tab and bright everywhere else" }
+
+# ---- V112: a control that locks at runtime dims in the same breath ----------------
+# btnSaveBaseline is the only one. Writing `enabled` without writing `opacity` leaves a dead
+# button with a live button's face, which is the same lie V111 refuses in the XML.
+$stTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.10.lfm")))
+if ($stTxt -notmatch 'btnSaveBaseline\.enabled\s*=\s*not saved;') { Fail "V112 the Save button is not disabled once the baseline is saved (SPEC V82)" }
+elseif ($stTxt -notmatch 'btnSaveBaseline\.opacity\s*=\s*saved and 0\.55 or 1;') { Fail "V112 the Save button locks without dimming - dead control, live face" }
+else { Pass "V112 the Save button dims in the same breath it locks" }
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.

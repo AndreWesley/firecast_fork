@@ -44,7 +44,11 @@
 				local saved = sheet.baseline ~= nil and sheet.baseline ~= "";
 				local lang  = sheet.language or "en";
 
+				-- Dead controls read dead, exactly like the read-only fields the XML dims
+				-- (SPEC V111/V112). Written in the same breath as `enabled`, so the look and
+				-- the state cannot come apart.
 				form.btnSaveBaseline.enabled = not saved;
+				form.btnSaveBaseline.opacity = saved and 0.55 or 1;
 
 				if saved then
 					form.dynBaselineState.text = translateSheetText("Initial character saved", lang);
@@ -58,7 +62,7 @@
 		<!-- Theme backdrop, same arrangement as every other tab (SPEC T158, V56, V57). -->
 		<image name="themePaper10" align="client" style="stretch" hitTest="false" visible="false"/>
 
-		<layout left="0" top="0" width="520" height="270">
+		<layout left="0" top="0" width="520" height="240">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="520" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 
@@ -78,7 +82,6 @@
 			     anything, and unticking it prices everything bought since the baseline all over
 			     again - the log is worked out, and nothing marks a point as having been free.
 			     Off by default like the two tabs above it (SPEC V106). -->
-			<checkBox name="chkFreeDots" left="15" top="210" width="490" height="25" field="stFreeDots" text="Allow Buy Dots For Free"/>
 		</layout>
 	</scrollBox>
 

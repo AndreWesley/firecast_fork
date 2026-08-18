@@ -73,37 +73,37 @@
 		     are not something a player changes mid-fight, so the Main tab owns them alone. -->
 		<template name="VirtueMirror">
 			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
-			<image left="125" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
-			<imageCheckBox name="ro_$(field)_2" left="150" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="ro_$(field)_3" left="175" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="ro_$(field)_4" left="200" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="ro_$(field)_5" left="225" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<image left="125" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_2" left="150" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_3" left="175" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_4" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_5" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 
 		<!-- No `field=` anywhere: these dots are painted by renderCombatTraits() and own nothing,
 		     so they cannot collide with the real widgets on Main (SPEC I3 SO-LEITURA, V1). -->
 		<template name="ReadOnlyTrait">
 			<label name="dynRo$(field)" left="0" top="5" width="125" height="20" text="$(nome)"/>
-			<imageCheckBox name="ro_$(field)_1" left="125" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="ro_$(field)_2" left="150" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="ro_$(field)_3" left="175" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="ro_$(field)_4" left="200" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="ro_$(field)_5" left="225" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_1" left="125" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_2" left="150" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_3" left="175" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_4" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_5" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 
 		<!-- Ten read-only dots over ten real boxes (SPEC V51). The dots carry no `field=` and
 		     are painted by paintWillpower(); only the boxes below own anything. -->
 		<template name="WillpowerMirror">
-			<imageCheckBox name="roWp_1" left="0" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roWp_2" left="25" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roWp_3" left="50" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roWp_4" left="75" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roWp_5" left="100" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roWp_6" left="125" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roWp_7" left="150" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roWp_8" left="175" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roWp_9" left="200" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roWp_10" left="225" top="0" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_1" left="0" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_2" left="25" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_3" left="50" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_4" left="75" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_5" left="100" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_6" left="125" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_7" left="150" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_8" left="175" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_9" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_10" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 
 			<checkBox left="2" top="20" width="25" height="25" field="willpower_c1"/>
 			<checkBox left="27" top="20" width="25" height="25" field="willpower_c2"/>

@@ -324,8 +324,9 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - consequência declarada da semente: ficha JÁ congelada c/ `appearance_1` nil ganha o ponto ∴ nasce 1 linha `Attribute\|Appearance\|1\|0` no log — custo 0 (§I9, `n×4` c/ n=0) ∴ barulho cosmético, ⊥ cobra nada
 - `?` a semente inteira depende de o NDB GRAVAR `false` ao desmarcar (⊥ apagar o atributo) — §R36. Mesma dúvida derruba a semente de `stShowNumina` (§V89) ∴ 1 teste resolve as 2
 - checkBox `Allow Buy Dots For Free` (`stFreeDots`, default OFF) na aba Storyteller: enquanto LIGADA ∀ ponto sai por 0 & a coluna `Cost` do log mostra `FREE`. Pedido do user 2026-08-18
-- é LENTE, ⊥ CARIMBO: o log é DERIVADO (§V83 §V100) ∴ desligar a flag RE-PREÇA tudo que foi comprado desde o baseline & o saldo PODE FICAR NEGATIVO. Lembrar quais pontos saíram de graça exigiria jornalizar — §V100 proíbe ∴ custo aceito & declarado. ≡ como `stBackgroundsXP` já se comporta (§I9)
-- saldo negativo ⊥ é travado nem escondido: o guarda simplesmente barra compra NOVA (§I12) até o mestre dar XP | o jogador devolver ponto ∴ o número na tela é a verdade, ⊥ um 0 mentiroso
+- ~~é LENTE, ⊥ CARIMBO~~ SUPERSEDED na 34ª rodada ↓ — o user pediu CARIMBO. As 2 linhas abaixo valeram só entre a 31ª & a 33ª rodada
+- ~~desligar a flag RE-PREÇA tudo comprado desde o baseline & o saldo PODE FICAR NEGATIVO~~ — deixa de acontecer c/ `freeDots` (§V114)
+- saldo negativo ⊥ é travado nem escondido: o guarda simplesmente barra compra NOVA (§I12) até o mestre dar XP | o jogador devolver ponto ∴ o número na tela é a verdade, ⊥ um 0 mentiroso. SEGUE VALENDO — só deixa de ser CAUSADO por desligar a flag
 
 - 32ª rodada (2026-08-18) — `Game` da aba Settings: lista TROCADA & campo TRAVADO. Pedido do user
 - lista passa a ser 3: `Vampire` `Hunters Hunted` `Mage` (pt `Vampiro` `Caçadores Caçados` `Mago`), default `Hunters Hunted` via `<dataLink defaultValue=…>` (≡ `cboSheetTheme` & precedente `Sheets/Avatar Legends/Background.lfm:16`)
@@ -334,6 +335,44 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - os 4 nomes longos velhos (`Vampire: The Masquerade` `Vampire: Dark Ages` `Werewolf: The Apocalypse` `Mage: The Ascension`) SAEM da lista & suas chaves [pt]+[en] saem junto — conferido que ⊥ aparecem em outro lugar do plugin
 - ficha velha guarda 1 dos 4 (\| vazio) ∴ valor FORA da lista num combo travado = valor morto que o jogador ⊥ pode consertar → load normaliza p/ `Hunters Hunted` (§V110). Custo declarado: mesa que tinha marcado Vampiro \| Lobisomem perde a marca — o campo ⊥ é lido por nada (§C) ∴ é cosmético
 
+- 33ª rodada (2026-08-18) — campo que ⊥ dá p/ editar ! LER como só-leitura. Pedido do user: "cor mais esmaecida … o usuário percebe que é só leitura só de olhar"
+- forma = `opacity="0.55"` no PRÓPRIO widget, ⊥ cor nova. Motivo: opacity mistura o widget c/ o fundo da caixa ∴ 1 atributo serve TEXTO & BOLINHA, vale nas 4 épocas sem chave nova de paleta (§V53 §V63 intactos) & ⊥ pede PNG esmaecido por época (§V64 ⊥ ganha 8 arquivos). Cor própria resolveria só o texto & custaria 4 entradas de paleta. JULGAMENTO meu
+- 0.55 = chute meu p/ "esmaecido sobre caixa preta" — ajustável no teste no Firecast (§T307). Valor ÚNICO: XML ⊥ tem constante ∴ quem trava o número é o gate (≡ §V41 p/ `HEALTH_MARKS`, outro mecanismo)
+- esmaece o widget que RECEBERIA o clique/digitação — rótulo & título de caixa & moldura ⊥ esmaecem. `VirtueMirror` é a exceção: o dot1 dele é `<image>` fixa DENTRO de linha só-leitura ∴ esmaece junto, senão a linha lê 1 bolinha acesa + 4 apagadas. CONFIRMAR c/ user: quer o RÓTULO da linha só-leitura esmaecido também?
+- dot1 fixo da Main (atributo & virtude) ⊥ esmaece — a linha ali é EDITÁVEL & o dot1 é o valor 1, ⊥ um campo travado
+- alcance = os 28 widgets já declarados só-leitura: `HH.3` 19 bolinhas de espelho + 1 `<image>` · `HH.9` 2 `edit` + 4 `textEditor` do ledger · `HH.7` `edtNuminaDesc` · `HH.6` `cboGame`. `willpower_c*` `edtCurrentXP` `edtCurrentXPMain` são EDITÁVEIS ∴ seguem em brilho cheio
+
+- 34ª rodada (2026-08-18) — `Allow Buy Dots For Free` vira CARIMBO. Pedido do user: ponto comprado de graça ⊥ passa a consumir XP quando a flag desligar; ponto comprado com XP gasta XP c/ a flag ligada ou desligada
+- REVOGA a decisão de "é LENTE, ⊥ carimbo" da 31ª rodada (§C ↑, §V105). O que aquela decisão evitava — jornalizar — volta em forma MÍNIMA: `freeDots` guarda NOMES de dot, ⊥ números ∴ o único número gravado segue sendo `xpTotal` & §V100 ⊥ é violado (§V113)
+- 1 campo novo (`freeDots`, string, LUA-OWNED §I13) & ⊥ 1 campo por dot: ~458 dots viraria ~458 nomes de campo queimados p/ sempre (§V2 ⊥ perdoa rename)
+- carimbo é do DOT, ⊥ do traço: `dexterity_4` grátis & `dexterity_5` pago convivem na mesma linha de traço
+- flag desligada ⊥ apaga carimbo — apagar faria o mestre ⊥ conseguir desligar sem cobrar retroativamente, que é exatamente o que o user pediu p/ ⊥ acontecer
+- custo declarado: ficha das rodadas 31…33 que comprou de graça & ainda está c/ a flag LIGADA é migrada 1× (§V117); se a flag já tiver sido desligada antes do update, o XP já foi cobrado & ⊥ ∃ o que restaurar — ⊥ ∃ registro de quais pontos eram grátis
+
+- 35ª rodada (2026-08-18) — user REAFIRMA a regra do `Allow Buy Dots For Free` com traço canônico. ⊥ é regra NOVA: é exatamente o que a 34ª rodada especificou (§V114 §V115 §V116) ∴ este bloco entra como CRITÉRIO DE ACEITE, ⊥ como mudança de comportamento
+- a regra em 1 linha: o ponto sai de graça ⟺ o checkbox estava LIGADO no instante da compra. O que veio antes segue pago & o que vier depois volta a custar
+- traço canônico (Força, baseline 1, `n×4` de §I9). Passo 1, flag DESLIGADA, o jogador subiu 2 pontos: `Atributo\|Força\|2\|4` & `Atributo\|Força\|3\|8`
+- passo 2, LIGA o checkbox: log IDÊNTICO. Ligar ⊥ zera linha velha & ⊥ mexe no saldo
+- passo 3, compra 1 ponto c/ a flag ligada: entra `Atributo\|Força\|4\|GRÁTIS` & `Current` ⊥ se move
+- passo 4, DESLIGA o checkbox: log IDÊNTICO — a linha 4 segue `GRÁTIS`. Desligar ⊥ re-preça o que já foi comprado (era o que a lente da 31ª rodada fazia, §V105)
+- passo 5, compra mais 1 c/ a flag desligada: entra `Atributo\|Força\|5\|16` & `Current` cai 16
+- ponto grátis ⊥ barateia o SEGUINTE: nível 5 sai por 16 (`n=4`), ⊥ por 12 — o preço lê o nível ALCANÇADO (§I10), ⊥ quantos pontos foram pagos até ali
+- caixa da célula DECIDIDA pelo user 2026-08-18: [pt] = `GRÁTIS`, caixa alta (era `Grátis`). [en] segue `FREE`. Trocar mexe em `.lang` & no mapa `PT` de `HH.6` no MESMO commit (§V28) & pede conferir a largura 85 da coluna `Cost` (medida com `Gratis` 44px; caixa alta é mais larga)
+- herança DECIDIDA pelo user 2026-08-18: ⊥ herda NADA. Ficha das rodadas 31…33 aberta c/ a flag LIGADA volta a mostrar o preço real de tudo & o `Current` cai de uma vez no 1º load. Custo ACEITO: a alternativa (carimbar o log inteiro no 1º load) tornaria GRÁTIS p/ sempre ponto comprado ANTES de ligar a flag, contra o passo 1 do traço ↑
+- consequência: ⊥ sobra migração p/ escrever. `freeDots` nil = conjunto VAZIO, que é o que `freeHas` já responde ∴ o bloco de §V117 SAI do `onNodeReady` (§T316). Menos código, ⊥ mais — a decisão de herança era a única coisa que pedia a migração
+
+
+- 37ª rodada (2026-08-18) — 2 pedidos do user: (a) coluna `Cost` mostra `0` puro, `FREE`/`GRÁTIS` SAEM; (b) a flag ⊥ faz diferença NENHUMA em runtime — 2º relato seguido
+- STATUS HONESTO: causa ⊥ isolada. O carimbo depende de 2 contratos que NUNCA foram observados rodando — (1) `xpGuard` roda no clique do dot; (2) `sheet[field]` já reflete o clique quando o `onChange` dispara. §R39: o evento ⊥ passa valor nenhum ∴ ler estado é a única via & QUAL estado está correto naquele instante é `?`
+- se (2) for falsa o guarda inteiro lê estado VELHO: `on` = false na compra ∴ ⊥ carimba & AINDA poda (§V116) o carimbo da compra anterior — sintoma = "⊥ faz diferença nenhuma", exatamente o relatado
+- LIÇÃO DE PROCESSO (⊥ é §V, gate ⊥ checa): ⊥ ∃ 1 teste da família do guarda confirmado — §T277 §T296 §T315 §T323 seguem `.` desde a 30ª rodada. 4 rodadas empilharam em cima de contrato ⊥ observado & 3 consertos (§B30 §B31 inclusos) saíram sem 1 clique de confirmação. Diagnóstico ANTES do próximo conserto (§T324)
+- `Cost` = número sempre ∴ ponto carimbado mostra `0` & some a palavra especial: 1 chave a menos em 2 idiomas, 1 ramo a menos no renderer & o check de §V105 encolhe. Ponto grátis passa a ser indistinguível de Antecedente c/ `stBackgroundsXP` desligada (que já mostrava 0) — custo ACEITO, o user pediu
+
+- 38ª rodada (2026-08-18) — `Allow Buy Dots For Free` REMOVIDO por inteiro a pedido do user: checkbox & funcionalidade. Nunca funcionou em runtime (§B32) & 3 rodadas de conserto (34ª carimbo · 36ª chave de nível · 37ª diagnóstico) ⊥ acharam a causa ∴ o user cortou em vez de pagar a 4ª
+- sai TUDO: `chkFreeDots` de `HH.10` (caixa `520×270` → `520×240`) · `freeDots` & os 5 helpers (`freeStamps` `freeHas` `freeAdd` `freeDel` `freeTrim`) · o carimbo & a poda dentro do `xpGuard` · `free` na linha do log · o param `field` de `pushRise` (só o carimbo usava) · o diagnóstico de §T324 · as 3 chaves de `Allow Buy Dots For Free` · 6 blocos de check do gate
+- FICA: coluna `Cost` = número puro (§V120, pedido SEPARADO do user na 37ª) & o resto do `xpGuard` (barra compra sem saldo · barra venda de ponto do baseline)
+- `stFreeDots` & `freeDots` viram ÓRFÃOS declarados (§I3) ∴ nome QUEIMADO p/ sempre (§V2) & ficha que já gravou mantém o dado sem widget lendo. ≡ `xpLog` `spentXP` `experience`
+- o que ⊥ se sabe SEGUE ⊥ sabido: §R39 (`onChange` ⊥ passa valor & a ordem NDB↔evento é `?`) fica aberto & §B32 fica no §B. O guarda continua apoiado nessa premissa p/ barrar compra sem saldo — §T277 & §T296 seguem `.` ∴ se o guarda estiver morto, aparece de novo por outro caminho
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
@@ -364,9 +403,9 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - progress (aba Progress, `HH.9`): NENHUM campo próprio desde a 30ª rodada — as 3 caixas de XP ⊥ têm `field` (§I11): só `xpTotal` (LUA-OWNED ↓) fica salvo, `Spent` = Σ log   - progress (aba Progress, `HH.9`): `spentXP`. `experience` = ESPELHO do da Main (§V36). `totalXP` ⊥ tem `field` ∴ ∉ contrato, ⊥ salvo (§C, ≡ §V29). `xpLog` SAIU na 27ª rodada (bloco virou ledger derivado, §I10) ∴ ÓRFÃO declarado ↓; as 4 colunas do ledger ⊥ têm `field` (≡ `totalXP`, §V84) `Current` = `xpTotal` − `Spent`. `spentXP`   - progress (aba Progress, `HH.9`): `spentXP`. `experience` = ESPELHO do da Main (§V36). `totalXP` ⊥ tem `field` ∴ ∉ contrato, ⊥ salvo (§C, ≡ §V29). `xpLog` SAIU na 27ª rodada (bloco virou ledger derivado, §I10) ∴ ÓRFÃO declarado ↓; as 4 colunas do ledger ⊥ têm `field` (≡ `totalXP`, §V84) `experience` viraram ÓRFÃOS ↓. `xpLog` SAIU na 27ª rodada (bloco virou ledger derivado, §I10) ∴ ÓRFÃO declarado ↓; as 4 colunas do ledger ⊥ têm `field` (§V84)
   - ESPELHOS declarados (>1 widget de entrada no MESMO `field`, §V36 — ⊥ é violação de §V1): `health_1`…`_10` em `HH.1`+`HH.3` · `willpower_c1`…`_c10` em `HH.1`+`HH.3` (11ª rodada) · `experience` SAIU na 30ª rodada (as 2 caixas perderam o `field`, §I11). Virtudes SAÍRAM daqui na 12ª rodada — viraram só-leitura ↓
   - SÓ-LEITURA em `HH.3` (espelho ⊥ editável, ⊥ conta como dono): `alertness` `athletics` `awareness` `brawl` `melee` `stealth` (+`_1`…`_5`) + 1 SLOT `ro_ranged_*` = `Firearms` (`firearms`) | `Archery` (`archery`) conforme a lista da época (21ª rodada — `Archery` virou campo próprio ∴ o slot voltou; `Melee` ∈ ∀ época SÓ-LEITURA em `HH.3` (espelho ⊥ editável, ⊥ conta como dono): `alertness` `athletics` `awareness` `brawl` `firearms` `melee` `stealth` (+`_1`…`_5`) — os 2 SLOTS da 19ª rodada SAÍRAM na 20ª: `Firearms` mora sempre em `melee`)|`Archery` mora sempre em `firearms` & `Melee` sempre em `melee` (§V74) ∴ ligação estática de volta · `strength` `dexterity` `stamina` `perception` (+`_2`…`_5`) · `willpower_1`…`_10` (bolinhas da caixa WILLPOWER nova — 11ª rodada; os `_c1`…`_c10` do MESMO bloco são espelho editável ↑) · `conscience` `selfControl` `courage` (+`_2`…`_5`) — 12ª rodada, virtudes deixaram de ser editáveis aqui
-  - ÓRFÃOS declarados (∈ NDB de ficha salva, ⊥ widget em nenhum `.lfm`): `transportation` `other` (3ª rodada) · `bruised` `hurt` `injured` `wounded` `mauled` `crippled` `incapacitated` (4ª rodada — vitalidade virou posicional, §C) · `personalidade` `natureza` (9ª rodada — caixas Concept & Nature removidas a pedido) · `xpLog` (27ª rodada — bloco de texto livre virou ledger derivado, §I10 §V91) · `spentXP` `experience` (30ª rodada — XP virou derivado, lidos 1× na migração de §I11 §I10 §V91). nunca mais, §V102). ⊥ reusar estes nomes p/ campo novo ∴ ficha velha ⊥ ressuscita dado em caixa errada
+  - ÓRFÃOS declarados (∈ NDB de ficha salva, ⊥ widget em nenhum `.lfm`): `transportation` `other` (3ª rodada) · `bruised` `hurt` `injured` `wounded` `mauled` `crippled` `incapacitated` (4ª rodada — vitalidade virou posicional, §C) · `personalidade` `natureza` (9ª rodada — caixas Concept & Nature removidas a pedido) · `xpLog` (27ª rodada — bloco de texto livre virou ledger derivado, §I10 §V91) · `spentXP` `experience` (30ª rodada — XP virou derivado, lidos 1× na migração de §I11 §I10 §V91) · `stFreeDots` `freeDots` (38ª rodada — `Allow Buy Dots For Free` removido por inteiro, §C). ⊥ reusar estes nomes p/ campo novo ∴ ficha velha ⊥ ressuscita dado em caixa errada
   - settings (aba Settings, `HH.6`): `language` · `game` (novo 2026-08-17, 5 jogos + vazio) · `sheetTheme` (11ª rodada; 16ª rodada = 4 valores `Modern`\|`Victorian Era`\|`Dark Ages`\|`Classical Era`, ∀ um c/ paleta, default `Modern`, PINTA — §I5 §I6)
-  - LUA-OWNED declarados (∈ NDB, ⊥ widget POR DESIGN — escritos só por Lua ∴ ⊥ órfãos: dado VIVO): `baseline` (§I8c) · `xpTotal` (§I11, 30ª rodada — XP total ganho; único número de XP salvo). `<dataLink>` pode observar (exceção de §V8, §B25)
+  - LUA-OWNED declarados (∈ NDB, ⊥ widget POR DESIGN — escritos só por Lua ∴ ⊥ órfãos: dado VIVO): `baseline` (§I8c) · `xpTotal` (§I11, 30ª rodada — XP total ganho; único número de XP salvo). `freeDots` SAIU na 38ª rodada — virou ÓRFÃO ↓. `<dataLink>` pode observar (exceção de §V8, §B25)
   - storyteller (aba Storyteller, `HH.10`, 27ª rodada): `baseline` = XML do snapshot do personagem inicial (§R32), string, vazio ⟺ ⊥ salvo · `stBackgroundsXP` `stShowNumina` `stShowDisciplines` `stShowMagika` = bool (§I8, defaults OFF\|ON\|OFF\|OFF por §V89). ∀ um ⊥ tem widget em aba de jogador ∴ só o mestre edita (§V79)
   - `experience` · `avatar`
 - I4 build: `rdk -l` @ raiz do plugin → compile + lint fonte → `output/World of Darkness 20th.rpk`. `rdk -c` = só compile. `rdk p` = PREPARE, ⊥ build.
@@ -374,20 +413,20 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - I6 `applyTheme(v, from)` — @ `HH.6.lfm`, MESMA forma de `applyLanguage`: `rootOf(from)` + `collect` da raiz, snapshot 1× por handle antes da 1ª pintura, depois pinta `THEMES[v]` | restaura snapshot. Chamado pelo `<dataLink field="sheetTheme">` ∴ roda no load & em ∀ troca
 - I7 `ABILITY_FIELD` & `ERA_ABILITIES` — tabelas Lua @ `HuntersHunted.lfm` (form RAIZ, ≡ `HEALTH_MARKS`/§V41). `ABILITY_FIELD[nome]` = campo do traço (41 nomes, bijeção §V74). `ERA_ABILITIES[t][coluna]` = os 10 nomes daquela coluna naquela época, na ordem de leitura; `coluna` ∈ `talents` `skills` `knowledges`; chave `t` = `values` do `cboSheetTheme`. `THEME_LABELS` (19ª/20ª rodada) & `THEME_COMBAT` (19ª) ⊥ ∃ mais
 
-- I8 aba `Storyteller` (`HH.10.lfm`, 27ª rodada) — caixa `STORYTELLER SETTINGS`: linha `Save Initial Character` + `<button>` `Save` & 5 `checkBox` — `Can Buy Backgrounds With Experience` (`stBackgroundsXP`, default OFF) · `Show Numina` (`stShowNumina`, default ON) · `Show Disciplines` (`stShowDisciplines`, default OFF) · `Show Magika` (`stShowMagika`, default OFF) · `Allow Buy Dots For Free` (`stFreeDots`, default OFF, 31ª rodada §V105)
+- I8 aba `Storyteller` (`HH.10.lfm`, 27ª rodada) — caixa `STORYTELLER SETTINGS`: linha `Save Initial Character` + `<button>` `Save` & 5 `checkBox` — `Can Buy Backgrounds With Experience` (`stBackgroundsXP`, default OFF) · `Show Numina` (`stShowNumina`, default ON) · `Show Disciplines` (`stShowDisciplines`, default OFF) · `Show Magika` (`stShowMagika`, default OFF). `Allow Buy Dots For Free` (`stFreeDots`) SAIU na 38ª rodada ∴ 4 checkBox & caixa `520×240`
   - I8a `isStoryteller()` @ form RAIZ = `Firecast.getMesaDe(sheet)` ⊥ nil & `.meuJogador` ⊥ nil & `.isMestre == true`; ∀ outro caminho → false (fail-closed, §V80). ⊥ mesa → false ∴ ficha fora de mesa ⊥ mostra a aba (§C)
   - I8b `applyTabVisibility(from)` @ form RAIZ (≡ `HEALTH_LEVELS`/§V41): `Storyteller`.visible = `isStoryteller()`; `Numina`/`Disciplines`/`Magika`.visible = flag de §I8. REESCRITO na 28ª rodada (§B26): gatilho mora no form RAIZ (`onNodeReady` + `dataLink` dos 3 flags) ⊥ em `HH.10` ∴ ⊥ depende do ciclo de vida de aba nenhuma; esconde ABA **&** CONTEÚDO da aba (§V92); depois de recalcular, aba ativa proibida → volta p/ `Main` (§V93)
   - I8c `Save` → `Dialogs.confirmOkCancel` (aviso de ação SEM VOLTA, §R30) → OK → `sheet.baseline = ndb.exportXML(sheet)` (§R32). `baseline` ⊥ vazio ⟺ personagem inicial salvo ∴ ⊥ precisa de 2º campo de estado
 - I9 tabela de custo de XP (custo p/ ir do nível `n` → `n+1`; `n` = nível ATUAL, §V85). ∀ custo em pontos de Experiência
   - Atributo `n×4` · Habilidade `n×2` (`n=0` → 3) · Virtude `n×2` · Humanidade `n×2` · Força de Vontade `n` (SEM ×2 — correção do user 2026-08-18, §B29: FdV 4 → 5 custa 4; `n` = bolinhas `willpower_1`…`_10`, ⊥ `willpower_c*`)
   - Antecedente `n×3` (`n=0` → 3) SÓ c/ `stBackgroundsXP` ligado; flag desligada → linha entra c/ custo `0` (§C)
-  - MODO GRÁTIS (`stFreeDots` ligada, §I8, 31ª rodada): ∀ custo = 0 & a coluna `Cost` do log mostra `FREE` (pt `Grátis`) em TODA linha ∴ `xpSpent()` = 0 & o guarda ⊥ barra compra por saldo. É LENTE, ⊥ carimbo — desligar re-preça tudo desde o baseline (§V105)
   - Númina `n×7` (`n=0` → 7); 1º ponto de TIPO ∉ baseline → 21 (§V87). Númina de afinidade (`numina_1`) `n×6`, `n=0` segue 7 (| 21 se tipo novo)
   - tipos de númina (3): `hedge` = `numina_1`…`_10` (Magia Estática) · `psychic` = `psychic_1`…`_10` (Fenômenos Psíquicos) · `faith` = `faith` (Fé Verdadeira)
   - DORMENTES — regra declarada, ⊥ ∃ campo p/ diffar enquanto `Disciplines`/`Magika` estiverem vazias (§C): Disciplina de clã `n×5` (`n=0` → 10) · Disciplina fora do clã `n×7` (`n=0` → 10) · Trilha (Necromancy Path \| Thaumaturgy Path) `n×4` (`n=0` → 7) · Esfera de afinidade `n×7` (`n=0` → 10) · Esfera sem afinidade `n×8` (`n=0` → 10) · Arete `n×8`
 - I10 ledger de XP (aba Progress, `HH.9`, 27ª rodada) — bloco `EXPERIENCE LOG` vira 4 colunas SÓ-LEITURA: `Type` \| `Trait` \| `Level` \| `Cost`
   - fonte = diff(`baseline`, ficha atual), recalculado a ∀ render (§V83). ⊥ tem `field` ∴ ∉ contrato de dados & ⊥ salvo (≡ §V29, ≡ `totalXP`)
   - 1 linha por PONTO: baseline 2 → atual 4 = 2 linhas (nível 3 & nível 4), custo de CADA passo por §I9. `Level` = nível ALCANÇADO
+  - coluna `Cost` = NÚMERO em ∀ linha (37ª rodada, §V120), ⊥ ∃ palavra especial. Era `FREE`/`Grátis` enquanto o free-buy existiu (31ª…37ª) ∴ 3ª forma, a que sobrou depois da remoção da 38ª
   - ordem = categoria na ordem de §I9, depois índice do campo/slot (⊥ ∃ ordem cronológica, §C)
   - `Type` & `Trait` renderizados por Lua ∴ passam por `tryTranslate` (≡ §V70): `Attribute`=`Atributo` · `Ability`=`Habilidade` · `Virtue`=`Virtude` · `Humanity`=`Humanidade` · `Willpower`=`Força de Vontade` · `Background`=`Antecedente` · `Numina`=`Númina` (+ dormentes `Discipline` `Sphere` `Arete`)
   - `baseline` vazio → bloco mostra texto de estado EXPLÍCITO (`initial character not saved yet`), ⊥ tabela em branco (§V33)
@@ -402,6 +441,7 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - dot LIGOU & `xpTotal` − Σ log < 0 → DESFAZ (dot volta a `false`) ∴ ⊥ compra sem saldo
   - dot DESLIGOU & nível resultante < nível no `baseline` → DESFAZ (dot volta a `true`) ∴ ponto do personagem inicial ⊥ é vendido (§V103)
   - desfazer re-dispara o `onChange` — o 2º passe acha estado legal & para ∴ ⊥ ∃ laço
+
 
 ## §R RESEARCH
 
@@ -449,6 +489,10 @@ R35|`?` `onShow` em aba|`gui.Form.eves["onShow"]` ∃ (§R34) mas ⊥ ∃ preced
 R36|`?` desmarcar guarda `false`?|`imageCheckBox`/`checkBox` gravam o `field` sozinhos (`autoChange`), mas ⊥ se sabe se DESMARCAR grava `false` ou APAGA o atributo — `_ndb_setAttribute` é nativo. Se apagar: "default 1" torna Aparência 0 INALCANÇÁVEL (o load semeia de novo a ∀ abertura) & `stShowNumina` desligado volta ligado (§V89) ∴ as 2 sementes caem juntas. §T282 resolve|`SDK3/API/ndb.lua:60` `:310`
 
 R37|`onUserChange` por controle|`gui.Edit` `gui.ColorComboBox` & `gui.DataLink` têm `onUserChange`; `gui.CheckBox` `gui.ImageCheckBox` `gui.ComboBox` `gui.RadioButton` têm SÓ `onChange` ∴ dot ⊥ sabe por EVENTO se quem escreveu foi a mão do jogador \| o próprio Lua — separar exige FLAG no código (§V107)|`SDK3/API/rrpgGUI.lua:788` `:730` `:919` `:1176`
+
+R38|`opacity` em runtime & XML|`gui.Control.props["opacity"]` = `{setter="setOpacity", getter="getOpacity", tipo="double"}` ∴ ∀ controle aceita — `imageCheckBox` `edit` `textEditor` `comboBox` `button` `image` incluídos, ⊥ só `image`. Faixa 0..1 (precedente usa `0` `0.5` `0.6` `0.9`). Precedente em `.lfm` de FICHA do repo ∴ ⊥ é API de cena. `?` que valor lê como "esmaecido" sobre fundo preto — §T307 fixa|`SDK3/API/rrpgGUI.lua:108` `:239` · `Plugins/Core/rrpginlua/turnos/EfeitoCombatTracker.lfm:25,35` · `Plugins/Sheets/Anime e5 Sheet/FichaAnimeE5/primeiraPagina.lfm:43`
+
+R39|`onChange` de dot ⊥ passa valor|`gui.ImageCheckBox.eves["onChange"] = ""` & `gui.CheckBox.eves["onChange"] = ""` — string VAZIA = evento sem parâmetro ∴ o handler ⊥ recebe o valor novo & ler estado (`sheet[field]` \| `control.checked`) é a ÚNICA via. ORDEM (NDB gravado ANTES do evento disparar?) = `?` — ⊥ ∃ precedente no repo lendo `checked` dentro do próprio `onChange`. É a premissa em que o guarda inteiro se apoia desde a v2.8 & nunca foi observada|`SDK3/API/rrpgGUI.lua:788` `:730` `:761` · grep `onChange.*checked` em `Plugins/Sheets` = 0 hits
 
 ## §V INVARIANTS
 
@@ -559,12 +603,25 @@ V101: `xpGuard` DORME enquanto `baseline` vazio ∴ montar personagem ⊥ é bar
 V102: `experience` & `spentXP` ∈ ÓRFÃOS de §I3 depois da migração — lidos 1× p/ semear `xpTotal`, ⊥ reusados por widget nenhum (≡ §V91)
 V103: desfazer ponto só vale p/ ponto QUE ESTÁ NO LOG ∴ nível ⊥ desce abaixo do `baseline`; devolução = a própria subtração (§V100), ⊥ ∃ crédito escrito
 V104: `appearance_1` == nil (nunca tocado) → load semeia `true` ∴ ficha nova nasce c/ Aparência 1 ≡ os outros 8 atributos. `false` EXPLÍCITO ⊥ é tocado por semente nenhuma ∴ Aparência 0 ∃ & sobrevive ao load — vale enquanto §R36 disser que desmarcar grava `false`
-V105: `stFreeDots` ligada → ∀ `cost` do log = 0 & ∀ célula da coluna `Cost` = `FREE` traduzido ∴ `xpSpent()` = 0 & compra nenhuma é barrada por saldo (§I12). LENTE: ⊥ ∃ campo marcando ponto como grátis ∴ desligar re-preça TUDO desde o baseline & o saldo pode ficar negativo (§C) — jornalizar seria o único jeito de carimbar & §V100 proíbe
-V106: `stFreeDots` nil (ficha velha \| nunca tocada) = DESLIGADA ∴ ⊥ ∃ ficha que compre de graça por omissão — fail-closed ≡ §V80 & ≡ `stShowDisciplines`/`stShowMagika` (§V89). Distinto de `stShowNumina`, que é o único default ON
+V105: RETIRADO na 38ª rodada — o `Allow Buy Dots For Free` inteiro saiu (§C). Viveu 3 formas em 7 rodadas: LENTE (31ª, zerava tudo enquanto ligada) → CARIMBO por dot (34ª) → carimbo por NÍVEL (36ª). Nenhuma foi observada funcionando (§B32)
+V106: RETIRADO na 38ª rodada c/ §V105 — dizia que `stFreeDots` nil = DESLIGADA (fail-closed). O campo virou ÓRFÃO de §I3 ∴ ⊥ ∃ mais leitura p/ ter default
 V107: escrita de campo feita pelo PRÓPRIO Lua (re-ligação de época §V76, semente de §V104, migração de §I11) ⊥ dispara guarda nem re-render ∴ abrir a ficha ⊥ paga 1 varredura de ledger POR dot. Flag global ligada em volta do lote & 1 render depois dele (§R37 — ⊥ ∃ `onUserChange` em `imageCheckBox` p/ separar por evento)
 V108: 1 clique de dot = no MÁXIMO 1 varredura de `xpLedgerRows` ∴ guarda & caixas compartilham o resultado. Eram 2 (guarda chamava `xpSpent()` & `renderXPBoxes` varria de novo)
 V109: `cboGame` = EXATAMENTE 3 items `Vampire` `Hunters Hunted` `Mage`, `values` canônicos EN ≡ items (§V24), default `Hunters Hunted` por `dataLink defaultValue` & `enabled="false"` ∴ ⊥ editável. SEM opção vazia — exceção declarada de §V15, ≡ `cboSheetTheme`
 V110: `game` ∉ {`Vampire`,`Hunters Hunted`,`Mage`} (nil \| vazio \| 1 dos 4 nomes velhos) → load normaliza p/ `Hunters Hunted` ∴ combo TRAVADO ⊥ fica exibindo valor morto que ninguém pode consertar. Normalização mora no form RAIZ, ⊥ em `HH.6` — a aba Settings pode nunca ser aberta (≡ §V95)
+
+
+V111: esmaecido ⟺ só-leitura, nos 2 sentidos. (a) ∀ widget de valor SÓ-LEITURA — `readOnly="true"` | `enabled="false"` | `imageCheckBox` c/ `autoChange="false"` (§V51) | a `<image>` de dot1 dentro de linha só-leitura — tem `opacity="0.55"`, o MESMO literal em ∀ ocorrência; (b) ∀ widget de entrada EDITÁVEL (`field=` sem trava | `onUserChange`) ⊥ tem `opacity` ∴ ⊥ ∃ campo editável que PAREÇA travado. Rótulo & título & moldura ∉ regra (§C). `applyTheme` ⊥ escreve `opacity` de NADA ∴ o esmaecido é do XML & vale igual nas 4 épocas (≡ §V57 §V66)
+V112: controle que TRAVA em runtime esmaece no MESMO passo em que perde o `enabled` — `btnSaveBaseline` (§V82) é o único ∴ ⊥ ∃ botão apagado c/ brilho de botão vivo. Escrever `enabled` sem escrever `opacity` = gate vermelho (≡ §V12, prop irmã ! mudar no mesmo commit)
+
+V113: RETIRADO na 38ª rodada c/ §V105 — `freeDots` ⊥ ∃ mais. Dizia que o carimbo guarda NOMES, ⊥ números, ∴ §V100 seguia de pé; §V100 segue de pé por ⊥ ∃ mais carimbo nenhum
+V114: RETIRADO na 38ª rodada c/ §V105 — dizia `cost` = 0 ⟺ dot carimbado, independente da flag
+V115: RETIRADO na 38ª rodada c/ §V105 — dizia que o carimbo cai ANTES do `xpSpent()` do mesmo clique
+V116: RETIRADO na 38ª rodada c/ §V105 — dizia que ⊥ ∃ carimbo acima do nível do traço (a poda)
+V117: RETIRADO na 38ª rodada c/ §V105 — dizia que ⊥ ∃ herança & ⊥ ∃ adição em lote de carimbo
+V118: RETIRADO na 38ª rodada c/ §V105 — dizia que a chave do carimbo é `<traço>_<nível>`, ⊥ o campo clicado (§B31). Foi o conserto da 36ª rodada; ⊥ chegou a ser observado rodando
+
+V120: coluna `Cost` = NÚMERO em ∀ linha, ⊥ ∃ palavra especial (37ª rodada, pedido do user; SOBREVIVE à remoção da 38ª). ∴ `FREE`/`GRÁTIS` ∉ `.lang` & ∉ mapa `PT` de `HH.6` & ∉ renderer de `HH.9`
 
 ## §T TASKS
 
@@ -860,7 +917,7 @@ T285|x|`HH.9.lfm` — coluna `Cost` escreve `FREE` traduzido quando `stFreeDots`
 T286|x|`localization.lang` + mapa `PT` de `HH.6` — `Allow Buy Dots For Free` & `FREE` (pt `Grátis`)|V10,V22,V28
 T287|x|`verify-hunters-hunted.ps1` — `$wantFlags` += `stFreeDots` & checks NOVOS §V105 §V106. Mutação antes de aceitar|V20,V89,V105,V106
 T288|x|`module.xml` version `2.9` → `3.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Se T278…T287 forem buildados de uma vez, ESTE bump é o único ∴ T281 vira no-op declarado|V6,V7
-T289|.|teste no Firecast: ligar `Allow Buy Dots For Free` → comprar 3 pontos → 3 linhas no log c/ `Cost` = `FREE` & `Current` PARADO · desligar → as 3 linhas voltam a mostrar preço & `Current` cai (pode ficar negativo, §C)|I8,V105,V106
+T289|~|SUPERSEDED por T315 — a 2ª metade ("desligar → as 3 linhas voltam a mostrar preço & `Current` cai") vira o COMPORTAMENTO ERRADO na 34ª rodada (§V114). A 1ª metade (flag ON → 3 linhas `FREE` & `Current` parado) segue viva dentro de T315|I8,V105,V114
 T290|x|`HuntersHunted.lfm` — flag global `xpQuiet`: `xpGuard` & `renderXPBoxes` saem cedo enquanto ligada|V107
 T291|x|`HH.6.lfm` — `renderAbilityLabels` liga `xpQuiet` antes do laço de re-ligação & desliga no fim; 1 `renderXPBoxes` depois do lote|V107,V76
 T292|x|`HuntersHunted.lfm` — semente de `appearance_1` (§V104) & migração de `xpTotal` (§I11) rodam sob `xpQuiet`|V107,V104,I11
@@ -872,6 +929,43 @@ T297|x|`HH.6.lfm` — `cboGame`: `items`/`values` = `Vampire` `Hunters Hunted` `
 T298|x|`verify-hunters-hunted.ps1` — `V14 cboGame offers 5 games` → 3; `cboGame` entra na exceção de §V15; checks NOVOS §V109 (`enabled="false"` & default) & §V110. Mutação antes de aceitar|V20,V109,V110,V15
 T299|x|`localization.lang` + mapa `PT` de `HH.6` — + `Vampire`=`Vampiro` & `Mage`=`Mago`; − chaves [pt]+[en] dos 4 nomes longos. `Hunters Hunted`=`Caçadores Caçados` JÁ ∃|V10,V22,V28
 T300|x|`HuntersHunted.lfm` — `onNodeReady` normaliza `game` fora da lista p/ `Hunters Hunted` (form RAIZ, ⊥ `HH.6`)|V110,V95
+
+T301|x|`HH.3.lfm` — `opacity="0.55"` nas bolinhas só-leitura dos 3 templates: `VirtueMirror` 4 `imageCheckBox` + a `<image>` de dot1 · `ReadOnlyTrait` 5 · `WillpowerMirror` 10. `willpower_c1`…`_c10` (espelho EDITÁVEL do mesmo bloco, §V36) ⊥ recebe|V111,V51
+T302|x|`HH.9.lfm` — `opacity="0.55"` em `edtTotalXP` `edtSpentXP` & nos 4 `textEditor` do ledger (`dynXpType` `dynXpTrait` `dynXpLevel` `dynXpCost`). `edtCurrentXP` ⊥ recebe — é o único EDITÁVEL da caixa (§I11)|V111,I10,I11
+T303|x|`HH.7.lfm` `edtNuminaDesc` (§V29) & `HH.6.lfm` `cboGame` (§V109) — `opacity="0.55"`|V111,V29,V109
+T304|x|`HH.10.lfm` — `form.btnSaveBaseline.opacity` escrito na MESMA linha lógica do `enabled` (`saved` → `0.55`, senão `1`)|V112,V82
+T305|x|`verify-hunters-hunted.ps1` — check NOVO §V111 nos 2 sentidos (só-leitura ! `0.55` · entrada editável ⊥ tem `opacity`) + §V112 (`enabled` & `opacity` do botão no mesmo lugar). Mutação antes de aceitar|V20,V111,V112
+T306|~|`module.xml` version `3.1` → `3.2` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T307|.|teste no Firecast (RESOLVE §R38): espelhos da Combat · colunas do log · descrição de númina · `Game` leem ESMAECIDOS nas 4 épocas & `willpower_c*` `Current` seguem em brilho cheio. 0.55 fraco demais \| forte demais → ajustar o literal & o gate no mesmo commit (§V111)|R38,V111
+
+T308|x|`HuntersHunted.lfm` — `freeDots` conforme §I13: `freeHas(dot)` `freeAdd(dot)` `freeDel(dot)` sobre a string delimitada; vazio = `" "`|I13,V113
+T309|x|`HuntersHunted.lfm` — `pushRise` recebe o CAMPO do traço & marca `row.free = freeHas(field .. "_" .. lvl)`; `xpCost` devolve 0 p/ linha carimbada & `ctx.free` (a flag) SAI de `xpCost`|V114,I9,I10
+T310|x|`HuntersHunted.lfm` `xpGuard` — carimba/descarimba conforme §I12, o carimbo ANTES do `xpSpent()` do mesmo clique; o DESFAZ descarimba junto|V115,V116,I12
+T311|x|`HuntersHunted.lfm` — migração de §V117 no `onNodeReady`, sob `xpQuiet`, gravando nos 2 caminhos (carimbo do log \| `" "`)|V117,V107,I11
+T312|x|`HH.9.lfm` — coluna `Cost` lê `r.free` POR LINHA (⊥ `sheet.stFreeDots`); `dataLink` segue observando `stFreeDots` (a flag muda o preço da PRÓXIMA compra, ⊥ das linhas de cima)|V114,I10
+T313|x|`verify-hunters-hunted.ps1` — checks NOVOS §V113…§V117 + `xpCost` ⊥ pode mais ler `stFreeDots`. Mutação antes de aceitar|V20,V113,V114,V115,V116,V117
+T314|~|`module.xml` version `3.2` → `3.3` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Se a 33ª rodada (§T301…§T307) sair no mesmo build, 1 bump só fecha as duas & §T306 vira no-op declarado|V6,V7
+T315|.|teste no Firecast = o traço canônico de §C 35ª rodada, na Força: 2 pontos pagos (4 & 8) → LIGA a flag (log IDÊNTICO, `Current` parado) → +1 ponto (`Força\|4\|GRÁTIS`, `Current` parado) → DESLIGA (log IDÊNTICO, linha 4 segue `GRÁTIS`) → +1 ponto (`Força\|5\|16`, `Current` cai 16) → reabrir a ficha: os 5 passos seguem na tela. Extra: desmarcar a Força 4 & recomprar c/ a flag desligada → agora COBRA 12 (§V116)|V114,V115,V116,V117
+T316|x|`HuntersHunted.lfm` — REMOVER o bloco de migração de `freeDots` do `onNodeReady` (§T311 desfeito): nil já é conjunto vazio ∴ herdar nada = ⊥ escrever nada|V117,V113
+T317|x|`verify-hunters-hunted.ps1` — §V117 vira a PROIBIÇÃO (⊥ ∃ carimbo em lote: nenhum laço escrevendo `freeDots`, nenhuma leitura de `rows[i].dot` fora do renderer) & §V113 passa a exigir `sheet.freeDots` escrito em 2 lugares, ⊥ 3. Mutação antes de aceitar|V20,V117,V113
+T318|x|`localization.lang` [pt] `wod.FREE`=`Grátis`→`GRÁTIS` + mapa `PT` de `HH.6` no mesmo commit; conferir se `GRÁTIS` cabe nos 85px da coluna `Cost` na mais larga das 4 fontes de época — ⊥ coube → alargar coluna & caixa juntas (§V37, §V40)|V28,V10,V22,V105
+T319|x|`module.xml` version `3.3` → `3.4` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Firecast FECHADO: c/ o app aberto o `rdk -i` sai 0 SEM escrever no `%APPDATA%` — visto na 34ª rodada|V6,V7
+
+T320|x|`HuntersHunted.lfm` — `xpGuard`: `now` calculado ANTES do carimbo; carimba `trait .. "_" .. now` (⊥ `field`); `freeTrim(trait, now)` poda acima do nível a ∀ mutação, DESFAZ incluso; `wasFree` & o restauro do desfazer SAEM|V118,V116,I12
+T321|x|`verify-hunters-hunted.ps1` — check NOVO §V118 (carimbo lê nível, ⊥ campo clicado) + §V116 novo (poda a ∀ mutação) + §V117 estreitado (proíbe ADIÇÃO em lote, ⊥ poda). Mutação antes de aceitar|V20,V118,V116,V117
+T322|x|`module.xml` version `3.4` → `3.5` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size, Firecast FECHADO)|V6,V7
+T323|.|teste no Firecast (§B31): Força em 1 & flag ON → clicar a 5ª bolinha → `Atributo\|Força\|2\|0` & `Current` PARADO · desmarcar → linha & carimbo somem · flag OFF → recomprar → COBRA 4. DEPENDE de §T324/§T326 — enquanto §B32 estiver aberto este teste ⊥ tem como passar|V118,V116,B31,B32
+
+T324|x|DIAGNÓSTICO temporário (`HH.9.lfm` + form raiz) — 1 label na aba Progress escreve `flag=<stFreeDots> stamps=<freeDots> guard=<nº de vezes que xpGuard passou do gate> on=<último `on` lido> now=<último nível>`; guarda alimenta os contadores. Responde em 1 clique QUAL elo quebra: guarda ⊥ roda \| `on` chega false na compra (§R39). ⊥ é feature — SAI em §T326|R39,B32
+T325|x|`HH.9.lfm` `localization.lang` mapa `PT` de `HH.6` + gate — coluna `Cost` escreve `tostring(r.cost)` SEMPRE; chaves `FREE`/`GRÁTIS` REMOVIDAS dos 3 lugares; check de §V105 perde a metade do `FREE` & entra §V120. Mutação antes de aceitar|V120,V105,V28,V10,V20
+T326|~|CANCELADO na 38ª rodada — era o conserto que dependeria do veredito de §T324; o user removeu a funcionalidade em vez de consertá-la (§T327…§T332)|B32
+
+T327|x|`HuntersHunted.lfm` — REMOVER `freeDots` & os 5 helpers & o carimbo/poda do `xpGuard` & o `free` da linha & o param `field` de `pushRise` & os contadores de §T324|V120
+T328|x|`HH.9.lfm` — REMOVER o label de diagnóstico & o bloco que o escreve & `stFreeDots` do `dataLink`. `Cost` segue número (§V120)|V120
+T329|x|`HH.10.lfm` — REMOVER `chkFreeDots`; caixa `520×270` → `520×240`|V40,V38
+T330|x|`localization.lang` + mapa `PT` de `HH.6` — REMOVER as 3 chaves de `Allow Buy Dots For Free`|V10,V22,V28
+T331|x|`verify-hunters-hunted.ps1` — REMOVER os checks §V105 §V106 §V113…§V118; `$wantFlags` volta a 4; `freeDots` sai de `$luaOwned`; `stFreeDots` & `freeDots` entram nos ÓRFÃOS de §I3 (mutação: widget novo c/ o nome queimado = vermelho)|V20,V2
+T332|x|`module.xml` version `3.6` → `3.7` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 
 ## §B BUGS
 
@@ -906,3 +1000,9 @@ B27|2026-08-18|`applyTabVisibility` só disparava no `onNodeReady` do form RAIZ 
 B28|2026-08-18|corretude do log de XP dependia de `ndb.newObserver` p/ os ~458 dots — API do SDK sem precedente em FICHA (só ChatMod) & nunca testada (§T252 ficou `~`). Os únicos gatilhos PROVADOS eram `onNodeReady` (1×/carga) & `dataLink` de 3 campos ∴ log congela no estado do load. Somado: `rows` vazio escrevia 4 colunas EM BRANCO (§V33 só cobria baseline ausente) ∴ baseline recém-salvo + ponto novo = tela vazia que ⊥ diz nada|V97,V98
 B29|2026-08-18|custo de Força de Vontade escrito `n×2` em §I9 desde a 27ª rodada, SEM fonte citada (§I9 ⊥ tem linha de §R p/ nenhum preço) ∴ o ledger cobrava o DOBRO em toda compra de FdV — FdV 4→5 aparecia por 8 em vez de 4. Achado pelo user 2026-08-18. §V86 amarra tabela↔código, ⊥ tabela↔livro ∴ preço errado passava verde nos 2 lados|I9
 B30|2026-08-18|abrir a ficha TRAVA. `onChange` de ∀ dot (T272/T273, versão 2.8) chama `xpGuard` **&** `renderXPBoxes` — cada um varre o LEDGER INTEIRO (~91 traços × 2 nós ≈ 1.1k leituras de NDB). O renderer de época re-liga 150 dots (30 linhas × 5) escrevendo `c.field` & `c.checked`, & roda 2× no load (`dataLink` de `language` & de `sheetTheme`, ambos c/ `defaultValue` ∴ disparam na abertura) ∴ ≈ 300 varreduras & ~660k leituras nativas ANTES da ficha aparecer. Escrita PROGRAMÁTICA ⊥ era separada de clique do jogador & `imageCheckBox` ⊥ tem `onUserChange` (§R37) ∴ nada distinguia as duas|V107,V108
+
+B31|2026-08-18|carimbo grava o CAMPO clicado (`strength_5`) & o log pergunta pelo NÍVEL alcançado (`strength_2` — `traitLevel` CONTA bolinhas marcadas, ⊥ lê índice) ∴ clique fora de ordem carimba chave que linha nenhuma consulta → cobra XP & ⊥ escreve `GRÁTIS`. §V114 dizia "a MESMA string que `xpGuard` recebe": premissa MINHA, verdadeira só c/ bolinha preenchida em ORDEM. O gate media as 2 pontas separadas (§V114 lê `pushRise`, §V115 lê o guarda) & nunca comparou as duas chaves ∴ passou verde. Achado pelo user 2026-08-18|V118,V116
+
+B32|2026-08-18|`Allow Buy Dots For Free` ⊥ produz efeito NENHUM em runtime (2 relatos do user, versões 3.4 & 3.5): cobra XP & ⊥ carimba. Causa ⊥ isolada — o carimbo depende de 2 contratos nunca observados: (a) `xpGuard` roda no clique; (b) `sheet[field]` já reflete o clique quando `onChange` dispara. §R39: o evento ⊥ passa valor ∴ ler estado é obrigatório & qual estado vale naquele instante é `?`. Se (b) for falsa, `on` = false na compra → ⊥ carimba & a poda de §V116 ainda APAGA o carimbo anterior. Agravante de PROCESSO: ∀ teste do guarda (§T277 §T296 §T315 §T323) segue `.` desde a 30ª rodada ∴ 4 rodadas construíram & 3 consertos saíram sem 1 confirmação — o gate lê o FONTE & ⊥ alcança contrato de evento (≡ §B6 §B9: código que nunca rodou passando por pronto)|R39,T324
+
+B33|2026-08-18|FECHAMENTO de §B32: causa NUNCA isolada. O user removeu a funcionalidade na 38ª rodada em vez de pagar uma 4ª rodada de conserto às cegas. O que sobra p/ a próxima geração: (a) §R39 segue `?` — `onChange` de `checkBox`/`imageCheckBox` ⊥ passa valor & ⊥ ∃ precedente NO REPO INTEIRO de ficha lendo estado dentro desse evento (grep 0); (b) o `xpGuard` continua de pé apoiado NA MESMA premissa p/ barrar compra sem saldo, & §T277/§T296 nunca rodaram ∴ o mesmo buraco pode estar sob o guarda inteiro; (c) LIÇÃO: 4 rodadas (33ª…36ª) empilharam código em cima de contrato de evento ⊥ observado — o gate lê o FONTE & é cego a runtime, ⊥ adianta apertar check (≡ §B6 §B9, código que nunca rodou passando por pronto)|C

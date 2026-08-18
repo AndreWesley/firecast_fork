@@ -2132,7 +2132,7 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 		<layout left="350" top="0" width="850" height="680">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtNuminaDesc" left="10" top="25" width="830" height="645" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+			<textEditor name="edtNuminaDesc" left="10" top="25" width="830" height="645" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 	</scrollBox>
 
