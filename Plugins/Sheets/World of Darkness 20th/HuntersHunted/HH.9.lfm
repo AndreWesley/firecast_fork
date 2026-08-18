@@ -153,6 +153,17 @@
 	     keep correct. -->
 	<dataLink fields="{'baseline', 'stBackgroundsXP', 'language'}" onChange="renderXPLedger(self);"/>
 
+	<!-- The tab is a REPORT, so it is rebuilt every time it comes up (SPEC V97). The dots that
+	     feed it live on other tabs and there are some four hundred and sixty of them: the
+	     observer below is meant to catch those, but it is an SDK call with no precedent in any
+	     sheet in this repo, and while it silently did nothing the log stayed frozen at whatever
+	     it showed when the sheet loaded - four blank columns (SPEC B28). Correctness hangs on
+	     this event, not on the observer. -->
+	<event name="onShow">
+		renderTotalXP(self);
+		renderXPLedger(self);
+	</event>
+
 	<event name="onNodeReady">
 		renderTotalXP(self);
 		renderXPLedger(self);
