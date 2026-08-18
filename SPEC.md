@@ -862,10 +862,10 @@ T287|x|`verify-hunters-hunted.ps1` — `$wantFlags` += `stFreeDots` & checks NOV
 T288|x|`module.xml` version `2.9` → `3.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Se T278…T287 forem buildados de uma vez, ESTE bump é o único ∴ T281 vira no-op declarado|V6,V7
 T289|.|teste no Firecast: ligar `Allow Buy Dots For Free` → comprar 3 pontos → 3 linhas no log c/ `Cost` = `FREE` & `Current` PARADO · desligar → as 3 linhas voltam a mostrar preço & `Current` cai (pode ficar negativo, §C)|I8,V105,V106
 T290|x|`HuntersHunted.lfm` — flag global `xpQuiet`: `xpGuard` & `renderXPBoxes` saem cedo enquanto ligada|V107
-T291|~|`HH.6.lfm` — `renderAbilityLabels` liga `xpQuiet` antes do laço de re-ligação & desliga no fim; 1 `renderXPBoxes` depois do lote|V107,V76
+T291|x|`HH.6.lfm` — `renderAbilityLabels` liga `xpQuiet` antes do laço de re-ligação & desliga no fim; 1 `renderXPBoxes` depois do lote|V107,V76
 T292|x|`HuntersHunted.lfm` — semente de `appearance_1` (§V104) & migração de `xpTotal` (§I11) rodam sob `xpQuiet`|V107,V104,I11
 T293|x|`HuntersHunted.lfm` `HH.1.lfm` `HH.7.lfm` — `xpGuard(field, form)` chama `renderXPBoxes` 1× no fim & devolve o `xpSpent()` que já calculou; `onChange` do dot vira só `xpGuard('…', self)`|V108,V99
-T294|.|`verify-hunters-hunted.ps1` — checks NOVOS §V107 §V108 (& §V99 aceita a assinatura nova). Mutação antes de aceitar|V20,V99,V107,V108
+T294|~|`verify-hunters-hunted.ps1` — checks NOVOS §V107 §V108 (& §V99 aceita a assinatura nova). Mutação antes de aceitar|V20,V99,V107,V108
 T295|.|`module.xml` version `3.0` → `3.1` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Rodar DEPOIS de §T297…§T300 — 1 build fecha as duas rodadas|V6,V7
 T296|.|teste no Firecast: ficha abre em tempo NORMAL (§B30) & o guarda segue barrando compra sem saldo (≡ §T277)|V107,V108
 T297|.|`HH.6.lfm` — `cboGame`: `items`/`values` = `Vampire` `Hunters Hunted` `Mage` (⊥ vazio), `enabled="false"` + `<dataLink field="game" defaultValue="Hunters Hunted"/>`|V109,V15,V24

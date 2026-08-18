@@ -568,6 +568,14 @@
 
 				collect(root, all);
 
+				-- Rebinding 150 dots writes 150 fields, and every one of those writes lands on
+				-- the experience guard. Left alone that is 300 walks of the ledger before the
+				-- sheet is even on screen - twice over, since the language and the theme link
+				-- both fire on load - which is what froze it (SPEC B30 / V107). None of these
+				-- writes changes a rating, so there is nothing here for the guard to weigh and
+				-- nothing to re-render once the batch is done.
+				xpQuiet = true;
+
 				for i = 1, #all, 1 do
 					local c = all[i];
 					local cls = c:getClassName();
@@ -628,6 +636,8 @@
 						if text ~= "" then show(c, text); end;
 					end;
 				end;
+
+				xpQuiet = false;
 			end;
 
 			-- ---- Theme (SPEC I5/I6, 14th round) --------------------------------------
