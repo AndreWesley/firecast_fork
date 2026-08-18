@@ -545,6 +545,39 @@
 				{ kind = "psychic", base = "psychic", count = 10 },
 			};
 
+			-- Field -> how to read that trait's rating, for every trait experience can buy
+			-- (SPEC I12). Built from the SAME lists the ledger walks, so a trait cannot be in
+			-- one and missing from the other (SPEC V86): the guard refuses moves on exactly
+			-- the traits the log prices.
+			--
+			-- It holds no cost of its own. Prices live in xpCost and nowhere else - the guard
+			-- reads what a move did to the LOG rather than pricing the move itself.
+			XP_TRAIT = {};
+
+			local function declareTrait(field, first, last, fixed)
+				XP_TRAIT[field] = { first = first, last = last, fixed = fixed };
+			end;
+
+			for i = 1, #XP_ATTRS, 1 do declareTrait(XP_ATTRS[i][2], 2, 5, 1); end;
+
+			-- Appearance is the attribute whose first dot can be switched off (SPEC I3).
+			declareTrait("appearance", 1, 5, 0);
+
+			for name, field in pairs(ABILITY_FIELD) do declareTrait(field, 1, 5, 0); end;
+			for i = 1, #XP_CUSTOM, 1 do declareTrait(XP_CUSTOM[i], 1, 5, 0); end;
+			for i = 1, #XP_VIRTUES, 1 do declareTrait(XP_VIRTUES[i][2], 2, 5, 1); end;
+
+			declareTrait("humanity", 1, 10, 0);
+			declareTrait("willpower", 1, 10, 0);
+
+			for i = 1, 9, 1 do declareTrait("background_" .. i, 1, 5, 0); end;
+
+			for g = 1, #XP_NUMINA, 1 do
+				for i = 1, XP_NUMINA[g].count, 1 do declareTrait(XP_NUMINA[g].base .. "_" .. i, 1, 5, 0); end;
+			end;
+
+			declareTrait("faith", 1, 5, 0);
+
 			local function numinaTypeInUse(node, base, count)
 				for i = 1, count, 1 do
 					if traitLevel(node, base .. "_" .. i, 1, 5, 0) > 0 then return true; end;
@@ -669,6 +702,21 @@
 				end;
 
 				return rows;
+			end;
+
+			-- What the character has spent, straight off the log (SPEC I11). Not stored: a
+			-- second copy of this number is the one thing that could disagree with the lines
+			-- the player is reading (SPEC V100).
+			function xpSpent()
+				local rows = xpLedgerRows();
+
+				if rows == nil then return 0; end;
+
+				local sum = 0;
+
+				for i = 1, #rows, 1 do sum = sum + rows[i].cost; end;
+
+				return sum;
 			end;
 		]]>
 	</script>

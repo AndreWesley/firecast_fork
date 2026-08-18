@@ -813,8 +813,8 @@ T266|x|`HH.9.lfm` — `#rows == 0` escreve estado "Nothing bought yet" na 1ª co
 T267|x|`verify-hunters-hunted.ps1` — checks NOVOS §V97 §V98. Mutação antes de aceitar|V20,V97,V98
 T268|x|`module.xml` version `2.6` → `2.7` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 T269|.|teste no Firecast (RESOLVE §R35 & §T252): baseline salvo → +1 em `dexterity` → ir p/ Progress → linha `Attribute\|Dexterity\|3\|8`; desmarcar REMOVE a linha. Se ⊥ aparecer ao trocar de aba, `onShow` ⊥ dispara em form de aba & o gatilho vira (a) \| (b) de §R35|R35,V97,V83
-T270|.|`HuntersHunted.lfm` — `XP_TRAIT[base] = {kind, first, fixed}` p/ ∀ traço de §I9, montado das MESMAS listas que `xpLedgerRows` usa (⊥ 2ª lista, §V86) + `xpSpent()` = Σ `cost` do log|I12,V86
-T271|.|`HuntersHunted.lfm` — `xpGuard(field)` conforme §I12 (dorme sem baseline · barra compra sem saldo · barra venda de ponto do baseline · desfaz escrevendo o campo de volta)|I12,V99,V101,V103
+T270|x|`HuntersHunted.lfm` — `XP_TRAIT[base] = {kind, first, fixed}` p/ ∀ traço de §I9, montado das MESMAS listas que `xpLedgerRows` usa (⊥ 2ª lista, §V86) + `xpSpent()` = Σ `cost` do log|I12,V86
+T271|~|`HuntersHunted.lfm` — `xpGuard(field)` conforme §I12 (dorme sem baseline · barra compra sem saldo · barra venda de ponto do baseline · desfaz escrevendo o campo de volta)|I12,V99,V101,V103
 T272|.|`HH.1.lfm` `HH.7.lfm` — `onChange="xpGuard('$(field)_N'); renderXPBoxes(self);"` em ∀ dot de traço que custa XP (templates)|V99
 T273|.|`HuntersHunted.lfm` — `renderXPBoxes(form)` (≡ `renderHealthTrack`, §R9): escreve `Total` `Spent` `Current` + migração de `xpTotal` (§I11). `HH.9` & `HH.1` chamam|I11,V100,V102
 T274|.|`HH.9.lfm` & `HH.1.lfm` — 3 caixas de XP perdem `field`; `Current` ganha `onUserChange` → `xpTotal = digitado + Spent`. `spentXP` & `experience` saem de §I3 ESPELHOS p/ ÓRFÃOS|I11,V1,V36,V102
