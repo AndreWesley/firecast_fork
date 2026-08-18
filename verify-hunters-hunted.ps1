@@ -1852,6 +1852,28 @@ elseif ($writes -ne 2) { Fail "V100 xpTotal is written in $writes places - it ma
 elseif ($boxesFn -notmatch 'xpSpent\(\)') { Fail "V100 the boxes do not read the log - Spent would be a stored number" }
 else { Pass "V100 experience is derived: one number saved, two worked out" }
 
+# ---- V107: a write the sheet makes to ITSELF is not a click -----------------------
+# The era renderer rebinds 150 dots, and both the language and the theme link fire it on
+# load. With the guard live on every one of those writes that was ~300 walks of the ledger
+# before the sheet drew - the freeze in B30. imageCheckBox has no onUserChange to tell a
+# click from a write (SPEC R37), so the flag is how the sheet says which is which.
+$eraFn = LuaFn $hh6 'renderAbilityLabels'
+if ($root -notmatch 'xpQuiet = false;') { Fail "V107 xpQuiet is not declared on the root form" }
+elseif ($guardFn -notmatch 'or xpQuiet or') { Fail "V107 the guard runs on the sheet's own writes - the load would walk the ledger per dot (SPEC B30)" }
+elseif ($boxesFn -notmatch 'if sheet == nil or xpQuiet then return') { Fail "V107 the box renderer runs on the sheet's own writes (SPEC B30)" }
+elseif ($boxesFn -notmatch 'xpQuiet = true') { Fail "V107 seeding xpTotal is not done quietly - the links watching it call straight back in" }
+elseif (-not $eraFn) { Fail "V107 renderAbilityLabels not found on HH.6" }
+elseif ($eraFn -notmatch 'xpQuiet = true') { Fail "V107 the era renderer rebinds its dots with the guard live - the sheet freezes on load (SPEC B30)" }
+elseif ($eraFn -notmatch 'xpQuiet = false') { Fail "V107 the era renderer never lowers xpQuiet - the guard would stay asleep for good" }
+else { Pass "V107 the sheet's own writes are quiet, and the flag comes back down" }
+
+# ---- V108: one walk of the ledger per click ---------------------------------------
+# The dot used to call the guard AND the box renderer, and each walked the whole ledger.
+$dotsDouble = @($dots | Where-Object { $_.GetAttribute("onChange") -match 'renderXPBoxes' })
+if ($dotsDouble) { Fail "V108 $($dotsDouble.Count) dot(s) call renderXPBoxes beside the guard - each click would walk the ledger twice" }
+elseif ($guardFn -notmatch 'renderXPBoxes\(form, spent\)') { Fail "V108 the guard does not hand its count to the boxes - they would build the same one again" }
+else { Pass "V108 a click walks the ledger once" }
+
 # ---- V101: the guard sleeps until the character is frozen -------------------------
 # Building a character spends nothing, so a balance of zero must not stop the first dot.
 if ($guardFn -notmatch 'baselineOf\(\)') { Fail "V101 the guard does not look for a baseline - a character could not be built at all" }
