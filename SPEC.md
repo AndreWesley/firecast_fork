@@ -1044,7 +1044,7 @@ T349|x|`HuntersHunted.lfm` — `xpSetCurrent`: `tonumber(typed) or 0` < 0 → �
 T350|x|`HuntersHunted.lfm` — semente da migração em `renderXPBoxes`: `math.max(0, tonumber(sheet.experience) or 0) + spent` ∴ ficha velha c/ `experience` negativo ⊥ nasce devendo. Segue 1 só escrita de `xpTotal` ali (gate de §V100 conta 2 no arquivo)|V131,I11,B35
 T351|x|`localization.lang` [pt] & [en] + mapa `PT` de `HH.6.lfm` — 2 strings NOVAS nos 3 lugares, MESMO commit: `Not enough experience to buy that dot` = `Experiência insuficiente para comprar esse ponto` · `Experience cannot go below zero` = `A experiência não pode ficar negativa`|V130,V10,V22,V28
 T352|x|`verify-hunters-hunted.ps1` — checks NOVOS §V129 §V130 §V131. Mutação antes de aceitar (§V20): apagar o pop-up · trocar por literal PT · mover o pop-up p/ o ramo de §V103 · aceitar negativo em `xpSetCurrent` · tirar o `math.max` da semente — ∀ um ! ficar VERMELHO|V20,V129,V130,V131
-T353|~|`module.xml` version `3.8` → `3.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (Firecast FECHADO, instalado c/ mesmo size)|V6,V7
+T353|x|`module.xml` version `3.8` → `3.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (Firecast FECHADO, instalado c/ mesmo size)|V6,V7
 T354|.|teste no Firecast — RESOLVE §T277 §T296 & RESPONDE §R39: baseline salvo & `Current` = 0 → clicar bolinha nova → POP-UP aparece · bolinha volta sozinha · `Current` segue 0. Pop-up ⊥ aparecer & bolinha FICAR = §R39 NEGATIVA ∴ guarda morto (§B33 b) & vira §B novo, ⊥ 4ª rodada de conserto às cegas. 2º caso: digitar `-5` no `Current` → pop-up & a caixa volta ao valor de antes|R39,V129,V131,B33
 
 ## §B BUGS
