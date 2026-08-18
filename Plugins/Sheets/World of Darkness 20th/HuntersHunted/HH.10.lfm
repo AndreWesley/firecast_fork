@@ -58,7 +58,7 @@
 		<!-- Theme backdrop, same arrangement as every other tab (SPEC T158, V56, V57). -->
 		<image name="themePaper10" align="client" style="stretch" hitTest="false" visible="false"/>
 
-		<layout left="0" top="0" width="520" height="240">
+		<layout left="0" top="0" width="520" height="270">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="520" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 
@@ -73,6 +73,12 @@
 			<checkBox name="chkShowNumina" left="15" top="120" width="490" height="25" field="stShowNumina" text="Show Numina"/>
 			<checkBox name="chkShowDisciplines" left="15" top="150" width="490" height="25" field="stShowDisciplines" text="Show Disciplines"/>
 			<checkBox name="chkShowMagika" left="15" top="180" width="490" height="25" field="stShowMagika" text="Show Magika"/>
+
+			<!-- Free-buy is a LENS, not a stamp (SPEC V105): while it is ticked nothing costs
+			     anything, and unticking it prices everything bought since the baseline all over
+			     again - the log is worked out, and nothing marks a point as having been free.
+			     Off by default like the two tabs above it (SPEC V106). -->
+			<checkBox name="chkFreeDots" left="15" top="210" width="490" height="25" field="stFreeDots" text="Allow Buy Dots For Free"/>
 		</layout>
 	</scrollBox>
 
