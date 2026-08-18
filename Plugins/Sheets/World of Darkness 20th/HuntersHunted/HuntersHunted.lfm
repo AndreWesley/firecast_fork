@@ -480,7 +480,7 @@
 				if kind == "Ability"   then if from == 0 then return 3; end; return from * 2; end;
 				if kind == "Virtue"    then return from * 2; end;
 				if kind == "Humanity"  then return from * 2; end;
-				if kind == "Willpower" then return from * 2; end;
+				if kind == "Willpower" then return from; end;
 
 				if kind == "Background" then
 					-- Off by default: the storyteller decides whether backgrounds cost XP at

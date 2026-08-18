@@ -1915,7 +1915,7 @@ else {
         'Ability'    = 'if from == 0 then return 3; end; return from \* 2'
         'Virtue'     = 'if kind == "Virtue"    then return from \* 2'
         'Humanity'   = 'if kind == "Humanity"  then return from \* 2'
-        'Willpower'  = 'if kind == "Willpower" then return from \* 2'
+        'Willpower'  = 'if kind == "Willpower" then return from;'
         'Background' = 'return from \* 3'
         'Numina'     = 'return from \* 7'
     }
