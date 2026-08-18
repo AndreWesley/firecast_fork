@@ -652,9 +652,11 @@
 		the three power tabs answer to the storyteller's checkboxes and the Storyteller tab
 		answers to the gate, so a player opens eight of these twelve.
 
-		The three hidden-by-default tabs are authored VISIBLE and hidden by the renderer on
-		load: a sheet whose Lua never ran shows too much rather than too little, which is
-		noticed and reported, unlike a tab that silently never appears.
+		Each of those four is authored in the state its flag defaults to (SPEC V94, 28th
+		round): Disciplines, Magika and Storyteller start hidden, Numina starts visible.
+		The 27th round authored them all visible and left the hiding to the renderer, and a
+		fresh sheet with every checkbox unticked opened with all three on show (SPEC B26) -
+		so the static state fails CLOSED too, not just the gate in Lua.
 	-->
 	<tabControl align="client">
 		<tab name="tabMain" title="Main">
@@ -666,10 +668,10 @@
 		<tab name="tabNumina" title="Numina">
 			<import file="HH.7.lfm"/>
 		</tab>
-		<tab name="tabDisciplines" title="Disciplines">
+		<tab name="tabDisciplines" title="Disciplines" visible="false">
 			<import file="HH.11.lfm"/>
 		</tab>
-		<tab name="tabMagika" title="Magika">
+		<tab name="tabMagika" title="Magika" visible="false">
 			<import file="HH.12.lfm"/>
 		</tab>
 		<tab name="tabCombat" title="Combat">
@@ -690,7 +692,7 @@
 		<tab name="tabSettings" title="Settings">
 			<import file="HH.6.lfm"/>
 		</tab>
-		<tab name="tabStoryteller" title="Storyteller">
+		<tab name="tabStoryteller" title="Storyteller" visible="false">
 			<import file="HH.10.lfm"/>
 		</tab>
 	</tabControl>

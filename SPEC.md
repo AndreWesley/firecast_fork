@@ -760,7 +760,7 @@ T251|x|`module.xml` version `2.3` → `2.4` + `rdk -l` (exit 0 & `.rpk` mudou) +
 T252|~|teste no Firecast: mestre vê `Storyteller` & jogador ⊥; salvar baseline → +1 em `dexterity` → linha `Attribute\|Dexterity\|3\|8` & desmarcar REMOVE a linha|V79,V81,V83
 
 T253|x|`HH.7.lfm` — label `*` da linha `numina_1` SAI (negrito fica); `["*"]` do mapa `PT` de `HH.6` & `wod.*` [pt]+[en] saem junto|V10,V22,V28,V88
-T254|.|`HuntersHunted.lfm` — `<tab>` `Disciplines` `Magika` `Storyteller` autoradas `visible="false"`; `Numina` segue visível|V89,V94
+T254|x|`HuntersHunted.lfm` — `<tab>` `Disciplines` `Magika` `Storyteller` autoradas `visible="false"`; `Numina` segue visível|V89,V94
 T255|.|`HuntersHunted.lfm` — `onNodeReady` + `dataLink` dos 3 flags MIGRAM de `HH.10` p/ o form RAIZ; `HH.10` fica só c/ `renderBaselineState`|I8,V95
 T256|.|`HuntersHunted.lfm` — `applyTabVisibility` esconde ABA & CONTEÚDO (filhos da `<tab>`)|I8,V92
 T257|.|`HuntersHunted.lfm` — pós-recálculo, aba ativa proibida → `Main` (`tabIndex = 0` \| `tabMain:activate()`)|I8,V93,R33
