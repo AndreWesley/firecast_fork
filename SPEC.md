@@ -306,6 +306,10 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - esconder aba = esconder ABA **&** CONTEÚDO dela ∴ mesmo que o host ⊥ tire o botão da aba (§R31 segue `?`), o jogador ⊥ vê o que está dentro
 - aba ativa proibida → ficha PULA p/ `Main` a ∀ recálculo (load, troca de flag, gate). Pedido do user 2026-08-18. ⊥ ∃ evento de troca de aba no SDK (`gui.TabControl` só tem `tabIndex`, §R33) ∴ ⊥ dá p/ barrar o clique no botão — o pulo cobre load & mudança de flag, ⊥ o clique em botão que sobreviva
 
+- 29ª rodada (2026-08-18) — visibilidade de aba vira DERIVADA, ⊥ decisão tomada 1 vez. ↓ ∀ decisão desta rodada
+- papel na mesa muda SEM avisar a ficha: `jogador`/`mesa` ⊥ têm evento nenhum no SDK, só getters (§R34) ∴ a ficha ⊥ pode esperar ser avisada — ! reperguntar a ∀ exibição (`onShow`, §V96)
+- §V93 reescrito p/ o que o SDK deixa fazer (§R33): "aba ATIVA ∈ proibidas" ⊥ é legível ∴ o gatilho vira a TRANSIÇÃO visível→escondida. Custo DECLARADO por mim, ⊥ pedido pelo user: mestre desligando 1 flag manda p/ `Main` também quem estava em aba permitida
+
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
@@ -401,6 +405,8 @@ R31|`?` esconder aba|`gui.TabItem` herda `gui.Control` ∴ tem prop `visible`. �
 R32|snapshot do NDB|`ndb.exportXML(nodeObj)` → string XML do nó inteiro; volta por `ndb.newMemNodeDatabase` + `ndb.importXML` ∴ baseline = 1 campo string lido em nó de MEMÓRIA, ⊥ 1 campo por traço & ⊥ toca a ficha. `baseline` vazio na hora do export ∴ ⊥ aninha snapshot dentro de snapshot (§V81 mantém isso verdade)|`SDK3/API/ndb.lua:552` `:390` `:568`
 
 R33|`?` troca de aba|`gui.TabControl` expõe SÓ `tabIndex` (get/set) & `gui.TabItem:activate()`; `eves` ⊥ tem `onChange`/`onTabIndexChange` — `Control.eves` só oferece mouse/teclado/foco ∴ ⊥ dá p/ interceptar o clique no botão de aba. Sobra recalcular & PULAR p/ `Main` (§V93) + esconder o conteúdo (§V92)|`SDK3/API/rrpgGUI.lua:1010` `:1025` `:268`
+
+R34|exibição de form|`gui.Form.eves["onShow"]` existe (par de `onHide`) ∴ dá p/ recalcular a ∀ vez que a ficha aparece, ⊥ só no `onNodeReady` (1×/nó). Precedente: 15 `.lfm` do repo, incl. ficha (`Sheets/Ficha de Reinos d20/FichaReinosD20/DockNPCs.lfm:73`). `jogador` & `mesa` ⊥ expõem evento nenhum em `rrpgWrappers` — só getters ∴ `onShow` é o gancho que ∃|`SDK3/API/rrpgGUI.lua:480` `SDK3/API/rrpgWrappers.lua:370` `:444`
 
 ## §V INVARIANTS
 
@@ -498,9 +504,11 @@ V90: `Disciplines` & `Magika` ⊥ declaram `field` nenhum enquanto vazias ∴ �
 V91: `xpLog` ∈ ÓRFÃOS de §I3 ∴ ⊥ reusado por widget novo — texto livre de ficha velha ⊥ ressuscita numa coluna do ledger (≡ `transportation` `personalidade`)
 
 V92: esconder aba manejada = `tab.visible = false` **&** conteúdo da aba invisível ∴ host que ⊥ tire o botão (§R31 `?`) ainda ⊥ mostra o que está dentro. Vale p/ as 4 (`Numina` `Disciplines` `Magika` `Storyteller`)
-V93: pós-recálculo, aba ATIVA ∈ proibidas → ficha ativa `Main` ∴ jogador ⊥ fica olhando aba que acabou de ser negada (load, troca de flag, gate). ⊥ ∃ evento de troca de aba (§R33) ∴ isto é o que dá p/ garantir
+V93: aba manejada que passa de VISÍVEL→ESCONDIDA num recálculo → ficha ativa `Main` ∴ ⊥ ∃ jogador preso olhando aba que acabou de ser negada. REESCRITO na 29ª rodada: "aba ATIVA ∈ proibidas" ⊥ é implementável — §R33, `tabIndex` é int sem nome & ⊥ se sabe se conta aba escondida ∴ resolver a ativa erraria & chutaria o jogador da `Numina` a ∀ load. Custo declarado: quem estava em aba permitida também vai p/ `Main` quando o mestre desliga 1 flag
 V94: estado autorado no XML de aba manejada = default do flag/gate — `Disciplines` `Magika` `Storyteller` `visible="false"`, `Numina` visível ∴ ficha cujo Lua ⊥ rodou mostra de MENOS, ⊥ de mais (§B26 revoga a decisão contrária da 27ª rodada). ≡ §V80 fail-closed, mas p/ o ESTÁTICO
 V95: gatilho de §I8b mora no form RAIZ ∴ aba nenhuma é dona do gatilho que a esconde — `HH.10` está escondida p/ o jogador & ⊥ pode ser quem decide isso (§B26)
+
+V96: visibilidade de aba = DERIVADA, recalculada a ∀ EXIBIÇÃO do form raiz (`onShow`, §R34) & ⊥ só 1× no `onNodeReady` ∴ papel que muda na mesa (jogador↔mestre) se conserta saindo & voltando p/ a ficha. ⊥ ∃ estado de visibilidade que sobreviva a uma re-exibição (§B27)
 
 ## §T TASKS
 
@@ -768,6 +776,11 @@ T258|x|`verify-hunters-hunted.ps1` — checks NOVOS §V92 §V93 §V94 §V95; §V
 T259|x|`module.xml` version `2.4` → `2.5` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 T260|.|teste no Firecast (RESOLVE §R31 & §T239): ficha nova como JOGADOR → `Disciplines` `Magika` `Storyteller` ⊥ aparecem; ST liga `Show Numina` → aparece p/ o jogador; jogador na aba & ST desliga → pula p/ `Main`. Se o botão da aba SOBREVIVER ao `visible=false`, §R31 vira `⊥` & §V92 é o que segura|R31,V92,V93,V94
 
+T261|x|`HuntersHunted.lfm` — `<event name="onShow">` no form RAIZ → `applyTabVisibility(self)`|V96,R34
+T262|x|`verify-hunters-hunted.ps1` — check NOVO §V96 (form raiz tem `onShow` chamando `applyTabVisibility`). Mutação antes de aceitar|V20,V96
+T263|x|`module.xml` version `2.5` → `2.6` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T264|.|teste no Firecast: mestre → jogador → mestre, sair da ficha & voltar → aba `Storyteller` REAPARECE. Se ⊥ reaparecer, a causa ⊥ é o gatilho & sim §R29 (`meuJogador` ⊥ populado) ∴ backprop de novo|R29,V96
+
 ## §B BUGS
 
 id|date|cause|fix
@@ -797,3 +810,4 @@ B23|2026-08-17|mapa de época da 19ª rodada escrito como RENOME DE LINHA ∴ o 
 B24|2026-08-17|20ª rodada deu campo canônico por NOME mas deixou 1 campo carregar vários nomes de épocas diferentes (`enigmas` = Enigmas \| Computer \| Philosophy, `science` = Science \| Seneschal \| Ritual …) ∴ 2 pontos em `Enigmas` apareciam como `Computer 2` em `Modern Nights`, num traço que o user nunca tocou. Eu declarei isso como custo aceito em §C — ⊥ era: o user quer identidade por nome. §V74 media só nome→1 campo ∴ o sentido inverso passava verde|V74,V75,V76
 B25|2026-08-18|`baseline` = campo só-Lua (⊥ widget — é o dado escondido do jogador) ∴ `<dataLink field="baseline">` de `HH.10` caiu em §V8 como link morto. Invariante ⊥ previa dono-Lua; gate ⊥ lê `fields=` de link múltiplo ∴ o mesmo campo em `HH.9` passou despercebido (gap ANTERIOR, ⊥ regressão desta rodada)|V8
 B26|2026-08-18|12 abas autoradas VISÍVEIS + gatilho de `applyTabVisibility` morando em `HH.10` (a própria aba escondida) ∴ ficha nova c/ os 3 flags desligados abria com `Disciplines` `Magika` & `Storyteller` à vista p/ o JOGADOR. §V80 fez o gate fail-closed na LÓGICA, mas o estado ESTÁTICO seguia fail-open & §R31 (`visible` tira o botão?) segue `?` ∴ 2 causas possíveis, 1 sintoma|V92,V93,V94,V95
+B27|2026-08-18|`applyTabVisibility` só disparava no `onNodeReady` do form RAIZ & no `dataLink` dos 3 flags ∴ trocar de papel na mesa ⊥ re-avaliava: a decisão tomada como JOGADOR congelava & o mestre voltava p/ a ficha sem a aba `Storyteller`. Até a 27ª rodada a aba nascia `visible="true"` ∴ o estado estático mascarava a falta de re-avaliação; §V94 fechou o default & EXPÔS. Agravante: os 3 checkbox que disparam o `dataLink` moram DENTRO da aba escondida ∴ ⊥ ∃ caminho de volta pelo próprio cliente|V96

@@ -1753,6 +1753,16 @@ elseif ($rootReady.Groups[1].Value -notmatch 'applyTabVisibility\(') { Fail "V95
 elseif ($stTxt -match 'applyTabVisibility') { Fail "V95 HH.10 still triggers the switch - it is one of the tabs being hidden (SPEC B26)" }
 else { Pass "V95 the tab switch is triggered from the root form" }
 
+# ---- V96: visibility is DERIVED, asked again every time the sheet is shown ---------
+# Nothing announces a change of role in the room - neither `jogador` nor `mesa` publishes an
+# event (SPEC R34) - so an answer taken once at load freezes. A storyteller who had opened
+# this sheet as a player came back to it with no Storyteller tab, and the checkboxes that
+# would switch it back are on that tab (SPEC B27).
+$rootShow = [regex]::Match($root, '<event name="onShow">(.*?)</event>', 'Singleline')
+if (-not $rootShow.Success) { Fail "V96 the root form has no onShow - tab visibility would be decided once and frozen (SPEC B27)" }
+elseif ($rootShow.Groups[1].Value -notmatch 'applyTabVisibility\(') { Fail "V96 the root onShow does not recompute tab visibility" }
+else { Pass "V96 tab visibility is asked again every time the sheet is shown" }
+
 # ---- V83 + V84: the log is derived, not stored -----------------------------------
 # Four columns written from ONE row list, so a line reads across, and none of them owns a
 # field: a stored copy of a derived number is the one thing that can drift from what produced

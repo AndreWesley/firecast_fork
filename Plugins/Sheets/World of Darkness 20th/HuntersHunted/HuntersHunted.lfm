@@ -737,6 +737,18 @@
 		</event>
 	</dataLink>
 
+	<!--
+		Shown again, asked again (SPEC V96). Nothing tells the sheet that its reader's role in
+		the room changed - neither `jogador` nor `mesa` publishes an event, they are getters
+		only (SPEC R34) - so the single answer taken at load would freeze: a storyteller who
+		had opened this sheet as a player came back to it with no Storyteller tab, and the
+		checkboxes that could have switched it back are ON that tab (SPEC B27). Leaving the
+		sheet and opening it again is the way back.
+	-->
+	<event name="onShow">
+		applyTabVisibility(self);
+	</event>
+
 	<event name="onNodeReady">
 		-- A sheet saved before the 27th round has nil here and was showing Numina all along,
 		-- so the flag is written true once rather than left nil: the renderer already treats
