@@ -20,8 +20,8 @@
 			-- While one of them is showing the other three columns are empty, so the sentence
 			-- borrows the whole row. That is why dynXpType is declared LAST in the XML: the
 			-- empty columns beside it are painted after their siblings and would cover it.
-			local XP_COL_TYPE_W = 190;
-			local XP_MSG_W      = 590;
+			local XP_COL_TYPE_W = 133;
+			local XP_MSG_W      = 442;
 
 			-- ---- Experience log (SPEC I10, 27th round) ---------------------------------
 			--
@@ -121,18 +121,18 @@
 			Stacking costs height - the box went 75 -> 95 - which is why the log below starts at 105
 			and still closes the tab on 640.
 		-->
-		<layout left="0" top="0" width="620" height="95">
+		<layout left="0" top="0" width="475" height="95">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="620" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+			<label left="0" top="10" width="475" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<label left="15" top="38" width="190" height="20" text="Total Experience" horzTextAlign="center"/>
-			<edit name="edtTotalXP" left="65" top="60" width="90" height="25" readOnly="true" horzTextAlign="center" fontSize="14"/>
+			<label left="15" top="38" width="141" height="20" text="Total Experience" horzTextAlign="center"/>
+			<edit name="edtTotalXP" left="40" top="60" width="90" height="25" readOnly="true" opacity="0.55" horzTextAlign="center" fontSize="14"/>
 
-			<label left="215" top="38" width="190" height="20" text="Spent Experience" horzTextAlign="center"/>
-			<edit name="edtSpentXP" left="265" top="60" width="90" height="25" readOnly="true" horzTextAlign="center" fontSize="14"/>
+			<label left="166" top="38" width="141" height="20" text="Spent Experience" horzTextAlign="center"/>
+			<edit name="edtSpentXP" left="191" top="60" width="90" height="25" readOnly="true" opacity="0.55" horzTextAlign="center" fontSize="14"/>
 
-			<label left="415" top="38" width="190" height="20" text="Current Experience" horzTextAlign="center"/>
-			<edit name="edtCurrentXP" left="465" top="60" width="90" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);"/>
+			<label left="317" top="38" width="141" height="20" text="Current Experience" horzTextAlign="center"/>
+			<edit name="edtCurrentXP" left="342" top="60" width="90" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);"/>
 		</layout>
 
 		<!--
@@ -145,28 +145,34 @@
 			The four editors are read-only and carry no `field`: the rows are derived on every
 			render (SPEC V83/V84).
 		-->
-		<layout name="xpLogBox" left="0" top="105" width="620" height="535">
+		<layout name="xpLogBox" left="0" top="105" width="475" height="535">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="620" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
+			<label left="0" top="0" width="475" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
 
 			<!--
-				Each column is cut to the longest thing it can ever hold, in EITHER language, with
-				room to spare: the kind names ("FORÇA DE VONTADE"), the trait names ("Empatia com
-				Animais"), a two-figure rating, and the word "Grátis". The four theme fonts were
-				measured, not guessed - Georgia and Book Antiqua are wider than Segoe UI at the
-				same size, so the widest of the four is what the widths are built on.
-			-->
-			<label left="15" top="25" width="190" height="20" text="Type" horzTextAlign="center"/>
-			<label left="215" top="25" width="225" height="20" text="Trait" horzTextAlign="center"/>
-			<label left="450" top="25" width="60" height="20" text="Level" horzTextAlign="center"/>
-			<label left="520" top="25" width="85" height="20" text="Cost" horzTextAlign="center"/>
+				Widths asked for by the user on top of the measured ones (33rd round): Type -30%,
+				Trait -20%, Level -10%, Cost -50%. The two text columns read from the left, the two
+				short ones are CENTRED - a rating and a price are read as a column of figures, not
+				as a sentence.
 
-			<textEditor name="dynXpTrait" left="215" top="50" width="225" height="470" readOnly="true"/>
-			<textEditor name="dynXpLevel" left="450" top="50" width="60" height="470" readOnly="true"/>
-			<textEditor name="dynXpCost" left="520" top="50" width="85" height="470" readOnly="true"/>
+				What the measurements say has to fit, at the widest of the four theme fonts (Georgia
+				and Book Antiqua run wider than Segoe UI at the same size): "FORÇA DE VONTADE" 134px
+				at a 12px body and 157px at 14px, "Empatia com Animais" 126/147px, "Grátis" 38/44px.
+				Type and Cost are now UNDER their 14px figure - the trim was asked for with the
+				sheet on screen, so what renders is the judge; if a kind name or the word Grátis
+				comes up cut in the Dark Ages or Classical paper, these two are what to widen.
+			-->
+			<label left="15" top="25" width="133" height="20" text="Type" horzTextAlign="center"/>
+			<label left="158" top="25" width="180" height="20" text="Trait" horzTextAlign="center"/>
+			<label left="348" top="25" width="54" height="20" text="Level" horzTextAlign="center"/>
+			<label left="412" top="25" width="45" height="20" text="Cost" horzTextAlign="center"/>
+
+			<textEditor name="dynXpTrait" left="158" top="50" width="180" height="470" readOnly="true" opacity="0.55"/>
+			<textEditor name="dynXpLevel" left="348" top="50" width="54" height="470" readOnly="true" opacity="0.55" horzTextAlign="center"/>
+			<textEditor name="dynXpCost" left="412" top="50" width="45" height="470" readOnly="true" opacity="0.55" horzTextAlign="center"/>
 			<!-- Type comes LAST so the state sentence it widens to shows OVER the three empty
 			     columns beside it, not under them (see XP_MSG_W above). -->
-			<textEditor name="dynXpType" left="15" top="50" width="190" height="470" readOnly="true"/>
+			<textEditor name="dynXpType" left="15" top="50" width="133" height="470" readOnly="true" opacity="0.55"/>
 		</layout>
 	</scrollBox>
 
