@@ -277,6 +277,13 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - 4px = o que cabe SEM mexer no conteúdo: título ocupa 0..20 & 1ª linha abre em 25 ∴ 4 deixa 1px de sobra. Mais que isso pediria empurrar linha por linha & crescer 51 caixas — trabalho de outra ordem, ⊥ "espaçamento bem pequeno"
 - aba Progress (`HH.9`) ⊥ tocada — pedido explícito do user. `EXPERIENCE LOG` de lá segue em `top` 0 ∴ é a exceção declarada de §V77
 - caixas c/ folga própria ⊥ mudam: `VIRTUES` 8 (18ª rodada) · `HUMANITY` 15 · Settings & créditos 10 — já passam de 4, ⊥ estavam coladas
+- 27ª rodada 2026-08-18 ↓ (1 pedido do user: 1 lista por caixa de númina)
+- as 2 tabelas dividiam 1 lista ÚNICA de 43 itens (§T55) ∴ `HEDGE MAGIC PATHS` oferecia `Telepathy` & `PSYCHIC PHENOMENA` oferecia `Alchemy`. User pede lista PRÓPRIA por caixa ∴ a parte "1 lista ÚNICA" de §T55 REVOGADA (1 lista → 2)
+- corte = §R.14 já pronto, ⊥ pede leitura nova do PDF: caixa de CIMA (`HEDGE MAGIC PATHS` = `CAMINHOS DE MAGIA ESTÁTICA`) = os 21 Paths do cap.1 · caixa de BAIXO (`PSYCHIC PHENOMENA` = `FENÔMENOS PSÍQUICOS`) = os 22 Phenomena do cap.2. União = 43 ≡ hoje ∴ ⊥ item novo, ⊥ item perdido & `.lang` + mapa `PT` + `DESC` ⊥ mudam
+- ordem pedida (magia estática em cima, psíquicos embaixo) JÁ é a ordem @ tela desde §T57 ∴ ⊥ move caixa nenhuma; a rodada só troca o `items`/`values` de cada picker
+- `Shadows` (cap.1, magia estática) ≠ `Shadow` (cap.2, psíquico) — 2 núminas distintas, 1 em cada caixa. Trocar as 2 = item sem `DESC` ∴ o gate pega (§V32)
+- 1 lista por caixa ! 1 template por caixa: `NuminaPicker` → `HedgePicker` (21) + `PsychicPicker` (22), mesmos x de radio/entrada/bolinha ∴ coluna segue alinhada (§V26) & `items` segue inline no XML (§V18), ⊥ Lua populando @ runtime. `NuminaFree` (linhas 9 & 10) ⊥ muda — texto livre ⊥ tem lista
+- ficha salva c/ númina na caixa ERRADA (ex: `numina_3` = `Telepathy`) segue no NDB, mas o combo abre VAZIO — valor ∉ `values` (§V12). ⊥ migração & ⊥ Lua limpando campo: o bloco `DESCRIPTION` lê `DESC[valor]` ∴ o dado segue visível & o user reescolhe na caixa certa. ≡ precedente `transportation`/`other` (user: ⊥ ∃ ficha salva que importe)
 
 ## §I INTERFACES
 
@@ -427,6 +434,7 @@ V74: bijeção nome↔campo: ∀ nome de perícia → EXATAMENTE 1 campo & ∀ c
 V75: ∀ época & ∀ coluna: `ERA_ABILITIES` = EXATAMENTE 10 nomes, ∀ um ∈ `ABILITY_FIELD` & distintos ∴ lista ⊥ deixa slot vazio, ⊥ pede campo inexistente & ⊥ repete nome (absorve §V73 p/ o modelo novo)
 V76: trocar época ! RE-LIGAR o `field` das 5 bolinhas de ∀ slot & recarregar `checked` do NDB no mesmo passo ∴ ⊥ bolinha marcada c/ estado do campo anterior. Ligação autorada no XML = lista `Victorian Era` ∴ renderer que ⊥ roda deixa a época base coerente, ⊥ ficha meio ligada (§V19)
 V77: ∀ título de seção (label `horzTextAlign="center"` em caixa `<rectangle color="black">`) tem `top` ≥ 4 ∴ ⊥ texto encostado no filete de 3px (`THEME_STROKE`). EXCEÇÃO declarada: aba Progress (`HH.9`) — user pediu p/ ⊥ mexer nela na 26ª rodada. ≡ §V68: 45 títulos alinhados de uma vez pedem check, senão a próxima caixa copiada de arquivo velho nasce colada
+V78: picker de númina = 1 lista por CAIXA — `HedgePicker` `items`/`values` ≡ os 21 Paths de §R.14 cap.1 & `PsychicPicker` ≡ os 22 Phenomena de §R.14 cap.2 (+ 1º item vazio, §V15) ∴ ∩ = ∅ & ∪ = 43 (∴ §V32 & §V17 seguem cobrindo os mesmos 43). Check ! ler os 2 `<template>` POR NOME: os 2 combos se chamam `cbo$(field)` ∴ coletor por nome de combo ⊥ distingue caixa (§V20)
 
 ## §T TASKS
 
@@ -666,6 +674,9 @@ T232|x|`module.xml` version `2.0` → `2.1` + `rdk -l` (exit 0 & `.rpk` mudou) +
 T233|x|8 `.lfm` (⊥ `HH.9`) — 45 títulos de seção `top` 0\|1 → 4 & os vizinhos de faixa (`cmbHealthLevels` ×2, `Page`/`Cost` de `Merit`/`Flaw`) acompanham|V27,V37,V77
 T234|x|`verify-hunters-hunted.ps1` — check NOVO §V77 (título ≥ 4, `HH.9` fora). Mutação: 1 título de volta p/ 0 ! ficar vermelho|V77,V20
 T235|x|`module.xml` version `2.1` → `2.2` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
+T236|x|`HH.7.lfm` — `NuminaPicker` → `HedgePicker` c/ `items`/`values` = 21 Paths de §R.14 cap.1 + template NOVO `PsychicPicker` = 22 Phenomena do cap.2; chamadas `numina_1`…`_8` → `HedgePicker` & `psychic_1`…`_8` → `PsychicPicker`. `NuminaFree`, x dos widgets, `DESC`, `.lang` & mapa `PT` ⊥ tocados|V12,V14,V15,V18,V24,V26,V78,R14
+T237|x|`verify-hunters-hunted.ps1` — check NOVO §V78 (2 templates lidos por NOME, listas literais 21 + 22, ∩ = ∅, ∪ = 43). Mutação: `Telepathy` movida p/ `HedgePicker` ! ficar vermelho|V78,V20
+T238|x|`module.xml` version `2.2` → `2.3` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 
 ## §B BUGS
 

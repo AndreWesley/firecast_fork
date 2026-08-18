@@ -1964,16 +1964,32 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			Powers tab. Two numina tables + one read-only description block (SPEC T56-T60).
 
 			Row templates: the radio sits at x=0, the name widget at x=25 and the first dot at
-			x=190 in BOTH templates, so picker rows and free-text rows keep one input column and
-			one dot column (SPEC V26 / B.12). The radios all share field="numinaSel" - that is
+			x=190 in ALL THREE templates, so picker rows and free-text rows keep one input column
+			and one dot column (SPEC V26 / B.12). The radios all share field="numinaSel" - that is
 			how a radio group binds in this SDK, and SPEC V1 carries the declared exception.
 			`fieldValue` is the row's own field name, which is what the renderer reads.
 
+			One picker template per box, not one shared list (SPEC V78): HedgePicker carries the
+			21 Hedge Magic Paths of M20 Sorcerer ch.1, PsychicPicker the 22 Psychic Phenomena of
+			ch.2. Same 43 items as before, split by chapter, so a box no longer offers the other
+			box's numina. `Shadows` (ch.1) and `Shadow` (ch.2) are two different numina.
+
 			Rows 9 and 10 of each table stay free text on purpose: homebrew numina.
 		-->
-		<template name="NuminaPicker">
+		<template name="HedgePicker">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
-			<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}" values="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}">
+			<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}" values="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}">
+			</comboBox>
+			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</template>
+
+		<template name="PsychicPicker">
+			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
+			<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}" values="{'', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}">
 			</comboBox>
 			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
@@ -1997,28 +2013,28 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			<label left="0" top="4" width="340" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
 
 			<layout left="12" top="25" width="315" height="25">
-				<NuminaPicker field="numina_1"/>
+				<HedgePicker field="numina_1"/>
 			</layout>
 			<layout left="12" top="50" width="315" height="25">
-				<NuminaPicker field="numina_2"/>
+				<HedgePicker field="numina_2"/>
 			</layout>
 			<layout left="12" top="75" width="315" height="25">
-				<NuminaPicker field="numina_3"/>
+				<HedgePicker field="numina_3"/>
 			</layout>
 			<layout left="12" top="100" width="315" height="25">
-				<NuminaPicker field="numina_4"/>
+				<HedgePicker field="numina_4"/>
 			</layout>
 			<layout left="12" top="125" width="315" height="25">
-				<NuminaPicker field="numina_5"/>
+				<HedgePicker field="numina_5"/>
 			</layout>
 			<layout left="12" top="150" width="315" height="25">
-				<NuminaPicker field="numina_6"/>
+				<HedgePicker field="numina_6"/>
 			</layout>
 			<layout left="12" top="175" width="315" height="25">
-				<NuminaPicker field="numina_7"/>
+				<HedgePicker field="numina_7"/>
 			</layout>
 			<layout left="12" top="200" width="315" height="25">
-				<NuminaPicker field="numina_8"/>
+				<HedgePicker field="numina_8"/>
 			</layout>
 			<layout left="12" top="225" width="315" height="25">
 				<NuminaFree field="numina_9"/>
@@ -2033,28 +2049,28 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			<label left="0" top="4" width="340" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
 
 			<layout left="12" top="25" width="315" height="25">
-				<NuminaPicker field="psychic_1"/>
+				<PsychicPicker field="psychic_1"/>
 			</layout>
 			<layout left="12" top="50" width="315" height="25">
-				<NuminaPicker field="psychic_2"/>
+				<PsychicPicker field="psychic_2"/>
 			</layout>
 			<layout left="12" top="75" width="315" height="25">
-				<NuminaPicker field="psychic_3"/>
+				<PsychicPicker field="psychic_3"/>
 			</layout>
 			<layout left="12" top="100" width="315" height="25">
-				<NuminaPicker field="psychic_4"/>
+				<PsychicPicker field="psychic_4"/>
 			</layout>
 			<layout left="12" top="125" width="315" height="25">
-				<NuminaPicker field="psychic_5"/>
+				<PsychicPicker field="psychic_5"/>
 			</layout>
 			<layout left="12" top="150" width="315" height="25">
-				<NuminaPicker field="psychic_6"/>
+				<PsychicPicker field="psychic_6"/>
 			</layout>
 			<layout left="12" top="175" width="315" height="25">
-				<NuminaPicker field="psychic_7"/>
+				<PsychicPicker field="psychic_7"/>
 			</layout>
 			<layout left="12" top="200" width="315" height="25">
-				<NuminaPicker field="psychic_8"/>
+				<PsychicPicker field="psychic_8"/>
 			</layout>
 			<layout left="12" top="225" width="315" height="25">
 				<NuminaFree field="psychic_9"/>
@@ -2066,12 +2082,12 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 
 		<!--
 			Third table, one row (SPEC T81). True Faith is the only Path in its Numina, so it
-			gets its own two-entry list instead of joining the 43 shared by the tables above -
+			gets its own two-entry list instead of joining either box's list (SPEC V78) -
 			otherwise every hedge/psychic row would offer True Faith as a choice.
 
 			Written out instead of templated: one call would not earn a template, and V26 skips
 			a box with fewer than two rows either way. The x positions are copied from
-			NuminaPicker so the radio, the picker and the dots stay in the same columns.
+			HedgePicker so the radio, the picker and the dots stay in the same columns.
 
 			`faith_1`..`_5` are the dots that used to live on the Main tab. They moved here in
 			the same change that removed them there, so a saved sheet keeps its rating (V35).

@@ -1147,6 +1147,41 @@ else {
         }
     }
 
+    # ---- V78: one list per box, split by book chapter (SPEC T236) -----------------
+    # Both pickers declare their combo as name="cbo$(field)", so a collector keyed on the
+    # combo NAME cannot tell the two boxes apart and every list check on them would read the
+    # same bucket (SPEC V20). Read each template BY NAME instead.
+    $hedgeCanon = @('Alchemy','Conjuration','Conveyance','Divination','Ephemera','Enchantment','Fascination','Fortune','Healing','Hellfire','Illusion','Maelstroms','Necromancy','Necronics','Oneiromancy','Quintessence Manipulation','Shadows','Shapeshifting','Starlight','Summoning, Binding, and Warding','Weather Control')
+    $psychicCanon = @('Animal Psychics','Anti-Psychic','Astral Projection','Biocontrol','Channeling','Clairvoyance','Cyberkinesis','Cyberpathy','Ectoplasmic Generation','Mind Shields','Precognition','Psychic Healing','Psychic Hypnosis','Psychic Invisibility','Psychic Vampirism','Psychokinesis','Psychometry','Psychoportation','Pyrokinesis','Shadow','Synergy','Telepathy')
+    $boxItems = @{}
+    foreach ($box in @(@('HedgePicker', $hedgeCanon), @('PsychicPicker', $psychicCanon))) {
+        $tpl = $box[0]
+        $canon = $box[1]
+        $cb = $hh7x.SelectSingleNode("//template[@name='$tpl']//comboBox[@items]")
+        if ($null -eq $cb) { Fail "V78 template '$tpl' carries no picker - its list is unchecked (SPEC V20)"; continue }
+        $got = @([regex]::Matches($cb.GetAttribute("items"), "'([^']*)'") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -ne '' })
+        $boxItems[$tpl] = $got
+        # 'Shadows' (ch.1) and 'Shadow' (ch.2) are different numina one letter apart, so match
+        # the names themselves - counting them would pass with the pair swapped.
+        $extra = @($got | Where-Object { $canon -notcontains $_ })
+        $absent = @($canon | Where-Object { $got -notcontains $_ })
+        foreach ($e in $extra) { Fail "V78 $tpl offers '$e' - it belongs to the other box (SPEC R.14)" }
+        foreach ($a in $absent) { Fail "V78 $tpl is missing '$a' (SPEC R.14)" }
+        if ($extra.Count -eq 0 -and $absent.Count -eq 0) { Pass "V78 $tpl offers exactly its $($canon.Count) book entries" }
+        # values carry the saved data (SPEC V24): if they drift from items the sheet would
+        # store a name the box no longer offers.
+        $vals = @([regex]::Matches($cb.GetAttribute("values"), "'([^']*)'") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -ne '' })
+        if (($got -join '|') -ne ($vals -join '|')) { Fail "V78 $tpl items and values disagree - the picker would save a different name than it shows" }
+    }
+    if ($boxItems.Count -eq 2) {
+        $shared = @($boxItems['HedgePicker'] | Where-Object { $boxItems['PsychicPicker'] -contains $_ })
+        if ($shared) { Fail "V78 offered by BOTH boxes: $($shared -join ', ')" }
+        else { Pass "V78 no numina is offered by both boxes" }
+        $total = $boxItems['HedgePicker'].Count + $boxItems['PsychicPicker'].Count
+        if ($total -eq 43) { Pass "V78 the two boxes still cover all 43 numina" }
+        else { Fail "V78 the two boxes cover $total numina, expected 43 - a name was dropped in the split (SPEC V32)" }
+    }
+
     # V33: no silent blank - each unresolved path must produce its own visible text
     foreach ($state in @('NO_SELECTION','EMPTY_ROW','NO_ENTRY')) {
         $sm = [regex]::Match($hh7, "local $state = \{(.*?)\};", 'Singleline')
