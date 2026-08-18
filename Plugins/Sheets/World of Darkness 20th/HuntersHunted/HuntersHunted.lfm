@@ -2,6 +2,21 @@
 <form name="frmHuntersHunted" formType="sheetTemplate" dataType="Ambesek.HuntersHunted.20th" title="Hunters Hunted - Mortal" align="client" theme="dark">
 	<script>
 		<![CDATA[
+			-- Every field write this sheet makes to ITSELF goes through here (SPEC V122).
+			--
+			-- Writing a value that is already there is not free: it wakes every dataLink on
+			-- that field and every renderer hanging off them, and those renderers write more
+			-- fields. The renderers below run on load and on both switches, so the same value
+			-- was being written back dozens of times per open and each write bought a whole
+			-- cascade - which is what froze the sheet on a saved character (SPEC B34).
+			--
+			-- Four lines, in one place, so the gate has one thing to check instead of every
+			-- assignment in the file.
+			function setField(name, value)
+				if sheet == nil then return; end;
+				if sheet[name] ~= value then sheet[name] = value; end;
+			end;
+
 			-- Health track, shared by the Main tab and its mirror on the Combat tab.
 			--
 			-- It lives on the ROOT form on purpose: this script is parsed before the <import>
@@ -86,13 +101,13 @@
 
 				for m = #HEALTH_MARKS, 2, -1 do
 					for k = 1, counts[m], 1 do
-						sheet["health_" .. row] = HEALTH_MARKS[m];
+						setField("health_" .. row, HEALTH_MARKS[m]);
 						row = row + 1;
 					end;
 				end;
 
 				while row <= n do
-					sheet["health_" .. row] = HEALTH_MARKS[1];
+					setField("health_" .. row, HEALTH_MARKS[1]);
 					row = row + 1;
 				end;
 			end;
@@ -112,7 +127,7 @@
 
 				for i = n, 1, -1 do
 					if markIndex(sheet["health_" .. i]) > 1 then
-						sheet["health_" .. i] = HEALTH_MARKS[1];
+						setField("health_" .. i, HEALTH_MARKS[1]);
 						return;
 					end;
 				end;
@@ -130,7 +145,7 @@
 					-- row is left alone and the bottom-most mark goes instead (SPEC V44).
 					healHealthMark();
 				else
-					sheet["health_" .. n] = HEALTH_MARKS[at + 1];
+					setField("health_" .. n, HEALTH_MARKS[at + 1]);
 				end;
 
 				-- Upgrading a mark in the middle of the stack, or starting a new one on an empty
@@ -167,7 +182,7 @@
 					local mark = sheet["health_" .. i];
 
 					if mark ~= nil and mark ~= HEALTH_MARKS[1] and markIndex(mark) == 1 then
-						sheet["health_" .. i] = HEALTH_MARKS[1];
+						setField("health_" .. i, HEALTH_MARKS[1]);
 					end;
 				end;
 
@@ -386,10 +401,13 @@
 				local tabs = {};
 				collectTabs(tabRootOf(from), tabs);
 
+				-- Three managed tabs since the 39th round (SPEC V128): Magika was an empty
+				-- window that Mage-only content was never going to fill on a mortal sheet, so
+				-- the user had it removed. `stShowMagika` is a burned name from here on
+				-- (SPEC I3, orphans) - nothing reads it and nothing may reuse it.
 				local shown = {
 					tabNumina      = sheet.stShowNumina ~= false,
 					tabDisciplines = sheet.stShowDisciplines == true,
-					tabMagika      = sheet.stShowMagika == true,
 					tabStoryteller = isStoryteller(),
 				};
 
@@ -482,8 +500,8 @@
 
 			-- SPEC I9. Every ACTIVE rule sits here exactly once (SPEC V86). The dormant ones -
 			-- Discipline, Path, Sphere, Arete - are in the spec but deliberately NOT written:
-			-- the Disciplines and Magika tabs are empty, so no field can produce that row and
-			-- a cost nothing can reach is dead code.
+			-- the Disciplines tab is empty and Magika is gone altogether (SPEC V128), so no
+			-- field can produce that row and a cost nothing can reach is dead code.
 			local function xpCost(kind, from, ctx)
 				if kind == "Attribute" then return from * 4; end;
 				if kind == "Ability"   then if from == 0 then return 3; end; return from * 2; end;
@@ -735,7 +753,7 @@
 					-- here and walk the ledger again for a number this call already has
 					-- (SPEC V107).
 					xpQuiet = true;
-					sheet.xpTotal = (tonumber(sheet.experience) or 0) + spent;
+					setField("xpTotal", (tonumber(sheet.experience) or 0) + spent);
 					xpQuiet = false;
 				end;
 
@@ -753,9 +771,22 @@
 			function xpSetCurrent(form, typed)
 				if sheet == nil then return; end;
 
-				sheet.xpTotal = (tonumber(typed) or 0) + xpSpent();
+				setField("xpTotal", (tonumber(typed) or 0) + xpSpent());
 
 				renderXPBoxes(form);
+			end;
+
+			-- The experience log lives on the Progress tab and only that form can address its
+			-- four columns, so the tab hands itself over on load (SPEC V125). Called with the
+			-- rows the caller already built - walking the ledger again for the same click is
+			-- the waste this round exists to remove (SPEC B34).
+			--
+			-- Both guards matter: the tab may not have loaded yet, and on a sheet where it
+			-- never does the log simply is not redrawn - nothing here raises.
+			local function xpLedgerRefresh(rows)
+				if xpLedgerForm ~= nil and renderXPLedger ~= nil then
+					renderXPLedger(xpLedgerForm, rows);
+				end;
 			end;
 
 			-- Every dot that costs experience calls this after it changes (SPEC I12/V99). It
@@ -764,8 +795,11 @@
 			-- dot back off refunds by the same subtraction. All this does is refuse the two
 			-- moves the rules do not allow, by putting the dot back where it was.
 			--
-			-- The undo writes the field again, so this runs a second time. That pass finds a
-			-- legal state and stops - there is no loop and no flag to keep.
+			-- The undo is written QUIETLY (SPEC V127), so this does not run a second time. It
+			-- used to rely on re-entry finding a legal state and stopping, and that is true for
+			-- every state but one: a trait sitting BELOW the baseline on a sheet with no
+			-- balance left. There the second pass refuses the undo of the undo, writes the dot
+			-- back, and the guard flips forever.
 			-- The ability rows hand in the field their dot is bound to RIGHT NOW, because the
 			-- era rebinds those five dots to another ability's field (SPEC V76) - the name
 			-- written in the .lfm is only the Victorian one. Everywhere else the authored name
@@ -789,7 +823,10 @@
 				local on  = sheet[field] == true;
 				local now = traitLevel(sheet, trait, t.first, t.last, t.fixed);
 
-				local spent = xpSpent();
+				-- ONE walk, shared by everything that draws off it (SPEC V125): the balance
+				-- boxes take the sum and the log takes the rows themselves.
+				local rows  = xpLedgerRows();
+				local spent = xpSum(rows);
 				local undo;
 
 				if on then
@@ -803,24 +840,35 @@
 				end;
 
 				if undo then
-					-- The dot goes back where it was, and the numbers are worked out again
-					-- from scratch: the count above described the state being refused.
-					sheet[field] = not on;
-					renderXPBoxes(form);
+					-- The dot goes back where it was, written quietly so this does not run
+					-- again (SPEC V127). The rows above describe the state being REFUSED, so
+					-- the restored state is read once more - the only click that pays for two
+					-- walks is one the rules turned down.
+					xpQuiet = true;
+					setField(field, not on);
+					xpQuiet = false;
+
+					local back = xpLedgerRows();
+
+					renderXPBoxes(form, xpSum(back));
+					xpLedgerRefresh(back);
 					return;
 				end;
 
-				-- One walk of the ledger per click (SPEC V108): the boxes are handed the count
-				-- this call already made instead of building it a second time.
+				-- One walk of the ledger per click (SPEC V108/V125): all three drawers are
+				-- handed what this call already built instead of building it again.
 				renderXPBoxes(form, spent);
+				xpLedgerRefresh(rows);
 			end;
 
 			-- What the character has spent, straight off the log (SPEC I11). Not stored: a
 			-- second copy of this number is the one thing that could disagree with the lines
 			-- the player is reading (SPEC V100).
-			function xpSpent()
-				local rows = xpLedgerRows();
-
+			-- Split from xpSpent so a caller holding the rows can total them without walking
+			-- the ledger again (SPEC V125). nil is what xpLedgerRows returns when no initial
+			-- character has been saved, and nothing has been spent against one that is not
+			-- there.
+			function xpSum(rows)
 				if rows == nil then return 0; end;
 
 				local sum = 0;
@@ -829,18 +877,24 @@
 
 				return sum;
 			end;
+
+			function xpSpent()
+				return xpSum(xpLedgerRows());
+			end;
 		]]>
 	</script>
 	<!--
-		Twelve tabs (SPEC I1b). Three of them are new in the 27th round: Disciplines and Magika
-		sit next to Numina because all three are power tabs, and Storyteller closes the row.
+		Eleven tabs (SPEC I1b / I1c). Disciplines sits next to Numina because both are power
+		tabs, and Storyteller closes the row. Magika sat between them until the 39th round,
+		when the user had the empty window removed: the content that would have filled it is
+		Mage-only and stays off a mortal sheet (SPEC C, V128).
 
-		Every tab carries a `name` because four of them are switched at runtime (SPEC I8b):
-		the three power tabs answer to the storyteller's checkboxes and the Storyteller tab
-		answers to the gate, so a player opens eight of these twelve.
+		Every tab carries a `name` because three of them are switched at runtime (SPEC I8b):
+		the two power tabs answer to the storyteller's checkboxes and the Storyteller tab
+		answers to the gate, so a player opens eight of these eleven.
 
-		Each of those four is authored in the state its flag defaults to (SPEC V94, 28th
-		round): Disciplines, Magika and Storyteller start hidden, Numina starts visible.
+		Each of those three is authored in the state its flag defaults to (SPEC V94, 28th
+		round): Disciplines and Storyteller start hidden, Numina starts visible.
 		The 27th round authored them all visible and left the hiding to the renderer, and a
 		fresh sheet with every checkbox unticked opened with all three on show (SPEC B26) -
 		so the static state fails CLOSED too, not just the gate in Lua.
@@ -857,9 +911,6 @@
 		</tab>
 		<tab name="tabDisciplines" title="Disciplines" visible="false">
 			<import file="HH.11.lfm"/>
-		</tab>
-		<tab name="tabMagika" title="Magika" visible="false">
-			<import file="HH.12.lfm"/>
 		</tab>
 		<tab name="tabCombat" title="Combat">
 			<import file="HH.3.lfm"/>
@@ -886,11 +937,11 @@
 
 	<!--
 		The tab switch is driven from HERE, though the checkboxes that feed it live on the
-		Storyteller tab (SPEC V95, 28th round). That tab is one of the four this hides, and a
+		Storyteller tab (SPEC V95, 28th round). That tab is one of the three this hides, and a
 		hidden tab cannot be trusted to run the code that hides its neighbours - that is how a
 		fresh sheet came up with all three power tabs on show (SPEC B26).
 	-->
-	<dataLink fields="{'stShowNumina', 'stShowDisciplines', 'stShowMagika'}">
+	<dataLink fields="{'stShowNumina', 'stShowDisciplines'}">
 		<event name="onChange">
 			applyTabVisibility(self);
 		</event>
@@ -918,13 +969,13 @@
 		-- so the flag is written true once rather than left nil: the renderer already treats
 		-- nil as visible (SPEC V89), and this keeps the checkbox from reading unticked beside
 		-- a tab that is plainly there.
-		if sheet ~= nil and sheet.stShowNumina == nil then sheet.stShowNumina = true; end;
+		if sheet ~= nil and sheet.stShowNumina == nil then setField("stShowNumina", true); end;
 
 		-- Appearance is the one attribute drawn without a fixed first dot, so that a character
 		-- can be at zero (SPEC I3). Zero is not the DEFAULT though - a new sheet starts at one
 		-- like the other eight (SPEC V104), and only a dot the player switched off keeps it at
 		-- zero. nil means nobody has touched it yet; false is a decision and is left alone.
-		if sheet ~= nil and sheet.appearance_1 == nil then sheet.appearance_1 = true; end;
+		if sheet ~= nil and sheet.appearance_1 == nil then setField("appearance_1", true); end;
 
 		-- The Game box is locked (SPEC V109), so a value outside its three would sit there
 		-- with nobody able to clear it: one of the four longer names this sheet used to offer,
@@ -934,7 +985,7 @@
 			local g = sheet.game;
 
 			if g ~= "Vampire" and g ~= "Hunters Hunted" and g ~= "Mage" then
-				sheet.game = "Hunters Hunted";
+				setField("game", "Hunters Hunted");
 			end;
 		end;
 

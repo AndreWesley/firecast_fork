@@ -237,8 +237,6 @@
 				["Mad Scientist"] = "Cientista Louco",
 				["Mage"] = "Mago",
 				["Maelstroms"] = "Maelstroms",
-				["MAGIKA"] = "MAGIKA",
-				["Magika"] = "Magika",
 				["Main"] = "Principal",
 				["Manipulation"] = "Manipulação",
 				["Martyr"] = "Mártir",
@@ -362,7 +360,6 @@
 				["Shapeshifting"] = "Metamorfose",
 				["Sheet made for the table"] = "Ficha feita para a mesa",
 				["Show Disciplines"] = "Mostrar Disciplinas",
-				["Show Magika"] = "Mostrar Magika",
 				["Show Numina"] = "Mostrar Númina",
 				["SKILLS"] = "PERÍCIAS",
 				["Social"] = "Sociais",
@@ -542,8 +539,23 @@
 			-- English depends on the era, so it is resolved before translating.
 			--
 			-- Runs on load and on BOTH switches, era and language (SPEC V72).
+			--
+			-- What it renders depends on exactly two things, so it remembers the pair and
+			-- returns when neither moved (SPEC V124). Both dataLinks below carry a
+			-- defaultValue, so BOTH fire when the sheet opens - this ran twice over the whole
+			-- control tree, rebinding a hundred and fifty dots each time, before the sheet was
+			-- even on screen (SPEC B34).
+			local abilityMemo = nil;
+
 			local function renderAbilityLabels(lang, from)
-				local lists = ERA_ABILITIES[currentTheme()];
+				local era = currentTheme();
+				local memo = era .. "|" .. tostring(lang);
+
+				if abilityMemo == memo then return; end;
+
+				abilityMemo = memo;
+
+				local lists = ERA_ABILITIES[era];
 
 				-- field -> name, rebuilt here rather than at load: this file is a tab, and the
 				-- root form's tables are not guaranteed to be in place while it parses.
@@ -552,11 +564,11 @@
 				for n, f in pairs(ABILITY_FIELD) do nameOf[f] = n; end;
 
 				local function show(c, text)
-					if lang == "pt" then
-						c.text = PT[text] or text;
-					else
-						c.text = text;
-					end;
+					local want = text;
+
+					if lang == "pt" then want = PT[text] or text; end;
+
+					if c.text ~= want then c.text = want; end;
 				end;
 
 				local root = rootOf(from);
@@ -600,11 +612,21 @@
 								-- Rebinding does not repaint by itself, so the state is reloaded
 								-- in the same step - otherwise the dot would keep showing what
 								-- the PREVIOUS field had (SPEC V76).
+								--
+								-- Both writes are compared first (SPEC V122). A bound dot writes
+								-- its field through the NDB, so putting back the value that is
+								-- already there wakes every link watching that trait for nothing.
+								-- Most eras differ from the authored list by a couple of rows;
+								-- this makes the other twenty-eight cost nothing.
 								local full = field .. "_" .. dot;
 
-								c.field = full;
+								if c.field ~= full then c.field = full; end;
 
-								if sheet ~= nil then c.checked = sheet[full] == true; end;
+								if sheet ~= nil then
+									local want = sheet[full] == true;
+
+									if c.checked ~= want then c.checked = want; end;
+								end;
 							end;
 						end;
 					elseif cls == "label" and string.sub(nm, 1, 5) == "dynRo" then

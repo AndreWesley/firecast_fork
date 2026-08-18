@@ -295,7 +295,7 @@ else { Pass "V35 all $movedSeen migrated fields sit exactly once, in their new f
 # Their text is still sitting in already-saved sheets. If either name were reused for a new
 # field, an old sheet would silently pour stale content into an unrelated box - so the names
 # stay burned, and SPEC I3 lists them as orphans. This is the check that keeps that promise.
-foreach ($orphan in @('transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated','personalidade','natureza','experience','spentXP','stFreeDots','freeDots')) {
+foreach ($orphan in @('stShowMagika','transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated','personalidade','natureza','experience','spentXP','stFreeDots','freeDots')) {
     if ($allFields.ContainsKey($orphan)) {
         Fail "I3 '$orphan' is a declared orphan but $($allFields[$orphan] -join ', ') owns it - choose a different field name"
     } else { Pass "I3 declared orphan '$orphan' owns no widget" }
@@ -696,7 +696,7 @@ else { Pass "V41 the mark list lives only on the root form" }
 
 # V42: an unknown value (boolean, nil, junk) must be written back as the empty mark by the
 # renderer, or the box shows "true" until someone clicks it.
-if ($root -match 'markIndex\(mark\)\s*==\s*1' -and $root -match 'sheet\["health_"\s*\.\.\s*i\]\s*=\s*HEALTH_MARKS\[1\]') {
+if ($root -match 'markIndex\(mark\)\s*==\s*1' -and $root -match 'setField\("health_"\s*\.\.\s*i, HEALTH_MARKS\[1\]\)') {
     Pass "V42 renderHealthTrack normalises an unknown mark to the empty one"
 } else {
     Fail "V42 no normalisation in renderHealthTrack - a pre-6th-round boolean would render as 'true'"
@@ -1010,7 +1010,7 @@ $gameNode = @((Doc (Join-Path $dir "HH.6.lfm")).SelectNodes("//comboBox[@name='c
 if ($gameNode.Count -ne 1) { Fail "V109 expected exactly one cboGame, found $($gameNode.Count)" }
 elseif ($gameNode[0].GetAttribute("enabled") -ne 'false') { Fail "V109 cboGame is editable - the game is information, not a choice" }
 elseif ($hh6 -notmatch 'dataLink field="game" defaultValue="Hunters Hunted"') { Fail "V109 cboGame has no default - a new sheet would show an empty locked box" }
-elseif ($root -notmatch 'sheet\.game = "Hunters Hunted"') { Fail "V110 nothing normalises a game outside the roster - the locked box would hold a value nobody can clear" }
+elseif ($root -notmatch 'setField\("game", "Hunters Hunted"\)') { Fail "V110 nothing normalises a game outside the roster - the locked box would hold a value nobody can clear" }
 else { Pass "V109/V110 cboGame is locked, defaulted and normalised on load" }
 
 # ---- V22: translation is non-destructive and the PT map matches localization.lang
@@ -1628,8 +1628,8 @@ else {
 
 # V76, runtime half: rebinding without reloading would leave the dot showing the previous
 # field's state, which looks exactly like the bug this round was opened for.
-if ($hh6 -notmatch 'c\.field = full;') { Fail "V76 the renderer never rebinds a dot - the slots would keep the authored field" }
-elseif ($hh6 -notmatch 'c\.checked = sheet\[full\] == true;') { Fail "V76 the renderer rebinds without reloading checked - the dot would show the old field's state" }
+if ($hh6 -notmatch 'if c\.field ~= full then c\.field = full; end;') { Fail "V76 the renderer never rebinds a dot - the slots would keep the authored field" }
+elseif ($hh6 -notmatch 'local want = sheet\[full\] == true;') { Fail "V76 the renderer rebinds without reloading checked - the dot would show the old field's state" }
 else { Pass "V76 the renderer rebinds each dot and reloads it from the NDB" }
 
 # The Combat mirror: one row follows the era, and it resolves the name off the era's own list
@@ -1686,9 +1686,8 @@ $visFn = LuaFn $root 'applyTabVisibility'
 if (-not $visFn) { Fail "V89 applyTabVisibility not found on the root form" }
 elseif ($visFn -notmatch 'tabNumina\s*=\s*sheet\.stShowNumina ~= false') { Fail "V89 tabNumina does not default to visible - an existing sheet would lose the tab" }
 elseif ($visFn -notmatch 'tabDisciplines\s*=\s*sheet\.stShowDisciplines == true') { Fail "V89 tabDisciplines does not default to hidden" }
-elseif ($visFn -notmatch 'tabMagika\s*=\s*sheet\.stShowMagika == true') { Fail "V89 tabMagika does not default to hidden" }
 elseif ($visFn -notmatch 'tabStoryteller\s*=\s*isStoryteller\(\)') { Fail "V89 tabStoryteller is not wired to the gate" }
-else { Pass "V89 four tabs switch on their own flag, Numina defaulting visible" }
+else { Pass "V89 three tabs switch on their own flag, Numina defaulting visible" }
 
 # ---- V92: a hidden tab is an EMPTY tab -------------------------------------------
 # Whether the host takes the tab button away with the tab is still an open question (SPEC
@@ -1710,12 +1709,12 @@ else { Pass "V93 a denied tab hands the player back to Main" }
 $tabNodes = (Doc $rootPath).SelectNodes("//tab")
 $tabNames = @($tabNodes | ForEach-Object { $_.GetAttribute("name") })
 $unnamed = @($tabNames | Where-Object { -not $_ })
-$wantTabs = @('tabNumina', 'tabDisciplines', 'tabMagika', 'tabStoryteller')
+$wantTabs = @('tabNumina', 'tabDisciplines', 'tabStoryteller')
 $missingTabs = @($wantTabs | Where-Object { $tabNames -notcontains $_ })
-if ($tabNodes.Count -ne 12) { Fail "V89 expected 12 tabs (SPEC I1b), found $($tabNodes.Count)" }
+if ($tabNodes.Count -ne 11) { Fail "V89 expected 11 tabs (SPEC I1b/I1c), found $($tabNodes.Count)" }
 elseif ($unnamed.Count) { Fail "V89 $($unnamed.Count) tab(s) carry no name - the renderer addresses them by name" }
 elseif ($missingTabs) { foreach ($t in $missingTabs) { Fail "V89 no tab named $t - its flag would switch nothing" } }
-else { Pass "V89 all 12 tabs named, including the four the renderer switches" }
+else { Pass "V89 all 11 tabs named, including the three the renderer switches" }
 
 # ---- V81 + V82: saving the initial character is one-shot, and says so ------------
 # The only irreversible action on this sheet. It must ask first, refuse a second write, and
@@ -1730,7 +1729,7 @@ else {
     if (-not $saveFn) { Fail "V81 saveBaseline not found on HH.10" }
     elseif ($saveFn -notmatch 'Dialogs\.confirmOkCancel') { Fail "V81 saveBaseline writes without asking (SPEC R30) - the action cannot be undone" }
     elseif (([regex]::Matches($saveFn, 'sheet\.baseline ~= nil and sheet\.baseline ~= ""')).Count -lt 2) { Fail "V81 saveBaseline does not re-check the baseline inside the callback - a second client could overwrite it" }
-    elseif ($saveFn -notmatch 'sheet\.baseline = ndb\.exportXML\(sheet\)') { Fail "V81 saveBaseline does not snapshot the sheet (SPEC R32)" }
+    elseif ($saveFn -notmatch 'setField\("baseline", ndb\.exportXML\(sheet\)\)') { Fail "V81 saveBaseline does not snapshot the sheet (SPEC R32)" }
     else { Pass "V81 baseline is written once, behind a confirmation" }
 
     if (-not $stateFn) { Fail "V82 renderBaselineState not found on HH.10" }
@@ -1740,7 +1739,7 @@ else {
 
     # No field of the ledger's own may be edited from here, and the flags must be real fields.
     $stFields = @((Doc $stDoc).SelectNodes("//*[@field]") | ForEach-Object { $_.GetAttribute("field") })
-    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines', 'stShowMagika')
+    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines')
     $missFlags = @($wantFlags | Where-Object { $stFields -notcontains $_ })
     if ($missFlags) { foreach ($f in $missFlags) { Fail "V89 HH.10 has no widget for $f" } }
     else { Pass "V89 all $($wantFlags.Count) storyteller flags are owned by HH.10" }
@@ -1750,19 +1749,19 @@ else {
 # The 27th round authored all of them visible and left the hiding to the renderer, so a fresh
 # sheet with every checkbox unticked opened with three tabs the player was never meant to see
 # (SPEC B26). The static state fails closed too now.
-$hiddenByDefault = @('tabDisciplines', 'tabMagika', 'tabStoryteller')
+$hiddenByDefault = @('tabDisciplines', 'tabStoryteller')
 $authoredOpen = @($tabNodes | Where-Object { $hiddenByDefault -contains $_.GetAttribute("name") -and $_.GetAttribute("visible") -ne 'false' })
 $numinaTab = @($tabNodes | Where-Object { $_.GetAttribute("name") -eq 'tabNumina' })
 if ($authoredOpen) { foreach ($t in $authoredOpen) { Fail "V94 tab $($t.GetAttribute('name')) is authored visible - a sheet whose Lua never ran would show it (SPEC B26)" } }
 elseif ($numinaTab.Count -ne 1) { Fail "V94 expected exactly one tabNumina, found $($numinaTab.Count)" }
 elseif ($numinaTab[0].GetAttribute("visible") -eq 'false') { Fail "V94 tabNumina is authored hidden - its flag defaults ON (SPEC V89)" }
-else { Pass "V94 three tabs authored hidden, Numina authored visible" }
+else { Pass "V94 two tabs authored hidden, Numina authored visible" }
 
 # ---- V95: the switch is triggered from the ROOT, not from the tab it hides ---------
 # HH.10 owns the checkboxes but is itself one of the four tabs being switched. A tab cannot be
 # trusted to run the code that hides its neighbours - that is exactly how B26 happened.
 $rootReady = [regex]::Match($root, '<event name="onNodeReady">(.*?)</event>', 'Singleline')
-if ($root -notmatch "dataLink fields=""\{'stShowNumina', 'stShowDisciplines', 'stShowMagika'\}""") { Fail "V95 the root form does not watch the three show-a-tab flags" }
+if ($root -notmatch "dataLink fields=""{'stShowNumina', 'stShowDisciplines'}""") { Fail "V95 the root form does not watch the two show-a-tab flags" }
 elseif (-not $rootReady.Success) { Fail "V95 the root form has no onNodeReady - nothing would apply tab visibility on load" }
 elseif ($rootReady.Groups[1].Value -notmatch 'applyTabVisibility\(') { Fail "V95 the root onNodeReady does not apply tab visibility" }
 elseif ($stTxt -match 'applyTabVisibility') { Fail "V95 HH.10 still triggers the switch - it is one of the tabs being hidden (SPEC B26)" }
@@ -1796,7 +1795,7 @@ elseif (@($colNodes | Where-Object { $_.GetAttribute("readOnly") -ne 'true' }).C
 else { Pass "V84 four read-only ledger columns, none owning a field" }
 
 if (-not $ledFn) { Fail "V83 renderXPLedger not found on HH.9" }
-elseif ($ledFn -notmatch 'local rows = xpLedgerRows\(\)') { Fail "V83 renderXPLedger does not rebuild the rows - it would render stale state" }
+elseif ($ledFn -notmatch 'if rows == nil then rows = xpLedgerRows\(\); end;') { Fail "V83 renderXPLedger does not rebuild the rows - it would render stale state" }
 elseif ($ledFn -notmatch 'if rows == nil then') { Fail "V83 renderXPLedger has no state text for a sheet with no baseline (SPEC V33)" }
 elseif (@($cols | Where-Object { $ledFn -notmatch $_ }).Count) { Fail "V83 renderXPLedger does not write all four columns - a line would stop reading across" }
 else { Pass "V83 the ledger is rebuilt from scratch on every render" }
@@ -1859,10 +1858,10 @@ else {
 # same purchases, and the two would part company the first time a click was missed.
 $guardFn = LuaFn $root 'xpGuard'
 $boxesFn = LuaFn $root 'renderXPBoxes'
-$writes = @([regex]::Matches($root, 'sheet\.xpTotal\s*=(?!=)')).Count
+$writes = @([regex]::Matches($root, 'setField\("xpTotal",')).Count
 if (-not $guardFn) { Fail "V100 xpGuard not found on the root form" }
 elseif (-not $boxesFn) { Fail "V100 renderXPBoxes not found on the root form" }
-elseif ($guardFn -match 'sheet\.xpTotal\s*=') { Fail "V100 the guard writes experience - a purchase would be counted twice (SPEC V83)" }
+elseif ($guardFn -match 'setField\("xpTotal",') { Fail "V100 the guard writes experience - a purchase would be counted twice (SPEC V83)" }
 elseif ($writes -ne 2) { Fail "V100 xpTotal is written in $writes places - it may only be seeded once and set by the player (SPEC I11)" }
 elseif ($boxesFn -notmatch 'xpSpent\(\)') { Fail "V100 the boxes do not read the log - Spent would be a stored number" }
 else { Pass "V100 experience is derived: one number saved, two worked out" }
@@ -1897,7 +1896,7 @@ else { Pass "V101 the guard sleeps until the storyteller freezes the character" 
 
 # ---- V103: only a point that is IN the log can be sold back -----------------------
 if ($guardFn -notmatch 'traitLevel\(base,') { Fail "V103 the guard never reads the baseline rating - it would let a frozen point be sold" }
-elseif ($guardFn -notmatch 'sheet\[field\] = not on') { Fail "V103 the guard has no way to put a refused dot back" }
+elseif ($guardFn -notmatch 'setField\(field, not on\)') { Fail "V103 the guard has no way to put a refused dot back" }
 else { Pass "V103 a point the storyteller froze cannot be sold back" }
 
 # ---- V102: the three experience boxes own no field --------------------------------
@@ -1947,7 +1946,7 @@ else { Pass "V85 fixed first dots and the Appearance exception are read correctl
 $rootReady2 = [regex]::Match($root, '<event name="onNodeReady">(.*?)</event>', 'Singleline')
 if (-not $rootReady2.Success) { Fail "V104 the root form has no onNodeReady - nothing would seed Appearance" }
 elseif ($rootReady2.Groups[1].Value -notmatch 'sheet\.appearance_1 == nil') { Fail "V104 the Appearance seed is not guarded by nil - a dot the player switched off would come back on every load" }
-elseif ($rootReady2.Groups[1].Value -notmatch 'sheet\.appearance_1 = true') { Fail "V104 nothing seeds appearance_1 - a new sheet would read Appearance 0" }
+elseif ($rootReady2.Groups[1].Value -notmatch 'setField\("appearance_1", true\)') { Fail "V104 nothing seeds appearance_1 - a new sheet would read Appearance 0" }
 else { Pass "V104 Appearance is seeded to one, and only when nobody has touched it" }
 
 # ---- V86: the cost table, once, and the dormant rules NOT written -----------------
@@ -2007,7 +2006,7 @@ else { Pass "V88 numina_1 is the affinity path in both the XML and the pricing" 
 # ---- V90: the two empty tabs stay empty ------------------------------------------
 # A field name cannot be renamed after release without losing what players saved under it
 # (SPEC V2), so none is spent before the content that would use it exists.
-foreach ($empty in @('HH.11.lfm', 'HH.12.lfm')) {
+foreach ($empty in @('HH.11.lfm')) {
     $ep = Join-Path $dir $empty
     if (-not (Test-Path $ep)) { Fail "V90 $empty is missing" ; continue }
     $eFields = @((Doc $ep).SelectNodes("//*[@field]"))
@@ -2065,6 +2064,162 @@ $stTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((
 if ($stTxt -notmatch 'btnSaveBaseline\.enabled\s*=\s*not saved;') { Fail "V112 the Save button is not disabled once the baseline is saved (SPEC V82)" }
 elseif ($stTxt -notmatch 'btnSaveBaseline\.opacity\s*=\s*saved and 0\.55 or 1;') { Fail "V112 the Save button locks without dimming - dead control, live face" }
 else { Pass "V112 the Save button dims in the same breath it locks" }
+
+
+# ---- V121: nothing redraws off a whole-node observer -------------------------------
+# B34: HH.9 registered ndb.newObserver(sheet) and redrew the whole experience log from its
+# onChanged. That fires for EVERY attribute written, including the hundreds the sheet writes
+# to itself while loading, and it does not pass through xpQuiet - so the shield that fixed
+# B30 never covered it. On a sheet with a saved baseline every one of those writes bought a
+# full walk of ~91 traits across two nodes, and opening the sheet froze Firecast.
+# A new sheet did not freeze: with no baseline the ledger returns on its first line, which is
+# why this only ever showed up on a character somebody had already played.
+#
+# A comment is allowed to name the thing it explains, so XML comments and Lua line comments
+# come out before the grep - otherwise documenting the removal would fail the check.
+function CodeOf($path) {
+    $t = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($path))
+    $t = [regex]::Replace($t, '(?s)<!--.*?-->', '')
+    $t = [regex]::Replace($t, '(?m)^\s*--.*$', '')
+    $t
+}
+$obsUsers = @($files | Where-Object { (CodeOf $_.FullName) -match 'ndb\.newObserver' })
+if ($obsUsers) { foreach ($o in $obsUsers) { Fail "V121 $($o.Name) hangs a redraw off ndb.newObserver - it fires on every attribute and bypasses xpQuiet (SPEC B34)" } }
+else { Pass "V121 no whole-node observer - redraws come from the click, a named dataLink or onShow" }
+
+# The replacement path must actually be wired, or the log simply stops following purchases.
+$rootTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HuntersHunted.lfm")))
+$ledgerTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.9.lfm")))
+if ($ledgerTxt -notmatch 'xpLedgerForm = self;') { Fail "V121 HH.9 never hands its form to the root - xpGuard has nothing to redraw through" }
+elseif ($rootTxt -notmatch 'renderXPLedger\(xpLedgerForm, rows\)') { Fail "V121 the root form never redraws the log through xpLedgerForm" }
+else { Pass "V121 the Progress tab hands itself over and the guard redraws through it" }
+
+# ---- V122: a renderer writes a field only when the value actually changes -----------
+# Writing back a value that is already there still wakes every dataLink on that field, and
+# those renderers write more fields. One helper, so there is one thing to check.
+if ($rootTxt -notmatch 'function setField\(name, value\)') { Fail "V122 setField is missing from the root form" }
+elseif ($rootTxt -notmatch 'if sheet\[name\] ~= value then sheet\[name\] = value; end;') { Fail "V122 setField writes without comparing first - the whole point of it" }
+else { Pass "V122 setField compares before it writes" }
+
+# Every field write in the sheet goes through it. The `sheet[name]` pair inside setField
+# itself is the only assignment allowed to be direct.
+$directWrites = @()
+foreach ($f in $files) {
+    $raw = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f.FullName))
+    foreach ($m in [regex]::Matches($raw, 'sheet(\[[^\]]+\]|\.[A-Za-z_][A-Za-z0-9_]*)\s*=(?!=)')) {
+        if ($m.Value -match '^sheet\[name\]') { continue }
+        $directWrites += "$($f.Name): $($m.Value.Trim())"
+    }
+}
+if ($directWrites) { foreach ($w in $directWrites) { Fail "V122 field written without comparing - $w - use setField (SPEC B34)" } }
+else { Pass "V122 every field write goes through setField" }
+
+# ---- V123: a dataLink watches only what its renderer reads --------------------------
+# HH.3 had one link over the health track AND the ~80 mirrored trait dots, so ticking any
+# trait re-rendered the health track, and that render wrote all ten health rows back.
+$combatTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.3.lfm")))
+$healthLinks = @([regex]::Matches($combatTxt, '<dataLink fields="\{([^}]*)\}"[^>]*renderHealthTrack'))
+if ($healthLinks.Count -ne 1) { Fail "V123 expected exactly one dataLink driving renderHealthTrack on HH.3, found $($healthLinks.Count)" }
+else {
+    $watched = @($healthLinks[0].Groups[1].Value -split ',' | ForEach-Object { $_.Trim().Trim("'") })
+    $strays  = @($watched | Where-Object { $_ -ne 'healthLevels' -and $_ -ne 'language' })
+    if ($strays) { Fail "V123 the health link on HH.3 also watches $($strays -join ', ') - fields renderHealthTrack never reads (SPEC B34)" }
+    else { Pass "V123 the health link on HH.3 watches only healthLevels and language" }
+}
+if ($combatTxt -notmatch '<dataLink fields="\{[^}]*\}"[^>]*renderCombatTraits\(self\);"\s*/>') { Fail "V123 the trait mirror on HH.3 has no link of its own" }
+elseif ($combatTxt -match '<dataLink fields="\{[^}]*\}"[^>]*renderHealthTrack[^>]*renderCombatTraits') { Fail "V123 one link still drives both renderers on HH.3" }
+else { Pass "V123 the trait mirror on HH.3 has its own link" }
+
+# ---- V124: a whole-tree renderer runs once per open for the same state --------------
+# language and sheetTheme both carry a defaultValue, so BOTH links fire when the sheet opens.
+# renderAbilityLabels walked the whole control tree and rebound 150 dots each time.
+$setTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.6.lfm")))
+if ($setTxt -notmatch 'local abilityMemo') { Fail "V124 renderAbilityLabels keeps no memo - it walks the tree twice on every open" }
+elseif ($setTxt -notmatch 'if abilityMemo == memo then return; end;') { Fail "V124 the memo is kept but never short-circuits" }
+elseif ($setTxt -notmatch 'abilityMemo = memo;') { Fail "V124 the memo is read but never written - it would short-circuit forever" }
+else { Pass "V124 renderAbilityLabels returns early when neither era nor language moved" }
+
+# The two writes it makes per dot are compared, like setField compares (SPEC V122). These are
+# control properties, not fields, so the setField check above cannot see them.
+if ($setTxt -notmatch 'if c\.field ~= full then c\.field = full; end;') { Fail "V124 renderAbilityLabels rebinds a dot without checking whether the binding changed" }
+elseif ($setTxt -notmatch 'if c\.checked ~= want then c\.checked = want; end;') { Fail "V124 renderAbilityLabels reloads a dot without checking whether the state changed" }
+else { Pass "V124 the dot rebind writes only what actually differs" }
+
+# ---- V125: one walk of the ledger per click, shared by all three drawers -------------
+# V108 said this when there were two drawers. There are three now: the log joined the two
+# boxes, and it takes the rows rather than building them again.
+if ($rootTxt -notmatch 'function xpSum\(rows\)') { Fail "V125 xpSum is missing - xpSpent cannot hand its rows to anyone" }
+elseif ($rootTxt -notmatch 'function xpSpent\(\)\s*\r?\n\s*return xpSum\(xpLedgerRows\(\)\);') { Fail "V125 xpSpent does not total the rows through xpSum" }
+else { Pass "V125 totalling is split from walking" }
+
+$guardFn = [regex]::Match($rootTxt, 'function xpGuard\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
+if (-not $guardFn.Success) { Fail "V125 xpGuard not found on the root form" }
+else {
+    $g = $guardFn.Groups[1].Value
+    # The accepted path walks once. The refused path reads the restored state a second time -
+    # the rows in hand describe the state being turned down, so they cannot be reused.
+    $walks = @([regex]::Matches($g, 'xpLedgerRows\(\)')).Count
+    if ($walks -gt 2) { Fail "V125 xpGuard walks the ledger $walks times - one for the click, at most one more to read back a refused move" }
+    elseif ($g -notmatch 'local spent = xpSum\(rows\);') { Fail "V125 xpGuard does not total the rows it already built" }
+    elseif ($g -notmatch 'renderXPBoxes\(form, spent\);') { Fail "V125 xpGuard makes the boxes walk the ledger again" }
+    elseif ($g -notmatch 'xpLedgerRefresh\(rows\);') { Fail "V125 xpGuard does not hand its rows to the log" }
+    else { Pass "V125 one walk per accepted click, shared by the boxes and the log" }
+}
+if ($ledgerTxt -notmatch 'function renderXPLedger\(form, rows\)') { Fail "V125 renderXPLedger does not accept rows - it always walks the ledger itself" }
+elseif ($ledgerTxt -notmatch 'if rows == nil then rows = xpLedgerRows\(\); end;') { Fail "V125 renderXPLedger cannot build its own rows when called without them" }
+else { Pass "V125 renderXPLedger takes the rows when the caller has them" }
+
+# ---- V126: the theme art is not a third of the .rpk ---------------------------------
+# The four papers were 1.10 MB of a 3.72 MB package. They go behind the content, stretched to
+# fill a tab, so the pixels were never being read at that size.
+$pngCap   = 120KB
+$pngTotal = 400KB
+$papers = @(Get-ChildItem -LiteralPath (Join-Path $dir "images") -Filter *.png)
+$tooBig = @($papers | Where-Object { $_.Length -gt $pngCap })
+$sum = ($papers | Measure-Object -Property Length -Sum).Sum
+if ($tooBig) { foreach ($p in $tooBig) { Fail "V126 images/$($p.Name) is $([int]($p.Length/1KB)) KB, over the $([int]($pngCap/1KB)) KB ceiling" } }
+elseif ($sum -gt $pngTotal) { Fail "V126 images/ totals $([int]($sum/1KB)) KB, over the $([int]($pngTotal/1KB)) KB budget" }
+else { Pass "V126 all $($papers.Count) images fit the ceiling ($([int]($sum/1KB)) KB total)" }
+
+# ---- V127: the guard terminates ------------------------------------------------------
+# The undo used to be written loudly and rely on re-entry finding a legal state. That holds
+# for every state but one: a trait below the baseline on a sheet with no balance left. There
+# the second pass refuses the undo of the undo and the guard flips forever.
+if (-not $guardFn.Success) { Fail "V127 xpGuard not found on the root form" }
+else {
+    $g = $guardFn.Groups[1].Value
+    $undo = [regex]::Match($g, 'if undo then(.*?)return;', 'Singleline')
+    if (-not $undo.Success) { Fail "V127 xpGuard has no undo branch" }
+    elseif ($undo.Groups[1].Value -notmatch 'xpQuiet = true;') { Fail "V127 the undo is written loudly - the guard re-enters and can flip forever" }
+    elseif ($undo.Groups[1].Value -notmatch 'setField\(field, not on\);') { Fail "V127 the undo does not put the dot back through setField" }
+    elseif ($undo.Groups[1].Value -notmatch 'xpQuiet = false;') { Fail "V127 the undo raises xpQuiet and never lowers it - every later click would be ignored" }
+    else { Pass "V127 the undo is written quietly, so the guard runs once and stops" }
+}
+
+# ---- V128: three managed tabs, and Magika is gone for good ---------------------------
+# The user had the empty Magika window removed in the 39th round. Its field name stays burned
+# (checked with the other orphans above): a sheet saved with it ticked still carries the value.
+if (Test-Path (Join-Path $dir "HH.12.lfm")) { Fail "V128 HH.12.lfm is still on disk - the Magika tab was removed" }
+else { Pass "V128 HH.12.lfm is gone" }
+
+$managed = @('tabNumina', 'tabDisciplines', 'tabStoryteller')
+$magikaLeft = @($files | Where-Object { (CodeOf $_.FullName) -match '(tabMagika|stShowMagika|"Show Magika"|HH[.]12)' })
+if ($magikaLeft) { foreach ($m in $magikaLeft) { Fail "V128 $($m.Name) still refers to the Magika tab" } }
+else { Pass "V128 nothing refers to the Magika tab any more" }
+
+$shownMap = [regex]::Match($rootTxt, 'local shown = \{(.*?)\};', 'Singleline')
+if (-not $shownMap.Success) { Fail "V128 applyTabVisibility has no shown map" }
+else {
+    $keys = @([regex]::Matches($shownMap.Groups[1].Value, 'tab[A-Za-z]+') | ForEach-Object { $_.Value })
+    $extra = @($keys | Where-Object { $managed -notcontains $_ })
+    $miss  = @($managed | Where-Object { $keys -notcontains $_ })
+    if ($extra) { Fail "V128 the shown map carries $($extra -join ', ') - not a managed tab" }
+    elseif ($miss) { Fail "V128 the shown map is missing $($miss -join ', ')" }
+    else { Pass "V128 exactly three managed tabs" }
+}
+$langMagika = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($langFile))
+if ($langMagika -match 'wod\.(Magika|Show Magika)=') { Fail "V128 localization.lang still carries a Magika key" }
+else { Pass "V128 the Magika keys are out of localization.lang" }
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.

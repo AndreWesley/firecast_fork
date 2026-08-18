@@ -32,11 +32,18 @@
 			--
 			-- The rows come from xpLedgerRows() on the root form (SPEC I9/I10); this routine
 			-- only formats them.
-			function renderXPLedger(form)
+			--
+			-- `rows` is optional. A caller that has just built the list hands it over rather
+			-- than making this walk the ledger a second time for the same click (SPEC V125) -
+			-- that second walk is half of what made the sheet freeze (SPEC B34). Left out, the
+			-- list is built here, and a nil coming back out of xpLedgerRows still means what it
+			-- always did: no initial character has been saved yet.
+			function renderXPLedger(form, rows)
 				if sheet == nil then return; end;
 
 				local lang = sheet.language or "en";
-				local rows = xpLedgerRows();
+
+				if rows == nil then rows = xpLedgerRows(); end;
 
 				if rows == nil then
 					-- SPEC V33: say WHY it is empty rather than show four blank columns.
@@ -181,17 +188,13 @@
 	     What the ledger reads directly: the snapshot itself, the rule that prices backgrounds,
 	     and the language its two text columns are written in. This tab watches `language`
 	     itself rather than being called from HH.6, because the four columns are declared here
-	     and only this form can address them. Dots are watched by the observer below - there
-	     are some five hundred of them, and naming every one here would be a list nobody could
-	     keep correct. -->
+	     and only this form can address them. The dots are NOT watched from here - there are
+	     some four hundred and sixty of them and no list of that size stays correct. What
+	     redraws the log when one of them is clicked is the click itself: xpGuard already runs
+	     on every dot that costs experience and already holds the rows (SPEC V121/V125). -->
 	<dataLink fields="{'baseline', 'stBackgroundsXP', 'language'}" onChange="renderXPLedger(self); renderXPBoxes(self);"/>
 
-	<!-- The tab is a REPORT, so it is rebuilt every time it comes up (SPEC V97). The dots that
-	     feed it live on other tabs and there are some four hundred and sixty of them: the
-	     observer below is meant to catch those, but it is an SDK call with no precedent in any
-	     sheet in this repo, and while it silently did nothing the log stayed frozen at whatever
-	     it showed when the sheet loaded - four blank columns (SPEC B28). Correctness hangs on
-	     this event, not on the observer. -->
+	<!-- The tab is a REPORT, so it is rebuilt every time it comes up (SPEC V97). -->
 	<event name="onShow">
 		renderXPBoxes(self);
 		renderXPLedger(self);
@@ -201,12 +204,15 @@
 		renderXPBoxes(self);
 		renderXPLedger(self);
 
-		-- One observer for the whole sheet: every dot on every tab feeds this table, so the
-		-- log follows the sheet instead of a hand-written list of fields. Kept in a global so
-		-- it is not collected while the sheet is open.
-		xpLedgerObserver = ndb.newObserver(sheet);
-		xpLedgerObserver.onChanged = function(node, attribute, oldValue)
-			renderXPLedger(self);
-		end;
+		-- How xpGuard reaches these four columns. A tab form cannot be addressed from the root
+		-- script by name (SPEC R.9 / B.9), so the tab hands itself over once and the guard
+		-- redraws through it on every purchase (SPEC V125).
+		--
+		-- This replaces the whole-node ndb.newObserver that used to sit here (SPEC V121). That
+		-- observer fired on EVERY attribute written - including the hundreds the sheet writes
+		-- to itself while loading - and it did not pass through xpQuiet, so the shield that
+		-- fixed B30 never covered it. On a sheet with a saved baseline that was a full walk of
+		-- the ledger per write, and the sheet froze on open (SPEC B34).
+		xpLedgerForm = self;
 	</event>
 </form>

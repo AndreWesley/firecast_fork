@@ -327,8 +327,15 @@
 	<!--
 		Two entry points, same reason as the Main tab: the dataLink catches later edits, the
 		onNodeReady catches the sheet being opened (SPEC V19 / V33).
+
+		TWO links, because they watch different things (SPEC V123). The health track reads the
+		track length and the language and nothing else; the mirror reads the traits and the era.
+		One link over both lists meant that ticking any of the eighty trait dots re-rendered the
+		health track as well - and that render wrote all ten health rows back, which woke
+		everything hanging off THEM. That cascade is what froze a saved sheet on open (SPEC B34).
 	-->
-	<dataLink fields="{'healthLevels', 'language', 'strength_2', 'strength_3', 'strength_4', 'strength_5', 'dexterity_2', 'dexterity_3', 'dexterity_4', 'dexterity_5', 'stamina_2', 'stamina_3', 'stamina_4', 'stamina_5', 'perception_2', 'perception_3', 'perception_4', 'perception_5', 'alertness_1', 'alertness_2', 'alertness_3', 'alertness_4', 'alertness_5', 'athletics_1', 'athletics_2', 'athletics_3', 'athletics_4', 'athletics_5', 'awareness_1', 'awareness_2', 'awareness_3', 'awareness_4', 'awareness_5', 'brawl_1', 'brawl_2', 'brawl_3', 'brawl_4', 'brawl_5', 'firearms_1', 'firearms_2', 'firearms_3', 'firearms_4', 'firearms_5', 'melee_1', 'melee_2', 'melee_3', 'melee_4', 'melee_5', 'stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'stealth_5', 'archery_1', 'archery_2', 'archery_3', 'archery_4', 'archery_5', 'sheetTheme', 'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'conscience_2', 'conscience_3', 'conscience_4', 'conscience_5', 'selfControl_2', 'selfControl_3', 'selfControl_4', 'selfControl_5', 'courage_2', 'courage_3', 'courage_4', 'courage_5'}" onChange="renderHealthTrack(self, 'dynHealth3_'); renderCombatTraits(self);"/>
+	<dataLink fields="{'healthLevels', 'language'}" onChange="renderHealthTrack(self, 'dynHealth3_');"/>
+	<dataLink fields="{'sheetTheme', 'strength_2', 'strength_3', 'strength_4', 'strength_5', 'dexterity_2', 'dexterity_3', 'dexterity_4', 'dexterity_5', 'stamina_2', 'stamina_3', 'stamina_4', 'stamina_5', 'perception_2', 'perception_3', 'perception_4', 'perception_5', 'alertness_1', 'alertness_2', 'alertness_3', 'alertness_4', 'alertness_5', 'athletics_1', 'athletics_2', 'athletics_3', 'athletics_4', 'athletics_5', 'awareness_1', 'awareness_2', 'awareness_3', 'awareness_4', 'awareness_5', 'brawl_1', 'brawl_2', 'brawl_3', 'brawl_4', 'brawl_5', 'firearms_1', 'firearms_2', 'firearms_3', 'firearms_4', 'firearms_5', 'melee_1', 'melee_2', 'melee_3', 'melee_4', 'melee_5', 'stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'stealth_5', 'archery_1', 'archery_2', 'archery_3', 'archery_4', 'archery_5', 'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'conscience_2', 'conscience_3', 'conscience_4', 'conscience_5', 'selfControl_2', 'selfControl_3', 'selfControl_4', 'selfControl_5', 'courage_2', 'courage_3', 'courage_4', 'courage_5'}" onChange="renderCombatTraits(self);"/>
 
 	<event name="onNodeReady">
 		renderHealthTrack(self, 'dynHealth3_');
