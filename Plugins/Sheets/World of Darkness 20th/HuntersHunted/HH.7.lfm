@@ -2018,10 +2018,9 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="340" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
 
-			<!-- The star sits in the box's left margin, clear of the row itself (SPEC V37): the
-			     rows start at x=12 and this ends there. It marks the affinity path, and the note
-			     under TRUE FAITH says what that means (SPEC V88). -->
-			<label left="2" top="29" width="10" height="20" text="*"/>
+			<!-- The first row is the affinity path, and bold is the whole of that mark: the
+			     star that used to sit in the left margin came off at the user's request (SPEC
+			     V88, 28th round). The note under TRUE FAITH still says what the row means. -->
 			<layout left="12" top="25" width="315" height="25">
 				<HedgePicker field="numina_1" style="bold"/>
 			</layout>

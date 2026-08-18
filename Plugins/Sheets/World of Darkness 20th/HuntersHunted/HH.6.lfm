@@ -7,7 +7,6 @@
 			-- Firecast APP language, not this dropdown, so a pt-locale user picking "English"
 			-- would still get Portuguese. SPEC R.1 / R.5.
 			local PT = {
-				["*"] = "*",
 				["* The first path is the Affinity Path"] = "* O primeiro caminho é o de Afinidade",
 				["ABILITIES"] = "HABILIDADES",
 				["Ability"] = "Habilidade",
