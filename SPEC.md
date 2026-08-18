@@ -285,11 +285,25 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - 1 lista por caixa ! 1 template por caixa: `NuminaPicker` → `HedgePicker` (21) + `PsychicPicker` (22), mesmos x de radio/entrada/bolinha ∴ coluna segue alinhada (§V26) & `items` segue inline no XML (§V18), ⊥ Lua populando @ runtime. `NuminaFree` (linhas 9 & 10) ⊥ muda — texto livre ⊥ tem lista
 - ficha salva c/ númina na caixa ERRADA (ex: `numina_3` = `Telepathy`) segue no NDB, mas o combo abre VAZIO — valor ∉ `values` (§V12). ⊥ migração & ⊥ Lua limpando campo: o bloco `DESCRIPTION` lê `DESC[valor]` ∴ o dado segue visível & o user reescolhe na caixa certa. ≡ precedente `transportation`/`other` (user: ⊥ ∃ ficha salva que importe)
 
+- 27ª rodada (2026-08-18) — aba `Storyteller` + ledger de XP derivado. ↓ ∀ decisão desta rodada
+- aba `Storyteller` = 12ª aba, SÓ p/ mestre da mesa. Gate = `Firecast.getMesaDe(sheet).meuJogador.isMestre` (§R29). ⊥ mesa (biblioteca local, ficha aberta fora de mesa) → aba ESCONDIDA. DECIDIDA pelo user 2026-08-18 ∴ baseline só é salvável c/ a ficha aberta DENTRO da mesa
+- "salvo de forma ⊥ visível ao jogador" = ⊥ renderiza widget no cliente dele. O NDB segue chegando ao cliente ∴ ⊥ é segredo criptográfico — blindar contra jogador que lê o dado por fora ∉ escopo
+- `Salvar Personagem Inicial` = 1 SHOT. `Dialogs.confirmOkCancel` antes (§R30, "ação sem volta"); gravado ⊥ regravável & ⊥ ∃ caminho na ficha que apague
+- log de XP = DERIVADO (baseline × ficha atual, recalculado a ∀ mudança), ⊥ diário append-only. DECIDIDA pelo user 2026-08-18 ∴ desmarcar bolinha some c/ a linha & clique errado ⊥ fica no log p/ sempre. Preço aceito: log ⊥ tem ordem cronológica (ordena por categoria & slot)
+- custo de Habilidade = nível atual ×2 (1º ponto fixo 3). Pedido escrito dizia ×3 mas o exemplo do próprio user (`Firearms 1→2 = 2`) & o canon V20 dizem ×2 — user CONFIRMOU ×2 2026-08-18
+- Affinity Path = SEMPRE `numina_1` (slot FIXO), ⊥ "primeira linha preenchida". DECIDIDA pelo user 2026-08-18. Destaque = `*` + negrito na linha 1 mesmo vazia + nota curta depois de `TRUE FAITH`
+- `Mostrar Númina` `Mostrar Disciplinas` `Mostrar Magika` escondem a aba p/ TODOS (mestre incluso), ⊥ só p/ jogador — 1 flag, 0 ramo por papel; mestre que quer ver liga o flag. JULGAMENTO meu, reversível
+- default dos flags: `stShowNumina` LIGADO · `stShowDisciplines` & `stShowMagika` DESLIGADOS ∴ ficha salva antes desta rodada (campo nil) ⊥ perde a aba Numina que já via
+- abas `Disciplines` & `Magika` nascem VAZIAS (moldura + título) a pedido do user ∴ custo de Disciplina & Trilha & Esfera & Arete fica DECLARADO & DORMENTE (§I9) — ⊥ ∃ campo p/ diffar. SUPERSEDE em parte o §C "Mage-only ⊥ portar": a JANELA de Magika entra, o conteúdo (Spheres, Rotes, Focus, Arete) ⊥
+- antecedente c/ `stBackgroundsXP` desligado → linha ENTRA no log c/ custo 0 (o aumento existiu, XP ⊥ foi gasto) ∴ mestre vê o que mudou. JULGAMENTO meu
+- `xpLog` (textEditor livre da aba Progress) SAI — o bloco vira tabela DERIVADA de 4 colunas. Campo vira ÓRFÃO declarado (§I3) ∴ texto que o jogador já digitou ⊥ ressuscita em caixa errada
+- soma automática de `spentXP` a partir do ledger ⊥ pedida ∴ campo segue manual & c/ 1 dono (§V1). Fora de escopo desta rodada
+
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
-- I2 arquivos: `Plugins/Sheets/World of Darkness 20th/HuntersHunted/` → `HuntersHunted.lfm` (raiz) + `HH.1.lfm`…`HH.9.lfm` (`HH.8` = aba Inventory, `HH.9` = aba Progress) + `images/` = `prime_on.png` `prime_off.png` (XML, tema base) + arte de paleta (15ª rodada): `prime_on_gold.png` `prime_off_gold.png` (Vitoriano & Clássico) · `prime_on_crimson.png` `prime_off_slate.png` (Atual) · `prime_on_silver.png` `prime_off_silver.png` (Idade das Trevas — prata do outline, 19ª rodada; par `blood`/`iron` saiu) · `paper_present.png` `paper_victorian.png` `paper_dark_ages.png` `paper_classical.png`
-- I1b ordem das abas (9): Main · Traits · Numina (era `Powers` até a 22ª rodada) · Combat · Inventory · Background · Progress · Notes · Settings
+- I2 arquivos: `Plugins/Sheets/World of Darkness 20th/HuntersHunted/` → `HuntersHunted.lfm` (raiz) + `HH.1.lfm`…`HH.12.lfm` (`HH.8` = aba Inventory, `HH.9` = aba Progress, `HH.10` = aba Storyteller, `HH.11` = aba Disciplines, `HH.12` = aba Magika — os 3 últimos NOVOS na 27ª rodada) + `images/` = `prime_on.png` `prime_off.png` (XML, tema base) + arte de paleta (15ª rodada): `prime_on_gold.png` `prime_off_gold.png` (Vitoriano & Clássico) · `prime_on_crimson.png` `prime_off_slate.png` (Atual) · `prime_on_silver.png` `prime_off_silver.png` (Idade das Trevas — prata do outline, 19ª rodada; par `blood`/`iron` saiu) · `paper_present.png` `paper_victorian.png` `paper_dark_ages.png` `paper_classical.png`
+- I1b ordem das abas (12, 27ª rodada; eram 9): Main · Traits · Numina (era `Powers` até a 22ª rodada) · Disciplines · Magika · Combat · Inventory · Background · Progress · Notes · Settings · Storyteller. As 3 NOVAS entram assim: `Disciplines` & `Magika` colam em `Numina` (as 3 são poder ∴ ficam juntas) & `Storyteller` fecha a fileira depois de `Settings`. `Numina`/`Disciplines`/`Magika` escondem por flag (§I8, §V89) & `Storyteller` por papel (§V79) ∴ jogador comum abre 8 abas
 - I3 campos NDB (contrato de dados — ⊥ renomear pós-release):
   - header: `name` `player` `chronicle` `nature` `demeanor` `concept` `motivation` `occupation` `residence`
   - attrs (dot1 fixo, campos `_2`…`_5`): `strength` `dexterity` `stamina` `charisma` `manipulation` `perception` `inteligence` `wits`
@@ -312,16 +326,35 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - combat (aba Combat, `HH.3`): `attack_N` `roll_N` `difficulty_N` `damage_N` `range_N` `rate_N` `clip_N` `conceal_N`, N=1…10 (era `attack`\|`damage`\|`difficulty` N=1…4 antes de T30) + `armorClass` `armorRating` `armorPenalty` `armorDescription` (VOLTARAM de `HH.8` na 3ª rodada — §V35)
   - inventory (aba Inventory, `HH.8`): `gear` · `equipment` · `items` (RÓTULO = `TRANSPORTATION`, ⊥ `ITEMS` — §C) · `baseDefenses` `baseArmaments` `baseOther` (novos 2026-08-17)
   - história (aba Background, `HH.4`): `desc_sexo` `desc_altura` `desc_olhos` `desc_idade` `desc_peso` `desc_cabelo` `desc_idadeAparente` `desc_etinicidade` + `desc_nacionalidade` (novo) · `aparencia` (RÓTULO = `Languages`) · `idiomas` (RÓTULO = `Goals`) · `moralFlaws` `fears` (novos) · `background`. `personalidade` & `natureza` SAÍRAM na 9ª rodada ∴ órfãos ↓
-  - progress (aba Progress, `HH.9`): `spentXP` · `xpLog`. `experience` = ESPELHO do da Main (§V36). `totalXP` ⊥ tem `field` ∴ ∉ contrato, ⊥ salvo (§C, ≡ §V29)
+  - progress (aba Progress, `HH.9`): `spentXP`. `experience` = ESPELHO do da Main (§V36). `totalXP` ⊥ tem `field` ∴ ∉ contrato, ⊥ salvo (§C, ≡ §V29). `xpLog` SAIU na 27ª rodada (bloco virou ledger derivado, §I10) ∴ ÓRFÃO declarado ↓; as 4 colunas do ledger ⊥ têm `field` (≡ `totalXP`, §V84)
   - ESPELHOS declarados (>1 widget de entrada no MESMO `field`, §V36 — ⊥ é violação de §V1): `health_1`…`_10` em `HH.1`+`HH.3` · `willpower_c1`…`_c10` em `HH.1`+`HH.3` (11ª rodada) · `experience` em `HH.1`+`HH.9`. Virtudes SAÍRAM daqui na 12ª rodada — viraram só-leitura ↓
   - SÓ-LEITURA em `HH.3` (espelho ⊥ editável, ⊥ conta como dono): `alertness` `athletics` `awareness` `brawl` `melee` `stealth` (+`_1`…`_5`) + 1 SLOT `ro_ranged_*` = `Firearms` (`firearms`) | `Archery` (`archery`) conforme a lista da época (21ª rodada — `Archery` virou campo próprio ∴ o slot voltou; `Melee` ∈ ∀ época SÓ-LEITURA em `HH.3` (espelho ⊥ editável, ⊥ conta como dono): `alertness` `athletics` `awareness` `brawl` `firearms` `melee` `stealth` (+`_1`…`_5`) — os 2 SLOTS da 19ª rodada SAÍRAM na 20ª: `Firearms` mora sempre em `melee`)|`Archery` mora sempre em `firearms` & `Melee` sempre em `melee` (§V74) ∴ ligação estática de volta · `strength` `dexterity` `stamina` `perception` (+`_2`…`_5`) · `willpower_1`…`_10` (bolinhas da caixa WILLPOWER nova — 11ª rodada; os `_c1`…`_c10` do MESMO bloco são espelho editável ↑) · `conscience` `selfControl` `courage` (+`_2`…`_5`) — 12ª rodada, virtudes deixaram de ser editáveis aqui
-  - ÓRFÃOS declarados (∈ NDB de ficha salva, ⊥ widget em nenhum `.lfm`): `transportation` `other` (3ª rodada) · `bruised` `hurt` `injured` `wounded` `mauled` `crippled` `incapacitated` (4ª rodada — vitalidade virou posicional, §C) · `personalidade` `natureza` (9ª rodada — caixas Concept & Nature removidas a pedido). ⊥ reusar estes nomes p/ campo novo ∴ ficha velha ⊥ ressuscita dado em caixa errada
+  - ÓRFÃOS declarados (∈ NDB de ficha salva, ⊥ widget em nenhum `.lfm`): `transportation` `other` (3ª rodada) · `bruised` `hurt` `injured` `wounded` `mauled` `crippled` `incapacitated` (4ª rodada — vitalidade virou posicional, §C) · `personalidade` `natureza` (9ª rodada — caixas Concept & Nature removidas a pedido) · `xpLog` (27ª rodada — bloco de texto livre virou ledger derivado, §I10 §V91). ⊥ reusar estes nomes p/ campo novo ∴ ficha velha ⊥ ressuscita dado em caixa errada
   - settings (aba Settings, `HH.6`): `language` · `game` (novo 2026-08-17, 5 jogos + vazio) · `sheetTheme` (11ª rodada; 16ª rodada = 4 valores `Modern`\|`Victorian Era`\|`Dark Ages`\|`Classical Era`, ∀ um c/ paleta, default `Modern`, PINTA — §I5 §I6)
+  - LUA-OWNED declarados (∈ NDB, ⊥ widget POR DESIGN — escritos só por Lua ∴ ⊥ órfãos: dado VIVO): `baseline` (§I8c). `<dataLink>` pode observar (exceção de §V8, §B25)
+  - storyteller (aba Storyteller, `HH.10`, 27ª rodada): `baseline` = XML do snapshot do personagem inicial (§R32), string, vazio ⟺ ⊥ salvo · `stBackgroundsXP` `stShowNumina` `stShowDisciplines` `stShowMagika` = bool (§I8, defaults OFF\|ON\|OFF\|OFF por §V89). ∀ um ⊥ tem widget em aba de jogador ∴ só o mestre edita (§V79)
   - `experience` · `avatar`
 - I4 build: `rdk -l` @ raiz do plugin → compile + lint fonte → `output/World of Darkness 20th.rpk`. `rdk -c` = só compile. `rdk p` = PREPARE, ⊥ build.
 - I5 `THEMES` — tabela Lua @ `HH.6.lfm`, chave = `values` do `cboSheetTheme` (16ª rodada: ∀ valor tem paleta, ⊥ ∃ mais entrada ausente). ∀ época: `{ form, fill = {<cor autorada> → <cor nova>}, stroke = {…}, font = {…}, fontFamily, dotOn, dotOff, paper }` — 8 chaves, todas obrigatórias (§V63). `corner` REMOVIDO (§V66) & `strokeSize` virou constante `THEME_STROKE` (§V67)
 - I6 `applyTheme(v, from)` — @ `HH.6.lfm`, MESMA forma de `applyLanguage`: `rootOf(from)` + `collect` da raiz, snapshot 1× por handle antes da 1ª pintura, depois pinta `THEMES[v]` | restaura snapshot. Chamado pelo `<dataLink field="sheetTheme">` ∴ roda no load & em ∀ troca
 - I7 `ABILITY_FIELD` & `ERA_ABILITIES` — tabelas Lua @ `HuntersHunted.lfm` (form RAIZ, ≡ `HEALTH_MARKS`/§V41). `ABILITY_FIELD[nome]` = campo do traço (41 nomes, bijeção §V74). `ERA_ABILITIES[t][coluna]` = os 10 nomes daquela coluna naquela época, na ordem de leitura; `coluna` ∈ `talents` `skills` `knowledges`; chave `t` = `values` do `cboSheetTheme`. `THEME_LABELS` (19ª/20ª rodada) & `THEME_COMBAT` (19ª) ⊥ ∃ mais
+
+- I8 aba `Storyteller` (`HH.10.lfm`, 27ª rodada) — caixa `STORYTELLER SETTINGS`: linha `Save Initial Character` + `<button>` `Save` & 4 `checkBox` — `Can Buy Backgrounds With Experience` (`stBackgroundsXP`, default OFF) · `Show Numina` (`stShowNumina`, default ON) · `Show Disciplines` (`stShowDisciplines`, default OFF) · `Show Magika` (`stShowMagika`, default OFF)
+  - I8a `isStoryteller()` @ form RAIZ = `Firecast.getMesaDe(sheet)` ⊥ nil & `.meuJogador` ⊥ nil & `.isMestre == true`; ∀ outro caminho → false (fail-closed, §V80). ⊥ mesa → false ∴ ficha fora de mesa ⊥ mostra a aba (§C)
+  - I8b `applyTabVisibility(from)` @ form RAIZ (≡ `HEALTH_LEVELS`/§V41): `Storyteller`.visible = `isStoryteller()`; `Numina`/`Disciplines`/`Magika`.visible = flag de §I8. Roda no `onNodeReady` & no `dataLink` dos 3 flags (≡ §V72)
+  - I8c `Save` → `Dialogs.confirmOkCancel` (aviso de ação SEM VOLTA, §R30) → OK → `sheet.baseline = ndb.exportXML(sheet)` (§R32). `baseline` ⊥ vazio ⟺ personagem inicial salvo ∴ ⊥ precisa de 2º campo de estado
+- I9 tabela de custo de XP (custo p/ ir do nível `n` → `n+1`; `n` = nível ATUAL, §V85). ∀ custo em pontos de Experiência
+  - Atributo `n×4` · Habilidade `n×2` (`n=0` → 3) · Virtude `n×2` · Humanidade `n×2` · Força de Vontade `n×2` (`n` = bolinhas `willpower_1`…`_10`, ⊥ `willpower_c*`)
+  - Antecedente `n×3` (`n=0` → 3) SÓ c/ `stBackgroundsXP` ligado; flag desligada → linha entra c/ custo `0` (§C)
+  - Númina `n×7` (`n=0` → 7); 1º ponto de TIPO ∉ baseline → 21 (§V87). Númina de afinidade (`numina_1`) `n×6`, `n=0` segue 7 (| 21 se tipo novo)
+  - tipos de númina (3): `hedge` = `numina_1`…`_10` (Magia Estática) · `psychic` = `psychic_1`…`_10` (Fenômenos Psíquicos) · `faith` = `faith` (Fé Verdadeira)
+  - DORMENTES — regra declarada, ⊥ ∃ campo p/ diffar enquanto `Disciplines`/`Magika` estiverem vazias (§C): Disciplina de clã `n×5` (`n=0` → 10) · Disciplina fora do clã `n×7` (`n=0` → 10) · Trilha (Necromancy Path \| Thaumaturgy Path) `n×4` (`n=0` → 7) · Esfera de afinidade `n×7` (`n=0` → 10) · Esfera sem afinidade `n×8` (`n=0` → 10) · Arete `n×8`
+- I10 ledger de XP (aba Progress, `HH.9`, 27ª rodada) — bloco `EXPERIENCE LOG` vira 4 colunas SÓ-LEITURA: `Type` \| `Trait` \| `Level` \| `Cost`
+  - fonte = diff(`baseline`, ficha atual), recalculado a ∀ render (§V83). ⊥ tem `field` ∴ ∉ contrato de dados & ⊥ salvo (≡ §V29, ≡ `totalXP`)
+  - 1 linha por PONTO: baseline 2 → atual 4 = 2 linhas (nível 3 & nível 4), custo de CADA passo por §I9. `Level` = nível ALCANÇADO
+  - ordem = categoria na ordem de §I9, depois índice do campo/slot (⊥ ∃ ordem cronológica, §C)
+  - `Type` & `Trait` renderizados por Lua ∴ passam por `tryTranslate` (≡ §V70): `Attribute`=`Atributo` · `Ability`=`Habilidade` · `Virtue`=`Virtude` · `Humanity`=`Humanidade` · `Willpower`=`Força de Vontade` · `Background`=`Antecedente` · `Numina`=`Númina` (+ dormentes `Discipline` `Sphere` `Arete`)
+  - `baseline` vazio → bloco mostra texto de estado EXPLÍCITO (`initial character not saved yet`), ⊥ tabela em branco (§V33)
 
 ## §R RESEARCH
 
@@ -355,6 +388,11 @@ R26|caminho de imagem @ runtime|rdk resolve `src=`/`checkedImage=`/`uncheckedIma
 R27|`?` fonte herdada|`getFontFamily` = `_obj_getProp(handle,"Font.Family")` — ⊥ sei o que devolve p/ controle que nunca autorou fonte (`""` \| nil \| família efetiva) nem se gravar de volta RE-acopla ao tema. CERTO: ∀ setter de fonte passa por `_gui_prepareForFont*Change` ∴ 1ª gravação DESACOPLA p/ sempre, mesmo gravando o valor lido (§B21)|`sdk/rrpgGUI.lua:617-621`
 R28|`field` @ runtime|`gui.ImageCheckBox.props["field"]` tem SETTER: `setField(v)` = `_obj_setProp(self.handle, "FieldName", v)` (`SDK3/API/rrpgGUI.lua:765`) ∴ re-ligar bolinha a outro campo em runtime é API suportada, ⊥ gambiarra. `?` se o controle recarrega `checked` sozinho ao trocar de `FieldName` — assumo que ⊥ & recarrego à mão (§V76)
 
+R29|mestre da mesa|`Firecast.getMesaDe(sheet)` → mesa (global dentro de `.lfm` de ficha, precedente `Sheets/Anime e5 Sheet/FichaAnimeE5/primeiraPagina.lfm:45`); `mesa.meuJogador.isMestre` = bool, precedente de uso `ChatMods/AfkBot/afkbot.lua:182`. Fora de mesa devolve nil. `?` `meuJogador` já populado no `onNodeReady` — ! testar no Firecast|`SDK3/API/rrpg.lua:185` `SDK3/API/rrpgWrappers.lua:398` `:214`
+R30|confirmação modal|`Dialogs.confirmOkCancel(msg, callback)` — callback recebe o OK; precedente em ficha DO REPO (`Tem certeza que quer apagar?`)|`Sheets/Ao cair da noite/Ficha ACN/ACN.1.Other.lfm:48`
+R31|`?` esconder aba|`gui.TabItem` herda `gui.Control` ∴ tem prop `visible`. ⊥ confirmado que o host TIRA o botão da aba (vs só esvaziar o conteúdo) ∴ `?` até teste no Firecast — §T.239 é gate desta rodada|`SDK3/API/rrpgGUI.lua:1017` `:225`
+R32|snapshot do NDB|`ndb.exportXML(nodeObj)` → string XML do nó inteiro; volta por `ndb.newMemNodeDatabase` + `ndb.importXML` ∴ baseline = 1 campo string lido em nó de MEMÓRIA, ⊥ 1 campo por traço & ⊥ toca a ficha. `baseline` vazio na hora do export ∴ ⊥ aninha snapshot dentro de snapshot (§V81 mantém isso verdade)|`SDK3/API/ndb.lua:552` `:390` `:568`
+
 ## §V INVARIANTS
 
 V1: ∀ `field=` de widget de entrada único na árvore do sheetTemplate ∴ ⊥ 2 inputs no mesmo dado. `<dataLink>` ∉ contagem — observa, ⊥ possui (§B.3). `radioButton` do MESMO grupo compartilha `field` POR DESIGN (exclusão mútua) ∴ exceção declarada, ⊥ conta como 2 donos — distinção fica em `fieldValue` (§V.30)
@@ -364,7 +402,7 @@ V4: dataType `Ambesek.HuntersHunted.20th` ∉ demais plugins do repo
 V5: qtd de dots ! = PDF — attrs 5, abilities 5, virtues 5, numina 5 (20 linhas: 10 hedge + 10 psíquicas), backgrounds 5, humanity 10, willpower 10 dots + 10 box, faith 5, health 7 níveis
 V6: build = `rdk -l` @ raiz do plugin, exit 0 antes de commit. `rdk p` ⊥ build (§B.1)
 V7: build ok ! = exit 0 & mtime|size do `.rpk` mudou — exit 0 sozinho ⊥ prova (§B.1)
-V8: ∀ `<dataLink field=X>` → ∃ widget de entrada com `field=X` no mesmo sheet ∴ ⊥ link morto
+V8: ∀ `<dataLink field=X>` → ∃ widget de entrada com `field=X` no mesmo sheet ∴ ⊥ link morto. EXCEÇÃO declarada (27ª rodada): X ∈ LUA-OWNED de §I3 — campo sem widget POR DESIGN (dado escondido do jogador, escrito só por Lua) ∴ link vivo sem dono de widget. Lista FECHADA em §I3, ⊥ escapatória genérica (§B25)
 V9: ∀ string visível ! autorada em inglês ∴ tradução one-way EN→[pt] (§B.4)
 V10: ∀ string visível ∈ {`label`, `checkBox`, `button`} → ∃ `wod.<txt>` em [pt] & [en]
 V11: ⊥ label com padding p/ alinhar coluna — 1 label por coluna ∴ cada um traduzível (§B.5)
@@ -435,6 +473,20 @@ V75: ∀ época & ∀ coluna: `ERA_ABILITIES` = EXATAMENTE 10 nomes, ∀ um ∈ 
 V76: trocar época ! RE-LIGAR o `field` das 5 bolinhas de ∀ slot & recarregar `checked` do NDB no mesmo passo ∴ ⊥ bolinha marcada c/ estado do campo anterior. Ligação autorada no XML = lista `Victorian Era` ∴ renderer que ⊥ roda deixa a época base coerente, ⊥ ficha meio ligada (§V19)
 V77: ∀ título de seção (label `horzTextAlign="center"` em caixa `<rectangle color="black">`) tem `top` ≥ 4 ∴ ⊥ texto encostado no filete de 3px (`THEME_STROKE`). EXCEÇÃO declarada: aba Progress (`HH.9`) — user pediu p/ ⊥ mexer nela na 26ª rodada. ≡ §V68: 45 títulos alinhados de uma vez pedem check, senão a próxima caixa copiada de arquivo velho nasce colada
 V78: picker de númina = 1 lista por CAIXA — `HedgePicker` `items`/`values` ≡ os 21 Paths de §R.14 cap.1 & `PsychicPicker` ≡ os 22 Phenomena de §R.14 cap.2 (+ 1º item vazio, §V15) ∴ ∩ = ∅ & ∪ = 43 (∴ §V32 & §V17 seguem cobrindo os mesmos 43). Check ! ler os 2 `<template>` POR NOME: os 2 combos se chamam `cbo$(field)` ∴ coletor por nome de combo ⊥ distingue caixa (§V20)
+
+V79: aba `Storyteller` visível ⟺ `isStoryteller()` (§I8a) ∴ jogador & espectador ⊥ a veem & ficha fora de mesa ⊥ a abre (decisão user 2026-08-18)
+V80: gate de §V79 FAIL-CLOSED — mesa nil | `meuJogador` nil | prop nil | erro → aba ESCONDIDA ∴ falha ⊥ vaza a aba (§V19, §V33). Roda no load & em ∀ gatilho que possa mudar o papel (≡ §V72)
+V81: `baseline` = 1 SHOT — gravado só se `baseline` vazio & só depois do OK de `Dialogs.confirmOkCancel` ∴ 2º clique ⊥ sobrescreve, ⊥ ∃ caminho na ficha que apague & snapshot ⊥ contém outro snapshot (§R32)
+V82: `baseline` ⊥ vazio → botão `Save` DESABILITADO & estado explícito ao lado ∴ ⊥ botão que parece funcionar e ⊥ faz nada (§V33)
+V83: ledger = f(`baseline`, ficha) PURO — recalculado do zero a ∀ render, ⊥ acumula & ⊥ guarda estado próprio ∴ 2 renders seguidos = mesmo texto (idempotente, ≡ §V22) & desmarcar bolinha REMOVE a linha
+V84: as 4 colunas do ledger ⊥ têm `field` ∴ ∉ contrato de dados & ⊥ salvas (≡ §V29, ≡ `totalXP`). Fonte única = `baseline` + campos de traço ∴ ⊥ 3º número p/ divergir dos 2 que o produzem
+V85: nível de traço lido pela MESMA função no baseline & na ficha: nº de bolinhas marcadas (+1 onde dot1 é fixo — 8 atributos & 3 virtudes), Força de Vontade conta `willpower_1`…`_10` (⊥ `willpower_c*`) ∴ ⊥ 2 leituras p/ divergir (≡ §V41 p/ `HEALTH_MARKS`)
+V86: ∀ linha do ledger tira custo de §I9 & ∀ regra ATIVA de §I9 tem exatamente 1 implementação ∴ tabela do spec = tabela do código. Regra DORMENTE ⊥ tem código (⊥ ∃ campo) & ⊥ conta como implementada
+V87: 1º ponto de tipo de númina ∉ `baseline` = 21 ∴ 21 é por TIPO NOVO, ⊥ por númina nova — demais núminas daquele tipo seguem §I9 (7 no 1º ponto). "1º" = menor índice de slot daquele tipo entre as compras ∴ determinístico mesmo sem cronologia (§C)
+V88: `numina_1` = Affinity Path, slot FIXO ∴ custo ×6 & destaque (`*` + negrito) na linha 1 SEMPRE, mesmo vazia; nota explicativa depois de `TRUE FAITH`. Trocar a númina da linha ⊥ move a afinidade
+V89: `stShowNumina` `stShowDisciplines` `stShowMagika` escondem a aba p/ TODO cliente (mestre incluso, §C) & default = ON | OFF | OFF ∴ ficha velha (campo nil) ⊥ perde a aba Numina que já via
+V90: `Disciplines` & `Magika` ⊥ declaram `field` nenhum enquanto vazias ∴ ⊥ queima nome de campo antes do conteúdo existir (§V2 ⊥ perdoa rename depois)
+V91: `xpLog` ∈ ÓRFÃOS de §I3 ∴ ⊥ reusado por widget novo — texto livre de ficha velha ⊥ ressuscita numa coluna do ledger (≡ `transportation` `personalidade`)
 
 ## §T TASKS
 
@@ -678,6 +730,21 @@ T236|x|`HH.7.lfm` — `NuminaPicker` → `HedgePicker` c/ `items`/`values` = 21 
 T237|x|`verify-hunters-hunted.ps1` — check NOVO §V78 (2 templates lidos por NOME, listas literais 21 + 22, ∩ = ∅, ∪ = 43). Mutação: `Telepathy` movida p/ `HedgePicker` ! ficar vermelho|V78,V20
 T238|x|`module.xml` version `2.2` → `2.3` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size)|V6,V7
 
+T239|~|TESTE de viabilidade no Firecast: `<tab visible="false">` TIRA o botão da aba? ⊥ tirar → §R.31 vira BLOQUEIO & a rodada para p/ replanejar antes de T240|R31,V79
+T240|x|`HH.10.lfm` NOVO — aba Storyteller: caixa `STORYTELLER SETTINGS` c/ linha `Save Initial Character` + `<button>` `Save` & os 4 `checkBox` de §I8|I2,I3,I8,V1,V38,V48,V68,V77
+T241|x|`HH.11.lfm` & `HH.12.lfm` NOVOS — abas `Disciplines` & `Magika` VAZIAS (scrollBox + backdrop de tema + caixa de título só, ⊥ `field`)|I2,V48,V57,V68,V90
+T242|x|`HuntersHunted.lfm` — 3 `<tab>` novas na ordem de §I.1b + `name=` único em ∀ tab|I1b,I2,V59
+T243|x|`HuntersHunted.lfm` — `isStoryteller()` & `applyTabVisibility(from)` no form RAIZ; chamados no `onNodeReady` & pelo `dataLink` dos 3 flags|I8,V19,V33,V79,V80,V89,R29
+T244|x|`HH.10.lfm` — `Save` → `Dialogs.confirmOkCancel` → `sheet.baseline = ndb.exportXML(sheet)`; 1 shot, botão desabilita & mostra estado|I8,V33,V81,V82,R30,R32
+T245|x|`HuntersHunted.lfm` — `traitLevel(node, campo)` (§V85) & `XP_COST` (§I9) no form RAIZ ∴ ledger & futuros leitores usam a MESMA leitura|I9,V85,V86
+T246|x|`HH.9.lfm` — bloco `EXPERIENCE LOG` vira 4 colunas só-leitura sem `field`; `xpLog` SAI do XML & entra em ÓRFÃOS de §I.3|I3,I10,V29,V84,V91
+T247|x|`HH.9.lfm` — `renderXPLedger`: diff `baseline`×ficha por nó de memória, 1 linha por ponto, custo por §I9, 21 por tipo novo de númina, afinidade ×6; baseline vazio → texto de estado|I10,V33,V70,V83,V85,V86,V87
+T248|x|`HH.7.lfm` — linha `numina_1` c/ `*` + negrito & nota de Affinity Path depois de `TRUE FAITH`|V9,V10,V16,V88
+T249|x|`localization.lang` [pt]+[en] & mapa `PT` de `HH.6` — strings novas das 3 abas + 4 títulos de coluna + 7 nomes de `Type` + nota de afinidade|V9,V10,V17,V22,V28,V34,V70
+T250|x|`verify-hunters-hunted.ps1` — checks NOVOS §V79…§V91. Mutação antes de aceitar ∀ check|V20,V79,V80,V81,V83,V84,V85,V86,V87,V88,V89,V90,V91
+T251|x|`module.xml` version `2.3` → `2.4` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size) — CLAUDE.md|V6,V7
+T252|~|teste no Firecast: mestre vê `Storyteller` & jogador ⊥; salvar baseline → +1 em `dexterity` → linha `Attribute\|Dexterity\|3\|8` & desmarcar REMOVE a linha|V79,V81,V83
+
 ## §B BUGS
 
 id|date|cause|fix
@@ -705,3 +772,4 @@ B21|2026-08-17|snapshot-e-restaura gravava `fontColor`+`fontFamily` em ∀ contr
 B22|2026-08-17|dot1 fixo de atributo & virtude = `<image src=>`, ⊥ `imageCheckBox` ∴ ⊥ passava pelo ramo de troca de arte & ficava BRANCO ao lado das bolinhas douradas/carmim/sangue em ∀ tema. Ramo `image` do `applyTheme` só olhava `themePaper*` — corte declarado por mim na 14ª rodada. §V53 cobria COR autorada; ⊥ ∃ equivalente p/ ARTE autorada|V65
 B23|2026-08-17|mapa de época da 19ª rodada escrito como RENOME DE LINHA ∴ o mesmo nome mudava de campo entre épocas: `Melee` = `melee` na Idade das Trevas & `performance` no Clássico, `Etiquette` = `etiquette` \| `firearms` \| `larceny` conforme a época. Trocar de época mostrava `Melee 3` virando `Performance 3` & `Melee 0`. Custo declarado por MIM em §C da 19ª rodada ("re-interpreta as bolinhas") — o user recusa: valor ! seguir o NOME. §V71 media o par rótulo↔bolinha DENTRO de 1 época ∴ ⊥ via a troca|V74
 B24|2026-08-17|20ª rodada deu campo canônico por NOME mas deixou 1 campo carregar vários nomes de épocas diferentes (`enigmas` = Enigmas \| Computer \| Philosophy, `science` = Science \| Seneschal \| Ritual …) ∴ 2 pontos em `Enigmas` apareciam como `Computer 2` em `Modern Nights`, num traço que o user nunca tocou. Eu declarei isso como custo aceito em §C — ⊥ era: o user quer identidade por nome. §V74 media só nome→1 campo ∴ o sentido inverso passava verde|V74,V75,V76
+B25|2026-08-18|`baseline` = campo só-Lua (⊥ widget — é o dado escondido do jogador) ∴ `<dataLink field="baseline">` de `HH.10` caiu em §V8 como link morto. Invariante ⊥ previa dono-Lua; gate ⊥ lê `fields=` de link múltiplo ∴ o mesmo campo em `HH.9` passou despercebido (gap ANTERIOR, ⊥ regressão desta rodada)|V8

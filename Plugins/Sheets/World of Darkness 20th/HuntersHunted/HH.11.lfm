@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmHH_11" align="client" theme="dark">
+	<!--
+		Disciplines tab (SPEC T241, 27th round). EMPTY on purpose: the user asked for the
+		window now and the content later, and the tab is hidden unless the storyteller ticks
+		"Show Disciplines" (SPEC I8b, V89).
+
+		It declares no `field` at all (SPEC V90). A field name cannot be renamed after release
+		without losing what players saved under it (SPEC V2), so none is spent before the
+		content that would use it exists.
+	-->
+	<scrollBox align="client">
+		<image name="themePaper11" align="client" style="stretch" hitTest="false" visible="false"/>
+
+		<layout left="0" top="0" width="1040" height="120">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="1040" height="20" text="DISCIPLINES" horzTextAlign="center"/>
+		</layout>
+	</scrollBox>
+</form>

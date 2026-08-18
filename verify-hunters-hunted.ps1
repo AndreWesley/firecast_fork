@@ -185,8 +185,14 @@ if ($staleMirror) { foreach ($s in $staleMirror) { Fail "V36 '$s' is declared a 
 else { Pass "V36 all $($mirrors.Count) declared mirrors really are mirrored" }
 
 # ---- V8: every dataLink observes a field some input widget owns ---------------
+# The one exception is a field no widget can own: the storyteller's snapshot is hidden from the
+# player by having no widget at all, so the usual "some input owns it" test reads it as a dead
+# link (SPEC B25). The list is closed and declared in SPEC I3 - a name has to be put here on
+# purpose, which is not the same as letting any unowned field through.
+$luaOwned = @('baseline')
 foreach ($l in $linkFields) {
     if ($allFields.ContainsKey($l.Field)) { Pass "V8 dataLink '$($l.Field)' observes a real field" }
+    elseif ($luaOwned -contains $l.Field) { Pass "V8 dataLink '$($l.Field)' observes a declared Lua-owned field (SPEC I3)" }
     else { Fail "V8 dataLink '$($l.Field)' in $($l.File) observes no existing field - dead link" }
 }
 
@@ -1471,9 +1477,13 @@ foreach ($f in $files) {
         }
     }
 }
+# Counted off the tabs rather than hard-coded: the 27th round took the sheet from 9 tabs to 12
+# and a fixed 8 here would have to be edited by hand every time a tab is added, which is how a
+# check quietly stops matching the sheet it guards.
+$paperWant = ((Doc $rootPath).SelectNodes("//tab")).Count - 1
 if ($paperTabs -contains 'HH.6.lfm') { Fail "V56 the Settings tab has a backdrop - a covered theme combo cannot be switched back" }
-elseif ($paperTabs.Count -ne 8) { Fail "V56 found $($paperTabs.Count) backdrops, expected 8 (every tab but Settings)" }
-else { Pass "V56 all 8 content tabs carry a hidden, click-through backdrop; Settings has none" }
+elseif ($paperTabs.Count -ne $paperWant) { Fail "V56 found $($paperTabs.Count) backdrops, expected $paperWant (every tab but Settings)" }
+else { Pass "V56 all $paperWant content tabs carry a hidden, click-through backdrop; Settings has none" }
 
 # ---- V70/V74/V75/V76: the era ability lists (SPEC I7, 21st round) ----------------
 # A row on the Main tab is a slot: the era decides which ability sits there and the renderer
@@ -1636,6 +1646,190 @@ if ($null -eq $abilityLbl -or $abilityLbl.GetAttribute("name") -ne 'dynAbil$(col
 elseif ($null -eq $abilityDot -or $abilityDot.GetAttribute("name") -ne 'abil$(col)$(num)_1') { Fail "V76 the Ability dots are not named per slot - nothing could rebind them" }
 elseif ($null -eq $roLbl -or $roLbl.GetAttribute("name") -ne 'dynRo$(field)') { Fail "V72 the ReadOnlyTrait label is not named dynRo - the Combat rows would keep their authored name" }
 else { Pass "V72/V76 both row templates hand their label and dots to the renderer" }
+
+# ==== 27th round: storyteller tab + derived experience ledger =====================
+
+# ---- V79 + V80: the storyteller gate, and that it fails CLOSED -------------------
+# The one tab a player must not reach. Every way the check can go wrong - no room, no player
+# object, an API that raises - has to read as "not the storyteller", so the test is not that
+# the gate exists but that its failure paths return false.
+$stFn = LuaFn $root 'isStoryteller'
+if (-not $stFn) { Fail "V79 isStoryteller not found on the root form" }
+elseif ($stFn -notmatch 'Firecast\.getMesaDe') { Fail "V79 isStoryteller does not ask the room who this is (SPEC R29)" }
+elseif ($stFn -notmatch 'isMestre') { Fail "V79 isStoryteller never reads isMestre" }
+elseif ($stFn -notmatch 'pcall') { Fail "V80 isStoryteller does not wrap the API call - a raise would escape instead of hiding the tab" }
+elseif ($stFn -notmatch 'if mesa == nil then return false') { Fail "V80 isStoryteller does not close on a sheet outside a room" }
+elseif ($stFn -notmatch 'if me == nil then return false') { Fail "V80 isStoryteller does not close on a missing player object" }
+elseif ($stFn -notmatch 'return ok and res == true') { Fail "V80 isStoryteller does not close on a failed pcall" }
+else { Pass "V79/V80 storyteller gate reads the room and fails closed" }
+
+# ---- V89: which flag drives which tab, and the default each one carries ----------
+# Numina has been visible since the sheet shipped, so a sheet saved before this round - nil in
+# all three flags - must keep it. That is the difference between `~= false` and `== true`, and
+# swapping them would silently take a tab away from every existing character.
+$visFn = LuaFn $root 'applyTabVisibility'
+if (-not $visFn) { Fail "V89 applyTabVisibility not found on the root form" }
+elseif ($visFn -notmatch 'tabNumina\s*=\s*sheet\.stShowNumina ~= false') { Fail "V89 tabNumina does not default to visible - an existing sheet would lose the tab" }
+elseif ($visFn -notmatch 'tabDisciplines\s*=\s*sheet\.stShowDisciplines == true') { Fail "V89 tabDisciplines does not default to hidden" }
+elseif ($visFn -notmatch 'tabMagika\s*=\s*sheet\.stShowMagika == true') { Fail "V89 tabMagika does not default to hidden" }
+elseif ($visFn -notmatch 'tabStoryteller\s*=\s*isStoryteller\(\)') { Fail "V89 tabStoryteller is not wired to the gate" }
+else { Pass "V89 four tabs switch on their own flag, Numina defaulting visible" }
+
+# The four switched tabs must exist under those names, and every tab needs one (SPEC I1b).
+$tabNodes = (Doc $rootPath).SelectNodes("//tab")
+$tabNames = @($tabNodes | ForEach-Object { $_.GetAttribute("name") })
+$unnamed = @($tabNames | Where-Object { -not $_ })
+$wantTabs = @('tabNumina', 'tabDisciplines', 'tabMagika', 'tabStoryteller')
+$missingTabs = @($wantTabs | Where-Object { $tabNames -notcontains $_ })
+if ($tabNodes.Count -ne 12) { Fail "V89 expected 12 tabs (SPEC I1b), found $($tabNodes.Count)" }
+elseif ($unnamed.Count) { Fail "V89 $($unnamed.Count) tab(s) carry no name - the renderer addresses them by name" }
+elseif ($missingTabs) { foreach ($t in $missingTabs) { Fail "V89 no tab named $t - its flag would switch nothing" } }
+else { Pass "V89 all 12 tabs named, including the four the renderer switches" }
+
+# ---- V81 + V82: saving the initial character is one-shot, and says so ------------
+# The only irreversible action on this sheet. It must ask first, refuse a second write, and
+# leave a button that cannot be pressed again.
+$stDoc = Join-Path $dir "HH.10.lfm"
+if (-not (Test-Path $stDoc)) { Fail "V81 HH.10.lfm (Storyteller tab) is missing" }
+else {
+    $stTxt  = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($stDoc))
+    $saveFn = LuaFn $stTxt 'saveBaseline'
+    $stateFn = LuaFn $stTxt 'renderBaselineState'
+
+    if (-not $saveFn) { Fail "V81 saveBaseline not found on HH.10" }
+    elseif ($saveFn -notmatch 'Dialogs\.confirmOkCancel') { Fail "V81 saveBaseline writes without asking (SPEC R30) - the action cannot be undone" }
+    elseif (([regex]::Matches($saveFn, 'sheet\.baseline ~= nil and sheet\.baseline ~= ""')).Count -lt 2) { Fail "V81 saveBaseline does not re-check the baseline inside the callback - a second client could overwrite it" }
+    elseif ($saveFn -notmatch 'sheet\.baseline = ndb\.exportXML\(sheet\)') { Fail "V81 saveBaseline does not snapshot the sheet (SPEC R32)" }
+    else { Pass "V81 baseline is written once, behind a confirmation" }
+
+    if (-not $stateFn) { Fail "V82 renderBaselineState not found on HH.10" }
+    elseif ($stateFn -notmatch 'btnSaveBaseline\.enabled = not saved') { Fail "V82 the Save button stays live after the baseline exists" }
+    elseif ($stateFn -notmatch 'dynBaselineState') { Fail "V82 nothing on the tab says whether the character was saved (SPEC V33)" }
+    else { Pass "V82 Save goes dead once the baseline exists, and the tab says so" }
+
+    # No field of the ledger's own may be edited from here, and the flags must be real fields.
+    $stFields = @((Doc $stDoc).SelectNodes("//*[@field]") | ForEach-Object { $_.GetAttribute("field") })
+    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines', 'stShowMagika')
+    $missFlags = @($wantFlags | Where-Object { $stFields -notcontains $_ })
+    if ($missFlags) { foreach ($f in $missFlags) { Fail "V89 HH.10 has no widget for $f" } }
+    else { Pass "V89 all four storyteller flags are owned by HH.10" }
+}
+
+# ---- V83 + V84: the log is derived, not stored -----------------------------------
+# Four columns written from ONE row list, so a line reads across, and none of them owns a
+# field: a stored copy of a derived number is the one thing that can drift from what produced
+# it (the same call V29 made for the description block and the total above).
+$progDoc = Join-Path $dir "HH.9.lfm"
+$progTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($progDoc))
+$ledFn   = LuaFn $progTxt 'renderXPLedger'
+$rowsFn  = LuaFn $root 'xpLedgerRows'
+
+$cols = @('dynXpType', 'dynXpTrait', 'dynXpLevel', 'dynXpCost')
+$colNodes = @((Doc $progDoc).SelectNodes("//textEditor") | Where-Object { $cols -contains $_.GetAttribute("name") })
+$colWithField = @($colNodes | Where-Object { $_.GetAttribute("field") })
+if ($colNodes.Count -ne 4) { Fail "V84 expected 4 ledger columns on HH.9, found $($colNodes.Count)" }
+elseif ($colWithField.Count) { Fail "V84 a ledger column owns a field - the derived log would be stored twice" }
+elseif (@($colNodes | Where-Object { $_.GetAttribute("readOnly") -ne 'true' }).Count) { Fail "V84 a ledger column is editable - the log is derived, not typed" }
+else { Pass "V84 four read-only ledger columns, none owning a field" }
+
+if (-not $ledFn) { Fail "V83 renderXPLedger not found on HH.9" }
+elseif ($ledFn -notmatch 'local rows = xpLedgerRows\(\)') { Fail "V83 renderXPLedger does not rebuild the rows - it would render stale state" }
+elseif ($ledFn -notmatch 'if rows == nil then') { Fail "V83 renderXPLedger has no state text for a sheet with no baseline (SPEC V33)" }
+elseif (@($cols | Where-Object { $ledFn -notmatch $_ }).Count) { Fail "V83 renderXPLedger does not write all four columns - a line would stop reading across" }
+else { Pass "V83 the ledger is rebuilt from scratch on every render" }
+
+if (-not $rowsFn) { Fail "V83 xpLedgerRows not found on the root form" }
+elseif ($rowsFn -notmatch 'local rows = \{\};') { Fail "V83 xpLedgerRows does not start from an empty list - rows would accumulate across renders" }
+elseif ($rowsFn -notmatch 'if base == nil then return nil; end;') { Fail "V83 xpLedgerRows does not report a missing baseline" }
+else { Pass "V83 xpLedgerRows starts empty and reports a missing baseline" }
+
+# ---- V91: xpLog is gone, and stays gone ------------------------------------------
+# The free-text box the ledger replaced. Reusing the name would bring a player's old notes
+# back up inside a column that means something else now (SPEC I3, orphans).
+$xpLogUsers = @($files | Where-Object {
+    ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($_.FullName))) -match 'field="xpLog"'
+})
+if ($xpLogUsers) { foreach ($f in $xpLogUsers) { Fail "V91 $($f.Name) still owns xpLog - it is an orphan now" } }
+else { Pass "V91 xpLog owned by nothing" }
+
+# ---- V85: ONE reading of a trait's rating ----------------------------------------
+# Both sides of the diff have to count the same way, and willpower has two rows of ten - the
+# dots are the rating, the boxes are spent points. Counting the boxes would price a spent
+# point as a purchase.
+$lvlFn = LuaFn $root 'traitLevel'
+if (-not $lvlFn) { Fail "V85 traitLevel not found on the root form" }
+elseif ($rowsFn -match 'willpower_c') { Fail "V85 the ledger reads the willpower BOXES - those are spent points, not rating" }
+elseif ($rowsFn -notmatch 'traitLevel\(base,' -or $rowsFn -notmatch 'traitLevel\(sheet,') { Fail "V85 the ledger does not read both sides through traitLevel" }
+elseif ($rowsFn -match '(?m)^\s*for i = 1, 5, 1 do') { Fail "V85 xpLedgerRows counts dots itself instead of calling traitLevel" }
+else { Pass "V85 both sides of the diff read ratings through traitLevel" }
+
+# Attributes and virtues start at _2 with a fixed first dot; Appearance is the declared
+# exception (SPEC I3). Getting this wrong prices every attribute one step off.
+if ($rowsFn -notmatch 'traitLevel\(base, field, 2, 5, 1\)') { Fail "V85 virtues are not read with the fixed first dot" }
+elseif ($rowsFn -notmatch 'if field == "appearance" then first, fixed = 1, 0; end;') { Fail "V85 Appearance is not read as the exception it is (its first dot can be switched off)" }
+else { Pass "V85 fixed first dots and the Appearance exception are read correctly" }
+
+# ---- V86: the cost table, once, and the dormant rules NOT written -----------------
+# Every active rule from SPEC I9 exactly once. The dormant ones - Discipline, Path, Sphere,
+# Arete - have no field to read while those tabs are empty, so writing them would be code that
+# nothing can reach and nothing can test.
+$costFn = LuaFn $root 'xpCost'
+if (-not $costFn) { Fail "V86 xpCost not found on the root form" }
+else {
+    $costWant = @{
+        'Attribute'  = 'return from \* 4'
+        'Ability'    = 'if from == 0 then return 3; end; return from \* 2'
+        'Virtue'     = 'if kind == "Virtue"    then return from \* 2'
+        'Humanity'   = 'if kind == "Humanity"  then return from \* 2'
+        'Willpower'  = 'if kind == "Willpower" then return from \* 2'
+        'Background' = 'return from \* 3'
+        'Numina'     = 'return from \* 7'
+    }
+    $costBad = @()
+    foreach ($k in $costWant.Keys) { if ($costFn -notmatch $costWant[$k]) { $costBad += "$k is not priced as SPEC I9 states" } }
+    # Read the CODE, not the prose: the comment above xpCost names the dormant rules on purpose,
+    # so the check looks for a dormant kind being handled - a quoted kind string - rather than
+    # for the word appearing anywhere in the file.
+    foreach ($dead in @('Discipline', 'Path', 'Sphere', 'Arete')) {
+        if ($costFn -match "kind == `"$dead`"") { $costBad += "$dead is priced here - SPEC I9 keeps it dormant until a field exists to read" }
+        if ($rowsFn -match "`"$dead`"") { $costBad += "$dead produces ledger rows - the tab that would own it is still empty" }
+    }
+    if ($costFn -notmatch 'if not ctx\.backgroundsXP then return 0; end;') { $costBad += "backgrounds are priced even with the storyteller's box unticked" }
+    if ($costFn -notmatch 'if ctx\.affinity then return from \* 6; end;') { $costBad += "the affinity path is not cheaper than the rest" }
+
+    if ($costBad) { foreach ($b in $costBad) { Fail "V86 $b" } }
+    else { Pass "V86 every active cost rule written once, every dormant one left out" }
+}
+
+# ---- V87: 21 buys the first point of a KIND, not of a numina ---------------------
+# A character with static magic paying for their first psychic phenomenon pays 21 once; the
+# next psychic numina costs the ordinary 7. Pricing it per numina would charge 21 every time.
+if ($costFn -notmatch 'if ctx\.newType then return 21; end;') { Fail "V87 the 21 is not gated on the kind being new" }
+elseif ($costFn -notmatch '(?ms)if from == 0 then.*?return 7;') { Fail "V87 an ordinary first point does not cost 7" }
+elseif ($rowsFn -notmatch 'ctx\.newType\s*=\s*\(from == 0\) and not unlocked\[grp\.kind\]') { Fail "V87 the ledger does not decide newType from the kinds the baseline already had" }
+elseif ($rowsFn -notmatch 'unlocked\[grp\.kind\] = true;') { Fail "V87 a kind is never marked bought - every numina of it would cost 21" }
+else { Pass "V87 21 is charged once per new kind of numina" }
+
+# ---- V88: the affinity path is the FIRST hedge row, always ------------------------
+# Marked in the XML, priced in the Lua, and the two have to name the same row.
+$numDoc = Join-Path $dir "HH.7.lfm"
+$numTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($numDoc))
+if ($numTxt -notmatch '<HedgePicker field="numina_1" style="bold"/>') { Fail "V88 the first hedge row is not marked bold" }
+elseif ($numTxt -match '<HedgePicker field="numina_(?!1")\d+" style="bold"/>') { Fail "V88 a row other than the first is marked as the affinity path" }
+elseif ($numTxt -notmatch 'text="\* The first path is the Affinity Path"') { Fail "V88 the note explaining the affinity path is missing (SPEC C, after True Faith)" }
+elseif ($rowsFn -notmatch 'ctx\.affinity = \(field == "numina_1"\)') { Fail "V88 the cheaper rate is not tied to numina_1" }
+else { Pass "V88 numina_1 is the affinity path in both the XML and the pricing" }
+
+# ---- V90: the two empty tabs stay empty ------------------------------------------
+# A field name cannot be renamed after release without losing what players saved under it
+# (SPEC V2), so none is spent before the content that would use it exists.
+foreach ($empty in @('HH.11.lfm', 'HH.12.lfm')) {
+    $ep = Join-Path $dir $empty
+    if (-not (Test-Path $ep)) { Fail "V90 $empty is missing" ; continue }
+    $eFields = @((Doc $ep).SelectNodes("//*[@field]"))
+    if ($eFields.Count) { Fail "V90 $empty declares $($eFields.Count) field(s) before it has content" }
+    else { Pass "V90 $empty declares no field" }
+}
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.

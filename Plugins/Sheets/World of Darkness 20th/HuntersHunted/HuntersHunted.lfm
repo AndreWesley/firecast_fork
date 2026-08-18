@@ -322,35 +322,376 @@
 
 				return "Firearms";
 			end;
+
+			-- ---- Storyteller gate (SPEC I8a / V79 / V80, 27th round) --------------------
+			--
+			-- The Storyteller tab is the one place on this sheet a player must not reach, so
+			-- the check fails CLOSED: no room (a sheet opened from the local library), no
+			-- player object, or an API that raises all read as "not the storyteller" and the
+			-- tab stays hidden. A gate that opened on error would leak the whole tab.
+			--
+			-- `Firecast.getMesaDe(sheet)` is what the Anime 5E sheet in this repo calls from
+			-- inside a sheet .lfm, and `isMestre` is what the AfkBot plugin reads (SPEC R29).
+			function isStoryteller()
+				if sheet == nil then return false; end;
+
+				local ok, res = pcall(function()
+					local mesa = Firecast.getMesaDe(sheet);
+
+					if mesa == nil then return false; end;
+
+					local me = mesa.meuJogador;
+
+					if me == nil then return false; end;
+
+					return me.isMestre == true;
+				end);
+
+				return ok and res == true;
+			end;
+
+			-- Tabs are found by walking from the root and matching names, not by form.<name>:
+			-- the calls come from HH.10 (the checkboxes) and HH.6 (the language switch), and a
+			-- tab form cannot reach its siblings (SPEC R.9 / B.9).
+			local function tabRootOf(ctrl)
+				local p = ctrl;
+
+				while true do
+					local up = p:getParent();
+
+					if up == nil then return p; end;
+
+					p = up;
+				end;
+			end;
+
+			local function collectTabs(node, out)
+				local children = node:getChildren();
+
+				for i = 1, #children, 1 do
+					local c = children[i];
+
+					if c:getClassName() == "tab" then out[#out + 1] = c; end;
+
+					collectTabs(c, out);
+				end;
+			end;
+
+			-- SPEC I8b / V89. Numina reads `~= false` and the other two read `== true`: a
+			-- sheet saved before this round has nil in all three, and Numina was always
+			-- visible on it - defaulting it off would take away a tab the player already had.
+			function applyTabVisibility(from)
+				if sheet == nil then return; end;
+
+				local tabs = {};
+				collectTabs(tabRootOf(from), tabs);
+
+				local shown = {
+					tabNumina      = sheet.stShowNumina ~= false,
+					tabDisciplines = sheet.stShowDisciplines == true,
+					tabMagika      = sheet.stShowMagika == true,
+					tabStoryteller = isStoryteller(),
+				};
+
+				for i = 1, #tabs, 1 do
+					local want = shown[tabs[i]:getName()];
+
+					if want ~= nil then tabs[i].visible = want; end;
+				end;
+			end;
+
+			-- ---- Experience ledger (SPEC I9 / I10 / V83 / V85 / V86, 27th round) --------
+			--
+			-- The log is DERIVED: every render diffs the saved initial character against the
+			-- sheet as it stands now (SPEC V83). Nothing is journalled, so unticking a dot
+			-- takes its line back out and a mis-click never has to be edited away by hand.
+			--
+			-- The baseline is the whole sheet in one XML string, written once (SPEC R32/V81).
+			-- It is parsed on demand and cached against the string it came from: the ledger
+			-- re-renders on every dot click, and re-parsing that each time would be waste.
+			local baselineXML, baselineNode;
+
+			local function baselineOf()
+				if sheet == nil then return nil; end;
+
+				local xml = sheet.baseline;
+
+				if xml == nil or xml == "" then return nil; end;
+
+				if xml ~= baselineXML then
+					local node = ndb.newMemNodeDatabase();
+					ndb.importXML(node, xml);
+
+					baselineXML  = xml;
+					baselineNode = node;
+				end;
+
+				return baselineNode;
+			end;
+
+			-- SPEC V85: ONE reading, used for both sides of the diff. Attributes and virtues
+			-- draw their first dot as fixed art, so their fields start at _2 and the rating is
+			-- one above the count. Willpower counts the DOTS (willpower_1..10) and never the
+			-- boxes (willpower_c1..c10) - those are spent points, not rating.
+			function traitLevel(node, base, first, last, fixed)
+				local n = fixed;
+
+				for i = first, last, 1 do
+					if node[base .. "_" .. i] == true then n = n + 1; end;
+				end;
+
+				return n;
+			end;
+
+			-- SPEC I9. Every ACTIVE rule sits here exactly once (SPEC V86). The dormant ones -
+			-- Discipline, Path, Sphere, Arete - are in the spec but deliberately NOT written:
+			-- the Disciplines and Magika tabs are empty, so no field can produce that row and
+			-- a cost nothing can reach is dead code.
+			local function xpCost(kind, from, ctx)
+				if kind == "Attribute" then return from * 4; end;
+				if kind == "Ability"   then if from == 0 then return 3; end; return from * 2; end;
+				if kind == "Virtue"    then return from * 2; end;
+				if kind == "Humanity"  then return from * 2; end;
+				if kind == "Willpower" then return from * 2; end;
+
+				if kind == "Background" then
+					-- Off by default: the storyteller decides whether backgrounds cost XP at
+					-- all (SPEC C). With the box unticked the rise still shows, at zero - it
+					-- happened, and the storyteller is who reads this table.
+					if not ctx.backgroundsXP then return 0; end;
+					if from == 0 then return 3; end;
+
+					return from * 3;
+				end;
+
+				if kind == "Numina" then
+					if from == 0 then
+						-- The 21 is the first point of a KIND the character did not have -
+						-- static magic, psychic, true faith - not merely a numina they did not
+						-- have (SPEC V87).
+						if ctx.newType then return 21; end;
+
+						return 7;
+					end;
+
+					if ctx.affinity then return from * 6; end;
+
+					return from * 7;
+				end;
+
+				return 0;
+			end;
+
+			-- One line per POINT: 2 -> 4 is two lines, each costed off the rating it was bought
+			-- from (SPEC I10).
+			local function pushRise(rows, kind, name, from, to, ctx)
+				for lvl = from + 1, to, 1 do
+					rows[#rows + 1] = { kind = kind, name = name, level = lvl, cost = xpCost(kind, lvl - 1, ctx) };
+
+					-- 21 buys the FIRST point of the new kind and nothing after it.
+					ctx.newType = false;
+				end;
+			end;
+
+			local XP_ATTRS = {
+				{"Strength", "strength"}, {"Dexterity", "dexterity"}, {"Stamina", "stamina"},
+				{"Charisma", "charisma"}, {"Manipulation", "manipulation"}, {"Appearance", "appearance"},
+				{"Perception", "perception"}, {"Inteligence", "inteligence"}, {"Wits", "wits"},
+			};
+
+			local XP_VIRTUES = { {"Conscience", "conscience"}, {"Self-Control", "selfControl"}, {"Courage", "courage"} };
+
+			local XP_CUSTOM = { "customTalent_1", "customTalent_2", "customSkill_1", "customSkill_2", "customKnowledge_1", "customKnowledge_2" };
+
+			-- The 41 ability names, sorted so the ledger is in the same order every render.
+			-- ABILITY_FIELD is a bijection (SPEC V74), so the name identifies the trait no
+			-- matter which era is showing.
+			local XP_ABILITIES = {};
+
+			for name in pairs(ABILITY_FIELD) do XP_ABILITIES[#XP_ABILITIES + 1] = name; end;
+
+			table.sort(XP_ABILITIES);
+
+			local XP_NUMINA = {
+				{ kind = "hedge",   base = "numina",  count = 10 },
+				{ kind = "psychic", base = "psychic", count = 10 },
+			};
+
+			local function numinaTypeInUse(node, base, count)
+				for i = 1, count, 1 do
+					if traitLevel(node, base .. "_" .. i, 1, 5, 0) > 0 then return true; end;
+				end;
+
+				return false;
+			end;
+
+			-- A row the player named carries that name; one they only put dots on carries the
+			-- field id, which is at least honest about which line it is.
+			local function slotName(field)
+				local v = sheet[field];
+
+				if v == nil or v == "" then return field; end;
+
+				return v;
+			end;
+
+			-- Returns the rows, or nil when no initial character has been saved yet - the
+			-- caller shows a state text for that instead of an empty table (SPEC V33).
+			function xpLedgerRows()
+				local base = baselineOf();
+
+				if base == nil then return nil; end;
+
+				local ctx  = { backgroundsXP = sheet.stBackgroundsXP == true };
+				local rows = {};
+
+				for i = 1, #XP_ATTRS, 1 do
+					local nome, field = XP_ATTRS[i][1], XP_ATTRS[i][2];
+					local first, fixed = 2, 1;
+
+					-- Appearance is the one attribute whose first dot can be switched off
+					-- (SPEC I3), so it counts from _1 with nothing fixed.
+					if field == "appearance" then first, fixed = 1, 0; end;
+
+					pushRise(rows, "Attribute", nome,
+						traitLevel(base, field, first, 5, fixed),
+						traitLevel(sheet, field, first, 5, fixed), ctx);
+				end;
+
+				for i = 1, #XP_ABILITIES, 1 do
+					local nome  = XP_ABILITIES[i];
+					local field = ABILITY_FIELD[nome];
+
+					pushRise(rows, "Ability", nome,
+						traitLevel(base, field, 1, 5, 0),
+						traitLevel(sheet, field, 1, 5, 0), ctx);
+				end;
+
+				for i = 1, #XP_CUSTOM, 1 do
+					local field = XP_CUSTOM[i];
+
+					pushRise(rows, "Ability", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						traitLevel(sheet, field, 1, 5, 0), ctx);
+				end;
+
+				for i = 1, #XP_VIRTUES, 1 do
+					local nome, field = XP_VIRTUES[i][1], XP_VIRTUES[i][2];
+
+					pushRise(rows, "Virtue", nome,
+						traitLevel(base, field, 2, 5, 1),
+						traitLevel(sheet, field, 2, 5, 1), ctx);
+				end;
+
+				pushRise(rows, "Humanity", "Humanity",
+					traitLevel(base, "humanity", 1, 10, 0),
+					traitLevel(sheet, "humanity", 1, 10, 0), ctx);
+
+				pushRise(rows, "Willpower", "Willpower",
+					traitLevel(base, "willpower", 1, 10, 0),
+					traitLevel(sheet, "willpower", 1, 10, 0), ctx);
+
+				for i = 1, 9, 1 do
+					local field = "background_" .. i;
+
+					pushRise(rows, "Background", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						traitLevel(sheet, field, 1, 5, 0), ctx);
+				end;
+
+				-- Which kinds the character already had when the storyteller froze the sheet.
+				-- Buying into a kind that is not in here costs 21 for its first point, once.
+				local unlocked = {
+					hedge   = numinaTypeInUse(base, "numina", 10),
+					psychic = numinaTypeInUse(base, "psychic", 10),
+					faith   = traitLevel(base, "faith", 1, 5, 0) > 0,
+				};
+
+				for g = 1, #XP_NUMINA, 1 do
+					local grp = XP_NUMINA[g];
+
+					for i = 1, grp.count, 1 do
+						local field = grp.base .. "_" .. i;
+						local from  = traitLevel(base, field, 1, 5, 0);
+						local to    = traitLevel(sheet, field, 1, 5, 0);
+
+						if to > from then
+							-- SPEC V88: the affinity path is the FIRST hedge row, always. It is
+							-- the ROW that is cheap, not whichever numina currently sits on it.
+							ctx.affinity = (field == "numina_1");
+							ctx.newType  = (from == 0) and not unlocked[grp.kind];
+
+							pushRise(rows, "Numina", slotName(field), from, to, ctx);
+
+							unlocked[grp.kind] = true;
+						end;
+					end;
+				end;
+
+				-- True Faith is a numina like the others; the combo beside it picks a religion,
+				-- not a power (SPEC V50), so the ledger names the numina.
+				local ff = traitLevel(base, "faith", 1, 5, 0);
+				local ft = traitLevel(sheet, "faith", 1, 5, 0);
+
+				if ft > ff then
+					ctx.affinity = false;
+					ctx.newType  = (ff == 0) and not unlocked.faith;
+
+					pushRise(rows, "Numina", "True Faith", ff, ft, ctx);
+				end;
+
+				return rows;
+			end;
 		]]>
 	</script>
+	<!--
+		Twelve tabs (SPEC I1b). Three of them are new in the 27th round: Disciplines and Magika
+		sit next to Numina because all three are power tabs, and Storyteller closes the row.
+
+		Every tab carries a `name` because four of them are switched at runtime (SPEC I8b):
+		the three power tabs answer to the storyteller's checkboxes and the Storyteller tab
+		answers to the gate, so a player opens eight of these twelve.
+
+		The three hidden-by-default tabs are authored VISIBLE and hidden by the renderer on
+		load: a sheet whose Lua never ran shows too much rather than too little, which is
+		noticed and reported, unlike a tab that silently never appears.
+	-->
 	<tabControl align="client">
-		<tab title="Main">
+		<tab name="tabMain" title="Main">
 			<import file="HH.1.lfm"/>
 		</tab>
-		<tab title="Traits">
+		<tab name="tabTraits" title="Traits">
 			<import file="HH.2.lfm"/>
 		</tab>
-		<tab title="Numina">
+		<tab name="tabNumina" title="Numina">
 			<import file="HH.7.lfm"/>
 		</tab>
-		<tab title="Combat">
+		<tab name="tabDisciplines" title="Disciplines">
+			<import file="HH.11.lfm"/>
+		</tab>
+		<tab name="tabMagika" title="Magika">
+			<import file="HH.12.lfm"/>
+		</tab>
+		<tab name="tabCombat" title="Combat">
 			<import file="HH.3.lfm"/>
 		</tab>
-		<tab title="Inventory">
+		<tab name="tabInventory" title="Inventory">
 			<import file="HH.8.lfm"/>
 		</tab>
-		<tab title="Background">
+		<tab name="tabBackground" title="Background">
 			<import file="HH.4.lfm"/>
 		</tab>
-		<tab title="Progress">
+		<tab name="tabProgress" title="Progress">
 			<import file="HH.9.lfm"/>
 		</tab>
-		<tab title="Notes">
+		<tab name="tabNotes" title="Notes">
 			<import file="HH.5.lfm"/>
 		</tab>
-		<tab title="Settings">
+		<tab name="tabSettings" title="Settings">
 			<import file="HH.6.lfm"/>
+		</tab>
+		<tab name="tabStoryteller" title="Storyteller">
+			<import file="HH.10.lfm"/>
 		</tab>
 	</tabControl>
 </form>

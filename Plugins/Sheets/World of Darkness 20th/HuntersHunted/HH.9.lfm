@@ -17,6 +17,67 @@
 
 				form.edtTotalXP.text = tostring(spent + current);
 			end;
+
+			-- The log box grows with the rows instead of scrolling four columns apart from
+			-- each other: the tab's scrollBox does the scrolling, so line N stays line N in
+			-- all four. The XML height is the floor - shrinking would leave a hole in the box.
+			local XP_ROW_H    = 20;
+			local XP_LOG_MIN_H = 470;
+			local XP_LOG_PAD  = 65;
+
+			-- ---- Experience log (SPEC I10, 27th round) ---------------------------------
+			--
+			-- Four columns, all four written from ONE row list, so a line reads across. They
+			-- own no `field` (SPEC V84): the log is derived from the saved initial character
+			-- and the sheet as it stands, exactly like the total above is derived from the two
+			-- numbers beside it. A stored third copy could only drift.
+			--
+			-- The rows come from xpLedgerRows() on the root form (SPEC I9/I10); this routine
+			-- only formats them.
+			function renderXPLedger(form)
+				if sheet == nil then return; end;
+
+				local lang = sheet.language or "en";
+				local rows = xpLedgerRows();
+
+				if rows == nil then
+					-- SPEC V33: say WHY it is empty rather than show four blank columns.
+					form.dynXpType.text  = translateSheetText("Initial character not saved yet", lang);
+					form.dynXpTrait.text = "";
+					form.dynXpLevel.text = "";
+					form.dynXpCost.text  = "";
+					return;
+				end;
+
+				local kinds, traits, levels, costs = {}, {}, {}, {};
+
+				for i = 1, #rows, 1 do
+					local r = rows[i];
+
+					-- Both columns are written by Lua, so they are translated here (SPEC V70,
+					-- same arrangement as the era ability labels): whoever writes a text owns
+					-- both languages for it.
+					kinds[i]  = translateSheetText(r.kind, lang);
+					traits[i] = translateSheetText(r.name, lang);
+					levels[i] = tostring(r.level);
+					costs[i]  = tostring(r.cost);
+				end;
+
+				form.dynXpType.text  = table.concat(kinds, "\n");
+				form.dynXpTrait.text = table.concat(traits, "\n");
+				form.dynXpLevel.text = table.concat(levels, "\n");
+				form.dynXpCost.text  = table.concat(costs, "\n");
+
+				local h = XP_LOG_MIN_H;
+
+				if #rows * XP_ROW_H + 12 > h then h = #rows * XP_ROW_H + 12; end;
+
+				form.dynXpType.height  = h;
+				form.dynXpTrait.height = h;
+				form.dynXpLevel.height = h;
+				form.dynXpCost.height  = h;
+				form.xpLogBox.height   = h + XP_LOG_PAD;
+			end;
 		]]>
 	</script>
 	<scrollBox align="client">
@@ -54,11 +115,29 @@
 			<edit left="812" top="60" width="90" height="25" field="experience" horzTextAlign="center" fontSize="14"/>
 		</layout>
 
-		<layout left="0" top="105" width="1040" height="535">
+		<!--
+			The log is now four columns instead of one free-text box (SPEC I10, 27th round):
+			what was raised, which trait, the rating it reached, and what that point cost.
+			`xpLog` is gone with the box that owned it and is an ORPHAN from here on (SPEC I3 /
+			V91) - the name is never reused, so text typed into the old sheet cannot come back
+			up inside a column that means something else.
+
+			The four editors are read-only and carry no `field`: the rows are derived on every
+			render (SPEC V83/V84).
+		-->
+		<layout name="xpLogBox" left="0" top="105" width="1040" height="535">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="0" width="1040" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
 
-			<textEditor left="15" top="25" width="1010" height="495" field="xpLog"/>
+			<label left="15" top="25" width="200" height="20" text="Type" horzTextAlign="center"/>
+			<label left="225" top="25" width="480" height="20" text="Trait" horzTextAlign="center"/>
+			<label left="715" top="25" width="140" height="20" text="Level" horzTextAlign="center"/>
+			<label left="865" top="25" width="160" height="20" text="Cost" horzTextAlign="center"/>
+
+			<textEditor name="dynXpType" left="15" top="50" width="200" height="470" readOnly="true"/>
+			<textEditor name="dynXpTrait" left="225" top="50" width="480" height="470" readOnly="true"/>
+			<textEditor name="dynXpLevel" left="715" top="50" width="140" height="470" readOnly="true"/>
+			<textEditor name="dynXpCost" left="865" top="50" width="160" height="470" readOnly="true"/>
 		</layout>
 	</scrollBox>
 
@@ -66,7 +145,24 @@
 	     onNodeReady catches the sheet being opened (SPEC V19 / V33). -->
 	<dataLink fields="{'spentXP', 'experience'}" onChange="renderTotalXP(self);"/>
 
+	<!-- What the ledger reads directly: the snapshot itself, the rule that prices backgrounds,
+	     and the language its two text columns are written in. This tab watches `language`
+	     itself rather than being called from HH.6, because the four columns are declared here
+	     and only this form can address them. Dots are watched by the observer below - there
+	     are some five hundred of them, and naming every one here would be a list nobody could
+	     keep correct. -->
+	<dataLink fields="{'baseline', 'stBackgroundsXP', 'language'}" onChange="renderXPLedger(self);"/>
+
 	<event name="onNodeReady">
 		renderTotalXP(self);
+		renderXPLedger(self);
+
+		-- One observer for the whole sheet: every dot on every tab feeds this table, so the
+		-- log follows the sheet instead of a hand-written list of fields. Kept in a global so
+		-- it is not collected while the sheet is open.
+		xpLedgerObserver = ndb.newObserver(sheet);
+		xpLedgerObserver.onChanged = function(node, attribute, oldValue)
+			renderXPLedger(self);
+		end;
 	</event>
 </form>

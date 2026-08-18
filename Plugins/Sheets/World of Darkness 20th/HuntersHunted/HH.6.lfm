@@ -7,7 +7,10 @@
 			-- Firecast APP language, not this dropdown, so a pt-locale user picking "English"
 			-- would still get Portuguese. SPEC R.1 / R.5.
 			local PT = {
+				["*"] = "*",
+				["* The first path is the Affinity Path"] = "* O primeiro caminho é o de Afinidade",
 				["ABILITIES"] = "HABILIDADES",
+				["Ability"] = "Habilidade",
 				["Academics"] = "Acadêmicos",
 				["Activist"] = "Ativista",
 				["Age"] = "Idade",
@@ -34,6 +37,7 @@
 				["Astral Projection"] = "Projeção Astral",
 				["Athetics"] = "Esportes",
 				["Athletics"] = "Esportes",
+				["Attribute"] = "Atributo",
 				["ATTRIBUTES"] = "ATRIBUTOS",
 				["Auspice"] = "Augúrio",
 				["Autocrat"] = "Autocrata",
@@ -44,6 +48,7 @@
 				["Awareness"] = "Sensitividade",
 				["Background"] = "História",
 				["BACKGROUNDS"] = "ANTECEDENTES",
+				["Backgrounds"] = "Antecedentes",
 				["Backup"] = "Reforços",
 				["BASE OF OPERATIONS"] = "BASE DE OPERAÇÕES",
 				["Base of Operations"] = "Base de Operações",
@@ -61,6 +66,7 @@
 				["Breed"] = "Raça",
 				["Bruised"] = "Escoriado",
 				["Bureaucrat"] = "Burocrata",
+				["Can Buy Backgrounds With Experience"] = "Pode Comprar Antecedentes com Experiência",
 				["Caregiver"] = "Protetor",
 				["Celebrant"] = "Celebrante",
 				["Certification"] = "Certificação",
@@ -125,6 +131,8 @@
 				["Dexterity"] = "Destreza",
 				["Diff."] = "Dif.",
 				["Director"] = "Diretor",
+				["DISCIPLINES"] = "DISCIPLINAS",
+				["Disciplines"] = "Disciplinas",
 				["Divination"] = "Divinação",
 				["Dodge"] = "Esquiva",
 				["Domain"] = "Domínio",
@@ -197,6 +205,8 @@
 				["Incapacitated"] = "Incapacitado",
 				["INFLUENCE"] = "INFLUÊNCIA",
 				["Influence"] = "Influência",
+				["Initial character not saved yet"] = "Personagem inicial ainda não salvo",
+				["Initial character saved"] = "Personagem inicial salvo",
 				["Injured (-1)"] = "Ferido (-1)",
 				["Innovator"] = "Inovador",
 				["INSTALLED VERSION:"] = "VERSÃO INSTALADA:",
@@ -220,6 +230,7 @@
 				["Leadership"] = "Liderança",
 				["Legend"] = "Lenda",
 				["Legerdemain"] = "Prestidigitação",
+				["Level"] = "Nível",
 				["Library"] = "Biblioteca",
 				["Lines"] = "Linhas",
 				["Loner"] = "Solitário",
@@ -227,6 +238,8 @@
 				["Mad Scientist"] = "Cientista Louco",
 				["Maelstroms"] = "Maelstroms",
 				["Mage: The Ascension"] = "Mago: A Ascensão",
+				["MAGIKA"] = "MAGIKA",
+				["Magika"] = "Magika",
 				["Main"] = "Principal",
 				["Manipulation"] = "Manipulação",
 				["Martyr"] = "Mártir",
@@ -257,6 +270,7 @@
 				["Necronics"] = "Necrônica",
 				["No"] = "Não",
 				["Node"] = "Nódulo",
+				["Not saved yet"] = "Ainda não salvo",
 				["Notes"] = "Anotações",
 				["NUMINA"] = "NÚMINAS",
 				["NUMINA & OTHER TRAITS"] = "NUMINA E OUTROS TRAÇOS",
@@ -332,6 +346,9 @@
 				["Sadist"] = "Sádico",
 				["Samaritan"] = "Samaritano",
 				["Sanctum"] = "Santuário",
+				["Save"] = "Salvar",
+				["Save Initial Character"] = "Salvar Personagem Inicial",
+				["Save the initial character? This cannot be undone."] = "Salvar o personagem inicial? Esta ação não pode ser desfeita.",
 				["Science"] = "Ciência",
 				["Scientist"] = "Cientista",
 				["Secret Weapons"] = "Armas Secretas",
@@ -344,6 +361,9 @@
 				["Shadows"] = "Sombras",
 				["Shapeshifting"] = "Metamorfose",
 				["Sheet made for the table"] = "Ficha feita para a mesa",
+				["Show Disciplines"] = "Mostrar Disciplinas",
+				["Show Magika"] = "Mostrar Magika",
+				["Show Numina"] = "Mostrar Númina",
 				["SKILLS"] = "PERÍCIAS",
 				["Social"] = "Sociais",
 				["Soldier"] = "Soldado",
@@ -354,6 +374,8 @@
 				["STATUS"] = "STATUS",
 				["Status"] = "Status",
 				["Stealth"] = "Furtividade",
+				["Storyteller"] = "Narrador",
+				["STORYTELLER SETTINGS"] = "CONFIGURAÇÕES DO NARRADOR",
 				["Streetwise"] = "Manha",
 				["Strength"] = "Força",
 				["strength"] = "Força",
@@ -374,6 +396,7 @@
 				["Total Experience"] = "Experiência Total",
 				["Totem"] = "Totem",
 				["Traditionalist"] = "Tradicionalista",
+				["Trait"] = "Traço",
 				["Traits"] = "Traços",
 				["Translate"] = "Traduzir",
 				["TRANSPORTATION"] = "TRANSPORTE",
@@ -391,6 +414,7 @@
 				["Victorian Era"] = "Era Vitoriana",
 				["Dark Ages"] = "Idade das Trevas",
 				["Classical Age"] = "Idade Clássica",
+				["Virtue"] = "Virtude",
 				["VIRTUES"] = "VIRTUDES",
 				["Visionary"] = "Visionário",
 				["Visit the Table:"] = "Conheça a Mesa:",
@@ -406,6 +430,16 @@
 				["Wounded (-2)"] = "Ferido Gravemente (-2)",
 				["Yes"] = "Sim",
 			};
+
+			-- PT is local to this file, but text written by Lua lives on other tabs too - the
+			-- health track here, the experience ledger on HH.9 (SPEC I10). One exported lookup
+			-- keeps ONE map: a second copy in another file is exactly what V28 is written to
+			-- catch, and it would drift the first time a term was retranslated.
+			function translateSheetText(txt, lang)
+				if lang == "pt" then return PT[txt] or txt; end;
+
+				return txt;
+			end;
 
 			-- SPEC V21 / B.9: a form's getChildren() returns only its own declared children,
 			-- so recursing from this Credits form reached this tab and nothing else. Walk UP

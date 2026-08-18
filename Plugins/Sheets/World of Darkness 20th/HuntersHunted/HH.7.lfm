@@ -1976,9 +1976,15 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 
 			Rows 9 and 10 of each table stay free text on purpose: homebrew numina.
 		-->
+		<!--
+			`style` is bold on the first row and empty on the rest (SPEC V88): the affinity path
+			is always numina_1, so the row is marked, not whichever numina happens to sit on it.
+			One template keeps ONE list of the 21 paths - a second bold copy would be a second
+			list to keep in step, which is exactly what V78 checks against.
+		-->
 		<template name="HedgePicker">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
-			<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}" values="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}">
+			<comboBox left="25" top="0" width="160" height="25" fontSize="12" fontStyle="$(style)" name="cbo$(field)" field="$(field)" items="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}" values="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}">
 			</comboBox>
 			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
@@ -2012,29 +2018,33 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="340" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
 
+			<!-- The star sits in the box's left margin, clear of the row itself (SPEC V37): the
+			     rows start at x=12 and this ends there. It marks the affinity path, and the note
+			     under TRUE FAITH says what that means (SPEC V88). -->
+			<label left="2" top="29" width="10" height="20" text="*"/>
 			<layout left="12" top="25" width="315" height="25">
-				<HedgePicker field="numina_1"/>
+				<HedgePicker field="numina_1" style="bold"/>
 			</layout>
 			<layout left="12" top="50" width="315" height="25">
-				<HedgePicker field="numina_2"/>
+				<HedgePicker field="numina_2" style=""/>
 			</layout>
 			<layout left="12" top="75" width="315" height="25">
-				<HedgePicker field="numina_3"/>
+				<HedgePicker field="numina_3" style=""/>
 			</layout>
 			<layout left="12" top="100" width="315" height="25">
-				<HedgePicker field="numina_4"/>
+				<HedgePicker field="numina_4" style=""/>
 			</layout>
 			<layout left="12" top="125" width="315" height="25">
-				<HedgePicker field="numina_5"/>
+				<HedgePicker field="numina_5" style=""/>
 			</layout>
 			<layout left="12" top="150" width="315" height="25">
-				<HedgePicker field="numina_6"/>
+				<HedgePicker field="numina_6" style=""/>
 			</layout>
 			<layout left="12" top="175" width="315" height="25">
-				<HedgePicker field="numina_7"/>
+				<HedgePicker field="numina_7" style=""/>
 			</layout>
 			<layout left="12" top="200" width="315" height="25">
-				<HedgePicker field="numina_8"/>
+				<HedgePicker field="numina_8" style=""/>
 			</layout>
 			<layout left="12" top="225" width="315" height="25">
 				<NuminaFree field="numina_9"/>
@@ -2092,7 +2102,9 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			`faith_1`..`_5` are the dots that used to live on the Main tab. They moved here in
 			the same change that removed them there, so a saved sheet keeps its rating (V35).
 		-->
-		<layout left="0" top="620" width="340" height="60">
+		<!-- 30px taller than the single row needs: the affinity note goes at the bottom of the
+		     left-hand column, after True Faith, where the user asked for it. -->
+		<layout left="0" top="620" width="340" height="90">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="340" height="20" text="TRUE FAITH" horzTextAlign="center"/>
 
@@ -2106,6 +2118,8 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 				<imageCheckBox left="265" top="0" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 				<imageCheckBox left="290" top="0" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			</layout>
+
+			<label left="12" top="58" width="315" height="20" text="* The first path is the Affinity Path" fontSize="12"/>
 		</layout>
 
 		<!--
