@@ -2221,6 +2221,64 @@ $langMagika = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBy
 if ($langMagika -match 'wod\.(Magika|Show Magika)=') { Fail "V128 localization.lang still carries a Magika key" }
 else { Pass "V128 the Magika keys are out of localization.lang" }
 
+# ---- V129 + V130: the refusal that speaks, and the one that must not -----------------
+# The guard has refused a purchase with no balance behind it since v2.8, silently, and no
+# test has ever seen it fire (SPEC B33). The pop-up is both what the user asked for and the
+# first runtime proof the guard runs at all, so it sits on the balance branch ONLY: selling
+# back a point the storyteller paid for (V103) is a different refusal, and a message naming
+# the wrong reason is worse than one that never comes.
+$guardFn = [regex]::Match($rootTxt, 'function xpGuard\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
+if (-not $guardFn.Success) { Fail "V129 xpGuard not found on the root form" }
+else {
+    $g     = $guardFn.Groups[1].Value
+    $undo  = [regex]::Match($g, 'if undo then(.*?)return;', 'Singleline')
+    $warns = @([regex]::Matches($g, 'xpWarn\("([^"]*)"\)'))
+    if (-not $undo.Success) { Fail "V129 xpGuard has no undo branch" }
+    elseif ($warns.Count -ne 1) { Fail "V129 xpGuard raises $($warns.Count) pop-ups - exactly one refusal, the one for want of experience, may speak" }
+    elseif ($undo.Groups[1].Value -notmatch 'if on then xpWarn\(') { Fail "V129 the pop-up is not fenced to the balance branch - it would fire when a baseline point is sold back (SPEC V103)" }
+    elseif ($undo.Groups[1].Value.IndexOf('xpWarn(') -lt $undo.Groups[1].Value.IndexOf('setField(field, not on)')) { Fail "V129 the pop-up opens before the dot goes back - the modal would sit over a sheet the rules have refused" }
+    else { Pass "V129 only the balance refusal speaks, and only once the dot is back" }
+}
+
+$warnFn   = LuaFn $rootTxt 'xpWarn'
+$warnMsgs = @([regex]::Matches($rootTxt, 'xpWarn\("([^"]*)"\)') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+if (-not $warnFn) { Fail "V130 xpWarn not found on the root form" }
+elseif ($warnFn -notmatch 'translateSheetText\(') { Fail "V130 xpWarn shows its message untranslated - a [pt] sheet would read English (SPEC V70)" }
+elseif ($warnFn -notmatch 'Dialogs\.showMessage\(') { Fail "V130 xpWarn opens no dialog - the refusal would stay silent" }
+elseif ($warnMsgs.Count -eq 0) { Fail "V130 no pop-up message found - nothing tells the player why the dot came back" }
+else {
+    $badMsg = @()
+    foreach ($m in $warnMsgs) {
+        if (-not $enK.Contains($m)) { $badMsg += "'$m' has no [en] key - it is not authored English (SPEC V9)" }
+        elseif (-not $ptK.Contains($m)) { $badMsg += "'$m' has no [pt] key" }
+        elseif (-not $embedded.ContainsKey($m)) { $badMsg += "'$m' is absent from the PT map - it would never translate" }
+    }
+    if ($badMsg) { foreach ($b in $badMsg) { Fail "V130 $b (a string living only in Lua escapes the XML checks of V10/V28)" } }
+    else { Pass "V130 all $($warnMsgs.Count) pop-up messages are English, keyed both ways and in the PT map" }
+}
+
+# ---- V131: no path leaves the character owing experience ----------------------------
+# The guard only ever runs on a dot click, so the balance box was the way round it: a typed
+# -5 wrote xpTotal = -5 + spent and the sheet came up owing (SPEC B35). Refused, not clamped -
+# clamping would write xpTotal = Spent, and one mistyped minus sign would cost the player
+# every point they had earned.
+$setFn = LuaFn $rootTxt 'xpSetCurrent'
+$boxFn = LuaFn $rootTxt 'renderXPBoxes'
+if (-not $setFn) { Fail "V131 xpSetCurrent not found on the root form" }
+elseif ($setFn -notmatch 'if n < 0 then') { Fail "V131 xpSetCurrent takes any number it is handed - a typed -5 leaves the character owing (SPEC B35)" }
+else {
+    $refusal = [regex]::Match($setFn, 'if n < 0 then(.*?)end;', 'Singleline')
+    if (-not $refusal.Success) { Fail "V131 the refusal branch of xpSetCurrent cannot be read" }
+    elseif ($refusal.Groups[1].Value -match 'setField\("xpTotal"') { Fail "V131 the refused balance is written anyway" }
+    elseif ($refusal.Groups[1].Value -notmatch 'return;') { Fail "V131 the refusal falls through and writes the negative balance below it" }
+    elseif ($refusal.Groups[1].Value -notmatch 'xpWarn\(') { Fail "V131 the refused balance says nothing - the box would snap back with no reason given" }
+    elseif (@([regex]::Matches($setFn, 'setField\("xpTotal"')).Count -ne 1) { Fail "V131 xpSetCurrent writes xpTotal more than once - V100 counts two writes in the file" }
+    else { Pass "V131 a balance below zero is refused, not clamped, and says so" }
+}
+if (-not $boxFn) { Fail "V131 renderXPBoxes not found on the root form" }
+elseif ($boxFn -notmatch 'setField\("xpTotal", math\.max\(0,') { Fail "V131 the migration seed has no floor - an old sheet holding a negative experience value is born owing (SPEC I11)" }
+else { Pass "V131 the one-shot migration cannot seed a negative balance" }
+
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.
 # Exit 0 alone is not proof of a build - the artifact must change.

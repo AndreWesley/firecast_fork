@@ -392,6 +392,18 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
 - teto de peso da arte CONFIRMADO pelo user 2026-08-18 = 120 KB por PNG / Σ 400 KB (§V126); alternativa 60 KB recusada
 - §I3 linha `- progress (aba Progress, HH.9)` está com TEXTO DUPLICADO desde alguma rodada anterior (3 cópias emendadas numa linha só) ∴ dano de spec PRÉ-EXISTENTE, ⊥ desta rodada. ⊥ consertado calado — §I3 ⊥ foi seção nomeada pelo user; entra como achado p/ decisão
 
+- 40ª rodada 2026-08-18 ↓ (1 pedido do user, 3 partes: compra sem saldo ⊥ acontece · POP-UP avisa · XP ⊥ fica negativo)
+- parte 1 (compra barrada) JÁ ∃ em código desde a v2.8 — §I12 ramo `on`, `xpTotal` − Σ log < 0 → desfaz. Esta rodada ⊥ REIMPLEMENTA o bloqueio: dá VOZ a ele & fecha o teste que ⊥ rodou (§T277 §T296 §T315 seguem `.`; §B33 (b) diz em letra que o guarda inteiro pode estar morto)
+- o pop-up é TAMBÉM a sonda que 4 rodadas ⊥ conseguiram (§B32 §B33 §T324): pop-up aparece ⟺ `xpGuard` rodou **&** `sheet[field]` já refletia o clique (§R39). Ausência dele numa compra sem saldo = §R39 respondida NEGATIVA ∴ §T354 vale mais que a mensagem
+- ⊥ ∃ como barrar o clique ANTES: `imageCheckBox` ⊥ tem `onUserChange` (§R37) & `onChange` ⊥ passa valor (§R39) ∴ "o ponto ⊥ deve ser comprado" = comprar-e-DESFAZER & a bolinha pode PISCAR. Forma HERDADA (§I12), ⊥ escolha nova desta rodada
+- pop-up = 1 por clique RECUSADO por saldo, texto autorado EN + [pt] por `translateSheetText` (≡ ledger de `HH.9`, §V70) ∴ §V9 §V10 §V28 intactos
+- o OUTRO desfazer do guarda (venda de ponto do baseline, §V103) segue MUDO: o user pediu aviso p/ falta de XP, ⊥ p/ venda. `?` p/ decisão dele — 1 string a mais fecharia a incoerência de 2 recusas c/ vozes diferentes
+- parte 3 (XP ⊥ negativo) = buraco REAL que o guarda ⊥ cobre: `xpSetCurrent` grava `(tonumber(typed) or 0) + Σ log` SEM piso ∴ digitar `-5` no `Current` deixa a ficha devendo (§B35). Achado LENDO o código nesta rodada, ⊥ relatado pelo user
+- negativo digitado = RECUSA + re-render (a caixa volta ao valor gravado), ⊥ clamp p/ `0`: clamp gravaria `xpTotal = Spent` ∴ um typo APAGARIA o total ganho. JULGAMENTO meu
+- negativo digitado ganha pop-up PRÓPRIO (`Experience cannot go below zero`), ⊥ o mesmo da compra — motivo diferente, mensagem diferente. JULGAMENTO meu; o user reclamou de recusa MUDA ∴ recusar calado aqui repetiria a queixa
+- 2º caminho de saldo negativo: a semente da migração de §I11 repassa `experience` negativo de ficha velha ∴ fecha na MESMA linha (`math.max(0, …)`). Sem isso §V131 nasceria falsa em ficha migrada
+- 3º caminho, DECLARADO & ⊥ FECHADO: mestre liga `stBackgroundsXP` c/ antecedentes já comprados → linhas que custavam `0` passam a custar (§I9) ∴ `Spent` sobe sozinho & `Current` vai a negativo SEM clique nenhum. Guarda ⊥ roda (⊥ ∃ dot) & `xpTotal` ⊥ é escrito ∴ FORA de §V131. Fechar = barrar a flag | escrever XP (⊥ §V100) ∴ `?` p/ o user, ⊥ conserto calado
+
 ## §I INTERFACES
 
 - I1 dataType: `Ambesek.HuntersHunted.20th`, `formType="sheetTemplate"`, title `Hunters Hunted - Mortal`, `theme="dark"`
@@ -456,11 +468,13 @@ Ficha Firecast p/ Hunters Hunted (mortal WoD 20th), estrutura clonada do `Mage20
   - `Total` = `xpTotal`, só-leitura · `Spent` = Σ `cost` do log, só-leitura · `Current` = `xpTotal` − `Spent`, EDITÁVEL
   - digitar X no `Current` → `xpTotal = X + Spent` (`onUserChange` do `edit`, ⊥ `field`) ∴ o jogador mexe no saldo & o total se ajusta
   - migração 1×: `xpTotal` nil → `xpTotal = (`experience` \| 0) + Σ log ∴ o `Current` renderizado = o que o jogador via antes
+  - 40ª rodada: `Current` digitado < 0 → RECUSA (⊥ grava `xpTotal`) + pop-up + re-render ∴ a caixa volta ao valor gravado & nada se perde. Semente da migração passa por `math.max(0, experience)` (§V131, §B35)
 - I12 `xpGuard(field)` @ form RAIZ — `onChange` de ∀ dot que custa XP chama. ⊥ escreve XP nenhum (Current é derivado ∴ ⊥ ∃ o que descontar \| devolver)
   - `baseline` vazio → sai (§V101). `base` = `field` sem `_N`; `XP_TRAIT[base]` nil → sai
   - dot LIGOU & `xpTotal` − Σ log < 0 → DESFAZ (dot volta a `false`) ∴ ⊥ compra sem saldo
   - dot DESLIGOU & nível resultante < nível no `baseline` → DESFAZ (dot volta a `true`) ∴ ponto do personagem inicial ⊥ é vendido (§V103)
   - desfazer re-dispara o `onChange` — o 2º passe acha estado legal & para ∴ ⊥ ∃ laço
+  - 40ª rodada: desfazer do ramo `on` (falta de saldo) levanta 1 pop-up — `Dialogs.showMessage(translateSheetText("Not enough experience to buy that dot", lang))` (§V129, §R41). Desfazer do ramo de §V103 (venda abaixo do baseline) segue MUDO ∴ a mensagem ⊥ mente o motivo
 
 
 ## §R RESEARCH
@@ -516,6 +530,9 @@ R39|`onChange` de dot ⊥ passa valor|`gui.ImageCheckBox.eves["onChange"] = ""` 
 
 
 R40|`?` escrita programática acorda `dataLink`?|`c.field = X` & `c.checked = v` em `imageCheckBox` LIGADO gravam no NDB pelo caminho normal (`autoChange`) ∴ acordam `dataLink` & observador do campo — inclusive quando o valor ⊥ muda? `_ndb_setAttribute` é nativo & ⊥ ∃ precedente no repo medindo isso. É a premissa do custo de §B34; gravar só o que MUDA (§V122) vale nos 2 casos ∴ o conserto ⊥ depende da resposta|`SDK3/API/ndb.lua:60` · `SDK3/API/rrpgGUI.lua:788`
+
+
+R41|pop-up de aviso|`Dialogs.showMessage(msg, callback)` = `showMessageDlg(msg, DT_INFORMATION, {DB_OK}, …)`; irmãs `alert` (DT_WARNING) & `showErrorMessage` (DT_ERROR) diferem SÓ no ícone ∴ escolha = estética, ⊥ contrato. `Dialogs` é global dentro de `.lfm` de ficha — precedente NO PRÓPRIO sheet: `Dialogs.confirmOkCancel` (§R30, §I8c). ⊥ ∃ precedente de `showMessage` em `.lfm` de ficha no repo (1 hit, COMENTADO, em ChatMod) ∴ modal aberto DE DENTRO de `onChange` (o dialog volta por callback & o handler segue) = `?` até §T354|`SDK3/API/rrpgDialogs.lua:85` `:94` `:103` · `HuntersHunted/HH.10.lfm:23` · grep `Dialogs.showMessage` em `Plugins/**/*.lfm` = 1 hit comentado
 
 ## §V INVARIANTS
 
@@ -655,6 +672,10 @@ V125: ledger varrido ≤1× por clique de dot & as LINHAS são passadas a quem d
 V126: ∀ PNG em `HuntersHunted/images/` ≤ 120 KB & Σ ≤ 400 KB ∴ arte de fundo ⊥ volta a ser ~30% do `.rpk`
 V127: `xpGuard` TERMINA — o desfazer é escrito sob `xpQuiet` ∴ ⊥ ∃ re-entrada. Caminho velho (re-entra & "acha estado legal") ⊥ vale p/ traço abaixo do baseline c/ saldo 0: o 2º passe desfaz o desfazer & o guarda oscila p/ sempre
 V128: abas MANEJADAS = EXATAMENTE 3 (`tabNumina` `tabDisciplines` `tabStoryteller`) ∴ `applyTabVisibility` ⊥ carrega chave p/ aba que ⊥ ∃ mais & §V92 §V93 §V94 medem 3, ⊥ 4. `stShowMagika` ∈ ÓRFÃOS de §I3 & `HH.12.lfm` ∉ `I2` (≡ §V91, §V102)
+
+V129: recusa por SALDO fala — o ramo `on` do desfazer de `xpGuard` levanta EXATAMENTE 1 pop-up por clique recusado, texto EN autorado passado por `translateSheetText` ∴ ⊥ ∃ recusa muda por falta de XP & ⊥ ∃ literal PT no código (§V9). O ramo de §V103 (venda abaixo do baseline) ⊥ levanta pop-up nenhum ∴ mensagem ⊥ pode mentir o motivo. Pop-up ABRE DEPOIS do desfazer estar escrito ∴ o modal ⊥ cobre estado ilegal
+V130: ∀ string de pop-up ∈ `.lang` [pt] & [en] & ∈ mapa `PT` de `HH.6` ∴ string que só existe em Lua ⊥ escapa dos checks que leem o XML (≡ §V70, mesmo ponto cego de §B11 §B17). §V10 & §V28 medem `label`/`checkBox`/`button` ∴ ⊥ alcançam mensagem de modal
+V131: ∀ caminho que ESCREVE `xpTotal` deixa `xpTotal` − Σ log ≥ 0 — são 2 & só 2 (§V100 conta as escritas): digitado em `xpSetCurrent` (negativo → RECUSA, ⊥ grava) & semente da migração de §I11 (`math.max(0, experience)`). Flip de `stBackgroundsXP` ⊥ escreve `xpTotal` ∴ ∉ este invariante — buraco declarado em §C, ⊥ esquecido
 
 ## §T TASKS
 
@@ -1017,6 +1038,15 @@ T341|x|`module.xml` version `3.7` → `3.8` + `rdk -l` (exit 0 & `.rpk` mudou) +
 T342|.|teste no Firecast (RESOLVE §B34): ficha ANTIGA c/ `baseline` salvo abre em tempo normal · aba Progress mostra o log · comprar 1 ponto → linha nova SEM trocar de aba · saldo 0 & traço abaixo do baseline → clique ⊥ trava (§V127)|B34,V121,V127
 T343|x|2ª varredura de ⊥-usado DEPOIS do build (pedido 5 do user): template · identificador de script · PNG · campo órfão · chave `.lang` exclusiva de `HuntersHunted/`. O que sobrar vira §T próprio — remoção calada ⊥|V64,V2
 
+
+T348|x|`HuntersHunted.lfm` — `xpGuard`: dentro do ramo `if undo then`, DEPOIS do desfazer & do re-render, `if on then` levanta `Dialogs.showMessage(translateSheetText("Not enough experience to buy that dot", sheet.language or "en"))` sob nil-check de `translateSheetText` (≡ `xpLedgerRefresh`). Checks de §V125 (≤2 varreduras) & §V127 (bloco do desfazer) seguem VERDES|V129,I12,R41
+T349|x|`HuntersHunted.lfm` — `xpSetCurrent`: `tonumber(typed) or 0` < 0 → ⊥ grava `xpTotal`, chama `renderXPBoxes(form)` (a caixa volta) + pop-up `Experience cannot go below zero` & retorna|V131,I11,B35
+T350|x|`HuntersHunted.lfm` — semente da migração em `renderXPBoxes`: `math.max(0, tonumber(sheet.experience) or 0) + spent` ∴ ficha velha c/ `experience` negativo ⊥ nasce devendo. Segue 1 só escrita de `xpTotal` ali (gate de §V100 conta 2 no arquivo)|V131,I11,B35
+T351|x|`localization.lang` [pt] & [en] + mapa `PT` de `HH.6.lfm` — 2 strings NOVAS nos 3 lugares, MESMO commit: `Not enough experience to buy that dot` = `Experiência insuficiente para comprar esse ponto` · `Experience cannot go below zero` = `A experiência não pode ficar negativa`|V130,V10,V22,V28
+T352|x|`verify-hunters-hunted.ps1` — checks NOVOS §V129 §V130 §V131. Mutação antes de aceitar (§V20): apagar o pop-up · trocar por literal PT · mover o pop-up p/ o ramo de §V103 · aceitar negativo em `xpSetCurrent` · tirar o `math.max` da semente — ∀ um ! ficar VERMELHO|V20,V129,V130,V131
+T353|~|`module.xml` version `3.8` → `3.9` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (Firecast FECHADO, instalado c/ mesmo size)|V6,V7
+T354|.|teste no Firecast — RESOLVE §T277 §T296 & RESPONDE §R39: baseline salvo & `Current` = 0 → clicar bolinha nova → POP-UP aparece · bolinha volta sozinha · `Current` segue 0. Pop-up ⊥ aparecer & bolinha FICAR = §R39 NEGATIVA ∴ guarda morto (§B33 b) & vira §B novo, ⊥ 4ª rodada de conserto às cegas. 2º caso: digitar `-5` no `Current` → pop-up & a caixa volta ao valor de antes|R39,V129,V131,B33
+
 ## §B BUGS
 
 id|date|cause|fix
@@ -1058,3 +1088,5 @@ B32|2026-08-18|`Allow Buy Dots For Free` ⊥ produz efeito NENHUM em runtime (2 
 B33|2026-08-18|FECHAMENTO de §B32: causa NUNCA isolada. O user removeu a funcionalidade na 38ª rodada em vez de pagar uma 4ª rodada de conserto às cegas. O que sobra p/ a próxima geração: (a) §R39 segue `?` — `onChange` de `checkBox`/`imageCheckBox` ⊥ passa valor & ⊥ ∃ precedente NO REPO INTEIRO de ficha lendo estado dentro desse evento (grep 0); (b) o `xpGuard` continua de pé apoiado NA MESMA premissa p/ barrar compra sem saldo, & §T277/§T296 nunca rodaram ∴ o mesmo buraco pode estar sob o guarda inteiro; (c) LIÇÃO: 4 rodadas (33ª…36ª) empilharam código em cima de contrato de evento ⊥ observado — o gate lê o FONTE & é cego a runtime, ⊥ adianta apertar check (≡ §B6 §B9, código que nunca rodou passando por pronto)|C
 
 B34|2026-08-18|abrir ficha ANTIGA trava o Firecast. `ndb.newObserver(sheet)` de `HH.9` (conserto de §B28) redesenha o ledger a ∀ atributo gravado & ⊥ passa por `xpQuiet` ∴ o escudo de §V107 (conserto de §B30) ⊥ o cobre. No load quem mais grava é o próprio Lua: `renderAbilityLabels` religa 150 dots ×2 (os 2 `dataLink` c/ `defaultValue` disparam na abertura) · `regroupHealthMarks` grava as 7-10 linhas de vitalidade a ∀ render · o `dataLink` de ~80 traços de `HH.3` chama `renderHealthTrack` junto ∴ 1 dot escrito ≈ 10 escritas de vitalidade ≈ 10 varreduras de ~91 traços × 2 nós. Ficha NOVA ⊥ trava: sem `baseline` o `xpLedgerRows` sai em 1 linha ∴ o custo é exclusivo de ficha já salva. Gate lê o FONTE & ⊥ conta chamada em runtime (≡ §B30, §B33)|V121,V122,V123,V124,V125
+
+B35|2026-08-18|`xpSetCurrent` grava `xpTotal = (tonumber(typed) or 0) + xpSpent()` SEM piso ∴ digitar `-5` no `Current` deixa a ficha c/ saldo NEGATIVO & o guarda ⊥ vê (ele só corre em `onChange` de dot, §I12). 2º caminho: a semente da migração de §I11 repassa `experience` negativo de ficha velha. §V100 amarrava o número a ⊥ divergir do log, NUNCA a ⊥ ser negativo ∴ os 2 caminhos passavam verde. Achado lendo o código na 40ª rodada, ⊥ relatado pelo user|V131

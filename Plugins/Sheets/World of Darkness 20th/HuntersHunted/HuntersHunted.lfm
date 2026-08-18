@@ -753,7 +753,7 @@
 					-- here and walk the ledger again for a number this call already has
 					-- (SPEC V107).
 					xpQuiet = true;
-					setField("xpTotal", (tonumber(sheet.experience) or 0) + spent);
+					setField("xpTotal", math.max(0, tonumber(sheet.experience) or 0) + spent);
 					xpQuiet = false;
 				end;
 
@@ -765,13 +765,40 @@
 				if form.edtCurrentXPMain ~= nil then form.edtCurrentXPMain.text = tostring(total - spent); end;
 			end;
 
+			-- Both refusals the sheet can hand the player - no balance left for a dot, and a
+			-- balance typed below zero - come out through here (SPEC V129/V131). Authored in
+			-- English and shown through the sheet's own translation (SPEC V70/V130); the
+			-- Settings tab owns that map, and on a sheet where it has not loaded the English
+			-- is still the right thing to read.
+			local function xpWarn(msg)
+				local txt = msg;
+
+				if translateSheetText ~= nil then
+					txt = translateSheetText(msg, (sheet ~= nil and sheet.language) or "en");
+				end;
+
+				Dialogs.showMessage(txt);
+			end;
+
 			-- The player types the BALANCE, never the total (SPEC I11): the storyteller hands
 			-- out 10 experience, the number in that box goes up by 10, and the total behind it
 			-- follows. Spending moves the same box down on its own, through the log.
 			function xpSetCurrent(form, typed)
 				if sheet == nil then return; end;
 
-				setField("xpTotal", (tonumber(typed) or 0) + xpSpent());
+				local n = tonumber(typed) or 0;
+
+				-- SPEC V131: experience never goes below zero. The typed number is REFUSED,
+				-- not clamped - clamping would write xpTotal = Spent, and one mistyped minus
+				-- sign would cost the player every point they had earned. Nothing is written,
+				-- so the box simply comes back to the balance that is stored.
+				if n < 0 then
+					renderXPBoxes(form);
+					xpWarn("Experience cannot go below zero");
+					return;
+				end;
+
+				setField("xpTotal", n + xpSpent());
 
 				renderXPBoxes(form);
 			end;
@@ -852,6 +879,14 @@
 
 					renderXPBoxes(form, xpSum(back));
 					xpLedgerRefresh(back);
+
+					-- SPEC V129: a refusal for want of experience says so, and only that one.
+					-- The other refusal - selling back a point the storyteller paid for (SPEC
+					-- V103) - stays silent, so this message can never name the wrong reason.
+					-- Raised AFTER the dot is back where it was: the modal covers a legal
+					-- sheet.
+					if on then xpWarn("Not enough experience to buy that dot"); end;
+
 					return;
 				end;
 
