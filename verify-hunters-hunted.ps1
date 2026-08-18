@@ -377,7 +377,9 @@ foreach ($l in $listReport) {
     else { Pass "V14 $($l.Name) has $($l.Items.Count) unique entries" }
     # cboSheetTheme is the declared exception (SPEC V15, 11th round): a state combo with a real
     # default, not prose to be cleared - there is no such thing as a sheet with no theme.
-    if ($l.Name -like '*cboSheetTheme*') { Pass "V15 $($l.Name) n/a - state combo with a default (declared exception)" }
+    # cboGame joined it in the 32nd round for the same reason and one more: it is locked, so an
+    # empty row would be a value nobody could get back out of (SPEC V109).
+    if ($l.Name -like '*cboSheetTheme*' -or $l.Name -like '*cboGame*') { Pass "V15 $($l.Name) n/a - state combo with a default (declared exception)" }
     elseif ($l.Items[0] -eq '') { Pass "V15 $($l.Name) starts empty" } else { Fail "V15 $($l.Name) first entry is '$($l.Items[0])', expected empty" }
 }
 
@@ -389,13 +391,15 @@ foreach ($must in @('HH.6.lfm/cboGame','HH.7.lfm/cboFaith','HH.6.lfm/cboSheetThe
     else { Fail "V14/V15/V17 $must was never collected - its list is unchecked" }
 }
 
-# cboGame is a closed roster, not an open vocabulary: assert the count so a dropped or
-# duplicated entry fails instead of passing as "no duplicates, starts empty" (SPEC T90).
+# cboGame is a closed roster, not an open vocabulary: assert the names themselves, so a
+# dropped, renamed or added entry fails instead of passing as "no duplicates" (SPEC V109).
+# Three since the 32nd round, and no leading empty one to discount.
 $gameList = @($listReport | Where-Object { $_.Name -eq 'HH.6.lfm/cboGame' })
 if ($gameList.Count -eq 1) {
-    $nGames = $gameList[0].Items.Count - 1      # minus the leading empty entry
-    if ($nGames -eq 5) { Pass "V14 cboGame offers 5 games" }
-    else { Fail "V14 cboGame offers $nGames games, expected 5" }
+    $wantGames = @('Vampire', 'Hunters Hunted', 'Mage')
+    $gotGames = @($gameList[0].Items)
+    if (($gotGames -join '|') -eq ($wantGames -join '|')) { Pass "V109 cboGame offers exactly $($wantGames -join ', ')" }
+    else { Fail "V109 cboGame offers '$($gotGames -join ', ')', expected '$($wantGames -join ', ')'" }
 }
 
 # ---- V9: source language is English - no non-ASCII in authored strings -------

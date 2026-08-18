@@ -237,8 +237,8 @@
 				["Loner"] = "Solitário",
 				["Machine"] = "Máquina",
 				["Mad Scientist"] = "Cientista Louco",
+				["Mage"] = "Mago",
 				["Maelstroms"] = "Maelstroms",
-				["Mage: The Ascension"] = "Mago: A Ascensão",
 				["MAGIKA"] = "MAGIKA",
 				["Magika"] = "Magika",
 				["Main"] = "Principal",
@@ -410,8 +410,6 @@
 				["Type"] = "Tipo",
 				["Tyrant"] = "Tirano",
 				["Update"] = "Atualizar",
-				["Vampire: Dark Ages"] = "Vampiro: Idade das Trevas",
-				["Vampire: The Masquerade"] = "Vampiro: A Máscara",
 				["Version"] = "Versão Atual",
 				["Victorian Era"] = "Era Vitoriana",
 				["Dark Ages"] = "Idade das Trevas",
@@ -423,10 +421,10 @@
 				["Weapon/Attack"] = "Arma/Ataque",
 				["Weather Control"] = "Controle do Clima",
 				["Weight"] = "Peso",
-				["Werewolf: The Apocalypse"] = "Lobisomem: O Apocalipse",
 				["Willpower"] = "Força-de-Vontade",
 				["WILLPOWER"] = "FORÇA DE VONTADE",
 				["Wisdom"] = "Sabedoria",
+				["Vampire"] = "Vampiro",
 				["Wits"] = "Raciocínio",
 				["Wonder"] = "Maravilha",
 				["Wounded (-2)"] = "Ferido Gravemente (-2)",
@@ -984,12 +982,20 @@
 				</event>
 			</dataLink>
 
-			<!-- `Game` only stores what the table is playing (SPEC C, T75). Nothing reads it
-			     yet - no content is filtered by it, on purpose. Named cbo* so the language
-			     switch translates the shown items while `values` stay English (SPEC V24). -->
+			<!-- `Game` says what the table is playing (SPEC C, T75). Nothing reads it - no
+			     content is filtered by it, on purpose. Named cbo* so the language switch
+			     translates the shown items while `values` stay English (SPEC V24).
+
+			     Three games since the 32nd round, and the box is NOT editable: the value is
+			     information, not a choice (SPEC V109). No empty row goes with that - a locked
+			     combo carrying a default has nothing to clear - which is the same declared
+			     exception to V15 that cboSheetTheme carries. A sheet holding one of the four
+			     older, longer names is normalised on load (SPEC V110), because a locked box
+			     showing a dead value is one nobody could fix. -->
 			<label left="0" top="50" width="90" height="20" text="Game" horzTextAlign="center"/>
-			<comboBox left="95" top="50" width="220" height="25" name="cboGame" field="game" fontColor="white" horzTextAlign="center" items="{'', 'Vampire: The Masquerade', 'Vampire: Dark Ages', 'Werewolf: The Apocalypse', 'Mage: The Ascension', 'Hunters Hunted'}" values="{'', 'Vampire: The Masquerade', 'Vampire: Dark Ages', 'Werewolf: The Apocalypse', 'Mage: The Ascension', 'Hunters Hunted'}">
+			<comboBox left="95" top="50" width="220" height="25" name="cboGame" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Hunters Hunted', 'Mage'}" values="{'Vampire', 'Hunters Hunted', 'Mage'}">
 			</comboBox>
+			<dataLink field="game" defaultValue="Hunters Hunted"/>
 
 			<!--
 				`Theme` is the era the table plays in and, like `Game`, only stores state today
