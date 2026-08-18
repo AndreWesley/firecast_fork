@@ -63,6 +63,11 @@
 					costs[i]  = tostring(r.cost);
 				end;
 
+				-- A saved character nobody has spent on yet. Four blank columns read as a broken
+				-- tab, so the first one says why it is empty - the same call V33 makes for the
+				-- no-baseline case above (SPEC V98).
+				if #rows == 0 then kinds[1] = translateSheetText("Nothing bought yet", lang); end;
+
 				form.dynXpType.text  = table.concat(kinds, "\n");
 				form.dynXpTrait.text = table.concat(traits, "\n");
 				form.dynXpLevel.text = table.concat(levels, "\n");
