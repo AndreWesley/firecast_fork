@@ -1986,32 +1986,32 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
 			<comboBox left="25" top="0" width="160" height="25" fontSize="12" fontStyle="$(style)" name="cbo$(field)" field="$(field)" items="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}" values="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}">
 			</comboBox>
-			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1'); renderXPBoxes(self);"/>
-			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2'); renderXPBoxes(self);"/>
-			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3'); renderXPBoxes(self);"/>
-			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4'); renderXPBoxes(self);"/>
-			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5'); renderXPBoxes(self);"/>
+			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1', self);"/>
+			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2', self);"/>
+			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3', self);"/>
+			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4', self);"/>
+			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5', self);"/>
 		</template>
 
 		<template name="PsychicPicker">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
 			<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}" values="{'', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}">
 			</comboBox>
-			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1'); renderXPBoxes(self);"/>
-			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2'); renderXPBoxes(self);"/>
-			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3'); renderXPBoxes(self);"/>
-			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4'); renderXPBoxes(self);"/>
-			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5'); renderXPBoxes(self);"/>
+			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1', self);"/>
+			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2', self);"/>
+			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3', self);"/>
+			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4', self);"/>
+			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5', self);"/>
 		</template>
 
 		<template name="NuminaFree">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
 			<edit left="25" top="2" width="160" height="21" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1'); renderXPBoxes(self);"/>
-			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2'); renderXPBoxes(self);"/>
-			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3'); renderXPBoxes(self);"/>
-			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4'); renderXPBoxes(self);"/>
-			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5'); renderXPBoxes(self);"/>
+			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1', self);"/>
+			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2', self);"/>
+			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3', self);"/>
+			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4', self);"/>
+			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5', self);"/>
 		</template>
 
 		<layout left="0" top="0" width="340" height="300">
@@ -2109,11 +2109,11 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 				<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="faith" groupName="numinaSel"/>
 				<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cboFaith" field="faith" items="{'', 'Christianity', 'Judaism', 'Islam', 'Other'}" values="{'', 'Christianity', 'Judaism', 'Islam', 'Other'}">
 				</comboBox>
-				<imageCheckBox left="190" top="0" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_1'); renderXPBoxes(self);"/>
-				<imageCheckBox left="215" top="0" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_2'); renderXPBoxes(self);"/>
-				<imageCheckBox left="240" top="0" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_3'); renderXPBoxes(self);"/>
-				<imageCheckBox left="265" top="0" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_4'); renderXPBoxes(self);"/>
-				<imageCheckBox left="290" top="0" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_5'); renderXPBoxes(self);"/>
+				<imageCheckBox left="190" top="0" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_1', self);"/>
+				<imageCheckBox left="215" top="0" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_2', self);"/>
+				<imageCheckBox left="240" top="0" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_3', self);"/>
+				<imageCheckBox left="265" top="0" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_4', self);"/>
+				<imageCheckBox left="290" top="0" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('faith_5', self);"/>
 			</layout>
 		</layout>
 

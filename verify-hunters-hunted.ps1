@@ -1855,7 +1855,7 @@ else { Pass "V100 experience is derived: one number saved, two worked out" }
 # ---- V101: the guard sleeps until the character is frozen -------------------------
 # Building a character spends nothing, so a balance of zero must not stop the first dot.
 if ($guardFn -notmatch 'baselineOf\(\)') { Fail "V101 the guard does not look for a baseline - a character could not be built at all" }
-elseif ($guardFn -notmatch 'if base == nil then return') { Fail "V101 the guard does not stand down without a baseline (SPEC I8c)" }
+elseif ($guardFn -notmatch 'if base == nil then[^\r\n]*return;') { Fail "V101 the guard does not stand down without a baseline (SPEC I8c)" }
 else { Pass "V101 the guard sleeps until the storyteller freezes the character" }
 
 # ---- V103: only a point that is IN the log can be sold back -----------------------

@@ -428,6 +428,15 @@
 				if denied and tabMain ~= nil then tabMain:activate(); end;
 			end;
 
+			-- A write the sheet makes to ITSELF is not a click by the player, and an
+			-- imageCheckBox has no onUserChange to tell the two apart (SPEC R37) - so the code
+			-- says which is which. Whatever writes a batch of fields raises this first and
+			-- lowers it after.
+			--
+			-- Without it the sheet froze on load (SPEC B30): the era renderer rebinds 150 dots,
+			-- twice, and each rebind was costing two full walks of the ledger.
+			xpQuiet = false;
+
 			-- ---- Experience ledger (SPEC I9 / I10 / V83 / V85 / V86, 27th round) --------
 			--
 			-- The log is DERIVED: every render diffs the saved initial character against the
@@ -715,17 +724,24 @@
 			--
 			-- Named per tab because control names are unique across the sheet's files (V59),
 			-- so each box is written only where it exists.
-			function renderXPBoxes(form)
-				if sheet == nil then return; end;
+			function renderXPBoxes(form, spent)
+				if sheet == nil or xpQuiet then return; end;
 
-				local spent = xpSpent();
+				-- The guard has usually just worked this out; walking the ledger a second time
+				-- for the same click is the other half of what froze the sheet (SPEC V108).
+				spent = spent or xpSpent();
 
 				-- One-shot migration (SPEC I11/V102). A sheet from before this round kept its
 				-- balance in `experience`; seeding the total with balance + log leaves the
 				-- rendered balance exactly where the player left it. `spentXP` is not read -
 				-- that was the player's own arithmetic, and the log counts from here on.
 				if sheet.xpTotal == nil then
+					-- Quiet, because the links watching xpTotal would call straight back into
+					-- here and walk the ledger again for a number this call already has
+					-- (SPEC V107).
+					xpQuiet = true;
 					sheet.xpTotal = (tonumber(sheet.experience) or 0) + spent;
+					xpQuiet = false;
 				end;
 
 				local total = tonumber(sheet.xpTotal) or 0;
@@ -759,14 +775,14 @@
 			-- era rebinds those five dots to another ability's field (SPEC V76) - the name
 			-- written in the .lfm is only the Victorian one. Everywhere else the authored name
 			-- is the name for good.
-			function xpGuard(field)
-				if sheet == nil or field == nil or field == "" then return; end;
+			function xpGuard(field, form)
+				if sheet == nil or xpQuiet or field == nil or field == "" then return; end;
 
 				-- Nothing is enforced while the character is being built: the rule starts when
 				-- the storyteller freezes the sheet (SPEC V101).
 				local base = baselineOf();
 
-				if base == nil then return; end;
+				if base == nil then renderXPBoxes(form); return; end;
 
 				local trait = string.match(field, "^(.+)_%d+$");
 				local t     = trait ~= nil and XP_TRAIT[trait] or nil;
@@ -775,21 +791,32 @@
 				-- rating land here.
 				if t == nil then return; end;
 
-				local on  = sheet[field] == true;
-				local now = traitLevel(sheet, trait, t.first, t.last, t.fixed);
+				local on    = sheet[field] == true;
+				local now   = traitLevel(sheet, trait, t.first, t.last, t.fixed);
+				local spent = xpSpent();
 				local undo;
 
 				if on then
 					-- The log already counts the point, so this is the balance the player
 					-- would be left holding.
-					undo = ((tonumber(sheet.xpTotal) or 0) - xpSpent()) < 0;
+					undo = ((tonumber(sheet.xpTotal) or 0) - spent) < 0;
 				else
 					-- SPEC V103: only a point that is IN the log can be sold back. Below the
 					-- baseline is the storyteller's character, not the player's purchase.
 					undo = now < traitLevel(base, trait, t.first, t.last, t.fixed);
 				end;
 
-				if undo then sheet[field] = not on; end;
+				if undo then
+					-- The dot goes back where it was, and the numbers are worked out again
+					-- from scratch: the count above described the state being refused.
+					sheet[field] = not on;
+					renderXPBoxes(form);
+					return;
+				end;
+
+				-- One walk of the ledger per click (SPEC V108): the boxes are handed the count
+				-- this call already made instead of building it a second time.
+				renderXPBoxes(form, spent);
 			end;
 
 			-- What the character has spent, straight off the log (SPEC I11). Not stored: a
