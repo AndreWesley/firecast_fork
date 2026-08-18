@@ -704,6 +704,44 @@
 				return rows;
 			end;
 
+			-- The three numbers, wherever they are drawn (SPEC I11): the Progress tab has all
+			-- three, the Main tab has the balance only. One is stored and two are worked out,
+			-- which is what stops any of them from disagreeing with the log (SPEC V100).
+			--
+			-- Named per tab because control names are unique across the sheet's files (V59),
+			-- so each box is written only where it exists.
+			function renderXPBoxes(form)
+				if sheet == nil then return; end;
+
+				local spent = xpSpent();
+
+				-- One-shot migration (SPEC I11/V102). A sheet from before this round kept its
+				-- balance in `experience`; seeding the total with balance + log leaves the
+				-- rendered balance exactly where the player left it. `spentXP` is not read -
+				-- that was the player's own arithmetic, and the log counts from here on.
+				if sheet.xpTotal == nil then
+					sheet.xpTotal = (tonumber(sheet.experience) or 0) + spent;
+				end;
+
+				local total = tonumber(sheet.xpTotal) or 0;
+
+				if form.edtTotalXP       ~= nil then form.edtTotalXP.text       = tostring(total); end;
+				if form.edtSpentXP       ~= nil then form.edtSpentXP.text       = tostring(spent); end;
+				if form.edtCurrentXP     ~= nil then form.edtCurrentXP.text     = tostring(total - spent); end;
+				if form.edtCurrentXPMain ~= nil then form.edtCurrentXPMain.text = tostring(total - spent); end;
+			end;
+
+			-- The player types the BALANCE, never the total (SPEC I11): the storyteller hands
+			-- out 10 experience, the number in that box goes up by 10, and the total behind it
+			-- follows. Spending moves the same box down on its own, through the log.
+			function xpSetCurrent(form, typed)
+				if sheet == nil then return; end;
+
+				sheet.xpTotal = (tonumber(typed) or 0) + xpSpent();
+
+				renderXPBoxes(form);
+			end;
+
 			-- Every dot that costs experience calls this after it changes (SPEC I12/V99). It
 			-- writes no experience at all: the balance is xpTotal minus the log (SPEC V100),
 			-- so a purchase pays for itself the moment the dot reaches the log and taking the
