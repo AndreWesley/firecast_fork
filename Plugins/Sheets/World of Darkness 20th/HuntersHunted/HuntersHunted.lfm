@@ -913,6 +913,11 @@
 	</event>
 
 	<event name="onNodeReady">
+		-- Everything seeded here is the sheet writing to itself, so it is written quietly: the
+		-- Appearance dot would otherwise put the guard through a full walk of the ledger before
+		-- the sheet is even on screen (SPEC V107).
+		xpQuiet = true;
+
 		-- A sheet saved before the 27th round has nil here and was showing Numina all along,
 		-- so the flag is written true once rather than left nil: the renderer already treats
 		-- nil as visible (SPEC V89), and this keeps the checkbox from reading unticked beside
@@ -924,6 +929,20 @@
 		-- like the other eight (SPEC V104), and only a dot the player switched off keeps it at
 		-- zero. nil means nobody has touched it yet; false is a decision and is left alone.
 		if sheet ~= nil and sheet.appearance_1 == nil then sheet.appearance_1 = true; end;
+
+		-- The Game box is locked (SPEC V109), so a value outside its three would sit there
+		-- with nobody able to clear it: one of the four longer names this sheet used to offer,
+		-- or nothing at all (SPEC V110). It runs here rather than on the Settings tab because
+		-- that tab may never be opened - the same reason V95 moved the tab switch up here.
+		if sheet ~= nil then
+			local g = sheet.game;
+
+			if g ~= "Vampire" and g ~= "Hunters Hunted" and g ~= "Mage" then
+				sheet.game = "Hunters Hunted";
+			end;
+		end;
+
+		xpQuiet = false;
 
 		applyTabVisibility(self);
 	</event>

@@ -866,12 +866,12 @@ T291|x|`HH.6.lfm` — `renderAbilityLabels` liga `xpQuiet` antes do laço de re-
 T292|x|`HuntersHunted.lfm` — semente de `appearance_1` (§V104) & migração de `xpTotal` (§I11) rodam sob `xpQuiet`|V107,V104,I11
 T293|x|`HuntersHunted.lfm` `HH.1.lfm` `HH.7.lfm` — `xpGuard(field, form)` chama `renderXPBoxes` 1× no fim & devolve o `xpSpent()` que já calculou; `onChange` do dot vira só `xpGuard('…', self)`|V108,V99
 T294|x|`verify-hunters-hunted.ps1` — checks NOVOS §V107 §V108 (& §V99 aceita a assinatura nova). Mutação antes de aceitar|V20,V99,V107,V108
-T295|.|`module.xml` version `3.0` → `3.1` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Rodar DEPOIS de §T297…§T300 — 1 build fecha as duas rodadas|V6,V7
+T295|~|`module.xml` version `3.0` → `3.1` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (instalado c/ mesmo size). Rodar DEPOIS de §T297…§T300 — 1 build fecha as duas rodadas|V6,V7
 T296|.|teste no Firecast: ficha abre em tempo NORMAL (§B30) & o guarda segue barrando compra sem saldo (≡ §T277)|V107,V108
 T297|x|`HH.6.lfm` — `cboGame`: `items`/`values` = `Vampire` `Hunters Hunted` `Mage` (⊥ vazio), `enabled="false"` + `<dataLink field="game" defaultValue="Hunters Hunted"/>`|V109,V15,V24
-T298|.|`verify-hunters-hunted.ps1` — `V14 cboGame offers 5 games` → 3; `cboGame` entra na exceção de §V15; checks NOVOS §V109 (`enabled="false"` & default) & §V110. Mutação antes de aceitar|V20,V109,V110,V15
+T298|x|`verify-hunters-hunted.ps1` — `V14 cboGame offers 5 games` → 3; `cboGame` entra na exceção de §V15; checks NOVOS §V109 (`enabled="false"` & default) & §V110. Mutação antes de aceitar|V20,V109,V110,V15
 T299|x|`localization.lang` + mapa `PT` de `HH.6` — + `Vampire`=`Vampiro` & `Mage`=`Mago`; − chaves [pt]+[en] dos 4 nomes longos. `Hunters Hunted`=`Caçadores Caçados` JÁ ∃|V10,V22,V28
-T300|~|`HuntersHunted.lfm` — `onNodeReady` normaliza `game` fora da lista p/ `Hunters Hunted` (form RAIZ, ⊥ `HH.6`)|V110,V95
+T300|x|`HuntersHunted.lfm` — `onNodeReady` normaliza `game` fora da lista p/ `Hunters Hunted` (form RAIZ, ⊥ `HH.6`)|V110,V95
 
 ## §B BUGS
 

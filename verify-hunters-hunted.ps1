@@ -1002,6 +1002,17 @@ if ($hh6 -match 'recursiveFindControls\s*\(\s*self') { Fail "V21 traversal still
 elseif ($hh6 -notmatch 'getParent\(\)') { Fail "V21 no getParent() walk found - traversal cannot reach the sheet root" }
 else { Pass "V21 traversal walks up to the sheet root" }
 
+# ---- V109 + V110: the Game box is locked, defaulted, and kept inside its roster ---
+# Information, not a choice. Which makes what it holds the sheet's problem: a value outside
+# the three - one of the four longer names this sheet used to offer, or nothing at all - would
+# sit in a box nobody can open, so the load puts it back inside the roster.
+$gameNode = @((Doc (Join-Path $dir "HH.6.lfm")).SelectNodes("//comboBox[@name='cboGame']"))
+if ($gameNode.Count -ne 1) { Fail "V109 expected exactly one cboGame, found $($gameNode.Count)" }
+elseif ($gameNode[0].GetAttribute("enabled") -ne 'false') { Fail "V109 cboGame is editable - the game is information, not a choice" }
+elseif ($hh6 -notmatch 'dataLink field="game" defaultValue="Hunters Hunted"') { Fail "V109 cboGame has no default - a new sheet would show an empty locked box" }
+elseif ($root -notmatch 'sheet\.game = "Hunters Hunted"') { Fail "V110 nothing normalises a game outside the roster - the locked box would hold a value nobody can clear" }
+else { Pass "V109/V110 cboGame is locked, defaulted and normalised on load" }
+
 # ---- V22: translation is non-destructive and the PT map matches localization.lang
 if ($hh6 -notmatch 'originalText\[') { Fail "V22 no snapshot table - translating in place cannot be undone" }
 else { Pass "V22 original English is snapshotted before translating" }
