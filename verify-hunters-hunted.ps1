@@ -1675,6 +1675,22 @@ elseif ($visFn -notmatch 'tabMagika\s*=\s*sheet\.stShowMagika == true') { Fail "
 elseif ($visFn -notmatch 'tabStoryteller\s*=\s*isStoryteller\(\)') { Fail "V89 tabStoryteller is not wired to the gate" }
 else { Pass "V89 four tabs switch on their own flag, Numina defaulting visible" }
 
+# ---- V92: a hidden tab is an EMPTY tab -------------------------------------------
+# Whether the host takes the tab button away with the tab is still an open question (SPEC
+# R31). Hiding the contents as well is what makes the answer stop mattering.
+if (-not $visFn) { } # already reported above
+elseif ($visFn -notmatch 'local kids = tab:getChildren\(\)') { Fail "V92 applyTabVisibility never reaches the tab's contents - a host that keeps the tab button would still show them (SPEC R31)" }
+elseif ($visFn -notmatch 'kids\[j\]\.visible = want') { Fail "V92 the tab's contents do not follow the tab's own visibility" }
+else { Pass "V92 hiding a tab hides what is inside it" }
+
+# ---- V93: nobody is left standing on a tab that was just denied -------------------
+# There is no event for the active tab and no trustworthy reading of tabIndex (SPEC R33), so
+# the renderer watches for a tab going from shown to hidden and moves everyone to Main.
+if (-not $visFn) { } # already reported above
+elseif ($visFn -notmatch 'if tab\.visible and not want then') { Fail "V93 applyTabVisibility does not notice a tab going from shown to hidden - it cannot tell when to move the player" }
+elseif ($visFn -notmatch 'tabMain:activate\(\)') { Fail "V93 nothing hands the player back to Main when a tab is denied" }
+else { Pass "V93 a denied tab hands the player back to Main" }
+
 # The four switched tabs must exist under those names, and every tab needs one (SPEC I1b).
 $tabNodes = (Doc $rootPath).SelectNodes("//tab")
 $tabNames = @($tabNodes | ForEach-Object { $_.GetAttribute("name") })
@@ -1714,6 +1730,28 @@ else {
     if ($missFlags) { foreach ($f in $missFlags) { Fail "V89 HH.10 has no widget for $f" } }
     else { Pass "V89 all four storyteller flags are owned by HH.10" }
 }
+
+# ---- V94: a switched tab is AUTHORED in the state its flag defaults to ------------
+# The 27th round authored all of them visible and left the hiding to the renderer, so a fresh
+# sheet with every checkbox unticked opened with three tabs the player was never meant to see
+# (SPEC B26). The static state fails closed too now.
+$hiddenByDefault = @('tabDisciplines', 'tabMagika', 'tabStoryteller')
+$authoredOpen = @($tabNodes | Where-Object { $hiddenByDefault -contains $_.GetAttribute("name") -and $_.GetAttribute("visible") -ne 'false' })
+$numinaTab = @($tabNodes | Where-Object { $_.GetAttribute("name") -eq 'tabNumina' })
+if ($authoredOpen) { foreach ($t in $authoredOpen) { Fail "V94 tab $($t.GetAttribute('name')) is authored visible - a sheet whose Lua never ran would show it (SPEC B26)" } }
+elseif ($numinaTab.Count -ne 1) { Fail "V94 expected exactly one tabNumina, found $($numinaTab.Count)" }
+elseif ($numinaTab[0].GetAttribute("visible") -eq 'false') { Fail "V94 tabNumina is authored hidden - its flag defaults ON (SPEC V89)" }
+else { Pass "V94 three tabs authored hidden, Numina authored visible" }
+
+# ---- V95: the switch is triggered from the ROOT, not from the tab it hides ---------
+# HH.10 owns the checkboxes but is itself one of the four tabs being switched. A tab cannot be
+# trusted to run the code that hides its neighbours - that is exactly how B26 happened.
+$rootReady = [regex]::Match($root, '<event name="onNodeReady">(.*?)</event>', 'Singleline')
+if ($root -notmatch "dataLink fields=""\{'stShowNumina', 'stShowDisciplines', 'stShowMagika'\}""") { Fail "V95 the root form does not watch the three show-a-tab flags" }
+elseif (-not $rootReady.Success) { Fail "V95 the root form has no onNodeReady - nothing would apply tab visibility on load" }
+elseif ($rootReady.Groups[1].Value -notmatch 'applyTabVisibility\(') { Fail "V95 the root onNodeReady does not apply tab visibility" }
+elseif ($stTxt -match 'applyTabVisibility') { Fail "V95 HH.10 still triggers the switch - it is one of the tabs being hidden (SPEC B26)" }
+else { Pass "V95 the tab switch is triggered from the root form" }
 
 # ---- V83 + V84: the log is derived, not stored -----------------------------------
 # Four columns written from ONE row list, so a line reads across, and none of them owns a
@@ -1811,10 +1849,13 @@ elseif ($rowsFn -notmatch 'unlocked\[grp\.kind\] = true;') { Fail "V87 a kind is
 else { Pass "V87 21 is charged once per new kind of numina" }
 
 # ---- V88: the affinity path is the FIRST hedge row, always ------------------------
-# Marked in the XML, priced in the Lua, and the two have to name the same row.
+# Marked in the XML, priced in the Lua, and the two have to name the same row. Bold is the
+# whole of the mark since the 28th round - the star that stood in the box's left margin came
+# off at the user's request, and only the footnote under TRUE FAITH keeps one.
 $numDoc = Join-Path $dir "HH.7.lfm"
 $numTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($numDoc))
-if ($numTxt -notmatch '<HedgePicker field="numina_1" style="bold"/>') { Fail "V88 the first hedge row is not marked bold" }
+if ($numTxt -match '<label[^>]*text="\*"') { Fail "V88 the star label is back on the hedge box - bold is the whole mark now (28th round)" }
+elseif ($numTxt -notmatch '<HedgePicker field="numina_1" style="bold"/>') { Fail "V88 the first hedge row is not marked bold" }
 elseif ($numTxt -match '<HedgePicker field="numina_(?!1")\d+" style="bold"/>') { Fail "V88 a row other than the first is marked as the affinity path" }
 elseif ($numTxt -notmatch 'text="\* The first path is the Affinity Path"') { Fail "V88 the note explaining the affinity path is missing (SPEC C, after True Faith)" }
 elseif ($rowsFn -notmatch 'ctx\.affinity = \(field == "numina_1"\)') { Fail "V88 the cheaper rate is not tied to numina_1" }
