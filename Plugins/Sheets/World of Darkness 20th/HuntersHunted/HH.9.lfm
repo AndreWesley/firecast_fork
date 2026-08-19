@@ -38,8 +38,20 @@
 			-- that second walk is half of what made the sheet freeze (SPEC B34). Left out, the
 			-- list is built here, and a nil coming back out of xpLedgerRows still means what it
 			-- always did: no initial character has been saved yet.
-			function renderXPLedger(form, rows)
+			-- The five controls this routine writes. Found by name from whatever node it is
+			-- handed (SPEC V143), so the same call works from this tab's own events and from
+			-- the root, which is how a purchase made on ANY tab reaches the log without the
+			-- tab having registered itself first (SPEC V133, B39).
+			local XP_LOG = { dynXpType = true, dynXpTrait = true, dynXpLevel = true, dynXpCost = true, xpLogBox = true };
+
+			function renderXPLedger(node, rows)
 				if sheet == nil then return; end;
+
+				local form = xpFind(node, XP_LOG, {});
+
+				-- The tab is not on the sheet yet: nothing to draw on, and nothing to raise
+				-- about it either.
+				if form.dynXpType == nil then return; end;
 
 				local lang = sheet.language or "en";
 
@@ -204,19 +216,17 @@
 		renderXPBoxes(self);
 		renderXPLedger(self);
 
-		-- How xpClick reaches these four columns. A tab form cannot be addressed from the root
-		-- script by name (SPEC R.9 / B.9), so the tab hands itself over once and the guard
-		-- redraws through it on every purchase (SPEC V125).
+		-- Nothing is handed over any more (SPEC V133, 44th round). This tab used to register
+		-- itself twice - once for the log and once for the three numbers - and a purchase
+		-- reached neither until it had (SPEC B39). xpClick now walks from the sheet root and
+		-- finds both by name, so a tab that was never opened costs nothing and a tab that is
+		-- open is drawn whether or not it ever announced itself.
 		--
-		-- This replaces the whole-node ndb.newObserver that used to sit here (SPEC V121). That
-		-- observer fired on EVERY attribute written - including the hundreds the sheet writes
-		-- to itself while loading - and it did not pass through xpQuiet, so the shield that
-		-- fixed B30 never covered it. On a sheet with a saved baseline that was a full walk of
-		-- the ledger per write, and the sheet froze on open (SPEC B34).
-		xpLedgerForm = self;
-
-		-- Same handover for the three numbers above the log (SPEC V133, SPEC B37): buying a
-		-- numina happens on a tab that owns no box at all.
-		registerXPBoxes('progress', self);
+		-- What DID have to leave for good is the whole-node ndb.newObserver that sat here
+		-- until the 39th round (SPEC V121): it fired on EVERY attribute written - including
+		-- the hundreds the sheet writes to itself while loading - and it did not pass through
+		-- xpQuiet, so the shield that fixed B30 never covered it. On a sheet with a saved
+		-- baseline that was a full walk of the ledger per write, and the sheet froze on open
+		-- (SPEC B34).
 	</event>
 </form>

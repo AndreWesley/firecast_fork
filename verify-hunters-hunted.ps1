@@ -1868,12 +1868,14 @@ else {
 # same purchases, and the two would part company the first time a click was missed.
 $guardFn = LuaFn $root 'xpClick'
 $boxesFn = LuaFn $root 'renderXPBoxes'
+$paintFn = LuaFn $root 'xpPaint'
 $writes = @([regex]::Matches($root, 'setField\("xpTotal",')).Count
 if (-not $guardFn) { Fail "V100 xpClick not found on the root form" }
 elseif (-not $boxesFn) { Fail "V100 renderXPBoxes not found on the root form" }
+elseif (-not $paintFn) { Fail "V100 xpPaint not found on the root form" }
 elseif ($guardFn -match 'setField\("xpTotal",') { Fail "V100 the guard writes experience - a purchase would be counted twice (SPEC V83)" }
 elseif ($writes -ne 2) { Fail "V100 xpTotal is written in $writes places - it may only be seeded once and set by the player (SPEC I11)" }
-elseif ($boxesFn -notmatch 'xpSpent\(\)') { Fail "V100 the boxes do not read the log - Spent would be a stored number" }
+elseif ($paintFn -notmatch 'xpSpent\(\)') { Fail "V100 the boxes do not read the log - Spent would be a stored number" }
 else { Pass "V100 experience is derived: one number saved, two worked out" }
 
 # ---- V107: a write the sheet makes to ITSELF is not a click -----------------------
@@ -1883,9 +1885,8 @@ else { Pass "V100 experience is derived: one number saved, two worked out" }
 # click from a write (SPEC R37), so the flag is how the sheet says which is which.
 $eraFn = LuaFn $hh6 'renderAbilityLabels'
 if ($root -notmatch 'xpQuiet = false;') { Fail "V107 xpQuiet is not declared on the root form" }
-elseif ((LuaFn $root 'renderAllXPBoxes') -notmatch 'if sheet == nil or xpQuiet then return') { Fail "V107 the all-forms box renderer runs on the sheet's own writes - the load would walk the ledger per dot (SPEC B30)" }
-elseif ($boxesFn -notmatch 'if sheet == nil or xpQuiet then return') { Fail "V107 the box renderer runs on the sheet's own writes (SPEC B30)" }
-elseif ($boxesFn -notmatch 'xpQuiet = true') { Fail "V107 seeding xpTotal is not done quietly - the links watching it call straight back in" }
+elseif ($boxesFn -notmatch 'if xpQuiet then return') { Fail "V107 the dataLink entry runs on the sheet's own writes (SPEC B30) - that entry is the one the flag exists for" }
+elseif ($paintFn -notmatch 'xpQuiet = true') { Fail "V107 seeding xpTotal is not done quietly - the links watching it call straight back in" }
 elseif (-not $eraFn) { Fail "V107 renderAbilityLabels not found on HH.6" }
 elseif ($eraFn -notmatch 'xpQuiet = true') { Fail "V107 the era renderer rebinds its dots with the guard live - the sheet freezes on load (SPEC B30)" }
 elseif ($eraFn -notmatch 'xpQuiet = false') { Fail "V107 the era renderer never lowers xpQuiet - the guard would stay asleep for good" }
@@ -1895,7 +1896,7 @@ else { Pass "V107 the sheet's own writes are quiet, and the flag comes back down
 # The dot used to call the guard AND the box renderer, and each walked the whole ledger.
 $dotsDouble = @($dots | Where-Object { $_.GetAttribute("onChange") -match 'renderXPBoxes' })
 if ($dotsDouble) { Fail "V108 $($dotsDouble.Count) dot(s) call renderXPBoxes beside the guard - each click would walk the ledger twice" }
-elseif ($guardFn -notmatch 'renderAllXPBoxes\(spent\)') { Fail "V108 the guard does not hand its count to the boxes - they would build the same one again" }
+elseif ($guardFn -notmatch 'renderAllXPBoxes\(form, spent\)') { Fail "V108 the guard does not hand its count to the boxes - they would build the same one again" }
 else { Pass "V108 a click walks the ledger once" }
 
 # ---- V101: the guard sleeps until the character is frozen -------------------------
@@ -1920,7 +1921,7 @@ foreach ($f in $files) {
     }
 }
 if ($xpOwning) { foreach ($b in $xpOwning) { Fail "V102 '$b' owns a field - a derived number would be stored beside the log that produces it" } }
-elseif ($boxesFn -notmatch 'sheet\.experience') { Fail "V102 nothing seeds xpTotal from the old balance - every sheet would come back to zero (SPEC I11)" }
+elseif ($paintFn -notmatch 'sheet\.experience') { Fail "V102 nothing seeds xpTotal from the old balance - every sheet would come back to zero (SPEC I11)" }
 else { Pass "V102 the four experience boxes own no field, and the old balance seeds the total" }
 
 # ---- V91: xpLog is gone, and stays gone ------------------------------------------
@@ -2098,11 +2099,13 @@ if ($obsUsers) { foreach ($o in $obsUsers) { Fail "V121 $($o.Name) hangs a redra
 else { Pass "V121 no whole-node observer - redraws come from the click, a named dataLink or onShow" }
 
 # The replacement path must actually be wired, or the log simply stops following purchases.
+# Since the 44th round that path carries no registration: the click hands the log the sheet
+# ROOT and the renderer finds its own columns from there (SPEC V133/V143, B39).
 $rootTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HuntersHunted.lfm")))
 $ledgerTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.9.lfm")))
-if ($ledgerTxt -notmatch 'xpLedgerForm = self;') { Fail "V121 HH.9 never hands its form to the root - xpGuard has nothing to redraw through" }
-elseif ($rootTxt -notmatch 'renderXPLedger\(xpLedgerForm, rows\)') { Fail "V121 the root form never redraws the log through xpLedgerForm" }
-else { Pass "V121 the Progress tab hands itself over and the guard redraws through it" }
+if ($rootTxt -notmatch 'renderXPLedger\(tabRootOf\(from\), rows\)') { Fail "V121 the click never redraws the log from the sheet root - a purchase would leave it stale" }
+elseif ($rootTxt -notmatch 'xpLedgerRefresh\(form, rows\);') { Fail "V121 xpClick does not redraw the log after an accepted click" }
+else { Pass "V121 the click redraws the log from the sheet root, with no handover in between" }
 
 # ---- V122: a renderer writes a field only when the value actually changes -----------
 # Writing back a value that is already there still wakes every dataLink on that field, and
@@ -2171,11 +2174,11 @@ else {
     $walks = @([regex]::Matches($g, 'xpLedgerRows\(\)')).Count
     if ($walks -gt 2) { Fail "V125 xpClick walks the ledger $walks times - one for the click, at most one more to read back a refused move" }
     elseif ($g -notmatch 'local spent = xpSum\(rows\);') { Fail "V125 xpClick does not total the rows it already built" }
-    elseif ($g -notmatch 'renderAllXPBoxes\(spent\);') { Fail "V125 xpClick makes the boxes walk the ledger again" }
-    elseif ($g -notmatch 'xpLedgerRefresh\(rows\);') { Fail "V125 xpClick does not hand its rows to the log" }
+    elseif ($g -notmatch 'renderAllXPBoxes\(form, spent\);') { Fail "V125 xpClick makes the boxes walk the ledger again" }
+    elseif ($g -notmatch 'xpLedgerRefresh\(form, rows\);') { Fail "V125 xpClick does not hand its rows to the log" }
     else { Pass "V125 one walk per accepted click, shared by the boxes and the log" }
 }
-if ($ledgerTxt -notmatch 'function renderXPLedger\(form, rows\)') { Fail "V125 renderXPLedger does not accept rows - it always walks the ledger itself" }
+if ($ledgerTxt -notmatch 'function renderXPLedger\(node, rows\)') { Fail "V125 renderXPLedger does not accept rows - it always walks the ledger itself" }
 elseif ($ledgerTxt -notmatch 'if rows == nil then rows = xpLedgerRows\(\); end;') { Fail "V125 renderXPLedger cannot build its own rows when called without them" }
 else { Pass "V125 renderXPLedger takes the rows when the caller has them" }
 
@@ -2258,7 +2261,7 @@ else {
 # clamping would write xpTotal = Spent, and one mistyped minus sign would cost the player
 # every point they had earned.
 $setFn = LuaFn $rootTxt 'xpSetCurrent'
-$boxFn = LuaFn $rootTxt 'renderXPBoxes'
+$boxFn = LuaFn $rootTxt 'xpPaint'
 if (-not $setFn) { Fail "V131 xpSetCurrent not found on the root form" }
 elseif ($setFn -notmatch 'if n < 0 then') { Fail "V131 xpSetCurrent takes any number it is handed - a typed -5 leaves the character owing (SPEC B35)" }
 else {
@@ -2270,33 +2273,87 @@ else {
     elseif (@([regex]::Matches($setFn, 'setField\("xpTotal"')).Count -ne 1) { Fail "V131 xpSetCurrent writes xpTotal more than once - V100 counts two writes in the file" }
     else { Pass "V131 a balance below zero is refused, not clamped, and says so" }
 }
-if (-not $boxFn) { Fail "V131 renderXPBoxes not found on the root form" }
+if (-not $boxFn) { Fail "V131 xpPaint not found on the root form" }
 elseif ($boxFn -notmatch 'setField\("xpTotal", math\.max\(0,') { Fail "V131 the migration seed has no floor - an old sheet holding a negative experience value is born owing (SPEC I11)" }
 else { Pass "V131 the one-shot migration cannot seed a negative balance" }
 
-# ---- V133: a click repaints every box, not just the ones on its own tab ---------------
-# The Numina tab has twenty guarded dots and no experience box at all, so painting only the
-# clicked dot's form left the balance untouched on every numina purchase (SPEC B37). The log
-# was made global in the 39th round; the boxes were the half left behind.
+# ---- V133: a click repaints from the sheet ROOT, with nothing registered -------------
+# Buying a dot never writes xpTotal (V100), so no dataLink wakes up and this call is the only
+# thing that moves a number after a purchase. It used to reach the other tabs through a
+# registry filled at onNodeReady - a promise nobody could see being kept, and silent when it
+# was not (SPEC B39). Walking from the root needs no promise: what is on the sheet is found.
 $boxAllFn = LuaFn $rootTxt 'renderAllXPBoxes'
-if ($rootTxt -notmatch 'xpBoxForms = \{\};') { Fail "V133 xpBoxForms is not declared on the root form" }
-elseif ($rootTxt -notmatch 'function registerXPBoxes\(') { Fail "V133 nothing registers the forms that carry the boxes" }
+$registry = @($files | Where-Object { (CodeOf $_.FullName) -match 'xpBoxForms|registerXPBoxes|xpLedgerForm' })
+if ($registry) { foreach ($r in $registry) { Fail "V133 $($r.Name) still hands a form to a registry - a tab that never opened would leave the numbers stale (SPEC B39)" } }
 elseif (-not $boxAllFn) { Fail "V133 renderAllXPBoxes not found on the root form" }
-elseif ($boxAllFn -notmatch 'spent = spent or xpSpent\(\);') { Fail "V133 renderAllXPBoxes would walk the ledger once per form (SPEC V108)" }
-elseif ($boxAllFn -notmatch 'pairs\(xpBoxForms\)') { Fail "V133 renderAllXPBoxes does not paint every registered form" }
-elseif ($guardFn.Success -and $guardFn.Groups[1].Value -match 'renderXPBoxes\(form') { Fail "V133 the guard still paints only the form the dot lives on - a numina purchase would move no number (SPEC B37)" }
-else { Pass "V133 every click repaints every registered box form, off one walk" }
+elseif ($boxAllFn -notmatch 'tabRootOf\(from\)') { Fail "V133 the click's repaint does not climb to the sheet root - only the clicked tab would follow" }
+elseif ($guardFn -notmatch 'renderAllXPBoxes\(form') { Fail "V133 xpClick does not repaint from the form that was clicked" }
+elseif ($guardFn -match 'renderXPBoxes\(form') { Fail "V133 the guard paints only the form the dot lives on - a numina purchase would move no number (SPEC B37)" }
+elseif ((LuaFn $rootTxt 'xpSetCurrent') -notmatch 'renderAllXPBoxes\(form\)') { Fail "V133 a typed balance never repaints - the box would keep the number that was refused (SPEC V131)" }
+elseif ((LuaFn $rootTxt 'xpSetCurrent') -match 'renderXPBoxes\(') { Fail "V133 a typed balance repaints one tab only - the balance is drawn twice and the other copy would sit on the old number (SPEC I11)" }
+else { Pass "V133 a click and a typed balance both repaint from the sheet root, with nothing registered" }
 
+# Both tabs that carry boxes must still be reachable BY NAME from a walk: the names are what
+# the painter matches on, so a rename here is what would quietly stop the repaint.
 $boxFiles = @()
 foreach ($bf in $files) {
     if ($bf.Name -eq 'HuntersHunted.lfm') { continue }
     $bd = Doc $bf.FullName
     if (@($bd.SelectNodes("//edit[starts-with(@name,'edtTotalXP') or starts-with(@name,'edtSpentXP') or starts-with(@name,'edtCurrentXP')]")).Count -gt 0) { $boxFiles += $bf }
 }
-$unregistered = @($boxFiles | Where-Object { (CodeOf $_.FullName) -notmatch 'registerXPBoxes\(' })
+$boxNames = @()
+foreach ($bf in $boxFiles) {
+    foreach ($n in (Doc $bf.FullName).SelectNodes("//edit[starts-with(@name,'edtTotalXP') or starts-with(@name,'edtSpentXP') or starts-with(@name,'edtCurrentXP')]")) { $boxNames += $n.GetAttribute("name") }
+}
+$unpainted = @($boxNames | Where-Object { $paintFn -notmatch [regex]::Escape($_) })
 if ($boxFiles.Count -lt 2) { Fail "V133 expected two tabs carrying experience boxes, found $($boxFiles.Count)" }
-elseif ($unregistered) { foreach ($ur in $unregistered) { Fail "V133 $($ur.Name) carries experience boxes but never registers - a purchase on another tab would leave them stale (SPEC B37)" } }
-else { Pass "V133 both tabs with experience boxes hand themselves over ($(($boxFiles | ForEach-Object { $_.Name }) -join ', '))" }
+elseif ($unpainted) { foreach ($u in $unpainted) { Fail "V133 box '$u' is on the sheet but the painter never names it - it would never follow a purchase" } }
+else { Pass "V133 all $($boxNames.Count) boxes across $($boxFiles.Count) tabs are named by the painter" }
+
+# ---- V142: a click's repaint is never silenced -----------------------------------------
+# xpQuiet exists so the sheet's OWN writes do not drag a repaint along (V107). A player's
+# click is not one of those, and a flag left stuck true would otherwise mute every number on
+# the sheet for the rest of the session with nothing on screen to say so (SPEC B39).
+if (-not $paintFn) { Fail "V142 xpPaint not found on the root form" }
+elseif ($paintFn -match 'xpQuiet then return') { Fail "V142 the painting core stands down on xpQuiet - a stuck flag would mute the sheet (SPEC B39)" }
+elseif ($boxAllFn -match 'xpQuiet') { Fail "V142 the click's repaint asks xpQuiet - a click is not a batch of the sheet's own writes" }
+elseif ($boxesFn -notmatch 'if xpQuiet then return') { Fail "V142 the dataLink entry does not stand down - the load would repaint per write (SPEC V107/B30)" }
+else { Pass "V142 the click paints unconditionally, and only the dataLink entry stands down" }
+
+# ---- V143: one way to find a control by name -------------------------------------------
+# form.<name> does not cross an <import> (SPEC B9), which is the whole reason a registry
+# existed. One walker serves the boxes and the log; a second one would be a second answer to
+# the same question, and the two would drift.
+$finders = @([regex]::Matches($rootTxt, 'function xpFind\('))
+$ledgerUsesFind = ((CodeOf (Join-Path $dir "HH.9.lfm")) -match 'xpFind\(node, XP_LOG')
+if ($finders.Count -ne 1) { Fail "V143 xpFind is declared $($finders.Count) times on the root form - exactly one walker" }
+elseif ($rootTxt -notmatch 'xpFind\(node, XP_BOXES, \{\}\)') { Fail "V143 the box painter does not find its controls through xpFind" }
+elseif (-not $ledgerUsesFind) { Fail "V143 HH.9 does not find its columns through xpFind - a second way to reach a control by name" }
+elseif ((CodeOf (Join-Path $dir "HH.9.lfm")) -match 'function renderXPLedger\(node, rows\)[\s\S]{0,400}?form\.dynXpType\.width' -and (CodeOf (Join-Path $dir "HH.9.lfm")) -notmatch 'local form = xpFind') { Fail "V143 HH.9 still addresses its columns off a form handed to it" }
+else { Pass "V143 one walker finds every control by name, for both the boxes and the log" }
+
+# ---- V144: the storyteller's notes are the storyteller's ------------------------------
+# Three boxes that look exactly like the player's, on fields of their own. Pointing one of
+# them at anotacoes* would put what the storyteller wrote inside the player's Notes tab -
+# two owners of one text (V1), and the tab being hidden would stop hiding anything.
+$stDocPath = Join-Path $dir "HH.10.lfm"
+$hh5Path   = Join-Path $dir "HH.5.lfm"
+$stNoteFields = @((Doc $stDocPath).SelectNodes("//textEditor[@field]") | ForEach-Object { $_.GetAttribute("field") })
+$stElsewhere  = @()
+foreach ($nf in $files) {
+    if ($nf.Name -eq 'HH.10.lfm') { continue }
+    foreach ($n in (Doc $nf.FullName).SelectNodes("//*[@field]")) {
+        if ($n.GetAttribute("field") -match '^stNotes\d$') { $stElsewhere += "$($nf.Name)/$($n.GetAttribute('field'))" }
+    }
+}
+$playerNotes = @((Doc $hh5Path).SelectNodes("//textEditor[@field]") | ForEach-Object { $_.GetAttribute("field") })
+$crossed = @($stNoteFields | Where-Object { $playerNotes -contains $_ })
+if ($stNoteFields.Count -ne 3) { Fail "V144 HH.10 carries $($stNoteFields.Count) note box(es) - the storyteller was given three" }
+elseif (@($stNoteFields | Sort-Object -Unique).Count -ne 3) { Fail "V144 two of the storyteller's note boxes share a field - one of them would never be read back" }
+elseif ($crossed) { foreach ($c in $crossed) { Fail "V144 HH.10 note box owns '$c', which is the player's on HH.5 - the storyteller's text would show up in the player's Notes tab (SPEC V1)" } }
+elseif (@($stNoteFields | Where-Object { $_ -notmatch '^stNotes\d$' })) { Fail "V144 a storyteller note box is on a field outside stNotes1..3 - the contract in I3 names those three" }
+elseif ($stElsewhere) { foreach ($s in $stElsewhere) { Fail "V144 $s - a storyteller field is owned outside HH.10, where a player can reach it" } }
+else { Pass "V144 the storyteller's three notes own their own fields, and no tab shares them ($($stNoteFields -join ', '))" }
 
 # ---- V135: priced first, marked only if it is allowed --------------------------------
 # The dot cannot flip itself any more (V134), so the order inside xpClick IS the rule: work

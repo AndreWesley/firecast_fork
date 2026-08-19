@@ -62,7 +62,33 @@
 		<!-- Theme backdrop, same arrangement as every other tab (SPEC T158, V56, V57). -->
 		<image name="themePaper10" align="client" style="stretch" hitTest="false" visible="false"/>
 
-		<layout left="0" top="0" width="520" height="240">
+		<!-- The storyteller's own notes (SPEC I8e, V144). Three boxes, laid out exactly like
+		     the player's on HH.5 - same size, same gutter, same title - but on their own
+		     fields: one `field` in two tabs would be two owners of one text (SPEC V1), and
+		     what the storyteller wrote would turn up inside the player's Notes tab.
+
+		     The tab is hidden by ROLE (SPEC V79), and this text lives in the sheet's NDB like
+		     `baseline` does. That is visibility, not secrecy. -->
+		<layout left="0" top="0" width="400" height="580">
+			<rectangle left="0" top="0" width="400" height="580" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="400" height="20" text="Notes" horzTextAlign="center"/>
+			<textEditor left="10" top="25" width="380" height="540" field="stNotes1"/>
+		</layout>
+
+		<layout left="410" top="0" width="400" height="580">
+			<rectangle left="0" top="0" width="400" height="580" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="400" height="20" text="Notes" horzTextAlign="center"/>
+			<textEditor left="10" top="25" width="380" height="540" field="stNotes2"/>
+		</layout>
+
+		<layout left="820" top="0" width="400" height="580">
+			<rectangle left="0" top="0" width="400" height="580" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="400" height="20" text="Notes" horzTextAlign="center"/>
+			<textEditor left="10" top="25" width="380" height="540" field="stNotes3"/>
+		</layout>
+
+		<!-- 590 = the notes' 580 plus the same 10 the three of them keep between each other. -->
+		<layout left="0" top="590" width="520" height="240">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="520" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 

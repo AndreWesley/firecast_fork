@@ -781,14 +781,42 @@
 				return rows;
 			end;
 
+			-- Controls by name, in ONE pass (SPEC V143). `form.<name>` does not cross an
+			-- <import>, which is why the boxes and the log used to hand their forms to a
+			-- registry (SPEC V133, 41st round) - and a registry filled at onNodeReady is a
+			-- promise nobody could see being kept: a tab never opened never registered, and
+			-- the failure was silent (SPEC B39). Walking from the root DOES cross the import;
+			-- it is how the era rebind reaches HH.1's dots from HH.6 and how the translation
+			-- reaches all eleven tabs (SPEC V21 / B9).
+			function xpFind(node, names, out)
+				local children = node:getChildren();
+
+				if children == nil then return out; end;
+
+				for i = 1, #children, 1 do
+					local c  = children[i];
+					local nm = c:getName();
+
+					if nm ~= nil and names[nm] == true then out[nm] = c; end;
+
+					xpFind(c, names, out);
+				end;
+
+				return out;
+			end;
+
 			-- The three numbers, wherever they are drawn (SPEC I11): the Progress tab has all
 			-- three, the Main tab has the balance only. One is stored and two are worked out,
 			-- which is what stops any of them from disagreeing with the log (SPEC V100).
-			--
-			-- Named per tab because control names are unique across the sheet's files (V59),
-			-- so each box is written only where it exists.
-			function renderXPBoxes(form, spent)
-				if sheet == nil or xpQuiet then return; end;
+			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true };
+
+			-- The painting itself. No xpQuiet here (SPEC V142): the flag exists to keep the
+			-- sheet's OWN writes from dragging a repaint along (SPEC V107), and a flag left
+			-- stuck true would otherwise mute every number on the sheet for the rest of the
+			-- session with nothing to show for it (SPEC B39). The callers that need silencing
+			-- ask for it themselves, just below.
+			local function xpPaint(node, spent)
+				if sheet == nil then return; end;
 
 				-- The guard has usually just worked this out; walking the ledger a second time
 				-- for the same click is the other half of what froze the sheet (SPEC V108).
@@ -808,38 +836,31 @@
 				end;
 
 				local total = tonumber(sheet.xpTotal) or 0;
+				local box   = xpFind(node, XP_BOXES, {});
 
-				if form.edtTotalXP       ~= nil then form.edtTotalXP.text       = tostring(total); end;
-				if form.edtSpentXP       ~= nil then form.edtSpentXP.text       = tostring(spent); end;
-				if form.edtCurrentXP     ~= nil then form.edtCurrentXP.text     = tostring(total - spent); end;
-				if form.edtCurrentXPMain ~= nil then form.edtCurrentXPMain.text = tostring(total - spent); end;
+				if box.edtTotalXP       ~= nil then box.edtTotalXP.text       = tostring(total); end;
+				if box.edtSpentXP       ~= nil then box.edtSpentXP.text       = tostring(spent); end;
+				if box.edtCurrentXP     ~= nil then box.edtCurrentXP.text     = tostring(total - spent); end;
+				if box.edtCurrentXPMain ~= nil then box.edtCurrentXPMain.text = tostring(total - spent); end;
 			end;
 
-			-- Which forms carry experience boxes, so a click on ANY tab can repaint them all
-			-- (SPEC V133). The Numina tab has twenty guarded dots and no box of its own, so
-			-- painting only the form the clicked dot lives on left the balance untouched on
-			-- every numina purchase (SPEC B37). The log went global in the 39th round and the
-			-- boxes were left behind; this is the other half.
-			--
-			-- Keyed rather than appended: reopening the sheet builds new form objects, and a
-			-- list would go on holding the dead ones.
-			xpBoxForms = {};
+			-- What a dataLink, an onShow or an onNodeReady calls: it paints its own tab, and
+			-- it stands down while the sheet is writing to itself (SPEC V107).
+			function renderXPBoxes(form, spent)
+				if xpQuiet then return; end;
 
-			function registerXPBoxes(key, form)
-				xpBoxForms[key] = form;
+				xpPaint(form, spent);
 			end;
 
-			-- Still one walk of the ledger per click (SPEC V108/V125): the caller normally has
-			-- the total already, and when it does not this works it out ONCE instead of once
-			-- per form.
-			function renderAllXPBoxes(spent)
-				if sheet == nil or xpQuiet then return; end;
+			-- What a CLICK calls (SPEC V133/V142). Buying a dot never writes xpTotal - Spent
+			-- and Current are worked out (SPEC V100) - so no dataLink wakes up and this is the
+			-- only thing that moves a number on the screen. It climbs to the sheet root, so
+			-- every box on every loaded tab follows a purchase made on any of them, and it
+			-- never asks xpQuiet: a player's click is not a batch of the sheet's own writes.
+			function renderAllXPBoxes(from, spent)
+				if from == nil then return; end;
 
-				spent = spent or xpSpent();
-
-				for _, form in pairs(xpBoxForms) do
-					renderXPBoxes(form, spent);
-				end;
+				xpPaint(tabRootOf(from), spent);
 			end;
 
 			-- Both refusals the sheet can hand the player - no balance left for a dot, and a
@@ -870,26 +891,31 @@
 				-- sign would cost the player every point they had earned. Nothing is written,
 				-- so the box simply comes back to the balance that is stored.
 				if n < 0 then
-					renderXPBoxes(form);
+					renderAllXPBoxes(form);
 					xpWarn("Experience cannot go below zero");
 					return;
 				end;
 
 				setField("xpTotal", n + xpSpent());
 
-				renderXPBoxes(form);
+				-- The whole sheet, not the tab that was typed on: the balance is drawn twice
+				-- (SPEC I11) and one of the two would otherwise sit on the old number until
+				-- something else happened to redraw it (SPEC V133).
+				renderAllXPBoxes(form);
 			end;
 
-			-- The experience log lives on the Progress tab and only that form can address its
-			-- four columns, so the tab hands itself over on load (SPEC V125). Called with the
-			-- rows the caller already built - walking the ledger again for the same click is
-			-- the waste this round exists to remove (SPEC B34).
+			-- The experience log lives on the Progress tab, which owns the four columns and
+			-- their widths. It is handed the sheet ROOT rather than its own form (SPEC V133):
+			-- the renderer finds its columns by name from whatever node it is given, so the
+			-- log follows a purchase made on any tab without anyone having registered
+			-- anything (SPEC B39). Called with the rows the caller already built - walking the
+			-- ledger again for the same click is the waste the 39th round removed (SPEC B34).
 			--
-			-- Both guards matter: the tab may not have loaded yet, and on a sheet where it
-			-- never does the log simply is not redrawn - nothing here raises.
-			local function xpLedgerRefresh(rows)
-				if xpLedgerForm ~= nil and renderXPLedger ~= nil then
-					renderXPLedger(xpLedgerForm, rows);
+			-- The guard stays: on a sheet where the Progress tab never loaded there is no
+			-- renderer and nothing to draw on - nothing here raises.
+			local function xpLedgerRefresh(from, rows)
+				if from ~= nil and renderXPLedger ~= nil then
+					renderXPLedger(tabRootOf(from), rows);
 				end;
 			end;
 
@@ -954,7 +980,7 @@
 				-- the storyteller freezes the sheet (SPEC V101).
 				if base == nil then
 					markDot(form, field, want);
-					renderAllXPBoxes();
+					renderAllXPBoxes(form);
 					return;
 				end;
 
@@ -1019,8 +1045,8 @@
 					setField("xpFree", (string.gsub(sheet.xpFree, "|" .. trait .. "#" .. level .. "|", "|")));
 				end;
 
-				renderAllXPBoxes(spent);
-				xpLedgerRefresh(rows);
+				renderAllXPBoxes(form, spent);
+				xpLedgerRefresh(form, rows);
 			end;
 
 
