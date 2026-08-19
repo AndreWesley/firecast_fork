@@ -189,7 +189,7 @@ else { Pass "V36 all $($mirrors.Count) declared mirrors really are mirrored" }
 # player by having no widget at all, so the usual "some input owns it" test reads it as a dead
 # link (SPEC B25). The list is closed and declared in SPEC I3 - a name has to be put here on
 # purpose, which is not the same as letting any unowned field through.
-$luaOwned = @('baseline', 'xpTotal')
+$luaOwned = @('baseline', 'xpTotal', 'xpFree')
 foreach ($l in $linkFields) {
     if ($allFields.ContainsKey($l.Field)) { Pass "V8 dataLink '$($l.Field)' observes a real field" }
     elseif ($luaOwned -contains $l.Field) { Pass "V8 dataLink '$($l.Field)' observes a declared Lua-owned field (SPEC I3)" }
@@ -237,6 +237,13 @@ if (-not $bgDecl.Success) { Fail "V145 BACKGROUND_ROWS is not declared on the ro
 1..$bgRows | ForEach-Object { $expect["background_$_"] = 5 }
 # Powers tab: 10 hedge rows + 10 psychic rows, 5 dots each (SPEC V5 after T56/T57)
 1..10 | ForEach-Object { $expect["numina_$_"] = 5; $expect["psychic_$_"] = 5 }
+# Specialities are ONE dot per row (SPEC V147), and the row count is read off the sheet's own
+# declaration for the same reason BACKGROUND_ROWS is: a tenth row drawn in the XML and walked
+# by neither loop would be a dot that costs nothing and never reaches the log.
+$spDecl = [regex]::Match($bgRootTxt, '(?m)^\s*SPECIALITY_ROWS = (\d+);')
+$spRows = if ($spDecl.Success) { [int]$spDecl.Groups[1].Value } else { 0 }
+if (-not $spDecl.Success) { Fail "V147 SPECIALITY_ROWS is not declared on the root form - the row count would be a literal in every loop" }
+elseif ($spRows -ge 1) { 1..$spRows | ForEach-Object { $expect["speciality_$_"] = 1 } }
 
 foreach ($k in ($expect.Keys | Sort-Object)) {
     $got = DotCount $k
@@ -247,7 +254,7 @@ if ($wb -eq 10) { Pass "V5 willpower = 10 boxes" } else { Fail "V5 willpower = $
 
 # Each numina table is 8 pickers + 2 free rows (SPEC T56/T57); backgrounds are however many
 # BACKGROUND_ROWS says (9 until the 46th round moved the box to the Traits tab, 20 after).
-foreach ($grp in @(@('numina',10), @('psychic',10), @('background',$bgRows), @('health',10))) {
+foreach ($grp in @(@('numina',10), @('psychic',10), @('background',$bgRows), @('health',10), @('speciality',$spRows))) {
     $n = ($allFields.Keys | Where-Object { $_ -match "^$($grp[0])_\d+$" }).Count
     if ($n -eq $grp[1]) { Pass "V5 $($grp[0]) = $n rows" } else { Fail "V5 $($grp[0]) = $n rows, expected $($grp[1])" }
 }
@@ -1750,7 +1757,7 @@ else {
 
     # No field of the ledger's own may be edited from here, and the flags must be real fields.
     $stFields = @((Doc $stDoc).SelectNodes("//*[@field]") | ForEach-Object { $_.GetAttribute("field") })
-    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines', 'stFreeBuy')
+    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines', 'stFreeBuy', 'stSpec3XP', 'stSpec4XP')
     $missFlags = @($wantFlags | Where-Object { $stFields -notcontains $_ })
     if ($missFlags) { foreach ($f in $missFlags) { Fail "V89 HH.10 has no widget for $f" } }
     else { Pass "V89 all $($wantFlags.Count) storyteller flags are owned by HH.10" }
@@ -2099,6 +2106,12 @@ else { Pass "V112 the Save button dims in the same breath it locks" }
 #
 # A comment is allowed to name the thing it explains, so XML comments and Lua line comments
 # come out before the grep - otherwise documenting the removal would fail the check.
+# Lua comment lines, dropped. Every check that reads the inside of a function is looking for
+# CODE, and a comment that quotes code - "written flat rather than nested under `if want
+# then`" - would otherwise answer for it: two checks went red on exactly that, reading a
+# sentence about the balance branch as the balance branch (SPEC V20, the B7 failure mode).
+function NoComments($t) { [regex]::Replace($t, '(?m)^\s*--.*$', '') }
+
 function CodeOf($path) {
     $t = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($path))
     $t = [regex]::Replace($t, '(?s)<!--.*?-->', '')
@@ -2179,7 +2192,7 @@ else { Pass "V125 totalling is split from walking" }
 $guardFn = [regex]::Match($rootTxt, 'function xpClick\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
 if (-not $guardFn.Success) { Fail "V125 xpClick not found on the root form" }
 else {
-    $g = $guardFn.Groups[1].Value
+    $g = NoComments $guardFn.Groups[1].Value
     # The accepted path walks once. The refused path reads the restored state a second time -
     # the rows in hand describe the state being turned down, so they cannot be reused.
     $walks = @([regex]::Matches($g, 'xpLedgerRows\(\)')).Count
@@ -2239,11 +2252,17 @@ else { Pass "V128 the Magika keys are out of localization.lang" }
 $guardFn = [regex]::Match($rootTxt, 'function xpClick\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
 if (-not $guardFn.Success) { Fail "V129 xpClick not found on the root form" }
 else {
-    $g     = $guardFn.Groups[1].Value
+    $g     = NoComments $guardFn.Groups[1].Value
     $buy   = [regex]::Match($g, 'if want then(.*?)else', 'Singleline')
     $warns = @([regex]::Matches($g, 'xpWarn\("([^"]*)"\)'))
+    # Three refusals speak, and each one says its own reason: want of experience (this check),
+    # and the two a speciality row adds - no trait chosen, and the storyteller allowing none
+    # (SPEC V154/V156). What may NOT happen is a second voice inside the balance branch, or
+    # the sale refusal of V103 growing one.
+    $buyWarns = @([regex]::Matches($buy.Groups[1].Value, 'xpWarn\("([^"]*)"\)'))
     if (-not $buy.Success) { Fail "V129 xpClick has no purchase branch" }
-    elseif ($warns.Count -ne 1) { Fail "V129 xpClick raises $($warns.Count) pop-ups - exactly one refusal, the one for want of experience, may speak" }
+    elseif ($warns.Count -ne 4) { Fail "V129 xpClick raises $($warns.Count) pop-ups - four refusals speak: the balance, the empty trait, the closed door, and the gift that is not the player's to take off (SPEC V161)" }
+    elseif ($buyWarns.Count -ne 1) { Fail "V129 the balance branch raises $($buyWarns.Count) pop-ups - only the refusal for want of experience may speak there" }
     elseif ($buy.Groups[1].Value -notmatch 'xpWarn\(') { Fail "V129 the refusal for want of experience says nothing" }
     elseif ($buy.Groups[1].Value -match 'markDot\(') { Fail "V129 the refused purchase marks the dot anyway (SPEC V135)" }
     else { Pass "V129 only the balance refusal speaks, and it speaks over a sheet nothing was written to" }
@@ -2397,7 +2416,7 @@ $clickFn = [regex]::Match($rootTxt, 'function xpClick\(field, form\)(.*?)\n\t\t\
 $markFn  = LuaFn $rootTxt 'markDot'
 if (-not $clickFn.Success) { Fail "V135 xpClick not found on the root form" }
 else {
-    $c     = $clickFn.Groups[1].Value
+    $c     = NoComments $clickFn.Groups[1].Value
     $iPr   = $c.IndexOf('xpLedgerRows(field, want, key)')
     $iMark = $c.LastIndexOf('markDot(form, field, want)')
     $marks = @([regex]::Matches($c, 'markDot\('))
@@ -2456,10 +2475,18 @@ else { Pass "V137 Free dots is read once, at the click, and by nothing else" }
 # name (SPEC I3, V2).
 $burnedUse  = @($files | Where-Object { (CodeOf $_.FullName) -match 'stFreeDots|freeDots' })
 $freeWrites = @([regex]::Matches($rootTxt, 'setField\("xpFree"'))
-$freeElse   = @($files | Where-Object { $_.Name -ne 'HuntersHunted.lfm' -and (CodeOf $_.FullName) -match 'xpFree' })
+# A tab may WATCH the stamps - HH.1 locks its rows off them (SPEC V164) - but naming the
+# field in any other way outside the root form means a second owner of the gift.
+#
+# Only the `field=` attribute is dropped, not the whole tag: a handler written inside that
+# same tag (onChange="setField('xpFree', ...)") is exactly the write this forbids, and
+# stripping the element wholesale would have hidden it.
+$freeElse   = @($files | Where-Object { $_.Name -ne 'HuntersHunted.lfm' -and ([regex]::Replace((CodeOf $_.FullName), '<dataLink field="xpFree"', '<dataLink')) -match 'xpFree' })
 if ($burnedUse) { Fail "V138 $(($burnedUse | ForEach-Object { $_.Name }) -join ', ') names a burned field (stFreeDots/freeDots) - an old sheet would resurrect stamps under a scheme nothing reads any more (SPEC I3)" }
 elseif ($freeElse) { Fail "V138 xpFree is touched outside the root form ($(($freeElse | ForEach-Object { $_.Name }) -join ', ')) - the stamp belongs to the click" }
-elseif ($freeWrites.Count -ne 2) { Fail "V138 xpFree is written in $($freeWrites.Count) place(s) - exactly two: the stamp a free purchase leaves, and the one a sale takes away" }
+elseif ($freeWrites.Count -ne 4) { Fail "V138 xpFree is written in $($freeWrites.Count) place(s) - exactly four: the stamp a free purchase leaves, the one a sale takes away, the gift given, and the gift revoked (SPEC V152/V159)" }
+elseif ((LuaFn $rootTxt 'grantSpeciality') -notmatch 'setField\("xpFree"') { Fail "V138 the gift leaves no stamp - the free line would be charged on the next render" }
+elseif ((LuaFn $rootTxt 'revokeSpeciality') -notmatch 'setField\("xpFree"') { Fail "V138 the revoked gift keeps its stamp - the row would stay locked with nothing in it (SPEC V159)" }
 elseif ($clickFn.Groups[1].Value -notmatch 'trait \.\. "#" \.\. \(level \+ 1\)') { Fail "V138 the stamp is not keyed off the rating the click REACHES (SPEC B31)" }
 elseif ($rowsSim -notmatch 'free\s+= \(sheet\.xpFree or ""\) \.\. "\|" \.\. \(clickFree or ""\) \.\. "\|"') { Fail "V138 the ledger never reads the stamps - every point would be priced as if the box had never been ticked" }
 else { Pass "V138 the stamp keeps names keyed by the rating reached, and no burned name is back" }
@@ -2475,8 +2502,8 @@ elseif ($riseFn -notmatch 'function pushRise\(rows, kind, name, from, to, ctx, f
 elseif ($riseFn -notmatch 'local cost = xpCost\(kind, lvl - 1, ctx\);') { Fail "V139 pushRise no longer prices the row through xpCost (SPEC V86)" }
 elseif ($riseFn -notmatch 'string\.find\(ctx\.free, "\|" \.\. field \.\. "#" \.\. lvl \.\. "\|", 1, true\)') { Fail "V139 pushRise does not look the row's level up in the stamps" }
 elseif ($riseFn.IndexOf('string.find(ctx.free') -lt $riseFn.IndexOf('local cost = xpCost(')) { Fail "V139 the discount lands before the price exists - it must zero a cost the table already worked out (SPEC V86)" }
-elseif ($riseCalls.Count -ne 9) { Fail "V139 $($riseCalls.Count) of the ledger's nine row groups hand pushRise their field - one that does not could never go free" }
-else { Pass "V139 all nine row groups carry their field, and a stamp zeroes a price xpCost worked out" }
+elseif ($riseCalls.Count -ne 10) { Fail "V139 $($riseCalls.Count) of the ledger's ten row groups hand pushRise their field - one that does not could never go free" }
+else { Pass "V139 all ten row groups carry their field, and a stamp zeroes a price xpCost worked out" }
 
 # ---- V140: the stamp goes down with the mark, never on a refusal ---------------------
 # Pricing writes nothing (V136), so the stamp reaches the sheet only after the rules have
@@ -2484,7 +2511,7 @@ else { Pass "V139 all nine row groups carry their field, and a stamp zeroes a pr
 # rather than passing it on the arithmetic: `spent` does not move, but a sheet the
 # storyteller has already put in the red - by charging for backgrounds after the fact -
 # would refuse a point that costs nothing (SPEC C, 40th round).
-$cc      = $clickFn.Groups[1].Value
+$cc      = NoComments $clickFn.Groups[1].Value
 $iStamp  = $cc.IndexOf('setField("xpFree"')
 $iMarkOk = $cc.LastIndexOf('markDot(form, field, want)')
 $buyBr   = [regex]::Match($cc, 'if want then(.*?)else', 'Singleline')
@@ -2502,6 +2529,294 @@ else { Pass "V140 the stamp goes down with the mark, and a free point never meet
 if ($cc -notmatch 'elseif not want and sheet\.xpFree ~= nil then') { Fail "V141 a sale never reaches the stamps - a sold point would come back free" }
 elseif ($cc -notmatch 'string\.gsub\(sheet\.xpFree, "\|" \.\. trait \.\. "#" \.\. level \.\. "\|", "\|"\)') { Fail "V141 the sale does not drop the stamp of the level it gave up" }
 else { Pass "V141 a sold point hands its stamp back" }
+
+# ---- V146: the speciality box fills the corner the 46th round emptied ----------------
+# 890..1210 x 510..810 is the slot BACKGROUNDS left when it moved to the Traits tab, and 810
+# is the line every other box on this tab already closes on - which is what "line the bottom
+# up with the others" meant. Nine rows at a pitch of 30 from 25: a tenth would want 295..320
+# inside a box 300 tall, and a full table says so with a pop-up instead (V153).
+$mainDoc = Doc (Join-Path $dir "HH.1.lfm")
+$specBox = @($mainDoc.SelectNodes("//layout[label/@text='SPECIALTIES']"))
+if ($specBox.Count -ne 1) { Fail "V146 HH.1 declares $($specBox.Count) SPECIALTIES boxes - the tab's map says exactly one" }
+else {
+    $sb = $specBox[0]
+    $sbL = [int]$sb.GetAttribute("left"); $sbT = [int]$sb.GetAttribute("top")
+    $sbW = [int]$sb.GetAttribute("width"); $sbH = [int]$sb.GetAttribute("height")
+    $sRows = @($sb.SelectNodes("layout[SpecialityRow]"))
+    $sTops = @($sRows | ForEach-Object { [int]$_.GetAttribute("top") } | Sort-Object)
+    $sPitchBad = 0
+    for ($i = 1; $i -lt $sTops.Count; $i++) { if (($sTops[$i] - $sTops[$i - 1]) -ne 30) { $sPitchBad++ } }
+    if ($sbL -ne 890 -or $sbT -ne 510 -or $sbW -ne 320 -or $sbH -ne 300) { Fail "V146 SPECIALTIES sits at $sbL,$sbT ${sbW}x${sbH} - SPEC I14 puts it at 890,510 320x300" }
+    elseif (($sbT + $sbH) -ne 810) { Fail "V146 SPECIALTIES closes at $($sbT + $sbH), not the 810 the rest of the tab lines up on" }
+    elseif ($sRows.Count -ne $spRows) { Fail "V146 SPECIALTIES draws $($sRows.Count) row(s) with SPECIALITY_ROWS at $spRows" }
+    elseif ($sTops[0] -ne 25) { Fail "V146 the first speciality row starts at $($sTops[0]), not under the title at 25" }
+    elseif ($sPitchBad -gt 0) { Fail "V146 $sPitchBad speciality row(s) break the pitch of 30 - the box would not hold $spRows of them" }
+    elseif (($sTops[-1] + 25) -gt $sbH) { Fail "V146 the last speciality row ends at $($sTops[-1] + 25), past a box $sbH tall" }
+    else { Pass "V146 SPECIALTIES fills 890..1210 x 510..810 with $($sRows.Count) rows" }
+}
+
+# ---- V147: three fields and one dot per row, counted in one place --------------------
+# Same shape as BACKGROUND_ROWS (V145): the XML draws the rows and two loops on the root form
+# walk them - one to let experience buy the row, one to price it for the log. A tenth row
+# added to the XML alone would be a speciality nothing charges for and nothing shows.
+$specXmlRows = @()
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//SpecialityRow[@num]")) { $specXmlRows += [int]$n.GetAttribute("num") }
+}
+$specMax     = if ($specXmlRows.Count -gt 0) { ($specXmlRows | Measure-Object -Maximum).Maximum } else { 0 }
+$specLoops   = @([regex]::Matches($rootTxt, 'for i = 1, SPECIALITY_ROWS, 1 do'))
+$specLiteral = @([regex]::Matches($rootTxt, 'for i = 1, \d+, 1 do[^\r\n]*speciality'))
+$specFldBad  = @()
+if ($spRows -ge 1) {
+    for ($i = 1; $i -le $spRows; $i++) {
+        foreach ($fld in @("speciality_$i", "specialityName_$i", "speciality_${i}_1")) {
+            if (-not $allFields.ContainsKey($fld)) { $specFldBad += "$fld is not owned by any widget" }
+            elseif ($allFields[$fld].Count -ne 1) { $specFldBad += "$fld has $($allFields[$fld].Count) owners (SPEC V1)" }
+        }
+    }
+}
+if ($spRows -lt 1) { Fail "V147 SPECIALITY_ROWS is not declared - the count would be a literal in every loop" }
+elseif ($specLoops.Count -lt 3) { Fail "V147 only $($specLoops.Count) loop(s) read SPECIALITY_ROWS - the three that walk the rows are declareTrait, the ledger and the grant looking for a free slot" }
+elseif ($specLiteral.Count -gt 0) { Fail "V147 a speciality loop still counts to a literal - the XML and the ledger would drift apart" }
+elseif ($specXmlRows.Count -ne $spRows) { Fail "V147 the XML draws $($specXmlRows.Count) speciality row(s) but SPECIALITY_ROWS says $spRows" }
+elseif ($specMax -ne $spRows) { Fail "V147 the speciality rows run up to num=$specMax with SPECIALITY_ROWS at $spRows - the loops walk 1..$spRows and would miss it" }
+elseif (@($specXmlRows | Sort-Object -Unique).Count -ne $spRows) { Fail "V147 two speciality rows carry the same num - they would share their fields (SPEC V1)" }
+elseif ($specFldBad.Count -gt 0) { foreach ($b in $specFldBad) { Fail "V147 $b" } }
+else { Pass "V147 $spRows speciality rows, three owned fields each, one declared count read by both loops" }
+
+# ---- V148: the trait picker is the two Lua tables, not a third copy of them ----------
+# The grant writes a canonical trait NAME into the combo (V152), so a name the picker does not
+# carry is a value the player would see as blank. Both directions are checked: an era ability
+# added to ABILITY_FIELD and not to the picker, and an item in the picker that names no trait,
+# are the same failure from either end (SPEC B23/B24).
+$attrBlk = [regex]::Match($rootTxt, 'local XP_ATTRS = \{(.*?)\};', 'Singleline')
+$abilBlk = [regex]::Match($rootTxt, 'ABILITY_FIELD = \{(.*?)\n\t\t\t\};', 'Singleline')
+$mainRaw =[System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.1.lfm")))
+$pickBlk = [regex]::Match($mainRaw, '<template name="SpecialityRow">(.*?)</template>', 'Singleline')
+if (-not $attrBlk.Success) { Fail "V148 XP_ATTRS not found on the root form" }
+elseif (-not $abilBlk.Success) { Fail "V148 ABILITY_FIELD not found on the root form" }
+elseif (-not $pickBlk.Success) { Fail "V148 the SpecialityRow template is not in HH.1" }
+else {
+    $luaNames = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+    foreach ($m in [regex]::Matches($attrBlk.Groups[1].Value, '\{"([^"]+)", "[^"]+"\}')) { [void]$luaNames.Add($m.Groups[1].Value) }
+    foreach ($m in [regex]::Matches($abilBlk.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"[^"]+"')) { [void]$luaNames.Add($m.Groups[1].Value) }
+
+    $itemsAttr = [regex]::Match($pickBlk.Groups[1].Value, 'items="\{([^}]*)\}"')
+    $valsAttr  = [regex]::Match($pickBlk.Groups[1].Value, 'values="\{([^}]*)\}"')
+    $pickItems = @([regex]::Matches($itemsAttr.Groups[1].Value, "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
+    $pickVals  = @([regex]::Matches($valsAttr.Groups[1].Value, "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
+    $pickSet   = @($pickItems | Where-Object { $_ -ne '' })
+
+    $missPick = @($luaNames | Where-Object { $pickSet -notcontains $_ })
+    $missLua  = @($pickSet | Where-Object { -not $luaNames.Contains($_) })
+    if (-not $itemsAttr.Success -or -not $valsAttr.Success) { Fail "V148 the trait picker declares no inline items/values (SPEC V18)" }
+    elseif ($pickItems.Count -ne $pickVals.Count) { Fail "V148 the trait picker shows $($pickItems.Count) items for $($pickVals.Count) values - one of them would save nothing" }
+    elseif ($missPick.Count -gt 0) { foreach ($m in $missPick) { Fail "V148 '$m' is a trait in Lua and not in the picker - a grant on it would write a value the combo cannot show" } }
+    elseif ($missLua.Count -gt 0) { foreach ($m in $missLua) { Fail "V148 '$m' is in the picker and names no trait - picking it would buy a speciality of nothing" } }
+    else { Pass "V148 the trait picker carries exactly the $($pickSet.Count) traits XP_ATTRS and ABILITY_FIELD name" }
+}
+
+# ---- V149: which trait gives a speciality, and at which rating ------------------------
+# SPEC_TRAIT is DERIVED from the same two tables the picker is checked against, so the fifty
+# names exist once. Only the five abilities the book hands a speciality to at the first dot
+# are named here - and naming them is also what stops them getting a second one at four.
+$specTblBlk = [regex]::Match($rootTxt, 'SPEC_TRAIT = \{\};(.*?)XP_TRAIT = \{\};', 'Singleline')
+if (-not $specTblBlk.Success) { Fail "V149 SPEC_TRAIT is not declared on the root form" }
+else {
+    $st = $specTblBlk.Groups[1].Value
+    $stQuoted = @([regex]::Matches($st, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+    $wantFive = @('academics', 'crafts', 'expression', 'performance', 'technology')
+    if ($st -notmatch 'for i = 1, #XP_ATTRS, 1 do SPEC_TRAIT') { Fail "V149 SPEC_TRAIT does not read the attributes off XP_ATTRS" }
+    elseif ($st -notmatch 'for name, field in pairs\(ABILITY_FIELD\) do SPEC_TRAIT') { Fail "V149 SPEC_TRAIT does not read the abilities off ABILITY_FIELD" }
+    elseif ($st -notmatch 'free = 4') { Fail "V149 nothing grants a speciality at four - that is the rule for every trait but five" }
+    elseif ($st -notmatch 'free = 1') { Fail "V149 nothing grants a speciality at one - the five abilities that do would get nothing" }
+    elseif (Compare-Object $stQuoted $wantFive) { Fail "V149 SPEC_TRAIT names [$($stQuoted -join ', ')] - it must name the five one-dot abilities and nothing else, or the fifty are typed out twice" }
+    else { Pass "V149 SPEC_TRAIT is derived from the two tables, with five abilities granting at one and the rest at four" }
+}
+
+# ---- V150 + V158: the gift moves with the click, both ways, and with nothing else -----
+# No observer, no sweep at load (V121). Two call sites, both inside xpClick - the character
+# being built and the click the rules allowed - and each of them asks ONE question, so the
+# rise and the fall cannot drift apart (SPEC V158).
+$grantFn      = LuaFn $rootTxt 'grantSpeciality'
+$revokeFn     = LuaFn $rootTxt 'revokeSpeciality'
+$movedFn      = LuaFn $rootTxt 'specialityMoved'
+$movedInClick = @([regex]::Matches($cc, 'specialityMoved\('))
+$specOutside  = @()
+foreach ($f in $files) {
+    if ($f.Name -eq 'HuntersHunted.lfm') { continue }
+    $raw = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f.FullName))
+    if ($raw -match 'grantSpeciality|revokeSpeciality|specialityMoved') { $specOutside += $f.Name }
+}
+$grantTotal  = @([regex]::Matches($rootTxt, 'grantSpeciality\('))
+$revokeTotal = @([regex]::Matches($rootTxt, 'revokeSpeciality\('))
+if (-not $grantFn) { Fail "V150 grantSpeciality not found on the root form" }
+elseif (-not $revokeFn) { Fail "V158 revokeSpeciality not found on the root form - a gift could never be lost" }
+elseif (-not $movedFn) { Fail "V158 specialityMoved not found - the two directions would each need their own call site" }
+elseif ($movedInClick.Count -ne 2) { Fail "V158 xpClick asks specialityMoved $($movedInClick.Count) time(s) - once while the character is being built, once on an accepted click" }
+elseif ($grantTotal.Count -ne 2) { Fail "V150 grantSpeciality is called from $($grantTotal.Count - 1) place(s) - only specialityMoved may reach it" }
+elseif ($revokeTotal.Count -ne 2) { Fail "V158 revokeSpeciality is called from $($revokeTotal.Count - 1) place(s) - only specialityMoved may reach it" }
+elseif ($movedFn -notmatch 'return grantSpeciality\(form, trait, level \+ 1\);') { Fail "V158 the rise does not ask for the level the click REACHES" }
+elseif ($movedFn -notmatch 'return revokeSpeciality\(form, trait, level - 1\);') { Fail "V158 the fall does not ask for the level the click LEAVES BEHIND" }
+elseif ($specOutside.Count -gt 0) { Fail "V150 the gift is moved by $($specOutside -join ', ') - a renderer or dataLink granting would re-grant on every load (SPEC V121)" }
+elseif ($grantFn -notmatch 'if t == nil or reached ~= t\.free then return false; end;') { Fail "V150 the grant does not test the rating the click REACHED - it would fire on every dot of the trait" }
+elseif ($revokeFn -notmatch 'if t == nil or reached >= t\.free then return false; end;') { Fail "V158 the revoke fires at the wrong side of the line - Expression grants at one, so selling from four to three must take nothing" }
+else { Pass "V150/V158 the gift is born on the click that reaches the rating and dies on the click that leaves it" }
+
+# ---- V151 + V160: one lookup, name AND stamp, serving the dedup and the revoke --------
+# A row only counts as the gift if it carries the stamp as well as the name: a speciality
+# the player PAID for on the same trait neither eats the free one nor is taken away with it.
+$isFreeFn  = LuaFn $rootTxt 'isFreeRow'
+$freeRowFn = LuaFn $rootTxt 'freeRowOf'
+$stampFinds = @([regex]::Matches($rootTxt, 'string\.find\(sheet\.xpFree'))
+if (-not $isFreeFn) { Fail "V160 isFreeRow not found - the stamp question would be asked three different ways" }
+elseif (-not $freeRowFn) { Fail "V160 freeRowOf not found - the dedup and the revoke would each look the row up their own way" }
+elseif ($stampFinds.Count -ne 1) { Fail "V160 the stamps are read directly in $($stampFinds.Count) places - isFreeRow is meant to be the only one" }
+elseif ($isFreeFn -notmatch '"\|" \.\. field \.\. "#1\|"') { Fail "V160 isFreeRow does not key off the row's own stamp" }
+elseif ($freeRowFn -notmatch 'sheet\["speciality_" \.\. i\] == name and isFreeRow\("speciality_" \.\. i\)') { Fail "V151 freeRowOf does not check name AND stamp together - a speciality the player PAID for would be taken for the gift" }
+elseif ($grantFn -notmatch 'if freeRowOf\(t\.name\) ~= nil then return false; end;') { Fail "V151 the grant does not ask whether the trait already has its gift" }
+elseif ($revokeFn -notmatch 'local slot = freeRowOf\(t\.name\);') { Fail "V151 the revoke does not find its row through the same lookup - it could take a paid speciality" }
+else { Pass "V151/V160 one lookup, name and stamp together, serving both the dedup and the revoke" }
+
+# ---- V152: name, mark and stamp in one step; the text stays the player's --------------
+# Exactly what a free purchase writes, so the line is priced at zero by the rule that prices
+# any stamped dot (V139) - there is no second cost table to disagree with it.
+$nameWrites = @()
+foreach ($f in $files) {
+    if ($f.Name -eq 'HuntersHunted.lfm') { continue }
+    $raw = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f.FullName))
+    if ($raw -match 'setField\("specialityName') { $nameWrites += $f.Name }
+}
+# The typed text has exactly ONE writer in the whole sheet, and it is the revoke taking the
+# row away (SPEC V163). Anything else writing it would be Lua typing for the player.
+$rootNameWrites = @([regex]::Matches($rootTxt, 'setField\("specialityName'))
+if (-not $grantFn) { Fail "V152 grantSpeciality not found on the root form" }
+elseif ($grantFn -notmatch 'setField\("speciality_" \.\. slot, t\.name\);') { Fail "V152 the grant never writes the trait into the row" }
+elseif ($grantFn -notmatch 'markDot\(form, "speciality_" \.\. slot \.\. "_1", true\);') { Fail "V152 the grant never lights the dot - with autoChange off nothing else will (SPEC V134)" }
+elseif ($grantFn -notmatch 'setField\("xpFree", stamps') { Fail "V152 the grant leaves no stamp - the free line would be charged on the next render (SPEC V139)" }
+elseif ($grantFn -match 'specialityName') { Fail "V163 the grant touches specialityName - what the specialty IS is the player's to type" }
+elseif ($nameWrites.Count -gt 0) { Fail "V163 $($nameWrites -join ', ') writes specialityName - only the revoke on the root form may (SPEC V159)" }
+elseif ($rootNameWrites.Count -ne 1) { Fail "V163 specialityName is written in $($rootNameWrites.Count) places - exactly one, the revoke clearing the row it takes away" }
+elseif ($revokeFn -notmatch 'setField\("specialityName_" \.\. slot, ""\);') { Fail "V163 the one writer is not the revoke - the text would be cleared by something that is not taking the row away" }
+else { Pass "V152/V163 the gift writes trait, mark and stamp and leaves the text alone; only the revoke clears it" }
+
+# ---- V153: a full table says so, and the dot that earned it stays bought --------------
+if (-not $grantFn) { Fail "V153 grantSpeciality not found on the root form" }
+else {
+    $iNoSlot = $grantFn.IndexOf('if slot == nil then')
+    $iWrite  = $grantFn.IndexOf('setField("speciality_" .. slot')
+    if ($iNoSlot -lt 0) { Fail "V153 the grant never handles a full table - it would write into a row that does not exist" }
+    elseif ($grantFn -notmatch 'xpWarn\("No free specialty slot"\);') { Fail "V153 a full table refuses in silence" }
+    elseif ($iWrite -lt $iNoSlot) { Fail "V153 the grant writes before it knows there is a slot" }
+    elseif ($grantFn -notmatch '(?s)if slot == nil then.*?return false;') { Fail "V153 the grant carries on after a full table - the caller would think it wrote something" }
+    else { Pass "V153 a full table warns and writes nothing; the dot that earned the gift stays bought" }
+}
+
+# ---- V154 + V156: bought only where the storyteller allowed, and never blind ----------
+# Two boxes, one choice, neither on by default. Four is read first so a sheet carrying both -
+# which the interface cannot produce (V155) - still has one price. Free dots does not open the
+# door: one flag says WHETHER, the other says HOW MUCH.
+$costSpecFn = LuaFn $rootTxt 'specCost'
+$xpCostFn   = LuaFn $rootTxt 'xpCost'
+$specGuard  = [regex]::Match($cc, 'if trait ~= nil and string\.match\(trait, "\^speciality_%d\+\$"\) ~= nil then(.*?)\n\t\t\t\tend;', 'Singleline')
+if (-not $costSpecFn) { Fail "V154 specCost not found on the root form" }
+elseif ($costSpecFn.IndexOf('stSpec4XP') -gt $costSpecFn.IndexOf('stSpec3XP')) { Fail "V154 specCost reads the 3-point box first - a sheet with both set would answer differently depending on who asked" }
+elseif ($costSpecFn -notmatch 'return 4;' -or $costSpecFn -notmatch 'return 3;') { Fail "V154 specCost does not price the two boxes at 4 and 3" }
+elseif ($costSpecFn -notmatch 'return 0;') { Fail "V154 specCost has no answer for both boxes off - that is the default state" }
+elseif ($xpCostFn -notmatch 'if kind == "Specialty" then return specCost\(\); end;') { Fail "V154 xpCost does not price a specialty through specCost - the log would show it free" }
+elseif (-not $specGuard.Success) { Fail "V154 xpClick has no speciality branch - a row could be bought with both boxes off" }
+elseif ($specGuard.Groups[1].Value -notmatch 'if want and base ~= nil and specCost\(\) == 0 then') { Fail "V154 the closed door is not asked about, or is asked before the character is frozen (SPEC V101)" }
+elseif ($specGuard.Groups[1].Value -notmatch 'xpWarn\("Specialties cannot be bought"\);') { Fail "V154 a closed door refuses in silence" }
+elseif ($specGuard.Groups[1].Value -notmatch 'xpWarn\("Choose a trait first"\);') { Fail "V156 a row with no trait refuses in silence" }
+elseif ($specGuard.Groups[1].Value -match 'markDot\(|setField\(') { Fail "V154/V156 the speciality branch writes before it has decided (SPEC V135)" }
+elseif ($cc.IndexOf('if trait ~= nil and string.match(trait, "^speciality_%d+$")') -gt $cc.LastIndexOf('markDot(form, field, want)')) { Fail "V154/V156 the speciality refusals come after the mark - there would be nothing to refuse" }
+else { Pass "V154/V156 a specialty is bought only where the storyteller allowed it, and every refusal says why" }
+
+# ---- V155: two prices are one choice ---------------------------------------------------
+# Ticking either clears the other, written from a dataLink and NOT from the checkbox's own
+# onChange: a write made inside a control's own dispatch does not survive it (SPEC B36/B38).
+# Both off is legal - it is the default, and it means specialities are not for sale.
+$stDoc     = Doc (Join-Path $dir "HH.10.lfm")
+$specBoxes = @($stDoc.SelectNodes("//checkBox[@field='stSpec3XP' or @field='stSpec4XP']"))
+$specLinks = @($stDoc.SelectNodes("//dataLink[@field='stSpec3XP' or @field='stSpec4XP']"))
+$specOnChg = @($specBoxes | Where-Object { $_.GetAttribute("onChange") -ne "" })
+if ($specBoxes.Count -ne 2) { Fail "V155 HH.10 carries $($specBoxes.Count) speciality price box(es) - the storyteller is given two" }
+elseif ($specOnChg.Count -gt 0) { Fail "V155 a speciality box clears its sibling from its own onChange - that write does not survive the dispatch (SPEC B36/B38)" }
+elseif ($specLinks.Count -ne 2) { Fail "V155 $($specLinks.Count) of the two flags are watched - the unwatched one could never clear the other" }
+elseif ($stTxt -notmatch 'if sheet ~= nil and sheet\.stSpec3XP == true then setField\("stSpec4XP", false\); end;') { Fail "V155 ticking the 3-point box does not clear the 4-point one" }
+elseif ($stTxt -notmatch 'if sheet ~= nil and sheet\.stSpec4XP == true then setField\("stSpec3XP", false\); end;') { Fail "V155 ticking the 4-point box does not clear the 3-point one" }
+else { Pass "V155 the two speciality prices clear each other, from a dataLink, and both off stays legal" }
+
+# ---- V157: selling a speciality does not take the typing with it ---------------------
+# The sale is the ordinary one: the dot goes out and the stamp with it (V141). The trait and
+# the text stay where the player left them - one click may not destroy what was typed.
+if ($cc -match 'setField\("speciality_"') { Fail "V157 xpClick writes a speciality row itself - the sale would clear the trait the player chose" }
+elseif ($cc -match 'setField\("specialityName') { Fail "V157 xpClick clears the speciality text - one click would destroy what was typed" }
+else { Pass "V157 a sold speciality keeps its trait and its text" }
+
+# ---- V159: the revoked gift takes the whole row with it ------------------------------
+# Trait, text, dot and stamp leave together, so the slot goes back to the pool. Half a row -
+# the trait still showing with the dot out - would hold a slot for ever and say nothing. The
+# typed text goes with it: that is what losing the gift costs.
+if (-not $revokeFn) { Fail "V159 revokeSpeciality not found on the root form" }
+elseif ($revokeFn -notmatch 'setField\("speciality_" \.\. slot, ""\);') { Fail "V159 the revoke leaves the trait in the row - the slot would never come back" }
+elseif ($revokeFn -notmatch 'setField\("specialityName_" \.\. slot, ""\);') { Fail "V159 the revoke leaves the text behind - the next gift would land under someone else's words" }
+elseif ($revokeFn -notmatch 'markDot\(form, "speciality_" \.\. slot \.\. "_1", false\);') { Fail "V159 the revoke leaves the dot lit - with autoChange off nothing else will put it out (SPEC V134)" }
+elseif ($revokeFn -notmatch 'string\.gsub\(sheet\.xpFree or "", "\|speciality_" \.\. slot \.\. "#1\|", "\|"\)') { Fail "V159 the revoke leaves the stamp - the empty row would stay locked (SPEC V161)" }
+elseif ($revokeFn -notmatch 'if slot == nil then return false; end;') { Fail "V159 the revoke carries on with no row to revoke" }
+else { Pass "V159 a revoked gift gives back trait, text, dot and stamp in one step" }
+
+# ---- V161 + V162: the gift is not the player's to change ------------------------------
+# Two widgets, two mechanisms, one truth each: a comboBox has no click hook, so `enabled` is
+# the only lock there (the same one cboGame carries, V109); the dot has an onClick, which is
+# what marks a dot editable (V111), so it is refused inside xpClick instead of being dimmed.
+#
+# The lock is settled BEFORE the baseline test: a gift is never the player's to take off,
+# not even while the character is being built.
+$renderSpecFn = LuaFn $rootTxt 'renderSpecialities'
+$iSpecGuard   = $cc.IndexOf('if trait ~= nil and string.match(trait, "^speciality_%d+$")')
+$iBaseTest    = $cc.IndexOf('if base == nil then')
+$specDotOpacity = @($mainDoc.SelectNodes("//template[@name='SpecialityRow']//imageCheckBox[@opacity]"))
+if (-not $renderSpecFn) { Fail "V161 renderSpecialities not found on the root form" }
+elseif ($iSpecGuard -lt 0) { Fail "V161 xpClick has no speciality branch - the gift could be taken off with a click" }
+elseif ($iSpecGuard -gt $iBaseTest) { Fail "V161 the lock is tested after the baseline check - the gift would be the player's to remove while the character is being built" }
+elseif ($specGuard.Groups[1].Value -notmatch 'if not want and isFreeRow\(trait\) then') { Fail "V161 selling a stamped row is not refused - the gift would go with one click" }
+elseif ($specGuard.Groups[1].Value -notmatch 'xpWarn\("Free specialties are lost only by lowering the trait"\);') { Fail "V161 the locked dot refuses in silence" }
+elseif ($specDotOpacity.Count -gt 0) { Fail "V161 the speciality dot carries opacity - a dot with an onClick is editable and must not read as read-only (SPEC V111)" }
+elseif ($renderSpecFn -notmatch 'c\.enabled = not locked;') { Fail "V161 the trait combo of a gift row is never switched off - it is the only lock a comboBox has" }
+elseif ($renderSpecFn -notmatch '(?s)c\.enabled = not locked;\s*\r?\n\s*c\.opacity = locked and 0\.55 or 1;') { Fail "V162 enabled and opacity are not written in the same breath - a row could look open while it is locked (SPEC V112)" }
+elseif ($renderSpecFn -match 'specialityName|markDot') { Fail "V163 the renderer touches the text or the dot - it paints the lock and nothing else" }
+else { Pass "V161/V162 a gift row locks its combo and refuses its dot, and the look is written with the state" }
+
+# ---- V164: the lock is painted from three places, and finds its controls the one way ---
+# The click covers the sheet in front of the player; onNodeReady covers the sheet being
+# opened; the xpFree link covers a grant made on ANOTHER client at the table. `form.<name>`
+# does not cross the <import>, which is why this walks with the one finder (V143).
+$mainRawTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.1.lfm")))
+$renderCalls = @([regex]::Matches($rootTxt, 'renderSpecialities\('))
+$specLinks2  = @($mainDoc.SelectNodes("//dataLink[@field='xpFree']"))
+if (-not $renderSpecFn) { Fail "V164 renderSpecialities not found on the root form" }
+elseif ($renderSpecFn -notmatch 'xpFind\(tabRootOf\(from\), names, found\);') { Fail "V164 the renderer does not use the one control finder - form.<name> does not cross the import (SPEC V143, B9)" }
+elseif ($renderCalls.Count -ne 3) { Fail "V164 renderSpecialities is called from $($renderCalls.Count - 1) place(s) on the root form - the two accepted click paths and no more" }
+elseif ($specLinks2.Count -ne 1) { Fail "V164 HH.1 carries $($specLinks2.Count) xpFree links - one, so a grant made on another client locks the row here too" }
+elseif ($mainRawTxt -notmatch '<dataLink field="xpFree" onChange="renderSpecialities\(self\);"/>') { Fail "V164 the xpFree link does not repaint the lock" }
+elseif ($mainRawTxt -notmatch '(?s)<event name="onNodeReady">.*?renderSpecialities\(self\);.*?</event>') { Fail "V164 opening the sheet does not paint the lock - a saved gift would show as editable" }
+else { Pass "V164 the lock is painted on the click, on open and on a remote grant, through the one finder" }
+
+# ---- V165: the rename is text, never a field ------------------------------------------
+# speciality_N and specialityName_N shipped in 4.6, so they stay whatever the label says
+# (SPEC V2) - the same lie `retainers` tells the GUIDES box. What must not survive is a key
+# nobody reads: the old English strings are gone from the .lang and from the PT map.
+$oldStrings = @('SPECIALITIES', 'Speciality', 'Specialities cannot be bought', 'No free speciality slot')
+$staleKeys  = @($oldStrings | Where-Object { $enK.Contains($_) -or $ptK.Contains($_) -or $embedded.ContainsKey($_) })
+$kindPush   = @([regex]::Matches($rootTxt, 'pushRise\(rows, "Specialty"'))
+$fieldsKept = (($allFields.Keys | Where-Object { $_ -match '^speciality_\d+$' }).Count -eq $spRows) -and
+              (($allFields.Keys | Where-Object { $_ -match '^specialityName_\d+$' }).Count -eq $spRows)
+if ($staleKeys.Count -gt 0) { foreach ($s in $staleKeys) { Fail "V165 '$s' is still keyed - the old spelling would sit in the .lang and the PT map with nothing reading it" } }
+elseif ($kindPush.Count -ne 1) { Fail "V165 the ledger does not push a 'Specialty' row - the kind and the label must be the same string (SPEC V12)" }
+elseif ($xpCostFn -notmatch 'kind == "Specialty"') { Fail "V165 xpCost prices a kind the ledger never produces - the two halves of the rename came apart" }
+elseif (-not $fieldsKept) { Fail "V165 the speciality FIELDS were renamed - they shipped in 4.6 and a saved sheet would lose them (SPEC V2)" }
+else { Pass "V165 the rename is text and keys only; the fields kept the name they shipped with" }
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.

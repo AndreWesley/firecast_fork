@@ -522,6 +522,21 @@
 			-- Discipline, Path, Sphere, Arete - are in the spec but deliberately NOT written:
 			-- the Disciplines tab is empty and Magika is gone altogether (SPEC V128), so no
 			-- field can produce that row and a cost nothing can reach is dead code.
+			-- What a speciality costs at this moment (SPEC I9/V154). The storyteller opens the
+			-- door with one of two boxes and neither is ticked by default, so a sheet where
+			-- nobody decided anything cannot buy one at all.
+			--
+			-- Four is read FIRST. The two boxes cannot both be on through the interface (SPEC
+			-- V155), but a sheet edited by hand could carry both, and a price that depends on
+			-- which question you ask is not a price.
+			local function specCost()
+				if sheet == nil then return 0; end;
+				if sheet.stSpec4XP == true then return 4; end;
+				if sheet.stSpec3XP == true then return 3; end;
+
+				return 0;
+			end;
+
 			local function xpCost(kind, from, ctx)
 				if kind == "Attribute" then return from * 4; end;
 				if kind == "Ability"   then if from == 0 then return 3; end; return from * 2; end;
@@ -538,6 +553,12 @@
 
 					return from * 3;
 				end;
+
+				-- One dot, so there is no rating to price off: a speciality costs whatever the
+				-- storyteller opened the door at (SPEC I9). A purchase never reaches here with
+				-- both boxes off (SPEC V154); a line bought while one was on reads zero after
+				-- it is turned off, which is what the background flag has always done.
+				if kind == "Specialty" then return specCost(); end;
 
 				if kind == "Numina" then
 					if from == 0 then
@@ -612,6 +633,31 @@
 			-- charges for and nothing shows in the log (SPEC I3, I9).
 			BACKGROUND_ROWS = 20;
 
+			-- How many speciality rows the box on the Main tab draws (SPEC V147). Same reason
+			-- as BACKGROUND_ROWS: both the loop that lets experience buy them and the loop that
+			-- prices them for the log read this, so a tenth row added to the XML alone would be
+			-- a dot nothing charges for and nothing shows.
+			SPECIALITY_ROWS = 9;
+
+			-- Which traits hand out a free speciality, and at which rating (SPEC I14/V149).
+			-- DERIVED from the two tables that already name every attribute and every ability,
+			-- never typed out again: the picker on HH.1 offers exactly these fifty names, and
+			-- the gate compares the two sides rather than trusting them to stay in step
+			-- (SPEC V148, the failure B23/B24 were made of).
+			--
+			-- Custom ability rows are deliberately absent. They are not in the picker, so a
+			-- grant on one would write a value the combo has no item for (SPEC V13).
+			SPEC_TRAIT = {};
+
+			for i = 1, #XP_ATTRS, 1 do SPEC_TRAIT[XP_ATTRS[i][2]] = { name = XP_ATTRS[i][1], free = 4 }; end;
+			for name, field in pairs(ABILITY_FIELD) do SPEC_TRAIT[field] = { name = name, free = 4 }; end;
+
+			-- The five that come with a speciality at the FIRST dot - and get nothing at the
+			-- fourth, which is the whole point of listing them (the user's second request).
+			local SPEC_FREE_AT_ONE = { "crafts", "expression", "performance", "academics", "technology" };
+
+			for i = 1, #SPEC_FREE_AT_ONE, 1 do SPEC_TRAIT[SPEC_FREE_AT_ONE[i]].free = 1; end;
+
 			-- Field -> how to read that trait's rating, for every trait experience can buy
 			-- (SPEC I12). Built from the SAME lists the ledger walks, so a trait cannot be in
 			-- one and missing from the other (SPEC V86): the guard refuses moves on exactly
@@ -638,6 +684,10 @@
 			declareTrait("willpower", 1, 10, 0);
 
 			for i = 1, BACKGROUND_ROWS, 1 do declareTrait("background_" .. i, 1, 5, 0); end;
+
+			-- One dot per row, so first and last are both 1 (SPEC V147). The row is a trait like
+			-- any other from here on: the same click path prices it, refuses it and sells it.
+			for i = 1, SPECIALITY_ROWS, 1 do declareTrait("speciality_" .. i, 1, 1, 0); end;
 
 			for g = 1, #XP_NUMINA, 1 do
 				for i = 1, XP_NUMINA[g].count, 1 do declareTrait(XP_NUMINA[g].base .. "_" .. i, 1, 5, 0); end;
@@ -782,6 +832,18 @@
 					ctx.newType  = (ff == 0) and not unlocked.faith;
 
 					pushRise(rows, "Numina", "True Faith", ff, ft, ctx, "faith");
+				end;
+
+				-- Specialities close the order (SPEC I10). The Trait column carries the TRAIT
+				-- the row belongs to, not the text the player typed into it: that column is
+				-- translated (SPEC V70) and free text is not - the storyteller reads what was
+				-- written on the sheet itself.
+				for i = 1, SPECIALITY_ROWS, 1 do
+					local field = "speciality_" .. i;
+
+					pushRise(rows, "Specialty", slotName(field),
+						traitLevel(base, field, 1, 1, 0),
+						liveLevel(field, 1, 1, 0), ctx, field);
 				end;
 
 				simTrait, simField, simValue = nil, nil, nil;
@@ -960,6 +1022,140 @@
 				if dot ~= nil then dot.checked = v; end;
 			end;
 
+			-- The free speciality (SPEC I14). A trait reaching four - or one, for the five
+			-- abilities the book hands a speciality to straight away - fills the next empty row
+			-- with that trait's name, lights its dot and stamps it free. The text box is left
+			-- alone: what the speciality IS is the player's to write (SPEC V152).
+			--
+			-- It hangs off the click that REACHES the rating and nowhere else (SPEC V150): no
+			-- observer, no sweep at load. A sheet that already stood at four before this version
+			-- is given nothing, because nothing recorded what was granted before the stamp
+			-- existed to record it.
+			--
+			-- Returns whether it wrote anything, so the caller knows its ledger rows are stale.
+			-- Is THIS row a gift? One question, one line, and the primitive under all three
+			-- places that ask about the stamp: the lock, the dedup and the revoke (SPEC V160).
+			function isFreeRow(field)
+				return string.find(sheet.xpFree or "", "|" .. field .. "#1|", 1, true) ~= nil;
+			end;
+
+			-- Where is the gift for this trait? A row only counts as the gift if it carries the
+			-- stamp as well as the name (SPEC V151/V160): a speciality the player PAID for on
+			-- the same trait neither uses the free one up nor gets taken away with it.
+			local function freeRowOf(name)
+				for i = 1, SPECIALITY_ROWS, 1 do
+					if sheet["speciality_" .. i] == name and isFreeRow("speciality_" .. i) then return i; end;
+				end;
+
+				return nil;
+			end;
+
+			local function grantSpeciality(form, trait, reached)
+				local t = SPEC_TRAIT[trait];
+
+				if t == nil or reached ~= t.free then return false; end;
+				if freeRowOf(t.name) ~= nil then return false; end;
+
+				local stamps = sheet.xpFree or "";
+				local slot   = nil;
+
+				for i = 1, SPECIALITY_ROWS, 1 do
+					local v = sheet["speciality_" .. i];
+
+					if slot == nil and (v == nil or v == "") then slot = i; end;
+				end;
+
+				-- The gift fails on its own (SPEC V153): the dot that earned it stays bought,
+				-- because the player asked for that one and got it.
+				if slot == nil then
+					xpWarn("No free specialty slot");
+					return false;
+				end;
+
+				-- Name, mark and stamp in one step - exactly what a free purchase writes
+				-- (SPEC V152). The line is then priced at zero by the rule that prices any
+				-- stamped dot (SPEC V139), so no second cost table exists to disagree with it.
+				setField("speciality_" .. slot, t.name);
+				markDot(form, "speciality_" .. slot .. "_1", true);
+				setField("xpFree", stamps .. "|speciality_" .. slot .. "#1|");
+
+				return true;
+			end;
+
+			-- The mirror of the grant (SPEC V158): the gift exists exactly while the trait
+			-- stands at the rating that gave it. Expression hands one over at the first dot, so
+			-- selling from four down to one takes nothing away and selling the LAST point does;
+			-- Medicine hands one over at the fourth, so the first sale takes it.
+			--
+			-- The whole row goes back to the pool - trait, text, dot and stamp together (SPEC
+			-- V159). Half a row, with the trait still showing and the dot out, would hold a slot
+			-- for ever and say nothing. The typed text goes with it: that is what losing the
+			-- gift costs.
+			local function revokeSpeciality(form, trait, reached)
+				local t = SPEC_TRAIT[trait];
+
+				if t == nil or reached >= t.free then return false; end;
+
+				local slot = freeRowOf(t.name);
+
+				if slot == nil then return false; end;
+
+				setField("speciality_" .. slot, "");
+				setField("specialityName_" .. slot, "");
+				markDot(form, "speciality_" .. slot .. "_1", false);
+				setField("xpFree", (string.gsub(sheet.xpFree or "", "|speciality_" .. slot .. "#1|", "|")));
+
+				return true;
+			end;
+
+			-- The gift, both ways, from the one rating the click lands on (SPEC V158): buying
+			-- into the rating that grants hands one over, selling out of it takes it back. Both
+			-- accepted paths through xpClick ask this and nothing else, so the two directions
+			-- cannot drift apart.
+			--
+			-- Says whether the sheet was written to, which is what tells the caller its ledger
+			-- rows are stale and the box needs repainting.
+			local function specialityMoved(form, trait, want, level)
+				if want then return grantSpeciality(form, trait, level + 1); end;
+
+				return revokeSpeciality(form, trait, level - 1);
+			end;
+
+			-- A gift is not the player's to change (SPEC V161): the trait combo of a stamped row
+			-- is switched off, so the only way to lose the speciality is to lower the trait that
+			-- handed it over. The dot is refused inside xpClick instead - it carries an onClick,
+			-- which is what tells the sheet a dot is editable (SPEC V111), so it must not be
+			-- dimmed. The typed text stays the player's on every row (SPEC V163).
+			--
+			-- enabled and opacity are written in the same breath, so a row cannot look locked
+			-- while it is open, or the other way round (SPEC V162, the same rule the Save button
+			-- follows on HH.10).
+			--
+			-- Controls are found with the one walker (SPEC V143/V164): this runs on the root
+			-- form, and `form.<name>` does not cross the <import> into HH.1.
+			function renderSpecialities(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = {};
+
+				for i = 1, SPECIALITY_ROWS, 1 do names["cboSpeciality" .. i] = true; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				for i = 1, SPECIALITY_ROWS, 1 do
+					local c = found["cboSpeciality" .. i];
+
+					if c ~= nil then
+						local locked = isFreeRow("speciality_" .. i);
+
+						c.enabled = not locked;
+						c.opacity = locked and 0.55 or 1;
+					end;
+				end;
+			end;
+
 			-- Every dot that costs experience calls this when it is CLICKED (SPEC I13/V99).
 			-- The dot is autoChange="false" (SPEC V134), so nothing has happened yet: the mark
 			-- is this function's to make, and it is made only if the rules allow it.
@@ -984,25 +1180,59 @@
 				local want = not (sheet[field] == true);
 				local base = baselineOf();
 
-				-- Nothing is priced while the character is being built: the rule starts when
-				-- the storyteller freezes the sheet (SPEC V101).
-				if base == nil then
-					markDot(form, field, want);
-					renderAllXPBoxes(form);
-					return;
-				end;
-
 				local trait = string.match(field, "^(.+)_%d+$");
 				local t     = trait ~= nil and XP_TRAIT[trait] or nil;
-
-				-- Willpower's spent boxes (willpower_c1..c10) and anything else that is not a
-				-- rating cost nothing, so they simply happen.
-				if t == nil then markDot(form, field, want); return; end;
 
 				-- The rating the trait stands at right now. The click moves it by one, either
 				-- way, so this is both the level a purchase REACHES and the level a sale leaves
 				-- behind (SPEC V138/V141).
-				local level = traitLevel(sheet, trait, t.first, t.last, t.fixed);
+				local level = (t ~= nil) and traitLevel(sheet, trait, t.first, t.last, t.fixed) or 0;
+
+				-- The speciality rows answer to rules of their own, and they are settled before
+				-- anything else because one of them holds while the character is still being
+				-- built (SPEC V161): a gift is never the player's to take off. The storyteller's
+				-- door is the exception - it only means anything once the sheet is frozen, so it
+				-- waits for the baseline (SPEC V101).
+				--
+				-- Every refusal here speaks. A refusal with no reason on screen is the complaint
+				-- the 40th round was opened to answer (SPEC V129/V130).
+				if trait ~= nil and string.match(trait, "^speciality_%d+$") ~= nil then
+					if not want and isFreeRow(trait) then
+						xpWarn("Free specialties are lost only by lowering the trait");
+						return;
+					end;
+
+					if want and (sheet[trait] == nil or sheet[trait] == "") then
+						xpWarn("Choose a trait first");
+						return;
+					end;
+
+					-- Written flat rather than nested under a purchase block: the balance branch
+					-- further down opens the same way, and two of them read as one.
+					if want and base ~= nil and specCost() == 0 then
+						xpWarn("Specialties cannot be bought");
+						return;
+					end;
+				end;
+
+				-- Nothing is priced while the character is being built: the rule starts when
+				-- the storyteller freezes the sheet (SPEC V101).
+				--
+				-- The free speciality moves here as well, both ways: it is not a price, it is
+				-- what the book hands out at that rating, and a character built to four before
+				-- the sheet was frozen earned it just the same (SPEC V150/V158).
+				if base == nil then
+					markDot(form, field, want);
+
+					if t ~= nil and specialityMoved(form, trait, want, level) then renderSpecialities(form); end;
+
+					renderAllXPBoxes(form);
+					return;
+				end;
+
+				-- Willpower's spent boxes (willpower_c1..c10) and anything else that is not a
+				-- rating cost nothing, so they simply happen.
+				if t == nil then markDot(form, field, want); return; end;
 
 				-- SPEC V137: `Free dots` is read HERE, at the click, and in no other place on
 				-- the sheet. That is what makes "free only if the box was ticked at the moment
@@ -1051,6 +1281,17 @@
 					setField("xpFree", (sheet.xpFree or "") .. "|" .. key .. "|");
 				elseif not want and sheet.xpFree ~= nil then
 					setField("xpFree", (string.gsub(sheet.xpFree, "|" .. trait .. "#" .. level .. "|", "|")));
+				end;
+
+				-- The gift, if this click earned one or lost one (SPEC I14/V158). Either way it
+				-- writes a dot of its own, so the rows priced above no longer describe the sheet
+				-- - a click that moves the gift walks the ledger a second time, and only that
+				-- click does (SPEC V125).
+				if specialityMoved(form, trait, want, level) then
+					rows  = xpLedgerRows();
+					spent = xpSum(rows);
+
+					renderSpecialities(form);
 				end;
 
 				renderAllXPBoxes(form, spent);

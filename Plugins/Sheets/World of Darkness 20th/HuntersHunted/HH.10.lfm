@@ -88,7 +88,7 @@
 		</layout>
 
 		<!-- 590 = the notes' 580 plus the same 10 the three of them keep between each other. -->
-		<layout left="0" top="590" width="520" height="240">
+		<layout left="0" top="590" width="520" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="520" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 
@@ -114,12 +114,45 @@
 			<checkBox name="chkShowNumina" left="15" top="120" width="490" height="25" field="stShowNumina" text="Show Numina"/>
 			<checkBox name="chkShowDisciplines" left="15" top="150" width="490" height="25" field="stShowDisciplines" text="Show Disciplines"/>
 			<checkBox name="chkFreeBuy" left="15" top="180" width="490" height="25" field="stFreeBuy" text="Free dots"/>
+
+			<!-- Specialities are bought only where the storyteller opened the door, and the two
+			     prices are ONE choice: ticking either clears the other, and both off - the
+			     default - means the table does not buy them at all (SPEC I8f, V154, V155).
+
+			     Free specialities are unaffected: what a trait hands out at one dot or at four
+			     is the book's, not the storyteller's, and it costs nothing either way. -->
+			<checkBox name="chkSpec3XP" left="15" top="210" width="490" height="25" field="stSpec3XP" text="Allow buy Specialization for 3 experience points"/>
+			<checkBox name="chkSpec4XP" left="15" top="240" width="490" height="25" field="stSpec4XP" text="Allow buy Specialization for 4 experience points"/>
 		</layout>
 	</scrollBox>
 
 	<dataLink field="baseline">
 		<event name="onChange">
 			renderBaselineState(self);
+		</event>
+	</dataLink>
+
+	<!--
+		The two speciality prices are one choice, not two flags (SPEC V155): ticking either one
+		clears the other, and both off is a legal state - it is the default, and it means the
+		table does not buy specialities.
+
+		Written from a dataLink rather than from the checkbox's own onChange because a write made
+		inside a control's own dispatch does not survive it (SPEC B36/B38). This is the path that
+		repaints the whole sheet on every theme and language change, and it crosses controls.
+
+		setField only writes when the value actually CHANGES (SPEC V122), so clearing a box that
+		is already clear wakes nothing: the two links cannot bounce off one another.
+	-->
+	<dataLink field="stSpec3XP">
+		<event name="onChange">
+			if sheet ~= nil and sheet.stSpec3XP == true then setField("stSpec4XP", false); end;
+		</event>
+	</dataLink>
+
+	<dataLink field="stSpec4XP">
+		<event name="onChange">
+			if sheet ~= nil and sheet.stSpec4XP == true then setField("stSpec3XP", false); end;
 		</event>
 	</dataLink>
 

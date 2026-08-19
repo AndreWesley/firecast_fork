@@ -25,12 +25,12 @@
 			                       VIRTUES 310..590               y 510..636
 			                       HUMANITY+WILLPOWER 310..590     y 646..810
 			                       HEALTH  600..880               y 510..816 at ten rows
-			                       (empty) 890..1210              y 510..810
+			                       SPECIALTIES 890..1210         y 510..810
 
 			BACKGROUNDS stood in that last slot until the 46th round, when it moved to the
 			Traits tab and grew from nine rows to twenty (SPEC I3, V145). The corner it left
-			is deliberately empty: filling it was not part of what was asked, and the tab is
-			still 1210 wide because ABILITIES and EXPERIENCE reach that far.
+			stood empty for one round; SPECIALTIES took it in the 47th (SPEC I14, V146),
+			which is why the box lines up on 810 with everything else on this tab.
 
 			HEALTH is the one box that does not end on 810: its height is the ten-row case and
 			the renderer shrinks it to the chosen track length (SPEC V49), so at the default of
@@ -135,6 +135,32 @@
 			<rectangle left="223" top="0" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="cycleHealthMark($(num));" onMenu="healHealthMark();">
 				<label align="client" field="health_$(num)" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
+		</template>
+
+		<!--
+			One speciality row (SPEC I14, T388): the trait it belongs to, the speciality the
+			player types, and a single dot that confirms it.
+
+			The dot's field is `speciality_N_1`, not `speciality_N`, because xpClick splits a
+			field into <trait>_<n> to find its rating (SPEC I13): the row is a one-dot trait,
+			exactly the shape `background_3` and `background_3_1` already have. The combo owns
+			`speciality_N` - the trait NAME, canonical English, which is what the free grant
+			writes and what the log reads back (SPEC V147/V152).
+
+			The name starts with `cbo` because that prefix is what the language traversal looks
+			for when it translates a picker's items (SPEC V24, HH.6), and it carries the row
+			number because a control name is global across the sheet's files (SPEC B19/V59).
+
+			Fifty items plus the empty one (SPEC V15): the nine attributes and the forty-one
+			abilities, the same names the root form holds in XP_ATTRS and ABILITY_FIELD. The
+			gate derives that list from those two tables rather than keeping a copy, so an era
+			ability added to one side and not the other is a red gate, not a picker that cannot
+			show what Lua wrote (SPEC V148).
+		-->
+		<template name="SpecialityRow">
+			<comboBox name="cboSpeciality$(num)" left="0" top="0" width="150" height="25" field="speciality_$(num)" fontSize="12" items="{'', 'Strength', 'Dexterity', 'Stamina', 'Charisma', 'Manipulation', 'Appearance', 'Perception', 'Inteligence', 'Wits', 'Academics', 'Alertness', 'Animal Ken', 'Archery', 'Athletics', 'Awareness', 'Brawl', 'Commerce', 'Computer', 'Crafts', 'Drive', 'Empathy', 'Enigmas', 'Etiquette', 'Expression', 'Finance', 'Firearms', 'Hearth Wisdom', 'Intimidation', 'Investigation', 'Larceny', 'Law', 'Leadership', 'Legerdemain', 'Medicine', 'Melee', 'Occult', 'Performance', 'Philosophy', 'Politics', 'Religion', 'Ride', 'Ritual', 'Science', 'Seneschal', 'Stealth', 'Streetwise', 'Subterfuge', 'Survival', 'Technology', 'Theology'}" values="{'', 'Strength', 'Dexterity', 'Stamina', 'Charisma', 'Manipulation', 'Appearance', 'Perception', 'Inteligence', 'Wits', 'Academics', 'Alertness', 'Animal Ken', 'Archery', 'Athletics', 'Awareness', 'Brawl', 'Commerce', 'Computer', 'Crafts', 'Drive', 'Empathy', 'Enigmas', 'Etiquette', 'Expression', 'Finance', 'Firearms', 'Hearth Wisdom', 'Intimidation', 'Investigation', 'Larceny', 'Law', 'Leadership', 'Legerdemain', 'Medicine', 'Melee', 'Occult', 'Performance', 'Philosophy', 'Politics', 'Religion', 'Ride', 'Ritual', 'Science', 'Seneschal', 'Stealth', 'Streetwise', 'Subterfuge', 'Survival', 'Technology', 'Theology'}"/>
+			<edit left="155" top="0" width="115" height="25" field="specialityName_$(num)" fontSize="12"/>
+			<imageCheckBox left="275" top="0" width="25" height="25" field="speciality_$(num)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('speciality_$(num)_1', self);"/>
 		</template>
 
 		<template name="Willpower">
@@ -393,7 +419,7 @@
 		<!--
 			Bottom row, two columns now, ending at y=810 (SPEC T78/T79, V69):
 			  VIRTUES (310-590, y 510-636) over HUMANITY & WILLPOWER (310-590, y 646-810)
-			  HEALTH (600-880) | 890-1210 left empty by the 46th round (SPEC I3)
+			  HEALTH (600-880) | SPECIALTIES (890-1210, y 510-810, SPEC I14)
 
 			Virtues and Humanity are 280 wide, not 410: their content is a 250px track (a 125px
 			label plus 5 dots, or 10 bare dots), so 410 left a wide empty margin and made the
@@ -477,6 +503,34 @@
 			<layout name="dynHealth_row10" left="20" top="271" width="245" height="20"><HealthRow num="10"/></layout>
 		</layout>
 
+		<!--
+			SPECIALTIES (SPEC I14, T388) fills the corner the 46th round emptied when
+			BACKGROUNDS moved to the Traits tab, and it closes on y=810 like the rest of the
+			row - which is what "line the bottom up with the other boxes" means here.
+
+			Nine rows: the first at 25 and a pitch of 30 puts the ninth at 265..290, and a tenth
+			would want 295..320 in a box that is 300 tall. Nine is what fits, and a table with no
+			free slot says so with a pop-up rather than dropping the grant (SPEC V146/V153).
+
+			No column headings: the box has one title and the three columns explain themselves
+			(the user's fifth point). The row is 300 wide inside a 320 box - 150 for the trait,
+			115 for the text, 25 for the dot, 5 between each.
+		-->
+		<layout left="890" top="510" width="320" height="300">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="320" height="20" text="SPECIALTIES" horzTextAlign="center"/>
+
+			<layout left="10" top="25" width="300" height="25"><SpecialityRow num="1"/></layout>
+			<layout left="10" top="55" width="300" height="25"><SpecialityRow num="2"/></layout>
+			<layout left="10" top="85" width="300" height="25"><SpecialityRow num="3"/></layout>
+			<layout left="10" top="115" width="300" height="25"><SpecialityRow num="4"/></layout>
+			<layout left="10" top="145" width="300" height="25"><SpecialityRow num="5"/></layout>
+			<layout left="10" top="175" width="300" height="25"><SpecialityRow num="6"/></layout>
+			<layout left="10" top="205" width="300" height="25"><SpecialityRow num="7"/></layout>
+			<layout left="10" top="235" width="300" height="25"><SpecialityRow num="8"/></layout>
+			<layout left="10" top="265" width="300" height="25"><SpecialityRow num="9"/></layout>
+		</layout>
+
 	</scrollBox>
 
 	<!--
@@ -490,6 +544,14 @@
 	     number, and every dot on this tab redraws it through the guard. -->
 	<dataLink field="xpTotal" onChange="renderXPBoxes(self);"/>
 
+	<!-- A free speciality is locked (SPEC V161/V164), and which rows are free is written in
+	     the stamps. Watching them covers the grant that happened on ANOTHER client at the
+	     table: the field arrives over the NDB, and the row locks here too.
+
+	     `xpFree` carries no widget by design - it is Lua-owned, the declared exception to
+	     V8 (SPEC I3, B25). -->
+	<dataLink field="xpFree" onChange="renderSpecialities(self);"/>
+
 	<event name="onShow">
 		renderXPBoxes(self);
 	</event>
@@ -497,5 +559,6 @@
 	<event name="onNodeReady">
 		renderHealthTrack(self, 'dynHealth_');
 		renderXPBoxes(self);
+		renderSpecialities(self);
 	</event>
 </form>
