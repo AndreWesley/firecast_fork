@@ -1068,10 +1068,10 @@ T353|x|`module.xml` version `3.8` → `3.9` + `rdk -l` (exit 0 & `.rpk` mudou) +
 T354|.|teste no Firecast — RESOLVE §T277 §T296 & RESPONDE §R39: baseline salvo & `Current` = 0 → clicar bolinha nova → POP-UP aparece · bolinha volta sozinha · `Current` segue 0. Pop-up ⊥ aparecer & bolinha FICAR = §R39 NEGATIVA ∴ guarda morto (§B33 b) & vira §B novo, ⊥ 4ª rodada de conserto às cegas. 2º caso: digitar `-5` no `Current` → pop-up & a caixa volta ao valor de antes|R39,V129,V131,B33
 
 
-T355|.|`HuntersHunted.lfm` — `xpGuard`: no ramo do desfazer, achar o dot no form CLICADO (varredura recursiva por `field` igual) & escrever `.checked = not on` junto do `setField`, os 2 sob `xpQuiet`. ⊥ achou → só NDB, sem erro|V132,B36,I12
-T356|.|`HuntersHunted.lfm` + `HH.1.lfm` + `HH.9.lfm` — `xpBoxForms` registrado no `onNodeReady` de quem tem caixa; `xpGuard` repinta TODAS c/ o `spent` que já calculou (inclui o caminho de saída c/ `baseline` vazio). `renderXPBoxes(form, spent)` segue igual p/ os `dataLink`|V133,I11,V125
-T357|.|`verify-hunters-hunted.ps1` — checks NOVOS §V132 §V133 + ajustar o check de §V125 (o guarda passa a chamar o repintor de TODAS as caixas). Mutação antes de aceitar (§V20): tirar a escrita do `checked` · tirar o `xpQuiet` de volta · repintar só o form clicado · ⊥ registrar `HH.1`|V20,V132,V133,V125
-T358|.|`module.xml` version `3.9` → `4.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (Firecast FECHADO, instalado c/ mesmo size)|V6,V7
+T355|x|`HuntersHunted.lfm` — `xpGuard`: no ramo do desfazer, achar o dot no form CLICADO (varredura recursiva por `field` igual) & escrever `.checked = not on` junto do `setField`, os 2 sob `xpQuiet`. ⊥ achou → só NDB, sem erro|V132,B36,I12
+T356|x|`HuntersHunted.lfm` + `HH.1.lfm` + `HH.9.lfm` — `xpBoxForms` registrado no `onNodeReady` de quem tem caixa; `xpGuard` repinta TODAS c/ o `spent` que já calculou (inclui o caminho de saída c/ `baseline` vazio). `renderXPBoxes(form, spent)` segue igual p/ os `dataLink`|V133,I11,V125
+T357|x|`verify-hunters-hunted.ps1` — checks NOVOS §V132 §V133 + ajustar o check de §V125 (o guarda passa a chamar o repintor de TODAS as caixas). Mutação antes de aceitar (§V20): tirar a escrita do `checked` · tirar o `xpQuiet` de volta · repintar só o form clicado · ⊥ registrar `HH.1`|V20,V132,V133,V125
+T358|x|`module.xml` version `3.9` → `4.0` + `rdk -l` (exit 0 & `.rpk` mudou) + `rdk -i` (Firecast FECHADO, instalado c/ mesmo size)|V6,V7
 T359|.|teste no Firecast — SUPERSEDE §T354: baseline salvo & `Current` = 0 → clicar bolinha nova → pop-up **&** bolinha VOLTA a apagar **&** log SEM linha nova (§B36 fechado). Depois, c/ saldo: comprar númina em `HH.7` → `Current` da Main muda NA HORA (§V133). Bolinha ainda acesa depois do pop-up = §R43 resolvida p/ (b) ∴ vai p/ a reserva de §R44, ⊥ 3º caminho novo|V132,V133,B36,R43,R44
 
 ## §B BUGS

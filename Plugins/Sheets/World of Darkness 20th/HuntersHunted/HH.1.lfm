@@ -536,5 +536,8 @@
 	<event name="onNodeReady">
 		renderHealthTrack(self, 'dynHealth_');
 		renderXPBoxes(self);
+
+		-- How xpGuard reaches this tab's balance box from a click on ANOTHER tab (SPEC V133).
+		registerXPBoxes('main', self);
 	</event>
 </form>

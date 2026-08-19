@@ -214,5 +214,9 @@
 		-- fixed B30 never covered it. On a sheet with a saved baseline that was a full walk of
 		-- the ledger per write, and the sheet froze on open (SPEC B34).
 		xpLedgerForm = self;
+
+		-- Same handover for the three numbers above the log (SPEC V133, SPEC B37): buying a
+		-- numina happens on a tab that owns no box at all.
+		registerXPBoxes('progress', self);
 	</event>
 </form>

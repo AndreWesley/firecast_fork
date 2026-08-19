@@ -765,6 +765,33 @@
 				if form.edtCurrentXPMain ~= nil then form.edtCurrentXPMain.text = tostring(total - spent); end;
 			end;
 
+			-- Which forms carry experience boxes, so a click on ANY tab can repaint them all
+			-- (SPEC V133). The Numina tab has twenty guarded dots and no box of its own, so
+			-- painting only the form the clicked dot lives on left the balance untouched on
+			-- every numina purchase (SPEC B37). The log went global in the 39th round and the
+			-- boxes were left behind; this is the other half.
+			--
+			-- Keyed rather than appended: reopening the sheet builds new form objects, and a
+			-- list would go on holding the dead ones.
+			xpBoxForms = {};
+
+			function registerXPBoxes(key, form)
+				xpBoxForms[key] = form;
+			end;
+
+			-- Still one walk of the ledger per click (SPEC V108/V125): the caller normally has
+			-- the total already, and when it does not this works it out ONCE instead of once
+			-- per form.
+			function renderAllXPBoxes(spent)
+				if sheet == nil or xpQuiet then return; end;
+
+				spent = spent or xpSpent();
+
+				for _, form in pairs(xpBoxForms) do
+					renderXPBoxes(form, spent);
+				end;
+			end;
+
 			-- Both refusals the sheet can hand the player - no balance left for a dot, and a
 			-- balance typed below zero - come out through here (SPEC V129/V131). Authored in
 			-- English and shown through the sheet's own translation (SPEC V70/V130); the
@@ -816,6 +843,28 @@
 				end;
 			end;
 
+			-- The dot that fired, found by the field it is bound to. onChange hands over the
+			-- form, not the control (SPEC R39 - the event carries no arguments), and naming all
+			-- sixty-four dots in the XML would touch ten templates to answer a question nobody
+			-- asks except on a refused click (SPEC V132).
+			local function findDot(node, field)
+				local children = node:getChildren();
+
+				if children == nil then return nil; end;
+
+				for i = 1, #children, 1 do
+					local c = children[i];
+
+					if c.field == field then return c; end;
+
+					local found = findDot(c, field);
+
+					if found ~= nil then return found; end;
+				end;
+
+				return nil;
+			end;
+
 			-- Every dot that costs experience calls this after it changes (SPEC I12/V99). It
 			-- writes no experience at all: the balance is xpTotal minus the log (SPEC V100),
 			-- so a purchase pays for itself the moment the dot reaches the log and taking the
@@ -838,7 +887,7 @@
 				-- the storyteller freezes the sheet (SPEC V101).
 				local base = baselineOf();
 
-				if base == nil then renderXPBoxes(form); return; end;
+				if base == nil then renderAllXPBoxes(); return; end;
 
 				local trait = string.match(field, "^(.+)_%d+$");
 				local t     = trait ~= nil and XP_TRAIT[trait] or nil;
@@ -871,13 +920,23 @@
 					-- again (SPEC V127). The rows above describe the state being REFUSED, so
 					-- the restored state is read once more - the only click that pays for two
 					-- walks is one the rules turned down.
+					--
+					-- The CONTROL is written as well as the field (SPEC V132). Writing the NDB
+					-- from inside the control's own onChange does not survive the end of the
+					-- dispatch: the dot stayed lit and the refused purchase still reached the
+					-- log (SPEC B36). Whether the control re-asserts its own checked state or
+					-- ignores the write while it is dispatching cannot be told apart from here
+					-- (SPEC R43) - writing both covers either one.
+					local dot = findDot(form, field);
+
 					xpQuiet = true;
 					setField(field, not on);
+					if dot ~= nil then dot.checked = not on; end;
 					xpQuiet = false;
 
 					local back = xpLedgerRows();
 
-					renderXPBoxes(form, xpSum(back));
+					renderAllXPBoxes(xpSum(back));
 					xpLedgerRefresh(back);
 
 					-- SPEC V129: a refusal for want of experience says so, and only that one.
@@ -892,7 +951,7 @@
 
 				-- One walk of the ledger per click (SPEC V108/V125): all three drawers are
 				-- handed what this call already built instead of building it again.
-				renderXPBoxes(form, spent);
+				renderAllXPBoxes(spent);
 				xpLedgerRefresh(rows);
 			end;
 

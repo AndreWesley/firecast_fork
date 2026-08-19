@@ -1885,7 +1885,7 @@ else { Pass "V107 the sheet's own writes are quiet, and the flag comes back down
 # The dot used to call the guard AND the box renderer, and each walked the whole ledger.
 $dotsDouble = @($dots | Where-Object { $_.GetAttribute("onChange") -match 'renderXPBoxes' })
 if ($dotsDouble) { Fail "V108 $($dotsDouble.Count) dot(s) call renderXPBoxes beside the guard - each click would walk the ledger twice" }
-elseif ($guardFn -notmatch 'renderXPBoxes\(form, spent\)') { Fail "V108 the guard does not hand its count to the boxes - they would build the same one again" }
+elseif ($guardFn -notmatch 'renderAllXPBoxes\(spent\)') { Fail "V108 the guard does not hand its count to the boxes - they would build the same one again" }
 else { Pass "V108 a click walks the ledger once" }
 
 # ---- V101: the guard sleeps until the character is frozen -------------------------
@@ -2161,7 +2161,7 @@ else {
     $walks = @([regex]::Matches($g, 'xpLedgerRows\(\)')).Count
     if ($walks -gt 2) { Fail "V125 xpGuard walks the ledger $walks times - one for the click, at most one more to read back a refused move" }
     elseif ($g -notmatch 'local spent = xpSum\(rows\);') { Fail "V125 xpGuard does not total the rows it already built" }
-    elseif ($g -notmatch 'renderXPBoxes\(form, spent\);') { Fail "V125 xpGuard makes the boxes walk the ledger again" }
+    elseif ($g -notmatch 'renderAllXPBoxes\(spent\);') { Fail "V125 xpGuard makes the boxes walk the ledger again" }
     elseif ($g -notmatch 'xpLedgerRefresh\(rows\);') { Fail "V125 xpGuard does not hand its rows to the log" }
     else { Pass "V125 one walk per accepted click, shared by the boxes and the log" }
 }
@@ -2278,6 +2278,60 @@ else {
 if (-not $boxFn) { Fail "V131 renderXPBoxes not found on the root form" }
 elseif ($boxFn -notmatch 'setField\("xpTotal", math\.max\(0,') { Fail "V131 the migration seed has no floor - an old sheet holding a negative experience value is born owing (SPEC I11)" }
 else { Pass "V131 the one-shot migration cannot seed a negative balance" }
+
+# ---- V132: the undo writes the CONTROL, not just the field ---------------------------
+# The 40th round's guard refused correctly and the pop-up proved it ran (SPEC R42), but the
+# dot stayed lit and the purchase still reached the log: a write to the NDB from inside the
+# control's own onChange does not survive the end of the dispatch (SPEC B36). Whether the
+# control re-asserts its checked state or ignores the write while dispatching cannot be told
+# from Lua (SPEC R43), so both are written - and both under xpQuiet, or the control write
+# re-enters the guard (SPEC V127).
+$guardFn = [regex]::Match($rootTxt, 'function xpGuard\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
+if (-not $guardFn.Success) { Fail "V132 xpGuard not found on the root form" }
+else {
+    $undo = [regex]::Match($guardFn.Groups[1].Value, 'if undo then(.*?)return;', 'Singleline')
+    if (-not $undo.Success) { Fail "V132 xpGuard has no undo branch" }
+    else {
+        $u    = $undo.Groups[1].Value
+        $iOn  = $u.IndexOf('xpQuiet = true;')
+        $iOff = $u.IndexOf('xpQuiet = false;')
+        $iDot = $u.IndexOf('dot.checked = not on;')
+        if ($u -notmatch 'findDot\(form, field\)') { Fail "V132 the undo never looks the dot up - only the field would be written, and the control writes it straight back (SPEC B36)" }
+        elseif ($iDot -lt 0) { Fail "V132 the undo does not write the control's checked state - the dot stays lit over a field that says otherwise (SPEC B36)" }
+        elseif ($iDot -lt $iOn -or $iDot -gt $iOff) { Fail "V132 the control is written outside xpQuiet - that write re-enters the guard (SPEC V127)" }
+        elseif ($u -notmatch 'setField\(field, not on\);') { Fail "V132 the undo stopped writing the field" }
+        else { Pass "V132 the undo writes the field and the control, both quietly" }
+    }
+}
+$finderFn = LuaFn $rootTxt 'findDot'
+if (-not $finderFn) { Fail "V132 findDot not found on the root form" }
+elseif ($finderFn -notmatch 'getChildren\(\)') { Fail "V132 findDot does not walk the form it was handed" }
+elseif ($finderFn -notmatch 'c\.field == field') { Fail "V132 findDot does not match on the field the dot is bound to" }
+else { Pass "V132 the dot is found by the field it is bound to" }
+
+# ---- V133: a click repaints every box, not just the ones on its own tab ---------------
+# The Numina tab has twenty guarded dots and no experience box at all, so painting only the
+# clicked dot's form left the balance untouched on every numina purchase (SPEC B37). The log
+# was made global in the 39th round; the boxes were the half left behind.
+$boxAllFn = LuaFn $rootTxt 'renderAllXPBoxes'
+if ($rootTxt -notmatch 'xpBoxForms = \{\};') { Fail "V133 xpBoxForms is not declared on the root form" }
+elseif ($rootTxt -notmatch 'function registerXPBoxes\(') { Fail "V133 nothing registers the forms that carry the boxes" }
+elseif (-not $boxAllFn) { Fail "V133 renderAllXPBoxes not found on the root form" }
+elseif ($boxAllFn -notmatch 'spent = spent or xpSpent\(\);') { Fail "V133 renderAllXPBoxes would walk the ledger once per form (SPEC V108)" }
+elseif ($boxAllFn -notmatch 'pairs\(xpBoxForms\)') { Fail "V133 renderAllXPBoxes does not paint every registered form" }
+elseif ($guardFn.Success -and $guardFn.Groups[1].Value -match 'renderXPBoxes\(form') { Fail "V133 the guard still paints only the form the dot lives on - a numina purchase would move no number (SPEC B37)" }
+else { Pass "V133 every click repaints every registered box form, off one walk" }
+
+$boxFiles = @()
+foreach ($bf in $files) {
+    if ($bf.Name -eq 'HuntersHunted.lfm') { continue }
+    $bd = Doc $bf.FullName
+    if (@($bd.SelectNodes("//edit[starts-with(@name,'edtTotalXP') or starts-with(@name,'edtSpentXP') or starts-with(@name,'edtCurrentXP')]")).Count -gt 0) { $boxFiles += $bf }
+}
+$unregistered = @($boxFiles | Where-Object { (CodeOf $_.FullName) -notmatch 'registerXPBoxes\(' })
+if ($boxFiles.Count -lt 2) { Fail "V133 expected two tabs carrying experience boxes, found $($boxFiles.Count)" }
+elseif ($unregistered) { foreach ($ur in $unregistered) { Fail "V133 $($ur.Name) carries experience boxes but never registers - a purchase on another tab would leave them stale (SPEC B37)" } }
+else { Pass "V133 both tabs with experience boxes hand themselves over ($(($boxFiles | ForEach-Object { $_.Name }) -join ', '))" }
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.
