@@ -19,8 +19,8 @@
 		<!--
 			Layout grid (SPEC T41, V26, V27). Everything closes on x=1210 / y=810.
 
-			  header  0..1100      EXPERIENCE 1110..1210          y   0..100
-			  ATTRIBUTES 0..300    ABILITIES  310..1210           y 110..500
+			  header  0..1030      EXPERIENCE 1050..1210          y   0..100
+			  ATTRIBUTES 0..300    TALENTS 310..600 | SKILLS 615..905 | KNOWLEDGES 920..1210    y 110..500
 			  avatar     0..300                                   y 405..810
 			                       VIRTUES 310..590               y 510..636
 			                       HUMANITY+WILLPOWER 310..590     y 646..810
@@ -37,10 +37,15 @@
 			seven rows it ends at 735 and only a player who picks ten pushes 6px past the rest.
 
 			Label widths are sized for the LONGER of [en] and [pt]: "Animal Ken" is
-			"Empatia com Animais" (19 chars) in pt, so the ability label is 125px, not 80.
-			Attribute / Ability / CustomAbility put their first dot at x=125, past that label,
-			so those dot columns line up with each other. Advantages / Willpower carry no label
-			and start at x=0 - they live alone in their own box and are centred by the caller.
+			"Empatia com Animais" (19 chars) in pt, so the ability label is 135px, not 80.
+			It was 125 until the 49th round, when the ABILITIES frame came off and handed the
+			three columns 10px apiece: the point of that request was the names, so the width
+			went to the label and the dots moved right with it (SPEC T408, V170).
+
+			Ability / CustomAbility put their first dot at x=135 and Attribute at x=125. V26
+			compares rows that are SIBLINGS, and those two never share a box, so each column
+			still lines up with itself. Advantages / Willpower carry no label and start at
+			x=0 - they live alone in their own box and are centred by the caller.
 		-->
 		<template name="Header">
 			<label left="0" top="5" width="105" height="20" text="$(nome)" horzTextAlign="trailing"/>
@@ -80,21 +85,21 @@
 			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 		<template name="Ability">
-			<label name="dynAbil$(col)$(num)" left="0" top="5" width="125" height="20" text="$(nome)"/>
-			<imageCheckBox name="abil$(col)$(num)_1" left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_1.field, self);"/>
-			<imageCheckBox name="abil$(col)$(num)_2" left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_2.field, self);"/>
-			<imageCheckBox name="abil$(col)$(num)_3" left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_3.field, self);"/>
-			<imageCheckBox name="abil$(col)$(num)_4" left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_4.field, self);"/>
-			<imageCheckBox name="abil$(col)$(num)_5" left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_5.field, self);"/>
+			<label name="dynAbil$(col)$(num)" left="0" top="5" width="135" height="20" text="$(nome)"/>
+			<imageCheckBox name="abil$(col)$(num)_1" left="135" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_1.field, self);"/>
+			<imageCheckBox name="abil$(col)$(num)_2" left="160" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_2.field, self);"/>
+			<imageCheckBox name="abil$(col)$(num)_3" left="185" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_3.field, self);"/>
+			<imageCheckBox name="abil$(col)$(num)_4" left="210" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_4.field, self);"/>
+			<imageCheckBox name="abil$(col)$(num)_5" left="235" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_5.field, self);"/>
 		</template>
 		<!-- Blank rows at the bottom of each ability column, for abilities the book does not list. -->
 		<template name="CustomAbility">
-			<edit left="0" top="2" width="122" height="21" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<edit left="0" top="2" width="132" height="21" field="$(field)" fontSize="12"/>
+			<imageCheckBox left="135" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="160" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="185" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="210" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="235" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 		<!-- No label: HUMANITY / WILLPOWER are titled above the track, so "FORCA DE VONTADE"
 		     cannot be clipped.
@@ -282,137 +287,146 @@
 		<rectangle left="0" top="405" width="300" height="405" color="DimGray" xradius="5" yradius="5" cornerType="innerRound"/>
 		<image left="0" top="405" width="300" height="405" field="avatar" editable="true" style="autoFit"/>
 
-		<layout left="310" top="110" width="900" height="390">
-			<!-- Filled black like every other section box. It shipped with the Mage sheet's
-			     transparent fill (#FFFFFF00), which let the tab background through and read as
-			     grey next to its black siblings - SPEC B18, now covered by V48. -->
-			<rectangle align="client" color="black" strokeColor="black" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="900" height="20" text="ABILITIES" horzTextAlign="center"/>
+		<!--
+			The three ability columns stand loose (SPEC T407, V168, V169). Until the 49th round
+			they sat inside one ABILITIES box, whose frame and title spent 30px of width on a
+			heading that named what the three titles below it already said. The user asked for
+			the heading gone so the names could breathe, so the box the columns were nested in
+			is now the row they form: TALENTS starts where VIRTUES starts and KNOWLEDGES closes
+			where EXPERIENCE closes. V168 measures it against those two boxes, not against a
+			literal, so moving either one without the other turns the gate red.
 
-			<layout left="15" top="30" width="280" height="350">
-				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="0" top="4" width="280" height="20" text="TALENTS" horzTextAlign="center"/>
+			Each column still fills black under a centred title of its own width, so V27 and V48
+			read them exactly as before. What changed is V40: it now weighs them against every
+			box on the tab instead of against the two siblings they shared a frame with - which
+			is the check the old nesting was hiding (SPEC B18 is the same lesson from the fill
+			side, and the frame that carried that note went out with this comment).
 
-				<layout left="15" top="25" width="250" height="25" >
-					<Ability col="talents" num="1" field="alertness" nome="Alertness"/>
-				</layout>
-				<layout left="15" top="50" width="250" height="25" >
-					<Ability col="talents" num="2" field="athletics" nome="Athletics"/>
-				</layout>
-				<layout left="15" top="75" width="250" height="25" >
-					<Ability col="talents" num="3" field="awareness" nome="Awareness"/>
-				</layout>
-				<layout left="15" top="100" width="250" height="25" >
-					<Ability col="talents" num="4" field="brawl" nome="Brawl"/>
-				</layout>
-				<layout left="15" top="125" width="250" height="25" >
-					<Ability col="talents" num="5" field="empathy" nome="Empathy"/>
-				</layout>
-				<layout left="15" top="150" width="250" height="25" >
-					<Ability col="talents" num="6" field="expression" nome="Expression"/>
-				</layout>
-				<layout left="15" top="175" width="250" height="25" >
-					<Ability col="talents" num="7" field="intimidation" nome="Intimidation"/>
-				</layout>
-				<layout left="15" top="200" width="250" height="25" >
-					<Ability col="talents" num="8" field="leadership" nome="Leadership"/>
-				</layout>
-				<layout left="15" top="225" width="250" height="25" >
-					<Ability col="talents" num="9" field="streetwise" nome="Streetwise"/>
-				</layout>
-				<layout left="15" top="250" width="250" height="25" >
-					<Ability col="talents" num="10" field="subterfuge" nome="Subterfuge"/>
-				</layout>
-				<layout left="15" top="275" width="250" height="25" >
-					<CustomAbility field="customTalent_1"/>
-				</layout>
-				<layout left="15" top="300" width="250" height="25" >
-					<CustomAbility field="customTalent_2"/>
-				</layout>
+			The gap between columns is 15, the same gap VIRTUES leaves to HEALTH one row down.
+		-->
+		<layout left="310" top="110" width="290" height="390">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="290" height="20" text="TALENTS" horzTextAlign="center"/>
+
+			<layout left="15" top="25" width="260" height="25" >
+				<Ability col="talents" num="1" field="alertness" nome="Alertness"/>
 			</layout>
-
-			<layout left="310" top="30" width="280" height="350">
-				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="0" top="4" width="280" height="20" text="SKILLS" horzTextAlign="center"/>
-
-				<layout left="15" top="25" width="250" height="25" >
-					<Ability col="skills" num="1" field="animalKen" nome="Animal Ken"/>
-				</layout>
-				<layout left="15" top="50" width="250" height="25" >
-					<Ability col="skills" num="2" field="crafts" nome="Crafts"/>
-				</layout>
-				<layout left="15" top="75" width="250" height="25" >
-					<Ability col="skills" num="3" field="etiquette" nome="Etiquette"/>
-				</layout>
-				<layout left="15" top="100" width="250" height="25" >
-					<Ability col="skills" num="4" field="firearms" nome="Firearms"/>
-				</layout>
-				<layout left="15" top="125" width="250" height="25" >
-					<Ability col="skills" num="5" field="larceny" nome="Larceny"/>
-				</layout>
-				<layout left="15" top="150" width="250" height="25" >
-					<Ability col="skills" num="6" field="melee" nome="Melee"/>
-				</layout>
-				<layout left="15" top="175" width="250" height="25" >
-					<Ability col="skills" num="7" field="performance" nome="Performance"/>
-				</layout>
-				<layout left="15" top="200" width="250" height="25" >
-					<Ability col="skills" num="8" field="ride" nome="Ride"/>
-				</layout>
-				<layout left="15" top="225" width="250" height="25" >
-					<Ability col="skills" num="9" field="stealth" nome="Stealth"/>
-				</layout>
-				<layout left="15" top="250" width="250" height="25" >
-					<Ability col="skills" num="10" field="survival" nome="Survival"/>
-				</layout>
-				<layout left="15" top="275" width="250" height="25" >
-					<CustomAbility field="customSkill_1"/>
-				</layout>
-				<layout left="15" top="300" width="250" height="25" >
-					<CustomAbility field="customSkill_2"/>
-				</layout>
+			<layout left="15" top="50" width="260" height="25" >
+				<Ability col="talents" num="2" field="athletics" nome="Athletics"/>
 			</layout>
+			<layout left="15" top="75" width="260" height="25" >
+				<Ability col="talents" num="3" field="awareness" nome="Awareness"/>
+			</layout>
+			<layout left="15" top="100" width="260" height="25" >
+				<Ability col="talents" num="4" field="brawl" nome="Brawl"/>
+			</layout>
+			<layout left="15" top="125" width="260" height="25" >
+				<Ability col="talents" num="5" field="empathy" nome="Empathy"/>
+			</layout>
+			<layout left="15" top="150" width="260" height="25" >
+				<Ability col="talents" num="6" field="expression" nome="Expression"/>
+			</layout>
+			<layout left="15" top="175" width="260" height="25" >
+				<Ability col="talents" num="7" field="intimidation" nome="Intimidation"/>
+			</layout>
+			<layout left="15" top="200" width="260" height="25" >
+				<Ability col="talents" num="8" field="leadership" nome="Leadership"/>
+			</layout>
+			<layout left="15" top="225" width="260" height="25" >
+				<Ability col="talents" num="9" field="streetwise" nome="Streetwise"/>
+			</layout>
+			<layout left="15" top="250" width="260" height="25" >
+				<Ability col="talents" num="10" field="subterfuge" nome="Subterfuge"/>
+			</layout>
+			<layout left="15" top="275" width="260" height="25" >
+				<CustomAbility field="customTalent_1"/>
+			</layout>
+			<layout left="15" top="300" width="260" height="25" >
+				<CustomAbility field="customTalent_2"/>
+			</layout>
+		</layout>
 
-			<layout left="605" top="30" width="280" height="350">
-				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="0" top="4" width="280" height="20" text="KNOWLEDGES" horzTextAlign="center"/>
+		<layout left="615" top="110" width="290" height="390">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="290" height="20" text="SKILLS" horzTextAlign="center"/>
 
-				<layout left="15" top="25" width="250" height="25" >
-					<Ability col="knowledges" num="1" field="academics" nome="Academics"/>
-				</layout>
-				<layout left="15" top="50" width="250" height="25" >
-					<Ability col="knowledges" num="2" field="enigmas" nome="Enigmas"/>
-				</layout>
-				<layout left="15" top="75" width="250" height="25" >
-					<Ability col="knowledges" num="3" field="finance" nome="Finance"/>
-				</layout>
-				<layout left="15" top="100" width="250" height="25" >
-					<Ability col="knowledges" num="4" field="investigation" nome="Investigation"/>
-				</layout>
-				<layout left="15" top="125" width="250" height="25" >
-					<Ability col="knowledges" num="5" field="law" nome="Law"/>
-				</layout>
-				<layout left="15" top="150" width="250" height="25" >
-					<Ability col="knowledges" num="6" field="medicine" nome="Medicine"/>
-				</layout>
-				<layout left="15" top="175" width="250" height="25" >
-					<Ability col="knowledges" num="7" field="occult" nome="Occult"/>
-				</layout>
-				<layout left="15" top="200" width="250" height="25" >
-					<Ability col="knowledges" num="8" field="politics" nome="Politics"/>
-				</layout>
-				<layout left="15" top="225" width="250" height="25" >
-					<Ability col="knowledges" num="9" field="science" nome="Science"/>
-				</layout>
-				<layout left="15" top="250" width="250" height="25" >
-					<Ability col="knowledges" num="10" field="technology" nome="Technology"/>
-				</layout>
-				<layout left="15" top="275" width="250" height="25" >
-					<CustomAbility field="customKnowledge_1"/>
-				</layout>
-				<layout left="15" top="300" width="250" height="25" >
-					<CustomAbility field="customKnowledge_2"/>
-				</layout>
+			<layout left="15" top="25" width="260" height="25" >
+				<Ability col="skills" num="1" field="animalKen" nome="Animal Ken"/>
+			</layout>
+			<layout left="15" top="50" width="260" height="25" >
+				<Ability col="skills" num="2" field="crafts" nome="Crafts"/>
+			</layout>
+			<layout left="15" top="75" width="260" height="25" >
+				<Ability col="skills" num="3" field="etiquette" nome="Etiquette"/>
+			</layout>
+			<layout left="15" top="100" width="260" height="25" >
+				<Ability col="skills" num="4" field="firearms" nome="Firearms"/>
+			</layout>
+			<layout left="15" top="125" width="260" height="25" >
+				<Ability col="skills" num="5" field="larceny" nome="Larceny"/>
+			</layout>
+			<layout left="15" top="150" width="260" height="25" >
+				<Ability col="skills" num="6" field="melee" nome="Melee"/>
+			</layout>
+			<layout left="15" top="175" width="260" height="25" >
+				<Ability col="skills" num="7" field="performance" nome="Performance"/>
+			</layout>
+			<layout left="15" top="200" width="260" height="25" >
+				<Ability col="skills" num="8" field="ride" nome="Ride"/>
+			</layout>
+			<layout left="15" top="225" width="260" height="25" >
+				<Ability col="skills" num="9" field="stealth" nome="Stealth"/>
+			</layout>
+			<layout left="15" top="250" width="260" height="25" >
+				<Ability col="skills" num="10" field="survival" nome="Survival"/>
+			</layout>
+			<layout left="15" top="275" width="260" height="25" >
+				<CustomAbility field="customSkill_1"/>
+			</layout>
+			<layout left="15" top="300" width="260" height="25" >
+				<CustomAbility field="customSkill_2"/>
+			</layout>
+		</layout>
+
+		<layout left="920" top="110" width="290" height="390">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="290" height="20" text="KNOWLEDGES" horzTextAlign="center"/>
+
+			<layout left="15" top="25" width="260" height="25" >
+				<Ability col="knowledges" num="1" field="academics" nome="Academics"/>
+			</layout>
+			<layout left="15" top="50" width="260" height="25" >
+				<Ability col="knowledges" num="2" field="enigmas" nome="Enigmas"/>
+			</layout>
+			<layout left="15" top="75" width="260" height="25" >
+				<Ability col="knowledges" num="3" field="finance" nome="Finance"/>
+			</layout>
+			<layout left="15" top="100" width="260" height="25" >
+				<Ability col="knowledges" num="4" field="investigation" nome="Investigation"/>
+			</layout>
+			<layout left="15" top="125" width="260" height="25" >
+				<Ability col="knowledges" num="5" field="law" nome="Law"/>
+			</layout>
+			<layout left="15" top="150" width="260" height="25" >
+				<Ability col="knowledges" num="6" field="medicine" nome="Medicine"/>
+			</layout>
+			<layout left="15" top="175" width="260" height="25" >
+				<Ability col="knowledges" num="7" field="occult" nome="Occult"/>
+			</layout>
+			<layout left="15" top="200" width="260" height="25" >
+				<Ability col="knowledges" num="8" field="politics" nome="Politics"/>
+			</layout>
+			<layout left="15" top="225" width="260" height="25" >
+				<Ability col="knowledges" num="9" field="science" nome="Science"/>
+			</layout>
+			<layout left="15" top="250" width="260" height="25" >
+				<Ability col="knowledges" num="10" field="technology" nome="Technology"/>
+			</layout>
+			<layout left="15" top="275" width="260" height="25" >
+				<CustomAbility field="customKnowledge_1"/>
+			</layout>
+			<layout left="15" top="300" width="260" height="25" >
+				<CustomAbility field="customKnowledge_2"/>
 			</layout>
 		</layout>
 

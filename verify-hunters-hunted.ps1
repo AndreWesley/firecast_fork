@@ -2818,6 +2818,116 @@ elseif ($xpCostFn -notmatch 'kind == "Specialty"') { Fail "V165 xpCost prices a 
 elseif (-not $fieldsKept) { Fail "V165 the speciality FIELDS were renamed - they shipped in 4.6 and a saved sheet would lose them (SPEC V2)" }
 else { Pass "V165 the rename is text and keys only; the fields kept the name they shipped with" }
 
+# ---- V166: the sheet is authored hidden, and one place lights it ---------------------
+# B40: the host draws before any hook of ours runs (SPEC R47), so every open showed a
+# second of the sheet as the XML authors it - a look no theme has offered since the 16th
+# round. The fix is not to show it, which only holds while exactly one place can show it.
+$tcTag = [regex]::Match($rootLfm, '<tabControl\b[^>]*>')
+$revealFn = [regex]::Match($rootLfm, '(?s)function sheetReveal\(from\)(.*?)\r?\n\t{3}end;')
+$revealBody = if ($revealFn.Success) { $revealFn.Groups[1].Value } else { '' }
+$tabsHHTotal = 0
+foreach ($f in $files) {
+    $raw = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f.FullName))
+    $tabsHHTotal += ([regex]::Matches($raw, 'tabsHH')).Count
+}
+$tabsHHInReveal = ([regex]::Matches($revealBody, 'tabsHH')).Count
+$tabsHHInTag = ([regex]::Matches($tcTag.Value, 'tabsHH')).Count
+$revealLights = ([regex]::Matches($revealBody, '\.visible\s*=\s*true')).Count
+$tabsHHLoose = $tabsHHTotal - $tabsHHInReveal - $tabsHHInTag
+if (-not $tcTag.Success) { Fail "V166 no <tabControl> on the root form" }
+elseif ($tcTag.Value -notmatch 'name="tabsHH"') { Fail "V166 the tabControl carries no name - sheetReveal finds it by name from the root (SPEC V143)" }
+elseif ($tcTag.Value -notmatch 'visible="false"') { Fail "V166 the tabControl is authored visible - the raw sheet is on screen before anything paints it (SPEC B40)" }
+elseif (-not $revealFn.Success) { Fail "V166 sheetReveal not found on the root form - nothing would ever show the sheet" }
+elseif ($revealLights -ne 1) { Fail "V166 sheetReveal writes visible=true $revealLights time(s) - it is the one place that lights the sheet" }
+elseif ($tabsHHLoose -ne 0) { Fail "V166 tabsHH is named $tabsHHLoose time(s) outside sheetReveal and its own declaration - a second place could show the sheet early" }
+else { Pass "V166 the tabControl is authored hidden and sheetReveal is the only thing that lights it" }
+
+# ---- V167: the reveal is idempotent and cannot leave the sheet blank -----------------
+# The mirror of B26: there the static state failed OPEN and showed tabs nobody asked for;
+# here it fails open on purpose. A paint that never runs has to leave the sheet ugly, never
+# blank, so one of the two entries must not depend on any paint. A timer cannot fire early
+# and cannot depend on the paint (SPEC R44 - it is only asynchronous above zero).
+$revealCallCount = -1
+foreach ($f in $files) {
+    $raw = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f.FullName))
+    $revealCallCount += ([regex]::Matches($raw, 'sheetReveal\(')).Count
+}
+$timerArm = [regex]::Match($rootLfm, 'setTimeout\(\s*function\(\)\s*sheetReveal\(self\);\s*end\s*,\s*(\d+)\s*\)')
+$themeEntry = ($hh6 -match '(?s)<dataLink field="sheetTheme".*?sheetReveal\(self\);.*?</dataLink>')
+$armedOnReady = ($rootLfm -match '(?s)<event name="onNodeReady">.*?setTimeout\(\s*function\(\)\s*sheetReveal')
+if ($revealCallCount -lt 2) { Fail "V167 sheetReveal is called from $revealCallCount place(s) - one entry means one way to fail (SPEC I15)" }
+elseif ($revealBody -notmatch 'tc\.visible ~= true') { Fail "V167 sheetReveal writes without looking - it is called more than once and must be idempotent" }
+elseif (-not $timerArm.Success) { Fail "V167 no timer arms the reveal on the root form - every entry would hang off a paint that may never run (SPEC B40)" }
+elseif ([int]$timerArm.Groups[1].Value -le 0) { Fail "V167 the reveal timer is armed at $($timerArm.Groups[1].Value)ms - setTimeout runs synchronously at zero (SPEC R44)" }
+elseif (-not $armedOnReady) { Fail "V167 the timer is not armed from onNodeReady - the floor has to go down when the sheet opens" }
+elseif (-not $themeEntry) { Fail "V167 the theme paint does not call sheetReveal - the normal entry is the last load paint there is (SPEC I15)" }
+else { Pass "V167 the reveal is idempotent, armed by a $($timerArm.Groups[1].Value)ms floor and by the theme paint" }
+
+# ---- V168: the ability row is measured against its neighbours, not a literal ---------
+# The user gave the two ENDS of this row: TALENTS starts where VIRTUES starts and
+# KNOWLEDGES closes where EXPERIENCE closes. Measuring those two pairs is what stops one
+# of the four boxes from moving without the other (the same shape as V69).
+function BoxOf($doc, $title) { @($doc.SelectNodes("//layout[label/@text='$title']"))[0] }
+$bTal = BoxOf $mainDoc "TALENTS"; $bSki = BoxOf $mainDoc "SKILLS"; $bKno = BoxOf $mainDoc "KNOWLEDGES"
+$bVir = BoxOf $mainDoc "VIRTUES"; $bExp = BoxOf $mainDoc "EXPERIENCE"
+$colW = @(); $abilRowOk = $false
+if (-not ($bTal -and $bSki -and $bKno -and $bVir -and $bExp)) { Fail "V168 one of TALENTS/SKILLS/KNOWLEDGES/VIRTUES/EXPERIENCE is not a titled box on HH.1" }
+else {
+    $talL = [int]$bTal.GetAttribute("left"); $virL = [int]$bVir.GetAttribute("left")
+    $knoR = [int]$bKno.GetAttribute("left") + [int]$bKno.GetAttribute("width")
+    $expR = [int]$bExp.GetAttribute("left") + [int]$bExp.GetAttribute("width")
+    $colW = @(@($bTal, $bSki, $bKno) | ForEach-Object { [int]$_.GetAttribute("width") } | Sort-Object -Unique)
+    $colT = @(@($bTal, $bSki, $bKno) | ForEach-Object { [int]$_.GetAttribute("top") } | Sort-Object -Unique)
+    $gapA = [int]$bSki.GetAttribute("left") - ($talL + [int]$bTal.GetAttribute("width"))
+    $gapB = [int]$bKno.GetAttribute("left") - ([int]$bSki.GetAttribute("left") + [int]$bSki.GetAttribute("width"))
+    if ($talL -ne $virL) { Fail "V168 TALENTS starts at $talL and VIRTUES at $virL - the user asked for the two to line up" }
+    elseif ($knoR -ne $expR) { Fail "V168 KNOWLEDGES closes at $knoR and EXPERIENCE at $expR - the user asked for the two to line up" }
+    elseif ($colW.Count -ne 1) { Fail "V168 the three ability columns are $($colW -join '/') wide - one would read narrower than its neighbours" }
+    elseif ($colT.Count -ne 1) { Fail "V168 the three ability columns start at $($colT -join '/') - they are one row and share a top" }
+    elseif ($gapA -ne $gapB) { Fail "V168 the column gaps are $gapA and $gapB - the row would read lopsided" }
+    else { $abilRowOk = $true; Pass "V168 the ability row runs $talL..$knoR, aligned on VIRTUES and EXPERIENCE, three $($colW[0])px columns $gapA apart" }
+}
+
+# ---- V169: the ABILITIES frame is gone, key and all ----------------------------------
+# It was a box whose title named what the three titles inside it already said, and its
+# frame cost 30px of width the names wanted. A label that no longer exists must not leave
+# a key behind in the .lang or the PT map (the rule V165 wrote for the rename).
+$abilTitles = @($mainDoc.SelectNodes("//label[@text='ABILITIES']"))
+$looseCols = @($mainDoc.SelectNodes("/form/scrollBox/layout[label/@text='TALENTS' or label/@text='SKILLS' or label/@text='KNOWLEDGES']"))
+if ($abilTitles.Count -ne 0) { Fail "V169 HH.1 still draws an ABILITIES title - the frame the user asked to remove is back" }
+elseif ($looseCols.Count -ne 3) { Fail "V169 $($looseCols.Count) of the three ability columns are direct children of the scrollBox - nested again, V40 stops weighing them against the tab" }
+elseif ($ptK.Contains("ABILITIES") -or $enK.Contains("ABILITIES")) { Fail "V169 ABILITIES is still keyed in localization.lang with no label reading it" }
+elseif ($hh6 -match '\["ABILITIES"\]') { Fail "V169 ABILITIES is still in the PT map with no label reading it" }
+else { Pass "V169 the ABILITIES frame is gone, the three columns stand loose and no key survives it" }
+
+# ---- V170: the width the columns gained went to the NAMES ----------------------------
+# The whole point of the request was the ability names, so the 10px each column picked up
+# has to be readable as label, not as air between the last dot and the border. Ability and
+# CustomAbility are measured together: they are siblings in every column (SPEC V26).
+$tplA = @($mainDoc.SelectNodes("//template[@name='Ability']"))[0]
+$tplC = @($mainDoc.SelectNodes("//template[@name='CustomAbility']"))[0]
+$rowW = @()
+foreach ($col in $looseCols) {
+    foreach ($r in $col.SelectNodes("layout[Ability or CustomAbility]")) { $rowW += [int]$r.GetAttribute("width") }
+}
+$rowW = @($rowW | Sort-Object -Unique)
+if (-not $abilRowOk) { Fail "V170 not measured - the ability row did not pass V168" }
+elseif (-not ($tplA -and $tplC)) { Fail "V170 Ability or CustomAbility is not declared on HH.1" }
+elseif ($rowW.Count -ne 1) { Fail "V170 the ability rows are $($rowW -join '/') wide - one column would hold a different name width" }
+else {
+    $aInput = [int](@($tplA.SelectNodes("label"))[0].GetAttribute("width"))
+    $cInput = [int](@($tplC.SelectNodes("edit"))[0].GetAttribute("width"))
+    $aDots = @($tplA.SelectNodes("imageCheckBox") | ForEach-Object { [int]$_.GetAttribute("left") } | Sort-Object)
+    $cDots = @($tplC.SelectNodes("imageCheckBox") | ForEach-Object { [int]$_.GetAttribute("left") } | Sort-Object)
+    $colInner = $colW[0] - 30
+    if ($aDots[0] -ne $cDots[0]) { Fail "V170 Ability puts its first dot at $($aDots[0]) and CustomAbility at $($cDots[0]) - they are siblings in every column (SPEC V26)" }
+    elseif ($rowW[0] -ne $colInner) { Fail "V170 the rows are $($rowW[0]) wide inside a $($colW[0])px column - $($colW[0] - $rowW[0])px of the column reaches no row" }
+    elseif (($aDots[-1] + 25) -ne $rowW[0]) { Fail "V170 the last dot ends at $($aDots[-1] + 25) in a row $($rowW[0]) wide - the leftover is dead margin, not name" }
+    elseif ($aInput -gt $aDots[0] -or $cInput -gt $cDots[0]) { Fail "V170 the name field runs under the first dot ($aInput / $cInput against $($aDots[0]))" }
+    elseif (($aDots[0] - $aInput) -gt 3) { Fail "V170 $($aDots[0] - $aInput)px sit between the ability label and its first dot - that width was asked for by the names" }
+    else { Pass "V170 the $($colW[0])px column hands ${aInput}px to the name and closes on its last dot" }
+}
+
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.
 # Exit 0 alone is not proof of a build - the artifact must change.

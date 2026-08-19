@@ -446,6 +446,32 @@
 				if denied and tabMain ~= nil then tabMain:activate(); end;
 			end;
 
+			-- ---- First paint (SPEC I15 / V166 / V167 / B40, 49th round) -----------------
+			--
+			-- The host draws the sheet before any hook of ours runs (SPEC R47), so for about a
+			-- second every open showed the sheet exactly as the XML authors it: black boxes, the
+			-- host font, white dots, no parchment, HEALTH with no labels and abilities off their
+			-- era. That look is nobody's choice - since the 16th round every value the theme
+			-- combo offers repaints, so there is no way back to it (SPEC C). It was dead state
+			-- on display at every single open, and the user asked for it gone.
+			--
+			-- The fix is not to show it. The tabControl is authored hidden and this is the one
+			-- place in the sheet that lights it (SPEC V166).
+			--
+			-- Idempotent, and deliberately reachable two ways (SPEC V167): the theme paint calls
+			-- it when it is done, and onNodeReady arms a timer that calls it whatever happens. A
+			-- paint that never runs has to leave the sheet ugly, never blank - hiding it forever
+			-- is worse than showing it raw, which is the mirror of the mistake B26 made when it
+			-- left hidden tabs authored visible.
+			--
+			-- Found by name from the root, through the one finder there is (SPEC V143): this is
+			-- called from HH.6, and a tab form cannot reach its siblings (SPEC R.9 / B.9).
+			function sheetReveal(from)
+				local tc = xpFind(tabRootOf(from), { tabsHH = true }, {}).tabsHH;
+
+				if tc ~= nil and tc.visible ~= true then tc.visible = true; end;
+			end;
+
 			-- A write the sheet makes to ITSELF is not a click by the player, and an
 			-- imageCheckBox has no onUserChange to tell the two apart (SPEC R37) - so the code
 			-- says which is which. Whatever writes a batch of fields raises this first and
@@ -1336,8 +1362,17 @@
 		The 27th round authored them all visible and left the hiding to the renderer, and a
 		fresh sheet with every checkbox unticked opened with all three on show (SPEC B26) -
 		so the static state fails CLOSED too, not just the gate in Lua.
+
+		The whole control is authored HIDDEN and stays that way until sheetReveal lights it
+		(SPEC I15, V166, B40): the host paints before any hook of ours runs (SPEC R47), and
+		what it painted was the sheet as the XML authors it - a look no theme has offered
+		since the 16th round. A second of nothing beats a second of the wrong sheet.
+
+		This is a different mechanism from the three tabs above and they do not meet: this
+		one is the whole control and is written once, on load; those are individual <tab>s
+		and are written by applyTabVisibility every time the sheet is shown (SPEC V96).
 	-->
-	<tabControl align="client">
+	<tabControl name="tabsHH" align="client" visible="false">
 		<tab name="tabMain" title="Main">
 			<import file="HH.1.lfm"/>
 		</tab>
@@ -1430,5 +1465,14 @@
 		xpQuiet = false;
 
 		applyTabVisibility(self);
+
+		-- The floor under the reveal (SPEC V167, I15). The theme paint is what normally
+		-- lights the sheet, and it is the last load paint there is - but which of this
+		-- event, a tab's dataLink and a tab's own onNodeReady runs first is unknown
+		-- (SPEC R47), and a paint that throws or never fires would leave the player
+		-- staring at nothing. A timer cannot fire early and cannot depend on the paint,
+		-- which is exactly the two properties this needs. setTimeout is only
+		-- asynchronous with a positive interval (SPEC R44).
+		setTimeout(function() sheetReveal(self); end, 1500);
 	</event>
 </form>
