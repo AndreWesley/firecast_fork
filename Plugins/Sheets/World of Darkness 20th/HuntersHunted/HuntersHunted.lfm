@@ -498,6 +498,26 @@
 				return n;
 			end;
 
+			-- The sheet as it WOULD be if the click were allowed (SPEC V136). Pricing a dot
+			-- must not write it: what kept the guard from ever making a refusal stick was
+			-- that it let the mark happen and argued afterwards (SPEC B38).
+			--
+			-- Only the live sheet is simulated. The baseline is the character the storyteller
+			-- froze, and it goes on being read through traitLevel directly.
+			local simTrait, simField, simValue;
+
+			local function liveLevel(base, first, last, fixed)
+				local n = traitLevel(sheet, base, first, last, fixed);
+
+				-- One dot, one trait: a pending click moves the count by one at most, and only
+				-- for the trait the dot belongs to.
+				if simTrait == base and (sheet[simField] == true) ~= simValue then
+					if simValue then n = n + 1; else n = n - 1; end;
+				end;
+
+				return n;
+			end;
+
 			-- SPEC I9. Every ACTIVE rule sits here exactly once (SPEC V86). The dormant ones -
 			-- Discipline, Path, Sphere, Arete - are in the spec but deliberately NOT written:
 			-- the Disciplines tab is empty and Magika is gone altogether (SPEC V128), so no
@@ -625,10 +645,15 @@
 
 			-- Returns the rows, or nil when no initial character has been saved yet - the
 			-- caller shows a state text for that instead of an empty table (SPEC V33).
-			function xpLedgerRows()
+			function xpLedgerRows(clickField, clickValue)
 				local base = baselineOf();
 
 				if base == nil then return nil; end;
+
+				-- Set after the baseline check and cleared before the one way out, so nothing
+				-- later is priced under a click that has already been answered (SPEC V136).
+				simField, simValue = clickField, clickValue;
+				simTrait = clickField ~= nil and string.match(clickField, "^(.+)_%d+$") or nil;
 
 				local ctx  = { backgroundsXP = sheet.stBackgroundsXP == true };
 				local rows = {};
@@ -643,7 +668,7 @@
 
 					pushRise(rows, "Attribute", nome,
 						traitLevel(base, field, first, 5, fixed),
-						traitLevel(sheet, field, first, 5, fixed), ctx);
+						liveLevel(field, first, 5, fixed), ctx);
 				end;
 
 				for i = 1, #XP_ABILITIES, 1 do
@@ -652,7 +677,7 @@
 
 					pushRise(rows, "Ability", nome,
 						traitLevel(base, field, 1, 5, 0),
-						traitLevel(sheet, field, 1, 5, 0), ctx);
+						liveLevel(field, 1, 5, 0), ctx);
 				end;
 
 				for i = 1, #XP_CUSTOM, 1 do
@@ -660,7 +685,7 @@
 
 					pushRise(rows, "Ability", slotName(field),
 						traitLevel(base, field, 1, 5, 0),
-						traitLevel(sheet, field, 1, 5, 0), ctx);
+						liveLevel(field, 1, 5, 0), ctx);
 				end;
 
 				for i = 1, #XP_VIRTUES, 1 do
@@ -668,23 +693,23 @@
 
 					pushRise(rows, "Virtue", nome,
 						traitLevel(base, field, 2, 5, 1),
-						traitLevel(sheet, field, 2, 5, 1), ctx);
+						liveLevel(field, 2, 5, 1), ctx);
 				end;
 
 				pushRise(rows, "Humanity", "Humanity",
 					traitLevel(base, "humanity", 1, 10, 0),
-					traitLevel(sheet, "humanity", 1, 10, 0), ctx);
+					liveLevel("humanity", 1, 10, 0), ctx);
 
 				pushRise(rows, "Willpower", "Willpower",
 					traitLevel(base, "willpower", 1, 10, 0),
-					traitLevel(sheet, "willpower", 1, 10, 0), ctx);
+					liveLevel("willpower", 1, 10, 0), ctx);
 
 				for i = 1, 9, 1 do
 					local field = "background_" .. i;
 
 					pushRise(rows, "Background", slotName(field),
 						traitLevel(base, field, 1, 5, 0),
-						traitLevel(sheet, field, 1, 5, 0), ctx);
+						liveLevel(field, 1, 5, 0), ctx);
 				end;
 
 				-- Which kinds the character already had when the storyteller froze the sheet.
@@ -701,7 +726,7 @@
 					for i = 1, grp.count, 1 do
 						local field = grp.base .. "_" .. i;
 						local from  = traitLevel(base, field, 1, 5, 0);
-						local to    = traitLevel(sheet, field, 1, 5, 0);
+						local to    = liveLevel(field, 1, 5, 0);
 
 						if to > from then
 							-- SPEC V88: the affinity path is the FIRST hedge row, always. It is
@@ -719,7 +744,7 @@
 				-- True Faith is a numina like the others; the combo beside it picks a religion,
 				-- not a power (SPEC V50), so the ledger names the numina.
 				local ff = traitLevel(base, "faith", 1, 5, 0);
-				local ft = traitLevel(sheet, "faith", 1, 5, 0);
+				local ft = liveLevel("faith", 1, 5, 0);
 
 				if ft > ff then
 					ctx.affinity = false;
@@ -727,6 +752,8 @@
 
 					pushRise(rows, "Numina", "True Faith", ff, ft, ctx);
 				end;
+
+				simTrait, simField, simValue = nil, nil, nil;
 
 				return rows;
 			end;
@@ -865,95 +892,84 @@
 				return nil;
 			end;
 
-			-- Every dot that costs experience calls this after it changes (SPEC I12/V99). It
-			-- writes no experience at all: the balance is xpTotal minus the log (SPEC V100),
-			-- so a purchase pays for itself the moment the dot reaches the log and taking the
-			-- dot back off refunds by the same subtraction. All this does is refuse the two
-			-- moves the rules do not allow, by putting the dot back where it was.
+			-- The mark itself, made in one step: the field the sheet is saved from and the
+			-- control the player is looking at (SPEC V135). With autoChange="false" the dot
+			-- writes neither of them on its own, so both are this function's job.
+			local function markDot(form, field, v)
+				setField(field, v);
+
+				local dot = findDot(form, field);
+
+				if dot ~= nil then dot.checked = v; end;
+			end;
+
+			-- Every dot that costs experience calls this when it is CLICKED (SPEC I13/V99).
+			-- The dot is autoChange="false" (SPEC V134), so nothing has happened yet: the mark
+			-- is this function's to make, and it is made only if the rules allow it.
 			--
-			-- The undo is written QUIETLY (SPEC V127), so this does not run a second time. It
-			-- used to rely on re-entry finding a legal state and stopping, and that is true for
-			-- every state but one: a trait sitting BELOW the baseline on a sheet with no
-			-- balance left. There the second pass refuses the undo of the undo, writes the dot
-			-- back, and the guard flips forever.
+			-- Three rounds tried letting the mark happen and taking it back (SPEC B36/B38). A
+			-- write made from inside the dot's own onChange - to the field or to the control -
+			-- does not survive the end of the dispatch, so no undo could ever stick. Deciding
+			-- first is not a way around that; it is what the sheet should have done all along.
+			--
+			-- It writes no experience at all (SPEC V100): a purchase pays for itself the moment
+			-- the dot reaches the log, and taking the dot back off refunds by the same
+			-- subtraction.
+			--
 			-- The ability rows hand in the field their dot is bound to RIGHT NOW, because the
 			-- era rebinds those five dots to another ability's field (SPEC V76) - the name
-			-- written in the .lfm is only the Victorian one. Everywhere else the authored name
-			-- is the name for good.
-			function xpGuard(field, form)
-				if sheet == nil or xpQuiet or field == nil or field == "" then return; end;
+			-- written in the .lfm is only the Victorian one.
+			function xpClick(field, form)
+				if sheet == nil or field == nil or field == "" then return; end;
 
-				-- Nothing is enforced while the character is being built: the rule starts when
-				-- the storyteller freezes the sheet (SPEC V101).
+				-- What the click is ASKING for. The dot cannot flip itself, so this is a
+				-- request, not a fact.
+				local want = not (sheet[field] == true);
 				local base = baselineOf();
 
-				if base == nil then renderAllXPBoxes(); return; end;
+				-- Nothing is priced while the character is being built: the rule starts when
+				-- the storyteller freezes the sheet (SPEC V101).
+				if base == nil then
+					markDot(form, field, want);
+					renderAllXPBoxes();
+					return;
+				end;
 
 				local trait = string.match(field, "^(.+)_%d+$");
 				local t     = trait ~= nil and XP_TRAIT[trait] or nil;
 
 				-- Willpower's spent boxes (willpower_c1..c10) and anything else that is not a
-				-- rating land here.
-				if t == nil then return; end;
+				-- rating cost nothing, so they simply happen.
+				if t == nil then markDot(form, field, want); return; end;
 
-				local on  = sheet[field] == true;
-				local now = traitLevel(sheet, trait, t.first, t.last, t.fixed);
-
-				-- ONE walk, shared by everything that draws off it (SPEC V125): the balance
-				-- boxes take the sum and the log takes the rows themselves.
-				local rows  = xpLedgerRows();
+				-- ONE walk, of the sheet as it WOULD be (SPEC V125/V135/V136): the balance
+				-- boxes take the sum and the log takes the rows, and both already describe the
+				-- state this click is about to create.
+				local rows  = xpLedgerRows(field, want);
 				local spent = xpSum(rows);
-				local undo;
 
-				if on then
-					-- The log already counts the point, so this is the balance the player
-					-- would be left holding.
-					undo = ((tonumber(sheet.xpTotal) or 0) - spent) < 0;
+				if want then
+					-- SPEC V135: refused BEFORE the mark. Nothing was written, so there is
+					-- nothing to put back and nothing to flicker.
+					if ((tonumber(sheet.xpTotal) or 0) - spent) < 0 then
+						xpWarn("Not enough experience to buy that dot");
+						return;
+					end;
 				else
 					-- SPEC V103: only a point that is IN the log can be sold back. Below the
-					-- baseline is the storyteller's character, not the player's purchase.
-					undo = now < traitLevel(base, trait, t.first, t.last, t.fixed);
+					-- baseline is the storyteller's character, not the player's purchase. The
+					-- dot being switched off is on, so this would leave the trait one lower.
+					local after = traitLevel(sheet, trait, t.first, t.last, t.fixed) - 1;
+
+					if after < traitLevel(base, trait, t.first, t.last, t.fixed) then return; end;
 				end;
 
-				if undo then
-					-- The dot goes back where it was, written quietly so this does not run
-					-- again (SPEC V127). The rows above describe the state being REFUSED, so
-					-- the restored state is read once more - the only click that pays for two
-					-- walks is one the rules turned down.
-					--
-					-- The CONTROL is written as well as the field (SPEC V132). Writing the NDB
-					-- from inside the control's own onChange does not survive the end of the
-					-- dispatch: the dot stayed lit and the refused purchase still reached the
-					-- log (SPEC B36). Whether the control re-asserts its own checked state or
-					-- ignores the write while it is dispatching cannot be told apart from here
-					-- (SPEC R43) - writing both covers either one.
-					local dot = findDot(form, field);
+				markDot(form, field, want);
 
-					xpQuiet = true;
-					setField(field, not on);
-					if dot ~= nil then dot.checked = not on; end;
-					xpQuiet = false;
-
-					local back = xpLedgerRows();
-
-					renderAllXPBoxes(xpSum(back));
-					xpLedgerRefresh(back);
-
-					-- SPEC V129: a refusal for want of experience says so, and only that one.
-					-- The other refusal - selling back a point the storyteller paid for (SPEC
-					-- V103) - stays silent, so this message can never name the wrong reason.
-					-- Raised AFTER the dot is back where it was: the modal covers a legal
-					-- sheet.
-					if on then xpWarn("Not enough experience to buy that dot"); end;
-
-					return;
-				end;
-
-				-- One walk of the ledger per click (SPEC V108/V125): all three drawers are
-				-- handed what this call already built instead of building it again.
 				renderAllXPBoxes(spent);
 				xpLedgerRefresh(rows);
 			end;
+
 
 			-- What the character has spent, straight off the log (SPEC I11). Not stored: a
 			-- second copy of this number is the one thing that could disagree with the lines

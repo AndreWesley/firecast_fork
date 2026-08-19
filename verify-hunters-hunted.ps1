@@ -1833,11 +1833,21 @@ foreach ($f in $files) {
     foreach ($n in (Doc $f.FullName).SelectNodes("//imageCheckBox")) {
         if (-not $n.GetAttribute("field")) { continue }   # display-only mirror (V51): owns nothing, buys nothing
         $dots += $n
-        if ($n.GetAttribute("onChange") -notmatch 'xpGuard\(') { $dotsUnguarded += "$($f.Name) $($n.GetAttribute('field'))" }
+        if ($n.GetAttribute("onClick") -notmatch 'xpClick\(') { $dotsUnguarded += "$($f.Name) $($n.GetAttribute('field'))" }
     }
 }
-if ($dotsUnguarded) { foreach ($d in $dotsUnguarded) { Fail "V99 dot '$d' does not call xpGuard - that trait could be raised with no experience left" } }
-else { Pass "V99 all $($dots.Count) rating dots call the guard" }
+if ($dotsUnguarded) { foreach ($d in $dotsUnguarded) { Fail "V99 dot '$d' does not call xpClick on the click - that trait could be raised with no experience left" } }
+else { Pass "V99 all $($dots.Count) rating dots ask xpClick before anything is marked" }
+
+# ---- V134: the host marks nothing on its own (SPEC B38) ------------------------------
+# Three rounds tried to let the click land and take it back. It cannot be taken back: a
+# write made from inside the dot own onChange does not survive the dispatch. So the dot is
+# told not to change itself, and the mark becomes the sheet decision to make.
+$dotsAuto = @($dots | Where-Object { $_.GetAttribute("autoChange") -ne 'false' })
+$dotsOnChange = @($dots | Where-Object { $_.GetAttribute("onChange") -ne "" })
+if ($dotsAuto.Count -gt 0) { Fail "V134 $($dotsAuto.Count) rating dot(s) still mark themselves - autoChange is not false, so the host writes before anyone is asked (SPEC B38)" }
+elseif ($dotsOnChange.Count -gt 0) { Fail "V134 $($dotsOnChange.Count) rating dot(s) still carry an onChange - two decision paths for one click" }
+else { Pass "V134 all $($dots.Count) rating dots leave the marking to xpClick" }
 
 # The guard only knows the traits XP_TRAIT declares, and it is built from the ledger's own
 # lists so the two cannot disagree (SPEC V86). A dropped category would leave those dots
@@ -1856,10 +1866,10 @@ else {
 # ---- V100: experience is worked out, never booked ---------------------------------
 # The balance is xpTotal minus the log. A deducted balance would be a second count of the
 # same purchases, and the two would part company the first time a click was missed.
-$guardFn = LuaFn $root 'xpGuard'
+$guardFn = LuaFn $root 'xpClick'
 $boxesFn = LuaFn $root 'renderXPBoxes'
 $writes = @([regex]::Matches($root, 'setField\("xpTotal",')).Count
-if (-not $guardFn) { Fail "V100 xpGuard not found on the root form" }
+if (-not $guardFn) { Fail "V100 xpClick not found on the root form" }
 elseif (-not $boxesFn) { Fail "V100 renderXPBoxes not found on the root form" }
 elseif ($guardFn -match 'setField\("xpTotal",') { Fail "V100 the guard writes experience - a purchase would be counted twice (SPEC V83)" }
 elseif ($writes -ne 2) { Fail "V100 xpTotal is written in $writes places - it may only be seeded once and set by the player (SPEC I11)" }
@@ -1873,7 +1883,7 @@ else { Pass "V100 experience is derived: one number saved, two worked out" }
 # click from a write (SPEC R37), so the flag is how the sheet says which is which.
 $eraFn = LuaFn $hh6 'renderAbilityLabels'
 if ($root -notmatch 'xpQuiet = false;') { Fail "V107 xpQuiet is not declared on the root form" }
-elseif ($guardFn -notmatch 'or xpQuiet or') { Fail "V107 the guard runs on the sheet's own writes - the load would walk the ledger per dot (SPEC B30)" }
+elseif ((LuaFn $root 'renderAllXPBoxes') -notmatch 'if sheet == nil or xpQuiet then return') { Fail "V107 the all-forms box renderer runs on the sheet's own writes - the load would walk the ledger per dot (SPEC B30)" }
 elseif ($boxesFn -notmatch 'if sheet == nil or xpQuiet then return') { Fail "V107 the box renderer runs on the sheet's own writes (SPEC B30)" }
 elseif ($boxesFn -notmatch 'xpQuiet = true') { Fail "V107 seeding xpTotal is not done quietly - the links watching it call straight back in" }
 elseif (-not $eraFn) { Fail "V107 renderAbilityLabels not found on HH.6" }
@@ -1891,12 +1901,12 @@ else { Pass "V108 a click walks the ledger once" }
 # ---- V101: the guard sleeps until the character is frozen -------------------------
 # Building a character spends nothing, so a balance of zero must not stop the first dot.
 if ($guardFn -notmatch 'baselineOf\(\)') { Fail "V101 the guard does not look for a baseline - a character could not be built at all" }
-elseif ($guardFn -notmatch 'if base == nil then[^\r\n]*return;') { Fail "V101 the guard does not stand down without a baseline (SPEC I8c)" }
+elseif ($guardFn -notmatch '(?s)if base == nil then.{0,220}return;') { Fail "V101 the guard does not stand down without a baseline (SPEC I8c)" }
 else { Pass "V101 the guard sleeps until the storyteller freezes the character" }
 
 # ---- V103: only a point that is IN the log can be sold back -----------------------
 if ($guardFn -notmatch 'traitLevel\(base,') { Fail "V103 the guard never reads the baseline rating - it would let a frozen point be sold" }
-elseif ($guardFn -notmatch 'setField\(field, not on\)') { Fail "V103 the guard has no way to put a refused dot back" }
+elseif ($guardFn -notmatch '(?s)if after < traitLevel\(base,.{0,80}return;') { Fail "V103 the guard does not refuse a sale that would drop the trait below the frozen character" }
 else { Pass "V103 a point the storyteller froze cannot be sold back" }
 
 # ---- V102: the three experience boxes own no field --------------------------------
@@ -1929,9 +1939,9 @@ else { Pass "V91 xpLog owned by nothing" }
 $lvlFn = LuaFn $root 'traitLevel'
 if (-not $lvlFn) { Fail "V85 traitLevel not found on the root form" }
 elseif ($rowsFn -match 'willpower_c') { Fail "V85 the ledger reads the willpower BOXES - those are spent points, not rating" }
-elseif ($rowsFn -notmatch 'traitLevel\(base,' -or $rowsFn -notmatch 'traitLevel\(sheet,') { Fail "V85 the ledger does not read both sides through traitLevel" }
+elseif ($rowsFn -notmatch 'traitLevel\(base,' -or $rowsFn -notmatch 'liveLevel\(') { Fail "V85 the ledger does not read both sides through traitLevel" }
 elseif ($rowsFn -match '(?m)^\s*for i = 1, 5, 1 do') { Fail "V85 xpLedgerRows counts dots itself instead of calling traitLevel" }
-else { Pass "V85 both sides of the diff read ratings through traitLevel" }
+else { Pass "V85 both sides of the diff read ratings through traitLevel (the live side through liveLevel, which adds only the pending click)" }
 
 # Attributes and virtues start at _2 with a fixed first dot; Appearance is the declared
 # exception (SPEC I3). Getting this wrong prices every attribute one step off.
@@ -2029,7 +2039,7 @@ foreach ($f in $files) {
     foreach ($n in (Doc $f.FullName).SelectNodes("//edit | //textEditor | //comboBox | //checkBox | //imageCheckBox")) {
         $ro = ($n.GetAttribute("readOnly") -eq 'true') -or
               ($n.GetAttribute("enabled")  -eq 'false') -or
-              ($n.LocalName -eq 'imageCheckBox' -and $n.GetAttribute("autoChange") -eq 'false')
+              ($n.LocalName -eq 'imageCheckBox' -and $n.GetAttribute("autoChange") -eq 'false' -and -not $n.GetAttribute("onClick"))
         $op = $n.GetAttribute("opacity")
         $id = $n.GetAttribute("name"); if (-not $id) { $id = $n.GetAttribute("field") }; if (-not $id) { $id = $n.LocalName }
 
@@ -2152,17 +2162,17 @@ if ($rootTxt -notmatch 'function xpSum\(rows\)') { Fail "V125 xpSum is missing -
 elseif ($rootTxt -notmatch 'function xpSpent\(\)\s*\r?\n\s*return xpSum\(xpLedgerRows\(\)\);') { Fail "V125 xpSpent does not total the rows through xpSum" }
 else { Pass "V125 totalling is split from walking" }
 
-$guardFn = [regex]::Match($rootTxt, 'function xpGuard\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
-if (-not $guardFn.Success) { Fail "V125 xpGuard not found on the root form" }
+$guardFn = [regex]::Match($rootTxt, 'function xpClick\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
+if (-not $guardFn.Success) { Fail "V125 xpClick not found on the root form" }
 else {
     $g = $guardFn.Groups[1].Value
     # The accepted path walks once. The refused path reads the restored state a second time -
     # the rows in hand describe the state being turned down, so they cannot be reused.
     $walks = @([regex]::Matches($g, 'xpLedgerRows\(\)')).Count
-    if ($walks -gt 2) { Fail "V125 xpGuard walks the ledger $walks times - one for the click, at most one more to read back a refused move" }
-    elseif ($g -notmatch 'local spent = xpSum\(rows\);') { Fail "V125 xpGuard does not total the rows it already built" }
-    elseif ($g -notmatch 'renderAllXPBoxes\(spent\);') { Fail "V125 xpGuard makes the boxes walk the ledger again" }
-    elseif ($g -notmatch 'xpLedgerRefresh\(rows\);') { Fail "V125 xpGuard does not hand its rows to the log" }
+    if ($walks -gt 2) { Fail "V125 xpClick walks the ledger $walks times - one for the click, at most one more to read back a refused move" }
+    elseif ($g -notmatch 'local spent = xpSum\(rows\);') { Fail "V125 xpClick does not total the rows it already built" }
+    elseif ($g -notmatch 'renderAllXPBoxes\(spent\);') { Fail "V125 xpClick makes the boxes walk the ledger again" }
+    elseif ($g -notmatch 'xpLedgerRefresh\(rows\);') { Fail "V125 xpClick does not hand its rows to the log" }
     else { Pass "V125 one walk per accepted click, shared by the boxes and the log" }
 }
 if ($ledgerTxt -notmatch 'function renderXPLedger\(form, rows\)') { Fail "V125 renderXPLedger does not accept rows - it always walks the ledger itself" }
@@ -2180,21 +2190,6 @@ $sum = ($papers | Measure-Object -Property Length -Sum).Sum
 if ($tooBig) { foreach ($p in $tooBig) { Fail "V126 images/$($p.Name) is $([int]($p.Length/1KB)) KB, over the $([int]($pngCap/1KB)) KB ceiling" } }
 elseif ($sum -gt $pngTotal) { Fail "V126 images/ totals $([int]($sum/1KB)) KB, over the $([int]($pngTotal/1KB)) KB budget" }
 else { Pass "V126 all $($papers.Count) images fit the ceiling ($([int]($sum/1KB)) KB total)" }
-
-# ---- V127: the guard terminates ------------------------------------------------------
-# The undo used to be written loudly and rely on re-entry finding a legal state. That holds
-# for every state but one: a trait below the baseline on a sheet with no balance left. There
-# the second pass refuses the undo of the undo and the guard flips forever.
-if (-not $guardFn.Success) { Fail "V127 xpGuard not found on the root form" }
-else {
-    $g = $guardFn.Groups[1].Value
-    $undo = [regex]::Match($g, 'if undo then(.*?)return;', 'Singleline')
-    if (-not $undo.Success) { Fail "V127 xpGuard has no undo branch" }
-    elseif ($undo.Groups[1].Value -notmatch 'xpQuiet = true;') { Fail "V127 the undo is written loudly - the guard re-enters and can flip forever" }
-    elseif ($undo.Groups[1].Value -notmatch 'setField\(field, not on\);') { Fail "V127 the undo does not put the dot back through setField" }
-    elseif ($undo.Groups[1].Value -notmatch 'xpQuiet = false;') { Fail "V127 the undo raises xpQuiet and never lowers it - every later click would be ignored" }
-    else { Pass "V127 the undo is written quietly, so the guard runs once and stops" }
-}
 
 # ---- V128: three managed tabs, and Magika is gone for good ---------------------------
 # The user had the empty Magika window removed in the 39th round. Its field name stays burned
@@ -2222,22 +2217,22 @@ if ($langMagika -match 'wod\.(Magika|Show Magika)=') { Fail "V128 localization.l
 else { Pass "V128 the Magika keys are out of localization.lang" }
 
 # ---- V129 + V130: the refusal that speaks, and the one that must not -----------------
-# The guard has refused a purchase with no balance behind it since v2.8, silently, and no
-# test has ever seen it fire (SPEC B33). The pop-up is both what the user asked for and the
-# first runtime proof the guard runs at all, so it sits on the balance branch ONLY: selling
-# back a point the storyteller paid for (V103) is a different refusal, and a message naming
-# the wrong reason is worse than one that never comes.
-$guardFn = [regex]::Match($rootTxt, 'function xpGuard\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
-if (-not $guardFn.Success) { Fail "V129 xpGuard not found on the root form" }
+# The pop-up is what made B36 and B38 findable: it proved the click reached the sheet's own
+# code (SPEC R42) while the mark stayed anyway. The refusal now happens BEFORE the mark, so
+# the message describes a sheet nothing was written to. It stays fenced to the balance
+# branch: selling back a point the storyteller paid for (V103) is a different refusal, and a
+# message naming the wrong reason is worse than one that never comes.
+$guardFn = [regex]::Match($rootTxt, 'function xpClick\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
+if (-not $guardFn.Success) { Fail "V129 xpClick not found on the root form" }
 else {
     $g     = $guardFn.Groups[1].Value
-    $undo  = [regex]::Match($g, 'if undo then(.*?)return;', 'Singleline')
+    $buy   = [regex]::Match($g, 'if want then(.*?)else', 'Singleline')
     $warns = @([regex]::Matches($g, 'xpWarn\("([^"]*)"\)'))
-    if (-not $undo.Success) { Fail "V129 xpGuard has no undo branch" }
-    elseif ($warns.Count -ne 1) { Fail "V129 xpGuard raises $($warns.Count) pop-ups - exactly one refusal, the one for want of experience, may speak" }
-    elseif ($undo.Groups[1].Value -notmatch 'if on then xpWarn\(') { Fail "V129 the pop-up is not fenced to the balance branch - it would fire when a baseline point is sold back (SPEC V103)" }
-    elseif ($undo.Groups[1].Value.IndexOf('xpWarn(') -lt $undo.Groups[1].Value.IndexOf('setField(field, not on)')) { Fail "V129 the pop-up opens before the dot goes back - the modal would sit over a sheet the rules have refused" }
-    else { Pass "V129 only the balance refusal speaks, and only once the dot is back" }
+    if (-not $buy.Success) { Fail "V129 xpClick has no purchase branch" }
+    elseif ($warns.Count -ne 1) { Fail "V129 xpClick raises $($warns.Count) pop-ups - exactly one refusal, the one for want of experience, may speak" }
+    elseif ($buy.Groups[1].Value -notmatch 'xpWarn\(') { Fail "V129 the refusal for want of experience says nothing" }
+    elseif ($buy.Groups[1].Value -match 'markDot\(') { Fail "V129 the refused purchase marks the dot anyway (SPEC V135)" }
+    else { Pass "V129 only the balance refusal speaks, and it speaks over a sheet nothing was written to" }
 }
 
 $warnFn   = LuaFn $rootTxt 'xpWarn'
@@ -2279,36 +2274,6 @@ if (-not $boxFn) { Fail "V131 renderXPBoxes not found on the root form" }
 elseif ($boxFn -notmatch 'setField\("xpTotal", math\.max\(0,') { Fail "V131 the migration seed has no floor - an old sheet holding a negative experience value is born owing (SPEC I11)" }
 else { Pass "V131 the one-shot migration cannot seed a negative balance" }
 
-# ---- V132: the undo writes the CONTROL, not just the field ---------------------------
-# The 40th round's guard refused correctly and the pop-up proved it ran (SPEC R42), but the
-# dot stayed lit and the purchase still reached the log: a write to the NDB from inside the
-# control's own onChange does not survive the end of the dispatch (SPEC B36). Whether the
-# control re-asserts its checked state or ignores the write while dispatching cannot be told
-# from Lua (SPEC R43), so both are written - and both under xpQuiet, or the control write
-# re-enters the guard (SPEC V127).
-$guardFn = [regex]::Match($rootTxt, 'function xpGuard\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
-if (-not $guardFn.Success) { Fail "V132 xpGuard not found on the root form" }
-else {
-    $undo = [regex]::Match($guardFn.Groups[1].Value, 'if undo then(.*?)return;', 'Singleline')
-    if (-not $undo.Success) { Fail "V132 xpGuard has no undo branch" }
-    else {
-        $u    = $undo.Groups[1].Value
-        $iOn  = $u.IndexOf('xpQuiet = true;')
-        $iOff = $u.IndexOf('xpQuiet = false;')
-        $iDot = $u.IndexOf('dot.checked = not on;')
-        if ($u -notmatch 'findDot\(form, field\)') { Fail "V132 the undo never looks the dot up - only the field would be written, and the control writes it straight back (SPEC B36)" }
-        elseif ($iDot -lt 0) { Fail "V132 the undo does not write the control's checked state - the dot stays lit over a field that says otherwise (SPEC B36)" }
-        elseif ($iDot -lt $iOn -or $iDot -gt $iOff) { Fail "V132 the control is written outside xpQuiet - that write re-enters the guard (SPEC V127)" }
-        elseif ($u -notmatch 'setField\(field, not on\);') { Fail "V132 the undo stopped writing the field" }
-        else { Pass "V132 the undo writes the field and the control, both quietly" }
-    }
-}
-$finderFn = LuaFn $rootTxt 'findDot'
-if (-not $finderFn) { Fail "V132 findDot not found on the root form" }
-elseif ($finderFn -notmatch 'getChildren\(\)') { Fail "V132 findDot does not walk the form it was handed" }
-elseif ($finderFn -notmatch 'c\.field == field') { Fail "V132 findDot does not match on the field the dot is bound to" }
-else { Pass "V132 the dot is found by the field it is bound to" }
-
 # ---- V133: a click repaints every box, not just the ones on its own tab ---------------
 # The Numina tab has twenty guarded dots and no experience box at all, so painting only the
 # clicked dot's form left the balance untouched on every numina purchase (SPEC B37). The log
@@ -2332,6 +2297,51 @@ $unregistered = @($boxFiles | Where-Object { (CodeOf $_.FullName) -notmatch 'reg
 if ($boxFiles.Count -lt 2) { Fail "V133 expected two tabs carrying experience boxes, found $($boxFiles.Count)" }
 elseif ($unregistered) { foreach ($ur in $unregistered) { Fail "V133 $($ur.Name) carries experience boxes but never registers - a purchase on another tab would leave them stale (SPEC B37)" } }
 else { Pass "V133 both tabs with experience boxes hand themselves over ($(($boxFiles | ForEach-Object { $_.Name }) -join ', '))" }
+
+# ---- V135: priced first, marked only if it is allowed --------------------------------
+# The dot cannot flip itself any more (V134), so the order inside xpClick IS the rule: work
+# out what the click is asking for, price the sheet as it WOULD be, and only then write. The
+# three rounds before this one all let the mark land and tried to take it back, and a write
+# made from inside the dot's own onChange never survived the dispatch (SPEC B36/B38).
+$clickFn = [regex]::Match($rootTxt, 'function xpClick\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
+$markFn  = LuaFn $rootTxt 'markDot'
+if (-not $clickFn.Success) { Fail "V135 xpClick not found on the root form" }
+else {
+    $c     = $clickFn.Groups[1].Value
+    $iPr   = $c.IndexOf('xpLedgerRows(field, want)')
+    $iMark = $c.LastIndexOf('markDot(form, field, want)')
+    $marks = @([regex]::Matches($c, 'markDot\('))
+    if ($c -notmatch 'local want = not \(sheet\[field\] == true\);') { Fail "V135 xpClick never works out what the click is asking for - with autoChange off, nothing else does" }
+    elseif ($c -match 'if undo then') { Fail "V135 xpClick still has an undo branch - a mark taken back does not stick (SPEC B36/B38)" }
+    elseif ($iPr -lt 0) { Fail "V135 xpClick does not price the click before deciding" }
+    elseif ($iMark -lt $iPr) { Fail "V135 xpClick marks the dot before it prices the click (SPEC B38)" }
+    elseif ($marks.Count -ne 3) { Fail "V135 xpClick marks the dot in a place it should not - exactly three marks: no baseline, nothing to price, and the one the rules allowed" }
+    else { Pass "V135 the click is priced first and marked only if the rules allow it" }
+}
+if (-not $markFn) { Fail "V135 markDot not found on the root form" }
+elseif ($markFn -notmatch 'setField\(field, v\);') { Fail "V135 markDot does not write the field - the mark would not be saved" }
+elseif ($markFn -notmatch 'findDot\(form, field\)') { Fail "V135 markDot never looks the dot up" }
+elseif ($markFn -notmatch 'dot\.checked = v;') { Fail "V135 markDot does not paint the dot - with autoChange off nothing else will" }
+else { Pass "V135 the accepted mark writes the field and paints the dot in one step" }
+
+# ---- V136: pricing a click writes nothing ---------------------------------------------
+# The ledger is asked what the sheet WOULD cost, and it answers without touching it. The
+# simulation is switched on after the baseline check and put away before the only way out,
+# so no later price can carry a click that has already been answered.
+$rowsSim = LuaFn $rootTxt 'xpLedgerRows'
+$liveFn  = LuaFn $rootTxt 'liveLevel'
+if (-not $rowsSim) { Fail "V136 xpLedgerRows not found on the root form" }
+elseif ($rowsSim -notmatch 'function xpLedgerRows\(clickField, clickValue\)') { Fail "V136 xpLedgerRows cannot be handed a pending click" }
+elseif ($rowsSim -notmatch 'simField, simValue = clickField, clickValue;') { Fail "V136 the pending click is never put in front of the ledger" }
+elseif ($rowsSim -notmatch 'simTrait, simField, simValue = nil, nil, nil;') { Fail "V136 the simulation is never cleared - a later price would carry an answered click" }
+elseif ($rowsSim.IndexOf('simTrait, simField, simValue = nil, nil, nil;') -gt $rowsSim.IndexOf('return rows;')) { Fail "V136 the simulation is cleared after the ledger has returned, which is never" }
+elseif ($rowsSim -match 'traitLevel\(sheet,') { Fail "V136 the ledger still reads the live sheet directly - that read would miss the pending click" }
+elseif ($rowsSim -match 'setField\(') { Fail "V136 pricing a click writes to the sheet (SPEC B38)" }
+else { Pass "V136 the click is priced by simulation, and the simulation is put away before the ledger returns" }
+if (-not $liveFn) { Fail "V136 liveLevel not found on the root form" }
+elseif ($liveFn -notmatch 'traitLevel\(sheet, base, first, last, fixed\)') { Fail "V136 liveLevel does not read the sheet through traitLevel (SPEC V85)" }
+elseif ($liveFn -notmatch 'if simTrait == base') { Fail "V136 liveLevel would apply the pending click to a trait it does not belong to" }
+else { Pass "V136 the live side is traitLevel plus at most the one dot being clicked" }
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.

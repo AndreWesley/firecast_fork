@@ -59,46 +59,46 @@
 		<template name="Attribute">
 			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
 			<image left="125" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
-			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2', self);"/>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3', self);"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4', self);"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5', self);"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 		<!-- Attribute, but dot 1 is a real checkbox instead of a fixed image, so the rating can
 		     drop to zero. Only Appearance uses it (SPEC T95). -->
 		<template name="AttributeZeroable">
 			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
-			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1', self);"/>
-			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2', self);"/>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3', self);"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4', self);"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5', self);"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 		<template name="Ability">
 			<label name="dynAbil$(col)$(num)" left="0" top="5" width="125" height="20" text="$(nome)"/>
-			<imageCheckBox name="abil$(col)$(num)_1" left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard(self.abil$(col)$(num)_1.field, self);"/>
-			<imageCheckBox name="abil$(col)$(num)_2" left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard(self.abil$(col)$(num)_2.field, self);"/>
-			<imageCheckBox name="abil$(col)$(num)_3" left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard(self.abil$(col)$(num)_3.field, self);"/>
-			<imageCheckBox name="abil$(col)$(num)_4" left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard(self.abil$(col)$(num)_4.field, self);"/>
-			<imageCheckBox name="abil$(col)$(num)_5" left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard(self.abil$(col)$(num)_5.field, self);"/>
+			<imageCheckBox name="abil$(col)$(num)_1" left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_1.field, self);"/>
+			<imageCheckBox name="abil$(col)$(num)_2" left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_2.field, self);"/>
+			<imageCheckBox name="abil$(col)$(num)_3" left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_3.field, self);"/>
+			<imageCheckBox name="abil$(col)$(num)_4" left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_4.field, self);"/>
+			<imageCheckBox name="abil$(col)$(num)_5" left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_5.field, self);"/>
 		</template>
 		<!-- Blank rows at the bottom of each ability column, for abilities the book does not list. -->
 		<template name="CustomAbility">
 			<edit left="0" top="2" width="122" height="21" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1', self);"/>
-			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2', self);"/>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3', self);"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4', self);"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5', self);"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 		<template name="OpenAbility">
 			<comboBox left="0" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Armory', 'Avatar', 'Backup', 'Base of Operations', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Guide', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}" values="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Armory', 'Avatar', 'Backup', 'Base of Operations', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Guide', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}">
 			</comboBox>
-			<imageCheckBox left="165" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1', self);"/>
-			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2', self);"/>
-			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3', self);"/>
-			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4', self);"/>
-			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5', self);"/>
+			<imageCheckBox left="165" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 		<!-- No label: HUMANITY / WILLPOWER are titled above the track, so "FORCA DE VONTADE"
 		     cannot be clipped.
@@ -110,16 +110,16 @@
 		     125px of dead space that pushed the dots against the right edge. The track is now
 		     250px wide and the caller centres it with its own left margin. -->
 		<template name="Advantages">
-			<imageCheckBox left="0" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1', self);"/>
-			<imageCheckBox left="25" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2', self);"/>
-			<imageCheckBox left="50" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3', self);"/>
-			<imageCheckBox left="75" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4', self);"/>
-			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5', self);"/>
-			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_6', self);"/>
-			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_7', self);"/>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_8', self);"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_9', self);"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_10', self);"/>
+			<imageCheckBox left="0" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="25" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="50" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="75" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_6', self);"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_10', self);"/>
 		</template>
 		<!--
 			One health row: level name on the left, damage mark box on the right edge (SPEC T116).
@@ -142,16 +142,16 @@
 		</template>
 
 		<template name="Willpower">
-			<imageCheckBox left="0" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_1', self);"/>
-			<imageCheckBox left="25" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_2', self);"/>
-			<imageCheckBox left="50" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_3', self);"/>
-			<imageCheckBox left="75" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_4', self);"/>
-			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_5', self);"/>
-			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_6', self);"/>
-			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_7', self);"/>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_8', self);"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_9', self);"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" onChange="xpGuard('$(field)_10', self);"/>
+			<imageCheckBox left="0" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="25" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="50" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="75" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="100" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_6', self);"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_10', self);"/>
 
 			<checkBox left="2" top="20" width="25" height="25" field="$(field)_c1"/>
 			<checkBox left="27" top="20" width="25" height="25" field="$(field)_c2"/>
@@ -537,7 +537,7 @@
 		renderHealthTrack(self, 'dynHealth_');
 		renderXPBoxes(self);
 
-		-- How xpGuard reaches this tab's balance box from a click on ANOTHER tab (SPEC V133).
+		-- How xpClick reaches this tab's balance box from a click on ANOTHER tab (SPEC V133).
 		registerXPBoxes('main', self);
 	</event>
 </form>

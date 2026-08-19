@@ -190,7 +190,7 @@
 	     itself rather than being called from HH.6, because the four columns are declared here
 	     and only this form can address them. The dots are NOT watched from here - there are
 	     some four hundred and sixty of them and no list of that size stays correct. What
-	     redraws the log when one of them is clicked is the click itself: xpGuard already runs
+	     redraws the log when one of them is clicked is the click itself: xpClick already runs
 	     on every dot that costs experience and already holds the rows (SPEC V121/V125). -->
 	<dataLink fields="{'baseline', 'stBackgroundsXP', 'language'}" onChange="renderXPLedger(self); renderXPBoxes(self);"/>
 
@@ -204,7 +204,7 @@
 		renderXPBoxes(self);
 		renderXPLedger(self);
 
-		-- How xpGuard reaches these four columns. A tab form cannot be addressed from the root
+		-- How xpClick reaches these four columns. A tab form cannot be addressed from the root
 		-- script by name (SPEC R.9 / B.9), so the tab hands itself over once and the guard
 		-- redraws through it on every purchase (SPEC V125).
 		--
