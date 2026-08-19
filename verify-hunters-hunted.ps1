@@ -859,18 +859,26 @@ elseif ($corners.Count -gt 1) {
 }
 
 
-# ---- V69: the Main bottom row closes on the line the tab declares (SPEC V69, T193) ----
+# ---- V69: the Main tab closes on ONE line, and the map says which ------------------
 # V40 only asks that two boxes never overlap, so growing VIRTUES and shrinking the
-# HUMANITY/WILLPOWER box under it by the wrong amount would leave the middle column ending
-# short and still pass green - the 18th round moves both, and this is what keeps it honest.
+# HUMANITY/WILLPOWER box under it by the wrong amount would leave the middle column
+# ending short and still pass green - the 18th round moves both, and this keeps it honest.
 #
-# The ruler used to be the BACKGROUNDS box beside it. That box moved to the Traits tab in
-# the 46th round, so the ruler is now the y=810 the tab's own grid comment declares.
-# HEALTH is out of it on purpose: its declared height is the ten-row case (816) and the
-# renderer shrinks it to the chosen track (V49), an exception taken in the 11th round.
-$MAIN_BOTTOM_Y = 810
+# The ruler has moved twice. It was the BACKGROUNDS box beside it until the 46th round,
+# then the literal y=810 the grid comment declared. The 50th round raised the whole bottom
+# row and that literal had to be hand-edited again - a gate measuring the round instead of
+# the rule. So it is READ from the map comment now and cross-checked against every box that
+# is supposed to close on it, the avatar included: the comment cannot rot either.
+#
+# HEALTH is the declared exception: its authored height is the ten-row case and the renderer
+# shrinks it to the chosen track (V49), so it hangs exactly 6px below the line - a corner
+# taken in the 11th round, and measured here rather than skipped.
+$HEALTH_TEN_ROW_OVERHANG = 6
+$mainRawForMap = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.1.lfm")))
+$mapY = [regex]::Match($mainRawForMap, 'Everything closes on x=\d+ / y=(\d+)')
+$mainDocV69 = Doc (Join-Path $dir "HH.1.lfm")
 $mainBottom = @{}
-foreach ($bx in (Doc (Join-Path $dir "HH.1.lfm")).SelectNodes("//scrollBox/layout")) {
+foreach ($bx in $mainDocV69.SelectNodes("//scrollBox/layout")) {
     $bt = 0; $bh = 0
     if (-not ([int]::TryParse($bx.GetAttribute("top"), [ref]$bt) -and
               [int]::TryParse($bx.GetAttribute("height"), [ref]$bh))) { continue }
@@ -879,12 +887,22 @@ foreach ($bx in (Doc (Join-Path $dir "HH.1.lfm")).SelectNodes("//scrollBox/layou
         if ($t) { $mainBottom[$t] = $bt + $bh }
     }
 }
-if (-not $mainBottom.ContainsKey("HUMANITY")) {
-    Fail "V69 HUMANITY not found on HH.1 - the check measured nothing (SPEC V20)"
-} elseif ($mainBottom["HUMANITY"] -ne $MAIN_BOTTOM_Y) {
-    Fail "V69 the HUMANITY/WILLPOWER box ends at y=$($mainBottom['HUMANITY']), not the y=$MAIN_BOTTOM_Y the tab's grid closes on - the Main bottom row must close on one line"
-} else {
-    Pass "V69 Main bottom row closes on y=$MAIN_BOTTOM_Y"
+$avatarImg = @($mainDocV69.SelectNodes("//scrollBox/image[@field='avatar']"))[0]
+$avatarBottom = if ($avatarImg) { [int]$avatarImg.GetAttribute("top") + [int]$avatarImg.GetAttribute("height") } else { -1 }
+$closers = @("HUMANITY", "SPECIALTIES")
+$missing = @($closers | Where-Object { -not $mainBottom.ContainsKey($_) })
+if (-not $mapY.Success) { Fail "V69 the tab's grid comment no longer says where the tab closes - the ruler would be a literal in the gate again (SPEC V20)" }
+elseif ($missing.Count -gt 0) { Fail "V69 $($missing -join '/') not found on HH.1 - the check measured nothing (SPEC V20)" }
+elseif ($avatarBottom -lt 0) { Fail "V69 the avatar image was not found on HH.1 - it closes the left column and V69 measures it since the 50th round" }
+elseif (-not $mainBottom.ContainsKey("HEALTH")) { Fail "V69 HEALTH not found on HH.1 - its declared overhang went unmeasured (SPEC V20)" }
+else {
+    $line = [int]$mapY.Groups[1].Value
+    $off = @()
+    foreach ($c in $closers) { if ($mainBottom[$c] -ne $line) { $off += "$c ends at $($mainBottom[$c])" } }
+    if ($avatarBottom -ne $line) { $off += "the avatar ends at $avatarBottom" }
+    if ($off.Count -gt 0) { Fail "V69 the map says the tab closes on y=$line but $($off -join ', ') - the Main bottom row must close on one line" }
+    elseif (($mainBottom["HEALTH"] - $line) -ne $HEALTH_TEN_ROW_OVERHANG) { Fail "V69 HEALTH hangs $($mainBottom['HEALTH'] - $line)px below the line, not the $HEALTH_TEN_ROW_OVERHANG px the ten-row case is allowed (SPEC V49)" }
+    else { Pass "V69 HUMANITY, SPECIALTIES and the avatar all close on y=$line; HEALTH hangs the declared $HEALTH_TEN_ROW_OVERHANG px at ten rows" }
 }
 # ---- V48: a section box is filled black (SPEC B18) -------------------------------
 # ABILITIES shipped with the Mage sheet's transparent fill, so the tab background showed
@@ -2530,29 +2548,55 @@ if ($cc -notmatch 'elseif not want and sheet\.xpFree ~= nil then') { Fail "V141 
 elseif ($cc -notmatch 'string\.gsub\(sheet\.xpFree, "\|" \.\. trait \.\. "#" \.\. level \.\. "\|", "\|"\)') { Fail "V141 the sale does not drop the stamp of the level it gave up" }
 else { Pass "V141 a sold point hands its stamp back" }
 
-# ---- V146: the speciality box fills the corner the 46th round emptied ----------------
-# 890..1210 x 510..810 is the slot BACKGROUNDS left when it moved to the Traits tab, and 810
-# is the line every other box on this tab already closes on - which is what "line the bottom
-# up with the others" meant. Nine rows at a pitch of 30 from 25: a tenth would want 295..320
-# inside a box 300 tall, and a full table says so with a pop-up instead (V153).
+# ---- V146: the speciality box has no coordinates of its own -------------------------
+# It took the corner BACKGROUNDS emptied in the 46th round and shipped in the 47th with
+# 890..1210 x 510..810 written into this check. The 50th round moved it again - the second
+# time a literal here had to be hand-edited - so where the box SITS is now measured against
+# KNOWLEDGES above it (V168) and the tab's closing line (V69). What stays here is what only
+# this box knows: how many rows fit down, and whether one row still fits across.
+function BoxOf($doc, $title) { @($doc.SelectNodes("//layout[label/@text='$title']"))[0] }
 $mainDoc = Doc (Join-Path $dir "HH.1.lfm")
-$specBox = @($mainDoc.SelectNodes("//layout[label/@text='SPECIALTIES']"))
-if ($specBox.Count -ne 1) { Fail "V146 HH.1 declares $($specBox.Count) SPECIALTIES boxes - the tab's map says exactly one" }
+$sb = BoxOf $mainDoc "SPECIALTIES"
+$specTpl = @($mainDoc.SelectNodes("//template[@name='SpecialityRow']"))[0]
+if (-not $sb) { Fail "V146 HH.1 declares no SPECIALTIES box - the tab's map says exactly one" }
+elseif (-not $specTpl) { Fail "V146 SpecialityRow is not declared on HH.1" }
 else {
-    $sb = $specBox[0]
-    $sbL = [int]$sb.GetAttribute("left"); $sbT = [int]$sb.GetAttribute("top")
     $sbW = [int]$sb.GetAttribute("width"); $sbH = [int]$sb.GetAttribute("height")
     $sRows = @($sb.SelectNodes("layout[SpecialityRow]"))
     $sTops = @($sRows | ForEach-Object { [int]$_.GetAttribute("top") } | Sort-Object)
+    $sLefts = @($sRows | ForEach-Object { [int]$_.GetAttribute("left") } | Sort-Object -Unique)
+    $sWide = @($sRows | ForEach-Object { [int]$_.GetAttribute("width") } | Sort-Object -Unique)
     $sPitchBad = 0
     for ($i = 1; $i -lt $sTops.Count; $i++) { if (($sTops[$i] - $sTops[$i - 1]) -ne 30) { $sPitchBad++ } }
-    if ($sbL -ne 890 -or $sbT -ne 510 -or $sbW -ne 320 -or $sbH -ne 300) { Fail "V146 SPECIALTIES sits at $sbL,$sbT ${sbW}x${sbH} - SPEC I14 puts it at 890,510 320x300" }
-    elseif (($sbT + $sbH) -ne 810) { Fail "V146 SPECIALTIES closes at $($sbT + $sbH), not the 810 the rest of the tab lines up on" }
-    elseif ($sRows.Count -ne $spRows) { Fail "V146 SPECIALTIES draws $($sRows.Count) row(s) with SPECIALITY_ROWS at $spRows" }
+    # The row is measured as a SUM, not as an extent: with the widgets laid end to end,
+    # each has to start at or after the one before it ends, and the last has to close on
+    # the row. The first cut of this check took the furthest right edge instead, and a
+    # mutation that widened the text field straight through the dot survived it green
+    # (SPEC V20, B7) - the dot was still the right-most thing, it just had the edit
+    # sitting on top of it.
+    $rowCells = @()
+    foreach ($w in $specTpl.ChildNodes) {
+        if ($w.NodeType -ne 'Element') { continue }
+        $wl = 0; $ww = 0
+        if ([int]::TryParse($w.GetAttribute("left"), [ref]$wl) -and [int]::TryParse($w.GetAttribute("width"), [ref]$ww)) {
+            $rowCells += [pscustomobject]@{ L = $wl; R = $wl + $ww; N = $w.LocalName }
+        }
+    }
+    $rowCells = @($rowCells | Sort-Object L)
+    $rowOverlap = @()
+    for ($i = 1; $i -lt $rowCells.Count; $i++) {
+        if ($rowCells[$i].L -lt $rowCells[$i - 1].R) { $rowOverlap += "$($rowCells[$i - 1].N) ends at $($rowCells[$i - 1].R) but $($rowCells[$i].N) starts at $($rowCells[$i].L)" }
+    }
+    $rowSpan = if ($rowCells.Count -gt 0) { $rowCells[-1].R } else { 0 }
+    if ($sRows.Count -ne $spRows) { Fail "V146 SPECIALTIES draws $($sRows.Count) row(s) with SPECIALITY_ROWS at $spRows" }
     elseif ($sTops[0] -ne 25) { Fail "V146 the first speciality row starts at $($sTops[0]), not under the title at 25" }
     elseif ($sPitchBad -gt 0) { Fail "V146 $sPitchBad speciality row(s) break the pitch of 30 - the box would not hold $spRows of them" }
     elseif (($sTops[-1] + 25) -gt $sbH) { Fail "V146 the last speciality row ends at $($sTops[-1] + 25), past a box $sbH tall" }
-    else { Pass "V146 SPECIALTIES fills 890..1210 x 510..810 with $($sRows.Count) rows" }
+    elseif ($sLefts.Count -ne 1 -or $sWide.Count -ne 1) { Fail "V146 the speciality rows do not share one left/width - one row would sit differently from its neighbours" }
+    elseif ($sWide[0] -ne ($sbW - 2 * $sLefts[0])) { Fail "V146 the rows are $($sWide[0]) wide at left $($sLefts[0]) in a $sbW box - the right margin no longer matches the left" }
+    elseif ($rowOverlap.Count -gt 0) { Fail "V146 SpecialityRow widgets sit on each other - $($rowOverlap -join '; ') - a narrower box needs the row refitted, not the widgets stacked" }
+    elseif ($rowSpan -ne $sWide[0]) { Fail "V146 SpecialityRow spans $rowSpan in a row $($sWide[0]) wide - narrowing the box without refitting the row leaves the dot short of the edge or past it" }
+    else { Pass "V146 SPECIALTIES holds $($sRows.Count) rows and its row spans exactly the $rowSpan it is given" }
 }
 
 # ---- V147: three fields and one dot per row, counted in one place --------------------
@@ -2863,29 +2907,83 @@ elseif (-not $armedOnReady) { Fail "V167 the timer is not armed from onNodeReady
 elseif (-not $themeEntry) { Fail "V167 the theme paint does not call sheetReveal - the normal entry is the last load paint there is (SPEC I15)" }
 else { Pass "V167 the reveal is idempotent, armed by a $($timerArm.Groups[1].Value)ms floor and by the theme paint" }
 
-# ---- V168: the ability row is measured against its neighbours, not a literal ---------
-# The user gave the two ENDS of this row: TALENTS starts where VIRTUES starts and
-# KNOWLEDGES closes where EXPERIENCE closes. Measuring those two pairs is what stops one
-# of the four boxes from moving without the other (the same shape as V69).
-function BoxOf($doc, $title) { @($doc.SelectNodes("//layout[label/@text='$title']"))[0] }
+# ---- V168: the Main tab is a three-column grid ---------------------------------------
+# The 49th round lined up the two outer ends of the top row (TALENTS with VIRTUES,
+# KNOWLEDGES with EXPERIENCE) and this check measured that one pair. In the 50th the user
+# asked for the other three, so the rule is the grid itself: every box on the bottom row
+# takes BOTH x edges from the column above it, and the three columns are one row - same
+# top, same width, same height, same gap.
 $bTal = BoxOf $mainDoc "TALENTS"; $bSki = BoxOf $mainDoc "SKILLS"; $bKno = BoxOf $mainDoc "KNOWLEDGES"
-$bVir = BoxOf $mainDoc "VIRTUES"; $bExp = BoxOf $mainDoc "EXPERIENCE"
+$bExp = BoxOf $mainDoc "EXPERIENCE"
+$GRID = @(
+    @{ col = "TALENTS";    under = @("VIRTUES", "HUMANITY") },
+    @{ col = "SKILLS";     under = @("HEALTH") },
+    @{ col = "KNOWLEDGES"; under = @("SPECIALTIES") }
+)
 $colW = @(); $abilRowOk = $false
-if (-not ($bTal -and $bSki -and $bKno -and $bVir -and $bExp)) { Fail "V168 one of TALENTS/SKILLS/KNOWLEDGES/VIRTUES/EXPERIENCE is not a titled box on HH.1" }
+$gridMissing = @()
+foreach ($g in $GRID) {
+    if (-not (BoxOf $mainDoc $g.col)) { $gridMissing += $g.col }
+    foreach ($u in $g.under) { if (-not (BoxOf $mainDoc $u)) { $gridMissing += $u } }
+}
+if (-not $bExp) { $gridMissing += "EXPERIENCE" }
+if ($gridMissing.Count -gt 0) { Fail "V168 not a titled box on HH.1: $($gridMissing -join ', ')" }
 else {
-    $talL = [int]$bTal.GetAttribute("left"); $virL = [int]$bVir.GetAttribute("left")
-    $knoR = [int]$bKno.GetAttribute("left") + [int]$bKno.GetAttribute("width")
-    $expR = [int]$bExp.GetAttribute("left") + [int]$bExp.GetAttribute("width")
+    $offGrid = @()
+    foreach ($g in $GRID) {
+        $c = BoxOf $mainDoc $g.col
+        $cL = [int]$c.GetAttribute("left"); $cR = $cL + [int]$c.GetAttribute("width")
+        foreach ($u in $g.under) {
+            $b = BoxOf $mainDoc $u
+            $bL = [int]$b.GetAttribute("left"); $bR = $bL + [int]$b.GetAttribute("width")
+            if ($bL -ne $cL -or $bR -ne $cR) { $offGrid += "$u runs $bL..$bR under $($g.col) at $cL..$cR" }
+        }
+    }
     $colW = @(@($bTal, $bSki, $bKno) | ForEach-Object { [int]$_.GetAttribute("width") } | Sort-Object -Unique)
     $colT = @(@($bTal, $bSki, $bKno) | ForEach-Object { [int]$_.GetAttribute("top") } | Sort-Object -Unique)
+    $colH = @(@($bTal, $bSki, $bKno) | ForEach-Object { [int]$_.GetAttribute("height") } | Sort-Object -Unique)
+    $talL = [int]$bTal.GetAttribute("left")
+    $knoR = [int]$bKno.GetAttribute("left") + [int]$bKno.GetAttribute("width")
+    $expR = [int]$bExp.GetAttribute("left") + [int]$bExp.GetAttribute("width")
     $gapA = [int]$bSki.GetAttribute("left") - ($talL + [int]$bTal.GetAttribute("width"))
     $gapB = [int]$bKno.GetAttribute("left") - ([int]$bSki.GetAttribute("left") + [int]$bSki.GetAttribute("width"))
-    if ($talL -ne $virL) { Fail "V168 TALENTS starts at $talL and VIRTUES at $virL - the user asked for the two to line up" }
-    elseif ($knoR -ne $expR) { Fail "V168 KNOWLEDGES closes at $knoR and EXPERIENCE at $expR - the user asked for the two to line up" }
+    if ($offGrid.Count -gt 0) { Fail "V168 the grid is broken - $($offGrid -join '; ')" }
+    elseif ($knoR -ne $expR) { Fail "V168 KNOWLEDGES closes at $knoR and EXPERIENCE at $expR - the grid closes on the header's right edge" }
     elseif ($colW.Count -ne 1) { Fail "V168 the three ability columns are $($colW -join '/') wide - one would read narrower than its neighbours" }
     elseif ($colT.Count -ne 1) { Fail "V168 the three ability columns start at $($colT -join '/') - they are one row and share a top" }
+    elseif ($colH.Count -ne 1) { Fail "V168 the three ability columns are $($colH -join '/') tall - they are one row and share a height" }
     elseif ($gapA -ne $gapB) { Fail "V168 the column gaps are $gapA and $gapB - the row would read lopsided" }
-    else { $abilRowOk = $true; Pass "V168 the ability row runs $talL..$knoR, aligned on VIRTUES and EXPERIENCE, three $($colW[0])px columns $gapA apart" }
+    else { $abilRowOk = $true; Pass "V168 the grid runs $talL..${knoR}: three $($colW[0])px columns $gapA apart, each carrying the bottom row under it" }
+}
+
+# ---- V171: an ability column fits its content ----------------------------------------
+# The columns shipped 390 tall with twelve rows closing at 325 - 65px of black tail under
+# the last ability, which is what the user asked to be rid of. "Fits" is not a number here:
+# the bottom margin is whatever ATTRIBUTES already leaves under its own last row, so the
+# three columns and the box beside them agree by construction, and a thirteenth ability has
+# to grow the box instead of moving into slack nobody declared.
+function TailOf($box, $rowXPath) {
+    $rows = @($box.SelectNodes($rowXPath))
+    if ($rows.Count -eq 0) { return $null }
+    $last = 0
+    foreach ($r in $rows) {
+        $rb = [int]$r.GetAttribute("top") + [int]$r.GetAttribute("height")
+        if ($rb -gt $last) { $last = $rb }
+    }
+    return ([int]$box.GetAttribute("height") - $last)
+}
+$bAttr = BoxOf $mainDoc "ATTRIBUTES"
+$refTail = if ($bAttr) { TailOf $bAttr "layout[Attribute or AttributeZeroable]" } else { $null }
+if (-not $abilRowOk) { Fail "V171 not measured - the ability grid did not pass V168" }
+elseif ($null -eq $refTail) { Fail "V171 ATTRIBUTES has no rows to take the bottom margin from - the ruler measured nothing (SPEC V20)" }
+else {
+    $tails = @()
+    foreach ($n in @("TALENTS", "SKILLS", "KNOWLEDGES")) {
+        $t = TailOf (BoxOf $mainDoc $n) "layout[Ability or CustomAbility]"
+        if ($t -ne $refTail) { $tails += "$n leaves ${t}px" }
+    }
+    if ($tails.Count -gt 0) { Fail "V171 ATTRIBUTES leaves ${refTail}px under its last row but $($tails -join ', ') - the column carries dead tail (or clips its last row)" }
+    else { Pass "V171 all three ability columns close ${refTail}px under their last row, the margin ATTRIBUTES sets" }
 }
 
 # ---- V169: the ABILITIES frame is gone, key and all ----------------------------------

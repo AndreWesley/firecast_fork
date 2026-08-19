@@ -17,24 +17,30 @@
 		-->
 		<image name="themePaper1" align="client" style="stretch" hitTest="false" visible="false"/>
 		<!--
-			Layout grid (SPEC T41, V26, V27). Everything closes on x=1210 / y=810.
+			Layout grid (SPEC T41, V26, V27). Everything closes on x=1210 / y=760.
 
 			  header  0..1030      EXPERIENCE 1050..1210          y   0..100
-			  ATTRIBUTES 0..300    TALENTS 310..600 | SKILLS 615..905 | KNOWLEDGES 920..1210    y 110..500
-			  avatar     0..300                                   y 405..810
-			                       VIRTUES 310..590               y 510..636
-			                       HUMANITY+WILLPOWER 310..590     y 646..810
-			                       HEALTH  600..880               y 510..816 at ten rows
-			                       SPECIALTIES 890..1210         y 510..810
+			  ATTRIBUTES 0..300    TALENTS 310..600 | SKILLS 615..905 | KNOWLEDGES 920..1210    y 110..450
+			  avatar     0..300                                   y 405..760
+			                       VIRTUES 310..600               y 460..586
+			                       HUMANITY+WILLPOWER 310..600     y 596..760
+			                       HEALTH  615..905               y 460..766 at ten rows
+			                       SPECIALTIES 920..1210          y 460..760
 
-			BACKGROUNDS stood in that last slot until the 46th round, when it moved to the
-			Traits tab and grew from nine rows to twenty (SPEC I3, V145). The corner it left
-			stood empty for one round; SPECIALTIES took it in the 47th (SPEC I14, V146),
-			which is why the box lines up on 810 with everything else on this tab.
+			Read it as a THREE-COLUMN GRID, which is what V168 measures since the 50th round:
+			each box on the bottom row shares both x edges with the column above it - VIRTUES
+			and HUMANITY under TALENTS, HEALTH under SKILLS, SPECIALTIES under KNOWLEDGES. The
+			49th round had lined up only the two outer ends of the top row; the user asked for
+			the other three pairs, and a grid is cheaper to check than four separate rules.
 
-			HEALTH is the one box that does not end on 810: its height is the ten-row case and
+			The columns are 340 tall, not 390: twelve rows from 25 at a pitch of 25 close at
+			325, so the old height carried 65px of black tail (SPEC V171). The bottom row rose
+			by exactly that 50, and the avatar came with it - it was not in the request, but
+			leaving it at 810 would have made it the only thing 50px below everything else.
+
+			HEALTH is the one box that does not end on 760: its height is the ten-row case and
 			the renderer shrinks it to the chosen track length (SPEC V49), so at the default of
-			seven rows it ends at 735 and only a player who picks ten pushes 6px past the rest.
+			seven rows it ends at 685 and only a player who picks ten pushes 6px past the rest.
 
 			Label widths are sized for the LONGER of [en] and [pt]: "Animal Ken" is
 			"Empatia com Animais" (19 chars) in pt, so the ability label is 135px, not 80.
@@ -164,8 +170,8 @@
 		-->
 		<template name="SpecialityRow">
 			<comboBox name="cboSpeciality$(num)" left="0" top="0" width="150" height="25" field="speciality_$(num)" fontSize="12" items="{'', 'Strength', 'Dexterity', 'Stamina', 'Charisma', 'Manipulation', 'Appearance', 'Perception', 'Inteligence', 'Wits', 'Academics', 'Alertness', 'Animal Ken', 'Archery', 'Athletics', 'Awareness', 'Brawl', 'Commerce', 'Computer', 'Crafts', 'Drive', 'Empathy', 'Enigmas', 'Etiquette', 'Expression', 'Finance', 'Firearms', 'Hearth Wisdom', 'Intimidation', 'Investigation', 'Larceny', 'Law', 'Leadership', 'Legerdemain', 'Medicine', 'Melee', 'Occult', 'Performance', 'Philosophy', 'Politics', 'Religion', 'Ride', 'Ritual', 'Science', 'Seneschal', 'Stealth', 'Streetwise', 'Subterfuge', 'Survival', 'Technology', 'Theology'}" values="{'', 'Strength', 'Dexterity', 'Stamina', 'Charisma', 'Manipulation', 'Appearance', 'Perception', 'Inteligence', 'Wits', 'Academics', 'Alertness', 'Animal Ken', 'Archery', 'Athletics', 'Awareness', 'Brawl', 'Commerce', 'Computer', 'Crafts', 'Drive', 'Empathy', 'Enigmas', 'Etiquette', 'Expression', 'Finance', 'Firearms', 'Hearth Wisdom', 'Intimidation', 'Investigation', 'Larceny', 'Law', 'Leadership', 'Legerdemain', 'Medicine', 'Melee', 'Occult', 'Performance', 'Philosophy', 'Politics', 'Religion', 'Ride', 'Ritual', 'Science', 'Seneschal', 'Stealth', 'Streetwise', 'Subterfuge', 'Survival', 'Technology', 'Theology'}"/>
-			<edit left="155" top="0" width="115" height="25" field="specialityName_$(num)" fontSize="12"/>
-			<imageCheckBox left="275" top="0" width="25" height="25" field="speciality_$(num)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('speciality_$(num)_1', self);"/>
+			<edit left="155" top="0" width="85" height="25" field="specialityName_$(num)" fontSize="12"/>
+			<imageCheckBox left="245" top="0" width="25" height="25" field="speciality_$(num)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('speciality_$(num)_1', self);"/>
 		</template>
 
 		<template name="Willpower">
@@ -282,10 +288,12 @@
 			</layout>
 		</layout>
 
-		<!-- 405 tall, not 375: the preview ends on y=810 with the HUMANITY box, which is
-		     where the column closes (SPEC T134, V69). -->
-		<rectangle left="0" top="405" width="300" height="405" color="DimGray" xradius="5" yradius="5" cornerType="innerRound"/>
-		<image left="0" top="405" width="300" height="405" field="avatar" editable="true" style="autoFit"/>
+		<!-- 355 tall, not 405: the preview ends on y=760 with the HUMANITY box, which is
+		     where the column closes (SPEC T134, V69). It followed the bottom row up in the
+		     50th round - the request did not name it, but a picture reaching 50px below
+		     every other box is the ragged edge V69 exists to prevent. -->
+		<rectangle left="0" top="405" width="300" height="355" color="DimGray" xradius="5" yradius="5" cornerType="innerRound"/>
+		<image left="0" top="405" width="300" height="355" field="avatar" editable="true" style="autoFit"/>
 
 		<!--
 			The three ability columns stand loose (SPEC T407, V168, V169). Until the 49th round
@@ -304,7 +312,7 @@
 
 			The gap between columns is 15, the same gap VIRTUES leaves to HEALTH one row down.
 		-->
-		<layout left="310" top="110" width="290" height="390">
+		<layout left="310" top="110" width="290" height="340">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="290" height="20" text="TALENTS" horzTextAlign="center"/>
 
@@ -346,7 +354,7 @@
 			</layout>
 		</layout>
 
-		<layout left="615" top="110" width="290" height="390">
+		<layout left="615" top="110" width="290" height="340">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="290" height="20" text="SKILLS" horzTextAlign="center"/>
 
@@ -388,7 +396,7 @@
 			</layout>
 		</layout>
 
-		<layout left="920" top="110" width="290" height="390">
+		<layout left="920" top="110" width="290" height="340">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="290" height="20" text="KNOWLEDGES" horzTextAlign="center"/>
 
@@ -431,47 +439,52 @@
 		</layout>
 
 		<!--
-			Bottom row, two columns now, ending at y=810 (SPEC T78/T79, V69):
-			  VIRTUES (310-590, y 510-636) over HUMANITY & WILLPOWER (310-590, y 646-810)
-			  HEALTH (600-880) | SPECIALTIES (890-1210, y 510-810, SPEC I14)
+			Bottom row, two columns now, ending at y=760 (SPEC T78/T79, V69):
+			  VIRTUES (310-600, y 460-586) over HUMANITY & WILLPOWER (310-600, y 596-760)
+			  HEALTH (615-905) | SPECIALTIES (920-1210, y 460-760, SPEC I14)
 
-			Virtues and Humanity are 280 wide, not 410: their content is a 250px track (a 125px
+			Every one of them takes its x from the column above it since the 50th round
+			(SPEC V168): Virtues and Humanity from TALENTS, HEALTH from SKILLS, SPECIALTIES
+			from KNOWLEDGES. They rose 50 with the same round, which is what the ability
+			columns gave back when they stopped carrying a black tail (SPEC V171).
+
+			Virtues and Humanity are 290 wide, not 410: their content is a 250px track (a 125px
 			label plus 5 dots, or 10 bare dots), so 410 left a wide empty margin and made the
-			Humanity/Willpower dots read as right-aligned. 280 = 250 + a 15px margin each side,
-			which centres both tracks. The 130px freed went to HEALTH.
+			Humanity/Willpower dots read as right-aligned. 290 = 250 + a 20px margin each side,
+			which centres both tracks. The 120px freed went to HEALTH.
 
-			HEALTH is 280 wide because 150 was not enough for its own labels: "Wounded (-2)" is
+			HEALTH is 290 wide because 150 was not enough for its own labels: "Wounded (-2)" is
 			"Ferido Gravemente (-2)" in pt, ~143px in a 125px checkBox. V16 only measures
 			<label>, never <checkBox>, so that overflow was never flagged by the gate.
 
 			Faith is gone from this tab on purpose: `faith_1`..`_5` are now the dots of the
 			TRUE FAITH row on the Powers tab, so a saved sheet keeps its rating (SPEC V35).
 		-->
-		<layout left="310" top="510" width="280" height="126">
+		<layout left="310" top="460" width="290" height="126">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="8" width="280" height="20" text="VIRTUES" horzTextAlign="center"/>
+			<label left="0" top="8" width="290" height="20" text="VIRTUES" horzTextAlign="center"/>
 
-			<layout left="15" top="33" width="250" height="25" >
+			<layout left="20" top="33" width="250" height="25" >
 				<Attribute field="conscience" nome="Conscience"/>
 			</layout>
-			<layout left="15" top="62" width="250" height="25" >
+			<layout left="20" top="62" width="250" height="25" >
 				<Attribute field="selfControl" nome="Self-Control"/>
 			</layout>
-			<layout left="15" top="91" width="250" height="25" >
+			<layout left="20" top="91" width="250" height="25" >
 				<Attribute field="courage" nome="Courage"/>
 			</layout>
 		</layout>
 
-		<layout left="310" top="646" width="280" height="164">
+		<layout left="310" top="596" width="290" height="164">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="0" top="15" width="280" height="20" text="HUMANITY" horzTextAlign="center"/>
-			<layout left="15" top="40" width="250" height="25" >
+			<label left="0" top="15" width="290" height="20" text="HUMANITY" horzTextAlign="center"/>
+			<layout left="20" top="40" width="250" height="25" >
 				<Advantages field="humanity"/>
 			</layout>
 
-			<label left="0" top="85" width="280" height="20" text="WILLPOWER" horzTextAlign="center"/>
-			<layout left="15" top="110" width="250" height="45" >
+			<label left="0" top="85" width="290" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<layout left="20" top="110" width="250" height="45" >
 				<Willpower field="willpower"/>
 			</layout>
 		</layout>
@@ -499,10 +512,10 @@
 			the gate treats as a full-width section title, so V27 still holds for this box.
 			245px per row because "Wounded (-2)" is "Ferido Gravemente (-2)" in pt (V38 / B17).
 		-->
-		<layout name="dynHealth_box" left="600" top="510" width="280" height="306">
+		<layout name="dynHealth_box" left="615" top="460" width="290" height="306">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="205" height="20" text="HEALTH" horzTextAlign="center"/>
-			<comboBox name="cmbHealthLevels" left="212" top="4" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+			<label left="0" top="4" width="215" height="20" text="HEALTH" horzTextAlign="center"/>
+			<comboBox name="cmbHealthLevels" left="222" top="4" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
 			<dataLink field="healthLevels" defaultValue="7"/>
 
 			<layout name="dynHealth_row1" left="20" top="28" width="245" height="20"><HealthRow num="1"/></layout>
@@ -518,31 +531,34 @@
 		</layout>
 
 		<!--
-			SPECIALTIES (SPEC I14, T388) fills the corner the 46th round emptied when
-			BACKGROUNDS moved to the Traits tab, and it closes on y=810 like the rest of the
-			row - which is what "line the bottom up with the other boxes" means here.
+			SPECIALTIES (SPEC I14, T388) took the corner the 46th round emptied when BACKGROUNDS
+			moved to the Traits tab. Since the 50th it has no coordinates of its own: it takes
+			both x edges from KNOWLEDGES above it and closes on the bottom line with the rest of
+			the row (SPEC V146, V168, V69).
 
 			Nine rows: the first at 25 and a pitch of 30 puts the ninth at 265..290, and a tenth
 			would want 295..320 in a box that is 300 tall. Nine is what fits, and a table with no
 			free slot says so with a pop-up rather than dropping the grant (SPEC V146/V153).
 
-			No column headings: the box has one title and the three columns explain themselves
-			(the user's fifth point). The row is 300 wide inside a 320 box - 150 for the trait,
-			115 for the text, 25 for the dot, 5 between each.
+			No column headings: the box has one title and the three columns explain themselves.
+			The row is 270 wide inside a 290 box - 150 for the trait, 85 for the text, 25 for the
+			dot, 5 between each. It was 300 in a 320 box until the 50th round narrowed the box to
+			match KNOWLEDGES; the 30 came out of the free-text field and not out of the picker,
+			which has to show "Empatia com Animais" at 19 characters (SPEC V16).
 		-->
-		<layout left="890" top="510" width="320" height="300">
+		<layout left="920" top="460" width="290" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="320" height="20" text="SPECIALTIES" horzTextAlign="center"/>
+			<label left="0" top="4" width="290" height="20" text="SPECIALTIES" horzTextAlign="center"/>
 
-			<layout left="10" top="25" width="300" height="25"><SpecialityRow num="1"/></layout>
-			<layout left="10" top="55" width="300" height="25"><SpecialityRow num="2"/></layout>
-			<layout left="10" top="85" width="300" height="25"><SpecialityRow num="3"/></layout>
-			<layout left="10" top="115" width="300" height="25"><SpecialityRow num="4"/></layout>
-			<layout left="10" top="145" width="300" height="25"><SpecialityRow num="5"/></layout>
-			<layout left="10" top="175" width="300" height="25"><SpecialityRow num="6"/></layout>
-			<layout left="10" top="205" width="300" height="25"><SpecialityRow num="7"/></layout>
-			<layout left="10" top="235" width="300" height="25"><SpecialityRow num="8"/></layout>
-			<layout left="10" top="265" width="300" height="25"><SpecialityRow num="9"/></layout>
+			<layout left="10" top="25" width="270" height="25"><SpecialityRow num="1"/></layout>
+			<layout left="10" top="55" width="270" height="25"><SpecialityRow num="2"/></layout>
+			<layout left="10" top="85" width="270" height="25"><SpecialityRow num="3"/></layout>
+			<layout left="10" top="115" width="270" height="25"><SpecialityRow num="4"/></layout>
+			<layout left="10" top="145" width="270" height="25"><SpecialityRow num="5"/></layout>
+			<layout left="10" top="175" width="270" height="25"><SpecialityRow num="6"/></layout>
+			<layout left="10" top="205" width="270" height="25"><SpecialityRow num="7"/></layout>
+			<layout left="10" top="235" width="270" height="25"><SpecialityRow num="8"/></layout>
+			<layout left="10" top="265" width="270" height="25"><SpecialityRow num="9"/></layout>
 		</layout>
 
 	</scrollBox>
