@@ -25,7 +25,12 @@
 			                       VIRTUES 310..590               y 510..636
 			                       HUMANITY+WILLPOWER 310..590     y 646..810
 			                       HEALTH  600..880               y 510..816 at ten rows
-			                       BACKGROUNDS 890..1210          y 510..810
+			                       (empty) 890..1210              y 510..810
+
+			BACKGROUNDS stood in that last slot until the 46th round, when it moved to the
+			Traits tab and grew from nine rows to twenty (SPEC I3, V145). The corner it left
+			is deliberately empty: filling it was not part of what was asked, and the tab is
+			still 1210 wide because ABILITIES and EXPERIENCE reach that far.
 
 			HEALTH is the one box that does not end on 810: its height is the ten-row case and
 			the renderer shrinks it to the chosen track length (SPEC V49), so at the default of
@@ -90,15 +95,6 @@
 			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
 			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
 			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
-		</template>
-		<template name="OpenAbility">
-			<comboBox left="0" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Armory', 'Avatar', 'Backup', 'Base of Operations', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Guide', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}" values="{'', 'Allies', 'Alternate Identity', 'Ancestors', 'Arcane', 'Armory', 'Avatar', 'Backup', 'Base of Operations', 'Certification', 'Chantry', 'Contacts', 'Cult', 'Demesne', 'Destiny', 'Domain', 'Dream', 'Enhancement', 'Fame', 'Familiar', 'Fetish', 'Generation', 'Guide', 'Herd', 'Influence', 'Kinfolk', 'Legend', 'Library', 'Mentor', 'Node', 'Past Lives', 'Patron', 'Pure Breed', 'Rank', 'Requisitions', 'Resources', 'Retainers', 'Rites', 'Rituals', 'Sanctum', 'Secret Weapons', 'Spies', 'Status', 'Totem', 'Wonder'}">
-			</comboBox>
-			<imageCheckBox left="165" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 		<!-- No label: HUMANITY / WILLPOWER are titled above the track, so "FORCA DE VONTADE"
 		     cannot be clipped.
@@ -255,8 +251,8 @@
 			</layout>
 		</layout>
 
-		<!-- 405 tall, not 375: the preview now ends on y=810 with BACKGROUNDS and the
-		     HUMANITY box, which is where the column closes (SPEC T134). -->
+		<!-- 405 tall, not 375: the preview ends on y=810 with the HUMANITY box, which is
+		     where the column closes (SPEC T134, V69). -->
 		<rectangle left="0" top="405" width="300" height="405" color="DimGray" xradius="5" yradius="5" cornerType="innerRound"/>
 		<image left="0" top="405" width="300" height="405" field="avatar" editable="true" style="autoFit"/>
 
@@ -395,9 +391,9 @@
 		</layout>
 
 		<!--
-			Bottom row, three columns, all ending at y=810 (SPEC T78/T79):
+			Bottom row, two columns now, ending at y=810 (SPEC T78/T79, V69):
 			  VIRTUES (310-590, y 510-636) over HUMANITY & WILLPOWER (310-590, y 646-810)
-			  HEALTH (600-880) | BACKGROUNDS (890-1210)
+			  HEALTH (600-880) | 890-1210 left empty by the 46th round (SPEC I3)
 
 			Virtues and Humanity are 280 wide, not 410: their content is a 250px track (a 125px
 			label plus 5 dots, or 10 bare dots), so 410 left a wide empty margin and made the
@@ -481,41 +477,6 @@
 			<layout name="dynHealth_row10" left="20" top="271" width="245" height="20"><HealthRow num="10"/></layout>
 		</layout>
 
-		<!-- 9 rows in the same 300px box: the pitch drops 40 -> 30 so the bottom edge still
-		     lines up with HEALTH and WILLPOWER at y=810. Rows are 25 tall, so this leaves a 5px
-		     gap - the box is full. A 10th row does not fit without growing the whole band. -->
-		<layout left="890" top="510" width="320" height="300">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="320" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
-
-			<layout left="15" top="25" width="290" height="25" >
-				<OpenAbility field="background_1"/>
-			</layout>
-			<layout left="15" top="55" width="290" height="25" >
-				<OpenAbility field="background_2"/>
-			</layout>
-			<layout left="15" top="85" width="290" height="25" >
-				<OpenAbility field="background_3"/>
-			</layout>
-			<layout left="15" top="115" width="290" height="25" >
-				<OpenAbility field="background_4"/>
-			</layout>
-			<layout left="15" top="145" width="290" height="25" >
-				<OpenAbility field="background_5"/>
-			</layout>
-			<layout left="15" top="175" width="290" height="25" >
-				<OpenAbility field="background_6"/>
-			</layout>
-			<layout left="15" top="205" width="290" height="25" >
-				<OpenAbility field="background_7"/>
-			</layout>
-			<layout left="15" top="235" width="290" height="25" >
-				<OpenAbility field="background_8"/>
-			</layout>
-			<layout left="15" top="265" width="290" height="25" >
-				<OpenAbility field="background_9"/>
-			</layout>
-		</layout>
 	</scrollBox>
 
 	<!--

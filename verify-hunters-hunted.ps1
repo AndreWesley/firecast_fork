@@ -226,7 +226,15 @@ $expect['humanity'] = 10
 $expect['willpower'] = 10
 # SPEC V5 says "backgrounds 5" dots, but only the ROW count was ever checked - a background
 # row could have shipped with four dots and passed.
-1..9 | ForEach-Object { $expect["background_$_"] = 5 }
+#
+# The count itself is not written here: it is read off BACKGROUND_ROWS, the one place the
+# sheet declares it (SPEC V145). A gate holding its own copy of that number is a third place
+# to forget.
+$bgRootTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HuntersHunted.lfm")))
+$bgDecl = [regex]::Match($bgRootTxt, '(?m)^\s*BACKGROUND_ROWS = (\d+);')
+$bgRows = if ($bgDecl.Success) { [int]$bgDecl.Groups[1].Value } else { 0 }
+if (-not $bgDecl.Success) { Fail "V145 BACKGROUND_ROWS is not declared on the root form - the row count would be a literal in every loop again" }
+1..$bgRows | ForEach-Object { $expect["background_$_"] = 5 }
 # Powers tab: 10 hedge rows + 10 psychic rows, 5 dots each (SPEC V5 after T56/T57)
 1..10 | ForEach-Object { $expect["numina_$_"] = 5; $expect["psychic_$_"] = 5 }
 
@@ -237,9 +245,9 @@ foreach ($k in ($expect.Keys | Sort-Object)) {
 $wb = BoxCount 'willpower'
 if ($wb -eq 10) { Pass "V5 willpower = 10 boxes" } else { Fail "V5 willpower = $wb boxes, expected 10" }
 
-# Each numina table is 8 pickers + 2 free rows (SPEC T56/T57); backgrounds are 9 (T78, then
-# the 7th, then _8 and _9 in the 4th round).
-foreach ($grp in @(@('numina',10), @('psychic',10), @('background',9), @('health',10))) {
+# Each numina table is 8 pickers + 2 free rows (SPEC T56/T57); backgrounds are however many
+# BACKGROUND_ROWS says (9 until the 46th round moved the box to the Traits tab, 20 after).
+foreach ($grp in @(@('numina',10), @('psychic',10), @('background',$bgRows), @('health',10))) {
     $n = ($allFields.Keys | Where-Object { $_ -match "^$($grp[0])_\d+$" }).Count
     if ($n -eq $grp[1]) { Pass "V5 $($grp[0]) = $n rows" } else { Fail "V5 $($grp[0]) = $n rows, expected $($grp[1])" }
 }
@@ -844,13 +852,16 @@ elseif ($corners.Count -gt 1) {
 }
 
 
-# ---- V69: the Main bottom row closes on one line (SPEC V69, T193) -----------------
+# ---- V69: the Main bottom row closes on the line the tab declares (SPEC V69, T193) ----
 # V40 only asks that two boxes never overlap, so growing VIRTUES and shrinking the
-# HUMANITY/WILLPOWER box under it by the wrong amount would leave the middle column
-# ending short of BACKGROUNDS and still pass green - the 18th round moves both, and this
-# is what keeps the two columns closing together.
+# HUMANITY/WILLPOWER box under it by the wrong amount would leave the middle column ending
+# short and still pass green - the 18th round moves both, and this is what keeps it honest.
+#
+# The ruler used to be the BACKGROUNDS box beside it. That box moved to the Traits tab in
+# the 46th round, so the ruler is now the y=810 the tab's own grid comment declares.
 # HEALTH is out of it on purpose: its declared height is the ten-row case (816) and the
 # renderer shrinks it to the chosen track (V49), an exception taken in the 11th round.
+$MAIN_BOTTOM_Y = 810
 $mainBottom = @{}
 foreach ($bx in (Doc (Join-Path $dir "HH.1.lfm")).SelectNodes("//scrollBox/layout")) {
     $bt = 0; $bh = 0
@@ -861,12 +872,12 @@ foreach ($bx in (Doc (Join-Path $dir "HH.1.lfm")).SelectNodes("//scrollBox/layou
         if ($t) { $mainBottom[$t] = $bt + $bh }
     }
 }
-if (-not ($mainBottom.ContainsKey("HUMANITY") -and $mainBottom.ContainsKey("BACKGROUNDS"))) {
-    Fail "V69 HUMANITY or BACKGROUNDS not found on HH.1 - the check measured nothing (SPEC V20)"
-} elseif ($mainBottom["HUMANITY"] -ne $mainBottom["BACKGROUNDS"]) {
-    Fail "V69 the HUMANITY/WILLPOWER box ends at y=$($mainBottom['HUMANITY']) but BACKGROUNDS ends at y=$($mainBottom['BACKGROUNDS']) - the Main bottom row must close on one line"
+if (-not $mainBottom.ContainsKey("HUMANITY")) {
+    Fail "V69 HUMANITY not found on HH.1 - the check measured nothing (SPEC V20)"
+} elseif ($mainBottom["HUMANITY"] -ne $MAIN_BOTTOM_Y) {
+    Fail "V69 the HUMANITY/WILLPOWER box ends at y=$($mainBottom['HUMANITY']), not the y=$MAIN_BOTTOM_Y the tab's grid closes on - the Main bottom row must close on one line"
 } else {
-    Pass "V69 Main bottom row closes together on y=$($mainBottom['BACKGROUNDS'])"
+    Pass "V69 Main bottom row closes on y=$MAIN_BOTTOM_Y"
 }
 # ---- V48: a section box is filled black (SPEC B18) -------------------------------
 # ABILITIES shipped with the Mage sheet's transparent fill, so the tab background showed
@@ -2354,6 +2365,28 @@ elseif ($crossed) { foreach ($c in $crossed) { Fail "V144 HH.10 note box owns '$
 elseif (@($stNoteFields | Where-Object { $_ -notmatch '^stNotes\d$' })) { Fail "V144 a storyteller note box is on a field outside stNotes1..3 - the contract in I3 names those three" }
 elseif ($stElsewhere) { foreach ($s in $stElsewhere) { Fail "V144 $s - a storyteller field is owned outside HH.10, where a player can reach it" } }
 else { Pass "V144 the storyteller's three notes own their own fields, and no tab shares them ($($stNoteFields -join ', '))" }
+
+# ---- V145: one place says how many backgrounds there are -------------------------------
+# The XML draws the rows, two loops on the root form walk them - one to let experience buy a
+# background, one to price it for the log. The count was a literal `9` in both until the 46th
+# round doubled it. A row added to the XML and to neither loop is a background nothing
+# charges for and nothing shows in the log: free, and invisible.
+$bgLoops   = @([regex]::Matches($rootTxt, 'for i = 1, BACKGROUND_ROWS, 1 do'))
+$bgLiteral = @([regex]::Matches($rootTxt, 'for i = 1, \d+, 1 do[^\r\n]*background'))
+$bgXml     = @()
+foreach ($bf in $files) {
+    foreach ($n in (Doc $bf.FullName).SelectNodes("//OpenAbility[@field]")) {
+        if ($n.GetAttribute("field") -match '^background_(\d+)$') { $bgXml += [int]$Matches[1] }
+    }
+}
+$bgMax = if ($bgXml.Count -gt 0) { ($bgXml | Measure-Object -Maximum).Maximum } else { 0 }
+if ($bgRows -lt 1) { Fail "V145 BACKGROUND_ROWS is not declared - the count would be a literal in every loop again" }
+elseif ($bgLoops.Count -ne 2) { Fail "V145 $($bgLoops.Count) of the two background loops read BACKGROUND_ROWS - the other one is carrying its own copy of the number" }
+elseif ($bgLiteral.Count -gt 0) { Fail "V145 a background loop still counts to a literal - the XML and the ledger would drift apart" }
+elseif ($bgXml.Count -ne $bgRows) { Fail "V145 the XML draws $($bgXml.Count) background row(s) but BACKGROUND_ROWS says $bgRows - the extra rows cost nothing and never reach the log" }
+elseif ($bgMax -ne $bgRows) { Fail "V145 the background rows run up to background_$bgMax with BACKGROUND_ROWS at $bgRows - the loops walk 1..$bgRows and would miss it" }
+elseif (@($bgXml | Sort-Object -Unique).Count -ne $bgRows) { Fail "V145 two background rows carry the same field - one of them would never be read back (SPEC V1)" }
+else { Pass "V145 $bgRows background rows, one declared count, both loops reading it" }
 
 # ---- V135: priced first, marked only if it is allowed --------------------------------
 # The dot cannot flip itself any more (V134), so the order inside xpClick IS the rule: work
