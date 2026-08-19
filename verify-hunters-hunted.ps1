@@ -1739,7 +1739,7 @@ else {
 
     # No field of the ledger's own may be edited from here, and the flags must be real fields.
     $stFields = @((Doc $stDoc).SelectNodes("//*[@field]") | ForEach-Object { $_.GetAttribute("field") })
-    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines')
+    $wantFlags = @('stBackgroundsXP', 'stShowNumina', 'stShowDisciplines', 'stFreeBuy')
     $missFlags = @($wantFlags | Where-Object { $stFields -notcontains $_ })
     if ($missFlags) { foreach ($f in $missFlags) { Fail "V89 HH.10 has no widget for $f" } }
     else { Pass "V89 all $($wantFlags.Count) storyteller flags are owned by HH.10" }
@@ -2308,7 +2308,7 @@ $markFn  = LuaFn $rootTxt 'markDot'
 if (-not $clickFn.Success) { Fail "V135 xpClick not found on the root form" }
 else {
     $c     = $clickFn.Groups[1].Value
-    $iPr   = $c.IndexOf('xpLedgerRows(field, want)')
+    $iPr   = $c.IndexOf('xpLedgerRows(field, want, key)')
     $iMark = $c.LastIndexOf('markDot(form, field, want)')
     $marks = @([regex]::Matches($c, 'markDot\('))
     if ($c -notmatch 'local want = not \(sheet\[field\] == true\);') { Fail "V135 xpClick never works out what the click is asking for - with autoChange off, nothing else does" }
@@ -2331,7 +2331,7 @@ else { Pass "V135 the accepted mark writes the field and paints the dot in one s
 $rowsSim = LuaFn $rootTxt 'xpLedgerRows'
 $liveFn  = LuaFn $rootTxt 'liveLevel'
 if (-not $rowsSim) { Fail "V136 xpLedgerRows not found on the root form" }
-elseif ($rowsSim -notmatch 'function xpLedgerRows\(clickField, clickValue\)') { Fail "V136 xpLedgerRows cannot be handed a pending click" }
+elseif ($rowsSim -notmatch 'function xpLedgerRows\(clickField, clickValue, clickFree\)') { Fail "V136 xpLedgerRows cannot be handed a pending click" }
 elseif ($rowsSim -notmatch 'simField, simValue = clickField, clickValue;') { Fail "V136 the pending click is never put in front of the ledger" }
 elseif ($rowsSim -notmatch 'simTrait, simField, simValue = nil, nil, nil;') { Fail "V136 the simulation is never cleared - a later price would carry an answered click" }
 elseif ($rowsSim.IndexOf('simTrait, simField, simValue = nil, nil, nil;') -gt $rowsSim.IndexOf('return rows;')) { Fail "V136 the simulation is cleared after the ledger has returned, which is never" }
@@ -2342,6 +2342,76 @@ if (-not $liveFn) { Fail "V136 liveLevel not found on the root form" }
 elseif ($liveFn -notmatch 'traitLevel\(sheet, base, first, last, fixed\)') { Fail "V136 liveLevel does not read the sheet through traitLevel (SPEC V85)" }
 elseif ($liveFn -notmatch 'if simTrait == base') { Fail "V136 liveLevel would apply the pending click to a trait it does not belong to" }
 else { Pass "V136 the live side is traitLevel plus at most the one dot being clicked" }
+
+# ---- V137: Free dots is read at the click, and nowhere else --------------------------
+# "Free only if the box was ticked at the MOMENT of purchase" is not a rule anyone has to
+# remember while editing: it holds because nothing except xpClick can see the flag. A
+# renderer that read it would re-price the past every time the storyteller changed their
+# mind, which is the lens the 31st round shipped and the user rejected (SPEC V105).
+$flagReads = @()
+foreach ($ff in $files) {
+    foreach ($m in [regex]::Matches((CodeOf $ff.FullName), '(?<!field=")stFreeBuy')) { $flagReads += $ff.Name }
+}
+if ($flagReads.Count -ne 1) { Fail "V137 stFreeBuy is read in $($flagReads.Count) place(s) ($($flagReads -join ', ')) - exactly one, inside xpClick" }
+elseif ($flagReads[0] -ne 'HuntersHunted.lfm') { Fail "V137 stFreeBuy is read from $($flagReads[0]) - the flag belongs to the click, not to a tab" }
+elseif ($clickFn.Groups[1].Value -notmatch 'local free = want and sheet\.stFreeBuy == true;') { Fail "V137 xpClick does not read the flag at the click - the answer would come from somewhere else in time" }
+else { Pass "V137 Free dots is read once, at the click, and by nothing else" }
+
+# ---- V138: the stamp holds names, keyed by the rating REACHED ------------------------
+# strength_5 clicked with two dots lit is level 3, and the log asks for the level, not for
+# the dot - keying off the clicked field is what made the 34th round charge for points it
+# had stamped (SPEC B31). '#' keeps a key from ever reading as a field name. The burned
+# names stay burned: sheets from the 31st..37th rounds carry `freeDots` written under two
+# incompatible schemes, and reviving it would zero the cost of whichever dot it happened to
+# name (SPEC I3, V2).
+$burnedUse  = @($files | Where-Object { (CodeOf $_.FullName) -match 'stFreeDots|freeDots' })
+$freeWrites = @([regex]::Matches($rootTxt, 'setField\("xpFree"'))
+$freeElse   = @($files | Where-Object { $_.Name -ne 'HuntersHunted.lfm' -and (CodeOf $_.FullName) -match 'xpFree' })
+if ($burnedUse) { Fail "V138 $(($burnedUse | ForEach-Object { $_.Name }) -join ', ') names a burned field (stFreeDots/freeDots) - an old sheet would resurrect stamps under a scheme nothing reads any more (SPEC I3)" }
+elseif ($freeElse) { Fail "V138 xpFree is touched outside the root form ($(($freeElse | ForEach-Object { $_.Name }) -join ', ')) - the stamp belongs to the click" }
+elseif ($freeWrites.Count -ne 2) { Fail "V138 xpFree is written in $($freeWrites.Count) place(s) - exactly two: the stamp a free purchase leaves, and the one a sale takes away" }
+elseif ($clickFn.Groups[1].Value -notmatch 'trait \.\. "#" \.\. \(level \+ 1\)') { Fail "V138 the stamp is not keyed off the rating the click REACHES (SPEC B31)" }
+elseif ($rowsSim -notmatch 'free\s+= \(sheet\.xpFree or ""\) \.\. "\|" \.\. \(clickFree or ""\) \.\. "\|"') { Fail "V138 the ledger never reads the stamps - every point would be priced as if the box had never been ticked" }
+else { Pass "V138 the stamp keeps names keyed by the rating reached, and no burned name is back" }
+
+# ---- V139: a stamp DISCOUNTS a price the table worked out ----------------------------
+# Not a second cost table (SPEC V86): xpCost prices the point and the stamp zeroes it after
+# the fact. That is also what stops a free point from making the next one cheaper - the
+# price still reads the rating reached, never how many points were paid for.
+$riseFn    = LuaFn $rootTxt 'pushRise'
+$riseCalls = @([regex]::Matches($rootTxt, 'ctx, (field|"humanity"|"willpower"|"faith")\);'))
+if (-not $riseFn) { Fail "V139 pushRise not found on the root form" }
+elseif ($riseFn -notmatch 'function pushRise\(rows, kind, name, from, to, ctx, field\)') { Fail "V139 pushRise cannot tell which trait the row belongs to - it could not read a stamp" }
+elseif ($riseFn -notmatch 'local cost = xpCost\(kind, lvl - 1, ctx\);') { Fail "V139 pushRise no longer prices the row through xpCost (SPEC V86)" }
+elseif ($riseFn -notmatch 'string\.find\(ctx\.free, "\|" \.\. field \.\. "#" \.\. lvl \.\. "\|", 1, true\)') { Fail "V139 pushRise does not look the row's level up in the stamps" }
+elseif ($riseFn.IndexOf('string.find(ctx.free') -lt $riseFn.IndexOf('local cost = xpCost(')) { Fail "V139 the discount lands before the price exists - it must zero a cost the table already worked out (SPEC V86)" }
+elseif ($riseCalls.Count -ne 9) { Fail "V139 $($riseCalls.Count) of the ledger's nine row groups hand pushRise their field - one that does not could never go free" }
+else { Pass "V139 all nine row groups carry their field, and a stamp zeroes a price xpCost worked out" }
+
+# ---- V140: the stamp goes down with the mark, never on a refusal ---------------------
+# Pricing writes nothing (V136), so the stamp reaches the sheet only after the rules have
+# said yes, in the same pass as the mark. A free point skips the balance test outright
+# rather than passing it on the arithmetic: `spent` does not move, but a sheet the
+# storyteller has already put in the red - by charging for backgrounds after the fact -
+# would refuse a point that costs nothing (SPEC C, 40th round).
+$cc      = $clickFn.Groups[1].Value
+$iStamp  = $cc.IndexOf('setField("xpFree"')
+$iMarkOk = $cc.LastIndexOf('markDot(form, field, want)')
+$buyBr   = [regex]::Match($cc, 'if want then(.*?)else', 'Singleline')
+if ($iStamp -lt 0) { Fail "V140 xpClick never writes the stamp - a free point would be charged again on the next render" }
+elseif ($iStamp -lt $iMarkOk) { Fail "V140 the stamp is written before the mark - a refused click would leave one behind (SPEC V135)" }
+elseif (-not $buyBr.Success) { Fail "V140 xpClick has no purchase branch" }
+elseif ($buyBr.Groups[1].Value -notmatch 'if not free and') { Fail "V140 a free purchase is put through the balance test - a sheet already in the red would refuse a point that costs nothing" }
+elseif ($buyBr.Groups[1].Value -match 'setField\(') { Fail "V140 the purchase branch writes before the decision is made (SPEC V135)" }
+else { Pass "V140 the stamp goes down with the mark, and a free point never meets the balance" }
+
+# ---- V141: selling a point takes its stamp with it -----------------------------------
+# The rule is about the moment of purchase, so a point sold and bought again obeys the flag
+# of the NEW click. One key, not a sweep: a sale drops the rating by one and V103 forbids
+# going below the frozen character, so no stamp can be left stranded above the rating.
+if ($cc -notmatch 'elseif not want and sheet\.xpFree ~= nil then') { Fail "V141 a sale never reaches the stamps - a sold point would come back free" }
+elseif ($cc -notmatch 'string\.gsub\(sheet\.xpFree, "\|" \.\. trait \.\. "#" \.\. level \.\. "\|", "\|"\)') { Fail "V141 the sale does not drop the stamp of the level it gave up" }
+else { Pass "V141 a sold point hands its stamp back" }
 
 # ---- V6 + V7: real build, and proof the artifact actually changed -------------
 # B.1: `rdk p` is PREPARE, not pack. It exits 0 without touching the .rpk.

@@ -62,7 +62,7 @@
 		<!-- Theme backdrop, same arrangement as every other tab (SPEC T158, V56, V57). -->
 		<image name="themePaper10" align="client" style="stretch" hitTest="false" visible="false"/>
 
-		<layout left="0" top="0" width="520" height="210">
+		<layout left="0" top="0" width="520" height="240">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="520" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 
@@ -72,15 +72,22 @@
 			<label name="dynBaselineState" left="335" top="45" width="170" height="20" text=""/>
 
 			<!-- Backgrounds are free by default: the storyteller opts INTO charging for them
-			     (SPEC C, I9). The other two decide which power tabs the table can see.
+			     (SPEC C, I9). The two Show flags decide which power tabs the table can see.
+
+			     `Free dots` hides no tab and is read in exactly one place - xpClick, at the
+			     moment a dot is clicked (SPEC I8d, V137). Ticking it now does nothing to what
+			     was bought before, and unticking it later does nothing to what was bought
+			     while it was on: the price is settled at the click and stamped (SPEC V138).
 
 			     `Show Magika` stood at top=180 until the 39th round, when the user had the
-			     empty tab removed (SPEC V128). Its field name stays burned (SPEC I3, orphans):
-			     a sheet saved with it ticked still carries the value, and nothing may reuse
-			     the name for something else (SPEC V2). -->
+			     empty tab removed (SPEC V128); `Free dots` takes the empty slot. `stShowMagika`,
+			     `stFreeDots` and `freeDots` all stay burned (SPEC I3, orphans): a sheet saved
+			     with them still carries the value, and nothing may reuse the name - which is
+			     why the flag here is `stFreeBuy` and the stamp is `xpFree` (SPEC V2, V138). -->
 			<checkBox name="chkBackgroundsXP" left="15" top="90" width="490" height="25" field="stBackgroundsXP" text="Can Buy Backgrounds With Experience"/>
 			<checkBox name="chkShowNumina" left="15" top="120" width="490" height="25" field="stShowNumina" text="Show Numina"/>
 			<checkBox name="chkShowDisciplines" left="15" top="150" width="490" height="25" field="stShowDisciplines" text="Show Disciplines"/>
+			<checkBox name="chkFreeBuy" left="15" top="180" width="490" height="25" field="stFreeBuy" text="Free dots"/>
 		</layout>
 	</scrollBox>
 

@@ -559,9 +559,21 @@
 
 			-- One line per POINT: 2 -> 4 is two lines, each costed off the rating it was bought
 			-- from (SPEC I10).
-			local function pushRise(rows, kind, name, from, to, ctx)
+			--
+			-- `field` is here for the free-dot stamp and nothing else (SPEC V139). The stamp
+			-- keys off the rating the point REACHED, never off the dot that was clicked:
+			-- strength_5 clicked with two dots lit is level 3, and keying off the field is the
+			-- mistake that made the 34th round's version charge for stamped points (SPEC B31).
+			local function pushRise(rows, kind, name, from, to, ctx, field)
 				for lvl = from + 1, to, 1 do
-					rows[#rows + 1] = { kind = kind, name = name, level = lvl, cost = xpCost(kind, lvl - 1, ctx) };
+					local cost = xpCost(kind, lvl - 1, ctx);
+
+					-- A stamp DISCOUNTS a price the table already worked out; it is not a second
+					-- table (SPEC V86/V139). A free point does not make the next one cheaper -
+					-- the price reads the rating reached, not how many were paid for.
+					if string.find(ctx.free, "|" .. field .. "#" .. lvl .. "|", 1, true) ~= nil then cost = 0; end;
+
+					rows[#rows + 1] = { kind = kind, name = name, level = lvl, cost = cost };
 
 					-- 21 buys the FIRST point of the new kind and nothing after it.
 					ctx.newType = false;
@@ -645,7 +657,12 @@
 
 			-- Returns the rows, or nil when no initial character has been saved yet - the
 			-- caller shows a state text for that instead of an empty table (SPEC V33).
-			function xpLedgerRows(clickField, clickValue)
+			--
+			-- `clickFree` is the stamp the click being priced WOULD leave if it is allowed
+			-- (SPEC V140). It is handed in rather than written first, because pricing a click
+			-- writes nothing at all (SPEC V136): the row comes out at zero here, and the stamp
+			-- reaches the sheet only on the way through xpClick.
+			function xpLedgerRows(clickField, clickValue, clickFree)
 				local base = baselineOf();
 
 				if base == nil then return nil; end;
@@ -655,7 +672,13 @@
 				simField, simValue = clickField, clickValue;
 				simTrait = clickField ~= nil and string.match(clickField, "^(.+)_%d+$") or nil;
 
-				local ctx  = { backgroundsXP = sheet.stBackgroundsXP == true };
+				-- The stamps, read ONCE per walk (SPEC V125). Bars on both sides of every key
+				-- so that a search for |a_3#4| cannot match inside |numina_3#4|.
+				local ctx  = {
+					backgroundsXP = sheet.stBackgroundsXP == true,
+					free          = (sheet.xpFree or "") .. "|" .. (clickFree or "") .. "|",
+				};
+
 				local rows = {};
 
 				for i = 1, #XP_ATTRS, 1 do
@@ -668,7 +691,7 @@
 
 					pushRise(rows, "Attribute", nome,
 						traitLevel(base, field, first, 5, fixed),
-						liveLevel(field, first, 5, fixed), ctx);
+						liveLevel(field, first, 5, fixed), ctx, field);
 				end;
 
 				for i = 1, #XP_ABILITIES, 1 do
@@ -677,7 +700,7 @@
 
 					pushRise(rows, "Ability", nome,
 						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx);
+						liveLevel(field, 1, 5, 0), ctx, field);
 				end;
 
 				for i = 1, #XP_CUSTOM, 1 do
@@ -685,7 +708,7 @@
 
 					pushRise(rows, "Ability", slotName(field),
 						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx);
+						liveLevel(field, 1, 5, 0), ctx, field);
 				end;
 
 				for i = 1, #XP_VIRTUES, 1 do
@@ -693,23 +716,23 @@
 
 					pushRise(rows, "Virtue", nome,
 						traitLevel(base, field, 2, 5, 1),
-						liveLevel(field, 2, 5, 1), ctx);
+						liveLevel(field, 2, 5, 1), ctx, field);
 				end;
 
 				pushRise(rows, "Humanity", "Humanity",
 					traitLevel(base, "humanity", 1, 10, 0),
-					liveLevel("humanity", 1, 10, 0), ctx);
+					liveLevel("humanity", 1, 10, 0), ctx, "humanity");
 
 				pushRise(rows, "Willpower", "Willpower",
 					traitLevel(base, "willpower", 1, 10, 0),
-					liveLevel("willpower", 1, 10, 0), ctx);
+					liveLevel("willpower", 1, 10, 0), ctx, "willpower");
 
 				for i = 1, 9, 1 do
 					local field = "background_" .. i;
 
 					pushRise(rows, "Background", slotName(field),
 						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx);
+						liveLevel(field, 1, 5, 0), ctx, field);
 				end;
 
 				-- Which kinds the character already had when the storyteller froze the sheet.
@@ -734,7 +757,7 @@
 							ctx.affinity = (field == "numina_1");
 							ctx.newType  = (from == 0) and not unlocked[grp.kind];
 
-							pushRise(rows, "Numina", slotName(field), from, to, ctx);
+							pushRise(rows, "Numina", slotName(field), from, to, ctx, field);
 
 							unlocked[grp.kind] = true;
 						end;
@@ -750,7 +773,7 @@
 					ctx.affinity = false;
 					ctx.newType  = (ff == 0) and not unlocked.faith;
 
-					pushRise(rows, "Numina", "True Faith", ff, ft, ctx);
+					pushRise(rows, "Numina", "True Faith", ff, ft, ctx, "faith");
 				end;
 
 				simTrait, simField, simValue = nil, nil, nil;
@@ -942,16 +965,35 @@
 				-- rating cost nothing, so they simply happen.
 				if t == nil then markDot(form, field, want); return; end;
 
+				-- The rating the trait stands at right now. The click moves it by one, either
+				-- way, so this is both the level a purchase REACHES and the level a sale leaves
+				-- behind (SPEC V138/V141).
+				local level = traitLevel(sheet, trait, t.first, t.last, t.fixed);
+
+				-- SPEC V137: `Free dots` is read HERE, at the click, and in no other place on
+				-- the sheet. That is what makes "free only if the box was ticked at the moment
+				-- of purchase" true by construction: ticking it later cannot reach a price that
+				-- was already settled, and unticking it cannot take back one that was not
+				-- charged. The stamp carries the answer from here on (SPEC V138).
+				local free = want and sheet.stFreeBuy == true;
+				local key  = free and (trait .. "#" .. (level + 1)) or nil;
+
 				-- ONE walk, of the sheet as it WOULD be (SPEC V125/V135/V136): the balance
 				-- boxes take the sum and the log takes the rows, and both already describe the
-				-- state this click is about to create.
-				local rows  = xpLedgerRows(field, want);
+				-- state this click is about to create. A free click is priced with its stamp in
+				-- hand, so the new line is already worth zero.
+				local rows  = xpLedgerRows(field, want, key);
 				local spent = xpSum(rows);
 
 				if want then
 					-- SPEC V135: refused BEFORE the mark. Nothing was written, so there is
 					-- nothing to put back and nothing to flicker.
-					if ((tonumber(sheet.xpTotal) or 0) - spent) < 0 then
+					--
+					-- A free point skips the balance outright (SPEC V140) rather than passing it
+					-- on the arithmetic: `spent` does not move, but a sheet already in the red -
+					-- the storyteller can put it there by charging for backgrounds after the
+					-- fact (SPEC C, 40th round) - would refuse a point that costs nothing.
+					if not free and ((tonumber(sheet.xpTotal) or 0) - spent) < 0 then
 						xpWarn("Not enough experience to buy that dot");
 						return;
 					end;
@@ -959,12 +1001,23 @@
 					-- SPEC V103: only a point that is IN the log can be sold back. Below the
 					-- baseline is the storyteller's character, not the player's purchase. The
 					-- dot being switched off is on, so this would leave the trait one lower.
-					local after = traitLevel(sheet, trait, t.first, t.last, t.fixed) - 1;
+					local after = level - 1;
 
 					if after < traitLevel(base, trait, t.first, t.last, t.fixed) then return; end;
 				end;
 
 				markDot(form, field, want);
+
+				-- The stamp moves with the mark and only with it (SPEC V140/V141): written when
+				-- a free purchase goes through, dropped when the point it paid for is sold. A
+				-- sold point that is bought again obeys the flag of THAT click, which is the
+				-- whole rule. Nothing here is written on a refusal - there is no refusal left
+				-- to write on.
+				if key ~= nil then
+					setField("xpFree", (sheet.xpFree or "") .. "|" .. key .. "|");
+				elseif not want and sheet.xpFree ~= nil then
+					setField("xpFree", (string.gsub(sheet.xpFree, "|" .. trait .. "#" .. level .. "|", "|")));
+				end;
 
 				renderAllXPBoxes(spent);
 				xpLedgerRefresh(rows);
