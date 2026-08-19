@@ -41,3 +41,17 @@ Verde é condição para marcar §T como `x`. Check novo no gate ! poder falhar 
 
 Só `/ck:spec` (ou `/cavepony:spec`) escreve seções; `/ck:build` só vira o status do §T.
 Numeração de §V/§B/§T é monotônica — nunca reusar id.
+
+## Git ! commit só sob pedido direto
+
+Neste projeto o Claude **não commita** por conta própria. Nada de `git commit`, `git add`
+seguido de commit, amend, push, tag ou branch de entrega sem o user pedir **naquela mensagem**.
+
+- Vale mesmo quando um skill manda commitar: `/ck:build` diz "commit after each §T" —
+  esta regra **vence**. O build termina com o §T marcado, o gate verde e o `.rpk` instalado,
+  e as mudanças ficam no working tree.
+- Autorização não é permanente nem retroativa: "pode commitar" vale para aquele commit,
+  não para os próximos.
+- O que continua normal sem pedido: editar arquivos, rodar o gate, `rdk -l` / `rdk -i`,
+  e comandos git de **leitura** (`status`, `diff`, `log`, `show`).
+- Ao fechar tarefa, dizer o que ficou pendente de commit em vez de commitar.
