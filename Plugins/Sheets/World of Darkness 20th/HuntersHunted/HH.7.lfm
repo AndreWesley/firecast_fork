@@ -1984,107 +1984,107 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 		-->
 		<template name="HedgePicker">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
-			<comboBox left="25" top="0" width="160" height="25" fontSize="12" fontStyle="$(style)" name="cbo$(field)" field="$(field)" items="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}" values="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}">
+			<comboBox left="25" top="0" width="230" height="25" fontSize="12" fontStyle="$(style)" name="cbo$(field)" field="$(field)" items="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}" values="{'', 'Alchemy', 'Conjuration', 'Conveyance', 'Divination', 'Ephemera', 'Enchantment', 'Fascination', 'Fortune', 'Healing', 'Hellfire', 'Illusion', 'Maelstroms', 'Necromancy', 'Necronics', 'Oneiromancy', 'Quintessence Manipulation', 'Shadows', 'Shapeshifting', 'Starlight', 'Summoning, Binding, and Warding', 'Weather Control'}">
 			</comboBox>
-			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="310" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="335" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
 		<template name="PsychicPicker">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
-			<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}" values="{'', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}">
+			<comboBox left="25" top="0" width="230" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}" values="{'', 'Animal Psychics', 'Anti-Psychic', 'Astral Projection', 'Biocontrol', 'Channeling', 'Clairvoyance', 'Cyberkinesis', 'Cyberpathy', 'Ectoplasmic Generation', 'Mind Shields', 'Precognition', 'Psychic Healing', 'Psychic Hypnosis', 'Psychic Invisibility', 'Psychic Vampirism', 'Psychokinesis', 'Psychometry', 'Psychoportation', 'Pyrokinesis', 'Shadow', 'Synergy', 'Telepathy'}">
 			</comboBox>
-			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="310" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="335" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
 		<template name="NuminaFree">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
-			<edit left="25" top="2" width="160" height="21" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<edit left="25" top="2" width="230" height="21" field="$(field)" fontSize="12"/>
+			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="310" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="335" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
-		<layout left="0" top="0" width="340" height="300">
+		<layout left="0" top="0" width="410" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="340" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
+			<label left="0" top="4" width="410" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
 
 			<!-- The first row is the affinity path, and bold is the whole of that mark: the
 			     star that used to sit in the left margin came off at the user's request (SPEC
 			     V88, 28th round). The note under TRUE FAITH still says what the row means. -->
-			<layout left="12" top="25" width="315" height="25">
+			<layout left="12" top="25" width="385" height="25">
 				<HedgePicker field="numina_1" style="bold"/>
 			</layout>
-			<layout left="12" top="50" width="315" height="25">
+			<layout left="12" top="50" width="385" height="25">
 				<HedgePicker field="numina_2" style=""/>
 			</layout>
-			<layout left="12" top="75" width="315" height="25">
+			<layout left="12" top="75" width="385" height="25">
 				<HedgePicker field="numina_3" style=""/>
 			</layout>
-			<layout left="12" top="100" width="315" height="25">
+			<layout left="12" top="100" width="385" height="25">
 				<HedgePicker field="numina_4" style=""/>
 			</layout>
-			<layout left="12" top="125" width="315" height="25">
+			<layout left="12" top="125" width="385" height="25">
 				<HedgePicker field="numina_5" style=""/>
 			</layout>
-			<layout left="12" top="150" width="315" height="25">
+			<layout left="12" top="150" width="385" height="25">
 				<HedgePicker field="numina_6" style=""/>
 			</layout>
-			<layout left="12" top="175" width="315" height="25">
+			<layout left="12" top="175" width="385" height="25">
 				<HedgePicker field="numina_7" style=""/>
 			</layout>
-			<layout left="12" top="200" width="315" height="25">
+			<layout left="12" top="200" width="385" height="25">
 				<HedgePicker field="numina_8" style=""/>
 			</layout>
-			<layout left="12" top="225" width="315" height="25">
+			<layout left="12" top="225" width="385" height="25">
 				<NuminaFree field="numina_9"/>
 			</layout>
-			<layout left="12" top="250" width="315" height="25">
+			<layout left="12" top="250" width="385" height="25">
 				<NuminaFree field="numina_10"/>
 			</layout>
 		</layout>
 
-		<layout left="0" top="310" width="340" height="300">
+		<layout left="0" top="310" width="410" height="300">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="340" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
+			<label left="0" top="4" width="410" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
 
-			<layout left="12" top="25" width="315" height="25">
+			<layout left="12" top="25" width="385" height="25">
 				<PsychicPicker field="psychic_1"/>
 			</layout>
-			<layout left="12" top="50" width="315" height="25">
+			<layout left="12" top="50" width="385" height="25">
 				<PsychicPicker field="psychic_2"/>
 			</layout>
-			<layout left="12" top="75" width="315" height="25">
+			<layout left="12" top="75" width="385" height="25">
 				<PsychicPicker field="psychic_3"/>
 			</layout>
-			<layout left="12" top="100" width="315" height="25">
+			<layout left="12" top="100" width="385" height="25">
 				<PsychicPicker field="psychic_4"/>
 			</layout>
-			<layout left="12" top="125" width="315" height="25">
+			<layout left="12" top="125" width="385" height="25">
 				<PsychicPicker field="psychic_5"/>
 			</layout>
-			<layout left="12" top="150" width="315" height="25">
+			<layout left="12" top="150" width="385" height="25">
 				<PsychicPicker field="psychic_6"/>
 			</layout>
-			<layout left="12" top="175" width="315" height="25">
+			<layout left="12" top="175" width="385" height="25">
 				<PsychicPicker field="psychic_7"/>
 			</layout>
-			<layout left="12" top="200" width="315" height="25">
+			<layout left="12" top="200" width="385" height="25">
 				<PsychicPicker field="psychic_8"/>
 			</layout>
-			<layout left="12" top="225" width="315" height="25">
+			<layout left="12" top="225" width="385" height="25">
 				<NuminaFree field="psychic_9"/>
 			</layout>
-			<layout left="12" top="250" width="315" height="25">
+			<layout left="12" top="250" width="385" height="25">
 				<NuminaFree field="psychic_10"/>
 			</layout>
 		</layout>
@@ -2101,19 +2101,19 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 			`faith_1`..`_5` are the dots that used to live on the Main tab. They moved here in
 			the same change that removed them there, so a saved sheet keeps its rating (V35).
 		-->
-		<layout left="0" top="620" width="340" height="60">
+		<layout left="0" top="620" width="410" height="60">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="340" height="20" text="TRUE FAITH" horzTextAlign="center"/>
+			<label left="0" top="4" width="410" height="20" text="TRUE FAITH" horzTextAlign="center"/>
 
-			<layout left="12" top="25" width="315" height="25">
+			<layout left="12" top="25" width="385" height="25">
 				<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="faith" groupName="numinaSel"/>
-				<comboBox left="25" top="0" width="160" height="25" fontSize="12" name="cboFaith" field="faith" items="{'', 'Christianity', 'Judaism', 'Islam', 'Other'}" values="{'', 'Christianity', 'Judaism', 'Islam', 'Other'}">
+				<comboBox left="25" top="0" width="230" height="25" fontSize="12" name="cboFaith" field="faith" items="{'', 'Christianity', 'Judaism', 'Islam', 'Other'}" values="{'', 'Christianity', 'Judaism', 'Islam', 'Other'}">
 				</comboBox>
-				<imageCheckBox left="190" top="0" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_1', self);"/>
-				<imageCheckBox left="215" top="0" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_2', self);"/>
-				<imageCheckBox left="240" top="0" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_3', self);"/>
-				<imageCheckBox left="265" top="0" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_4', self);"/>
-				<imageCheckBox left="290" top="0" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_5', self);"/>
+				<imageCheckBox left="260" top="0" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_1', self);"/>
+				<imageCheckBox left="285" top="0" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_2', self);"/>
+				<imageCheckBox left="310" top="0" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_3', self);"/>
+				<imageCheckBox left="335" top="0" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_4', self);"/>
+				<imageCheckBox left="360" top="0" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_5', self);"/>
 			</layout>
 		</layout>
 
@@ -2129,7 +2129,7 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 
 			Height tracks the three tables on the left, which now end at y=680 (SPEC T81).
 		-->
-		<layout left="350" top="0" width="850" height="680">
+		<layout left="420" top="0" width="850" height="680">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
 			<textEditor name="edtNuminaDesc" left="10" top="25" width="830" height="645" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>

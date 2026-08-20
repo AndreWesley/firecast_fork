@@ -88,7 +88,7 @@
 		</layout>
 
 		<!-- 590 = the notes' 580 plus the same 10 the three of them keep between each other. -->
-		<layout left="0" top="590" width="520" height="300">
+		<layout left="0" top="590" width="520" height="330">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="520" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 
@@ -112,7 +112,7 @@
 			     why the flag here is `stFreeBuy` and the stamp is `xpFree` (SPEC V2, V138). -->
 			<checkBox name="chkBackgroundsXP" left="15" top="90" width="490" height="25" field="stBackgroundsXP" text="Can Buy Backgrounds With Experience"/>
 			<checkBox name="chkShowNumina" left="15" top="120" width="490" height="25" field="stShowNumina" text="Show Numina"/>
-			<checkBox name="chkShowDisciplines" left="15" top="150" width="490" height="25" field="stShowDisciplines" text="Show Disciplines"/>
+			<checkBox name="chkShowDisciplines" left="15" top="150" width="490" height="25" field="stShowDisciplines" text="Show Vampire"/>
 			<checkBox name="chkFreeBuy" left="15" top="180" width="490" height="25" field="stFreeBuy" text="Free dots"/>
 
 			<!-- Specialities are bought only where the storyteller opened the door, and the two
@@ -123,6 +123,12 @@
 			     is the book's, not the storyteller's, and it costs nothing either way. -->
 			<checkBox name="chkSpec3XP" left="15" top="210" width="490" height="25" field="stSpec3XP" text="Allow buy Specialization for 3 experience points"/>
 			<checkBox name="chkSpec4XP" left="15" top="240" width="490" height="25" field="stSpec4XP" text="Allow buy Specialization for 4 experience points"/>
+
+			<!-- 51st round (SPEC I8g, V175). OFF by default and OFF when nil - the four clan slots
+			     stay locked unless the storyteller opens them, which is the fail-closed default the
+			     other Show flags use (SPEC V89, V80). While `clan` sleeps (SPEC V173) this is the
+			     only way the box gets filled at all. -->
+			<checkBox name="chkEditClanDisc" left="15" top="270" width="490" height="25" field="stEditClanDisc" text="Edit Clan Disciplines"/>
 		</layout>
 	</scrollBox>
 

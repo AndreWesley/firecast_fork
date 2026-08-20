@@ -16,6 +16,22 @@
 			all (SPEC B19 / V59). The Lua matches on the prefix.
 		-->
 		<image name="themePaper1" align="client" style="stretch" hitTest="false" visible="false"/>
+
+		<!--
+			The clan, born ASLEEP (SPEC V173, T432): invisible AND disabled, and no Lua on any
+			tab writes the field, so nothing can fill it. It exists now only so the roster of
+			CLANS (SPEC I17) has one owner of `clan` the day a round wakes it up - and so V8
+			closes, since a widget that is hidden is still a widget.
+
+			Outside every box on purpose: it draws nothing, so it belongs to no layout and it
+			cannot push a sibling around. Dimmed like every other read-only widget (SPEC V111)
+			- unobservable while it is hidden, but the rule is about what the XML says.
+
+			Sixty entries, the thirteen clans plus the bloodlines the core lists in its tenth
+			chapter, with Gargoyles as four rows (SPEC I17). The empty first entry is the one
+			every picker carries (SPEC V15).
+		-->
+		<comboBox name="cboClan" left="0" top="0" width="215" height="25" visible="false" enabled="false" opacity="0.55" field="clan" items="{'', 'Assamite', 'Brujah', 'Followers of Set', 'Gangrel', 'Giovanni', 'Lasombra', 'Malkavian', 'Nosferatu', 'Ravnos', 'Toreador', 'Tremere', 'Tzimisce', 'Ventrue', 'Baali', 'Blood Brothers', 'Daughters of Cacophony', 'Harbingers of Skulls', 'Kiasyd', 'Nagaraja', 'Salubri', 'Samedi', 'True Brujah', 'Ahrimanes', 'Anda', 'Cappadocians', 'Lamia', 'Lhiannan', 'Noiad', 'Assamite Antitribu', 'Brujah Antitribu', 'City Gangrel', 'Country Gangrel', 'Malkavian Antitribu', 'Nosferatu Antitribu', 'Ravnos Antitribu', 'Salubri Antitribu', 'Serpents of the Light', 'Toreador Antitribu', 'Tremere Antitribu', 'Assamite Sorcerers', 'Assamite Viziers', 'Daitya', 'Tlacique', 'Warrior Setites', 'Mariners', 'Lasombra Antitribu', 'Dominate Malkavians', 'Brahman', 'Telyavelic Tremere', 'Old Clan Tzimisce', 'Gargoyles (Modern)', 'Gargoyles (Scout)', 'Gargoyles (Sentinel)', 'Gargoyles (Warrior)', 'Ventrue Antitribu', 'Wu Zao', 'Angellis Ater', 'Maeghar', 'Panders', 'Children of Osiris'}" values="{'', 'Assamite', 'Brujah', 'Followers of Set', 'Gangrel', 'Giovanni', 'Lasombra', 'Malkavian', 'Nosferatu', 'Ravnos', 'Toreador', 'Tremere', 'Tzimisce', 'Ventrue', 'Baali', 'Blood Brothers', 'Daughters of Cacophony', 'Harbingers of Skulls', 'Kiasyd', 'Nagaraja', 'Salubri', 'Samedi', 'True Brujah', 'Ahrimanes', 'Anda', 'Cappadocians', 'Lamia', 'Lhiannan', 'Noiad', 'Assamite Antitribu', 'Brujah Antitribu', 'City Gangrel', 'Country Gangrel', 'Malkavian Antitribu', 'Nosferatu Antitribu', 'Ravnos Antitribu', 'Salubri Antitribu', 'Serpents of the Light', 'Toreador Antitribu', 'Tremere Antitribu', 'Assamite Sorcerers', 'Assamite Viziers', 'Daitya', 'Tlacique', 'Warrior Setites', 'Mariners', 'Lasombra Antitribu', 'Dominate Malkavians', 'Brahman', 'Telyavelic Tremere', 'Old Clan Tzimisce', 'Gargoyles (Modern)', 'Gargoyles (Scout)', 'Gargoyles (Sentinel)', 'Gargoyles (Warrior)', 'Ventrue Antitribu', 'Wu Zao', 'Angellis Ater', 'Maeghar', 'Panders', 'Children of Osiris'}"/>
 		<!--
 			Layout grid (SPEC T41, V26, V27). Everything closes on x=1210 / y=760.
 

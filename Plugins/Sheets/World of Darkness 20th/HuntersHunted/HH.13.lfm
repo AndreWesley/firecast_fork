@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmHH_13" align="client" theme="dark">
+	<script>
+		<![CDATA[
+			-- Paths area of the Vampire tab (SPEC I16, I18). Empty DESC for the same reason as
+			-- HH.12: the layout is judged before the book entries land (SPEC T444/T445, T459).
+			local DESC = {
+				-- >>> PATH_DESC_BEGIN (generated - SPEC T445)
+				["Ash Path"] = {
+					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 163
+
+
+Ash Path
+
+
+The Ash Path allows necromancers to peer into the lands of the dead, and even affect things there. Of the paths of Necromancy, the Ash Path is the most perilous to learn, because many of the path’s uses increase a necromancer’s vulnerability to wraiths.
+
+• Shroudsight
+Shroudsight allows a necromancer to see through the Shroud, the mystical barrier that separates the living world from the Underworld. By using this power, the vampire can spot ghostly buildings and items, the landscape of the so-called Shadowlands, and even wraiths themselves. However, an observant wraith may notice when a vampire suddenly starts staring at him, which can lead to unpleasant consequences.
+System: A simple roll of Perception + Awareness (difficulty 7) allows a necromancer to utilize Shroudsight. The effects last for a scene.
+
+•• Lifeless Tongues
+Where Shroudsight allows a necromancer to see ghosts, Lifeless Tongues allows her to converse with them effortlessly. Once Lifeless Tongues is employed, the vampire can carry on a conversation with the denizens of the ghostly Underworld without spending blood or causing the wraiths to expend any effort.
+System: To use Lifeless Tongues requires a roll of Perception + Occult (difficulty 6) and the expenditure of a Willpower point.
+
+••• Dead Hand
+Similar to the Sepulchre Path power Torment, Dead Hand allows a necromancer to reach across the Shroud and affect a ghostly object as if it were in the real world. Ghosts are solid to necromancers using this power, and can be attacked. Furthermore, the necromancer can pick up ghostly items, scale ghostly architecture (giving real-world bystanders the impression that he’s climbing on air!), and generally exist in two worlds. On the other hand, a necromancer using Dead Hand is quite solid to the residents of the Underworld — and to whatever hostilities they might have.
+System: The player spends a point of Willpower and makes a successful Wits + Occult roll (difficulty 7) to activate Dead Hand for one scene. For each additional scene the vampire wishes to remain in contact with the Underworld, he must spend a point of blood.
+
+•••• Ex Nihilo
+Ex Nihilo allows a necromancer to enter the Underworld physically. While in the lands of the dead, the vampire is essentially a particularly solid ghost. He maintains his normal number of health levels, but can be hurt only by things that inflict aggravated damage on ghosts (weapons forged from souls, certain ghostly powers, etc.). A vampire physically in the Underworld can pass through solid objects in the real world (at the cost of one health level) and remain "incorporeal" for a number of turns equal to her Stamina rating. On the other hand, vampires present in the Underworld are subject to all of the Underworld’s perils, including ultimate destruction. A vampire killed in the realm of the dead is gone forever, beyond even the reach of other necromancers.
+System: Using Ex Nihilo takes a tremendous toll on the necromancer. To activate this power, the vampire must first draw a doorway with chalk or blood on any available surface. (The vampire may draw doors ahead of time for exactly this purpose.) The player must then expend two points of Willpower and two points of blood before making a Stamina + Occult roll (difficulty 8) as the vampire attempts to open the chalk door physically. If the roll succeeds, the door opens and the vampire steps through into the Underworld.
+When the vampire wishes to return to the real world, he merely needs to concentrate (and the player spends another Willpower point and rolls Stamina + Occult, difficulty 6). At Storyteller discretion, a vampire who is too deeply immersed in the Underworld may need to journey to a place close to the lands of the living in order to cross over. Vampires who wander too far into the lands of the dead may be trapped there forever.
+Vampires in the Underworld cannot feed upon ghosts without the use of another power; their only sustenance is the blood they bring with them.
+
+••••• Shroud Mastery
+Shroud Mastery offers the Kindred the ability to manipulate the veil between the worlds of the living and the dead. By doing so, a necromancer can make it easier for bound wraiths in his service to function, or make it nearly impossible for ghosts to contact the material world.
+System: To exercise Shroud Mastery, the necromancer expends two points of Willpower, then states whether he is attempting to raise or lower the Shroud. The player then makes a Willpower roll (difficulty 9). Each success on the roll raises or lowers the difficulties of all nearby wraiths’ attempts to cross the Shroud in any way by one, to a maximum of 10 or a minimum of 3. The Shroud reverts to its normal strength at a rate of one point per hour thereafter.]==],
+					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 163
+
+
+Ash Path
+
+
+A Trilha das Cinzas permite aos necromantes espiar as terras dos mortos e até afetar coisas de lá. Entre as trilhas de Necromancia, a Trilha das Cinzas é a mais perigosa de aprender, porque muitos dos usos da trilha aumentam a vulnerabilidade do necromante a espectros.
+
+• Visão do Sudário
+Visão do Sudário permite ao necromante enxergar através do Sudário, a barreira mística que separa o mundo dos vivos do Submundo. Usando este poder, o vampiro consegue avistar construções e objetos espectrais, a paisagem das chamadas Terras das Sombras e até os próprios espectros. Contudo, um espectro observador pode notar quando um vampiro subitamente começa a encará-lo, o que pode levar a consequências desagradáveis.
+Sistema: Uma simples rolagem de Percepção + Prontidão (dificuldade 7) permite ao necromante utilizar Visão do Sudário. Os efeitos duram uma cena.
+
+•• Línguas sem Vida
+Onde Visão do Sudário permite ao necromante ver fantasmas, Línguas sem Vida permite a ela conversar com eles sem esforço. Uma vez empregado Línguas sem Vida, o vampiro consegue manter uma conversa com os habitantes do Submundo espectral sem gastar sangue nem fazer os espectros despenderem qualquer esforço.
+Sistema: Usar Línguas sem Vida exige uma rolagem de Percepção + Ocultismo (dificuldade 6) e o gasto de um ponto de Força de Vontade.
+
+••• Mão Morta
+Semelhante ao poder Tormento da Trilha do Sepulcro, Mão Morta permite ao necromante alcançar através do Sudário e afetar um objeto espectral como se ele estivesse no mundo real. Fantasmas são sólidos para necromantes que usam este poder, e podem ser atacados. Além disso, o necromante consegue pegar objetos espectrais, escalar arquitetura espectral (dando aos espectadores do mundo real a impressão de que ele está escalando o ar!) e, de modo geral, existir em dois mundos. Por outro lado, um necromante usando Mão Morta é bastante sólido para os residentes do Submundo — e para quaisquer hostilidades que eles possam ter.
+Sistema: O jogador gasta um ponto de Força de Vontade e faz uma rolagem bem-sucedida de Raciocínio + Ocultismo (dificuldade 7) para ativar Mão Morta por uma cena. Para cada cena adicional em que o vampiro queira permanecer em contato com o Submundo, ele precisa gastar um ponto de sangue.
+
+•••• Ex Nihilo
+Ex Nihilo permite ao necromante entrar fisicamente no Submundo. Enquanto está nas terras dos mortos, o vampiro é essencialmente um fantasma particularmente sólido. Ele mantém seu número normal de níveis de vitalidade, mas só pode ser ferido por coisas que causem dano agravado a fantasmas (armas forjadas de almas, certos poderes espectrais etc.). Um vampiro fisicamente no Submundo pode atravessar objetos sólidos no mundo real (ao custo de um nível de vitalidade) e permanecer "incorpóreo" por um número de turnos igual ao seu Vigor. Por outro lado, vampiros presentes no Submundo estão sujeitos a todos os perigos do Submundo, incluindo a destruição definitiva. Um vampiro morto no reino dos mortos se foi para sempre, além até do alcance de outros necromantes.
+Sistema: Usar Ex Nihilo cobra um preço tremendo do necromante. Para ativar este poder, o vampiro precisa primeiro desenhar uma porta com giz ou sangue em qualquer superfície disponível. (O vampiro pode desenhar portas com antecedência exatamente para esse fim.) O jogador precisa então gastar dois pontos de Força de Vontade e dois pontos de sangue antes de fazer uma rolagem de Vigor + Ocultismo (dificuldade 8) enquanto o vampiro tenta abrir fisicamente a porta de giz. Se a rolagem tiver sucesso, a porta se abre e o vampiro atravessa para o Submundo.
+Quando o vampiro deseja retornar ao mundo real, basta que se concentre (e o jogador gasta outro ponto de Força de Vontade e rola Vigor + Ocultismo, dificuldade 6). A critério do Narrador, um vampiro imerso fundo demais no Submundo pode precisar viajar até um lugar próximo das terras dos vivos para conseguir atravessar. Vampiros que vagam longe demais pelas terras dos mortos podem ficar presos lá para sempre.
+Vampiros no Submundo não podem se alimentar de fantasmas sem o uso de outro poder; seu único sustento é o sangue que trazem consigo.
+
+••••• Domínio do Sudário
+Domínio do Sudário oferece ao Membro a capacidade de manipular o véu entre os mundos dos vivos e dos mortos. Ao fazê-lo, um necromante pode tornar mais fácil aos espectros vinculados a seu serviço funcionarem, ou tornar quase impossível que fantasmas contatem o mundo material.
+Sistema: Para exercer Domínio do Sudário, o necromante gasta dois pontos de Força de Vontade e então declara se está tentando erguer ou baixar o Sudário. O jogador então faz uma rolagem de Força de Vontade (dificuldade 9). Cada sucesso na rolagem aumenta ou reduz em um as dificuldades de todas as tentativas de espectros próximos de atravessar o Sudário de qualquer forma, até um máximo de 10 ou um mínimo de 3. O Sudário volta à sua força normal a uma taxa de um ponto por hora daí em diante.]==],
+				},
+				-- <<< PATH_DESC_END
+			};
+
+			local NO_SELECTION = {
+				en = "Pick the selector next to a path to read its description here.",
+				pt = "Marque o seletor ao lado de uma trilha para ler a descrição dela aqui.",
+			};
+
+			local EMPTY_ROW = {
+				en = "That row is still empty. Choose a path in the list first.",
+				pt = "Essa linha ainda está vazia. Escolha uma trilha na lista primeiro.",
+			};
+
+			local NO_ENTRY = {
+				en = "No description on file for: ",
+				pt = "Sem descrição registrada para: ",
+			};
+
+			local function pick(tbl, lang)
+				return tbl[lang] or tbl.en;
+			end;
+
+			local function pathText(lang)
+				local selected = sheet.pathSel;
+
+				if selected == nil or selected == "" then
+					return pick(NO_SELECTION, lang);
+				end;
+
+				local value = sheet[selected];
+
+				if value == nil or value == "" then
+					return pick(EMPTY_ROW, lang);
+				end;
+
+				local entry = DESC[value];
+
+				-- The name in the message is the one the ROW shows, so it goes through the era
+				-- and then through the language exactly as the picker item does (SPEC I22, T469).
+				-- Naming it by the raw canonical value would send the player looking for a line
+				-- that is not in the list above.
+				if entry == nil then
+					return pick(NO_ENTRY, lang) .. translateSheetText(eraName(value, currentTheme()), lang);
+				end;
+
+				return pick(entry, lang);
+			end;
+
+			function renderPathDesc(form)
+				if sheet == nil then return; end;
+				form.edtPathDesc.text = pathText(sheet.language or "en");
+			end;
+		]]>
+	</script>
+
+	<scrollBox align="client">
+		<image name="themePaper13" align="client" style="stretch" hitTest="false" visible="false"/>
+
+		<!--
+			MAIN PATHS carry dots that are DISPLAY ONLY (SPEC V179): no field, no onClick,
+			autoChange off, dimmed like every other read-only widget on the sheet (SPEC V111).
+			A main path's rating IS its blood sorcery's rating (SPEC V180) - the discipline is
+			what was paid for, so charging for the path too would bill one dot twice.
+
+			They are painted from the discipline by renderMainPaths, which arrives with the
+			BLOOD_SORCERY table in SPEC T435/T439. Until then they simply sit dark.
+		-->
+		<template name="MainPathRow">
+			<radioButton left="0" top="2" width="20" height="21" field="pathSel" fieldValue="$(field)" groupName="pathSel"/>
+			<comboBox left="25" top="0" width="345" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Ash Path', 'Awakening of the Steel', 'Bone Path', 'Cenotaph Path', 'Corpse in the Monster', 'Die Herrschaft des Wyrm', 'Elemental Mastery', 'Grave’s Decay', 'Hands of Destruction', 'Iter Pernix', 'Lure of Flames', 'Mastery of the Mortal Shell', 'Movement of the Mind', 'Neptune’s Might', 'Path of Conjuring', 'Path of Corruption', 'Path of Haunting', 'Path of Mars', 'Path of Spirit Manipulation', 'Path of Technomancy', 'Path of the Father’s Vengeance', 'Path of the Focused Mind', 'Path of the Levinbolt', 'Potestas Exsecrabilis', 'Rego Calatio', 'Sepulchre Path', 'The Bialowieza Kraina', 'The Black Sea Kraina', 'The Blessings of the Great Dark Mother', 'The Covenant of Enki', 'The Fires of the Inferno', 'The Flow of Ashe', 'The Green Path', 'The Hand of the Magi', 'The Hunter’s Winds', 'The Keeper’s Way', 'The Kraina of Enoch', 'The Kraina of the Well', 'The Laws of Suleiman', 'The Nightshade Path', 'The Path of Blood', 'The Path of Jinn’s Gift', 'The Path of Life’s Waters', 'The Path of Phobos', 'The Path of Praapti', 'The Path of Skulls', 'The Path of Woe', 'The Path of the Ailing Jackal', 'The Path of the Evil Eye', 'The Path of the Twilight Garden', 'The Revelations of Duat', 'The Revelations of Eden', 'The Revelations of Midgard', 'The Taking of the Spirit', 'The Transylvanian Kraina', 'The Way of Earth', 'The Way of Fire', 'The Way of Sorrows', 'The Way of Water', 'The Way of Wind', 'The Way of the Spirit', 'Ushabti', 'Vitreous Path', 'Weather Control'}" values="{'', 'Ash Path', 'Awakening of the Steel', 'Bone Path', 'Cenotaph Path', 'Corpse in the Monster', 'Die Herrschaft des Wyrm', 'Elemental Mastery', 'Grave’s Decay', 'Hands of Destruction', 'Iter Pernix', 'Lure of Flames', 'Mastery of the Mortal Shell', 'Movement of the Mind', 'Neptune’s Might', 'Path of Conjuring', 'Path of Corruption', 'Path of Haunting', 'Path of Mars', 'Path of Spirit Manipulation', 'Path of Technomancy', 'Path of the Father’s Vengeance', 'Path of the Focused Mind', 'Path of the Levinbolt', 'Potestas Exsecrabilis', 'Rego Calatio', 'Sepulchre Path', 'The Bialowieza Kraina', 'The Black Sea Kraina', 'The Blessings of the Great Dark Mother', 'The Covenant of Enki', 'The Fires of the Inferno', 'The Flow of Ashe', 'The Green Path', 'The Hand of the Magi', 'The Hunter’s Winds', 'The Keeper’s Way', 'The Kraina of Enoch', 'The Kraina of the Well', 'The Laws of Suleiman', 'The Nightshade Path', 'The Path of Blood', 'The Path of Jinn’s Gift', 'The Path of Life’s Waters', 'The Path of Phobos', 'The Path of Praapti', 'The Path of Skulls', 'The Path of Woe', 'The Path of the Ailing Jackal', 'The Path of the Evil Eye', 'The Path of the Twilight Garden', 'The Revelations of Duat', 'The Revelations of Eden', 'The Revelations of Midgard', 'The Taking of the Spirit', 'The Transylvanian Kraina', 'The Way of Earth', 'The Way of Fire', 'The Way of Sorrows', 'The Way of Water', 'The Way of Wind', 'The Way of the Spirit', 'Ushabti', 'Vitreous Path', 'Weather Control'}"/>
+			<imageCheckBox name="ro_$(field)_1" left="375" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_2" left="400" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_3" left="425" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_4" left="450" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_5" left="475" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+		</template>
+
+		<!-- Secondary paths ARE bought, at the Trilha price of SPEC I9, capped at the blood
+		     sorcery's rating minus one (SPEC V183, enforced in xpClick at SPEC T441). -->
+		<template name="SecPathRow">
+			<radioButton left="0" top="2" width="20" height="21" field="pathSel" fieldValue="$(field)" groupName="pathSel"/>
+			<comboBox left="25" top="0" width="345" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Ash Path', 'Awakening of the Steel', 'Bone Path', 'Cenotaph Path', 'Corpse in the Monster', 'Die Herrschaft des Wyrm', 'Elemental Mastery', 'Grave’s Decay', 'Hands of Destruction', 'Iter Pernix', 'Lure of Flames', 'Mastery of the Mortal Shell', 'Movement of the Mind', 'Neptune’s Might', 'Path of Conjuring', 'Path of Corruption', 'Path of Haunting', 'Path of Mars', 'Path of Spirit Manipulation', 'Path of Technomancy', 'Path of the Father’s Vengeance', 'Path of the Focused Mind', 'Path of the Levinbolt', 'Potestas Exsecrabilis', 'Rego Calatio', 'Sepulchre Path', 'The Bialowieza Kraina', 'The Black Sea Kraina', 'The Blessings of the Great Dark Mother', 'The Covenant of Enki', 'The Fires of the Inferno', 'The Flow of Ashe', 'The Green Path', 'The Hand of the Magi', 'The Hunter’s Winds', 'The Keeper’s Way', 'The Kraina of Enoch', 'The Kraina of the Well', 'The Laws of Suleiman', 'The Nightshade Path', 'The Path of Blood', 'The Path of Jinn’s Gift', 'The Path of Life’s Waters', 'The Path of Phobos', 'The Path of Praapti', 'The Path of Skulls', 'The Path of Woe', 'The Path of the Ailing Jackal', 'The Path of the Evil Eye', 'The Path of the Twilight Garden', 'The Revelations of Duat', 'The Revelations of Eden', 'The Revelations of Midgard', 'The Taking of the Spirit', 'The Transylvanian Kraina', 'The Way of Earth', 'The Way of Fire', 'The Way of Sorrows', 'The Way of Water', 'The Way of Wind', 'The Way of the Spirit', 'Ushabti', 'Vitreous Path', 'Weather Control'}" values="{'', 'Ash Path', 'Awakening of the Steel', 'Bone Path', 'Cenotaph Path', 'Corpse in the Monster', 'Die Herrschaft des Wyrm', 'Elemental Mastery', 'Grave’s Decay', 'Hands of Destruction', 'Iter Pernix', 'Lure of Flames', 'Mastery of the Mortal Shell', 'Movement of the Mind', 'Neptune’s Might', 'Path of Conjuring', 'Path of Corruption', 'Path of Haunting', 'Path of Mars', 'Path of Spirit Manipulation', 'Path of Technomancy', 'Path of the Father’s Vengeance', 'Path of the Focused Mind', 'Path of the Levinbolt', 'Potestas Exsecrabilis', 'Rego Calatio', 'Sepulchre Path', 'The Bialowieza Kraina', 'The Black Sea Kraina', 'The Blessings of the Great Dark Mother', 'The Covenant of Enki', 'The Fires of the Inferno', 'The Flow of Ashe', 'The Green Path', 'The Hand of the Magi', 'The Hunter’s Winds', 'The Keeper’s Way', 'The Kraina of Enoch', 'The Kraina of the Well', 'The Laws of Suleiman', 'The Nightshade Path', 'The Path of Blood', 'The Path of Jinn’s Gift', 'The Path of Life’s Waters', 'The Path of Phobos', 'The Path of Praapti', 'The Path of Skulls', 'The Path of Woe', 'The Path of the Ailing Jackal', 'The Path of the Evil Eye', 'The Path of the Twilight Garden', 'The Revelations of Duat', 'The Revelations of Eden', 'The Revelations of Midgard', 'The Taking of the Spirit', 'The Transylvanian Kraina', 'The Way of Earth', 'The Way of Fire', 'The Way of Sorrows', 'The Way of Water', 'The Way of Wind', 'The Way of the Spirit', 'Ushabti', 'Vitreous Path', 'Weather Control'}"/>
+			<imageCheckBox left="375" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="400" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="425" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="450" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="475" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+		</template>
+
+		<!-- 5 slots: one main path per blood sorcery (SPEC V181). 25 + 5*25 + 25 = 175. -->
+		<layout left="0" top="0" width="525" height="175">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="525" height="20" text="MAIN PATHS" horzTextAlign="center"/>
+			<layout left="12" top="25" width="500" height="25">
+				<MainPathRow field="mainPath_1"/>
+			</layout>
+			<layout left="12" top="50" width="500" height="25">
+				<MainPathRow field="mainPath_2"/>
+			</layout>
+			<layout left="12" top="75" width="500" height="25">
+				<MainPathRow field="mainPath_3"/>
+			</layout>
+			<layout left="12" top="100" width="500" height="25">
+				<MainPathRow field="mainPath_4"/>
+			</layout>
+			<layout left="12" top="125" width="500" height="25">
+				<MainPathRow field="mainPath_5"/>
+			</layout>
+		</layout>
+
+		<layout left="0" top="185" width="525" height="425">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="525" height="20" text="SECONDARY PATHS" horzTextAlign="center"/>
+			<layout left="12" top="25" width="500" height="25">
+				<SecPathRow field="secPath_1"/>
+			</layout>
+			<layout left="12" top="50" width="500" height="25">
+				<SecPathRow field="secPath_2"/>
+			</layout>
+			<layout left="12" top="75" width="500" height="25">
+				<SecPathRow field="secPath_3"/>
+			</layout>
+			<layout left="12" top="100" width="500" height="25">
+				<SecPathRow field="secPath_4"/>
+			</layout>
+			<layout left="12" top="125" width="500" height="25">
+				<SecPathRow field="secPath_5"/>
+			</layout>
+			<layout left="12" top="150" width="500" height="25">
+				<SecPathRow field="secPath_6"/>
+			</layout>
+			<layout left="12" top="175" width="500" height="25">
+				<SecPathRow field="secPath_7"/>
+			</layout>
+			<layout left="12" top="200" width="500" height="25">
+				<SecPathRow field="secPath_8"/>
+			</layout>
+			<layout left="12" top="225" width="500" height="25">
+				<SecPathRow field="secPath_9"/>
+			</layout>
+			<layout left="12" top="250" width="500" height="25">
+				<SecPathRow field="secPath_10"/>
+			</layout>
+			<layout left="12" top="275" width="500" height="25">
+				<SecPathRow field="secPath_11"/>
+			</layout>
+			<layout left="12" top="300" width="500" height="25">
+				<SecPathRow field="secPath_12"/>
+			</layout>
+			<layout left="12" top="325" width="500" height="25">
+				<SecPathRow field="secPath_13"/>
+			</layout>
+			<layout left="12" top="350" width="500" height="25">
+				<SecPathRow field="secPath_14"/>
+			</layout>
+			<layout left="12" top="375" width="500" height="25">
+				<SecPathRow field="secPath_15"/>
+			</layout>
+		</layout>
+
+		<layout left="535" top="0" width="850" height="610">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtPathDesc" left="10" top="25" width="830" height="575" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>
+		</layout>
+	</scrollBox>
+
+	<dataLink fields="{'language', 'pathSel', 'mainPath_1', 'mainPath_2', 'mainPath_3', 'mainPath_4', 'mainPath_5', 'secPath_1', 'secPath_2', 'secPath_3', 'secPath_4', 'secPath_5', 'secPath_6', 'secPath_7', 'secPath_8', 'secPath_9', 'secPath_10', 'secPath_11', 'secPath_12', 'secPath_13', 'secPath_14', 'secPath_15'}" onChange="renderPathDesc(self);"/>
+
+	<!--
+		The five main path dots follow the Discipline, recomputed on every render and stored
+		nowhere (SPEC V180), so this link watches what renderMainPaths actually READS and
+		nothing else (SPEC V123): the five path slots, the nineteen Discipline slots, and the
+		dots of those nineteen - the rating is the dots, so a bought dot has to reach here.
+
+		It is a link of its own rather than fields bolted onto the description link above:
+		that one repaints prose from `language` and the picker rows, and hanging ninety-five
+		dot fields on it would repaint the description every time anyone bought anything
+		(SPEC V123, the mistake B34 records).
+	-->
+	<dataLink fields="{'mainPath_1', 'mainPath_2', 'mainPath_3', 'mainPath_4', 'mainPath_5', 'clanDisc_1', 'clanDisc_2', 'clanDisc_3', 'clanDisc_4', 'disc_1', 'disc_2', 'disc_3', 'disc_4', 'disc_5', 'disc_6', 'disc_7', 'disc_8', 'disc_9', 'disc_10', 'disc_11', 'disc_12', 'disc_13', 'disc_14', 'disc_15', 'clanDisc_1_1', 'clanDisc_1_2', 'clanDisc_1_3', 'clanDisc_1_4', 'clanDisc_1_5', 'clanDisc_2_1', 'clanDisc_2_2', 'clanDisc_2_3', 'clanDisc_2_4', 'clanDisc_2_5', 'clanDisc_3_1', 'clanDisc_3_2', 'clanDisc_3_3', 'clanDisc_3_4', 'clanDisc_3_5', 'clanDisc_4_1', 'clanDisc_4_2', 'clanDisc_4_3', 'clanDisc_4_4', 'clanDisc_4_5', 'disc_1_1', 'disc_1_2', 'disc_1_3', 'disc_1_4', 'disc_1_5', 'disc_2_1', 'disc_2_2', 'disc_2_3', 'disc_2_4', 'disc_2_5', 'disc_3_1', 'disc_3_2', 'disc_3_3', 'disc_3_4', 'disc_3_5', 'disc_4_1', 'disc_4_2', 'disc_4_3', 'disc_4_4', 'disc_4_5', 'disc_5_1', 'disc_5_2', 'disc_5_3', 'disc_5_4', 'disc_5_5', 'disc_6_1', 'disc_6_2', 'disc_6_3', 'disc_6_4', 'disc_6_5', 'disc_7_1', 'disc_7_2', 'disc_7_3', 'disc_7_4', 'disc_7_5', 'disc_8_1', 'disc_8_2', 'disc_8_3', 'disc_8_4', 'disc_8_5', 'disc_9_1', 'disc_9_2', 'disc_9_3', 'disc_9_4', 'disc_9_5', 'disc_10_1', 'disc_10_2', 'disc_10_3', 'disc_10_4', 'disc_10_5', 'disc_11_1', 'disc_11_2', 'disc_11_3', 'disc_11_4', 'disc_11_5', 'disc_12_1', 'disc_12_2', 'disc_12_3', 'disc_12_4', 'disc_12_5', 'disc_13_1', 'disc_13_2', 'disc_13_3', 'disc_13_4', 'disc_13_5', 'disc_14_1', 'disc_14_2', 'disc_14_3', 'disc_14_4', 'disc_14_5', 'disc_15_1', 'disc_15_2', 'disc_15_3', 'disc_15_4', 'disc_15_5'}" onChange="renderMainPaths(self);"/>
+
+	<!--
+		The picker guard (SPEC V181/V182/V185). It hangs off a dataLink and NOT off the
+		comboBox onChange, because a write made inside a control's own dispatch does not
+		survive it - that is how B36 and B38 both let a refusal be ignored (SPEC V186).
+
+		Only the twenty picker fields are watched. Taking a Discipline OFF the sheet does
+		not come through here on purpose: it would clear rows the player already filled,
+		and the main path dots going dark already show that something is missing (V180).
+	-->
+	<dataLink fields="{'mainPath_1', 'mainPath_2', 'mainPath_3', 'mainPath_4', 'mainPath_5', 'secPath_1', 'secPath_2', 'secPath_3', 'secPath_4', 'secPath_5', 'secPath_6', 'secPath_7', 'secPath_8', 'secPath_9', 'secPath_10', 'secPath_11', 'secPath_12', 'secPath_13', 'secPath_14', 'secPath_15'}" onChange="guardPick(field, oldValue, newValue);"/>
+
+	<event name="onNodeReady">
+		renderPathDesc(self);
+		renderMainPaths(self);
+	</event>
+</form>

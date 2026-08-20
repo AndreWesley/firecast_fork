@@ -5,6 +5,12 @@ Plugins de ficha para o Firecast (SDK3). Spec do trabalho corrente = `SPEC.md` n
 
 Plugin ativo: `Plugins/Sheets/World of Darkness 20th/` (ficha `HuntersHunted/`).
 
+**Antes do primeiro `/ck:build` da sessão, leia `HANDOFF.md` na raiz.** Ele lista onde o
+`SPEC.md` está atrás do código (buildar sem saber disso faz "consertar" código correto),
+qual §T pegar em seguida e quais parecem prontas mas arrastam trabalho junto.
+Dados de pesquisa extraídos dos livros: `research/` (leia o `README.md` de lá antes de
+reextrair qualquer coisa dos PDFs).
+
 ## Build ! terminar em .rpk INSTALADO
 
 Toda vez que terminar de buildar: gerar o `.rpk` **e instalar**. Build sem install =

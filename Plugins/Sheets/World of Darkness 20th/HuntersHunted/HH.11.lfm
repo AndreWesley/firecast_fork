@@ -1,20 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form name="frmHH_11" align="client" theme="dark">
 	<!--
-		Disciplines tab (SPEC T241, 27th round). EMPTY on purpose: the user asked for the
-		window now and the content later, and the tab is hidden unless the storyteller ticks
-		"Show Disciplines" (SPEC I8b, V89).
+		Vampire tab (SPEC I16, 51st round). This file is a SHELL: it owns the tabControl and
+		nothing else. The content lives one file per area because the descriptions run to
+		hundreds of book entries, and HH.7 already spends 397 KB on 43 numina - one .lfm for
+		all of it would be megabytes (SPEC C).
 
-		It declares no `field` at all (SPEC V90). A field name cannot be renamed after release
-		without losing what players saved under it (SPEC V2), so none is spent before the
-		content that would use it exists.
+		    Vampire ─┬─ Disciplines            → HH.12
+		             ├─ Blood Sorcery: Paths   → HH.13
+		             └─ Blood Sorcery: Rituals → HH.14
+
+		THREE SIBLING TABS, one tabControl (SPEC V188, 54th round). It used to be two
+		tabControls, the second nested inside a `Blood Sorcery` tab, which is the shape the
+		tree above is really describing. The nested control drew its tabs but never their
+		labels: the strip came up blank, so the sub-tabs were three unmarked click targets
+		(SPEC R49). Rather than keep probing why a tabControl misbehaves inside a <tab>, the
+		grouping moved into the titles - `Blood Sorcery: Paths` and `Blood Sorcery: Rituals`
+		say the same thing a parent tab said, in a control the host is known to render.
+
+		The tabControl and all three tabs are authored HERE, in the XML, never built by Lua
+		(SPEC V188): a sheet whose script did not run still opens with the structure, the same
+		way the root tabControl does. Default is the first tab, Disciplines.
+
+		The tab is hidden unless the storyteller ticks the flag, which is still the field
+		`stShowDisciplines` even though the tab now reads `Vampire` - a field cannot be renamed
+		after release (SPEC V2/V172), so the name stays and the label moves.
+
+		Still declares no `field` of its own (SPEC V90), and carries NO theme backdrop.
+
+		It used to. That is SPEC B41: the backdrop is align="client", the tabControl is
+		align="client", and two siblings claiming one client rect means the loser is not drawn.
+		applyTheme turns the paper visible on every load - Modern Nights ships paper_present.png
+		- so a stretched image sat over the page area and the sub-tabs opened onto nothing.
+
+		The backdrop belongs to the form that carries CONTENT, not to the tab (SPEC V56, V190).
+		This file carries none, so the paper lives in HH.12, HH.13 and HH.14 instead, one per
+		scrollBox, exactly the arrangement HH.7 uses. What is left here is the tabControl alone,
+		which is the arrangement the root form uses for its own tabControl.
 	-->
-	<scrollBox align="client">
-		<image name="themePaper11" align="client" style="stretch" hitTest="false" visible="false"/>
-
-		<layout left="0" top="0" width="1040" height="120">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="1040" height="20" text="DISCIPLINES" horzTextAlign="center"/>
-		</layout>
-	</scrollBox>
+	<tabControl name="tabsVamp" align="client">
+		<tab name="tabDisc" title="Disciplines">
+			<import file="HH.12.lfm"/>
+		</tab>
+		<tab name="tabPaths" title="Blood Sorcery: Paths">
+			<import file="HH.13.lfm"/>
+		</tab>
+		<tab name="tabRituals" title="Blood Sorcery: Rituals">
+			<import file="HH.14.lfm"/>
+		</tab>
+	</tabControl>
 </form>

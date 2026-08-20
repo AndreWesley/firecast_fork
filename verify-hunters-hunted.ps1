@@ -420,7 +420,13 @@ if ($gameList.Count -eq 1) {
 # ---- V9: source language is English - no non-ASCII in authored strings -------
 # Deliberately a codepoint range, not a list of accented letters: this file is read
 # as ANSI by PowerShell 5.1 when it has no BOM, so non-ASCII literals here would rot.
-$ptChars = $visible | Where-Object { $_ -match '[^\x00-\x7F]' }
+#
+# ONE codepoint is excused, U+2019, and it is written as an escape for the same reason
+# (SPEC V195, B42): the core prints forty-two path and ritual names with a typographic
+# apostrophe - Devil's Touch, Grave's Decay, Boukephos' Gateway - so this check was
+# calling correct English "not English". Spelling is not language. Every other non-ASCII
+# codepoint still fails, so an authored Portuguese string is caught exactly as before.
+$ptChars = $visible | Where-Object { $_ -match '[^\x00-\x7F\u2019]' }
 if ($ptChars) { foreach ($s in $ptChars) { Fail "V9 non-English string '$s' - source must be English" } }
 else { Pass "V9 all $($visible.Count) visible strings authored in English" }
 
@@ -1087,6 +1093,8 @@ else {
 }
 
 # ---- V24: picker values stay canonical English -------------------------------
+# Same one-codepoint excuse V9 carries, and for the same names (SPEC V195, B42): a
+# canonical value out of the core keeps the book's typographic apostrophe.
 $notEn = @()
 foreach ($f in $files) {
     $xml = Doc $f.FullName
@@ -1094,11 +1102,190 @@ foreach ($f in $files) {
         if ($cb.GetAttribute("name") -notlike 'cbo*') { continue }
         foreach ($m in [regex]::Matches($cb.GetAttribute("values"), "'([^']*)'")) {
             $v = $m.Groups[1].Value
-            if ($v -ne '' -and $v -match '[^\x00-\x7F]') { $notEn += "$($f.Name): stored value '$v' is not English" }
+            if ($v -ne '' -and $v -match '[^\x00-\x7F\u2019]') { $notEn += "$($f.Name): stored value '$v' is not English" }
         }
     }
 }
 if ($notEn) { foreach ($n in $notEn) { Fail "V24 $n" } } else { Pass "V24 all picker values are canonical English" }
+
+# ---- V195: a straight apostrophe inside a list would split the item in two -------
+# The other half of the exception above, and the half that makes it compulsory rather
+# than convenient. A list attribute is written {'a', 'b'}, so an ASCII ' INSIDE an entry
+# is the delimiter: Firecast's parser and the regex two blocks up would both read
+# "Devil's Touch" as "Devil" followed by rubbish, silently and identically. That is why
+# the forty-two names keep U+2019 instead of being flattened to a straight quote.
+#
+# Measured on the STRUCTURE of the whole attribute, not by hunting for the character
+# (SPEC V20): a well-formed list is quoted entries separated by commas and nothing else,
+# so any stray quote breaks the shape no matter where it lands. Every comboBox, not only
+# the cbo* pickers - a split entry is just as wrong in a state combo.
+$listShape = '^\{\s*''[^'']*''(\s*,\s*''[^'']*'')*\s*\}$'
+$listBad  = @()
+$listSeen = 0
+foreach ($f in $files) {
+    foreach ($cb in (Doc $f.FullName).SelectNodes("//comboBox")) {
+        foreach ($a in @('items','values')) {
+            if (-not $cb.HasAttribute($a)) { continue }
+            $listSeen++
+            $raw = $cb.GetAttribute($a)
+            $id = $cb.GetAttribute("name"); if (-not $id) { $id = $cb.GetAttribute("field") }; if (-not $id) { $id = 'comboBox' }
+            if ($raw -notmatch $listShape) { $listBad += "$($f.Name): $id $a= is not a list of quoted entries - a straight apostrophe inside one splits it (SPEC V195)" }
+        }
+    }
+}
+if ($listBad) { foreach ($b in $listBad) { Fail "V195 $b" } }
+elseif ($listSeen -eq 0) { Fail "V195 no items=/values= attribute was read - the check verifies nothing (SPEC V20, B7)" }
+else { Pass "V195 all $listSeen list attributes are quoted entries and commas, with no straight apostrophe to split them" }
+
+# ---- V194: the era renames the LABEL, never the value (SPEC I22, T469) ---------------
+# B23 is the bug this exists to stop happening a second time: the 19th round expressed an era
+# as a rename of the row, so the same name changed which field it stood for and ratings walked
+# between traits when the sheet changed period. ERA_NAME is the answer - one table of DISPLAY
+# strings keyed by the canonical value - and this is what keeps it a display table.
+#
+# Three things, and the third is the one with teeth: a display must never turn up as a stored
+# value. "Creatio Ignis (The Creation of Fire)" is what a Dark Ages sheet SHOWS for Lure of
+# Flames; the moment it is also something a picker can save, a character built in one era
+# stops opening the same in another (SPEC V2, V24).
+$eraTbl = [regex]::Match($root, '(?ms)-- >>> ERA_NAME_BEGIN[^\n]*\n(.*?)-- <<< ERA_NAME_END')
+$eraMap = New-Object 'System.Collections.Generic.Dictionary[string,string]' ([StringComparer]::Ordinal)
+if ($eraTbl.Success) {
+    foreach ($m in [regex]::Matches($eraTbl.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"([^"]*)"')) { $eraMap[$m.Groups[1].Value] = $m.Groups[2].Value }
+}
+
+# Every value a picker offers, split two ways: the vampire tab's, which is what ERA_NAME is
+# allowed to rename, and the sheet's whole set, which is where a display must never appear.
+$vampVals = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+$anyVals  = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+foreach ($f in $files) {
+    $isVamp = $f.Name -in @('HH.12.lfm', 'HH.13.lfm', 'HH.14.lfm')
+    foreach ($cb in (Doc $f.FullName).SelectNodes("//comboBox[@values]")) {
+        foreach ($m in [regex]::Matches($cb.GetAttribute("values"), "'([^']*)'")) {
+            $v = $m.Groups[1].Value
+            if ($v -eq '') { continue }
+            [void]$anyVals.Add($v)
+            if ($isVamp) { [void]$vampVals.Add($v) }
+        }
+    }
+}
+
+$eraDrift = @()
+if (-not $eraTbl.Success) { $eraDrift += "the ERA_NAME region is gone from the root form - nothing below reads anything (SPEC V20, B7)" }
+elseif ($eraMap.Count -eq 0) { $eraDrift += "the ERA_NAME region parsed to zero rows - the check verifies nothing (SPEC V20, B7)" }
+elseif ($vampVals.Count -eq 0) { $eraDrift += "the vampire pickers offer no value at all - there is nothing for ERA_NAME to key by (SPEC V20)" }
+else {
+    foreach ($k in $eraMap.Keys) {
+        if (-not $vampVals.Contains($k)) { $eraDrift += "'$k' is keyed in ERA_NAME but no vampire picker offers it - a display rule for a row nobody can choose" }
+    }
+    foreach ($d in @($eraMap.Values | Sort-Object -Unique)) {
+        if (-not $ptK.Contains($d))          { $eraDrift += "display '$d' has no [pt] key - the era name skips the translation every other label goes through (SPEC V17)" }
+        if (-not $enK.Contains($d))          { $eraDrift += "display '$d' has no [en] key (SPEC V17)" }
+        if (-not $embedded.ContainsKey($d))  { $eraDrift += "display '$d' is absent from the PT map - it would never translate at runtime (SPEC V28, B14)" }
+        if ($anyVals.Contains($d))           { $eraDrift += "display '$d' is ALSO a stored value - a sheet saved in one era would not open the same in another (SPEC V2, V24, B23)" }
+    }
+}
+if ($eraDrift) { foreach ($e in $eraDrift) { Fail "V194 $e" } }
+else { Pass "V194 all $($eraMap.Count) era names rename a value the pickers offer, carry both keys, and none of them is a value" }
+
+# The renamer itself: one reader, and the two switches that already walk the sheet call it.
+# A dataLink of its own on sheetTheme would be a second era trigger, which is the drift T469
+# was written to make impossible.
+$eraFn = [regex]::Match($root, '(?ms)function eraName\(v, era\)(.*?)\n\t\t\tend;')
+if (-not $eraFn.Success) { Fail "V194 eraName is not declared on the root form - ERA_NAME has no reader" }
+elseif ($eraFn.Groups[1].Value -notmatch 'ERA_NAME\[v\]') { Fail "V194 eraName does not read ERA_NAME - the table is dead again" }
+elseif ($eraFn.Groups[1].Value -notmatch '"Dark Ages"' -or $eraFn.Groups[1].Value -notmatch '"Classical Age"') { Fail "V194 eraName does not gate on both medieval eras - one table serves the two (SPEC C, I22)" }
+elseif ($hh6 -notmatch 'c\.items = shown;') { Fail "V194 nothing writes a picker's items in HH.6 - the era and the language would both stop reaching the rows" }
+elseif ($hh6 -notmatch 'pickerItems\(c, lang, currentTheme\(\)\);') { Fail "V194 applyLanguage no longer rebuilds the items through pickerItems" }
+elseif ($hh6 -notmatch 'pickerItems\(c, \(sheet ~= nil and sheet\.language\) or "en", v\);') { Fail "V194 applyTheme no longer rebuilds the items - changing era would leave the old era's words on the rows (SPEC T469)" }
+elseif ($hh6 -match 'dataLink[^>]*field="sheetTheme"[^>]*pickerItems') { Fail "V194 a second era trigger was added - the era must ride applyTheme's own walk (SPEC T469)" }
+else { Pass "V194 one reader of ERA_NAME, called from both switches, with no era trigger of its own" }
+
+# ---- V196: a picker must be wide enough for what it offers (SPEC B43) ---------------
+# V16 has measured //label since the first round and never once looked at a comboBox, so
+# every picker on the sheet went 58 rounds unmeasured. That was survivable while the lists
+# were short words; T460 put 384 book names in them and three of the four could not hold
+# their own contents. A comboBox CLIPS - it does not wrap - so the text simply disappears,
+# exactly the way a checkBox did in B17.
+#
+# Two axes, because `items` has two (SPEC V24): the language, which NeededPx already folds
+# in, and the ERA. A value can DISPLAY as something much longer than itself: HH.13's widest
+# entry is "Potestas Tempestatum (Poder sobre as Tempestades)", the Dark Ages name for
+# "Weather Control" - fifteen characters that render as forty-nine. Sizing off items= alone
+# would have passed a picker that clips in two of the four eras.
+#
+# Same ruler as V16 - one $PX_PER_CHAR for labels and pickers alike - plus room for the
+# dropdown arrow, measured off cboNature: 25 characters living comfortably in 215px.
+$ARROW = 24
+$comboNarrow = @()
+$comboSeen = 0
+foreach ($f in $files) {
+    foreach ($cb in (Doc $f.FullName).SelectNodes("//comboBox[@items][@width]")) {
+        $w = 0; if (-not [int]::TryParse($cb.GetAttribute("width"), [ref]$w)) { continue }
+        $shown = @([regex]::Matches($cb.GetAttribute("items"), "'([^']*)'") |
+                   ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -ne '' })
+        # The era axis is scoped by SENSE, not by the cbo* prefix (SPEC V197, B44): only the
+        # Vampire rows are renamed, so only they may be sized for a Dark Ages name. Measuring
+        # HH.7 against "Potestas Tempestatum" would demand width for a string it never shows.
+        $fieldTpl = $cb.GetAttribute("field")
+        $isVampRow = $fieldTpl -match '^\$\((field)\)$' -and $f.Name -in @('HH.12.lfm', 'HH.13.lfm', 'HH.14.lfm')
+        if ($isVampRow) {
+            foreach ($m in [regex]::Matches($cb.GetAttribute("values"), "'([^']*)'")) {
+                $v = $m.Groups[1].Value
+                if ($v -ne '' -and $eraMap.ContainsKey($v)) { $shown += $eraMap[$v] }
+            }
+        }
+        if ($shown.Count -eq 0) { continue }
+        $comboSeen++
+        $worst = ''; $need = 0
+        foreach ($it in $shown) { $n = NeededPx $it; if ($n -gt $need) { $need = $n; $worst = $it } }
+        $need += $ARROW
+        $id = $cb.GetAttribute("name"); if (-not $id) { $id = $cb.GetAttribute("field") }; if (-not $id) { $id = 'comboBox' }
+        if ($need -gt $w) { $comboNarrow += "$($f.Name): picker $id is ${w}px but '$worst' (pt '$($ptVal[$worst])') needs ~${need}px - a comboBox clips, it does not wrap" }
+    }
+}
+if ($comboNarrow) { foreach ($c in $comboNarrow) { Fail "V196 $c" } }
+elseif ($comboSeen -eq 0) { Fail "V196 no picker was measured - the check verifies nothing (SPEC V20, B7)" }
+else { Pass "V196 all $comboSeen pickers fit their longest item, in both languages and every era" }
+
+# ---- V197: the era rename is scoped by SENSE, not by the cbo* prefix (SPEC B44) -------
+# ERA_NAME is keyed by the canonical value and a value does not carry its sense. "Weather
+# Control" is a Thaumaturgy path on the Vampire tab and a hedge magic path on HH.7; renaming
+# every picker showed the hedge wizard a Latin blood-sorcery name. V194 proves the KEY sits
+# in a vampire picker; this proves the EFFECT does not leave one. Third time this same rule
+# has been asked for - B15 for hedge magic, T472 for path, B44 for this.
+$scopeFn = [regex]::Match($hh6, '(?ms)local function pickerItems\(c, lang, era\)(.*?)\n\t\t\tend;')
+$vampTbl = [regex]::Match($hh6, '(?ms)local VAMP_ROW = \{(.*?)\}')
+if (-not $scopeFn.Success) { Fail "V197 pickerItems is gone from HH.6 - nothing builds a picker's items" }
+elseif (-not $vampTbl.Success) { Fail "V197 VAMP_ROW is not declared - the era has no scope and renames the whole sheet (SPEC B44)" }
+else {
+    $wantRoots = @('clanDisc', 'disc', 'mainPath', 'secPath', 'ritual')
+    $gotRoots = @([regex]::Matches($vampTbl.Groups[1].Value, '(\w+)\s*=\s*true') | ForEach-Object { $_.Groups[1].Value })
+    $body = $scopeFn.Groups[1].Value
+    $missing = @($wantRoots | Where-Object { $gotRoots -notcontains $_ })
+    $extra = @($gotRoots | Where-Object { $wantRoots -notcontains $_ })
+    if ($missing) { Fail "V197 VAMP_ROW is missing $($missing -join ', ') - those rows would stop being renamed by the era (SPEC I16)" }
+    elseif ($extra) { Fail "V197 VAMP_ROW carries $($extra -join ', ') on top of the five vampire rows - the era would reach a picker that is not one" }
+    elseif ($body -notmatch 'local vamp = isVampireRow\(nm\);') { Fail "V197 pickerItems does not ask whether the row is a vampire one" }
+    elseif ($body -notmatch 'if vamp then v = eraName\(v, era\); end;') { Fail "V197 the era rename is not gated on that answer - every cbo* would be renamed again (SPEC B44)" }
+    elseif ($body -notmatch 'if lang == "pt" then v = PT\[v\] or v; end;') { Fail "V197 the language axis is gone - a translation is sheet-wide and must not be scoped with the era" }
+    else { Pass "V197 the era renames the five vampire rows only; the language axis stays sheet-wide" }
+}
+
+# The gate must scope it the same way, or it sizes a picker for a name it never shows. Proved
+# by a value that IS an ERA_NAME key and IS offered outside the Vampire tab.
+$leak = @()
+foreach ($k in $eraMap.Keys) {
+    foreach ($f in $files) {
+        if ($f.Name -in @('HH.12.lfm', 'HH.13.lfm', 'HH.14.lfm')) { continue }
+        foreach ($cb in (Doc $f.FullName).SelectNodes("//comboBox[@values]")) {
+            foreach ($m in [regex]::Matches($cb.GetAttribute("values"), "'([^']*)'")) {
+                if ($m.Groups[1].Value -eq $k) { $leak += "$($f.Name)/$($cb.GetAttribute('name')) offers '$k'" }
+            }
+        }
+    }
+}
+if ($leak.Count -eq 0) { Pass "V197 no ERA_NAME key is shared with a non-vampire picker today - the scope is untested but armed" }
+else { Pass "V197 $($leak.Count) shared name(s) - $($leak -join '; ') - kept unrenamed off the Vampire tab by the scope above" }
 
 # ---- V29 - V33: the Powers tab description block ------------------------------
 # The block shows book text: read-only, no field, fed from the DESC table by the renderer.
@@ -1108,14 +1295,27 @@ else {
     $hh7 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($hh7Path))
     $hh7x = Doc $hh7Path
 
-    # V29: read-only, and no `field=` - a field here would write book text into the character
-    $desc = $hh7x.SelectSingleNode("//textEditor[@name='edtNuminaDesc']")
-    if ($null -eq $desc) { Fail "V29 no <textEditor name='edtNuminaDesc'> - the renderer has nothing to write to" }
+    # V29: read-only, and no `field=` - a field here would write book text into the character.
+    # Scoped to edtNuminaDesc until the 55th round, when the Vampire tab added three more
+    # description blocks and the check would have gone on passing while none of them was
+    # read. V29 was never about one widget: it is the rule for the DESCRIPTION block, so the
+    # blocks are found by their owning box - every one of them, in every file.
+    $descBlocks = @()
+    foreach ($f in $files) {
+        foreach ($lay in (Doc $f.FullName).SelectNodes("//layout[label/@text='DESCRIPTION']")) {
+            foreach ($te in $lay.SelectNodes("textEditor")) { $descBlocks += @{ File = $f.Name; Node = $te } }
+        }
+    }
+    if ($descBlocks.Count -eq 0) { Fail "V29 no DESCRIPTION block found in any file - the check reads nothing (SPEC V20)" }
     else {
-        if ($desc.GetAttribute("readOnly") -eq 'true') { Pass "V29 description block is readOnly" }
-        else { Fail "V29 description block is not readOnly - the reader could type over the book text" }
-        if ($desc.HasAttribute("field")) { Fail "V29 description block owns field '$($desc.GetAttribute('field'))' - it would be saved on the sheet" }
-        else { Pass "V29 description block owns no field (nothing saved)" }
+        $descBad = @()
+        foreach ($d in $descBlocks) {
+            $nm = $d.Node.GetAttribute("name")
+            if ($d.Node.GetAttribute("readOnly") -ne 'true') { $descBad += "$($d.File)/$nm is not readOnly - the reader could type over the book text" }
+            if ($d.Node.HasAttribute("field")) { $descBad += "$($d.File)/$nm owns field '$($d.Node.GetAttribute('field'))' - book text would be saved onto the character (SPEC R12)" }
+        }
+        if ($descBad) { foreach ($d in $descBad) { Fail "V29 $d" } }
+        else { Pass "V29 all $($descBlocks.Count) description blocks are readOnly and own no field" }
     }
 
     # V30: one group, one field, distinct fieldValues, each pointing at a real row
@@ -1528,13 +1728,197 @@ foreach ($f in $files) {
         }
     }
 }
-# Counted off the tabs rather than hard-coded: the 27th round took the sheet from 9 tabs to 12
-# and a fixed 8 here would have to be edited by hand every time a tab is added, which is how a
-# check quietly stops matching the sheet it guards.
-$paperWant = ((Doc $rootPath).SelectNodes("//tab")).Count - 1
+# Read off the files rather than counted off the root's tabs: the 51st round split ONE tab
+# into a shell plus three sub-forms (SPEC I16), so "one backdrop per root <tab>" stopped
+# describing the sheet. What actually decides it is whether a form carries CONTENT - every
+# content form wraps its widgets in a <scrollBox>, and a shell that only holds a tabControl
+# has none. Derived, so a tab added later is picked up without editing a number here.
+$wantPaper = @($files | Where-Object {
+    $_.Name -ne 'HH.6.lfm' -and $null -ne (Doc $_.FullName).SelectSingleNode("//scrollBox")
+} | ForEach-Object { $_.Name })
+$missPaper = @($wantPaper | Where-Object { $paperTabs -notcontains $_ })
+$extraPaper = @($paperTabs | Where-Object { $wantPaper -notcontains $_ })
 if ($paperTabs -contains 'HH.6.lfm') { Fail "V56 the Settings tab has a backdrop - a covered theme combo cannot be switched back" }
-elseif ($paperTabs.Count -ne $paperWant) { Fail "V56 found $($paperTabs.Count) backdrops, expected $paperWant (every tab but Settings)" }
-else { Pass "V56 all $paperWant content tabs carry a hidden, click-through backdrop; Settings has none" }
+elseif ($missPaper) { Fail "V56 $($missPaper -join ', ') carries content but no backdrop" }
+elseif ($extraPaper) { Fail "V56 $($extraPaper -join ', ') carries a backdrop but no content to put it behind" }
+else { Pass "V56 all $($wantPaper.Count) content forms carry a hidden, click-through backdrop; Settings and the Vampire shell have none" }
+
+# ---- V190: align=client is exclusive per container -----------------------------------
+# SPEC B41. The backdrop is align=client and so is a tabControl; put side by side they claim
+# one client rect and whichever loses is simply not drawn - which is how the Vampire tab
+# shipped with its sub-tabs opening onto nothing. The sheet had obeyed this for fifty rounds
+# without it ever being written down: one align=client per container, everything else placed
+# with left/top/width/height.
+$alignClash = @()
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//*")) {
+        $kids = @($n.ChildNodes | Where-Object { $_.NodeType -eq 'Element' -and $_.GetAttribute('align') -eq 'client' })
+        if ($kids.Count -gt 1) {
+            $who = ($kids | ForEach-Object { "$($_.LocalName)/$($_.GetAttribute('name'))" }) -join ' + '
+            $alignClash += "$($f.Name) <$($n.LocalName)>: $who"
+        }
+    }
+}
+if ($alignClash) { foreach ($a in $alignClash) { Fail "V190 two controls claim one client rect - $a" } }
+else { Pass "V190 no container hands align=client to more than one child" }
+
+# ---- V188: the Vampire tab is ONE tabControl with three SIBLING tabs -----------------
+# 54th round. It shipped as two nested controls - a `Blood Sorcery` tab holding a second
+# tabControl with `Paths` and `Rituals` inside it - and the inner control drew its tabs
+# without their labels, so the sub-tabs were two unmarked click targets (SPEC R49). The
+# grouping moved into the titles instead, which is why the titles are checked here and not
+# just the names: `Blood Sorcery: Paths` is now the ONLY thing telling the player those two
+# tabs belong together, so a title edited back to `Paths` silently loses the grouping.
+#
+# Read off the XML because that is the point of the invariant: the structure is authored,
+# never built by Lua, so a sheet whose script did not run still opens with it (SPEC V18, V94).
+$vampX   = Doc (Join-Path $dir "HH.11.lfm")
+$vampCtl = @($vampX.SelectNodes("//tabControl"))
+$wantVamp = [ordered]@{
+    'tabDisc'    = @('Disciplines',            'HH.12.lfm')
+    'tabPaths'   = @('Blood Sorcery: Paths',   'HH.13.lfm')
+    'tabRituals' = @('Blood Sorcery: Rituals', 'HH.14.lfm')
+}
+if ($vampCtl.Count -ne 1) { Fail "V188 HH.11 declares $($vampCtl.Count) tabControls - the Vampire tab is ONE control with three sibling tabs (SPEC R49)" }
+elseif ($vampCtl[0].GetAttribute("name") -ne 'tabsVamp') { Fail "V188 the Vampire tabControl is named '$($vampCtl[0].GetAttribute('name'))', not tabsVamp" }
+else {
+    $vampTabs = @($vampCtl[0].ChildNodes | Where-Object { $_.NodeType -eq 'Element' -and $_.LocalName -eq 'tab' })
+    $vampBad = @()
+    if ($vampTabs.Count -ne $wantVamp.Count) { $vampBad += "tabsVamp holds $($vampTabs.Count) tabs, not $($wantVamp.Count)" }
+    else {
+        $i = 0
+        foreach ($nm in $wantVamp.Keys) {
+            $t   = $vampTabs[$i]
+            $imp = @($t.SelectNodes("import") | ForEach-Object { $_.GetAttribute("file") })
+            if ($t.GetAttribute("name") -ne $nm) { $vampBad += "tab $($i + 1) is '$($t.GetAttribute('name'))', expected $nm - the first tab is the one that opens" }
+            elseif ($t.GetAttribute("title") -ne $wantVamp[$nm][0]) { $vampBad += "$nm reads '$($t.GetAttribute('title'))', expected '$($wantVamp[$nm][0])' - the title is what groups the blood sorcery pair" }
+            elseif ($imp.Count -ne 1 -or $imp[0] -ne $wantVamp[$nm][1]) { $vampBad += "$nm imports '$($imp -join ', ')', expected $($wantVamp[$nm][1])" }
+            $i++
+        }
+    }
+    if ($vampBad) { foreach ($v in $vampBad) { Fail "V188 $v" } }
+    else { Pass "V188 the Vampire tab is one tabControl over three sibling tabs, opening on Disciplines" }
+}
+
+# No tabControl inside a tabControl, in any file: that is the shape R49 broke. Checked per
+# file because a nested control is authored in one - the root reaching HH.11 through an
+# <import> is the arrangement that WORKS and is what the two names below account for.
+$nestedCtl = @()
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//tabControl//tabControl")) {
+        $nestedCtl += "$($f.Name): $($n.GetAttribute('name')) sits inside another tabControl"
+    }
+}
+$allCtl = @()
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//tabControl")) { $allCtl += "$($f.Name)/$($n.GetAttribute('name'))" }
+}
+if ($nestedCtl) { foreach ($n in $nestedCtl) { Fail "V188 $n - R49 says the inner one loses its tab labels" } }
+elseif ($allCtl.Count -ne 2) { Fail "V188 the sheet carries $($allCtl.Count) tabControls ($($allCtl -join ', ')) - it has room for two, the root's and the Vampire tab's" }
+else { Pass "V188 two tabControls in the sheet ($($allCtl -join ', ')), neither inside the other" }
+
+# ---- V192: a DESCRIPTION entry carries its source header (SPEC I21) ------------------
+# 54th round, the user's ask: a description opens with the book and the exact page it came
+# from, then the item's name, then the text - three blocks, two blank lines apart. The header
+# lives INSIDE the string, never concatenated at render time (SPEC I21), so it is checkable
+# here and there is only one way to build the block.
+#
+# This measures FORM, not existence: the three tables are still empty until SPEC T444-T446,
+# and an empty region passes. What it must not let through is an entry that is on file but
+# malformed - no source line, or a name block that drifted from the key the picker looks up.
+$descForm = @()
+$descSeen = 0
+$descRx = [regex]'(?ms)^\s*\["([^"]+)"\]\s*=\s*\{\s*en\s*=\s*\[==\[(.*?)\]==\]\s*,\s*pt\s*=\s*\[==\[(.*?)\]==\]\s*,?\s*\},'
+$srcRx  = [regex]'^.+,\s+(p\.|p(\xE1|a)g\.)\s*\d+$'
+foreach ($area in @(
+    @('HH.12.lfm', 'DISC_DESC'),
+    @('HH.13.lfm', 'PATH_DESC'),
+    @('HH.14.lfm', 'RITUAL_DESC'))) {
+    $txt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir $area[0]))) -replace "`r`n", "`n"
+    $region = [regex]::Match($txt, "-- >>> $($area[1])_BEGIN[^\n]*\n(.*?)-- <<< $($area[1])_END", 'Singleline')
+    if (-not $region.Success) { $descForm += "$($area[0]) has no $($area[1]) markers - the region the entries land in is gone"; continue }
+    foreach ($m in $descRx.Matches($region.Groups[1].Value)) {
+        $key = $m.Groups[1].Value
+        foreach ($lang in @('en', 'pt')) {
+            $descSeen++
+            $blocks = @(($m.Groups[$(if ($lang -eq 'en') { 2 } else { 3 })].Value.Trim()) -split "`n`n`n")
+            if ($blocks.Count -ne 3) { $descForm += "$($area[0]) '$key' [$lang] is $($blocks.Count) block(s), not source + name + text two blank lines apart"; continue }
+            if (-not $srcRx.IsMatch($blocks[0].Trim())) { $descForm += "$($area[0]) '$key' [$lang] opens with '$($blocks[0].Trim())' - block one is '<book>, p. <page>'" }
+            if ($blocks[1].Trim() -ne $key) { $descForm += "$($area[0]) '$key' [$lang] names itself '$($blocks[1].Trim())' - block two is the picker value the entry is keyed by" }
+            if ($blocks[2].Trim().Length -lt 1) { $descForm += "$($area[0]) '$key' [$lang] has a header and no description under it" }
+        }
+    }
+}
+if ($descForm) { foreach ($d in $descForm) { Fail "V192 $d" } }
+elseif ($descSeen -eq 0) { Pass "V192 the three DESC regions are still empty (SPEC T444-T446); the form check is armed" }
+else { Pass "V192 all $descSeen description strings open with their book, page and name (SPEC I21)" }
+
+# ---- V193: the description block closes with the column beside it --------------------
+# 55th round. The rituals box went from 20 rows to 25 and grew 550 -> 675; had the
+# DESCRIPTION been left at 550, nothing would have OVERLAPPED - the two boxes stand side by
+# side - so V40 would have passed it and the only symptom would be a black tail on the tab.
+# The relation held in all three areas by convention and by nothing else.
+#
+# Measured as a RELATION, not against the literals (the same move V171 makes): the block
+# opens at the top of the left column and ends where the lowest box on the left ends, and its
+# textEditor fills that minus the 35px title band. So it survives the NEXT row-count change,
+# which is the whole point - the layout gate is still open.
+foreach ($areaFile in @('HH.12.lfm', 'HH.13.lfm', 'HH.14.lfm')) {
+    $ax  = Doc (Join-Path $dir $areaFile)
+    $box = @($ax.SelectNodes("//scrollBox/layout"))
+    $descBox = @($box | Where-Object { $null -ne $_.SelectSingleNode("label[@text='DESCRIPTION']") })
+    $leftBox = @($box | Where-Object { $null -eq $_.SelectSingleNode("label[@text='DESCRIPTION']") })
+    if ($descBox.Count -ne 1) { Fail "V193 $areaFile holds $($descBox.Count) DESCRIPTION boxes - the area has exactly one"; continue }
+    if ($leftBox.Count -lt 1) { Fail "V193 $areaFile has a DESCRIPTION box and no column beside it to measure against (SPEC V20)"; continue }
+    $leftTop = ($leftBox  | ForEach-Object { [int]$_.GetAttribute("top") } | Measure-Object -Minimum).Minimum
+    $leftEnd = ($leftBox  | ForEach-Object { [int]$_.GetAttribute("top") + [int]$_.GetAttribute("height") } | Measure-Object -Maximum).Maximum
+    $dTop    = [int]$descBox[0].GetAttribute("top")
+    $dEnd    = $dTop + [int]$descBox[0].GetAttribute("height")
+    $edit    = $descBox[0].SelectSingleNode("textEditor")
+    if ($dTop -ne $leftTop) { Fail "V193 $areaFile DESCRIPTION opens at $dTop, the column beside it at $leftTop" }
+    elseif ($dEnd -ne $leftEnd) { Fail "V193 $areaFile DESCRIPTION closes at $dEnd, the column beside it at $leftEnd - $([Math]::Abs($dEnd - $leftEnd))px of one box faces nothing" }
+    elseif ($null -eq $edit) { Fail "V193 $areaFile DESCRIPTION carries no textEditor - the renderer has nothing to write to" }
+    elseif (([int]$edit.GetAttribute("top") + [int]$edit.GetAttribute("height")) -ne ($dEnd - $dTop - 10)) {
+        Fail "V193 $areaFile the description text ends at $([int]$edit.GetAttribute('top') + [int]$edit.GetAttribute('height')) inside a $($dEnd - $dTop)px box - it does not fill what the box grew to"
+    }
+    else { Pass "V193 $areaFile DESCRIPTION runs $dTop..$dEnd with its column, and the text fills it" }
+}
+
+# ---- V175: the clan discipline row is locked unless the storyteller opened it ---------
+# SPEC I8g. The four CLAN DISCIPLINES combos are the clan's own three-plus, not the player's
+# picks, so they are read-only until stEditClanDisc is ticked. Written the way V162 writes
+# the speciality lock - enabled and opacity in the same breath - because a row that is
+# disabled but still bright reads as a bug in the sheet rather than as a rule.
+$lockFn = LuaFn $root 'renderClanDiscLock'
+$discX  = Doc (Join-Path $dir "HH.12.lfm")
+$discRaw = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "HH.12.lfm")))
+$lockLinks = @($discX.SelectNodes("//dataLink[@field='stEditClanDisc']") | ForEach-Object { $_.GetAttribute("onChange") })
+$discReady = [regex]::Match($discRaw, '<event name="onNodeReady">(.*?)</event>', 'Singleline')
+if (-not $lockFn) { Fail "V175 renderClanDiscLock not found on the root form - nothing locks the clan combos" }
+elseif ($lockFn -notmatch 'sheet\.stEditClanDisc == true') { Fail "V175 the lock does not read stEditClanDisc as an explicit true - nil would fall open on an old sheet (SPEC V89, V80)" }
+elseif ($lockFn -notmatch '(?s)c\.enabled = open;\s*\r?\n\s*c\.opacity = open and 1 or 0\.55;') { Fail "V175 enabled and opacity are not written in the same breath - a combo could look open while it is locked (SPEC V162)" }
+elseif ($lockLinks -notcontains 'renderClanDiscLock(self);') { Fail "V175 HH.12 has no dataLink on stEditClanDisc - flipping the flag would not repaint the lock" }
+elseif (-not $discReady.Success -or $discReady.Groups[1].Value -notmatch 'renderClanDiscLock\(self\);') { Fail "V175 HH.12 does not paint the lock on open - the tab would come up bright until the flag moved" }
+else { Pass "V175 the clan combos are locked from stEditClanDisc, fail-closed, and the look is written with the state" }
+
+# ---- V179: a main path dot is read-only, and owns nothing --------------------------
+# SPEC I16/V51. The main path's rating IS the blood sorcery's rating, painted per render.
+# Giving these dots a field would put a second number on the sheet to drift from the first,
+# and giving them an onClick would sell the player a dot the discipline already paid for.
+$pathX   = Doc (Join-Path $dir "HH.13.lfm")
+$roTpl   = $pathX.SelectSingleNode("//template[@name='MainPathRow']")
+if ($null -eq $roTpl) { Fail "V179 MainPathRow is not declared on HH.13 - the read-only row is gone" }
+else {
+    $roDots = @($roTpl.SelectNodes("imageCheckBox"))
+    $owning = @($roDots | Where-Object { $_.HasAttribute("field") -or $_.HasAttribute("onClick") })
+    $bright = @($roDots | Where-Object { $_.GetAttribute("opacity") -ne '0.55' })
+    $live   = @($roDots | Where-Object { $_.GetAttribute("autoChange") -ne 'false' })
+    if ($roDots.Count -ne 5) { Fail "V179 MainPathRow carries $($roDots.Count) dots, not the five the scale has" }
+    elseif ($owning) { Fail "V179 $($owning.Count) main path dot(s) own a field or an onClick - the rating belongs to the discipline (SPEC I9, I10)" }
+    elseif ($live) { Fail "V179 $($live.Count) main path dot(s) still toggle themselves - autoChange must be false" }
+    elseif ($bright) { Fail "V179 $($bright.Count) main path dot(s) are drawn at full brightness - a read-only widget is dimmed (SPEC V111)" }
+    else { Pass "V179 all five main path dots are read-only: no field, no click, no self-toggle, dimmed" }
+}
 
 # ---- V70/V74/V75/V76: the era ability lists (SPEC I7, 21st round) ----------------
 # A row on the Main tab is a slot: the era decides which ability sits there and the renderer
@@ -2011,13 +2395,20 @@ else {
         'Willpower'  = 'if kind == "Willpower" then return from;'
         'Background' = 'return from \* 3'
         'Numina'     = 'return from \* 7'
+        # SPEC I9b, 51st round: the two rules that were dormant since the 27th are awake now
+        # that the Vampire tab owns fields to read. Sphere and Arete stay dormant below - the
+        # Magika tab that would have owned them was deleted in the 39th round.
+        'Discipline (first dot)' = 'if from == 0 then return 10; end;'
+        'Discipline (clan)'      = 'if ctx\.inClan then return from \* 5; end;'
+        'Path (first dot)'       = 'if from == 0 then return 7; end;'
+        'Path (rest)'            = 'return from \* 4;'
     }
     $costBad = @()
     foreach ($k in $costWant.Keys) { if ($costFn -notmatch $costWant[$k]) { $costBad += "$k is not priced as SPEC I9 states" } }
     # Read the CODE, not the prose: the comment above xpCost names the dormant rules on purpose,
     # so the check looks for a dormant kind being handled - a quoted kind string - rather than
     # for the word appearing anywhere in the file.
-    foreach ($dead in @('Discipline', 'Path', 'Sphere', 'Arete')) {
+    foreach ($dead in @('Sphere', 'Arete')) {
         if ($costFn -match "kind == `"$dead`"") { $costBad += "$dead is priced here - SPEC I9 keeps it dormant until a field exists to read" }
         if ($rowsFn -match "`"$dead`"") { $costBad += "$dead produces ledger rows - the tab that would own it is still empty" }
     }
@@ -2239,11 +2630,32 @@ else { Pass "V126 all $($papers.Count) images fit the ceiling ($([int]($sum/1KB)
 # ---- V128: three managed tabs, and Magika is gone for good ---------------------------
 # The user had the empty Magika window removed in the 39th round. Its field name stays burned
 # (checked with the other orphans above): a sheet saved with it ticked still carries the value.
-if (Test-Path (Join-Path $dir "HH.12.lfm")) { Fail "V128 HH.12.lfm is still on disk - the Magika tab was removed" }
-else { Pass "V128 HH.12.lfm is gone" }
+# 51st round: HH.12.lfm is BACK, this time as the Disciplines area of the Vampire tab (SPEC
+# C, I16). The file NAME was only ever a proxy for "the Magika tab is gone"; what actually has
+# to stay gone is the tab's IDENTITY. Kept as a name check it would now fail on a file that has
+# nothing to do with Magika, so the proxy is replaced by the two things it stood for: no <tab>
+# anywhere in the sheet is a Magika tab, and HH.12, if it is on disk at all, is the file HH.11
+# imports for Disciplines rather than a name that came loose again.
+$magikaTabs = @()
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//tab")) {
+        $id = (("{0} {1}" -f $n.GetAttribute('name'), $n.GetAttribute('title'))).Trim()
+        if ($id -match 'Magika') { $magikaTabs += "$($f.Name): $id" }
+    }
+}
+if ($magikaTabs) { foreach ($m in $magikaTabs) { Fail "V128 a Magika tab is back - $m" } }
+else { Pass "V128 no tab in the sheet is a Magika tab" }
+
+$hh12 = Join-Path $dir "HH.12.lfm"
+if (Test-Path $hh12) {
+    $imp = @((Doc (Join-Path $dir "HH.11.lfm")).SelectNodes("//import") | ForEach-Object { $_.GetAttribute("file") })
+    if ($imp -notcontains "HH.12.lfm") { Fail "V128 HH.12.lfm is on disk but HH.11 does not import it - the freed name came loose again" }
+    else { Pass "V128 HH.12.lfm is the Vampire tab's Disciplines area, imported by HH.11" }
+}
+else { Pass "V128 HH.12.lfm is not on disk" }
 
 $managed = @('tabNumina', 'tabDisciplines', 'tabStoryteller')
-$magikaLeft = @($files | Where-Object { (CodeOf $_.FullName) -match '(tabMagika|stShowMagika|"Show Magika"|HH[.]12)' })
+$magikaLeft = @($files | Where-Object { (CodeOf $_.FullName) -match '(tabMagika|stShowMagika|"Show Magika")' })
 if ($magikaLeft) { foreach ($m in $magikaLeft) { Fail "V128 $($m.Name) still refers to the Magika tab" } }
 else { Pass "V128 nothing refers to the Magika tab any more" }
 
@@ -2273,13 +2685,16 @@ else {
     $g     = NoComments $guardFn.Groups[1].Value
     $buy   = [regex]::Match($g, 'if want then(.*?)else', 'Singleline')
     $warns = @([regex]::Matches($g, 'xpWarn\("([^"]*)"\)'))
-    # Three refusals speak, and each one says its own reason: want of experience (this check),
-    # and the two a speciality row adds - no trait chosen, and the storyteller allowing none
-    # (SPEC V154/V156). What may NOT happen is a second voice inside the balance branch, or
+    # Six refusals speak, and each one says its own reason: want of experience (this check),
+    # the three a speciality row adds - no trait chosen, the storyteller allowing none
+    # (SPEC V154/V156), a gift that is not the player's to drop - and the two a secondary path
+    # adds: an empty row, and a dot above what its blood sorcery allows (SPEC V183). The count
+    # is a census on purpose: a refusal added without coming here first turns this red.
+    # What may NOT happen is a second voice inside the balance branch, or
     # the sale refusal of V103 growing one.
     $buyWarns = @([regex]::Matches($buy.Groups[1].Value, 'xpWarn\("([^"]*)"\)'))
     if (-not $buy.Success) { Fail "V129 xpClick has no purchase branch" }
-    elseif ($warns.Count -ne 4) { Fail "V129 xpClick raises $($warns.Count) pop-ups - four refusals speak: the balance, the empty trait, the closed door, and the gift that is not the player's to take off (SPEC V161)" }
+    elseif ($warns.Count -ne 6) { Fail "V129 xpClick raises $($warns.Count) pop-ups - six refusals speak: the balance, the empty trait, the closed door, the gift that is not the player's to take off (SPEC V161), the secondary path row with nothing picked in it, and the secondary path above what its blood sorcery allows (SPEC V183)" }
     elseif ($buyWarns.Count -ne 1) { Fail "V129 the balance branch raises $($buyWarns.Count) pop-ups - only the refusal for want of experience may speak there" }
     elseif ($buy.Groups[1].Value -notmatch 'xpWarn\(') { Fail "V129 the refusal for want of experience says nothing" }
     elseif ($buy.Groups[1].Value -match 'markDot\(') { Fail "V129 the refused purchase marks the dot anyway (SPEC V135)" }
@@ -2288,6 +2703,16 @@ else {
 
 $warnFn   = LuaFn $rootTxt 'xpWarn'
 $warnMsgs = @([regex]::Matches($rootTxt, 'xpWarn\("([^"]*)"\)') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+
+# The picker guard does not hand xpWarn a literal: pickRefusal RETURNS the reason and
+# guardPick passes it along (SPEC V181/V182/V185). Those are pop-up messages just the same,
+# and a sweep that only saw xpWarn("...") would let every one of them skip V10/V28 - which is
+# the exact hole this invariant exists to close. Missing pickRefusal is a failure, not a
+# quiet zero: the guard being deleted must not read as "nothing left to check".
+$refusalFn = LuaFn $rootTxt 'pickRefusal'
+if (-not $refusalFn) { Fail "V130 pickRefusal not found on the root form - the picker refusals cannot be checked (SPEC V186)" }
+else { $warnMsgs = @(($warnMsgs + @([regex]::Matches($refusalFn, 'return "([^"]*)"') | ForEach-Object { $_.Groups[1].Value })) | Sort-Object -Unique) }
+
 if (-not $warnFn) { Fail "V130 xpWarn not found on the root form" }
 elseif ($warnFn -notmatch 'translateSheetText\(') { Fail "V130 xpWarn shows its message untranslated - a [pt] sheet would read English (SPEC V70)" }
 elseif ($warnFn -notmatch 'Dialogs\.showMessage\(') { Fail "V130 xpWarn opens no dialog - the refusal would stay silent" }
@@ -2515,12 +2940,15 @@ else { Pass "V138 the stamp keeps names keyed by the rating reached, and no burn
 # price still reads the rating reached, never how many points were paid for.
 $riseFn    = LuaFn $rootTxt 'pushRise'
 $riseCalls = @([regex]::Matches($rootTxt, 'ctx, (field|"humanity"|"willpower"|"faith")\);'))
+# Derived, not a literal: the 51st round took the ledger from ten row groups to thirteen,
+# and a number typed here would have to be edited by hand every time a box is added.
+$riseTotal = @([regex]::Matches($rootTxt, [regex]::Escape('pushRise(rows, "'))).Count
 if (-not $riseFn) { Fail "V139 pushRise not found on the root form" }
 elseif ($riseFn -notmatch 'function pushRise\(rows, kind, name, from, to, ctx, field\)') { Fail "V139 pushRise cannot tell which trait the row belongs to - it could not read a stamp" }
 elseif ($riseFn -notmatch 'local cost = xpCost\(kind, lvl - 1, ctx\);') { Fail "V139 pushRise no longer prices the row through xpCost (SPEC V86)" }
 elseif ($riseFn -notmatch 'string\.find\(ctx\.free, "\|" \.\. field \.\. "#" \.\. lvl \.\. "\|", 1, true\)') { Fail "V139 pushRise does not look the row's level up in the stamps" }
 elseif ($riseFn.IndexOf('string.find(ctx.free') -lt $riseFn.IndexOf('local cost = xpCost(')) { Fail "V139 the discount lands before the price exists - it must zero a cost the table already worked out (SPEC V86)" }
-elseif ($riseCalls.Count -ne 10) { Fail "V139 $($riseCalls.Count) of the ledger's ten row groups hand pushRise their field - one that does not could never go free" }
+elseif ($riseCalls.Count -ne $riseTotal) { Fail "V139 $($riseTotal - $riseCalls.Count) ledger row group(s) do not hand pushRise their field - one that does not could never go free" }
 else { Pass "V139 all ten row groups carry their field, and a stamp zeroes a price xpCost worked out" }
 
 # ---- V140: the stamp goes down with the mark, never on a refusal ---------------------

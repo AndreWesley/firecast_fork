@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmHH_12" align="client" theme="dark">
+	<script>
+		<![CDATA[
+			-- Disciplines area of the Vampire tab (SPEC I16). Same shape as the numina tab: two
+			-- boxes of picker rows on the left, one read-only description block on the right.
+			--
+			-- DESC is EMPTY on purpose. The book lists are frozen in SPEC T430 and the entries
+			-- land in SPEC T444; the layout ships first so it can be judged before ~300 book
+			-- entries are encoded against it (SPEC T459). Every branch below still produces
+			-- visible text, so an empty table reads as "nothing on file", never as a blank box
+			-- (SPEC V33, B6).
+			local DESC = {
+				-- >>> DISC_DESC_BEGIN (generated - SPEC T444)
+				["Abombwe"] = {
+					en = [==[Vampire: The Dark Ages 20th Anniversary Edition, p. 189
+
+
+Abombwe
+
+
+The Bonsam claim heritage from a hunter possessed by a darkness from a time before the light. It is impossible to trace the veracity of this statement, but the Discipline of Abombwe certainly taps into both primal darkness and predatory prowess.
+
+• Predator’s Communion
+The Laibon is the greatest predator in his territory and senses whenever a potential ally or rival is nearby.
+System: Spend a blood point. For the rest of the scene, the Laibon can sense predators in the area, including vampires, shapeshifters, ghosts, predatory animals, mortals, and ghouls with a Road rating of 4 or less. To pinpoint the location or find a hidden creature, the player rolls Perception + Survival (difficulty 6, modified by the strength of the predator as determined by the Storyteller; stronger predators are generally easier to detect).
+
+•• Invoking the Predator
+Sculpting the malleable darkness inside him and pushing it outward, the Laibon can copy aspects of predatory animals.
+System: This transformation takes one turn and requires one blood point. The character might grow claws that inflict Strength +1 lethal damage or a tail for balance. Most transformations are automatic, but particularly exotic ones such as poison glands require an Intelligence + Survival roll (difficulty 7). A botch results in a successful transformation, but adds cosmetic changes such as scales or stripes. This power does not suspend the laws of physics; the Laibon cannot create wings or spider webbing strong enough to carry his weight.
+
+••• Unseen Hibernation
+The Laibon makes his lair inside natural formations, plants, or earth by melting into the darkness hidden under their surface. A natural object significantly altered or sculpted by man is not suitable for this power; a wooden hut cannot be used, but a tree with carvings on it might do.
+System: The player spends a blood point. Unseen Hibernation is automatic and takes a turn to complete. The character falls into a consciousness one step above torpor during this time and his player must make a Road roll (difficulty 6) for the character to rouse prematurely.
+The difficulty of rolls to locate the character increase by two. Astral individuals cannot affect him directly, instead meeting with writhing darkness as their hands pass through him.
+Violence upon the submerged vampire expels him from the object in a blinding spray (everyone near the vampire, and the vampire are at +2 difficulty on Perception for the turn). The vampire subtracts two from his Initiative for the first turn upon expulsion, but may act normally after that.
+
+•••• Power from Darkness
+The Laibon lets darkness flow out and over him like black, clotted blood that clings to his body. This grants him power and special abilities even as the light repels it.
+System: This power costs two blood points and is automatic. One transformation may be active at a time, lasting for a scene, during which resisting Rötschreck is at +1 difficulty.
+Examples of use are listed below, but players and Storytellers are encouraged to come up with their own changes:
+Hands – Punches inflict Strength +1 aggravated damage.
+Head – Gain the ability to see perfectly in normal darkness and a -2 difficulty for seeing in supernatural darkness. Spit a toxin by rolling Dexterity + Athletics (difficulty 7) that paralyzes any enemy’s limbs it touches unless the target succeeds at a Stamina roll (difficulty 7).
+Torso – Sprout four spider legs which allow for one additional attack as part of a multiple action in a turn. Climb actions automatically succeed, and attempts to escape by running are at -2 difficulty.
+Legs – Kicks inflicts aggravated damage. Leap up to 10 times the normal jumping distance and receive -1 difficulty to landing safely after a fall or jump.
+Throat – Emit a primordial roar. Mortals and ghouls must succeed at a Courage roll (difficulty 9) or flee, whilst supernatural beings must succeed at a Courage roll (difficulty 8) or become weak with terror (all dice pools reduced by half, rounded up).
+
+••••• Predator’s Transformation
+The Laibon slays a predator and consumes a part of it, be it heart, liver, flesh, or blood. He then becomes that creature as his vitae fully absorbs its essence.
+System: The player spends one blood point and rolls Stamina + Survival (difficulty 7). If successful, the Laibon physically transforms into the creature. The creature must be predatory in nature and at least the size of a cat. Humans and supernatural beings may be duplicated, but this does not include powers. Predator’s Transformation lasts until sunrise or the Laibon ends the power.
+A Laibon may duplicate a previous transformation without consuming another creature. This requires a Stamina + Survival roll (difficulty 10) with difficulty reduced by one for each time he has killed and transformed into a creature of that type, to a minimum difficulty of 6. With mortals, vampires, and other humanoids, the Laibon takes on an average appearance for his victim’s ethnic group.]==],
+					pt = [==[Vampire: The Dark Ages 20th Anniversary Edition, pág. 189
+
+
+Abombwe
+
+
+Os Bonsam alegam descender de um caçador possuído por uma escuridão de um tempo anterior à luz. É impossível verificar a veracidade dessa afirmação, mas a Disciplina de Abombwe certamente bebe tanto da escuridão primordial quanto da destreza predatória.
+
+• Comunhão do Predador
+O Laibon é o maior predador do seu território e percebe sempre que um possível aliado ou rival está por perto.
+Sistema: Gaste um ponto de sangue. Pelo resto da cena, o Laibon consegue sentir predadores na área, incluindo vampiros, metamorfos, fantasmas, animais predatórios, mortais e carniçais com Caminho 4 ou menos. Para localizar com precisão ou encontrar uma criatura escondida, o jogador rola Percepção + Sobrevivência (dificuldade 6, modificada pela força do predador conforme o Narrador determinar; predadores mais fortes costumam ser mais fáceis de detectar).
+
+•• Invocando o Predador
+Esculpindo a escuridão maleável dentro de si e empurrando-a para fora, o Laibon consegue copiar aspectos de animais predatórios.
+Sistema: Essa transformação leva um turno e exige um ponto de sangue. O personagem pode fazer crescer garras que causam Força +1 de dano letal ou uma cauda para equilíbrio. A maioria das transformações é automática, mas as particularmente exóticas, como glândulas de veneno, exigem uma rolagem de Inteligência + Sobrevivência (dificuldade 7). Uma falha crítica resulta numa transformação bem-sucedida, mas acrescenta mudanças cosméticas como escamas ou listras. Esse poder não suspende as leis da física; o Laibon não pode criar asas nem teia de aranha forte o bastante para sustentar seu peso.
+
+••• Hibernação Invisível
+O Laibon faz seu covil dentro de formações naturais, plantas ou terra, derretendo-se na escuridão escondida sob a superfície delas. Um objeto natural significativamente alterado ou esculpido pelo homem não serve para esse poder; uma cabana de madeira não pode ser usada, mas uma árvore com entalhes talvez sirva.
+Sistema: O jogador gasta um ponto de sangue. Hibernação Invisível é automática e leva um turno para se completar. O personagem cai numa consciência um passo acima do torpor durante esse tempo, e seu jogador precisa fazer uma rolagem de Caminho (dificuldade 6) para que o personagem desperte antes da hora.
+A dificuldade das rolagens para localizar o personagem aumenta em dois. Indivíduos astrais não conseguem afetá-lo diretamente, encontrando em vez disso uma escuridão contorcida enquanto suas mãos o atravessam.
+Violência contra o vampiro submerso o expele do objeto num jato ofuscante (todos perto do vampiro, e o próprio vampiro, ficam com +2 de dificuldade em Percepção naquele turno). O vampiro subtrai dois da sua Iniciativa no primeiro turno após a expulsão, mas pode agir normalmente depois disso.
+
+•••• Poder da Escuridão
+O Laibon deixa a escuridão escorrer para fora e sobre si como sangue negro e coagulado que gruda no seu corpo. Isso lhe concede poder e habilidades especiais, ainda que a luz a repila.
+Sistema: Esse poder custa dois pontos de sangue e é automático. Uma transformação pode estar ativa por vez, durando uma cena, durante a qual resistir a Rötschreck é +1 de dificuldade.
+Exemplos de uso estão listados abaixo, mas jogadores e Narradores são encorajados a criar suas próprias mudanças:
+Mãos – Socos causam Força +1 de dano agravado.
+Cabeça – Ganhe a capacidade de enxergar perfeitamente na escuridão normal e -2 de dificuldade para enxergar em escuridão sobrenatural. Cuspa uma toxina rolando Destreza + Esportes (dificuldade 7) que paralisa qualquer membro inimigo que toque, a menos que o alvo obtenha sucesso numa rolagem de Vigor (dificuldade 7).
+Torso – Faça brotar quatro pernas de aranha, que permitem um ataque adicional como parte de uma ação múltipla no turno. Ações de escalada têm sucesso automático, e tentativas de escapar correndo ficam com -2 de dificuldade.
+Pernas – Chutes causam dano agravado. Salte até 10 vezes a distância normal e receba -1 de dificuldade para aterrissar em segurança depois de uma queda ou salto.
+Garganta – Emita um rugido primordial. Mortais e carniçais precisam ter sucesso numa rolagem de Coragem (dificuldade 9) ou fogem, enquanto seres sobrenaturais precisam ter sucesso numa rolagem de Coragem (dificuldade 8) ou ficam fracos de terror (todas as paradas de dados reduzidas à metade, arredondando para cima).
+
+••••• Transformação do Predador
+O Laibon mata um predador e consome uma parte dele, seja coração, fígado, carne ou sangue. Ele então se torna aquela criatura, à medida que sua vitae absorve por completo a essência dela.
+Sistema: O jogador gasta um ponto de sangue e rola Vigor + Sobrevivência (dificuldade 7). Se tiver sucesso, o Laibon se transforma fisicamente na criatura. A criatura precisa ser predatória por natureza e ter ao menos o tamanho de um gato. Humanos e seres sobrenaturais podem ser duplicados, mas isso não inclui poderes. Transformação do Predador dura até o nascer do sol ou até o Laibon encerrar o poder.
+Um Laibon pode duplicar uma transformação anterior sem consumir outra criatura. Isso exige uma rolagem de Vigor + Sobrevivência (dificuldade 10), com a dificuldade reduzida em um para cada vez que ele matou e se transformou numa criatura daquele tipo, até uma dificuldade mínima de 6. Com mortais, vampiros e outros humanoides, o Laibon assume uma aparência média para o grupo étnico da vítima.]==],
+				},
+				["Abyss Mysticism"] = {
+					en = [==[Lore of the Clans, p. 125
+
+
+Abyss Mysticism
+
+
+As the Lasombra delved deeper into the secrets of Obtenebration, they discovered it drew power from a dark realm of shadows called the Abyss. Mystics within the Clan began to study this secret realm to unlock its secrets, and through this developed the art of Abyss Mysticism. The Lasombra keep this power secret from the rest of the Sabbat, as the creatures they summon and control with it are as dark as they are mysterious.
+
+Abyss Mysticism is difficult and time consuming to learn, and comes at a cost. Its rituals often have side effects that create Flaws the character cannot remove that provide no bonus points. To learn the power, a vampire must have at least one dot in both Obtenebration and Occult. She may not learn any Abyss rituals higher than the lowest of her Obtenebration or Occult ratings, and each ritual costs a number of experience points equal to three times the ritual’s level.
+
+Abyss rituals are cast using a Wits + Occult roll. The difficulty is 3 + the level of the ritual being cast. Only one success is required to cast the ritual, but the Storyteller is encouraged to make the penalties for failure especially horrifying.
+
+(More detail on Abyss Mysticism can be found in Rites of Blood, pp. 37-39.)]==],
+					pt = [==[Lore of the Clans, pág. 125
+
+
+Abyss Mysticism
+
+
+À medida que os Lasombra se aprofundavam nos segredos da Tenebrosidade, descobriram que ela extraía poder de um reino sombrio de sombras chamado Abismo. Místicos do Clã passaram a estudar esse reino secreto para destrancar seus segredos e, por meio disso, desenvolveram a arte do Misticismo do Abismo. Os Lasombra mantêm esse poder em segredo do resto da Sabbat, pois as criaturas que invocam e controlam com ele são tão sombrias quanto misteriosas.
+
+O Misticismo do Abismo é difícil e demorado de aprender, e cobra seu preço. Seus rituais muitas vezes têm efeitos colaterais que criam Defeitos que o personagem não pode remover e que não dão pontos de bônus. Para aprender o poder, um vampiro precisa ter ao menos um ponto tanto em Tenebrosidade quanto em Ocultismo. Ela não pode aprender nenhum ritual do Abismo de nível superior ao menor entre seus valores de Tenebrosidade e Ocultismo, e cada ritual custa um número de pontos de experiência igual a três vezes o nível do ritual.
+
+Rituais do Abismo são conjurados com uma rolagem de Raciocínio + Ocultismo. A dificuldade é 3 + o nível do ritual sendo conjurado. Apenas um sucesso é necessário para conjurar o ritual, mas o Narrador é encorajado a tornar as penalidades do fracasso especialmente horripilantes.
+
+(Mais detalhes sobre o Misticismo do Abismo podem ser encontrados em Rites of Blood, pp. 37-39.)]==],
+				},
+				["Animalism"] = {
+					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 128
+
+
+Animalism
+
+
+The Beast resides within all creatures, from scuttling cockroaches to scabrous rats up through untamed wolves and even powerful Kindred elders. Animalism allows the vampire to amplify his intensely primordial nature. He can not only communicate with animals, but can also force his will upon them, directing such beasts to do as he commands. As the vampire grows in power, he can even control the Beast within mortals and other supernaturals.
+Beasts grow distinctly agitated in the presence of a vampire who lacks this Discipline or the Skill of Animal Ken, often to the point of attacking or running from the vampire. In contrast, vampires possessing Animalism exude a dominant vibe to lower creatures, which attracts them.
+Animalism is commonly found with vampires of the Gangrel and Nosferatu Clans. Manipulation and Charisma are important for the use of Animalism powers; the stronger the vampire’s personality, the more influence he has over animals.
+
+• Feral Whispers
+This power is the basis from which all other Animalism abilities grow. The vampire creates an empathic connection with a beast, thereby allowing him to communicate or issue simple commands. The Kindred locks eyes with the animal, transmitting his desires through sheer force of will. Although it isn’t necessary to actually "speak" in chirps, hisses, or barks, some vampires find that doing so helps strengthen the connection with the animal. Eye contact must be maintained the entire time; if it’s broken, the Kindred must re-establish contact to continue communication.
+The simpler the creature, the more difficult it becomes to connect with the animal’s Beast. Mammals, predatory birds, and larger reptiles are relatively easy to communicate with. Insects, invertebrates, and most fish are just too simple to connect with.
+Feral Whispers provides no guarantees that an animal will want to deal with the vampire, nor does it ensure that the animal will pursue any requests the vampire makes of it. Still, it does at least make the creature better disposed toward the Kindred. The manner in which the vampire presents his desires to the animal often depends on the type of creature. A Kindred can often bully smaller beasts into heeding commands, but he’s better off couching orders for large predators as requests.
+If the vampire successfully uses the power, the animal performs the command to the best of its ability and intellect. Only the very brightest creatures understand truly complex directives (orders dealing with conditional situations or requiring abstract logic). Commands that the animal does understand remain deeply implanted, however, and guide its behavior for some time.
+System: No roll is necessary to talk with an animal, but the character must establish eye contact (see p. 152) first. Issuing commands requires a Manipulation + Animal Ken roll. The difficulty depends on the creature: Predatory mammals (wolves, cats, vampire bats) are difficulty 6, other mammals and predatory birds (rats, owls) are difficulty 7, and other birds and reptiles (pigeons, snakes) are difficulty 8. This difficulty is reduced by one if the character speaks to the animal in its "native tongue," and can be adjusted further by circumstances and roleplaying skill (we highly recommend that all communication between characters and animals be roleplayed).
+The number of successes the player achieves dictates how strongly the character’s command affects the animal. One success is sufficient to have a cat follow an individual and lead the character to the same location, three successes are enough to have a raven spy on a target for weeks, and five successes ensure that a grizzly ferociously guards the entrance to the character’s wilderness haven for some months.
+The character’s Nature plays a large part in how he approaches these conversations. The character might try intimidating, teasing, cajoling, or rationalizing. The player should understand that he does not simply play his character in these situations, but the Beast Within as well.
+Using this power cannot force an animal to do something against its nature, or to force a creature to risk its life. While the aforementioned grizzly would stand guard to the vampire’s haven and even fight for it, it would not do so against obviously superior numbers or something overwhelmingly supernatural. A predatory bird might be convinced to harry a target, but would definitely not hold ground. A docile dog or skittish cat would have no problem with reporting something it had seen, but it wouldn’t enter combat unless given no other option — though it would likely agree to stand and fight and then flee at the first opportunity, if a harsh Kindred demanded it.
+
+•• Beckoning
+The vampire’s connection to the Beast grows strong enough that he may call out in the voice of a specific type of animal — howling like a wolf, shrilling like a raven, etc. This call mystically summons creatures of the chosen type. Since each type of animal has a different call, Beckoning works for only a single species at a time.
+All such animals within earshot are summoned, and some percentage of them will heed the Beckoning if it is successful. While the vampire has no further control over the beasts who answer, the animals who do are favorably disposed toward him and are at least willing to listen to the Kindred’s concerns. (The vampire can then use Feral Whispers on individual animals to command them, which may be at a decreased difficulty at Storyteller discretion.)
+System: The player rolls Charisma + Survival (difficulty 6) to determine the response to the character’s call; consult the table below. Only animals that can hear the cry will respond. If the Storyteller decides no animals of that type are within earshot, the summons goes unanswered.
+The call can be as specific as the player desires. A character could call for all bats in the area, for only the male bats nearby, or for only the albino bat with the notched ear he saw the other night.
+1 success — A single animal responds.
+2 successes — One-quarter of the animals within earshot respond.
+3 successes — Half of the animals respond.
+4 successes — Most of the animals respond.
+5 successes — All of the animals respond.
+
+••• Quell the Beast
+As the supreme predators of the natural world, Kindred are highly attuned to the bestial nature that dwells within every mortal heart. A vampire who develops this power may assert his will over a mortal (animal or human) subject, subduing the Beast within her. This quenches all powerful, strong emotions — hope, fury, love, fear — within the target. The Kindred must either touch his subject or stare into her eyes to channel his will effectively.
+Mortals who lack the fire of their inner Beasts are quite tractable, reacting to even stressful situations with indifference. Even the most courageous or maddened mortal becomes apathetic and listless, while an especially sensitive individual may suffer from a phobic derangement while under the power’s influence.
+Different Clans evoke this power in different ways, though the effect itself is identical. Tzimisce call it Cowing the Beast, since they force the mortal’s weaker spirit to shrivel in fear before the Kindred’s own inner Beast. Nosferatu refer to it as Song of Serenity, since they soothe the subject’s Beast into a state of utter complacency, thus allowing them to feed freely. Gangrel know the power as Quell the Beast, and force the mortal spirit into a state of fear or apathy as befits the individual vampire’s nature.
+System: The player rolls Manipulation + Intimidation if forcing down the Beast through fear, or Manipulation + Empathy if soothing it into complacency. The difficulty of the roll is 7 in either case. This is an extended action requiring as many total successes as the target has Willpower. Failure indicates that the player must start over from the beginning, while a botch indicates that the vampire may not affect that subject’s Beast for the remainder of the scene.
+When a mortal’s Beast is cowed or soothed, she can no longer use or regain Willpower. She ceases all struggles, whether mental or physical. She doesn’t even defend herself if assaulted, though the Storyteller may allow a Willpower roll if the mortal believes her life is truly threatened. To recover from this power, the mortal’s player rolls Willpower (difficulty 6) once per day until she accumulates enough successes to equal the vampire’s Willpower. Kindred cannot be affected by this power.
+Though a vampire’s Beast cannot be cowed with this ability, the Storyteller may allow characters to use the "soothing" variation of this power to pull a vampire out of frenzy. With three or more successes, the frenzying vampire may roll again to pull herself out of frenzy, using the same difficulty as the stimulus that caused the frenzy originally.
+
+•••• Subsume the Spirit
+By locking his gaze with that of an animal, the vampire may mentally possess the creature. Some elders believe that since animals don’t have souls but spirits, the vampire can move his own soul into the animal’s body. Many younger vampires think it a matter of transferring one’s consciousness into the animal’s mind. In either case, it’s agreed that the beast’s weaker spirit (or mind) is pushed aside by the Kindred’s own consciousness. The vampire’s body falls into a motionless state akin to torpor while his mind takes control of the animal’s actions, remaining this way until the Kindred’s consciousness returns.
+Some haughty Tzimisce eschew this power, considering it debasing to enter the body of a lesser creature. When they do stoop to using it, they possess only predators. Conversely, Gangrel revel in connecting to the natural world in this way. They delight in sampling different animals’ natures.
+System: The player rolls Manipulation + Animal Ken (difficulty 8) as the character looks into the animal’s eyes (see sidebar on p. 152). The number of successes allows the character to employ some mental Disciplines while possessing the animal, as noted below.
+1 success — Cannot use Disciplines.
+2 successes — Can use Auspex and other sensory powers.
+3 successes — Can also use Presence and other powers of emotional manipulation.
+4 successes — Can also use Dementation, Dominate, and other powers of mental manipulation.
+5 successes — Can also use Chimerstry, Necromancy, Thaumaturgy, and other mystical powers.
+This power entwines the character’s consciousness closely with the animal’s spirit, so much so that the character may continue to think and feel like that animal even after breaking the connection. This effect continues until the character spends a total of seven nights or three Willpower points to resist and finally overcome the animal nature. This should be roleplayed, though the character will be affected to a lesser degree if the player chooses to spend Willpower.
+At the end of any particularly exciting incident during possession, the player rolls Wits + Empathy (difficulty 8) for the character to retain his own mind. Failure indicates that the character’s mind returns to his own body, but still thinks in purely animalistic terms. A botch returns the character to his body, and also sends him into frenzy.
+The character may travel as far from his own physical body as he chooses while possessing the animal. The character retains no conscious connection with his vampire body during this time, though. The vampire may also venture out during the day, albeit in the animal’s body. However, the character’s own body must be awake to do so, requiring a successful roll to remain awake (see p. 262). If the character leaves the animal’s body (by choice, if his body falls asleep, or after sustaining significant injury), the vampire’s consciousness returns to his physical form instantaneously.
+Although the vampire has no conscious link to his body while possessing the animal, he does form a sympathetic bond. Anything the animal feels, the vampire also experiences, from pleasure to pain. In fact, any damage the animal’s body sustains is also applied to the character’s body, though the Kindred body may soak as normal. If the animal dies before the vampire’s soul can flee from the body, the character’s body falls into torpor. Presumably this is in sympathetic response to the massive trauma of death, but some Kindred believe that the vampire’s soul is cast adrift during this time and must find its way back to the body.
+
+••••• Drawing Out the Beast
+At this level of Animalism, the Kindred has a keen understanding of the Beast Within, and is able to release his feral urges upon another mortal or vampire. The recipient of the vampire’s Beast is instantly overcome by frenzy. This is an unnatural frenzy, however, as the victim is channeling the Kindred’s own fury. As such, the vampire’s own behavior, expressions, and even speech patterns are evident in the subject’s savage actions.
+Gangrel and Tzimisce are especially fond of unleashing their Beasts onto others. Gangrel do so to stir their ghouls into inspired heights of savagery during combat. Tzimisce care less about who receives their Beast than retaining their own composure.
+System: The player must announce his preferred target (since it must be someone within sight, Drawing Out the Beast cannot be used if the vampire is alone), then roll Manipulation + Self-Control/Instinct (difficulty 8). Refer to the table below for the results:
+1 success — The character transfers the Beast, but unleashes it upon a random individual.
+2 successes — The character is stunned by the effort and may not act next turn, but transfers the Beast successfully. Alternatively, the character may act normally during the turn, but must spend a Willpower point or suffer a single level of lethal damage.
+3+ successes — The character transfers the Beast successfully.
+If the attempt fails, the character himself immediately enters frenzy. As the character relaxes in expectation of relieving his savage urges, the Beast takes that opportunity to dig deeper. In this case, the frenzy lasts twice as long as normal and is twice as difficult to shrug off; its severity also increases exponentially. Botching this roll is even more catastrophic; the heightened frenzy grows so extreme that not even expending Willpower curbs its duration or effects. The character is a hapless victim to the terrible fury of his Beast, and may well hurl herself into a savage, flesh-rending rampage that leaves the Masquerade (and unfortunate nearby onlookers) in tatters.
+If the character leaves the target’s presence before the frenzy expends itself, the vampire loses his Beast, perhaps permanently. While no longer vulnerable to frenzy, the character cannot use or regain Willpower and becomes increasingly lethargic. To recover the Beast, he must find the person who now possesses it (who likely isn’t enjoying herself very much) and coax the Beast into its proper vessel. The most effective way to do so is to behave in ways that make the Beast want to return — however, this isn’t a guarantee that it will wish to do so. Alternatively, the character can simply kill the host (thus causing the Beast to return to the vampire immediately).]==],
+					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 128
+
+
+Animalism
+
+
+A Besta reside dentro de todas as criaturas, das baratas que se arrastam aos ratos sarnentos, passando por lobos indomados e até por poderosos anciões Membros. Animalismo permite ao vampiro amplificar sua natureza intensamente primordial. Ele não apenas se comunica com animais, como também impõe sua vontade sobre eles, dirigindo tais bestas a fazer o que ordena. Conforme o vampiro cresce em poder, ele consegue até controlar a Besta dentro de mortais e de outros seres sobrenaturais.
+Bestas ficam nitidamente agitadas na presença de um vampiro que não tenha esta Disciplina ou a Perícia Empatia com Animais, muitas vezes a ponto de atacar o vampiro ou fugir dele. Em contraste, vampiros que possuem Animalismo exalam uma aura dominante para criaturas inferiores, o que as atrai.
+Animalismo é comumente encontrado em vampiros dos Clãs Gangrel e Nosferatu. Manipulação e Carisma são importantes para o uso dos poderes de Animalismo; quanto mais forte a personalidade do vampiro, mais influência ele tem sobre os animais.
+
+• Sussurros Selvagens
+Este poder é a base a partir da qual todas as outras habilidades de Animalismo crescem. O vampiro cria uma conexão empática com uma besta, permitindo-lhe assim comunicar-se ou dar ordens simples. O Membro trava os olhos com o animal, transmitindo seus desejos por pura força de vontade. Embora não seja necessário de fato "falar" em pios, sibilos ou latidos, alguns vampiros descobrem que fazê-lo ajuda a fortalecer a conexão com o animal. O contato visual precisa ser mantido o tempo todo; se for rompido, o Membro precisa restabelecer o contato para continuar a comunicação.
+Quanto mais simples a criatura, mais difícil se torna conectar-se com a Besta do animal. Mamíferos, aves de rapina e répteis maiores são relativamente fáceis de comunicar-se. Insetos, invertebrados e a maioria dos peixes são simples demais para conectar-se.
+Sussurros Selvagens não garante que um animal vá querer lidar com o vampiro, nem assegura que o animal vá atender a qualquer pedido que o vampiro lhe faça. Ainda assim, ao menos deixa a criatura mais bem disposta em relação ao Membro. A maneira como o vampiro apresenta seus desejos ao animal muitas vezes depende do tipo de criatura. Um Membro pode com frequência intimidar bestas menores a obedecer ordens, mas faz melhor em formular ordens para grandes predadores como pedidos.
+Se o vampiro usar o poder com sucesso, o animal executa a ordem da melhor forma que sua capacidade e intelecto permitem. Só as criaturas mais brilhantes entendem diretrizes verdadeiramente complexas (ordens que lidem com situações condicionais ou exijam lógica abstrata). Ordens que o animal de fato entende, porém, ficam profundamente implantadas e guiam seu comportamento por algum tempo.
+Sistema: Nenhuma rolagem é necessária para conversar com um animal, mas o personagem precisa primeiro estabelecer contato visual (ver p. 152). Dar ordens exige uma rolagem de Manipulação + Empatia com Animais. A dificuldade depende da criatura: mamíferos predadores (lobos, gatos, morcegos-vampiros) são dificuldade 6, outros mamíferos e aves de rapina (ratos, corujas) são dificuldade 7, e outras aves e répteis (pombos, cobras) são dificuldade 8. Essa dificuldade é reduzida em um se o personagem falar com o animal na "língua nativa" dele, e pode ser ajustada ainda mais pelas circunstâncias e pela habilidade de interpretação (recomendamos fortemente que toda comunicação entre personagens e animais seja interpretada).
+O número de sucessos que o jogador obtém determina o quão fortemente a ordem do personagem afeta o animal. Um sucesso basta para fazer um gato seguir um indivíduo e levar o personagem ao mesmo lugar, três sucessos bastam para fazer um corvo espionar um alvo por semanas, e cinco sucessos garantem que um urso-pardo guarde ferozmente a entrada do refúgio silvestre do personagem por alguns meses.
+A Natureza do personagem tem grande papel em como ele aborda essas conversas. O personagem pode tentar intimidar, provocar, bajular ou racionalizar. O jogador deve entender que, nessas situações, ele não interpreta apenas seu personagem, mas a Besta Interior também.
+Usar este poder não pode forçar um animal a fazer algo contra sua natureza, nem forçar uma criatura a arriscar a vida. Embora o urso-pardo mencionado acima montasse guarda ao refúgio do vampiro e até lutasse por ele, não o faria contra um número obviamente superior nem contra algo esmagadoramente sobrenatural. Uma ave de rapina poderia ser convencida a fustigar um alvo, mas definitivamente não manteria posição. Um cão dócil ou um gato arisco não teria problema em relatar algo que tivesse visto, mas não entraria em combate a menos que não lhe restasse outra opção — embora provavelmente concordasse em ficar e lutar e então fugisse na primeira oportunidade, se um Membro severo o exigisse.
+
+•• Chamado
+A conexão do vampiro com a Besta fica forte o bastante para que ele possa clamar na voz de um tipo específico de animal — uivando como um lobo, guinchando como um corvo etc. Esse chamado convoca misticamente criaturas do tipo escolhido. Como cada tipo de animal tem um chamado diferente, Chamado funciona para uma única espécie por vez.
+Todos esses animais ao alcance da audição são convocados, e alguma porcentagem deles atenderá ao Chamado se ele for bem-sucedido. Embora o vampiro não tenha nenhum controle adicional sobre as bestas que respondem, os animais que o fazem ficam favoravelmente dispostos em relação a ele e estão ao menos dispostos a ouvir as preocupações do Membro. (O vampiro pode então usar Sussurros Selvagens em animais individuais para comandá-los, possivelmente com dificuldade reduzida, a critério do Narrador.)
+Sistema: O jogador rola Carisma + Sobrevivência (dificuldade 6) para determinar a resposta ao chamado do personagem; consulte a tabela abaixo. Só animais que possam ouvir o grito responderão. Se o Narrador decidir que não há animais daquele tipo ao alcance da audição, a convocação fica sem resposta.
+O chamado pode ser tão específico quanto o jogador desejar. Um personagem poderia chamar todos os morcegos da área, apenas os morcegos machos por perto, ou apenas o morcego albino de orelha entalhada que ele viu na outra noite.
+1 sucesso — Um único animal responde.
+2 sucessos — Um quarto dos animais ao alcance da audição responde.
+3 sucessos — Metade dos animais responde.
+4 sucessos — A maioria dos animais responde.
+5 sucessos — Todos os animais respondem.
+
+••• Aplacar a Besta
+Como predadores supremos do mundo natural, os Membros são altamente sintonizados com a natureza bestial que habita todo coração mortal. Um vampiro que desenvolve este poder pode impor sua vontade sobre um sujeito mortal (animal ou humano), subjugando a Besta dentro dela. Isso extingue todas as emoções fortes e poderosas — esperança, fúria, amor, medo — dentro do alvo. O Membro precisa tocar seu sujeito ou fitar seus olhos para canalizar sua vontade de forma eficaz.
+Mortais que carecem do fogo de suas Bestas interiores ficam bastante dóceis, reagindo com indiferença até a situações estressantes. Mesmo o mortal mais corajoso ou enlouquecido torna-se apático e desanimado, enquanto um indivíduo especialmente sensível pode sofrer de um distúrbio fóbico enquanto estiver sob a influência do poder.
+Clãs diferentes evocam este poder de maneiras diferentes, embora o efeito em si seja idêntico. Os Tzimisce o chamam de Intimidar a Besta, pois forçam o espírito mais fraco do mortal a encolher de medo diante da própria Besta interior do Membro. Os Nosferatu se referem a ele como Canção da Serenidade, pois acalmam a Besta do sujeito até um estado de completa complacência, permitindo assim que se alimentem livremente. Os Gangrel conhecem o poder como Aplacar a Besta, e forçam o espírito mortal a um estado de medo ou apatia conforme convier à natureza de cada vampiro.
+Sistema: O jogador rola Manipulação + Intimidação se estiver subjugando a Besta pelo medo, ou Manipulação + Empatia se estiver acalmando-a até a complacência. A dificuldade da rolagem é 7 em qualquer dos casos. Esta é uma ação estendida que exige tantos sucessos totais quanto o alvo tiver de Força de Vontade. Um fracasso indica que o jogador precisa recomeçar do início, enquanto uma falha crítica indica que o vampiro não pode afetar a Besta daquele sujeito pelo resto da cena.
+Quando a Besta de um mortal é intimidada ou acalmada, ela não pode mais usar nem recuperar Força de Vontade. Ela cessa toda resistência, seja mental ou física. Ela nem sequer se defende se for agredida, embora o Narrador possa permitir uma rolagem de Força de Vontade se a mortal acreditar que sua vida está realmente ameaçada. Para se recuperar deste poder, a jogadora da mortal rola Força de Vontade (dificuldade 6) uma vez por dia até acumular sucessos suficientes para igualar a Força de Vontade do vampiro. Membros não podem ser afetados por este poder.
+Embora a Besta de um vampiro não possa ser intimidada com esta habilidade, o Narrador pode permitir que personagens usem a variação "acalmante" deste poder para tirar um vampiro do frenesi. Com três ou mais sucessos, o vampiro em frenesi pode rolar novamente para sair do frenesi, usando a mesma dificuldade do estímulo que causou o frenesi originalmente.
+
+•••• Subsumir o Espírito
+Ao travar seu olhar com o de um animal, o vampiro pode possuir mentalmente a criatura. Alguns anciões acreditam que, como animais não têm almas e sim espíritos, o vampiro consegue mover a própria alma para dentro do corpo do animal. Muitos vampiros mais jovens acham que é questão de transferir a própria consciência para a mente do animal. Em qualquer dos casos, concorda-se que o espírito (ou mente) mais fraco da besta é empurrado para o lado pela consciência do Membro. O corpo do vampiro cai num estado imóvel semelhante ao torpor enquanto sua mente assume o controle das ações do animal, permanecendo assim até que a consciência do Membro retorne.
+Alguns Tzimisce arrogantes evitam este poder, considerando aviltante entrar no corpo de uma criatura inferior. Quando se rebaixam a usá-lo, possuem apenas predadores. Inversamente, os Gangrel se deleitam em conectar-se ao mundo natural desta forma. Eles adoram experimentar a natureza de diferentes animais.
+Sistema: O jogador rola Manipulação + Empatia com Animais (dificuldade 8) enquanto o personagem olha nos olhos do animal (ver o quadro na p. 152). O número de sucessos permite ao personagem empregar algumas Disciplinas mentais enquanto possui o animal, conforme indicado abaixo.
+1 sucesso — Não pode usar Disciplinas.
+2 sucessos — Pode usar Auspícios e outros poderes sensoriais.
+3 sucessos — Pode usar também Presença e outros poderes de manipulação emocional.
+4 sucessos — Pode usar também Demência, Dominação e outros poderes de manipulação mental.
+5 sucessos — Pode usar também Quimerismo, Necromancia, Taumaturgia e outros poderes místicos.
+Este poder entrelaça a consciência do personagem intimamente com o espírito do animal, a tal ponto que o personagem pode continuar a pensar e sentir como aquele animal mesmo depois de romper a conexão. Esse efeito continua até que o personagem gaste um total de sete noites ou três pontos de Força de Vontade para resistir e finalmente superar a natureza animal. Isso deve ser interpretado, embora o personagem seja afetado em menor grau se o jogador optar por gastar Força de Vontade.
+Ao fim de qualquer incidente particularmente empolgante durante a possessão, o jogador rola Raciocínio + Empatia (dificuldade 8) para que o personagem retenha a própria mente. Um fracasso indica que a mente do personagem retorna ao próprio corpo, mas ainda pensa em termos puramente animalescos. Uma falha crítica devolve o personagem ao corpo e também o lança em frenesi.
+O personagem pode viajar tão longe do próprio corpo físico quanto quiser enquanto possui o animal. Nesse período, porém, o personagem não retém nenhuma conexão consciente com seu corpo vampírico. O vampiro também pode se aventurar durante o dia, ainda que no corpo do animal. Contudo, o próprio corpo do personagem precisa estar desperto para isso, exigindo uma rolagem bem-sucedida para permanecer acordado (ver p. 262). Se o personagem deixar o corpo do animal (por escolha, se seu corpo adormecer, ou após sofrer ferimento significativo), a consciência do vampiro retorna instantaneamente à sua forma física.
+Embora o vampiro não tenha ligação consciente com seu corpo enquanto possui o animal, ele forma um vínculo simpático. Tudo o que o animal sente, o vampiro também experimenta, do prazer à dor. De fato, qualquer dano que o corpo do animal sofra também é aplicado ao corpo do personagem, embora o corpo do Membro possa absorver normalmente. Se o animal morrer antes que a alma do vampiro possa fugir do corpo, o corpo do personagem cai em torpor. Presume-se que isso seja uma resposta simpática ao trauma massivo da morte, mas alguns Membros acreditam que a alma do vampiro fica à deriva durante esse tempo e precisa encontrar o caminho de volta ao corpo.
+
+••••• Extrair a Besta
+Neste nível de Animalismo, o Membro tem um entendimento aguçado da Besta Interior e é capaz de liberar seus impulsos ferais sobre outro mortal ou vampiro. Quem recebe a Besta do vampiro é instantaneamente tomado pelo frenesi. Trata-se, porém, de um frenesi antinatural, pois a vítima está canalizando a fúria do próprio Membro. Assim, o comportamento, as expressões e até os padrões de fala do vampiro ficam evidentes nas ações selvagens do sujeito.
+Gangrel e Tzimisce apreciam especialmente desencadear suas Bestas sobre os outros. Os Gangrel o fazem para incitar seus carniçais a alturas inspiradas de selvageria durante o combate. Os Tzimisce se importam menos com quem recebe sua Besta do que em manter a própria compostura.
+Sistema: O jogador precisa anunciar o alvo pretendido (já que precisa ser alguém à vista, Extrair a Besta não pode ser usado se o vampiro estiver sozinho) e então rolar Manipulação + Autocontrole/Instinto (dificuldade 8). Consulte a tabela abaixo para os resultados:
+1 sucesso — O personagem transfere a Besta, mas a desencadeia sobre um indivíduo aleatório.
+2 sucessos — O personagem fica atordoado pelo esforço e não pode agir no turno seguinte, mas transfere a Besta com sucesso. Alternativamente, o personagem pode agir normalmente durante o turno, mas precisa gastar um ponto de Força de Vontade ou sofrer um único nível de dano letal.
+3+ sucessos — O personagem transfere a Besta com sucesso.
+Se a tentativa fracassar, o próprio personagem entra imediatamente em frenesi. Enquanto o personagem relaxa na expectativa de aliviar seus impulsos selvagens, a Besta aproveita a oportunidade para se enterrar mais fundo. Nesse caso, o frenesi dura o dobro do normal e é duas vezes mais difícil de sacudir; sua severidade também aumenta exponencialmente. Obter uma falha crítica nessa rolagem é ainda mais catastrófico; o frenesi intensificado cresce a tal extremo que nem mesmo gastar Força de Vontade contém sua duração ou seus efeitos. O personagem é vítima indefesa da fúria terrível de sua Besta, e pode muito bem lançar-se numa carnificina selvagem e dilacerante que deixa a Máscara (e os infelizes espectadores por perto) em farrapos.
+Se o personagem deixar a presença do alvo antes que o frenesi se esgote, o vampiro perde sua Besta, talvez permanentemente. Embora não esteja mais vulnerável ao frenesi, o personagem não pode usar nem recuperar Força de Vontade e fica cada vez mais letárgico. Para recuperar a Besta, ele precisa encontrar a pessoa que agora a possui (e que provavelmente não está se divertindo nada) e persuadir a Besta a voltar ao seu receptáculo apropriado. A maneira mais eficaz de fazê-lo é comportar-se de modo que faça a Besta querer voltar — no entanto, isso não garante que ela vá desejar fazê-lo. Alternativamente, o personagem pode simplesmente matar o hospedeiro (fazendo assim com que a Besta retorne imediatamente ao vampiro).]==],
+				},
+				["Assamite Sorcery"] = {
+					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 440
+
+
+Assamite Sorcery
+
+
+From a purely functional standpoint, the blood magic that the Assamite sorcerer caste practices differs little from that wielded by the Tremere. From a philosophical perspective, however, worlds of difference separate the two. The Tremere force every piece of knowledge they incorporate into the structured, rigid framework of high Hermetic invocation. By contrast, the sorcerer caste’s practices are the result of millennia of adaptation and melding, and are too disparate to be considered "structured" in any real sense. The modern body of knowledge that is Assamite Sorcery draws its content from a wide array of magical traditions, from the ecstatic rites of Kali and Shiva’s followers to the subtle precision of feng shui to the elegant symbolic and mathematical transformations of Islamic alchemists and astronomers.
+Assamite Sorcery is mechanically identical to the more common Thaumaturgy that appears on pp. 212-240. However, though they work on similar principles (the use of vampiric vitae to fuel exertions of conscious will in order to effect change upon the physical or spiritual world), the two are not cross-compatible. A Tremere strives to perform his magic the same way, all the time, every time. An Assamite might never enact the same ritual the same exact way twice in a millennium.
+As may be expected, students of Assamite Sorcery have great difficulty learning the practices of other blood magic traditions. All experience points costs to learn other blood magic paths and rituals are increased by half (round up) for Assamite sorcerers. In addition, even once the sorcerer has incorporated these lessons into her repertoire, they are still alien to her. All invocations of a "foreign" path require one extra blood point and all rituals take triple the normal time and require one extra success for any desired result.
+
+The sorcerers have equivalent teachings for many common blood magic techniques in addition to their own unique lessons. The following list is not an exhaustive coverage of everything in the Great Library, but it is a starting point for players and Storytellers who wish to determine the capabilities of Assamite sorcerers. Names in parentheses are the names that the sorcerer caste prefers to use for each item, if the Assamite name differs from the commonly accepted one. Paths marked with an asterisk are usually options for an Assamite sorcerer to learn as his primary path, provided his instructor approves.
+Paths: The Path of Blood, The Lure of Flames*, Movement of the Mind*, The Path of Conjuring, Hands of Destruction
+Rituals: Defense of the Sacred Haven (Curtain of Will), Wake with Evening’s Freshness (Black Sunrise), Communicate with Kindred Sire (Speak with Sire), Deflection of Wooden Doom (Turn the Impaling Shaft), Ward versus Ghouls, Principal Focus of Vitae Infusion (Draught of the Pebble), Incorporeal Passage (Passage of the Ghul), Bone of Lies (Stain of Guilt)]==],
+					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 440
+
+
+Assamite Sorcery
+
+
+De um ponto de vista puramente funcional, a magia de sangue que a casta de feiticeiros Assamita pratica difere pouco daquela empunhada pelos Tremere. De uma perspectiva filosófica, porém, mundos de diferença separam as duas. Os Tremere forçam cada fragmento de conhecimento que incorporam para dentro da estrutura rígida e sistemática da alta invocação Hermética. Em contraste, as práticas da casta de feiticeiros são fruto de milênios de adaptação e fusão, e são díspares demais para serem consideradas "estruturadas" em qualquer sentido real. O corpo moderno de conhecimento que é a Feitiçaria Assamita extrai seu conteúdo de um amplo leque de tradições mágicas, dos ritos extáticos dos seguidores de Kali e Shiva à precisão sutil do feng shui, até as elegantes transformações simbólicas e matemáticas dos alquimistas e astrônomos islâmicos.
+A Feitiçaria Assamita é mecanicamente idêntica à Taumaturgia mais comum que aparece nas pp. 212-240. Contudo, embora funcionem por princípios semelhantes (o uso de vitae vampírica para alimentar exercícios de vontade consciente a fim de efetuar mudança no mundo físico ou espiritual), as duas não são compatíveis entre si. Um Tremere se esforça para realizar sua magia da mesma maneira, o tempo todo, sempre. Um Assamita pode nunca executar o mesmo ritual exatamente da mesma forma duas vezes num milênio.
+Como se pode esperar, estudantes de Feitiçaria Assamita têm grande dificuldade em aprender as práticas de outras tradições de magia de sangue. Todos os custos em pontos de experiência para aprender outras trilhas e rituais de magia de sangue são aumentados pela metade (arredondando para cima) para feiticeiros Assamitas. Além disso, mesmo depois que a feiticeira incorpora essas lições ao seu repertório, elas continuam alheias a ela. Todas as invocações de uma trilha "estrangeira" exigem um ponto de sangue extra, e todos os rituais levam o triplo do tempo normal e exigem um sucesso extra para qualquer resultado desejado.
+
+Os feiticeiros têm ensinamentos equivalentes para muitas técnicas comuns de magia de sangue, além de suas próprias lições exclusivas. A lista a seguir não é uma cobertura exaustiva de tudo o que há na Grande Biblioteca, mas é um ponto de partida para jogadores e Narradores que queiram determinar as capacidades dos feiticeiros Assamitas. Nomes entre parênteses são os nomes que a casta de feiticeiros prefere usar para cada item, quando o nome Assamita difere do comumente aceito. Trilhas marcadas com asterisco costumam ser opções para um feiticeiro Assamita aprender como sua trilha principal, desde que seu instrutor aprove.
+Trilhas: The Path of Blood, The Lure of Flames*, Movement of the Mind*, The Path of Conjuring, Hands of Destruction
+Rituais: Defense of the Sacred Haven (Curtain of Will), Wake with Evening’s Freshness (Black Sunrise), Communicate with Kindred Sire (Speak with Sire), Deflection of Wooden Doom (Turn the Impaling Shaft), Ward versus Ghouls, Principal Focus of Vitae Infusion (Draught of the Pebble), Incorporeal Passage (Passage of the Ghul), Bone of Lies (Stain of Guilt)]==],
+				},
+				-- <<< DISC_DESC_END
+			};
+
+			local NO_SELECTION = {
+				en = "Pick the selector next to a discipline to read its description here.",
+				pt = "Marque o seletor ao lado de uma disciplina para ler a descrição dela aqui.",
+			};
+
+			local EMPTY_ROW = {
+				en = "That row is still empty. Choose a discipline in the list first.",
+				pt = "Essa linha ainda está vazia. Escolha uma disciplina na lista primeiro.",
+			};
+
+			local NO_ENTRY = {
+				en = "No description on file for: ",
+				pt = "Sem descrição registrada para: ",
+			};
+
+			local function pick(tbl, lang)
+				return tbl[lang] or tbl.en;
+			end;
+
+			local function discText(lang)
+				local selected = sheet.discSel;
+
+				if selected == nil or selected == "" then
+					return pick(NO_SELECTION, lang);
+				end;
+
+				-- `selected` is the FIELD NAME of the chosen row (SPEC V176), so the picked
+				-- discipline is one indirection away and changing a row keeps the selection valid.
+				local value = sheet[selected];
+
+				if value == nil or value == "" then
+					return pick(EMPTY_ROW, lang);
+				end;
+
+				local entry = DESC[value];
+
+				-- The name in the message is the one the ROW shows, so it goes through the era
+				-- and then through the language exactly as the picker item does (SPEC I22, T469).
+				-- Naming it by the raw canonical value would send the player looking for a line
+				-- that is not in the list above.
+				if entry == nil then
+					return pick(NO_ENTRY, lang) .. translateSheetText(eraName(value, currentTheme()), lang);
+				end;
+
+				return pick(entry, lang);
+			end;
+
+			function renderDiscDesc(form)
+				if sheet == nil then return; end;
+				form.edtDiscDesc.text = discText(sheet.language or "en");
+			end;
+		]]>
+	</script>
+
+	<!--
+		The theme backdrop lives HERE, not on the HH.11 shell: it belongs to the form that
+		carries content, and it is the only align="client" child of the container it sits in
+		(SPEC V56, V190). Putting it beside the tabControl instead is what blanked the sub-tabs
+		in the 51st round (SPEC B41).
+	-->
+	<scrollBox align="client">
+		<image name="themePaper12" align="client" style="stretch" hitTest="false" visible="false"/>
+
+		<!--
+			One row template for BOTH boxes (SPEC V178): clan slots and open slots offer the same
+			list, so a second copy would be a second list to keep in step. The radio sits at x=0,
+			the picker at x=25 and the first dot at x=190 - the columns HH.7 uses, so the rows of
+			the two boxes line up (SPEC V26, B12).
+
+			items/values carry only the empty first entry for now (SPEC V15); the disciplines
+			themselves arrive in SPEC T460, and nothing but items=/values= changes then.
+		-->
+		<template name="DiscRow">
+			<radioButton left="0" top="2" width="20" height="21" field="discSel" fieldValue="$(field)" groupName="discSel"/>
+			<comboBox left="25" top="0" width="170" height="25" fontSize="12" name="cbo$(field)" field="$(field)" items="{'', 'Abombwe', 'Abyss Mysticism', 'Animalism', 'Assamite Sorcery', 'Auspex', 'Bardo', 'Celerity', 'Chimerstry', 'Daimonion', 'Dark Thaumaturgy', 'Dementation', 'Dominate', 'Flight', 'Fortitude', 'Koldunic Sorcery', 'Melpominee', 'Mytherceria', 'Necromancy', 'Obeah', 'Obfuscate', 'Obtenebration', 'Ogham', 'Potence', 'Presence', 'Protean', 'Quietus', 'Sanguinus', 'Serpentis', 'Setite Sorcery', 'Spiritus', 'Temporis', 'Thanatosis', 'Thaumaturgy', 'Valeren', 'Vicissitude', 'Visceratika'}" values="{'', 'Abombwe', 'Abyss Mysticism', 'Animalism', 'Assamite Sorcery', 'Auspex', 'Bardo', 'Celerity', 'Chimerstry', 'Daimonion', 'Dark Thaumaturgy', 'Dementation', 'Dominate', 'Flight', 'Fortitude', 'Koldunic Sorcery', 'Melpominee', 'Mytherceria', 'Necromancy', 'Obeah', 'Obfuscate', 'Obtenebration', 'Ogham', 'Potence', 'Presence', 'Protean', 'Quietus', 'Sanguinus', 'Serpentis', 'Setite Sorcery', 'Spiritus', 'Temporis', 'Thanatosis', 'Thaumaturgy', 'Valeren', 'Vicissitude', 'Visceratika'}"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="250" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="275" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="300" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+		</template>
+
+		<!-- 4 slots, editable only while the storyteller ticks Edit Clan Disciplines (SPEC I8g,
+		     V175). Height = 25 title + 4 rows of 25 + 25 foot, the arithmetic HH.7 uses. -->
+		<layout left="0" top="0" width="350" height="150">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="350" height="20" text="CLAN DISCIPLINES" horzTextAlign="center"/>
+			<layout left="12" top="25" width="325" height="25">
+				<DiscRow field="clanDisc_1"/>
+			</layout>
+			<layout left="12" top="50" width="325" height="25">
+				<DiscRow field="clanDisc_2"/>
+			</layout>
+			<layout left="12" top="75" width="325" height="25">
+				<DiscRow field="clanDisc_3"/>
+			</layout>
+			<layout left="12" top="100" width="325" height="25">
+				<DiscRow field="clanDisc_4"/>
+			</layout>
+		</layout>
+
+		<!-- 15 open slots. 25 + 15*25 + 25 = 425. -->
+		<layout left="0" top="160" width="350" height="425">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="350" height="20" text="DISCIPLINES" horzTextAlign="center"/>
+			<layout left="12" top="25" width="325" height="25">
+				<DiscRow field="disc_1"/>
+			</layout>
+			<layout left="12" top="50" width="325" height="25">
+				<DiscRow field="disc_2"/>
+			</layout>
+			<layout left="12" top="75" width="325" height="25">
+				<DiscRow field="disc_3"/>
+			</layout>
+			<layout left="12" top="100" width="325" height="25">
+				<DiscRow field="disc_4"/>
+			</layout>
+			<layout left="12" top="125" width="325" height="25">
+				<DiscRow field="disc_5"/>
+			</layout>
+			<layout left="12" top="150" width="325" height="25">
+				<DiscRow field="disc_6"/>
+			</layout>
+			<layout left="12" top="175" width="325" height="25">
+				<DiscRow field="disc_7"/>
+			</layout>
+			<layout left="12" top="200" width="325" height="25">
+				<DiscRow field="disc_8"/>
+			</layout>
+			<layout left="12" top="225" width="325" height="25">
+				<DiscRow field="disc_9"/>
+			</layout>
+			<layout left="12" top="250" width="325" height="25">
+				<DiscRow field="disc_10"/>
+			</layout>
+			<layout left="12" top="275" width="325" height="25">
+				<DiscRow field="disc_11"/>
+			</layout>
+			<layout left="12" top="300" width="325" height="25">
+				<DiscRow field="disc_12"/>
+			</layout>
+			<layout left="12" top="325" width="325" height="25">
+				<DiscRow field="disc_13"/>
+			</layout>
+			<layout left="12" top="350" width="325" height="25">
+				<DiscRow field="disc_14"/>
+			</layout>
+			<layout left="12" top="375" width="325" height="25">
+				<DiscRow field="disc_15"/>
+			</layout>
+		</layout>
+
+		<!-- Read-only and field-less: book text must never be typed over, and never saved onto
+		     the character (SPEC V29, R12). Closes level with the left column at y=585. -->
+		<layout left="360" top="0" width="850" height="585">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtDiscDesc" left="10" top="25" width="830" height="550" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>
+		</layout>
+	</scrollBox>
+
+	<!-- Watches only what the renderer READS (SPEC V123): the selection, the 19 rows it points
+	     at, and the language the text comes out in. -->
+	<dataLink fields="{'language', 'discSel', 'clanDisc_1', 'clanDisc_2', 'clanDisc_3', 'clanDisc_4', 'disc_1', 'disc_2', 'disc_3', 'disc_4', 'disc_5', 'disc_6', 'disc_7', 'disc_8', 'disc_9', 'disc_10', 'disc_11', 'disc_12', 'disc_13', 'disc_14', 'disc_15'}" onChange="renderDiscDesc(self);"/>
+
+	<!-- The lock follows the storyteller's flag from HH.10, where it is owned (SPEC V95), so a
+	     tick made by another client at the table reaches this tab too (SPEC V175). -->
+	<dataLink field="stEditClanDisc" onChange="renderClanDiscLock(self);"/>
+
+	<event name="onNodeReady">
+		renderDiscDesc(self);
+		renderClanDiscLock(self);
+	</event>
+</form>

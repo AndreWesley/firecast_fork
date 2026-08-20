@@ -59,6 +59,669 @@
 			-- is a single space, not "": the sheet stores exactly what the box shows.
 			HEALTH_MARKS = {" ", "/", "X", "*"};
 
+			-- CLANS (SPEC I17). Dormant data: nothing reads it yet (SPEC V174), and the clan
+			-- combo on Main is invisible and disabled (SPEC V173). Frozen by SPEC T430 from the
+			-- core and Dark Ages; `open` counts slots the player fills from the whole list.
+			local CLANS = {
+				-- >>> CLANS_BEGIN (generated - SPEC T434, T430 froze the lists)
+				["Assamite"] = { fixed = {"Celerity", "Obfuscate", "Quietus"} },
+				["Brujah"] = { fixed = {"Celerity", "Potence", "Presence"} },
+				["Followers of Set"] = { fixed = {"Obfuscate", "Presence", "Serpentis"} },
+				["Gangrel"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
+				["Giovanni"] = { fixed = {"Dominate", "Necromancy", "Potence"} },
+				["Lasombra"] = { fixed = {"Dominate", "Obtenebration", "Potence"} },
+				["Malkavian"] = { fixed = {"Auspex", "Dementation", "Obfuscate"} },
+				["Nosferatu"] = { fixed = {"Animalism", "Obfuscate", "Potence"} },
+				["Ravnos"] = { fixed = {"Animalism", "Chimerstry", "Fortitude"} },
+				["Toreador"] = { fixed = {"Auspex", "Celerity", "Presence"} },
+				["Tremere"] = { fixed = {"Auspex", "Dominate", "Thaumaturgy"} },
+				["Tzimisce"] = { fixed = {"Animalism", "Auspex", "Vicissitude"} },
+				["Ventrue"] = { fixed = {"Dominate", "Fortitude", "Presence"} },
+				["Baali"] = { fixed = {"Daimonion", "Obfuscate", "Presence"} },
+				["Blood Brothers"] = { fixed = {"Fortitude", "Potence", "Sanguinus"} },
+				["Daughters of Cacophony"] = { fixed = {"Fortitude", "Melpominee", "Presence"} },
+				["Harbingers of Skulls"] = { fixed = {"Auspex", "Fortitude", "Necromancy"} },
+				["Kiasyd"] = { fixed = {"Dominate", "Mytherceria", "Obtenebration"} },
+				["Nagaraja"] = { fixed = {"Auspex", "Dominate", "Necromancy"} },
+				["Salubri"] = { fixed = {"Auspex", "Fortitude", "Obeah"} },
+				["Samedi"] = { fixed = {"Fortitude", "Obfuscate", "Thanatosis"} },
+				["True Brujah"] = { fixed = {"Potence", "Presence", "Temporis"} },
+				["Ahrimanes"] = { fixed = {"Animalism", "Presence", "Spiritus"} },
+				["Anda"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
+				["Cappadocians"] = { fixed = {"Auspex", "Fortitude", "Necromancy"} },
+				["Lamia"] = { fixed = {"Fortitude", "Necromancy", "Potence"} },
+				["Lhiannan"] = { fixed = {"Animalism", "Ogham", "Presence"} },
+				["Noiad"] = { fixed = {"Animalism", "Auspex", "Protean"} },
+				["Assamite Antitribu"] = { fixed = {"Celerity", "Obfuscate", "Quietus"} },
+				["Brujah Antitribu"] = { fixed = {"Celerity", "Potence", "Presence"} },
+				["City Gangrel"] = { fixed = {"Celerity", "Obfuscate", "Protean"} },
+				["Country Gangrel"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
+				["Malkavian Antitribu"] = { fixed = {"Auspex", "Dementation", "Obfuscate"} },
+				["Nosferatu Antitribu"] = { fixed = {"Animalism", "Obfuscate", "Potence"} },
+				["Ravnos Antitribu"] = { fixed = {"Animalism", "Chimerstry", "Fortitude"} },
+				["Salubri Antitribu"] = { fixed = {"Auspex", "Fortitude", "Valeren"} },
+				["Serpents of the Light"] = { fixed = {"Presence", "Obfuscate", "Serpentis"} },
+				["Toreador Antitribu"] = { fixed = {"Auspex", "Celerity", "Presence"} },
+				["Tremere Antitribu"] = { fixed = {"Auspex", "Dominate", "Thaumaturgy"} },
+				["Assamite Sorcerers"] = { fixed = {"Assamite Sorcery", "Obfuscate", "Quietus"} },
+				["Assamite Viziers"] = { fixed = {"Auspex", "Celerity", "Quietus"} },
+				["Daitya"] = { fixed = {"Presence", "Obfuscate", "Serpentis"} },
+				["Tlacique"] = { fixed = {"Obfuscate", "Presence", "Protean"} },
+				["Warrior Setites"] = { fixed = {"Potence", "Presence", "Serpentis"} },
+				["Mariners"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
+				["Lasombra Antitribu"] = { fixed = {"Dominate", "Obtenebration", "Potence"} },
+				["Dominate Malkavians"] = { fixed = {"Auspex", "Dominate", "Obfuscate"} },
+				["Brahman"] = { fixed = {"Animalism", "Auspex", "Chimerstry"} },
+				["Telyavelic Tremere"] = { fixed = {"Auspex", "Presence", "Thaumaturgy"} },
+				["Old Clan Tzimisce"] = { fixed = {"Animalism", "Auspex", "Dominate"} },
+				["Gargoyles (Modern)"]   = { fixed = {"Flight", "Fortitude", "Potence", "Visceratika"} },
+				["Gargoyles (Scout)"]    = { fixed = {"Auspex", "Obfuscate", "Flight"} },
+				["Gargoyles (Sentinel)"] = { fixed = {"Flight", "Potence", "Fortitude"} },
+				["Gargoyles (Warrior)"]  = { fixed = {"Flight", "Fortitude", "Protean"} },
+				["Ventrue Antitribu"] = { fixed = {"Dominate", "Fortitude"}, choice = {"Auspex", "Presence"} },
+				["Wu Zao"]            = { fixed = {"Auspex", "Fortitude"}, choice = {"Obeah", "Valeren"} },
+				["Angellis Ater"]     = { fixed = {"Daimonion", "Dominate"}, choice = {"Potence", "Presence", "Obfuscate"} },
+				["Maeghar"]            = { choice = {"Mytherceria", "Necromancy"}, open = 2 },
+				["Panders"]            = { open = 3 },
+				["Children of Osiris"] = { open = 3 },
+				-- <<< CLANS_END
+			};
+
+			-- BLOOD_SORCERY (SPEC I18), RITUAL_DISC (SPEC I19) and ADVANCED_DISC. Dormant like
+			-- CLANS above: no reader yet. The pickers get their items in SPEC T460, the guards
+			-- arrive in T439/T440, and nothing reads ADVANCED_DISC at all - it is banked for a
+			-- later round (user, 57th) and deliberately changes NOTHING on the sheet.
+			--
+			-- Membership in "blood sorcery" is DERIVED, never listed (SPEC V191): a Discipline is one
+			-- iff it owns a path here or a ritual below. That lands on the seven SPEC R87 froze -
+			-- Dark Thaumaturgy by paths alone, Abyss Mysticism by rituals alone (its MAIN PATHS box
+			-- stays empty, which is the case SPEC I19 predicted).
+			--
+			-- Path names are the MODERN spelling wherever the same path exists in both eras, because
+			-- the value is what gets saved and the era only changes the display (SPEC V24, I22). So
+			-- Lure of Flames, not Creatio Ignis; The Way of the Spirit, not Genius Loci. The two
+			-- Dark-Ages-only Thaumaturgy paths keep their Latin names - nothing modern to defer to.
+			--
+			-- A ritual can have MORE THAN ONE owner (user, 57th round), so every RITUAL_DISC value is
+			-- a LIST even when it holds one name - one shape, so a reader never type-checks. Thirteen
+			-- of the 284 carry two: the eight the core (p. 440) hands Assamite Sorcery under its own
+			-- names, the four the Dark Ages files under Assamite and Setite clan rituals, and
+			-- Mirror of Blood, which Rites of Blood prints as "Thaumaturgy or Koldunic". A ritual with
+			-- two owners is offered under both, which is what the books mean by listing it twice.
+			--
+			-- Ritual levels run 1..9, not 1..5. Abyss Mysticism is the only Discipline that goes past
+			-- five (Dark Ages pp. 273-274 and Tome of Secrets p. 38), and it does so because its
+			-- rituals ARE its power ladder - it has no paths to spend the dots on.
+			--
+			-- ADVANCED_DISC is the sixth-to-ninth dot of a Discipline: elder powers, one entry per
+			-- power as {level, name}, from the core Disciplines chapter plus its bloodline chapter
+			-- and from Dark Ages p. 188 onward. Levels 6..9 by definition - the fifth dot and below
+			-- is the ordinary ladder and is not repeated here. The sheet still draws five dots per
+			-- Discipline row; this table does not ask it to draw more.
+			local BLOOD_SORCERY = {
+				-- >>> BLOOD_SORCERY_BEGIN (generated - SPEC T435)
+				["Thaumaturgy"] = {
+					"The Path of Blood", "Elemental Mastery", "The Green Path",
+					"Hands of Destruction", "Lure of Flames", "Neptune’s Might",
+					"Path of Conjuring", "Movement of the Mind", "Path of Corruption",
+					"Path of Mars", "Path of Technomancy", "Path of the Father’s Vengeance",
+					"Weather Control", "Mastery of the Mortal Shell", "Path of the Focused Mind",
+					"Path of the Levinbolt", "Path of Spirit Manipulation", "The Blessings of the Great Dark Mother",
+					"Iter Pernix", "Potestas Exsecrabilis",
+				},
+				["Necromancy"] = {
+					"Sepulchre Path", "Ash Path", "Bone Path",
+					"Cenotaph Path", "Corpse in the Monster", "Grave’s Decay",
+					"Vitreous Path", "Path of Haunting", "The Path of the Twilight Garden",
+					"The Path of Skulls", "The Path of Woe", "The Nightshade Path",
+				},
+				["Koldunic Sorcery"] = {
+					"The Way of the Spirit", "The Way of Sorrows", "The Transylvanian Kraina",
+					"The Black Sea Kraina", "The Bialowieza Kraina", "The Kraina of Enoch",
+					"The Kraina of the Well", "The Way of Earth", "The Way of Wind",
+					"The Way of Water", "The Way of Fire",
+				},
+				["Assamite Sorcery"] = {
+					"The Keeper’s Way", "The Hunter’s Winds", "The Path of the Evil Eye",
+					"Awakening of the Steel", "The Path of Life’s Waters", "The Path of Jinn’s Gift",
+					"The Path of the Ailing Jackal", "The Hand of the Magi", "The Covenant of Enki",
+					"The Laws of Suleiman", "Movement of the Mind", "Hands of Destruction",
+				},
+				["Setite Sorcery"] = {
+					"The Revelations of Duat", "The Revelations of Eden", "The Revelations of Midgard",
+					"Ushabti", "The Path of Praapti", "The Flow of Ashe",
+				},
+				["Dark Thaumaturgy"] = {
+					"Die Herrschaft des Wyrm", "Rego Calatio", "The Fires of the Inferno",
+					"The Path of Phobos", "The Taking of the Spirit",
+				},
+				-- <<< BLOOD_SORCERY_END
+			};
+
+			local RITUAL_DISC = {
+				-- >>> RITUAL_DISC_BEGIN (generated - SPEC T435)
+				-- Abyss Mysticism (34)
+				["1. Eyes of the Abyss"] = {"Abyss Mysticism"},
+				["1. Light within Shadow"] = {"Abyss Mysticism"},
+				["1. Locating the Oubliette"] = {"Abyss Mysticism"},
+				["1. Pierce the Veil"] = {"Abyss Mysticism"},
+				["1. The Abyss Knows"] = {"Abyss Mysticism"},
+				["1. Weight of Shadows"] = {"Abyss Mysticism"},
+				["2. Abyssal Blade"] = {"Abyss Mysticism"},
+				["2. Comforting Darkness"] = {"Abyss Mysticism"},
+				["2. Feed the Darkness"] = {"Abyss Mysticism"},
+				["2. Implant the Bezoar"] = {"Abyss Mysticism"},
+				["2. Subsume the Darkness"] = {"Abyss Mysticism"},
+				["3. Abyssal Threads"] = {"Abyss Mysticism"},
+				["3. Angra Mainyu Consumes Spenta Mainyu"] = {"Abyss Mysticism"},
+				["3. Balthazar’s Revelation"] = {"Abyss Mysticism"},
+				["3. Calling the Hungry Shade"] = {"Abyss Mysticism"},
+				["3. Claiming the Dark"] = {"Abyss Mysticism"},
+				["3. One with the Dark"] = {"Abyss Mysticism"},
+				["3. Summoning the Blatherskites"] = {"Abyss Mysticism"},
+				["3. The Third Eye of Rickard Argentis"] = {"Abyss Mysticism"},
+				["4. Boukephos’ Gateway"] = {"Abyss Mysticism"},
+				["4. Lord Aludian’s Orifices"] = {"Abyss Mysticism"},
+				["4. Maw of Ahriman"] = {"Abyss Mysticism"},
+				["4. Reflections of Hollow Revelation"] = {"Abyss Mysticism"},
+				["4. Vision of Shadow"] = {"Abyss Mysticism"},
+				["5. Ahriman’s Wight"] = {"Abyss Mysticism"},
+				["5. Beckon the Ingurgitant"] = {"Abyss Mysticism"},
+				["5. Commune with the Abyss"] = {"Abyss Mysticism"},
+				["5. Rickard Argentis’s Homunculus"] = {"Abyss Mysticism"},
+				["5. Whispers in the Dark"] = {"Abyss Mysticism"},
+				["6. Into the Chasm"] = {"Abyss Mysticism"},
+				["7. Evocation of the Oubliette"] = {"Abyss Mysticism"},
+				["8. Cry That Slays the Light"] = {"Abyss Mysticism"},
+				["8. Lord Aludian’s Claim"] = {"Abyss Mysticism"},
+				["9. Boukephos’ Chosen Oubliette"] = {"Abyss Mysticism"},
+
+				-- Assamite Sorcery (21)
+				["1. Horoscope"] = {"Assamite Sorcery"},
+				["1. Rite of Reclamation"] = {"Assamite Sorcery"},
+				["1. Ritual of Return"] = {"Assamite Sorcery"},
+				["1. Strength of Haqim"] = {"Assamite Sorcery"},
+				["1. Tame the Maddening Flame"] = {"Assamite Sorcery"},
+				["2. Banning Rituals"] = {"Assamite Sorcery"},
+				["2. Blade of Smoke and Shadow"] = {"Assamite Sorcery"},
+				["2. Blood Calls to Blood"] = {"Assamite Sorcery"},
+				["2. Infusion of Kalif"] = {"Assamite Sorcery"},
+				["3. A Shield of Mirror"] = {"Assamite Sorcery"},
+				["3. Blood and Bane"] = {"Assamite Sorcery"},
+				["3. Bound by Oath"] = {"Assamite Sorcery"},
+				["3. Bull of Heaven"] = {"Assamite Sorcery"},
+				["3. Strength in Wisdom"] = {"Assamite Sorcery"},
+				["3. Wield the Spear of Damnation"] = {"Assamite Sorcery"},
+				["4. Directing Ahriman’s Lance"] = {"Assamite Sorcery"},
+				["4. Rebirth in the Light of Haqim"] = {"Assamite Sorcery"},
+				["5. From Marduk’s Throat"] = {"Assamite Sorcery"},
+				["5. Occlude the Western Road"] = {"Assamite Sorcery"},
+				["5. Ravening Walls of Ceoris"] = {"Assamite Sorcery"},
+				["5. Seeing With the Sky’s Eyes"] = {"Assamite Sorcery"},
+
+				-- Koldunic Sorcery (20)
+				["1. Drinking Death"] = {"Koldunic Sorcery"},
+				["1. Master of the Domain"] = {"Koldunic Sorcery"},
+				["1. Reawakening the Dead Water"] = {"Koldunic Sorcery"},
+				["1. Servitor’s Perception"] = {"Koldunic Sorcery"},
+				["1. Treasured Ornaments"] = {"Koldunic Sorcery"},
+				["1. Truth in Water"] = {"Koldunic Sorcery"},
+				["1. Unnatural Decay"] = {"Koldunic Sorcery"},
+				["2. Autumn’s Armor"] = {"Koldunic Sorcery"},
+				["2. Borne by Wind"] = {"Koldunic Sorcery"},
+				["2. Concentrated Vitae"] = {"Koldunic Sorcery"},
+				["2. Eyes of the Dead"] = {"Koldunic Sorcery"},
+				["2. Invoke the Lesser Sign of Power"] = {"Koldunic Sorcery"},
+				["3. Animate Curios"] = {"Koldunic Sorcery"},
+				["3. Cowing the Servant"] = {"Koldunic Sorcery"},
+				["3. One with the Forest"] = {"Koldunic Sorcery"},
+				["3. The Floating Dead"] = {"Koldunic Sorcery"},
+				["4. Evoke the Storm"] = {"Koldunic Sorcery"},
+				["4. Scrying Pool"] = {"Koldunic Sorcery"},
+				["4. Ties That Bind"] = {"Koldunic Sorcery"},
+				["5. The Inmost Tug"] = {"Koldunic Sorcery"},
+
+				-- Necromancy (53)
+				["1. Call of the Hungry Dead"] = {"Necromancy"},
+				["1. Death’s Communion"] = {"Necromancy"},
+				["1. Eldritch Beacon"] = {"Necromancy"},
+				["1. Final Sight"] = {"Necromancy"},
+				["1. Foxfire"] = {"Necromancy"},
+				["1. Insight"] = {"Necromancy"},
+				["1. Knowing Stone"] = {"Necromancy"},
+				["1. Memento Mori"] = {"Necromancy"},
+				["1. Minestra di Morte"] = {"Necromancy"},
+				["1. Preserve Corpse"] = {"Necromancy"},
+				["1. Ritual of the Smoking Mirror"] = {"Necromancy"},
+				["1. Shew-Stone"] = {"Necromancy"},
+				["1. Word of Insight"] = {"Necromancy"},
+				["2. Antonius’s Denial"] = {"Necromancy"},
+				["2. Draining the Well of Life"] = {"Necromancy"},
+				["2. Eyes of the Grave"] = {"Necromancy"},
+				["2. Generation of the Acheron Vortex"] = {"Necromancy"},
+				["2. Haunting Breeze"] = {"Necromancy"},
+				["2. Occhio d’Uomo Morto"] = {"Necromancy"},
+				["2. Parting the Veil"] = {"Necromancy"},
+				["2. Prepare the Vessel"] = {"Necromancy"},
+				["2. Puppet"] = {"Necromancy"},
+				["2. Thanatos’ Caress"] = {"Necromancy"},
+				["2. The Hand of Glory"] = {"Necromancy"},
+				["2. The Ritual of Pochtli"] = {"Necromancy"},
+				["2. Totenpass"] = {"Necromancy"},
+				["2. Two Centimes"] = {"Necromancy"},
+				["2. Witch Eye"] = {"Necromancy"},
+				["3. Blood Dance"] = {"Necromancy"},
+				["3. Death’s Head"] = {"Necromancy"},
+				["3. Din of the Damned"] = {"Necromancy"},
+				["3. Divine Sign"] = {"Necromancy"},
+				["3. Nightmare Drums"] = {"Necromancy"},
+				["3. Ritual of The Unearthed Fetter"] = {"Necromancy"},
+				["3. Tempest Prison"] = {"Necromancy"},
+				["3. Tempesta Scudo"] = {"Necromancy"},
+				["4. Baleful Doll"] = {"Necromancy"},
+				["4. Bastone Diabolico"] = {"Necromancy"},
+				["4. Cadaver’s Touch"] = {"Necromancy"},
+				["4. Impregnable Soul"] = {"Necromancy"},
+				["4. Peek Past the Shroud"] = {"Necromancy"},
+				["4. Point of the Needle"] = {"Necromancy"},
+				["4. Ritual of Xipe Totec"] = {"Necromancy"},
+				["4. Summon Ethereal Horde"] = {"Necromancy"},
+				["4. Vision of St. Anthony"] = {"Necromancy"},
+				["5. Chill of Oblivion"] = {"Necromancy"},
+				["5. Dead Man’s Hand"] = {"Necromancy"},
+				["5. Enochian Passage"] = {"Necromancy"},
+				["5. Esilio"] = {"Necromancy"},
+				["5. Grasp the Ghostly"] = {"Necromancy"},
+				["5. Orphic Sojourn"] = {"Necromancy"},
+				["5. The Ferryman’s Recall"] = {"Necromancy"},
+				["5. Treasures of Hades"] = {"Necromancy"},
+
+				-- Setite Sorcery (10)
+				["1. Armor of Diamond Serenity"] = {"Setite Sorcery"},
+				["1. The Word of the Dark God"] = {"Setite Sorcery"},
+				["1. Typhon’s Brew"] = {"Setite Sorcery"},
+				["2. Craft Gris-Gris"] = {"Setite Sorcery"},
+				["2. To Lace with Hidden Nectar"] = {"Setite Sorcery"},
+				["3. Rings Like Chains"] = {"Setite Sorcery"},
+				["3. Scorpion Sending"] = {"Setite Sorcery"},
+				["4. Dismemberment of Osiris"] = {"Setite Sorcery"},
+				["5. Creation of the Shabti"] = {"Setite Sorcery"},
+				["5. Shackles of Blood"] = {"Setite Sorcery"},
+
+				-- Thaumaturgy (146)
+				["1. Ambrus Kelemen’s Aegis"] = {"Thaumaturgy"},
+				["1. Bind the Accusing Tongue"] = {"Thaumaturgy"},
+				["1. Blood Mastery"] = {"Thaumaturgy"},
+				["1. Blood Rush"] = {"Thaumaturgy"},
+				["1. Blood into Water"] = {"Thaumaturgy"},
+				["1. Brand"] = {"Thaumaturgy"},
+				["1. CCTV"] = {"Thaumaturgy"},
+				["1. Calling Card"] = {"Thaumaturgy"},
+				["1. Chime of Unseen Spirits"] = {"Thaumaturgy"},
+				["1. Communicate with Kindred Sire"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["1. Defense of the Sacred Haven"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["1. Deflection of Wooden Doom"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["1. Devil’s Touch"] = {"Thaumaturgy"},
+				["1. Domino of Life"] = {"Thaumaturgy"},
+				["1. Encrypt Missive"] = {"Thaumaturgy"},
+				["1. Engaging the Vessel of Transference"] = {"Thaumaturgy"},
+				["1. Flatline"] = {"Thaumaturgy"},
+				["1. Illuminate the Trail of Prey"] = {"Thaumaturgy"},
+				["1. Impressive Visage"] = {"Thaumaturgy"},
+				["1. Incantation of the Shepherd"] = {"Thaumaturgy"},
+				["1. Learning the Mind Enslumbered"] = {"Thaumaturgy"},
+				["1. Purify Blood"] = {"Thaumaturgy"},
+				["1. Purity of Flesh"] = {"Thaumaturgy"},
+				["1. Rite of Introduction"] = {"Thaumaturgy"},
+				["1. Sanctify the Temple"] = {"Thaumaturgy"},
+				["1. Sanguineous Phial"] = {"Thaumaturgy"},
+				["1. Sense the Mystical"] = {"Thaumaturgy"},
+				["1. Sigil of Authority"] = {"Thaumaturgy"},
+				["1. Wake with Evening’s Freshness"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["1. Water Walking"] = {"Thaumaturgy"},
+				["1. Widow’s Spite"] = {"Thaumaturgy"},
+				["2. Ascension of the Blood"] = {"Thaumaturgy"},
+				["2. Beat Your Way to Glory"] = {"Thaumaturgy"},
+				["2. Blood Crystal"] = {"Thaumaturgy"},
+				["2. Blood Walk"] = {"Thaumaturgy"},
+				["2. Burning Blade"] = {"Thaumaturgy"},
+				["2. Commune with Cainite"] = {"Thaumaturgy"},
+				["2. Craft Bloodstone"] = {"Thaumaturgy"},
+				["2. Donning the Mask of Shadows"] = {"Thaumaturgy"},
+				["2. Extinguish"] = {"Thaumaturgy"},
+				["2. Eyes of Babel"] = {"Thaumaturgy"},
+				["2. Eyes of the Night Hawk"] = {"Thaumaturgy"},
+				["2. Flaming Weapon"] = {"Thaumaturgy"},
+				["2. Haruspicy"] = {"Thaumaturgy"},
+				["2. Hidden Haven"] = {"Thaumaturgy"},
+				["2. Illusion of Peaceful Death"] = {"Thaumaturgy"},
+				["2. Iron Body"] = {"Thaumaturgy"},
+				["2. Machine Blitz"] = {"Thaumaturgy"},
+				["2. Oinos of Dionysus"] = {"Thaumaturgy"},
+				["2. Preserve"] = {"Thaumaturgy"},
+				["2. Principal Focus of Vitae Infusion"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["2. Recure of the Homeland"] = {"Thaumaturgy"},
+				["2. Seal Egress"] = {"Thaumaturgy"},
+				["2. Self-Executing File"] = {"Thaumaturgy"},
+				["2. Summon Guardian Spirit"] = {"Thaumaturgy"},
+				["2. The Jinx"] = {"Thaumaturgy"},
+				["2. Ward"] = {"Thaumaturgy"},
+				["2. Ward Versus Ghouls"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["2. Warding Circle versus Ghouls"] = {"Thaumaturgy"},
+				["2. Whispers of the Ghost"] = {"Thaumaturgy"},
+				["2. Witness of Whispers"] = {"Thaumaturgy"},
+				["3. A Touch of Nightshade"] = {"Thaumaturgy"},
+				["3. Amulet of Mnemosyne"] = {"Thaumaturgy"},
+				["3. Animated Assistants"] = {"Thaumaturgy"},
+				["3. BFU"] = {"Thaumaturgy"},
+				["3. Bind the Familiar"] = {"Thaumaturgy"},
+				["3. Brotherhood of the Cup"] = {"Thaumaturgy"},
+				["3. Clinging of the Insect"] = {"Thaumaturgy"},
+				["3. Craft Dream Catcher"] = {"Thaumaturgy"},
+				["3. Dante’s Urban Legend"] = {"Thaumaturgy"},
+				["3. Displacement of the Pneuma"] = {"Thaumaturgy", "Setite Sorcery"},
+				["3. Enfolding the Believers"] = {"Thaumaturgy"},
+				["3. Father’s Freedom"] = {"Thaumaturgy"},
+				["3. Flesh of Fiery Touch"] = {"Thaumaturgy"},
+				["3. Hell’s Calling"] = {"Thaumaturgy"},
+				["3. Incorporeal Passage"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["3. Inscription"] = {"Thaumaturgy"},
+				["3. Mirror of Second Sight"] = {"Thaumaturgy"},
+				["3. Pavis of Foul Presence"] = {"Thaumaturgy"},
+				["3. Rutor’s Hands"] = {"Thaumaturgy"},
+				["3. Samira’s Kihanah"] = {"Thaumaturgy"},
+				["3. Sanguine Assistant"] = {"Thaumaturgy"},
+				["3. Sanguine Trail"] = {"Thaumaturgy"},
+				["3. Scry the Hearthstone"] = {"Thaumaturgy"},
+				["3. Shaft of Belated Quiescence"] = {"Thaumaturgy"},
+				["3. Soul of the Homunculus"] = {"Thaumaturgy"},
+				["3. Telecommunication"] = {"Thaumaturgy"},
+				["3. The Bottled Voice"] = {"Thaumaturgy"},
+				["3. Translocation of the Vessel"] = {"Thaumaturgy"},
+				["3. Transubstantiation of Seven"] = {"Thaumaturgy"},
+				["3. Ward of the Winged Sepulcher"] = {"Thaumaturgy"},
+				["3. Ward versus Lupines"] = {"Thaumaturgy"},
+				["3. Warding Circle versus Lupines"] = {"Thaumaturgy"},
+				["4. Animated Weapon"] = {"Thaumaturgy"},
+				["4. Baron Zaraguin’s Sting"] = {"Thaumaturgy"},
+				["4. Bone of Lies"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["4. Candle of Haunting"] = {"Thaumaturgy"},
+				["4. Firewalker"] = {"Thaumaturgy"},
+				["4. Heart of Stone"] = {"Thaumaturgy"},
+				["4. Houngan’s Doll"] = {"Thaumaturgy"},
+				["4. Infirm Inert"] = {"Thaumaturgy"},
+				["4. Innocence of the Child’s Heart"] = {"Thaumaturgy"},
+				["4. Invisible Chains of Binding"] = {"Thaumaturgy"},
+				["4. Mirror Walk"] = {"Thaumaturgy"},
+				["4. Non-Disclosure Clause"] = {"Thaumaturgy"},
+				["4. Preservation of the Sanguine Heart"] = {"Thaumaturgy"},
+				["4. Return of the Heart"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["4. Scry"] = {"Thaumaturgy"},
+				["4. Splinter Servant"] = {"Thaumaturgy"},
+				["4. Stolen Kisses"] = {"Thaumaturgy"},
+				["4. Summon the Blood Imp"] = {"Thaumaturgy"},
+				["4. The Curse Belated"] = {"Thaumaturgy"},
+				["4. Track Transgressor"] = {"Thaumaturgy"},
+				["4. Transcending Barriers Through Love"] = {"Thaumaturgy"},
+				["4. Unweave Ritual"] = {"Thaumaturgy"},
+				["4. Vigil of the Stone Guardian"] = {"Thaumaturgy"},
+				["4. Ward versus Kindred"] = {"Thaumaturgy"},
+				["4. Ward versus Vitae"] = {"Thaumaturgy"},
+				["4. Warding Circle versus Kindred"] = {"Thaumaturgy"},
+				["5. Abandon the Fetters"] = {"Thaumaturgy"},
+				["5. Asymmetrical Reproduction"] = {"Thaumaturgy"},
+				["5. At Our Command It Breathes"] = {"Thaumaturgy"},
+				["5. Blood Contract"] = {"Thaumaturgy"},
+				["5. Bloody Mary"] = {"Thaumaturgy"},
+				["5. Cheat the Scale of Hades"] = {"Thaumaturgy", "Setite Sorcery"},
+				["5. Cobra’s Favor"] = {"Thaumaturgy"},
+				["5. Court of Hallowed Truth"] = {"Thaumaturgy"},
+				["5. Dedicate the Haven"] = {"Thaumaturgy"},
+				["5. Enchant Talisman"] = {"Thaumaturgy"},
+				["5. Escape to a True Friend"] = {"Thaumaturgy"},
+				["5. Ghost in the System"] = {"Thaumaturgy"},
+				["5. Mirror Prison"] = {"Thaumaturgy"},
+				["5. Mirror of Blood"] = {"Thaumaturgy", "Koldunic Sorcery"},
+				["5. Nectar of the Bitter Rose"] = {"Thaumaturgy"},
+				["5. Paper Flesh"] = {"Thaumaturgy"},
+				["5. Rite of Marduk Slain and Risen"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["5. Sanctuary"] = {"Thaumaturgy"},
+				["5. Severed Hand"] = {"Thaumaturgy"},
+				["5. Skinwalker’s Belt"] = {"Thaumaturgy"},
+				["5. Stone Slumber"] = {"Thaumaturgy"},
+				["5. Stone of the True Form"] = {"Thaumaturgy"},
+				["5. The Pursuit of Apotheosis"] = {"Thaumaturgy"},
+				["5. Ward versus Spirits"] = {"Thaumaturgy"},
+				["5. Warding Circle versus Technology"] = {"Thaumaturgy"},
+				["5. Warding Circles versus Spirits, Ghosts, and Demons"] = {"Thaumaturgy"},
+				["5. Way of the Wendigo"] = {"Thaumaturgy"},
+				-- <<< RITUAL_DISC_END
+			};
+
+			local ADVANCED_DISC = {
+				-- >>> ADVANCED_DISC_BEGIN (generated - SPEC T435)
+				["Abombwe"] = {
+					{6, "Incarnate Darkness"},
+				},
+				["Animalism"] = {
+					{6, "Animal Succulence"}, {6, "Shared Soul"},
+					{6, "Species Speech"}, {6, "The Tongue of Beasts"},
+					{6, "The Twin Souls"}, {7, "Beast Shard"},
+					{7, "Conquer the Beast"}, {7, "The Devil’s Claws"},
+					{8, "Taunt the Caged Beast"}, {8, "The Beast’s Quills"},
+					{9, "Plague of Beasts"}, {9, "Unchain the Beast"},
+				},
+				["Auspex"] = {
+					{6, "Clairvoyance"}, {6, "Far Sense"},
+					{6, "Prediction"}, {6, "Soul Bond"},
+					{6, "Telepathic Communication"}, {6, "The Heart’s Desire"},
+					{7, "A Gathering of Souls"}, {7, "Anticipate Victory"},
+					{7, "Brutal Ecstasy"}, {7, "Karmic Sight"},
+					{7, "Mirror Reflex"}, {8, "Omniscience"},
+					{8, "Psychic Assault"}, {8, "Soul’s Sword"},
+					{9, "False Slumber"},
+				},
+				["Bardo"] = {
+					{6, "Boon of Anubis"}, {7, "Bring Forth the Dawn"},
+					{8, "Mummification"}, {9, "Ra’s Blessing"},
+				},
+				["Celerity"] = {
+					{6, "Momentum"}, {6, "Precision"},
+					{6, "Projectile"}, {7, "Flower of Death"},
+					{7, "Quickness"}, {8, "Physical Defiance"},
+					{8, "Time Out of Time"}, {8, "Zephyr"},
+				},
+				["Chimerstry"] = {
+					{6, "False Resonance"}, {6, "Fatuus Mastery"},
+					{6, "Shared Nightmare"}, {7, "Blade of the Demons"},
+					{7, "Far Fatuus"}, {7, "Interrupt Reality"},
+					{7, "Suspension of Disbelief"}, {8, "Synesthesia"},
+					{8, "Visions from the Asura"}, {9, "Fabrication"},
+					{9, "Mayaparisatya"},
+				},
+				["Daimonion"] = {
+					{6, "Concordance"}, {6, "Hell-Born Investiture"},
+					{6, "Lure Diabolik"}, {7, "Bring the Plague"},
+					{7, "Demonic Servitor"}, {7, "Summon the Herald of Topheth"},
+					{8, "Adramelech’s Wrath"}, {8, "Call Forth the Herald of Hell"},
+					{8, "Contagion"}, {9, "Call the Great Beast"},
+					{9, "Spew Wide the Pit"},
+				},
+				["Dementation"] = {
+					{6, "Lingering Malaise"}, {6, "Shattered Mirror"},
+					{6, "Stain the Soul"}, {6, "The Call"},
+					{7, "Cobble the Road"}, {7, "Restructure"},
+					{7, "The Sword of Malkav"}, {8, "Personal Scourge"},
+					{8, "Prison of the Mind"}, {9, "Brother’s Gift"},
+					{9, "Lunatic Eruption"},
+				},
+				["Dominate"] = {
+					{6, "Chain the Psyche"}, {6, "Loyalty"},
+					{6, "Obedience"}, {7, "Mass Manipulation"},
+					{7, "Still the Mortal Flesh"}, {8, "Far Mastery"},
+					{9, "Speak Through the Blood"},
+				},
+				["Fortitude"] = {
+					{6, "Personal Armor"}, {6, "The Knight’s Bane"},
+					{7, "Shared Strength"}, {7, "The Blessing of Vitality"},
+					{8, "Adamantine"}, {8, "Armored Flesh"},
+				},
+				["Melpominee"] = {
+					{6, "Shattering Crescendo"}, {7, "Persistent Echo"},
+				},
+				["Mytherceria"] = {
+					{6, "Steal the Mind"}, {7, "Absorb the Mind"},
+					{8, "The Grandest Trick"},
+				},
+				["Obeah"] = {
+					{6, "Unburdening the Bestial Soul"}, {7, "Renewed Vigor"},
+					{8, "Safe Passage"}, {9, "Unburden the Flesh-Clad Soul"},
+				},
+				["Obfuscate"] = {
+					{6, "Conceal"}, {6, "Mask the Devil"},
+					{6, "Mind Blank"}, {6, "Soul Mask"},
+					{7, "Cache"}, {7, "Fortress of Silence"},
+					{7, "Veil of Blissful Ignorance"}, {8, "Old Friend"},
+					{8, "Reaper of the Heart"}, {9, "Create Name"},
+					{9, "Obscure God’s Creation"},
+				},
+				["Obtenebration"] = {
+					{6, "Shadowstep"}, {6, "The Darkness Within"},
+					{6, "Walk the Abyss"}, {7, "Shadow Twin"},
+					{8, "Oubliette"}, {9, "Ahriman’s Demesne"},
+				},
+				["Ogham"] = {
+					{6, "Inscribe the Forgotten Names"},
+				},
+				["Potence"] = {
+					{6, "Crush"}, {6, "Imprint"},
+					{7, "Brutality"}, {7, "Earthshock"},
+					{8, "Aftershock"}, {8, "Flick"},
+				},
+				["Presence"] = {
+					{6, "Kingmaker"}, {6, "Love"},
+					{6, "Paralyzing Glance"}, {6, "Spark of Rage"},
+					{7, "Cooperation"}, {8, "Ironclad Command"},
+					{9, "Pulse of the City"}, {9, "Pulse of the People"},
+				},
+				["Protean"] = {
+					{6, "Adaptation"}, {6, "Earth Control"},
+					{6, "Ephemeral Slumber"}, {6, "Flesh of Marble"},
+					{6, "Loki’s Gift"}, {6, "Reversion to the True Form"},
+					{7, "Death’s Hidden Crawl"}, {7, "Restore the Mortal Visage"},
+					{7, "Shape of the Beast’s Wrath"}, {7, "Spectral Body"},
+					{8, "Purify the Impaled Beast"}, {8, "Purify the Impaled Breast"},
+					{9, "Draught of Phoenix Blood"}, {9, "Inward Focus"},
+				},
+				["Quietus"] = {
+					{6, "Blood Awakening"}, {6, "Blood Sweat"},
+					{6, "Purification"}, {6, "Ripples of the Heart"},
+					{6, "Selective Silence"}, {6, "Taste of Death"},
+					{7, "Baal’s Bloody Talons"}, {7, "Dam the Heart’s River"},
+					{7, "Poison the Well of Life"}, {7, "Rapturous Touch"},
+					{8, "Blood of Destruction"}, {8, "Songs of Distant Vitae"},
+					{9, "Condemn the Sins of the Father"}, {9, "Weaken the Blood of Ancients"},
+				},
+				["Serpentis"] = {
+					{6, "Cobra Fangs"}, {6, "Echidna’s Venom"},
+					{7, "Divine Image"}, {7, "Form of the Storm"},
+					{8, "Cerberus’s Fury"}, {8, "Heart Thief"},
+					{9, "Godhead"}, {9, "Shadow of Apep"},
+				},
+				["Spiritus"] = {
+					{6, "The Spirit Beast"},
+				},
+				["Temporis"] = {
+					{6, "Kiss of Lachesis"}, {7, "Cheat the Fates"},
+					{8, "Clio’s Kiss"}, {9, "Tangle Atropos’ Hand"},
+				},
+				["Thanatosis"] = {
+					{6, "Creeping Infection"}, {7, "Dust to Dust"},
+					{8, "Putrescent Servitude"},
+				},
+				["Valeren"] = {
+					{6, "Blissful Agony"}, {6, "Father’s Judgment"},
+					{6, "Safe Passage"}, {6, "Samiel’s Vengeance"},
+					{7, "Aversion"}, {7, "Blissful Gaze"},
+					{7, "Dream Combat"}, {8, "Fiery Agony"},
+					{8, "Purification"}, {8, "Rayzeel’s Song"},
+					{9, "Heaven’s Gate"}, {9, "Song of the Blooded"},
+					{9, "Soul Exchange"},
+				},
+				["Vicissitude"] = {
+					{6, "Blood of Acid"}, {6, "Chiropteran Marauder"},
+					{7, "Blood of the Earth"}, {7, "Cocoon"},
+					{8, "Breath of the Dragon"}, {8, "Sublimation of the Larval Flesh"},
+					{9, "Earth’s Vast Haven"}, {9, "The Last Dracul"},
+				},
+				-- <<< ADVANCED_DISC_END
+			};
+
+			-- ERA_NAME (SPEC I22). Dormant this round: T469 is what puts it on a picker's `items`.
+			--
+			-- Keyed by the CANONICAL value (SPEC V24), so the saved data never moves when the theme
+			-- does - a Tremere who bought Lure of Flames still owns Lure of Flames after the sheet
+			-- turns medieval; only the words on the row change. That is the whole reason this is a
+			-- display table and not a second set of values (SPEC B23 is what happens otherwise).
+			--
+			-- Only DIVERGENCES live here. A value with no entry displays itself, which is why 20 rows
+			-- cover a picker of 386 - the Dark Ages renamed a handful of things and reprinted the rest.
+			--
+			-- One table for BOTH medieval themes, Dark Ages and Classical Age (SPEC C), so there is no
+			-- per-era key to fall out of step with applyTheme.
+			--
+			-- Ritual keys carry their level prefix because the prefix belongs to the value (SPEC V184).
+			-- Blood Contract is NOT here: the Dark Ages prints it as level one and the core as level
+			-- five, and the core wins (SPEC C), so the row reads "5. Blood Contract" in every era.
+			local ERA_NAME = {
+				-- >>> ERA_NAME_BEGIN (generated - SPEC T468)
+				-- Thaumaturgy paths: the Dark Ages gives them Latin names (Dark Ages pp. 297-302).
+				["Lure of Flames"]      = "Creatio Ignis (The Creation of Fire)",
+				["Movement of the Mind"] = "Potestas Motus (Power of Motion)",
+				["Weather Control"]     = "Potestas Tempestatum (Power Over Storms)",
+				["Elemental Mastery"]   = "Potestas Elementorum (The Power of the Elements)",
+				["The Path of Blood"]   = "Potestas Vitae (The Power of Lifeblood)",
+
+				-- Necromancy paths: same path, the article moved (Dark Ages pp. 279-291).
+				["Bone Path"]              = "The Path of Bone",
+				["Cenotaph Path"]          = "The Path of the Cenotaph",
+				["Corpse in the Monster"]  = "The Path of the Corpse in the Monster",
+				["Grave’s Decay"]          = "The Grave’s Decay",
+				["Path of Haunting"]       = "The Path of Haunting",
+				["Sepulchre Path"]         = "The Path of the Sepulchre",
+				["Ash Path"]               = "The Path of Ash",
+				["Vitreous Path"]          = "The Vitreous Path",
+
+				-- Koldunic path. The Black Hand (p. 170) is what ties the two names together:
+				-- "the Genius Loci (known to the modern koldun as the Way of Spirit)".
+				["The Way of the Spirit"] = "Genius Loci",
+
+				-- Rituals. Level prefix kept on both sides - it is part of the value.
+				["1. Encrypt Missive"]         = "1. Encrypt/Decrypt Missive",
+				["2. The Hand of Glory"]       = "2. Hand of Glory",
+				["2. Recure of the Homeland"]  = "2. Cure of the Homeland",
+				["3. Tempesta Scudo"]          = "3. Tempest Shield",
+				["4. Bastone Diabolico"]       = "4. Bastone del Diavolo",
+				["5. Escape to a True Friend"] = "5. Escape to a True Haven",
+				-- <<< ERA_NAME_END
+			};
+
+			-- The only reader of ERA_NAME (SPEC I22, T469), exported as a global for the same
+			-- reason ERA_ABILITIES is: the table belongs on the root form and the pickers are
+			-- repainted over on HH.6.
+			--
+			-- Total over every canonical value - a value with no row displays ITSELF - so the
+			-- caller never has to ask whether an entry exists, and the twenty rows cover a picker
+			-- of three hundred and eighty-four.
+			--
+			-- Both medieval themes read the same rows (SPEC C); the two modern ones read none, so
+			-- the era is asked for by name rather than assumed from the presence of a row.
+			function eraName(v, era)
+				if era ~= "Dark Ages" and era ~= "Classical Age" then return v; end;
+
+				return ERA_NAME[v] or v;
+			end;
+
 			-- Box geometry, named rather than written into the height sum further down: PITCH is
 			-- the distance between two rows in the .lfm files and PAD is the room above the first
 			-- row plus the room under the last. The gate measures the real row spacing in the XML
@@ -586,6 +1249,22 @@
 				-- it is turned off, which is what the background flag has always done.
 				if kind == "Specialty" then return specCost(); end;
 
+				-- SPEC I9, dormant since the 27th round and awake now that the fields exist. What
+				-- makes a discipline "clan" is that it SITS in a clan slot at the moment of the
+				-- click (SPEC C) - not which box bought it, and not the CLANS table, which stays
+				-- asleep while `clan` is invisible (SPEC V173/V174).
+				if kind == "Discipline" then
+					if from == 0 then return 10; end;
+					if ctx.inClan then return from * 5; end;
+					return from * 7;
+				end;
+
+				-- Secondary paths only. The main path is not bought (SPEC V179).
+				if kind == "Path" then
+					if from == 0 then return 7; end;
+					return from * 4;
+				end;
+
 				if kind == "Numina" then
 					if from == 0 then
 						-- The 21 is the first point of a KIND the character did not have -
@@ -665,6 +1344,18 @@
 			-- a dot nothing charges for and nothing shows.
 			SPECIALITY_ROWS = 9;
 
+			-- Rows of the Vampire tab (SPEC I16). Same contract as BACKGROUND_ROWS above: the loop
+			-- that lets experience buy a dot and the loop that prices it for the log both read
+			-- these, so a row added to the XML alone would be a dot nothing charges for.
+			-- MAIN_PATH_ROWS and RITUAL_ROWS buy nothing - a main path mirrors its discipline
+			-- (SPEC V179/V180) and a ritual has no dots at all (SPEC C) - so neither is declared
+			-- as a trait; they are here so the count lives in one place per box.
+			CLAN_DISC_ROWS = 4;
+			DISC_ROWS      = 15;
+			MAIN_PATH_ROWS = 5;
+			SEC_PATH_ROWS  = 15;
+			RITUAL_ROWS    = 20;
+
 			-- Which traits hand out a free speciality, and at which rating (SPEC I14/V149).
 			-- DERIVED from the two tables that already name every attribute and every ability,
 			-- never typed out again: the picker on HH.1 offers exactly these fifty names, and
@@ -720,6 +1411,10 @@
 			end;
 
 			declareTrait("faith", 1, 5, 0);
+
+			for i = 1, CLAN_DISC_ROWS, 1 do declareTrait("clanDisc_" .. i, 1, 5, 0); end;
+			for i = 1, DISC_ROWS, 1 do declareTrait("disc_" .. i, 1, 5, 0); end;
+			for i = 1, SEC_PATH_ROWS, 1 do declareTrait("secPath_" .. i, 1, 5, 0); end;
 
 			local function numinaTypeInUse(node, base, count)
 				for i = 1, count, 1 do
@@ -858,6 +1553,50 @@
 					ctx.newType  = (ff == 0) and not unlocked.faith;
 
 					pushRise(rows, "Numina", "True Faith", ff, ft, ctx, "faith");
+				end;
+
+				-- Disciplines and paths (SPEC I10b), between the numina and the specialities.
+				--
+				-- A discipline is priced as CLAN when the discipline itself sits in one of the four
+				-- clan slots (SPEC C). Read once, off the live sheet, so the same discipline picked
+				-- in an open slot is priced the same as in its clan slot - it is one discipline,
+				-- and which box it was typed into is not what the book charges for.
+				local inClan = {};
+
+				for i = 1, CLAN_DISC_ROWS, 1 do
+					local v = sheet["clanDisc_" .. i];
+					if v ~= nil and v ~= "" then inClan[v] = true; end;
+				end;
+
+				for i = 1, CLAN_DISC_ROWS, 1 do
+					local field = "clanDisc_" .. i;
+
+					ctx.inClan = true;
+
+					pushRise(rows, "Discipline", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field);
+				end;
+
+				for i = 1, DISC_ROWS, 1 do
+					local field = "disc_" .. i;
+					local v     = sheet[field];
+
+					ctx.inClan = (v ~= nil and v ~= "" and inClan[v] == true);
+
+					pushRise(rows, "Discipline", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field);
+				end;
+
+				-- Only the secondary paths: a main path rides its blood sorcery and was paid for
+				-- when the discipline was (SPEC V179/V180), so it owns no field and no line here.
+				for i = 1, SEC_PATH_ROWS, 1 do
+					local field = "secPath_" .. i;
+
+					pushRise(rows, "Path", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field);
 				end;
 
 				-- Specialities close the order (SPEC I10). The Trait column carries the TRAIT
@@ -1159,6 +1898,250 @@
 			--
 			-- Controls are found with the one walker (SPEC V143/V164): this runs on the root
 			-- form, and `form.<name>` does not cross the <import> into HH.1.
+			-- Which blood sorcery owns a path, DERIVED from BLOOD_SORCERY at load (SPEC V191).
+			-- Not a second table: BLOOD_SORCERY reads Discipline-to-paths because that is how
+			-- the books print it, and every reader here needs the arrow the other way round.
+			-- Building it costs one pass and cannot fall out of step with its source.
+			--
+			-- The value is a LIST because a path can have two owners - the core (p. 440) hands
+			-- Movement of the Mind and Hands of Destruction to Assamite Sorcery as well as to
+			-- Thaumaturgy - the same shape RITUAL_DISC uses for the same reason.
+			local PATH_DISC = {};
+
+			for disc, paths in pairs(BLOOD_SORCERY) do
+				for i = 1, #paths, 1 do
+					local p = paths[i];
+
+					if PATH_DISC[p] == nil then PATH_DISC[p] = {}; end;
+
+					PATH_DISC[p][#PATH_DISC[p] + 1] = disc;
+				end;
+			end;
+
+			-- What a Discipline stands at on THIS sheet, 0 when it is not on the sheet at all.
+			-- Both boxes are walked: the four clan slots and the fifteen open ones hold the same
+			-- kind of thing and are offered the same list (SPEC V178), so a Discipline typed into
+			-- an open slot counts exactly as much as one sitting in its clan slot - which is the
+			-- same reading the ledger already takes when it prices a dot (SPEC I9b).
+			--
+			-- Highest wins if the same Discipline was typed twice. The sheet does not stop the
+			-- player doing that, and answering with the lower of the two would silently take a
+			-- path away from someone who owns it.
+			local function discLevel(name)
+				if name == nil or name == "" then return 0; end;
+
+				local best = 0;
+
+				for i = 1, CLAN_DISC_ROWS, 1 do
+					local f = "clanDisc_" .. i;
+
+					if sheet[f] == name then
+						local n = traitLevel(sheet, f, 1, 5, 0);
+
+						if n > best then best = n; end;
+					end;
+				end;
+
+				for i = 1, DISC_ROWS, 1 do
+					local f = "disc_" .. i;
+
+					if sheet[f] == name then
+						local n = traitLevel(sheet, f, 1, 5, 0);
+
+						if n > best then best = n; end;
+					end;
+				end;
+
+				return best;
+			end;
+
+			-- The level a path stands at: the rating of its own blood sorcery (SPEC V180). A path
+			-- with two owners takes the higher - the player reaches it through whichever of the
+			-- two Disciplines he actually bought.
+			--
+			-- An empty row, or a value no Discipline claims, answers 0. That is what keeps a
+			-- blank main path row dark instead of inheriting the row above it (SPEC V180).
+			local function pathLevel(path)
+				local owners = (path ~= nil and path ~= "") and PATH_DISC[path] or nil;
+
+				if owners == nil then return 0; end;
+
+				local best = 0;
+
+				for i = 1, #owners, 1 do
+					local n = discLevel(owners[i]);
+
+					if n > best then best = n; end;
+				end;
+
+				return best;
+			end;
+
+			-- The five main path rows (SPEC V180). Their dots are read-only art - no field, no
+			-- click (SPEC V179) - so this writes `checked` on the control and NOTHING to the
+			-- sheet. That is the whole point: the level is worked out at every render from the
+			-- Discipline, so there is no second number saved anywhere that could disagree with
+			-- the first (the same reason the experience boxes are derived, SPEC V100).
+			--
+			-- Found through xpFind from the tab root, the one finder this sheet has (SPEC V143):
+			-- `form.<name>` does not cross the <import> from HH.11 into HH.13 (SPEC B9).
+			function renderMainPaths(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = {};
+
+				for i = 1, MAIN_PATH_ROWS, 1 do
+					for d = 1, 5, 1 do names["ro_mainPath_" .. i .. "_" .. d] = true; end;
+				end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				for i = 1, MAIN_PATH_ROWS, 1 do
+					local n = pathLevel(sheet["mainPath_" .. i]);
+
+					for d = 1, 5, 1 do
+						local c = found["ro_mainPath_" .. i .. "_" .. d];
+
+						if c ~= nil then c.checked = (d <= n); end;
+					end;
+				end;
+			end;
+
+			-- Do two paths answer to the same blood sorcery? Both sides are LISTS, because a
+			-- path can have two owners (core p. 440), so the question is whether the two lists
+			-- share anything at all - not whether they are equal.
+			local function sharesDisc(a, b)
+				if a == nil or b == nil then return false; end;
+
+				for i = 1, #a, 1 do
+					for j = 1, #b, 1 do
+						if a[i] == b[j] then return true; end;
+					end;
+				end;
+
+				return false;
+			end;
+
+			-- Why a picked value cannot sit in the row it landed in, or nil when it can. The
+			-- reason comes back as the message itself: a refusal that does not say which rule
+			-- it is enforcing is the complaint the 40th round was opened to answer (SPEC V129).
+			--
+			-- The empty item is ALWAYS legal (SPEC V15). That is not a courtesy - it is what
+			-- makes the revert below terminate.
+			local function pickRefusal(field, value)
+				if field == nil or value == nil or value == "" then return nil; end;
+
+				local isMain = string.match(field, "^mainPath_%d+$") ~= nil;
+
+				if isMain or string.match(field, "^secPath_%d+$") ~= nil then
+					-- SPEC V182: the path's own blood sorcery has to be on the sheet. Koldunic
+					-- Sorcery at four opens no Thaumaturgy path, however high it is.
+					if pathLevel(value) < 1 then
+						return "That path needs its blood sorcery on the sheet";
+					end;
+
+					-- SPEC V181: one main path per blood sorcery. Secondary rows are not capped
+					-- this way - that is what makes them secondary.
+					if isMain then
+						local mine = PATH_DISC[value];
+
+						for i = 1, MAIN_PATH_ROWS, 1 do
+							local f = "mainPath_" .. i;
+
+							if f ~= field and sheet[f] ~= nil and sheet[f] ~= "" then
+								if sharesDisc(mine, PATH_DISC[sheet[f]]) then
+									return "That blood sorcery already has a main path";
+								end;
+							end;
+						end;
+					end;
+
+					return nil;
+				end;
+
+				if string.match(field, "^ritual_%d+$") ~= nil then
+					local owners = RITUAL_DISC[value];
+
+					-- A value no table claims is left alone. Refusing what we cannot price would
+					-- make a typo unrecoverable, and the picker only offers what the tables know.
+					if owners == nil then return nil; end;
+
+					-- The level is read off the NAME (SPEC V184), never from a second table that
+					-- could disagree with it. Abyss Mysticism runs past five, so the prefix is
+					-- one digit but not one of 1..5.
+					local need = tonumber(string.match(value, "^(%d+)%. ")) or 0;
+					local best = 0;
+
+					for i = 1, #owners, 1 do
+						local n = discLevel(owners[i]);
+
+						if n > best then best = n; end;
+					end;
+
+					-- SPEC V185: absent Discipline frees no level at all, and the two refusals
+					-- are told apart because "you do not have it" and "you do not have enough of
+					-- it" are different problems with different fixes.
+					if best < 1 then return "That ritual needs its blood sorcery on the sheet"; end;
+					if best < need then return "That ritual is above what its blood sorcery allows"; end;
+				end;
+
+				return nil;
+			end;
+
+			-- The picker guard (SPEC V181/V182/V185). Reached from a dataLink, never from the
+			-- comboBox's own onChange (SPEC V186): a write made inside a control's dispatch does
+			-- not survive it, which is how B36 and B38 both got their refusals ignored.
+			--
+			-- The revert goes back to oldValue only when oldValue is ITSELF legal. It usually is
+			-- - it was accepted once - but not always: the Discipline that allowed it may have
+			-- come off the sheet since, and reverting into a second refusal is how a link starts
+			-- bouncing between two illegal values forever. Falling through to the empty item
+			-- always terminates, because the empty item always passes.
+			function guardPick(field, oldValue, newValue)
+				if sheet == nil or field == nil then return; end;
+
+				local why = pickRefusal(field, newValue);
+
+				if why == nil then return; end;
+
+				local back = (pickRefusal(field, oldValue) == nil) and oldValue or "";
+
+				setField(field, back);
+				xpWarn(why);
+			end;
+
+			-- The four clan slots are the storyteller's to open (SPEC I8g, V175). Locked is the
+			-- DEFAULT and nil counts as locked, the same fail-closed reading the Show flags use
+			-- (SPEC V89, V80): a sheet saved before the flag existed must not find the box open.
+			--
+			-- `enabled` and `opacity` are written on the SAME line (SPEC V162): a combo that looks
+			-- locked and is not - or the reverse - is the exact failure V111 exists to stop. Found
+			-- through xpFind from the tab root, the one finder this sheet has (SPEC V143).
+			function renderClanDiscLock(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = {};
+
+				for i = 1, CLAN_DISC_ROWS, 1 do names["cboclanDisc_" .. i] = true; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				local open = (sheet.stEditClanDisc == true);
+
+				for i = 1, CLAN_DISC_ROWS, 1 do
+					local c = found["cboclanDisc_" .. i];
+
+					if c ~= nil then
+						c.enabled = open;
+						c.opacity = open and 1 or 0.55;
+					end;
+				end;
+			end;
+
 			function renderSpecialities(from)
 				if sheet == nil or from == nil then return; end;
 
@@ -1237,6 +2220,33 @@
 					-- further down opens the same way, and two of them read as one.
 					if want and base ~= nil and specCost() == 0 then
 						xpWarn("Specialties cannot be bought");
+						return;
+					end;
+				end;
+
+				-- A secondary path is capped by its OWN blood sorcery (SPEC V183): a Discipline
+				-- at four allows three, and only at five does the ceiling come off and let a
+				-- secondary path reach five as well. `pathLevel` is the same reading the main
+				-- path dots use (SPEC V180), so the ceiling and the lit dots cannot disagree.
+				--
+				-- Tested HERE, before anything is written - not after. A guard that lets the
+				-- mark happen and argues afterwards is the failure the 38th round spent three
+				-- rounds chasing (SPEC V135, B38). Nothing below this point runs on a refusal,
+				-- so there is no field to put back and no dot to flicker.
+				--
+				-- Only a PURCHASE is capped. A dot going out cannot break a ceiling, and
+				-- selling back is already governed by the baseline (SPEC V103).
+				if want and trait ~= nil and string.match(trait, "^secPath_%d+$") ~= nil then
+					if sheet[trait] == nil or sheet[trait] == "" then
+						xpWarn("Choose a path first");
+						return;
+					end;
+
+					local n   = pathLevel(sheet[trait]);
+					local cap = (n >= 5) and 5 or (n - 1);
+
+					if (level + 1) > cap then
+						xpWarn("That path is above what its blood sorcery allows");
 						return;
 					end;
 				end;
@@ -1382,7 +2392,7 @@
 		<tab name="tabNumina" title="Numina">
 			<import file="HH.7.lfm"/>
 		</tab>
-		<tab name="tabDisciplines" title="Disciplines" visible="false">
+		<tab name="tabDisciplines" title="Vampire" visible="false">
 			<import file="HH.11.lfm"/>
 		</tab>
 		<tab name="tabCombat" title="Combat">
