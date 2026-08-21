@@ -1,53 +1,53 @@
 #	nivel	ritual	dona	livro	pagina IMPRESSA	feito
 1	Ambrus Kelemen’s Aegis	Thaumaturgy	da	303	.
-1	Armor of Diamond Serenity	Setite Sorcery	rob	166	.
+1	Armor of Diamond Serenity	Setite Sorcery	rob	166	x
 1	Bind the Accusing Tongue	Thaumaturgy	core	230	x
-1	Blood Mastery	Thaumaturgy	rob	145	.
+1	Blood Mastery	Thaumaturgy	rob	145	x
 1	Blood Rush	Thaumaturgy	core	230	x
-1	Blood into Water	Thaumaturgy	rob	145	.
+1	Blood into Water	Thaumaturgy	rob	145	x
 1	Brand	Thaumaturgy	rob	23	.
 1	CCTV	Thaumaturgy	rob	67	.
-1	Call of the Hungry Dead	Necromancy	core	177	.
+1	Call of the Hungry Dead	Necromancy	core	177	x
 1	Calling Card	Thaumaturgy	rob	65	.
 1	Chime of Unseen Spirits	Thaumaturgy	rob	23	.
-1	Communicate with Kindred Sire	Thaumaturgy	core	230	.
+1	Communicate with Kindred Sire	Thaumaturgy	core	230	x
 1	Death’s Communion	Necromancy	lotc	108	.
-1	Defense of the Sacred Haven	Thaumaturgy	core	230	.
-1	Deflection of Wooden Doom	Thaumaturgy	core	231	.
-1	Devil’s Touch	Thaumaturgy	core	231	.
-1	Domino of Life	Thaumaturgy	core	231	.
+1	Defense of the Sacred Haven	Thaumaturgy	core	230	x
+1	Deflection of Wooden Doom	Thaumaturgy	core	231	x
+1	Devil’s Touch	Thaumaturgy	core	231	x
+1	Domino of Life	Thaumaturgy	core	231	x
 1	Drinking Death	Koldunic Sorcery	tos	48	.
-1	Eldritch Beacon	Necromancy	core	177	.
-1	Encrypt Missive	Thaumaturgy	rob	145	.
-1	Engaging the Vessel of Transference	Thaumaturgy	core	231	.
+1	Eldritch Beacon	Necromancy	core	177	x
+1	Encrypt Missive	Thaumaturgy	rob	145	x
+1	Engaging the Vessel of Transference	Thaumaturgy	core	231	x
 1	Eyes of the Abyss	Abyss Mysticism	da	271	.
 1	Final Sight	Necromancy	da	292	.
-1	Flatline	Thaumaturgy	rob	158	.
+1	Flatline	Thaumaturgy	rob	158	x
 1	Foxfire	Necromancy	da	292	.
-1	Horoscope	Assamite Sorcery	rob	162	.
-1	Illuminate the Trail of Prey	Thaumaturgy	core	231	.
-1	Impressive Visage	Thaumaturgy	rob	146	.
-1	Incantation of the Shepherd	Thaumaturgy	core	232	.
-1	Insight	Necromancy	core	177	.
-1	Knowing Stone	Necromancy	core	177	.
-1	Learning the Mind Enslumbered	Thaumaturgy	rob	146	.
+1	Horoscope	Assamite Sorcery	rob	162	x
+1	Illuminate the Trail of Prey	Thaumaturgy	core	231	x
+1	Impressive Visage	Thaumaturgy	rob	146	x
+1	Incantation of the Shepherd	Thaumaturgy	core	232	x
+1	Insight	Necromancy	core	177	x
+1	Knowing Stone	Necromancy	core	177	x
+1	Learning the Mind Enslumbered	Thaumaturgy	rob	146	x
 1	Light within Shadow	Abyss Mysticism	lotc	126	.
 1	Locating the Oubliette	Abyss Mysticism	tos	35	.
 1	Master of the Domain	Koldunic Sorcery	tos	49	.
 1	Memento Mori	Necromancy	da	293	.
-1	Minestra di Morte	Necromancy	core	177	.
+1	Minestra di Morte	Necromancy	core	177	x
 1	Pierce the Veil	Abyss Mysticism	da	271	.
 1	Preserve Corpse	Necromancy	rob	103	.
-1	Purify Blood	Thaumaturgy	rob	147	.
-1	Purity of Flesh	Thaumaturgy	core	232	.
-1	Reawakening the Dead Water	Koldunic Sorcery	rob	157	.
+1	Purify Blood	Thaumaturgy	rob	147	x
+1	Purity of Flesh	Thaumaturgy	core	232	x
+1	Reawakening the Dead Water	Koldunic Sorcery	rob	157	x
 1	Rite of Introduction	Thaumaturgy	da	311	.
 1	Rite of Reclamation	Assamite Sorcery	rob	76	.
 1	Ritual of Return	Assamite Sorcery	tos	42	.
-1	Ritual of the Smoking Mirror	Necromancy	core	178	.
+1	Ritual of the Smoking Mirror	Necromancy	core	178	x
 1	Sanctify the Temple	Thaumaturgy	rob	62	.
-1	Sanguineous Phial	Thaumaturgy	rob	147	.
-1	Sense the Mystical	Thaumaturgy	rob	147	.
+1	Sanguineous Phial	Thaumaturgy	rob	147	x
+1	Sense the Mystical	Thaumaturgy	rob	147	x
 1	Servitor’s Perception	Koldunic Sorcery	tos	50	.
 1	Shew-Stone	Necromancy	da	293	.
 1	Sigil of Authority	Thaumaturgy	rob	24	.
@@ -59,10 +59,10 @@
 1	Truth in Water	Koldunic Sorcery	tos	50	.
 1	Typhon’s Brew	Setite Sorcery	rob	84	.
 1	Unnatural Decay	Koldunic Sorcery	tos	48	.
-1	Wake with Evening’s Freshness	Thaumaturgy	core	232	.
+1	Wake with Evening’s Freshness	Thaumaturgy	core	232	x
 1	Water Walking	Thaumaturgy	rob	63	.
 1	Weight of Shadows	Abyss Mysticism	rob	38	.
-1	Widow’s Spite	Thaumaturgy	core	232	.
+1	Widow’s Spite	Thaumaturgy	core	232	x
 1	Word of Insight	Necromancy	rob	93	.
 2	Abyssal Blade	Abyss Mysticism	tos	35	.
 2	Antonius’s Denial	Necromancy	da	293	.
@@ -73,60 +73,60 @@
 2	Blade of Smoke and Shadow	Assamite Sorcery	rob	77	.
 2	Blood Calls to Blood	Assamite Sorcery	tos	43	.
 2	Blood Crystal	Thaumaturgy	rob	63	.
-2	Blood Walk	Thaumaturgy	core	232	.
+2	Blood Walk	Thaumaturgy	core	232	x
 2	Borne by Wind	Koldunic Sorcery	tos	50	.
-2	Burning Blade	Thaumaturgy	core	232	.
+2	Burning Blade	Thaumaturgy	core	232	x
 2	Comforting Darkness	Abyss Mysticism	lotc	126	.
 2	Commune with Cainite	Thaumaturgy	da	304	.
 2	Concentrated Vitae	Koldunic Sorcery	tos	50	.
-2	Craft Bloodstone	Thaumaturgy	rob	147	.
-2	Craft Gris-Gris	Setite Sorcery	rob	166	.
-2	Donning the Mask of Shadows	Thaumaturgy	core	233	.
+2	Craft Bloodstone	Thaumaturgy	rob	147	x
+2	Craft Gris-Gris	Setite Sorcery	rob	166	x
+2	Donning the Mask of Shadows	Thaumaturgy	core	233	x
 2	Draining the Well of Life	Necromancy	rob	93	.
-2	Extinguish	Thaumaturgy	rob	148	.
+2	Extinguish	Thaumaturgy	rob	148	x
 2	Eyes of Babel	Thaumaturgy	rob	24	.
 2	Eyes of the Dead	Koldunic Sorcery	tos	50	.
-2	Eyes of the Grave	Necromancy	core	179	.
-2	Eyes of the Night Hawk	Thaumaturgy	core	233	.
+2	Eyes of the Grave	Necromancy	core	179	x
+2	Eyes of the Night Hawk	Thaumaturgy	core	233	x
 2	Feed the Darkness	Abyss Mysticism	rob	38	.
 2	Flaming Weapon	Thaumaturgy	da	304	.
 2	Generation of the Acheron Vortex	Necromancy	lob	49	.
 2	Haruspicy	Thaumaturgy	rob	62	.
 2	Haunting Breeze	Necromancy	rob	103	.
 2	Hidden Haven	Thaumaturgy	rob	101	.
-2	Illusion of Peaceful Death	Thaumaturgy	rob	148	.
+2	Illusion of Peaceful Death	Thaumaturgy	rob	148	x
 2	Implant the Bezoar	Abyss Mysticism	tos	35	.
-2	Infusion of Kalif	Assamite Sorcery	rob	162	.
-2	Invoke the Lesser Sign of Power	Koldunic Sorcery	rob	157	.
-2	Iron Body	Thaumaturgy	rob	158	.
-2	Machine Blitz	Thaumaturgy	core	233	.
-2	Occhio d’Uomo Morto	Necromancy	core	179	.
-2	Oinos of Dionysus	Thaumaturgy	rob	148	.
+2	Infusion of Kalif	Assamite Sorcery	rob	162	x
+2	Invoke the Lesser Sign of Power	Koldunic Sorcery	rob	157	x
+2	Iron Body	Thaumaturgy	rob	158	x
+2	Machine Blitz	Thaumaturgy	core	233	x
+2	Occhio d’Uomo Morto	Necromancy	core	179	x
+2	Oinos of Dionysus	Thaumaturgy	rob	148	x
 2	Parting the Veil	Necromancy	bh	176	.
 2	Prepare the Vessel	Necromancy	da	293	.
 2	Preserve	Thaumaturgy	rob	24	.
-2	Principal Focus of Vitae Infusion	Thaumaturgy	core	234	.
-2	Puppet	Necromancy	core	179	.
-2	Recure of the Homeland	Thaumaturgy	core	234	.
+2	Principal Focus of Vitae Infusion	Thaumaturgy	core	234	x
+2	Puppet	Necromancy	core	179	x
+2	Recure of the Homeland	Thaumaturgy	core	234	x
 2	Seal Egress	Thaumaturgy	rob	25	.
 2	Self-Executing File	Thaumaturgy	rob	68	.
 2	Subsume the Darkness	Abyss Mysticism	da	272	.
 2	Summon Guardian Spirit	Thaumaturgy	da	305	.
 2	Thanatos’ Caress	Necromancy	rob	90	.
-2	The Hand of Glory	Necromancy	core	179	.
-2	The Jinx	Thaumaturgy	rob	148	.
-2	The Ritual of Pochtli	Necromancy	core	180	.
+2	The Hand of Glory	Necromancy	core	179	x
+2	The Jinx	Thaumaturgy	rob	148	x
+2	The Ritual of Pochtli	Necromancy	core	180	x
 2	To Lace with Hidden Nectar	Setite Sorcery	rob	84	.
 2	Totenpass	Necromancy	da	294	.
-2	Two Centimes	Necromancy	core	180	.
+2	Two Centimes	Necromancy	core	180	x
 2	Ward	Thaumaturgy	da	305	.
-2	Ward Versus Ghouls	Thaumaturgy	core	234	.
-2	Warding Circle versus Ghouls	Thaumaturgy	core	234	.
-2	Whispers of the Ghost	Thaumaturgy	rob	149	.
+2	Ward Versus Ghouls	Thaumaturgy	core	234	x
+2	Warding Circle versus Ghouls	Thaumaturgy	core	234	x
+2	Whispers of the Ghost	Thaumaturgy	rob	149	x
 2	Witch Eye	Necromancy	da	293	.
 2	Witness of Whispers	Thaumaturgy	da	304	.
 3	A Shield of Mirror	Assamite Sorcery	tos	43	.
-3	A Touch of Nightshade	Thaumaturgy	rob	149	.
+3	A Touch of Nightshade	Thaumaturgy	rob	149	x
 3	Abyssal Threads	Abyss Mysticism	rob	38	.
 3	Amulet of Mnemosyne	Thaumaturgy	rob	25	.
 3	Angra Mainyu Consumes Spenta Mainyu	Abyss Mysticism	tos	37	.
@@ -135,147 +135,147 @@
 3	BFU	Thaumaturgy	rob	66	.
 3	Balthazar’s Revelation	Abyss Mysticism	da	272	.
 3	Bind the Familiar	Thaumaturgy	da	306	.
-3	Blood Dance	Necromancy	core	180	.
+3	Blood Dance	Necromancy	core	180	x
 3	Blood and Bane	Assamite Sorcery	rob	37	.
 3	Bound by Oath	Assamite Sorcery	rob	77	.
 3	Brotherhood of the Cup	Thaumaturgy	lotc	221	.
-3	Bull of Heaven	Assamite Sorcery	rob	163	.
+3	Bull of Heaven	Assamite Sorcery	rob	163	x
 3	Calling the Hungry Shade	Abyss Mysticism	da	272	.
 3	Claiming the Dark	Abyss Mysticism	lotc	126	.
-3	Clinging of the Insect	Thaumaturgy	core	235	.
-3	Cowing the Servant	Koldunic Sorcery	rob	157	.
+3	Clinging of the Insect	Thaumaturgy	core	235	x
+3	Cowing the Servant	Koldunic Sorcery	rob	157	x
 3	Craft Dream Catcher	Thaumaturgy	rob	62	.
 3	Dante’s Urban Legend	Thaumaturgy	rob	26	.
 3	Death’s Head	Necromancy	rob	103	.
-3	Din of the Damned	Necromancy	core	180	.
+3	Din of the Damned	Necromancy	core	180	x
 3	Displacement of the Pneuma	Thaumaturgy	da	311	.
-3	Divine Sign	Necromancy	core	180	.
+3	Divine Sign	Necromancy	core	180	x
 3	Enfolding the Believers	Thaumaturgy	rob	64	.
 3	Father’s Freedom	Thaumaturgy	rob	101	.
-3	Flesh of Fiery Touch	Thaumaturgy	core	235	.
-3	Hell’s Calling	Thaumaturgy	rob	158	.
-3	Incorporeal Passage	Thaumaturgy	core	236	.
-3	Inscription	Thaumaturgy	rob	150	.
-3	Mirror of Second Sight	Thaumaturgy	core	236	.
-3	Nightmare Drums	Necromancy	core	180	.
+3	Flesh of Fiery Touch	Thaumaturgy	core	235	x
+3	Hell’s Calling	Thaumaturgy	rob	158	x
+3	Incorporeal Passage	Thaumaturgy	core	236	x
+3	Inscription	Thaumaturgy	rob	150	x
+3	Mirror of Second Sight	Thaumaturgy	core	236	x
+3	Nightmare Drums	Necromancy	core	180	x
 3	One with the Dark	Abyss Mysticism	tos	36	.
 3	One with the Forest	Koldunic Sorcery	tos	51	.
-3	Pavis of Foul Presence	Thaumaturgy	core	236	.
+3	Pavis of Foul Presence	Thaumaturgy	core	236	x
 3	Rings Like Chains	Setite Sorcery	rob	84	.
-3	Ritual of The Unearthed Fetter	Necromancy	core	181	.
-3	Rutor’s Hands	Thaumaturgy	rob	150	.
+3	Ritual of The Unearthed Fetter	Necromancy	core	181	x
+3	Rutor’s Hands	Thaumaturgy	rob	150	x
 3	Samira’s Kihanah	Thaumaturgy	tos	117	.
-3	Sanguine Assistant	Thaumaturgy	core	236	.
+3	Sanguine Assistant	Thaumaturgy	core	236	x
 3	Sanguine Trail	Thaumaturgy	lotc	221	.
-3	Scorpion Sending	Setite Sorcery	rob	166	.
+3	Scorpion Sending	Setite Sorcery	rob	166	x
 3	Scry the Hearthstone	Thaumaturgy	da	307	.
-3	Shaft of Belated Quiescence	Thaumaturgy	core	237	.
-3	Soul of the Homunculus	Thaumaturgy	rob	151	.
+3	Shaft of Belated Quiescence	Thaumaturgy	core	237	x
+3	Soul of the Homunculus	Thaumaturgy	rob	151	x
 3	Strength in Wisdom	Assamite Sorcery	tos	43	.
 3	Summoning the Blatherskites	Abyss Mysticism	tos	36	.
 3	Telecommunication	Thaumaturgy	rob	68	.
 3	Tempest Prison	Necromancy	rob	94	.
-3	Tempesta Scudo	Necromancy	core	181	.
-3	The Bottled Voice	Thaumaturgy	rob	150	.
+3	Tempesta Scudo	Necromancy	core	181	x
+3	The Bottled Voice	Thaumaturgy	rob	150	x
 3	The Floating Dead	Koldunic Sorcery	tos	51	.
 3	The Third Eye of Rickard Argentis	Abyss Mysticism	da	273	.
 3	Translocation of the Vessel	Thaumaturgy	rob	27	.
-3	Transubstantiation of Seven	Thaumaturgy	rob	151	.
+3	Transubstantiation of Seven	Thaumaturgy	rob	151	x
 3	Ward of the Winged Sepulcher	Thaumaturgy	lob	37	.
-3	Ward versus Lupines	Thaumaturgy	core	237	.
-3	Warding Circle versus Lupines	Thaumaturgy	core	234	.
+3	Ward versus Lupines	Thaumaturgy	core	237	x
+3	Warding Circle versus Lupines	Thaumaturgy	core	234	x
 3	Wield the Spear of Damnation	Assamite Sorcery	dac	116	.
 4	Animated Weapon	Thaumaturgy	da	307	.
-4	Baleful Doll	Necromancy	core	181	.
+4	Baleful Doll	Necromancy	core	181	x
 4	Baron Zaraguin’s Sting	Thaumaturgy	rob	66	.
-4	Bastone Diabolico	Necromancy	core	181	.
-4	Bone of Lies	Thaumaturgy	core	237	.
+4	Bastone Diabolico	Necromancy	core	181	x
+4	Bone of Lies	Thaumaturgy	core	237	x
 4	Boukephos’ Gateway	Abyss Mysticism	tos	37	.
-4	Cadaver’s Touch	Necromancy	core	182	.
+4	Cadaver’s Touch	Necromancy	core	182	x
 4	Candle of Haunting	Thaumaturgy	da	308	.
-4	Directing Ahriman’s Lance	Assamite Sorcery	rob	163	.
-4	Dismemberment of Osiris	Setite Sorcery	rob	167	.
+4	Directing Ahriman’s Lance	Assamite Sorcery	rob	163	x
+4	Dismemberment of Osiris	Setite Sorcery	rob	167	x
 4	Evoke the Storm	Koldunic Sorcery	tos	52	.
-4	Firewalker	Thaumaturgy	core	238	.
-4	Heart of Stone	Thaumaturgy	core	238	.
+4	Firewalker	Thaumaturgy	core	238	x
+4	Heart of Stone	Thaumaturgy	core	238	x
 4	Houngan’s Doll	Thaumaturgy	rob	62	.
 4	Impregnable Soul	Necromancy	rob	104	.
-4	Infirm Inert	Thaumaturgy	rob	152	.
-4	Innocence of the Child’s Heart	Thaumaturgy	rob	152	.
+4	Infirm Inert	Thaumaturgy	rob	152	x
+4	Innocence of the Child’s Heart	Thaumaturgy	rob	152	x
 4	Invisible Chains of Binding	Thaumaturgy	da	308	.
 4	Lord Aludian’s Orifices	Abyss Mysticism	tos	37	.
 4	Maw of Ahriman	Abyss Mysticism	rob	38	.
-4	Mirror Walk	Thaumaturgy	rob	152	.
+4	Mirror Walk	Thaumaturgy	rob	152	x
 4	Non-Disclosure Clause	Thaumaturgy	rob	69	.
-4	Peek Past the Shroud	Necromancy	core	182	.
+4	Peek Past the Shroud	Necromancy	core	182	x
 4	Point of the Needle	Necromancy	rob	90	.
 4	Preservation of the Sanguine Heart	Thaumaturgy	rob	27	.
 4	Rebirth in the Light of Haqim	Assamite Sorcery	tos	43	.
 4	Reflections of Hollow Revelation	Abyss Mysticism	da	273	.
 4	Return of the Heart	Thaumaturgy	da	310	.
-4	Ritual of Xipe Totec	Necromancy	core	182	.
-4	Scry	Thaumaturgy	rob	153	.
+4	Ritual of Xipe Totec	Necromancy	core	182	x
+4	Scry	Thaumaturgy	rob	153	x
 4	Scrying Pool	Koldunic Sorcery	tos	51	.
-4	Splinter Servant	Thaumaturgy	core	238	.
-4	Stolen Kisses	Thaumaturgy	rob	153	.
+4	Splinter Servant	Thaumaturgy	core	238	x
+4	Stolen Kisses	Thaumaturgy	rob	153	x
 4	Summon Ethereal Horde	Necromancy	rob	89	.
 4	Summon the Blood Imp	Thaumaturgy	rob	27	.
-4	The Curse Belated	Thaumaturgy	rob	151	.
-4	Ties That Bind	Koldunic Sorcery	rob	158	.
-4	Track Transgressor	Thaumaturgy	rob	152	.
+4	The Curse Belated	Thaumaturgy	rob	151	x
+4	Ties That Bind	Koldunic Sorcery	rob	158	x
+4	Track Transgressor	Thaumaturgy	rob	152	x
 4	Transcending Barriers Through Love	Thaumaturgy	rob	64	.
-4	Unweave Ritual	Thaumaturgy	rob	154	.
+4	Unweave Ritual	Thaumaturgy	rob	154	x
 4	Vigil of the Stone Guardian	Thaumaturgy	rob	29	.
 4	Vision of Shadow	Abyss Mysticism	lotc	126	.
 4	Vision of St. Anthony	Necromancy	da	294	.
-4	Ward versus Kindred	Thaumaturgy	core	239	.
-4	Ward versus Vitae	Thaumaturgy	rob	158	.
-4	Warding Circle versus Kindred	Thaumaturgy	core	234	.
-5	Abandon the Fetters	Thaumaturgy	rob	154	.
+4	Ward versus Kindred	Thaumaturgy	core	239	x
+4	Ward versus Vitae	Thaumaturgy	rob	158	x
+4	Warding Circle versus Kindred	Thaumaturgy	core	234	x
+5	Abandon the Fetters	Thaumaturgy	rob	154	x
 5	Ahriman’s Wight	Abyss Mysticism	rob	38	.
 5	Asymmetrical Reproduction	Thaumaturgy	rob	109	.
 5	At Our Command It Breathes	Thaumaturgy	rob	106	.
 5	Beckon the Ingurgitant	Abyss Mysticism	tos	37	.
-5	Blood Contract	Thaumaturgy	core	239	.
+5	Blood Contract	Thaumaturgy	core	239	x
 5	Bloody Mary	Thaumaturgy	rob	67	.
 5	Cheat the Scale of Hades	Thaumaturgy	da	311	.
-5	Chill of Oblivion	Necromancy	core	183	.
-5	Cobra’s Favor	Thaumaturgy	rob	154	.
+5	Chill of Oblivion	Necromancy	core	183	x
+5	Cobra’s Favor	Thaumaturgy	rob	154	x
 5	Commune with the Abyss	Abyss Mysticism	lotc	127	.
-5	Court of Hallowed Truth	Thaumaturgy	rob	155	.
+5	Court of Hallowed Truth	Thaumaturgy	rob	155	x
 5	Creation of the Shabti	Setite Sorcery	rob	109	.
-5	Dead Man’s Hand	Necromancy	core	183	.
+5	Dead Man’s Hand	Necromancy	core	183	x
 5	Dedicate the Haven	Thaumaturgy	da	310	.
-5	Enchant Talisman	Thaumaturgy	core	239	.
+5	Enchant Talisman	Thaumaturgy	core	239	x
 5	Enochian Passage	Necromancy	rob	104	.
-5	Escape to a True Friend	Thaumaturgy	core	239	.
-5	Esilio	Necromancy	core	183	.
+5	Escape to a True Friend	Thaumaturgy	core	239	x
+5	Esilio	Necromancy	core	183	x
 5	From Marduk’s Throat	Assamite Sorcery	lotc	31	.
 5	Ghost in the System	Thaumaturgy	rob	69	.
-5	Grasp the Ghostly	Necromancy	core	184	.
+5	Grasp the Ghostly	Necromancy	core	184	x
 5	Mirror Prison	Thaumaturgy	rob	29	.
 5	Mirror of Blood	Thaumaturgy	rob	107	.
-5	Nectar of the Bitter Rose	Thaumaturgy	rob	155	.
+5	Nectar of the Bitter Rose	Thaumaturgy	rob	155	x
 5	Occlude the Western Road	Assamite Sorcery	tos	43	.
 5	Orphic Sojourn	Necromancy	da	296	.
-5	Paper Flesh	Thaumaturgy	core	240	.
+5	Paper Flesh	Thaumaturgy	core	240	x
 5	Ravening Walls of Ceoris	Assamite Sorcery	dac	117	.
 5	Rickard Argentis’s Homunculus	Abyss Mysticism	tos	116	.
 5	Rite of Marduk Slain and Risen	Thaumaturgy	da	310	.
 5	Sanctuary	Thaumaturgy	rob	29	.
-5	Seeing With the Sky’s Eyes	Assamite Sorcery	rob	163	.
-5	Severed Hand	Thaumaturgy	rob	155	.
-5	Shackles of Blood	Setite Sorcery	rob	167	.
+5	Seeing With the Sky’s Eyes	Assamite Sorcery	rob	163	x
+5	Severed Hand	Thaumaturgy	rob	155	x
+5	Shackles of Blood	Setite Sorcery	rob	167	x
 5	Skinwalker’s Belt	Thaumaturgy	rob	63	.
 5	Stone Slumber	Thaumaturgy	da	310	.
-5	Stone of the True Form	Thaumaturgy	rob	156	.
+5	Stone of the True Form	Thaumaturgy	rob	156	x
 5	The Ferryman’s Recall	Necromancy	lotc	109	.
-5	The Inmost Tug	Koldunic Sorcery	rob	158	.
+5	The Inmost Tug	Koldunic Sorcery	rob	158	x
 5	The Pursuit of Apotheosis	Thaumaturgy	rob	64	.
 5	Treasures of Hades	Necromancy	da	296	.
-5	Ward versus Spirits	Thaumaturgy	core	240	.
+5	Ward versus Spirits	Thaumaturgy	core	240	x
 5	Warding Circle versus Technology	Thaumaturgy	rob	102	.
-5	Warding Circles versus Spirits, Ghosts, and Demons	Thaumaturgy	core	234	.
+5	Warding Circles versus Spirits, Ghosts, and Demons	Thaumaturgy	core	234	x
 5	Way of the Wendigo	Thaumaturgy	rob	30	.
 5	Whispers in the Dark	Abyss Mysticism	da	273	.
 6	Into the Chasm	Abyss Mysticism	da	273	.

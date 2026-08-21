@@ -28,6 +28,31 @@ o `.lfm` precisar ser regerado, e para §T444–446 saberem o que procurar em qu
 Os 5 `rd_*.tsv` de livro já vêm **dedupados entre si**, na precedência
 core > RoB > (LotC/LoB/DAC/BH) > TOS > DA. Somados dão 284 sem repetir nome.
 
+## Código de livro → título para o bloco 1 de §I21
+
+`path_pages.tsv` e `ritual_pages.tsv` gravam o livro como CÓDIGO CURTO; `disc_pages.tsv`
+grava por extenso. O bloco 1 de §I21 quer o **título**, e o título **⊥ traduz** (só o
+`p.`/`pág.` muda de idioma). Tabela abaixo = a tradução do código, o offset de página e o
+arquivo PDF de onde o texto sai.
+
+| código | título p/ o bloco 1 | offset | arquivo `.pdf` |
+|---|---|---|---|
+| `core` | `Vampire: The Masquerade 20th Anniversary Edition` | **8** | `vampire the masquerade - 20th anniversary edition` |
+| `da` | `Vampire: The Dark Ages 20th Anniversary Edition` | 1 | `_Vampiro V20 - Dark Ages - Livro Base` |
+| `rob` | `Rites of Blood` | 1 | `Vampire V20 - Rites of Blood` |
+| `lotc` | `Lore of the Clans` | 1 | `Vampiro V20 - Lore of the Clans` |
+| `lob` | `Lore of the Bloodlines` | 1 | `Vampiro V20 - Dark Ages - Lore of the Bloodlines` |
+| `tos` | `Dark Ages Tome of Secrets` | 1 | `Vampiro V20 - Dark Ages - Tome of Secrets` |
+| `dac` | `Dark Ages Companion` | 1 | `Vampiro V20 - Dark Ages - Companion` |
+| `bh` | `The Black Hand: A Guide to the Tal’Mahe’Ra` | 1 | `Vampiro V20 - The Black Hand A Guide to the TalMaRahe` |
+
+`core` · `da` · `rob` · `lotc` são os 4 títulos que §T444 já gravou no `HH.12.lfm` — copie
+a grafia de lá, ⊥ reinvente. `lob` & `bh` saem do rodapé corrido do próprio livro; `tos` &
+`dac` põem o nome do CAPÍTULO no rodapé, ⊥ o do livro, ∴ o título vem desta tabela.
+
+**Página impressa, ⊥ do PDF.** A coluna dos mapas já é a IMPRESSA. Para abrir o PDF na
+página certa: `pdftotext -f <impressa + offset>`.
+
 ## Offset de página, por livro
 
 Página IMPRESSA = página do PDF menos:
@@ -72,7 +97,7 @@ awk -v RS='\f' '{p=NR;n=split($0,L,"\n");for(i=1;i<=n;i++){t=L[i];gsub(/^[ \t]+|
 
 `Vampire V20 - Anarchs Unbound.pdf` ⊥ rende nada (§R69): 0 marcador de nível. Já varrido.
 
-## `disc_pages.tsv` — o mapa de página de §T444 (58ª rodada)
+## `disc_pages.tsv` — o mapa de página de §T444 (FECHADO 36/36 na 59ª rodada)
 
 `<disciplina>\t<título do livro>\t<pág impressa>\t<pág pdf>\t<x|.>`
 
@@ -97,6 +122,18 @@ extração de 8 PDFs; o mapa existe para ⊥ repetir. A 5ª coluna é o progress
 
 Gerados por `findpage.sh` (busca de CABEÇALHO no índice de página, ⊥ de menção em prosa)
 + `mapritual.sh`. **Validação: as 70 páginas que o §I19 coletou à mão batem 70/70.**
+
+**Os 2 mapas casam 1:1 com o `values=` do picker — conferido na 59ª rodada, 0 divergência:**
+
+```bash
+# HH.13: coluna 1 do mapa == value do picker
+# HH.14: value do picker == "<coluna 1>. <coluna 2>" — o nível mora em coluna SEPARADA
+#        no mapa, mas COLADO no value (§V184)
+awk -F'\t' 'NR>1{print $1". "$2}' research/ritual_pages.tsv | sort -u
+```
+
+∴ dá p/ gerar a lista de chaves de `DESC` direto do mapa, sem reler o `.lfm` — e dá p/
+FECHAR a tarefa provando que ⊥ ∃ item órfão nem chave sem item (foi assim que §T444 fechou).
 
 3 correções que o gerador cru errou — repetir os mesmos filtros se reextrair:
 
@@ -141,3 +178,21 @@ done
 Uso: `bash research/findpage.sh research/txt/core.idx 8 "Bind the Accusing Tongue"` → `230`.
 2º argumento = offset (core 8, resto 1). **Conferir contra as 70 páginas do §I19 antes de
 confiar** — foi assim que os 3 filtros de cima foram achados.
+
+## `rebuild_ritual_desc.sh` — escrever entradas de `DESC` no `HH.14.lfm` (§T446)
+
+3º gerador daqui, da 62ª rodada. Existe porque a chave de ritual é `<nível>. <nome>` (§V184)
+e o picker ordena por ela: um ritual novo quase nunca é o último ∴ **enxertar antes do
+marcador de FIM — a receita que fechou §T444/§T445 — põe a entrada no lugar errado, calado.**
+Este script faz SORT-MERGE da tabela inteira, com a ordem vindo de `ritual_pages.tsv`.
+
+```bash
+SP=<scratchpad>/r ; mkdir -p "$SP"
+bash research/rebuild_ritual_desc.sh "$SP" --split   # dumpa o que o .lfm JÁ tem
+#   ... escrever os blocos novos em "$SP"/<qualquer nome>.lua (1 arquivo pode levar N) ...
+bash research/rebuild_ritual_desc.sh "$SP"           # reescreve a tabela inteira
+```
+
+`--split` é obrigatório na 1ª chamada da rodada, senão o rebuild apaga o que já estava lá.
+O script aborta sem tocar o `.lfm` em chave fora do mapa ou duplicada, e confere
+`[==[`/`]==]`, `]]>` == 1 e a ordem no fim. `--split` + rebuild devolve o arquivo byte a byte.
