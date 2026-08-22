@@ -202,10 +202,10 @@
 
 		<!-- Read-only and field-less: book text must never be typed over, and never saved onto
 		     the character (SPEC V29, R12). Closes level with the left column at y=585. -->
-		<layout left="360" top="0" width="850" height="585">
+		<layout left="360" top="0" width="1025" height="585">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtDiscDesc" left="10" top="25" width="830" height="550" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>
+			<label left="0" top="4" width="1025" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtDiscDesc" left="10" top="25" width="1005" height="550" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 	</scrollBox>
 

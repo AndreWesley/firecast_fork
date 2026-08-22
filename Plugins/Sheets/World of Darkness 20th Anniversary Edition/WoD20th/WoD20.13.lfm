@@ -115,11 +115,11 @@
 		<template name="MainPathRow">
 			<radioButton left="0" top="2" width="20" height="21" field="pathSel" fieldValue="$(field)" groupName="pathSel"/>
 			<comboBox left="25" top="0" width="345" height="25" fontSize="12" name="cbo$(field)" field="$(field)"/>
-			<imageCheckBox name="ro_$(field)_1" left="375" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
-			<imageCheckBox name="ro_$(field)_2" left="400" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
-			<imageCheckBox name="ro_$(field)_3" left="425" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
-			<imageCheckBox name="ro_$(field)_4" left="450" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
-			<imageCheckBox name="ro_$(field)_5" left="475" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_1" left="375" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+			<imageCheckBox name="ro_$(field)_2" left="400" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+			<imageCheckBox name="ro_$(field)_3" left="425" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+			<imageCheckBox name="ro_$(field)_4" left="450" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+			<imageCheckBox name="ro_$(field)_5" left="475" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
 		</template>
 
 		<!-- Secondary paths ARE bought, at the Trilha price of SPEC I9, capped at the blood
@@ -208,7 +208,7 @@
 		<layout left="535" top="0" width="850" height="610">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtPathDesc" left="10" top="25" width="830" height="575" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>
+			<textEditor name="edtPathDesc" left="10" top="25" width="830" height="575" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 	</scrollBox>
 

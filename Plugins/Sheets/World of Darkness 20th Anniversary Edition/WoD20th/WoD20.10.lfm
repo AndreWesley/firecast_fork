@@ -48,7 +48,7 @@
 				-- (SPEC V111/V112). Written in the same breath as `enabled`, so the look and
 				-- the state cannot come apart.
 				form.btnSaveBaseline.enabled = not saved;
-				form.btnSaveBaseline.opacity = saved and 0.55 or 1;
+				form.btnSaveBaseline.opacity = saved and 0.40 or 1;
 
 				if saved then
 					form.dynBaselineState.text = translateSheetText("Initial character saved", lang);

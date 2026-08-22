@@ -2182,7 +2182,7 @@ $lockLinks = @($discX.SelectNodes("//dataLink[@field='stEditClanDisc']") | ForEa
 $discReady = [regex]::Match($discRaw, '<event name="onNodeReady">(.*?)</event>', 'Singleline')
 if (-not $lockFn) { Fail "V175 renderClanDiscLock not found on the root form - nothing locks the clan combos" }
 elseif ($lockFn -notmatch 'sheet\.stEditClanDisc == true') { Fail "V175 the lock does not read stEditClanDisc as an explicit true - nil would fall open on an old sheet (SPEC V89, V80)" }
-elseif ($lockFn -notmatch '(?s)c\.enabled = open;\s*\r?\n\s*c\.opacity = open and 1 or 0\.55;') { Fail "V175 enabled and opacity are not written in the same breath - a combo could look open while it is locked (SPEC V162)" }
+elseif ($lockFn -notmatch '(?s)c\.enabled = open;\s*\r?\n\s*c\.opacity = open and 1 or 0\.40;') { Fail "V175 enabled and opacity are not written in the same breath - a combo could look open while it is locked (SPEC V162)" }
 elseif ($lockLinks -notcontains 'renderClanDiscLock(self);') { Fail "V175 WoD20.12 has no dataLink on stEditClanDisc - flipping the flag would not repaint the lock" }
 elseif (-not $discReady.Success -or $discReady.Groups[1].Value -notmatch 'renderClanDiscLock\(self\);') { Fail "V175 WoD20.12 does not paint the lock on open - the tab would come up bright until the flag moved" }
 else { Pass "V175 the clan combos are locked from stEditClanDisc, fail-closed, and the look is written with the state" }
@@ -2197,7 +2197,7 @@ if ($null -eq $roTpl) { Fail "V179 MainPathRow is not declared on WoD20.13 - the
 else {
     $roDots = @($roTpl.SelectNodes("imageCheckBox"))
     $owning = @($roDots | Where-Object { $_.HasAttribute("field") -or $_.HasAttribute("onClick") })
-    $bright = @($roDots | Where-Object { $_.GetAttribute("opacity") -ne '0.55' })
+    $bright = @($roDots | Where-Object { $_.GetAttribute("opacity") -ne '0.40' })
     $live   = @($roDots | Where-Object { $_.GetAttribute("autoChange") -ne 'false' })
     if ($roDots.Count -ne 5) { Fail "V179 MainPathRow carries $($roDots.Count) dots, not the five the scale has" }
     elseif ($owning) { Fail "V179 $($owning.Count) main path dot(s) own a field or an onClick - the rating belongs to the discipline (SPEC I9, I10)" }
@@ -2774,10 +2774,23 @@ foreach ($empty in $emptyShells) {
 # The sheet has no other way to say "look, do not touch": a mirror dot and a real dot are the
 # same art, and a read-only edit is the same box as an editable one. Opacity is the whole of
 # the signal (SPEC C, 33rd round), so it has to be exact and it has to be exclusive - a live
-# field wearing 0.55 lies in the other direction and would teach the player to ignore it.
+# field wearing the dim value lies in the other direction and would teach the player to
 # The theme never writes opacity (V57/V66 family), so what the XML says is what renders in
 # all four eras.
-$DIM     = '0.55'
+# 0.40 since 2026-08-22 (SPEC V111, user asked for "a bit more dimmed"). This constant is
+# NOT the only place the number lives: V175, V179, V112 and V162 each carry it in their own
+# literal because they match Lua source, not an attribute. Change one, change all five -
+# they are named here by CHECK ID rather than by line, because line numbers rot (SPEC V209).
+$DIM     = '0.40'
+
+# The four description panes are the ONE read-only thing that stays bright (SPEC V111(2),
+# user 2026-08-22). They are read-only and they are also the text the player opened the tab
+# to read, and dimming the content to signal "do not edit" charges legibility for a warning
+# the frame and the missing caret already give. Named, like bloodPool_* in V219 and
+# willpower_c* in V99 - loosening (a) instead would let ANY read-only widget go bright, and
+# (a) exists because a mirror dot and a real dot are the same art.
+$DESC_BRIGHT = @('edtDiscDesc','edtPathDesc','edtRitualDesc','edtNuminaDesc')
+$descSeen = 0
 $dimSeen = 0
 $dimBefore = $fail
 foreach ($f in $files) {
@@ -2788,7 +2801,10 @@ foreach ($f in $files) {
         $op = $n.GetAttribute("opacity")
         $id = $n.GetAttribute("name"); if (-not $id) { $id = $n.GetAttribute("field") }; if (-not $id) { $id = $n.LocalName }
 
-        if ($ro) {
+        if ($DESC_BRIGHT -contains $id) {
+            $descSeen++
+            if ($op -ne '') { Fail "V111 $($f.Name) $id is a description pane and still carries opacity '$op' - the text the player opened the tab to READ is the one read-only widget that stays bright (SPEC V111(2))" }
+        } elseif ($ro) {
             $dimSeen++
             if ($op -ne $DIM) { Fail "V111 $($f.Name) $id is read-only but reads live (opacity '$op', expected $DIM)" }
         } elseif ($op -ne '') {
@@ -2796,7 +2812,8 @@ foreach ($f in $files) {
         }
     }
 }
-if ($fail -eq $dimBefore) { Pass "V111 $dimSeen read-only widgets dimmed at $DIM, every editable one left bright" }
+if ($descSeen -ne $DESC_BRIGHT.Count) { Fail "V111 $descSeen of the $($DESC_BRIGHT.Count) named description panes were found - a renamed pane would fall back into the dim rule silently, or the exception is now covering nothing (SPEC V209)" }
+elseif ($fail -eq $dimBefore) { Pass "V111 $dimSeen read-only widgets dimmed at $DIM, $descSeen description panes left bright, every editable one untouched" }
 
 # The fixed first dot of a virtue is an <image>, not an input, so the sweep above cannot see
 # it - and a bright dot beside four dimmed ones is exactly the row reading half-locked (SPEC C).
@@ -2817,7 +2834,7 @@ if ($fail -eq $imgBefore) { Pass "V111 the fixed dot1 art is dimmed on the mirro
 # button with a live button's face, which is the same lie V111 refuses in the XML.
 $stTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.10.lfm")))
 if ($stTxt -notmatch 'btnSaveBaseline\.enabled\s*=\s*not saved;') { Fail "V112 the Save button is not disabled once the baseline is saved (SPEC V82)" }
-elseif ($stTxt -notmatch 'btnSaveBaseline\.opacity\s*=\s*saved and 0\.55 or 1;') { Fail "V112 the Save button locks without dimming - dead control, live face" }
+elseif ($stTxt -notmatch 'btnSaveBaseline\.opacity\s*=\s*saved and 0\.40 or 1;') { Fail "V112 the Save button locks without dimming - dead control, live face" }
 else { Pass "V112 the Save button dims in the same breath it locks" }
 
 
@@ -3576,7 +3593,7 @@ elseif ($specGuard.Groups[1].Value -notmatch 'if not want and isFreeRow\(trait\)
 elseif ($specGuard.Groups[1].Value -notmatch 'xpWarn\("Free specialties are lost only by lowering the trait"\);') { Fail "V161 the locked dot refuses in silence" }
 elseif ($specDotOpacity.Count -gt 0) { Fail "V161 the speciality dot carries opacity - a dot with an onClick is editable and must not read as read-only (SPEC V111)" }
 elseif ($renderSpecFn -notmatch 'c\.enabled = not locked;') { Fail "V161 the trait combo of a gift row is never switched off - it is the only lock a comboBox has" }
-elseif ($renderSpecFn -notmatch '(?s)c\.enabled = not locked;\s*\r?\n\s*c\.opacity = locked and 0\.55 or 1;') { Fail "V162 enabled and opacity are not written in the same breath - a row could look open while it is locked (SPEC V112)" }
+elseif ($renderSpecFn -notmatch '(?s)c\.enabled = not locked;\s*\r?\n\s*c\.opacity = locked and 0\.40 or 1;') { Fail "V162 enabled and opacity are not written in the same breath - a row could look open while it is locked (SPEC V112)" }
 elseif ($renderSpecFn -match 'specialityName|markDot') { Fail "V163 the renderer touches the text or the dot - it paints the lock and nothing else" }
 else { Pass "V161/V162 a gift row locks its combo and refuses its dot, and the look is written with the state" }
 
@@ -4516,6 +4533,135 @@ else {
     if ($lowest -eq 0) { Fail "V221 no box was found above the sub-tabs - this check measured nothing (SPEC V209)" }
     elseif ($tabTop -lt $lowest) { Fail "V221 tabsVamp starts at $tabTop, inside the boxes that end at $lowest" }
     else { Pass "V221 the sub-tabs start at $tabTop, clear of the boxes ending at $lowest" }
+}
+
+# ---- V223: nothing calls a `local function` from above the line declaring it ------
+# Lua resolves a non-local name at COMPILE time, so a body written above the `local` that
+# names it compiles to a GETGLOBAL and calls nil at runtime. That is invisible to every
+# verifier this round has: `rdk -l` exits 0 because an undefined global is legal Lua, and
+# the other 443 checks read structure, never order. It cost the user the Max Discipline
+# Level label, dead in BOTH paths while the gate stayed green (SPEC B51, V223).
+#
+# Measured on the 73rd: 24 local functions on the root form and exactly ONE violation in
+# the whole sheet - the one B51 is about. So this check ships with zero teeth left, by
+# design: it is a regression guard, not an audit. The convention it defends is measured,
+# not invented - a function called from ANOTHER .lfm is global, an internal helper is
+# local - so the fix for a hit here is to move the CALLER down, never to promote the
+# helper (that spends a name in a namespace shared with every plugin Firecast loads).
+$orderBad = @()
+$orderSeen = 0
+foreach ($f in $files) {
+    $ls = [System.IO.File]::ReadAllLines($f.FullName)
+    $decl = @{}
+    for ($i = 0; $i -lt $ls.Count; $i++) {
+        $m = [regex]::Match($ls[$i], '^\s*local function ([A-Za-z_][A-Za-z0-9_]*)')
+        if ($m.Success -and -not $decl.ContainsKey($m.Groups[1].Value)) { $decl[$m.Groups[1].Value] = $i }
+    }
+    foreach ($nm in $decl.Keys) {
+        $orderSeen++
+        for ($i = 0; $i -lt $decl[$nm]; $i++) {
+            if ($ls[$i] -match '^\s*(--|<!--)') { continue }   # prose, not a call
+            if ($ls[$i] -match ('\b' + $nm + '\s*\(')) {
+                $orderBad += "$($f.Name):$($i + 1) calls $nm(), which is local from line $($decl[$nm] + 1) down"
+            }
+        }
+    }
+}
+if ($orderSeen -lt 20) { Fail "V223 only $orderSeen local function(s) were collected - the root form alone had 24, so this check is measuring almost nothing (SPEC V209)" }
+elseif ($orderBad.Count) { foreach ($b in $orderBad) { Fail "V223 $b - Lua compiles that as a GETGLOBAL and it is nil at runtime (SPEC B51)" } }
+else { Pass "V223 all $orderSeen local functions are declared above every call to them" }
+
+# ---- V224: the DOMINATOR box is a GRID, not four controls that happen to line up ---
+# Two label columns and two input columns, both rows on the same four (SPEC I30). The
+# failure this guards is drift, not a wrong pixel: B12 was sibling templates whose entry x
+# fell out of step (Header edit@90 vs HeaderPicker combo@112) and B13 a title centred 5px
+# off, and both survived rounds because every width and position check here reads ONE
+# control at a time. Nothing measured a column, so nothing saw the column break.
+#
+# The header label is excluded by spanning the full box width - it is a caption, not a cell.
+$gridDoc = Doc (Join-Path $dir "WoD20.11.lfm")
+$gridBox = $gridDoc.SelectSingleNode("//layout[label/@name='lblMaxDisc']")
+if ($null -eq $gridBox) { Fail "V224 the DOMINATOR box is gone from WoD20.11 - nothing left to measure (SPEC V209)" }
+else {
+    $boxW = [int]$gridBox.GetAttribute("width")
+    $cells = @()
+    foreach ($c in $gridBox.ChildNodes) {
+        if ($c.NodeType -ne "Element" -or $c.LocalName -eq "rectangle") { continue }
+        if (-not $c.HasAttribute("left")) { continue }
+        if ([int]$c.GetAttribute("width") -eq $boxW) { continue }   # the caption spans the box
+        $cells += [int]$c.GetAttribute("left")
+    }
+    $cols = $cells | Group-Object | Sort-Object { [int]$_.Name }
+    $offGrid = @($cols | Where-Object { $_.Count -ne 2 })
+    if ($cells.Count -ne 8) { Fail "V224 the DOMINATOR box holds $($cells.Count) placed controls, expected 8 - four label/input pairs (SPEC I30)" }
+    elseif ($cols.Count -ne 4) { Fail "V224 the DOMINATOR box uses $($cols.Count) x positions, expected 4 - two label columns and two input columns (SPEC I30)" }
+    elseif ($offGrid.Count) { Fail "V224 x=$($offGrid[0].Name) is used by $($offGrid[0].Count) control(s), not 2 - the two rows left the same column (SPEC B12)" }
+    else { Pass "V224 the DOMINATOR box is a grid: 8 controls on 4 shared columns ($(($cols | ForEach-Object { $_.Name }) -join ", "))" }
+}
+
+# ---- V225: the right rule of the Vampire tab, in two legs ------------------------
+# (a) content fits its container, on BOTH AXES. The first cut of this check measured width
+# only - it was written answering a report of a HORIZONTAL scrollbar - and the very next
+# thing the user saw was the same scrollbar on the other axis: WoD20.14 closes at 675 in a
+# tabsVamp of 650 (SPEC B52). The failure mode is "content bigger than container" and it
+# has two axes; one of them was built. Worse, the Pass said "fit inside tabsVamp (1395)",
+# which READS as "they fit" while having compared width alone - a green claiming more than
+# it measured, which is V209, in a message that cited V209.
+#
+# The vertical inset is bigger than the horizontal one: it holds the row of tab BUTTONS,
+# not just a border (SPEC R94). Bounded by deduction rather than guessed - WoD20.13 closes
+# at 610 and shows no bar, so the client is at least 610 and the inset is at most 40.
+#
+# This was the one the user had to find by looking: WoD20.13
+# closed at 1385 inside a tabsVamp of 1210 - 175px of overflow, shipped in the 65th round and
+# green ever since, because every box here was measured ALONE and each one passed. Nothing
+# compared a child form against the parent that has to hold it. Same shape as V224 one round
+# earlier, one level out: there the columns inside a box, here the boxes inside a tab.
+#
+# (b) the ruler itself. Four boxes in four files close on one number that none of them
+# declares, because the user asked for that alignment (SPEC I31) - the classic way a number
+# drifts. Cheap to hold: the gate already has all four files open.
+$vampTop = Doc (Join-Path $dir "WoD20.11.lfm")
+$tv = $vampTop.SelectSingleNode("//tabControl[@name='tabsVamp']")
+if ($null -eq $tv) { Fail "V225 tabsVamp is gone from WoD20.11 - there is no container left to measure against (SPEC V209)" }
+else {
+    $tvW = [int]$tv.GetAttribute("width")
+    $tvH = [int]$tv.GetAttribute("height")
+    $over = @()
+    $edges = @{}
+    $subsSeen = 0
+
+    foreach ($imp in $tv.SelectNodes(".//import")) {
+        $sub = $imp.GetAttribute("file")
+        $p = Join-Path $dir $sub
+        if (-not (Test-Path $p)) { $over += "$sub is imported by tabsVamp but is not on disk"; continue }
+        $subsSeen++
+        $widest = 0
+        $lowest = 0
+        foreach ($l in (Doc $p).SelectNodes("//scrollBox/layout")) {
+            $r = [int]$l.GetAttribute("left") + [int]$l.GetAttribute("width")
+            $b = [int]$l.GetAttribute("top") + [int]$l.GetAttribute("height")
+            if ($r -gt $widest) { $widest = $r }
+            if ($b -gt $lowest) { $lowest = $b }
+            if ($l.SelectSingleNode("textEditor[starts-with(@name,'edt') and contains(@name,'Desc')]")) { $edges[$sub] = $r }
+        }
+        if (-not $widest) { $over += "$sub has no top-level layout - leg (a) measured nothing there (SPEC V209)" }
+        elseif ($widest -gt $tvW) { $over += "$sub closes at x=$widest inside a tabsVamp of $tvW wide - $($widest - $tvW)px of overflow is a horizontal scrollbar (SPEC I31)" }
+        elseif ($lowest -gt $tvH) { $over += "$sub ends at y=$lowest inside a tabsVamp of $tvH tall - $($lowest - $tvH)px of overflow is a vertical scrollbar (SPEC B52)" }
+    }
+
+    foreach ($l in $vampTop.SelectNodes("//scrollBox/layout")) {
+        if ($l.SelectSingleNode("imageCheckBox[@field='bloodPool_1']")) {
+            $edges["WoD20.11.lfm (BLOOD POOL)"] = [int]$l.GetAttribute("left") + [int]$l.GetAttribute("width")
+        }
+    }
+
+    $ruler = @($edges.Values | Sort-Object -Unique)
+    if ($subsSeen -lt 3) { Fail "V225 only $subsSeen sub-tab form(s) were read, expected 3 - leg (a) is covering less than the tab holds (SPEC V209)" }
+    elseif ($over.Count) { foreach ($o in $over) { Fail "V225 $o" } }
+    elseif ($edges.Count -ne 4) { Fail "V225 the ruler was read on $($edges.Count) box(es), expected 4 - three DESCRIPTION panes and the BLOOD POOL box (SPEC I31)" }
+    elseif ($ruler.Count -ne 1) { Fail "V225 the four boxes close on $($ruler.Count) different x ($($ruler -join ', ')) - they are one ruler (SPEC I31): $(($edges.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join '; ')" }
+    else { Pass "V225 the three sub-tabs fit inside tabsVamp on both axes ($($tvW)x$($tvH)), and all four boxes close on x=$($ruler[0])" }
 }
 if ($Build) {
     $rdk = "$env:LOCALAPPDATA\FirecastSDK3\rdk.exe"

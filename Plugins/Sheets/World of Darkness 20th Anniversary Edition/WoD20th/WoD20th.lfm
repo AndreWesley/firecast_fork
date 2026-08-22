@@ -236,21 +236,12 @@
 				return GEN_MAX[tostring(g)];
 			end;
 
-			function renderMaxDisc(from)
-				if from == nil then return; end;
-
-				local found = {};
-
-				xpFind(tabRootOf(from), { lblMaxDisc = true }, found);
-
-				local c = found["lblMaxDisc"];
-
-				if c == nil then return; end;
-
-				local m = maxDiscLevel();
-
-				c.text = (m == nil) and "-" or tostring(m);
-			end;
+			-- `renderMaxDisc` NAO fica aqui, e a ausencia e deliberada (SPEC B51, V223). Ele anda da
+			-- raiz por `tabRootOf`, que e um `local function` declarado ~1050 linhas ABAIXO deste
+			-- ponto, e Lua resolve nome nao-local em tempo de COMPILACAO: corpo escrito acima do
+			-- `local` vira GETGLOBAL e acha nil rodando. Foi exatamente o erro que o label deu ao
+			-- user. Ele mora logo abaixo de `applyTabVisibility`, o outro global que anda da raiz.
+			-- Nao devolver p/ ca ao lado de GEN_MAX: a leitura melhora e o label morre.
 
 			function setField(name, value)
 				if sheet == nil then return; end;
@@ -1360,6 +1351,27 @@
 				end;
 
 			end;
+			-- Aqui, e nao la em cima ao lado de GEN_MAX e maxDiscLevel onde ele LERIA melhor, por um
+			-- motivo so (SPEC B51, V223): ele chama `tabRootOf`, `local function` declarada ACIMA
+			-- desta linha. Lua resolve nome nao-local em tempo de COMPILACAO, entao corpo escrito
+			-- acima daquela declaracao compila GETGLOBAL e chama nil - e `rdk -l` sai 0 nisso e os
+			-- 443 checks passaram verdes enquanto o label nunca pintou, nos DOIS caminhos.
+			function renderMaxDisc(from)
+				if from == nil then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), { lblMaxDisc = true }, found);
+
+				local c = found["lblMaxDisc"];
+
+				if c == nil then return; end;
+
+				local m = maxDiscLevel();
+
+				c.text = (m == nil) and "-" or tostring(m);
+			end;
+
 
 			-- ---- First paint (SPEC I15 / V166 / V167 / B40, 49th round) -----------------
 			--
@@ -2423,7 +2435,7 @@
 
 					if c ~= nil then
 						c.enabled = open;
-						c.opacity = open and 1 or 0.55;
+						c.opacity = open and 1 or 0.40;
 					end;
 				end;
 			end;
@@ -2446,7 +2458,7 @@
 						local locked = isFreeRow("speciality_" .. i);
 
 						c.enabled = not locked;
-						c.opacity = locked and 0.55 or 1;
+						c.opacity = locked and 0.40 or 1;
 					end;
 				end;
 			end;

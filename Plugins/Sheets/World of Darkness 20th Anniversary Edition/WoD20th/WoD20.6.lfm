@@ -108,8 +108,6 @@
 				["Conveyance"] = "Transporte",
 				["Cost"] = "Custo",
 				["DOMINATOR"] = "DOMINADOR",
-				["Dominator"] = "Dominador",
-				["Dominator Generation"] = "Geração do Dominador",
 				["Max Discipline Level"] = "Nível Máx. de Disciplina",
 				["-"] = "-",
 				["Clan/Family"] = "Clã/Família",
@@ -1711,7 +1709,7 @@
 			     older, longer names is normalised on load (SPEC V110), because a locked box
 			     showing a dead value is one nobody could fix. -->
 			<label left="0" top="50" width="90" height="20" text="Game" horzTextAlign="center"/>
-			<comboBox left="95" top="50" width="220" height="25" name="cboGame" field="game" enabled="false" opacity="0.55" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Hunters Hunted', 'Mage'}" values="{'Vampire', 'Hunters Hunted', 'Mage'}">
+			<comboBox left="95" top="50" width="220" height="25" name="cboGame" field="game" enabled="false" opacity="0.40" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Hunters Hunted', 'Mage'}" values="{'Vampire', 'Hunters Hunted', 'Mage'}">
 			</comboBox>
 			<dataLink field="game" defaultValue="Hunters Hunted"/>
 

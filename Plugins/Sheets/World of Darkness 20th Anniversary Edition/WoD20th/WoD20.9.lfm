@@ -139,10 +139,10 @@
 			<label left="0" top="10" width="475" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
 			<label left="15" top="38" width="141" height="20" text="Total Experience" horzTextAlign="center"/>
-			<edit name="edtTotalXP" left="40" top="60" width="90" height="25" readOnly="true" opacity="0.55" horzTextAlign="center" fontSize="14"/>
+			<edit name="edtTotalXP" left="40" top="60" width="90" height="25" readOnly="true" opacity="0.40" horzTextAlign="center" fontSize="14"/>
 
 			<label left="166" top="38" width="141" height="20" text="Spent Experience" horzTextAlign="center"/>
-			<edit name="edtSpentXP" left="191" top="60" width="90" height="25" readOnly="true" opacity="0.55" horzTextAlign="center" fontSize="14"/>
+			<edit name="edtSpentXP" left="191" top="60" width="90" height="25" readOnly="true" opacity="0.40" horzTextAlign="center" fontSize="14"/>
 
 			<label left="317" top="38" width="141" height="20" text="Current Experience" horzTextAlign="center"/>
 			<edit name="edtCurrentXP" left="342" top="60" width="90" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);"/>
@@ -180,12 +180,12 @@
 			<label left="348" top="25" width="54" height="20" text="Level" horzTextAlign="center"/>
 			<label left="412" top="25" width="45" height="20" text="Cost" horzTextAlign="center"/>
 
-			<textEditor name="dynXpTrait" left="158" top="50" width="180" height="470" readOnly="true" opacity="0.55"/>
-			<textEditor name="dynXpLevel" left="348" top="50" width="54" height="470" readOnly="true" opacity="0.55" horzTextAlign="center"/>
-			<textEditor name="dynXpCost" left="412" top="50" width="45" height="470" readOnly="true" opacity="0.55" horzTextAlign="center"/>
+			<textEditor name="dynXpTrait" left="158" top="50" width="180" height="470" readOnly="true" opacity="0.40"/>
+			<textEditor name="dynXpLevel" left="348" top="50" width="54" height="470" readOnly="true" opacity="0.40" horzTextAlign="center"/>
+			<textEditor name="dynXpCost" left="412" top="50" width="45" height="470" readOnly="true" opacity="0.40" horzTextAlign="center"/>
 			<!-- Type comes LAST so the state sentence it widens to shows OVER the three empty
 			     columns beside it, not under them (see XP_MSG_W above). -->
-			<textEditor name="dynXpType" left="15" top="50" width="133" height="470" readOnly="true" opacity="0.55"/>
+			<textEditor name="dynXpType" left="15" top="50" width="133" height="470" readOnly="true" opacity="0.40"/>
 
 		</layout>
 	</scrollBox>

@@ -1,8 +1,74 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-Reescrito 2026-08-21, fim da **72ª rodada**. Para um Claude que abre a sessão sem contexto.
+Reescrito 2026-08-22, fim da **76ª rodada**. Para um Claude que abre a sessão sem contexto.
 
 A 69ª fechou **§T498 · §T499 · §T500 · §T501 · §T502** (plugin próprio); a 70ª fechou **§T503** & a 71ª **§T504** — preços de XP de vampiro TROCADOS (§I9: disciplina 20 / clã n×15 / fora do clã n×25 · Secondary Path 20 / n×15) & ⚠ ficha que JÁ comprou disciplina é REPRECIFICADA na abertura, `Current` pode ir a negativo (§C); a 72ª fechou **§T505–§T509** — topo da aba Vampiro ganhou 2 caixas: `DOMINATOR` (dominador · geração 4ª-14ª · Max Discipline Level derivado · Clan/Family) & `BLOOD POOL` (20 bolinhas LIVRES, 10 por default). Teto de geração RECUSA compra de disciplina acima do máximo (§V220). **§T510 BLOQUEADA**: falta o user passar os livros p/ as famílias de revenant (§R93) — o combo `Clan/Family` vive c/ 60 clãs/linhagens até lá, & `clanFamily` é ALIAS de `clan` (§B50) ∴ §T510 TROCA o alias, ⊥ dá append. **§T511 é teste SEU no Firecast**; — esconder aba manejada ⊥ move mais ninguém: §V217 REVOGA §V93 (o pulo p/ `Main` arrancava o mestre da aba `Storyteller` a cada toggle). Gate verde, `.rpk` gerado e instalado.
+
+A **73ª** fechou **§T512** — conserto do erro que o user viu ao trocar `Dominator Generation`:
+`attempt to call a nil value (global 'tabRootOf')`. RAIZ = ORDEM DE DECLARAÇÃO em Lua, ⊥ lógica
+(§B51): `tabRootOf` é `local function` & `renderMaxDisc` tinha sido escrita ~1050 linhas ACIMA
+dela ∴ o corpo compilava GETGLOBAL & achava nil. `renderMaxDisc` DESCEU p/ debaixo de
+`applyTabVisibility`, corpo intacto byte a byte; `GEN_MAX` & `maxDiscLevel` ficaram onde estavam.
+O label `Max Discipline Level` estava MORTO nos 2 caminhos (`onNodeReady` & `onChange`) desde
+a 72ª — §T507 (o teto que recusa a compra) ⊥ foi atingida, ela lê `maxDiscLevel()` direto.
+
+⚠ **`rdk -l` sai 0 sobre global indefinido** — é Lua legal — & os 442 checks liam ESTRUTURA,
+nunca ORDEM ∴ a 72ª fechou verde c/ o label morto. **§V223** fecha essa porta: nenhuma chamada
+a `local function` acima da linha que a declara. Ela nasce c/ **0 dentes** de propósito (a única
+violação do sheet era essa) — é guarda de REGRESSÃO, ⊥ auditoria. Conserto de um hit nela é
+DESCER o chamador, ⊥ promover o helper a global (§V223 traz a convenção medida: global = chamada
+de outro `.lfm`, local = helper interno).
+
+A **74ª** fechou **§T513** & **§T514** (pedido user 2026-08-22, 2 mudanças de layout):
+
+- a caixa `DOMINATOR` virou **grade 2×2** — linha 1 `Name` · `Generation`, linha 2 `Clan/Family`
+  · `Max Discipline Level`. ⚠ **só o `text=` mudou**: os campos seguem `dominator` &
+  `dominatorGen` (§V2 — o user grafou `dominatorName`/`dominatorGeneration` no pedido & esses
+  ⊥ ∃; renomear perderia o dado da ficha que ele já está testando, §I30). As 2 caixas 150→**120**
+  & `tabsVamp` 160→**130** ∴ as sub-abas ganharam 40px. `wod.Dominator` & `wod.Dominator
+  Generation` perderam o último leitor & SAÍRAM dos 3 lugares; `wod.Name`/`wod.Generation` já ∃
+  ∴ ⊥ entrou chave nova. **§V224** guarda a grade por COLUNA (§B12 §B13 são a mesma deriva).
+- **esmaecimento**: as 4 caixas de descrição (`edtDiscDesc` `edtPathDesc` `edtRitualDesc`
+  `edtNuminaDesc`) PERDERAM `opacity` — exceção NOMINAL de §V111, ≡ `bloodPool_*`/`willpower_c*`
+  — & todo o resto foi `0.55`→**`0.40`**: 33 literais no XML + 3 sítios Lua. ⚠ o §T514 dizia
+  "as 2 regex do gate" & são **3** (§V112 §V162 **§V175**) + o literal solto de §V179 + `$DIM`
+  = **5** sítios no gate, & eles ⊥ leem a constante de propósito (casam fonte Lua, ⊥ atributo).
+  O `$DIM` agora nomeia os outros 4 por ID DE CHECK, ⊥ por linha (§V209: linha apodrece).
+
+A **75ª** fechou **§T516** & **§T517** — a aba Vampiro ganhou **régua direita em x=1385**.
+O relato era "aparece scrollbar nas abas de disciplina/blood sorcery" & o número era grande:
+`WoD20.13` fechava em **1385** dentro de um `tabsVamp` de **1210** — 175px de transbordo,
+entregues na 65ª & VERDES desde então, porque ∀ caixa era medida SOZINHA & todas passavam.
+⊥ ∃ quem comparasse o filho c/ o pai que ! segurá-lo. **§V225** fecha isso em 2 pernas:
+(a) conteúdo de sub-aba ≤ largura de `tabsVamp` · (b) as 3 `DESCRIPTION` & a `BLOOD POOL`
+fecham no MESMO x (4 arquivos concordando num número que nenhum declara).
+
+- `DOMINATOR` 0..**875** (vão de coluna 13→68px) & `cboClanFamily` 200→**320** — que é o que
+  §T510 vai querer quando as famílias de revenant chegarem. `BLOOD POOL` 885..1385 (600→500),
+  20 bolinhas recentralizadas nos 2 eixos (x 111..388 · fileiras em 42 & 77).
+- `WoD20.12` DESCRIPTION 850→**1025** & `WoD20.14` 850→**865**. **`WoD20.13` ⊥ foi tocado**:
+  ele JÁ fechava em 1385 & é a FONTE da régua — mexer nele seria mover o alvo.
+- `tabsVamp` 1210→**1395**, 10px além do conteúdo: o inset do `<tab>` ⊥ é legível no fonte
+  (**§R94**) ∴ a folga é declarada. §T518 resolve nos 2 sentidos.
+
+⚠ CUSTO declarado: a ficha já exigia **1370** pela aba Traits (46ª) ∴ o ponto mais largo vai
+p/ 1395, **+25px** — mas a Vampiro TOMA da Traits o posto de 1ª aba a mostrar barra
+horizontal quando a janela encolhe.
+
+A **76ª** fechou **§T519** — barra de rolagem em `Blood Sorcery: Rituals` (relato user). Era o
+eixo **Y**: `WoD20.14` fecha em **675** & `tabsVamp` tinha **650**. `tabsVamp` `height` 650→**730**
+∴ fundo 780→860, & o CUSTO é **zero** — a aba Storyteller (`WoD20.10`) já obriga a ficha a **920**
+de altura (MEDIDO nos 15 forms) ∴ o ponto mais alto ⊥ se move. ⊥ encolhi `WoD20.14`: os 675 são
+25 linhas de ritual & cortar altura cortaria LINHA (§R8).
+
+⚠ **§B52 é sobre MIM, ⊥ sobre o código**: §V225 nasceu na 75ª respondendo a um relato de barra
+HORIZONTAL & mediu só o X; o relato seguinte foi a MESMA barra no Y, & o transbordo já estava
+lá antes (as alturas ⊥ foram tocadas na 75ª). Pior: o Pass dizia "the three sub-tabs fit inside
+tabsVamp (1395)" — "fit inside" LÊ como "cabem" & ele comparara LARGURA só. Verde afirmando
+mais do que mediu = §V209, numa mensagem que CITAVA §V209. §V225(a) agora mede os 2 eixos & o
+Pass nomeia os 2. Regra que sai daí: **eixo novo pede mutação PRÓPRIA** — a mutação de X ⊥
+prova Y (§V222 em forma de eixo).
+
 **Nada commitado.**
 
 ## ⚠ A FICHA MUDOU DE PLUGIN E DE NOME NA 69ª
@@ -150,11 +216,11 @@ cd "c:\Users\awlol\OneDrive\Documents\firecast_fork"
 
 | | |
 |---|---|
-| `.rpk` | **1.952.695** B, 2026-08-21 22:37:01 — instalado 22:37:01, sizes batendo |
-| `WoD20th.lfm.lua` | **1.415.113** B (⊥ remedido na 69ª — o rename ⊥ muda tamanho) |
+| `.rpk` | **1.964.049** B, 2026-08-22 12:59:03 — instalado 12:59:04, sizes batendo |
+| `WoD20th.lfm.lua` | **1.435.277** B (remedido na 73ª) |
 | `module.xml` | `<id>AndreOliveira.Styllern.WoD20th</id>` · `<version>1.0</version>` (plugin novo) |
-| gate | **4.439** linhas, ASCII puro, LF · 436 checks |
-| §V máx | **V222** · §B máx **B50** · §T máx **T511** · gate **443** checks |
+| gate | **4.575** linhas, ASCII puro, LF |
+| §V máx | **V225** · §B máx **B51** · §T máx **T520** · §B máx **B52** · §R máx **R94** · gate **445** checks estáticos, **447** c/ `-Build` |
 
 ⚠ **⊥ deixe a saída do gate cair no chat** — são ~400 linhas `ok` e afoga o contexto:
 
@@ -165,6 +231,10 @@ grep -E "FAIL|ALL CHECKS" '<tmp>/g.txt'
 
 As linhas `FAIL` **⊥ aparecem** em `$o = .\verify...` — `Fail` escreve em outro stream. ! usar
 `*>&1` p/ arquivo.
+
+⚠ **`Out-File -Encoding utf8` põe BOM na 1ª linha** ∴ `grep -c '^ok  '` perde 1 check & a
+contagem sai 1 A MENOS. Foi o que fez a 72ª ser relatada c/ "443 checks" quando eram **442**.
+Se a contagem parecer ter caído sem motivo, confira o BOM ANTES de caçar check perdido.
 
 ---
 

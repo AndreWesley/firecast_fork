@@ -202,10 +202,10 @@
 		</layout>
 
 		<!-- Grows with the column on its left, never on its own (SPEC V193). -->
-		<layout left="520" top="0" width="850" height="675">
+		<layout left="520" top="0" width="865" height="675">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtRitualDesc" left="10" top="25" width="830" height="640" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>
+			<label left="0" top="4" width="865" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtRitualDesc" left="10" top="25" width="845" height="640" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 	</scrollBox>
 
