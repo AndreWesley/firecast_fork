@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmWoD20_13" align="client" theme="dark">
+	<script>
+		<![CDATA[
+			-- Paths area of the Vampire tab (SPEC I16, I18). Same shape as WoD20.12: picker rows on the
+			-- left, one read-only description block on the right.
+			--
+			-- The book text lives in descPath.lua, at the plugin root next to module.xml
+			-- (SPEC I24). The generator markers moved with it, so the region keeps its shape;
+			-- only the file it sits in changed. The require that loads it is INSIDE pathText,
+			-- never here (SPEC V198): this CDATA is copied raw into constructNew_*(), so a
+			-- top-level require would parse the whole table on every sheet open and the
+			-- deferral would be a silent no-op.
+
+			local NO_SELECTION = {
+				en = "Pick the selector next to a path to read its description here.",
+				pt = "Marque o seletor ao lado de uma trilha para ler a descrição dela aqui.",
+			};
+
+			local EMPTY_ROW = {
+				en = "That row is still empty. Choose a path in the list first.",
+				pt = "Essa linha ainda está vazia. Escolha uma trilha na lista primeiro.",
+			};
+
+			local NO_ENTRY = {
+				en = "No description on file for: ",
+				pt = "Sem descrição registrada para: ",
+			};
+
+			local function pick(tbl, lang)
+				return tbl[lang] or tbl.en;
+			end;
+
+			-- SPEC T470 / I21: an entry may carry a SECOND body, written from the Dark Ages book,
+			-- under daEn/daPt. The two medieval themes read it; the two modern ones never do.
+			-- An entry with no medieval body falls back to the core one, so a gap in the Dark
+			-- Ages text shows the core text and never an empty box (SPEC V33).
+			local function pickEra(entry, lang)
+				local era = currentTheme();
+
+				if era == "Dark Ages" or era == "Classical Age" then
+					local da = (lang == "pt" and entry.daPt) or entry.daEn;
+					if da ~= nil and da ~= "" then return da; end;
+				end;
+
+				return pick(entry, lang);
+			end;
+
+			local function pathText(lang)
+				wodTrace("pathText");
+				local selected = sheet.pathSel;
+
+				if selected == nil or selected == "" then
+					return pick(NO_SELECTION, lang);
+				end;
+
+				local value = sheet[selected];
+
+				if value == nil or value == "" then
+					return pick(EMPTY_ROW, lang);
+				end;
+
+				-- SPEC V206: the require sits BELOW every early return, so a sheet with no
+				-- selection - and a row that never reaches the book - parses nothing. SPEC V198
+				-- put it inside this body and the gate went green, but onNodeReady called this
+				-- function on EVERY open and the deferral was a no-op nobody could see (SPEC
+				-- B47): position in the FILE is not reach in the FLOW, and the gate reads source,
+				-- not runtime (SPEC B30, B34). `require` still caches in package.loaded, so the
+				-- first row that really needs the book pays the parse and every later one is free.
+				wodTrace("descPath.REQUIRE");
+				local DESC = require("descPath.lua");
+
+				local entry = DESC[value];
+
+				-- The name in the message is the one the ROW shows, so it goes through the era
+				-- and then through the language exactly as the picker item does (SPEC I22, T469).
+				-- Naming it by the raw canonical value would send the player looking for a line
+				-- that is not in the list above.
+				if entry == nil then
+					return pick(NO_ENTRY, lang) .. translateSheetText(eraName(value, currentTheme()), lang);
+				end;
+
+				return pickEra(entry, lang);
+			end;
+
+			-- SPEC I26 / V206: painting this block costs a parse of the book module, so it
+			-- happens when the tab is SHOWN, never when the sheet opens. onShow is the trigger
+			-- and this guard is the second leg: whether onShow fires for a form inside an
+			-- INACTIVE tab is not measured yet (SPEC R92b), so the fix hangs on two contracts
+			-- instead of one - the lesson of SPEC B39.
+			--
+			-- Tested against `false`, not falsiness: if the host answers nil the block PAINTS,
+			-- which is today's behaviour. Failing closed would leave an empty box with nothing
+			-- to show for it - the silence SPEC V33 exists to forbid.
+			function renderPathDesc(form)
+				if sheet == nil then return; end;
+				if form.isShowing == false then return; end;
+				form.edtPathDesc.text = pathText(sheet.language or "en");
+			end;
+		]]>
+	</script>
+
+	<scrollBox align="client">
+		<image name="themePaper13" align="client" style="stretch" hitTest="false" visible="false"/>
+
+		<!--
+			MAIN PATHS carry dots that are DISPLAY ONLY (SPEC V179): no field, no onClick,
+			autoChange off, dimmed like every other read-only widget on the sheet (SPEC V111).
+			A main path's rating IS its blood sorcery's rating (SPEC V180) - the discipline is
+			what was paid for, so charging for the path too would bill one dot twice.
+
+			They are painted from the discipline by renderMainPaths, which arrives with the
+			BLOOD_SORCERY table in SPEC T435/T439. Until then they simply sit dark.
+		-->
+		<template name="MainPathRow">
+			<radioButton left="0" top="2" width="20" height="21" field="pathSel" fieldValue="$(field)" groupName="pathSel"/>
+			<comboBox left="25" top="0" width="345" height="25" fontSize="12" name="cbo$(field)" field="$(field)"/>
+			<imageCheckBox name="ro_$(field)_1" left="375" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_2" left="400" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_3" left="425" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_4" left="450" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_5" left="475" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.55"/>
+		</template>
+
+		<!-- Secondary paths ARE bought, at the Trilha price of SPEC I9, capped at the blood
+		     sorcery's rating minus one (SPEC V183, enforced in xpClick at SPEC T441). -->
+		<template name="SecPathRow">
+			<radioButton left="0" top="2" width="20" height="21" field="pathSel" fieldValue="$(field)" groupName="pathSel"/>
+			<comboBox left="25" top="0" width="345" height="25" fontSize="12" name="cbo$(field)" field="$(field)"/>
+			<imageCheckBox left="375" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="400" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="425" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="450" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="475" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+		</template>
+
+		<!-- 5 slots: one main path per blood sorcery (SPEC V181). 25 + 5*25 + 25 = 175. -->
+		<layout left="0" top="0" width="525" height="175">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="525" height="20" text="MAIN PATHS" horzTextAlign="center"/>
+			<layout left="12" top="25" width="500" height="25">
+				<MainPathRow field="mainPath_1"/>
+			</layout>
+			<layout left="12" top="50" width="500" height="25">
+				<MainPathRow field="mainPath_2"/>
+			</layout>
+			<layout left="12" top="75" width="500" height="25">
+				<MainPathRow field="mainPath_3"/>
+			</layout>
+			<layout left="12" top="100" width="500" height="25">
+				<MainPathRow field="mainPath_4"/>
+			</layout>
+			<layout left="12" top="125" width="500" height="25">
+				<MainPathRow field="mainPath_5"/>
+			</layout>
+		</layout>
+
+		<layout left="0" top="185" width="525" height="425">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="525" height="20" text="SECONDARY PATHS" horzTextAlign="center"/>
+			<layout left="12" top="25" width="500" height="25">
+				<SecPathRow field="secPath_1"/>
+			</layout>
+			<layout left="12" top="50" width="500" height="25">
+				<SecPathRow field="secPath_2"/>
+			</layout>
+			<layout left="12" top="75" width="500" height="25">
+				<SecPathRow field="secPath_3"/>
+			</layout>
+			<layout left="12" top="100" width="500" height="25">
+				<SecPathRow field="secPath_4"/>
+			</layout>
+			<layout left="12" top="125" width="500" height="25">
+				<SecPathRow field="secPath_5"/>
+			</layout>
+			<layout left="12" top="150" width="500" height="25">
+				<SecPathRow field="secPath_6"/>
+			</layout>
+			<layout left="12" top="175" width="500" height="25">
+				<SecPathRow field="secPath_7"/>
+			</layout>
+			<layout left="12" top="200" width="500" height="25">
+				<SecPathRow field="secPath_8"/>
+			</layout>
+			<layout left="12" top="225" width="500" height="25">
+				<SecPathRow field="secPath_9"/>
+			</layout>
+			<layout left="12" top="250" width="500" height="25">
+				<SecPathRow field="secPath_10"/>
+			</layout>
+			<layout left="12" top="275" width="500" height="25">
+				<SecPathRow field="secPath_11"/>
+			</layout>
+			<layout left="12" top="300" width="500" height="25">
+				<SecPathRow field="secPath_12"/>
+			</layout>
+			<layout left="12" top="325" width="500" height="25">
+				<SecPathRow field="secPath_13"/>
+			</layout>
+			<layout left="12" top="350" width="500" height="25">
+				<SecPathRow field="secPath_14"/>
+			</layout>
+			<layout left="12" top="375" width="500" height="25">
+				<SecPathRow field="secPath_15"/>
+			</layout>
+		</layout>
+
+		<layout left="535" top="0" width="850" height="610">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtPathDesc" left="10" top="25" width="830" height="575" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>
+		</layout>
+	</scrollBox>
+
+	<dataLink fields="{'language', 'sheetTheme', 'pathSel', 'mainPath_1', 'mainPath_2', 'mainPath_3', 'mainPath_4', 'mainPath_5', 'secPath_1', 'secPath_2', 'secPath_3', 'secPath_4', 'secPath_5', 'secPath_6', 'secPath_7', 'secPath_8', 'secPath_9', 'secPath_10', 'secPath_11', 'secPath_12', 'secPath_13', 'secPath_14', 'secPath_15'}" onChange="renderPathDesc(self);"/>
+
+	<!--
+		The five main path dots follow the Discipline, recomputed on every render and stored
+		nowhere (SPEC V180), so this link watches what renderMainPaths actually READS and
+		nothing else (SPEC V123): the five path slots, the nineteen Discipline slots, and the
+		dots of those nineteen - the rating is the dots, so a bought dot has to reach here.
+
+		It is a link of its own rather than fields bolted onto the description link above:
+		that one repaints prose from `language` and the picker rows, and hanging ninety-five
+		dot fields on it would repaint the description every time anyone bought anything
+		(SPEC V123, the mistake B34 records).
+	-->
+	<dataLink fields="{'mainPath_1', 'mainPath_2', 'mainPath_3', 'mainPath_4', 'mainPath_5', 'clanDisc_1', 'clanDisc_2', 'clanDisc_3', 'clanDisc_4', 'disc_1', 'disc_2', 'disc_3', 'disc_4', 'disc_5', 'disc_6', 'disc_7', 'disc_8', 'disc_9', 'disc_10', 'disc_11', 'disc_12', 'disc_13', 'disc_14', 'disc_15', 'clanDisc_1_1', 'clanDisc_1_2', 'clanDisc_1_3', 'clanDisc_1_4', 'clanDisc_1_5', 'clanDisc_2_1', 'clanDisc_2_2', 'clanDisc_2_3', 'clanDisc_2_4', 'clanDisc_2_5', 'clanDisc_3_1', 'clanDisc_3_2', 'clanDisc_3_3', 'clanDisc_3_4', 'clanDisc_3_5', 'clanDisc_4_1', 'clanDisc_4_2', 'clanDisc_4_3', 'clanDisc_4_4', 'clanDisc_4_5', 'disc_1_1', 'disc_1_2', 'disc_1_3', 'disc_1_4', 'disc_1_5', 'disc_2_1', 'disc_2_2', 'disc_2_3', 'disc_2_4', 'disc_2_5', 'disc_3_1', 'disc_3_2', 'disc_3_3', 'disc_3_4', 'disc_3_5', 'disc_4_1', 'disc_4_2', 'disc_4_3', 'disc_4_4', 'disc_4_5', 'disc_5_1', 'disc_5_2', 'disc_5_3', 'disc_5_4', 'disc_5_5', 'disc_6_1', 'disc_6_2', 'disc_6_3', 'disc_6_4', 'disc_6_5', 'disc_7_1', 'disc_7_2', 'disc_7_3', 'disc_7_4', 'disc_7_5', 'disc_8_1', 'disc_8_2', 'disc_8_3', 'disc_8_4', 'disc_8_5', 'disc_9_1', 'disc_9_2', 'disc_9_3', 'disc_9_4', 'disc_9_5', 'disc_10_1', 'disc_10_2', 'disc_10_3', 'disc_10_4', 'disc_10_5', 'disc_11_1', 'disc_11_2', 'disc_11_3', 'disc_11_4', 'disc_11_5', 'disc_12_1', 'disc_12_2', 'disc_12_3', 'disc_12_4', 'disc_12_5', 'disc_13_1', 'disc_13_2', 'disc_13_3', 'disc_13_4', 'disc_13_5', 'disc_14_1', 'disc_14_2', 'disc_14_3', 'disc_14_4', 'disc_14_5', 'disc_15_1', 'disc_15_2', 'disc_15_3', 'disc_15_4', 'disc_15_5'}" onChange="renderMainPaths(self); renderVampPickers(self);"/>
+
+	<!--
+		The picker guard (SPEC V181/V182/V185). It hangs off a dataLink and NOT off the
+		comboBox onChange, because a write made inside a control's own dispatch does not
+		survive it - that is how B36 and B38 both let a refusal be ignored (SPEC V186).
+
+		Only the twenty picker fields are watched. Taking a Discipline OFF the sheet does
+		not come through here on purpose: it would clear rows the player already filled,
+		and the main path dots going dark already show that something is missing (V180).
+
+		renderVampPickers rides along because a ROW changing value changes what the lists may
+		offer (SPEC I25): the value a row was holding is kept in its list however illegal it
+		went (SPEC V200), so the moment the player picks something else the stale one has to
+		go - and a main path taken here disappears from the other four (SPEC V181). The
+		guard runs first: if it reverts, the write comes back through this same link and the
+		lists are built from what actually stuck.
+	-->
+	<dataLink fields="{'mainPath_1', 'mainPath_2', 'mainPath_3', 'mainPath_4', 'mainPath_5', 'secPath_1', 'secPath_2', 'secPath_3', 'secPath_4', 'secPath_5', 'secPath_6', 'secPath_7', 'secPath_8', 'secPath_9', 'secPath_10', 'secPath_11', 'secPath_12', 'secPath_13', 'secPath_14', 'secPath_15'}" onChange="guardPick(field, oldValue, newValue); renderVampPickers(self);"/>
+
+	<!-- The description block paints when the tab is SHOWN (SPEC I26 / V206): onNodeReady fires
+	     on every open and dragged the whole 754 KB module in with it (SPEC B47). The other two
+	     stay: they write no book text and pay no parse, and a tab that opened with unpainted
+	     main-path dots or an unfiltered picker would be showing the wrong thing, not a blank
+	     box (SPEC V180, V181). -->
+	<event name="onShow">
+		wodTrace("WoD20.13.onShow");
+		renderPathDesc(self);
+	</event>
+
+	<event name="onNodeReady">
+		renderMainPaths(self);
+		renderVampPickers(self);
+	</event>
+</form>

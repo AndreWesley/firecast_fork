@@ -1,0 +1,2725 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmWoD20th" formType="sheetTemplate" dataType="AndreOliveira.Styllern.WoD20th" title="World of Darkness 20th Anniversary Edition" align="client" theme="dark">
+	<script>
+		<![CDATA[
+			-- Every field write this sheet makes to ITSELF goes through here (SPEC V122).
+			--
+			-- Writing a value that is already there is not free: it wakes every dataLink on
+			-- that field and every renderer hanging off them, and those renderers write more
+			-- fields. The renderers below run on load and on both switches, so the same value
+			-- was being written back dozens of times per open and each write bought a whole
+			-- cascade - which is what froze the sheet on a saved character (SPEC B34).
+			--
+			-- Four lines, in one place, so the gate has one thing to check instead of every
+			-- assignment in the file.
+			-- ---- PICKER_LIST (SPEC I27, 68th round) ------------------------------------------
+			--
+			-- Every picker list the sheet offers, declared ONCE, keyed by FIELD ROOT. It used to
+			-- live inline in each template's items=/values=, which meant the twenty-five ritual
+			-- combos each carried their own copy of the same 284 names - 480,053 bytes of pure
+			-- duplication in the compiled .lfm.lua (SPEC R92d).
+			--
+			-- On the ROOT and not per form (SPEC I27 rule 1): WoD20.1 and WoD20.2 carry no <script> at
+			-- all, and four of these lists live in them. The root script is parsed before any
+			-- <import>, the same reason the health track sits here.
+			--
+			-- items and values are ONE list: the authored pair was identical for all eleven
+			-- declarations (measured). pickerItems writes values from it and items from it after
+			-- the era/language pass, which is what keeps the pair aligned (SPEC V202).
+			--
+			-- CONSTANT: nothing writes into these tables (SPEC V201). One table_remove here would
+			-- poison every combo that shares it, and there is no authored copy left to recover
+			-- from - that is what the second leg of V201 forbids.
+			PICKER_LIST = {
+				-- >>> PICKER_LIST_BEGIN (SPEC V211b - the gate finds this region by MARKER)
+				["clan"] = {
+					"", "Assamite", "Brujah", "Followers of Set", "Gangrel", "Giovanni", "Lasombra", "Malkavian",
+					"Nosferatu", "Ravnos", "Toreador", "Tremere", "Tzimisce", "Ventrue", "Baali", "Blood Brothers",
+					"Daughters of Cacophony", "Harbingers of Skulls", "Kiasyd", "Nagaraja", "Salubri", "Samedi",
+					"True Brujah", "Ahrimanes", "Anda", "Cappadocians", "Lamia", "Lhiannan", "Noiad", "Assamite Antitribu",
+					"Brujah Antitribu", "City Gangrel", "Country Gangrel", "Malkavian Antitribu", "Nosferatu Antitribu",
+					"Ravnos Antitribu", "Salubri Antitribu", "Serpents of the Light", "Toreador Antitribu",
+					"Tremere Antitribu", "Assamite Sorcerers", "Assamite Viziers", "Daitya", "Tlacique", "Warrior Setites",
+					"Mariners", "Lasombra Antitribu", "Dominate Malkavians", "Brahman", "Telyavelic Tremere",
+					"Old Clan Tzimisce", "Gargoyles (Modern)", "Gargoyles (Scout)", "Gargoyles (Sentinel)",
+					"Gargoyles (Warrior)", "Ventrue Antitribu", "Wu Zao", "Angellis Ater", "Maeghar", "Panders",
+					"Children of Osiris",
+				},
+				["nature"] = {
+					"", "Activist", "Architect", "Autocrat", "Benefactor", "Bon Vivant", "Bravo", "Bureaucrat", "Caregiver",
+					"Celebrant", "Chameleon", "Child", "Comedian", "Competitor", "Conformist", "Conniver", "Contrary",
+					"Creep Show", "Critic", "Crusader", "Curmudgeon", "Dabbler", "Defender", "Deviant", "Director", "Enigma",
+					"Explorer", "Eye of the Storm", "Fanatic", "Follower", "Gallant", "Gambler", "Grifter", "Guru", "Hacker",
+					"Idealist", "Innovator", "Jester", "Judge", "Leader", "Loner", "Machine", "Mad Scientist", "Martyr",
+					"Masochist", "Mediator", "Mercenary", "Monster", "Optimist", "Pedagogue", "Penitent", "Perfectionist",
+					"Philosopher", "Pragmatist", "Prophet", "Rebel", "Rogue", "Sadist", "Samaritan", "Scientist",
+					"Sensualist", "Soldier", "Survivor", "Thrill-Seeker", "Traditionalist", "Trendsetter", "Trickster",
+					"Tyrant", "Visionary",
+				},
+				["speciality"] = {
+					"", "Strength", "Dexterity", "Stamina", "Charisma", "Manipulation", "Appearance", "Perception",
+					"Inteligence", "Wits", "Academics", "Alertness", "Animal Ken", "Archery", "Athletics", "Awareness",
+					"Brawl", "Commerce", "Computer", "Crafts", "Drive", "Empathy", "Enigmas", "Etiquette", "Expression",
+					"Finance", "Firearms", "Hearth Wisdom", "Intimidation", "Investigation", "Larceny", "Law", "Leadership",
+					"Legerdemain", "Medicine", "Melee", "Occult", "Performance", "Philosophy", "Politics", "Religion",
+					"Ride", "Ritual", "Science", "Seneschal", "Stealth", "Streetwise", "Subterfuge", "Survival",
+					"Technology", "Theology",
+				},
+				["background"] = {
+					"", "Allies", "Alternate Identity", "Ancestors", "Arcane", "Armory", "Avatar", "Backup",
+					"Base of Operations", "Certification", "Chantry", "Contacts", "Cult", "Demesne", "Destiny", "Domain",
+					"Dream", "Enhancement", "Fame", "Familiar", "Fetish", "Generation", "Guide", "Herd", "Influence",
+					"Kinfolk", "Legend", "Library", "Mentor", "Node", "Past Lives", "Patron", "Pure Breed", "Rank",
+					"Requisitions", "Resources", "Retainers", "Rites", "Rituals", "Sanctum", "Secret Weapons", "Spies",
+					"Status", "Totem", "Wonder",
+				},
+				["numina"] = {
+					"", "Alchemy", "Conjuration", "Conveyance", "Divination", "Ephemera", "Enchantment", "Fascination",
+					"Fortune", "Healing", "Hellfire", "Illusion", "Maelstroms", "Necromancy", "Necronics", "Oneiromancy",
+					"Quintessence Manipulation", "Shadows", "Shapeshifting", "Starlight", "Summoning, Binding, and Warding",
+					"Weather Control",
+				},
+				["psychic"] = {
+					"", "Animal Psychics", "Anti-Psychic", "Astral Projection", "Biocontrol", "Channeling", "Clairvoyance",
+					"Cyberkinesis", "Cyberpathy", "Ectoplasmic Generation", "Mind Shields", "Precognition",
+					"Psychic Healing", "Psychic Hypnosis", "Psychic Invisibility", "Psychic Vampirism", "Psychokinesis",
+					"Psychometry", "Psychoportation", "Pyrokinesis", "Shadow", "Synergy", "Telepathy",
+				},
+				["faith"] = {
+					"", "Christianity", "Judaism", "Islam", "Other",
+				},
+				["disc"] = {
+					"", "Abombwe", "Abyss Mysticism", "Animalism", "Assamite Sorcery", "Auspex", "Bardo", "Celerity",
+					"Chimerstry", "Daimonion", "Dark Thaumaturgy", "Dementation", "Dominate", "Flight", "Fortitude",
+					"Koldunic Sorcery", "Melpominee", "Mytherceria", "Necromancy", "Obeah", "Obfuscate", "Obtenebration",
+					"Ogham", "Potence", "Presence", "Protean", "Quietus", "Sanguinus", "Serpentis", "Setite Sorcery",
+					"Spiritus", "Temporis", "Thanatosis", "Thaumaturgy", "Valeren", "Vicissitude", "Visceratika",
+				},
+				["mainPath"] = {
+					"", "Ash Path", "Awakening of the Steel", "Bone Path", "Cenotaph Path", "Corpse in the Monster",
+					"Die Herrschaft des Wyrm", "Elemental Mastery", "Grave’s Decay", "Hands of Destruction", "Iter Pernix",
+					"Lure of Flames", "Mastery of the Mortal Shell", "Movement of the Mind", "Neptune’s Might",
+					"Path of Conjuring", "Path of Corruption", "Path of Haunting", "Path of Mars",
+					"Path of Spirit Manipulation", "Path of Technomancy", "Path of the Father’s Vengeance",
+					"Path of the Focused Mind", "Path of the Levinbolt", "Potestas Exsecrabilis", "Rego Calatio",
+					"Sepulchre Path", "The Bialowieza Kraina", "The Black Sea Kraina",
+					"The Blessings of the Great Dark Mother", "The Covenant of Enki", "The Fires of the Inferno",
+					"The Flow of Ashe", "The Green Path", "The Hand of the Magi", "The Hunter’s Winds", "The Keeper’s Way",
+					"The Kraina of Enoch", "The Kraina of the Well", "The Laws of Suleiman", "The Nightshade Path",
+					"The Path of Blood", "The Path of Jinn’s Gift", "The Path of Life’s Waters", "The Path of Phobos",
+					"The Path of Praapti", "The Path of Skulls", "The Path of Woe", "The Path of the Ailing Jackal",
+					"The Path of the Evil Eye", "The Path of the Twilight Garden", "The Revelations of Duat",
+					"The Revelations of Eden", "The Revelations of Midgard", "The Taking of the Spirit",
+					"The Transylvanian Kraina", "The Way of Earth", "The Way of Fire", "The Way of Sorrows",
+					"The Way of Water", "The Way of Wind", "The Way of the Spirit", "Ushabti", "Vitreous Path",
+					"Weather Control",
+				},
+				["ritual"] = {
+					"", "1. Ambrus Kelemen’s Aegis", "1. Armor of Diamond Serenity", "1. Bind the Accusing Tongue",
+					"1. Blood Mastery", "1. Blood Rush", "1. Blood into Water", "1. Brand", "1. CCTV",
+					"1. Call of the Hungry Dead", "1. Calling Card", "1. Chime of Unseen Spirits",
+					"1. Communicate with Kindred Sire", "1. Death’s Communion", "1. Defense of the Sacred Haven",
+					"1. Deflection of Wooden Doom", "1. Devil’s Touch", "1. Domino of Life", "1. Drinking Death",
+					"1. Eldritch Beacon", "1. Encrypt Missive", "1. Engaging the Vessel of Transference",
+					"1. Eyes of the Abyss", "1. Final Sight", "1. Flatline", "1. Foxfire", "1. Horoscope",
+					"1. Illuminate the Trail of Prey", "1. Impressive Visage", "1. Incantation of the Shepherd",
+					"1. Insight", "1. Knowing Stone", "1. Learning the Mind Enslumbered", "1. Light within Shadow",
+					"1. Locating the Oubliette", "1. Master of the Domain", "1. Memento Mori", "1. Minestra di Morte",
+					"1. Pierce the Veil", "1. Preserve Corpse", "1. Purify Blood", "1. Purity of Flesh",
+					"1. Reawakening the Dead Water", "1. Rite of Introduction", "1. Rite of Reclamation",
+					"1. Ritual of Return", "1. Ritual of the Smoking Mirror", "1. Sanctify the Temple",
+					"1. Sanguineous Phial", "1. Sense the Mystical", "1. Servitor’s Perception", "1. Shew-Stone",
+					"1. Sigil of Authority", "1. Strength of Haqim", "1. Tame the Maddening Flame", "1. The Abyss Knows",
+					"1. The Word of the Dark God", "1. Treasured Ornaments", "1. Truth in Water", "1. Typhon’s Brew",
+					"1. Unnatural Decay", "1. Wake with Evening’s Freshness", "1. Water Walking", "1. Weight of Shadows",
+					"1. Widow’s Spite", "1. Word of Insight", "2. Abyssal Blade", "2. Antonius’s Denial",
+					"2. Ascension of the Blood", "2. Autumn’s Armor", "2. Banning Rituals", "2. Beat Your Way to Glory",
+					"2. Blade of Smoke and Shadow", "2. Blood Calls to Blood", "2. Blood Crystal", "2. Blood Walk",
+					"2. Borne by Wind", "2. Burning Blade", "2. Comforting Darkness", "2. Commune with Cainite",
+					"2. Concentrated Vitae", "2. Craft Bloodstone", "2. Craft Gris-Gris", "2. Donning the Mask of Shadows",
+					"2. Draining the Well of Life", "2. Extinguish", "2. Eyes of Babel", "2. Eyes of the Dead",
+					"2. Eyes of the Grave", "2. Eyes of the Night Hawk", "2. Feed the Darkness", "2. Flaming Weapon",
+					"2. Generation of the Acheron Vortex", "2. Haruspicy", "2. Haunting Breeze", "2. Hidden Haven",
+					"2. Illusion of Peaceful Death", "2. Implant the Bezoar", "2. Infusion of Kalif",
+					"2. Invoke the Lesser Sign of Power", "2. Iron Body", "2. Machine Blitz", "2. Occhio d’Uomo Morto",
+					"2. Oinos of Dionysus", "2. Parting the Veil", "2. Prepare the Vessel", "2. Preserve",
+					"2. Principal Focus of Vitae Infusion", "2. Puppet", "2. Recure of the Homeland", "2. Seal Egress",
+					"2. Self-Executing File", "2. Subsume the Darkness", "2. Summon Guardian Spirit", "2. Thanatos’ Caress",
+					"2. The Hand of Glory", "2. The Jinx", "2. The Ritual of Pochtli", "2. To Lace with Hidden Nectar",
+					"2. Totenpass", "2. Two Centimes", "2. Ward", "2. Ward Versus Ghouls", "2. Warding Circle versus Ghouls",
+					"2. Whispers of the Ghost", "2. Witch Eye", "2. Witness of Whispers", "3. A Shield of Mirror",
+					"3. A Touch of Nightshade", "3. Abyssal Threads", "3. Amulet of Mnemosyne",
+					"3. Angra Mainyu Consumes Spenta Mainyu", "3. Animate Curios", "3. Animated Assistants", "3. BFU",
+					"3. Balthazar’s Revelation", "3. Bind the Familiar", "3. Blood Dance", "3. Blood and Bane",
+					"3. Bound by Oath", "3. Brotherhood of the Cup", "3. Bull of Heaven", "3. Calling the Hungry Shade",
+					"3. Claiming the Dark", "3. Clinging of the Insect", "3. Cowing the Servant", "3. Craft Dream Catcher",
+					"3. Dante’s Urban Legend", "3. Death’s Head", "3. Din of the Damned", "3. Displacement of the Pneuma",
+					"3. Divine Sign", "3. Enfolding the Believers", "3. Father’s Freedom", "3. Flesh of Fiery Touch",
+					"3. Hell’s Calling", "3. Incorporeal Passage", "3. Inscription", "3. Mirror of Second Sight",
+					"3. Nightmare Drums", "3. One with the Dark", "3. One with the Forest", "3. Pavis of Foul Presence",
+					"3. Rings Like Chains", "3. Ritual of The Unearthed Fetter", "3. Rutor’s Hands", "3. Samira’s Kihanah",
+					"3. Sanguine Assistant", "3. Sanguine Trail", "3. Scorpion Sending", "3. Scry the Hearthstone",
+					"3. Shaft of Belated Quiescence", "3. Soul of the Homunculus", "3. Strength in Wisdom",
+					"3. Summoning the Blatherskites", "3. Telecommunication", "3. Tempest Prison", "3. Tempesta Scudo",
+					"3. The Bottled Voice", "3. The Floating Dead", "3. The Third Eye of Rickard Argentis",
+					"3. Translocation of the Vessel", "3. Transubstantiation of Seven", "3. Ward of the Winged Sepulcher",
+					"3. Ward versus Lupines", "3. Warding Circle versus Lupines", "3. Wield the Spear of Damnation",
+					"4. Animated Weapon", "4. Baleful Doll", "4. Baron Zaraguin’s Sting", "4. Bastone Diabolico",
+					"4. Bone of Lies", "4. Boukephos’ Gateway", "4. Cadaver’s Touch", "4. Candle of Haunting",
+					"4. Directing Ahriman’s Lance", "4. Dismemberment of Osiris", "4. Evoke the Storm", "4. Firewalker",
+					"4. Heart of Stone", "4. Houngan’s Doll", "4. Impregnable Soul", "4. Infirm Inert",
+					"4. Innocence of the Child’s Heart", "4. Invisible Chains of Binding", "4. Lord Aludian’s Orifices",
+					"4. Maw of Ahriman", "4. Mirror Walk", "4. Non-Disclosure Clause", "4. Peek Past the Shroud",
+					"4. Point of the Needle", "4. Preservation of the Sanguine Heart", "4. Rebirth in the Light of Haqim",
+					"4. Reflections of Hollow Revelation", "4. Return of the Heart", "4. Ritual of Xipe Totec", "4. Scry",
+					"4. Scrying Pool", "4. Splinter Servant", "4. Stolen Kisses", "4. Summon Ethereal Horde",
+					"4. Summon the Blood Imp", "4. The Curse Belated", "4. Ties That Bind", "4. Track Transgressor",
+					"4. Transcending Barriers Through Love", "4. Unweave Ritual", "4. Vigil of the Stone Guardian",
+					"4. Vision of Shadow", "4. Vision of St. Anthony", "4. Ward versus Kindred", "4. Ward versus Vitae",
+					"4. Warding Circle versus Kindred", "5. Abandon the Fetters", "5. Ahriman’s Wight",
+					"5. Asymmetrical Reproduction", "5. At Our Command It Breathes", "5. Beckon the Ingurgitant",
+					"5. Blood Contract", "5. Bloody Mary", "5. Cheat the Scale of Hades", "5. Chill of Oblivion",
+					"5. Cobra’s Favor", "5. Commune with the Abyss", "5. Court of Hallowed Truth",
+					"5. Creation of the Shabti", "5. Dead Man’s Hand", "5. Dedicate the Haven", "5. Enchant Talisman",
+					"5. Enochian Passage", "5. Escape to a True Friend", "5. Esilio", "5. From Marduk’s Throat",
+					"5. Ghost in the System", "5. Grasp the Ghostly", "5. Mirror Prison", "5. Mirror of Blood",
+					"5. Nectar of the Bitter Rose", "5. Occlude the Western Road", "5. Orphic Sojourn", "5. Paper Flesh",
+					"5. Ravening Walls of Ceoris", "5. Rickard Argentis’s Homunculus", "5. Rite of Marduk Slain and Risen",
+					"5. Sanctuary", "5. Seeing With the Sky’s Eyes", "5. Severed Hand", "5. Shackles of Blood",
+					"5. Skinwalker’s Belt", "5. Stone Slumber", "5. Stone of the True Form", "5. The Ferryman’s Recall",
+					"5. The Inmost Tug", "5. The Pursuit of Apotheosis", "5. Treasures of Hades", "5. Ward versus Spirits",
+					"5. Warding Circle versus Technology", "5. Warding Circles versus Spirits, Ghosts, and Demons",
+					"5. Way of the Wendigo", "5. Whispers in the Dark", "6. Into the Chasm", "7. Evocation of the Oubliette",
+					"8. Cry That Slays the Light", "8. Lord Aludian’s Claim", "9. Boukephos’ Chosen Oubliette",
+				},
+				-- <<< PICKER_LIST_END
+			};
+
+			-- Three ALIASES, by IDENTITY and not by copy (SPEC V211c, V208): the pairs below are
+			-- one authored list each. Nature and Demeanour pick from the same archetypes; a clan
+			-- Discipline is a Discipline; a secondary path is a path.
+			PICKER_LIST["demeanor"] = PICKER_LIST["nature"];
+			PICKER_LIST["clanDisc"] = PICKER_LIST["disc"];
+			PICKER_LIST["secPath"]  = PICKER_LIST["mainPath"];
+
+			function setField(name, value)
+				if sheet == nil then return; end;
+				if sheet[name] ~= value then sheet[name] = value; end;
+			end;
+
+			-- ---- SPEC T492: TEMPORARY instrumentation. It comes OUT before the round closes --
+			--
+			-- The "before" the round has to have MEASURED (SPEC C), and what T497 reads. It answers
+			-- two things the gate cannot: how many times each entry point actually runs on an open,
+			-- and whether a description require was ever REACHED (SPEC R92b, R92i, B47, B48).
+			--
+			-- It lives on the ROOT form because every tab has to reach it and the root <script> is
+			-- parsed before any <import> - the same reason the health track lives here.
+			--
+			-- Log.i needs API 87.3 and the generated module.xml declares 88.2 (SPEC R92i).
+			WOD_HITS = {};
+			
+			function wodTrace(what)
+				WOD_HITS[what] = (WOD_HITS[what] or 0) + 1;
+				Log.i("WOD", what .. " x" .. WOD_HITS[what]);
+			end;
+
+			-- Health track, shared by the Main tab and its mirror on the Combat tab.
+			--
+			-- It lives on the ROOT form on purpose: this script is parsed before the <import>
+			-- of any tab, so both tabs can call into it without depending on which sibling tab
+			-- happened to load first. SPEC R.9 / B.9 is the same lesson from the other side -
+			-- a tab form cannot reach its siblings, so anything two tabs share belongs here.
+
+			-- The 10 lists are LITERAL from the user (SPEC C, V39). They are NOT derivable:
+			-- 6 is 7 minus Bruised and 5 is that minus Hurt, but 4 skips Crippled instead of
+			-- continuing to trim from the top. Do not "simplify" this into a loop.
+			HEALTH_LEVELS = {
+				[1]  = {"Incapacitated"},
+				[2]  = {"Injured (-1)", "Incapacitated"},
+				[3]  = {"Injured (-1)", "Wounded (-2)", "Incapacitated"},
+				[4]  = {"Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Incapacitated"},
+				[5]  = {"Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[6]  = {"Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[7]  = {"Bruised", "Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[8]  = {"Bruised", "Bruised", "Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[9]  = {"Bruised", "Bruised", "Bruised", "Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+				[10] = {"Bruised", "Bruised", "Bruised", "Bruised", "Hurt (-1)", "Injured (-1)", "Wounded (-2)", "Mauled (-2)", "Crippled (-5)", "Incapacitated"},
+			};
+
+			-- These labels are written by Lua, so they never pass through the WoD20.6 translation
+			-- traversal - that routine snapshots the authored English once and would restore a
+			-- stale snapshot the moment the track length changed. Same arrangement as the numina
+			-- description block (SPEC V31): whoever writes the text owns both languages.
+			-- The gate checks this table against localization.lang, like it does the PT map.
+			HEALTH_PT = {
+				["Bruised"]        = "Escoriado",
+				["Hurt (-1)"]      = "Machucado (-1)",
+				["Injured (-1)"]   = "Ferido (-1)",
+				["Wounded (-2)"]   = "Ferido Gravemente (-2)",
+				["Mauled (-2)"]    = " Espancado (-2)",
+				["Crippled (-5)"]  = "Aleijado (-5)",
+				["Incapacitated"]  = "Incapacitado",
+			};
+
+			-- The four damage marks, LITERAL from the user (SPEC C, V41), in cycle order. Mark 1
+			-- is a single space, not "": the sheet stores exactly what the box shows.
+			HEALTH_MARKS = {" ", "/", "X", "*"};
+
+			-- CLANS (SPEC I17). Dormant data: nothing reads it yet (SPEC V174), and the clan
+			-- combo on Main is invisible and disabled (SPEC V173). Frozen by SPEC T430 from the
+			-- core and Dark Ages; `open` counts slots the player fills from the whole list.
+			local CLANS = {
+				-- >>> CLANS_BEGIN (generated - SPEC T434, T430 froze the lists)
+				["Assamite"] = { fixed = {"Celerity", "Obfuscate", "Quietus"} },
+				["Brujah"] = { fixed = {"Celerity", "Potence", "Presence"} },
+				["Followers of Set"] = { fixed = {"Obfuscate", "Presence", "Serpentis"} },
+				["Gangrel"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
+				["Giovanni"] = { fixed = {"Dominate", "Necromancy", "Potence"} },
+				["Lasombra"] = { fixed = {"Dominate", "Obtenebration", "Potence"} },
+				["Malkavian"] = { fixed = {"Auspex", "Dementation", "Obfuscate"} },
+				["Nosferatu"] = { fixed = {"Animalism", "Obfuscate", "Potence"} },
+				["Ravnos"] = { fixed = {"Animalism", "Chimerstry", "Fortitude"} },
+				["Toreador"] = { fixed = {"Auspex", "Celerity", "Presence"} },
+				["Tremere"] = { fixed = {"Auspex", "Dominate", "Thaumaturgy"} },
+				["Tzimisce"] = { fixed = {"Animalism", "Auspex", "Vicissitude"} },
+				["Ventrue"] = { fixed = {"Dominate", "Fortitude", "Presence"} },
+				["Baali"] = { fixed = {"Daimonion", "Obfuscate", "Presence"} },
+				["Blood Brothers"] = { fixed = {"Fortitude", "Potence", "Sanguinus"} },
+				["Daughters of Cacophony"] = { fixed = {"Fortitude", "Melpominee", "Presence"} },
+				["Harbingers of Skulls"] = { fixed = {"Auspex", "Fortitude", "Necromancy"} },
+				["Kiasyd"] = { fixed = {"Dominate", "Mytherceria", "Obtenebration"} },
+				["Nagaraja"] = { fixed = {"Auspex", "Dominate", "Necromancy"} },
+				["Salubri"] = { fixed = {"Auspex", "Fortitude", "Obeah"} },
+				["Samedi"] = { fixed = {"Fortitude", "Obfuscate", "Thanatosis"} },
+				["True Brujah"] = { fixed = {"Potence", "Presence", "Temporis"} },
+				["Ahrimanes"] = { fixed = {"Animalism", "Presence", "Spiritus"} },
+				["Anda"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
+				["Cappadocians"] = { fixed = {"Auspex", "Fortitude", "Necromancy"} },
+				["Lamia"] = { fixed = {"Fortitude", "Necromancy", "Potence"} },
+				["Lhiannan"] = { fixed = {"Animalism", "Ogham", "Presence"} },
+				["Noiad"] = { fixed = {"Animalism", "Auspex", "Protean"} },
+				["Assamite Antitribu"] = { fixed = {"Celerity", "Obfuscate", "Quietus"} },
+				["Brujah Antitribu"] = { fixed = {"Celerity", "Potence", "Presence"} },
+				["City Gangrel"] = { fixed = {"Celerity", "Obfuscate", "Protean"} },
+				["Country Gangrel"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
+				["Malkavian Antitribu"] = { fixed = {"Auspex", "Dementation", "Obfuscate"} },
+				["Nosferatu Antitribu"] = { fixed = {"Animalism", "Obfuscate", "Potence"} },
+				["Ravnos Antitribu"] = { fixed = {"Animalism", "Chimerstry", "Fortitude"} },
+				["Salubri Antitribu"] = { fixed = {"Auspex", "Fortitude", "Valeren"} },
+				["Serpents of the Light"] = { fixed = {"Presence", "Obfuscate", "Serpentis"} },
+				["Toreador Antitribu"] = { fixed = {"Auspex", "Celerity", "Presence"} },
+				["Tremere Antitribu"] = { fixed = {"Auspex", "Dominate", "Thaumaturgy"} },
+				["Assamite Sorcerers"] = { fixed = {"Assamite Sorcery", "Obfuscate", "Quietus"} },
+				["Assamite Viziers"] = { fixed = {"Auspex", "Celerity", "Quietus"} },
+				["Daitya"] = { fixed = {"Presence", "Obfuscate", "Serpentis"} },
+				["Tlacique"] = { fixed = {"Obfuscate", "Presence", "Protean"} },
+				["Warrior Setites"] = { fixed = {"Potence", "Presence", "Serpentis"} },
+				["Mariners"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
+				["Lasombra Antitribu"] = { fixed = {"Dominate", "Obtenebration", "Potence"} },
+				["Dominate Malkavians"] = { fixed = {"Auspex", "Dominate", "Obfuscate"} },
+				["Brahman"] = { fixed = {"Animalism", "Auspex", "Chimerstry"} },
+				["Telyavelic Tremere"] = { fixed = {"Auspex", "Presence", "Thaumaturgy"} },
+				["Old Clan Tzimisce"] = { fixed = {"Animalism", "Auspex", "Dominate"} },
+				["Gargoyles (Modern)"]   = { fixed = {"Flight", "Fortitude", "Potence", "Visceratika"} },
+				["Gargoyles (Scout)"]    = { fixed = {"Auspex", "Obfuscate", "Flight"} },
+				["Gargoyles (Sentinel)"] = { fixed = {"Flight", "Potence", "Fortitude"} },
+				["Gargoyles (Warrior)"]  = { fixed = {"Flight", "Fortitude", "Protean"} },
+				["Ventrue Antitribu"] = { fixed = {"Dominate", "Fortitude"}, choice = {"Auspex", "Presence"} },
+				["Wu Zao"]            = { fixed = {"Auspex", "Fortitude"}, choice = {"Obeah", "Valeren"} },
+				["Angellis Ater"]     = { fixed = {"Daimonion", "Dominate"}, choice = {"Potence", "Presence", "Obfuscate"} },
+				["Maeghar"]            = { choice = {"Mytherceria", "Necromancy"}, open = 2 },
+				["Panders"]            = { open = 3 },
+				["Children of Osiris"] = { open = 3 },
+				-- <<< CLANS_END
+			};
+
+			-- BLOOD_SORCERY (SPEC I18), RITUAL_DISC (SPEC I19) and ADVANCED_DISC. Dormant like
+			-- CLANS above: no reader yet. The pickers get their items in SPEC T460, the guards
+			-- arrive in T439/T440, and nothing reads ADVANCED_DISC at all - it is banked for a
+			-- later round (user, 57th) and deliberately changes NOTHING on the sheet.
+			--
+			-- Membership in "blood sorcery" is DERIVED, never listed (SPEC V191): a Discipline is one
+			-- iff it owns a path here or a ritual below. That lands on the seven SPEC R87 froze -
+			-- Dark Thaumaturgy by paths alone, Abyss Mysticism by rituals alone (its MAIN PATHS box
+			-- stays empty, which is the case SPEC I19 predicted).
+			--
+			-- Path names are the MODERN spelling wherever the same path exists in both eras, because
+			-- the value is what gets saved and the era only changes the display (SPEC V24, I22). So
+			-- Lure of Flames, not Creatio Ignis; The Way of the Spirit, not Genius Loci. The two
+			-- Dark-Ages-only Thaumaturgy paths keep their Latin names - nothing modern to defer to.
+			--
+			-- A ritual can have MORE THAN ONE owner (user, 57th round), so every RITUAL_DISC value is
+			-- a LIST even when it holds one name - one shape, so a reader never type-checks. Thirteen
+			-- of the 284 carry two: the eight the core (p. 440) hands Assamite Sorcery under its own
+			-- names, the four the Dark Ages files under Assamite and Setite clan rituals, and
+			-- Mirror of Blood, which Rites of Blood prints as "Thaumaturgy or Koldunic". A ritual with
+			-- two owners is offered under both, which is what the books mean by listing it twice.
+			--
+			-- Ritual levels run 1..9, not 1..5. Abyss Mysticism is the only Discipline that goes past
+			-- five (Dark Ages pp. 273-274 and Tome of Secrets p. 38), and it does so because its
+			-- rituals ARE its power ladder - it has no paths to spend the dots on.
+			--
+			-- ADVANCED_DISC is the sixth-to-ninth dot of a Discipline: elder powers, one entry per
+			-- power as {level, name}, from the core Disciplines chapter plus its bloodline chapter
+			-- and from Dark Ages p. 188 onward. Levels 6..9 by definition - the fifth dot and below
+			-- is the ordinary ladder and is not repeated here. The sheet still draws five dots per
+			-- Discipline row; this table does not ask it to draw more.
+			local BLOOD_SORCERY = {
+				-- >>> BLOOD_SORCERY_BEGIN (generated - SPEC T435)
+				["Thaumaturgy"] = {
+					"The Path of Blood", "Elemental Mastery", "The Green Path",
+					"Hands of Destruction", "Lure of Flames", "Neptune’s Might",
+					"Path of Conjuring", "Movement of the Mind", "Path of Corruption",
+					"Path of Mars", "Path of Technomancy", "Path of the Father’s Vengeance",
+					"Weather Control", "Mastery of the Mortal Shell", "Path of the Focused Mind",
+					"Path of the Levinbolt", "Path of Spirit Manipulation", "The Blessings of the Great Dark Mother",
+					"Iter Pernix", "Potestas Exsecrabilis",
+				},
+				["Necromancy"] = {
+					"Sepulchre Path", "Ash Path", "Bone Path",
+					"Cenotaph Path", "Corpse in the Monster", "Grave’s Decay",
+					"Vitreous Path", "Path of Haunting", "The Path of the Twilight Garden",
+					"The Path of Skulls", "The Path of Woe", "The Nightshade Path",
+				},
+				["Koldunic Sorcery"] = {
+					"The Way of the Spirit", "The Way of Sorrows", "The Transylvanian Kraina",
+					"The Black Sea Kraina", "The Bialowieza Kraina", "The Kraina of Enoch",
+					"The Kraina of the Well", "The Way of Earth", "The Way of Wind",
+					"The Way of Water", "The Way of Fire",
+				},
+				["Assamite Sorcery"] = {
+					"The Keeper’s Way", "The Hunter’s Winds", "The Path of the Evil Eye",
+					"Awakening of the Steel", "The Path of Life’s Waters", "The Path of Jinn’s Gift",
+					"The Path of the Ailing Jackal", "The Hand of the Magi", "The Covenant of Enki",
+					"The Laws of Suleiman", "Movement of the Mind", "Hands of Destruction",
+				},
+				["Setite Sorcery"] = {
+					"The Revelations of Duat", "The Revelations of Eden", "The Revelations of Midgard",
+					"Ushabti", "The Path of Praapti", "The Flow of Ashe",
+				},
+				["Dark Thaumaturgy"] = {
+					"Die Herrschaft des Wyrm", "Rego Calatio", "The Fires of the Inferno",
+					"The Path of Phobos", "The Taking of the Spirit",
+				},
+				-- <<< BLOOD_SORCERY_END
+			};
+
+			local RITUAL_DISC = {
+				-- >>> RITUAL_DISC_BEGIN (generated - SPEC T435)
+				-- Abyss Mysticism (34)
+				["1. Eyes of the Abyss"] = {"Abyss Mysticism"},
+				["1. Light within Shadow"] = {"Abyss Mysticism"},
+				["1. Locating the Oubliette"] = {"Abyss Mysticism"},
+				["1. Pierce the Veil"] = {"Abyss Mysticism"},
+				["1. The Abyss Knows"] = {"Abyss Mysticism"},
+				["1. Weight of Shadows"] = {"Abyss Mysticism"},
+				["2. Abyssal Blade"] = {"Abyss Mysticism"},
+				["2. Comforting Darkness"] = {"Abyss Mysticism"},
+				["2. Feed the Darkness"] = {"Abyss Mysticism"},
+				["2. Implant the Bezoar"] = {"Abyss Mysticism"},
+				["2. Subsume the Darkness"] = {"Abyss Mysticism"},
+				["3. Abyssal Threads"] = {"Abyss Mysticism"},
+				["3. Angra Mainyu Consumes Spenta Mainyu"] = {"Abyss Mysticism"},
+				["3. Balthazar’s Revelation"] = {"Abyss Mysticism"},
+				["3. Calling the Hungry Shade"] = {"Abyss Mysticism"},
+				["3. Claiming the Dark"] = {"Abyss Mysticism"},
+				["3. One with the Dark"] = {"Abyss Mysticism"},
+				["3. Summoning the Blatherskites"] = {"Abyss Mysticism"},
+				["3. The Third Eye of Rickard Argentis"] = {"Abyss Mysticism"},
+				["4. Boukephos’ Gateway"] = {"Abyss Mysticism"},
+				["4. Lord Aludian’s Orifices"] = {"Abyss Mysticism"},
+				["4. Maw of Ahriman"] = {"Abyss Mysticism"},
+				["4. Reflections of Hollow Revelation"] = {"Abyss Mysticism"},
+				["4. Vision of Shadow"] = {"Abyss Mysticism"},
+				["5. Ahriman’s Wight"] = {"Abyss Mysticism"},
+				["5. Beckon the Ingurgitant"] = {"Abyss Mysticism"},
+				["5. Commune with the Abyss"] = {"Abyss Mysticism"},
+				["5. Rickard Argentis’s Homunculus"] = {"Abyss Mysticism"},
+				["5. Whispers in the Dark"] = {"Abyss Mysticism"},
+				["6. Into the Chasm"] = {"Abyss Mysticism"},
+				["7. Evocation of the Oubliette"] = {"Abyss Mysticism"},
+				["8. Cry That Slays the Light"] = {"Abyss Mysticism"},
+				["8. Lord Aludian’s Claim"] = {"Abyss Mysticism"},
+				["9. Boukephos’ Chosen Oubliette"] = {"Abyss Mysticism"},
+
+				-- Assamite Sorcery (21)
+				["1. Horoscope"] = {"Assamite Sorcery"},
+				["1. Rite of Reclamation"] = {"Assamite Sorcery"},
+				["1. Ritual of Return"] = {"Assamite Sorcery"},
+				["1. Strength of Haqim"] = {"Assamite Sorcery"},
+				["1. Tame the Maddening Flame"] = {"Assamite Sorcery"},
+				["2. Banning Rituals"] = {"Assamite Sorcery"},
+				["2. Blade of Smoke and Shadow"] = {"Assamite Sorcery"},
+				["2. Blood Calls to Blood"] = {"Assamite Sorcery"},
+				["2. Infusion of Kalif"] = {"Assamite Sorcery"},
+				["3. A Shield of Mirror"] = {"Assamite Sorcery"},
+				["3. Blood and Bane"] = {"Assamite Sorcery"},
+				["3. Bound by Oath"] = {"Assamite Sorcery"},
+				["3. Bull of Heaven"] = {"Assamite Sorcery"},
+				["3. Strength in Wisdom"] = {"Assamite Sorcery"},
+				["3. Wield the Spear of Damnation"] = {"Assamite Sorcery"},
+				["4. Directing Ahriman’s Lance"] = {"Assamite Sorcery"},
+				["4. Rebirth in the Light of Haqim"] = {"Assamite Sorcery"},
+				["5. From Marduk’s Throat"] = {"Assamite Sorcery"},
+				["5. Occlude the Western Road"] = {"Assamite Sorcery"},
+				["5. Ravening Walls of Ceoris"] = {"Assamite Sorcery"},
+				["5. Seeing With the Sky’s Eyes"] = {"Assamite Sorcery"},
+
+				-- Koldunic Sorcery (20)
+				["1. Drinking Death"] = {"Koldunic Sorcery"},
+				["1. Master of the Domain"] = {"Koldunic Sorcery"},
+				["1. Reawakening the Dead Water"] = {"Koldunic Sorcery"},
+				["1. Servitor’s Perception"] = {"Koldunic Sorcery"},
+				["1. Treasured Ornaments"] = {"Koldunic Sorcery"},
+				["1. Truth in Water"] = {"Koldunic Sorcery"},
+				["1. Unnatural Decay"] = {"Koldunic Sorcery"},
+				["2. Autumn’s Armor"] = {"Koldunic Sorcery"},
+				["2. Borne by Wind"] = {"Koldunic Sorcery"},
+				["2. Concentrated Vitae"] = {"Koldunic Sorcery"},
+				["2. Eyes of the Dead"] = {"Koldunic Sorcery"},
+				["2. Invoke the Lesser Sign of Power"] = {"Koldunic Sorcery"},
+				["3. Animate Curios"] = {"Koldunic Sorcery"},
+				["3. Cowing the Servant"] = {"Koldunic Sorcery"},
+				["3. One with the Forest"] = {"Koldunic Sorcery"},
+				["3. The Floating Dead"] = {"Koldunic Sorcery"},
+				["4. Evoke the Storm"] = {"Koldunic Sorcery"},
+				["4. Scrying Pool"] = {"Koldunic Sorcery"},
+				["4. Ties That Bind"] = {"Koldunic Sorcery"},
+				["5. The Inmost Tug"] = {"Koldunic Sorcery"},
+
+				-- Necromancy (53)
+				["1. Call of the Hungry Dead"] = {"Necromancy"},
+				["1. Death’s Communion"] = {"Necromancy"},
+				["1. Eldritch Beacon"] = {"Necromancy"},
+				["1. Final Sight"] = {"Necromancy"},
+				["1. Foxfire"] = {"Necromancy"},
+				["1. Insight"] = {"Necromancy"},
+				["1. Knowing Stone"] = {"Necromancy"},
+				["1. Memento Mori"] = {"Necromancy"},
+				["1. Minestra di Morte"] = {"Necromancy"},
+				["1. Preserve Corpse"] = {"Necromancy"},
+				["1. Ritual of the Smoking Mirror"] = {"Necromancy"},
+				["1. Shew-Stone"] = {"Necromancy"},
+				["1. Word of Insight"] = {"Necromancy"},
+				["2. Antonius’s Denial"] = {"Necromancy"},
+				["2. Draining the Well of Life"] = {"Necromancy"},
+				["2. Eyes of the Grave"] = {"Necromancy"},
+				["2. Generation of the Acheron Vortex"] = {"Necromancy"},
+				["2. Haunting Breeze"] = {"Necromancy"},
+				["2. Occhio d’Uomo Morto"] = {"Necromancy"},
+				["2. Parting the Veil"] = {"Necromancy"},
+				["2. Prepare the Vessel"] = {"Necromancy"},
+				["2. Puppet"] = {"Necromancy"},
+				["2. Thanatos’ Caress"] = {"Necromancy"},
+				["2. The Hand of Glory"] = {"Necromancy"},
+				["2. The Ritual of Pochtli"] = {"Necromancy"},
+				["2. Totenpass"] = {"Necromancy"},
+				["2. Two Centimes"] = {"Necromancy"},
+				["2. Witch Eye"] = {"Necromancy"},
+				["3. Blood Dance"] = {"Necromancy"},
+				["3. Death’s Head"] = {"Necromancy"},
+				["3. Din of the Damned"] = {"Necromancy"},
+				["3. Divine Sign"] = {"Necromancy"},
+				["3. Nightmare Drums"] = {"Necromancy"},
+				["3. Ritual of The Unearthed Fetter"] = {"Necromancy"},
+				["3. Tempest Prison"] = {"Necromancy"},
+				["3. Tempesta Scudo"] = {"Necromancy"},
+				["4. Baleful Doll"] = {"Necromancy"},
+				["4. Bastone Diabolico"] = {"Necromancy"},
+				["4. Cadaver’s Touch"] = {"Necromancy"},
+				["4. Impregnable Soul"] = {"Necromancy"},
+				["4. Peek Past the Shroud"] = {"Necromancy"},
+				["4. Point of the Needle"] = {"Necromancy"},
+				["4. Ritual of Xipe Totec"] = {"Necromancy"},
+				["4. Summon Ethereal Horde"] = {"Necromancy"},
+				["4. Vision of St. Anthony"] = {"Necromancy"},
+				["5. Chill of Oblivion"] = {"Necromancy"},
+				["5. Dead Man’s Hand"] = {"Necromancy"},
+				["5. Enochian Passage"] = {"Necromancy"},
+				["5. Esilio"] = {"Necromancy"},
+				["5. Grasp the Ghostly"] = {"Necromancy"},
+				["5. Orphic Sojourn"] = {"Necromancy"},
+				["5. The Ferryman’s Recall"] = {"Necromancy"},
+				["5. Treasures of Hades"] = {"Necromancy"},
+
+				-- Setite Sorcery (10)
+				["1. Armor of Diamond Serenity"] = {"Setite Sorcery"},
+				["1. The Word of the Dark God"] = {"Setite Sorcery"},
+				["1. Typhon’s Brew"] = {"Setite Sorcery"},
+				["2. Craft Gris-Gris"] = {"Setite Sorcery"},
+				["2. To Lace with Hidden Nectar"] = {"Setite Sorcery"},
+				["3. Rings Like Chains"] = {"Setite Sorcery"},
+				["3. Scorpion Sending"] = {"Setite Sorcery"},
+				["4. Dismemberment of Osiris"] = {"Setite Sorcery"},
+				["5. Creation of the Shabti"] = {"Setite Sorcery"},
+				["5. Shackles of Blood"] = {"Setite Sorcery"},
+
+				-- Thaumaturgy (146)
+				["1. Ambrus Kelemen’s Aegis"] = {"Thaumaturgy"},
+				["1. Bind the Accusing Tongue"] = {"Thaumaturgy"},
+				["1. Blood Mastery"] = {"Thaumaturgy"},
+				["1. Blood Rush"] = {"Thaumaturgy"},
+				["1. Blood into Water"] = {"Thaumaturgy"},
+				["1. Brand"] = {"Thaumaturgy"},
+				["1. CCTV"] = {"Thaumaturgy"},
+				["1. Calling Card"] = {"Thaumaturgy"},
+				["1. Chime of Unseen Spirits"] = {"Thaumaturgy"},
+				["1. Communicate with Kindred Sire"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["1. Defense of the Sacred Haven"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["1. Deflection of Wooden Doom"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["1. Devil’s Touch"] = {"Thaumaturgy"},
+				["1. Domino of Life"] = {"Thaumaturgy"},
+				["1. Encrypt Missive"] = {"Thaumaturgy"},
+				["1. Engaging the Vessel of Transference"] = {"Thaumaturgy"},
+				["1. Flatline"] = {"Thaumaturgy"},
+				["1. Illuminate the Trail of Prey"] = {"Thaumaturgy"},
+				["1. Impressive Visage"] = {"Thaumaturgy"},
+				["1. Incantation of the Shepherd"] = {"Thaumaturgy"},
+				["1. Learning the Mind Enslumbered"] = {"Thaumaturgy"},
+				["1. Purify Blood"] = {"Thaumaturgy"},
+				["1. Purity of Flesh"] = {"Thaumaturgy"},
+				["1. Rite of Introduction"] = {"Thaumaturgy"},
+				["1. Sanctify the Temple"] = {"Thaumaturgy"},
+				["1. Sanguineous Phial"] = {"Thaumaturgy"},
+				["1. Sense the Mystical"] = {"Thaumaturgy"},
+				["1. Sigil of Authority"] = {"Thaumaturgy"},
+				["1. Wake with Evening’s Freshness"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["1. Water Walking"] = {"Thaumaturgy"},
+				["1. Widow’s Spite"] = {"Thaumaturgy"},
+				["2. Ascension of the Blood"] = {"Thaumaturgy"},
+				["2. Beat Your Way to Glory"] = {"Thaumaturgy"},
+				["2. Blood Crystal"] = {"Thaumaturgy"},
+				["2. Blood Walk"] = {"Thaumaturgy"},
+				["2. Burning Blade"] = {"Thaumaturgy"},
+				["2. Commune with Cainite"] = {"Thaumaturgy"},
+				["2. Craft Bloodstone"] = {"Thaumaturgy"},
+				["2. Donning the Mask of Shadows"] = {"Thaumaturgy"},
+				["2. Extinguish"] = {"Thaumaturgy"},
+				["2. Eyes of Babel"] = {"Thaumaturgy"},
+				["2. Eyes of the Night Hawk"] = {"Thaumaturgy"},
+				["2. Flaming Weapon"] = {"Thaumaturgy"},
+				["2. Haruspicy"] = {"Thaumaturgy"},
+				["2. Hidden Haven"] = {"Thaumaturgy"},
+				["2. Illusion of Peaceful Death"] = {"Thaumaturgy"},
+				["2. Iron Body"] = {"Thaumaturgy"},
+				["2. Machine Blitz"] = {"Thaumaturgy"},
+				["2. Oinos of Dionysus"] = {"Thaumaturgy"},
+				["2. Preserve"] = {"Thaumaturgy"},
+				["2. Principal Focus of Vitae Infusion"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["2. Recure of the Homeland"] = {"Thaumaturgy"},
+				["2. Seal Egress"] = {"Thaumaturgy"},
+				["2. Self-Executing File"] = {"Thaumaturgy"},
+				["2. Summon Guardian Spirit"] = {"Thaumaturgy"},
+				["2. The Jinx"] = {"Thaumaturgy"},
+				["2. Ward"] = {"Thaumaturgy"},
+				["2. Ward Versus Ghouls"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["2. Warding Circle versus Ghouls"] = {"Thaumaturgy"},
+				["2. Whispers of the Ghost"] = {"Thaumaturgy"},
+				["2. Witness of Whispers"] = {"Thaumaturgy"},
+				["3. A Touch of Nightshade"] = {"Thaumaturgy"},
+				["3. Amulet of Mnemosyne"] = {"Thaumaturgy"},
+				["3. Animated Assistants"] = {"Thaumaturgy"},
+				["3. BFU"] = {"Thaumaturgy"},
+				["3. Bind the Familiar"] = {"Thaumaturgy"},
+				["3. Brotherhood of the Cup"] = {"Thaumaturgy"},
+				["3. Clinging of the Insect"] = {"Thaumaturgy"},
+				["3. Craft Dream Catcher"] = {"Thaumaturgy"},
+				["3. Dante’s Urban Legend"] = {"Thaumaturgy"},
+				["3. Displacement of the Pneuma"] = {"Thaumaturgy", "Setite Sorcery"},
+				["3. Enfolding the Believers"] = {"Thaumaturgy"},
+				["3. Father’s Freedom"] = {"Thaumaturgy"},
+				["3. Flesh of Fiery Touch"] = {"Thaumaturgy"},
+				["3. Hell’s Calling"] = {"Thaumaturgy"},
+				["3. Incorporeal Passage"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["3. Inscription"] = {"Thaumaturgy"},
+				["3. Mirror of Second Sight"] = {"Thaumaturgy"},
+				["3. Pavis of Foul Presence"] = {"Thaumaturgy"},
+				["3. Rutor’s Hands"] = {"Thaumaturgy"},
+				["3. Samira’s Kihanah"] = {"Thaumaturgy"},
+				["3. Sanguine Assistant"] = {"Thaumaturgy"},
+				["3. Sanguine Trail"] = {"Thaumaturgy"},
+				["3. Scry the Hearthstone"] = {"Thaumaturgy"},
+				["3. Shaft of Belated Quiescence"] = {"Thaumaturgy"},
+				["3. Soul of the Homunculus"] = {"Thaumaturgy"},
+				["3. Telecommunication"] = {"Thaumaturgy"},
+				["3. The Bottled Voice"] = {"Thaumaturgy"},
+				["3. Translocation of the Vessel"] = {"Thaumaturgy"},
+				["3. Transubstantiation of Seven"] = {"Thaumaturgy"},
+				["3. Ward of the Winged Sepulcher"] = {"Thaumaturgy"},
+				["3. Ward versus Lupines"] = {"Thaumaturgy"},
+				["3. Warding Circle versus Lupines"] = {"Thaumaturgy"},
+				["4. Animated Weapon"] = {"Thaumaturgy"},
+				["4. Baron Zaraguin’s Sting"] = {"Thaumaturgy"},
+				["4. Bone of Lies"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["4. Candle of Haunting"] = {"Thaumaturgy"},
+				["4. Firewalker"] = {"Thaumaturgy"},
+				["4. Heart of Stone"] = {"Thaumaturgy"},
+				["4. Houngan’s Doll"] = {"Thaumaturgy"},
+				["4. Infirm Inert"] = {"Thaumaturgy"},
+				["4. Innocence of the Child’s Heart"] = {"Thaumaturgy"},
+				["4. Invisible Chains of Binding"] = {"Thaumaturgy"},
+				["4. Mirror Walk"] = {"Thaumaturgy"},
+				["4. Non-Disclosure Clause"] = {"Thaumaturgy"},
+				["4. Preservation of the Sanguine Heart"] = {"Thaumaturgy"},
+				["4. Return of the Heart"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["4. Scry"] = {"Thaumaturgy"},
+				["4. Splinter Servant"] = {"Thaumaturgy"},
+				["4. Stolen Kisses"] = {"Thaumaturgy"},
+				["4. Summon the Blood Imp"] = {"Thaumaturgy"},
+				["4. The Curse Belated"] = {"Thaumaturgy"},
+				["4. Track Transgressor"] = {"Thaumaturgy"},
+				["4. Transcending Barriers Through Love"] = {"Thaumaturgy"},
+				["4. Unweave Ritual"] = {"Thaumaturgy"},
+				["4. Vigil of the Stone Guardian"] = {"Thaumaturgy"},
+				["4. Ward versus Kindred"] = {"Thaumaturgy"},
+				["4. Ward versus Vitae"] = {"Thaumaturgy"},
+				["4. Warding Circle versus Kindred"] = {"Thaumaturgy"},
+				["5. Abandon the Fetters"] = {"Thaumaturgy"},
+				["5. Asymmetrical Reproduction"] = {"Thaumaturgy"},
+				["5. At Our Command It Breathes"] = {"Thaumaturgy"},
+				["5. Blood Contract"] = {"Thaumaturgy"},
+				["5. Bloody Mary"] = {"Thaumaturgy"},
+				["5. Cheat the Scale of Hades"] = {"Thaumaturgy", "Setite Sorcery"},
+				["5. Cobra’s Favor"] = {"Thaumaturgy"},
+				["5. Court of Hallowed Truth"] = {"Thaumaturgy"},
+				["5. Dedicate the Haven"] = {"Thaumaturgy"},
+				["5. Enchant Talisman"] = {"Thaumaturgy"},
+				["5. Escape to a True Friend"] = {"Thaumaturgy"},
+				["5. Ghost in the System"] = {"Thaumaturgy"},
+				["5. Mirror Prison"] = {"Thaumaturgy"},
+				["5. Mirror of Blood"] = {"Thaumaturgy", "Koldunic Sorcery"},
+				["5. Nectar of the Bitter Rose"] = {"Thaumaturgy"},
+				["5. Paper Flesh"] = {"Thaumaturgy"},
+				["5. Rite of Marduk Slain and Risen"] = {"Thaumaturgy", "Assamite Sorcery"},
+				["5. Sanctuary"] = {"Thaumaturgy"},
+				["5. Severed Hand"] = {"Thaumaturgy"},
+				["5. Skinwalker’s Belt"] = {"Thaumaturgy"},
+				["5. Stone Slumber"] = {"Thaumaturgy"},
+				["5. Stone of the True Form"] = {"Thaumaturgy"},
+				["5. The Pursuit of Apotheosis"] = {"Thaumaturgy"},
+				["5. Ward versus Spirits"] = {"Thaumaturgy"},
+				["5. Warding Circle versus Technology"] = {"Thaumaturgy"},
+				["5. Warding Circles versus Spirits, Ghosts, and Demons"] = {"Thaumaturgy"},
+				["5. Way of the Wendigo"] = {"Thaumaturgy"},
+				-- <<< RITUAL_DISC_END
+			};
+
+			local ADVANCED_DISC = {
+				-- >>> ADVANCED_DISC_BEGIN (generated - SPEC T435)
+				["Abombwe"] = {
+					{6, "Incarnate Darkness"},
+				},
+				["Animalism"] = {
+					{6, "Animal Succulence"}, {6, "Shared Soul"},
+					{6, "Species Speech"}, {6, "The Tongue of Beasts"},
+					{6, "The Twin Souls"}, {7, "Beast Shard"},
+					{7, "Conquer the Beast"}, {7, "The Devil’s Claws"},
+					{8, "Taunt the Caged Beast"}, {8, "The Beast’s Quills"},
+					{9, "Plague of Beasts"}, {9, "Unchain the Beast"},
+				},
+				["Auspex"] = {
+					{6, "Clairvoyance"}, {6, "Far Sense"},
+					{6, "Prediction"}, {6, "Soul Bond"},
+					{6, "Telepathic Communication"}, {6, "The Heart’s Desire"},
+					{7, "A Gathering of Souls"}, {7, "Anticipate Victory"},
+					{7, "Brutal Ecstasy"}, {7, "Karmic Sight"},
+					{7, "Mirror Reflex"}, {8, "Omniscience"},
+					{8, "Psychic Assault"}, {8, "Soul’s Sword"},
+					{9, "False Slumber"},
+				},
+				["Bardo"] = {
+					{6, "Boon of Anubis"}, {7, "Bring Forth the Dawn"},
+					{8, "Mummification"}, {9, "Ra’s Blessing"},
+				},
+				["Celerity"] = {
+					{6, "Momentum"}, {6, "Precision"},
+					{6, "Projectile"}, {7, "Flower of Death"},
+					{7, "Quickness"}, {8, "Physical Defiance"},
+					{8, "Time Out of Time"}, {8, "Zephyr"},
+				},
+				["Chimerstry"] = {
+					{6, "False Resonance"}, {6, "Fatuus Mastery"},
+					{6, "Shared Nightmare"}, {7, "Blade of the Demons"},
+					{7, "Far Fatuus"}, {7, "Interrupt Reality"},
+					{7, "Suspension of Disbelief"}, {8, "Synesthesia"},
+					{8, "Visions from the Asura"}, {9, "Fabrication"},
+					{9, "Mayaparisatya"},
+				},
+				["Daimonion"] = {
+					{6, "Concordance"}, {6, "Hell-Born Investiture"},
+					{6, "Lure Diabolik"}, {7, "Bring the Plague"},
+					{7, "Demonic Servitor"}, {7, "Summon the Herald of Topheth"},
+					{8, "Adramelech’s Wrath"}, {8, "Call Forth the Herald of Hell"},
+					{8, "Contagion"}, {9, "Call the Great Beast"},
+					{9, "Spew Wide the Pit"},
+				},
+				["Dementation"] = {
+					{6, "Lingering Malaise"}, {6, "Shattered Mirror"},
+					{6, "Stain the Soul"}, {6, "The Call"},
+					{7, "Cobble the Road"}, {7, "Restructure"},
+					{7, "The Sword of Malkav"}, {8, "Personal Scourge"},
+					{8, "Prison of the Mind"}, {9, "Brother’s Gift"},
+					{9, "Lunatic Eruption"},
+				},
+				["Dominate"] = {
+					{6, "Chain the Psyche"}, {6, "Loyalty"},
+					{6, "Obedience"}, {7, "Mass Manipulation"},
+					{7, "Still the Mortal Flesh"}, {8, "Far Mastery"},
+					{9, "Speak Through the Blood"},
+				},
+				["Fortitude"] = {
+					{6, "Personal Armor"}, {6, "The Knight’s Bane"},
+					{7, "Shared Strength"}, {7, "The Blessing of Vitality"},
+					{8, "Adamantine"}, {8, "Armored Flesh"},
+				},
+				["Melpominee"] = {
+					{6, "Shattering Crescendo"}, {7, "Persistent Echo"},
+				},
+				["Mytherceria"] = {
+					{6, "Steal the Mind"}, {7, "Absorb the Mind"},
+					{8, "The Grandest Trick"},
+				},
+				["Obeah"] = {
+					{6, "Unburdening the Bestial Soul"}, {7, "Renewed Vigor"},
+					{8, "Safe Passage"}, {9, "Unburden the Flesh-Clad Soul"},
+				},
+				["Obfuscate"] = {
+					{6, "Conceal"}, {6, "Mask the Devil"},
+					{6, "Mind Blank"}, {6, "Soul Mask"},
+					{7, "Cache"}, {7, "Fortress of Silence"},
+					{7, "Veil of Blissful Ignorance"}, {8, "Old Friend"},
+					{8, "Reaper of the Heart"}, {9, "Create Name"},
+					{9, "Obscure God’s Creation"},
+				},
+				["Obtenebration"] = {
+					{6, "Shadowstep"}, {6, "The Darkness Within"},
+					{6, "Walk the Abyss"}, {7, "Shadow Twin"},
+					{8, "Oubliette"}, {9, "Ahriman’s Demesne"},
+				},
+				["Ogham"] = {
+					{6, "Inscribe the Forgotten Names"},
+				},
+				["Potence"] = {
+					{6, "Crush"}, {6, "Imprint"},
+					{7, "Brutality"}, {7, "Earthshock"},
+					{8, "Aftershock"}, {8, "Flick"},
+				},
+				["Presence"] = {
+					{6, "Kingmaker"}, {6, "Love"},
+					{6, "Paralyzing Glance"}, {6, "Spark of Rage"},
+					{7, "Cooperation"}, {8, "Ironclad Command"},
+					{9, "Pulse of the City"}, {9, "Pulse of the People"},
+				},
+				["Protean"] = {
+					{6, "Adaptation"}, {6, "Earth Control"},
+					{6, "Ephemeral Slumber"}, {6, "Flesh of Marble"},
+					{6, "Loki’s Gift"}, {6, "Reversion to the True Form"},
+					{7, "Death’s Hidden Crawl"}, {7, "Restore the Mortal Visage"},
+					{7, "Shape of the Beast’s Wrath"}, {7, "Spectral Body"},
+					{8, "Purify the Impaled Beast"}, {8, "Purify the Impaled Breast"},
+					{9, "Draught of Phoenix Blood"}, {9, "Inward Focus"},
+				},
+				["Quietus"] = {
+					{6, "Blood Awakening"}, {6, "Blood Sweat"},
+					{6, "Purification"}, {6, "Ripples of the Heart"},
+					{6, "Selective Silence"}, {6, "Taste of Death"},
+					{7, "Baal’s Bloody Talons"}, {7, "Dam the Heart’s River"},
+					{7, "Poison the Well of Life"}, {7, "Rapturous Touch"},
+					{8, "Blood of Destruction"}, {8, "Songs of Distant Vitae"},
+					{9, "Condemn the Sins of the Father"}, {9, "Weaken the Blood of Ancients"},
+				},
+				["Serpentis"] = {
+					{6, "Cobra Fangs"}, {6, "Echidna’s Venom"},
+					{7, "Divine Image"}, {7, "Form of the Storm"},
+					{8, "Cerberus’s Fury"}, {8, "Heart Thief"},
+					{9, "Godhead"}, {9, "Shadow of Apep"},
+				},
+				["Spiritus"] = {
+					{6, "The Spirit Beast"},
+				},
+				["Temporis"] = {
+					{6, "Kiss of Lachesis"}, {7, "Cheat the Fates"},
+					{8, "Clio’s Kiss"}, {9, "Tangle Atropos’ Hand"},
+				},
+				["Thanatosis"] = {
+					{6, "Creeping Infection"}, {7, "Dust to Dust"},
+					{8, "Putrescent Servitude"},
+				},
+				["Valeren"] = {
+					{6, "Blissful Agony"}, {6, "Father’s Judgment"},
+					{6, "Safe Passage"}, {6, "Samiel’s Vengeance"},
+					{7, "Aversion"}, {7, "Blissful Gaze"},
+					{7, "Dream Combat"}, {8, "Fiery Agony"},
+					{8, "Purification"}, {8, "Rayzeel’s Song"},
+					{9, "Heaven’s Gate"}, {9, "Song of the Blooded"},
+					{9, "Soul Exchange"},
+				},
+				["Vicissitude"] = {
+					{6, "Blood of Acid"}, {6, "Chiropteran Marauder"},
+					{7, "Blood of the Earth"}, {7, "Cocoon"},
+					{8, "Breath of the Dragon"}, {8, "Sublimation of the Larval Flesh"},
+					{9, "Earth’s Vast Haven"}, {9, "The Last Dracul"},
+				},
+				-- <<< ADVANCED_DISC_END
+			};
+
+			-- ERA_NAME (SPEC I22). Dormant this round: T469 is what puts it on a picker's `items`.
+			--
+			-- Keyed by the CANONICAL value (SPEC V24), so the saved data never moves when the theme
+			-- does - a Tremere who bought Lure of Flames still owns Lure of Flames after the sheet
+			-- turns medieval; only the words on the row change. That is the whole reason this is a
+			-- display table and not a second set of values (SPEC B23 is what happens otherwise).
+			--
+			-- Only DIVERGENCES live here. A value with no entry displays itself, which is why 20 rows
+			-- cover a picker of 386 - the Dark Ages renamed a handful of things and reprinted the rest.
+			--
+			-- One table for BOTH medieval themes, Dark Ages and Classical Age (SPEC C), so there is no
+			-- per-era key to fall out of step with applyTheme.
+			--
+			-- Ritual keys carry their level prefix because the prefix belongs to the value (SPEC V184).
+			-- Blood Contract is NOT here: the Dark Ages prints it as level one and the core as level
+			-- five, and the core wins (SPEC C), so the row reads "5. Blood Contract" in every era.
+			local ERA_NAME = {
+				-- >>> ERA_NAME_BEGIN (generated - SPEC T468)
+				-- Thaumaturgy paths: the Dark Ages gives them Latin names (Dark Ages pp. 297-302).
+				["Lure of Flames"]      = "Creatio Ignis (The Creation of Fire)",
+				["Movement of the Mind"] = "Potestas Motus (Power of Motion)",
+				["Weather Control"]     = "Potestas Tempestatum (Power Over Storms)",
+				["Elemental Mastery"]   = "Potestas Elementorum (The Power of the Elements)",
+				["The Path of Blood"]   = "Potestas Vitae (The Power of Lifeblood)",
+
+				-- Necromancy paths: same path, the article moved (Dark Ages pp. 279-291).
+				["Bone Path"]              = "The Path of Bone",
+				["Cenotaph Path"]          = "The Path of the Cenotaph",
+				["Corpse in the Monster"]  = "The Path of the Corpse in the Monster",
+				["Grave’s Decay"]          = "The Grave’s Decay",
+				["Path of Haunting"]       = "The Path of Haunting",
+				["Sepulchre Path"]         = "The Path of the Sepulchre",
+				["Ash Path"]               = "The Path of Ash",
+				["Vitreous Path"]          = "The Vitreous Path",
+
+				-- Koldunic path. The Black Hand (p. 170) is what ties the two names together:
+				-- "the Genius Loci (known to the modern koldun as the Way of Spirit)".
+				["The Way of the Spirit"] = "Genius Loci",
+
+				-- Rituals. Level prefix kept on both sides - it is part of the value.
+				["1. Encrypt Missive"]         = "1. Encrypt/Decrypt Missive",
+				["2. The Hand of Glory"]       = "2. Hand of Glory",
+				["2. Recure of the Homeland"]  = "2. Cure of the Homeland",
+				["3. Tempesta Scudo"]          = "3. Tempest Shield",
+				["4. Bastone Diabolico"]       = "4. Bastone del Diavolo",
+				["5. Escape to a True Friend"] = "5. Escape to a True Haven",
+				-- <<< ERA_NAME_END
+			};
+
+			-- The only reader of ERA_NAME (SPEC I22, T469), exported as a global for the same
+			-- reason ERA_ABILITIES is: the table belongs on the root form and the pickers are
+			-- repainted over on WoD20.6.
+			--
+			-- Total over every canonical value - a value with no row displays ITSELF - so the
+			-- caller never has to ask whether an entry exists, and the twenty rows cover a picker
+			-- of three hundred and eighty-four.
+			--
+			-- Both medieval themes read the same rows (SPEC C); the two modern ones read none, so
+			-- the era is asked for by name rather than assumed from the presence of a row.
+			function eraName(v, era)
+				if era ~= "Dark Ages" and era ~= "Classical Age" then return v; end;
+
+				return ERA_NAME[v] or v;
+			end;
+
+			-- Box geometry, named rather than written into the height sum further down: PITCH is
+			-- the distance between two rows in the .lfm files and PAD is the room above the first
+			-- row plus the room under the last. The gate measures the real row spacing in the XML
+			-- and fails if it stops matching PITCH (SPEC V49) - the same Lua-vs-XML drift that
+			-- produced B12 and B16.
+			HEALTH_ROW_PITCH = 27;
+			HEALTH_BOX_PAD   = 36;
+
+			local function markIndex(v)
+				for i = 1, #HEALTH_MARKS, 1 do
+					if HEALTH_MARKS[i] == v then return i; end;
+				end;
+
+				-- nil, a boolean from a sheet saved before the 6th round, or anything else:
+				-- reads as the empty mark, so a click always continues the cycle (SPEC V42).
+				return 1;
+			end;
+
+			-- The track is always grouped, worst damage first (SPEC V46): every aggravated, then
+			-- every lethal, then every bashing, then the empty rows - and never a gap between
+			-- two marks. HEALTH_MARKS runs from empty to worst, so walking it backwards IS the
+			-- severity order and there is no second list to drift from it (SPEC V47).
+			--
+			-- This only ever moves marks around: the count of each symbol before and after is
+			-- the same, so regrouping is not healing and cannot hide damage.
+			function regroupHealthMarks()
+				if sheet == nil then return; end;
+
+				local n = tonumber(sheet.healthLevels) or 7;
+				local counts = {};
+
+				for m = 1, #HEALTH_MARKS, 1 do counts[m] = 0; end;
+
+				for i = 1, n, 1 do
+					local at = markIndex(sheet["health_" .. i]);
+					counts[at] = counts[at] + 1;
+				end;
+
+				local row = 1;
+
+				for m = #HEALTH_MARKS, 2, -1 do
+					for k = 1, counts[m], 1 do
+						setField("health_" .. row, HEALTH_MARKS[m]);
+						row = row + 1;
+					end;
+				end;
+
+				while row <= n do
+					setField("health_" .. row, HEALTH_MARKS[1]);
+					row = row + 1;
+				end;
+			end;
+
+			-- Clearing a mark is HEALING, and healing always comes off the BOTTOM of the track
+			-- (SPEC V44): whatever row the player clicks, the last marked row is the one that
+			-- empties, and the clicked row keeps what it was showing. Damage goes in anywhere,
+			-- healing only ever comes off the end.
+			--
+			-- Only rows the player can see are eligible (SPEC V45). A mark stranded above the
+			-- current track length - marked at 10 levels, then the track shortened to 7 - would
+			-- otherwise eat the click and look like nothing happened.
+			function healHealthMark()
+				if sheet == nil then return; end;
+
+				local n = tonumber(sheet.healthLevels) or 7;
+
+				for i = n, 1, -1 do
+					if markIndex(sheet["health_" .. i]) > 1 then
+						setField("health_" .. i, HEALTH_MARKS[1]);
+						return;
+					end;
+				end;
+			end;
+
+			-- Both tabs call this. The argument is the row number because the field name is
+			-- positional (health_1 .. health_10, SPEC I3) - the row IS the identity.
+			function cycleHealthMark(n)
+				if sheet == nil then return; end;
+
+				local at = markIndex(sheet["health_" .. n]);
+
+				if at == #HEALTH_MARKS then
+					-- Next symbol would be the empty one, so this click is a heal: the clicked
+					-- row is left alone and the bottom-most mark goes instead (SPEC V44).
+					healHealthMark();
+				else
+					setField("health_" .. n, HEALTH_MARKS[at + 1]);
+				end;
+
+				-- Upgrading a mark in the middle of the stack, or starting a new one on an empty
+				-- row further down, leaves the track out of order - regroup puts the worse
+				-- damage back on top (SPEC V46). Healing cannot break the order: dropping the
+				-- last mark of a sorted list leaves it sorted.
+				regroupHealthMarks();
+			end;
+
+			-- `form` is the tab form; `prefix` names its ten rows: the layout `<prefix>rowN`
+			-- holds the level label `<prefix>N` and the clickable mark box.
+			-- The `dyn` prefix is what tells the WoD20.6 traversal to leave them alone.
+			function renderHealthTrack(form, prefix)
+				if sheet == nil then return; end;
+
+				local n = tonumber(sheet.healthLevels) or 7;
+				local levels = HEALTH_LEVELS[n];
+				local lang = sheet.language or "en";
+
+				-- The black box ends right under the last visible row instead of always being
+				-- ten rows tall (SPEC V49). It only ever shrinks: the .lfm declares the ten-row
+				-- height, and ten is the top of the combo.
+				local box = form[prefix .. "box"];
+
+				if box ~= nil then
+					box.height = n * HEALTH_ROW_PITCH + HEALTH_BOX_PAD;
+				end;
+
+				for i = 1, 10, 1 do
+					-- A sheet saved before the 6th round has a boolean here, which the mark
+					-- label would render as "true". Normalise it once, on the first render that
+					-- sees it (SPEC V42). Hidden rows are normalised too, so growing the track
+					-- later cannot expose a stale value.
+					local mark = sheet["health_" .. i];
+
+					if mark ~= nil and mark ~= HEALTH_MARKS[1] and markIndex(mark) == 1 then
+						setField("health_" .. i, HEALTH_MARKS[1]);
+					end;
+				end;
+
+				-- A sheet marked before the 8th round has its marks in click order, so the first
+				-- render groups them (SPEC V46). Normalisation runs first: a leftover boolean
+				-- would otherwise be counted as a mark. This only moves marks, never drops one.
+				regroupHealthMarks();
+
+				for i = 1, 10, 1 do
+					local row = form[prefix .. "row" .. i];
+					local text = form[prefix .. i];
+
+					if row ~= nil and text ~= nil then
+						local canon = nil;
+
+						if levels ~= nil then canon = levels[i]; end;
+
+						if canon == nil then
+							-- Rows past the chosen length, or an out-of-range value: hide the
+							-- whole row, label and mark box together.
+							row.visible = false;
+						else
+							row.visible = true;
+
+							if lang == "pt" then
+								text.text = HEALTH_PT[canon] or canon;
+							else
+								text.text = canon;
+							end;
+						end;
+					end;
+				end;
+			end;
+
+			-- ---- Era ability lists (SPEC I7 / V74 / V75, 21st round) --------------------
+			--
+			-- Each era shows its own ten abilities per column. A NAME is a trait: it owns one
+			-- field and no other name shares it (SPEC V74), so two dots in Enigmas can never
+			-- surface as two dots in Computer - that was B24, and before it B23.
+			--
+			-- The row is a SLOT. The renderer puts the era's name on it and rebinds the five
+			-- dots to that name's field (SPEC V76); `imageCheckBox.field` has a setter in the
+			-- SDK (SPEC R28), so nothing here needs Lua-owned dots or hidden rows.
+			--
+			-- Eleven of these fields are new in the 21st round and exist only at runtime: the
+			-- XML authors the Victorian list, which is what a sheet shows if the renderer never
+			-- runs - the base era, coherent, rather than half-bound (SPEC V19).
+			--
+			-- These live on the ROOT form for the same reason the health track does: the Combat
+			-- tab reads them too, and a local in WoD20.6 does not cross forms (SPEC R.9 / B.9).
+			THEME_DEFAULT = "Modern Nights";
+
+			ABILITY_FIELD = {
+				-- talents
+				["Alertness"]     = "alertness",
+				["Athletics"]     = "athletics",
+				["Awareness"]     = "awareness",
+				["Brawl"]         = "brawl",
+				["Empathy"]       = "empathy",
+				["Expression"]    = "expression",
+				["Intimidation"]  = "intimidation",
+				["Leadership"]    = "leadership",
+				["Legerdemain"]   = "legerdemain",
+				["Streetwise"]    = "streetwise",
+				["Subterfuge"]    = "subterfuge",
+
+				-- skills
+				["Animal Ken"]    = "animalKen",
+				["Archery"]       = "archery",
+				["Commerce"]      = "commerce",
+				["Crafts"]        = "crafts",
+				["Drive"]         = "drive",
+				["Etiquette"]     = "etiquette",
+				["Firearms"]      = "firearms",
+				["Larceny"]       = "larceny",
+				["Melee"]         = "melee",
+				["Performance"]   = "performance",
+				["Ride"]          = "ride",
+				["Stealth"]       = "stealth",
+				["Survival"]      = "survival",
+
+				-- knowledges
+				["Academics"]     = "academics",
+				["Computer"]      = "computer",
+				["Enigmas"]       = "enigmas",
+				["Finance"]       = "finance",
+				["Hearth Wisdom"] = "hearthWisdom",
+				["Investigation"] = "investigation",
+				["Law"]           = "law",
+				["Medicine"]      = "medicine",
+				["Occult"]        = "occult",
+				["Philosophy"]    = "philosophy",
+				["Politics"]      = "politics",
+				["Religion"]      = "religion",
+				["Ritual"]        = "ritual",
+				["Science"]       = "science",
+				["Seneschal"]     = "seneschal",
+				["Technology"]    = "technology",
+				["Theology"]      = "theology",
+			};
+
+			-- Ten names per column per era, in reading order (alphabetical). The lists are the
+			-- user's, from the 19th round; the 21st only stopped expressing them as renames of
+			-- rows, which is what made ratings walk between traits.
+			local BASE_TALENTS = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Streetwise", "Subterfuge"};
+
+			ERA_ABILITIES = {
+				["Modern Nights"] = {
+					talents    = BASE_TALENTS,
+					skills     = {"Animal Ken", "Crafts", "Drive", "Etiquette", "Firearms", "Larceny", "Melee", "Performance", "Stealth", "Survival"},
+					knowledges = {"Academics", "Computer", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
+				},
+				["Victorian Era"] = {
+					talents    = BASE_TALENTS,
+					skills     = {"Animal Ken", "Crafts", "Etiquette", "Firearms", "Larceny", "Melee", "Performance", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Enigmas", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
+				},
+				["Dark Ages"] = {
+					talents    = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Legerdemain", "Subterfuge"},
+					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Melee", "Performance", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Enigmas", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Politics", "Seneschal", "Theology"},
+				},
+				["Classical Age"] = {
+					talents    = BASE_TALENTS,
+					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Melee", "Performance", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Philosophy", "Politics", "Religion", "Ritual"},
+				},
+			};
+
+			-- The era in force, with the same fallback the palette uses (SPEC V52): a sheet
+			-- saved before the 19th round carries `Modern` or `Classical Era`, neither of which
+			-- is a key any more.
+			function currentTheme()
+				local v = nil;
+
+				if sheet ~= nil then v = sheet.sheetTheme; end;
+				if v == nil or ERA_ABILITIES[v] == nil then return THEME_DEFAULT; end;
+
+				return v;
+			end;
+
+			-- The ranged skill of the era in force. Read off the era's own list rather than
+			-- from a second table, so there is nothing to fall out of step with it (the same
+			-- reason HEALTH_MARKS is declared once, SPEC V41). Dark Ages and the Classical Age
+			-- fight with Archery; the other two carry Firearms.
+			function eraRangedName()
+				local list = ERA_ABILITIES[currentTheme()].skills;
+
+				for i = 1, #list, 1 do
+					if list[i] == "Firearms" or list[i] == "Archery" then return list[i]; end;
+				end;
+
+				return "Firearms";
+			end;
+
+			-- ---- Storyteller gate (SPEC I8a / V79 / V80, 27th round) --------------------
+			--
+			-- The Storyteller tab is the one place on this sheet a player must not reach, so
+			-- the check fails CLOSED: no room (a sheet opened from the local library), no
+			-- player object, or an API that raises all read as "not the storyteller" and the
+			-- tab stays hidden. A gate that opened on error would leak the whole tab.
+			--
+			-- `Firecast.getMesaDe(sheet)` is what the Anime 5E sheet in this repo calls from
+			-- inside a sheet .lfm, and `isMestre` is what the AfkBot plugin reads (SPEC R29).
+			function isStoryteller()
+				if sheet == nil then return false; end;
+
+				local ok, res = pcall(function()
+					local mesa = Firecast.getMesaDe(sheet);
+
+					if mesa == nil then return false; end;
+
+					local me = mesa.meuJogador;
+
+					if me == nil then return false; end;
+
+					return me.isMestre == true;
+				end);
+
+				return ok and res == true;
+			end;
+
+			-- Tabs are found by walking from the root and matching names, not by form.<name>:
+			-- the calls come from WoD20.10 (the checkboxes) and WoD20.6 (the language switch), and a
+			-- tab form cannot reach its siblings (SPEC R.9 / B.9).
+			local function tabRootOf(ctrl)
+				local p = ctrl;
+
+				while true do
+					local up = p:getParent();
+
+					if up == nil then return p; end;
+
+					p = up;
+				end;
+			end;
+
+			local function collectTabs(node, out)
+				local children = node:getChildren();
+
+				for i = 1, #children, 1 do
+					local c = children[i];
+
+					if c:getClassName() == "tab" then out[#out + 1] = c; end;
+
+					collectTabs(c, out);
+				end;
+			end;
+
+			-- SPEC I8b / V89. Numina reads `~= false` and the other two read `== true`: a
+			-- sheet saved before this round has nil in all three, and Numina was always
+			-- visible on it - defaulting it off would take away a tab the player already had.
+			function applyTabVisibility(from)
+				if sheet == nil then return; end;
+
+				local tabs = {};
+				collectTabs(tabRootOf(from), tabs);
+
+				-- Three managed tabs since the 39th round (SPEC V128): Magika was an empty
+				-- window that Mage-only content was never going to fill on a mortal sheet, so
+				-- the user had it removed. `stShowMagika` is a burned name from here on
+				-- (SPEC I3, orphans) - nothing reads it and nothing may reuse it.
+				local shown = {
+					tabNumina      = sheet.stShowNumina ~= false,
+					tabDisciplines = sheet.stShowDisciplines == true,
+					tabStoryteller = isStoryteller(),
+				};
+
+				-- SPEC V93: a player must not be left sitting on a tab that was just denied.
+				-- There is no event for the active tab and no reading of tabIndex that can be
+				-- trusted here (SPEC R33): the index is an int with no name attached, and
+				-- whether it counts the hidden tabs decides which tab it points at - guessing
+				-- wrong would throw players off Numina on every load. So the sheet watches the
+				-- one thing it can see for certain, a tab going from shown to hidden, and
+				-- moves everyone to Main when it happens. Nothing moves on load: the tabs are
+				-- authored in their default state (SPEC V94), so there is no transition.
+				local tabMain, denied;
+
+				for i = 1, #tabs, 1 do
+					local tab  = tabs[i];
+					local name = tab:getName();
+					local want = shown[name];
+
+					if name == "tabMain" then tabMain = tab; end;
+
+					if want ~= nil then
+						if tab.visible and not want then denied = true; end;
+
+						tab.visible = want;
+
+						-- Nothing confirms that the host takes the tab BUTTON away with the
+						-- tab (SPEC R31), so the contents are hidden as well (SPEC V92):
+						-- whoever still reaches a denied tab finds nothing on it. One level
+						-- down is the form the <tab> imports, which is all it holds.
+						local kids = tab:getChildren();
+
+						for j = 1, #kids, 1 do kids[j].visible = want; end;
+					end;
+				end;
+
+				if denied and tabMain ~= nil then tabMain:activate(); end;
+			end;
+
+			-- ---- First paint (SPEC I15 / V166 / V167 / B40, 49th round) -----------------
+			--
+			-- The host draws the sheet before any hook of ours runs (SPEC R47), so for about a
+			-- second every open showed the sheet exactly as the XML authors it: black boxes, the
+			-- host font, white dots, no parchment, HEALTH with no labels and abilities off their
+			-- era. That look is nobody's choice - since the 16th round every value the theme
+			-- combo offers repaints, so there is no way back to it (SPEC C). It was dead state
+			-- on display at every single open, and the user asked for it gone.
+			--
+			-- The fix is not to show it. The tabControl is authored hidden and this is the one
+			-- place in the sheet that lights it (SPEC V166).
+			--
+			-- Idempotent, and deliberately reachable two ways (SPEC V167): the theme paint calls
+			-- it when it is done, and onNodeReady arms a timer that calls it whatever happens. A
+			-- paint that never runs has to leave the sheet ugly, never blank - hiding it forever
+			-- is worse than showing it raw, which is the mirror of the mistake B26 made when it
+			-- left hidden tabs authored visible.
+			--
+			-- Found by name from the root, through the one finder there is (SPEC V143): this is
+			-- called from WoD20.6, and a tab form cannot reach its siblings (SPEC R.9 / B.9).
+			function sheetReveal(from)
+				local tc = xpFind(tabRootOf(from), { tabsHH = true }, {}).tabsHH;
+
+				if tc ~= nil and tc.visible ~= true then tc.visible = true; end;
+			end;
+
+			-- A write the sheet makes to ITSELF is not a click by the player, and an
+			-- imageCheckBox has no onUserChange to tell the two apart (SPEC R37) - so the code
+			-- says which is which. Whatever writes a batch of fields raises this first and
+			-- lowers it after.
+			--
+			-- Without it the sheet froze on load (SPEC B30): the era renderer rebinds 150 dots,
+			-- twice, and each rebind was costing two full walks of the ledger.
+			xpQuiet = false;
+
+			-- ---- Experience ledger (SPEC I9 / I10 / V83 / V85 / V86, 27th round) --------
+			--
+			-- The log is DERIVED: every render diffs the saved initial character against the
+			-- sheet as it stands now (SPEC V83). Nothing is journalled, so unticking a dot
+			-- takes its line back out and a mis-click never has to be edited away by hand.
+			--
+			-- The baseline is the whole sheet in one XML string, written once (SPEC R32/V81).
+			-- It is parsed on demand and cached against the string it came from: the ledger
+			-- re-renders on every dot click, and re-parsing that each time would be waste.
+			local baselineXML, baselineNode;
+
+			local function baselineOf()
+				if sheet == nil then return nil; end;
+
+				local xml = sheet.baseline;
+
+				if xml == nil or xml == "" then return nil; end;
+
+				if xml ~= baselineXML then
+					local node = ndb.newMemNodeDatabase();
+					ndb.importXML(node, xml);
+
+					baselineXML  = xml;
+					baselineNode = node;
+				end;
+
+				return baselineNode;
+			end;
+
+			-- SPEC V85: ONE reading, used for both sides of the diff. Attributes and virtues
+			-- draw their first dot as fixed art, so their fields start at _2 and the rating is
+			-- one above the count. Willpower counts the DOTS (willpower_1..10) and never the
+			-- boxes (willpower_c1..c10) - those are spent points, not rating.
+			function traitLevel(node, base, first, last, fixed)
+				local n = fixed;
+
+				for i = first, last, 1 do
+					if node[base .. "_" .. i] == true then n = n + 1; end;
+				end;
+
+				return n;
+			end;
+
+			-- The sheet as it WOULD be if the click were allowed (SPEC V136). Pricing a dot
+			-- must not write it: what kept the guard from ever making a refusal stick was
+			-- that it let the mark happen and argued afterwards (SPEC B38).
+			--
+			-- Only the live sheet is simulated. The baseline is the character the storyteller
+			-- froze, and it goes on being read through traitLevel directly.
+			local simTrait, simField, simValue;
+
+			local function liveLevel(base, first, last, fixed)
+				local n = traitLevel(sheet, base, first, last, fixed);
+
+				-- One dot, one trait: a pending click moves the count by one at most, and only
+				-- for the trait the dot belongs to.
+				if simTrait == base and (sheet[simField] == true) ~= simValue then
+					if simValue then n = n + 1; else n = n - 1; end;
+				end;
+
+				return n;
+			end;
+
+			-- SPEC I9. Every ACTIVE rule sits here exactly once (SPEC V86). The dormant ones -
+			-- Discipline, Path, Sphere, Arete - are in the spec but deliberately NOT written:
+			-- the Disciplines tab is empty and Magika is gone altogether (SPEC V128), so no
+			-- field can produce that row and a cost nothing can reach is dead code.
+			-- What a speciality costs at this moment (SPEC I9/V154). The storyteller opens the
+			-- door with one of two boxes and neither is ticked by default, so a sheet where
+			-- nobody decided anything cannot buy one at all.
+			--
+			-- Four is read FIRST. The two boxes cannot both be on through the interface (SPEC
+			-- V155), but a sheet edited by hand could carry both, and a price that depends on
+			-- which question you ask is not a price.
+			local function specCost()
+				if sheet == nil then return 0; end;
+				if sheet.stSpec4XP == true then return 4; end;
+				if sheet.stSpec3XP == true then return 3; end;
+
+				return 0;
+			end;
+
+			local function xpCost(kind, from, ctx)
+				if kind == "Attribute" then return from * 4; end;
+				if kind == "Ability"   then if from == 0 then return 3; end; return from * 2; end;
+				if kind == "Virtue"    then return from * 2; end;
+				if kind == "Humanity"  then return from * 2; end;
+				if kind == "Willpower" then return from; end;
+
+				if kind == "Background" then
+					-- Off by default: the storyteller decides whether backgrounds cost XP at
+					-- all (SPEC C). With the box unticked the rise still shows, at zero - it
+					-- happened, and the storyteller is who reads this table.
+					if not ctx.backgroundsXP then return 0; end;
+					if from == 0 then return 3; end;
+
+					return from * 3;
+				end;
+
+				-- One dot, so there is no rating to price off: a speciality costs whatever the
+				-- storyteller opened the door at (SPEC I9). A purchase never reaches here with
+				-- both boxes off (SPEC V154); a line bought while one was on reads zero after
+				-- it is turned off, which is what the background flag has always done.
+				if kind == "Specialty" then return specCost(); end;
+
+				-- SPEC I9, dormant since the 27th round and awake now that the fields exist. What
+				-- makes a discipline "clan" is that it SITS in a clan slot at the moment of the
+				-- click (SPEC C) - not which box bought it, and not the CLANS table, which stays
+				-- asleep while `clan` is invisible (SPEC V173/V174).
+				if kind == "Discipline" then
+					if from == 0 then return 10; end;
+					if ctx.inClan then return from * 5; end;
+					return from * 7;
+				end;
+
+				-- Secondary paths only. The main path is not bought (SPEC V179).
+				if kind == "Path" then
+					if from == 0 then return 7; end;
+					return from * 4;
+				end;
+
+				if kind == "Numina" then
+					if from == 0 then
+						-- The 21 is the first point of a KIND the character did not have -
+						-- static magic, psychic, true faith - not merely a numina they did not
+						-- have (SPEC V87).
+						if ctx.newType then return 21; end;
+
+						return 7;
+					end;
+
+					if ctx.affinity then return from * 6; end;
+
+					return from * 7;
+				end;
+
+				return 0;
+			end;
+
+			-- One line per POINT: 2 -> 4 is two lines, each costed off the rating it was bought
+			-- from (SPEC I10).
+			--
+			-- `field` is here for the free-dot stamp and nothing else (SPEC V139). The stamp
+			-- keys off the rating the point REACHED, never off the dot that was clicked:
+			-- strength_5 clicked with two dots lit is level 3, and keying off the field is the
+			-- mistake that made the 34th round's version charge for stamped points (SPEC B31).
+			local function pushRise(rows, kind, name, from, to, ctx, field)
+				for lvl = from + 1, to, 1 do
+					local cost = xpCost(kind, lvl - 1, ctx);
+
+					-- A stamp DISCOUNTS a price the table already worked out; it is not a second
+					-- table (SPEC V86/V139). A free point does not make the next one cheaper -
+					-- the price reads the rating reached, not how many were paid for.
+					if string.find(ctx.free, "|" .. field .. "#" .. lvl .. "|", 1, true) ~= nil then cost = 0; end;
+
+					rows[#rows + 1] = { kind = kind, name = name, level = lvl, cost = cost };
+
+					-- 21 buys the FIRST point of the new kind and nothing after it.
+					ctx.newType = false;
+				end;
+			end;
+
+			local XP_ATTRS = {
+				{"Strength", "strength"}, {"Dexterity", "dexterity"}, {"Stamina", "stamina"},
+				{"Charisma", "charisma"}, {"Manipulation", "manipulation"}, {"Appearance", "appearance"},
+				{"Perception", "perception"}, {"Inteligence", "inteligence"}, {"Wits", "wits"},
+			};
+
+			local XP_VIRTUES = { {"Conscience", "conscience"}, {"Self-Control", "selfControl"}, {"Courage", "courage"} };
+
+			local XP_CUSTOM = { "customTalent_1", "customTalent_2", "customSkill_1", "customSkill_2", "customKnowledge_1", "customKnowledge_2" };
+
+			-- The 41 ability names, sorted so the ledger is in the same order every render.
+			-- ABILITY_FIELD is a bijection (SPEC V74), so the name identifies the trait no
+			-- matter which era is showing.
+			local XP_ABILITIES = {};
+
+			for name in pairs(ABILITY_FIELD) do XP_ABILITIES[#XP_ABILITIES + 1] = name; end;
+
+			table.sort(XP_ABILITIES);
+
+			local XP_NUMINA = {
+				{ kind = "hedge",   base = "numina",  count = 10 },
+				{ kind = "psychic", base = "psychic", count = 10 },
+			};
+
+			-- How many background rows the sheet draws (SPEC V145). Declared ONCE and read by
+			-- both loops that walk them - the one that lets experience buy them and the one
+			-- that prices them for the log. The count was written out twice as `9` until the
+			-- 46th round moved the box to the Traits tab and doubled it; a twenty-first row
+			-- added to the XML and to only one of the two loops would be a background nothing
+			-- charges for and nothing shows in the log (SPEC I3, I9).
+			BACKGROUND_ROWS = 20;
+
+			-- How many speciality rows the box on the Main tab draws (SPEC V147). Same reason
+			-- as BACKGROUND_ROWS: both the loop that lets experience buy them and the loop that
+			-- prices them for the log read this, so a tenth row added to the XML alone would be
+			-- a dot nothing charges for and nothing shows.
+			SPECIALITY_ROWS = 9;
+
+			-- Rows of the Vampire tab (SPEC I16). Same contract as BACKGROUND_ROWS above: the loop
+			-- that lets experience buy a dot and the loop that prices it for the log both read
+			-- these, so a row added to the XML alone would be a dot nothing charges for.
+			-- MAIN_PATH_ROWS and RITUAL_ROWS buy nothing - a main path mirrors its discipline
+			-- (SPEC V179/V180) and a ritual has no dots at all (SPEC C) - so neither is declared
+			-- as a trait; they are here so the count lives in one place per box.
+			--
+			-- RITUAL_ROWS said 20 for three rounds while WoD20.14 drew 25 (SPEC B46). Nothing read
+			-- it, so nothing broke and the gate stayed green over a wrong number; the picker
+			-- filter is its first reader and would have left five rows unfiltered without a
+			-- word. The gate now measures every one of these against the XML (SPEC V204).
+			CLAN_DISC_ROWS = 4;
+			DISC_ROWS      = 15;
+			MAIN_PATH_ROWS = 5;
+			SEC_PATH_ROWS  = 15;
+			RITUAL_ROWS    = 25;
+
+			-- Which traits hand out a free speciality, and at which rating (SPEC I14/V149).
+			-- DERIVED from the two tables that already name every attribute and every ability,
+			-- never typed out again: the picker on WoD20.1 offers exactly these fifty names, and
+			-- the gate compares the two sides rather than trusting them to stay in step
+			-- (SPEC V148, the failure B23/B24 were made of).
+			--
+			-- Custom ability rows are deliberately absent. They are not in the picker, so a
+			-- grant on one would write a value the combo has no item for (SPEC V13).
+			SPEC_TRAIT = {};
+
+			for i = 1, #XP_ATTRS, 1 do SPEC_TRAIT[XP_ATTRS[i][2]] = { name = XP_ATTRS[i][1], free = 4 }; end;
+			for name, field in pairs(ABILITY_FIELD) do SPEC_TRAIT[field] = { name = name, free = 4 }; end;
+
+			-- The five that come with a speciality at the FIRST dot - and get nothing at the
+			-- fourth, which is the whole point of listing them (the user's second request).
+			local SPEC_FREE_AT_ONE = { "crafts", "expression", "performance", "academics", "technology" };
+
+			for i = 1, #SPEC_FREE_AT_ONE, 1 do SPEC_TRAIT[SPEC_FREE_AT_ONE[i]].free = 1; end;
+
+			-- Field -> how to read that trait's rating, for every trait experience can buy
+			-- (SPEC I12). Built from the SAME lists the ledger walks, so a trait cannot be in
+			-- one and missing from the other (SPEC V86): the guard refuses moves on exactly
+			-- the traits the log prices.
+			--
+			-- It holds no cost of its own. Prices live in xpCost and nowhere else - the guard
+			-- reads what a move did to the LOG rather than pricing the move itself.
+			XP_TRAIT = {};
+
+			local function declareTrait(field, first, last, fixed)
+				XP_TRAIT[field] = { first = first, last = last, fixed = fixed };
+			end;
+
+			for i = 1, #XP_ATTRS, 1 do declareTrait(XP_ATTRS[i][2], 2, 5, 1); end;
+
+			-- Appearance is the attribute whose first dot can be switched off (SPEC I3).
+			declareTrait("appearance", 1, 5, 0);
+
+			for name, field in pairs(ABILITY_FIELD) do declareTrait(field, 1, 5, 0); end;
+			for i = 1, #XP_CUSTOM, 1 do declareTrait(XP_CUSTOM[i], 1, 5, 0); end;
+			for i = 1, #XP_VIRTUES, 1 do declareTrait(XP_VIRTUES[i][2], 2, 5, 1); end;
+
+			declareTrait("humanity", 1, 10, 0);
+			declareTrait("willpower", 1, 10, 0);
+
+			for i = 1, BACKGROUND_ROWS, 1 do declareTrait("background_" .. i, 1, 5, 0); end;
+
+			-- One dot per row, so first and last are both 1 (SPEC V147). The row is a trait like
+			-- any other from here on: the same click path prices it, refuses it and sells it.
+			for i = 1, SPECIALITY_ROWS, 1 do declareTrait("speciality_" .. i, 1, 1, 0); end;
+
+			for g = 1, #XP_NUMINA, 1 do
+				for i = 1, XP_NUMINA[g].count, 1 do declareTrait(XP_NUMINA[g].base .. "_" .. i, 1, 5, 0); end;
+			end;
+
+			declareTrait("faith", 1, 5, 0);
+
+			for i = 1, CLAN_DISC_ROWS, 1 do declareTrait("clanDisc_" .. i, 1, 5, 0); end;
+			for i = 1, DISC_ROWS, 1 do declareTrait("disc_" .. i, 1, 5, 0); end;
+			for i = 1, SEC_PATH_ROWS, 1 do declareTrait("secPath_" .. i, 1, 5, 0); end;
+
+			local function numinaTypeInUse(node, base, count)
+				for i = 1, count, 1 do
+					if traitLevel(node, base .. "_" .. i, 1, 5, 0) > 0 then return true; end;
+				end;
+
+				return false;
+			end;
+
+			-- A row the player named carries that name; one they only put dots on carries the
+			-- field id, which is at least honest about which line it is.
+			local function slotName(field)
+				local v = sheet[field];
+
+				if v == nil or v == "" then return field; end;
+
+				return v;
+			end;
+
+			-- Returns the rows, or nil when no initial character has been saved yet - the
+			-- caller shows a state text for that instead of an empty table (SPEC V33).
+			--
+			-- `clickFree` is the stamp the click being priced WOULD leave if it is allowed
+			-- (SPEC V140). It is handed in rather than written first, because pricing a click
+			-- writes nothing at all (SPEC V136): the row comes out at zero here, and the stamp
+			-- reaches the sheet only on the way through xpClick.
+			function xpLedgerRows(clickField, clickValue, clickFree)
+				local base = baselineOf();
+
+				if base == nil then return nil; end;
+
+				-- Set after the baseline check and cleared before the one way out, so nothing
+				-- later is priced under a click that has already been answered (SPEC V136).
+				simField, simValue = clickField, clickValue;
+				simTrait = clickField ~= nil and string.match(clickField, "^(.+)_%d+$") or nil;
+
+				-- The stamps, read ONCE per walk (SPEC V125). Bars on both sides of every key
+				-- so that a search for |a_3#4| cannot match inside |numina_3#4|.
+				local ctx  = {
+					backgroundsXP = sheet.stBackgroundsXP == true,
+					free          = (sheet.xpFree or "") .. "|" .. (clickFree or "") .. "|",
+				};
+
+				local rows = {};
+
+				for i = 1, #XP_ATTRS, 1 do
+					local nome, field = XP_ATTRS[i][1], XP_ATTRS[i][2];
+					local first, fixed = 2, 1;
+
+					-- Appearance is the one attribute whose first dot can be switched off
+					-- (SPEC I3), so it counts from _1 with nothing fixed.
+					if field == "appearance" then first, fixed = 1, 0; end;
+
+					pushRise(rows, "Attribute", nome,
+						traitLevel(base, field, first, 5, fixed),
+						liveLevel(field, first, 5, fixed), ctx, field);
+				end;
+
+				for i = 1, #XP_ABILITIES, 1 do
+					local nome  = XP_ABILITIES[i];
+					local field = ABILITY_FIELD[nome];
+
+					pushRise(rows, "Ability", nome,
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field);
+				end;
+
+				for i = 1, #XP_CUSTOM, 1 do
+					local field = XP_CUSTOM[i];
+
+					pushRise(rows, "Ability", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field);
+				end;
+
+				for i = 1, #XP_VIRTUES, 1 do
+					local nome, field = XP_VIRTUES[i][1], XP_VIRTUES[i][2];
+
+					pushRise(rows, "Virtue", nome,
+						traitLevel(base, field, 2, 5, 1),
+						liveLevel(field, 2, 5, 1), ctx, field);
+				end;
+
+				pushRise(rows, "Humanity", "Humanity",
+					traitLevel(base, "humanity", 1, 10, 0),
+					liveLevel("humanity", 1, 10, 0), ctx, "humanity");
+
+				pushRise(rows, "Willpower", "Willpower",
+					traitLevel(base, "willpower", 1, 10, 0),
+					liveLevel("willpower", 1, 10, 0), ctx, "willpower");
+
+				for i = 1, BACKGROUND_ROWS, 1 do
+					local field = "background_" .. i;
+
+					pushRise(rows, "Background", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field);
+				end;
+
+				-- Which kinds the character already had when the storyteller froze the sheet.
+				-- Buying into a kind that is not in here costs 21 for its first point, once.
+				local unlocked = {
+					hedge   = numinaTypeInUse(base, "numina", 10),
+					psychic = numinaTypeInUse(base, "psychic", 10),
+					faith   = traitLevel(base, "faith", 1, 5, 0) > 0,
+				};
+
+				for g = 1, #XP_NUMINA, 1 do
+					local grp = XP_NUMINA[g];
+
+					for i = 1, grp.count, 1 do
+						local field = grp.base .. "_" .. i;
+						local from  = traitLevel(base, field, 1, 5, 0);
+						local to    = liveLevel(field, 1, 5, 0);
+
+						if to > from then
+							-- SPEC V88: the affinity path is the FIRST hedge row, always. It is
+							-- the ROW that is cheap, not whichever numina currently sits on it.
+							ctx.affinity = (field == "numina_1");
+							ctx.newType  = (from == 0) and not unlocked[grp.kind];
+
+							pushRise(rows, "Numina", slotName(field), from, to, ctx, field);
+
+							unlocked[grp.kind] = true;
+						end;
+					end;
+				end;
+
+				-- True Faith is a numina like the others; the combo beside it picks a religion,
+				-- not a power (SPEC V50), so the ledger names the numina.
+				local ff = traitLevel(base, "faith", 1, 5, 0);
+				local ft = liveLevel("faith", 1, 5, 0);
+
+				if ft > ff then
+					ctx.affinity = false;
+					ctx.newType  = (ff == 0) and not unlocked.faith;
+
+					pushRise(rows, "Numina", "True Faith", ff, ft, ctx, "faith");
+				end;
+
+				-- Disciplines and paths (SPEC I10b), between the numina and the specialities.
+				--
+				-- A discipline is priced as CLAN when the discipline itself sits in one of the four
+				-- clan slots (SPEC C). Read once, off the live sheet, so the same discipline picked
+				-- in an open slot is priced the same as in its clan slot - it is one discipline,
+				-- and which box it was typed into is not what the book charges for.
+				local inClan = {};
+
+				for i = 1, CLAN_DISC_ROWS, 1 do
+					local v = sheet["clanDisc_" .. i];
+					if v ~= nil and v ~= "" then inClan[v] = true; end;
+				end;
+
+				for i = 1, CLAN_DISC_ROWS, 1 do
+					local field = "clanDisc_" .. i;
+
+					ctx.inClan = true;
+
+					pushRise(rows, "Discipline", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field);
+				end;
+
+				for i = 1, DISC_ROWS, 1 do
+					local field = "disc_" .. i;
+					local v     = sheet[field];
+
+					ctx.inClan = (v ~= nil and v ~= "" and inClan[v] == true);
+
+					pushRise(rows, "Discipline", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field);
+				end;
+
+				-- Only the secondary paths: a main path rides its blood sorcery and was paid for
+				-- when the discipline was (SPEC V179/V180), so it owns no field and no line here.
+				for i = 1, SEC_PATH_ROWS, 1 do
+					local field = "secPath_" .. i;
+
+					pushRise(rows, "Path", slotName(field),
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field);
+				end;
+
+				-- Specialities close the order (SPEC I10). The Trait column carries the TRAIT
+				-- the row belongs to, not the text the player typed into it: that column is
+				-- translated (SPEC V70) and free text is not - the storyteller reads what was
+				-- written on the sheet itself.
+				for i = 1, SPECIALITY_ROWS, 1 do
+					local field = "speciality_" .. i;
+
+					pushRise(rows, "Specialty", slotName(field),
+						traitLevel(base, field, 1, 1, 0),
+						liveLevel(field, 1, 1, 0), ctx, field);
+				end;
+
+				simTrait, simField, simValue = nil, nil, nil;
+
+				return rows;
+			end;
+
+			-- Controls by name, in ONE pass (SPEC V143). `form.<name>` does not cross an
+			-- <import>, which is why the boxes and the log used to hand their forms to a
+			-- registry (SPEC V133, 41st round) - and a registry filled at onNodeReady is a
+			-- promise nobody could see being kept: a tab never opened never registered, and
+			-- the failure was silent (SPEC B39). Walking from the root DOES cross the import;
+			-- it is how the era rebind reaches WoD20.1's dots from WoD20.6 and how the translation
+			-- reaches all eleven tabs (SPEC V21 / B9).
+			function xpFind(node, names, out)
+				local children = node:getChildren();
+
+				if children == nil then return out; end;
+
+				for i = 1, #children, 1 do
+					local c  = children[i];
+					local nm = c:getName();
+
+					if nm ~= nil and names[nm] == true then out[nm] = c; end;
+
+					xpFind(c, names, out);
+				end;
+
+				return out;
+			end;
+
+			-- The three numbers, wherever they are drawn (SPEC I11): the Progress tab has all
+			-- three, the Main tab has the balance only. One is stored and two are worked out,
+			-- which is what stops any of them from disagreeing with the log (SPEC V100).
+			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true };
+
+			-- The painting itself. No xpQuiet here (SPEC V142): the flag exists to keep the
+			-- sheet's OWN writes from dragging a repaint along (SPEC V107), and a flag left
+			-- stuck true would otherwise mute every number on the sheet for the rest of the
+			-- session with nothing to show for it (SPEC B39). The callers that need silencing
+			-- ask for it themselves, just below.
+			local function xpPaint(node, spent)
+				if sheet == nil then return; end;
+
+				-- The guard has usually just worked this out; walking the ledger a second time
+				-- for the same click is the other half of what froze the sheet (SPEC V108).
+				spent = spent or xpSpent();
+
+				-- One-shot migration (SPEC I11/V102). A sheet from before this round kept its
+				-- balance in `experience`; seeding the total with balance + log leaves the
+				-- rendered balance exactly where the player left it. `spentXP` is not read -
+				-- that was the player's own arithmetic, and the log counts from here on.
+				if sheet.xpTotal == nil then
+					-- Quiet, because the links watching xpTotal would call straight back into
+					-- here and walk the ledger again for a number this call already has
+					-- (SPEC V107).
+					xpQuiet = true;
+					setField("xpTotal", math.max(0, tonumber(sheet.experience) or 0) + spent);
+					xpQuiet = false;
+				end;
+
+				local total = tonumber(sheet.xpTotal) or 0;
+				local box   = xpFind(node, XP_BOXES, {});
+
+				if box.edtTotalXP       ~= nil then box.edtTotalXP.text       = tostring(total); end;
+				if box.edtSpentXP       ~= nil then box.edtSpentXP.text       = tostring(spent); end;
+				if box.edtCurrentXP     ~= nil then box.edtCurrentXP.text     = tostring(total - spent); end;
+				if box.edtCurrentXPMain ~= nil then box.edtCurrentXPMain.text = tostring(total - spent); end;
+			end;
+
+			-- What a dataLink, an onShow or an onNodeReady calls: it paints its own tab, and
+			-- it stands down while the sheet is writing to itself (SPEC V107).
+			function renderXPBoxes(form, spent)
+				if xpQuiet then return; end;
+
+				xpPaint(form, spent);
+			end;
+
+			-- What a CLICK calls (SPEC V133/V142). Buying a dot never writes xpTotal - Spent
+			-- and Current are worked out (SPEC V100) - so no dataLink wakes up and this is the
+			-- only thing that moves a number on the screen. It climbs to the sheet root, so
+			-- every box on every loaded tab follows a purchase made on any of them, and it
+			-- never asks xpQuiet: a player's click is not a batch of the sheet's own writes.
+			function renderAllXPBoxes(from, spent)
+				if from == nil then return; end;
+
+				xpPaint(tabRootOf(from), spent);
+			end;
+
+			-- Both refusals the sheet can hand the player - no balance left for a dot, and a
+			-- balance typed below zero - come out through here (SPEC V129/V131). Authored in
+			-- English and shown through the sheet's own translation (SPEC V70/V130); the
+			-- Settings tab owns that map, and on a sheet where it has not loaded the English
+			-- is still the right thing to read.
+			local function xpWarn(msg)
+				local txt = msg;
+
+				if translateSheetText ~= nil then
+					txt = translateSheetText(msg, (sheet ~= nil and sheet.language) or "en");
+				end;
+
+				Dialogs.showMessage(txt);
+			end;
+
+			-- The player types the BALANCE, never the total (SPEC I11): the storyteller hands
+			-- out 10 experience, the number in that box goes up by 10, and the total behind it
+			-- follows. Spending moves the same box down on its own, through the log.
+			function xpSetCurrent(form, typed)
+				if sheet == nil then return; end;
+
+				local n = tonumber(typed) or 0;
+
+				-- SPEC V131: experience never goes below zero. The typed number is REFUSED,
+				-- not clamped - clamping would write xpTotal = Spent, and one mistyped minus
+				-- sign would cost the player every point they had earned. Nothing is written,
+				-- so the box simply comes back to the balance that is stored.
+				if n < 0 then
+					renderAllXPBoxes(form);
+					xpWarn("Experience cannot go below zero");
+					return;
+				end;
+
+				setField("xpTotal", n + xpSpent());
+
+				-- The whole sheet, not the tab that was typed on: the balance is drawn twice
+				-- (SPEC I11) and one of the two would otherwise sit on the old number until
+				-- something else happened to redraw it (SPEC V133).
+				renderAllXPBoxes(form);
+			end;
+
+			-- The experience log lives on the Progress tab, which owns the four columns and
+			-- their widths. It is handed the sheet ROOT rather than its own form (SPEC V133):
+			-- the renderer finds its columns by name from whatever node it is given, so the
+			-- log follows a purchase made on any tab without anyone having registered
+			-- anything (SPEC B39). Called with the rows the caller already built - walking the
+			-- ledger again for the same click is the waste the 39th round removed (SPEC B34).
+			--
+			-- The guard stays: on a sheet where the Progress tab never loaded there is no
+			-- renderer and nothing to draw on - nothing here raises.
+			local function xpLedgerRefresh(from, rows)
+				if from ~= nil and renderXPLedger ~= nil then
+					renderXPLedger(tabRootOf(from), rows);
+				end;
+			end;
+
+			-- The dot that fired, found by the field it is bound to. onChange hands over the
+			-- form, not the control (SPEC R39 - the event carries no arguments), and naming all
+			-- sixty-four dots in the XML would touch ten templates to answer a question nobody
+			-- asks except on a refused click (SPEC V132).
+			local function findDot(node, field)
+				local children = node:getChildren();
+
+				if children == nil then return nil; end;
+
+				for i = 1, #children, 1 do
+					local c = children[i];
+
+					if c.field == field then return c; end;
+
+					local found = findDot(c, field);
+
+					if found ~= nil then return found; end;
+				end;
+
+				return nil;
+			end;
+
+			-- The mark itself, made in one step: the field the sheet is saved from and the
+			-- control the player is looking at (SPEC V135). With autoChange="false" the dot
+			-- writes neither of them on its own, so both are this function's job.
+			local function markDot(form, field, v)
+				setField(field, v);
+
+				local dot = findDot(form, field);
+
+				if dot ~= nil then dot.checked = v; end;
+			end;
+
+			-- The free speciality (SPEC I14). A trait reaching four - or one, for the five
+			-- abilities the book hands a speciality to straight away - fills the next empty row
+			-- with that trait's name, lights its dot and stamps it free. The text box is left
+			-- alone: what the speciality IS is the player's to write (SPEC V152).
+			--
+			-- It hangs off the click that REACHES the rating and nowhere else (SPEC V150): no
+			-- observer, no sweep at load. A sheet that already stood at four before this version
+			-- is given nothing, because nothing recorded what was granted before the stamp
+			-- existed to record it.
+			--
+			-- Returns whether it wrote anything, so the caller knows its ledger rows are stale.
+			-- Is THIS row a gift? One question, one line, and the primitive under all three
+			-- places that ask about the stamp: the lock, the dedup and the revoke (SPEC V160).
+			function isFreeRow(field)
+				return string.find(sheet.xpFree or "", "|" .. field .. "#1|", 1, true) ~= nil;
+			end;
+
+			-- Where is the gift for this trait? A row only counts as the gift if it carries the
+			-- stamp as well as the name (SPEC V151/V160): a speciality the player PAID for on
+			-- the same trait neither uses the free one up nor gets taken away with it.
+			local function freeRowOf(name)
+				for i = 1, SPECIALITY_ROWS, 1 do
+					if sheet["speciality_" .. i] == name and isFreeRow("speciality_" .. i) then return i; end;
+				end;
+
+				return nil;
+			end;
+
+			local function grantSpeciality(form, trait, reached)
+				local t = SPEC_TRAIT[trait];
+
+				if t == nil or reached ~= t.free then return false; end;
+				if freeRowOf(t.name) ~= nil then return false; end;
+
+				local stamps = sheet.xpFree or "";
+				local slot   = nil;
+
+				for i = 1, SPECIALITY_ROWS, 1 do
+					local v = sheet["speciality_" .. i];
+
+					if slot == nil and (v == nil or v == "") then slot = i; end;
+				end;
+
+				-- The gift fails on its own (SPEC V153): the dot that earned it stays bought,
+				-- because the player asked for that one and got it.
+				if slot == nil then
+					xpWarn("No free specialty slot");
+					return false;
+				end;
+
+				-- Name, mark and stamp in one step - exactly what a free purchase writes
+				-- (SPEC V152). The line is then priced at zero by the rule that prices any
+				-- stamped dot (SPEC V139), so no second cost table exists to disagree with it.
+				setField("speciality_" .. slot, t.name);
+				markDot(form, "speciality_" .. slot .. "_1", true);
+				setField("xpFree", stamps .. "|speciality_" .. slot .. "#1|");
+
+				return true;
+			end;
+
+			-- The mirror of the grant (SPEC V158): the gift exists exactly while the trait
+			-- stands at the rating that gave it. Expression hands one over at the first dot, so
+			-- selling from four down to one takes nothing away and selling the LAST point does;
+			-- Medicine hands one over at the fourth, so the first sale takes it.
+			--
+			-- The whole row goes back to the pool - trait, text, dot and stamp together (SPEC
+			-- V159). Half a row, with the trait still showing and the dot out, would hold a slot
+			-- for ever and say nothing. The typed text goes with it: that is what losing the
+			-- gift costs.
+			local function revokeSpeciality(form, trait, reached)
+				local t = SPEC_TRAIT[trait];
+
+				if t == nil or reached >= t.free then return false; end;
+
+				local slot = freeRowOf(t.name);
+
+				if slot == nil then return false; end;
+
+				setField("speciality_" .. slot, "");
+				setField("specialityName_" .. slot, "");
+				markDot(form, "speciality_" .. slot .. "_1", false);
+				setField("xpFree", (string.gsub(sheet.xpFree or "", "|speciality_" .. slot .. "#1|", "|")));
+
+				return true;
+			end;
+
+			-- The gift, both ways, from the one rating the click lands on (SPEC V158): buying
+			-- into the rating that grants hands one over, selling out of it takes it back. Both
+			-- accepted paths through xpClick ask this and nothing else, so the two directions
+			-- cannot drift apart.
+			--
+			-- Says whether the sheet was written to, which is what tells the caller its ledger
+			-- rows are stale and the box needs repainting.
+			local function specialityMoved(form, trait, want, level)
+				if want then return grantSpeciality(form, trait, level + 1); end;
+
+				return revokeSpeciality(form, trait, level - 1);
+			end;
+
+			-- A gift is not the player's to change (SPEC V161): the trait combo of a stamped row
+			-- is switched off, so the only way to lose the speciality is to lower the trait that
+			-- handed it over. The dot is refused inside xpClick instead - it carries an onClick,
+			-- which is what tells the sheet a dot is editable (SPEC V111), so it must not be
+			-- dimmed. The typed text stays the player's on every row (SPEC V163).
+			--
+			-- enabled and opacity are written in the same breath, so a row cannot look locked
+			-- while it is open, or the other way round (SPEC V162, the same rule the Save button
+			-- follows on WoD20.10).
+			--
+			-- Controls are found with the one walker (SPEC V143/V164): this runs on the root
+			-- form, and `form.<name>` does not cross the <import> into WoD20.1.
+			-- Which blood sorcery owns a path, DERIVED from BLOOD_SORCERY at load (SPEC V191).
+			-- Not a second table: BLOOD_SORCERY reads Discipline-to-paths because that is how
+			-- the books print it, and every reader here needs the arrow the other way round.
+			-- Building it costs one pass and cannot fall out of step with its source.
+			--
+			-- The value is a LIST because a path can have two owners - the core (p. 440) hands
+			-- Movement of the Mind and Hands of Destruction to Assamite Sorcery as well as to
+			-- Thaumaturgy - the same shape RITUAL_DISC uses for the same reason.
+			local PATH_DISC = {};
+
+			for disc, paths in pairs(BLOOD_SORCERY) do
+				for i = 1, #paths, 1 do
+					local p = paths[i];
+
+					if PATH_DISC[p] == nil then PATH_DISC[p] = {}; end;
+
+					PATH_DISC[p][#PATH_DISC[p] + 1] = disc;
+				end;
+			end;
+
+			-- What every Discipline on THIS sheet stands at, as one map, built in ONE pass over
+			-- the nineteen rows. Both boxes are walked: the four clan slots and the fifteen open
+			-- ones hold the same kind of thing and are offered the same list (SPEC V178), so a
+			-- Discipline typed into an open slot counts exactly as much as one sitting in its
+			-- clan slot - the same reading the ledger takes when it prices a dot (SPEC I9b).
+			--
+			-- Highest wins if the same Discipline was typed twice. The sheet does not stop the
+			-- player doing that, and answering with the lower of the two would silently take a
+			-- path away from someone who owns it.
+			--
+			-- A MAP and not a per-name lookup, because the picker filter (SPEC I25) asks this
+			-- question once per ITEM: twenty-five ritual combos times 284 items times nineteen
+			-- rows times five dots of field reading, on every click of a Discipline dot, is a
+			-- tab that locks up with no error for anyone to see (SPEC V205). The map is built
+			-- once per render and handed down, so there is nothing to cache between renders and
+			-- nothing to go stale.
+			--
+			-- Global because WoD20.6 builds it before its own traversals (SPEC I25).
+			function discLevels()
+				local levels = {};
+
+				if sheet == nil then return levels; end;
+
+				local function scan(f)
+					local name = sheet[f];
+
+					if name == nil or name == "" then return; end;
+
+					local n = traitLevel(sheet, f, 1, 5, 0);
+
+					if levels[name] == nil or n > levels[name] then levels[name] = n; end;
+				end;
+
+				for i = 1, CLAN_DISC_ROWS, 1 do scan("clanDisc_" .. i); end;
+				for i = 1, DISC_ROWS, 1 do scan("disc_" .. i); end;
+
+				return levels;
+			end;
+
+			-- The level a path stands at: the rating of its own blood sorcery (SPEC V180). A path
+			-- with two owners takes the higher - the player reaches it through whichever of the
+			-- two Disciplines he actually bought.
+			--
+			-- An empty row, or a value no Discipline claims, answers 0. That is what keeps a
+			-- blank main path row dark instead of inheriting the row above it (SPEC V180).
+			local function pathLevel(path, levels)
+				local owners = (path ~= nil and path ~= "") and PATH_DISC[path] or nil;
+
+				if owners == nil then return 0; end;
+
+				local best = 0;
+
+				for i = 1, #owners, 1 do
+					local n = levels[owners[i]] or 0;
+
+					if n > best then best = n; end;
+				end;
+
+				return best;
+			end;
+
+			-- The five main path rows (SPEC V180). Their dots are read-only art - no field, no
+			-- click (SPEC V179) - so this writes `checked` on the control and NOTHING to the
+			-- sheet. That is the whole point: the level is worked out at every render from the
+			-- Discipline, so there is no second number saved anywhere that could disagree with
+			-- the first (the same reason the experience boxes are derived, SPEC V100).
+			--
+			-- Found through xpFind from the tab root, the one finder this sheet has (SPEC V143):
+			-- `form.<name>` does not cross the <import> from WoD20.11 into WoD20.13 (SPEC B9).
+			function renderMainPaths(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = {};
+
+				for i = 1, MAIN_PATH_ROWS, 1 do
+					for d = 1, 5, 1 do names["ro_mainPath_" .. i .. "_" .. d] = true; end;
+				end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				-- One pass over the Disciplines for the whole render, not one per row
+				-- (SPEC V205).
+				local levels = discLevels();
+
+				for i = 1, MAIN_PATH_ROWS, 1 do
+					local n = pathLevel(sheet["mainPath_" .. i], levels);
+
+					for d = 1, 5, 1 do
+						local c = found["ro_mainPath_" .. i .. "_" .. d];
+
+						if c ~= nil then c.checked = (d <= n); end;
+					end;
+				end;
+			end;
+
+			-- Do two paths answer to the same blood sorcery? Both sides are LISTS, because a
+			-- path can have two owners (core p. 440), so the question is whether the two lists
+			-- share anything at all - not whether they are equal.
+			local function sharesDisc(a, b)
+				if a == nil or b == nil then return false; end;
+
+				for i = 1, #a, 1 do
+					for j = 1, #b, 1 do
+						if a[i] == b[j] then return true; end;
+					end;
+				end;
+
+				return false;
+			end;
+
+			-- Why a picked value cannot sit in the row it landed in, or nil when it can. The
+			-- reason comes back as the message itself: a refusal that does not say which rule
+			-- it is enforcing is the complaint the 40th round was opened to answer (SPEC V129).
+			--
+			-- The empty item is ALWAYS legal (SPEC V15). That is not a courtesy - it is what
+			-- makes the revert below terminate.
+			--
+			-- `levels` comes from discLevels() and is asked for by the CALLER, once per render
+			-- (SPEC V205). Reading it here per call is what the filter cannot afford, and an
+			-- argument the caller must pass is a cache nobody has to remember to invalidate.
+			--
+			-- This is the ONE place that knows what is legal (SPEC V199). The guard below reverts
+			-- what it refuses; the picker filter never offers it in the first place. Both ask the
+			-- same function, so a list cannot offer what the guard would throw back.
+			local function pickRefusal(field, value, levels)
+				if field == nil or value == nil or value == "" then return nil; end;
+
+				local isMain = string.match(field, "^mainPath_%d+$") ~= nil;
+
+				if isMain or string.match(field, "^secPath_%d+$") ~= nil then
+					-- SPEC V182: the path's own blood sorcery has to be on the sheet. Koldunic
+					-- Sorcery at four opens no Thaumaturgy path, however high it is.
+					if pathLevel(value, levels) < 1 then
+						return "That path needs its blood sorcery on the sheet";
+					end;
+
+					-- SPEC V181: one main path per blood sorcery. Secondary rows are not capped
+					-- this way - that is what makes them secondary.
+					if isMain then
+						local mine = PATH_DISC[value];
+
+						for i = 1, MAIN_PATH_ROWS, 1 do
+							local f = "mainPath_" .. i;
+
+							if f ~= field and sheet[f] ~= nil and sheet[f] ~= "" then
+								if sharesDisc(mine, PATH_DISC[sheet[f]]) then
+									return "That blood sorcery already has a main path";
+								end;
+							end;
+						end;
+					end;
+
+					return nil;
+				end;
+
+				if string.match(field, "^ritual_%d+$") ~= nil then
+					local owners = RITUAL_DISC[value];
+
+					-- A value no table claims is left alone. Refusing what we cannot price would
+					-- make a typo unrecoverable, and the picker only offers what the tables know.
+					if owners == nil then return nil; end;
+
+					-- The level is read off the NAME (SPEC V184), never from a second table that
+					-- could disagree with it. Abyss Mysticism runs past five, so the prefix is
+					-- one digit but not one of 1..5.
+					local need = tonumber(string.match(value, "^(%d+)%. ")) or 0;
+					local best = 0;
+
+					for i = 1, #owners, 1 do
+						local n = levels[owners[i]] or 0;
+
+						if n > best then best = n; end;
+					end;
+
+					-- SPEC V185: absent Discipline frees no level at all, and the two refusals
+					-- are told apart because "you do not have it" and "you do not have enough of
+					-- it" are different problems with different fixes.
+					if best < 1 then return "That ritual needs its blood sorcery on the sheet"; end;
+					if best < need then return "That ritual is above what its blood sorcery allows"; end;
+				end;
+
+				return nil;
+			end;
+
+			-- The picker guard (SPEC V181/V182/V185). Reached from a dataLink, never from the
+			-- comboBox's own onChange (SPEC V186): a write made inside a control's dispatch does
+			-- not survive it, which is how B36 and B38 both got their refusals ignored.
+			--
+			-- The revert goes back to oldValue only when oldValue is ITSELF legal. It usually is
+			-- - it was accepted once - but not always: the Discipline that allowed it may have
+			-- come off the sheet since, and reverting into a second refusal is how a link starts
+			-- bouncing between two illegal values forever. Falling through to the empty item
+			-- always terminates, because the empty item always passes.
+			function guardPick(field, oldValue, newValue)
+				if sheet == nil or field == nil then return; end;
+
+				local levels = discLevels();
+				local why = pickRefusal(field, newValue, levels);
+
+				if why == nil then return; end;
+
+				local back = (pickRefusal(field, oldValue, levels) == nil) and oldValue or "";
+
+				setField(field, back);
+				xpWarn(why);
+			end;
+
+			-- The one door the picker filter has to the rule (SPEC I25, V199). It is the same
+			-- body the guard above asks, phrased as a yes: the filter has no message to show, it
+			-- simply leaves the item out. A second test written for the list is how the list and
+			-- the guard start disagreeing about what is legal, which is why there is not one.
+			function pickAllowed(field, value, levels)
+				return pickRefusal(field, value, levels) == nil;
+			end;
+
+			-- The four clan slots are the storyteller's to open (SPEC I8g, V175). Locked is the
+			-- DEFAULT and nil counts as locked, the same fail-closed reading the Show flags use
+			-- (SPEC V89, V80): a sheet saved before the flag existed must not find the box open.
+			--
+			-- `enabled` and `opacity` are written on the SAME line (SPEC V162): a combo that looks
+			-- locked and is not - or the reverse - is the exact failure V111 exists to stop. Found
+			-- through xpFind from the tab root, the one finder this sheet has (SPEC V143).
+			function renderClanDiscLock(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = {};
+
+				for i = 1, CLAN_DISC_ROWS, 1 do names["cboclanDisc_" .. i] = true; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				local open = (sheet.stEditClanDisc == true);
+
+				for i = 1, CLAN_DISC_ROWS, 1 do
+					local c = found["cboclanDisc_" .. i];
+
+					if c ~= nil then
+						c.enabled = open;
+						c.opacity = open and 1 or 0.55;
+					end;
+				end;
+			end;
+
+			function renderSpecialities(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = {};
+
+				for i = 1, SPECIALITY_ROWS, 1 do names["cboSpeciality" .. i] = true; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				for i = 1, SPECIALITY_ROWS, 1 do
+					local c = found["cboSpeciality" .. i];
+
+					if c ~= nil then
+						local locked = isFreeRow("speciality_" .. i);
+
+						c.enabled = not locked;
+						c.opacity = locked and 0.55 or 1;
+					end;
+				end;
+			end;
+
+			-- Every dot that costs experience calls this when it is CLICKED (SPEC I13/V99).
+			-- The dot is autoChange="false" (SPEC V134), so nothing has happened yet: the mark
+			-- is this function's to make, and it is made only if the rules allow it.
+			--
+			-- Three rounds tried letting the mark happen and taking it back (SPEC B36/B38). A
+			-- write made from inside the dot's own onChange - to the field or to the control -
+			-- does not survive the end of the dispatch, so no undo could ever stick. Deciding
+			-- first is not a way around that; it is what the sheet should have done all along.
+			--
+			-- It writes no experience at all (SPEC V100): a purchase pays for itself the moment
+			-- the dot reaches the log, and taking the dot back off refunds by the same
+			-- subtraction.
+			--
+			-- The ability rows hand in the field their dot is bound to RIGHT NOW, because the
+			-- era rebinds those five dots to another ability's field (SPEC V76) - the name
+			-- written in the .lfm is only the Victorian one.
+			function xpClick(field, form)
+				if sheet == nil or field == nil or field == "" then return; end;
+
+				-- What the click is ASKING for. The dot cannot flip itself, so this is a
+				-- request, not a fact.
+				local want = not (sheet[field] == true);
+				local base = baselineOf();
+
+				local trait = string.match(field, "^(.+)_%d+$");
+				local t     = trait ~= nil and XP_TRAIT[trait] or nil;
+
+				-- The rating the trait stands at right now. The click moves it by one, either
+				-- way, so this is both the level a purchase REACHES and the level a sale leaves
+				-- behind (SPEC V138/V141).
+				local level = (t ~= nil) and traitLevel(sheet, trait, t.first, t.last, t.fixed) or 0;
+
+				-- The speciality rows answer to rules of their own, and they are settled before
+				-- anything else because one of them holds while the character is still being
+				-- built (SPEC V161): a gift is never the player's to take off. The storyteller's
+				-- door is the exception - it only means anything once the sheet is frozen, so it
+				-- waits for the baseline (SPEC V101).
+				--
+				-- Every refusal here speaks. A refusal with no reason on screen is the complaint
+				-- the 40th round was opened to answer (SPEC V129/V130).
+				if trait ~= nil and string.match(trait, "^speciality_%d+$") ~= nil then
+					if not want and isFreeRow(trait) then
+						xpWarn("Free specialties are lost only by lowering the trait");
+						return;
+					end;
+
+					if want and (sheet[trait] == nil or sheet[trait] == "") then
+						xpWarn("Choose a trait first");
+						return;
+					end;
+
+					-- Written flat rather than nested under a purchase block: the balance branch
+					-- further down opens the same way, and two of them read as one.
+					if want and base ~= nil and specCost() == 0 then
+						xpWarn("Specialties cannot be bought");
+						return;
+					end;
+				end;
+
+				-- A secondary path is capped by its OWN blood sorcery (SPEC V183): a Discipline
+				-- at four allows three, and only at five does the ceiling come off and let a
+				-- secondary path reach five as well. `pathLevel` is the same reading the main
+				-- path dots use (SPEC V180), so the ceiling and the lit dots cannot disagree.
+				--
+				-- Tested HERE, before anything is written - not after. A guard that lets the
+				-- mark happen and argues afterwards is the failure the 38th round spent three
+				-- rounds chasing (SPEC V135, B38). Nothing below this point runs on a refusal,
+				-- so there is no field to put back and no dot to flicker.
+				--
+				-- Only a PURCHASE is capped. A dot going out cannot break a ceiling, and
+				-- selling back is already governed by the baseline (SPEC V103).
+				if want and trait ~= nil and string.match(trait, "^secPath_%d+$") ~= nil then
+					if sheet[trait] == nil or sheet[trait] == "" then
+						xpWarn("Choose a path first");
+						return;
+					end;
+
+					local n   = pathLevel(sheet[trait], discLevels());
+					local cap = (n >= 5) and 5 or (n - 1);
+
+					if (level + 1) > cap then
+						xpWarn("That path is above what its blood sorcery allows");
+						return;
+					end;
+				end;
+
+				-- Nothing is priced while the character is being built: the rule starts when
+				-- the storyteller freezes the sheet (SPEC V101).
+				--
+				-- The free speciality moves here as well, both ways: it is not a price, it is
+				-- what the book hands out at that rating, and a character built to four before
+				-- the sheet was frozen earned it just the same (SPEC V150/V158).
+				if base == nil then
+					markDot(form, field, want);
+
+					if t ~= nil and specialityMoved(form, trait, want, level) then renderSpecialities(form); end;
+
+					renderAllXPBoxes(form);
+					return;
+				end;
+
+				-- Willpower's spent boxes (willpower_c1..c10) and anything else that is not a
+				-- rating cost nothing, so they simply happen.
+				if t == nil then markDot(form, field, want); return; end;
+
+				-- SPEC V137: `Free dots` is read HERE, at the click, and in no other place on
+				-- the sheet. That is what makes "free only if the box was ticked at the moment
+				-- of purchase" true by construction: ticking it later cannot reach a price that
+				-- was already settled, and unticking it cannot take back one that was not
+				-- charged. The stamp carries the answer from here on (SPEC V138).
+				local free = want and sheet.stFreeBuy == true;
+				local key  = free and (trait .. "#" .. (level + 1)) or nil;
+
+				-- ONE walk, of the sheet as it WOULD be (SPEC V125/V135/V136): the balance
+				-- boxes take the sum and the log takes the rows, and both already describe the
+				-- state this click is about to create. A free click is priced with its stamp in
+				-- hand, so the new line is already worth zero.
+				local rows  = xpLedgerRows(field, want, key);
+				local spent = xpSum(rows);
+
+				if want then
+					-- SPEC V135: refused BEFORE the mark. Nothing was written, so there is
+					-- nothing to put back and nothing to flicker.
+					--
+					-- A free point skips the balance outright (SPEC V140) rather than passing it
+					-- on the arithmetic: `spent` does not move, but a sheet already in the red -
+					-- the storyteller can put it there by charging for backgrounds after the
+					-- fact (SPEC C, 40th round) - would refuse a point that costs nothing.
+					if not free and ((tonumber(sheet.xpTotal) or 0) - spent) < 0 then
+						xpWarn("Not enough experience to buy that dot");
+						return;
+					end;
+				else
+					-- SPEC V103: only a point that is IN the log can be sold back. Below the
+					-- baseline is the storyteller's character, not the player's purchase. The
+					-- dot being switched off is on, so this would leave the trait one lower.
+					local after = level - 1;
+
+					if after < traitLevel(base, trait, t.first, t.last, t.fixed) then return; end;
+				end;
+
+				markDot(form, field, want);
+
+				-- The stamp moves with the mark and only with it (SPEC V140/V141): written when
+				-- a free purchase goes through, dropped when the point it paid for is sold. A
+				-- sold point that is bought again obeys the flag of THAT click, which is the
+				-- whole rule. Nothing here is written on a refusal - there is no refusal left
+				-- to write on.
+				if key ~= nil then
+					setField("xpFree", (sheet.xpFree or "") .. "|" .. key .. "|");
+				elseif not want and sheet.xpFree ~= nil then
+					setField("xpFree", (string.gsub(sheet.xpFree, "|" .. trait .. "#" .. level .. "|", "|")));
+				end;
+
+				-- The gift, if this click earned one or lost one (SPEC I14/V158). Either way it
+				-- writes a dot of its own, so the rows priced above no longer describe the sheet
+				-- - a click that moves the gift walks the ledger a second time, and only that
+				-- click does (SPEC V125).
+				if specialityMoved(form, trait, want, level) then
+					rows  = xpLedgerRows();
+					spent = xpSum(rows);
+
+					renderSpecialities(form);
+				end;
+
+				renderAllXPBoxes(form, spent);
+				xpLedgerRefresh(form, rows);
+			end;
+
+
+			-- What the character has spent, straight off the log (SPEC I11). Not stored: a
+			-- second copy of this number is the one thing that could disagree with the lines
+			-- the player is reading (SPEC V100).
+			-- Split from xpSpent so a caller holding the rows can total them without walking
+			-- the ledger again (SPEC V125). nil is what xpLedgerRows returns when no initial
+			-- character has been saved, and nothing has been spent against one that is not
+			-- there.
+			function xpSum(rows)
+				if rows == nil then return 0; end;
+
+				local sum = 0;
+
+				for i = 1, #rows, 1 do sum = sum + rows[i].cost; end;
+
+				return sum;
+			end;
+
+			function xpSpent()
+				return xpSum(xpLedgerRows());
+			end;
+		]]>
+	</script>
+	<!--
+		Eleven tabs (SPEC I1b / I1c). Disciplines sits next to Numina because both are power
+		tabs, and Storyteller closes the row. Magika sat between them until the 39th round,
+		when the user had the empty window removed: the content that would have filled it is
+		Mage-only and stays off a mortal sheet (SPEC C, V128).
+
+		Every tab carries a `name` because three of them are switched at runtime (SPEC I8b):
+		the two power tabs answer to the storyteller's checkboxes and the Storyteller tab
+		answers to the gate, so a player opens eight of these eleven.
+
+		Each of those three is authored in the state its flag defaults to (SPEC V94, 28th
+		round): Disciplines and Storyteller start hidden, Numina starts visible.
+		The 27th round authored them all visible and left the hiding to the renderer, and a
+		fresh sheet with every checkbox unticked opened with all three on show (SPEC B26) -
+		so the static state fails CLOSED too, not just the gate in Lua.
+
+		The whole control is authored HIDDEN and stays that way until sheetReveal lights it
+		(SPEC I15, V166, B40): the host paints before any hook of ours runs (SPEC R47), and
+		what it painted was the sheet as the XML authors it - a look no theme has offered
+		since the 16th round. A second of nothing beats a second of the wrong sheet.
+
+		This is a different mechanism from the three tabs above and they do not meet: this
+		one is the whole control and is written once, on load; those are individual <tab>s
+		and are written by applyTabVisibility every time the sheet is shown (SPEC V96).
+	-->
+	<tabControl name="tabsHH" align="client" visible="false">
+		<tab name="tabMain" title="Main">
+			<import file="WoD20.1.lfm"/>
+		</tab>
+		<tab name="tabTraits" title="Traits">
+			<import file="WoD20.2.lfm"/>
+		</tab>
+		<tab name="tabNumina" title="Numina">
+			<import file="WoD20.7.lfm"/>
+		</tab>
+		<tab name="tabDisciplines" title="Vampire" visible="false">
+			<import file="WoD20.11.lfm"/>
+		</tab>
+		<tab name="tabCombat" title="Combat">
+			<import file="WoD20.3.lfm"/>
+		</tab>
+		<tab name="tabInventory" title="Inventory">
+			<import file="WoD20.8.lfm"/>
+		</tab>
+		<tab name="tabBackground" title="Background">
+			<import file="WoD20.4.lfm"/>
+		</tab>
+		<tab name="tabProgress" title="Progress">
+			<import file="WoD20.9.lfm"/>
+		</tab>
+		<tab name="tabNotes" title="Notes">
+			<import file="WoD20.5.lfm"/>
+		</tab>
+		<tab name="tabSettings" title="Settings">
+			<import file="WoD20.6.lfm"/>
+		</tab>
+		<tab name="tabStoryteller" title="Storyteller" visible="false">
+			<import file="WoD20.10.lfm"/>
+		</tab>
+	</tabControl>
+
+	<!--
+		The tab switch is driven from HERE, though the checkboxes that feed it live on the
+		Storyteller tab (SPEC V95, 28th round). That tab is one of the three this hides, and a
+		hidden tab cannot be trusted to run the code that hides its neighbours - that is how a
+		fresh sheet came up with all three power tabs on show (SPEC B26).
+	-->
+	<dataLink fields="{'stShowNumina', 'stShowDisciplines'}">
+		<event name="onChange">
+			applyTabVisibility(self);
+		</event>
+	</dataLink>
+
+	<!--
+		Shown again, asked again (SPEC V96). Nothing tells the sheet that its reader's role in
+		the room changed - neither `jogador` nor `mesa` publishes an event, they are getters
+		only (SPEC R34) - so the single answer taken at load would freeze: a storyteller who
+		had opened this sheet as a player came back to it with no Storyteller tab, and the
+		checkboxes that could have switched it back are ON that tab (SPEC B27). Leaving the
+		sheet and opening it again is the way back.
+	-->
+	<event name="onShow">
+		wodTrace("root.onShow");
+		applyTabVisibility(self);
+	</event>
+
+	<event name="onNodeReady">
+		wodTrace("root.onNodeReady");
+		-- Everything seeded here is the sheet writing to itself, so it is written quietly: the
+		-- Appearance dot would otherwise put the guard through a full walk of the ledger before
+		-- the sheet is even on screen (SPEC V107).
+		xpQuiet = true;
+
+		-- A sheet saved before the 27th round has nil here and was showing Numina all along,
+		-- so the flag is written true once rather than left nil: the renderer already treats
+		-- nil as visible (SPEC V89), and this keeps the checkbox from reading unticked beside
+		-- a tab that is plainly there.
+		if sheet ~= nil and sheet.stShowNumina == nil then setField("stShowNumina", true); end;
+
+		-- Appearance is the one attribute drawn without a fixed first dot, so that a character
+		-- can be at zero (SPEC I3). Zero is not the DEFAULT though - a new sheet starts at one
+		-- like the other eight (SPEC V104), and only a dot the player switched off keeps it at
+		-- zero. nil means nobody has touched it yet; false is a decision and is left alone.
+		if sheet ~= nil and sheet.appearance_1 == nil then setField("appearance_1", true); end;
+
+		-- The Game box is locked (SPEC V109), so a value outside its three would sit there
+		-- with nobody able to clear it: one of the four longer names this sheet used to offer,
+		-- or nothing at all (SPEC V110). It runs here rather than on the Settings tab because
+		-- that tab may never be opened - the same reason V95 moved the tab switch up here.
+		if sheet ~= nil then
+			local g = sheet.game;
+
+			if g ~= "Vampire" and g ~= "Hunters Hunted" and g ~= "Mage" then
+				setField("game", "Hunters Hunted");
+			end;
+		end;
+
+		xpQuiet = false;
+
+		applyTabVisibility(self);
+
+		-- The floor under the reveal (SPEC V167, I15). The theme paint is what normally
+		-- lights the sheet, and it is the last load paint there is - but which of this
+		-- event, a tab's dataLink and a tab's own onNodeReady runs first is unknown
+		-- (SPEC R47), and a paint that throws or never fires would leave the player
+		-- staring at nothing. A timer cannot fire early and cannot depend on the paint,
+		-- which is exactly the two properties this needs. setTimeout is only
+		-- asynchronous with a positive interval (SPEC R44).
+		setTimeout(function() sheetReveal(self); end, 1500);
+	</event>
+</form>

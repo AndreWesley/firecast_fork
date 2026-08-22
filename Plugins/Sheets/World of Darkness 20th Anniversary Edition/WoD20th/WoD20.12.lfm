@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmWoD20_12" align="client" theme="dark">
+	<script>
+		<![CDATA[
+			-- Disciplines area of the Vampire tab (SPEC I16). Same shape as the numina tab: two
+			-- boxes of picker rows on the left, one read-only description block on the right.
+			--
+			-- The book text lives in descDisc.lua, at the plugin root next to module.xml
+			-- (SPEC I24). The generator markers moved with it, so the region keeps its shape;
+			-- only the file it sits in changed. The require that loads it is INSIDE discText,
+			-- never here (SPEC V198): this CDATA is copied raw into constructNew_*(), so a
+			-- top-level require would parse the whole table on every sheet open and the
+			-- deferral would be a silent no-op.
+
+			local NO_SELECTION = {
+				en = "Pick the selector next to a discipline to read its description here.",
+				pt = "Marque o seletor ao lado de uma disciplina para ler a descrição dela aqui.",
+			};
+
+			local EMPTY_ROW = {
+				en = "That row is still empty. Choose a discipline in the list first.",
+				pt = "Essa linha ainda está vazia. Escolha uma disciplina na lista primeiro.",
+			};
+
+			local NO_ENTRY = {
+				en = "No description on file for: ",
+				pt = "Sem descrição registrada para: ",
+			};
+
+			local function pick(tbl, lang)
+				return tbl[lang] or tbl.en;
+			end;
+
+			-- SPEC T470 / I21: an entry may carry a SECOND body, written from the Dark Ages book,
+			-- under daEn/daPt. The two medieval themes read it; the two modern ones never do.
+			-- An entry with no medieval body falls back to the core one, so a gap in the Dark
+			-- Ages text shows the core text and never an empty box (SPEC V33).
+			local function pickEra(entry, lang)
+				local era = currentTheme();
+
+				if era == "Dark Ages" or era == "Classical Age" then
+					local da = (lang == "pt" and entry.daPt) or entry.daEn;
+					if da ~= nil and da ~= "" then return da; end;
+				end;
+
+				return pick(entry, lang);
+			end;
+
+			local function discText(lang)
+				wodTrace("discText");
+				local selected = sheet.discSel;
+
+				if selected == nil or selected == "" then
+					return pick(NO_SELECTION, lang);
+				end;
+
+				-- `selected` is the FIELD NAME of the chosen row (SPEC V176), so the picked
+				-- discipline is one indirection away and changing a row keeps the selection valid.
+				local value = sheet[selected];
+
+				if value == nil or value == "" then
+					return pick(EMPTY_ROW, lang);
+				end;
+
+				-- SPEC V206: the require sits BELOW every early return, so a sheet with no
+				-- selection - and a row that never reaches the book - parses nothing. SPEC V198
+				-- put it inside this body and the gate went green, but onNodeReady called this
+				-- function on EVERY open and the deferral was a no-op nobody could see (SPEC
+				-- B47): position in the FILE is not reach in the FLOW, and the gate reads source,
+				-- not runtime (SPEC B30, B34). `require` still caches in package.loaded, so the
+				-- first row that really needs the book pays the parse and every later one is free.
+				wodTrace("descDisc.REQUIRE");
+				local DESC = require("descDisc.lua");
+
+				local entry = DESC[value];
+
+				-- The name in the message is the one the ROW shows, so it goes through the era
+				-- and then through the language exactly as the picker item does (SPEC I22, T469).
+				-- Naming it by the raw canonical value would send the player looking for a line
+				-- that is not in the list above.
+				if entry == nil then
+					return pick(NO_ENTRY, lang) .. translateSheetText(eraName(value, currentTheme()), lang);
+				end;
+
+				return pickEra(entry, lang);
+			end;
+
+			-- SPEC I26 / V206: painting this block costs a parse of the book module, so it
+			-- happens when the tab is SHOWN, never when the sheet opens. onShow is the trigger
+			-- and this guard is the second leg: whether onShow fires for a form inside an
+			-- INACTIVE tab is not measured yet (SPEC R92b), so the fix hangs on two contracts
+			-- instead of one - the lesson of SPEC B39.
+			--
+			-- Tested against `false`, not falsiness: if the host answers nil the block PAINTS,
+			-- which is today's behaviour. Failing closed would leave an empty box with nothing
+			-- to show for it - the silence SPEC V33 exists to forbid.
+			function renderDiscDesc(form)
+				if sheet == nil then return; end;
+				if form.isShowing == false then return; end;
+				form.edtDiscDesc.text = discText(sheet.language or "en");
+			end;
+		]]>
+	</script>
+
+	<!--
+		The theme backdrop lives HERE, not on the WoD20.11 shell: it belongs to the form that
+		carries content, and it is the only align="client" child of the container it sits in
+		(SPEC V56, V190). Putting it beside the tabControl instead is what blanked the sub-tabs
+		in the 51st round (SPEC B41).
+	-->
+	<scrollBox align="client">
+		<image name="themePaper12" align="client" style="stretch" hitTest="false" visible="false"/>
+
+		<!--
+			One row template for BOTH boxes (SPEC V178): clan slots and open slots offer the same
+			list, so a second copy would be a second list to keep in step. The radio sits at x=0,
+			the picker at x=25 and the first dot at x=190 - the columns WoD20.7 uses, so the rows of
+			the two boxes line up (SPEC V26, B12).
+
+			items/values carry only the empty first entry for now (SPEC V15); the disciplines
+			themselves arrive in SPEC T460, and nothing but items=/values= changes then.
+		-->
+		<template name="DiscRow">
+			<radioButton left="0" top="2" width="20" height="21" field="discSel" fieldValue="$(field)" groupName="discSel"/>
+			<comboBox left="25" top="0" width="170" height="25" fontSize="12" name="cbo$(field)" field="$(field)"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="250" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="275" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="300" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+		</template>
+
+		<!-- 4 slots, editable only while the storyteller ticks Edit Clan Disciplines (SPEC I8g,
+		     V175). Height = 25 title + 4 rows of 25 + 25 foot, the arithmetic WoD20.7 uses. -->
+		<layout left="0" top="0" width="350" height="150">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="350" height="20" text="CLAN DISCIPLINES" horzTextAlign="center"/>
+			<layout left="12" top="25" width="325" height="25">
+				<DiscRow field="clanDisc_1"/>
+			</layout>
+			<layout left="12" top="50" width="325" height="25">
+				<DiscRow field="clanDisc_2"/>
+			</layout>
+			<layout left="12" top="75" width="325" height="25">
+				<DiscRow field="clanDisc_3"/>
+			</layout>
+			<layout left="12" top="100" width="325" height="25">
+				<DiscRow field="clanDisc_4"/>
+			</layout>
+		</layout>
+
+		<!-- 15 open slots. 25 + 15*25 + 25 = 425. -->
+		<layout left="0" top="160" width="350" height="425">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="350" height="20" text="DISCIPLINES" horzTextAlign="center"/>
+			<layout left="12" top="25" width="325" height="25">
+				<DiscRow field="disc_1"/>
+			</layout>
+			<layout left="12" top="50" width="325" height="25">
+				<DiscRow field="disc_2"/>
+			</layout>
+			<layout left="12" top="75" width="325" height="25">
+				<DiscRow field="disc_3"/>
+			</layout>
+			<layout left="12" top="100" width="325" height="25">
+				<DiscRow field="disc_4"/>
+			</layout>
+			<layout left="12" top="125" width="325" height="25">
+				<DiscRow field="disc_5"/>
+			</layout>
+			<layout left="12" top="150" width="325" height="25">
+				<DiscRow field="disc_6"/>
+			</layout>
+			<layout left="12" top="175" width="325" height="25">
+				<DiscRow field="disc_7"/>
+			</layout>
+			<layout left="12" top="200" width="325" height="25">
+				<DiscRow field="disc_8"/>
+			</layout>
+			<layout left="12" top="225" width="325" height="25">
+				<DiscRow field="disc_9"/>
+			</layout>
+			<layout left="12" top="250" width="325" height="25">
+				<DiscRow field="disc_10"/>
+			</layout>
+			<layout left="12" top="275" width="325" height="25">
+				<DiscRow field="disc_11"/>
+			</layout>
+			<layout left="12" top="300" width="325" height="25">
+				<DiscRow field="disc_12"/>
+			</layout>
+			<layout left="12" top="325" width="325" height="25">
+				<DiscRow field="disc_13"/>
+			</layout>
+			<layout left="12" top="350" width="325" height="25">
+				<DiscRow field="disc_14"/>
+			</layout>
+			<layout left="12" top="375" width="325" height="25">
+				<DiscRow field="disc_15"/>
+			</layout>
+		</layout>
+
+		<!-- Read-only and field-less: book text must never be typed over, and never saved onto
+		     the character (SPEC V29, R12). Closes level with the left column at y=585. -->
+		<layout left="360" top="0" width="850" height="585">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtDiscDesc" left="10" top="25" width="830" height="550" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>
+		</layout>
+	</scrollBox>
+
+	<!-- Watches only what the renderer READS (SPEC V123): the selection, the 19 rows it points
+	     at, and the language the text comes out in. -->
+	<dataLink fields="{'language', 'sheetTheme', 'discSel', 'clanDisc_1', 'clanDisc_2', 'clanDisc_3', 'clanDisc_4', 'disc_1', 'disc_2', 'disc_3', 'disc_4', 'disc_5', 'disc_6', 'disc_7', 'disc_8', 'disc_9', 'disc_10', 'disc_11', 'disc_12', 'disc_13', 'disc_14', 'disc_15'}" onChange="renderDiscDesc(self);"/>
+
+	<!-- The lock follows the storyteller's flag from WoD20.10, where it is owned (SPEC V95), so a
+	     tick made by another client at the table reaches this tab too (SPEC V175). -->
+	<dataLink field="stEditClanDisc" onChange="renderClanDiscLock(self);"/>
+
+	<!-- The description block paints when the tab is SHOWN (SPEC I26 / V206): onNodeReady fires
+	     on every open and dragged the whole 502 KB module in with it (SPEC B47). The lock is a
+	     different animal - it writes no book text, costs no parse, and a tab that opens with an
+	     unlocked combo would let the player edit what the storyteller froze - so it stays on
+	     onNodeReady, where it has always been (SPEC V175). -->
+	<event name="onShow">
+		wodTrace("WoD20.12.onShow");
+		renderDiscDesc(self);
+	</event>
+
+	<event name="onNodeReady">
+		renderClanDiscLock(self);
+	</event>
+</form>

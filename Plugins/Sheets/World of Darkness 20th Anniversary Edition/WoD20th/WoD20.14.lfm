@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmWoD20_14" align="client" theme="dark">
+	<script>
+		<![CDATA[
+			-- Rituals area of the Vampire tab (SPEC I16, I19). Same shape as WoD20.12 and WoD20.13.
+			--
+			-- Rituals carry NO dots: the user asked for the five-dot scale on disciplines and
+			-- blood sorcery paths, not on rituals, so a ritual is picked and that is all - it
+			-- costs no experience and writes no ledger line (SPEC C, R52 is the open question).
+			--
+			-- The book text lives in descRitual.lua, at the plugin root next to module.xml
+			-- (SPEC I24). The generator markers moved with it, so the region keeps its shape;
+			-- only the file it sits in changed. The require that loads it is INSIDE ritualText,
+			-- never here (SPEC V198): this CDATA is copied raw into constructNew_*(), so a
+			-- top-level require would parse the whole table on every sheet open and the
+			-- deferral would be a silent no-op.
+
+			local NO_SELECTION = {
+				en = "Pick the selector next to a ritual to read its description here.",
+				pt = "Marque o seletor ao lado de um ritual para ler a descrição dele aqui.",
+			};
+
+			local EMPTY_ROW = {
+				en = "That row is still empty. Choose a ritual in the list first.",
+				pt = "Essa linha ainda está vazia. Escolha um ritual na lista primeiro.",
+			};
+
+			local NO_ENTRY = {
+				en = "No description on file for: ",
+				pt = "Sem descrição registrada para: ",
+			};
+
+			local function pick(tbl, lang)
+				return tbl[lang] or tbl.en;
+			end;
+
+			-- SPEC T470 / I21: an entry may carry a SECOND body, written from the Dark Ages book,
+			-- under daEn/daPt. The two medieval themes read it; the two modern ones never do.
+			-- An entry with no medieval body falls back to the core one, so a gap in the Dark
+			-- Ages text shows the core text and never an empty box (SPEC V33).
+			local function pickEra(entry, lang)
+				local era = currentTheme();
+
+				if era == "Dark Ages" or era == "Classical Age" then
+					local da = (lang == "pt" and entry.daPt) or entry.daEn;
+					if da ~= nil and da ~= "" then return da; end;
+				end;
+
+				return pick(entry, lang);
+			end;
+
+			local function ritualText(lang)
+				wodTrace("ritualText");
+				local selected = sheet.ritualSel;
+
+				if selected == nil or selected == "" then
+					return pick(NO_SELECTION, lang);
+				end;
+
+				local value = sheet[selected];
+
+				if value == nil or value == "" then
+					return pick(EMPTY_ROW, lang);
+				end;
+
+				-- SPEC V206: the require sits BELOW every early return, so a sheet with no
+				-- selection - and a row that never reaches the book - parses nothing. This is the
+				-- biggest of the four modules (1.1 MB) and it was the one paid on every open.
+				-- SPEC V198 put it inside this body and the gate went green, but onNodeReady
+				-- called this function on EVERY open and the deferral was a no-op nobody could
+				-- see (SPEC B47): position in the FILE is not reach in the FLOW, and the gate
+				-- reads source, not runtime (SPEC B30, B34). `require` still caches in
+				-- package.loaded, so the first row that needs the book pays once.
+				wodTrace("descRitual.REQUIRE");
+				local DESC = require("descRitual.lua");
+
+				local entry = DESC[value];
+
+				-- The name in the message is the one the ROW shows, so it goes through the era
+				-- and then through the language exactly as the picker item does (SPEC I22, T469).
+				-- Naming it by the raw canonical value would send the player looking for a line
+				-- that is not in the list above.
+				if entry == nil then
+					return pick(NO_ENTRY, lang) .. translateSheetText(eraName(value, currentTheme()), lang);
+				end;
+
+				return pickEra(entry, lang);
+			end;
+
+			-- SPEC I26 / V206: painting this block costs a parse of the book module, so it
+			-- happens when the tab is SHOWN, never when the sheet opens. onShow is the trigger
+			-- and this guard is the second leg: whether onShow fires for a form inside an
+			-- INACTIVE tab is not measured yet (SPEC R92b), so the fix hangs on two contracts
+			-- instead of one - the lesson of SPEC B39.
+			--
+			-- Tested against `false`, not falsiness: if the host answers nil the block PAINTS,
+			-- which is today's behaviour. Failing closed would leave an empty box with nothing
+			-- to show for it - the silence SPEC V33 exists to forbid.
+			function renderRitualDesc(form)
+				if sheet == nil then return; end;
+				if form.isShowing == false then return; end;
+				form.edtRitualDesc.text = ritualText(sheet.language or "en");
+			end;
+		]]>
+	</script>
+
+	<scrollBox align="client">
+		<image name="themePaper14" align="client" style="stretch" hitTest="false" visible="false"/>
+
+		<!--
+			No dot column here, so the picker takes the width the dots would have used. The radio
+			still sits at x=0 and the picker at x=25, which keeps this row reading like the other
+			three areas even though it is the only one that ends there.
+
+			Ritual names arrive prefixed with their level - "3. Name" - so the level is read off
+			the item itself and there is no second table to drift from it (SPEC V184, T460).
+		-->
+		<template name="RitualRow">
+			<radioButton left="0" top="2" width="20" height="21" field="ritualSel" fieldValue="$(field)" groupName="ritualSel"/>
+			<comboBox left="25" top="0" width="460" height="25" fontSize="12" name="cbo$(field)" field="$(field)"/>
+		</template>
+
+		<!-- 25 slots. 25 + 25*25 + 25 = 675. -->
+		<layout left="0" top="0" width="510" height="675">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="510" height="20" text="RITUALS" horzTextAlign="center"/>
+			<layout left="12" top="25" width="485" height="25">
+				<RitualRow field="ritual_1"/>
+			</layout>
+			<layout left="12" top="50" width="485" height="25">
+				<RitualRow field="ritual_2"/>
+			</layout>
+			<layout left="12" top="75" width="485" height="25">
+				<RitualRow field="ritual_3"/>
+			</layout>
+			<layout left="12" top="100" width="485" height="25">
+				<RitualRow field="ritual_4"/>
+			</layout>
+			<layout left="12" top="125" width="485" height="25">
+				<RitualRow field="ritual_5"/>
+			</layout>
+			<layout left="12" top="150" width="485" height="25">
+				<RitualRow field="ritual_6"/>
+			</layout>
+			<layout left="12" top="175" width="485" height="25">
+				<RitualRow field="ritual_7"/>
+			</layout>
+			<layout left="12" top="200" width="485" height="25">
+				<RitualRow field="ritual_8"/>
+			</layout>
+			<layout left="12" top="225" width="485" height="25">
+				<RitualRow field="ritual_9"/>
+			</layout>
+			<layout left="12" top="250" width="485" height="25">
+				<RitualRow field="ritual_10"/>
+			</layout>
+			<layout left="12" top="275" width="485" height="25">
+				<RitualRow field="ritual_11"/>
+			</layout>
+			<layout left="12" top="300" width="485" height="25">
+				<RitualRow field="ritual_12"/>
+			</layout>
+			<layout left="12" top="325" width="485" height="25">
+				<RitualRow field="ritual_13"/>
+			</layout>
+			<layout left="12" top="350" width="485" height="25">
+				<RitualRow field="ritual_14"/>
+			</layout>
+			<layout left="12" top="375" width="485" height="25">
+				<RitualRow field="ritual_15"/>
+			</layout>
+			<layout left="12" top="400" width="485" height="25">
+				<RitualRow field="ritual_16"/>
+			</layout>
+			<layout left="12" top="425" width="485" height="25">
+				<RitualRow field="ritual_17"/>
+			</layout>
+			<layout left="12" top="450" width="485" height="25">
+				<RitualRow field="ritual_18"/>
+			</layout>
+			<layout left="12" top="475" width="485" height="25">
+				<RitualRow field="ritual_19"/>
+			</layout>
+			<layout left="12" top="500" width="485" height="25">
+				<RitualRow field="ritual_20"/>
+			</layout>
+			<layout left="12" top="525" width="485" height="25">
+				<RitualRow field="ritual_21"/>
+			</layout>
+			<layout left="12" top="550" width="485" height="25">
+				<RitualRow field="ritual_22"/>
+			</layout>
+			<layout left="12" top="575" width="485" height="25">
+				<RitualRow field="ritual_23"/>
+			</layout>
+			<layout left="12" top="600" width="485" height="25">
+				<RitualRow field="ritual_24"/>
+			</layout>
+			<layout left="12" top="625" width="485" height="25">
+				<RitualRow field="ritual_25"/>
+			</layout>
+		</layout>
+
+		<!-- Grows with the column on its left, never on its own (SPEC V193). -->
+		<layout left="520" top="0" width="850" height="675">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtRitualDesc" left="10" top="25" width="830" height="640" readOnly="true" opacity="0.55" wordWrap="true" transparent="true" fontSize="12"/>
+		</layout>
+	</scrollBox>
+
+	<dataLink fields="{'language', 'sheetTheme', 'ritualSel', 'ritual_1', 'ritual_2', 'ritual_3', 'ritual_4', 'ritual_5', 'ritual_6', 'ritual_7', 'ritual_8', 'ritual_9', 'ritual_10', 'ritual_11', 'ritual_12', 'ritual_13', 'ritual_14', 'ritual_15', 'ritual_16', 'ritual_17', 'ritual_18', 'ritual_19', 'ritual_20', 'ritual_21', 'ritual_22', 'ritual_23', 'ritual_24', 'ritual_25'}" onChange="renderRitualDesc(self);"/>
+
+	<!--
+		The picker guard (SPEC V185). Same door as WoD20.13: a dataLink, never the comboBox
+		onChange (SPEC V186, B36/B38). A ritual asks two questions of its blood sorcery -
+		is it on the sheet at all, and is it high enough - and the two refusals are told
+		apart, because they are different problems with different fixes.
+	-->
+	<dataLink fields="{'ritual_1', 'ritual_2', 'ritual_3', 'ritual_4', 'ritual_5', 'ritual_6', 'ritual_7', 'ritual_8', 'ritual_9', 'ritual_10', 'ritual_11', 'ritual_12', 'ritual_13', 'ritual_14', 'ritual_15', 'ritual_16', 'ritual_17', 'ritual_18', 'ritual_19', 'ritual_20', 'ritual_21', 'ritual_22', 'ritual_23', 'ritual_24', 'ritual_25'}" onChange="guardPick(field, oldValue, newValue); renderVampPickers(self);"/>
+
+	<!--
+		What a ritual may BE is decided by the Disciplines (SPEC V185), so the list has to be
+		rebuilt whenever one of them moves - which is the nineteen picker slots and the
+		ninety-five dots under them, the rating BEING the dots. Same field set, and the same
+		reason, as the link WoD20.13 uses to repaint its main path dots (SPEC V123): a link
+		watches what its handler actually READS.
+
+		It is a link of its own and not fields bolted onto the description link above: that
+		one repaints book prose, and hanging ninety-five dot fields on it would re-render the
+		whole description every time anyone bought anything (SPEC B34).
+
+		Lowering a Discipline does NOT clear a row here (SPEC V187): the ritual the row is
+		holding stays in its own list, and only its sisters stop offering it (SPEC V200).
+	-->
+	<dataLink fields="{'clanDisc_1', 'clanDisc_2', 'clanDisc_3', 'clanDisc_4', 'disc_1', 'disc_2', 'disc_3', 'disc_4', 'disc_5', 'disc_6', 'disc_7', 'disc_8', 'disc_9', 'disc_10', 'disc_11', 'disc_12', 'disc_13', 'disc_14', 'disc_15', 'clanDisc_1_1', 'clanDisc_1_2', 'clanDisc_1_3', 'clanDisc_1_4', 'clanDisc_1_5', 'clanDisc_2_1', 'clanDisc_2_2', 'clanDisc_2_3', 'clanDisc_2_4', 'clanDisc_2_5', 'clanDisc_3_1', 'clanDisc_3_2', 'clanDisc_3_3', 'clanDisc_3_4', 'clanDisc_3_5', 'clanDisc_4_1', 'clanDisc_4_2', 'clanDisc_4_3', 'clanDisc_4_4', 'clanDisc_4_5', 'disc_1_1', 'disc_1_2', 'disc_1_3', 'disc_1_4', 'disc_1_5', 'disc_2_1', 'disc_2_2', 'disc_2_3', 'disc_2_4', 'disc_2_5', 'disc_3_1', 'disc_3_2', 'disc_3_3', 'disc_3_4', 'disc_3_5', 'disc_4_1', 'disc_4_2', 'disc_4_3', 'disc_4_4', 'disc_4_5', 'disc_5_1', 'disc_5_2', 'disc_5_3', 'disc_5_4', 'disc_5_5', 'disc_6_1', 'disc_6_2', 'disc_6_3', 'disc_6_4', 'disc_6_5', 'disc_7_1', 'disc_7_2', 'disc_7_3', 'disc_7_4', 'disc_7_5', 'disc_8_1', 'disc_8_2', 'disc_8_3', 'disc_8_4', 'disc_8_5', 'disc_9_1', 'disc_9_2', 'disc_9_3', 'disc_9_4', 'disc_9_5', 'disc_10_1', 'disc_10_2', 'disc_10_3', 'disc_10_4', 'disc_10_5', 'disc_11_1', 'disc_11_2', 'disc_11_3', 'disc_11_4', 'disc_11_5', 'disc_12_1', 'disc_12_2', 'disc_12_3', 'disc_12_4', 'disc_12_5', 'disc_13_1', 'disc_13_2', 'disc_13_3', 'disc_13_4', 'disc_13_5', 'disc_14_1', 'disc_14_2', 'disc_14_3', 'disc_14_4', 'disc_14_5', 'disc_15_1', 'disc_15_2', 'disc_15_3', 'disc_15_4', 'disc_15_5'}" onChange="renderVampPickers(self);"/>
+
+	<!-- The description block paints when the tab is SHOWN (SPEC I26 / V206): onNodeReady fires
+	     on every open and dragged the whole 1.1 MB module in with it, the largest of the four
+	     (SPEC B47).
+
+	     The picker filter is NOT wired here any more (SPEC V207, T490). renderVampPickers walks
+	     from the sheet ROOT and refilters all 45 vampire combos in one pass: the filter belongs
+	     to the SHEET, not to this tab (SPEC V203), so one call does the whole job. T484 gave
+	     WoD20.13 and WoD20.14 an onNodeReady each because every tab asked for its own without looking
+	     at its sibling, and the second pass re-walked 1900 controls for nothing (SPEC B48).
+	     The surviving call is WoD20.13's, which already shares its block with renderMainPaths.
+
+	     Dropping THIS one rather than WoD20.13's is safe in both directions. Coverage: the walk
+	     starts at the root, so it reaches this tab's ritual combos from a sibling just as well.
+	     Ordering: the compiled form builds every control inside one constructNew_ and only
+	     THEN registers the onNodeReady listeners, so the ritual combos already exist whichever
+	     sibling fires first - the firing order never had to be known. -->
+	<event name="onShow">
+		wodTrace("WoD20.14.onShow");
+		renderRitualDesc(self);
+	</event>
+</form>

@@ -3,7 +3,7 @@
 Plugins de ficha para o Firecast (SDK3). Spec do trabalho corrente = `SPEC.md` na raiz
 (formato caveman, §G/§C/§I/§R/§V/§T/§B). Gate = `verify-hunters-hunted.ps1` na raiz.
 
-Plugin ativo: `Plugins/Sheets/World of Darkness 20th/` (ficha `HuntersHunted/`).
+Plugin ativo: `Plugins/Sheets/World of Darkness 20th Anniversary Edition/` (ficha `WoD20th/`).
 
 **Antes do primeiro `/ck:build` da sessão, leia `HANDOFF.md` na raiz.** Ele lista onde o
 `SPEC.md` está atrás do código (buildar sem saber disso faz "consertar" código correto),
@@ -16,10 +16,10 @@ reextrair qualquer coisa dos PDFs).
 Toda vez que terminar de buildar: gerar o `.rpk` **e instalar**. Build sem install =
 tarefa incompleta — o Firecast continua rodando a versão velha.
 
-Da raiz do plugin (`Plugins/Sheets/World of Darkness 20th/`):
+Da raiz do plugin (`Plugins/Sheets/World of Darkness 20th Anniversary Edition/`):
 
 ```powershell
-rdk -l    # compila + lint do código-fonte -> output/World of Darkness 20th.rpk
+rdk -l    # compila + lint do código-fonte -> output/World of Darkness 20th Anniversary Edition.rpk
 rdk -i    # compila + INSTALA no Firecast
 ```
 
@@ -27,8 +27,8 @@ rdk -i    # compila + INSTALA no Firecast
 
 Provas de que funcionou (exit 0 sozinho não prova nada — §B1 do SPEC):
 
-- build: `output/World of Darkness 20th.rpk` mudou de mtime **e** size;
-- install: `%APPDATA%\Firecast\Plugins\ambesek.wod.20th.rpk` com o mesmo size do `.rpk`
+- build: `output/World of Darkness 20th Anniversary Edition.rpk` mudou de mtime **e** size;
+- install: `%APPDATA%\Firecast\Plugins\andreoliveira.styllern.wod20th.rpk` com o mesmo size do `.rpk`
   recém-gerado e mtime da hora do install.
 
 `rdk -p` é PREPARE, não build: sai 0 sem tocar no `.rpk` e ainda reescreve o `module.xml`.

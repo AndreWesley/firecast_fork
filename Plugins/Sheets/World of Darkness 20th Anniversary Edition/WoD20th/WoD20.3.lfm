@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmWoD20_3" align="client" theme="dark">
+	<script>
+		<![CDATA[
+			-- Display-only trait dots (SPEC T101). Two groups because attributes have no `_1`
+			-- field - dot 1 is a fixed image in the Attribute template - while abilities do.
+			local RO_ATTRS     = {"strength", "dexterity", "stamina", "perception"};
+
+			-- Six ability rows mirror a fixed field. The seventh is the era's ranged skill: with
+			-- one field per name (SPEC V74), Archery is `archery` and Firearms is `firearms`, so
+			-- the row is a slot again and the era's own list decides which one it shows.
+			local RO_ABILITIES = {"alertness", "athletics", "awareness", "brawl", "melee", "stealth"};
+
+			-- Virtues joined the display-only side in the 12th round (SPEC V51). Their dot 1 is
+			-- a fixed image, like an attribute, so they take the same firstDot = 2.
+			local RO_VIRTUES   = {"conscience", "selfControl", "courage"};
+
+			local function paintAs(form, widget, field, firstDot)
+				for d = 1, 5, 1 do
+					local dot = form["ro_" .. widget .. "_" .. d];
+
+					if dot ~= nil then
+						if d < firstDot then
+							dot.checked = true;          -- the fixed dot an attribute always has
+						else
+							dot.checked = sheet[field .. "_" .. d] == true;
+						end;
+					end;
+				end;
+			end;
+
+			local function paint(form, field, firstDot)
+				paintAs(form, field, field, firstDot);
+			end;
+
+			-- Willpower has ten dots, so it does not fit paint()'s five-dot loop. Only the dots
+			-- are painted here: the boxes under them own `willpower_c*` and stay editable, which
+			-- is the whole point of putting willpower on this tab (SPEC V51).
+			local function paintWillpower(form)
+				for d = 1, 10, 1 do
+					local dot = form["roWp_" .. d];
+
+					if dot ~= nil then
+						dot.checked = sheet["willpower_" .. d] == true;
+					end;
+				end;
+			end;
+
+			function renderCombatTraits(form)
+				if sheet == nil then return; end;
+
+				for i = 1, #RO_ATTRS, 1 do paint(form, RO_ATTRS[i], 2); end;
+				for i = 1, #RO_ABILITIES, 1 do paint(form, RO_ABILITIES[i], 1); end;
+				for i = 1, #RO_VIRTUES, 1 do paint(form, RO_VIRTUES[i], 2); end;
+
+				-- The ranged row follows the era: Firearms in the modern and Victorian lists,
+				-- Archery in the medieval and classical ones, each with its own field (SPEC V74).
+				-- The name comes off the era's own list, so there is no second table to drift.
+				paintAs(form, "ranged", ABILITY_FIELD[eraRangedName()], 1);
+
+				paintWillpower(form);
+			end;
+		]]>
+	</script>
+	<scrollBox align="client">
+		<!-- Theme backdrop, same arrangement as WoD20.1 (SPEC T158, V56, V57). -->
+		<image name="themePaper3" align="client" style="stretch" hitTest="false" visible="false"/>
+		<!-- Same geometry as the Attribute template on the Main tab, so the virtues keep the
+		     label width and the x=125 dot column (SPEC V26).
+
+		     Display only since the 12th round (SPEC V51): the dots carry no `field=` and are
+		     named ro_* like the combat traits, which is what lets paint() drive them. Virtues
+		     are not something a player changes mid-fight, so the Main tab owns them alone. -->
+		<template name="VirtueMirror">
+			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<image left="125" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png" opacity="0.55"/>
+			<imageCheckBox name="ro_$(field)_2" left="150" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_3" left="175" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_4" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_5" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</template>
+
+		<!-- No `field=` anywhere: these dots are painted by renderCombatTraits() and own nothing,
+		     so they cannot collide with the real widgets on Main (SPEC I3 SO-LEITURA, V1). -->
+		<template name="ReadOnlyTrait">
+			<label name="dynRo$(field)" left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<imageCheckBox name="ro_$(field)_1" left="125" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_2" left="150" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_3" left="175" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_4" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="ro_$(field)_5" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</template>
+
+		<!-- Ten read-only dots over ten real boxes (SPEC V51). The dots carry no `field=` and
+		     are painted by paintWillpower(); only the boxes below own anything. -->
+		<template name="WillpowerMirror">
+			<imageCheckBox name="roWp_1" left="0" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_2" left="25" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_3" left="50" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_4" left="75" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_5" left="100" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_6" left="125" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_7" left="150" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_8" left="175" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_9" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roWp_10" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.55" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+
+			<checkBox left="2" top="20" width="25" height="25" field="willpower_c1"/>
+			<checkBox left="27" top="20" width="25" height="25" field="willpower_c2"/>
+			<checkBox left="52" top="20" width="25" height="25" field="willpower_c3"/>
+			<checkBox left="77" top="20" width="25" height="25" field="willpower_c4"/>
+			<checkBox left="102" top="20" width="25" height="25" field="willpower_c5"/>
+			<checkBox left="127" top="20" width="25" height="25" field="willpower_c6"/>
+			<checkBox left="152" top="20" width="25" height="25" field="willpower_c7"/>
+			<checkBox left="177" top="20" width="25" height="25" field="willpower_c8"/>
+			<checkBox left="202" top="20" width="25" height="25" field="willpower_c9"/>
+			<checkBox left="227" top="20" width="25" height="25" field="willpower_c10"/>
+		</template>
+
+		<!--
+			Same row as HealthRow on the Main tab, with the Combat-tab widget names (SPEC T117).
+			Two templates instead of one because template names are module-global - rdk exits 1
+			with no message if two files declare the same name - and each tab needs its own
+			`dyn` names for the renderer to find.
+
+			Nothing here syncs the two tabs by hand: both mark labels carry `field="health_N"`,
+			so the NDB is the single source and a click on either side updates both (SPEC V36).
+		-->
+		<template name="HealthRowMirror">
+			<label name="dynHealth3_$(num)" left="0" top="0" width="215" height="20"/>
+			<rectangle left="223" top="0" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="cycleHealthMark($(num));" onMenu="healHealthMark();">
+				<label align="client" field="health_$(num)" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+		</template>
+
+		<!-- Damage went 50 -> 90 (SPEC T145): "Str+2 (L)" never fit in 50px. The 40 comes from the
+		     10 the box gained on the right plus 30 off Weapon/Attack, still the widest column. -->
+		<template name="Attack">
+			<edit left="0" top="0" width="170" height="24" field="attack_$(num)"/>
+			<edit left="170" top="0" width="100" height="24" field="roll_$(num)"/>
+			<edit left="270" top="0" width="50" height="24" field="difficulty_$(num)"/>
+			<edit left="320" top="0" width="90" height="24" field="damage_$(num)"/>
+			<edit left="410" top="0" width="50" height="24" field="range_$(num)"/>
+			<edit left="460" top="0" width="50" height="24" field="rate_$(num)"/>
+			<edit left="510" top="0" width="50" height="24" field="clip_$(num)"/>
+			<edit left="560" top="0" width="70" height="24" field="conceal_$(num)"/>
+		</template>
+
+		<!-- 660 wide to close on VIRTUES, 320 tall to close on COMBAT TRAITS (SPEC T145). Each
+		     header label is as wide as its column and centred on it, so the titles sit over the
+		     fields instead of hugging their left edge. One label per column, no padding runs (V11). -->
+		<layout left="0" top="0" width="660" height="320">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="660" height="20" text="COMBAT" horzTextAlign="center"/>
+
+			<label left="15" top="25" width="170" height="20" text="Weapon/Attack" horzTextAlign="center"/>
+			<label left="185" top="25" width="100" height="20" text="Roll" horzTextAlign="center"/>
+			<label left="285" top="25" width="50" height="20" text="Diff." horzTextAlign="center"/>
+			<label left="335" top="25" width="90" height="20" text="Damage" horzTextAlign="center"/>
+			<label left="425" top="25" width="50" height="20" text="Range" horzTextAlign="center"/>
+			<label left="475" top="25" width="50" height="20" text="Rate" horzTextAlign="center"/>
+			<label left="525" top="25" width="50" height="20" text="Clip" horzTextAlign="center"/>
+			<label left="575" top="25" width="70" height="20" text="Conceal" horzTextAlign="center"/>
+
+			<layout left="15" top="50" width="630" height="25" >
+				<Attack num="1"/>
+			</layout>
+			<layout left="15" top="75" width="630" height="25" >
+				<Attack num="2"/>
+			</layout>
+			<layout left="15" top="100" width="630" height="25" >
+				<Attack num="3"/>
+			</layout>
+			<layout left="15" top="125" width="630" height="25" >
+				<Attack num="4"/>
+			</layout>
+			<layout left="15" top="150" width="630" height="25" >
+				<Attack num="5"/>
+			</layout>
+			<layout left="15" top="175" width="630" height="25" >
+				<Attack num="6"/>
+			</layout>
+			<layout left="15" top="200" width="630" height="25" >
+				<Attack num="7"/>
+			</layout>
+			<layout left="15" top="225" width="630" height="25" >
+				<Attack num="8"/>
+			</layout>
+			<layout left="15" top="250" width="630" height="25" >
+				<Attack num="9"/>
+			</layout>
+			<layout left="15" top="275" width="630" height="25" >
+				<Attack num="10"/>
+			</layout>
+		</layout>
+		<!--
+			ARMOR belongs on this tab, not on Inventory: armour is combat gear. It went to
+			WoD20.8 in T76/T77 and came back on 2026-08-17, field names untouched both times
+			(SPEC T87 / V35).
+
+			One input column: all three rows put their edit at x=75 (SPEC V26 / B.12).
+		-->
+		<layout left="0" top="330" width="380" height="225">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="380" height="20" text="ARMOR" horzTextAlign="center"/>
+
+			<layout left="15" top="25" width="350" height="25" >
+				<label left="0" top="5" width="70" height="20" text="Class" horzTextAlign="trailing"/>
+				<edit left="75" top="0" width="275" height="25" field="armorClass"/>
+			</layout>
+			<layout left="15" top="50" width="350" height="25" >
+				<label left="0" top="5" width="70" height="20" text="Rating" horzTextAlign="trailing"/>
+				<edit left="75" top="0" width="275" height="25" field="armorRating"/>
+			</layout>
+			<layout left="15" top="75" width="350" height="25" >
+				<label left="0" top="5" width="70" height="20" text="Penalty" horzTextAlign="trailing"/>
+				<edit left="75" top="0" width="275" height="25" field="armorPenalty"/>
+			</layout>
+
+			<textEditor left="15" top="105" width="350" height="110" field="armorDescription"/>
+		</layout>
+
+		<!--
+			Willpower on the Combat tab (SPEC T138 / V51). The two halves are deliberately
+			different: the DOTS are display only - no `field=`, painted by paintWillpower() from
+			the real values, `autoChange="false"` so a click does nothing - while the BOXES
+			underneath carry `field="willpower_c*"` and are a declared mirror of the Main tab
+			(SPEC I3 ESPELHOS, V36). Spending willpower is what a player does mid-fight; raising
+			the permanent rating is not.
+		-->
+		<layout left="390" top="450" width="270" height="105">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="270" height="20" text="WILLPOWER" horzTextAlign="center"/>
+
+			<layout left="10" top="30" width="250" height="45">
+				<WillpowerMirror/>
+			</layout>
+		</layout>
+
+		<!-- ITEMS / GEAR / EQUIPMENT / TRANSPORTATION / OTHER moved to the Inventory tab
+		     (WoD20.8.lfm) with their field names untouched - SPEC T77 / V35. -->
+
+		<!--
+			HEALTH and VIRTUES here are MIRRORS, not copies (SPEC T100 / V36): the widgets carry
+			the same `field=` as the ones on the Main tab, and the NDB is the single source of
+			truth, so editing either side updates both with no Lua involved. SPEC V1 normally
+			forbids two input widgets on one field - these are the declared exception, listed
+			under ESPELHOS in SPEC I3.
+
+			5th round (SPEC T111): the right column now reads COMBAT TRAITS then HEALTH, and
+			VIRTUES left it to sit beside ARMOR. Only left/top/width moved - the three blocks keep
+			their file order because the Lua finds widgets by name (dynHealth3_N, ro_<field>_N),
+			never by position.
+		-->
+		<!-- height=306 is the ten-row case; the renderer shrinks it to the chosen track length
+		     (SPEC V49), so the file declares the tallest this box can ever be.
+		     top=330 lines this box up with ARMOR and VIRTUES; the row sits 10 under COMBAT (T150). -->
+		<layout name="dynHealth3_box" left="670" top="330" width="280" height="306">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="205" height="20" text="HEALTH" horzTextAlign="center"/>
+			<comboBox name="cmbHealthLevels3" left="212" top="4" width="58" height="22" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+
+			<layout name="dynHealth3_row1" left="20" top="28" width="245" height="20"><HealthRowMirror num="1"/></layout>
+			<layout name="dynHealth3_row2" left="20" top="55" width="245" height="20"><HealthRowMirror num="2"/></layout>
+			<layout name="dynHealth3_row3" left="20" top="82" width="245" height="20"><HealthRowMirror num="3"/></layout>
+			<layout name="dynHealth3_row4" left="20" top="109" width="245" height="20"><HealthRowMirror num="4"/></layout>
+			<layout name="dynHealth3_row5" left="20" top="136" width="245" height="20"><HealthRowMirror num="5"/></layout>
+			<layout name="dynHealth3_row6" left="20" top="163" width="245" height="20"><HealthRowMirror num="6"/></layout>
+			<layout name="dynHealth3_row7" left="20" top="190" width="245" height="20"><HealthRowMirror num="7"/></layout>
+			<layout name="dynHealth3_row8" left="20" top="217" width="245" height="20"><HealthRowMirror num="8"/></layout>
+			<layout name="dynHealth3_row9" left="20" top="244" width="245" height="20"><HealthRowMirror num="9"/></layout>
+			<layout name="dynHealth3_row10" left="20" top="271" width="245" height="20"><HealthRowMirror num="10"/></layout>
+		</layout>
+
+		<!--
+			VIRTUES sits in the gap between ARMOR (ends at x=380) and the right column (starts at
+			x=670), so it is 270 wide, not 280: 390+270 leaves the same 10px gutter on both sides.
+			The rows lose 5px of indent to keep the 250px template inside the narrower box.
+		-->
+		<layout left="390" top="330" width="270" height="110">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="270" height="20" text="VIRTUES" horzTextAlign="center"/>
+
+			<layout left="10" top="25" width="250" height="25" >
+				<VirtueMirror field="conscience" nome="Conscience"/>
+			</layout>
+			<layout left="10" top="50" width="250" height="25" >
+				<VirtueMirror field="selfControl" nome="Self-Control"/>
+			</layout>
+			<layout left="10" top="75" width="250" height="25" >
+				<VirtueMirror field="courage" nome="Courage"/>
+			</layout>
+		</layout>
+
+		<!--
+			Combat-relevant traits, DISPLAY ONLY (SPEC T101). These dots carry no `field=` at all,
+			so they own nothing and cannot be a second owner of anything (SPEC I3 lists them under
+			SO-LEITURA, deliberately outside the mirror list). renderCombatTraits() reads the real
+			fields and pushes `checked` into them; `autoChange="false"` is what stops a click from
+			toggling one - it is an ImageCheckBox property, not the greying-out `enabled=false`,
+			so these read as normal dots (sdk/rrpgGUI.lua:776-777,786).
+
+			Attributes show five dots with the first always lit, matching the Attribute template
+			where dot 1 is a fixed image and only `_2`..`_5` are real fields.
+		-->
+		<layout left="670" top="0" width="280" height="320">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="280" height="20" text="COMBAT TRAITS" horzTextAlign="center"/>
+
+			<layout left="15" top="25" width="250" height="25" ><ReadOnlyTrait field="strength" nome="Strength"/></layout>
+			<layout left="15" top="50" width="250" height="25" ><ReadOnlyTrait field="dexterity" nome="Dexterity"/></layout>
+			<layout left="15" top="75" width="250" height="25" ><ReadOnlyTrait field="stamina" nome="Stamina"/></layout>
+			<layout left="15" top="100" width="250" height="25" ><ReadOnlyTrait field="perception" nome="Perception"/></layout>
+
+			<horzLine left="10" top="130" width="260" strokeColor="white"/>
+
+			<layout left="15" top="140" width="250" height="25" ><ReadOnlyTrait field="alertness" nome="Alertness"/></layout>
+			<layout left="15" top="165" width="250" height="25" ><ReadOnlyTrait field="athletics" nome="Athletics"/></layout>
+			<layout left="15" top="190" width="250" height="25" ><ReadOnlyTrait field="awareness" nome="Awareness"/></layout>
+			<layout left="15" top="215" width="250" height="25" ><ReadOnlyTrait field="brawl" nome="Brawl"/></layout>
+			<layout left="15" top="240" width="250" height="25" ><ReadOnlyTrait field="ranged" nome="Firearms"/></layout>
+			<layout left="15" top="265" width="250" height="25" ><ReadOnlyTrait field="melee" nome="Melee"/></layout>
+			<layout left="15" top="290" width="250" height="25" ><ReadOnlyTrait field="stealth" nome="Stealth"/></layout>
+		</layout>
+	</scrollBox>
+
+	<!--
+		Two entry points, same reason as the Main tab: the dataLink catches later edits, the
+		onNodeReady catches the sheet being opened (SPEC V19 / V33).
+
+		TWO links, because they watch different things (SPEC V123). The health track reads the
+		track length and the language and nothing else; the mirror reads the traits and the era.
+		One link over both lists meant that ticking any of the eighty trait dots re-rendered the
+		health track as well - and that render wrote all ten health rows back, which woke
+		everything hanging off THEM. That cascade is what froze a saved sheet on open (SPEC B34).
+	-->
+	<dataLink fields="{'healthLevels', 'language'}" onChange="renderHealthTrack(self, 'dynHealth3_');"/>
+	<dataLink fields="{'sheetTheme', 'strength_2', 'strength_3', 'strength_4', 'strength_5', 'dexterity_2', 'dexterity_3', 'dexterity_4', 'dexterity_5', 'stamina_2', 'stamina_3', 'stamina_4', 'stamina_5', 'perception_2', 'perception_3', 'perception_4', 'perception_5', 'alertness_1', 'alertness_2', 'alertness_3', 'alertness_4', 'alertness_5', 'athletics_1', 'athletics_2', 'athletics_3', 'athletics_4', 'athletics_5', 'awareness_1', 'awareness_2', 'awareness_3', 'awareness_4', 'awareness_5', 'brawl_1', 'brawl_2', 'brawl_3', 'brawl_4', 'brawl_5', 'firearms_1', 'firearms_2', 'firearms_3', 'firearms_4', 'firearms_5', 'melee_1', 'melee_2', 'melee_3', 'melee_4', 'melee_5', 'stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'stealth_5', 'archery_1', 'archery_2', 'archery_3', 'archery_4', 'archery_5', 'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'conscience_2', 'conscience_3', 'conscience_4', 'conscience_5', 'selfControl_2', 'selfControl_3', 'selfControl_4', 'selfControl_5', 'courage_2', 'courage_3', 'courage_4', 'courage_5'}" onChange="renderCombatTraits(self);"/>
+
+	<event name="onNodeReady">
+		renderHealthTrack(self, 'dynHealth3_');
+		renderCombatTraits(self);
+	</event>
+</form>
