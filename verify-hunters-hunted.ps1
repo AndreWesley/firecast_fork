@@ -2403,13 +2403,25 @@ elseif ($visFn -notmatch 'local kids = tab:getChildren\(\)') { Fail "V92 applyTa
 elseif ($visFn -notmatch 'kids\[j\]\.visible = want') { Fail "V92 the tab's contents do not follow the tab's own visibility" }
 else { Pass "V92 hiding a tab hides what is inside it" }
 
-# ---- V93: nobody is left standing on a tab that was just denied -------------------
-# There is no event for the active tab and no trustworthy reading of tabIndex (SPEC R33), so
-# the renderer watches for a tab going from shown to hidden and moves everyone to Main.
+# ---- V217 (revokes V93): recalculating visibility moves nobody --------------------
+# The jump to Main was paid on every toggle by the only person who can toggle - the
+# checkboxes live on the Storyteller tab (SPEC I8, V95) - to cover the rare reader sitting
+# on the tab as it went. That reader now stays put and finds the tab empty, never holding
+# denied content, because V92 above still hides the children. ABSENCE is the only way this
+# can be measured at all: SPEC R33 says there is no tab-change event and no trustworthy
+# tabIndex, so runtime cannot answer it and the source is all there is.
+#
+# Comments come off first. V92's prose and V217's own both say "a denied tab" in plain
+# English, and prose is not what this measures - code is. NoComments is defined further
+# down this file, too late to call from here, so the strip is inline. The patterns are
+# code-SHAPED for the same reason: a trailing comment survives the strip (NoComments only
+# eats whole lines), and a check that reddens over prose sends the next round hunting a
+# comment. Proven by mutation: `-- a denied tab` must NOT redden this.
+$visFnCode = [regex]::Replace([string]$visFn, '(?m)^\s*--.*$', '')
 if (-not $visFn) { } # already reported above
-elseif ($visFn -notmatch 'if tab\.visible and not want then') { Fail "V93 applyTabVisibility does not notice a tab going from shown to hidden - it cannot tell when to move the player" }
-elseif ($visFn -notmatch 'tabMain:activate\(\)') { Fail "V93 nothing hands the player back to Main when a tab is denied" }
-else { Pass "V93 a denied tab hands the player back to Main" }
+elseif ($visFnCode -match ':activate\(\)') { Fail "V217 applyTabVisibility still activates a tab - hiding one must leave the reader where they are (SPEC V93 revoked)" }
+elseif ($visFnCode -match 'denied\s*=|if\s+denied') { Fail "V217 the shown-to-hidden flag is still live in applyTabVisibility - a dead variable is how the jump crawls back" }
+else { Pass "V217 hiding a tab moves nobody" }
 
 # The four switched tabs must exist under those names, and every tab needs one (SPEC I1b).
 $tabNodes = (Doc $rootPath).SelectNodes("//tab")
@@ -2531,13 +2543,18 @@ else { Pass "V98 an empty log says nothing was bought yet" }
 # ---- V99: every rating dot goes through the guard ---------------------------------
 # One dot wired straight to its field is one trait that can be raised with an empty pocket,
 # and nothing would show it: the log would price the point and the balance would go negative.
-# Every imageCheckBox on this sheet IS a rating dot - the willpower boxes are checkBoxes and
-# the Combat mirror is images - so the rule is simply all of them.
+# That used to be every imageCheckBox on the sheet - the willpower boxes are checkBoxes and
+# the Combat mirror is images. The blood pool broke the premise (SPEC V219, B50): twenty dots
+# wearing the rating art that are a RESOURCE, spent and regained inside a scene, never priced
+# and never in XP_TRAIT. They are named here by field PREFIX rather than by loosening the rule
+# for everyone, because a loosened V134 lets ANY dot mark itself, and that is B38 walking back
+# in. Same standing as willpower_c*: spent points, not a rating.
 $dots = @()
 $dotsUnguarded = @()
 foreach ($f in $files) {
     foreach ($n in (Doc $f.FullName).SelectNodes("//imageCheckBox")) {
         if (-not $n.GetAttribute("field")) { continue }   # display-only mirror (V51): owns nothing, buys nothing
+        if ($n.GetAttribute("field") -match '^bloodPool_\d+$') { continue }   # free resource, not a rating (V219)
         $dots += $n
         if ($n.GetAttribute("onClick") -notmatch 'xpClick\(') { $dotsUnguarded += "$($f.Name) $($n.GetAttribute('field'))" }
     }
@@ -2680,14 +2697,22 @@ else {
         'Humanity'   = 'if kind == "Humanity"  then return from \* 2'
         'Willpower'  = 'if kind == "Willpower" then return from;'
         'Background' = 'return from \* 3'
-        'Numina'     = 'return from \* 7'
+        'Numina'     = 'kind == "Numina" then[\s\S]+?return from \* 7;'
         # SPEC I9b, 51st round: the two rules that were dormant since the 27th are awake now
         # that the Vampire tab owns fields to read. Sphere and Arete stay dormant below - the
         # Magika tab that would have owned them was deleted in the 39th round.
-        'Discipline (first dot)' = 'if from == 0 then return 10; end;'
-        'Discipline (clan)'      = 'if ctx\.inClan then return from \* 5; end;'
-        'Path (first dot)'       = 'if from == 0 then return 7; end;'
-        'Path (rest)'            = 'return from \* 4;'
+        #
+        # Prices rewritten 2026-08-22 (SPEC I9). Every key is anchored on its own `kind` from
+        # here on, because the new table makes bare patterns lie: both first dots now cost 20,
+        # so 'Discipline (first dot)' would pass reading Path's line and vice versa - the rule
+        # could be DELETED and the check would still go green (SPEC B7, V20). The non-clan rule
+        # gets a key of its own for the same reason: it had none, and its old x7 was what the
+        # Numina key was matching all along.
+        'Discipline (first dot)' = 'kind == "Discipline" then\s+if from == 0 then return 20; end;'
+        'Discipline (clan)'      = 'if ctx\.inClan then return from \* 15; end;'
+        'Discipline (non-clan)'  = 'if ctx\.inClan then return from \* 15; end;\s+return from \* 25;'
+        'Path (first dot)'       = 'kind == "Path" then\s+if from == 0 then return 20; end;'
+        'Path (rest)'            = 'kind == "Path" then\s+if from == 0 then return 20; end;\s+return from \* 15;'
     }
     $costBad = @()
     foreach ($k in $costWant.Keys) { if ($costFn -notmatch $costWant[$k]) { $costBad += "$k is not priced as SPEC I9 states" } }
@@ -2730,7 +2755,13 @@ else { Pass "V88 numina_1 is the affinity path in both the XML and the pricing" 
 # ---- V90: the two empty tabs stay empty ------------------------------------------
 # A field name cannot be renamed after release without losing what players saved under it
 # (SPEC V2), so none is spent before the content that would use it exists.
-foreach ($empty in @('WoD20.11.lfm')) {
+# WoD20.11 left this list on 2026-08-22 (SPEC B50): it carries the Dominator and Blood Pool
+# boxes now, so it declares fields on purpose. Magika, the other subject this invariant was
+# written for, was deleted in the 39th round. The list is empty and the check says so rather
+# than looping over nothing and reporting a pass it did not earn (SPEC V209).
+$emptyShells = @()
+if (-not $emptyShells.Count) { Pass "V90 no empty shell left to guard - WoD20.11 carries content (B50), Magika is gone (V128)" }
+foreach ($empty in $emptyShells) {
     $ep = Join-Path $dir $empty
     if (-not (Test-Path $ep)) { Fail "V90 $empty is missing" ; continue }
     $eFields = @((Doc $ep).SelectNodes("//*[@field]"))
@@ -2980,7 +3011,7 @@ else {
     # the sale refusal of V103 growing one.
     $buyWarns = @([regex]::Matches($buy.Groups[1].Value, 'xpWarn\("([^"]*)"\)'))
     if (-not $buy.Success) { Fail "V129 xpClick has no purchase branch" }
-    elseif ($warns.Count -ne 6) { Fail "V129 xpClick raises $($warns.Count) pop-ups - six refusals speak: the balance, the empty trait, the closed door, the gift that is not the player's to take off (SPEC V161), the secondary path row with nothing picked in it, and the secondary path above what its blood sorcery allows (SPEC V183)" }
+    elseif ($warns.Count -ne 7) { Fail "V129 xpClick raises $($warns.Count) pop-ups - seven refusals speak: the balance, the empty trait, the closed door, the generation ceiling (SPEC V220), the gift that is not the player's to take off (SPEC V161), the secondary path row with nothing picked in it, and the secondary path above what its blood sorcery allows (SPEC V183)" }
     elseif ($buyWarns.Count -ne 1) { Fail "V129 the balance branch raises $($buyWarns.Count) pop-ups - only the refusal for want of experience may speak there" }
     elseif ($buy.Groups[1].Value -notmatch 'xpWarn\(') { Fail "V129 the refusal for want of experience says nothing" }
     elseif ($buy.Groups[1].Value -match 'markDot\(') { Fail "V129 the refused purchase marks the dot anyway (SPEC V135)" }
@@ -4137,7 +4168,10 @@ if (-not $levelsFn) { $filterBad += "V205 discLevels is gone from the root form 
 elseif ((NoComments $levelsFn) -notmatch 'CLAN_DISC_ROWS' -or (NoComments $levelsFn) -notmatch 'DISC_ROWS') {
     $filterBad += "V205 discLevels does not walk both Discipline boxes - a Discipline in an open slot would count for nothing (SPEC V178)"
 }
-if ($rootTxt -match 'discLevel\(') {
+# Word-anchored since 2026-08-22 (SPEC B50, V222): -match is case-INSENSITIVE in PowerShell,
+# so the bare 'discLevel\(' also matched maxDiscLevel( and reddened a check that is about
+# something else entirely. The boundary keeps it on the function this invariant names.
+if ($rootTxt -match '\bdiscLevel\(') {
     $filterBad += "V205 the per-name discLevel is back - two readings of the same rating is one more than this sheet has room for (SPEC V145)"
 }
 if ($refusalFn2 -and (NoComments $refusalFn2) -match 'discLevels\(') {
@@ -4417,6 +4451,72 @@ foreach ($f in $files) {
 if ($v216Seen -eq 0) { Fail "V216 found no dataType at all - the check verified nothing (SPEC V209)" }
 elseif ($v216Bad) { foreach ($b in $v216Bad) { Fail "V216 $b (alphanumerics, underscore, dot, 5..40 - SPEC B49)" } }
 else { Pass "V216 <id> and $v216Seen dataType match the rdk id rule" }
+
+# Comments come off before either of the next two checks reads the form. Both of them were
+# caught reddening over PROSE by their own probe (SPEC V222): a comment saying GEN_MAX = { or
+# naming declareTrait("bloodPool is a comment, not a second map and not a declaration.
+$rootCode = NoComments $rootTxt
+
+# ---- V218: one GEN->MAX map, and both readers on it ------------------------------
+# The label says what the ceiling is and xpClick enforces it. Two copies is how the number
+# shown and the number charged start disagreeing, and the sheet would be lying on screen
+# about a rule it applies itself (SPEC B46 is the same shape: a constant with no reader).
+$genDecl = [regex]::Matches($rootCode, 'GEN_MAX\s*=\s*\{')
+$genReads = [regex]::Matches($rootCode, 'GEN_MAX\[')
+$ceilReads = [regex]::Matches($rootCode, 'maxDiscLevel\(\)')
+if ($genDecl.Count -ne 1) { Fail "V218 GEN_MAX is declared $($genDecl.Count) time(s) - the label and the ceiling must read one map" }
+elseif ($genReads.Count -lt 1) { Fail "V218 nothing indexes GEN_MAX - the map has no reader" }
+elseif ($ceilReads.Count -lt 3) { Fail "V218 maxDiscLevel has $($ceilReads.Count - 1) reader(s) - the label and the refusal must share it" }
+else { Pass "V218 one GEN_MAX, read by the label and by the refusal" }
+
+# ---- V219: the blood pool is free, and is not a trait -----------------------------
+# Blood is spent and regained inside a scene, so these mark themselves. What must stay true
+# is that nothing prices them: no declareTrait, no ledger line, no xpClick on the click.
+$bpDoc = Doc (Join-Path $dir "WoD20.11.lfm")
+$bpDots = @($bpDoc.SelectNodes("//imageCheckBox") | Where-Object { $_.GetAttribute("field") -match '^bloodPool_\d+$' })
+if ($bpDots.Count -ne 20) { Fail "V219 the blood pool has $($bpDots.Count) dots, expected 20 (SPEC I29)" }
+elseif (@($bpDots | Where-Object { $_.GetAttribute("autoChange") -eq 'false' }).Count) { Fail "V219 a blood pool dot was told not to mark itself - it is a resource, not a rating" }
+elseif (@($bpDots | Where-Object { $_.GetAttribute("onClick") -ne "" }).Count) { Fail "V219 a blood pool dot runs something on the click - nothing here may reach xpClick" }
+elseif ($rootCode -match 'declareTrait\("bloodPool') { Fail "V219 bloodPool is declared in XP_TRAIT - it would be priced and would write ledger lines" }
+elseif ($rootCode -notmatch 'bloodPool_1 == nil') { Fail "V219 the ten-dot seed is gone - a new sheet would open empty (SPEC I29)" }
+else { Pass "V219 twenty free blood pool dots, none of them a trait" }
+
+# ---- V220: the ceiling refuses BEFORE anything is written -------------------------
+# Same spot and same shape as the path ceiling it sits beside. A guard that lets the mark
+# land and argues afterwards cost three rounds once already (SPEC B38, V135).
+$clickBody = LuaFn $rootTxt 'xpClick'
+if (-not $clickBody) { Fail "V220 xpClick not found on the root form" }
+else {
+    $cb = NoComments $clickBody
+    $capAt = $cb.IndexOf("maxDiscLevel()")
+    $markAt = $cb.IndexOf("markDot(")
+    if ($capAt -lt 0) { Fail "V220 nothing in xpClick asks for the generation ceiling" }
+    elseif (-not $cb.Contains('"^clanDisc_%d+$"')) { Fail "V220 the ceiling does not cover clan Discipline dots" }
+    elseif (-not $cb.Contains('"^disc_%d+$"')) { Fail "V220 the ceiling does not cover out-of-clan Discipline dots" }
+    elseif ($cb -notmatch 'genCap ~= nil') { Fail "V220 the ceiling applies with no generation chosen - a mortal with no domitor is not a fourteenth-generation ghoul (SPEC V220a)" }
+    elseif ($markAt -ge 0 -and $capAt -gt $markAt) { Fail "V220 the ceiling is asked after the dot is marked - a mark made inside onChange does not come back (SPEC B38)" }
+    else { Pass "V220 the generation ceiling refuses before anything is written" }
+}
+
+# ---- V221: the sub-tabs sit BELOW the boxes, not under them -----------------------
+# V190 catches two siblings claiming one client rect. It does not catch an absolute layout
+# sitting under a tabControl that still claims it - same symptom as B41 (content vanishes),
+# different door, so this one measures geometry.
+$vampDoc = Doc (Join-Path $dir "WoD20.11.lfm")
+$tabsVamp = $vampDoc.SelectSingleNode("//tabControl[@name='tabsVamp']")
+if ($null -eq $tabsVamp) { Fail "V221 tabsVamp is gone from WoD20.11" }
+elseif ($tabsVamp.GetAttribute("align")) { Fail "V221 tabsVamp claims align='$($tabsVamp.GetAttribute('align'))' again - whatever is authored above it would be drawn under it (SPEC B41)" }
+else {
+    $lowest = 0
+    foreach ($l in $vampDoc.SelectNodes("//scrollBox/layout")) {
+        $b = [int]$l.GetAttribute("top") + [int]$l.GetAttribute("height")
+        if ($b -gt $lowest) { $lowest = $b }
+    }
+    $tabTop = [int]$tabsVamp.GetAttribute("top")
+    if ($lowest -eq 0) { Fail "V221 no box was found above the sub-tabs - this check measured nothing (SPEC V209)" }
+    elseif ($tabTop -lt $lowest) { Fail "V221 tabsVamp starts at $tabTop, inside the boxes that end at $lowest" }
+    else { Pass "V221 the sub-tabs start at $tabTop, clear of the boxes ending at $lowest" }
+}
 if ($Build) {
     $rdk = "$env:LOCALAPPDATA\FirecastSDK3\rdk.exe"
     if (-not (Test-Path $rdk)) { Fail "V6 rdk.exe not found at $rdk" }

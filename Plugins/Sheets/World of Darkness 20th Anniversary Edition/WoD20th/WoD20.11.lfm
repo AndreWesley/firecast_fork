@@ -35,18 +35,111 @@
 
 		The backdrop belongs to the form that carries CONTENT, not to the tab (SPEC V56, V190).
 		This file carries none, so the paper lives in WoD20.12, WoD20.13 and WoD20.14 instead, one per
-		scrollBox, exactly the arrangement WoD20.7 uses. What is left here is the tabControl alone,
-		which is the arrangement the root form uses for its own tabControl.
+		scrollBox, exactly the arrangement WoD20.7 uses.
+
+		2026-08-22 (SPEC I29): this file stopped being a bare tabControl. It now carries the two
+		ghoul boxes - DOMINATOR and BLOOD POOL - which sit above the sub-tabs so all three read
+		them, and that is why the shape below is a scrollBox with everything absolute inside,
+		the same shape WoD20.12 uses. tabsVamp LOST its align on purpose: an absolute sibling
+		under an align="client" tabControl does not clash by the rule V190 measures, it simply
+		overlaps - B41 by a second door, which is what V221 is for.
+
+		Geometry follows the sub-tabs it hosts: WoD20.12 is 1210 wide (360 + 850) and 585 tall,
+		so the boxes take 600 + 600 across the same width and tabsVamp starts below them.
+		No theme backdrop here: SPEC I29 did not ask for one, and the image that used to hang
+		in this file is the one B41 was about.
 	-->
-	<tabControl name="tabsVamp" align="client">
-		<tab name="tabDisc" title="Disciplines">
-			<import file="WoD20.12.lfm"/>
-		</tab>
-		<tab name="tabPaths" title="Blood Sorcery: Paths">
-			<import file="WoD20.13.lfm"/>
-		</tab>
-		<tab name="tabRituals" title="Blood Sorcery: Rituals">
-			<import file="WoD20.14.lfm"/>
-		</tab>
-	</tabControl>
+	<scrollBox align="client">
+		<!-- The paper is back (SPEC B50). V56 asks every form that carries CONTENT to carry the
+		     backdrop, and this file stopped being a shell the moment the two boxes landed. It is
+		     safe now for the reason it was not in B41: tabsVamp gave up align="client", so the
+		     image is the ONE child claiming the client rect, exactly as in WoD20.12. applyTheme
+		     finds it by the first ten characters of the name, so the number must stay attached. -->
+		<image name="themePaper11" align="client" style="stretch" hitTest="false" visible="false"/>
+		<!-- The two boxes are EMPTY in this task on purpose (SPEC T505): the shape is what the
+		     storyteller has to look at first, and a box with nothing in it is the cheapest way
+		     to find out whether an absolute tabControl still hands its height to the sub-tabs
+		     (SPEC T511). Fields land in T506 and T508. -->
+		<layout left="0" top="0" width="600" height="150">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="600" height="20" text="DOMINATOR" horzTextAlign="center"/>
+
+			<label left="12" top="30" width="165" height="24" text="Dominator"/>
+			<edit left="180" top="30" width="405" height="24" field="dominator"/>
+
+			<!-- cmb, not cbo: pickerItems only touches controls named cbo* (WoD20.6), which is what
+			     lets this one keep an items/values pair that DIFFERS - the ordinal is what the player
+			     reads, the number is what GEN_MAX is keyed by (SPEC I29). Same footing as
+			     cmbHealthLevels: a combo of VALUE, not a picker of prose (SPEC V208 scope). -->
+			<label left="12" top="60" width="165" height="24" text="Dominator Generation"/>
+			<comboBox name="cmbDominatorGen" left="180" top="60" width="150" height="24" field="dominatorGen"
+			          items="{'', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th'}"
+			          values="{'', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'}"/>
+
+			<!-- Derived, so it has no `field` and is never saved (SPEC I3, V29): a number that can be
+			     recomputed must not be able to disagree with what it was computed from. -->
+			<label left="12" top="90" width="165" height="24" text="Max Discipline Level"/>
+			<label name="lblMaxDisc" left="180" top="90" width="150" height="24" text="-"/>
+
+			<label left="12" top="120" width="165" height="24" text="Clan/Family"/>
+			<comboBox name="cboClanFamily" left="180" top="120" width="405" height="24" field="clanFamily"/>
+		</layout>
+
+		<layout left="610" top="0" width="600" height="150">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="4" width="600" height="20" text="BLOOD POOL" horzTextAlign="center"/>
+
+			<!-- Twenty FREE dots (SPEC V219). They wear the rating art and they are not rating dots:
+			     blood is spent and regained inside a single scene, so autoChange stays ON and there
+			     is no onClick - nothing here reaches xpClick, nothing is declared in XP_TRAIT, and no
+			     ledger line is ever written. willpower_c1..c10 and health_1..10 have always worked
+			     this way; what is new is only that these wear the dot instead of a plain box.
+			
+			     V134 (every rating dot is autoChange="false" + onClick) is what makes B38 stay dead,
+			     so it must NOT be loosened to let these through - the gate names them by field
+			     prefix instead (SPEC T509). applyTheme repaints by CLASS, so they follow the palette
+			     with nothing added (MEASURED: WoD20.6, cls == "imageCheckBox"). -->
+			<imageCheckBox left="165" top="50" width="25" height="25" field="bloodPool_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="193" top="50" width="25" height="25" field="bloodPool_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="221" top="50" width="25" height="25" field="bloodPool_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="249" top="50" width="25" height="25" field="bloodPool_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="277" top="50" width="25" height="25" field="bloodPool_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="305" top="50" width="25" height="25" field="bloodPool_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="333" top="50" width="25" height="25" field="bloodPool_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="361" top="50" width="25" height="25" field="bloodPool_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="389" top="50" width="25" height="25" field="bloodPool_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="417" top="50" width="25" height="25" field="bloodPool_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+
+			<imageCheckBox left="165" top="85" width="25" height="25" field="bloodPool_11" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="193" top="85" width="25" height="25" field="bloodPool_12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="221" top="85" width="25" height="25" field="bloodPool_13" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="249" top="85" width="25" height="25" field="bloodPool_14" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="277" top="85" width="25" height="25" field="bloodPool_15" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="305" top="85" width="25" height="25" field="bloodPool_16" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="333" top="85" width="25" height="25" field="bloodPool_17" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="361" top="85" width="25" height="25" field="bloodPool_18" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="389" top="85" width="25" height="25" field="bloodPool_19" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="417" top="85" width="25" height="25" field="bloodPool_20" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</layout>
+
+		<tabControl name="tabsVamp" left="0" top="160" width="1210" height="620">
+			<tab name="tabDisc" title="Disciplines">
+				<import file="WoD20.12.lfm"/>
+			</tab>
+			<tab name="tabPaths" title="Blood Sorcery: Paths">
+				<import file="WoD20.13.lfm"/>
+			</tab>
+			<tab name="tabRituals" title="Blood Sorcery: Rituals">
+				<import file="WoD20.14.lfm"/>
+			</tab>
+		</tabControl>
+	</scrollBox>
+
+	<!-- The ceiling label follows the generation on every client at the table, not just the one
+	     that changed it (SPEC V175 is the same reason the clan-discipline lock is wired here). -->
+	<dataLink field="dominatorGen" onChange="renderMaxDisc(self);"/>
+
+	<event name="onNodeReady">
+		renderMaxDisc(self);
+	</event>
 </form>

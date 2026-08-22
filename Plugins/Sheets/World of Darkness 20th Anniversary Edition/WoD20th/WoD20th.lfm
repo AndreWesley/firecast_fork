@@ -202,6 +202,56 @@
 			PICKER_LIST["clanDisc"] = PICKER_LIST["disc"];
 			PICKER_LIST["secPath"]  = PICKER_LIST["mainPath"];
 
+			-- A fourth alias, and it is one only while the lists are the same list (SPEC B50). The first
+			-- draft built a copy here so it could diverge later; V201 forbids writing anything but an
+			-- alias into this map, and V208 forbids two tables holding the same content, so today the
+			-- rules agree with each other and with the data: clan and clanFamily ARE one list.
+			--
+			-- SPEC T510 REPLACES this line with an authored list of its own the day the revenant
+			-- families arrive (SPEC R93). It must not be appended to instead: an alias is identity, so
+			-- a push here would grow the clan picker on the Main tab with it (SPEC V211c).
+			PICKER_LIST["clanFamily"] = PICKER_LIST["clan"];
+
+			-- >>> GEN_MAX_BEGIN (SPEC I29, V218: one map, both readers)
+			-- The ceiling a domitor's generation puts on a ghoul's Disciplines. Keyed by the VALUE the
+			-- combo stores ("4".."14"), which is why that value is a plain number and the ordinal is
+			-- only what the item READS (SPEC I29). Read by renderMaxDisc for the label and by xpClick
+			-- for the refusal - a second copy is how the number shown and the number charged diverge.
+			GEN_MAX = {
+				["4"] = 5, ["5"] = 4, ["6"] = 3, ["7"] = 2,
+				["8"] = 1, ["9"] = 1, ["10"] = 1, ["11"] = 1, ["12"] = 1, ["13"] = 1,
+				["14"] = 0,
+			};
+			-- <<< GEN_MAX_END
+
+			-- nil means NO ceiling, and that is not the same as zero: a mortal with no domitor is not a
+			-- ghoul with a fourteenth-generation one (SPEC V220a).
+			function maxDiscLevel()
+				if sheet == nil then return nil; end;
+
+				local g = sheet.dominatorGen;
+
+				if g == nil or g == "" then return nil; end;
+
+				return GEN_MAX[tostring(g)];
+			end;
+
+			function renderMaxDisc(from)
+				if from == nil then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), { lblMaxDisc = true }, found);
+
+				local c = found["lblMaxDisc"];
+
+				if c == nil then return; end;
+
+				local m = maxDiscLevel();
+
+				c.text = (m == nil) and "-" or tostring(m);
+			end;
+
 			function setField(name, value)
 				if sheet == nil then return; end;
 				if sheet[name] ~= value then sheet[name] = value; end;
@@ -1281,26 +1331,22 @@
 					tabStoryteller = isStoryteller(),
 				};
 
-				-- SPEC V93: a player must not be left sitting on a tab that was just denied.
-				-- There is no event for the active tab and no reading of tabIndex that can be
-				-- trusted here (SPEC R33): the index is an int with no name attached, and
-				-- whether it counts the hidden tabs decides which tab it points at - guessing
-				-- wrong would throw players off Numina on every load. So the sheet watches the
-				-- one thing it can see for certain, a tab going from shown to hidden, and
-				-- moves everyone to Main when it happens. Nothing moves on load: the tabs are
-				-- authored in their default state (SPEC V94), so there is no transition.
-				local tabMain, denied;
-
+				-- SPEC V217, which revokes V93: recalculating visibility moves nobody. The jump to
+				-- Main was paid on EVERY toggle by the one person who can toggle - the checkboxes
+				-- live on the Storyteller tab (SPEC I8, V95), so hiding Numina threw the storyteller
+				-- off the tab they were working on - to cover the rare reader who happened to be there
+				-- on the tab as it went. That reader now stays put and finds the tab EMPTY, never
+				-- holding denied content: V92 below still hides the children. One click leaves it.
+				--
+				-- No half-measure exists: SPEC R33 says there is no tab-change event and no reading of
+				-- tabIndex worth trusting, so "move only if the ACTIVE tab is the one being hidden" is
+				-- not expressible. It is jump always or jump never, and never is what was asked for.
 				for i = 1, #tabs, 1 do
 					local tab  = tabs[i];
 					local name = tab:getName();
 					local want = shown[name];
 
-					if name == "tabMain" then tabMain = tab; end;
-
 					if want ~= nil then
-						if tab.visible and not want then denied = true; end;
-
 						tab.visible = want;
 
 						-- Nothing confirms that the host takes the tab BUTTON away with the
@@ -1313,7 +1359,6 @@
 					end;
 				end;
 
-				if denied and tabMain ~= nil then tabMain:activate(); end;
 			end;
 
 			-- ---- First paint (SPEC I15 / V166 / V167 / B40, 49th round) -----------------
@@ -1461,15 +1506,21 @@
 				-- click (SPEC C) - not which box bought it, and not the CLANS table, which stays
 				-- asleep while `clan` is invisible (SPEC V173/V174).
 				if kind == "Discipline" then
-					if from == 0 then return 10; end;
-					if ctx.inClan then return from * 5; end;
-					return from * 7;
+					if from == 0 then return 20; end;
+					if ctx.inClan then return from * 15; end;
+					return from * 25;
 				end;
 
 				-- Secondary paths only. The main path is not bought (SPEC V179).
+				--
+				-- The five vampire prices are the table's own, not the book's (SPEC I9, 2026-08-22).
+				-- Nothing here stores what a dot COST when it was bought: Spent is the sum of a ledger
+				-- rebuilt from the diff on every render (SPEC V83, V100), so changing a price reprices
+				-- every sheet that already owns those dots, and Current can go negative with nobody
+				-- clicking anything. That is a known consequence, not a bug to fix here (SPEC C).
 				if kind == "Path" then
-					if from == 0 then return 7; end;
-					return from * 4;
+					if from == 0 then return 20; end;
+					return from * 15;
 				end;
 
 				if kind == "Numina" then
@@ -2486,6 +2537,24 @@
 					end;
 				end;
 
+				-- The domitor's generation caps every Discipline on the sheet (SPEC I29, V220). Same
+				-- shape and same place as the path ceiling above, on purpose: one refusal path for two
+				-- rules, tested BEFORE anything is written, and it speaks (SPEC V129, V135, B38).
+				--
+				-- No generation means NO ceiling, which is not a ceiling of zero: a mortal with no
+				-- domitor is not a fourteenth-generation ghoul (SPEC V220a).
+				--
+				-- Only the PURCHASE is asked. A dot already lit above the ceiling stays lit, so lowering
+				-- the generation never takes away what the player had already bought (SPEC V220c, V187).
+				if want and trait ~= nil and (string.match(trait, "^clanDisc_%d+$") ~= nil or string.match(trait, "^disc_%d+$") ~= nil) then
+					local genCap = maxDiscLevel();
+
+					if genCap ~= nil and (level + 1) > genCap then
+						xpWarn("That Discipline is above what the dominator's generation allows");
+						return;
+					end;
+				end;
+
 				-- Nothing is priced while the character is being built: the rule starts when
 				-- the storyteller freezes the sheet (SPEC V101).
 				--
@@ -2696,6 +2765,13 @@
 		-- like the other eight (SPEC V104), and only a dot the player switched off keeps it at
 		-- zero. nil means nobody has touched it yet; false is a decision and is left alone.
 		if sheet ~= nil and sheet.appearance_1 == nil then setField("appearance_1", true); end;
+
+		-- A ghoul opens with ten of twenty (SPEC I29). Seeded once, keyed on nil exactly like the
+		-- dot above: nil is "nobody has touched this yet" and false is a decision, so a player who
+		-- spends blood down to zero and closes the sheet does not find it refilled on the way back.
+		if sheet ~= nil and sheet.bloodPool_1 == nil then
+			for i = 1, 10, 1 do setField("bloodPool_" .. i, true); end;
+		end;
 
 		-- The Game box is locked (SPEC V109), so a value outside its three would sit there
 		-- with nobody able to clear it: one of the four longer names this sheet used to offer,

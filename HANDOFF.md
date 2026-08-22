@@ -1,8 +1,8 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-Reescrito 2026-08-21, fim da **69ª rodada**. Para um Claude que abre a sessão sem contexto.
+Reescrito 2026-08-21, fim da **72ª rodada**. Para um Claude que abre a sessão sem contexto.
 
-A 69ª fechou **§T498 · §T499 · §T500 · §T501 · §T502**. Gate verde, `.rpk` gerado e instalado.
+A 69ª fechou **§T498 · §T499 · §T500 · §T501 · §T502** (plugin próprio); a 70ª fechou **§T503** & a 71ª **§T504** — preços de XP de vampiro TROCADOS (§I9: disciplina 20 / clã n×15 / fora do clã n×25 · Secondary Path 20 / n×15) & ⚠ ficha que JÁ comprou disciplina é REPRECIFICADA na abertura, `Current` pode ir a negativo (§C); a 72ª fechou **§T505–§T509** — topo da aba Vampiro ganhou 2 caixas: `DOMINATOR` (dominador · geração 4ª-14ª · Max Discipline Level derivado · Clan/Family) & `BLOOD POOL` (20 bolinhas LIVRES, 10 por default). Teto de geração RECUSA compra de disciplina acima do máximo (§V220). **§T510 BLOQUEADA**: falta o user passar os livros p/ as famílias de revenant (§R93) — o combo `Clan/Family` vive c/ 60 clãs/linhagens até lá, & `clanFamily` é ALIAS de `clan` (§B50) ∴ §T510 TROCA o alias, ⊥ dá append. **§T511 é teste SEU no Firecast**; — esconder aba manejada ⊥ move mais ninguém: §V217 REVOGA §V93 (o pulo p/ `Main` arrancava o mestre da aba `Storyteller` a cada toggle). Gate verde, `.rpk` gerado e instalado.
 **Nada commitado.**
 
 ## ⚠ A FICHA MUDOU DE PLUGIN E DE NOME NA 69ª
@@ -154,7 +154,7 @@ cd "c:\Users\awlol\OneDrive\Documents\firecast_fork"
 | `WoD20th.lfm.lua` | **1.415.113** B (⊥ remedido na 69ª — o rename ⊥ muda tamanho) |
 | `module.xml` | `<id>AndreOliveira.Styllern.WoD20th</id>` · `<version>1.0</version>` (plugin novo) |
 | gate | **4.439** linhas, ASCII puro, LF · 436 checks |
-| §V máx | **V216** · §B máx **B49** · §T máx **T502** |
+| §V máx | **V222** · §B máx **B50** · §T máx **T511** · gate **443** checks |
 
 ⚠ **⊥ deixe a saída do gate cair no chat** — são ~400 linhas `ok` e afoga o contexto:
 
