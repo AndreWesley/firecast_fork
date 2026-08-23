@@ -152,77 +152,77 @@
 			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
-		<layout left="0" top="0" width="410" height="300">
+		<layout left="0" top="12" width="410" height="291">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="410" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
+			<label left="0" top="10" width="410" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
 
 			<!-- The first row is the affinity path, and bold is the whole of that mark: the
 			     star that used to sit in the left margin came off at the user's request (SPEC
 			     V88, 28th round). The note under TRUE FAITH still says what the row means. -->
-			<layout left="12" top="25" width="385" height="25">
+			<layout left="12" top="31" width="386" height="25">
 				<HedgePicker field="numina_1" style="bold"/>
 			</layout>
-			<layout left="12" top="50" width="385" height="25">
+			<layout left="12" top="56" width="386" height="25">
 				<HedgePicker field="numina_2" style=""/>
 			</layout>
-			<layout left="12" top="75" width="385" height="25">
+			<layout left="12" top="81" width="386" height="25">
 				<HedgePicker field="numina_3" style=""/>
 			</layout>
-			<layout left="12" top="100" width="385" height="25">
+			<layout left="12" top="106" width="386" height="25">
 				<HedgePicker field="numina_4" style=""/>
 			</layout>
-			<layout left="12" top="125" width="385" height="25">
+			<layout left="12" top="131" width="386" height="25">
 				<HedgePicker field="numina_5" style=""/>
 			</layout>
-			<layout left="12" top="150" width="385" height="25">
+			<layout left="12" top="156" width="386" height="25">
 				<HedgePicker field="numina_6" style=""/>
 			</layout>
-			<layout left="12" top="175" width="385" height="25">
+			<layout left="12" top="181" width="386" height="25">
 				<HedgePicker field="numina_7" style=""/>
 			</layout>
-			<layout left="12" top="200" width="385" height="25">
+			<layout left="12" top="206" width="386" height="25">
 				<HedgePicker field="numina_8" style=""/>
 			</layout>
-			<layout left="12" top="225" width="385" height="25">
+			<layout left="12" top="231" width="386" height="25">
 				<NuminaFree field="numina_9"/>
 			</layout>
-			<layout left="12" top="250" width="385" height="25">
+			<layout left="12" top="256" width="386" height="25">
 				<NuminaFree field="numina_10"/>
 			</layout>
 		</layout>
 
-		<layout left="0" top="310" width="410" height="300">
+		<layout left="0" top="313" width="410" height="291">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="410" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
+			<label left="0" top="10" width="410" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
 
-			<layout left="12" top="25" width="385" height="25">
+			<layout left="12" top="31" width="386" height="25">
 				<PsychicPicker field="psychic_1"/>
 			</layout>
-			<layout left="12" top="50" width="385" height="25">
+			<layout left="12" top="56" width="386" height="25">
 				<PsychicPicker field="psychic_2"/>
 			</layout>
-			<layout left="12" top="75" width="385" height="25">
+			<layout left="12" top="81" width="386" height="25">
 				<PsychicPicker field="psychic_3"/>
 			</layout>
-			<layout left="12" top="100" width="385" height="25">
+			<layout left="12" top="106" width="386" height="25">
 				<PsychicPicker field="psychic_4"/>
 			</layout>
-			<layout left="12" top="125" width="385" height="25">
+			<layout left="12" top="131" width="386" height="25">
 				<PsychicPicker field="psychic_5"/>
 			</layout>
-			<layout left="12" top="150" width="385" height="25">
+			<layout left="12" top="156" width="386" height="25">
 				<PsychicPicker field="psychic_6"/>
 			</layout>
-			<layout left="12" top="175" width="385" height="25">
+			<layout left="12" top="181" width="386" height="25">
 				<PsychicPicker field="psychic_7"/>
 			</layout>
-			<layout left="12" top="200" width="385" height="25">
+			<layout left="12" top="206" width="386" height="25">
 				<PsychicPicker field="psychic_8"/>
 			</layout>
-			<layout left="12" top="225" width="385" height="25">
+			<layout left="12" top="231" width="386" height="25">
 				<NuminaFree field="psychic_9"/>
 			</layout>
-			<layout left="12" top="250" width="385" height="25">
+			<layout left="12" top="256" width="386" height="25">
 				<NuminaFree field="psychic_10"/>
 			</layout>
 		</layout>
@@ -239,11 +239,11 @@
 			`faith_1`..`_5` are the dots that used to live on the Main tab. They moved here in
 			the same change that removed them there, so a saved sheet keeps its rating (V35).
 		-->
-		<layout left="0" top="620" width="410" height="60">
+		<layout left="0" top="614" width="410" height="66">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="410" height="20" text="TRUE FAITH" horzTextAlign="center"/>
+			<label left="0" top="10" width="410" height="20" text="TRUE FAITH" horzTextAlign="center"/>
 
-			<layout left="12" top="25" width="385" height="25">
+			<layout left="12" top="31" width="386" height="25">
 				<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="faith" groupName="numinaSel"/>
 				<comboBox left="25" top="0" width="230" height="25" fontSize="12" name="cboFaith" field="faith">
 				</comboBox>
@@ -259,7 +259,7 @@
 		     left-hand column, not a line of the True Faith table, so it sits under the box on
 		     the tab itself. It is a bare label, not a section box, so V40 and V48 - which
 		     measure boxes - have nothing to say about it. -->
-		<label left="12" top="686" width="315" height="20" text="* The first path is the Affinity Path" fontSize="12"/>
+		<label left="12" top="698" width="315" height="20" text="* The first path is the Affinity Path" fontSize="12"/>
 
 		<!--
 			Read-only on purpose: this block displays book text, it is not a note field. No
@@ -267,10 +267,10 @@
 
 			Height tracks the three tables on the left, which now end at y=680 (SPEC T81).
 		-->
-		<layout left="420" top="0" width="850" height="680">
+		<layout left="420" top="12" width="850" height="686">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtNuminaDesc" left="10" top="25" width="830" height="645" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+			<label left="0" top="10" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtNuminaDesc" left="10" top="31" width="830" height="645" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 	</scrollBox>
 

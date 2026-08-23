@@ -42,7 +42,7 @@
 					"Tremere Antitribu", "Assamite Sorcerers", "Assamite Viziers", "Daitya", "Tlacique", "Warrior Setites",
 					"Mariners", "Lasombra Antitribu", "Dominate Malkavians", "Brahman", "Telyavelic Tremere",
 					"Old Clan Tzimisce", "Gargoyles (Modern)", "Gargoyles (Scout)", "Gargoyles (Sentinel)",
-					"Gargoyles (Warrior)", "Ventrue Antitribu", "Wu Zao", "Angellis Ater", "Maeghar", "Panders",
+					"Gargoyles (Warrior)", "Ventrue Antitribu", "Wu Zao", "Angellis Ater", "Maeghar", "Panders", "Caitiff",
 					"Children of Osiris",
 				},
 				["nature"] = {
@@ -212,6 +212,46 @@
 			-- a push here would grow the clan picker on the Main tab with it (SPEC V211c).
 			PICKER_LIST["clanFamily"] = PICKER_LIST["clan"];
 
+			-- >>> TAB_LIST_BEGIN (SPEC I32, V228: one list, every reader on it)
+			-- The eleven tabs, in the order the strip draws them. Every name in the XML is built
+			-- from these mechanically - pane `tab<X>`, button `btnTab<X>`, fill `tabOn<X>` - so the
+			-- list and the sheet cannot drift into disagreeing about which tabs exist.
+			TAB_LIST = {
+				"Main", "Traits", "Numina", "Disciplines", "Combat", "Inventory",
+				"Background", "Progress", "Notes", "Settings", "Storyteller",
+			};
+			-- <<< TAB_LIST_END
+
+			-- >>> TAB_W_BEGIN (SPEC I36, V232: one width, both readers)
+			-- How wide each tab button is, in TAB_LIST order, and the two numbers that lay the
+			-- eleven of them out. The strip REFLOWS: a tab the storyteller turned off loses its
+			-- button and the ones to its right slide left, so the bar has no hole in the middle
+			-- of it (SPEC I36, user 2026-08-22). Numina and Ghoul are the two that can go, and
+			-- both sit in the MIDDLE, which is why this could not stay a matter of authored left.
+			--
+			-- The widths live here instead of being read back off the control because WRITING
+			-- geometry from Lua is proved on this sheet - WoD20.9 has written width and height
+			-- since the 27th round - and READING it is not: a nil coming back would scatter an
+			-- invalid left across twenty-two rectangles in silence, and the fallback that would
+			-- guard against it costs the very second copy this table already is. The gate welds
+			-- the table to the XML instead, the same weld V49 puts on HEALTH_ROW_PITCH.
+			TAB_W = {
+				99, 79, 79, 92, 86, 105, 105, 112, 99, 125, 112,
+			};
+			STRIP_X0  = 16;
+			STRIP_GAP = 4;
+			-- <<< TAB_W_END
+
+			-- Which tab is open is SESSION state and must never become a field (SPEC V227): a field
+			-- syncs to every client of the table, so the player clicking Combat would drag the
+			-- storyteller off whatever they were reading. It is also for ever - a field name cannot
+			-- be renamed without dropping what is saved under it (SPEC I3, V2).
+			activeTab = "tabMain";
+
+			-- The three sub-tabs of the Vampire tab (SPEC T523). They carry no gating of their own:
+			-- nothing hides a sub-tab, so there is no `shown` map for them.
+			VAMP_LIST = { "Disc", "Paths", "Rituals" };
+			activeVampTab = "tabDisc";
 			-- >>> GEN_MAX_BEGIN (SPEC I29, V218: one map, both readers)
 			-- The ceiling a domitor's generation puts on a ghoul's Disciplines. Keyed by the VALUE the
 			-- combo stores ("4".."14"), which is why that value is a plain number and the ordinal is
@@ -371,6 +411,7 @@
 				["Angellis Ater"]     = { fixed = {"Daimonion", "Dominate"}, choice = {"Potence", "Presence", "Obfuscate"} },
 				["Maeghar"]            = { choice = {"Mytherceria", "Necromancy"}, open = 2 },
 				["Panders"]            = { open = 3 },
+				["Caitiff"]            = { open = 3 },
 				["Children of Osiris"] = { open = 3 },
 				-- <<< CLANS_END
 			};
@@ -976,7 +1017,7 @@
 			-- and fails if it stops matching PITCH (SPEC V49) - the same Lua-vs-XML drift that
 			-- produced B12 and B16.
 			HEALTH_ROW_PITCH = 27;
-			HEALTH_BOX_PAD   = 36;
+			HEALTH_BOX_PAD   = 37;
 
 			local function markIndex(v)
 				for i = 1, #HEALTH_MARKS, 1 do
@@ -1291,26 +1332,17 @@
 				end;
 			end;
 
-			local function collectTabs(node, out)
-				local children = node:getChildren();
-
-				for i = 1, #children, 1 do
-					local c = children[i];
-
-					if c:getClassName() == "tab" then out[#out + 1] = c; end;
-
-					collectTabs(c, out);
-				end;
-			end;
 
 			-- SPEC I8b / V89. Numina reads `~= false` and the other two read `== true`: a
 			-- sheet saved before this round has nil in all three, and Numina was always
 			-- visible on it - defaulting it off would take away a tab the player already had.
+			--
+			-- Since the 78th round this paints the strip as well as gating it (SPEC I32). The two
+			-- jobs are one function on purpose: "allowed" and "open" both decide whether a pane is
+			-- on screen, and splitting them across two writers is how they end up disagreeing about
+			-- the same control.
 			function applyTabVisibility(from)
 				if sheet == nil then return; end;
-
-				local tabs = {};
-				collectTabs(tabRootOf(from), tabs);
 
 				-- Three managed tabs since the 39th round (SPEC V128): Magika was an empty
 				-- window that Mage-only content was never going to fill on a mortal sheet, so
@@ -1322,34 +1354,109 @@
 					tabStoryteller = isStoryteller(),
 				};
 
+				-- One sweep of the tree for all three names per tab, through the one finder there is
+				-- (SPEC V143). collectTabs is gone with the <tab> it matched on class.
+				local names = {};
+
+				for i = 1, #TAB_LIST, 1 do
+					names["tab" .. TAB_LIST[i]]    = true;
+					names["btnTab" .. TAB_LIST[i]] = true;
+					names["tabOn" .. TAB_LIST[i]]  = true;
+				end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
 				-- SPEC V217, which revokes V93: recalculating visibility moves nobody. The jump to
 				-- Main was paid on EVERY toggle by the one person who can toggle - the checkboxes
 				-- live on the Storyteller tab (SPEC I8, V95), so hiding Numina threw the storyteller
 				-- off the tab they were working on - to cover the rare reader who happened to be there
-				-- on the tab as it went. That reader now stays put and finds the tab EMPTY, never
-				-- holding denied content: V92 below still hides the children. One click leaves it.
+				-- on the tab as it went. That reader now stays put and finds the body EMPTY, never
+				-- holding denied content. One click on any other tab leaves it.
 				--
-				-- No half-measure exists: SPEC R33 says there is no tab-change event and no reading of
-				-- tabIndex worth trusting, so "move only if the ACTIVE tab is the one being hidden" is
-				-- not expressible. It is jump always or jump never, and never is what was asked for.
-				for i = 1, #tabs, 1 do
-					local tab  = tabs[i];
-					local name = tab:getName();
-					local want = shown[name];
+				-- SPEC R33 said there was no way to know which tab was open. That was true of the
+				-- native strip and stopped being true when the strip became ours: `activeTab` is the
+				-- answer now. The rule does not change - the user asked for never jumping - but it is
+				-- a choice again rather than a limit.
+				-- The cursor the reflow walks (SPEC I36, V232). It starts at the strip's left
+				-- margin and only advances past a tab that is SHOWN, which is the whole of what
+				-- "no hole" means here.
+				local x = STRIP_X0;
 
-					if want ~= nil then
-						tab.visible = want;
+				for i = 1, #TAB_LIST, 1 do
+					local nm   = "tab" .. TAB_LIST[i];
+					local want = shown[nm];
 
-						-- Nothing confirms that the host takes the tab BUTTON away with the
-						-- tab (SPEC R31), so the contents are hidden as well (SPEC V92):
-						-- whoever still reaches a denied tab finds nothing on it. One level
-						-- down is the form the <tab> imports, which is all it holds.
-						local kids = tab:getChildren();
+					if want == nil then want = true; end;
 
-						for j = 1, #kids, 1 do kids[j].visible = want; end;
+					local pane = found[nm];
+					local btn  = found["btnTab" .. TAB_LIST[i]];
+					local on   = found["tabOn" .. TAB_LIST[i]];
+
+					-- The pane is the tab's contents, so hiding it hides everything inside - which is
+					-- what V92 asks for, now by construction instead of by walking children. A denied
+					-- tab loses its button too, which the native strip never let us promise (SPEC R31).
+					local live = want and (nm == activeTab);
+
+					if btn  ~= nil then btn.visible  = want; end;
+					if on   ~= nil then on.visible   = live; end;
+					if pane ~= nil then pane.visible = live; end;
+
+					-- Where it sits and whether it is there are written in the SAME breath, the
+					-- shape V112/V162 ask for everywhere else on this sheet: a button parked over
+					-- the slot of a neighbour that went away is a hole with no visible cause.
+					if want then
+						if btn ~= nil then btn.left = x; end;
+						if on  ~= nil then on.left  = x; end;
+
+						x = x + TAB_W[i] + STRIP_GAP;
+					end;
+				end;
+			end;
+
+			-- Down here, not up beside TAB_LIST where it would read better, for the reason B51
+			-- cost a whole round (SPEC V223): both of these call `tabRootOf`, which is a `local`
+			-- declared further down, and Lua resolves a non-local name at COMPILE time - a body
+			-- written above that line gets a GETGLOBAL and calls nil. V223 caught it the same day
+			-- it was written.
+			function renderVampTabs(from)
+				local names = {};
+
+				for i = 1, #VAMP_LIST, 1 do
+					names["tab" .. VAMP_LIST[i]]   = true;
+					names["tabOn" .. VAMP_LIST[i]] = true;
+				end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				for i = 1, #VAMP_LIST, 1 do
+					local live = ("tab" .. VAMP_LIST[i]) == activeVampTab;
+					local pane = found["tab" .. VAMP_LIST[i]];
+					local on   = found["tabOn" .. VAMP_LIST[i]];
+
+					if on   ~= nil then on.visible   = live; end;
+					if pane ~= nil then pane.visible = live; end;
+				end;
+			end;
+
+			-- Setting the tab and painting the strip are the same act, so they cannot come apart
+			-- (the shape V112/V162 ask for on enabled+opacity). One entry point for both strips:
+			-- the XML says selectTab everywhere and this decides which strip the name belongs to,
+			-- rather than the caller having to know.
+			function selectTab(name, from)
+				for i = 1, #VAMP_LIST, 1 do
+					if ("tab" .. VAMP_LIST[i]) == name then
+						activeVampTab = name;
+						renderVampTabs(from);
+						return;
 					end;
 				end;
 
+				activeTab = name;
+				applyTabVisibility(from);
 			end;
 			-- Aqui, e nao la em cima ao lado de GEN_MAX e maxDiscLevel onde ele LERIA melhor, por um
 			-- motivo so (SPEC B51, V223): ele chama `tabRootOf`, `local function` declarada ACIMA
@@ -1394,7 +1501,7 @@
 			-- Found by name from the root, through the one finder there is (SPEC V143): this is
 			-- called from WoD20.6, and a tab form cannot reach its siblings (SPEC R.9 / B.9).
 			function sheetReveal(from)
-				local tc = xpFind(tabRootOf(from), { tabsHH = true }, {}).tabsHH;
+				local tc = xpFind(tabRootOf(from), { sheetBody = true }, {}).sheetBody;
 
 				if tc ~= nil and tc.visible ~= true then tc.visible = true; end;
 			end;
@@ -1475,19 +1582,32 @@
 			-- Discipline, Path, Sphere, Arete - are in the spec but deliberately NOT written:
 			-- the Disciplines tab is empty and Magika is gone altogether (SPEC V128), so no
 			-- field can produce that row and a cost nothing can reach is dead code.
-			-- What a speciality costs at this moment (SPEC I9/V154). The storyteller opens the
-			-- door with one of two boxes and neither is ticked by default, so a sheet where
-			-- nobody decided anything cannot buy one at all.
+			-- What a speciality costs at this moment (SPEC I9/I49/V154/V254). ONE field carries both
+			-- halves of the storyteller's answer: a number 0..5 is the price and the door is open,
+			-- the sentinel is the door shut.
 			--
-			-- Four is read FIRST. The two boxes cannot both be on through the interface (SPEC
-			-- V155), but a sheet edited by hand could carry both, and a price that depends on
-			-- which question you ask is not a price.
+			-- ZERO IS A PRICE. The two-flag version could not say 'free' and 'not for sale' apart -
+			-- both were 'specCost() == 0' - so the door has its own reader now, and xpClick asks
+			-- THAT one (SPEC V254b). Reading the closed door as cost 0 is deliberate on the ledger
+			-- side: a specialty already bought when the storyteller shuts the door prices at zero
+			-- rather than at three, which is what the flags did before this round.
+			--
+			-- nil lands on 3, the same default the dataLink declares in WoD20.10 (SPEC V254c):
+			-- defaultValue does not WRITE the field, so a sheet saved before this round arrives
+			-- empty and the two places that answer for it must not disagree (the healthLevels pair).
+			local SPEC_FORBIDDEN = "forbidden";
+
+			local function specForbidden()
+				if sheet == nil then return true; end;
+
+				return sheet.stSpecCost == SPEC_FORBIDDEN;
+			end;
+
 			local function specCost()
 				if sheet == nil then return 0; end;
-				if sheet.stSpec4XP == true then return 4; end;
-				if sheet.stSpec3XP == true then return 3; end;
+				if specForbidden() then return 0; end;
 
-				return 0;
+				return tonumber(sheet.stSpecCost) or 3;
 			end;
 
 			local function xpCost(kind, from, ctx)
@@ -1608,11 +1728,22 @@
 			-- charges for and nothing shows in the log (SPEC I3, I9).
 			BACKGROUND_ROWS = 20;
 
+			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
+			-- 2026-08-22). The LAST five, so every reader is 'picker = total - typed' and no list of
+			-- indices exists to drift from this number.
+			BACKGROUND_FREE_ROWS = 5;
+
+
 			-- How many speciality rows the box on the Main tab draws (SPEC V147). Same reason
 			-- as BACKGROUND_ROWS: both the loop that lets experience buy them and the loop that
 			-- prices them for the log read this, so a tenth row added to the XML alone would be
 			-- a dot nothing charges for and nothing shows.
 			SPECIALITY_ROWS = 9;
+
+			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
+			-- 2026-08-22). Same contract as the three on the Ghoul tab: they are the LAST rows, so
+			-- the picker count is the total minus these and no reader carries a list of indices.
+			SPECIALITY_FREE_ROWS = 3;
 
 			-- Rows of the Vampire tab (SPEC I16). Same contract as BACKGROUND_ROWS above: the loop
 			-- that lets experience buy a dot and the loop that prices it for the log both read
@@ -1629,7 +1760,78 @@
 			DISC_ROWS      = 15;
 			MAIN_PATH_ROWS = 5;
 			SEC_PATH_ROWS  = 15;
-			RITUAL_ROWS    = 25;
+			RITUAL_ROWS    = 20;
+
+			-- How many of those rows the storyteller TYPES instead of picking (SPEC I45, V248,
+			-- user 2026-08-22). They are always the LAST ones, so the picker count is the total
+			-- minus these and there is no second list of indices to drift from the first.
+			DISC_FREE_ROWS     = 3;
+			SEC_PATH_FREE_ROWS = 3;
+			RITUAL_FREE_ROWS   = 5;
+
+			-- The first typed row of each box, keyed by field root. Built from the two counts
+			-- above rather than typed out again: a row moved in the XML changes one number here
+			-- and every reader follows (SPEC V204).
+			local TYPED_ROW_FROM = {
+				disc       = DISC_ROWS - DISC_FREE_ROWS + 1,
+				speciality = SPECIALITY_ROWS - SPECIALITY_FREE_ROWS + 1,
+				background = BACKGROUND_ROWS - BACKGROUND_FREE_ROWS + 1,
+				secPath    = SEC_PATH_ROWS - SEC_PATH_FREE_ROWS + 1,
+				ritual     = RITUAL_ROWS - RITUAL_FREE_ROWS + 1,
+			};
+
+			-- Is this field one of the typed rows? GLOBAL because three other files ask it: the
+			-- picker guard here, the three description renderers on WoD20.12/13/14, and the sort
+			-- on WoD20.14 (SPEC V223 - global is the convention for a function called across
+			-- .lfm boundaries).
+			--
+			-- `isTypedRow` and NOT `isFreeRow`: that name is taken, by the speciality stamp two
+			-- thousand lines down (SPEC V160), and a second global of the same name would have
+			-- silently replaced it - the whole free-specialty ledger answering a question about
+			-- ritual rows. The gate caught it on the first run. FREE means free of CHARGE
+			-- everywhere else on this sheet (xpFree, stFreeBuy, Free dots), so these rows are
+			-- TYPED here even though SPEC V248 still calls their counts *_FREE_ROWS.
+			--
+			-- `clanDisc_2` answers false and has to: the clan box is picked from the same list
+			-- as `disc_*` (SPEC V178) and only the fifteen open rows have typed ones at the end.
+			function isTypedRow(field)
+				if field == nil then return false; end;
+
+				local base, n = string.match(field, "^(%a+)_(%d+)$");
+
+				if base == nil then return false; end;
+
+				local from = TYPED_ROW_FROM[base];
+
+				return from ~= nil and tonumber(n) >= from;
+			end;
+
+			-- Where a typed row keeps the text the storyteller wrote for it (SPEC I45): the
+			-- row's own name with `Desc` inside it, so `disc_13` holds its description in
+			-- `discDesc_13` and the two cannot end up pointing at different rows. Derived and
+			-- never listed out, for the same reason the counts above are derived.
+			--
+			-- These eleven fields are written by Lua ALONE - the description block owns no
+			-- `field` and never will (SPEC V29, V249b) - so they are Lua-owned in the sense
+			-- SPEC I3 uses, and nothing but the block itself reads them.
+			function descFieldOf(field)
+				if field == nil then return nil; end;
+
+				local base, n = string.match(field, "^(%a+)_(%d+)$");
+
+				if base == nil then return nil; end;
+
+				return base .. "Desc_" .. n;
+			end;
+
+			-- The description block writes its own text, and gui.TextEditor has onChange and no
+			-- onUserChange (rrpgGUI.lua:667-675) - so the renderer's write comes back through
+			-- the same door the storyteller's typing does. This says which is which, exactly as
+			-- xpQuiet does for a batch of field writes (SPEC V107, V249d).
+			--
+			-- Raised and lowered around ONE write, with no return in between: a flag stuck true
+			-- would mute the storyteller's keyboard for the rest of the session (SPEC B39).
+			descQuiet = false;
 
 			-- Which traits hand out a free speciality, and at which rating (SPEC I14/V149).
 			-- DERIVED from the two tables that already name every attribute and every ability,
@@ -1886,6 +2088,20 @@
 						liveLevel(field, 1, 1, 0), ctx, field);
 				end;
 
+				-- The storyteller's own correction, LAST of all (SPEC I44, V246). It is a line
+				-- in the log and not a second number beside it: Spent stays the sum of what the
+				-- log shows (SPEC I11, V100), so the figure the storyteller typed and the lines
+				-- the player is reading cannot come apart.
+				--
+				-- It has no category in the price table and no slot index, which is exactly why
+				-- it closes the order instead of sorting into it. Level is the word and not a
+				-- rating: nothing was raised - the number was.
+				local manual = tonumber(sheet.xpManual) or 0;
+
+				if manual ~= 0 then
+					rows[#rows + 1] = { kind = "MANUAL", name = "MANUAL", level = "MANUAL", cost = manual };
+				end;
+
 				simTrait, simField, simValue = nil, nil, nil;
 
 				return rows;
@@ -1949,7 +2165,22 @@
 				local box   = xpFind(node, XP_BOXES, {});
 
 				if box.edtTotalXP       ~= nil then box.edtTotalXP.text       = tostring(total); end;
-				if box.edtSpentXP       ~= nil then box.edtSpentXP.text       = tostring(spent); end;
+
+				-- Spent is the one box whose lock moves (SPEC I44, V245). `== true` and not
+				-- truthiness: a sheet saved before this round answers nil and has to read as
+				-- LOCKED, the same fail-closed reading every other storyteller flag takes
+				-- (SPEC V80, V89, V175).
+				--
+				-- readOnly and opacity are written on the SAME line, like every other runtime
+				-- lock on this sheet (SPEC V112, V162): a box that looks free and refuses the
+				-- key is the lie those two exist to stop. 0.75 because an edit is TEXT
+				-- (SPEC V244).
+				if box.edtSpentXP ~= nil then
+					local stEdit = (sheet.stEditSpentXP == true);
+
+					box.edtSpentXP.text = tostring(spent);
+					box.edtSpentXP.readOnly = not stEdit; box.edtSpentXP.opacity = stEdit and 1 or 0.75;
+				end;
 				if box.edtCurrentXP     ~= nil then box.edtCurrentXP.text     = tostring(total - spent); end;
 				if box.edtCurrentXPMain ~= nil then box.edtCurrentXPMain.text = tostring(total - spent); end;
 			end;
@@ -2029,6 +2260,50 @@
 				end;
 			end;
 
+			-- The storyteller types SPENT, and what that writes is a LINE in the log (SPEC I44,
+			-- V246): `xpManual` carries the difference between the figure typed and what the log
+			-- already adds up to, so reading the box back gives exactly what was typed, and a
+			-- dot bought afterwards still moves it. An absolute override would have frozen the
+			-- number and let the log disagree with it in front of the player (SPEC V100).
+			--
+			-- It does not sit beside xpSetCurrent, where it belongs by subject: it calls
+			-- xpLedgerRefresh, and a body written above a `local function` compiles a GETGLOBAL
+			-- and calls nil (SPEC B51, V223).
+			function xpSetSpent(form, typed)
+				if sheet == nil then return; end;
+
+				local rows = xpLedgerRows();
+
+				-- No snapshot means no log, and a correction to a log that does not exist would
+				-- be a number nothing on the sheet could show. Refused out loud, in the sentence
+				-- the log itself uses for this state (SPEC V33, V129).
+				if rows == nil then
+					renderAllXPBoxes(form);
+					xpWarn("Initial character not saved yet");
+					return;
+				end;
+
+				local n = tonumber(typed) or 0;
+
+				-- SPEC V246d: refused, not clamped - the same call V131 makes for the balance.
+				-- Nothing is written, so the box comes straight back to what the log adds up to.
+				if n < 0 then
+					renderAllXPBoxes(form);
+					xpWarn("Experience cannot go below zero");
+					return;
+				end;
+
+				-- What the log says WITHOUT the correction, so the correction can be worked out
+				-- against it. Reading xpSum(rows) alone would fold the old adjustment into the
+				-- new one and the box would drift by its own value on every second edit.
+				local logged = xpSum(rows) - (tonumber(sheet.xpManual) or 0);
+
+				setField("xpManual", n - logged);
+
+				renderAllXPBoxes(form);
+				xpLedgerRefresh(form);
+			end;
+
 			-- The dot that fired, found by the field it is bound to. onChange hands over the
 			-- form, not the control (SPEC R39 - the event carries no arguments), and naming all
 			-- sixty-four dots in the XML would touch ten templates to answer a question nobody
@@ -2099,7 +2374,9 @@
 				local stamps = sheet.xpFree or "";
 				local slot   = nil;
 
-				for i = 1, SPECIALITY_ROWS, 1 do
+				-- The slot the gift takes is a PICKER row (SPEC V255d): a typed row is locked by nothing,
+				-- so a granted specialty written into one could be typed over and the stamp would stay.
+				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do
 					local v = sheet["speciality_" .. i];
 
 					if slot == nil and (v == nil or v == "") then slot = i; end;
@@ -2322,6 +2599,12 @@
 			local function pickRefusal(field, value, levels)
 				if field == nil or value == nil or value == "" then return nil; end;
 
+				-- A TYPED row answers to no table (SPEC I45, V248d): there is no list it came
+				-- from, so there is nothing to check it against and nothing to send back. Without
+				-- this the storyteller could not write a secondary path at all - a name no blood
+				-- sorcery claims is exactly what V182 refuses.
+				if isTypedRow(field) then return nil; end;
+
 				local isMain = string.match(field, "^mainPath_%d+$") ~= nil;
 
 				if isMain or string.match(field, "^secPath_%d+$") ~= nil then
@@ -2428,37 +2711,117 @@
 
 				xpFind(tabRootOf(from), names, found);
 
-				local open = (sheet.stEditClanDisc == true);
+				-- Open when the storyteller says so, and ALSO when the clan itself settles nothing:
+				-- six of the sixty entries carry a `choice` or an `open` instead of a settled trio,
+				-- and those slots have nobody to fill them but the table (SPEC I37, V236d). A clan
+				-- that DOES settle its trio is still fail-closed behind the flag (SPEC V175, V89).
+				local entry   = CLANS[sheet.clanFamily or ""];
+				local settled = entry ~= nil and entry.choice == nil and entry.open == nil;
+				local open    = (sheet.stEditClanDisc == true) or not settled;
 
 				for i = 1, CLAN_DISC_ROWS, 1 do
 					local c = found["cboclanDisc_" .. i];
 
 					if c ~= nil then
+						-- `enabled` and nothing else (SPEC I41, V241, user 2026-08-22). `opacity` lives on
+						-- gui.Control and dims the WHOLE control, the text with it, and a comboBox has no
+						-- text-only opacity to reach for - so a locked dropdown was unreadable, which is
+						-- the opposite of what a lock is for. What it looks like disabled is the HOST's
+						-- call now, and only the Firecast can answer that (SPEC R98).
 						c.enabled = open;
-						c.opacity = open and 1 or 0.40;
 					end;
 				end;
+			end;
+
+
+			-- The domitor's clan says which Disciplines are in-clan, and filling Clan/Family is what
+			-- says the domitor's clan (SPEC I37, user 2026-08-22). A ghoul learns what that clan
+			-- teaches, and learns it from ZERO - so this writes NAMES and never a dot.
+			--
+			-- It lives on the ROOT form for the reason B26 cost a round: the four slots are drawn in
+			-- WoD20.12, inside a MANAGED tab that a table with Show Ghoul off never opens, and a tab
+			-- that may not be there cannot be what keeps the sheet correct (SPEC V95).
+			--
+			-- `clan` - the dormant combo on the Main tab - is NOT written here and stays asleep
+			-- (SPEC V173). What plays the part of the clan today is `clanFamily` (SPEC B50): one
+			-- field, not two mirroring each other into disagreement.
+			function renderClanDisc(from)
+				if sheet == nil or from == nil then return; end;
+
+				-- CLANS (SPEC I17) was frozen from the books by T430 and sat dormant for fifty
+				-- rounds. The 82nd re-extracted the same sixty entries into a second table before
+				-- noticing (SPEC B55); this reads the one that was already here, and it carries the
+				-- better shape: `fixed` is what the clan settles, `choice` enumerates a third the
+				-- book leaves open, `open` counts slots that come from the sire and can be anything.
+				local entry = CLANS[sheet.clanFamily or ""];
+
+				if entry ~= nil then
+					local fixed = entry.fixed or {};
+
+					for i = 1, CLAN_DISC_ROWS, 1 do
+						local field = "clanDisc_" .. i;
+						local name  = fixed[i];
+
+						-- Past what the clan settles, who owns the slot depends on WHY it is open:
+						--   `open`   - anything is legal, so nothing here can tell a leftover from a
+						--              pick, and the slot is left exactly as the table left it;
+						--   `choice` - the legal values are enumerated, so a leftover from the clan
+						--              before IS recognisable and goes, while a legal pick stays;
+						--   neither  - the clan settles every slot, so the rest is emptied.
+						if name == nil then
+							if entry.open ~= nil then name = nil;
+							elseif entry.choice ~= nil then
+								name = "";
+
+								for c = 1, #entry.choice, 1 do
+									if sheet[field] == entry.choice[c] then name = nil; break; end;
+								end;
+							else name = ""; end;
+						end;
+
+						if name ~= nil then
+							-- Only a slot whose NAME changes is touched, which is what makes reopening a
+							-- sheet cost nothing: the dots of a slot that already reads Auspex are
+							-- somebody's purchase and they stay where they are (SPEC V237).
+							if sheet[field] ~= name then
+								setField(field, name);
+
+								-- The name and the dots go in the SAME pass (SPEC V237): a dot bought
+								-- under Auspex is not a dot of Celerity, and the ledger prices by the
+								-- name it finds (SPEC I9, I10b) - so leaving them would surface weeks
+								-- later as an experience total nobody can account for.
+								for d = 1, 5, 1 do setField(field .. "_" .. d, false); end;
+							end;
+						end;
+					end;
+				end;
+
+				renderClanDiscLock(from);
 			end;
 
 			function renderSpecialities(from)
 				if sheet == nil or from == nil then return; end;
 
+				-- Only the PICKER rows: the last three are typed and have no combo to find, let alone
+				-- to lock (SPEC I50, V255d).
 				local names = {};
 
-				for i = 1, SPECIALITY_ROWS, 1 do names["cboSpeciality" .. i] = true; end;
+				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do names["cboSpeciality" .. i] = true; end;
 
 				local found = {};
 
 				xpFind(tabRootOf(from), names, found);
 
-				for i = 1, SPECIALITY_ROWS, 1 do
+				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do
 					local c = found["cboSpeciality" .. i];
 
 					if c ~= nil then
 						local locked = isFreeRow("speciality_" .. i);
 
+						-- Same as the clan slots: the lock is `enabled`, and the text stays legible
+						-- (SPEC I41, V241). A free speciality is one the trait handed out, and reading
+						-- WHICH one is the whole point of showing the row.
 						c.enabled = not locked;
-						c.opacity = locked and 0.40 or 1;
 					end;
 				end;
 			end;
@@ -2516,7 +2879,7 @@
 
 					-- Written flat rather than nested under a purchase block: the balance branch
 					-- further down opens the same way, and two of them read as one.
-					if want and base ~= nil and specCost() == 0 then
+					if want and base ~= nil and specForbidden() then
 						xpWarn("Specialties cannot be bought");
 						return;
 					end;
@@ -2698,41 +3061,165 @@
 		one is the whole control and is written once, on load; those are individual <tab>s
 		and are written by applyTabVisibility every time the sheet is shown (SPEC V96).
 	-->
-	<tabControl name="tabsHH" align="client" visible="false">
-		<tab name="tabMain" title="Main">
+	<!--
+		The tab strip is OURS since the 78th round (SPEC I32). It is not a preference: the
+		native strip has no look to change - gui.TabItem exposes text/title/activate and what
+		it inherits from Control, gui.TabControl adds tabIndex, and putting color= on a <tab>
+		makes rdk exit 1 with no message and delete the .rpk (SPEC B19, B49). A rectangle and
+		a label are the one pair applyTheme reaches on both ends - THEME_SHAPES is rectangle
+		only, and <button> is in THEME_TEXTS for its fontColor alone, so its face would stay
+		host-drawn and the tabs would go on clashing (SPEC V226).
+	
+		The panes are N align="client" siblings with exactly one visible - PROVED in Firecast
+		before a line of this was written (SPEC T521, R95). B41 does not forbid it: there the
+		two siblings were both VISIBLE (the theme paper lit OVER the tabControl), so it was
+		overlap, never sizing.
+	
+		Active is a rectangle that is SHOWN, never a colour written from Lua: applyTheme
+		repaints a shape from the colour the XML authored (SPEC V57), so a Lua write here
+		would be overwritten on the next repaint, or would have to join the ledger. Toggling
+		`visible` contends with nothing and keeps the palette in charge of the palette.
+	
+		Authored hidden, like the tabControl it replaces: the host paints before any hook of
+		ours runs (SPEC R47) and sheetReveal is still the one thing that lights it (V166).
+	-->
+	<layout name="sheetBody" align="client" visible="false">
+		<layout name="tabStrip" align="top" height="46">
+			<rectangle align="client" color="black"/>
+
+			<rectangle name="tabOnMain" left="16" top="8" width="99" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabMain" left="16" top="8" width="99" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabMain', self);">
+				<label left="0" top="0" width="99" height="30" text="Main" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnTraits" left="119" top="8" width="79" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabTraits" left="119" top="8" width="79" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabTraits', self);">
+				<label left="0" top="0" width="79" height="30" text="Traits" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnNumina" left="202" top="8" width="79" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabNumina" left="202" top="8" width="79" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabNumina', self);">
+				<label left="0" top="0" width="79" height="30" text="Numina" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnDisciplines" left="285" top="8" width="92" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabDisciplines" left="285" top="8" width="92" height="30" color="#00000000" visible="false"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabDisciplines', self);">
+				<label left="0" top="0" width="92" height="30" text="Ghoul" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnCombat" left="381" top="8" width="86" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabCombat" left="381" top="8" width="86" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabCombat', self);">
+				<label left="0" top="0" width="86" height="30" text="Combat" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnInventory" left="471" top="8" width="105" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabInventory" left="471" top="8" width="105" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabInventory', self);">
+				<label left="0" top="0" width="105" height="30" text="Inventory" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnBackground" left="580" top="8" width="105" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabBackground" left="580" top="8" width="105" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabBackground', self);">
+				<label left="0" top="0" width="105" height="30" text="Background" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnProgress" left="689" top="8" width="112" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabProgress" left="689" top="8" width="112" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabProgress', self);">
+				<label left="0" top="0" width="112" height="30" text="Experience" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnNotes" left="805" top="8" width="99" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabNotes" left="805" top="8" width="99" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabNotes', self);">
+				<label left="0" top="0" width="99" height="30" text="Notes" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnSettings" left="908" top="8" width="125" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabSettings" left="908" top="8" width="125" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabSettings', self);">
+				<label left="0" top="0" width="125" height="30" text="Settings" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnStoryteller" left="1037" top="8" width="112" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabStoryteller" left="1037" top="8" width="112" height="30" color="#00000000" visible="false"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabStoryteller', self);">
+				<label left="0" top="0" width="112" height="30" text="Storyteller" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+		</layout>
+
+		<layout name="tabMain" align="client" visible="false">
 			<import file="WoD20.1.lfm"/>
-		</tab>
-		<tab name="tabTraits" title="Traits">
+		</layout>
+
+		<layout name="tabTraits" align="client" visible="false">
 			<import file="WoD20.2.lfm"/>
-		</tab>
-		<tab name="tabNumina" title="Numina">
+		</layout>
+
+		<layout name="tabNumina" align="client" visible="false">
 			<import file="WoD20.7.lfm"/>
-		</tab>
-		<tab name="tabDisciplines" title="Vampire" visible="false">
+		</layout>
+
+		<layout name="tabDisciplines" align="client" visible="false">
 			<import file="WoD20.11.lfm"/>
-		</tab>
-		<tab name="tabCombat" title="Combat">
+		</layout>
+
+		<layout name="tabCombat" align="client" visible="false">
 			<import file="WoD20.3.lfm"/>
-		</tab>
-		<tab name="tabInventory" title="Inventory">
+		</layout>
+
+		<layout name="tabInventory" align="client" visible="false">
 			<import file="WoD20.8.lfm"/>
-		</tab>
-		<tab name="tabBackground" title="Background">
+		</layout>
+
+		<layout name="tabBackground" align="client" visible="false">
 			<import file="WoD20.4.lfm"/>
-		</tab>
-		<tab name="tabProgress" title="Progress">
+		</layout>
+
+		<layout name="tabProgress" align="client" visible="false">
 			<import file="WoD20.9.lfm"/>
-		</tab>
-		<tab name="tabNotes" title="Notes">
+		</layout>
+
+		<layout name="tabNotes" align="client" visible="false">
 			<import file="WoD20.5.lfm"/>
-		</tab>
-		<tab name="tabSettings" title="Settings">
+		</layout>
+
+		<layout name="tabSettings" align="client" visible="false">
 			<import file="WoD20.6.lfm"/>
-		</tab>
-		<tab name="tabStoryteller" title="Storyteller" visible="false">
+		</layout>
+
+		<layout name="tabStoryteller" align="client" visible="false">
 			<import file="WoD20.10.lfm"/>
-		</tab>
-	</tabControl>
+		</layout>
+	</layout>
 
 	<!--
 		The tab switch is driven from HERE, though the checkboxes that feed it live on the
@@ -2740,6 +3227,18 @@
 		hidden tab cannot be trusted to run the code that hides its neighbours - that is how a
 		fresh sheet came up with all three power tabs on show (SPEC B26).
 	-->
+	<!--
+		Filling Clan/Family fills the four clan Discipline slots (SPEC I37). Watched from HERE
+		and not from WoD20.12, where the slots are drawn: that file is inside a managed tab,
+		and a sheet whose table never turned Show Ghoul on would keep whatever the last clan
+		left behind (SPEC V95, B26).
+	-->
+	<dataLink field="clanFamily">
+		<event name="onChange">
+			renderClanDisc(self);
+		</event>
+	</dataLink>
+
 	<dataLink fields="{'stShowNumina', 'stShowDisciplines'}">
 		<event name="onChange">
 			applyTabVisibility(self);
@@ -2792,10 +3291,15 @@
 		if sheet ~= nil then
 			local g = sheet.game;
 
-			if g ~= "Vampire" and g ~= "Hunters Hunted" and g ~= "Mage" then
-				setField("game", "Hunters Hunted");
+			if g ~= "Vampire" and g ~= "Mortal" and g ~= "Mage" then
+				setField("game", "Mortal");
 			end;
 		end;
+
+		-- Before xpQuiet drops: this can write four names and up to twenty dots on a sheet
+		-- that was saved under a clan whose trio has since changed, and every one of those
+		-- writes would otherwise walk the ledger on the way in (SPEC B30, B34).
+		renderClanDisc(self);
 
 		xpQuiet = false;
 

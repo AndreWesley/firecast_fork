@@ -15,13 +15,11 @@
 			local XP_LOG_MIN_H = 470;
 			local XP_LOG_PAD  = 65;
 
-			-- The Type column is cut to the widest kind name in either language - "FORÇA DE
-			-- VONTADE" - so the two state texts below it are sentences that no longer fit in it.
-			-- While one of them is showing the other three columns are empty, so the sentence
-			-- borrows the whole row. That is why dynXpType is declared LAST in the XML: the
-			-- empty columns beside it are painted after their siblings and would cover it.
-			local XP_COL_TYPE_W = 133;
-			local XP_MSG_W      = 442;
+			-- The two state sentences used to live IN the Type column, which was widened to 442 so
+			-- it would cover its three empty neighbours. That is what made an empty log read as
+			-- something broken instead of as an empty log (SPEC I39, V235, user 2026-08-22): the
+			-- columns moved when there was nothing in them. The sentence has a label of its own
+			-- now (dynXpEmpty) and no column ever changes width.
 
 			-- ---- Experience log (SPEC I10, 27th round) ---------------------------------
 			--
@@ -42,7 +40,35 @@
 			-- handed (SPEC V143), so the same call works from this tab's own events and from
 			-- the root, which is how a purchase made on ANY tab reaches the log without the
 			-- tab having registered itself first (SPEC V133, B39).
-			local XP_LOG = { dynXpType = true, dynXpTrait = true, dynXpLevel = true, dynXpCost = true, xpLogBox = true };
+			local XP_LOG = { dynXpType = true, dynXpTrait = true, dynXpLevel = true, dynXpCost = true, dynXpEmpty = true, xpLogBox = true };
+
+			-- The four columns and the box they sit in grow together or not at all. Declared local
+			-- and ABOVE their caller, which is not a matter of reading order: Lua resolves a
+			-- non-local name at COMPILE time, so a body written above the declaration compiles a
+			-- GETGLOBAL and calls nil (SPEC B51, V223).
+			local function xpLogHeight(form, h)
+				form.dynXpType.height  = h;
+				form.dynXpTrait.height = h;
+				form.dynXpLevel.height = h;
+				form.dynXpCost.height  = h;
+				form.xpLogBox.height   = h + XP_LOG_PAD;
+			end;
+
+			-- The two empty states differ by their sentence and by NOTHING else, so they are
+			-- written once. Two copies is how one of them keeps a stale height, and that is not
+			-- hypothetical: the no-baseline path wrote no height at all, so a box that had grown
+			-- to forty rows stayed that tall and empty the moment the baseline came off.
+			local function xpEmptyLog(form, why)
+				form.dynXpType.text  = "";
+				form.dynXpTrait.text = "";
+				form.dynXpLevel.text = "";
+				form.dynXpCost.text  = "";
+
+				form.dynXpEmpty.text    = why;
+				form.dynXpEmpty.visible = true;
+
+				xpLogHeight(form, XP_LOG_MIN_H);
+			end;
 
 			function renderXPLedger(node, rows)
 				if sheet == nil then return; end;
@@ -57,13 +83,15 @@
 
 				if rows == nil then rows = xpLedgerRows(); end;
 
-				if rows == nil then
-					-- SPEC V33: say WHY it is empty rather than show four blank columns.
-					form.dynXpType.width = XP_MSG_W;
-					form.dynXpType.text  = translateSheetText("Initial character not saved yet", lang);
-					form.dynXpTrait.text = "";
-					form.dynXpLevel.text = "";
-					form.dynXpCost.text  = "";
+				-- SPEC V33 and V98: say WHY it is empty rather than show four blank columns. The two
+				-- states differ in the sentence and in nothing else, and neither of them moves a
+				-- column: an empty log has the shape of a full one (SPEC V235).
+				if rows == nil or #rows == 0 then
+					local why = "Nothing bought yet";
+
+					if rows == nil then why = "Initial character not saved yet"; end;
+
+					xpEmptyLog(form, translateSheetText(why, lang));
 					return;
 				end;
 
@@ -84,16 +112,9 @@
 					costs[i] = tostring(r.cost);
 				end;
 
-				-- A saved character nobody has spent on yet. Four blank columns read as a broken
-				-- tab, so the first one says why it is empty - the same call V33 makes for the
-				-- no-baseline case above (SPEC V98).
-				if #rows == 0 then kinds[1] = translateSheetText("Nothing bought yet", lang); end;
-
-				-- Back to a column when there are rows to read, wide when what it holds is that
-				-- sentence instead.
-				form.dynXpType.width = XP_COL_TYPE_W;
-
-				if #rows == 0 then form.dynXpType.width = XP_MSG_W; end;
+				-- Rows to read: the sentence steps aside and the columns stay exactly where they
+				-- are. Nothing here writes a width (SPEC V235a).
+				form.dynXpEmpty.visible = false;
 
 				form.dynXpType.text  = table.concat(kinds, "\n");
 				form.dynXpTrait.text = table.concat(traits, "\n");
@@ -104,11 +125,7 @@
 
 				if #rows * XP_ROW_H + 12 > h then h = #rows * XP_ROW_H + 12; end;
 
-				form.dynXpType.height  = h;
-				form.dynXpTrait.height = h;
-				form.dynXpLevel.height = h;
-				form.dynXpCost.height  = h;
-				form.xpLogBox.height   = h + XP_LOG_PAD;
+				xpLogHeight(form, h);
 			end;
 		]]>
 	</script>
@@ -134,18 +151,34 @@
 			Stacking costs height - the box went 75 -> 95 - which is why the log below starts at 105
 			and still closes the tab on 640.
 		-->
-		<layout left="0" top="0" width="475" height="95">
+		<layout left="0" top="12" width="501" height="95">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="475" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+			<label left="0" top="10" width="501" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<label left="15" top="38" width="141" height="20" text="Total Experience" horzTextAlign="center"/>
-			<edit name="edtTotalXP" left="40" top="60" width="90" height="25" readOnly="true" opacity="0.40" horzTextAlign="center" fontSize="14"/>
+			<label left="16" top="38" width="141" height="20" text="Total Experience" horzTextAlign="center"/>
+			<!-- The two locked numbers stand on a darker ground than the box (SPEC V256, user
+			     2026-08-22). It takes THREE things and any one of them alone does nothing: the
+			     rectangle declared BEFORE the edit so it paints behind it, transparent="true" on the
+			     edit so its own ground stops covering it, and a colour with a key in all four palettes
+			     so the theme owns the shade (SPEC V53). gui.Edit has no background colour of its own -
+			     MEASURED in the SDK, its props are textPrompt/transparent/field/frameRegion/type/min/
+			     max/decimalPlaces/asNumber - so the rectangle is the only way to say this.
 
-			<label left="166" top="38" width="141" height="20" text="Spent Experience" horzTextAlign="center"/>
-			<edit name="edtSpentXP" left="191" top="60" width="90" height="25" readOnly="true" opacity="0.40" horzTextAlign="center" fontSize="14"/>
+			     Current is NOT given one: it is the box the player types in, and a lock cue on an
+			     unlocked field is decoration (SPEC V256 scope, V241). -->
+			<rectangle name="bgTotalXP" left="41" top="60" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtTotalXP" left="41" top="60" width="90" height="25" readOnly="true" opacity="0.75" horzTextAlign="center" fontSize="14" transparent="true"/>
 
-			<label left="317" top="38" width="141" height="20" text="Current Experience" horzTextAlign="center"/>
-			<edit name="edtCurrentXP" left="342" top="60" width="90" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);"/>
+			<label left="180" top="38" width="141" height="20" text="Spent Experience" horzTextAlign="center"/>
+			<!-- Authored LOCKED, and the lock moves at runtime with the storyteller's flag
+			     (SPEC I44, V245): the sheet has to read right before any Lua runs, and OFF is
+			     what the flag defaults to. Typing here writes a MANUAL line into the log, never
+			     a second number beside it (SPEC V246). -->
+			<rectangle name="bgSpentXP" left="205" top="60" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtSpentXP" left="205" top="60" width="90" height="25" readOnly="true" opacity="0.75" horzTextAlign="center" fontSize="14" transparent="true" onUserChange="xpSetSpent(self, self.edtSpentXP.text);"/>
+
+			<label left="344" top="38" width="141" height="20" text="Current Experience" horzTextAlign="center"/>
+			<edit name="edtCurrentXP" left="369" top="60" width="90" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);"/>
 		</layout>
 
 		<!--
@@ -158,9 +191,9 @@
 			The four editors are read-only and carry no `field`: the rows are derived on every
 			render (SPEC V83/V84).
 		-->
-		<layout name="xpLogBox" left="0" top="105" width="475" height="535">
+		<layout name="xpLogBox" left="0" top="117" width="501" height="540">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="0" width="475" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
+			<label left="0" top="10" width="501" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
 
 			<!--
 				Widths asked for by the user on top of the measured ones (33rd round): Type -30%,
@@ -174,18 +207,29 @@
 				Type and Cost are now UNDER their 14px figure - the trim was asked for with the
 				sheet on screen, so what renders is the judge; if a kind name or the word Grátis
 				comes up cut in the Dark Ages or Classical paper, these two are what to widen.
-			-->
-			<label left="15" top="25" width="133" height="20" text="Type" horzTextAlign="center"/>
-			<label left="158" top="25" width="180" height="20" text="Trait" horzTextAlign="center"/>
-			<label left="348" top="25" width="54" height="20" text="Level" horzTextAlign="center"/>
-			<label left="412" top="25" width="45" height="20" text="Cost" horzTextAlign="center"/>
 
-			<textEditor name="dynXpTrait" left="158" top="50" width="180" height="470" readOnly="true" opacity="0.40"/>
-			<textEditor name="dynXpLevel" left="348" top="50" width="54" height="470" readOnly="true" opacity="0.40" horzTextAlign="center"/>
-			<textEditor name="dynXpCost" left="412" top="50" width="45" height="470" readOnly="true" opacity="0.40" horzTextAlign="center"/>
-			<!-- Type comes LAST so the state sentence it widens to shows OVER the three empty
-			     columns beside it, not under them (see XP_MSG_W above). -->
-			<textEditor name="dynXpType" left="15" top="50" width="133" height="470" readOnly="true" opacity="0.40"/>
+				85th round: Level went 54 -> 82 to hold the word MANUAL, the one row whose Level
+				is a word and not a rating (SPEC I44, V246). Cost moved with it and both boxes
+				grew by the same 26, so the four columns keep their gaps and the two boxes still
+				close on the same x (SPEC V247) - a column that grows while its box stands still
+				is how the log would have started poking out of its own frame.
+			-->
+			<label left="15" top="35" width="133" height="20" text="Type" horzTextAlign="center"/>
+			<label left="158" top="35" width="180" height="20" text="Trait" horzTextAlign="center"/>
+			<label left="348" top="35" width="82" height="20" text="Level" horzTextAlign="center"/>
+			<label left="440" top="35" width="45" height="20" text="Cost" horzTextAlign="center"/>
+
+			<textEditor name="dynXpType" left="15" top="60" width="133" height="470" readOnly="true" opacity="0.75"/>
+			<textEditor name="dynXpTrait" left="158" top="60" width="180" height="470" readOnly="true" opacity="0.75"/>
+			<textEditor name="dynXpLevel" left="348" top="60" width="82" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<textEditor name="dynXpCost" left="440" top="60" width="45" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+
+			<!-- Why the log is empty, on a line of its own (SPEC I39, V235). Declared LAST because
+			     it sits over the four columns and the host paints in document order - the same
+			     reason the Type column used to be last, now carried by the control that actually
+			     needs it. Authored hidden: a log with rows never shows it, and the dyn* prefix
+			     keeps the language traversal off it (SPEC V31). -->
+			<label name="dynXpEmpty" left="0" top="60" width="501" height="20" text="" horzTextAlign="center" opacity="0.75" visible="false"/>
 
 		</layout>
 	</scrollBox>
@@ -205,6 +249,16 @@
 	     redraws the log when one of them is clicked is the click itself: xpClick already runs
 	     on every dot that costs experience and already holds the rows (SPEC V121/V125). -->
 	<dataLink fields="{'baseline', 'stBackgroundsXP', 'language'}" onChange="renderXPLedger(self); renderXPBoxes(self);"/>
+
+	<!-- The storyteller's correction and the flag that allows it (SPEC I44, V245/V246). Both
+	     are owned on WoD20.10 and watched from here, so a tick or a figure entered by ANOTHER
+	     client at the table reaches this tab too - the same reason the clan lock hangs off a
+	     dataLink rather than off the checkbox that writes it (SPEC V175, V95).
+
+	     `xpManual` moves a LINE of the log and the Spent box with it; `stEditSpentXP` moves
+	     only the lock, but it is painted by the same routine that writes the number, so the
+	     two cannot come apart (SPEC V112). -->
+	<dataLink fields="{'xpManual', 'stEditSpentXP'}" onChange="renderXPLedger(self); renderXPBoxes(self);"/>
 
 	<!-- The tab is a REPORT, so it is rebuilt every time it comes up (SPEC V97). -->
 	<event name="onShow">

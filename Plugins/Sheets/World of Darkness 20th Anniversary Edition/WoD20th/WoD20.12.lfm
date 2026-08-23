@@ -27,6 +27,15 @@
 				pt = "Sem descrição registrada para: ",
 			};
 
+			-- A typed row whose text the storyteller has not written yet, read by anyone else
+			-- (SPEC I45, V250). The storyteller sees the empty box instead: for him it is an
+			-- input he is about to fill, and a sentence sitting in it would have to be deleted
+			-- before he could type.
+			local NO_TEXT_YET = {
+				en = "The storyteller has not written a description for this one yet.",
+				pt = "O narrador ainda não escreveu uma descrição para esta.",
+			};
+
 			local function pick(tbl, lang)
 				return tbl[lang] or tbl.en;
 			end;
@@ -52,6 +61,20 @@
 
 				if selected == nil or selected == "" then
 					return pick(NO_SELECTION, lang);
+				end;
+
+				-- A TYPED row never reaches the book (SPEC I45, V250): it carries the
+				-- storyteller's own text, one text for both languages and all four eras - it is
+				-- his, not the book's, so it passes through no translation and has no medieval
+				-- body to fall back to. This return also keeps the require below out of reach
+				-- for these rows (SPEC V206).
+				if isTypedRow(selected) then
+					local own = sheet[descFieldOf(selected)];
+
+					if own ~= nil and own ~= "" then return own; end;
+					if isStoryteller() then return ""; end;
+
+					return pick(NO_TEXT_YET, lang);
 				end;
 
 				-- `selected` is the FIELD NAME of the chosen row (SPEC V176), so the picked
@@ -97,7 +120,36 @@
 			function renderDiscDesc(form)
 				if sheet == nil then return; end;
 				if form.isShowing == false then return; end;
+
+				-- The lock is written in the SAME step as the text (SPEC V249c). A block showing
+				-- one row's text with another row's lock is the same lie V112 refuses of every
+				-- other control that locks at runtime - and here it would let a player type over
+				-- a description, or leave the storyteller staring at a box that will not take a
+				-- key.
+				local sel   = sheet.discSel;
+				local write = isTypedRow(sel) and isStoryteller();
+
+				descQuiet = true;
 				form.edtDiscDesc.text = discText(sheet.language or "en");
+				form.edtDiscDesc.readOnly = not write;
+				descQuiet = false;
+			end;
+
+			-- What the storyteller types lands in the field of the row that is MARKED, read at
+			-- the moment of the write (SPEC V249c): the selection decides where the text goes,
+			-- so leaving one typed row for another cannot spill into the one just left.
+			--
+			-- It asks BOTH questions again rather than trusting the readOnly it just wrote: the
+			-- flag on the control is a look, and the rule is a rule (SPEC V249a, fail-closed on
+			-- a sheet with no table, SPEC V80).
+			function saveDiscDesc(form)
+				if descQuiet or sheet == nil then return; end;
+
+				local sel = sheet.discSel;
+
+				if not isTypedRow(sel) or not isStoryteller() then return; end;
+
+				setField(descFieldOf(sel), form.edtDiscDesc.text);
 			end;
 		]]>
 	</script>
@@ -130,82 +182,105 @@
 			<imageCheckBox left="300" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
+		<!--
+			The last three rows are TYPED, not picked (SPEC I45, V248, user 2026-08-22). Same
+			radio, same dot column, same x for the entry as the picker row above it, so the two
+			templates read as one box (SPEC V26) - only the widget in the middle changes.
+
+			It is `edt` and not `cbo` on purpose: pickerItems only ever touches controls named
+			cbo*, so a typed row is out of the filter and out of PICKER_LIST without an
+			exception written anywhere (SPEC V211a). The guard skips it too - what the
+			storyteller types has no table to be judged against (SPEC V248d).
+
+			The dots are the picker row's dots, unchanged: a discipline the storyteller wrote is
+			still a discipline, and it is bought at the same price (SPEC I9).
+		-->
+		<template name="DiscFreeRow">
+			<radioButton left="0" top="2" width="20" height="21" field="discSel" fieldValue="$(field)" groupName="discSel"/>
+			<edit left="25" top="0" width="170" height="25" fontSize="12" name="edt$(field)" field="$(field)"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="250" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="275" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="300" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+		</template>
+
 		<!-- 4 slots, editable only while the storyteller ticks Edit Clan Disciplines (SPEC I8g,
 		     V175). Height = 25 title + 4 rows of 25 + 25 foot, the arithmetic WoD20.7 uses. -->
-		<layout left="0" top="0" width="350" height="150">
+		<layout left="0" top="12" width="350" height="141">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="350" height="20" text="CLAN DISCIPLINES" horzTextAlign="center"/>
-			<layout left="12" top="25" width="325" height="25">
+			<label left="0" top="10" width="350" height="20" text="CLAN DISCIPLINES" horzTextAlign="center"/>
+			<layout left="12" top="31" width="326" height="25">
 				<DiscRow field="clanDisc_1"/>
 			</layout>
-			<layout left="12" top="50" width="325" height="25">
+			<layout left="12" top="56" width="326" height="25">
 				<DiscRow field="clanDisc_2"/>
 			</layout>
-			<layout left="12" top="75" width="325" height="25">
+			<layout left="12" top="81" width="326" height="25">
 				<DiscRow field="clanDisc_3"/>
 			</layout>
-			<layout left="12" top="100" width="325" height="25">
+			<layout left="12" top="106" width="326" height="25">
 				<DiscRow field="clanDisc_4"/>
 			</layout>
 		</layout>
 
 		<!-- 15 open slots. 25 + 15*25 + 25 = 425. -->
-		<layout left="0" top="160" width="350" height="425">
+		<layout left="0" top="163" width="350" height="416">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="350" height="20" text="DISCIPLINES" horzTextAlign="center"/>
-			<layout left="12" top="25" width="325" height="25">
+			<label left="0" top="10" width="350" height="20" text="DISCIPLINES" horzTextAlign="center"/>
+			<layout left="12" top="31" width="326" height="25">
 				<DiscRow field="disc_1"/>
 			</layout>
-			<layout left="12" top="50" width="325" height="25">
+			<layout left="12" top="56" width="326" height="25">
 				<DiscRow field="disc_2"/>
 			</layout>
-			<layout left="12" top="75" width="325" height="25">
+			<layout left="12" top="81" width="326" height="25">
 				<DiscRow field="disc_3"/>
 			</layout>
-			<layout left="12" top="100" width="325" height="25">
+			<layout left="12" top="106" width="326" height="25">
 				<DiscRow field="disc_4"/>
 			</layout>
-			<layout left="12" top="125" width="325" height="25">
+			<layout left="12" top="131" width="326" height="25">
 				<DiscRow field="disc_5"/>
 			</layout>
-			<layout left="12" top="150" width="325" height="25">
+			<layout left="12" top="156" width="326" height="25">
 				<DiscRow field="disc_6"/>
 			</layout>
-			<layout left="12" top="175" width="325" height="25">
+			<layout left="12" top="181" width="326" height="25">
 				<DiscRow field="disc_7"/>
 			</layout>
-			<layout left="12" top="200" width="325" height="25">
+			<layout left="12" top="206" width="326" height="25">
 				<DiscRow field="disc_8"/>
 			</layout>
-			<layout left="12" top="225" width="325" height="25">
+			<layout left="12" top="231" width="326" height="25">
 				<DiscRow field="disc_9"/>
 			</layout>
-			<layout left="12" top="250" width="325" height="25">
+			<layout left="12" top="256" width="326" height="25">
 				<DiscRow field="disc_10"/>
 			</layout>
-			<layout left="12" top="275" width="325" height="25">
+			<layout left="12" top="281" width="326" height="25">
 				<DiscRow field="disc_11"/>
 			</layout>
-			<layout left="12" top="300" width="325" height="25">
+			<layout left="12" top="306" width="326" height="25">
 				<DiscRow field="disc_12"/>
 			</layout>
-			<layout left="12" top="325" width="325" height="25">
-				<DiscRow field="disc_13"/>
+			<layout left="12" top="331" width="326" height="25">
+				<DiscFreeRow field="disc_13"/>
 			</layout>
-			<layout left="12" top="350" width="325" height="25">
-				<DiscRow field="disc_14"/>
+			<layout left="12" top="356" width="326" height="25">
+				<DiscFreeRow field="disc_14"/>
 			</layout>
-			<layout left="12" top="375" width="325" height="25">
-				<DiscRow field="disc_15"/>
+			<layout left="12" top="381" width="326" height="25">
+				<DiscFreeRow field="disc_15"/>
 			</layout>
 		</layout>
 
 		<!-- Read-only and field-less: book text must never be typed over, and never saved onto
 		     the character (SPEC V29, R12). Closes level with the left column at y=585. -->
-		<layout left="360" top="0" width="1025" height="585">
+		<layout left="360" top="12" width="875" height="567">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="1025" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtDiscDesc" left="10" top="25" width="1005" height="550" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+			<label left="0" top="10" width="875" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtDiscDesc" left="10" top="31" width="855" height="526" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveDiscDesc(self);"/>
 		</layout>
 	</scrollBox>
 

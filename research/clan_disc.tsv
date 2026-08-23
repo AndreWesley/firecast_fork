@@ -1,0 +1,65 @@
+# clan -> in-clan Disciplines (SPEC R97, T546). Columns: entry, disc1..disc4, source.
+# An entry with NO discipline is RELEASED, not missing: the book leaves the trio open
+# (a choice, or the sire's clan), and the four slots unlock for the table to fill in
+# (SPEC V236d). Names are spelled as PICKER_LIST["disc"] spells them, which is not
+# always how the book does - see Baali.
+Assamite	Celerity	Obfuscate	Quietus		core
+Brujah	Celerity	Potence	Presence		core
+Followers of Set	Obfuscate	Presence	Serpentis		core
+Gangrel	Animalism	Fortitude	Protean		core
+Giovanni	Dominate	Necromancy	Potence		core
+Lasombra	Dominate	Obtenebration	Potence		core
+Malkavian	Auspex	Dementation	Obfuscate		core
+Nosferatu	Animalism	Obfuscate	Potence		core
+Ravnos	Animalism	Chimerstry	Fortitude		core
+Toreador	Auspex	Celerity	Presence		core
+Tremere	Auspex	Dominate	Thaumaturgy		core
+Tzimisce	Animalism	Auspex	Vicissitude		core
+Ventrue	Dominate	Fortitude	Presence		core
+Baali	Daimonion	Obfuscate	Presence		core (book spells it Daimoinon; the picker spells it Daimonion)
+Blood Brothers	Fortitude	Potence	Sanguinus		core
+Daughters of Cacophony	Fortitude	Melpominee	Presence		core
+Harbingers of Skulls	Auspex	Fortitude	Necromancy		core
+Kiasyd	Dominate	Mytherceria	Obtenebration		core
+Nagaraja	Auspex	Dominate	Necromancy		core
+Salubri	Auspex	Fortitude	Obeah		core
+Samedi	Fortitude	Obfuscate	Thanatosis		core
+True Brujah	Potence	Presence	Temporis		core
+Ahrimanes	Animalism	Presence	Spiritus		core
+Anda	Animalism	Fortitude	Protean		core
+Cappadocians	Auspex	Fortitude	Necromancy		core
+Lamia	Fortitude	Necromancy	Potence		core
+Lhiannan	Animalism	Ogham	Presence		core
+Noiad	Animalism	Auspex	Protean		core
+Assamite Antitribu	Celerity	Obfuscate	Quietus		core
+Brujah Antitribu	Celerity	Potence	Presence		core
+City Gangrel	Celerity	Obfuscate	Protean		core
+Country Gangrel	Animalism	Fortitude	Protean		core
+Malkavian Antitribu	Auspex	Dementation	Obfuscate		core
+Nosferatu Antitribu	Animalism	Obfuscate	Potence		core
+Ravnos Antitribu	Animalism	Chimerstry	Fortitude		core
+Salubri Antitribu	Auspex	Fortitude	Valeren		core
+Serpents of the Light	Presence	Obfuscate	Serpentis		core
+Toreador Antitribu	Auspex	Celerity	Presence		core
+Tremere Antitribu	Auspex	Dominate	Thaumaturgy		core
+Assamite Sorcerers	Assamite Sorcery	Obfuscate	Quietus		core
+Assamite Viziers	Auspex	Celerity	Quietus		core
+Daitya	Presence	Obfuscate	Serpentis		core
+Tlacique	Obfuscate	Presence	Protean		core
+Warrior Setites	Potence	Presence	Serpentis		core
+Mariners	Animalism	Fortitude	Protean		core
+Lasombra Antitribu	Dominate	Obtenebration	Potence		core
+Dominate Malkavians	Auspex	Dominate	Obfuscate		core
+Brahman	Animalism	Auspex	Chimerstry		core
+Telyavelic Tremere	Auspex	Presence	Thaumaturgy		core
+Old Clan Tzimisce	Animalism	Auspex	Dominate		core
+Gargoyles (Modern)	Flight	Fortitude	Potence	Visceratika	core (four, not three)
+Gargoyles (Scout)	Auspex	Obfuscate	Flight		lob
+Gargoyles (Sentinel)	Flight	Potence	Fortitude		lob
+Gargoyles (Warrior)	Flight	Fortitude	Protean		lob
+Ventrue Antitribu					core: "Dominate, Fortitude, Auspex OR Presence" - the third is a choice
+Wu Zao					core: "Auspex, Fortitude, Obeah OR Valeren (choice at creation)"
+Angellis Ater					core: "Daimoinon, Dominate, and one of Potence, Presence or Obfuscate"
+Maeghar					bh: "Mytherceria or Necromancy (choice), plus two from the sire's Clan"
+Panders					core: "Panders do not have Clan Disciplines" - pick any at creation
+Children of Osiris					core: "as appropriate for the original Clan", plus Bardo in-clan

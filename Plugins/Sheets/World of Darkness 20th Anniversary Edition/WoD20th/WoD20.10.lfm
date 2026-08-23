@@ -36,25 +36,20 @@
 					end);
 			end;
 
-			-- SPEC V82: once saved, the button goes dead and says so. A button that still looks
-			-- live but does nothing is the failure V33 exists to stop.
+			-- SPEC V82: once saved, the button goes dead. The dead button IS the message now
+			-- (SPEC I42, V243, user 2026-08-22): the sentence that used to sit under it said
+			-- what the Experience tab already says in the log it belongs to (SPEC I10, V33),
+			-- and two places saying one thing is one place too many.
 			function renderBaselineState(form)
 				if sheet == nil then return; end;
 
 				local saved = sheet.baseline ~= nil and sheet.baseline ~= "";
-				local lang  = sheet.language or "en";
 
 				-- Dead controls read dead, exactly like the read-only fields the XML dims
 				-- (SPEC V111/V112). Written in the same breath as `enabled`, so the look and
 				-- the state cannot come apart.
 				form.btnSaveBaseline.enabled = not saved;
-				form.btnSaveBaseline.opacity = saved and 0.40 or 1;
-
-				if saved then
-					form.dynBaselineState.text = translateSheetText("Initial character saved", lang);
-				else
-					form.dynBaselineState.text = translateSheetText("Not saved yet", lang);
-				end;
+				form.btnSaveBaseline.opacity = saved and 0.75 or 1;
 			end;
 		]]>
 	</script>
@@ -69,36 +64,42 @@
 
 		     The tab is hidden by ROLE (SPEC V79), and this text lives in the sheet's NDB like
 		     `baseline` does. That is visibility, not secrecy. -->
-		<layout left="0" top="0" width="400" height="580">
-			<rectangle left="0" top="0" width="400" height="580" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="400" height="20" text="Notes" horzTextAlign="center"/>
-			<textEditor left="10" top="25" width="380" height="540" field="stNotes1"/>
+		<layout left="0" top="12" width="400" height="581">
+			<rectangle left="0" top="0" width="400" height="581" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="10" width="400" height="20" text="Notes" horzTextAlign="center"/>
+			<textEditor left="10" top="31" width="380" height="540" field="stNotes1"/>
 		</layout>
 
-		<layout left="410" top="0" width="400" height="580">
-			<rectangle left="0" top="0" width="400" height="580" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="400" height="20" text="Notes" horzTextAlign="center"/>
-			<textEditor left="10" top="25" width="380" height="540" field="stNotes2"/>
+		<layout left="410" top="12" width="400" height="581">
+			<rectangle left="0" top="0" width="400" height="581" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="0" top="10" width="400" height="20" text="Notes" horzTextAlign="center"/>
+			<textEditor left="10" top="31" width="380" height="540" field="stNotes2"/>
 		</layout>
 
-		<layout left="820" top="0" width="400" height="580">
-			<rectangle left="0" top="0" width="400" height="580" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="400" height="20" text="Notes" horzTextAlign="center"/>
-			<textEditor left="10" top="25" width="380" height="540" field="stNotes3"/>
-		</layout>
 
-		<!-- 590 = the notes' 580 plus the same 10 the three of them keep between each other. -->
-		<layout left="0" top="590" width="520" height="330">
+		<!--
+			The storyteller's own box, in the column the third Notes used to fill (SPEC I35, user
+			2026-08-22). It sat UNDER the notes until the 82nd round, which made this the tallest
+			tab on the sheet for the sake of a box that is mostly empty.
+
+			540 wide and not the column's 400: the longest label here is the pt of "Allow buy
+			Specialization for 3 experience points" at 59 characters, about 384px plus the tick,
+			and 400 would cut it (SPEC C, asked and answered before this was specced).
+
+			The height is the last row plus 10 - the gap V240 asks of every box on the sheet -
+			and NOT the column's 580: 213px of dead black is the very thing two other items of
+			an earlier request were raised about.
+		-->
+		<layout left="820" top="12" width="405" height="339">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="520" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
+			<label left="0" top="10" width="405" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 
-			<label left="15" top="45" width="200" height="20" text="Save Initial Character"/>
-			<button name="btnSaveBaseline" left="225" top="42" width="100" height="26" text="Save" onClick="saveBaseline(self);"/>
-			<!-- dyn*: written by Lua, so the language traversal leaves it alone (SPEC V31). -->
-			<label name="dynBaselineState" left="335" top="45" width="170" height="20" text=""/>
+			<!-- The two flags that hide a TAB come FIRST (SPEC V238a, user 2026-08-22). They are
+			     the two settings that change what the table can see at all, and they used to sit
+			     third and fourth under a pricing rule.
 
-			<!-- Backgrounds are free by default: the storyteller opts INTO charging for them
-			     (SPEC C, I9). The two Show flags decide which power tabs the table can see.
+			     The two Show flags decide which power tabs the table can see; backgrounds are free
+			     by default and the storyteller opts INTO charging for them (SPEC C, I9).
 
 			     `Free dots` hides no tab and is read in exactly one place - xpClick, at the
 			     moment a dot is clicked (SPEC I8d, V137). Ticking it now does nothing to what
@@ -106,59 +107,80 @@
 			     while it was on: the price is settled at the click and stamped (SPEC V138).
 
 			     `Show Magika` stood at top=180 until the 39th round, when the user had the
-			     empty tab removed (SPEC V128); `Free dots` takes the empty slot. `stShowMagika`,
-			     `stFreeDots` and `freeDots` all stay burned (SPEC I3, orphans): a sheet saved
-			     with them still carries the value, and nothing may reuse the name - which is
-			     why the flag here is `stFreeBuy` and the stamp is `xpFree` (SPEC V2, V138). -->
-			<checkBox name="chkBackgroundsXP" left="15" top="90" width="490" height="25" field="stBackgroundsXP" text="Can Buy Backgrounds With Experience"/>
-			<checkBox name="chkShowNumina" left="15" top="120" width="490" height="25" field="stShowNumina" text="Show Numina"/>
-			<checkBox name="chkShowDisciplines" left="15" top="150" width="490" height="25" field="stShowDisciplines" text="Show Vampire"/>
-			<checkBox name="chkFreeBuy" left="15" top="180" width="490" height="25" field="stFreeBuy" text="Free dots"/>
+			     empty tab removed (SPEC V128). `stShowMagika`, `stFreeDots` and `freeDots` all
+			     stay burned (SPEC I3, orphans): a sheet saved with them still carries the value,
+			     and nothing may reuse the name - which is why the flag here is `stFreeBuy` and
+			     the stamp is `xpFree` (SPEC V2, V138). `stNotes3` joins them in the 82nd round.
 
-			<!-- Specialities are bought only where the storyteller opened the door, and the two
-			     prices are ONE choice: ticking either clears the other, and both off - the
-			     default - means the table does not buy them at all (SPEC I8f, V154, V155).
+			     `Show Ghoul` is the LABEL only - the field stays `stShowDisciplines`, and the tab
+			     it hides is still `tabDisciplines` (SPEC V2, V172, V233). -->
+			<checkBox name="chkShowNumina" left="15" top="46" width="375" height="25" field="stShowNumina" text="Show Numina"/>
+			<checkBox name="chkShowDisciplines" left="15" top="76" width="375" height="25" field="stShowDisciplines" text="Show Ghoul"/>
+			<checkBox name="chkBackgroundsXP" left="15" top="106" width="375" height="25" field="stBackgroundsXP" text="Can Buy Backgrounds With Experience"/>
+			<checkBox name="chkFreeBuy" left="15" top="136" width="375" height="25" field="stFreeBuy" text="Free dots"/>
 
-			     Free specialities are unaffected: what a trait hands out at one dot or at four
-			     is the book's, not the storyteller's, and it costs nothing either way. -->
-			<checkBox name="chkSpec3XP" left="15" top="210" width="490" height="25" field="stSpec3XP" text="Allow buy Specialization for 3 experience points"/>
-			<checkBox name="chkSpec4XP" left="15" top="240" width="490" height="25" field="stSpec4XP" text="Allow buy Specialization for 4 experience points"/>
+			<!-- What a speciality costs, as ONE value instead of two flags (SPEC I49, V254, user
+			     2026-08-22). The list is six prices and a closed door, and `0` is a PRICE: a table
+			     that hands specialities out for free is not the same table as one that does not sell
+			     them at all, and the two flags could not tell those apart - both off meant both.
+
+			     `cmb`, not `cbo`: a combo of VALUE like cmbHealthLevels, so pickerItems leaves it alone
+			     and it needs no PICKER_LIST key (SPEC V211a, V208). The prose item is the one string in
+			     it that translates, and it is keyed BY HAND in both .lang blocks - the traversal that
+			     enforces V17 filters cbo* and never sees this one (SPEC V254d).
+
+			     Free specialities are unaffected: what a trait hands out at one dot or at four is the
+			     book's, not the storyteller's, and it costs nothing either way. -->
+			<label left="15" top="166" width="170" height="20" text="Specialty Cost"/>
+			<comboBox name="cmbSpecCost" left="190" top="163" width="150" height="25" field="stSpecCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5','Purchase Forbidden'}" values="{'0','1','2','3','4','5','forbidden'}"/>
+			<dataLink field="stSpecCost" defaultValue="3"/>
 
 			<!-- 51st round (SPEC I8g, V175). OFF by default and OFF when nil - the four clan slots
 			     stay locked unless the storyteller opens them, which is the fail-closed default the
-			     other Show flags use (SPEC V89, V80). While `clan` sleeps (SPEC V173) this is the
-			     only way the box gets filled at all. -->
-			<checkBox name="chkEditClanDisc" left="15" top="270" width="490" height="25" field="stEditClanDisc" text="Edit Clan Disciplines"/>
+			     other Show flags use (SPEC V89, V80). -->
+			<checkBox name="chkEditClanDisc" left="15" top="196" width="375" height="25" field="stEditClanDisc" text="Edit Clan Disciplines"/>
+
+			<!-- 85th round (SPEC I42, V245). Same fail-closed default as every other flag in this
+			     box: OFF authored, OFF when nil, so a sheet saved before this round and a sheet
+			     whose storyteller never touched it read the same (SPEC V80, V89, V175).
+
+			     It opens ONE box on the Experience tab - Spent - and what typing there does is
+			     write a line into the log, not a second number beside it (SPEC I44, V246). -->
+			<checkBox name="chkEditSpentXP" left="15" top="226" width="375" height="25" field="stEditSpentXP" text="Edit Spent XP"/>
+
+			<!-- How long the health track is, moved here from the two HEALTH boxes in the 82nd
+			     round (SPEC I35, V234, user 2026-08-22). It is the storyteller's call, and until
+			     now it was two combos on one field - a declared mirror (SPEC I3, V36) that the
+			     player could reach from either the Main tab or Combat.
+
+			     SAME widget, SAME field, same ten values and the same default: it changed owner,
+			     not identity, so a saved sheet keeps its number (SPEC V2). renderHealthTrack
+			     still reads `tonumber(sheet.healthLevels) or 7`, so the default declared here and
+			     the fallback in the Lua cannot disagree about what seven means. -->
+			<label left="15" top="264" width="170" height="20" text="Health Levels"/>
+			<comboBox name="cmbHealthLevels" left="190" top="261" width="58" height="25" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+			<dataLink field="healthLevels" defaultValue="7"/>
+
+			<!-- Saving the initial character is LAST, after everything (SPEC V238b, user
+			     2026-08-22): it is the one irreversible action on this sheet (SPEC R30), and it
+			     spent five rounds sitting above the settings it snapshots.
+
+			     The button sits at the SAME x as the combo above it (SPEC I42, V243): they are
+			     the only two entry widgets in a box that is otherwise checkboxes, so either the
+			     two of them make a column or the box has none (SPEC V26 - B12 and B13 are this
+			     same drift, one round of nobody measuring a column apart).
+
+			     `dynBaselineState` used to close the box with a sentence of its own. It is gone
+			     for good (SPEC V243b): the dead button says "saved", and the Experience tab says
+			     "not saved yet" inside the log that sentence was about (SPEC I10, V33). -->
+			<label left="15" top="306" width="200" height="20" text="Save Initial Character"/>
+			<button name="btnSaveBaseline" left="190" top="303" width="100" height="26" text="Save" onClick="saveBaseline(self);"/>
 		</layout>
 	</scrollBox>
 
 	<dataLink field="baseline">
 		<event name="onChange">
 			renderBaselineState(self);
-		</event>
-	</dataLink>
-
-	<!--
-		The two speciality prices are one choice, not two flags (SPEC V155): ticking either one
-		clears the other, and both off is a legal state - it is the default, and it means the
-		table does not buy specialities.
-
-		Written from a dataLink rather than from the checkbox's own onChange because a write made
-		inside a control's own dispatch does not survive it (SPEC B36/B38). This is the path that
-		repaints the whole sheet on every theme and language change, and it crosses controls.
-
-		setField only writes when the value actually CHANGES (SPEC V122), so clearing a box that
-		is already clear wakes nothing: the two links cannot bounce off one another.
-	-->
-	<dataLink field="stSpec3XP">
-		<event name="onChange">
-			if sheet ~= nil and sheet.stSpec3XP == true then setField("stSpec4XP", false); end;
-		</event>
-	</dataLink>
-
-	<dataLink field="stSpec4XP">
-		<event name="onChange">
-			if sheet ~= nil and sheet.stSpec4XP == true then setField("stSpec3XP", false); end;
 		</event>
 	</dataLink>
 

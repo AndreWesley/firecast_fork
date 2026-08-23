@@ -16,8 +16,6 @@
 				["Alertness"] = "Prontidão",
 				["ALLIES"] = "ALIADOS",
 				["Allies"] = "Aliados",
-				["Allow buy Specialization for 3 experience points"] = "Permitir comprar Especialização por 3 pontos de experiência",
-				["Allow buy Specialization for 4 experience points"] = "Permitir comprar Especialização por 4 pontos de experiência",
 				["Alternate Identity"] = "Identidade Alternativa",
 				["Ancestors"] = "Ancestrais",
 				["Animal Ken"] = "Empatia com Animais",
@@ -33,7 +31,6 @@
 				["ARMOR"] = "ARMADURA",
 				["Armor"] = "Armadura",
 				["Armory"] = "Arsenal",
-				["Art: Nefer (Nefertyne)"] = "Arte: Nefer (Nefertyne)",
 				["Astral Projection"] = "Projeção Astral",
 				["Athetics"] = "Esportes",
 				["Athletics"] = "Esportes",
@@ -55,7 +52,7 @@
 				["BASE OF OPERATIONS (ARMAMENTS)"] = "BASE DE OPERAÇÕES (ARMAMENTOS)",
 				["BASE OF OPERATIONS (DEFENSES)"] = "BASE DE OPERAÇÕES (DEFESAS)",
 				["BASE OF OPERATIONS (OTHER)"] = "BASE DE OPERAÇÕES (OUTROS)",
-				["Based on the RPGmeister sheet plugin, by:"] = "Baseado no plugin de fichas do RPGmeister, por:",
+				["Based on the sheet plugin by Vinny (Ambesek)"] = "Baseado no plugin de fichas de Vinny (Ambesek)",
 				["Battle Scars"] = "Cicatrizes de Batalhas",
 				["Benefactor"] = "Benfeitor",
 				["Biocontrol"] = "Biocontrole",
@@ -100,11 +97,9 @@
 				["Conjuration"] = "Conjuração",
 				["Conniver"] = "Conspirador",
 				["Conscience"] = "Consciência",
-				["Consultant: Nautilus"] = "Consultor: Nautilus",
 				["CONTACTS"] = "CONTATOS",
 				["Contacts"] = "Contatos",
 				["Contrary"] = "Contrário",
-				["Contributors:"] = "Colaboradores:",
 				["Conveyance"] = "Transporte",
 				["Cost"] = "Custo",
 				["DOMINATOR"] = "DOMINADOR",
@@ -167,6 +162,13 @@
 				["EXPERIENCE"] = "EXPERIÊNCIA",
 				["Experience"] = "Experiência",
 				["Edit Clan Disciplines"] = "Editar Disciplinas de Clã",
+				["Edit Spent XP"] = "Editar XP Gasto",
+
+				-- Same word in both languages, and the key exists for exactly that reason
+				-- (SPEC I44): the ledger writes this one through translateSheetText like every
+				-- other column text, so without an entry it would be a visible string with no
+				-- key - which is what V10/V22/V28 are there to refuse.
+				["MANUAL"] = "MANUAL",
 				["Experience cannot go below zero"] = "A experiência não pode ficar negativa",
 				["EXPERIENCE LOG"] = "REGISTRO DE EXPERIÊNCIA",
 				["Explorer"] = "Explorador",
@@ -191,7 +193,6 @@
 				["Free dots"] = "Pontos grátis",
 				["Free specialties are lost only by lowering the trait"] = "Especializações gratuitas só são perdidas ao baixar o traço",
 				["Gallant"] = "Galante",
-				["Gallo"] = "Gallo",
 				["Gambler"] = "Jogador",
 				["Game"] = "Jogo",
 				["GEAR (CARRIED)"] = "EQUIPAMENTO (CARREGADO)",
@@ -208,6 +209,7 @@
 				["Hair"] = "Cabelos",
 				["Healing"] = "Cura",
 				["HEALTH"] = "VITALIDADE",
+				["Health Levels"] = "Níveis de Vitalidade",
 				["Hearth Wisdom"] = "Sabedoria Popular",
 				["Height"] = "Altura",
 				["Hellfire"] = "Fogo do Inferno",
@@ -215,7 +217,7 @@
 				["Honor"] = "Honra",
 				["HUMANITY"] = "HUMANIDADE",
 				["Humanity"] = "Humanidade",
-				["Hunters Hunted"] = "Caçadores Caçados",
+				["Mortal"] = "Mortal",
 				["Hurt (-1)"] = "Machucado (-1)",
 				["Idealist"] = "Idealista",
 				["Illusion"] = "Ilusão",
@@ -223,7 +225,6 @@
 				["INFLUENCE"] = "INFLUÊNCIA",
 				["Influence"] = "Influência",
 				["Initial character not saved yet"] = "Personagem inicial ainda não salvo",
-				["Initial character saved"] = "Personagem inicial salvo",
 				["Injured (-1)"] = "Ferido (-1)",
 				["Innovator"] = "Inovador",
 				["INSTALLED VERSION:"] = "VERSÃO INSTALADA:",
@@ -280,7 +281,6 @@
 				["name"] = "Nome",
 				["Nationality"] = "Nacionalidade",
 				["Nature"] = "Natureza",
-				["Nautilus"] = "Nautilus",
 				["Necromancy"] = "Necromancia",
 				["Necronics"] = "Necrônica",
 				["No"] = "Não",
@@ -288,7 +288,6 @@
 				["Node"] = "Nódulo",
 				["Nothing bought yet"] = "Nada comprado ainda",
 				["Not enough experience to buy that dot"] = "Experiência insuficiente para comprar esse ponto",
-				["Not saved yet"] = "Ainda não salvo",
 				["Notes"] = "Anotações",
 				["NUMINA"] = "NÚMINAS",
 				["NUMINA & OTHER TRAITS"] = "NUMINA E OUTROS TRAÇOS",
@@ -327,8 +326,6 @@
 				["Prelude"] = "Prelúdio",
 				["Primal-Urge"] = "Inst. Primitivo",
 				["Programmer: Andre (Styllern)"] = "Programador: André (Styllern)",
-				["Programmer: Vinny (Ambesek)"] = "Programador: Vinny (Ambesek)",
-				["Progress"] = "Progresso",
 				["Prophet"] = "Profeta",
 				["Psychic Healing"] = "Cura Psíquica",
 				["Psychic Hypnosis"] = "Hipnose Psíquica",
@@ -381,7 +378,7 @@
 				["Shadows"] = "Sombras",
 				["Shapeshifting"] = "Metamorfose",
 				["Sheet made for the table"] = "Ficha feita para a mesa",
-				["Show Vampire"] = "Mostrar Vampiro",
+				["Show Ghoul"] = "Mostrar Carniçal",
 				["Show Numina"] = "Mostrar Númina",
 				["SKILLS"] = "PERÍCIAS",
 				["Social"] = "Sociais",
@@ -389,6 +386,7 @@
 				["SPECIALTIES"] = "ESPECIALIZAÇÕES",
 				["Specialties cannot be bought"] = "Especializações não podem ser compradas",
 				["Specialty"] = "Especialização",
+				["Specialty Cost"] = "Custo por Especialização",
 				["Spent Experience"] = "Experiência Gasta",
 				["Spies"] = "Espiões",
 				["Stamina"] = "Vigor",
@@ -450,6 +448,7 @@
 				["Willpower"] = "Força-de-Vontade",
 				["WILLPOWER"] = "FORÇA DE VONTADE",
 				["Wisdom"] = "Sabedoria",
+				["Ghoul"] = "Carniçal",
 				["Vampire"] = "Vampiro",
 				["Wits"] = "Raciocínio",
 				["Wonder"] = "Maravilha",
@@ -883,6 +882,7 @@
 				["Nosferatu"] = "Nosferatu",
 				["Nosferatu Antitribu"] = "Nosferatu Antitribu",
 				["Old Clan Tzimisce"] = "Tzimisce do Clã Antigo",
+				["Caitiff"] = "Caitiff",
 				["Panders"] = "Panders",
 				["Ravnos"] = "Ravnos",
 				["Ravnos Antitribu"] = "Ravnos Antitribu",
@@ -1144,9 +1144,12 @@
 
 				local names = {};
 
+				-- The typed rows are skipped, not just missed (SPEC I45, V248d): they carry an
+				-- `edt` and the walk asks for `cbo`, so xpFind would come back empty for them
+				-- anyway - naming them here would be asking for a control that cannot exist.
 				for i = 1, MAIN_PATH_ROWS, 1 do names["cbomainPath_" .. i] = true; end;
-				for i = 1, SEC_PATH_ROWS, 1 do names["cbosecPath_" .. i] = true; end;
-				for i = 1, RITUAL_ROWS, 1 do names["cboritual_" .. i] = true; end;
+				for i = 1, SEC_PATH_ROWS - SEC_PATH_FREE_ROWS, 1 do names["cbosecPath_" .. i] = true; end;
+				for i = 1, RITUAL_ROWS - RITUAL_FREE_ROWS, 1 do names["cboritual_" .. i] = true; end;
 
 				local found  = {};
 				local lang   = sheet.language or "en";
@@ -1189,7 +1192,7 @@
 
 					if isDyn then
 						-- nothing: renderHealthTrack keeps this one in the right language
-					elseif cls == "label" or cls == "checkBox" or cls == "button" or cls == "tab" then
+					elseif cls == "label" or cls == "checkBox" or cls == "button" then
 						local h = c.handle;
 
 						if originalText[h] == nil then
@@ -1365,8 +1368,13 @@
 					fontFamily = "Segoe UI",
 					fill = {
 						["black"]     = "#12141A",    -- charcoal, blue cast
+						["#0A0A0A"]  = "#0A0B10",    -- charcoal, one step under the box
 						["DimGray"]   = "#2A2F3A",
 						["#00000000"] = "#00000000",  -- health mark box: the cut-out IS the effect (SPEC V48)
+						-- The one-second flash on a newly sorted ritual row (SPEC I47, V253). Alpha,
+						-- so the name reads through it, and the period's own accent rather than one
+						-- loose colour outside the theme (SPEC V53).
+						["#55FFFFFF"] = "#55A83232",  -- crimson, the era's dot art
 					},
 					stroke = {
 						["white"]   = "#3A4150",      -- cold graphite
@@ -1393,8 +1401,10 @@
 					fontFamily = "Georgia",
 					fill = {
 						["black"]     = "#1C1310",    -- mahogany
+						["#0A0A0A"]  = "#120C0A",    -- mahogany, one step under the box
 						["DimGray"]   = "#6B4F2A",
 						["#00000000"] = "#00000000",
+						["#55FFFFFF"] = "#55C2A14D",  -- aged gold
 					},
 					stroke = {
 						["white"]   = "#C2A14D",      -- aged gold
@@ -1417,8 +1427,10 @@
 					fontFamily = "Book Antiqua",
 					fill = {
 						["black"]     = "#0E0B09",    -- soot, darker than the candle-lit oak it was
+						["#0A0A0A"]  = "#070605",    -- soot, one step under the box
 						["DimGray"]   = "#5A4A32",
 						["#00000000"] = "#00000000",
+						["#55FFFFFF"] = "#55C0C6CC",  -- polished silver
 					},
 					stroke = {
 						["white"]   = "#C0C6CC",      -- polished silver
@@ -1442,8 +1454,10 @@
 					fontFamily = "Times New Roman",
 					fill = {
 						["black"]     = "#171218",    -- basalt, faint purple cast
+						["#0A0A0A"]  = "#0E0B0F",    -- basalt, one step under the box
 						["DimGray"]   = "#6B2A4A",    -- Tyrian purple on the avatar frame
 						["#00000000"] = "#00000000",
+						["#55FFFFFF"] = "#55BFA05A",  -- laurel gold
 					},
 					stroke = {
 						["white"]   = "#BFA05A",      -- laurel gold
@@ -1685,11 +1699,11 @@
 			Options first, credits last (SPEC T141): the settings are what a player opens this
 			tab to change; the credits are a signature.
 		-->
-		<layout left="0" top="0" width="330" height="145">
+		<layout left="0" top="12" width="380" height="125">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="0" top="10" width="90" height="20" text="Language" horzTextAlign="center"/>
-			<comboBox left="95" top="10" width="220" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
+			<label left="15" top="10" width="80" height="20" text="Language" horzTextAlign="center"/>
+			<comboBox left="95" top="10" width="270" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
 			<dataLink field="language" defaultValue="en">
 				<event name="onChange">
 					if sheet == nil then return end;
@@ -1708,10 +1722,10 @@
 			     exception to V15 that cboSheetTheme carries. A sheet holding one of the four
 			     older, longer names is normalised on load (SPEC V110), because a locked box
 			     showing a dead value is one nobody could fix. -->
-			<label left="0" top="50" width="90" height="20" text="Game" horzTextAlign="center"/>
-			<comboBox left="95" top="50" width="220" height="25" name="cboGame" field="game" enabled="false" opacity="0.40" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Hunters Hunted', 'Mage'}" values="{'Vampire', 'Hunters Hunted', 'Mage'}">
+			<label left="15" top="50" width="80" height="20" text="Game" horzTextAlign="center"/>
+			<comboBox left="95" top="50" width="270" height="25" name="cboGame" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}">
 			</comboBox>
-			<dataLink field="game" defaultValue="Hunters Hunted"/>
+			<dataLink field="game" defaultValue="Mortal"/>
 
 			<!--
 				`Theme` is the era the table plays in and, like `Game`, only stores state today
@@ -1734,8 +1748,8 @@
 				and gave the name to the contemporary palette. Every value paints now, so there
 				is no way back to the sheet as the XML authors it (SPEC C, 16th round).
 			-->
-			<label left="0" top="90" width="90" height="20" text="Theme" horzTextAlign="center"/>
-			<comboBox name="cboSheetTheme" left="95" top="90" width="220" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}"/>
+			<label left="15" top="90" width="80" height="20" text="Theme" horzTextAlign="center"/>
+			<comboBox name="cboSheetTheme" left="95" top="90" width="270" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}"/>
 			<dataLink field="sheetTheme" defaultValue="Modern Nights">
 				<event name="onChange">
 					if sheet == nil then return end;
@@ -1751,25 +1765,28 @@
 		</layout>
 
 		<!--
-			Credits (SPEC T141). Andre wrote this sheet; the plugin it grew out of is the
-			RPGmeister one, and the names under that heading are its authors, with the roles
-			left exactly as the original credits box had them.
+			Credits (SPEC T532). Andre wrote this sheet; it grew out of another author's sheet
+			plugin, and the one line under the developer credits them by name. The roll-call
+			this box used to carry - a brand heading, three roles and two contributors - came
+			out on the user's call (SPEC C, 2026-08-22). V230 holds both ends of what is left:
+			the line cannot grow back into a block, and it cannot quietly disappear either.
+			Neither the brand nor the author's name is spelled anywhere else in the source,
+			comments included - which is why this one talks around both.
+
+			82nd round (user 2026-08-22, items 7 and 8): the box gained the heading it never had
+			and the same 14px above the first line as below the last - it was 10 and 5, and the
+			lopsided pair is what showed. Both boxes on this tab went 330 -> 380 wide with it.
 		-->
-		<layout left="0" top="155" width="330" height="265">
+		<layout left="0" top="147" width="380" height="150">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="0" top="10" width="330" height="20" text="Developer: Andre (Styllern)" horzTextAlign="center"/>
+			<label left="0" top="10" width="380" height="20" text="Credits" horzTextAlign="center"/>
 
-			<label left="0" top="50" width="330" height="20" text="Based on the RPGmeister sheet plugin, by:" horzTextAlign="center" fontSize="12"/>
-			<label left="0" top="75" width="330" height="20" text="Programmer: Vinny (Ambesek)" horzTextAlign="center"/>
-			<label left="0" top="100" width="330" height="20" text="Art: Nefer (Nefertyne)" horzTextAlign="center"/>
-			<label left="0" top="125" width="330" height="20" text="Consultant: Nautilus" horzTextAlign="center" fontSize="13"/>
+			<label left="0" top="50" width="380" height="20" text="Developer: Andre (Styllern)" horzTextAlign="center"/>
 
-			<label left="0" top="165" width="330" height="20" text="Contributors:" horzTextAlign="center"/>
-			<label left="0" top="190" width="330" height="20" text="Nautilus" horzTextAlign="center"/>
-			<label left="0" top="215" width="330" height="20" text="Gallo" horzTextAlign="center"/>
+			<label left="0" top="84" width="380" height="20" text="Based on the sheet plugin by Vinny (Ambesek)" horzTextAlign="center" fontSize="12"/>
 
-			<label left="0" top="240" width="330" height="20" text="System: Storyteller" horzTextAlign="center"/>
+			<label left="0" top="120" width="380" height="20" text="System: Storyteller" horzTextAlign="center"/>
 		</layout>
 	</scrollBox>
 </form>

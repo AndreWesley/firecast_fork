@@ -27,6 +27,14 @@
 				pt = "Sem descrição registrada para: ",
 			};
 
+			-- A typed row the storyteller has not written yet, read by anyone else (SPEC I45,
+			-- V250). He sees the empty box: for him it is an input, and a sentence sitting in it
+			-- would have to be deleted before he could type.
+			local NO_TEXT_YET = {
+				en = "The storyteller has not written a description for this one yet.",
+				pt = "O narrador ainda não escreveu uma descrição para esta.",
+			};
+
 			local function pick(tbl, lang)
 				return tbl[lang] or tbl.en;
 			end;
@@ -52,6 +60,18 @@
 
 				if selected == nil or selected == "" then
 					return pick(NO_SELECTION, lang);
+				end;
+
+				-- A TYPED row never reaches the book (SPEC I45, V250): the text is the
+				-- storyteller's, one text for both languages and all four eras, and it keeps the
+				-- require below out of reach for these rows (SPEC V206).
+				if isTypedRow(selected) then
+					local own = sheet[descFieldOf(selected)];
+
+					if own ~= nil and own ~= "" then return own; end;
+					if isStoryteller() then return ""; end;
+
+					return pick(NO_TEXT_YET, lang);
 				end;
 
 				local value = sheet[selected];
@@ -95,7 +115,32 @@
 			function renderPathDesc(form)
 				if sheet == nil then return; end;
 				if form.isShowing == false then return; end;
+
+				-- Text and lock in the SAME step (SPEC V249c): one row's text under another
+				-- row's lock is the lie V112 refuses of every runtime lock on this sheet.
+				local sel   = sheet.pathSel;
+				local write = isTypedRow(sel) and isStoryteller();
+
+				descQuiet = true;
 				form.edtPathDesc.text = pathText(sheet.language or "en");
+				form.edtPathDesc.readOnly = not write;
+				descQuiet = false;
+			end;
+
+			-- The text lands in the field of the MARKED row, read at the moment of the write
+			-- (SPEC V249c), and both questions are asked again rather than trusting the readOnly
+			-- just written: that flag is a look, the rule is the rule (SPEC V249a, V80).
+			--
+			-- `mainPath_*` can never get here: isTypedRow answers false for it (its box is
+			-- picked, SPEC I45) and the main path rows carry no text of their own.
+			function savePathDesc(form)
+				if descQuiet or sheet == nil then return; end;
+
+				local sel = sheet.pathSel;
+
+				if not isTypedRow(sel) or not isStoryteller() then return; end;
+
+				setField(descFieldOf(sel), form.edtPathDesc.text);
 			end;
 		]]>
 	</script>
@@ -134,81 +179,101 @@
 			<imageCheckBox left="475" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
+		<!--
+			The last three secondary paths are TYPED (SPEC I45, V248, user 2026-08-22), the same
+			arrangement WoD20.12 gives its last three disciplines: same radio, same dot column,
+			same entry x as the picker row above (SPEC V26), and `edt` instead of `cbo` so the
+			filter and the guard leave it alone (SPEC V211a, V248d).
+
+			Here the guard skip MATTERS more than it does next door: a typed name answers to no
+			blood sorcery, so pickRefusal would send it straight back as "that path needs its
+			blood sorcery on the sheet" and the storyteller could never write one (SPEC V182).
+		-->
+		<template name="SecPathFreeRow">
+			<radioButton left="0" top="2" width="20" height="21" field="pathSel" fieldValue="$(field)" groupName="pathSel"/>
+			<edit left="25" top="0" width="345" height="25" fontSize="12" name="edt$(field)" field="$(field)"/>
+			<imageCheckBox left="375" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="400" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="425" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="450" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="475" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+		</template>
+
 		<!-- 5 slots: one main path per blood sorcery (SPEC V181). 25 + 5*25 + 25 = 175. -->
-		<layout left="0" top="0" width="525" height="175">
+		<layout left="0" top="12" width="525" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="525" height="20" text="MAIN PATHS" horzTextAlign="center"/>
-			<layout left="12" top="25" width="500" height="25">
+			<label left="0" top="10" width="525" height="20" text="MAIN PATHS" horzTextAlign="center"/>
+			<layout left="12" top="31" width="501" height="25">
 				<MainPathRow field="mainPath_1"/>
 			</layout>
-			<layout left="12" top="50" width="500" height="25">
+			<layout left="12" top="56" width="501" height="25">
 				<MainPathRow field="mainPath_2"/>
 			</layout>
-			<layout left="12" top="75" width="500" height="25">
+			<layout left="12" top="81" width="501" height="25">
 				<MainPathRow field="mainPath_3"/>
 			</layout>
-			<layout left="12" top="100" width="500" height="25">
+			<layout left="12" top="106" width="501" height="25">
 				<MainPathRow field="mainPath_4"/>
 			</layout>
-			<layout left="12" top="125" width="500" height="25">
+			<layout left="12" top="131" width="501" height="25">
 				<MainPathRow field="mainPath_5"/>
 			</layout>
 		</layout>
 
-		<layout left="0" top="185" width="525" height="425">
+		<layout left="0" top="188" width="525" height="416">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="525" height="20" text="SECONDARY PATHS" horzTextAlign="center"/>
-			<layout left="12" top="25" width="500" height="25">
+			<label left="0" top="10" width="525" height="20" text="SECONDARY PATHS" horzTextAlign="center"/>
+			<layout left="12" top="31" width="501" height="25">
 				<SecPathRow field="secPath_1"/>
 			</layout>
-			<layout left="12" top="50" width="500" height="25">
+			<layout left="12" top="56" width="501" height="25">
 				<SecPathRow field="secPath_2"/>
 			</layout>
-			<layout left="12" top="75" width="500" height="25">
+			<layout left="12" top="81" width="501" height="25">
 				<SecPathRow field="secPath_3"/>
 			</layout>
-			<layout left="12" top="100" width="500" height="25">
+			<layout left="12" top="106" width="501" height="25">
 				<SecPathRow field="secPath_4"/>
 			</layout>
-			<layout left="12" top="125" width="500" height="25">
+			<layout left="12" top="131" width="501" height="25">
 				<SecPathRow field="secPath_5"/>
 			</layout>
-			<layout left="12" top="150" width="500" height="25">
+			<layout left="12" top="156" width="501" height="25">
 				<SecPathRow field="secPath_6"/>
 			</layout>
-			<layout left="12" top="175" width="500" height="25">
+			<layout left="12" top="181" width="501" height="25">
 				<SecPathRow field="secPath_7"/>
 			</layout>
-			<layout left="12" top="200" width="500" height="25">
+			<layout left="12" top="206" width="501" height="25">
 				<SecPathRow field="secPath_8"/>
 			</layout>
-			<layout left="12" top="225" width="500" height="25">
+			<layout left="12" top="231" width="501" height="25">
 				<SecPathRow field="secPath_9"/>
 			</layout>
-			<layout left="12" top="250" width="500" height="25">
+			<layout left="12" top="256" width="501" height="25">
 				<SecPathRow field="secPath_10"/>
 			</layout>
-			<layout left="12" top="275" width="500" height="25">
+			<layout left="12" top="281" width="501" height="25">
 				<SecPathRow field="secPath_11"/>
 			</layout>
-			<layout left="12" top="300" width="500" height="25">
+			<layout left="12" top="306" width="501" height="25">
 				<SecPathRow field="secPath_12"/>
 			</layout>
-			<layout left="12" top="325" width="500" height="25">
-				<SecPathRow field="secPath_13"/>
+			<layout left="12" top="331" width="501" height="25">
+				<SecPathFreeRow field="secPath_13"/>
 			</layout>
-			<layout left="12" top="350" width="500" height="25">
-				<SecPathRow field="secPath_14"/>
+			<layout left="12" top="356" width="501" height="25">
+				<SecPathFreeRow field="secPath_14"/>
 			</layout>
-			<layout left="12" top="375" width="500" height="25">
-				<SecPathRow field="secPath_15"/>
+			<layout left="12" top="381" width="501" height="25">
+				<SecPathFreeRow field="secPath_15"/>
 			</layout>
 		</layout>
 
-		<layout left="535" top="0" width="850" height="610">
+		<layout left="535" top="12" width="700" height="592">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="4" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtPathDesc" left="10" top="25" width="830" height="575" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+			<label left="0" top="10" width="700" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtPathDesc" left="10" top="31" width="680" height="551" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePathDesc(self);"/>
 		</layout>
 	</scrollBox>
 

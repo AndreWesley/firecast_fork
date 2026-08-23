@@ -1,6 +1,110 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-Reescrito 2026-08-22, fim da **76ª rodada**. Para um Claude que abre a sessão sem contexto.
+## ⚠ 86ª & 87ª rodadas (2026-08-22) — §T566…§T575 FECHADAS, gate verde, `.rpk` instalado
+
+`.rpk` **2.004.830 B**, instalado 23:25 com o mesmo tamanho (§B1: exit 0 sozinho ⊥ prova).
+Gate **verde** (`ALL CHECKS PASSED`, ~480 checks) & `rdk -l` exit 0 antes de cada §T.
+Abertas: **§T569** & **§T576** — teste no Firecast, do USER. **Nada commitado.**
+
+### A 86ª: a régua da aba Ghoul DESCE (§T566 §T567 §T568)
+
+Pedido user: blood pool −30% · coluna Rituals no mínimo · as 3 `DESCRIPTION` fechando junto.
+
+- régua **1385 → 1235**: `BLOOD POOL` 500→**350** (`left` 885 intacto, as 20 bolinhas −75 em x,
+  vão 36/36) · `WoD20.12` 1025→**875** · `WoD20.13` 850→**700** · `WoD20.14` 865→**745** c/ `left`
+  520→**490**. Os 4 arquivos fecham em 1235 & §V225(b) mede isso numa passada;
+- coluna `RITUALS` 510→**480** & o combo 460→**430** — é o PISO, ⊥ escolha: o item PT mais longo
+  é `5. Círculos de Proteção contra Espíritos, Fantasmas e Demônios` (**62** char) & a régua da
+  casa (`ceil(char×6,5)+24`) pede **427**. `?` em aberto (§R102): a régua ⊥ conhece TAMANHO de
+  fonte & o picker roda `fontSize="12"` ∴ pode sobrar ~60px que só a tela mostra;
+- `vampStrip` & os 3 painéis 1395→**1245** (régua + 10, §R94) ∴ a aba Ghoul deixa de exigir
+  1395px de janela. O ponto mais largo da ficha volta a ser a **Traits (1370)**.
+
+⚠ **§B56 — §V196 media 5 dos 17 combo & ZERO dos 5 de vampiro.** O XPath era
+`//comboBox[@items][@width]` & §T493 (68ª) tinha tirado `items=` justo desses ∴ sumiram da conta
+os itens mais longos da ficha (284 rituais, 64 trilhas). §V209(f) PREVIU isso na 68ª & mandou
+trocar o count-guard por guard de CONTEÚDO; §T494 ⊥ construiu & 18 rodadas de verde passaram por
+cima. `ListOf()` (`:97`) existia p/ isso desde a 68ª c/ **0 chamadas**. Agora §V196 lê por
+`ListOf` & tem 2 zero-guards: `< 17` combo medidos **ou** `< 4` linhas de vampiro ! VERMELHO.
+
+### A 87ª: 5 mudanças (§T570…§T575)
+
+- **§T570 — preço de especialidade virou 1 VALOR (§I49, §V254).** Saíram `chkSpec3XP`/`chkSpec4XP`
+  + os 2 `dataLink` de exclusão + as 2 chaves `.lang` + as 2 do mapa `PT`; entrou
+  `Specialty Cost` + `cmbSpecCost` (`0`…`5` + `Purchase Forbidden`, `values` … `forbidden`,
+  `defaultValue="3"`). Caixa **540→405** & tudo abaixo −30, `height` 369→**339**.
+  ⚠ **`0` agora é PREÇO** (especialidade de graça) ∴ a recusa virou `specForbidden()` — a
+  pergunta velha era `specCost() == 0` & mantê-la faria escolher `0` RECUSAR a compra. Os 2
+  campos velhos são ÓRFÃOS (§V2) & `stSpecCost` é o único que a caixa escreve.
+  ⚠ **MUDANÇA DE DEFAULT declarada**: antes ninguém comprava especialidade sem o mestre ligar
+  flag; agora o default é `3` = compra LIBERADA. Ficha velha (campo `nil`) cai no 3 pelo fallback.
+- **§T571/§T572 — texto livre em SPECIALTIES & BACKGROUNDS (§I50, §V255).** Templates
+  `SpecialityFreeRow` (linhas 7-9) & `OpenAbilityFreeRow` (16-20), constantes
+  `SPECIALITY_FREE_ROWS`=3 & `BACKGROUND_FREE_ROWS`=5, & as 2 chaves NOVAS em `TYPED_ROW_FROM`
+  (`speciality` & `background`) ∴ `isTypedRow` responde por elas.
+  ⚠ `renderSpecialities` **&** a busca de slot de `grantSpeciality` param em `total − livres`: o
+  presente do traço é travado pelo `enabled` do COMBO & linha digitada ⊥ tem combo p/ travar.
+  `freeRowOf` segue varrendo as 9 (o carimbo é que decide) ∴ sobraram **3** laços de range cheio,
+  que é o piso de §V147.
+- **§T573 — fundo escuro sob `edtTotalXP` & `edtSpentXP` (§V256, §R103).** `gui.Edit` **⊥ tem**
+  prop de cor de fundo (MEDIDO no SDK) ∴ é `<rectangle>` ANTES do `edit` + `transparent="true"`
+  NELE + chave `#0A0A0A` nas **4** paletas. `edtCurrentXP` ⊥ ganhou — é o campo que o jogador
+  digita, & cue de trava em campo destravado é decoração. `<edit transparent>` ⊥ tem precedente
+  no sheet ∴ **`?` de tela**: se a moldura sumir junto, a decisão é do user (§R103 b).
+- **§T574 — `Caitiff`** entrou em `PICKER_LIST["clan"]`, em `CLANS` como `{ open = 3 }` (byte a
+  byte a de `Panders`), no mapa `PT` & nos 2 blocos do `.lang`. Roster **60 → 61** & os **3**
+  literais `60` do check de §V236 viraram 61.
+- **§T575 — §V254 §V255 §V256 no gate**, cada uma c/ zero-guard próprio & as **2 provas de
+  §V222 RODADAS** (3 mutações acenderam o check certo, 3 sondas ficaram verdes).
+
+### ⚠ Deriva SPEC ↔ código que esta rodada criou (pede `/ck:spec amend`)
+
+1. **§T570 diz "3 sítios de gate" & são 5**: `$wantFlags` de §V89 · o bloco de §V155 (removido) ·
+   §V154 (reescrito) · **§V238** (o censo era `< 7` checkBox & a caixa tem 6 agora) · **§V243**.
+2. **§V243 está desatualizada no texto**: ela diz "as 2 ÚNICAS entradas ⊥-`checkBox` da caixa" &
+   agora são **3** (`cmbSpecCost` entrou). O CHECK foi ampliado p/ contar x DISTINTOS de ∀ entrada
+   da caixa (+ zero-guard), ⊥ p/ nomear um par — mas o texto do §V ainda fala em 2.
+3. **§V147 mudou de mensagem**: os 3 laços de range cheio agora são `declareTrait` · ledger ·
+   `freeRowOf` (a mensagem velha citava "the grant looking for a free slot", que agora para antes).
+4. §V204/§V248 ganharam a coluna **`Attr`** no `$rowSpec`: `SPECIALTIES` chama o template por
+   `num=`, ⊥ por `field=` ∴ o censo pergunta a mesma coisa nos 2 formatos.
+
+### ⚠ Armadilha de ferramenta NOVA (custou 1 arquivo corrompido)
+
+`fs.readFileSync(f,"latin1")` + `fs.writeFileSync(f, s)` **sem o `"latin1"` na escrita** grava
+UTF-8 por cima de bytes que já eram UTF-8 ∴ **duplo-encoding silencioso**. Aconteceu em
+`WoD20.11.lfm` (3 linhas de comentário c/ `─┬─ → └─`) & o gate ⊥ pegou — XML segue válido.
+A cura é exata & reversível: reler `"utf8"` & regravar `"latin1"`. **Escreva SEMPRE os 2 lados.**
+Some a isso a armadilha que já estava no §7: `\\d` dentro de `node -e '...'` chega como `\d` &
+o JS o come — use a ferramenta `Write` p/ scripts com regex, ⊥ `node -e`.
+
+---
+
+## ⚠ 85ª rodada (2026-08-22) — §T554…§T564 FECHADAS, gate verde, `.rpk` instalado
+
+Pedido user de 9 itens → §I42…§I47 · §V243…§V253 · §T554…§T565. Só **§T565** ficou aberta
+(teste no Firecast, do USER — responde §R100 & §R101). **Nada commitado.**
+
+⚠ **ACHADO DE TOOLCHAIN — 5ª porta p/ a assinatura do §B19**: **comentário XML DENTRO de
+`<template>` faz `rdk -l` sair 1 SEM MENSAGEM & APAGAR o `.rpk`.** MEDIDO nos 2 sentidos: o
+MESMO texto compila fora do `<template>` & mata o build 11 linhas abaixo, dentro dele. O sheet
+tem **26** templates & nenhum tinha comentário — por isso ninguém tinha batido nisso.
+Custou um bisect de 7 arquivos × 6 variantes; o `.rpk` INSTALADO (`%APPDATA%\Firecast\Plugins\`)
+serviu de baseline bom, porque o `git HEAD` está rodadas atrás. **⊥ ∃ check estático disso** —
+o parser do gate (`System.Xml`) aceita o arquivo de boa. **PENDENTE de `/ck:spec bug:`** (o
+`/ck:build` ⊥ escreve seção): §B novo + §V que conte `<!--` dentro de `<template>` nos 15 `.lfm`.
+
+⚠ **`isFreeRow` JÁ EXISTIA** (carimbo de especialidade grátis, §V160) & o global novo de mesmo
+nome o sobrescrevia em SILÊNCIO — o gate pegou na 1ª rodada. O helper das linhas digitadas
+chama-se **`isTypedRow`** & o mapa **`TYPED_ROW_FROM`**. As CONSTANTES seguem `*_FREE_ROWS`
+como §V248 as nomeia ∴ `DISC_FREE_ROWS` (digitada) convive c/ `isFreeRow` (grátis) no mesmo
+arquivo. Candidato a `/ck:spec amend`: renomear p/ `*_TYPED_ROWS` & tirar a armadilha.
+
+⚠ §I44 pedia `Level` **80** & margem direita 18; §V247 pede `width` = borda do `Cost` + **16**.
+Ficou pela RELAÇÃO (§V247): `Level` **82** · `Cost` `left` **440** · as 2 caixas **501**. §I44
+está 2px atrás do código nesse número.
+
+Reescrito 2026-08-22, fim da **81ª rodada**. Para um Claude que abre a sessão sem contexto.
 
 A 69ª fechou **§T498 · §T499 · §T500 · §T501 · §T502** (plugin próprio); a 70ª fechou **§T503** & a 71ª **§T504** — preços de XP de vampiro TROCADOS (§I9: disciplina 20 / clã n×15 / fora do clã n×25 · Secondary Path 20 / n×15) & ⚠ ficha que JÁ comprou disciplina é REPRECIFICADA na abertura, `Current` pode ir a negativo (§C); a 72ª fechou **§T505–§T509** — topo da aba Vampiro ganhou 2 caixas: `DOMINATOR` (dominador · geração 4ª-14ª · Max Discipline Level derivado · Clan/Family) & `BLOOD POOL` (20 bolinhas LIVRES, 10 por default). Teto de geração RECUSA compra de disciplina acima do máximo (§V220). **§T510 BLOQUEADA**: falta o user passar os livros p/ as famílias de revenant (§R93) — o combo `Clan/Family` vive c/ 60 clãs/linhagens até lá, & `clanFamily` é ALIAS de `clan` (§B50) ∴ §T510 TROCA o alias, ⊥ dá append. **§T511 é teste SEU no Firecast**; — esconder aba manejada ⊥ move mais ninguém: §V217 REVOGA §V93 (o pulo p/ `Main` arrancava o mestre da aba `Storyteller` a cada toggle). Gate verde, `.rpk` gerado e instalado.
 
@@ -68,6 +172,180 @@ tabsVamp (1395)" — "fit inside" LÊ como "cabem" & ele comparara LARGURA só. 
 mais do que mediu = §V209, numa mensagem que CITAVA §V209. §V225(a) agora mede os 2 eixos & o
 Pass nomeia os 2. Regra que sai daí: **eixo novo pede mutação PRÓPRIA** — a mutação de X ⊥
 prova Y (§V222 em forma de eixo).
+
+A **77ª** especou a **barra de abas própria** (§I32 §R95 §V226 §V227 §T521-§T525) & fechou o
+probe **§T521**. Pedido user: trocar a estética das abas p/ combinar c/ o resto & seguir os
+temas. Decisões user: **as 14 abas de uma vez** (11 de `tabsHH` + 3 de `tabsVamp`) & **ativa
+preenchida / inativas só contorno**.
+
+⚠ **A barra nativa ⊥ TEM estética p/ trocar** — ⊥ é "difícil", ⊥ ∃ propriedade. `gui.TabItem`
+expõe `text`/`title`/`activate` + o que herda de `Control`; `gui.TabControl` só `tabIndex`.
+E `color=` numa `<tab>` faz o rdk sair **1 SEM MENSAGEM** & apagar o `.rpk`. Único caminho =
+substituir o `tabControl` por `rectangle`+`label`, que é o par que `applyTheme` alcança nas 2 pontas.
+
+## ✅ §R95 RESPONDIDO no Firecast (user, 2026-08-22) — **os 3 sim**
+
+**(a)** N irmãos `align="client"` c/ 1 visível: **FUNCIONA** — o visível preenche o container.
+**(b)** absoluto + `anchors="left top right bottom"`: **FUNCIONA** — acompanha ao redimensionar.
+**(c)** trocar de painel por `visible`: **FUNCIONA** nos 2 mecanismos.
+
+∴ §T522 usa **(a)**, que é o caminho barato, & §V190 ganha **exceção ESCOPADA** ("1 visível de
+N"), ⊥ revogação. §B41 segue válido & ⊥ contradiz isto: lá os 2 irmãos estavam VISÍVEIS (o
+papel de tema aceso POR CIMA do `tabControl`) ∴ era sobreposição, ⊥ dimensionamento.
+
+⚠ **PENDENTE de `/ck:spec`** (o `/ck:build` ⊥ escreve seção) — 3 coisas, & a 2ª MORDE:
+1. §R95 registrar a resposta acima & sair de `?`;
+2. **§T521 tem a sintaxe ERRADA no texto**: escrevi `anchors="{left,top,right,bottom}"` & a forma
+   de chaves é de `bounds` (`margins`/`padding`). `set` é separado por ESPAÇO: `anchors="left top`
+   `right bottom"` (MEDIDO: `corners="topLeft topRight"` · `sides="bottom"`). Sintaxe inválida em
+   `.lfm` = rdk 1 SEM MENSAGEM ∴ o literal errado manda a rodada seguinte p/ um bisect;
+3. §V190 escrever a exceção escopada que (a) autoriza.
+
+⚠ **FATO NOVO do toolchain**: **a pasta `sdk/` é OBRIGATÓRIA num plugin**. Sem ela o rdk sai **1
+SEM MENSAGEM** & ⊥ emite `.rpk` — 4ª porta p/ a mesma assinatura (§B19 §B49 §V216). Achado
+construindo o probe: as 8 variantes do bisect foram recusadas, INCLUSIVE um form c/ 1 `<label>`
+só — quando o mínimo absoluto falha, o problema ⊥ está no que você escreveu. Copiado o `sdk/`,
+as 8 passaram. Merece §R próprio. (Bônus medido: o `.rpk` é nomeado pela PASTA do plugin, ⊥ por
+`originalPluginFileName`.)
+
+⚠ **o plugin PROBE segue INSTALADO** (`andreoliveira.styllern.probealign.rpk`, 98.574 B). Fonte no
+scratchpad, fora do repo. P/ limpar: apagar a ficha de probe no Firecast ANTES de desinstalar,
+senão fica ficha órfã apontando p/ um dataType que ⊥ existe mais.
+
+## A 78ª: a barra de abas é NOSSA (§T522 §T523 §T524)
+
+⊥ ∃ mais `<tabControl>` nem `<tab>` na ficha. As 14 abas (11 + 3 sub) são:
+
+- **painel** = `<layout name="tab<X>">` c/ o `<import>` dentro. Na RAIZ eles são N irmãos
+  `align="client"` c/ 1 visível (mecanismo (a), provado em §T521); em `WoD20.11` são ABSOLUTOS,
+  porque lá o `scrollBox` já gasta o retângulo cliente c/ `themePaper11` & 2 `client` visíveis
+  disputando é o §B41 em pessoa;
+- **botão** = `<rectangle>` + `<label hitTest="false">` (idioma da trilha de saúde, `WoD20.1:162`);
+- **ativa** = um 2º retângulo (`tabOn<X>`) que LIGA por `visible` — ⊥ por cor escrita em Lua.
+  ⚠ Isto é decisão de projeto, ⊥ estilo: `applyTheme` repinta forma pela cor AUTORADA (§V57)
+  ∴ escrever `color` em Lua seria sobrescrito no próximo repaint, ou teria de entrar no ledger.
+  `visible` ⊥ disputa c/ ninguém & deixa a paleta mandando na paleta;
+- **estado** = `activeTab` & `activeVampTab`, globais Lua. **NUNCA campo** (§V227).
+
+§R33 ("⊥ ∃ evento de troca de aba") deixou de valer: a barra é nossa ∴ o clique é nosso. A
+regra de ⊥ pular (§V217) segue, mas agora por ESCOLHA & ⊥ por limite.
+
+⚠ **12 invariantes foram REAPONTADAS** (§V40 §V89 §V92 §V94 §V166 §V172 §V188 §V190 §V221
+§V225 + §V226 §V227 novas). ⊥ mudaram de SENTIDO, mudaram de ALVO — & as 12 acenderam
+VERMELHAS contra a estrutura nova antes de eu reapontá-las, o que é prova de mutação de
+graça. Destaques: §V190 ganhou **exceção ESCOPADA** (N `client` irmãos, ∀ um c/ `<import>` &
+nenhum autorado visível) & §V188 virou censo de **ZERO** `tabControl`.
+
+⚠ **§V223 pegou um bug MEU na mesma sessão em que nasceu**: `renderVampTabs` chamava
+`tabRootOf` de cima da declaração `local` — §B51 exato, 1 dia depois. Cura igual: DESCE o
+chamador. Se você escrever função nova no topo do `<script>`, confira antes de rodar o gate.
+
+⚠ **§B26 migrou de alvo**: os 2 botões gerenciados (`btnTabDisciplines` `btnTabStoryteller`)
+nascem `visible="false"`, ≡ os `<tab>` nasciam. Eu tinha autorado os 11 abertos & foi o §V94
+que me fez ver: se o Lua ⊥ rodar, a barra oferecia Vampiro & Narrador a qualquer um.
+
+⚠ **§V68 mordeu**: usei raio 8 nos botões & a casa usa **14**. O preenchimento é
+`color="black"` de propósito (p/ o tema mapeá-lo ≡ as caixas) ∴ entra no escopo de §V68.
+
+**§T525 é teste SEU** & o passo (5) precisa de **2 clientes na mesma ficha** — é o único
+jeito de ver §V227 funcionando.
+
+## A 79ª: a barra ganhou PELE (§T526 §T527 §T528)
+
+2 relatos do user sobre a barra que a 78ª entregou, & os 2 têm a mesma raiz estrutural:
+a barra foi construída SEM fundo próprio.
+
+- **o cinza** ⊥ era cor de ninguém: a faixa de `tabStrip` é a ÚNICA região da ficha SEM
+  papel atrás. Os 13 `themePaper*` moram nos forms IMPORTADOS & o form RAIZ ⊥ tem nenhum
+  ∴ ali aparecia o fundo do host (`theme="dark"`), que ⊥ é de época nenhuma. CURA = 1
+  `<rectangle align="client" color="black" xradius="14" cornerType="innerRound"/>` como 1º
+  filho — ≡ as 50+ caixas de seção (`WoD20.1:219`) ∴ `applyTheme` já repinta de graça.
+  ⊥ Lua nova, ⊥ chave nova. **PAPEL foi rejeitado por medida**: `gui.Image` ⊥ tem `tile`,
+  só `stretch` — textura em 34px vira borrão & a escala ⊥ casa c/ o painel de baixo;
+- **a mordida do arco (§B53)**: `cornerType="innerRound"` curva a borda p/ DENTRO ∴ o
+  interior é `width - 2*xradius` & a régua de §V16 mede `width` CRU. ⊥ CORTA nada —
+  o texto ENCOSTA na curva — ∴ nenhum check de estouro veria. Fórmula nova (§V228) =
+  `NeededPx + 2*xradius + 12`, nos **14** botões das 2 barras.
+
+⚠ **a pílula da aba ativa mudou de COR** (`black` → `DimGray`, o acento da época): faixa
+preta c/ pílula preta é falha CALADA & TOTAL — ⊥ quebra build, ⊥ acende check, & a ficha
+abre sem NENHUMA aba parecendo aberta. §V229 guarda o par. Efeito colateral: os 14
+`tabOn*` SAEM do alcance de §V68 (ela lê só `color='black'`) ∴ quem confere o canto
+deles agora é §V228 — que por isso mede o `xradius` além da largura, senão a fórmula
+afrouxa em silêncio junto c/ o que ela mede.
+
+⚠ **⊥ mexer na altura de `vampStrip`**: a `tabStrip` cresceu 34→38 de graça (os painéis
+dela são `align="client"`), mas em `WoD20.11` eles são ABSOLUTOS ∴ 4px ali reabrem
+§B52. `vampStrip` ficou c/ `top`=130 & `height`=34 INTOCADOS, só largura & cor.
+
+⚠ **§I33/§B53 dizem "folga ZERO" nas 3 sub-abas & está ERRADO** — o gate mediu 189px p/
+`Feitiçaria de Sangue: Trilhas` (29 char, ⊥ 30) contra os 195 autorados ∴ a folga era **6px**,
+⊥ zero. A CONCLUSÃO segue de pé (6px contra um pedágio de 28 é de longe o mais apertado da
+ficha; os 11 de cima tinham 26) mas o NÚMERO ⊥. Pede `/ck:spec amend`. Pelo mesmo motivo
+`btnTabPaths`/`btnTabRituals` ficaram em **235** & a regra só exige 229 — 6px acima do
+piso, de propósito: são justo os 2 rótulos que §R96 aponta como de risco em fonte serifada.
+
+## A 81ª: vão no topo (§T535 §T536 §T537)
+
+MEDIDO: os **14** forms de conteúdo começavam a 1ª caixa em `top=0`, sem 1 exceção — ⊥ era
+deriva de 1 arquivo, era como a ficha nasceu (herdado do Mage). Agora: conteúdo **12**,
+barra **8**, & os **75** filhos de 1º nível desceram junto.
+
+⚠ **o seletor ! ser ESTRUTURAL** (filho ELEMENTO direto de `<scrollBox>` c/ `top=`), ⊥ por
+RECUO: no 1º ensaio um regex de 2 tabs pegou **73 de 75** porque `WoD20.5` indenta com 4
+ESPAÇOS — & aplicação desigual ⊥ falha calada, ela vira SOBREPOSIÇÃO (§V40 acendeu em
+`WoD20.4`). `gaplib.js` no scratchpad tem o tokenizador (comentário & CDATA antes das tags).
+
+⚠ **§V231c guarda a RELAÇÃO, ⊥ os números**: o "espaçamento ainda menor" do pedido virou
+contrato — vão da barra **<** vão do conteúdo. Sem essa perna, 2 rodadas futuras mexendo
+em 1 número cada cruzam a hierarquia & ⊥ ∃ check que reclame. A faixa é conferida como
+`2*vão + pílula` ∴ o vão de cima ⊥ desliza sem o de baixo acender.
+
+⚠ a régua de **§V69 mora num COMENTÁRIO** de `WoD20.1` (`Everything closes on x=1210 / y=760`)
+& o gate a LÊ de propósito, p/ o comentário ⊥ apodrecer. Foi a ÚNICA coisa que acendeu no
+ensaio c/ o seletor certo ∴ ela vai a **772** na mesma rodada. Se você mexer em altura de
+caixa da Main, é lá que o número mora.
+
+⚠ `padding`/`margins` foram REJEITADOS como mecanismo: os 2 props ∃ (`rrpgGUI.lua:240-241`,
+tipo `bounds`) mas têm **ZERO** uso nos 15 `.lfm` & se o inset alcança filho ABSOLUTO só o
+Firecast responde ∴ custaria rodada de probe ≡ §T521. Empurrar é certo & estático.
+
+⚠ CUSTO: ∀ form desce 12 ∴ `WoD20.10` (a mais alta) pede **932**, ⊥ 920 — é ela quem decide
+quando nasce barra vertical. Sub-abas em 597 · 622 · **687** dentro dos 700 (13px de folga).
+
+⚠ **`WoD20.8.lfm` apareceu inteiro em CRLF** (68 CR num arquivo que no HEAD tem 0) & ⊥ veio
+de edição minha — fatiamento de string ⊥ converte quebra. Normalizei p/ LF depois de
+conferir que o conteúdo batia (só as 6 mudanças de `top`). Se reaparecer, é editor
+gravando CRLF: o repo inteiro é LF.
+
+## A 80ª: o chão da barra é QUADRADO (§T530 §T531)
+
+Pedido do user DEPOIS de ver a 79ª na tela: o fundo que a barra ganhou estava c/ canto
+côncavo ≡ as caixas. Agora ele ⊥ autora `xradius` nem `yradius` nem `cornerType` — é o
+**1º retângulo quadrado da ficha** (MEDIDO: os outros 99 autoram raio).
+
+POR QUE ele é diferente: caixa de seção é objeto POUSADO no papel & o canto recortado é o
+que a levanta do fundo; o chão da barra ⊥ é objeto, é o CHÃO — vai de ponta a ponta & ⊥ tem
+nada atrás p/ se destacar. Canto côncavo ali só morde 4 quinas da tela.
+
+⚠ **é a 1ª exceção PRETA de §V68**: as 2 velhas (moldura do avatar, marca de vitalidade)
+saem DE GRAÇA porque o XPath só pega `color='black'` & esta ⊥ sai ∴ ela ! ser cortada
+EXPLICITAMENTE. O corte é por CONSTRUÇÃO: retângulo `align="client"` cujo layout pai tem
+irmão `rectangle[@onClick]` — MEDIDO, casa em **1** layout (`tabStrip`) & em nenhuma caixa.
+⊥ cortar por NOME (âncora que apodrece) & sobretudo ⊥ pelo teste "⊥ autora canto": esse
+seria BURACO — caixa que ESQUECESSE o raio escaparia calada, que é §B18 voltando pela porta
+dos fundos. Prova RODADA: esquadrar 1 caixa de seção ! VERMELHO em §V68.
+
+⚠ o canto **TROCOU DE DONO, ⊥ ficou sem**: §V68 abre mão & §V229 passa a exigir que o chão
+⊥ autore raio nenhum. As 2 viram na MESMA rodada — §V68 sozinha deixa o canto órfão, §V229
+sozinha deixa o gate vermelho de propósito.
+
+⚠ o `left`=16 do 1º botão PERDEU a razão original (era fuga do arco da faixa, §R96) & FICA
+assim mesmo, agora como margem esquerda da barra. ⊥ "consertar" p/ 6: a faixa vai de ponta
+a ponta ∴ o 16 é a única margem visível que ela tem.
+
+**§T529 é teste SEU** & o passo (3) é o que fecha o `?` de §R96: conferir `Configurações` &
+`Feitiçaria de Sangue: Trilhas` em [pt] × `Victorian Era`/`Dark Ages` (as serifadas).
 
 **Nada commitado.**
 
@@ -216,11 +494,11 @@ cd "c:\Users\awlol\OneDrive\Documents\firecast_fork"
 
 | | |
 |---|---|
-| `.rpk` | **1.964.049** B, 2026-08-22 12:59:03 — instalado 12:59:04, sizes batendo |
+| `.rpk` | **1.971.201** B, 2026-08-22 15:56:24 — instalado 15:56:24, sizes batendo |
 | `WoD20th.lfm.lua` | **1.435.277** B (remedido na 73ª) |
 | `module.xml` | `<id>AndreOliveira.Styllern.WoD20th</id>` · `<version>1.0</version>` (plugin novo) |
-| gate | **4.575** linhas, ASCII puro, LF |
-| §V máx | **V225** · §B máx **B51** · §T máx **T520** · §B máx **B52** · §R máx **R94** · gate **445** checks estáticos, **447** c/ `-Build` |
+| gate | **6.013** linhas, ASCII puro, LF |
+| §V/§B/§T/§R | §V máx **V256** · §B máx **B56** · §T máx **T576** · §I máx **I50** · §R máx **R103** · gate **6.013** linhas, ~480 checks (87ª rodada) |
 
 ⚠ **⊥ deixe a saída do gate cair no chat** — são ~400 linhas `ok` e afoga o contexto:
 
