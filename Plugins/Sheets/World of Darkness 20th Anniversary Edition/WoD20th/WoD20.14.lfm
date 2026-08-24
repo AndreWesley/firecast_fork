@@ -8,8 +8,9 @@
 			-- blood sorcery paths, not on rituals, so a ritual is picked and that is all - it
 			-- costs no experience and writes no ledger line (SPEC C, R52 is the open question).
 			--
-			-- The book text lives in descRitual.lua, at the plugin root next to module.xml
-			-- (SPEC I24). The generator markers moved with it, so the region keeps its shape;
+			-- The book text lives in descRitual_en.lua and descRitual_pt.lua (SPEC T495), at the
+			-- plugin root next to module.xml (SPEC I24). The generator markers moved with it
+			-- and then to both halves, so the region keeps its shape;
 			-- only the file it sits in changed. The require that loads it is INSIDE ritualText,
 			-- never here (SPEC V198): this CDATA is copied raw into constructNew_*(), so a
 			-- top-level require would parse the whole table on every sheet open and the
@@ -92,8 +93,14 @@
 				-- see (SPEC B47): position in the FILE is not reach in the FLOW, and the gate
 				-- reads source, not runtime (SPEC B30, B34). `require` still caches in
 				-- package.loaded, so the first row that needs the book pays once.
-				wodTrace("descRitual.REQUIRE");
-				local DESC = require("descRitual.lua");
+				-- SPEC T495 / V210: the book is one module PER LANGUAGE, so what is parsed
+				-- here is the half the reader can actually read - the other half was always
+				-- text this session never opens (SPEC R92f). `lang` comes off the NDB, so
+				-- anything that is not "pt" falls to the English half rather than requiring
+				-- a file that is not there.
+				local half = (lang == "pt") and "pt" or "en";
+				wodTrace("descRitual.REQUIRE." .. half);
+				local DESC = require("descRitual_" .. half .. ".lua");
 
 				local entry = DESC[value];
 
@@ -283,7 +290,7 @@
 		-->
 		<template name="RitualRow">
 			<radioButton left="0" top="2" width="20" height="21" field="ritualSel" fieldValue="$(field)" groupName="ritualSel"/>
-			<comboBox left="25" top="0" width="430" height="25" fontSize="12" name="cbo$(field)" field="$(field)"/>
+			<comboBox left="24" top="0" width="430" height="25" fontSize="12" name="cbo$(field)" field="$(field)"/>
 			<rectangle name="hl$(field)" left="0" top="0" width="456" height="25" color="#55FFFFFF" xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
 		</template>
 
@@ -299,7 +306,7 @@
 		-->
 		<template name="RitualFreeRow">
 			<radioButton left="0" top="2" width="20" height="21" field="ritualSel" fieldValue="$(field)" groupName="ritualSel"/>
-			<edit left="25" top="0" width="430" height="25" fontSize="12" name="edt$(field)" field="$(field)"/>
+			<edit left="24" top="0" width="430" height="25" fontSize="12" name="edt$(field)" field="$(field)"/>
 		</template>
 
 		<!-- 20 slots since the 85th round: five came off by request (SPEC I46, V251) and the box
@@ -370,10 +377,10 @@
 		</layout>
 
 		<!-- Grows with the column on its left, never on its own (SPEC V193). -->
-		<layout left="490" top="12" width="745" height="541">
+		<layout left="490" top="12" width="490" height="541">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="745" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtRitualDesc" left="10" top="31" width="725" height="500" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveRitualDesc(self);"/>
+			<label left="0" top="10" width="490" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtRitualDesc" left="10" top="31" width="470" height="500" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveRitualDesc(self);"/>
 		</layout>
 	</scrollBox>
 

@@ -5,8 +5,9 @@
 			-- Paths area of the Vampire tab (SPEC I16, I18). Same shape as WoD20.12: picker rows on the
 			-- left, one read-only description block on the right.
 			--
-			-- The book text lives in descPath.lua, at the plugin root next to module.xml
-			-- (SPEC I24). The generator markers moved with it, so the region keeps its shape;
+			-- The book text lives in descPath_en.lua and descPath_pt.lua (SPEC T495), at the
+			-- plugin root next to module.xml (SPEC I24). The generator markers moved with it
+			-- and then to both halves, so the region keeps its shape;
 			-- only the file it sits in changed. The require that loads it is INSIDE pathText,
 			-- never here (SPEC V198): this CDATA is copied raw into constructNew_*(), so a
 			-- top-level require would parse the whole table on every sheet open and the
@@ -87,8 +88,14 @@
 				-- B47): position in the FILE is not reach in the FLOW, and the gate reads source,
 				-- not runtime (SPEC B30, B34). `require` still caches in package.loaded, so the
 				-- first row that really needs the book pays the parse and every later one is free.
-				wodTrace("descPath.REQUIRE");
-				local DESC = require("descPath.lua");
+				-- SPEC T495 / V210: the book is one module PER LANGUAGE, so what is parsed
+				-- here is the half the reader can actually read - the other half was always
+				-- text this session never opens (SPEC R92f). `lang` comes off the NDB, so
+				-- anything that is not "pt" falls to the English half rather than requiring
+				-- a file that is not there.
+				local half = (lang == "pt") and "pt" or "en";
+				wodTrace("descPath.REQUIRE." .. half);
+				local DESC = require("descPath_" .. half .. ".lua");
 
 				local entry = DESC[value];
 
@@ -270,10 +277,10 @@
 			</layout>
 		</layout>
 
-		<layout left="535" top="12" width="700" height="592">
+		<layout left="535" top="12" width="445" height="592">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="700" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtPathDesc" left="10" top="31" width="680" height="551" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePathDesc(self);"/>
+			<label left="0" top="10" width="445" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtPathDesc" left="10" top="31" width="425" height="551" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePathDesc(self);"/>
 		</layout>
 	</scrollBox>
 

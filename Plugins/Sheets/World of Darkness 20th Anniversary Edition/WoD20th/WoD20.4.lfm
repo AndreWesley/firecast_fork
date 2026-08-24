@@ -9,43 +9,54 @@
         </template>
 
 		<!--
-			Descriptor grid. The third column sits at x=635, not 585: the Descricao template is
-			310 wide (a 100px label plus a 200px edit at x=110), so a column starting at 585 drew
-			45px INSIDE the previous column's edit. It hit two rows, Height x Eyes and Weight x
-			Hair - SPEC B16, now covered by V37. 5 / 320 / 635 closes at 945, inside the 960 box.
+			Descriptor grid, 1040 wide so it closes on the same edge as Prelude (410..1040), which
+			is the alignment the user asked for when the columns moved (SPEC I53). The width is not
+			decoration: three 310px blocks inside a 960 box leave 30px, so the 15 of clearance V258
+			asks for on each side would leave ZERO gutter between columns. At 1040 there are 110 to
+			spend - 15 + 40 + 40 + 15.
+			
+			The 15 is V258, not taste. cornerType="innerRound" bites a 14x14 square out of every
+			corner, and at left=5 the third column edit sat 2.8px INSIDE the arc on the top row and
+			again on the bottom one - nothing was clipped, so no overflow check ever saw it (SPEC
+			B53, R96). The old 5 / 320 / 645 came from SPEC B16, where a column at 585 drew 45px
+			inside the previous column edit; 15 / 365 / 715 leaves V37 far more room than that fix
+			ever did - 40px between blocks where it used to be 5 and 15.
+			
+			The identity column is LAST as of SPEC I53. The three columns rotated one place and the
+			order INSIDE each one is untouched, as is every field name (SPEC V2) - only the
+			field=/nome= pair on each <Descricao> call moved.
 		-->
-		<layout left="0" top="12" width="960" height="105">
+		<layout left="0" top="12" width="1040" height="105">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<layout left="5" top="10" width="310" height="25" >
-				<Descricao field="sexo" nome="Sex"/>
-			</layout>
-			<layout left="320" top="10" width="310" height="25" >
+			<layout left="15" top="10" width="310" height="25" >
 				<Descricao field="altura" nome="Height"/>
 			</layout>
-			<layout left="645" top="10" width="310" height="25" >
+			<layout left="365" top="10" width="310" height="25" >
 				<Descricao field="olhos" nome="Eyes"/>
 			</layout>
-
-			<layout left="5" top="40" width="310" height="25" >
-				<Descricao field="idade" nome="Age"/>
+			<layout left="715" top="10" width="310" height="25" >
+				<Descricao field="sexo" nome="Sex"/>
 			</layout>
-			<layout left="320" top="40" width="310" height="25" >
+
+			<layout left="15" top="40" width="310" height="25" >
 				<Descricao field="peso" nome="Weight"/>
 			</layout>
-			<layout left="645" top="40" width="310" height="25" >
+			<layout left="365" top="40" width="310" height="25" >
 				<Descricao field="cabelo" nome="Hair"/>
 			</layout>
-
-			<layout left="5" top="70" width="310" height="25" >
-				<Descricao field="idadeAparente" nome="Apparent Age"/>
+			<layout left="715" top="40" width="310" height="25" >
+				<Descricao field="idade" nome="Age"/>
 			</layout>
-			<!-- Nationality sits under Weight, as requested (SPEC T105). -->
-			<layout left="320" top="70" width="310" height="25" >
+
+			<layout left="15" top="70" width="310" height="25" >
 				<Descricao field="nacionalidade" nome="Nationality"/>
 			</layout>
-			<layout left="645" top="70" width="310" height="25" >
+			<layout left="365" top="70" width="310" height="25" >
 				<Descricao field="etinicidade" nome="Ethnicity"/>
+			</layout>
+			<layout left="715" top="70" width="310" height="25" >
+				<Descricao field="idadeAparente" nome="Apparent Age"/>
 			</layout>
 		</layout>
 
@@ -59,7 +70,7 @@
 		<layout left="0" top="127" width="400" height="176">
 			<rectangle left="0" top="0" width="400" height="176" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="0" top="10" width="400" height="20" text="Languages" horzTextAlign="center"/>
-			<textEditor left="10" top="31" width="380" height="135" field="aparencia"/>
+			<textEditor left="15" top="31" width="370" height="135" field="aparencia"/>
         </layout>
 
 		<!-- New boxes, not renames: the tab never had a Goals box to rename onward from, so
@@ -84,13 +95,13 @@
 		<layout left="0" top="489" width="400" height="176">
 			<rectangle left="0" top="0" width="400" height="176" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="0" top="10" width="400" height="20" text="Goals" horzTextAlign="center"/>
-			<textEditor left="10" top="31" width="380" height="135" field="idiomas"/>
+			<textEditor left="15" top="31" width="370" height="135" field="idiomas"/>
         </layout>
 
 		<layout left="410" top="127" width="630" height="536">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="0" top="10" width="630" height="20" text="Prelude" horzTextAlign="center"/>
-			<richEdit left="10" top="31" width="610" height="495" field="background" backgroundColor="#333333" defaultFontSize="12" defaultFontColor="white"/>
+			<richEdit left="15" top="31" width="600" height="495" field="background" backgroundColor="#333333" defaultFontSize="12" defaultFontColor="white"/>
         </layout>
 	</scrollBox>
 </form>

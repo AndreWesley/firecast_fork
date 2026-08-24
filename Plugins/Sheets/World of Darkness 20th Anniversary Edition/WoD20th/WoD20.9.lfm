@@ -8,12 +8,18 @@
 			-- only the total behind them is saved, and Spent and the balance are worked out
 			-- from it and the log (SPEC V100).
 
-			-- The log box grows with the rows instead of scrolling four columns apart from
-			-- each other: the tab's scrollBox does the scrolling, so line N stays line N in
-			-- all four. The XML height is the floor - shrinking would leave a hole in the box.
+			-- The box no longer grows with the rows (SPEC I57, user 2026-08-23): it stands at
+			-- the height the XML gives it and the COLUMNS grow inside a scrollBox of their own,
+			-- so what runs past the frame is scrolled instead of pushing the frame down the tab.
+			--
+			-- The four columns share that one scrollBox rather than each carrying a bar, which
+			-- is the whole reason the box used to grow: four bars scroll four different amounts
+			-- and line N stops being line N across the row. One parent, one bar, one offset.
+			--
+			-- XP_LOG_MIN_H is the floor of the CONTENT now, not of the box - it keeps the empty
+			-- log the same shape as a full one (SPEC V235).
 			local XP_ROW_H    = 20;
 			local XP_LOG_MIN_H = 470;
-			local XP_LOG_PAD  = 65;
 
 			-- The two state sentences used to live IN the Type column, which was widened to 442 so
 			-- it would cover its three empty neighbours. That is what made an empty log read as
@@ -40,24 +46,27 @@
 			-- handed (SPEC V143), so the same call works from this tab's own events and from
 			-- the root, which is how a purchase made on ANY tab reaches the log without the
 			-- tab having registered itself first (SPEC V133, B39).
-			local XP_LOG = { dynXpType = true, dynXpTrait = true, dynXpLevel = true, dynXpCost = true, dynXpEmpty = true, xpLogBox = true };
+			local XP_LOG = { dynXpType = true, dynXpTrait = true, dynXpLevel = true, dynXpCost = true, dynXpEmpty = true };
 
-			-- The four columns and the box they sit in grow together or not at all. Declared local
-			-- and ABOVE their caller, which is not a matter of reading order: Lua resolves a
-			-- non-local name at COMPILE time, so a body written above the declaration compiles a
-			-- GETGLOBAL and calls nil (SPEC B51, V223).
-			local function xpLogHeight(form, h)
+			-- The four columns take the SAME height, in one call: four heights written apart
+			-- from each other scroll four different amounts inside the shared box, which is the
+			-- misalignment the shared parent exists to stop (SPEC V261b/d). The box itself is not
+			-- here on purpose - nothing writes its height any more (SPEC I57, V261a).
+			--
+			-- Declared local and ABOVE its caller, which is not a matter of reading order: Lua
+			-- resolves a non-local name at COMPILE time, so a body written above the declaration
+			-- compiles a GETGLOBAL and calls nil (SPEC B51, V223).
+			local function xpColsHeight(form, h)
 				form.dynXpType.height  = h;
 				form.dynXpTrait.height = h;
 				form.dynXpLevel.height = h;
 				form.dynXpCost.height  = h;
-				form.xpLogBox.height   = h + XP_LOG_PAD;
 			end;
 
 			-- The two empty states differ by their sentence and by NOTHING else, so they are
-			-- written once. Two copies is how one of them keeps a stale height, and that is not
-			-- hypothetical: the no-baseline path wrote no height at all, so a box that had grown
-			-- to forty rows stayed that tall and empty the moment the baseline came off.
+			-- written once. Two copies is how one of them keeps a stale height - which used to
+			-- mean a box that had grown to forty rows stayed that tall and empty the moment the
+			-- baseline came off, and now means a scroll range with nothing in it.
 			local function xpEmptyLog(form, why)
 				form.dynXpType.text  = "";
 				form.dynXpTrait.text = "";
@@ -67,7 +76,7 @@
 				form.dynXpEmpty.text    = why;
 				form.dynXpEmpty.visible = true;
 
-				xpLogHeight(form, XP_LOG_MIN_H);
+				xpColsHeight(form, XP_LOG_MIN_H);
 			end;
 
 			function renderXPLedger(node, rows)
@@ -121,11 +130,14 @@
 				form.dynXpLevel.text = table.concat(levels, "\n");
 				form.dynXpCost.text  = table.concat(costs, "\n");
 
+				-- The columns grow, the box does not (SPEC I57). Past the floor this runs longer
+				-- than the scrollBox holding it, which is what puts a bar on the side instead of
+				-- pushing the frame down the tab.
 				local h = XP_LOG_MIN_H;
 
 				if #rows * XP_ROW_H + 12 > h then h = #rows * XP_ROW_H + 12; end;
 
-				xpLogHeight(form, h);
+				xpColsHeight(form, h);
 			end;
 		]]>
 	</script>
@@ -190,6 +202,10 @@
 
 			The four editors are read-only and carry no `field`: the rows are derived on every
 			render (SPEC V83/V84).
+
+			The box is a FIXED height from the 90th round on (SPEC I57): the title and the four
+			column headings belong to it, the rows belong to the scrollBox below them, and
+			nothing in Lua writes this height any more.
 		-->
 		<layout name="xpLogBox" left="0" top="117" width="501" height="540">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
@@ -219,16 +235,37 @@
 			<label left="348" top="35" width="82" height="20" text="Level" horzTextAlign="center"/>
 			<label left="440" top="35" width="45" height="20" text="Cost" horzTextAlign="center"/>
 
-			<textEditor name="dynXpType" left="15" top="60" width="133" height="470" readOnly="true" opacity="0.75"/>
-			<textEditor name="dynXpTrait" left="158" top="60" width="180" height="470" readOnly="true" opacity="0.75"/>
-			<textEditor name="dynXpLevel" left="348" top="60" width="82" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-			<textEditor name="dynXpCost" left="440" top="60" width="45" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<!--
+				The four columns scroll TOGETHER, inside one box of their own (SPEC I57, user
+				2026-08-23). Giving each column a bar would let them scroll four different
+				amounts and line N would stop reading across the row - which is exactly why the
+				log used to grow the frame instead of scrolling it.
+
+				It sits at left=0 top=60, so every column keeps the x it was authored with and
+				only its `top` becomes relative: nothing on this tab moves by a pixel, and the
+				width relation of V247 still reads dynXpCost where it always did.
+
+				The 16 to the right of the Cost column is the room the vertical bar has to come
+				out of. gui.ScrollBox carries no properties of its own - no axis, no bar width,
+				nothing to hide the horizontal one - so whether 16 is enough is a question for
+				the screen, not for the XML (SPEC R104).
+			-->
+			<scrollBox name="xpLogScroll" left="0" top="60" width="501" height="470">
+				<textEditor name="dynXpType" left="15" top="0" width="133" height="470" readOnly="true" opacity="0.75"/>
+				<textEditor name="dynXpTrait" left="158" top="0" width="180" height="470" readOnly="true" opacity="0.75"/>
+				<textEditor name="dynXpLevel" left="348" top="0" width="82" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+				<textEditor name="dynXpCost" left="440" top="0" width="45" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			</scrollBox>
 
 			<!-- Why the log is empty, on a line of its own (SPEC I39, V235). Declared LAST because
-			     it sits over the four columns and the host paints in document order - the same
-			     reason the Type column used to be last, now carried by the control that actually
-			     needs it. Authored hidden: a log with rows never shows it, and the dyn* prefix
-			     keeps the language traversal off it (SPEC V31). -->
+			     it sits over the scrolling columns and the host paints in document order - the
+			     same reason the Type column used to be last, now carried by the control that
+			     actually needs it. Authored hidden: a log with rows never shows it, and the dyn*
+			     prefix keeps the language traversal off it (SPEC V31).
+
+			     OUTSIDE the scrollBox, and that is the point: it is the state of the BLOCK, not a
+			     row in it, so it must not scroll away from the only state it is ever shown in
+			     (SPEC V261c). -->
 			<label name="dynXpEmpty" left="0" top="60" width="501" height="20" text="" horzTextAlign="center" opacity="0.75" visible="false"/>
 
 		</layout>
@@ -248,7 +285,7 @@
 	     some four hundred and sixty of them and no list of that size stays correct. What
 	     redraws the log when one of them is clicked is the click itself: xpClick already runs
 	     on every dot that costs experience and already holds the rows (SPEC V121/V125). -->
-	<dataLink fields="{'baseline', 'stBackgroundsXP', 'language'}" onChange="renderXPLedger(self); renderXPBoxes(self);"/>
+	<dataLink fields="{'baseline', 'stBackgroundCost', 'language'}" onChange="renderXPLedger(self); renderXPBoxes(self);"/>
 
 	<!-- The storyteller's correction and the flag that allows it (SPEC I44, V245/V246). Both
 	     are owned on WoD20.10 and watched from here, so a tick or a figure entered by ANOTHER

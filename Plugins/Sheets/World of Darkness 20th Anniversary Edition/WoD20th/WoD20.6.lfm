@@ -44,6 +44,7 @@
 				["Avatar"] = "Avatar",
 				["Awareness"] = "Sensitividade",
 				["Background"] = "História",
+				["Background Cost"] = "Custo por Antecedente",
 				["BACKGROUNDS"] = "ANTECEDENTES",
 				["Backgrounds"] = "Antecedentes",
 				["Backup"] = "Reforços",
@@ -65,7 +66,6 @@
 				["Breed"] = "Raça",
 				["Bruised"] = "Escoriado",
 				["Bureaucrat"] = "Burocrata",
-				["Can Buy Backgrounds With Experience"] = "Pode Comprar Antecedentes com Experiência",
 				["Caregiver"] = "Protetor",
 				["Celebrant"] = "Celebrante",
 				["Certification"] = "Certificação",
@@ -79,6 +79,7 @@
 				["Choose a trait first"] = "Escolha um traço primeiro",
 				["Christianity"] = "Cristianismo",
 				["Chronicle"] = "Crônica",
+				["Chronomancy"] = "Cronomancia",
 				["Clairvoyance"] = "Clarividência",
 				["Class"] = "Classe",
 				["Clip"] = "Pente",
@@ -118,9 +119,11 @@
 				["Curmudgeon"] = "Rabugento",
 				["Current Experience"] = "Experiência Atual",
 				["Current Version:"] = "Versão Atual:",
+				["Curses"] = "Maldições",
 				["Cyberkinesis"] = "Cibercinese",
 				["Cyberpathy"] = "Ciberpatia",
 				["Dabbler"] = "Diletante",
+				["Dowsing"] = "Radiestesia",
 				["Damage"] = "Dano",
 				["damage"] = "Dano",
 				["Defender"] = "Defensor",
@@ -163,6 +166,8 @@
 				["Experience"] = "Experiência",
 				["Edit Clan Disciplines"] = "Editar Disciplinas de Clã",
 				["Edit Spent XP"] = "Editar XP Gasto",
+				["Edit Affiliation"] = "Editar Afiliação",
+				["Edit Clan/Family"] = "Editar Clã/Família",
 
 				-- Same word in both languages, and the key exists for exactly that reason
 				-- (SPEC I44): the ledger writes this one through translateSheetText like every
@@ -293,6 +298,39 @@
 				["NUMINA & OTHER TRAITS"] = "NUMINA E OUTROS TRAÇOS",
 				["HEDGE MAGIC PATHS"] = "CAMINHOS DE MAGIA ESTÁTICA",
 				["PSYCHIC PHENOMENA"] = "FENÔMENOS PSÍQUICOS",
+				["Hedge Magic"] = "Magia Estática",
+				["Psychic Phenomena"] = "Fenômenos Psíquicos",
+				["Paths"] = "Caminhos",
+				["HEDGE MAGIC RITUALS"] = "RITUAIS DE MAGIA ESTÁTICA",
+				["HEDGE MAGIC"] = "MAGIA ESTÁTICA",
+				["QUINTESSENCE"] = "QUINTESSÊNCIA",
+				["Essence"] = "Essência",
+				["Affiliation"] = "Afiliação",
+				["Casting Attribute"] = "Atributo de Conjuração",
+				["Balamo’ob"] = "Balamo’ob",
+				["Forn Jafnaðr"] = "Forn Jafnaðr",
+				["Lone Practitioner"] = "Praticante Solitário",
+				["Maison Liban"] = "Maison Liban",
+				["Mogen HaLev"] = "Mogen HaLev",
+				["Nebuu-Afef, The Order of The Golden Fly"] = "Nebuu-Afef, a Ordem da Mosca Dourada",
+				["Path-Dancers"] = "Dançarinos dos Caminhos",
+				["Thal’hun"] = "Thal’hun",
+				["The Ancient Order of The Aeon Rites"] = "A Antiga Ordem dos Ritos de Aeon",
+				["The Arcanum"] = "O Arcanum",
+				["The Children of Osiris"] = "Os Filhos de Osíris",
+				["The Crystal Circle"] = "O Círculo de Cristal",
+				["The Cult of Isis"] = "O Culto de Ísis",
+				["The Cult of Mercury"] = "O Culto de Mercúrio",
+				["The Dozen Priests of the Pythian Order"] = "Os Doze Sacerdotes da Ordem Pítia",
+				["The Fenian"] = "Os Fenianos",
+				["The Nephite Priesthood"] = "O Sacerdócio Nefita",
+				["The Seven Thunders"] = "Os Sete Trovões",
+				["The Silver Portal"] = "O Portal de Prata",
+				["The Society of Enlightened Altruistic Ideologies (SEAI)"] = "Sociedade de Ideologias Altruístas Esclarecidas (SEAI)",
+				["The Society of Leopold"] = "A Sociedade de Leopold",
+				["The Star Council"] = "O Conselho Estelar",
+				["U.S. Government (Project Twilight)"] = "Governo dos EUA (Projeto Twilight)",
+				["Uzoma"] = "Uzoma",
 				["Occult"] = "Ocultismo",
 				["Occupation"] = "Ocupação",
 				["Oneiromancy"] = "Oniromancia",
@@ -327,6 +365,7 @@
 				["Primal-Urge"] = "Inst. Primitivo",
 				["Programmer: Andre (Styllern)"] = "Programador: André (Styllern)",
 				["Prophet"] = "Profeta",
+				["Purchase Forbidden"] = "Compra Proibida",
 				["Psychic Healing"] = "Cura Psíquica",
 				["Psychic Hypnosis"] = "Hipnose Psíquica",
 				["Psychic Invisibility"] = "Invisibilidade Psíquica",
@@ -389,6 +428,7 @@
 				["Specialty Cost"] = "Custo por Especialização",
 				["Spent Experience"] = "Experiência Gasta",
 				["Spies"] = "Espiões",
+				["Spirit-Chasing"] = "Perseguição de Espíritos",
 				["Stamina"] = "Vigor",
 				["Starlight"] = "Luz das Estrelas",
 				["STATUS"] = "STATUS",
@@ -436,6 +476,12 @@
 				["Update"] = "Atualizar",
 				["Version"] = "Versão Atual",
 				["Victorian Era"] = "Era Vitoriana",
+				-- Latin, and the book leaves it Latin inside English prose - so the entry is the SAME
+				-- string on both sides (SPEC I17). The key still has to exist: V10 collects every picker
+				-- item into the visible set, and a name with no key fails there whether it translates or
+				-- not (SPEC V28).
+				["Via Geniorum"] = "Via Geniorum",
+				["Via Necromantiae"] = "Via Necromantiae",
 				["Dark Ages"] = "Idade das Trevas",
 				["Classical Age"] = "Idade Clássica",
 				["Virtue"] = "Virtude",
@@ -990,6 +1036,16 @@
 				mainPath = true, secPath = true, ritual = true,
 			};
 
+			-- A SECOND filter table, keyed by CONTROL NAME instead of by root (SPEC I67, V272a).
+			-- Two of them and not one, for the reason V203 has already charged four times: the
+			-- scope holds by SENSE. `FILTER_ROW["numina"] = true` would filter all seventeen hedge
+			-- rows, and only the FIRST is the Affinity Path (M20 Sorcerer p. 8). `cboHedgeAttr` is
+			-- a singleton and rowRoot returns nil for it - it demands a trailing _<n> - so a table
+			-- keyed by root could not reach it at all (SPEC I68).
+			local FILTER_NAME = {
+				cbonumina_1 = true, cboHedgeAttr = true,
+			};
+
 			local function rowRoot(nm)
 				return string.match(string.sub(nm, 4), "^(%a+)_%d+$");
 			end;
@@ -1003,7 +1059,7 @@
 			local function isFilterRow(nm)
 				local root = rowRoot(nm);
 
-				return root ~= nil and FILTER_ROW[root] == true;
+				return FILTER_NAME[nm] == true or (root ~= nil and FILTER_ROW[root] == true);
 			end;
 
 			-- Which PICKER_LIST key a combo reads (SPEC I27). The control name is "cbo" plus the
@@ -1059,7 +1115,20 @@
 				if vals == nil then return; end;
 
 				local vamp  = isVampireRow(nm);
-				local field = filter and string.sub(nm, 4) or nil;
+
+				-- Which FIELD the control writes, and the two spellings do not share one rule
+				-- (SPEC I68, V272c). A ROW carries its number - cbonumina_1 -> numina_1 - and
+				-- dropping the "cbo" is the whole of it. A SINGLETON does not: string.sub on
+				-- cboHedgeAttr hands back `HedgeAttr` with the capital still on it, sheet[field]
+				-- comes out nil, and V200 lets go of the stored value without a symptom anywhere -
+				-- no error, rdk exiting 0, gate green. fieldRoot lowercases that first letter,
+				-- which is what it was written to do, and it cannot serve the rows in turn: it
+				-- strips `_?%d+$` and would answer `numina` for all seventeen.
+				local field = nil;
+
+				if filter then
+					field = (string.match(nm, "_%d+$") ~= nil) and string.sub(nm, 4) or fieldRoot(nm);
+				end;
 
 				-- What the ROW is holding right now. It stays in the list however illegal it has
 				-- become (SPEC V200): lowering a Discipline does not clear a row (SPEC V187), and
@@ -1068,7 +1137,13 @@
 				-- the moment the player picks something else - then it is no longer the value.
 				local current = (field ~= nil and sheet ~= nil) and sheet[field] or nil;
 
-				local stamp = tostring(lang) .. "|" .. tostring(era);
+				-- The stamp names EVERYTHING the answer depends on (SPEC V205, V272b). The
+				-- affiliation joined it in the 94th round with the two filters of I67/I68: without
+				-- it, switching affiliation leaves lang and era untouched, the stamp holds, and
+				-- every combo is served the list built under the OLD affiliation - the filters
+				-- born broken with rdk exiting 0 and the gate green. This is the same memo B48
+				-- caught serving a stale list one lesson ago.
+				local stamp = tostring(lang) .. "|" .. tostring(era) .. "|" .. tostring(sheet ~= nil and sheet.hedgeAffiliation or "");
 
 				if memo.stamp ~= stamp or memo.levels ~= levels then
 					memo.stamp  = stamp;
@@ -1083,9 +1158,18 @@
 				-- keys and share nothing. mainPath is keyed by the CONTROL because its answer
 				-- really is per row - one main path per blood sorcery (SPEC V181) means row 1
 				-- offers what row 2 must not, so those five never share and must not appear to.
+				--
+				-- FILTER_NAME is on the same footing and for the same reason (SPEC I67, T605):
+				-- cbonumina_1 is the Affinity Path and answers to the affiliation, while
+				-- cbonumina_2..17 answer to nothing - yet fieldRoot hands all seventeen the root
+				-- `numina`. Sharing one key would let whichever rendered FIRST decide: row 1 first
+				-- and the other sixteen inherit its pruned list, rows 2..17 first and row 1 is
+				-- served the whole one with its filter silently doing nothing. Neither shows an
+				-- error and both survive rdk (SPEC B48, V272).
 				local root = fieldRoot(nm);
 				local odd  = (current ~= nil and current ~= "" and not pickAllowed(field, current, levels)) and current or "";
-				local key  = ((root == "mainPath") and nm or root) .. "|" .. odd;
+				local per  = (root == "mainPath") and nm or root;
+				local key  = (FILTER_NAME[nm] == true and nm or per) .. "|" .. odd;
 				local hit  = memo.lists[key];
 				local shown = hit ~= nil and hit.shown or nil;
 				local kept  = hit ~= nil and hit.kept or nil;
@@ -1163,6 +1247,136 @@
 				end;
 			end;
 
+			-- Re-filter the two hedge pickers after the affiliation changed (SPEC I67, I68, V272d).
+			-- Reached from the dataLink on WoD20.7 that watches `hedgeAffiliation` - what the answer
+			-- actually READS - and it is renderVampPickers with TWO names instead of forty-nine.
+			--
+			-- It lives here beside its sister and for the same reason: the two combos are drawn in
+			-- WoD20.7, `form.<name>` does not cross an <import>, and xpFind is the one finder this
+			-- sheet has (SPEC V143, B9).
+			--
+			-- `levels` is still built and handed in, though neither of these two reads it: filter
+			-- is `isFilterRow(nm) and levels ~= nil`, so passing nil would turn both filters OFF
+			-- and leave the round doing nothing at all with rdk exiting 0.
+			function renderHedgePickers(from)
+				wodTrace("renderHedgePickers");
+				if sheet == nil or from == nil then return; end;
+
+				local names  = { cbonumina_1 = true, cboHedgeAttr = true };
+				local found  = {};
+				local lang   = sheet.language or "en";
+				local era    = currentTheme();
+				local levels = discLevels();
+
+				xpFind(rootOf(from), names, found);
+
+				for nm, c in pairs(found) do
+					pickerItems(c, lang, era, levels);
+				end;
+			end;
+
+			-- Show the picker or the typed twin, one of each pair at a time (SPEC I71, V274, user
+			-- 2026-08-23). The storyteller who runs homebrew needs an affiliation or a clan the
+			-- books never printed, and a dropdown cannot offer what nobody wrote down.
+			--
+			-- ONE function for BOTH pairs, and the two flags are read together: it is reached from
+			-- two dataLinks and from two tab events, and either entry has to leave all four
+			-- controls agreeing with the two flags - a renderer that only fixed "its" pair would
+			-- leave the other one wherever the last event left it.
+			--
+			-- The flags are fail-closed: nil is not true, so a sheet saved before this round opens
+			-- with the pickers showing (SPEC V80, V89, V175).
+			--
+			-- `visible` AND `enabled`, on the same two lines, for the four of them (SPEC V274d).
+			-- Writing only `visible` leaves an invisible control taking Tab focus, which is the bug
+			-- that shows up in no screenshot - the same pairing cboClan is authored with.
+			--
+			-- xpFind from the ROOT and not the tab: the two pairs live in WoD20.7 and WoD20.11,
+			-- two tabs apart, and `form.<name>` does not cross an <import> (SPEC V143, B9).
+			function renderManualEntry(from)
+				wodTrace("renderManualEntry");
+				if sheet == nil or from == nil then return; end;
+
+				local names = {
+					cboHedgeAffiliation = true, edtHedgeAffiliation = true,
+					cboClanFamily = true, edtClanFamily = true,
+				};
+
+				local found = {};
+
+				xpFind(rootOf(from), names, found);
+
+				-- Which of the four is the one on show. The picker is the DEFAULT side of each
+				-- pair, so it reads the flag negated and the typed twin reads it straight.
+				local on = {
+					cboHedgeAffiliation = sheet.stManualAffiliation ~= true,
+					edtHedgeAffiliation = sheet.stManualAffiliation == true,
+					cboClanFamily       = sheet.stManualClanFamily ~= true,
+					edtClanFamily       = sheet.stManualClanFamily == true,
+				};
+
+				for nm, show in pairs(on) do
+					local c = found[nm];
+
+					if c ~= nil then
+						c.visible = show;
+						c.enabled = show;
+					end;
+				end;
+			end;
+
+			-- A combo of VALUE - cmbHealthLevels, cmbSpecCost, cmbBgCost - translates its own
+			-- items, and pickerItems will not do it: that one opens with a cbo* test and returns
+			-- (SPEC I52, V257, B57). The .lang keys these strings carry answer to the HOST's
+			-- language; this answers to the sheet's own `language` field, which is the one the
+			-- player switches, and the two are different axes rather than two copies.
+			--
+			-- BY PREFIX, never by name (SPEC V257a). Naming cmbSpecCost would have fixed today's
+			-- combo and left the next one born mute with nothing measuring it - which is exactly
+			-- the shape B57 arrived in.
+			--
+			-- `values` is READ and never written (SPEC V257b, V22): the item is what the player
+			-- sees and the value is what the NDB keeps, so a language switch cannot touch stored
+			-- data and running this twice lands in the same place. A numeral has no key and falls
+			-- through `or v`, so the two price combos cross this without a map entry each.
+			--
+			-- Declared here rather than at the top of the script on purpose: PT and the traversal
+			-- both live above it, and a local called from above its own declaration compiles to a
+			-- GETGLOBAL that finds nil (SPEC V223, B51).
+			-- The one cmb* whose item is NOT its value, declared rather than guessed at: the
+			-- dominator's generation shows `4th` and stores `4`, and maxDiscLevel reads that
+			-- number, so the pair cannot be collapsed without repricing every saved sheet
+			-- (SPEC I30, V2). Its items are authored once and translated by nobody - `4th` is
+			-- `4th` in both languages - so skipping it costs nothing.
+			--
+			-- This is a declared EXCEPTION, not a nominal selector: the branch below still
+			-- reaches every cmb* by prefix, and the gate holds the list to BOTH directions -
+			-- a cmb* whose items differ and is not named here turns red, and a name here whose
+			-- items match turns red as a dead exception (SPEC V257c). A combo added later can
+			-- neither be born mute nor sit in this list unnoticed.
+			local CMB_DISPLAY_MAP = { cmbDominatorGen = true };
+
+			local function cmbItems(c, lang)
+				local nm = c:getName();
+
+				if nm == nil or string.sub(nm, 1, 3) ~= "cmb" then return; end;
+				if CMB_DISPLAY_MAP[nm] then return; end;
+
+				local vals = c.values;
+
+				if vals == nil then return; end;
+
+				local shown = {};
+
+				for i = 1, #vals, 1 do
+					local v = vals[i];
+
+					shown[i] = (lang == "pt") and (PT[v] or v) or v;
+				end;
+
+				c.items = shown;
+			end;
+
 			-- SPEC V22 / B.8: the authored English is snapshotted once and never overwritten.
 			-- The old routine translated label.text in place with no original kept, which is
 			-- why it could not switch back and why a second run did nothing.
@@ -1210,6 +1424,7 @@
 						end;
 					elseif cls == "comboBox" then
 						pickerItems(c, lang, currentTheme(), levels);
+						cmbItems(c, lang);
 					end;
 				end;
 			end;

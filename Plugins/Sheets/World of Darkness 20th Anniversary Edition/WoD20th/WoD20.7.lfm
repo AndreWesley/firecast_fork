@@ -2,12 +2,13 @@
 <form name="frmWoD20_7" align="client" theme="dark">
 	<script>
 		<![CDATA[
-			-- Numina descriptions live in descNumina.lua, at the plugin root next to
-			-- module.xml (SPEC I24 / T478). The generator markers moved with the text, so
-			-- the region keeps its shape; only the file it sits in changed. The require
-			-- that loads it is INSIDE numinaText, never here (SPEC V198): this CDATA is
+			-- Numina descriptions live in descNumina_en.lua and descNumina_pt.lua, at the
+			-- plugin root next to module.xml (SPEC I24 / T478, split per language by T495).
+			-- The generator markers moved with the text and then to both halves, so the
+			-- region keeps its shape; only the file it sits in changed. The require
+			-- that loads it is INSIDE the text helpers, never here (SPEC V198): this CDATA is
 			-- copied raw into constructNew_frmWoD20_7(), so a top-level require would parse
-			-- 380 KB on every sheet open and the deferral would be a silent no-op.
+			-- 230 KB on every sheet open and the deferral would be a silent no-op.
 
 			-- Every branch below produces visible text. SPEC V33 / B.6: a missing entry or an
 			-- empty row must SAY so, never leave the reader staring at a blank box.
@@ -26,31 +27,49 @@
 				pt = "Sem descrição registrada para: ",
 			};
 
+			-- A typed row whose text the storyteller has not written yet, read by anyone else
+			-- (SPEC I62, V266). The storyteller sees the empty box instead: for him it is an
+			-- input he is about to fill, and a sentence sitting in it would have to be deleted
+			-- before he could type. Same table, same wording as the three Ghoul areas (SPEC I45).
+			local NO_TEXT_YET = {
+				en = "The storyteller has not written a description for this one yet.",
+				pt = "O narrador ainda não escreveu uma descrição para esta.",
+			};
+
 			local function pick(tbl, lang)
 				return tbl[lang] or tbl.en;
 			end;
 
-			local function numinaText(lang)
+			-- One helper for BOTH row-driven blocks (SPEC I58). `selected` is the FIELD NAME of
+			-- the chosen row, so the picked numina is one indirection away and changing a row's
+			-- numina keeps the selection valid. The Hedge pane hands it `numinaSel` and the
+			-- Psychic pane `psychicSel` - two groups, because one group for both panes would
+			-- make the psychic block paint a hedge numina's text.
+			local function numinaText(selected, lang)
 				wodTrace("numinaText");
-				local selected = sheet.numinaSel;
 
 				if selected == nil or selected == "" then
 					return pick(NO_SELECTION, lang);
 				end;
 
-				-- `selected` is the FIELD NAME of the chosen row (SPEC I3), so the picked numina
-				-- is one indirection away. Changing a row's numina keeps the selection valid.
+				-- A TYPED row never reaches the book (SPEC I62, V266): it carries the
+				-- storyteller's own text, one text for both languages - it is his, not the
+				-- book's, so it passes through no translation and has no `.lang` key. This
+				-- return also keeps the require below out of reach for these rows (SPEC V206):
+				-- a homebrew numina costs no parse of the 230 KB half the book weighs.
+				if isTypedRow(selected) then
+					local own = sheet[descFieldOf(selected)];
+
+					if own ~= nil and own ~= "" then return own; end;
+					if isStoryteller() then return ""; end;
+
+					return pick(NO_TEXT_YET, lang);
+				end;
+
 				local value = sheet[selected];
 
 				if value == nil or value == "" then
 					return pick(EMPTY_ROW, lang);
-				end;
-
-				-- The TRUE FAITH row picks a RELIGION, not a numina. True Faith is one Path
-				-- whatever faith the character holds, so every choice opens the same text and
-				-- the religions need no DESC entries of their own (SPEC V50).
-				if selected == "faith" then
-					value = "True Faith";
 				end;
 
 				-- SPEC V206: the require sits BELOW every early return, so a sheet with no
@@ -60,23 +79,60 @@
 				-- B47): position in the FILE is not reach in the FLOW, and the gate reads source,
 				-- not runtime (SPEC B30, B34). `require` still caches in package.loaded, so the
 				-- first row that really needs the book pays the parse and every later one is free.
-				wodTrace("descNumina.REQUIRE");
-				local DESC = require("descNumina.lua");
+				-- SPEC T495 / V210: the book is one module PER LANGUAGE, so what is parsed
+				-- here is the half the reader can actually read - the other half was always
+				-- text this session never opens (SPEC R92f). `lang` comes off the NDB, so
+				-- anything that is not "pt" falls to the English half rather than requiring
+				-- a file that is not there.
+				local half = (lang == "pt") and "pt" or "en";
+				wodTrace("descNumina.REQUIRE." .. half);
+				local DESC = require("descNumina_" .. half .. ".lua");
 
 				local entry = DESC[value];
 
 				if entry == nil then
-					-- Free-text rows (numina_9/_10, psychic_9/_10) land here by design.
+					-- Free-text rows land here by design.
 					return pick(NO_ENTRY, lang) .. value;
 				end;
 
 				return pick(entry, lang);
 			end;
 
-			-- `form` is the sheet tab form; the block is reached as a named child, not through a
-			-- findControlByName sweep guarded by `if ~= nil` (SPEC V19 / B.6).
+			-- True Faith is ONE Path whatever faith the character holds (SPEC V50, I61), so its
+			-- pane has a single row and NOTHING to select: the block opens on the same entry
+			-- always. That is why it takes no `selected` and carries no early return - and it is
+			-- also why showing the Numina tab now always pays the parse, the cost SPEC I58
+			-- declares. What B47 actually bought is still bought: opening the SHEET parses
+			-- nothing, because onShow is the trigger and it only fires when the tab is visited.
+			local function faithText(lang)
+				-- The language half, same as above (SPEC T495, V210).
+				local half = (lang == "pt") and "pt" or "en";
+				wodTrace("descNumina.REQUIRE." .. half);
+				local DESC = require("descNumina_" .. half .. ".lua");
+
+				local entry = DESC["True Faith"];
+
+				if entry == nil then
+					return pick(NO_ENTRY, lang) .. "True Faith";
+				end;
+
+				return pick(entry, lang);
+			end;
+
+			-- One pane, text and lock in the SAME step (SPEC V266c). The two row-driven blocks
+			-- read one helper instead of a copy each: the pair cannot come apart into a block
+			-- showing one row's text under another row's lock, which is the lie V112 refuses of
+			-- every control that locks at runtime - and here it would let a player type over a
+			-- description, or leave the storyteller staring at a box that will not take a key.
+			local function paintNuminaPane(box, selected, lang)
+				box.text     = numinaText(selected, lang);
+				box.readOnly = not (isTypedRow(selected) and isStoryteller());
+			end;
+
+			-- `form` is the sheet tab form; the blocks are reached as named children, not through
+			-- a findControlByName sweep guarded by `if ~= nil` (SPEC V19 / B.6).
 			--
-			-- SPEC I26 / V206: painting this block costs a parse of the book module, so it
+			-- SPEC I26 / V206: painting these blocks costs a parse of the book module, so it
 			-- happens when the tab is SHOWN, never when the sheet opens. onShow is the trigger
 			-- and this guard is the second leg: whether onShow fires for a form inside an
 			-- INACTIVE tab is not measured yet (SPEC R92b), so the fix hangs on two contracts
@@ -87,32 +143,137 @@
 			-- which is exactly today's behaviour. Failing closed here would leave an empty box
 			-- with nothing to show for it - the silence SPEC V33 exists to forbid - and it would
 			-- fail on the one path nobody can see, the sheet nobody opened yet.
+			--
+			-- All THREE panes are painted in one pass, not just the one on screen: they are
+			-- siblings in this form and a hidden pane costs a text assignment, while wiring the
+			-- paint to the sub-tab click would put the strip in charge of the book (SPEC I58).
 			function renderNuminaDesc(form)
 				if sheet == nil then return; end;
 				if form.isShowing == false then return; end;
-				form.edtNuminaDesc.text = numinaText(sheet.language or "en");
+
+				local lang = sheet.language or "en";
+
+				-- Raised ONCE around the whole paint, not per pane: gui.TextEditor has onChange
+				-- and no onUserChange, so every write below comes back through the same door the
+				-- storyteller's typing does (SPEC V249d, V266f). Lowering it between the two
+				-- panes would open the same window twice for nothing.
+				descQuiet = true;
+				paintNuminaPane(form.edtHedgeDesc,   sheet.numinaSel,  lang);
+				paintNuminaPane(form.edtPsychicDesc, sheet.psychicSel, lang);
+				paintNuminaPane(form.edtHedgeRitualDesc, sheet.hedgeRitualSel, lang);
+
+				-- True Faith is book text under a fixed key and stays locked forever (SPEC V265,
+				-- V266e): there is no row to type on, so there is nothing here to open.
+				form.edtFaithDesc.text = faithText(lang);
+				descQuiet = false;
+			end;
+
+			-- What the storyteller types lands in the field of the row that is MARKED in THAT
+			-- pane, read at the moment of the write (SPEC V266d): the selection decides where
+			-- the text goes, so leaving one typed row for another cannot spill into the one just
+			-- left, and the psychic pane cannot write into a hedge row.
+			--
+			-- `selField` arrives as a literal from the XML, the shape xpClick already uses in
+			-- this file, and the selection is read through it - `sheet[selField]`, the same
+			-- indirection numinaText takes. What it must NEVER become is the `and`/`or` idiom:
+			-- `(pane == "psychic") and sheet.psychicSel or sheet.numinaSel` answers numinaSel
+			-- whenever the psychic pane has no row marked, and the text would land on a hedge
+			-- row with nobody able to see why (SPEC I62).
+			--
+			-- It asks BOTH questions again rather than trusting the readOnly it just wrote: the
+			-- flag on the control is a look, and the rule is a rule (SPEC V266b, fail-closed on
+			-- a sheet with no table, SPEC V80).
+			function saveNuminaDesc(form, selField)
+				if descQuiet or sheet == nil then return; end;
+
+				local sel = sheet[selField];
+				local box = form.edtHedgeDesc;
+
+				if selField == "psychicSel" then box = form.edtPsychicDesc; end;
+				if selField == "hedgeRitualSel" then box = form.edtHedgeRitualDesc; end;
+
+				if not isTypedRow(sel) or not isStoryteller() then return; end;
+
+				setField(descFieldOf(sel), box.text);
+			end;
+
+			-- The ten PERMANENT dots of the WILLPOWER box are display only: no field, autoChange
+			-- off, a click does nothing - so what is on screen has to be painted from the values
+			-- the Main tab owns (SPEC I63, V267c). Same shape as paintWillpower on WoD20.3, down
+			-- to the string indexing, which that file proves works.
+			--
+			-- The ten boxes UNDER them are not painted by anybody: they carry field="willpower_c*"
+			-- and the host keeps all three copies in step on its own (SPEC V36).
+			-- The five dots of each PICKED ritual row say what the book charges for it (SPEC I65,
+			-- V269a). They own no field, so nothing keeps them on screen but this: the level comes
+			-- off hedgeRitualLevel, the same reader the log prices with, so the art and the price
+			-- cannot tell two stories (SPEC V269d).
+			--
+			-- It stops at the picked rows. The typed ones own their dots, the host draws them and
+			-- painting them here would fight the player for the widget.
+			function paintHedgeRitualDots(form)
+				if sheet == nil then return; end;
+
+				for i = 1, HEDGE_RITUAL_ROWS - HEDGE_RITUAL_FREE_ROWS, 1 do
+					local field = "hedgeRitual_" .. i;
+					local lvl   = hedgeRitualLevel(field, sheet[field]);
+
+					for d = 1, 5, 1 do
+						local dot = form["roHR" .. field .. "_" .. d];
+
+						if dot ~= nil then dot.checked = d <= lvl; end;
+					end;
+				end;
+			end;
+
+			function paintNuminaWillpower(form)
+				if sheet == nil then return; end;
+
+				for d = 1, 10, 1 do
+					local dot = form["wpNum_" .. d];
+
+					if dot ~= nil then
+						dot.checked = sheet["willpower_" .. d] == true;
+					end;
+				end;
 			end;
 		]]>
 	</script>
 
 	<scrollBox align="client">
-		<!-- Theme backdrop, same arrangement as WoD20.1 (SPEC T158, V56, V57). -->
+		<!-- Theme backdrop, same arrangement as WoD20.1 (SPEC T158, V56, V57). It is the ONE
+		     align="client" child of this scrollBox: the strip and the three panes are absolute,
+		     so nothing contends for the client rect (SPEC V190, B41). -->
 		<image name="themePaper7" align="client" style="stretch" hitTest="false" visible="false"/>
 		<!--
-			Powers tab. Two numina tables + one read-only description block (SPEC T56-T60).
+			Numina tab, three sub-tabs (SPEC I58, 90th round).
+
+			    Numina ─┬─ Hedge Magic         → tabHedge
+			            ├─ Psychic Phenomena   → tabPsychic
+			            └─ True Faith          → tabFaith
+
+			Same shape the Ghoul tab uses (SPEC I32): a strip of our own rectangles and labels -
+			the one pair applyTheme reaches on both ends (SPEC V226) - over N absolute panes
+			stacked on ONE rect, exactly one visible. No <import> and no new files: the four
+			vampire .lfm were split because the description ran to 397 KB of XML, and since
+			SPEC I24 the book lives in descNumina_en.lua and descNumina_pt.lua, so the reason to
+			split is gone.
 
 			Row templates: the radio sits at x=0, the name widget at x=25 and the first dot at
-			x=190 in ALL THREE templates, so picker rows and free-text rows keep one input column
-			and one dot column (SPEC V26 / B.12). The radios all share field="numinaSel" - that is
-			how a radio group binds in this SDK, and SPEC V1 carries the declared exception.
+			x=260 in ALL FOUR templates, so picker rows and free-text rows keep one input column
+			and one dot column (SPEC V26 / B.12).
+
+			The radios bind by field - that is how a radio group binds in this SDK, and SPEC V1
+			carries the declared exception - and there are TWO of them now (SPEC I58, V30):
+			`numinaSel` for the hedge rows and `psychicSel` for the psychic ones. One group for
+			both panes would make the psychic block paint a hedge numina's text and back.
 			`fieldValue` is the row's own field name, which is what the renderer reads.
 
 			One picker template per box, not one shared list (SPEC V78): HedgePicker carries the
 			21 Hedge Magic Paths of M20 Sorcerer ch.1, PsychicPicker the 22 Psychic Phenomena of
-			ch.2. Same 43 items as before, split by chapter, so a box no longer offers the other
-			box's numina. `Shadows` (ch.1) and `Shadow` (ch.2) are two different numina.
+			ch.2. `Shadows` (ch.1) and `Shadow` (ch.2) are two different numina.
 
-			Rows 9 and 10 of each table stay free text on purpose: homebrew numina.
+			The LAST rows of each box stay free text on purpose: homebrew numina (SPEC V263b).
 		-->
 		<!--
 			`style` is bold on the first row and empty on the rest (SPEC V88): the affinity path
@@ -132,7 +293,7 @@
 		</template>
 
 		<template name="PsychicPicker">
-			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
+			<radioButton left="0" top="2" width="20" height="21" field="psychicSel" fieldValue="$(field)" groupName="psychicSel"/>
 			<comboBox left="25" top="0" width="230" height="25" fontSize="12" name="cbo$(field)" field="$(field)">
 			</comboBox>
 			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
@@ -142,6 +303,12 @@
 			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
+		<!--
+			Two free-text templates and not one parameterised by the group, because `groupName`
+			is read RAW off the template by the gate while `field`/`fieldValue` are expanded from
+			the call site - a `$(sel)` there would reach V30 unresolved and stop being measurable.
+			The x of every widget is identical to the two pickers above, which is what V26 holds.
+		-->
 		<template name="NuminaFree">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
 			<edit left="25" top="2" width="230" height="21" field="$(field)" fontSize="12"/>
@@ -152,144 +319,612 @@
 			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
-		<layout left="0" top="12" width="410" height="291">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="410" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
+		<template name="PsychicFree">
+			<radioButton left="0" top="2" width="20" height="21" field="psychicSel" fieldValue="$(field)" groupName="psychicSel"/>
+			<edit left="25" top="2" width="230" height="21" field="$(field)" fontSize="12"/>
+			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="310" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="335" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+		</template>
 
-			<!-- The first row is the affinity path, and bold is the whole of that mark: the
-			     star that used to sit in the left margin came off at the user's request (SPEC
-			     V88, 28th round). The note under TRUE FAITH still says what the row means. -->
-			<layout left="12" top="31" width="386" height="25">
-				<HedgePicker field="numina_1" style="bold"/>
-			</layout>
-			<layout left="12" top="56" width="386" height="25">
-				<HedgePicker field="numina_2" style=""/>
-			</layout>
-			<layout left="12" top="81" width="386" height="25">
-				<HedgePicker field="numina_3" style=""/>
-			</layout>
-			<layout left="12" top="106" width="386" height="25">
-				<HedgePicker field="numina_4" style=""/>
-			</layout>
-			<layout left="12" top="131" width="386" height="25">
-				<HedgePicker field="numina_5" style=""/>
-			</layout>
-			<layout left="12" top="156" width="386" height="25">
-				<HedgePicker field="numina_6" style=""/>
-			</layout>
-			<layout left="12" top="181" width="386" height="25">
-				<HedgePicker field="numina_7" style=""/>
-			</layout>
-			<layout left="12" top="206" width="386" height="25">
-				<HedgePicker field="numina_8" style=""/>
-			</layout>
-			<layout left="12" top="231" width="386" height="25">
-				<NuminaFree field="numina_9"/>
-			</layout>
-			<layout left="12" top="256" width="386" height="25">
-				<NuminaFree field="numina_10"/>
-			</layout>
+		<!--
+			The rituals of static magic (SPEC I65). Two templates, the same shape the Hedge Magic
+			list uses one sub-tab over: radio at x=0, name widget at x=25, first dot at x=260, so
+			all six templates of this file keep ONE input column and ONE dot column (SPEC V26).
+
+			The five dots of a PICKED row are a DISPLAY of the book's level - no field, no click,
+			autoChange off and dimmed like every other read-only piece of art (SPEC V111) - and
+			paintHedgeRitualDots drives them from the "<n>. " the item carries. A field here would
+			be a second place to keep the level, arguing with the list (SPEC V269a).
+		-->
+		<template name="HedgeRitualPicker">
+			<radioButton left="0" top="2" width="20" height="21" field="hedgeRitualSel" fieldValue="$(field)" groupName="hedgeRitualSel"/>
+			<comboBox left="25" top="0" width="230" height="25" fontSize="12" name="cbo$(field)" field="$(field)">
+			</comboBox>
+			<imageCheckBox name="roHR$(field)_1" left="260" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roHR$(field)_2" left="285" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roHR$(field)_3" left="310" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roHR$(field)_4" left="335" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roHR$(field)_5" left="360" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+		</template>
+
+		<!--
+			Homebrew, and the storyteller's to shape: he types the name, he marks the dots and he
+			writes the description (SPEC I62, I65). These dots are REAL - they own fields, they go
+			through xpClick and they are declared traits - because a typed ritual has no prefix to
+			read its level from, so the dots ARE the level (SPEC V269b, V269d).
+		-->
+		<template name="HedgeRitualFree">
+			<radioButton left="0" top="2" width="20" height="21" field="hedgeRitualSel" fieldValue="$(field)" groupName="hedgeRitualSel"/>
+			<edit left="25" top="2" width="230" height="21" field="$(field)" fontSize="12"/>
+			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="310" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="335" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+		</template>
+
+		<!--
+			The WILLPOWER block of the Numina tab (SPEC I63). It is a COPY of WoD20.3's
+			WillpowerMirror and it has to carry another name: a <template> name is module-global
+			and two files declaring the same one make rdk exit 1 with NO message, taking the .rpk
+			with it (SPEC B19, V267d). The dots are named wpNum_* for the same reason on the
+			widget side - the painter finds them with form["wpNum_" .. d], the string indexing
+			WoD20.3 already proves.
+
+			No comment inside the template body: an XML comment in there kills the build, also
+			without a message (SPEC B19).
+		-->
+		<template name="WillpowerNumina">
+			<imageCheckBox name="wpNum_1" left="0" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="wpNum_2" left="25" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="wpNum_3" left="50" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="wpNum_4" left="75" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="wpNum_5" left="100" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="wpNum_6" left="125" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="wpNum_7" left="150" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="wpNum_8" left="175" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="wpNum_9" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="wpNum_10" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+
+			<checkBox left="2" top="20" width="25" height="25" field="willpower_c1"/>
+			<checkBox left="27" top="20" width="25" height="25" field="willpower_c2"/>
+			<checkBox left="52" top="20" width="25" height="25" field="willpower_c3"/>
+			<checkBox left="77" top="20" width="25" height="25" field="willpower_c4"/>
+			<checkBox left="102" top="20" width="25" height="25" field="willpower_c5"/>
+			<checkBox left="127" top="20" width="25" height="25" field="willpower_c6"/>
+			<checkBox left="152" top="20" width="25" height="25" field="willpower_c7"/>
+			<checkBox left="177" top="20" width="25" height="25" field="willpower_c8"/>
+			<checkBox left="202" top="20" width="25" height="25" field="willpower_c9"/>
+			<checkBox left="227" top="20" width="25" height="25" field="willpower_c10"/>
+		</template>
+
+		<!--
+			The strip, same construction as vampStrip (SPEC I32, V226, V228, V229): a DimGray
+			pill under a transparent outlined button, both cornerType="innerRound" at 14/14, and
+			the widths priced at NeededPx + 2*radius + 12 measured in [pt], which is the long
+			axis here - `Fenomenos Psiquicos` is 19 characters against 17 in English.
+
+			No floor rectangle: that is the ROOT strip's own detail (SPEC I33), and vampStrip has
+			none either. It carries no `align` on purpose, so the panes below it cannot lose the
+			client rect to it (SPEC V221, B41).
+		-->
+		<layout name="numStrip" left="0" top="12" width="1280" height="34">
+			<rectangle name="tabOnHedge" left="6" top="2" width="132" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabHedge" left="6" top="2" width="132" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabHedge', self);">
+				<label left="0" top="0" width="132" height="30" text="Hedge Magic" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnPsychic" left="142" top="2" width="165" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabPsychic" left="142" top="2" width="165" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabPsychic', self);">
+				<label left="0" top="0" width="165" height="30" text="Psychic Phenomena" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
+
+			<rectangle name="tabOnFaith" left="311" top="2" width="126" height="30" color="DimGray"
+			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+			<rectangle name="btnTabFaith" left="311" top="2" width="126" height="30" color="#00000000"
+			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			           onClick="selectTab('tabFaith', self);">
+				<label left="0" top="0" width="126" height="30" text="True Faith" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+			</rectangle>
 		</layout>
 
-		<layout left="0" top="313" width="410" height="291">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="410" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
+		<!--
+			Hedge Magic (SPEC I60, I63). THREE boxes across the top since the 91st round, and
+			they close on ONE base: 158 each. It was 130 until the 92nd, when Affiliation became
+			a PICKER and its widest name stopped fitting any column the three-row grid could
+			offer - 220px against the ~382 it wants (SPEC I66, V196). That row left the grid for
+			a full-width line of its own and the box grew the 28px it costs; the two beside it
+			grew with it, because V267a is what holds the band on one base.
 
-			<layout left="12" top="31" width="386" height="25">
-				<PsychicPicker field="psychic_1"/>
+			The two on the right are STRETCHED to reach that base, so the gap under their last
+			child is not V240's 10 - they are that invariant's one named exception and they pay
+			for it with CENTRING instead, top gap equal to bottom gap inside the body (SPEC
+			V267b). Loosening V240 for every box would be B38 again.
+
+			The list and the DESCRIPTION beside it open and close on the same y, which is the
+			whole of the request: 466 = 41 + 25*17, where 41 is the title band plus V240's 10.
+		-->
+		<layout name="tabHedge" left="0" top="58" width="1280" height="688">
+			<layout left="0" top="0" width="410" height="158">
+				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+				<label left="0" top="10" width="410" height="20" text="HEDGE MAGIC" horzTextAlign="center"/>
+
+				<!-- Affiliation FIRST, and on a line of its own (SPEC I66, V196). It became a
+				     picker in the 92nd round, and the widest name it offers - `The Society of
+				     Enlightened Altruistic Ideologies (SEAI)` - wants ~382px, which the grid
+				     under it can never give: the entry column opens at 175 and the box closes
+				     at 410 - 15, so 220 is its ceiling and a comboBox CLIPS rather than wraps
+				     (SPEC B43). So the label takes one line and the picker takes the next, 386
+				     wide at x=12 - the full-width line the path rows below already use, and 4px
+				     clear of what the longest name needs (the numina rows run on the same 4).
+
+				     It leads the box rather than trailing it for two reasons. It is the field
+				     the other two ANSWER TO - T605 filters the casting attribute by it - and a
+				     386-wide row cannot be the last one: V240 pins the bottom gap at 10, and a
+				     control 10 from the bottom and 12 from the side sits inside the 14x14 the
+				     innerRound border bites out of the corner (SPEC V258, R96).
+
+				     cbo, not cmb: a picker of PROSE, so the list lives in PICKER_LIST and rides
+				     the language axis with the sheet (SPEC I27, V208, B57). The key is
+				     `hedgeAffiliation`, never `affiliation`: fieldRoot drops the "cbo" and
+				     lowercases the FIRST letter only, and a key the map does not hold is not a
+				     compile error - the combo falls through to `or c.values` and opens BLANK
+				     with rdk exiting 0 (SPEC V211a, B6). -->
+				<label left="15" top="40" width="150" height="24" text="Affiliation"/>
+				<comboBox left="12" top="68" width="386" height="24" fontSize="12" name="cboHedgeAffiliation" field="hedgeAffiliation">
+				</comboBox>
+
+				<!-- The typed twin of the picker above, one field and two widgets with exactly one
+				     of them visible (SPEC I71, V274, user 2026-08-23). A DECLARED mirror in SPEC I3
+				     ESPELHOS and not the accidental duplicate V1 refuses.
+
+				     SAME rectangle as the combo, which is the 386-wide line of its own the 93rd
+				     round gave it - not the 220 of the grid below (SPEC I66, V196).
+
+				     Authored state IS the flag off - `visible="false" enabled="false"`, both, for
+				     the reason cboClan is authored the same way: invisible and still enabled takes
+				     Tab focus, and nothing on a screenshot shows that (SPEC V274c, V274d). A sheet
+				     that never opened the storyteller's tab paints right with no Lua (SPEC V56).
+
+				     ⚠ what is typed here is FREE text while the picker stores the canonical EN
+				     (SPEC V24), so the filters of I67/I68 read an affiliation they do not know and
+				     prune nothing - which is the right answer for homebrew, not an accident. -->
+				<edit name="edtHedgeAffiliation" left="12" top="68" width="386" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
+
+				<!-- The label column is 150 because SPEC V16 prices it there and not by eye:
+				     `Atributo de Conjuracao` is 22 characters, which the house ruler puts at
+				     143px. These two rows share one label x and one entry x, so they are a GRID
+				     and not two controls that happen to line up (SPEC V224, B12, B13). -->
+				<label left="15" top="96" width="150" height="24" text="Essence"/>
+				<edit left="175" top="96" width="220" height="24" field="hedgeEssence"/>
+
+				<!-- cbo, not cmb: this is a picker of PROSE, so its list lives in PICKER_LIST and
+				     translates with the sheet (SPEC I27, V208 scope, B57). The nine names are the
+				     nine of XP_ATTRS, `Inteligence` in the sheet's own spelling (SPEC I3). -->
+				<label left="15" top="124" width="150" height="24" text="Casting Attribute"/>
+				<comboBox left="175" top="124" width="220" height="24" fontSize="12" name="cboHedgeAttr" field="hedgeAttr">
+				</comboBox>
 			</layout>
-			<layout left="12" top="56" width="386" height="25">
-				<PsychicPicker field="psychic_2"/>
+
+			<!-- Ten FREE dots (SPEC I60, V264b). They wear the rating art and they are not rating
+			     dots: quintessence is spent and regained, so autoChange stays ON and there is no
+			     onClick - nothing here reaches xpClick, nothing is declared in XP_TRAIT, and no
+			     ledger line is ever written. Same standing as bloodPool_* (SPEC V219) and
+			     willpower_c*, and the gate names them by field PREFIX rather than loosening
+			     V134, which would let ANY dot mark itself and bring B38 back.
+
+			     Pitch 29 and not 28: the row spans 9*pitch + 25, and 286 leaves an integer gap on
+			     both sides of the 420-wide box the 91st round left it in - 67 and 67 (SPEC V239).
+			     At 28 the span is 277 and the two gaps come out 71 and 72.
+
+			     top=87 is the CENTRE of the body, not a row position: the box is stretched to the
+			     band's 158 and 87 - 41 equals 158 - 112 (SPEC I63, V267b). -->
+			<layout left="420" top="0" width="420" height="158">
+				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+				<label left="0" top="10" width="420" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
+
+				<imageCheckBox left="67" top="87" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="96" top="87" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="125" top="87" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="154" top="87" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="183" top="87" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="212" top="87" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="241" top="87" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="270" top="87" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="299" top="87" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="328" top="87" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			</layout>
-			<layout left="12" top="81" width="386" height="25">
-				<PsychicPicker field="psychic_3"/>
+
+			<!-- The WILLPOWER box of the Combat tab, moved here and not redesigned (SPEC I63,
+			     user 2026-08-23). The dots on top are DISPLAY ONLY - no field=, autoChange off,
+			     painted by paintNuminaWillpower() from what the Main tab owns - while the boxes
+			     under them carry field="willpower_c*" and are a declared mirror, the third one
+			     now (SPEC I3 ESPELHOS, V36). Spending willpower is what a sorcerer does mid-rite;
+			     buying the permanent rating stays where V240's price list put it (SPEC I9).
+
+			     The 250x45 block sits at 85/77: 85 = (420 - 250) / 2 and 77 - 41 = 158 - 122, the
+			     same centring the box beside it pays (SPEC V267b). -->
+			<layout left="850" top="0" width="420" height="158">
+				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+				<label left="0" top="10" width="420" height="20" text="WILLPOWER" horzTextAlign="center"/>
+
+				<layout left="85" top="77" width="250" height="45">
+					<WillpowerNumina/>
+				</layout>
 			</layout>
-			<layout left="12" top="106" width="386" height="25">
-				<PsychicPicker field="psychic_4"/>
+
+			<!--
+				Paths and Rituals (SPEC I64, 91st round). Third level of tab on this sheet, and
+				the same construction as numStrip above it and vampStrip on the Ghoul tab (SPEC
+				I32, I58): our own rectangles and labels - the one pair applyTheme reaches on both
+				ends (SPEC V226) - over two absolute panes stacked on ONE rect, exactly one visible.
+
+				The names carry "Hedge" because "tabPaths" and "tabRituals" are TAKEN, by the Ghoul
+				tab's own group. renderSubTabs keys its map by name and selectTab matches a name
+				against every group in SUB_TABS, so the duplicate would cross the two strips with
+				nothing in the gate or in rdk to say so (SPEC V268a).
+
+				Widths by the house ruler (SPEC V228): NeededPx + 2*14 + 12 over the LONGER of the
+				two languages - 'Caminhos' at 8 characters wants 92, 'Rituais' at 7 wants 86.
+
+				The affinity note rides HERE, at the right end of the strip, and not under the list
+				it explains: the pane is 472 tall, the seventeen rows measure 466, and the note plus
+				its gap wants 30 more (SPEC I64, user 2026-08-23). It is a bare label, so V40 and
+				V48 - which measure boxes - have nothing to say about it, and V227 is untouched
+				because it carries no field.
+			-->
+			<layout name="hedgeStrip" left="0" top="170" width="1280" height="34">
+				<rectangle name="tabOnHedgePaths" left="6" top="2" width="95" height="30" color="DimGray"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabHedgePaths" left="6" top="2" width="95" height="30" color="#00000000"
+				           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabHedgePaths', self);">
+					<label left="0" top="0" width="95" height="30" text="Paths" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
+
+				<rectangle name="tabOnHedgeRituals" left="105" top="2" width="90" height="30" color="DimGray"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabHedgeRituals" left="105" top="2" width="90" height="30" color="#00000000"
+				           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabHedgeRituals', self);">
+					<label left="0" top="0" width="90" height="30" text="Rituals" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
+
+				<label left="210" top="2" width="400" height="30" text="* The first path is the Affinity Path" fontSize="12" vertTextAlign="center"/>
 			</layout>
-			<layout left="12" top="131" width="386" height="25">
-				<PsychicPicker field="psychic_5"/>
+
+			<layout name="tabHedgePaths" left="0" top="216" width="1280" height="472">
+				<layout left="0" top="0" width="410" height="466">
+					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+					<label left="0" top="10" width="410" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
+
+					<layout left="12" top="31" width="386" height="25">
+						<HedgePicker field="numina_1" style="bold"/>
+					</layout>
+					<layout left="12" top="56" width="386" height="25">
+						<HedgePicker field="numina_2" style=""/>
+					</layout>
+					<layout left="12" top="81" width="386" height="25">
+						<HedgePicker field="numina_3" style=""/>
+					</layout>
+					<layout left="12" top="106" width="386" height="25">
+						<HedgePicker field="numina_4" style=""/>
+					</layout>
+					<layout left="12" top="131" width="386" height="25">
+						<HedgePicker field="numina_5" style=""/>
+					</layout>
+					<layout left="12" top="156" width="386" height="25">
+						<HedgePicker field="numina_6" style=""/>
+					</layout>
+					<layout left="12" top="181" width="386" height="25">
+						<HedgePicker field="numina_7" style=""/>
+					</layout>
+					<layout left="12" top="206" width="386" height="25">
+						<HedgePicker field="numina_8" style=""/>
+					</layout>
+					<layout left="12" top="231" width="386" height="25">
+						<HedgePicker field="numina_9" style=""/>
+					</layout>
+					<layout left="12" top="256" width="386" height="25">
+						<HedgePicker field="numina_10" style=""/>
+					</layout>
+					<layout left="12" top="281" width="386" height="25">
+						<HedgePicker field="numina_11" style=""/>
+					</layout>
+					<layout left="12" top="306" width="386" height="25">
+						<HedgePicker field="numina_12" style=""/>
+					</layout>
+					<layout left="12" top="331" width="386" height="25">
+						<NuminaFree field="numina_13"/>
+					</layout>
+					<layout left="12" top="356" width="386" height="25">
+						<NuminaFree field="numina_14"/>
+					</layout>
+					<layout left="12" top="381" width="386" height="25">
+						<NuminaFree field="numina_15"/>
+					</layout>
+					<layout left="12" top="406" width="386" height="25">
+						<NuminaFree field="numina_16"/>
+					</layout>
+					<layout left="12" top="431" width="386" height="25">
+						<NuminaFree field="numina_17"/>
+					</layout>
+				</layout>
+
+				<!--
+					Read-only on purpose: this block displays book text, it is not a note field. No
+					`field=` either, so nothing here is written to the character (SPEC V29 / R.12).
+				-->
+				<layout left="420" top="0" width="850" height="466">
+					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+					<label left="0" top="10" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+					<textEditor name="edtHedgeDesc" left="10" top="31" width="830" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'numinaSel');"/>
+				</layout>
 			</layout>
-			<layout left="12" top="156" width="386" height="25">
-				<PsychicPicker field="psychic_6"/>
+
+			<layout name="tabHedgeRituals" left="0" top="216" width="1280" height="472" visible="false">
+				<layout left="0" top="0" width="410" height="466">
+					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+					<label left="0" top="10" width="410" height="20" text="HEDGE MAGIC RITUALS" horzTextAlign="center"/>
+
+					<layout left="12" top="31" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_1"/>
+					</layout>
+					<layout left="12" top="56" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_2"/>
+					</layout>
+					<layout left="12" top="81" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_3"/>
+					</layout>
+					<layout left="12" top="106" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_4"/>
+					</layout>
+					<layout left="12" top="131" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_5"/>
+					</layout>
+					<layout left="12" top="156" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_6"/>
+					</layout>
+					<layout left="12" top="181" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_7"/>
+					</layout>
+					<layout left="12" top="206" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_8"/>
+					</layout>
+					<layout left="12" top="231" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_9"/>
+					</layout>
+					<layout left="12" top="256" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_10"/>
+					</layout>
+					<layout left="12" top="281" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_11"/>
+					</layout>
+					<layout left="12" top="306" width="386" height="25">
+						<HedgeRitualPicker field="hedgeRitual_12"/>
+					</layout>
+					<layout left="12" top="331" width="386" height="25">
+						<HedgeRitualFree field="hedgeRitual_13"/>
+					</layout>
+					<layout left="12" top="356" width="386" height="25">
+						<HedgeRitualFree field="hedgeRitual_14"/>
+					</layout>
+					<layout left="12" top="381" width="386" height="25">
+						<HedgeRitualFree field="hedgeRitual_15"/>
+					</layout>
+					<layout left="12" top="406" width="386" height="25">
+						<HedgeRitualFree field="hedgeRitual_16"/>
+					</layout>
+					<layout left="12" top="431" width="386" height="25">
+						<HedgeRitualFree field="hedgeRitual_17"/>
+					</layout>
+				</layout>
+
+				<!-- Read-only on purpose, and field-less: this block shows book text (SPEC V29), and
+				     it opens for the storyteller only on a typed row, exactly as the other two do
+				     (SPEC I62, V266). The list is empty until the rituals are entered, so what a
+				     player sees here today is a state sentence, never a blank box (SPEC V33). -->
+				<layout left="420" top="0" width="850" height="466">
+					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+					<label left="0" top="10" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+					<textEditor name="edtHedgeRitualDesc" left="10" top="31" width="830" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'hedgeRitualSel');"/>
+				</layout>
 			</layout>
-			<layout left="12" top="181" width="386" height="25">
-				<PsychicPicker field="psychic_7"/>
+
+		</layout>
+
+		<!--
+			Psychic Phenomena (SPEC I59). The list runs the full height of the DESCRIPTION beside
+			it: 641 = 41 + 25*24, where 41 is the title band plus the 10 SPEC V240 wants at the
+			bottom. The last five rows are typed, and they are the LAST five (SPEC V263b).
+		-->
+		<layout name="tabPsychic" left="0" top="58" width="1280" height="688" visible="false">
+			<layout left="0" top="0" width="410" height="641">
+				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+				<label left="0" top="10" width="410" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
+
+				<layout left="12" top="31" width="386" height="25">
+					<PsychicPicker field="psychic_1"/>
+				</layout>
+				<layout left="12" top="56" width="386" height="25">
+					<PsychicPicker field="psychic_2"/>
+				</layout>
+				<layout left="12" top="81" width="386" height="25">
+					<PsychicPicker field="psychic_3"/>
+				</layout>
+				<layout left="12" top="106" width="386" height="25">
+					<PsychicPicker field="psychic_4"/>
+				</layout>
+				<layout left="12" top="131" width="386" height="25">
+					<PsychicPicker field="psychic_5"/>
+				</layout>
+				<layout left="12" top="156" width="386" height="25">
+					<PsychicPicker field="psychic_6"/>
+				</layout>
+				<layout left="12" top="181" width="386" height="25">
+					<PsychicPicker field="psychic_7"/>
+				</layout>
+				<layout left="12" top="206" width="386" height="25">
+					<PsychicPicker field="psychic_8"/>
+				</layout>
+				<layout left="12" top="231" width="386" height="25">
+					<PsychicPicker field="psychic_9"/>
+				</layout>
+				<layout left="12" top="256" width="386" height="25">
+					<PsychicPicker field="psychic_10"/>
+				</layout>
+				<layout left="12" top="281" width="386" height="25">
+					<PsychicPicker field="psychic_11"/>
+				</layout>
+				<layout left="12" top="306" width="386" height="25">
+					<PsychicPicker field="psychic_12"/>
+				</layout>
+				<layout left="12" top="331" width="386" height="25">
+					<PsychicPicker field="psychic_13"/>
+				</layout>
+				<layout left="12" top="356" width="386" height="25">
+					<PsychicPicker field="psychic_14"/>
+				</layout>
+				<layout left="12" top="381" width="386" height="25">
+					<PsychicPicker field="psychic_15"/>
+				</layout>
+				<layout left="12" top="406" width="386" height="25">
+					<PsychicPicker field="psychic_16"/>
+				</layout>
+				<layout left="12" top="431" width="386" height="25">
+					<PsychicPicker field="psychic_17"/>
+				</layout>
+				<layout left="12" top="456" width="386" height="25">
+					<PsychicPicker field="psychic_18"/>
+				</layout>
+				<layout left="12" top="481" width="386" height="25">
+					<PsychicPicker field="psychic_19"/>
+				</layout>
+				<layout left="12" top="506" width="386" height="25">
+					<PsychicFree field="psychic_20"/>
+				</layout>
+				<layout left="12" top="531" width="386" height="25">
+					<PsychicFree field="psychic_21"/>
+				</layout>
+				<layout left="12" top="556" width="386" height="25">
+					<PsychicFree field="psychic_22"/>
+				</layout>
+				<layout left="12" top="581" width="386" height="25">
+					<PsychicFree field="psychic_23"/>
+				</layout>
+				<layout left="12" top="606" width="386" height="25">
+					<PsychicFree field="psychic_24"/>
+				</layout>
 			</layout>
-			<layout left="12" top="206" width="386" height="25">
-				<PsychicPicker field="psychic_8"/>
-			</layout>
-			<layout left="12" top="231" width="386" height="25">
-				<NuminaFree field="psychic_9"/>
-			</layout>
-			<layout left="12" top="256" width="386" height="25">
-				<NuminaFree field="psychic_10"/>
+
+			<layout left="420" top="0" width="850" height="641">
+				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+				<label left="0" top="10" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+				<textEditor name="edtPsychicDesc" left="10" top="31" width="830" height="600" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'psychicSel');"/>
 			</layout>
 		</layout>
 
 		<!--
-			Third table, one row (SPEC T81). True Faith is the only Path in its Numina, so it
-			gets its own two-entry list instead of joining either box's list (SPEC V78) -
-			otherwise every hedge/psychic row would offer True Faith as a choice.
+			True Faith (SPEC I61). One row, so there is no radio and nothing to select: the block
+			below opens on DESC['True Faith'] whatever religion is written beside it, which is
+			what SPEC V50 always said in words. The row is CENTRED because V239 asks the two side
+			gaps to agree, and a row parked on the left of a 1270-wide box would push the dots to
+			x=1255.
 
-			Written out instead of templated: one call would not earn a template, and V26 skips
-			a box with fewer than two rows either way. The x positions are copied from
-			HedgePicker so the radio, the picker and the dots stay in the same columns.
+			Religion is TYPED, not picked (user, 2026-08-23): the four-item list was the shape a
+			picker forced, not a roster the book closes, and nothing reads the value - the block
+			beside it is hard-wired to the one entry. The FIELD did not change (SPEC V2 forbids
+			renaming, not swapping the widget that owns it), so a sheet saved with `Christianity`
+			opens with `Christianity` in the box.
 
 			`faith_1`..`_5` are the dots that used to live on the Main tab. They moved here in
 			the same change that removed them there, so a saved sheet keeps its rating (V35).
 		-->
-		<layout left="0" top="614" width="410" height="66">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="410" height="20" text="TRUE FAITH" horzTextAlign="center"/>
+		<layout name="tabFaith" left="0" top="58" width="1280" height="688" visible="false">
+			<layout left="0" top="0" width="1270" height="76">
+				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+				<label left="0" top="10" width="1270" height="20" text="TRUE FAITH" horzTextAlign="center"/>
 
-			<layout left="12" top="31" width="386" height="25">
-				<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="faith" groupName="numinaSel"/>
-				<comboBox left="25" top="0" width="230" height="25" fontSize="12" name="cboFaith" field="faith">
-				</comboBox>
-				<imageCheckBox left="260" top="0" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_1', self);"/>
-				<imageCheckBox left="285" top="0" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_2', self);"/>
-				<imageCheckBox left="310" top="0" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_3', self);"/>
-				<imageCheckBox left="335" top="0" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_4', self);"/>
-				<imageCheckBox left="360" top="0" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_5', self);"/>
+				<layout left="352" top="41" width="566" height="25">
+					<label left="0" top="0" width="95" height="24" text="Religion"/>
+					<edit left="100" top="0" width="300" height="24" field="faith" fontSize="12"/>
+					<imageCheckBox left="425" top="0" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_1', self);"/>
+					<imageCheckBox left="454" top="0" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_2', self);"/>
+					<imageCheckBox left="483" top="0" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_3', self);"/>
+					<imageCheckBox left="512" top="0" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_4', self);"/>
+					<imageCheckBox left="541" top="0" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_5', self);"/>
+				</layout>
 			</layout>
-		</layout>
 
-		<!-- Outside the box on purpose (user, 27th round): it is a footnote to the whole
-		     left-hand column, not a line of the True Faith table, so it sits under the box on
-		     the tab itself. It is a bare label, not a section box, so V40 and V48 - which
-		     measure boxes - have nothing to say about it. -->
-		<label left="12" top="698" width="315" height="20" text="* The first path is the Affinity Path" fontSize="12"/>
-
-		<!--
-			Read-only on purpose: this block displays book text, it is not a note field. No
-			`field=` either, so nothing here is written to the character (SPEC V29 / R.12).
-
-			Height tracks the three tables on the left, which now end at y=680 (SPEC T81).
-		-->
-		<layout left="420" top="12" width="850" height="686">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="850" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtNuminaDesc" left="10" top="31" width="830" height="645" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+			<layout left="0" top="86" width="1270" height="574">
+				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+				<label left="0" top="10" width="1270" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+				<textEditor name="edtFaithDesc" left="10" top="31" width="1250" height="533" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+			</layout>
 		</layout>
 	</scrollBox>
 
 	<!--
-		One link for the whole tab: the selected row, every row's value, and the language combo.
-		`language` is in the list so switching languages re-renders the block from DESC instead
+		One link for the whole tab: the two selections, every row's value, and the language combo.
+		`language` is in the list so switching languages re-renders the blocks from DESC instead
 		of translating the textEditor in place (SPEC V31, T61) - no call across tab forms needed.
+		`faith` left the list in the 90th round: the True Faith block reads a fixed key now, so
+		the religion beside it drives nothing (SPEC I61).
 	-->
-	<dataLink fields="{'language', 'numinaSel', 'numina_1', 'numina_2', 'numina_3', 'numina_4', 'numina_5', 'numina_6', 'numina_7', 'numina_8', 'numina_9', 'numina_10', 'psychic_1', 'psychic_2', 'psychic_3', 'psychic_4', 'psychic_5', 'psychic_6', 'psychic_7', 'psychic_8', 'psychic_9', 'psychic_10', 'faith'}" onChange="renderNuminaDesc(self);"/>
+	<dataLink fields="{'language', 'numinaSel', 'psychicSel', 'numina_1', 'numina_2', 'numina_3', 'numina_4', 'numina_5', 'numina_6', 'numina_7', 'numina_8', 'numina_9', 'numina_10', 'numina_11', 'numina_12', 'numina_13', 'numina_14', 'numina_15', 'numina_16', 'numina_17', 'psychic_1', 'psychic_2', 'psychic_3', 'psychic_4', 'psychic_5', 'psychic_6', 'psychic_7', 'psychic_8', 'psychic_9', 'psychic_10', 'psychic_11', 'psychic_12', 'psychic_13', 'psychic_14', 'psychic_15', 'psychic_16', 'psychic_17', 'psychic_18', 'psychic_19', 'psychic_20', 'psychic_21', 'psychic_22', 'psychic_23', 'psychic_24', 'hedgeRitualSel', 'hedgeRitual_1', 'hedgeRitual_2', 'hedgeRitual_3', 'hedgeRitual_4', 'hedgeRitual_5', 'hedgeRitual_6', 'hedgeRitual_7', 'hedgeRitual_8', 'hedgeRitual_9', 'hedgeRitual_10', 'hedgeRitual_11', 'hedgeRitual_12', 'hedgeRitual_13', 'hedgeRitual_14', 'hedgeRitual_15', 'hedgeRitual_16', 'hedgeRitual_17'}" onChange="renderNuminaDesc(self);"/>
 
-	<!-- Second, independent entry point: the block must be filled when the reader can SEE it,
+	<!-- The permanent rating is bought on the Main tab (SPEC I9) and shown here, so this box
+	     follows the ten dots that own it. A link of its own and not more fields on the one
+	     above: that one repaints the three description blocks, and a willpower click has no
+	     business parsing the book (SPEC I63, V206). -->
+	<!-- The picked rituals wear their level in art, so the art follows the row (SPEC I65). It
+	     is a link of its own and not more handlers on the one above: that one repaints three
+	     description blocks and a level is not a description. -->
+	<dataLink fields="{'hedgeRitual_1', 'hedgeRitual_2', 'hedgeRitual_3', 'hedgeRitual_4', 'hedgeRitual_5', 'hedgeRitual_6', 'hedgeRitual_7', 'hedgeRitual_8', 'hedgeRitual_9', 'hedgeRitual_10', 'hedgeRitual_11', 'hedgeRitual_12', 'hedgeRitual_13', 'hedgeRitual_14', 'hedgeRitual_15', 'hedgeRitual_16', 'hedgeRitual_17'}" onChange="paintHedgeRitualDots(self);"/>
+
+	<dataLink fields="{'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10'}" onChange="paintNuminaWillpower(self);"/>
+
+	<!-- The affiliation decides what the Affinity Path row and the casting attribute may offer,
+	     so the two lists are rebuilt when it changes (SPEC I67, I68, V272d). A link of its own
+	     and not another field on the description one above: that one parses the book for three
+	     text blocks, and an affiliation is not a description (SPEC V206).
+
+	     At form level like every other dataLink on this sheet, not inside the HEDGE MAGIC box:
+	     there are twenty-odd links across the fifteen forms and not one of them is nested, and
+	     the handler walks up from `self` anyway (SPEC V143). -->
+	<dataLink field="hedgeAffiliation" onChange="renderHedgePickers(self);"/>
+
+	<!-- The storyteller flag that swaps this tab's Affiliation picker for a typed field
+	     (SPEC I71, V274). It is wired where the control it swaps lives, the same place the
+	     clan-discipline lock is wired (SPEC V175) - the flag is set two tabs away and every
+	     client at the table has to follow it, not just the one that ticked it. -->
+	<dataLink field="stManualAffiliation" onChange="renderManualEntry(self);"/>
+
+	<!-- Second, independent entry point: the blocks must be filled when the reader can SEE them,
 	     not only after they touch something. It used to hang on onNodeReady and cite SPEC
 	     V19 / V33 for it - but neither invariant asks for paint at OPEN: V19 forbids a silent
 	     `if ~= nil` init path and V33 demands explicit state text for an unresolved row. The
 	     comment was reading more into them than they say (SPEC I26), and onNodeReady fires on
 	     every open, dragging the whole 380 KB module in with it (SPEC B47). onShow costs
-	     nothing until the tab is actually visited. -->
+	     nothing until the tab is actually visited.
+
+	     renderSubTabs paints the strip from the same event: the panes are authored in the state
+	     the default sits in (SPEC V94), and this is what lights the pill over it. -->
 	<event name="onShow">
 		wodTrace("WoD20.7.onShow");
+		renderManualEntry(self);
+		renderSubTabs(self);
 		renderNuminaDesc(self);
+		paintNuminaWillpower(self);
+		paintHedgeRitualDots(self);
 	</event>
 </form>

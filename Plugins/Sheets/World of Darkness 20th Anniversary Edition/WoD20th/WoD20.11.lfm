@@ -44,8 +44,12 @@
 		under an align="client" tabControl does not clash by the rule V190 measures, it simply
 		overlaps - B41 by a second door, which is what V221 is for.
 
-		Geometry follows the sub-tabs it hosts: WoD20.12 is 1210 wide (360 + 850) and 585 tall,
-		so the boxes take 600 + 600 across the same width and tabsVamp starts below them.
+		Geometry follows the RULER, not a literal: BLOOD POOL is the box that anchors it and the
+		three DESCRIPTION panes reach it (SPEC I31, I48, I55). Since the 89th round the ruler is
+		980 - DOMINATOR closes on its own content at 620, BLOOD POOL sits 10 to its right and
+		keeps its 350 - and the strip and the three panes are 990, the ruler plus the border the
+		source cannot see (SPEC R94). V259 is what holds the 10 between the two boxes: shrink one
+		and leave the other parked and every other check still passes over 265px of nothing.
 		No theme backdrop here: SPEC I29 did not ask for one, and the image that used to hang
 		in this file is the one B41 was about.
 	-->
@@ -56,44 +60,63 @@
 		     image is the ONE child claiming the client rect, exactly as in WoD20.12. applyTheme
 		     finds it by the first ten characters of the name, so the number must stay attached. -->
 		<image name="themePaper11" align="client" style="stretch" hitTest="false" visible="false"/>
-		<!-- Two columns of LABEL (12, 500) and two of INPUT (112, 675), and both rows use the
-		     same four (SPEC I30, V224). That is what makes this a grid instead of four controls
+		<!-- Two columns of LABEL (15, 374) and two of INPUT (115, 549), and both rows use the
+		     same four (SPEC I30, V224). The four moved in the 89th round when Name and Clan/Family
+		     lost 40% and Generation 70% (SPEC I55); the label column went 12 -> 15 with them, and
+		     that 3px is V258, not taste - at 12 the entry column closed 12px from the border and
+		     sat inside the 14x14 the concave corner bites out (SPEC R96, B53). That is what makes this a grid instead of four controls
 		     that happen to line up today: B12 and B13 were sibling templates whose entry x drifted
 		     apart, and they survived rounds because nothing measured a COLUMN.
 		
 		     The two labels on the left say Name and Generation now, and the FIELDS under them did
 		     not change: `dominator` and `dominatorGen` still own the data (SPEC V2 - a rename here
 		     would drop what is already saved on the sheet the user is testing with). -->
-		<layout left="0" top="12" width="875" height="116">
+		<layout left="0" top="12" width="620" height="116">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="875" height="20" text="DOMINATOR" horzTextAlign="center"/>
+			<label left="0" top="10" width="620" height="20" text="DOMINATOR" horzTextAlign="center"/>
 
-			<label left="12" top="46" width="95" height="24" text="Name"/>
-			<edit left="112" top="46" width="320" height="24" field="dominator"/>
+			<label left="15" top="46" width="95" height="24" text="Name"/>
+			<edit left="115" top="46" width="192" height="24" field="dominator"/>
 
 			<!-- cmb, not cbo: pickerItems only touches controls named cbo* (WoD20.6), which is what
 			     lets this one keep an items/values pair that DIFFERS - the ordinal is what the player
 			     reads, the number is what GEN_MAX is keyed by (SPEC I29). Same footing as
 			     cmbHealthLevels: a combo of VALUE, not a picker of prose (SPEC V208 scope). -->
-			<label left="500" top="46" width="165" height="24" text="Generation"/>
-			<comboBox name="cmbDominatorGen" left="675" top="46" width="188" height="24" field="dominatorGen"
+			<label left="374" top="46" width="165" height="24" text="Generation"/>
+			<comboBox name="cmbDominatorGen" left="549" top="46" width="56" height="24" field="dominatorGen"
 			          items="{'', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th'}"
 			          values="{'', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'}"/>
 
-			<!-- The tightest pair in the box, both ways. The list holds `Daughters of Cacophony` (22
-			     chars, measured across the 60 in CLANS) and the revenant families are still unread
-			     (SPEC T510); and the label opposite is `Nivel Max. de Disciplina` in pt, 24 chars,
-			     which V16 prices at 156px inside these 165. -->
-			<label left="12" top="82" width="95" height="24" text="Clan/Family"/>
-			<comboBox name="cboClanFamily" left="112" top="82" width="320" height="24" field="clanFamily"/>
+			<!-- The tightest pair in the box, both ways, and 192 is where the 89th round left it (-40%,
+			     SPEC I55). V196 prices the widest of the 61 clans at 180 - `Dominate Malkavians`, whose
+			     pt is `Malkavianos de Dominacao` at 24 chars - so there are 12px of headroom and no
+			     more. The revenant families are still unread (SPEC T510); when they land and one of
+			     them is longer, the COLUMN gives way, not the list (SPEC I30). The label opposite is
+			     `Nivel Max. de Disciplina` in pt, 24 chars, which V16 prices at 156px inside these 165. -->
+			<label left="15" top="82" width="95" height="24" text="Clan/Family"/>
+			<comboBox name="cboClanFamily" left="115" top="82" width="192" height="24" field="clanFamily"/>
+
+			<!-- The typed twin of the picker above, one field and two widgets with exactly one of
+			     them visible (SPEC I71, V274, user 2026-08-23). It is a DECLARED mirror in SPEC I3
+			     ESPELHOS, not the accidental duplicate V1 refuses.
+
+			     SAME rectangle as the combo on purpose: the flag swaps which of the two the reader
+			     sees, and a second geometry would make that swap move the row.
+
+			     Authored state IS the flag off - `visible="false" enabled="false"`, both of them,
+			     for the reason cboClan is authored the same way: a control that is invisible and
+			     still enabled takes Tab focus, which is the bug no screenshot shows (SPEC V274c,
+			     V274d). A sheet that never opened the storyteller's tab paints right with no Lua
+			     at all (SPEC V56). -->
+			<edit name="edtClanFamily" left="115" top="82" width="192" height="24" field="clanFamily" visible="false" enabled="false"/>
 
 			<!-- Derived, so it has no `field` and is never saved (SPEC I3, V29): a number that can be
 			     recomputed must not be able to disagree with what it was computed from. -->
-			<label left="500" top="82" width="165" height="24" text="Max Discipline Level"/>
-			<label name="lblMaxDisc" left="675" top="82" width="188" height="24" text="-"/>
+			<label left="374" top="82" width="165" height="24" text="Max Discipline Level"/>
+			<label name="lblMaxDisc" left="549" top="82" width="56" height="24" text="-"/>
 		</layout>
 
-		<layout left="885" top="12" width="350" height="118">
+		<layout left="630" top="12" width="350" height="118">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="350" height="20" text="BLOOD POOL" horzTextAlign="center"/>
 
@@ -137,7 +160,7 @@
 			B41. The imported forms are align="client" themselves, so each one fills the layout
 			that holds it and the explicit size is all they need.
 		-->
-		<layout name="vampStrip" left="0" top="142" width="1245" height="34">
+		<layout name="vampStrip" left="0" top="142" width="990" height="34">
 			<rectangle name="tabOnDisc" left="6" top="2" width="112" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
 			<rectangle name="btnTabDisc" left="6" top="2" width="112" height="30" color="#00000000"
@@ -163,15 +186,15 @@
 			</rectangle>
 		</layout>
 
-		<layout name="tabDisc" left="0" top="180" width="1245" height="700">
+		<layout name="tabDisc" left="0" top="180" width="990" height="700">
 			<import file="WoD20.12.lfm"/>
 		</layout>
 
-		<layout name="tabPaths" left="0" top="180" width="1245" height="700" visible="false">
+		<layout name="tabPaths" left="0" top="180" width="990" height="700" visible="false">
 			<import file="WoD20.13.lfm"/>
 		</layout>
 
-		<layout name="tabRituals" left="0" top="180" width="1245" height="700" visible="false">
+		<layout name="tabRituals" left="0" top="180" width="990" height="700" visible="false">
 			<import file="WoD20.14.lfm"/>
 		</layout>
 	</scrollBox>
@@ -180,8 +203,14 @@
 	     that changed it (SPEC V175 is the same reason the clan-discipline lock is wired here). -->
 	<dataLink field="dominatorGen" onChange="renderMaxDisc(self);"/>
 
+	<!-- The storyteller flag that swaps this tab's Clan/Family picker for a typed field
+	     (SPEC I71, V274), wired beside the one above and for the same reason: the flag is set
+	     on another tab and every client at the table has to follow it. -->
+	<dataLink field="stManualClanFamily" onChange="renderManualEntry(self);"/>
+
 	<event name="onNodeReady">
 		renderMaxDisc(self);
-		renderVampTabs(self);
+		renderManualEntry(self);
+		renderSubTabs(self);
 	</event>
 </form>

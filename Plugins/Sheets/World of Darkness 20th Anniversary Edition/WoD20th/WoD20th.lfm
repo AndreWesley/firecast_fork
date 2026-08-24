@@ -73,11 +73,17 @@
 					"Requisitions", "Resources", "Retainers", "Rites", "Rituals", "Sanctum", "Secret Weapons", "Spies",
 					"Status", "Totem", "Wonder",
 				},
+				-- Twenty-seven hedge paths since the 94th round, when the three books were swept whole
+				-- and six the sheet did not carry came back with a page each (SPEC I69, R106, R107, R108).
+				-- `Ephemera` still stands BEFORE `Enchantment`: the list inherited that from the book's own
+				-- contents page and reordering it is a change nobody asked for - the six new ones take their
+				-- alphabetical place and that one exception stays.
 				["numina"] = {
-					"", "Alchemy", "Conjuration", "Conveyance", "Divination", "Ephemera", "Enchantment", "Fascination",
-					"Fortune", "Healing", "Hellfire", "Illusion", "Maelstroms", "Necromancy", "Necronics", "Oneiromancy",
-					"Quintessence Manipulation", "Shadows", "Shapeshifting", "Starlight", "Summoning, Binding, and Warding",
-					"Weather Control",
+					"", "Alchemy", "Chronomancy", "Conjuration", "Conveyance", "Curses", "Divination", "Dowsing",
+					"Ephemera", "Enchantment", "Fascination", "Fortune", "Healing", "Hellfire", "Illusion",
+					"Maelstroms", "Necromancy", "Necronics", "Oneiromancy", "Quintessence Manipulation", "Shadows",
+					"Shapeshifting", "Spirit-Chasing", "Starlight", "Summoning, Binding, and Warding",
+					"Via Geniorum", "Via Necromantiae", "Weather Control",
 				},
 				["psychic"] = {
 					"", "Animal Psychics", "Anti-Psychic", "Astral Projection", "Biocontrol", "Channeling", "Clairvoyance",
@@ -85,8 +91,50 @@
 					"Psychic Healing", "Psychic Hypnosis", "Psychic Invisibility", "Psychic Vampirism", "Psychokinesis",
 					"Psychometry", "Psychoportation", "Pyrokinesis", "Shadow", "Synergy", "Telepathy",
 				},
-				["faith"] = {
-					"", "Christianity", "Judaism", "Islam", "Other",
+				-- The twenty-six affiliations a hedge magician can belong to, and it is a PICKER
+				-- of prose like every other name on this sheet (SPEC I66, I27). The key is
+				-- `hedgeAffiliation` and not `affiliation`: fieldRoot drops the "cbo" and
+				-- lowercases the FIRST letter only, so cboHedgeAffiliation resolves here. A wrong
+				-- key is not a compile error - it falls through to `or c.values`, which T493
+				-- emptied, and the dropdown opens blank with rdk exiting 0 (SPEC V211a, B6).
+				--
+				-- Sorted by the WHOLE string, so the fourteen that open with `The` group under T,
+				-- exactly as mainPath already does. `Lone Practitioner` is the BOOK's term for the
+				-- unaffiliated (M20 Sorcerer p. 79) and is a choice of its own: the empty first
+				-- item means "not answered yet" and the two are not the same state, though the
+				-- filters of I67/I68 prune nothing for either (SPEC V15, V270c).
+				["hedgeAffiliation"] = {
+					"", "Balamo’ob", "Followers of Set", "Forn Jafnaðr", "Giovanni", "Lone Practitioner",
+					"Maison Liban", "Mogen HaLev", "Nebuu-Afef, The Order of The Golden Fly", "Path-Dancers",
+					"Thal’hun", "The Ancient Order of The Aeon Rites", "The Arcanum", "The Children of Osiris",
+					"The Crystal Circle", "The Cult of Isis", "The Cult of Mercury",
+					"The Dozen Priests of the Pythian Order", "The Fenian", "The Nephite Priesthood",
+					"The Seven Thunders", "The Silver Portal",
+					"The Society of Enlightened Altruistic Ideologies (SEAI)", "The Society of Leopold",
+					"The Star Council", "U.S. Government (Project Twilight)", "Uzoma",
+				},
+				-- `faith` was a list of four religions until the 90th round, when the row became a
+				-- typed field (SPEC I61, user 2026-08-23). It is gone rather than kept dormant:
+				-- a PICKER_LIST key with no cbo* reading it is the dead data B55 cost a whole
+				-- round of research to find. The four `wod.` keys stay in the .lang - nothing
+				-- reprimands an unused key, and `Other` has other readers.
+				-- The attribute a hedge magician casts on (SPEC I60). It is the same NINE names
+				-- XP_ATTRS carries below, and the gate compares the two lists in BOTH directions
+				-- for the reason V148 does it for the trait picker: an attribute that entered one
+				-- side only would pass every count check on the sheet. `Inteligence` is the
+				-- sheet's own spelling and has been since SPEC I3 - correcting it here alone
+				-- would break the bijection, not fix a typo.
+				["hedgeAttr"] = {
+					"", "Strength", "Dexterity", "Stamina", "Charisma", "Manipulation", "Appearance",
+					"Perception", "Inteligence", "Wits",
+				},
+				-- The rituals of static magic, and the list opens EMPTY on purpose: the powers are
+				-- entered in a round of their own (user 2026-08-23, SPEC I65). The key still has to
+				-- exist - pickerItems falls back to c.values when it finds none, and the box would
+				-- come up outside the axis that translates it, which is B57 through another door
+				-- (SPEC V269e). The empty first item is V15's, the same one every picker opens with.
+				["hedgeRitual"] = {
+					"",
 				},
 				["disc"] = {
 					"", "Abombwe", "Abyss Mysticism", "Animalism", "Assamite Sorcery", "Auspex", "Bardo", "Celerity",
@@ -212,6 +260,89 @@
 			-- a push here would grow the clan picker on the Main tab with it (SPEC V211c).
 			PICKER_LIST["clanFamily"] = PICKER_LIST["clan"];
 
+			-- Which hedge paths an affiliation FAVOURS, and it is the same block of the book the
+			-- casting attribute comes from - `Favored Attributes:` and `Favored Paths:` are two
+			-- lines of one entry (SPEC I67, R105). One Affinity Path is chosen from this list, so
+			-- what filters is the FIRST hedge row and not the seventeen (M20 Sorcerer p. 8).
+			--
+			-- ABSENCE of a key means "filters nothing", never "offers nothing". `Lone Practitioner`
+			-- and the empty item of V15 have no entry here on purpose: the unaligned magician picks
+			-- from everything (SPEC V271d). A key holding an EMPTY table would be the blank dropdown
+			-- of B6 arriving through another door, which is why the gate refuses one.
+			--
+			-- NORMALISED to the sheet's own spelling, and the normalisation is MEASURED rather than
+			-- tidied: the three books write six names outside it (SPEC I67) - `Summon, Binding, and
+			-- Warding` and `Summoning/Binding/Warding` -> `Summoning, Binding, and Warding`,
+			-- `Shadowcasting` and hedge `Shadow` -> `Shadows`, `Ephemera (Ghosts)` -> `Ephemera`,
+			-- `Mana Manipulation` -> `Quintessence Manipulation`, `Spirit Chasing` ->
+			-- `Spirit-Chasing`, and `Herbalism` -> `Alchemy`, which M20 Sorcerer p. 18 says in
+			-- print it folded into (SPEC R106). A value the numina picker does not carry is a
+			-- filter that blanks the whole row.
+			--
+			-- `Mogen HaLev` carries BOTH of its book lists - the body's and the `Female Auxiliary`
+			-- one - because this sheet has no sex field and inventing one to prune three paths is
+			-- outside what was asked.
+			AFFINITY = {
+				["The Ancient Order of The Aeon Rites"] = { "Conjuration", "Divination", "Enchantment", "Summoning, Binding, and Warding" },
+				["The Arcanum"] = { "Alchemy", "Conveyance", "Enchantment", "Summoning, Binding, and Warding" },
+				["Balamo’ob"] = { "Alchemy", "Healing", "Shapeshifting", "Summoning, Binding, and Warding" },
+				["The Children of Osiris"] = { "Alchemy", "Ephemera", "Healing", "Oneiromancy" },
+				["The Cult of Isis"] = { "Divination", "Fascination", "Fortune", "Healing" },
+				["The Cult of Mercury"] = { "Conjuration", "Conveyance", "Divination", "Fortune" },
+				["The Dozen Priests of the Pythian Order"] = { "Divination", "Healing", "Shapeshifting", "Weather Control" },
+				["The Fenian"] = { "Fascination", "Shapeshifting", "Weather Control" },
+				["Forn Jafnaðr"] = { "Divination", "Enchantment", "Hellfire", "Summoning, Binding, and Warding" },
+				["Maison Liban"] = { "Fortune", "Quintessence Manipulation", "Shadows", "Summoning, Binding, and Warding" },
+				["Mogen HaLev"] = { "Divination", "Ephemera", "Fortune", "Healing", "Summoning, Binding, and Warding", "Weather Control" },
+				["Nebuu-Afef, The Order of The Golden Fly"] = { "Conjuration", "Hellfire", "Shadows", "Shapeshifting" },
+				["The Nephite Priesthood"] = { "Divination", "Enchantment", "Hellfire", "Summoning, Binding, and Warding", "Weather Control" },
+				["The Seven Thunders"] = { "Divination", "Fortune", "Healing", "Hellfire" },
+				["The Silver Portal"] = { "Ephemera", "Fascination", "Oneiromancy", "Shadows" },
+				["The Society of Enlightened Altruistic Ideologies (SEAI)"] = { "Alchemy", "Conjuration", "Conveyance", "Enchantment" },
+				["The Star Council"] = { "Enchantment", "Healing", "Quintessence Manipulation", "Shadows" },
+				["Thal’hun"] = { "Conjuration", "Fortune", "Hellfire", "Quintessence Manipulation" },
+				["U.S. Government (Project Twilight)"] = { "Divination", "Fortune", "Hellfire" },
+				["Uzoma"] = { "Alchemy", "Healing", "Quintessence Manipulation", "Summoning, Binding, and Warding" },
+				["The Society of Leopold"] = { "Via Geniorum", "Via Necromantiae" },
+				["Followers of Set"] = { "Fascination", "Illusion", "Shapeshifting" },
+				["Giovanni"] = { "Divination", "Shadows", "Summoning, Binding, and Warding" },
+				["Path-Dancers"] = { "Alchemy", "Healing", "Shapeshifting", "Spirit-Chasing", "Summoning, Binding, and Warding" },
+				["The Crystal Circle"] = { "Dowsing", "Enchantment", "Oneiromancy", "Quintessence Manipulation" },
+			};
+
+			-- The casting Attribute the same book entry favours (SPEC I68, R105). TWENTY keys and
+			-- not twenty-five: only the M20 Sorcerer affiliations carry a `Favored Attributes:`
+			-- line, always two names. The five that come from the other two books declare no
+			-- attribute at all (SPEC R107, R108), so they have no key and open all nine - the same
+			-- nil that means "filters nothing" above. Inventing two attributes for them would be
+			-- data with no source.
+			--
+			-- The names are the NINE of PICKER_LIST["hedgeAttr"], in the sheet's own spelling:
+			-- `Inteligence` has been the field name since SPEC I3, and correcting it here alone
+			-- would break the bijection V264a measures in both directions.
+			CASTING_ATTR = {
+				["The Ancient Order of The Aeon Rites"] = { "Inteligence", "Wits" },
+				["The Arcanum"] = { "Inteligence", "Wits" },
+				["Balamo’ob"] = { "Stamina", "Wits" },
+				["The Children of Osiris"] = { "Inteligence", "Wits" },
+				["The Cult of Isis"] = { "Charisma", "Manipulation" },
+				["The Cult of Mercury"] = { "Charisma", "Stamina" },
+				["The Dozen Priests of the Pythian Order"] = { "Charisma", "Inteligence" },
+				["The Fenian"] = { "Manipulation", "Appearance" },
+				["Forn Jafnaðr"] = { "Dexterity", "Wits" },
+				["Maison Liban"] = { "Inteligence", "Manipulation" },
+				["Mogen HaLev"] = { "Inteligence", "Perception" },
+				["Nebuu-Afef, The Order of The Golden Fly"] = { "Strength", "Stamina" },
+				["The Nephite Priesthood"] = { "Stamina", "Wits" },
+				["The Seven Thunders"] = { "Charisma", "Manipulation" },
+				["The Silver Portal"] = { "Charisma", "Perception" },
+				["The Society of Enlightened Altruistic Ideologies (SEAI)"] = { "Inteligence", "Manipulation" },
+				["The Star Council"] = { "Perception", "Inteligence" },
+				["Thal’hun"] = { "Inteligence", "Wits" },
+				["U.S. Government (Project Twilight)"] = { "Dexterity", "Wits" },
+				["Uzoma"] = { "Charisma", "Wits" },
+			};
+
 			-- >>> TAB_LIST_BEGIN (SPEC I32, V228: one list, every reader on it)
 			-- The eleven tabs, in the order the strip draws them. Every name in the XML is built
 			-- from these mechanically - pane `tab<X>`, button `btnTab<X>`, fill `tabOn<X>` - so the
@@ -248,10 +379,27 @@
 			-- be renamed without dropping what is saved under it (SPEC I3, V2).
 			activeTab = "tabMain";
 
-			-- The three sub-tabs of the Vampire tab (SPEC T523). They carry no gating of their own:
-			-- nothing hides a sub-tab, so there is no `shown` map for them.
-			VAMP_LIST = { "Disc", "Paths", "Rituals" };
-			activeVampTab = "tabDisc";
+			-- The sub-tab strips, one entry per strip (SPEC I58). They carry no gating of their
+			-- own: nothing hides a sub-tab, so there is no `shown` map for them.
+			--
+			-- ONE table and one renderer for BOTH strips since the 90th round, when the Numina
+			-- tab got a strip of its own. It is not generalisation for its own sake - there are
+			-- two readers TODAY - and the alternative is two functions of the same twelve lines
+			-- with nothing measuring that they stay in step, which is the shape of B12 and B13.
+			--
+			-- `active` lives IN the entry, so the open sub-tab is still plain Lua session state
+			-- that no field syncs to the table (SPEC V227), exactly as activeVampTab was.
+			SUB_TABS = {
+				{ list = { "Disc", "Paths", "Rituals" }, active = "tabDisc" },
+				{ list = { "Hedge", "Psychic", "Faith" }, active = "tabHedge" },
+
+				-- The Hedge Magic pane splits in two from the 91st round (SPEC I64). The names
+				-- carry "Hedge" and they HAVE to: renderSubTabs builds one map keyed by NAME and
+				-- selectTab matches a name against every group, so a second "tabPaths" here would
+				-- make a click on the Numina tab flip the Ghoul tab's sub-tab instead - green
+				-- gate, rdk 0, and the symptom two tabs away from its cause (SPEC V268a).
+				{ list = { "HedgePaths", "HedgeRituals" }, active = "tabHedgePaths" },
+			};
 			-- >>> GEN_MAX_BEGIN (SPEC I29, V218: one map, both readers)
 			-- The ceiling a domitor's generation puts on a ghoul's Disciplines. Keyed by the VALUE the
 			-- combo stores ("4".."14"), which is why that value is a plain number and the ordinal is
@@ -1420,25 +1568,37 @@
 			-- declared further down, and Lua resolves a non-local name at COMPILE time - a body
 			-- written above that line gets a GETGLOBAL and calls nil. V223 caught it the same day
 			-- it was written.
-			function renderVampTabs(from)
+			-- Both strips, every call (SPEC I58). Painting the one that did not change costs six
+			-- lookups that find nothing when its form is not loaded, and it buys the caller not
+			-- having to know which strip its button belongs to - the same trade selectTab makes
+			-- one line below.
+			function renderSubTabs(from)
 				local names = {};
 
-				for i = 1, #VAMP_LIST, 1 do
-					names["tab" .. VAMP_LIST[i]]   = true;
-					names["tabOn" .. VAMP_LIST[i]] = true;
+				for s = 1, #SUB_TABS, 1 do
+					local list = SUB_TABS[s].list;
+
+					for i = 1, #list, 1 do
+						names["tab" .. list[i]]   = true;
+						names["tabOn" .. list[i]] = true;
+					end;
 				end;
 
 				local found = {};
 
 				xpFind(tabRootOf(from), names, found);
 
-				for i = 1, #VAMP_LIST, 1 do
-					local live = ("tab" .. VAMP_LIST[i]) == activeVampTab;
-					local pane = found["tab" .. VAMP_LIST[i]];
-					local on   = found["tabOn" .. VAMP_LIST[i]];
+				for s = 1, #SUB_TABS, 1 do
+					local grp = SUB_TABS[s];
 
-					if on   ~= nil then on.visible   = live; end;
-					if pane ~= nil then pane.visible = live; end;
+					for i = 1, #grp.list, 1 do
+						local live = ("tab" .. grp.list[i]) == grp.active;
+						local pane = found["tab" .. grp.list[i]];
+						local on   = found["tabOn" .. grp.list[i]];
+
+						if on   ~= nil then on.visible   = live; end;
+						if pane ~= nil then pane.visible = live; end;
+					end;
 				end;
 			end;
 
@@ -1447,11 +1607,15 @@
 			-- the XML says selectTab everywhere and this decides which strip the name belongs to,
 			-- rather than the caller having to know.
 			function selectTab(name, from)
-				for i = 1, #VAMP_LIST, 1 do
-					if ("tab" .. VAMP_LIST[i]) == name then
-						activeVampTab = name;
-						renderVampTabs(from);
-						return;
+				for s = 1, #SUB_TABS, 1 do
+					local grp = SUB_TABS[s];
+
+					for i = 1, #grp.list, 1 do
+						if ("tab" .. grp.list[i]) == name then
+							grp.active = name;
+							renderSubTabs(from);
+							return;
+						end;
 					end;
 				end;
 
@@ -1595,12 +1759,26 @@
 			-- nil lands on 3, the same default the dataLink declares in WoD20.10 (SPEC V254c):
 			-- defaultValue does not WRITE the field, so a sheet saved before this round arrives
 			-- empty and the two places that answer for it must not disagree (the healthLevels pair).
-			local SPEC_FORBIDDEN = "forbidden";
+			-- The sentinel is the ENGLISH TEXT of the item, not a code word (SPEC I52, V257c,
+			-- 88th round). It reads odd stored in a field and it is the whole point: a cmb* list
+			-- has no second list to keep in step, so `items` are rebuilt from `values` at every
+			-- language switch, and that only works while the value IS the English string.
+			-- Whatever is written here has to be the same literal WoD20.10 authors, or the door
+			-- never reads as shut (SPEC V12).
+			local SPEC_FORBIDDEN = "Purchase Forbidden";
+
+			-- The 87th round stored the shut door as `forbidden`; the 88th made the value the
+			-- English text itself. A sheet saved in between still carries the old literal, and a
+			-- door the storyteller SHUT must not open by itself when the sheet is next opened -
+			-- so the old word is still read as shut (SPEC V80, fail-closed). It is only read, it
+			-- is never written: the moment the storyteller touches the combo the field is one of
+			-- the seven current values, and this line stops mattering for that sheet.
+			local SPEC_FORBIDDEN_OLD = "forbidden";
 
 			local function specForbidden()
 				if sheet == nil then return true; end;
 
-				return sheet.stSpecCost == SPEC_FORBIDDEN;
+				return sheet.stSpecCost == SPEC_FORBIDDEN or sheet.stSpecCost == SPEC_FORBIDDEN_OLD;
 			end;
 
 			local function specCost()
@@ -1618,13 +1796,17 @@
 				if kind == "Willpower" then return from; end;
 
 				if kind == "Background" then
-					-- Off by default: the storyteller decides whether backgrounds cost XP at
-					-- all (SPEC C). With the box unticked the rise still shows, at zero - it
-					-- happened, and the storyteller is who reads this table.
-					if not ctx.backgroundsXP then return 0; end;
-					if from == 0 then return 3; end;
+					-- A PRICE since the 88th round, where a flag used to sit (SPEC I51, I9).
+					-- Same shape Ability and Numina already use: the first dot costs the price
+					-- flat and every later one costs rating times price.
+					--
+					-- Zero comes out of the ARITHMETIC, not out of a guard: `stBackgroundCost`
+					-- at 0 prices every rise at 0, which is what the unticked flag did, and the
+					-- rise still SHOWS at zero - it happened, and the storyteller is who reads
+					-- this table. 3 reproduces the old ticked price byte for byte.
+					if from == 0 then return ctx.backgroundCost; end;
 
-					return from * 3;
+					return from * ctx.backgroundCost;
 				end;
 
 				-- One dot, so there is no rating to price off: a speciality costs whatever the
@@ -1654,6 +1836,12 @@
 					if from == 0 then return 20; end;
 					return from * 15;
 				end;
+
+				-- One experience per level, flat: a level 3 ritual costs 3 and a homebrew taken to
+				-- two dots costs 2 (user 2026-08-23, SPEC I9). There is no ladder to climb here -
+				-- the caller charges the difference between the level reached and the level the
+				-- baseline held, one line for the whole ritual (SPEC V269c).
+				if kind == "Ritual" then return 1; end;
 
 				if kind == "Numina" then
 					if from == 0 then
@@ -1689,7 +1877,11 @@
 					-- the price reads the rating reached, not how many were paid for.
 					if string.find(ctx.free, "|" .. field .. "#" .. lvl .. "|", 1, true) ~= nil then cost = 0; end;
 
-					rows[#rows + 1] = { kind = kind, name = name, level = lvl, cost = cost };
+					-- The key the ORDER stamp is looked up by (SPEC I56). Same shape the free
+					-- stamp is keyed on, built from the same two parts a line away: one grammar
+					-- for both stamps, so a point that can be found in one can be found in the
+					-- other (SPEC V138, V260b).
+					rows[#rows + 1] = { kind = kind, name = name, level = lvl, cost = cost, key = field .. "#" .. lvl };
 
 					-- 21 buys the FIRST point of the new kind and nothing after it.
 					ctx.newType = false;
@@ -1715,9 +1907,32 @@
 
 			table.sort(XP_ABILITIES);
 
+			-- How many rows each numina list draws, and how many of those the player TYPES
+			-- instead of picking (SPEC I59, I60, V263). Declared ONCE and read by every loop
+			-- that walks them - declareTrait, the ledger, and the type-in-use test below - for
+			-- the same reason BACKGROUND_ROWS is: a row added to the XML and to only one of the
+			-- loops is a dot that costs nothing and never reaches the log (SPEC B46).
+			--
+			-- The typed rows are the LAST ones, so every reader is 'picker = total - typed' and
+			-- no list of indices exists to drift from these numbers (SPEC V255, V263b).
+			NUMINA_ROWS       = 17;
+			NUMINA_FREE_ROWS  = 5;
+			PSYCHIC_ROWS      = 24;
+			PSYCHIC_FREE_ROWS = 5;
+
+			-- The rituals of static magic, on the Rituals sub-tab of Hedge Magic (SPEC I65, 91st
+			-- round). Same contract as the four above: the total covers BOTH kinds of row and the
+			-- typed ones are the LAST, so every reader is "picker = total - typed" and no list of
+			-- indices exists to drift from these two numbers (SPEC V204, V263b).
+			--
+			-- A ritual is KNOWN, not rated: only the five TYPED rows carry dots of their own, and
+			-- only they are declared as traits below (SPEC V269b).
+			HEDGE_RITUAL_ROWS      = 17;
+			HEDGE_RITUAL_FREE_ROWS = 5;
+
 			local XP_NUMINA = {
-				{ kind = "hedge",   base = "numina",  count = 10 },
-				{ kind = "psychic", base = "psychic", count = 10 },
+				{ kind = "hedge",   base = "numina",  count = NUMINA_ROWS },
+				{ kind = "psychic", base = "psychic", count = PSYCHIC_ROWS },
 			};
 
 			-- How many background rows the sheet draws (SPEC V145). Declared ONCE and read by
@@ -1778,6 +1993,19 @@
 				background = BACKGROUND_ROWS - BACKGROUND_FREE_ROWS + 1,
 				secPath    = SEC_PATH_ROWS - SEC_PATH_FREE_ROWS + 1,
 				ritual     = RITUAL_ROWS - RITUAL_FREE_ROWS + 1,
+
+				-- The two Numina boxes since the 91st round (SPEC I62): their last rows have
+				-- been typed since the 90th, and now they answer isTypedRow like every other
+				-- typed row, so the description block opens for the storyteller on them too.
+				-- Derived from the counts for the same reason as the five above - a row that
+				-- changes kind in the XML changes one number here (SPEC V204, V263b).
+				numina     = NUMINA_ROWS - NUMINA_FREE_ROWS + 1,
+				psychic    = PSYCHIC_ROWS - PSYCHIC_FREE_ROWS + 1,
+
+				-- The homebrew rituals of the 91st round. isTypedRow answering for them is what
+				-- gives their DESCRIPTION to the storyteller (SPEC I62) and what tells the level
+				-- reader to count dots instead of reading a prefix that is not there (SPEC V269d).
+				hedgeRitual = HEDGE_RITUAL_ROWS - HEDGE_RITUAL_FREE_ROWS + 1,
 			};
 
 			-- Is this field one of the typed rows? GLOBAL because three other files ask it: the
@@ -1889,6 +2117,12 @@
 
 			declareTrait("faith", 1, 5, 0);
 
+			-- The rituals declare from their FIRST TYPED row up (SPEC I65, V269b). The twelve
+			-- picked ones carry no dot field at all - their level is the book's, shown in art the
+			-- painter drives - so declaring them would hand xpClick a range of widgets that do
+			-- not exist and leave V99/V134 measuring a ghost.
+			for i = TYPED_ROW_FROM.hedgeRitual, HEDGE_RITUAL_ROWS, 1 do declareTrait("hedgeRitual_" .. i, 1, 5, 0); end;
+
 			for i = 1, CLAN_DISC_ROWS, 1 do declareTrait("clanDisc_" .. i, 1, 5, 0); end;
 			for i = 1, DISC_ROWS, 1 do declareTrait("disc_" .. i, 1, 5, 0); end;
 			for i = 1, SEC_PATH_ROWS, 1 do declareTrait("secPath_" .. i, 1, 5, 0); end;
@@ -1911,6 +2145,27 @@
 				return v;
 			end;
 
+			-- The level of a ritual, and it is READ, never stored (SPEC I65, V269d). A PICKED
+			-- ritual carries it in the item text - "3. Name of the Ritual", the same grammar the
+			-- vampire rituals use and pickRefusal already reads - and a TYPED one carries it in
+			-- the dots the storyteller marked, because homebrew has no prefix to read.
+			--
+			-- `node` is the baseline when the caller wants the frozen side of the diff; without
+			-- it the live sheet answers, through liveLevel, so a dot being priced counts before
+			-- it is written (SPEC V136).
+			-- GLOBAL, and for the reason V223 gives: the dot painter on WoD20.7 reads it too, so
+			-- the "<n>. " grammar is written ONCE and the art on screen cannot drift from the price
+			-- in the log (SPEC V269d).
+			function hedgeRitualLevel(field, value, node)
+				if isTypedRow(field) then
+					if node == nil then return liveLevel(field, 1, 5, 0); end;
+
+					return traitLevel(node, field, 1, 5, 0);
+				end;
+
+				return tonumber(string.match(value or "", "^(%d+)%. ")) or 0;
+			end;
+
 			-- Returns the rows, or nil when no initial character has been saved yet - the
 			-- caller shows a state text for that instead of an empty table (SPEC V33).
 			--
@@ -1918,7 +2173,13 @@
 			-- (SPEC V140). It is handed in rather than written first, because pricing a click
 			-- writes nothing at all (SPEC V136): the row comes out at zero here, and the stamp
 			-- reaches the sheet only on the way through xpClick.
-			function xpLedgerRows(clickField, clickValue, clickFree)
+			--
+			-- `clickOrder` is the same arrangement for the ORDER stamp (SPEC I56): the key the
+			-- click would leave, handed in so the line it is about to create sorts to the top of
+			-- the log in the very repaint that click pays for. Without it the row just bought
+			-- comes up at the BOTTOM until something else redraws the sheet - nothing breaks,
+			-- the build is green, and the player watches it happen (SPEC B6, V260d).
+			function xpLedgerRows(clickField, clickValue, clickFree, clickOrder)
 				local base = baselineOf();
 
 				if base == nil then return nil; end;
@@ -1930,10 +2191,24 @@
 
 				-- The stamps, read ONCE per walk (SPEC V125). Bars on both sides of every key
 				-- so that a search for |a_3#4| cannot match inside |numina_3#4|.
+				-- The 0 here and the defaultValue="0" on WoD20.10 are the pair that answers for
+				-- a sheet which never touched the combo (SPEC I51, V12): defaultValue does not
+				-- WRITE the field, so a sheet saved before the 88th round arrives empty and the
+				-- two places must not disagree. `stBackgroundsXP` is an ORPHAN (SPEC I3, V2).
 				local ctx  = {
-					backgroundsXP = sheet.stBackgroundsXP == true,
-					free          = (sheet.xpFree or "") .. "|" .. (clickFree or "") .. "|",
+					backgroundCost = tonumber(sheet.stBackgroundCost) or 0,
+					free           = (sheet.xpFree or "") .. "|" .. (clickFree or "") .. "|",
 				};
+
+				-- The ORDER stamp, read once per walk like the price stamp beside it (SPEC I56,
+				-- V125). It is not in `ctx`: pricing never reads it - a point costs what the
+				-- table says whether it was bought first or last - and putting it there would
+				-- hand the order to xpCost, which has no business with it.
+				--
+				-- The click being priced is appended LAST, which is exactly what puts its line on
+				-- top. Pricing still writes nothing (SPEC V136): this string is local, and the
+				-- sheet learns about the stamp only on the way through xpClick.
+				local ord = (sheet.xpOrder or "") .. "|" .. (clickOrder or "") .. "|";
 
 				local rows = {};
 
@@ -1993,11 +2268,14 @@
 
 				-- Which kinds the character already had when the storyteller froze the sheet.
 				-- Buying into a kind that is not in here costs 21 for its first point, once.
-				local unlocked = {
-					hedge   = numinaTypeInUse(base, "numina", 10),
-					psychic = numinaTypeInUse(base, "psychic", 10),
-					faith   = traitLevel(base, "faith", 1, 5, 0) > 0,
-				};
+				-- Walked off XP_NUMINA rather than written out per kind, and the counts come off
+				-- the same table: they were a literal `10` twice, correct only by accident, which
+				-- is the shape of B46 (SPEC V263c). A third numina kind now lands here for free.
+				local unlocked = { faith = traitLevel(base, "faith", 1, 5, 0) > 0 };
+
+				for g = 1, #XP_NUMINA, 1 do
+					unlocked[XP_NUMINA[g].kind] = numinaTypeInUse(base, XP_NUMINA[g].base, XP_NUMINA[g].count);
+				end;
 
 				for g = 1, #XP_NUMINA, 1 do
 					local grp = XP_NUMINA[g];
@@ -2030,6 +2308,41 @@
 					ctx.newType  = (ff == 0) and not unlocked.faith;
 
 					pushRise(rows, "Numina", "True Faith", ff, ft, ctx, "faith");
+				end;
+
+				-- Static magic rituals (SPEC I65, V269c, user 2026-08-23). This is the ONE
+				-- aggregated category of the log: a ritual is known or it is not, it has one level
+				-- and it is paid once, so it gets ONE line saying the level reached - not
+				-- pushRise's line per point, which is the shape every rated trait above uses.
+				--
+				-- The stamp is still read per LEVEL, with the same key grammar as everything else
+				-- (SPEC V138, V139): a point the storyteller gave away costs nothing here either,
+				-- and the line simply comes out cheaper.
+				for i = 1, HEDGE_RITUAL_ROWS, 1 do
+					local field = "hedgeRitual_" .. i;
+					local live  = sheet[field];
+
+					if live ~= nil and live ~= "" then
+						local to = hedgeRitualLevel(field, live);
+
+						-- A row holding a DIFFERENT ritual than the one the storyteller froze is a
+						-- ritual nobody had: it pays from zero. Swapping a level one for a level
+						-- three is not a two-point rise, and pricing it as one would sell the two
+						-- top levels of a ritual at the price of a swap (SPEC I65).
+						local from = 0;
+
+						if base[field] == live then from = hedgeRitualLevel(field, live, base); end;
+
+						if to > from then
+							local cost = 0;
+
+							for lvl = from + 1, to, 1 do
+								if string.find(ctx.free, "|" .. field .. "#" .. lvl .. "|", 1, true) == nil then cost = cost + xpCost("Ritual", lvl - 1, ctx); end;
+							end;
+
+							rows[#rows + 1] = { kind = "Ritual", name = slotName(field), level = to, cost = cost, key = field .. "#" .. to };
+						end;
+					end;
 				end;
 
 				-- Disciplines and paths (SPEC I10b), between the numina and the specialities.
@@ -2093,16 +2406,51 @@
 				-- log shows (SPEC I11, V100), so the figure the storyteller typed and the lines
 				-- the player is reading cannot come apart.
 				--
-				-- It has no category in the price table and no slot index, which is exactly why
-				-- it closes the order instead of sorting into it. Level is the word and not a
-				-- rating: nothing was raised - the number was.
+				-- It has no category in the price table and no slot index. That used to be why it
+				-- closed the order; since the 90th round the order is the STAMP, so it sorts by
+				-- when the storyteller typed it like every other line (SPEC I56). Level is the
+				-- word and not a rating: nothing was raised - the number was.
+				--
+				-- One line means one key, and `#0` is a rating no trait can reach, so it cannot
+				-- collide with a real one (SPEC V138, V260b).
 				local manual = tonumber(sheet.xpManual) or 0;
 
 				if manual ~= 0 then
-					rows[#rows + 1] = { kind = "MANUAL", name = "MANUAL", level = "MANUAL", cost = manual };
+					rows[#rows + 1] = { kind = "MANUAL", name = "MANUAL", level = "MANUAL", cost = manual, key = "xpManual#0" };
 				end;
 
 				simTrait, simField, simValue = nil, nil, nil;
+
+				-- Newest purchase on top (SPEC I56, user 2026-08-23). The rows above are a DIFF
+				-- of the frozen character against this one, and a diff carries no history: the
+				-- order can only come from the stamp, which is why answering this at all took a
+				-- saved field. Everything the log SHOWS is still derived - the stamp says when,
+				-- never what or how much (SPEC V100).
+				--
+				-- A row with no stamp is what a sheet saved before this round is made of. Those
+				-- keep the order they were built in - category, then slot - BELOW everything
+				-- bought since. There is no chronology to seed them from, and writing one would
+				-- put a lie where an absence is.
+				--
+				-- Decorated with the build index and sorted on it as the tie-break, because
+				-- table.sort is NOT stable. On the day of the update every line is unstamped, so
+				-- an unstable sort is not a corner case here: it would deal the whole log a
+				-- different way round on every single render (SPEC V260f).
+				for i = 1, #rows, 1 do
+					rows[i].seq = i;
+					rows[i].at  = string.find(ord, "|" .. rows[i].key .. "|", 1, true);
+				end;
+
+				table.sort(rows, function(a, b)
+					if a.at ~= b.at then
+						if a.at == nil then return false; end;
+						if b.at == nil then return true; end;
+
+						return a.at > b.at;
+					end;
+
+					return a.seq < b.seq;
+				end);
 
 				return rows;
 			end;
@@ -2299,6 +2647,20 @@
 				local logged = xpSum(rows) - (tonumber(sheet.xpManual) or 0);
 
 				setField("xpManual", n - logged);
+
+				-- The correction is a LINE (SPEC I44), so it takes a place in the order like any
+				-- other: at the top, the moment it is typed (SPEC I56). One line means one key -
+				-- the old stamp comes out before the new one goes in, or the string ends up
+				-- carrying two copies of a row that only ever exists once.
+				--
+				-- Back to no stamp at all when the adjustment is zero, because that is the state
+				-- in which the row is not drawn: read off the field just written rather than the
+				-- arithmetic above it, so what is stamped and what is shown answer to one number.
+				local ord = (string.gsub(sheet.xpOrder or "", "|xpManual#0|", "|"));
+
+				if (tonumber(sheet.xpManual) or 0) ~= 0 then ord = ord .. "|xpManual#0|"; end;
+
+				setField("xpOrder", ord);
 
 				renderAllXPBoxes(form);
 				xpLedgerRefresh(form);
@@ -2685,11 +3047,48 @@
 				xpWarn(why);
 			end;
 
+			-- Does the affiliation on the sheet leave this value on offer (SPEC I67, I68)? A key
+			-- the table does not hold means "filters nothing", so `Lone Practitioner` and the
+			-- unanswered empty item open the whole list rather than an empty one (SPEC V271d,
+			-- V272e). The affiliation is read RAW: one typed by hand behind the storyteller's
+			-- flag matches no key and therefore prunes nothing, which is the right answer and
+			-- not an accident (SPEC I71).
+			--
+			-- Declared above pickAllowed rather than below it: a local called from above its own
+			-- declaration compiles to a GETGLOBAL that finds nil at runtime, with rdk exiting 0
+			-- (SPEC V223, B51).
+			local function hedgeAllows(t, value)
+				if value == nil or value == "" then return true; end;
+
+				local ok = t[(sheet ~= nil and sheet.hedgeAffiliation) or ""];
+
+				if ok == nil then return true; end;
+
+				for i = 1, #ok, 1 do
+					if ok[i] == value then return true; end;
+				end;
+
+				return false;
+			end;
+
 			-- The one door the picker filter has to the rule (SPEC I25, V199). It is the same
 			-- body the guard above asks, phrased as a yes: the filter has no message to show, it
 			-- simply leaves the item out. A second test written for the list is how the list and
 			-- the guard start disagreeing about what is legal, which is why there is not one.
+			--
+			-- The two affiliation branches answer HERE and not inside pickRefusal, and the split
+			-- is the point (SPEC I67, T605): pickRefusal is what guardPick REVERTS with, and a
+			-- path that stopped being favoured must not be thrown off the sheet - it simply stops
+			-- being offered (SPEC V200). Nothing guards these two fields, so there is no second
+			-- opinion for the list to disagree with.
+			--
+			-- `numina_1` alone, never `numina`: the Affinity Path is ONE row, and the book has the
+			-- magician choose one from the list (M20 Sorcerer p. 8). `hedgeAttr` is a SINGLETON
+			-- and carries no row number at all (SPEC I68).
 			function pickAllowed(field, value, levels)
+				if field == "numina_1" then return hedgeAllows(AFFINITY, value); end;
+				if field == "hedgeAttr" then return hedgeAllows(CASTING_ATTR, value); end;
+
 				return pickRefusal(field, value, levels) == nil;
 			end;
 
@@ -2957,11 +3356,19 @@
 				local free = want and sheet.stFreeBuy == true;
 				local key  = free and (trait .. "#" .. (level + 1)) or nil;
 
+				-- The key this click would leave in the ORDER (SPEC I56). Same grammar as the
+				-- price stamp above and built one line from it on purpose: two stamps that drift
+				-- into two key shapes is what burned `freeDots` for good (SPEC V138, V260b).
+				--
+				-- A purchase reaches level+1; a sale gives back the level the dot is standing on
+				-- right now. Same reading the sale of the price stamp already takes.
+				local okey = trait .. "#" .. (want and (level + 1) or level);
+
 				-- ONE walk, of the sheet as it WOULD be (SPEC V125/V135/V136): the balance
 				-- boxes take the sum and the log takes the rows, and both already describe the
 				-- state this click is about to create. A free click is priced with its stamp in
 				-- hand, so the new line is already worth zero.
-				local rows  = xpLedgerRows(field, want, key);
+				local rows  = xpLedgerRows(field, want, key, want and okey or nil);
 				local spent = xpSum(rows);
 
 				if want then
@@ -2996,6 +3403,21 @@
 					setField("xpFree", (sheet.xpFree or "") .. "|" .. key .. "|");
 				elseif not want and sheet.xpFree ~= nil then
 					setField("xpFree", (string.gsub(sheet.xpFree, "|" .. trait .. "#" .. level .. "|", "|")));
+				end;
+
+				-- The ORDER stamp goes down with the same mark, on the line below the one that
+				-- carries the price (SPEC V260a). Written apart from each other they drift, and
+				-- what drift looks like here is a point sitting on top of the log with no price
+				-- against it, or a price with no place in the order.
+				--
+				-- EVERY purchase stamps, the free one included, which is why this is a branch of
+				-- its own instead of a line inside the one above: a point that cost nothing still
+				-- happened, and the log shows it (SPEC I10, V120). Written after the mark and
+				-- never on a refusal - there is no refusal left below this point (SPEC V140).
+				if want then
+					setField("xpOrder", (sheet.xpOrder or "") .. "|" .. okey .. "|");
+				elseif sheet.xpOrder ~= nil then
+					setField("xpOrder", (string.gsub(sheet.xpOrder, "|" .. okey .. "|", "|")));
 				end;
 
 				-- The gift, if this click earned one or lost one (SPEC I14/V158). Either way it
