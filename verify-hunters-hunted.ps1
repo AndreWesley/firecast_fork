@@ -5806,6 +5806,101 @@ else {
     }
 }
 
+# ---- V296: the two rows of the Numina tab are ONE grid --------------------------------
+# The list boxes open and close where HEDGE MAGIC does, and the two DESCRIPTIONs span from
+# where QUINTESSENCE opens to where WILLPOWER closes (SPEC I75, user 2026-08-25). Until T642
+# that was a COINCIDENCE - 450/470/1410 happened to line up and nothing measured it - so
+# widening one box on its own would have left the gate green over a crooked screen, which is
+# B52 on the other axis.
+#
+# Found by TITLE, never by coordinate: a coordinate is what T490 already proved fragile
+# (SPEC V18), and the ruler here IS a coordinate. The XPaths are scoped to the pane that owns
+# each box because tabPsychic carries a DESCRIPTION of its own, on its own ruler (SPEC I75).
+$doc296 = Doc (Join-Path $dir "WoD20.7.lfm")
+$xp296 = [ordered]@{
+    magic = "//layout[@name='tabHedge']/layout[label/@text='HEDGE MAGIC']"
+    quint = "//layout[@name='tabHedge']/layout[label/@text='QUINTESSENCE']"
+    will  = "//layout[@name='tabHedge']/layout[label/@text='WILLPOWER']"
+    pathL = "//layout[@name='tabHedgePaths']/layout[label/@text='HEDGE MAGIC PATHS']"
+    pathD = "//layout[@name='tabHedgePaths']/layout[label/@text='DESCRIPTION']"
+    ritL  = "//layout[@name='tabHedgeRituals']/layout[label/@text='HEDGE MAGIC RITUALS']"
+    ritD  = "//layout[@name='tabHedgeRituals']/layout[label/@text='DESCRIPTION']"
+}
+$v296Bad = @()
+$b296 = @{}
+foreach ($k in $xp296.Keys) {
+    $node = @($doc296.SelectNodes($xp296[$k]))[0]
+    if ($null -ne $node) {
+        $l = 0; $w = 0
+        if ([int]::TryParse($node.GetAttribute("left"), [ref]$l) -and [int]::TryParse($node.GetAttribute("width"), [ref]$w)) {
+            $b296[$k] = @{ L = $l; R = $l + $w }
+        }
+    }
+}
+if ($b296.Count -lt 7) {
+    Fail "V296 only $($b296.Count) of the 7 boxes of the Numina tab were found by title (the ruler plus the 6 that follow it) - this check measured nothing (SPEC V209, B7)"
+} else {
+    # (a) both lists sit exactly under HEDGE MAGIC
+    foreach ($k in @('pathL', 'ritL')) {
+        if ($b296[$k].L -ne $b296['magic'].L -or $b296[$k].R -ne $b296['magic'].R) {
+            $v296Bad += "the list box of $k spans $($b296[$k].L)..$($b296[$k].R) and HEDGE MAGIC spans $($b296['magic'].L)..$($b296['magic'].R) - one number has to move all of them or none (SPEC V296a)"
+        }
+    }
+    # (b) both DESCRIPTIONs open at QUINTESSENCE and close at WILLPOWER
+    foreach ($k in @('pathD', 'ritD')) {
+        if ($b296[$k].L -ne $b296['quint'].L) {
+            $v296Bad += "the DESCRIPTION of $k opens at $($b296[$k].L) and QUINTESSENCE opens at $($b296['quint'].L) (SPEC V296b)"
+        }
+        if ($b296[$k].R -ne $b296['will'].R) {
+            $v296Bad += "the DESCRIPTION of $k closes at $($b296[$k].R) and WILLPOWER closes at $($b296['will'].R) (SPEC V296b)"
+        }
+    }
+    if ($v296Bad) { foreach ($b in $v296Bad) { Fail "V296 $b" } }
+    else { Pass "V296 the two rows of the Numina tab tile as one grid - lists on $($b296['magic'].L)..$($b296['magic'].R), descriptions on $($b296['quint'].L)..$($b296['will'].R)" }
+}
+
+# ---- V297: HEDGE MAGIC is a GRID, not three rows that happen to line up ----------------
+# Same shape V224 measures on the DOMINATOR box, and for the same reason it exists there
+# (SPEC B12, B13): three labels on one x, three entries on another, and the three entries
+# CLOSING on one x. Until T645 the entries were 386/220/220, which read as a staircase -
+# the user asked for that to go, and without a check the next round quietly brings it back.
+#
+# The mirror edtHedgeAffiliation is left OUT of the column count on purpose: it is the SAME
+# rectangle as the combo it hides behind (SPEC I71, V274), so counting it would put two
+# controls in one cell and make the grid look broken while it is right.
+$box297 = @($doc296.SelectNodes("//layout[@name='tabHedge']/layout[label/@text='HEDGE MAGIC']"))[0]
+$v297Bad = @()
+if ($null -eq $box297) {
+    Fail "V297 the HEDGE MAGIC box was not found by title on WoD20.7 - this check measured nothing (SPEC V209, B7)"
+} else {
+    $lab297 = @()
+    foreach ($nm in @('Affiliation', 'Essence', 'Casting Attribute')) {
+        $n = @($box297.SelectNodes("label[@text='$nm']"))[0]
+        if ($null -ne $n) { $lab297 += ,@($nm, [int]$n.GetAttribute("left"), [int]$n.GetAttribute("width")) }
+    }
+    $ent297 = @()
+    foreach ($xp in @("comboBox[@name='cboHedgeAffiliation']", "edit[@field='hedgeEssence']", "comboBox[@name='cboHedgeAttr']")) {
+        $n = @($box297.SelectNodes($xp))[0]
+        if ($null -ne $n) { $ent297 += ,@($xp, [int]$n.GetAttribute("left"), [int]$n.GetAttribute("width")) }
+    }
+    if (($lab297.Count + $ent297.Count) -lt 6) {
+        Fail "V297 only $($lab297.Count) label(s) and $($ent297.Count) entr(y/ies) of the six the grid needs were found - this check is covering less than the box has (SPEC V209)"
+    } else {
+        # (a) two shared columns
+        $lx = @($lab297 | ForEach-Object { $_[1] } | Sort-Object -Unique)
+        $ex = @($ent297 | ForEach-Object { $_[1] } | Sort-Object -Unique)
+        if ($lx.Count -ne 1) { $v297Bad += "the three labels sit on $($lx.Count) different x ($($lx -join ', ')) - a grid shares one label column (SPEC V297a)" }
+        if ($ex.Count -ne 1) { $v297Bad += "the three entries sit on $($ex.Count) different x ($($ex -join ', ')) - a grid shares one entry column (SPEC V297a)" }
+        # (b) the three entries close on one x
+        $er = @($ent297 | ForEach-Object { $_[1] + $_[2] } | Sort-Object -Unique)
+        if ($er.Count -ne 1) {
+            $v297Bad += "the three entries close on $($er.Count) different x ($($er -join ', ')) - shrinking one on its own reopens the staircase the user asked to remove (SPEC V297b)"
+        }
+        if ($v297Bad) { foreach ($b in $v297Bad) { Fail "V297 $b" } }
+        else { Pass "V297 HEDGE MAGIC is a grid - labels on x=$($lx[0]), entries on x=$($ex[0]), all three closing on $($er[0])" }
+    }
+}
+
 # ---- V232: a hidden tab leaves no HOLE in the strip -----------------------------------
 # The storyteller can switch Numina and Ghoul off and both sit in the MIDDLE of the bar, so
 # hiding one used to leave a gap exactly where its button had been. The strip reflows now:

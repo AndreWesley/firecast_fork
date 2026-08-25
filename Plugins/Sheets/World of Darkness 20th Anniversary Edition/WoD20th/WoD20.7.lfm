@@ -283,13 +283,13 @@
 		-->
 		<template name="HedgePicker">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
-			<comboBox left="25" top="0" width="230" height="25" fontSize="12" fontStyle="$(style)" name="cbo$(field)" field="$(field)">
+			<comboBox left="25" top="0" width="366" height="25" fontSize="12" fontStyle="$(style)" name="cbo$(field)" field="$(field)">
 			</comboBox>
-			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="310" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="335" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<imageCheckBox left="396" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="421" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="446" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="471" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="496" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
 		<template name="PsychicPicker">
@@ -311,12 +311,12 @@
 		-->
 		<template name="NuminaFree">
 			<radioButton left="0" top="2" width="20" height="21" field="numinaSel" fieldValue="$(field)" groupName="numinaSel"/>
-			<edit left="25" top="2" width="230" height="21" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="310" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="335" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<edit left="25" top="2" width="366" height="21" field="$(field)" fontSize="12"/>
+			<imageCheckBox left="396" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="421" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="446" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="471" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="496" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
 		<template name="PsychicFree">
@@ -341,13 +341,13 @@
 		-->
 		<template name="HedgeRitualPicker">
 			<radioButton left="0" top="2" width="20" height="21" field="hedgeRitualSel" fieldValue="$(field)" groupName="hedgeRitualSel"/>
-			<comboBox left="25" top="0" width="230" height="25" fontSize="12" name="cbo$(field)" field="$(field)">
+			<comboBox left="25" top="0" width="366" height="25" fontSize="12" name="cbo$(field)" field="$(field)">
 			</comboBox>
-			<imageCheckBox name="roHR$(field)_1" left="260" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roHR$(field)_2" left="285" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roHR$(field)_3" left="310" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roHR$(field)_4" left="335" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox name="roHR$(field)_5" left="360" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roHR$(field)_1" left="396" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roHR$(field)_2" left="421" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roHR$(field)_3" left="446" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roHR$(field)_4" left="471" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox name="roHR$(field)_5" left="496" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 
 		<!--
@@ -358,12 +358,12 @@
 		-->
 		<template name="HedgeRitualFree">
 			<radioButton left="0" top="2" width="20" height="21" field="hedgeRitualSel" fieldValue="$(field)" groupName="hedgeRitualSel"/>
-			<edit left="25" top="2" width="230" height="21" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="260" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="285" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="310" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="335" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="360" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<edit left="25" top="2" width="366" height="21" field="$(field)" fontSize="12"/>
+			<imageCheckBox left="396" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="421" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="446" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="471" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="496" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
 		<!--
@@ -454,9 +454,9 @@
 			whole of the request: 466 = 41 + 25*17, where 41 is the title band plus V240's 10.
 		-->
 		<layout name="tabHedge" left="0" top="72" width="1410" height="748">
-			<layout left="0" top="0" width="450" height="178">
+			<layout left="0" top="0" width="586" height="178">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="20" top="20" width="410" height="20" text="HEDGE MAGIC" horzTextAlign="center"/>
+				<label left="20" top="20" width="546" height="20" text="HEDGE MAGIC" horzTextAlign="center"/>
 
 				<!-- Affiliation FIRST, and on a line of its own (SPEC I66, V196). It became a
 				     picker in the 92nd round, and the widest name it offers - `The Society of
@@ -479,8 +479,8 @@
 				     lowercases the FIRST letter only, and a key the map does not hold is not a
 				     compile error - the combo falls through to `or c.values` and opens BLANK
 				     with rdk exiting 0 (SPEC V211a, B6). -->
-				<label left="35" top="50" width="150" height="24" text="Affiliation"/>
-				<comboBox left="32" top="78" width="386" height="24" fontSize="12" name="cboHedgeAffiliation" field="hedgeAffiliation">
+				<label left="20" top="78" width="150" height="24" text="Affiliation"/>
+				<comboBox left="180" top="78" width="386" height="24" fontSize="12" name="cboHedgeAffiliation" field="hedgeAffiliation">
 				</comboBox>
 
 				<!-- The typed twin of the picker above, one field and two widgets with exactly one
@@ -498,20 +498,20 @@
 				     ⚠ what is typed here is FREE text while the picker stores the canonical EN
 				     (SPEC V24), so the filters of I67/I68 read an affiliation they do not know and
 				     prune nothing - which is the right answer for homebrew, not an accident. -->
-				<edit name="edtHedgeAffiliation" left="32" top="78" width="386" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
+				<edit name="edtHedgeAffiliation" left="180" top="78" width="386" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
 
 				<!-- The label column is 150 because SPEC V16 prices it there and not by eye:
 				     `Atributo de Conjuracao` is 22 characters, which the house ruler puts at
 				     143px. These two rows share one label x and one entry x, so they are a GRID
 				     and not two controls that happen to line up (SPEC V224, B12, B13). -->
-				<label left="35" top="106" width="150" height="24" text="Essence"/>
-				<edit left="195" top="106" width="220" height="24" field="hedgeEssence"/>
+				<label left="20" top="106" width="150" height="24" text="Essence"/>
+				<edit left="180" top="106" width="386" height="24" field="hedgeEssence"/>
 
 				<!-- cbo, not cmb: this is a picker of PROSE, so its list lives in PICKER_LIST and
 				     translates with the sheet (SPEC I27, V208 scope, B57). The nine names are the
 				     nine of XP_ATTRS, `Inteligence` in the sheet's own spelling (SPEC I3). -->
-				<label left="35" top="134" width="150" height="24" text="Casting Attribute"/>
-				<comboBox left="195" top="134" width="220" height="24" fontSize="12" name="cboHedgeAttr" field="hedgeAttr">
+				<label left="20" top="134" width="150" height="24" text="Casting Attribute"/>
+				<comboBox left="180" top="134" width="386" height="24" fontSize="12" name="cboHedgeAttr" field="hedgeAttr">
 				</comboBox>
 			</layout>
 
@@ -529,20 +529,20 @@
 			     top=107 is the CENTRE of the body, not a row position: the box is stretched to the
 			     band's 178 and 107 - 61 equals 178 - 132, the body opening 20 under the title I73
 			     put at 20 (SPEC I63, V267b, I73). -->
-			<layout left="470" top="0" width="460" height="178">
+			<layout left="606" top="0" width="392" height="178">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="20" top="20" width="420" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
+				<label left="20" top="20" width="352" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
 
-				<imageCheckBox left="87" top="107" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="116" top="107" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="145" top="107" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="174" top="107" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="203" top="107" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="232" top="107" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="261" top="107" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="290" top="107" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="319" top="107" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="348" top="107" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="53" top="107" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="82" top="107" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="111" top="107" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="140" top="107" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="169" top="107" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="198" top="107" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="227" top="107" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="256" top="107" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="285" top="107" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="314" top="107" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			</layout>
 
 			<!-- The WILLPOWER box of the Combat tab, moved here and not redesigned (SPEC I63,
@@ -554,11 +554,11 @@
 
 			     The 250x45 block sits at 105/97: 105 = (460 - 250) / 2 and 97 - 61 = 178 - 142, the
 			     same centring the box beside it pays (SPEC V267b). -->
-			<layout left="950" top="0" width="460" height="178">
+			<layout left="1018" top="0" width="392" height="178">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="20" top="20" width="420" height="20" text="WILLPOWER" horzTextAlign="center"/>
+				<label left="20" top="20" width="352" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
-				<layout left="105" top="97" width="250" height="45">
+				<layout left="71" top="97" width="250" height="45">
 					<WillpowerNumina/>
 				</layout>
 			</layout>
@@ -604,59 +604,59 @@
 			</layout>
 
 			<layout name="tabHedgePaths" left="0" top="262" width="1410" height="486">
-				<layout left="0" top="0" width="450" height="486">
+				<layout left="0" top="0" width="586" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-					<label left="20" top="20" width="410" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
+					<label left="20" top="20" width="546" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
 
-					<layout left="32" top="41" width="386" height="25">
+					<layout left="32" top="41" width="522" height="25">
 						<HedgePicker field="numina_1" style="bold"/>
 					</layout>
-					<layout left="32" top="66" width="386" height="25">
+					<layout left="32" top="66" width="522" height="25">
 						<HedgePicker field="numina_2" style=""/>
 					</layout>
-					<layout left="32" top="91" width="386" height="25">
+					<layout left="32" top="91" width="522" height="25">
 						<HedgePicker field="numina_3" style=""/>
 					</layout>
-					<layout left="32" top="116" width="386" height="25">
+					<layout left="32" top="116" width="522" height="25">
 						<HedgePicker field="numina_4" style=""/>
 					</layout>
-					<layout left="32" top="141" width="386" height="25">
+					<layout left="32" top="141" width="522" height="25">
 						<HedgePicker field="numina_5" style=""/>
 					</layout>
-					<layout left="32" top="166" width="386" height="25">
+					<layout left="32" top="166" width="522" height="25">
 						<HedgePicker field="numina_6" style=""/>
 					</layout>
-					<layout left="32" top="191" width="386" height="25">
+					<layout left="32" top="191" width="522" height="25">
 						<HedgePicker field="numina_7" style=""/>
 					</layout>
-					<layout left="32" top="216" width="386" height="25">
+					<layout left="32" top="216" width="522" height="25">
 						<HedgePicker field="numina_8" style=""/>
 					</layout>
-					<layout left="32" top="241" width="386" height="25">
+					<layout left="32" top="241" width="522" height="25">
 						<HedgePicker field="numina_9" style=""/>
 					</layout>
-					<layout left="32" top="266" width="386" height="25">
+					<layout left="32" top="266" width="522" height="25">
 						<HedgePicker field="numina_10" style=""/>
 					</layout>
-					<layout left="32" top="291" width="386" height="25">
+					<layout left="32" top="291" width="522" height="25">
 						<HedgePicker field="numina_11" style=""/>
 					</layout>
-					<layout left="32" top="316" width="386" height="25">
+					<layout left="32" top="316" width="522" height="25">
 						<HedgePicker field="numina_12" style=""/>
 					</layout>
-					<layout left="32" top="341" width="386" height="25">
+					<layout left="32" top="341" width="522" height="25">
 						<NuminaFree field="numina_13"/>
 					</layout>
-					<layout left="32" top="366" width="386" height="25">
+					<layout left="32" top="366" width="522" height="25">
 						<NuminaFree field="numina_14"/>
 					</layout>
-					<layout left="32" top="391" width="386" height="25">
+					<layout left="32" top="391" width="522" height="25">
 						<NuminaFree field="numina_15"/>
 					</layout>
-					<layout left="32" top="416" width="386" height="25">
+					<layout left="32" top="416" width="522" height="25">
 						<NuminaFree field="numina_16"/>
 					</layout>
-					<layout left="32" top="441" width="386" height="25">
+					<layout left="32" top="441" width="522" height="25">
 						<NuminaFree field="numina_17"/>
 					</layout>
 				</layout>
@@ -665,67 +665,67 @@
 					Read-only on purpose: this block displays book text, it is not a note field. No
 					`field=` either, so nothing here is written to the character (SPEC V29 / R.12).
 				-->
-				<layout left="470" top="0" width="940" height="486">
+				<layout left="606" top="0" width="804" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-					<label left="20" top="20" width="900" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-					<textEditor name="edtHedgeDesc" left="30" top="41" width="880" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'numinaSel');"/>
+					<label left="20" top="20" width="764" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+					<textEditor name="edtHedgeDesc" left="30" top="41" width="744" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'numinaSel');"/>
 				</layout>
 			</layout>
 
 			<layout name="tabHedgeRituals" left="0" top="262" width="1410" height="486" visible="false">
-				<layout left="0" top="0" width="450" height="486">
+				<layout left="0" top="0" width="586" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-					<label left="20" top="20" width="410" height="20" text="HEDGE MAGIC RITUALS" horzTextAlign="center"/>
+					<label left="20" top="20" width="546" height="20" text="HEDGE MAGIC RITUALS" horzTextAlign="center"/>
 
-					<layout left="32" top="41" width="386" height="25">
+					<layout left="32" top="41" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_1"/>
 					</layout>
-					<layout left="32" top="66" width="386" height="25">
+					<layout left="32" top="66" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_2"/>
 					</layout>
-					<layout left="32" top="91" width="386" height="25">
+					<layout left="32" top="91" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_3"/>
 					</layout>
-					<layout left="32" top="116" width="386" height="25">
+					<layout left="32" top="116" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_4"/>
 					</layout>
-					<layout left="32" top="141" width="386" height="25">
+					<layout left="32" top="141" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_5"/>
 					</layout>
-					<layout left="32" top="166" width="386" height="25">
+					<layout left="32" top="166" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_6"/>
 					</layout>
-					<layout left="32" top="191" width="386" height="25">
+					<layout left="32" top="191" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_7"/>
 					</layout>
-					<layout left="32" top="216" width="386" height="25">
+					<layout left="32" top="216" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_8"/>
 					</layout>
-					<layout left="32" top="241" width="386" height="25">
+					<layout left="32" top="241" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_9"/>
 					</layout>
-					<layout left="32" top="266" width="386" height="25">
+					<layout left="32" top="266" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_10"/>
 					</layout>
-					<layout left="32" top="291" width="386" height="25">
+					<layout left="32" top="291" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_11"/>
 					</layout>
-					<layout left="32" top="316" width="386" height="25">
+					<layout left="32" top="316" width="522" height="25">
 						<HedgeRitualPicker field="hedgeRitual_12"/>
 					</layout>
-					<layout left="32" top="341" width="386" height="25">
+					<layout left="32" top="341" width="522" height="25">
 						<HedgeRitualFree field="hedgeRitual_13"/>
 					</layout>
-					<layout left="32" top="366" width="386" height="25">
+					<layout left="32" top="366" width="522" height="25">
 						<HedgeRitualFree field="hedgeRitual_14"/>
 					</layout>
-					<layout left="32" top="391" width="386" height="25">
+					<layout left="32" top="391" width="522" height="25">
 						<HedgeRitualFree field="hedgeRitual_15"/>
 					</layout>
-					<layout left="32" top="416" width="386" height="25">
+					<layout left="32" top="416" width="522" height="25">
 						<HedgeRitualFree field="hedgeRitual_16"/>
 					</layout>
-					<layout left="32" top="441" width="386" height="25">
+					<layout left="32" top="441" width="522" height="25">
 						<HedgeRitualFree field="hedgeRitual_17"/>
 					</layout>
 				</layout>
@@ -734,10 +734,10 @@
 				     it opens for the storyteller only on a typed row, exactly as the other two do
 				     (SPEC I62, V266). The list is empty until the rituals are entered, so what a
 				     player sees here today is a state sentence, never a blank box (SPEC V33). -->
-				<layout left="470" top="0" width="940" height="486">
+				<layout left="606" top="0" width="804" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-					<label left="20" top="20" width="900" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-					<textEditor name="edtHedgeRitualDesc" left="30" top="41" width="880" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'hedgeRitualSel');"/>
+					<label left="20" top="20" width="764" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+					<textEditor name="edtHedgeRitualDesc" left="30" top="41" width="744" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'hedgeRitualSel');"/>
 				</layout>
 			</layout>
 

@@ -1,18 +1,90 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ▶ COMECE AQUI — 107ª rodada: **§T510 DESBLOQUEADA & FECHADA · §T640 NASCEU E FECHOU**
+## ⛔ CHAT NOVO — LEIA ESTAS 20 LINHAS ANTES DE QUALQUER COMANDO
 
-**Estado MEDIDO 2026-08-25 18:19:**
+**⊥ ∃ §T CONSTRUÍVEL. ⊥ peça `/ck:build`.** Estado MEDIDO 2026-08-25 19:50, ⊥ estimado:
 
 | coisa | valor |
 |---|---|
-| gate estático | **VERDE** — **548** `ok`, **0** FAIL (era 545 na 106ª) |
-| gate `-Build` | **VERDE** — §V6 exit 0 · §V7 `.rpk` 2.105.616 → 2.110.913, em 2 builds |
-| `.rpk` gerado & INSTALADO | **2.110.913 B** nos 2, `18:19` — `rdk -i` rodado |
-| commitado | **NADA** — `SPEC.md` `HANDOFF.md` `research/README.md` + `WoD20th.lfm` `WoD20.6.lfm` `localization.lang` + o gate no working tree |
-| §T510 §T640 §T641 | **`x`** |
-| §V novas | §V294 §V295 · §B65 |
-| mutações RODADAS | **9**, todas mordem (6 de §V294 + 3 de §V295) |
+| §T | **587 `x`** · **54 `.`** · **5 `~`** |
+| das 59 abertas | **56** = teste no Firecast [USER] ou probe · **1** = `T159` (arte, o user dá o PNG) · **1** = `T619` REVOGADA (virou §B61) · **1** = `T622`, cujo CÓDIGO já está aplicado & espera só o teste `T625` |
+| §T de código | **ZERO** |
+| gate estático | **VERDE** — 550 `ok`, 0 FAIL |
+| gate `-Build` | **VERDE** — §V6 exit 0 · §V7 ok |
+| `.rpk` | **2.111.082 B** gerado & INSTALADO 19:50 |
+
+`/ck:build` pelado varre as 54 `.`, começa em `T114` (probe de tela) & erra — aconteceu na 99ª
+& na 103ª. `/ck:build --next` faz o mesmo. **⊥ ∃ id p/ pedir.**
+
+### O que PEDIR neste chat, em ordem de valor
+
+1. **Teste no Firecast** — é o ÚNICO gargalo. **56** testes acumulados, alguns de dezenas de
+   rodadas atrás. Os desta sessão: `T644` (aba Numina, ↓) · `T511` `T515` (as 2 caixas do topo
+   da aba Vampiro, agora c/ o combo `Clan/Family` de **84** itens). Peça ao Claude um ROTEIRO
+   AGRUPADO por tela & por época — a ordem de id é a PIOR p/ executar (abre a mesma aba 8×).
+2. **Spec nova** (`/ck:spec`) p/ o que a tela revelar.
+3. **`T159`** se o user tiver a arte.
+
+### ⚠ Working tree — o que está & o que ⊥ está commitado
+
+`dcd7e9af` (commit do USER) levou o estado até **§T643**. FICARAM DE FORA, no working tree:
+`SPEC.md` (§I75 emendada · §V297 · §T645 §T646 & os flips) · `verify-hunters-hunted.ps1` (o
+check de §V297) · `WoD20.7.lfm` (os números de §T645) · `HANDOFF.md` · o `.rpk` **2.111.082**.
+⊥ COMMITAR sem o user pedir NAQUELA mensagem (regra do `CLAUDE.md`, & ela vence o skill).
+
+### ⚠ TUDO abaixo da 107ª rodada é HISTÓRICO & tem afirmação ENVELHECIDA
+
+As seções antigas ainda dizem `T510` **bloqueada em §R93 esperando os livros** (linhas ~856
+· ~872 · ~920 · ~959 · ~969 · ~1646). **⊥ é mais verdade**: o user entregou
+`Ghouls_and_Revnants_(Final_Download).pdf` em 2026-08-25, §R93 FECHOU c/ as 22 famílias &
+`T510` `T640` `T641` `T642` `T643` `T645` `T646` estão `x`. O histórico ⊥ foi reescrito de
+propósito — ele registra o que se sabia NAQUELA rodada. **A 107ª (logo abaixo) manda.**
+
+### O `?` mais valioso p/ a próxima rodada (§R102, & o §T644 responde)
+
+A régua do gate é `$PX_PER_CHAR = 6.5`, calibrada 1× p/ o corpo PADRÃO. O picker de
+`Affiliation` (& os de ritual/trilha) rodam `fontSize="12"` ∴ a régua é TETO, ⊥ medida. Se a
+tela mostrar folga grande à direita de `Sociedade de Ideologias Altruístas Esclarecidas (SEAI)`,
+a constante desce & abre ~50px A MAIS p/ `QUINTESSENCE`/`WILLPOWER`, em cima dos 32 que §T645
+já cortou. Isso ⊥ se resolve daqui — só a tela responde.
+
+## ▶ COMECE AQUI — 107ª rodada: **§T510 DESBLOQUEADA & FECHADA · §T640 NASCEU E FECHOU**
+
+**Estado MEDIDO 2026-08-25 19:50:**
+
+| coisa | valor |
+|---|---|
+| gate estático | **VERDE** — **550** `ok`, **0** FAIL (era 545 na 106ª) |
+| gate `-Build` | **VERDE** — §V6 exit 0 · §V7 `.rpk` 2.105.616 → 2.111.082, em 4 builds |
+| `.rpk` gerado & INSTALADO | **2.111.082 B** nos 2, `19:50` — `rdk -i` rodado |
+| commitado | `dcd7e9af` levou até §T643. FORA: `SPEC.md` `HANDOFF.md` `WoD20.7.lfm` o gate & o `.rpk` |
+| §T510 §T640…§T643 §T645 §T646 | **`x`** |
+| §V novas | §V294…§V297 · §I75 · §B65 |
+| mutações RODADAS | **15**, todas mordem (6 §V294 · 3 §V295 · 3 §V296 · 3 §V297) |
+
+### ➕ §T642 & §T643 (mesma sessão) — aba Numina, 2ª passada de LARGURA
+
+Pedido user 2026-08-25: o dropdown de `Affiliation` sobe p/ a LINHA do rótulo & ⊥ encolhe
+(§V196 pede 382 p/ `The Society of Enlightened Altruistic Ideologies (SEAI)`) ∴ quem cede é
+a largura das vizinhas. `HEDGE MAGIC` 450→**618** · `QUINTESSENCE` 470/460→**638/376** ·
+`WILLPOWER` 950/460→**1034/376** · as 2 listas 450→**618** · as 2 `DESCRIPTION`
+470/940→**638/772** · as **34** linhas 386→**554** & os 168 que sobram foram P/ O COMBO DO
+NOME (230→**398**, bolinhas →428·453·478·503·528) nos 4 templates de Hedge. §V296 NOVA trava
+o alinhamento das 2 fileiras, que até aqui era COINCIDÊNCIA.
+
+### ⚠ 2 armadilhas de ESCOPO desta rodada — ⊥ repetir
+
+1. **`tabPsychic` compartilha as strings EXATAS de `tabHedge`** — `text="DESCRIPTION"`,
+   `<layout ... width="386" height="25">` (24 linhas) & `width="450"`. Substituição global
+   pega os 2 painéis: o 1º passe mexeu no Psychic sem querer (58 linhas em vez de 34) & foi
+   REVERTIDO. Editar `WoD20.7` só por REGIÃO delimitada (`tabHedge` → `tabPsychic`) & os
+   templates por nome.
+2. **As 2 `DESCRIPTION` têm `textEditor` de nomes DIFERENTES** — `edtHedgeDesc` (paths) &
+   `edtHedgeRitualDesc` (rituals). Trocar só o 1º deixa §V239/§V280 vermelhas c/ `R=-138`.
+
+`?` VIVO p/ o teste (§T644): `tabPsychic` ficou FORA (o user nomeou só as 2 de Hedge & o
+Psychic ⊥ tem a caixa que motivou a largura) ∴ trocar de painel SALTA de 618/638 p/ 450/470.
+Se incomodar, alinhar o Psychic = 1 §T de 4 números + 2 templates.
 
 ### ✅ O que a 107ª entregou
 
