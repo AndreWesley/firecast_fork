@@ -311,76 +311,76 @@
 
 		<!-- 20 slots since the 85th round: five came off by request (SPEC I46, V251) and the box
 		     came down with them. 10 title gap + 20 title + 20*25 rows + 10 foot = 541 (SPEC V240). -->
-		<layout left="0" top="20" width="480" height="541">
+		<layout left="0" top="20" width="520" height="561">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="480" height="20" text="RITUALS" horzTextAlign="center"/>
-			<layout left="12" top="31" width="456" height="25">
+			<label left="20" top="20" width="480" height="20" text="RITUALS" horzTextAlign="center"/>
+			<layout left="32" top="41" width="456" height="25">
 				<RitualRow field="ritual_1"/>
 			</layout>
-			<layout left="12" top="56" width="456" height="25">
+			<layout left="32" top="66" width="456" height="25">
 				<RitualRow field="ritual_2"/>
 			</layout>
-			<layout left="12" top="81" width="456" height="25">
+			<layout left="32" top="91" width="456" height="25">
 				<RitualRow field="ritual_3"/>
 			</layout>
-			<layout left="12" top="106" width="456" height="25">
+			<layout left="32" top="116" width="456" height="25">
 				<RitualRow field="ritual_4"/>
 			</layout>
-			<layout left="12" top="131" width="456" height="25">
+			<layout left="32" top="141" width="456" height="25">
 				<RitualRow field="ritual_5"/>
 			</layout>
-			<layout left="12" top="156" width="456" height="25">
+			<layout left="32" top="166" width="456" height="25">
 				<RitualRow field="ritual_6"/>
 			</layout>
-			<layout left="12" top="181" width="456" height="25">
+			<layout left="32" top="191" width="456" height="25">
 				<RitualRow field="ritual_7"/>
 			</layout>
-			<layout left="12" top="206" width="456" height="25">
+			<layout left="32" top="216" width="456" height="25">
 				<RitualRow field="ritual_8"/>
 			</layout>
-			<layout left="12" top="231" width="456" height="25">
+			<layout left="32" top="241" width="456" height="25">
 				<RitualRow field="ritual_9"/>
 			</layout>
-			<layout left="12" top="256" width="456" height="25">
+			<layout left="32" top="266" width="456" height="25">
 				<RitualRow field="ritual_10"/>
 			</layout>
-			<layout left="12" top="281" width="456" height="25">
+			<layout left="32" top="291" width="456" height="25">
 				<RitualRow field="ritual_11"/>
 			</layout>
-			<layout left="12" top="306" width="456" height="25">
+			<layout left="32" top="316" width="456" height="25">
 				<RitualRow field="ritual_12"/>
 			</layout>
-			<layout left="12" top="331" width="456" height="25">
+			<layout left="32" top="341" width="456" height="25">
 				<RitualRow field="ritual_13"/>
 			</layout>
-			<layout left="12" top="356" width="456" height="25">
+			<layout left="32" top="366" width="456" height="25">
 				<RitualRow field="ritual_14"/>
 			</layout>
-			<layout left="12" top="381" width="456" height="25">
+			<layout left="32" top="391" width="456" height="25">
 				<RitualRow field="ritual_15"/>
 			</layout>
-			<layout left="12" top="406" width="456" height="25">
+			<layout left="32" top="416" width="456" height="25">
 				<RitualFreeRow field="ritual_16"/>
 			</layout>
-			<layout left="12" top="431" width="456" height="25">
+			<layout left="32" top="441" width="456" height="25">
 				<RitualFreeRow field="ritual_17"/>
 			</layout>
-			<layout left="12" top="456" width="456" height="25">
+			<layout left="32" top="466" width="456" height="25">
 				<RitualFreeRow field="ritual_18"/>
 			</layout>
-			<layout left="12" top="481" width="456" height="25">
+			<layout left="32" top="491" width="456" height="25">
 				<RitualFreeRow field="ritual_19"/>
 			</layout>
-			<layout left="12" top="506" width="456" height="25">
+			<layout left="32" top="516" width="456" height="25">
 				<RitualFreeRow field="ritual_20"/>
 			</layout>
 		</layout>
 
 		<!-- Grows with the column on its left, never on its own (SPEC V193). -->
-		<layout left="490" top="20" width="490" height="541">
+		<layout left="540" top="20" width="530" height="561">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="490" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtRitualDesc" left="10" top="31" width="470" height="500" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveRitualDesc(self);"/>
+			<label left="20" top="20" width="490" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtRitualDesc" left="30" top="41" width="470" height="500" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveRitualDesc(self);"/>
 		</layout>
 	</scrollBox>
 

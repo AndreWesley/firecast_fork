@@ -71,19 +71,19 @@
 		     The two labels on the left say Name and Generation now, and the FIELDS under them did
 		     not change: `dominator` and `dominatorGen` still own the data (SPEC V2 - a rename here
 		     would drop what is already saved on the sheet the user is testing with). -->
-		<layout left="0" top="20" width="620" height="116">
+		<layout left="0" top="0" width="660" height="136">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="620" height="20" text="DOMINATOR" horzTextAlign="center"/>
+			<label left="20" top="20" width="620" height="20" text="DOMINATOR" horzTextAlign="center"/>
 
-			<label left="15" top="46" width="95" height="24" text="Name"/>
-			<edit left="115" top="46" width="192" height="24" field="dominator"/>
+			<label left="35" top="56" width="95" height="24" text="Name"/>
+			<edit left="135" top="56" width="192" height="24" field="dominator"/>
 
 			<!-- cmb, not cbo: pickerItems only touches controls named cbo* (WoD20.6), which is what
 			     lets this one keep an items/values pair that DIFFERS - the ordinal is what the player
 			     reads, the number is what GEN_MAX is keyed by (SPEC I29). Same footing as
 			     cmbHealthLevels: a combo of VALUE, not a picker of prose (SPEC V208 scope). -->
-			<label left="374" top="46" width="165" height="24" text="Generation"/>
-			<comboBox name="cmbDominatorGen" left="549" top="46" width="56" height="24" field="dominatorGen"
+			<label left="394" top="56" width="165" height="24" text="Generation"/>
+			<comboBox name="cmbDominatorGen" left="569" top="56" width="56" height="24" field="dominatorGen"
 			          items="{'', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th'}"
 			          values="{'', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'}"/>
 
@@ -93,8 +93,8 @@
 			     more. The revenant families are still unread (SPEC T510); when they land and one of
 			     them is longer, the COLUMN gives way, not the list (SPEC I30). The label opposite is
 			     `Nivel Max. de Disciplina` in pt, 24 chars, which V16 prices at 156px inside these 165. -->
-			<label left="15" top="82" width="95" height="24" text="Clan/Family"/>
-			<comboBox name="cboClanFamily" left="115" top="82" width="192" height="24" field="clanFamily"/>
+			<label left="35" top="92" width="95" height="24" text="Clan/Family"/>
+			<comboBox name="cboClanFamily" left="135" top="92" width="192" height="24" field="clanFamily"/>
 
 			<!-- The typed twin of the picker above, one field and two widgets with exactly one of
 			     them visible (SPEC I71, V274, user 2026-08-23). It is a DECLARED mirror in SPEC I3
@@ -108,17 +108,17 @@
 			     still enabled takes Tab focus, which is the bug no screenshot shows (SPEC V274c,
 			     V274d). A sheet that never opened the storyteller's tab paints right with no Lua
 			     at all (SPEC V56). -->
-			<edit name="edtClanFamily" left="115" top="82" width="192" height="24" field="clanFamily" visible="false" enabled="false"/>
+			<edit name="edtClanFamily" left="135" top="92" width="192" height="24" field="clanFamily" visible="false" enabled="false"/>
 
 			<!-- Derived, so it has no `field` and is never saved (SPEC I3, V29): a number that can be
 			     recomputed must not be able to disagree with what it was computed from. -->
-			<label left="374" top="82" width="165" height="24" text="Max Discipline Level"/>
-			<label name="lblMaxDisc" left="549" top="82" width="56" height="24" text="-"/>
+			<label left="394" top="92" width="165" height="24" text="Max Discipline Level"/>
+			<label name="lblMaxDisc" left="569" top="92" width="56" height="24" text="-"/>
 		</layout>
 
-		<layout left="630" top="20" width="350" height="118">
+		<layout left="680" top="0" width="390" height="138">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="350" height="20" text="BLOOD POOL" horzTextAlign="center"/>
+			<label left="20" top="20" width="350" height="20" text="BLOOD POOL" horzTextAlign="center"/>
 
 			<!-- Twenty FREE dots (SPEC V219). They wear the rating art and they are not rating dots:
 			     blood is spent and regained inside a single scene, so autoChange stays ON and there
@@ -130,27 +130,27 @@
 			     so it must NOT be loosened to let these through - the gate names them by field
 			     prefix instead (SPEC T509). applyTheme repaints by CLASS, so they follow the palette
 			     with nothing added (MEASURED: WoD20.6, cls == "imageCheckBox"). -->
-			<imageCheckBox left="36" top="48" width="25" height="25" field="bloodPool_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="64" top="48" width="25" height="25" field="bloodPool_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="92" top="48" width="25" height="25" field="bloodPool_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="120" top="48" width="25" height="25" field="bloodPool_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="148" top="48" width="25" height="25" field="bloodPool_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="176" top="48" width="25" height="25" field="bloodPool_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="204" top="48" width="25" height="25" field="bloodPool_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="232" top="48" width="25" height="25" field="bloodPool_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="260" top="48" width="25" height="25" field="bloodPool_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="289" top="48" width="25" height="25" field="bloodPool_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="56" top="58" width="25" height="25" field="bloodPool_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="84" top="58" width="25" height="25" field="bloodPool_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="112" top="58" width="25" height="25" field="bloodPool_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="140" top="58" width="25" height="25" field="bloodPool_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="168" top="58" width="25" height="25" field="bloodPool_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="196" top="58" width="25" height="25" field="bloodPool_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="224" top="58" width="25" height="25" field="bloodPool_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="252" top="58" width="25" height="25" field="bloodPool_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="280" top="58" width="25" height="25" field="bloodPool_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="309" top="58" width="25" height="25" field="bloodPool_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 
-			<imageCheckBox left="36" top="83" width="25" height="25" field="bloodPool_11" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="64" top="83" width="25" height="25" field="bloodPool_12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="92" top="83" width="25" height="25" field="bloodPool_13" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="120" top="83" width="25" height="25" field="bloodPool_14" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="148" top="83" width="25" height="25" field="bloodPool_15" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="176" top="83" width="25" height="25" field="bloodPool_16" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="204" top="83" width="25" height="25" field="bloodPool_17" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="232" top="83" width="25" height="25" field="bloodPool_18" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="260" top="83" width="25" height="25" field="bloodPool_19" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="289" top="83" width="25" height="25" field="bloodPool_20" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="56" top="93" width="25" height="25" field="bloodPool_11" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="84" top="93" width="25" height="25" field="bloodPool_12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="112" top="93" width="25" height="25" field="bloodPool_13" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="140" top="93" width="25" height="25" field="bloodPool_14" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="168" top="93" width="25" height="25" field="bloodPool_15" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="196" top="93" width="25" height="25" field="bloodPool_16" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="224" top="93" width="25" height="25" field="bloodPool_17" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="252" top="93" width="25" height="25" field="bloodPool_18" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="280" top="93" width="25" height="25" field="bloodPool_19" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="309" top="93" width="25" height="25" field="bloodPool_20" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</layout>
 
 		<!--
@@ -160,7 +160,7 @@
 			B41. The imported forms are align="client" themselves, so each one fills the layout
 			that holds it and the explicit size is all they need.
 		-->
-		<layout name="vampStrip" left="0" top="150" width="990" height="60">
+		<layout name="vampStrip" left="0" top="150" width="1070" height="60">
 			<rectangle name="tabOnDisc" left="30" top="15" width="112" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
 			<rectangle name="btnTabDisc" left="30" top="15" width="112" height="30" color="#00000000"
@@ -186,15 +186,15 @@
 			</rectangle>
 		</layout>
 
-		<layout name="tabDisc" left="0" top="214" width="990" height="700">
+		<layout name="tabDisc" left="0" top="214" width="1070" height="700">
 			<import file="WoD20.12.lfm"/>
 		</layout>
 
-		<layout name="tabPaths" left="0" top="214" width="990" height="700" visible="false">
+		<layout name="tabPaths" left="0" top="214" width="1070" height="700" visible="false">
 			<import file="WoD20.13.lfm"/>
 		</layout>
 
-		<layout name="tabRituals" left="0" top="214" width="990" height="700" visible="false">
+		<layout name="tabRituals" left="0" top="214" width="1070" height="700" visible="false">
 			<import file="WoD20.14.lfm"/>
 		</layout>
 	</scrollBox>

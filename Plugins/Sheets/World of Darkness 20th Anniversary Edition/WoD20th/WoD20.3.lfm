@@ -136,60 +136,60 @@
 		<!-- Damage went 50 -> 90 (SPEC T145): "Str+2 (L)" never fit in 50px. The 40 comes from the
 		     10 the box gained on the right plus 30 off Weapon/Attack, still the widest column. -->
 		<template name="Attack">
-			<edit left="0" top="0" width="170" height="24" field="attack_$(num)"/>
-			<edit left="170" top="0" width="100" height="24" field="roll_$(num)"/>
-			<edit left="270" top="0" width="50" height="24" field="difficulty_$(num)"/>
-			<edit left="320" top="0" width="90" height="24" field="damage_$(num)"/>
-			<edit left="410" top="0" width="50" height="24" field="range_$(num)"/>
-			<edit left="460" top="0" width="50" height="24" field="rate_$(num)"/>
-			<edit left="510" top="0" width="50" height="24" field="clip_$(num)"/>
-			<edit left="560" top="0" width="70" height="24" field="conceal_$(num)"/>
+			<edit left="0" top="0" width="220" height="24" field="attack_$(num)"/>
+			<edit left="220" top="0" width="100" height="24" field="roll_$(num)"/>
+			<edit left="320" top="0" width="50" height="24" field="difficulty_$(num)"/>
+			<edit left="370" top="0" width="90" height="24" field="damage_$(num)"/>
+			<edit left="460" top="0" width="50" height="24" field="range_$(num)"/>
+			<edit left="510" top="0" width="50" height="24" field="rate_$(num)"/>
+			<edit left="560" top="0" width="50" height="24" field="clip_$(num)"/>
+			<edit left="610" top="0" width="70" height="24" field="conceal_$(num)"/>
 		</template>
 
 		<!-- 660 wide to close on VIRTUES, 320 tall to close on COMBAT TRAITS (SPEC T145). Each
 		     header label is as wide as its column and centred on it, so the titles sit over the
 		     fields instead of hugging their left edge. One label per column, no padding runs (V11). -->
-		<layout left="0" top="20" width="660" height="316">
+		<layout left="0" top="0" width="750" height="336">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="660" height="20" text="COMBAT" horzTextAlign="center"/>
+			<label left="20" top="20" width="710" height="20" text="COMBAT" horzTextAlign="center"/>
 
-			<label left="15" top="31" width="170" height="20" text="Weapon/Attack" horzTextAlign="center"/>
-			<label left="185" top="31" width="100" height="20" text="Roll" horzTextAlign="center"/>
-			<label left="285" top="31" width="50" height="20" text="Diff." horzTextAlign="center"/>
-			<label left="335" top="31" width="90" height="20" text="Damage" horzTextAlign="center"/>
-			<label left="425" top="31" width="50" height="20" text="Range" horzTextAlign="center"/>
-			<label left="475" top="31" width="50" height="20" text="Rate" horzTextAlign="center"/>
-			<label left="525" top="31" width="50" height="20" text="Clip" horzTextAlign="center"/>
-			<label left="575" top="31" width="70" height="20" text="Conceal" horzTextAlign="center"/>
+			<label left="35" top="41" width="220" height="20" text="Weapon/Attack" horzTextAlign="center"/>
+			<label left="255" top="41" width="100" height="20" text="Roll" horzTextAlign="center"/>
+			<label left="355" top="41" width="50" height="20" text="Diff." horzTextAlign="center"/>
+			<label left="405" top="41" width="90" height="20" text="Damage" horzTextAlign="center"/>
+			<label left="495" top="41" width="50" height="20" text="Range" horzTextAlign="center"/>
+			<label left="545" top="41" width="50" height="20" text="Rate" horzTextAlign="center"/>
+			<label left="595" top="41" width="50" height="20" text="Clip" horzTextAlign="center"/>
+			<label left="645" top="41" width="70" height="20" text="Conceal" horzTextAlign="center"/>
 
-			<layout left="15" top="56" width="630" height="25" >
+			<layout left="35" top="66" width="680" height="25" >
 				<Attack num="1"/>
 			</layout>
-			<layout left="15" top="81" width="630" height="25" >
+			<layout left="35" top="91" width="680" height="25" >
 				<Attack num="2"/>
 			</layout>
-			<layout left="15" top="106" width="630" height="25" >
+			<layout left="35" top="116" width="680" height="25" >
 				<Attack num="3"/>
 			</layout>
-			<layout left="15" top="131" width="630" height="25" >
+			<layout left="35" top="141" width="680" height="25" >
 				<Attack num="4"/>
 			</layout>
-			<layout left="15" top="156" width="630" height="25" >
+			<layout left="35" top="166" width="680" height="25" >
 				<Attack num="5"/>
 			</layout>
-			<layout left="15" top="181" width="630" height="25" >
+			<layout left="35" top="191" width="680" height="25" >
 				<Attack num="6"/>
 			</layout>
-			<layout left="15" top="206" width="630" height="25" >
+			<layout left="35" top="216" width="680" height="25" >
 				<Attack num="7"/>
 			</layout>
-			<layout left="15" top="231" width="630" height="25" >
+			<layout left="35" top="241" width="680" height="25" >
 				<Attack num="8"/>
 			</layout>
-			<layout left="15" top="256" width="630" height="25" >
+			<layout left="35" top="266" width="680" height="25" >
 				<Attack num="9"/>
 			</layout>
-			<layout left="15" top="281" width="630" height="25" >
+			<layout left="35" top="291" width="680" height="25" >
 				<Attack num="10"/>
 			</layout>
 		</layout>
@@ -200,24 +200,24 @@
 
 			One input column: all three rows put their edit at x=75 (SPEC V26 / B.12).
 		-->
-		<layout left="0" top="346" width="380" height="231">
+		<layout left="0" top="356" width="420" height="251">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="380" height="20" text="ARMOR" horzTextAlign="center"/>
+			<label left="20" top="20" width="380" height="20" text="ARMOR" horzTextAlign="center"/>
 
-			<layout left="15" top="31" width="350" height="25" >
+			<layout left="35" top="41" width="350" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Class" horzTextAlign="trailing"/>
 				<edit left="75" top="0" width="275" height="25" field="armorClass"/>
 			</layout>
-			<layout left="15" top="56" width="350" height="25" >
+			<layout left="35" top="66" width="350" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Rating" horzTextAlign="trailing"/>
 				<edit left="75" top="0" width="275" height="25" field="armorRating"/>
 			</layout>
-			<layout left="15" top="81" width="350" height="25" >
+			<layout left="35" top="91" width="350" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Penalty" horzTextAlign="trailing"/>
 				<edit left="75" top="0" width="275" height="25" field="armorPenalty"/>
 			</layout>
 
-			<textEditor left="15" top="111" width="350" height="110" field="armorDescription"/>
+			<textEditor left="35" top="121" width="350" height="110" field="armorDescription"/>
 		</layout>
 
 		<!--
@@ -228,11 +228,11 @@
 			(SPEC I3 ESPELHOS, V36). Spending willpower is what a player does mid-fight; raising
 			the permanent rating is not.
 		-->
-		<layout left="390" top="472" width="270" height="91">
+		<layout left="440" top="512" width="310" height="111">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="270" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<label left="20" top="20" width="270" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
-			<layout left="10" top="36" width="250" height="45">
+			<layout left="30" top="46" width="250" height="45">
 				<WillpowerMirror/>
 			</layout>
 		</layout>
@@ -255,22 +255,22 @@
 		<!-- height=306 is the ten-row case; the renderer shrinks it to the chosen track length
 		     (SPEC V49), so the file declares the tallest this box can ever be.
 		     top=330 lines this box up with ARMOR and VIRTUES; the row sits 10 under COMBAT (T150). -->
-		<layout name="dynHealth3_box" left="670" top="361" width="280" height="307">
+		<layout name="dynHealth3_box" left="770" top="371" width="320" height="349">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- The track length lives on the storyteller's tab since the 82nd round (SPEC I35,
 			     V234). The title spans the box now, so it is centred on the box. -->
-			<label left="0" top="10" width="280" height="20" text="HEALTH" horzTextAlign="center"/>
+			<label left="20" top="20" width="280" height="20" text="HEALTH" horzTextAlign="center"/>
 
-			<layout name="dynHealth3_row1" left="17" top="34" width="246" height="20"><HealthRowMirror num="1"/></layout>
-			<layout name="dynHealth3_row2" left="17" top="61" width="246" height="20"><HealthRowMirror num="2"/></layout>
-			<layout name="dynHealth3_row3" left="17" top="88" width="246" height="20"><HealthRowMirror num="3"/></layout>
-			<layout name="dynHealth3_row4" left="17" top="115" width="246" height="20"><HealthRowMirror num="4"/></layout>
-			<layout name="dynHealth3_row5" left="17" top="142" width="246" height="20"><HealthRowMirror num="5"/></layout>
-			<layout name="dynHealth3_row6" left="17" top="169" width="246" height="20"><HealthRowMirror num="6"/></layout>
-			<layout name="dynHealth3_row7" left="17" top="196" width="246" height="20"><HealthRowMirror num="7"/></layout>
-			<layout name="dynHealth3_row8" left="17" top="223" width="246" height="20"><HealthRowMirror num="8"/></layout>
-			<layout name="dynHealth3_row9" left="17" top="250" width="246" height="20"><HealthRowMirror num="9"/></layout>
-			<layout name="dynHealth3_row10" left="17" top="277" width="246" height="20"><HealthRowMirror num="10"/></layout>
+			<layout name="dynHealth3_row1" left="37" top="44" width="246" height="20"><HealthRowMirror num="1"/></layout>
+			<layout name="dynHealth3_row2" left="37" top="71" width="246" height="20"><HealthRowMirror num="2"/></layout>
+			<layout name="dynHealth3_row3" left="37" top="98" width="246" height="20"><HealthRowMirror num="3"/></layout>
+			<layout name="dynHealth3_row4" left="37" top="125" width="246" height="20"><HealthRowMirror num="4"/></layout>
+			<layout name="dynHealth3_row5" left="37" top="152" width="246" height="20"><HealthRowMirror num="5"/></layout>
+			<layout name="dynHealth3_row6" left="37" top="179" width="246" height="20"><HealthRowMirror num="6"/></layout>
+			<layout name="dynHealth3_row7" left="37" top="206" width="246" height="20"><HealthRowMirror num="7"/></layout>
+			<layout name="dynHealth3_row8" left="37" top="233" width="246" height="20"><HealthRowMirror num="8"/></layout>
+			<layout name="dynHealth3_row9" left="37" top="260" width="246" height="20"><HealthRowMirror num="9"/></layout>
+			<layout name="dynHealth3_row10" left="37" top="287" width="246" height="20"><HealthRowMirror num="10"/></layout>
 		</layout>
 
 		<!--
@@ -278,17 +278,17 @@
 			x=670), so it is 270 wide, not 280: 390+270 leaves the same 10px gutter on both sides.
 			The rows lose 5px of indent to keep the 250px template inside the narrower box.
 		-->
-		<layout left="390" top="346" width="270" height="116">
+		<layout left="440" top="356" width="310" height="136">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="270" height="20" text="VIRTUES" horzTextAlign="center"/>
+			<label left="20" top="20" width="270" height="20" text="VIRTUES" horzTextAlign="center"/>
 
-			<layout left="10" top="31" width="250" height="25" >
+			<layout left="30" top="41" width="250" height="25" >
 				<VirtueMirror field="conscience" nome="Conscience"/>
 			</layout>
-			<layout left="10" top="56" width="250" height="25" >
+			<layout left="30" top="66" width="250" height="25" >
 				<VirtueMirror field="selfControl" nome="Self-Control"/>
 			</layout>
-			<layout left="10" top="81" width="250" height="25" >
+			<layout left="30" top="91" width="250" height="25" >
 				<VirtueMirror field="courage" nome="Courage"/>
 			</layout>
 		</layout>
@@ -304,24 +304,24 @@
 			Attributes show five dots with the first always lit, matching the Attribute template
 			where dot 1 is a fixed image and only `_2`..`_5` are real fields.
 		-->
-		<layout left="670" top="20" width="280" height="331">
+		<layout left="770" top="0" width="320" height="351">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="280" height="20" text="COMBAT TRAITS" horzTextAlign="center"/>
+			<label left="20" top="20" width="280" height="20" text="COMBAT TRAITS" horzTextAlign="center"/>
 
-			<layout left="15" top="31" width="250" height="25" ><ReadOnlyTrait field="strength" nome="Strength"/></layout>
-			<layout left="15" top="56" width="250" height="25" ><ReadOnlyTrait field="dexterity" nome="Dexterity"/></layout>
-			<layout left="15" top="81" width="250" height="25" ><ReadOnlyTrait field="stamina" nome="Stamina"/></layout>
-			<layout left="15" top="106" width="250" height="25" ><ReadOnlyTrait field="perception" nome="Perception"/></layout>
+			<layout left="35" top="41" width="250" height="25" ><ReadOnlyTrait field="strength" nome="Strength"/></layout>
+			<layout left="35" top="66" width="250" height="25" ><ReadOnlyTrait field="dexterity" nome="Dexterity"/></layout>
+			<layout left="35" top="91" width="250" height="25" ><ReadOnlyTrait field="stamina" nome="Stamina"/></layout>
+			<layout left="35" top="116" width="250" height="25" ><ReadOnlyTrait field="perception" nome="Perception"/></layout>
 
-			<horzLine left="10" top="136" width="260" strokeColor="white"/>
+			<horzLine left="30" top="146" width="260" strokeColor="white"/>
 
-			<layout left="15" top="146" width="250" height="25" ><ReadOnlyTrait field="alertness" nome="Alertness"/></layout>
-			<layout left="15" top="171" width="250" height="25" ><ReadOnlyTrait field="athletics" nome="Athletics"/></layout>
-			<layout left="15" top="196" width="250" height="25" ><ReadOnlyTrait field="awareness" nome="Awareness"/></layout>
-			<layout left="15" top="221" width="250" height="25" ><ReadOnlyTrait field="brawl" nome="Brawl"/></layout>
-			<layout left="15" top="246" width="250" height="25" ><ReadOnlyTrait field="ranged" nome="Firearms"/></layout>
-			<layout left="15" top="271" width="250" height="25" ><ReadOnlyTrait field="melee" nome="Melee"/></layout>
-			<layout left="15" top="296" width="250" height="25" ><ReadOnlyTrait field="stealth" nome="Stealth"/></layout>
+			<layout left="35" top="156" width="250" height="25" ><ReadOnlyTrait field="alertness" nome="Alertness"/></layout>
+			<layout left="35" top="181" width="250" height="25" ><ReadOnlyTrait field="athletics" nome="Athletics"/></layout>
+			<layout left="35" top="206" width="250" height="25" ><ReadOnlyTrait field="awareness" nome="Awareness"/></layout>
+			<layout left="35" top="231" width="250" height="25" ><ReadOnlyTrait field="brawl" nome="Brawl"/></layout>
+			<layout left="35" top="256" width="250" height="25" ><ReadOnlyTrait field="ranged" nome="Firearms"/></layout>
+			<layout left="35" top="281" width="250" height="25" ><ReadOnlyTrait field="melee" nome="Melee"/></layout>
+			<layout left="35" top="306" width="250" height="25" ><ReadOnlyTrait field="stealth" nome="Stealth"/></layout>
 		</layout>
 	</scrollBox>
 

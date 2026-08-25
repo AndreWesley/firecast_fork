@@ -60,6 +60,7 @@
 				["Blood Sorcery: Paths"] = "Feitiçaria de Sangue: Trilhas",
 				["Blood Sorcery: Rituals"] = "Feitiçaria de Sangue: Rituais",
 				["Bon Vivant"] = "Bon Vivant",
+				["Book"] = "Livro",
 				["Bravo"] = "Valentão",
 				["Brawl"] = "Briga",
 				["BRAWLING CHART"] = "TABELA DE COMBATE",
@@ -948,6 +949,28 @@
 				["Ventrue Antitribu"] = "Ventrue Antitribu",
 				["Warrior Setites"] = "Setitas Guerreiros",
 				["Wu Zao"] = "Wu Zao",
+				["Basarab"] = "Basarab",
+				["Bratovich (Dark Ages)"] = "Bratovich (Trevas)",
+				["Bratovitch (Modern)"] = "Bratovitch (Moderna)",
+				["D'Habi"] = "D'Habi",
+				["Danislav"] = "Danislav",
+				["Ducheski"] = "Ducheski",
+				["Enrathi"] = "Enrathi",
+				["Grimaldi"] = "Grimaldi",
+				["Kairouan Brotherhood"] = "Irmandade de Kairouan",
+				["Katayama"] = "Katayama",
+				["Keskinen"] = "Keskinen",
+				["Khavi"] = "Khavi",
+				["Krevcheski"] = "Krevcheski",
+				["Marijava"] = "Marijava",
+				["Obertus"] = "Obertus",
+				["Oprichniki"] = "Oprichniki",
+				["Rafastio"] = "Rafastio",
+				["Rossellini"] = "Rossellini",
+				["Servants of Anushin-Rawan"] = "Servos de Anushin-Rawan",
+				["Szantovich"] = "Szantovich",
+				["Vlaszy"] = "Vlaszy",
+				["Zantosa"] = "Zantosa",
 				["1. Encrypt/Decrypt Missive"] = "1. Cifrar/Decifrar Missiva",
 				["2. Cure of the Homeland"] = "2. Cura da Terra Natal",
 				["2. Hand of Glory"] = "2. Mão da Glória",
@@ -1595,6 +1618,7 @@
 						["white"]   = "#3A4150",      -- cold graphite
 						["#FFFFFF"] = "#3A4150",
 						["black"]   = "#3A4150",
+						["#00000000"] = "#00000000",  -- tab-strip floor: the band keeps its fill and loses its 3px outline -- SPEC I74b, V287
 					},
 					font = {
 						["white"] = "#E6E8EC",
@@ -1625,6 +1649,7 @@
 						["white"]   = "#C2A14D",      -- aged gold
 						["#FFFFFF"] = "#C2A14D",
 						["black"]   = "#C2A14D",
+						["#00000000"] = "#00000000",
 					},
 					font = {
 						["white"] = "#E8DCC0",        -- cream
@@ -1652,6 +1677,7 @@
 						["white"]   = "#C0C6CC",      -- polished silver
 						["#FFFFFF"] = "#C0C6CC",
 						["black"]   = "#C0C6CC",
+						["#00000000"] = "#00000000",
 					},
 					font = {
 						["white"] = "#E3D8BE",        -- candle on vellum
@@ -1679,6 +1705,7 @@
 						["white"]   = "#BFA05A",      -- laurel gold
 						["#FFFFFF"] = "#BFA05A",
 						["black"]   = "#BFA05A",
+						["#00000000"] = "#00000000",
 					},
 					font = {
 						["white"] = "#F0EAD9",        -- ivory
@@ -1841,6 +1868,17 @@
 			local ORN_ARM   = 40;      -- corner reach along each edge
 			local ORN_FLEUR = 150;     -- an edge run shorter than this carries no centre motif
 			local ORN_KAPPA = 0.5523;  -- cubic approximation of a quarter arc
+
+			-- SPEC R111, V282. The pill is its OWN motif and not the box frame shrunk: 2*ORN_ARM is
+			-- 80 against a pill 30 tall. What the user chose is the plainest of the three candidates -
+			-- a double rule, no figure - and MEASURING it is what decided its shape. A rule inset by d
+			-- follows radius ORN_PILLR + d and meets the short edge at sqrt((r+d)^2 - d^2): at d=1 that
+			-- is 14.97 against a half-height of 15, and at d=2 it is 15.87, so the two end arcs CROSS
+			-- instead of meeting. The wrap is impossible, and d=1 would sit under the 3px THEME_STROKE
+			-- applyTheme gives the pill anyway. So the rules run on the LONG edges and stop where the
+			-- corner arc starts - which is exactly what ornEdge does on a short run.
+			local ORN_PILLR = 14;      -- the radius V228 authors on every tab button
+			local ORN_PILL  = { 4, 7 };-- the two rules, in from the pill edge
 
 			-- Path data is parsed as SVG, where a comma separates x from y. The C library float
 			-- verbs follow LC_NUMERIC, so on a pt-BR host they write a decimal COMMA and every
@@ -2078,6 +2116,28 @@
 				return table.concat(o, " ");
 			end;
 
+			-- Two straight runs per long edge, and NOTHING on the short ones: there is no straight
+			-- run there to be a rule on. A run is emitted only where it has positive length, the
+			-- same refusal ornEdge makes, so a pill narrower than its own two corners simply gets
+			-- less rule rather than a line drawn backwards across itself (SPEC V279, V282).
+			local function pillPath(w, h)
+				local o = {};
+
+				for i = 1, #ORN_PILL, 1 do
+					local d = ORN_PILL[i];
+					local s = math.sqrt((ORN_PILLR + d) * (ORN_PILLR + d) - d * d);
+
+					if w - 2 * s > 0 then
+						o[#o + 1] = "M" .. ornNum(s) .. "," .. ornNum(d);
+						o[#o + 1] = "L" .. ornNum(w - s) .. "," .. ornNum(d);
+						o[#o + 1] = "M" .. ornNum(s) .. "," .. ornNum(h - d);
+						o[#o + 1] = "L" .. ornNum(w - s) .. "," .. ornNum(h - d);
+					end;
+				end;
+
+				return table.concat(o, " ");
+			end;
+
 			-- One <path> per box, made the first time an era asks for it and hidden - never destroyed
 			-- - when a plainer era takes over. An era that declares no `ornament` gets none, exactly
 			-- as a palette with no `paper` gets no backdrop (V56).
@@ -2156,10 +2216,21 @@
 
 					local p = gui.newPath();
 
-					-- Child of the BOX, not of the layout holding it: a child draws above its parent and
-					-- below the parent's later siblings, which is exactly where an ornament belongs -
-					-- over the box fill, under the labels and fields the box carries.
-					p:setParent(c);
+					-- Child of the LAYOUT holding the box, not of the box itself (SPEC I72c, V283a).
+					-- A child draws above its parent and below the parent's LATER siblings, so a path
+					-- parented to the rectangle sat under every label and field the box carries - the
+					-- user reported exactly that: the boxes you type in were covering the filigree.
+					-- Created here, after the authored children already exist, it is the last sibling
+					-- and draws over all of them. There is no z-order API to do this instead: bringToFront,
+					-- sendToBack and zorder are 0 hits across SDK3 (SPEC R112), so creation order IS the
+					-- mechanism. Do NOT "re-raise" with p:setParent(p:getParent()) - setParent returns
+					-- early when the parent is unchanged (rrpgObjs.lua:637), so it compiles, runs, exits
+					-- 0 and does nothing (SPEC V283b).
+					--
+					-- Safe only because hitTest stays false below (SPEC V283c): over the fields, but it
+					-- never eats a click. And it needs the 20px margin of I73 under it (SPEC V283d) -
+					-- at 10px the 5/9px rules would cross the full-width children of 68 of the 73 boxes.
+					p:setParent(c.parent);
 
 					p.align = "client";
 					p.mode = "original";
@@ -2175,6 +2246,61 @@
 
 				e.p.strokeColor = colour;
 				e.p.visible = true;
+			end;
+
+			-- The pill's rule. Same contract as ornament(): created once, HIDDEN by a plainer era and
+			-- never destroyed (SPEC V277), filtered by CONSTRUCTION and not by a roster of names.
+			--
+			-- The filter is a transparent fill PLUS the house radius. MEASURED across the sheet: 21
+			-- rectangles author #00000000 and only two of them are not tab buttons - the health marks,
+			-- which author a radius of 2 of their own for the reason V68 records. Reading the AUTHORED
+			-- fill matters here for the same reason it does in ornament(): by now the pill is painted.
+			--
+			-- Parented to the PILL and not to the strip, which is the one place this cannot copy V283a:
+			-- align="client" on a child of tabStrip would fill the whole 1280px band. Under the label
+			-- is harmless HERE and only here - the rules live in the border band and the label's glyphs
+			-- sit in the middle, so there is nothing for the text to cover.
+			local pillPainted = {};
+
+			local function pillRule(c, fill, colour)
+				local p = pillPainted[c.handle];
+
+				if colour == nil then
+					if p ~= nil then p.visible = false; end;
+					return;
+				end;
+
+				if p == nil then
+					if normColor(fill) ~= "#00000000" then return; end;
+
+					local rad = c.xradius;
+
+					if rad == nil or rad ~= ORN_PILLR then return; end;
+
+					local bw, bh = c.width, c.height;
+
+					if bw == nil or bh == nil then return; end;
+
+					local d = pillPath(bw, bh);
+
+					if d == "" then return; end;
+
+					p = gui.newPath();
+
+					p:setParent(c);
+
+					p.align = "client";
+					p.mode = "original";
+					p.hitTest = false;
+					p.color = "#00000000";
+					p.strokeSize = 1;
+					p.data = d;
+
+					pillPainted[c.handle] = p;
+				end;
+
+				p.strokeColor = colour;
+				p.visible = true;
 			end;
 
 			-- SPEC I72d / V284. The HEALTH box is resized by renderHealthTrack, which lives on the
@@ -2265,6 +2391,7 @@
 						-- The filigree rides the same walk and the same authored value the fill does,
 						-- so the frame and the box can never disagree about which era is in force.
 						ornament(c, fill, t.ornament);
+						pillRule(c, fill, t.ornament);
 					elseif THEME_TEXTS[cls] then
 						local fc = authored(c, "fontColor");
 
@@ -2318,11 +2445,11 @@
 			Options first, credits last (SPEC T141): the settings are what a player opens this
 			tab to change; the credits are a signature.
 		-->
-		<layout left="0" top="20" width="380" height="125">
+		<layout left="0" top="0" width="420" height="145">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="15" top="10" width="80" height="20" text="Language" horzTextAlign="center"/>
-			<comboBox left="95" top="10" width="270" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
+			<label left="20" top="20" width="80" height="20" text="Language" horzTextAlign="center"/>
+			<comboBox left="100" top="20" width="300" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
 			<dataLink field="language" defaultValue="en">
 				<event name="onChange">
 					if sheet == nil then return end;
@@ -2341,8 +2468,8 @@
 			     exception to V15 that cboSheetTheme carries. A sheet holding one of the four
 			     older, longer names is normalised on load (SPEC V110), because a locked box
 			     showing a dead value is one nobody could fix. -->
-			<label left="15" top="50" width="80" height="20" text="Game" horzTextAlign="center"/>
-			<comboBox left="95" top="50" width="270" height="25" name="cboGame" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}">
+			<label left="20" top="60" width="80" height="20" text="Game" horzTextAlign="center"/>
+			<comboBox left="100" top="60" width="300" height="25" name="cboGame" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}">
 			</comboBox>
 			<dataLink field="game" defaultValue="Mortal"/>
 
@@ -2367,8 +2494,8 @@
 				and gave the name to the contemporary palette. Every value paints now, so there
 				is no way back to the sheet as the XML authors it (SPEC C, 16th round).
 			-->
-			<label left="15" top="90" width="80" height="20" text="Theme" horzTextAlign="center"/>
-			<comboBox name="cboSheetTheme" left="95" top="90" width="270" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}"/>
+			<label left="20" top="100" width="80" height="20" text="Theme" horzTextAlign="center"/>
+			<comboBox name="cboSheetTheme" left="100" top="100" width="300" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}"/>
 			<dataLink field="sheetTheme" defaultValue="Modern Nights">
 				<event name="onChange">
 					if sheet == nil then return end;
@@ -2396,16 +2523,16 @@
 			and the same 14px above the first line as below the last - it was 10 and 5, and the
 			lopsided pair is what showed. Both boxes on this tab went 330 -> 380 wide with it.
 		-->
-		<layout left="0" top="155" width="380" height="150">
+		<layout left="0" top="165" width="420" height="170">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="0" top="10" width="380" height="20" text="Credits" horzTextAlign="center"/>
+			<label left="20" top="20" width="380" height="20" text="Credits" horzTextAlign="center"/>
 
-			<label left="0" top="50" width="380" height="20" text="Developer: Andre (Styllern)" horzTextAlign="center"/>
+			<label left="20" top="60" width="380" height="20" text="Developer: Andre (Styllern)" horzTextAlign="center"/>
 
-			<label left="0" top="84" width="380" height="20" text="Based on the sheet plugin by Vinny (Ambesek)" horzTextAlign="center" fontSize="12"/>
+			<label left="20" top="94" width="380" height="20" text="Based on the sheet plugin by Vinny (Ambesek)" horzTextAlign="center" fontSize="12"/>
 
-			<label left="0" top="120" width="380" height="20" text="System: Storyteller" horzTextAlign="center"/>
+			<label left="20" top="130" width="380" height="20" text="System: Storyteller" horzTextAlign="center"/>
 		</layout>
 	</scrollBox>
 </form>

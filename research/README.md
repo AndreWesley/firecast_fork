@@ -1,6 +1,6 @@
 # research/ — listas extraídas dos livros
 
-Dados DERIVADOS dos PDFs em
+Dados DERIVADOS dos PDFs em (pasta ÚNICA dos livros de Vampiro & de Ghoul, registrada 2026-08-25)
 `C:\Users\awlol\OneDrive\Documents\RPG\Storyteller V20\Vampiro\Vampiro - A Máscara\Books`.
 Só nome, nível, dona e página — **⊥ ∃ prosa de livro aqui**. O texto corrido de §T444–446
 sai do PDF na hora, ⊥ deste diretório.
@@ -45,6 +45,7 @@ arquivo PDF de onde o texto sai.
 | `tos` | `Dark Ages Tome of Secrets` | 1 | `Vampiro V20 - Dark Ages - Tome of Secrets` |
 | `dac` | `Dark Ages Companion` | 1 | `Vampiro V20 - Dark Ages - Companion` |
 | `bh` | `The Black Hand: A Guide to the Tal’Mahe’Ra` | 1 | `Vampiro V20 - The Black Hand A Guide to the TalMaRahe` |
+| `gr` | `Ghouls & Revenants` | 1 | `Ghouls_and_Revnants_(Final_Download)` |
 
 `core` · `da` · `rob` · `lotc` são os 4 títulos que §T444 já gravou no `HH.12.lfm` — copie
 a grafia de lá, ⊥ reinvente. `lob` & `bh` saem do rodapé corrido do próprio livro; `tos` &
@@ -61,7 +62,7 @@ Página IMPRESSA = página do PDF menos:
 |---|---|---|
 | V20 core | 8 | moderna |
 | Dark Ages base · Tome of Secrets · DA Companion | 1 | medieval |
-| Lore of the Clans · Lore of the Bloodlines · Rites of Blood · The Black Hand | 1 | **moderna** |
+| Lore of the Clans · Lore of the Bloodlines · Rites of Blood · The Black Hand · Ghouls & Revenants | 1 | **moderna** |
 
 `Vampiro V20 - Dark Ages - Lore of the Bloodlines.pdf` é livro MODERNO apesar do nome
 (§R79): `Dark Medieval` 0 ocorrências, `Camarilla` 47, © 2017. Conferir época por

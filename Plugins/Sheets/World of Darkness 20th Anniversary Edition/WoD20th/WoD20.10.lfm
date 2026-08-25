@@ -64,16 +64,16 @@
 
 		     The tab is hidden by ROLE (SPEC V79), and this text lives in the sheet's NDB like
 		     `baseline` does. That is visibility, not secrecy. -->
-		<layout left="0" top="20" width="400" height="581">
-			<rectangle left="0" top="0" width="400" height="581" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="400" height="20" text="Notes" horzTextAlign="center"/>
-			<textEditor left="15" top="31" width="370" height="540" field="stNotes1"/>
+		<layout left="0" top="0" width="440" height="601">
+			<rectangle left="0" top="0" width="440" height="601" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="20" width="400" height="20" text="Notes" horzTextAlign="center"/>
+			<textEditor left="35" top="41" width="370" height="540" field="stNotes1"/>
 		</layout>
 
-		<layout left="410" top="20" width="400" height="581">
-			<rectangle left="0" top="0" width="400" height="581" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="400" height="20" text="Notes" horzTextAlign="center"/>
-			<textEditor left="15" top="31" width="370" height="540" field="stNotes2"/>
+		<layout left="460" top="0" width="440" height="601">
+			<rectangle left="0" top="0" width="440" height="601" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="20" width="400" height="20" text="Notes" horzTextAlign="center"/>
+			<textEditor left="35" top="41" width="370" height="540" field="stNotes2"/>
 		</layout>
 
 
@@ -93,9 +93,9 @@
 			round added two flags and Save moved 60 with everything under them, so the box went
 			339 -> 399 and the gap under it is still 10 (SPEC I71, V274e).
 		-->
-		<layout left="820" top="20" width="405" height="399">
+		<layout left="920" top="0" width="445" height="419">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="405" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
+			<label left="20" top="20" width="405" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 
 			<!-- The SEVEN flags come first, then the three prices, then Save (SPEC I51, I71, V238,
 			     user 2026-08-22). Until the 88th round the box alternated the two kinds and a
@@ -119,14 +119,14 @@
 
 			     `Show Ghoul` is the LABEL only - the field stays `stShowDisciplines`, and the tab
 			     it hides is still `tabDisciplines` (SPEC V2, V172, V233). -->
-			<checkBox name="chkShowNumina" left="15" top="46" width="375" height="25" field="stShowNumina" text="Show Numina"/>
-			<checkBox name="chkShowDisciplines" left="15" top="76" width="375" height="25" field="stShowDisciplines" text="Show Ghoul"/>
-			<checkBox name="chkFreeBuy" left="15" top="106" width="375" height="25" field="stFreeBuy" text="Free dots"/>
+			<checkBox name="chkShowNumina" left="35" top="56" width="375" height="25" field="stShowNumina" text="Show Numina"/>
+			<checkBox name="chkShowDisciplines" left="35" top="86" width="375" height="25" field="stShowDisciplines" text="Show Ghoul"/>
+			<checkBox name="chkFreeBuy" left="35" top="116" width="375" height="25" field="stFreeBuy" text="Free dots"/>
 
 			<!-- 51st round (SPEC I8g, V175). OFF by default and OFF when nil - the four clan slots
 			     stay locked unless the storyteller opens them, which is the fail-closed default the
 			     other Show flags use (SPEC V89, V80). -->
-			<checkBox name="chkEditClanDisc" left="15" top="136" width="375" height="25" field="stEditClanDisc" text="Edit Clan Disciplines"/>
+			<checkBox name="chkEditClanDisc" left="35" top="146" width="375" height="25" field="stEditClanDisc" text="Edit Clan Disciplines"/>
 
 			<!-- 85th round (SPEC I42, V245). Same fail-closed default as every other flag in this
 			     box: OFF authored, OFF when nil, so a sheet saved before this round and a sheet
@@ -134,7 +134,7 @@
 
 			     It opens ONE box on the Experience tab - Spent - and what typing there does is
 			     write a line into the log, not a second number beside it (SPEC I44, V246). -->
-			<checkBox name="chkEditSpentXP" left="15" top="166" width="375" height="25" field="stEditSpentXP" text="Edit Spent XP"/>
+			<checkBox name="chkEditSpentXP" left="35" top="176" width="375" height="25" field="stEditSpentXP" text="Edit Spent XP"/>
 
 			<!-- 94th round (SPEC I71, V274, user 2026-08-23). Two flags that swap a PICKER for a
 			     typed field: the storyteller who runs homebrew needs an affiliation or a clan the
@@ -148,8 +148,8 @@
 			     tab-hiding flags keep the smallest tops and Save keeps the largest (SPEC V238a,
 			     V238b). Everything under them moved down 60 and the box grew 339 -> 399, which
 			     leaves V240's gap of 10 under Save exactly where it was. -->
-			<checkBox name="chkManualAffiliation" left="15" top="196" width="375" height="25" field="stManualAffiliation" text="Edit Affiliation"/>
-			<checkBox name="chkManualClanFamily" left="15" top="226" width="375" height="25" field="stManualClanFamily" text="Edit Clan/Family"/>
+			<checkBox name="chkManualAffiliation" left="35" top="206" width="375" height="25" field="stManualAffiliation" text="Edit Affiliation"/>
+			<checkBox name="chkManualClanFamily" left="35" top="236" width="375" height="25" field="stManualClanFamily" text="Edit Clan/Family"/>
 
 			<!-- The three prices, one column at x=190 and all three the same width (SPEC I51,
 			     V243): the box measures DISTINCT x across every entry widget it holds, so a
@@ -165,8 +165,8 @@
 			     still reads `tonumber(sheet.healthLevels) or 7`, so the default declared here and
 			     the fallback in the Lua cannot disagree about what seven means. The width went
 			     58 -> 150 in the 88th round to join the column, not to fit anything wider. -->
-			<label left="15" top="264" width="170" height="20" text="Health Levels"/>
-			<comboBox name="cmbHealthLevels" left="190" top="261" width="150" height="25" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+			<label left="35" top="274" width="170" height="20" text="Health Levels"/>
+			<comboBox name="cmbHealthLevels" left="210" top="271" width="150" height="25" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
 			<dataLink field="healthLevels" defaultValue="7"/>
 
 			<!-- What a speciality costs, as ONE value instead of two flags (SPEC I49, V254, user
@@ -181,8 +181,8 @@
 
 			     Free specialities are unaffected: what a trait hands out at one dot or at four is the
 			     book's, not the storyteller's, and it costs nothing either way. -->
-			<label left="15" top="294" width="170" height="20" text="Specialty Cost"/>
-			<comboBox name="cmbSpecCost" left="190" top="291" width="150" height="25" field="stSpecCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5','Purchase Forbidden'}" values="{'0','1','2','3','4','5','Purchase Forbidden'}"/>
+			<label left="35" top="304" width="170" height="20" text="Specialty Cost"/>
+			<comboBox name="cmbSpecCost" left="210" top="301" width="150" height="25" field="stSpecCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5','Purchase Forbidden'}" values="{'0','1','2','3','4','5','Purchase Forbidden'}"/>
 			<dataLink field="stSpecCost" defaultValue="3"/>
 
 			<!-- What a background dot costs, a PRICE where the 88th round found a flag (SPEC I51,
@@ -198,8 +198,8 @@
 
 			     The default is declared HERE and nowhere else in the XML; the Lua answers for a
 			     sheet that arrives with the field empty with the same 0 (SPEC V12). -->
-			<label left="15" top="324" width="170" height="20" text="Background Cost"/>
-			<comboBox name="cmbBgCost" left="190" top="321" width="150" height="25" field="stBackgroundCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5'}" values="{'0','1','2','3','4','5'}"/>
+			<label left="35" top="334" width="170" height="20" text="Background Cost"/>
+			<comboBox name="cmbBgCost" left="210" top="331" width="150" height="25" field="stBackgroundCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5'}" values="{'0','1','2','3','4','5'}"/>
 			<dataLink field="stBackgroundCost" defaultValue="0"/>
 
 			<!-- Saving the initial character is LAST, after everything (SPEC V238b, user
@@ -213,8 +213,8 @@
 			     `dynBaselineState` used to close the box with a sentence of its own. It is gone
 			     for good (SPEC V243b): the dead button says "saved", and the Experience tab says
 			     "not saved yet" inside the log that sentence was about (SPEC I10, V33). -->
-			<label left="15" top="366" width="200" height="20" text="Save Initial Character"/>
-			<button name="btnSaveBaseline" left="190" top="363" width="100" height="26" text="Save" onClick="saveBaseline(self);"/>
+			<label left="35" top="376" width="200" height="20" text="Save Initial Character"/>
+			<button name="btnSaveBaseline" left="210" top="373" width="100" height="26" text="Save" onClick="saveBaseline(self);"/>
 		</layout>
 	</scrollBox>
 

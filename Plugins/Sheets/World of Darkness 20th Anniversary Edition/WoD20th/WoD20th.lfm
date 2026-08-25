@@ -45,6 +45,20 @@
 					"Gargoyles (Warrior)", "Ventrue Antitribu", "Wu Zao", "Angellis Ater", "Maeghar", "Panders", "Caitiff",
 					"Children of Osiris",
 				},
+				-- The revenant families (SPEC R93, I29b). A list of its OWN, not an alias and not an
+				-- append: clan and family are two lists because the clan picker is going to be shown
+				-- somewhere else WITHOUT the families, and only the ghoul dropdown wants both at once.
+				--
+				-- No empty item here - the empty one comes from `clan`, which leads the union.
+				-- Bratovich is the only name that carries an era: its Dark Ages trio (Potence) and its
+				-- modern one (Fortitude) DISAGREE, while Grimaldi and Obertus read the same in both
+				-- books and stay one line each (SPEC R93).
+				["family"] = {
+					"Basarab", "Bratovich (Dark Ages)", "Bratovitch (Modern)", "D'Habi", "Danislav",
+					"Ducheski", "Enrathi", "Grimaldi", "Kairouan Brotherhood", "Katayama", "Keskinen",
+					"Khavi", "Krevcheski", "Marijava", "Obertus", "Oprichniki", "Rafastio", "Rossellini",
+					"Servants of Anushin-Rawan", "Szantovich", "Vlaszy", "Zantosa",
+				},
 				["nature"] = {
 					"", "Activist", "Architect", "Autocrat", "Benefactor", "Bon Vivant", "Bravo", "Bureaucrat", "Caregiver",
 					"Celebrant", "Chameleon", "Child", "Comedian", "Competitor", "Conformist", "Conniver", "Contrary",
@@ -250,15 +264,37 @@
 			PICKER_LIST["clanDisc"] = PICKER_LIST["disc"];
 			PICKER_LIST["secPath"]  = PICKER_LIST["mainPath"];
 
-			-- A fourth alias, and it is one only while the lists are the same list (SPEC B50). The first
-			-- draft built a copy here so it could diverge later; V201 forbids writing anything but an
-			-- alias into this map, and V208 forbids two tables holding the same content, so today the
-			-- rules agree with each other and with the data: clan and clanFamily ARE one list.
+			-- The fourth key stopped being an alias in the 107th round (SPEC I29b, T510). Clan and
+			-- family are two AUTHORED lists now - the clan picker is going to be shown somewhere
+			-- else without the families - and only this dropdown offers both, so what it gets is
+			-- their UNION, built once here and never written again.
 			--
-			-- SPEC T510 REPLACES this line with an authored list of its own the day the revenant
-			-- families arrive (SPEC R93). It must not be appended to instead: an alias is identity, so
-			-- a push here would grow the clan picker on the Main tab with it (SPEC V211c).
-			PICKER_LIST["clanFamily"] = PICKER_LIST["clan"];
+			-- Three invariants all say the same thing about the shape. V201 wants PICKER_LIST
+			-- constant: this is born in the constructor and nothing writes it afterwards, which is
+			-- exactly as constant as the two lists standing behind it. V208 forbids two tables with
+			-- the same content: the union holds neither list's content. V211c calls an alias
+			-- identity, and that is why the families are NOT appended to `clan` - a push there
+			-- would grow the Main tab's clan picker with them, which is what B50 already paid for
+			-- once.
+			--
+			-- The local is the point: writing straight into PICKER_LIST["clanFamily"][n] would be a
+			-- table growing inside the map, and V294c reads the source for exactly that shape.
+			-- >>> CLANFAMILY_UNION_BEGIN (SPEC V294 - the gate finds this region by MARKER)
+			local clanFamilyUnion = {};
+			local clanFamilyCount = 0;
+
+			for i = 1, #PICKER_LIST["clan"], 1 do
+				clanFamilyCount = clanFamilyCount + 1;
+				clanFamilyUnion[clanFamilyCount] = PICKER_LIST["clan"][i];
+			end;
+
+			for i = 1, #PICKER_LIST["family"], 1 do
+				clanFamilyCount = clanFamilyCount + 1;
+				clanFamilyUnion[clanFamilyCount] = PICKER_LIST["family"][i];
+			end;
+
+			PICKER_LIST["clanFamily"] = clanFamilyUnion;
+			-- <<< CLANFAMILY_UNION_END
 
 			-- Which hedge paths an affiliation FAVOURS, and it is the same block of the book the
 			-- casting attribute comes from - `Favored Attributes:` and `Favored Paths:` are two
@@ -561,6 +597,36 @@
 				["Panders"]            = { open = 3 },
 				["Caitiff"]            = { open = 3 },
 				["Children of Osiris"] = { open = 3 },
+				-- The revenant families (SPEC R93, T640). Eighteen trios come from the books; the
+				-- four the books NAME without statting - Katayama, Keskinen, Krevcheski, Marijava -
+				-- were answered by the user on 2026-08-25 and are his call, not the book's.
+				["Basarab"]                   = { fixed = {"Animalism", "Dominate", "Presence"} },
+				["Bratovich (Dark Ages)"]     = { fixed = {"Animalism", "Potence", "Vicissitude"} },
+				["Bratovitch (Modern)"]       = { fixed = {"Animalism", "Fortitude", "Vicissitude"} },
+				["D'Habi"]                    = { fixed = {"Presence", "Obfuscate", "Daimonion"} },
+				["Danislav"]                  = { fixed = {"Auspex", "Protean", "Vicissitude"} },
+				["Ducheski"]                  = { fixed = {"Auspex", "Dominate", "Thaumaturgy"} },
+				["Enrathi"]                   = { fixed = {"Dominate", "Obfuscate", "Potence"} },
+				["Grimaldi"]                  = { fixed = {"Celerity", "Dominate", "Fortitude"} },
+				["Kairouan Brotherhood"]      = { fixed = {"Auspex", "Celerity", "Obfuscate"} },
+				["Katayama"]                  = { fixed = {"Auspex", "Dominate", "Obfuscate"} },
+				-- One fixed and TWO picked from the same short list, which is the only entry in the
+				-- table that needs `choiceN` (SPEC I17): `choice` alone would leave all three empty
+				-- slots open and hand the player a third pick the family does not have.
+				["Keskinen"]                  = { fixed = {"Thaumaturgy"}, choice = {"Auspex", "Dominate", "Obfuscate"}, choiceN = 2 },
+				["Khavi"]                     = { fixed = {"Animalism", "Obfuscate", "Vicissitude"} },
+				-- TWO, and that is the family's weakness rather than missing research: distrusted by
+				-- the Tzimisce, the Krevcheski were taught two Disciplines instead of the usual three.
+				["Krevcheski"]                = { fixed = {"Auspex", "Dominate"} },
+				["Marijava"]                  = { fixed = {"Celerity", "Obfuscate", "Presence"} },
+				["Obertus"]                   = { fixed = {"Auspex", "Obfuscate", "Vicissitude"} },
+				["Oprichniki"]                = { fixed = {"Animalism", "Obfuscate", "Potence"} },
+				["Rafastio"]                  = { fixed = {"Animalism", "Auspex", "Thaumaturgy"} },
+				["Rossellini"]                = { fixed = {"Dominate", "Fortitude", "Necromancy"} },
+				["Servants of Anushin-Rawan"] = { fixed = {"Auspex", "Obfuscate", "Presence"} },
+				["Szantovich"]                = { fixed = {"Auspex", "Presence", "Vicissitude"} },
+				["Vlaszy"]                    = { fixed = {"Animalism", "Potence", "Presence"} },
+				["Zantosa"]                   = { fixed = {"Auspex", "Presence", "Vicissitude"} },
 				-- <<< CLANS_END
 			};
 
@@ -1165,7 +1231,7 @@
 			-- and fails if it stops matching PITCH (SPEC V49) - the same Lua-vs-XML drift that
 			-- produced B12 and B16.
 			HEALTH_ROW_PITCH = 27;
-			HEALTH_BOX_PAD   = 37;
+			HEALTH_BOX_PAD   = 79;
 
 			local function markIndex(v)
 				for i = 1, #HEALTH_MARKS, 1 do
@@ -1954,7 +2020,7 @@
 			-- 46th round moved the box to the Traits tab and doubled it; a twenty-first row
 			-- added to the XML and to only one of the two loops would be a background nothing
 			-- charges for and nothing shows in the log (SPEC I3, I9).
-			BACKGROUND_ROWS = 20;
+			BACKGROUND_ROWS = 22;
 
 			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
 			-- 2026-08-22). The LAST five, so every reader is 'picker = total - typed' and no list of
@@ -3182,7 +3248,11 @@
 						--   neither  - the clan settles every slot, so the rest is emptied.
 						if name == nil then
 							if entry.open ~= nil then name = nil;
-							elseif entry.choice ~= nil then
+							-- `choiceN` says how many slots come out of `choice`, and ABSENT means one
+							-- (SPEC I17). Only Keskinen declares it, with two - without the count a
+							-- family that fixes one Discipline would leave every remaining slot open
+							-- and hand out picks the book never gave.
+							elseif entry.choice ~= nil and i <= #fixed + (entry.choiceN or 1) then
 								name = "";
 
 								for c = 1, #entry.choice, 1 do
@@ -3520,7 +3590,7 @@
 	-->
 	<layout name="sheetBody" align="client" visible="false">
 		<layout name="tabStrip" align="top" height="60">
-			<rectangle align="client" color="black"/>
+			<rectangle align="client" color="black" strokeColor="#00000000"/>
 
 			<rectangle name="tabOnMain" left="30" top="15" width="99" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>

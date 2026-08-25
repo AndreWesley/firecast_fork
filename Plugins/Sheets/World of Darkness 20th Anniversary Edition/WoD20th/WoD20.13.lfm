@@ -207,80 +207,80 @@
 		</template>
 
 		<!-- 5 slots: one main path per blood sorcery (SPEC V181). 25 + 5*25 + 25 = 175. -->
-		<layout left="0" top="20" width="525" height="166">
+		<layout left="0" top="20" width="565" height="186">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="525" height="20" text="MAIN PATHS" horzTextAlign="center"/>
-			<layout left="12" top="31" width="501" height="25">
+			<label left="20" top="20" width="525" height="20" text="MAIN PATHS" horzTextAlign="center"/>
+			<layout left="32" top="41" width="501" height="25">
 				<MainPathRow field="mainPath_1"/>
 			</layout>
-			<layout left="12" top="56" width="501" height="25">
+			<layout left="32" top="66" width="501" height="25">
 				<MainPathRow field="mainPath_2"/>
 			</layout>
-			<layout left="12" top="81" width="501" height="25">
+			<layout left="32" top="91" width="501" height="25">
 				<MainPathRow field="mainPath_3"/>
 			</layout>
-			<layout left="12" top="106" width="501" height="25">
+			<layout left="32" top="116" width="501" height="25">
 				<MainPathRow field="mainPath_4"/>
 			</layout>
-			<layout left="12" top="131" width="501" height="25">
+			<layout left="32" top="141" width="501" height="25">
 				<MainPathRow field="mainPath_5"/>
 			</layout>
 		</layout>
 
-		<layout left="0" top="196" width="525" height="416">
+		<layout left="0" top="226" width="565" height="436">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="525" height="20" text="SECONDARY PATHS" horzTextAlign="center"/>
-			<layout left="12" top="31" width="501" height="25">
+			<label left="20" top="20" width="525" height="20" text="SECONDARY PATHS" horzTextAlign="center"/>
+			<layout left="32" top="41" width="501" height="25">
 				<SecPathRow field="secPath_1"/>
 			</layout>
-			<layout left="12" top="56" width="501" height="25">
+			<layout left="32" top="66" width="501" height="25">
 				<SecPathRow field="secPath_2"/>
 			</layout>
-			<layout left="12" top="81" width="501" height="25">
+			<layout left="32" top="91" width="501" height="25">
 				<SecPathRow field="secPath_3"/>
 			</layout>
-			<layout left="12" top="106" width="501" height="25">
+			<layout left="32" top="116" width="501" height="25">
 				<SecPathRow field="secPath_4"/>
 			</layout>
-			<layout left="12" top="131" width="501" height="25">
+			<layout left="32" top="141" width="501" height="25">
 				<SecPathRow field="secPath_5"/>
 			</layout>
-			<layout left="12" top="156" width="501" height="25">
+			<layout left="32" top="166" width="501" height="25">
 				<SecPathRow field="secPath_6"/>
 			</layout>
-			<layout left="12" top="181" width="501" height="25">
+			<layout left="32" top="191" width="501" height="25">
 				<SecPathRow field="secPath_7"/>
 			</layout>
-			<layout left="12" top="206" width="501" height="25">
+			<layout left="32" top="216" width="501" height="25">
 				<SecPathRow field="secPath_8"/>
 			</layout>
-			<layout left="12" top="231" width="501" height="25">
+			<layout left="32" top="241" width="501" height="25">
 				<SecPathRow field="secPath_9"/>
 			</layout>
-			<layout left="12" top="256" width="501" height="25">
+			<layout left="32" top="266" width="501" height="25">
 				<SecPathRow field="secPath_10"/>
 			</layout>
-			<layout left="12" top="281" width="501" height="25">
+			<layout left="32" top="291" width="501" height="25">
 				<SecPathRow field="secPath_11"/>
 			</layout>
-			<layout left="12" top="306" width="501" height="25">
+			<layout left="32" top="316" width="501" height="25">
 				<SecPathRow field="secPath_12"/>
 			</layout>
-			<layout left="12" top="331" width="501" height="25">
+			<layout left="32" top="341" width="501" height="25">
 				<SecPathFreeRow field="secPath_13"/>
 			</layout>
-			<layout left="12" top="356" width="501" height="25">
+			<layout left="32" top="366" width="501" height="25">
 				<SecPathFreeRow field="secPath_14"/>
 			</layout>
-			<layout left="12" top="381" width="501" height="25">
+			<layout left="32" top="391" width="501" height="25">
 				<SecPathFreeRow field="secPath_15"/>
 			</layout>
 		</layout>
 
-		<layout left="535" top="20" width="445" height="592">
+		<layout left="585" top="20" width="485" height="642">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="0" top="10" width="445" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtPathDesc" left="10" top="31" width="425" height="551" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePathDesc(self);"/>
+			<label left="20" top="20" width="445" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtPathDesc" left="30" top="41" width="425" height="581" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePathDesc(self);"/>
 		</layout>
 	</scrollBox>
 
