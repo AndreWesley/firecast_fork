@@ -163,7 +163,7 @@
 			Stacking costs height - the box went 75 -> 95 - which is why the log below starts at 105
 			and still closes the tab on 640.
 		-->
-		<layout left="0" top="12" width="501" height="95">
+		<layout left="0" top="20" width="501" height="95">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="501" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
@@ -207,7 +207,7 @@
 			column headings belong to it, the rows belong to the scrollBox below them, and
 			nothing in Lua writes this height any more.
 		-->
-		<layout name="xpLogBox" left="0" top="117" width="501" height="540">
+		<layout name="xpLogBox" left="0" top="125" width="501" height="540">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="501" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
 

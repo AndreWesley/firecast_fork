@@ -1,5 +1,378 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## ▶ COMECE AQUI — 102ª rodada: `/ck:spec` (§B62) + `/ck:build` → **§T626 & §T627 FECHADAS**
+
+A 101ª entregou §T622 c/ gate VERDE, 7 mutações rodadas & `.rpk` instalado — **& ⊥ funcionava
+na tela**. Esta rodada achou a raiz, curou & travou a lição.
+
+**Estado MEDIDO 2026-08-24 22:33:**
+
+| coisa | valor |
+|---|---|
+| gate estático | **VERDE**, **533** `ok`, 0 FAIL (era 532; +1 = §V285) |
+| gate `-Build` | **VERDE** (§V6 exit 0 · §V7) |
+| `.rpk` gerado & instalado | **2.096.951 B** nos 2, 22:33:34 / 22:33:35 |
+| commitado | **NADA** |
+
+### A raiz de §B62 — 2 leituras de runtime SEM precedente
+
+| leitura | precedente na ficha | veredito |
+|---|---|---|
+| `k:getClassName() == "rectangle"` | `THEME_SHAPES = { rectangle = true }` & o tema PINTA | provado |
+| `k.align == "client"` | **0** — era a única leitura de `.align` em Lua da ficha | `?` inventado |
+| `c.width`/`c.height` do filho `align="client"` | `getHeight` é `_gui_getHeight`, ≠ `getWidth` | `?` de reflow |
+
+Se o host devolve índice de enum, o laço ⊥ acha nada & sai 0. Se o layout ⊥ reflowou no mesmo
+tick, a comparação acha "igual" & ⊥ redesenha. **As 2 dão o MESMO sintoma** ∴ a cura mata as 2.
+
+### §T626 `x` — a cura ⊥ escolhe entre os candidatos
+
+`refreshOrnament(box, w, h)` recebe a medida por ARGUMENTO de `renderHealthTrack`, que acabou
+de escrevê-la, & acha o controle pelo **MEMO** (`ornPainted[k.handle]`). `ornament(c, fill,
+colour, w, h)` — os 2 opcionais; sem eles cai em `c.width`/`c.height` ≡ hoje ∴ §V276 intacta &
+a CRIAÇÃO segue lendo (lá ⊥ ∃ escrita competindo c/ o reflow). `fill` entra `nil` de propósito:
+o memo ∃ pelo teste recém-feito ∴ o ramo de criação ⊥ roda. De quebra some a dependência da
+ORDEM de `getChildren()`, que é `pairs()` de hashtable (`rrpgObjs.lua:577`).
+
+### §T627 `x` — §V285 no gate, 8 sondas RODADAS
+
+| mut | o que | resultado |
+|---|---|---|
+| **A** | **o código EXATO da 101ª** | **VERMELHO — as 4 pernas** |
+| B | `ornament` volta a 3 params | VERMELHO |
+| C | medida lida de volta | VERMELHO (2) |
+| D | chama sem entregar medida | VERMELHO |
+| E | lê outra propriedade do filho | VERMELHO |
+| **F** | **sonda**: renomear `k`→`kk` | **VERDE** |
+| G · H | §V49 afrouxada: literal · escrita some | V49 VERMELHO |
+
+⚠ **A e F quase passaram VACUOSAS**: usei `\r\n` no `.Replace()` & o arquivo é **LF** ∴ a
+mutação ⊥ aplicou & o "verde" da 1ª rodada ⊥ media nada — ≡ o `python` que ⊥ ∃ nesta máquina
+na 101ª. **Sonda ! ASSERTAR que o texto mudou**, senão ela mede a própria falha.
+
+⚠ §V49 foi AFROUXADA de propósito: ela casava `height\s*=.*HEALTH_ROW_PITCH` numa linha só & a
+cura calcula num local (1 fonte de verdade p/ 2 leitores). Re-ancorada na CONSTRUÇÃO — acha o
+que é atribuído a `.height` & aceita literal COM a pitch ou local ATRIBUÍDO dela. G & H provam
+que ainda sabe falhar.
+
+### ⛔ §T622 SEGUE `~` — & isso é a lição, ⊥ pendência
+
+A fiação está certa & o gate prova a FORMA. **O gate ⊥ RODA Lua** (§B30 §B34) ∴ ele ⊥ pode
+dizer que a filigrana acompanha — só a TELA pode. §T622 fecha quando **§T628** passar, & ⊥
+antes. Mutação prova que o CHECK sabe falhar, ⊥ que o CÓDIGO funciona.
+
+### Como retomar
+
+1. **§T628** [USER] — tema `Victorian Era`, `Health Levels` 7 → 10 → 4, nas 2 abas. Se AINDA
+   ⊥ acompanhar, ⊥ ∃ 3º palpite: o próximo passo é `Log.i` no caminho (§R92i diz que ∃ & a API
+   basta), ⊥ adivinhar uma 3ª leitura.
+2. `/ck:spec` p/ §T615: falta a **regra de reflow** (quem anda, quanto, nos 3 níveis de
+   aninhamento) & o que §V262c/§V267a VIRAM sob (A) — régua por fileira, ⊥ revogação.
+3. Depois `/ck:build T615` + §T618, & então §T621 (depende de §T615) & §T623 (fecha c/ §V283).
+
+⚠ **5 testes de tela acumulados**: §T628 (o urgente) · §T624 · §T625 · + os 3 da 97ª/98ª.
+
+---
+
+## 101ª rodada: `/ck:build --all` → **§T616 FECHADA**, §T622 REABERTA, §T618/§T623 parciais
+
+**Estado MEDIDO 2026-08-24 21:55:**
+
+| coisa | valor |
+|---|---|
+| gate estático | **VERDE**, **532** `ok`, 0 FAIL (era 531; +1 = §V284) |
+| gate `-Build` | **VERDE** (§V6 exit 0 · §V7 `.rpk` mudou) |
+| `.rpk` gerado & instalado | **2.095.061 B** nos 2, 21:55:16 / 21:55:17 |
+| commitado | **NADA** — working tree suja |
+
+### §T622 FECHADA — filigrana da vitalidade acompanha a caixa
+
+`ornPainted[handle]` passou de `path` p/ **`{p, w, h}`** & `ornament()` ganhou a 3ª porta
+(memo ∃ **&** medida ≠ guardada → recalcula & reescreve `p.data`). `refreshOrnament(box)` NOVA
+& global em `WoD20.6` (o padrão que `renderHedgePickers`/`renderManualEntry` já usam p/ falar
+com outros arquivos), declarada ABAIXO de `ornament()` (§V223). `renderHealthTrack`
+(`WoD20th.lfm`) chama **depois** de escrever `box.height`. `ornColour` guardado do último
+`applyTheme`, do MESMO `t` que pinta as caixas.
+
+**§V284 escrita no gate & 7 sondas RODADAS** — 6 mutações VERMELHAS + 1 vizinha VERDE:
+memo sem medidas · sem comparação · `mode="stretch"` · `refreshOrnament` renomeada · **ORDEM
+invertida** (refresh antes da altura) · nome LITERAL da caixa → todas VERMELHAS; renomear o
+local `e` (decl + usos) → VERDE.
+
+⚠ o 1º desenho de §V284 estava ERRADO & foi o check que mudou, ⊥ o código: ancorei em
+`ornPainted[c.handle] = {` & o código atribui via local ∴ falso vermelho. Re-ancorado no par
+que o box é medido (`local bw, bh = c.width, c.height`) & num construtor de tabela que carrega
+os 2 — é a letra de §V222, & valeu a mutação ter rodado ANTES de aceitar.
+
+### §T616 FECHADA — as 4 barras a h=60 & `CONTENT_GAP` 12→20
+
+- **73 filhos de 1º nível** deslocados **+8** nos 14 forms (o mais alto de cada um estava em
+  `top=12`) ∴ o espaçamento INTERNO ficou intacto.
+- **4 barras** a `height=60`, `top=15` nos 22+6+4+6 retângulos, 1º botão em `left=30`, gap 4
+  intacto. `tabStrip` desloca **+14** & as 3 sub-barras **+24**. Cadeia fecha em **1163**
+  (⊥ 1153 — a 98ª supôs 1ºleft=20). `STRIP_X0` 16 → 30.
+- **panes** liberam as barras: `WoD20.7` 66→**92** & `WoD20.11` 188→**214** (os gaps autorados,
+  12 & 4, preservados). As 3 panes de `WoD20.7` foram a **714** & `tabHedgePaths`/`Rituals` a
+  `top=242` — `tabHedge` fecha em 714/714, folga zero como previsto.
+- gate: `$CONTENT_GAP` 12 → **20** (`:5342`). **Sonda RODADA**: 1 form de volta a `top=12` →
+  §V231 VERMELHA no valor novo.
+
+⚠ **§V69 acendeu & foi conserto REAL, ⊥ literal de gate**: ela lê a régua de um COMENTÁRIO-mapa
+em `WoD20.1.lfm:36` (`Everything closes on x=1210 / y=784`), desenhado justamente p/ ⊥
+apodrecer. Com o +8 as caixas passaram a fechar em **792** & o comentário foi junto.
+
+⚠ Ferramenta nova em `$TMP/lfmedit.ps1`: mapeia elemento → offset no texto cru via `XmlReader`
++ `IXmlLineInfo`, correlacionado com o DOM por ordem de documento (conferido: 14/14 arquivos
+batem). Foi necessária porque **`WoD20.4` & `WoD20.5` têm indentação MISTA** (tab + espaços)
+∴ regex em texto cru erra 1 filho em cada — medido antes de editar.
+
+### ⛔ §T615 PAROU — a regra de REFLOW ⊥ ∃ no spec
+
+§T615 diz "a CAIXA cresce `+40×+20` & os filhos deslocam `+20/+10` — **nenhum conteúdo é
+re-disposto**". As 2 metades ⊥ fecham: se ∀ caixa cresce 40 de largura, **a caixa VIZINHA à
+direita ! andar 40** (& a de baixo, 20), senão §V40 (⊥ ∃ sobreposição) acende. O spec ⊥ diz
+p/ ONDE o vizinho vai — & a conta ⊥ é uniforme: as 73 estão em níveis de aninhamento
+DIFERENTES (umas são filhas do `scrollBox`, outras moram dentro de `tabHedge`/`tabDisc`).
+
+Falta também o que SUBSTITUI §V262c & §V267a. §T618 diz que elas "CAEM" — mas **reconciliar
+⊥ é apagar**: sob (A) a régua deixa de ser 1 número (1270) & vira "∀ fileira ladrilha de 0 até
+a borda DELA, & as caixas da fileira concordam nisso". Apagar a perna perde cobertura em
+silêncio, que é §B7 esperando.
+
+**⊥ inventei nenhuma das 2.** É o 3º item desta sequência em que o §T descreve o QUE sem o
+COMO (≡ §V281c & §B61) ∴ vale tratar como padrão, ⊥ como acaso.
+
+### Como retomar
+
+1. `/ck:spec` com 2 itens: **(a)** a regra de reflow de §T615 (quem anda, quanto, e como isso
+   se comporta nos 3 níveis de aninhamento); **(b)** o que §V262c & §V267a VIRAM sob (A) —
+   régua por fileira, ⊥ revogação. De quebra, §V281c (o "último botão fecha 30 antes do fim"
+   ⊥ é implementável: os botões são dimensionados pelo TEXTO).
+2. `/ck:build T615` + §T618, & só então §T621 (que depende de §T615) & §T623 (fecha c/ §V283).
+3. §T614 segue esperando tela (§R111).
+
+⚠ **4 testes de tela acumulados**: §T624 & §T625 (novos) + os 3 da 97ª/98ª (curvas cúbicas ·
+`TRUE FAITH` ornamentada · 13 controles em zona de canto). **Vale abrir a ficha AGORA**: a
+barra de abas mudou de altura em TODAS as abas & o conteúdo desceu 8px nas 14 — §T615 constrói
+em cima dessa geometria, & se ela estiver torta na tela, §T615 compõe o erro.
+
+---
+
+## 100ª rodada: `/ck:spec` (3 itens do user + os 5 pendentes da 99ª) — **SPEC ESCRITO, 0 código**
+
+`/ck:spec` fechou o buraco que travava a 99ª. **Escrito:** §C (17 bullets novos) · §I72c
+**REVOGADA** & §I72d **NOVA** · **§R112 §R113** · **§V283 §V284** · **§T621…§T625** ·
+**§B61** · & §T615 §T617 §T618 §T619 RE-ESCRITAS. Gate **VERDE, 531 `ok`** depois de escrever.
+Numeração conferida: 0 duplicata em §R/§V/§T/§B, monotônica (R113 V284 T625 B61).
+
+**O que a 100ª decidiu, & o que ela DESCOBRIU medindo:**
+
+- **item 1 (filigrana POR CIMA)** — ⊥ ∃ z-order no SDK: `bringToFront`/`sendToBack`/`zorder`
+  = **0 hit em `SDK3/` INTEIRO**. Só ordem de criação ∴ o `<path>` deixa de ser filho da
+  `<rectangle>` & vira filho do `<layout>`. ⚠ **`setParent` tem early-return**
+  (`rrpgObjs.lua:637`) ∴ `p:setParent(p:getParent())` — o idioma que o PRÓPRIO SDK usa em
+  `initialize()` — é **NO-OP silencioso**. Virou §R112 & §V283b, & é a mutação que §T623 exige.
+- **item 1 DEPENDE do item 3, & isso ⊥ é ordem preferida**: as réguas correm a `ORN_OUT=5` /
+  `ORN_IN=9` da borda & 65 das 73 caixas têm filho em `left=0` de largura cheia ∴ POR CIMA,
+  hoje, o filete RISCA o conteúdo. §V283d cobra §V280 como pré-requisito.
+- **item 2 (vitalidade)** — `renderHealthTrack` escreve `box.height` (`WoD20th.lfm:1274`) mas
+  `ornament()` calcula o dado **1× na criação** & o memo nunca recalcula. `gui.Path.data` TEM
+  setter ∴ redesenhar é 1 atribuição; `mode="stretch"` ∃ & resolveria de graça, **mas achata
+  o motivo ~26%** — rejeitado (§R113). São **2** caixas (`dynHealth_box` & `dynHealth3_box`).
+- **§T619 era FALSA nas 3 partes** → virou **§B61** & a linha foi revogada. O gate JÁ sabia da
+  rotação, por escrito, & §V27/§V239/§V240 já cortam `rotationAngle` — "⊥ ∃ check que o pegue"
+  eram **3 checks que decidiram ⊥ pegar**. §T617 ganhou o aviso: §V280 ! cortar rotacionado.
+- **§T617 ganhou um `?` novo**: §V281c ("o último botão fecha 30 antes do fim") ⊥ é
+  implementável como está — os 19 botões são dimensionados pelo TEXTO ∴ o último fecha em 1163
+  numa barra de 1280. Ou vira "≥30 de folga" ou sai. **Decidir antes de escrever o check.**
+
+**Próximo comando: `/ck:build T616`** (ele & §T618 juntos — §T618 agora nomeia §V262/§V267).
+Depois `/ck:build T615`, & só então §T621 (que depende de §T615). §T614 segue esperando tela.
+
+---
+
+## 99ª rodada: `/ck:build --all` → **0 §T fechada**, 3 decisões TOMADAS, 1 bloqueio MEDIDO
+
+Rodada de DIAGNÓSTICO. `/ck:build` sem arg varreu as 60 linhas abertas & **⊥ ∃ §T de código
+construível hoje** — ⊥ por falta de decisão (as 3 que faltavam foram tomadas nesta rodada),
+& sim porque §T615 **&** §T616 colidem com a MESMA invariante, **§V262**, que §T618 ⊥ nomeia.
+
+**Estado MEDIDO 2026-08-24 (99ª):**
+
+| coisa | valor |
+|---|---|
+| gate estático | **VERDE**, **531** `ok`, 0 FAIL (≡ 98ª) |
+| código tocado | **NENHUM** — 0 edição em `.lfm` `.lua` `.lang` & no gate |
+| `SPEC.md` | **⊥ tocado** (write policy: `/ck:build` só vira status de §T; nenhum §T mudou de status) |
+| commitado | **NADA** — working tree ≡ a da 98ª |
+
+### As 3 decisões do user (2026-08-24, 99ª)
+
+1. **§T615 = (A) as caixas CRESCEM** `+40×+20`, filhos deslocam `+20/+10`. Barras horizontais
+   **ACEITAS** — reafirmado depois de eu medir que o custo real é MAIOR que o estimado.
+2. **§T616 = `CONTENT_GAP` 12 → 20.** §I34 (a barra respira MENOS que o conteúdo) FICA:
+   15 < 20 ∴ §V231(c) sobrevive. `$stripGap` o gate LÊ do XML ∴ vira 15 sozinho.
+3. **§T619 = premissa errada** → vai p/ backprop, ⊥ p/ build (abaixo).
+
+### ⛔ O BLOQUEIO: §V262 é a colisão de §T615 **e** §T616, & §T618 ⊥ a nomeia
+
+§T618 lista §V240 §V231 §V221 §V225 §V232 §V247. **MEDIDO — 3 dessas ⊥ precisam de nada &
+1 que falta precisa:**
+
+- §V221 · §V225 · §V232 são **RELAÇÕES**, ⊥ literais: elas se reconciliam SOZINHAS se o
+  deslocamento for feito certo. O ÚNICO literal de gate que §T616 derruba é
+  `$CONTENT_GAP = 12` (`verify-hunters-hunted.ps1:5342`). `1153` & `1149` só ∃ em PROSA do
+  `SPEC.md` (§C:704 · §I36:1008 · §T618) — o gate ⊥ guarda nenhum dos 2.
+- **§V262 ⊥ está na lista & é quem acende nos 2 lados:**
+  - **por §T616:** `tabHedge` (`WoD20.7`) tem **folga vertical ZERO** — `maxBottom` = **688**
+    num pane de **688**. `hedgeStrip` 34 → 60 empurra `tabHedgePaths`/`tabHedgeRituals` de
+    `top=216` p/ `242` ∴ fundo **714 > 688** → §V262(b) VERMELHA ("a vertical bar, which is
+    the other half of §B52"). As outras 2 panes têm folga (47 & 28) & as 3 da Vampiro têm
+    ≥88 sobrando ∴ **`tabHedge` é a única**.
+  - **por §T615 sob (A):** §V262(c) mede "rows tile from 0 to 1270" & §V267 exige a banda
+    fechando em **1270** (`verify-hunters-hunted.ps1:7019`). Sob (A), **6 das 14 abas**
+    passam de 1280.
+
+**Scanline MEDIDA (caixas que um traço horizontal atravessa × +40 cada):**
+
+| arquivo | lado a lado | right hoje | right sob (A) |
+|---|---|---|---|
+| WoD20.2 | 6 | **1380** | **1620** |
+| WoD20.7 | 3 | 1270 | **1390** |
+| WoD20.1 | 4 | 1210 | **1370** |
+| WoD20.10 | 3 | 1225 | **1345** |
+| WoD20.5 | 3 | 1220 | **1340** |
+| WoD20.8 | 3 | 1180 | **1300** |
+| WoD20.4 · 3 · 11 · 12 · 13 · 14 · 6 · 9 | 1–3 | 380…1040 | 420…1160 ✓ |
+
+⚠ a 98ª estimou *"a aba mais larga vai de 1280 p/ ~1320+"* — ela contou **1 caixa por faixa**.
+O real é **1300…1620**. (WoD20.2 já está em 1380 HOJE — conferir se ela é uma das 3 panes que
+§V262 isenta por rect.)
+
+### §T619 — ⊥ construída. A premissa está errada nas 3 partes (é `/ck:spec bug:`, ⊥ build)
+
+§T619 diz *"`WoD20.1.lfm:278` tem margem `-40` à esquerda … É defeito próprio & ⊥ subproduto
+de §T615"*. MEDIDO:
+
+1. **`:278` ⊥ tem `-40`** — é a própria caixa `ATTRIBUTES`, `left="0" top="127" width="300"
+   height="286"`. Os `-40` estão em `:282` `:296` `:313` & são **3** (`Physical` `Social`
+   `Mental`), ⊥ 1.
+2. **⊥ vazam.** Os 3 têm `rotationAngle="270"` & `100×20` ∴ `-40` é a caixa PRÉ-rotação:
+   centro `x = -40+50 = 10` & o render ocupa **x ∈ [0,20]**, DENTRO da caixa. Quem já sabe
+   disso é o próprio gate, por escrito, em `verify-hunters-hunted.ps1:5819-5820`. §V27
+   (`:1019`) §V239 (`:5860`) §V240 (`:5935` `:5973`) cortam rotacionado DE PROPÓSITO. ⊥ é
+   "hoje ⊥ ∃ check que o pegue" — é **3 checks que decidiram ⊥ pegar**.
+3. **"⊥ é subproduto de §T615" está invertido.** Com os 10 de hoje `[0,20]` passa; é o **20 de
+   §I73** que faz o render encostar em `x=0`. E o conserto ⊥ é mexer no `-40` sozinho: as
+   linhas de atributo vizinhas nascem em `left="35"` ∴ empurrar o rótulo p/ `[20,40]` obriga
+   as 3 linhas a andar junto. Isso **É** §T615. `left="20"` cego põe o render em `[60,80]`,
+   em cima das linhas — regressão garantida.
+
+### Como retomar em chat novo — `/ck:spec` ANTES de qualquer build
+
+1. `/ck:spec` com estes 5 itens:
+   - **§T618 ganha §V262** (& §V267) na lista de reconciliação — é o item que falta & é o que
+     bloqueia as 2 tarefas.
+   - **§V262 sob (A):** revogar (c) & o 1270 de §V267 p/ as 6 abas medidas, OU declarar a
+     régua nova. §B52 muda de escopo junto.
+   - **§V262(b) p/ `tabHedge`:** decidir entre crescer as 3 panes de `WoD20.7` 688 → 714
+     (§V262a exige as 3 no MESMO rect) ou encolher `tabHedgePaths`/`tabHedgeRituals` 472 → 446.
+   - **§T615** re-escrita p/ (A): hoje a 2ª frase dela descreve (B) (*"Conteúdo encolhe 40px…"*).
+   - **§T618** ganha `CONTENT_GAP` 12 → 20 (a decisão 2 acima); e §I36:1008 / §C:704 / §T618
+     largam `1149`/`1153` — sob `left=30` a cadeia fecha em **1163**.
+2. `/ck:spec bug:` p/ §T619 (os 3 pontos acima).
+3. Só então `/ck:build T616` (menor) & depois `/ck:build T615`, cada uma com §T618 junto.
+
+### Mapa de edição de §T616, já MEDIDO (p/ a rodada de build não re-descobrir)
+
+- **4 barras** (19 botões: 11+3+2+3): `tabStrip` `WoD20th.lfm:3509` h46→60, 22 rects `top` 8→15,
+  11 pares deslocam **+14** (1º `left` 16→30; fim 1149→**1163**) · `numStrip` `WoD20.7:414` &
+  `hedgeStrip` `WoD20.7:585` & `vampStrip` `WoD20.11:163` h34→60, rects `top` 2→15, deslocam
+  **+24** (1º `left` 6→30). O `<label>` de afinidade da `hedgeStrip` (`210/2/400/30`) anda junto.
+- **Lua**: `STRIP_X0 = 16` → `30` (`WoD20th.lfm:372`, dentro de `TAB_W_BEGIN`/`_END`).
+- **`CONTENT_GAP`**: os 14 forms têm o filho mais alto em `top=12` ∴ deslocar TODOS os filhos
+  de 1º nível **+8** preserva o espaçamento interno exato; gate `:5342` 12 → 20.
+- **Deslocamento sob barra**: `WoD20.7` panes `58` → `92` (numStrip acaba em 80, gap 12 mantido) ·
+  `WoD20.11` panes `180` → `214` (vampStrip acaba em 210, gap 4 mantido).
+
+---
+
+
+## ▶ COMECE AQUI — 98ª rodada: **§T613 & §T620 FECHADAS**, §T617 PARCIAL, §T615 BLOQUEADA EM DECISÃO
+
+`/ck:spec` (5 itens do user 2026-08-24) + `/ck:build --all`. A filigrana vitoriana da 97ª
+estava **fora do spec**: código no `.lfm`, gate verde, & apagar a chave `ornament` ⊥ acendia
+NADA. Esta rodada especificou (§I72 §I73 §V276…§V282 §T613…§T620 §B59 §B60 §R111) & travou
+as 4 invariantes da filigrana no gate.
+
+**Estado MEDIDO 2026-08-24 20:36:**
+
+| coisa | valor |
+|---|---|
+| gate estático | **VERDE**, **531** `ok`, 0 FAIL |
+| gate `-Build` | **VERDE**, **533** `ok` (§V6 exit 0 · §V7 `2091801` → `2091802`) |
+| `.rpk` gerado & instalado | **2.091.800 B** nos 2, 20:36:54 / 20:36:55 |
+| commitado | **NADA** — working tree suja (`SPEC.md` `WoD20.6.lfm` `verify-hunters-hunted.ps1` `.rpk`) |
+
+### O que a 98ª FECHOU
+
+- **§T613** — braço ADAPTATIVO. `ornArm(w,h) = min(ORN_ARM, floor(min(w,h)/2) - 5)` & o guard
+  fixo `min(w,h) < 2*ORN_ARM` SAIU do `ornament()`. `TRUE FAITH` (`WoD20.7.lfm:853`,
+  `1270×76`) resolve braço **33** & ganha filigrana — era a ÚNICA das 73 que nascia lisa
+  (§B59). Contas & filete que ⊥ cabem em braço curto são DROPADOS um a um; o filete nunca.
+  MEDIDO: as 7 caixas de referência desenham dentro de `[0,w]×[0,h]`, 0 `NaN`.
+- **§T620** — as 2 âncoras frouxas (§B60). O coletor de §V10/§V28 ganhou `(?<!\w)` ∴ o `t` de
+  `format("…")` de 1 argumento ⊥ entra mais como string visível. §V205 passou a ler O QUE
+  INDEXA `memo.lists` & O QUE A LEITURA ATRIBUI, ≡ a cura que §V275 já carrega.
+  **6 sondas RODADAS**: `format("XYZZY")` → VERDE · `t("XYZZY")` → VERMELHO · renomear `key`
+  (declaração + 2 usos) → VERDE · renomear `hit` → VERDE · apagar leitura → VERMELHO ·
+  apagar escrita → VERMELHO.
+- **§T617 PARCIAL (`~`)** — §V276 §V277 §V278 §V279 estão no gate, **11 sondas RODADAS**
+  (9 mutações VERMELHAS + 2 vizinhas VERDES: renomear o local `p` dentro de `ornament()`,
+  & `ORN_ARM` 40→30). §V279 lê `ORN_ARM`, o encolhimento & o piso DO LUA & mede contra a
+  MENOR caixa do XML ∴ caixa curta nova acende vermelho. **FALTAM** os checks de §V280
+  §V281 §V282 — ⊥ podem existir antes de §T615/§T616/§T614 aterrissarem.
+
+### ⛔ §T615 PAROU EM DECISÃO SUA — ⊥ é falta de contexto, é bifurcação ⊥ especificada
+
+MEDIDO: com margem **20** nos 4 lados, **0 das 73 caixas cabe**. TODAS precisam de **+40 de
+largura & +20 de altura** — o conteúdo hoje encosta nas 4 bordas (65 das 73 em `0/10/0/10`).
+∴ ⊥ ∃ caminho mecânico: ou
+
+- **(A) as caixas CRESCEM** `+40×+20` & os filhos deslocam `+20/+10` — nada de conteúdo é
+  re-desenhado, mas a aba mais larga vai de 1280 p/ ~1320+, §V225 (painéis 990×700) &
+  §V239 §V240 §V247 recalculam, & as abas que já flertam c/ barra horizontal ganham uma; ou
+- **(B) o conteúdo ENCOLHE** — as caixas ficam, & cada linha apertada é re-disposta à mão
+  (o picker de 160px numa coluna de 290 vira 120 & corta texto; os 5 dots que fecham em
+  `x=1255` na `TRUE FAITH` saem da caixa).
+
+**⊥ escolher por você.** §T618 existe p/ reconciliar, mas ⊥ diz QUAL das duas.
+
+### ⚠ §T616 tem uma colisão declarada, tb sem decisão
+
+§V231 cobra, em LETRA, que **a barra respire MENOS que o conteúdo** (hoje 8 < `CONTENT_GAP`=12,
+pedido do user em §I34). O valor novo é **15** ∴ §V231 quebra por construção. 2 saídas:
+subir `CONTENT_GAP` 12 → **20** (preserva a relação de §I34 & casa c/ o 20 das caixas) **ou**
+revogar §I34 nesse ponto. A 1ª desloca o 1º box das 14 abas de `top=12` p/ `top=20`.
+
+### §T614 segue BLOQUEADA em §R111
+
+Forma do ornamento de pílula (`99×30`) é `?` de TELA: `2*ORN_ARM`=80 ⊥ cabe em 30 de altura
+∴ ⊥ é encolher a moldura, é desenhar outra. 3 candidatos em §R111.
+
+### Como retomar em chat novo
+
+1. Leia `SPEC.md` §I72 §I73 §V276…§V282 §T613…§T620 §B59 §B60 §R111.
+2. Responda as 2 decisões acima (§T615 A|B · §T616 `CONTENT_GAP` 20 | revogar §I34).
+3. `/ck:build T616` (menor) antes de `/ck:build T615`, & §T618 na MESMA rodada de cada uma.
+4. §T617 fecha por último, quando §V280/§V281/§V282 já forem verdade.
+
+⚠ Teste de TELA pendente da 97ª/98ª: abrir a ficha no tema `Victorian Era` & conferir
+(a) as curvas cúbicas renderizam · (b) `TRUE FAITH` agora ornamentada · (c) os 13 controles
+alinhados à esquerda em zona de canto — se a palmeta encostar no texto, encolher p/ ≤14px.
+
+---
+
 ## ▶ COMECE AQUI — 97ª rodada: `/ck:spec` (rename de rótulo) + **§T612 FECHADA**
 
 Pedido do user 2026-08-24: `Afiliação Manual` → **`Editar Afiliação`** & `Clã/Família Manual` →

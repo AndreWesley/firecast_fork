@@ -71,7 +71,7 @@
 		     The two labels on the left say Name and Generation now, and the FIELDS under them did
 		     not change: `dominator` and `dominatorGen` still own the data (SPEC V2 - a rename here
 		     would drop what is already saved on the sheet the user is testing with). -->
-		<layout left="0" top="12" width="620" height="116">
+		<layout left="0" top="20" width="620" height="116">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="620" height="20" text="DOMINATOR" horzTextAlign="center"/>
 
@@ -116,7 +116,7 @@
 			<label name="lblMaxDisc" left="549" top="82" width="56" height="24" text="-"/>
 		</layout>
 
-		<layout left="630" top="12" width="350" height="118">
+		<layout left="630" top="20" width="350" height="118">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="350" height="20" text="BLOOD POOL" horzTextAlign="center"/>
 
@@ -160,41 +160,41 @@
 			B41. The imported forms are align="client" themselves, so each one fills the layout
 			that holds it and the explicit size is all they need.
 		-->
-		<layout name="vampStrip" left="0" top="142" width="990" height="34">
-			<rectangle name="tabOnDisc" left="6" top="2" width="112" height="30" color="DimGray"
+		<layout name="vampStrip" left="0" top="150" width="990" height="60">
+			<rectangle name="tabOnDisc" left="30" top="15" width="112" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabDisc" left="6" top="2" width="112" height="30" color="#00000000"
+			<rectangle name="btnTabDisc" left="30" top="15" width="112" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabDisc', self);">
 				<label left="0" top="0" width="112" height="30" text="Disciplines" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnPaths" left="122" top="2" width="235" height="30" color="DimGray"
+			<rectangle name="tabOnPaths" left="146" top="15" width="235" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabPaths" left="122" top="2" width="235" height="30" color="#00000000"
+			<rectangle name="btnTabPaths" left="146" top="15" width="235" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabPaths', self);">
 				<label left="0" top="0" width="235" height="30" text="Blood Sorcery: Paths" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnRituals" left="361" top="2" width="235" height="30" color="DimGray"
+			<rectangle name="tabOnRituals" left="385" top="15" width="235" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabRituals" left="361" top="2" width="235" height="30" color="#00000000"
+			<rectangle name="btnTabRituals" left="385" top="15" width="235" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabRituals', self);">
 				<label left="0" top="0" width="235" height="30" text="Blood Sorcery: Rituals" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 		</layout>
 
-		<layout name="tabDisc" left="0" top="180" width="990" height="700">
+		<layout name="tabDisc" left="0" top="214" width="990" height="700">
 			<import file="WoD20.12.lfm"/>
 		</layout>
 
-		<layout name="tabPaths" left="0" top="180" width="990" height="700" visible="false">
+		<layout name="tabPaths" left="0" top="214" width="990" height="700" visible="false">
 			<import file="WoD20.13.lfm"/>
 		</layout>
 
-		<layout name="tabRituals" left="0" top="180" width="990" height="700" visible="false">
+		<layout name="tabRituals" left="0" top="214" width="990" height="700" visible="false">
 			<import file="WoD20.14.lfm"/>
 		</layout>
 	</scrollBox>

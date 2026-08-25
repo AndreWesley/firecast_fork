@@ -3,19 +3,19 @@
     <scrollBox align="client">
         <!-- Theme backdrop, same arrangement as WoD20.1 (SPEC T158, V56, V57). -->
         <image name="themePaper5" align="client" style="stretch" hitTest="false" visible="false"/>
-       <layout left="0" top="12" width="400" height="581">
+       <layout left="0" top="20" width="400" height="581">
 			<rectangle left="0" top="0" width="400" height="581" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="0" top="10" width="400" height="20" text="Notes" horzTextAlign="center"/>
 			<textEditor left="15" top="31" width="370" height="540" field="anotacoes1"/>
         </layout>
 
-		<layout left="410" top="12" width="400" height="581">
+		<layout left="410" top="20" width="400" height="581">
 			<rectangle left="0" top="0" width="400" height="581" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="0" top="10" width="400" height="20" text="Notes" horzTextAlign="center"/>
 			<textEditor left="15" top="31" width="370" height="540" field="anotacoes2"/>
         </layout>
 
-		<layout left="820" top="12" width="400" height="581">
+		<layout left="820" top="20" width="400" height="581">
 			<rectangle left="0" top="0" width="400" height="581" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="0" top="10" width="400" height="20" text="Notes" horzTextAlign="center"/>
 			<textEditor left="15" top="31" width="370" height="540" field="anotacoes3"/>

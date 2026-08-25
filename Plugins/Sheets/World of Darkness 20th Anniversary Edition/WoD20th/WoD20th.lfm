@@ -369,7 +369,7 @@
 			TAB_W = {
 				99, 79, 79, 92, 86, 105, 105, 112, 99, 125, 112,
 			};
-			STRIP_X0  = 16;
+			STRIP_X0  = 30;
 			STRIP_GAP = 4;
 			-- <<< TAB_W_END
 
@@ -1271,7 +1271,20 @@
 				local box = form[prefix .. "box"];
 
 				if box ~= nil then
-					box.height = n * HEALTH_ROW_PITCH + HEALTH_BOX_PAD;
+					local boxH = n * HEALTH_ROW_PITCH + HEALTH_BOX_PAD;
+
+					box.height = boxH;
+
+					-- AFTER the height, and the measurement is HANDED OVER rather than read back
+					-- (SPEC I72e, V285c). Asking the box how tall it is on this side of the write
+					-- can still answer with the track the storyteller just left - the redraw then
+					-- compares equal and skips, which is exactly what B62 shipped. The width is
+					-- authored and never written, so reading it is safe.
+					--
+					-- This is the only section box on the sheet whose size moves at runtime, and
+					-- both tabs carry one: the prefix is what reaches dynHealth_box AND
+					-- dynHealth3_box (SPEC V284c).
+					refreshOrnament(box, box.width, boxH);
 				end;
 
 				for i = 1, 10, 1 do
@@ -3506,92 +3519,92 @@
 		ours runs (SPEC R47) and sheetReveal is still the one thing that lights it (V166).
 	-->
 	<layout name="sheetBody" align="client" visible="false">
-		<layout name="tabStrip" align="top" height="46">
+		<layout name="tabStrip" align="top" height="60">
 			<rectangle align="client" color="black"/>
 
-			<rectangle name="tabOnMain" left="16" top="8" width="99" height="30" color="DimGray"
+			<rectangle name="tabOnMain" left="30" top="15" width="99" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabMain" left="16" top="8" width="99" height="30" color="#00000000"
+			<rectangle name="btnTabMain" left="30" top="15" width="99" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabMain', self);">
 				<label left="0" top="0" width="99" height="30" text="Main" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnTraits" left="119" top="8" width="79" height="30" color="DimGray"
+			<rectangle name="tabOnTraits" left="133" top="15" width="79" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabTraits" left="119" top="8" width="79" height="30" color="#00000000"
+			<rectangle name="btnTabTraits" left="133" top="15" width="79" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabTraits', self);">
 				<label left="0" top="0" width="79" height="30" text="Traits" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnNumina" left="202" top="8" width="79" height="30" color="DimGray"
+			<rectangle name="tabOnNumina" left="216" top="15" width="79" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabNumina" left="202" top="8" width="79" height="30" color="#00000000"
+			<rectangle name="btnTabNumina" left="216" top="15" width="79" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabNumina', self);">
 				<label left="0" top="0" width="79" height="30" text="Numina" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnDisciplines" left="285" top="8" width="92" height="30" color="DimGray"
+			<rectangle name="tabOnDisciplines" left="299" top="15" width="92" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabDisciplines" left="285" top="8" width="92" height="30" color="#00000000" visible="false"
+			<rectangle name="btnTabDisciplines" left="299" top="15" width="92" height="30" color="#00000000" visible="false"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabDisciplines', self);">
 				<label left="0" top="0" width="92" height="30" text="Ghoul" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnCombat" left="381" top="8" width="86" height="30" color="DimGray"
+			<rectangle name="tabOnCombat" left="395" top="15" width="86" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabCombat" left="381" top="8" width="86" height="30" color="#00000000"
+			<rectangle name="btnTabCombat" left="395" top="15" width="86" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabCombat', self);">
 				<label left="0" top="0" width="86" height="30" text="Combat" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnInventory" left="471" top="8" width="105" height="30" color="DimGray"
+			<rectangle name="tabOnInventory" left="485" top="15" width="105" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabInventory" left="471" top="8" width="105" height="30" color="#00000000"
+			<rectangle name="btnTabInventory" left="485" top="15" width="105" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabInventory', self);">
 				<label left="0" top="0" width="105" height="30" text="Inventory" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnBackground" left="580" top="8" width="105" height="30" color="DimGray"
+			<rectangle name="tabOnBackground" left="594" top="15" width="105" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabBackground" left="580" top="8" width="105" height="30" color="#00000000"
+			<rectangle name="btnTabBackground" left="594" top="15" width="105" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabBackground', self);">
 				<label left="0" top="0" width="105" height="30" text="Background" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnProgress" left="689" top="8" width="112" height="30" color="DimGray"
+			<rectangle name="tabOnProgress" left="703" top="15" width="112" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabProgress" left="689" top="8" width="112" height="30" color="#00000000"
+			<rectangle name="btnTabProgress" left="703" top="15" width="112" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabProgress', self);">
 				<label left="0" top="0" width="112" height="30" text="Experience" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnNotes" left="805" top="8" width="99" height="30" color="DimGray"
+			<rectangle name="tabOnNotes" left="819" top="15" width="99" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabNotes" left="805" top="8" width="99" height="30" color="#00000000"
+			<rectangle name="btnTabNotes" left="819" top="15" width="99" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabNotes', self);">
 				<label left="0" top="0" width="99" height="30" text="Notes" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnSettings" left="908" top="8" width="125" height="30" color="DimGray"
+			<rectangle name="tabOnSettings" left="922" top="15" width="125" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabSettings" left="908" top="8" width="125" height="30" color="#00000000"
+			<rectangle name="btnTabSettings" left="922" top="15" width="125" height="30" color="#00000000"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabSettings', self);">
 				<label left="0" top="0" width="125" height="30" text="Settings" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnStoryteller" left="1037" top="8" width="112" height="30" color="DimGray"
+			<rectangle name="tabOnStoryteller" left="1051" top="15" width="112" height="30" color="DimGray"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabStoryteller" left="1037" top="8" width="112" height="30" color="#00000000" visible="false"
+			<rectangle name="btnTabStoryteller" left="1051" top="15" width="112" height="30" color="#00000000" visible="false"
 			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabStoryteller', self);">
 				<label left="0" top="0" width="112" height="30" text="Storyteller" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>

@@ -207,7 +207,7 @@
 		</template>
 
 		<!-- 5 slots: one main path per blood sorcery (SPEC V181). 25 + 5*25 + 25 = 175. -->
-		<layout left="0" top="12" width="525" height="166">
+		<layout left="0" top="20" width="525" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="525" height="20" text="MAIN PATHS" horzTextAlign="center"/>
 			<layout left="12" top="31" width="501" height="25">
@@ -227,7 +227,7 @@
 			</layout>
 		</layout>
 
-		<layout left="0" top="188" width="525" height="416">
+		<layout left="0" top="196" width="525" height="416">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="525" height="20" text="SECONDARY PATHS" horzTextAlign="center"/>
 			<layout left="12" top="31" width="501" height="25">
@@ -277,7 +277,7 @@
 			</layout>
 		</layout>
 
-		<layout left="535" top="12" width="445" height="592">
+		<layout left="535" top="20" width="445" height="592">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="445" height="20" text="DESCRIPTION" horzTextAlign="center"/>
 			<textEditor name="edtPathDesc" left="10" top="31" width="425" height="551" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePathDesc(self);"/>

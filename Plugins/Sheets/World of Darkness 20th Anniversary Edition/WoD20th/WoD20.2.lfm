@@ -68,7 +68,7 @@
 		     The row count lives in BACKGROUND_ROWS on the root form (SPEC V145). A row added
 		     here and nowhere else would be a background nothing prices: free, and invisible
 		     in the log. -->
-		<layout left="0" top="12" width="330" height="636">
+		<layout left="0" top="20" width="330" height="636">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="330" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
 
@@ -134,7 +134,7 @@
 			</layout>
 		</layout>
 
-		<layout left="340" top="12" width="410" height="291">
+		<layout left="340" top="20" width="410" height="291">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="15" top="10" width="230" height="20" text="Merit" horzTextAlign="center"/>
 			<!-- Column renamed to Page on request. The field is still type_* : renaming a
@@ -174,7 +174,7 @@
 			</layout>
 		</layout>
 
-		<layout left="760" top="12" width="410" height="291">
+		<layout left="760" top="20" width="410" height="291">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="15" top="10" width="230" height="20" text="Flaw" horzTextAlign="center"/>
 			<label left="245" top="10" width="100" height="20" text="Page" horzTextAlign="center"/>
@@ -212,56 +212,56 @@
 			</layout>
 		</layout>
 
-		<layout left="1180" top="12" width="200" height="291">
+		<layout left="1180" top="20" width="200" height="291">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="DERANGEMENTS" horzTextAlign="center"/>
 
 			<textEditor left="15" top="31" width="170" height="250" field="derangements"/>
 		</layout>
 
-		<layout left="340" top="313" width="200" height="166">
+		<layout left="340" top="321" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="ALLIES" horzTextAlign="center"/>
 
 			<textEditor left="15" top="31" width="170" height="125" field="allies"/>
 		</layout>
 
-		<layout left="550" top="313" width="200" height="166">
+		<layout left="550" top="321" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="MENTOR" horzTextAlign="center"/>
 
 			<textEditor left="15" top="31" width="170" height="125" field="mentor"/>
 		</layout>
 
-		<layout left="760" top="313" width="200" height="166">
+		<layout left="760" top="321" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="CONTACTS" horzTextAlign="center"/>
 
 			<textEditor left="15" top="31" width="170" height="125" field="contacts"/>
 		</layout>
 
-		<layout left="970" top="313" width="200" height="166">
+		<layout left="970" top="321" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="FAME" horzTextAlign="center"/>
 
 			<textEditor left="15" top="31" width="170" height="125" field="fame"/>
 		</layout>
 
-		<layout left="1180" top="313" width="200" height="166">
+		<layout left="1180" top="321" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="BASE OF OPERATIONS" horzTextAlign="center"/>
 
 			<textEditor left="15" top="31" width="170" height="125" field="baseOfOperation"/>
 		</layout>
 
-		<layout left="340" top="489" width="200" height="166">
+		<layout left="340" top="497" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="RESOURCES" horzTextAlign="center"/>
 
 			<textEditor left="15" top="31" width="170" height="125" field="resources"/>
 		</layout>
 
-		<layout left="550" top="489" width="200" height="166">
+		<layout left="550" top="497" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- Retainers was renamed to Guides on request. The field is still `retainers`:
 			     renaming it would drop what is already saved in existing sheets (SPEC V2). -->
@@ -270,21 +270,21 @@
 			<textEditor left="15" top="31" width="170" height="125" field="retainers"/>
 		</layout>
 
-		<layout left="760" top="489" width="200" height="166">
+		<layout left="760" top="497" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="STATUS" horzTextAlign="center"/>
 
 			<textEditor left="15" top="31" width="170" height="125" field="status"/>
 		</layout>
 
-		<layout left="970" top="489" width="200" height="166">
+		<layout left="970" top="497" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="INFLUENCE" horzTextAlign="center"/>
 
 			<textEditor left="15" top="31" width="170" height="125" field="influence"/>
 		</layout>
 
-		<layout left="1180" top="489" width="200" height="166">
+		<layout left="1180" top="497" width="200" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="200" height="20" text="OTHER" horzTextAlign="center"/>
 

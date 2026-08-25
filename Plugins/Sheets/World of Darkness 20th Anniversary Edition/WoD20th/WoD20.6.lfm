@@ -1632,6 +1632,7 @@
 					dotOn  = "/WoD20th/images/prime_on_gold.png",
 					dotOff = "/WoD20th/images/prime_off_gold.png",
 					paper  = "/WoD20th/images/paper_victorian.png",
+					ornament = "#D8BC72",   -- brighter than the 3px outline, so the filigree reads as applied metal
 				},
 
 				-- Europe around 1300: stone and oak by candlelight, now with a silvered rule. The
@@ -1819,6 +1820,400 @@
 			--
 			-- Nothing here writes left/top/width/height (SPEC V57): the gate keeps measuring
 			-- the static XML for overlap, and no theme can invent a collision at runtime.
+			-- ---- Victorian filigree (user 2026-08-24) ---------------------------------------
+			--
+			-- The era's section boxes get applied gold ornament: a double rule following the box's
+			-- own corner, a scroll closing each corner arm, bead courses, and a fleuron at the
+			-- middle of the long edges. ONE <path> per box, built from that box's width and height.
+			--
+			-- Vector and not PNG. The boxes run from 160x101 to 1270x574 and one piece of art
+			-- stretched across that range shears its own corners; data built per box keeps every
+			-- scroll the size it was drawn at and lets only the straight runs grow. It also adds
+			-- nothing to `images/`, so V64 has no new art to police and V58/V60 no new path.
+			--
+			-- MEASURED before drawing: across the 73 boxes the free margin is 10px top and bottom
+			-- and ZERO left and right - children span the full box width. So the ornament stays in
+			-- the border band and the density goes where there is actually room, the corners, which
+			-- centred content never reaches. Deepest point is 23px, on the diagonal.
+			local ORN_BOXR  = 14;      -- the radius V68 authors on every section box
+			local ORN_OUT   = 5;       -- outer rule, in from the box edge
+			local ORN_IN    = 9;       -- inner rule
+			local ORN_ARM   = 40;      -- corner reach along each edge
+			local ORN_FLEUR = 150;     -- an edge run shorter than this carries no centre motif
+			local ORN_KAPPA = 0.5523;  -- cubic approximation of a quarter arc
+
+			-- Path data is parsed as SVG, where a comma separates x from y. The C library float
+			-- verbs follow LC_NUMERIC, so on a pt-BR host they write a decimal COMMA and every
+			-- coordinate parses as two numbers. Build the one decimal by hand instead: integer
+			-- tostring carries no locale.
+			local function ornNum(x)
+				local n = math.floor(x * 10 + 0.5);
+				local sign = "";
+
+				if n < 0 then sign = "-"; n = -n; end;
+
+				return sign .. tostring(math.floor(n / 10)) .. "." .. tostring(n % 10);
+			end;
+
+			-- Every motif is drawn ONCE, in canonical space - the top-left corner, u to the right
+			-- and v into the box - and stamped through `t`, which mirrors and transposes it onto the
+			-- other seven positions. One drawing per motif, so four corners cannot drift apart the
+			-- way four hand-authored copies would.
+			local function ornX(t, u, v)
+				if t.swap then return t.ox + t.sx * v; end;
+				return t.ox + t.sx * u;
+			end;
+
+			local function ornY(t, u, v)
+				if t.swap then return t.oy + t.sy * u; end;
+				return t.oy + t.sy * v;
+			end;
+
+			local function ornMove(o, t, u, v)
+				o[#o + 1] = "M" .. ornNum(ornX(t, u, v)) .. "," .. ornNum(ornY(t, u, v));
+			end;
+
+			local function ornLine(o, t, u, v)
+				o[#o + 1] = "L" .. ornNum(ornX(t, u, v)) .. "," .. ornNum(ornY(t, u, v));
+			end;
+
+			local function ornCurve(o, t, u1, v1, u2, v2, u, v)
+				o[#o + 1] = "C" .. ornNum(ornX(t, u1, v1)) .. "," .. ornNum(ornY(t, u1, v1))
+				         .. " " .. ornNum(ornX(t, u2, v2)) .. "," .. ornNum(ornY(t, u2, v2))
+				         .. " " .. ornNum(ornX(t, u,  v))  .. "," .. ornNum(ornY(t, u,  v));
+			end;
+
+			-- One cubic across an arc centred on the box corner. The box corner is CONCAVE
+			-- (cornerType="innerRound", V68), so insetting it by d rides a LARGER circle, radius
+			-- ORN_BOXR + d - offset it the wrong way and the rule crosses the outline it decorates.
+			local function ornArc(o, t, r, a1, a2)
+				local k = (4 / 3) * math.tan((a2 - a1) / 4);
+
+				ornCurve(o, t,
+					r * math.cos(a1) - k * r * math.sin(a1), r * math.sin(a1) + k * r * math.cos(a1),
+					r * math.cos(a2) + k * r * math.sin(a2), r * math.sin(a2) - k * r * math.cos(a2),
+					r * math.cos(a2),                        r * math.sin(a2));
+			end;
+
+			-- A scroll: five quarter turns of a spiral that gives up a fifth of its radius each time.
+			-- Cubic quarter-arcs rather than one SVG `A`: nothing in this repo has ever asked this
+			-- renderer to parse an arc command, and a curl that failed to parse would take its whole
+			-- box's ornament down with it.
+			local function ornVolute(o, t, cu, cv, r, a0, turn)
+				local ang, rad = a0, r;
+
+				ornMove(o, t, cu + rad * math.cos(ang), cv + rad * math.sin(ang));
+
+				for _ = 1, 5, 1 do
+					local nAng = ang + turn * (math.pi / 2);
+					local nRad = rad * 0.8;
+					local k1 = ORN_KAPPA * rad * turn;
+					local k2 = ORN_KAPPA * nRad * turn;
+
+					ornCurve(o, t,
+						cu + rad  * math.cos(ang)  - k1 * math.sin(ang),
+						cv + rad  * math.sin(ang)  + k1 * math.cos(ang),
+						cu + nRad * math.cos(nAng) + k2 * math.sin(nAng),
+						cv + nRad * math.sin(nAng) - k2 * math.cos(nAng),
+						cu + nRad * math.cos(nAng),
+						cv + nRad * math.sin(nAng));
+
+					ang, rad = nAng, nRad;
+				end;
+			end;
+
+			-- A pointed leaf between two points: out along one bulge and back along its mirror, so
+			-- the two cubics close a lens. Unfilled like everything here - the ornament is line work,
+			-- and a filled leaf reads as a blot at this size.
+			local function ornLeaf(o, t, u1, v1, u2, v2, b)
+				local du, dv = u2 - u1, v2 - v1;
+				local len = math.sqrt(du * du + dv * dv);
+
+				if len < 0.01 then return; end;
+
+				local nu, nv = -dv / len * b, du / len * b;
+
+				ornMove(o, t, u1, v1);
+				ornCurve(o, t, u1 + du * 0.28 + nu, v1 + dv * 0.28 + nv,
+				               u1 + du * 0.72 + nu, v1 + dv * 0.72 + nv, u2, v2);
+				ornCurve(o, t, u1 + du * 0.72 - nu, v1 + dv * 0.72 - nv,
+				               u1 + du * 0.28 - nu, v1 + dv * 0.28 - nv, u1, v1);
+			end;
+
+			local function ornDot(o, t, cu, cv, r)
+				local k = ORN_KAPPA * r;
+
+				ornMove(o, t, cu + r, cv);
+				ornCurve(o, t, cu + r, cv + k, cu + k, cv + r, cu,     cv + r);
+				ornCurve(o, t, cu - k, cv + r, cu - r, cv + k, cu - r, cv);
+				ornCurve(o, t, cu - r, cv - k, cu - k, cv - r, cu,     cv - r);
+				ornCurve(o, t, cu + k, cv - r, cu + r, cv - k, cu + r, cv);
+			end;
+
+			-- The corner piece: both rules turning the corner along the box's own arc, a bead course
+			-- on the curve, a three-leaf palmette on the diagonal, a scroll closing each arm and
+			-- beads running back along it.
+			local function ornCorner(o, t, a)
+				local runs = { {ORN_OUT, a}, {ORN_IN, a - 7} };
+
+				for i = 1, 2, 1 do
+					local d = runs[i][1];
+					local tip = runs[i][2];
+					local r = ORN_BOXR + d;
+					local u0 = math.sqrt(r * r - d * d);
+					local a1 = math.atan(d / u0);
+
+					ornMove(o, t, d, tip);
+					ornLine(o, t, d, u0);
+					ornArc(o, t, r, (math.pi / 2) - a1, a1);
+					ornLine(o, t, tip, d);
+				end;
+
+				local rMid = ORN_BOXR + (ORN_OUT + ORN_IN) / 2;
+
+				for _, ang in ipairs({ (math.pi / 4) - 0.42, math.pi / 4, (math.pi / 4) + 0.42 }) do
+					ornDot(o, t, rMid * math.cos(ang), rMid * math.sin(ang), 1.4);
+				end;
+
+				local rIn = ORN_BOXR + ORN_IN;
+				local q = math.pi / 4;
+
+				ornLeaf(o, t,
+					(rIn + 2.5) * math.cos(q), (rIn + 2.5) * math.sin(q),
+					(rIn + 9.5) * math.cos(q), (rIn + 9.5) * math.sin(q), 3.4);
+
+				for _, s in ipairs({ -1, 1 }) do
+					ornLeaf(o, t,
+						(rIn + 2.5) * math.cos(q + s * 0.34), (rIn + 2.5) * math.sin(q + s * 0.34),
+						(rIn + 8.0) * math.cos(q + s * 0.62), (rIn + 8.0) * math.sin(q + s * 0.62), 2.2);
+				end;
+
+				ornVolute(o, t, ORN_IN, a - 1, 5, -math.pi / 2, 1);
+				ornVolute(o, t, a - 1, ORN_IN, 5, math.pi, -1);
+
+				local mid = (ORN_OUT + ORN_IN) / 2;
+				local straight = math.sqrt((ORN_BOXR + ORN_IN) * (ORN_BOXR + ORN_IN) - ORN_IN * ORN_IN) + 2;
+
+				for _, u in ipairs({ a - 11, a - 18, a - 25 }) do
+					-- Only where the inner rule has already gone straight. Inside the arc a bead sits
+					-- ON the corner instead of beside it, and a short box has no straight run left to
+					-- put one on: what a short arm drops is the MOTIF, never the rule (SPEC V279).
+					if u >= straight then
+						ornDot(o, t, u, mid, 1.3);
+						ornDot(o, t, mid, u, 1.3);
+					end;
+				end;
+			end;
+
+			-- One edge, corner to corner. A short run is two plain rules; a long one opens at the
+			-- middle for a lozenge astride the outer rule, a leaf either side and a scroll closing
+			-- each end.
+			local function ornEdge(o, t, span, a)
+				local i, j = ORN_OUT, ORN_IN;
+
+				if span - 2 * a <= 0 then return; end;
+
+				-- A run is drawn only where it has positive length. On a short edge the inner rule
+				-- would otherwise be emitted BACKWARDS - end before start - which draws a line back
+				-- across the corner piece (SPEC V279).
+				local function rule(from, to, d)
+					if to > from then ornMove(o, t, from, d); ornLine(o, t, to, d); end;
+				end;
+
+				if span - 2 * a < ORN_FLEUR then
+					rule(a, span - a, i);
+					rule(a + 7, span - a - 7, j);
+					return;
+				end;
+
+				local c = span / 2;
+
+				rule(a, c - 24, i);
+				rule(c + 24, span - a, i);
+				rule(a + 7, c - 24, j);
+				rule(c + 24, span - a - 7, j);
+
+				ornMove(o, t, c - 8, i);
+				ornLine(o, t, c, i - 3.5);
+				ornLine(o, t, c + 8, i);
+				ornLine(o, t, c, i + 3.5);
+				ornLine(o, t, c - 8, i);
+
+				ornLeaf(o, t, c + 9, i, c + 17, i, 2.5);
+				ornLeaf(o, t, c - 9, i, c - 17, i, 2.5);
+
+				ornVolute(o, t, c + 20, i + 2.5, 3, -math.pi / 2, 1);
+				ornVolute(o, t, c - 20, i + 2.5, 3, -math.pi / 2, -1);
+
+				ornDot(o, t, c, j + 2, 1.3);
+			end;
+
+			-- The arm SHRINKS to fit; the ornament is never skipped (SPEC V279, B59). A corner
+			-- overhangs its own arm by the terminal scroll - reach is a + 4 - so two of them need
+			-- 2*(a+4) along the shorter side, and 5 buys that plus a pixel. ORN_ARM stays the
+			-- ceiling: a big box is not drawn with a bigger corner than the one it was designed at.
+			local function ornArm(w, h)
+				return math.min(ORN_ARM, math.floor(math.min(w, h) / 2) - 5);
+			end;
+
+			local function ornPath(w, h)
+				local o = {};
+				local a = ornArm(w, h);
+
+				-- The floor is the arc itself: below it there is no straight run for a rule to be a
+				-- rule on. Nothing in the sheet reaches it - the shortest box is 76 and resolves to
+				-- 33 - and the gate holds that gap open (SPEC V279).
+				if a < 12 then return ""; end;
+
+				ornCorner(o, {ox = 0, oy = 0, sx =  1, sy =  1}, a);
+				ornCorner(o, {ox = w, oy = 0, sx = -1, sy =  1}, a);
+				ornCorner(o, {ox = 0, oy = h, sx =  1, sy = -1}, a);
+				ornCorner(o, {ox = w, oy = h, sx = -1, sy = -1}, a);
+
+				ornEdge(o, {ox = 0, oy = 0, sx =  1, sy =  1}, w, a);
+				ornEdge(o, {ox = 0, oy = h, sx =  1, sy = -1}, w, a);
+				ornEdge(o, {ox = 0, oy = 0, sx =  1, sy =  1, swap = true}, h, a);
+				ornEdge(o, {ox = w, oy = 0, sx = -1, sy =  1, swap = true}, h, a);
+
+				return table.concat(o, " ");
+			end;
+
+			-- One <path> per box, made the first time an era asks for it and hidden - never destroyed
+			-- - when a plainer era takes over. An era that declares no `ornament` gets none, exactly
+			-- as a palette with no `paper` gets no backdrop (V56).
+			-- The entry is {p, w, h} and not the path alone: the memo has to tell "already drawn"
+			-- from "drawn at THIS size". The HEALTH box is the one section box that resizes at
+			-- runtime - renderHealthTrack writes its height from the storyteller's track length
+			-- (SPEC V49) - and a memo that only knew the first would keep serving a frame built
+			-- for the old measure, with no error and no symptom to grep (SPEC I72d, V284).
+			local ornPainted = {};
+
+			-- The era's ornament colour, kept from the last applyTheme so a refresh outside the
+			-- traversal does not have to resolve the palette a second time. nil is a real value
+			-- here: it is what a plainer era leaves behind, and it hides rather than repaints.
+			local ornColour = nil;
+
+			-- `w` and `h` are the caller's measurement and they are OPTIONAL. A caller that has
+			-- just written the size passes it; the theme traversal, which writes nothing, leaves
+			-- them out and the control is read instead (SPEC I72e, V285c).
+			local function ornament(c, fill, colour, w, h)
+				local e = ornPainted[c.handle];
+
+				if colour == nil then
+					if e ~= nil then e.p.visible = false; end;
+					return;
+				end;
+
+				if e ~= nil then
+					-- The box changed size since the data was built. Rebuilding beats stretching:
+					-- `mode` stays "original" because the SDK's stretch would scale the volutes and
+					-- beads with the box, and the HEALTH box moves on ONE axis only - the motif
+					-- would flatten by about a quarter (SPEC R113).
+					--
+					-- The HANDED-OVER measurement wins over the control's own. renderHealthTrack
+					-- has just written the height, and `getHeight` is _gui_getHeight rather than the
+					-- plain property getter `getWidth` uses (rrpgGUI.lua:95, :98) - reading it back
+					-- in the same tick can answer with the size the box is LEAVING, which compares
+					-- equal and skips the redraw in silence. That was B62 (SPEC V285c).
+					local bw = w or c.width;
+					local bh = h or c.height;
+
+					if bw ~= nil and bh ~= nil and (bw ~= e.w or bh ~= e.h) then
+						local d = ornPath(bw, bh);
+
+						if d ~= "" then
+							e.p.data = d;
+							e.w = bw;
+							e.h = bh;
+						end;
+					end;
+				end;
+
+				if e == nil then
+					-- Section boxes only. Black fill PLUS a corner radius of its own is what tells them
+					-- from the tab-strip floor (black, square), the pills (DimGray / transparent) and
+					-- the mark boxes (V68). `fill` is the AUTHORED colour and not the painted one: by
+					-- the time this runs the box is already mahogany (V62).
+					if normColor(fill) ~= "#FF000000" then return; end;
+
+					local rad = c.xradius;
+
+					if rad == nil or rad <= 0 then return; end;
+
+					-- READ, never written - the theme still writes no geometry (V57). A box whose size
+					-- the layout has not resolved gets no ornament rather than a frame drawn to a wrong
+					-- measure. Size no longer decides WHETHER, only how big the corner comes out.
+					local bw, bh = c.width, c.height;
+
+					if bw == nil or bh == nil then return; end;
+
+					-- The ONLY refusal left is a box too small for the arc to straighten out - no box
+					-- in the sheet is (SPEC V279). The old guard refused anything under 2*ORN_ARM and
+					-- TRUE FAITH, 1270 wide and 76 tall, fell through it silently (SPEC B59).
+					local d = ornPath(bw, bh);
+
+					if d == "" then return; end;
+
+					local p = gui.newPath();
+
+					-- Child of the BOX, not of the layout holding it: a child draws above its parent and
+					-- below the parent's later siblings, which is exactly where an ornament belongs -
+					-- over the box fill, under the labels and fields the box carries.
+					p:setParent(c);
+
+					p.align = "client";
+					p.mode = "original";
+					p.hitTest = false;
+					p.color = "#00000000";
+					p.strokeSize = 1;
+					p.data = d;
+
+					e = {p = p, w = bw, h = bh};
+
+					ornPainted[c.handle] = e;
+				end;
+
+				e.p.strokeColor = colour;
+				e.p.visible = true;
+			end;
+
+			-- SPEC I72d / V284. The HEALTH box is resized by renderHealthTrack, which lives on the
+			-- root form and has no reach into this chunk's locals - so the refresh is a global, the
+			-- same way renderHedgePickers and renderManualEntry already are. Declared BELOW
+			-- ornament() because it calls it: the other order compiles to a GETGLOBAL and finds nil
+			-- (SPEC V223, B51).
+			--
+			-- Takes the BOX and finds its own backdrop rather than taking the rectangle, because the
+			-- caller holds the layout - `form[prefix .. "box"]` - and nothing else. The backdrop is
+			-- the align="client" child, which is how V68 and V278 already tell a section box from
+			-- everything else that is black.
+			function refreshOrnament(box, w, h)
+				if box == nil then return; end;
+
+				local kids = box:getChildren();
+
+				for i = 1, #kids, 1 do
+					local k = kids[i];
+
+					-- Found by MEMO, never by reading a property off the control (SPEC V285a).
+					-- The first version asked `k.align == "client"`, and `align` had ZERO precedent
+					-- as a runtime READ anywhere in the sheet: getClassName is proven by the theme
+					-- walk that paints every round, align was proven by nothing. A finder that
+					-- matches nothing returns quietly and exits 0 - that was half of B62.
+					--
+					-- It also sidesteps the order: getChildren walks pairs() of a hash table
+					-- (rrpgObjs.lua:577), so which child comes first is undefined.
+					--
+					-- `fill` goes in as nil on purpose: the memo EXISTS by the test just made, so
+					-- the creation branch cannot run and the authored colour is never consulted.
+					-- Reading it here would be one more property off the control for nothing.
+					if ornPainted[k.handle] ~= nil then
+						ornament(k, nil, ornColour, w, h);
+						return;
+					end;
+				end;
+			end;
+
 			local function applyTheme(v, from)
 				-- Every value the combo offers has a palette since the 16th round, so this never
 				-- resolves to nil: a sheet carrying something else - "Present Day" from before
@@ -1827,6 +2222,11 @@
 				local t = THEMES[v] or THEMES[THEME_DEFAULT];
 				local root = rootOf(from);
 				local all = {root};
+
+				-- Kept for refreshOrnament, which runs outside this traversal (SPEC I72d, V284).
+				-- Written from the SAME `t` the walk below paints from, so the era the filigree
+				-- believes in can never differ from the era the boxes are wearing.
+				ornColour = t.ornament;
 
 				collect(root, all);
 
@@ -1861,6 +2261,10 @@
 						paint(c, "color", t.fill[normColor(fill)], fill);
 						paint(c, "strokeColor", t.stroke[normColor(line)], line);
 						paint(c, "strokeSize", THEME_STROKE, authored(c, "strokeSize"));
+
+						-- The filigree rides the same walk and the same authored value the fill does,
+						-- so the frame and the box can never disagree about which era is in force.
+						ornament(c, fill, t.ornament);
 					elseif THEME_TEXTS[cls] then
 						local fc = authored(c, "fontColor");
 
@@ -1914,7 +2318,7 @@
 			Options first, credits last (SPEC T141): the settings are what a player opens this
 			tab to change; the credits are a signature.
 		-->
-		<layout left="0" top="12" width="380" height="125">
+		<layout left="0" top="20" width="380" height="125">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<label left="15" top="10" width="80" height="20" text="Language" horzTextAlign="center"/>
@@ -1992,7 +2396,7 @@
 			and the same 14px above the first line as below the last - it was 10 and 5, and the
 			lopsided pair is what showed. Both boxes on this tab went 330 -> 380 wide with it.
 		-->
-		<layout left="0" top="147" width="380" height="150">
+		<layout left="0" top="155" width="380" height="150">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<label left="0" top="10" width="380" height="20" text="Credits" horzTextAlign="center"/>

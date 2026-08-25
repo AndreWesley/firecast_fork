@@ -311,7 +311,7 @@
 
 		<!-- 20 slots since the 85th round: five came off by request (SPEC I46, V251) and the box
 		     came down with them. 10 title gap + 20 title + 20*25 rows + 10 foot = 541 (SPEC V240). -->
-		<layout left="0" top="12" width="480" height="541">
+		<layout left="0" top="20" width="480" height="541">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="480" height="20" text="RITUALS" horzTextAlign="center"/>
 			<layout left="12" top="31" width="456" height="25">
@@ -377,7 +377,7 @@
 		</layout>
 
 		<!-- Grows with the column on its left, never on its own (SPEC V193). -->
-		<layout left="490" top="12" width="490" height="541">
+		<layout left="490" top="20" width="490" height="541">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="490" height="20" text="DESCRIPTION" horzTextAlign="center"/>
 			<textEditor name="edtRitualDesc" left="10" top="31" width="470" height="500" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveRitualDesc(self);"/>

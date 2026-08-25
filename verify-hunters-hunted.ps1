@@ -526,8 +526,13 @@ foreach ($f in $files) {
     }
     # Tab titles are translated too (WoD20.6 handles cls == "tab"), so they are visible strings.
     foreach ($n in $xml.SelectNodes("//tab[@title]")) { [void]$visible.Add($n.GetAttribute("title").Trim()) }
-    # runtime strings built in Lua go through the t() helper
-    [regex]::Matches($raw, 't\("([^"]+)"\)') | ForEach-Object { [void]$visible.Add($_.Groups[1].Value) }
+    # runtime strings built in Lua go through the t() helper. The lookbehind is the whole
+    # point (SPEC V222, B60): without it the pattern matches the trailing `t` of any other
+    # call - string.format("%.1f") read as t("%.1f") - and a format verb is demanded of the
+    # .lang file as if it were prose. One-argument calls only were affected, because the
+    # closing quote has to touch the paren; format("#%08X", v) escaped on its comma alone,
+    # which is luck and not a rule.
+    [regex]::Matches($raw, '(?<!\w)t\("([^"]+)"\)') | ForEach-Object { [void]$visible.Add($_.Groups[1].Value) }
     # Picker items are user-visible too (SPEC V17). Read them off the XML `items=` attribute,
     # NOT out of a Lua table: the lists live inline in the templates now, and a checker that
     # greps for the old Lua form would pass silently while verifying nothing.
@@ -1245,7 +1250,25 @@ else {
     }
     if ($measured -eq 0) { Fail "V49 no health box measured - the check reads nothing (SPEC V20)" }
 
-    if ($rendFn -notmatch 'height\s*=.*HEALTH_ROW_PITCH') { Fail "V49 renderHealthTrack never sets the box height from the pitch - the box would stay ten rows tall" }
+    # The height has to DERIVE from the pitch, and that is not the same as being written on one
+    # line with it. B62's fix hands the measurement to the filigree as well as to the box, so it
+    # is computed into a local first - one source of truth for two readers. Anchoring on the
+    # one-liner would have forced the expression to be written twice, which is the second truth
+    # this check exists to prevent. So: find what is assigned to `.height`, and accept it if the
+    # RHS carries the pitch itself OR names a local that was assigned from it (SPEC V222).
+    $hAsg = [regex]::Match($rendFn, '(?m)\.height\s*=\s*([^;\r\n]+);')
+    $pitchOk = $false
+    if ($hAsg.Success) {
+        $rhs = $hAsg.Groups[1].Value
+        if ($rhs -match 'HEALTH_ROW_PITCH') { $pitchOk = $true }
+        elseif ($rhs -match '^\s*(\w+)\s*$') {
+            $ln = [regex]::Escape($Matches[1])
+            if ($rendFn -match ('(?m)^\s*local\s+' + $ln + '\s*=[^;\r\n]*HEALTH_ROW_PITCH')) { $pitchOk = $true }
+        }
+    }
+
+    if (-not $hAsg.Success) { Fail "V49 renderHealthTrack never writes the box height - the box would stay ten rows tall" }
+    elseif (-not $pitchOk) { Fail "V49 renderHealthTrack sets the box height from something other than HEALTH_ROW_PITCH - the box would not end under the last row" }
     elseif ($rendFn -notmatch 'healthLevels') { Fail "V49 renderHealthTrack does not read healthLevels for the height" }
     else { Pass "V49 the renderer sizes the box from the chosen track length" }
 }
@@ -4617,10 +4640,25 @@ if ($pickerFn.Success) {
 
     # BOTH ends, named apart. A memo that is written and never read is the shape of SPEC B7:
     # the string is there, the work still happens, and this check reports on nothing.
-    if ($pkm -notmatch 'hit\s*= memo\.lists\[key\];') {
+    # Anchored on the CONSTRUCTION and never on the identifiers (SPEC V222, B60), the same
+    # cure V275 already carries: whatever indexes memo.lists IS the key, and whatever the read
+    # assigns IS the hit, under any name. Renaming either local is invisible here - that is the
+    # neighbour probe - while dropping the read, the store, or the miss gate still goes red.
+    # The old form spelled `key` and `hit` into the pattern, so a rename that changed no
+    # behaviour at all turned this check red (found by the T611 probe, 96th round).
+    $idx205 = [regex]::Match($pkm, 'memo\.lists\[\s*(\w+)\s*\]')
+    $rd205 = [regex]::Match($pkm, '(?m)^\s*local\s+(\w+)\s*=\s*memo\.lists\[\s*\w+\s*\];')
+    $read205 = $idx205.Success -and $rd205.Success
+    $store205 = $false
+    if ($read205) {
+        $k205 = [regex]::Escape($idx205.Groups[1].Value)
+        $h205 = [regex]::Escape($rd205.Groups[1].Value)
+        $store205 = ($pkm -match "memo\.lists\[\s*$k205\s*\]\s*=\s*\{ kept = kept, shown = shown \};") -and ($pkm -match "if\s+$h205\s+== nil then")
+    }
+    if (-not $read205) {
         $filterBad += "V205 pickerItems never READS the memo - the same list is rebuilt once per control, and the ritual rows alone pay that 25 times a pass (SPEC T491, B48)"
     }
-    elseif ($pkm -notmatch 'memo\.lists\[key\] = \{ kept = kept, shown = shown \};' -or $pkm -notmatch 'if hit == nil then') {
+    elseif (-not $store205) {
         $filterBad += "V205 pickerItems never STORES the pair it built, or does not gate the build on the miss - the read would find nothing and every control would rebuild anyway (SPEC T491)"
     }
     # discLevels() hands back a FRESH table each traversal, so this identity test IS "a new
@@ -5319,7 +5357,7 @@ else {
 # The strip band is checked as 2*gap + pill, so the space above equals the space below by
 # construction and neither can slide without the other lighting up. The floor rectangle is
 # skipped for free: it carries no name, while all 22 pills and buttons do.
-$CONTENT_GAP = 12
+$CONTENT_GAP = 20
 $gapBad = @()
 $gapForms = 0
 foreach ($f in $files) {
@@ -7587,7 +7625,267 @@ else {
     }
 }
 if ($v275Bad) { foreach ($b275 in $v275Bad) { Fail "V275 $b275" } }
+
 else { Pass "V275 the picker memo keys its $($names275.Count) filtered name(s) by name and everything else by root - the filtered row cannot inherit a sibling's list" }
+
+# ---- V276..V279: the Victorian filigree ---------------------------------------------
+# SPEC I72, the 98th round. The ornament is built by Lua into one <path> per section box, so
+# NOTHING above sees it: without this block the palette key, the generator and the call could
+# all be deleted and every other check would stay green - which is exactly the state the
+# feature shipped in, and the reason item (1) of the request was to spec it at all.
+$ornBad = @()
+$ornMake = LuaFn $hh6 'ornament'
+$ornGeo = LuaFn $hh6 'ornPath'
+$ornArmFn = LuaFn $hh6 'ornArm'
+
+if (-not $ornMake) { $ornBad += "ornament() is gone from WoD20.6 - the filigree has no painter (SPEC I72c)" }
+elseif (-not $ornGeo) { $ornBad += "ornPath() is gone from WoD20.6 - there is no geometry to paint (SPEC I72)" }
+elseif (-not $ornArmFn) { $ornBad += "ornArm() is gone - the corner cannot shrink to fit and a short box goes back to being skipped (SPEC V279, B59)" }
+else {
+    $ornBody = NoComments $ornMake
+
+    # V276: the path is made at RUNTIME and placed by align, never by geometry. A left/top/
+    # width/height written here would put a theme back in the business V57 took it out of.
+    if ($ornBody -notmatch 'gui\.newPath\(\)') { $ornBad += "V276 nothing creates a <path> - the filigree is declared and never drawn (SPEC I72)" }
+    elseif ($ornBody -notmatch 'setParent\(\s*c\s*\)') { $ornBad += "V276 the path is not parented to the box it decorates - as a sibling it would draw over the labels instead of under them (SPEC I72c)" }
+    elseif ($ornBody -notmatch '(?m)^\s*\w+\.align\s*=\s*"client";') { $ornBad += "V276 the path is not align=client - it would need a left and a size, which is the geometry V57 forbids" }
+    elseif ($ornBody -notmatch '(?m)^\s*\w+\.hitTest\s*=\s*false;') { $ornBad += "V276 the path is hit-testable - it would eat every click meant for the box under it" }
+    elseif ([regex]::Matches($ornBody, '"(left|top|width|height)"|\.(left|top|width|height)\s*=').Count -gt 0) {
+        $ornBad += "V276 the painter WRITES geometry - V37/V40/V49 only ever measure the static XML, so a size written here is a collision nothing can see (SPEC V57)"
+    }
+
+    # V277: a plainer era hides the filigree and never destroys it - the V56 promise, for the
+    # frame instead of the backdrop. Destroying would also strand the handle in the ledger.
+    if ($ornBody -notmatch 'visible\s*=\s*false;') { $ornBad += "V277 the filigree is never hidden - Modern would ship with a gold frame on every box (SPEC V56)" }
+    if ($ornBody -match 'destroy') { $ornBad += "V277 the filigree is DESTROYED rather than hidden - the ledger would keep a dead handle and switching back would redraw 73 paths (SPEC V277)" }
+
+    # V278: who gets one is decided by CONSTRUCTION - authored black plus a radius of its own.
+    # Anchored on what the code READS, not on a roster of names spelled here (SPEC V222).
+    if ($ornBody -notmatch 'normColor\(\s*fill\s*\)') { $ornBad += "V278 the filter does not read the AUTHORED fill - by the time this runs the box is mahogany, so reading the current colour matches nothing (SPEC V62)" }
+    else {
+        # The radius has to REFUSE, not merely be read. Anchored on the construction (SPEC
+        # V222): find the local assigned from c.xradius, then demand a return guarded by it.
+        # Asking only that the word appears passes a version that reads the radius and then
+        # frames the box anyway - which is how the tab-strip floor would get a gold frame.
+        $radL = [regex]::Match($ornBody, '(?m)^\s*local\s+(\w+)\s*=\s*c\.xradius;')
+        if (-not $radL.Success) { $ornBad += "V278 nothing reads the box own corner radius - the tab-strip floor is black and square and would be framed like a section box (SPEC V229, V68)" }
+        else {
+            $rn278 = [regex]::Escape($radL.Groups[1].Value)
+            if ($ornBody -notmatch "(?m)^\s*if\s+[^\r\n]*\b$rn278\b[^\r\n]*then return;") {
+                $ornBad += "V278 the corner radius is read and never REFUSES - a black square would be framed exactly like a section box (SPEC V229, V68)"
+            }
+        }
+    }
+
+    # V279: the corner SHRINKS to fit; no box is silently skipped. The floor is read out of the
+    # Lua and measured against the smallest box the XML actually authors, so the two can never
+    # drift: a shorter box added tomorrow reddens this instead of quietly coming out plain.
+    # This is the backprop of B59 - TRUE FAITH, 1270 wide and 76 tall, fell through the old
+    # fixed guard and nothing said so.
+    # $ornBody and not $ornMake: the comment above explains the OLD guard in prose, and a
+    # check that reddens on prose is the false positive V222 exists for.
+    if ($ornBody -match '2\s*\*\s*ORN_ARM') {
+        $ornBad += "V279 the painter still refuses a box by size - that is the guard that skipped TRUE FAITH in silence (SPEC B59)"
+    }
+    $armCap = [regex]::Match($hh6, '(?m)^\s*local ORN_ARM\s*=\s*(\d+);')
+    $armSlack = [regex]::Match($ornArmFn, 'math\.floor\(math\.min\(w, h\) / 2\) - (\d+)')
+    $armFloor = [regex]::Match($ornGeo, '(?m)^\s*if a < (\d+) then return "";')
+    if (-not $armCap.Success -or -not $armSlack.Success -or -not $armFloor.Success) {
+        $ornBad += "V279 ORN_ARM, the shrink or the floor could not be read - the guard this measures is unreadable, so the check is a no-op (SPEC V20)"
+    } else {
+        $slack = [int]$armSlack.Groups[1].Value
+        $floor = [int]$armFloor.Groups[1].Value
+        $tiny = 0
+        $tinyName = ''
+        foreach ($f in $files) {
+            foreach ($r in (Doc $f.FullName).SelectNodes("//rectangle[@color='black'][@xradius]")) {
+                $p = $r.ParentNode
+                $bw = 0; $bh = 0
+                if (-not [int]::TryParse($r.GetAttribute("width"), [ref]$bw)) { [void][int]::TryParse($p.GetAttribute("width"), [ref]$bw) }
+                if (-not [int]::TryParse($r.GetAttribute("height"), [ref]$bh)) { [void][int]::TryParse($p.GetAttribute("height"), [ref]$bh) }
+                if ($bw -le 0 -or $bh -le 0) { continue }
+                $side = [Math]::Min($bw, $bh)
+                if ($tiny -eq 0 -or $side -lt $tiny) { $tiny = $side; $tinyName = "$($f.Name) $($bw)x$($bh)" }
+            }
+        }
+        if ($tiny -eq 0) { $ornBad += "V279 no section box was found - this check measured nothing (SPEC V209)" }
+        else {
+            $arm = [Math]::Min([int]$armCap.Groups[1].Value, [Math]::Floor($tiny / 2) - $slack)
+            if ($arm -lt $floor) { $ornBad += "V279 the smallest section box ($tinyName) resolves to an arm of $arm, under the floor of $floor - it would come out with NO filigree while its neighbours carry it (SPEC B59)" }
+            else { Pass "V279 the shortest section box ($tinyName) resolves to an arm of $arm, clear of the floor of $floor - no box is skipped" }
+        }
+    }
+}
+if ($ornBad) { foreach ($b in $ornBad) { Fail $b } }
+else { Pass "V276/V277/V278 the filigree is a runtime path, placed by align, hidden and never destroyed, filtered by construction" }
+
+# ---- V284: the filigree of a box that RESIZES is redrawn, not inherited ---------------
+# SPEC I72d, the 100th round, item 2 of the request. HEALTH is the one section box whose size
+# moves at runtime - renderHealthTrack writes its height from the storyteller's track length
+# (SPEC V49) - and the ornament data is built ONCE, from what the box measured at creation.
+# Nothing above sees this: a frame drawn for ten rows sitting on a four-row box compiles,
+# runs, exits 0 and merely looks wrong, which is the B6 shape on a new door.
+$hbBad = @()
+$ornMake2 = LuaFn $hh6 'ornament'
+$refreshFn = LuaFn $hh6 'refreshOrnament'
+
+if (-not $ornMake2) { $hbBad += "V284 ornament() is gone from WoD20.6 - there is no painter to refresh, so this check measured nothing (SPEC V209)" }
+elseif (-not $rendFn) { $hbBad += "V284 renderHealthTrack() is gone from the root form - the box that resizes has no renderer, so this check measured nothing (SPEC V209)" }
+else {
+    $ornBody2 = NoComments $ornMake2
+    $rendBody = NoComments $rendFn
+
+    # (a) the memo carries the MEASUREMENTS, not just the path. Anchored on the CONSTRUCTION
+    # and not on field names (SPEC V222): what has to hold is that the stored entry is a table
+    # with the size beside the path, because a memo that only knows "already drawn" cannot
+    # know "drawn at THIS size" - B58 one axis over, the carimbo instead of the key.
+    $memoW = [regex]::Match($ornBody2, '(?m)^\s*local\s+(\w+)\s*=\s*ornPainted\[c\.handle\];')
+
+    # The pair the box is measured into. Everything below is anchored on THESE names rather
+    # than on the shape of the store, because "= {" is incidental: the entry may be built into
+    # a local and handed over on the next line and still be the same construction (SPEC V222).
+    $szL = [regex]::Match($ornBody2, '(?m)^\s*local\s+(\w+)\s*,\s*(\w+)\s*=\s*c\.width\s*,\s*c\.height;')
+    $memoStored = $ornBody2 -match 'ornPainted\[c\.handle\]\s*='
+    $carries = $false
+
+    if ($szL.Success) {
+        $wN = [regex]::Escape($szL.Groups[1].Value)
+        $hN = [regex]::Escape($szL.Groups[2].Value)
+
+        foreach ($t in [regex]::Matches($ornBody2, '\{[^{}]*\}')) {
+            if ($t.Value -match ('\b' + $wN + '\b') -and $t.Value -match ('\b' + $hN + '\b')) { $carries = $true; break }
+        }
+    }
+
+    if (-not $memoW.Success) { $hbBad += "V284 nothing reads ornPainted[c.handle] - the memo this check measures is gone (SPEC V209)" }
+    elseif (-not $szL.Success) { $hbBad += "V284 the box is never measured into a pair - there is nothing for the memo to carry (SPEC I72d, V209)" }
+    elseif (-not $memoStored) { $hbBad += "V284 nothing is stored in ornPainted[c.handle] - the memo is read and never written (SPEC V209)" }
+    elseif (-not $carries) {
+        $hbBad += "V284 the memo stores the path ALONE - with no measurement beside it the painter cannot tell 'already drawn' from 'drawn at this size', and a resized box keeps the frame it was born with (SPEC I72d, B58)"
+    }
+    else {
+        $mn = [regex]::Escape($memoW.Groups[1].Value)
+
+        # Storing the size and never reading it back is decoration. Demand the CURRENT size and
+        # a comparison against what was stored - that pair IS the third door.
+        if ($ornBody2 -notmatch 'c\.width' -or $ornBody2 -notmatch 'c\.height') {
+            $hbBad += "V284 the painter never reads the box's current size - it has nothing to notice a resize with (SPEC I72d)"
+        }
+
+        $cmpPat = '(?m)~=\s*' + $mn + '\.\w+|' + $mn + '\.\w+\s*~='
+        if ($ornBody2 -notmatch $cmpPat) {
+            $hbBad += "V284 the stored measurement is written and never COMPARED - the third door never opens and the resize goes unnoticed (SPEC I72d)"
+        }
+
+        if ($ornBody2 -notmatch '\.data\s*=') {
+            $hbBad += "V284 nothing rewrites the path data - the frame can only ever be built once (SPEC R113a)"
+        }
+    }
+
+    # (b) ORDER, and it is the leg with no symptom: refreshing on the near side of the height
+    # write rebuilds the frame to the measure the box is LEAVING, and exits 0 doing it.
+    $hIdx = $rendBody.IndexOf('.height')
+    $rIdx = $rendBody.IndexOf('refreshOrnament')
+
+    if ($hIdx -lt 0) { $hbBad += "V284 renderHealthTrack no longer writes the box height - the resize this check guards is gone (SPEC V49, V209)" }
+    elseif ($rIdx -lt 0) { $hbBad += "V284 renderHealthTrack never refreshes the filigree - the box resizes and the frame stays the size it was born (SPEC I72d)" }
+    elseif ($rIdx -lt $hIdx) { $hbBad += "V284 the filigree is refreshed BEFORE the height is written - it would be rebuilt to the measure the box is leaving, with no error to show for it (SPEC V284b)" }
+
+    # (c) BOTH health boxes, through the prefix the renderer already carries. A literal name
+    # here fixes the Main tab and leaves the Combat twin crooked, in silence.
+    if ($rendBody -match 'dynHealth3?_box') {
+        $hbBad += "V284 the refresh names a health box LITERALLY - renderHealthTrack serves both of them through its prefix, so a literal repairs one and abandons the other (SPEC V284c)"
+    }
+
+    # (d) the NEGATIVE leg. `stretch` exists in the SDK and would do all of this with no code
+    # at all, at the price of scaling the volutes and beads with the box - the very shearing
+    # that made the ornament vector instead of a PNG. Spelled out so a later round cannot
+    # "simplify" it back in and undo the reason the thing is drawn per box (SPEC R113b).
+    if ($ornBody2 -match '\.mode\s*=\s*"(?!original")') {
+        $hbBad += "V284 the path mode is no longer 'original' - stretch scales the volutes and beads with the box, which is the shearing the per-box vector exists to avoid (SPEC R113b)"
+    }
+
+    if (-not $refreshFn) {
+        $hbBad += "V284 refreshOrnament() is gone from WoD20.6 - renderHealthTrack lives on the root form and has no other reach into the painter's chunk (SPEC I72d)"
+    }
+}
+
+if ($hbBad) { foreach ($b in $hbBad) { Fail $b } }
+else { Pass "V284 the filigree carries its measurements, notices a resize, is refreshed AFTER the height is written, and reaches both health boxes by prefix" }
+
+# ---- V285: what the gate cannot RUN, the filigree may not DEPEND on ------------------
+# SPEC B62, the 102nd round. V284 above proved the SHAPE of the refresh - the memo carries a
+# measurement, the calls are in the right order, the mode is original - and the feature was
+# broken anyway, because the two RUNTIME facts it rested on were never checkable here: the
+# gate does not execute Lua (SPEC B30, B34). This block is V198/V275's own doctrine applied
+# to the READS instead of to the memo: what cannot be counted gets PROHIBITED.
+$v285Bad = @()
+$refFn = LuaFn $hh6 'refreshOrnament'
+$ornFn285 = LuaFn $hh6 'ornament'
+
+if (-not $refFn) { $v285Bad += "V285 refreshOrnament() is gone from WoD20.6 - the refresh path this check measures does not exist (SPEC V209)" }
+elseif (-not $ornFn285) { $v285Bad += "V285 ornament() is gone from WoD20.6 - there is no painter to measure (SPEC V209)" }
+else {
+    $refBody = NoComments $refFn
+    $ornBody285 = NoComments $ornFn285
+
+    # (a) the ornamented control is found by the MEMO. A finder that matches nothing returns
+    # quietly and exits 0 - there is no error and no check to catch it, which is half of B62.
+    if ($refBody -notmatch 'ornPainted\[') {
+        $v285Bad += "V285 refreshOrnament does not find its target through ornPainted - a finder built on a property read returns empty in silence when the host answers in a shape nobody checked (SPEC V285a, B62)"
+    }
+
+    # (b) the NEGATIVE leg, and the one that keeps (a) from being undone. getClassName is proven
+    # by the theme walk that repaints every round; `align` was proven by nothing, and the read
+    # this replaces was the only one in the sheet.
+    if ($refBody -match '\.align\s*==' -or $ornBody285 -match '\.align\s*==') {
+        $v285Bad += "V285 the filigree READS .align - it has no precedent as a runtime read anywhere in the sheet, and if the host answers with an enum index instead of the string the branch silently never runs (SPEC V285b, B62)"
+    }
+
+    # (c) the redraw measurement is HANDED OVER, not read back. Anchored on the signature and on
+    # the refresh branch actually naming those parameters - a fifth argument that is accepted and
+    # then ignored is the same bug wearing the fix's clothes.
+    $sig = [regex]::Match($ornBody285, 'function\s+ornament\s*\(([^)]*)\)')
+    if (-not $sig.Success) { $v285Bad += "V285 ornament's signature could not be read - this check is a no-op (SPEC V209, V20)" }
+    else {
+        $prms = @($sig.Groups[1].Value -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+        if ($prms.Count -lt 5) {
+            $v285Bad += "V285 ornament takes $($prms.Count) parameter(s) - it cannot be HANDED a measurement, so the redraw can only read one back off a control whose layout may not have resolved (SPEC V285c, B62)"
+        } else {
+            $reIdx = $ornBody285.IndexOf('if e ~= nil then')
+            $crIdx = $ornBody285.IndexOf('if e == nil then')
+            if ($reIdx -lt 0 -or $crIdx -le $reIdx) {
+                $v285Bad += "V285 the refresh branch and the creation branch could not be told apart in ornament - this check is a no-op (SPEC V209, V20)"
+            } else {
+                $refBranch = $ornBody285.Substring($reIdx, $crIdx - $reIdx)
+                foreach ($p in @($prms[3], $prms[4])) {
+                    if ($refBranch -notmatch ('(?<![\w.])' + [regex]::Escape($p) + '(?![\w])')) {
+                        $v285Bad += "V285 the refresh branch never uses the handed-over '$p' - the measurement is accepted and then thrown away, which redraws from the size the box is LEAVING (SPEC V285c, B62)"
+                    }
+                }
+            }
+        }
+        # and the caller has to actually hand something over
+        if ($refBody -notmatch 'ornament\s*\([^)]*,[^)]*,[^)]*,[^)]*,[^)]*\)') {
+            $v285Bad += "V285 refreshOrnament calls the painter without a measurement - the parameters exist and nobody fills them (SPEC V285c)"
+        }
+    }
+
+    # (d) the general rule (b) is one case of: nothing else is read off the child. `handle` is
+    # the key of a table the sheet owns, not a measurement the host has to resolve.
+    $loopVar = [regex]::Match($refBody, '(?m)^\s*local\s+(\w+)\s*=\s*\w+\[\s*i\s*\]\s*;')
+    if ($loopVar.Success) {
+        $lv = [regex]::Escape($loopVar.Groups[1].Value)
+        foreach ($m in [regex]::Matches($refBody, '(?<![\w.])' + $lv + '\.(\w+)')) {
+            if ($m.Groups[1].Value -ne 'handle') {
+                $v285Bad += "V285 refreshOrnament reads .$($m.Groups[1].Value) off the child - every property beyond `handle` is a runtime answer this gate cannot verify, and B62 was two of them (SPEC V285d)"
+            }
+        }
+    }
+}
+
+if ($v285Bad) { foreach ($b in ($v285Bad | Sort-Object -Unique)) { Fail $b } }
+else { Pass "V285 the filigree finds its target by memo, reads no .align, and is redrawn from the measurement it is handed - not from one read back" }
 
 if ($Build) {
     $rdk = "$env:LOCALAPPDATA\FirecastSDK3\rdk.exe"

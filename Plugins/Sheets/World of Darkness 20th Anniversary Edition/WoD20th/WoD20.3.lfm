@@ -149,7 +149,7 @@
 		<!-- 660 wide to close on VIRTUES, 320 tall to close on COMBAT TRAITS (SPEC T145). Each
 		     header label is as wide as its column and centred on it, so the titles sit over the
 		     fields instead of hugging their left edge. One label per column, no padding runs (V11). -->
-		<layout left="0" top="12" width="660" height="316">
+		<layout left="0" top="20" width="660" height="316">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="660" height="20" text="COMBAT" horzTextAlign="center"/>
 
@@ -200,7 +200,7 @@
 
 			One input column: all three rows put their edit at x=75 (SPEC V26 / B.12).
 		-->
-		<layout left="0" top="338" width="380" height="231">
+		<layout left="0" top="346" width="380" height="231">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="380" height="20" text="ARMOR" horzTextAlign="center"/>
 
@@ -228,7 +228,7 @@
 			(SPEC I3 ESPELHOS, V36). Spending willpower is what a player does mid-fight; raising
 			the permanent rating is not.
 		-->
-		<layout left="390" top="464" width="270" height="91">
+		<layout left="390" top="472" width="270" height="91">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="270" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
@@ -255,7 +255,7 @@
 		<!-- height=306 is the ten-row case; the renderer shrinks it to the chosen track length
 		     (SPEC V49), so the file declares the tallest this box can ever be.
 		     top=330 lines this box up with ARMOR and VIRTUES; the row sits 10 under COMBAT (T150). -->
-		<layout name="dynHealth3_box" left="670" top="353" width="280" height="307">
+		<layout name="dynHealth3_box" left="670" top="361" width="280" height="307">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- The track length lives on the storyteller's tab since the 82nd round (SPEC I35,
 			     V234). The title spans the box now, so it is centred on the box. -->
@@ -278,7 +278,7 @@
 			x=670), so it is 270 wide, not 280: 390+270 leaves the same 10px gutter on both sides.
 			The rows lose 5px of indent to keep the 250px template inside the narrower box.
 		-->
-		<layout left="390" top="338" width="270" height="116">
+		<layout left="390" top="346" width="270" height="116">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="270" height="20" text="VIRTUES" horzTextAlign="center"/>
 
@@ -304,7 +304,7 @@
 			Attributes show five dots with the first always lit, matching the Attribute template
 			where dot 1 is a fixed image and only `_2`..`_5` are real fields.
 		-->
-		<layout left="670" top="12" width="280" height="331">
+		<layout left="670" top="20" width="280" height="331">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="0" top="10" width="280" height="20" text="COMBAT TRAITS" horzTextAlign="center"/>
 
