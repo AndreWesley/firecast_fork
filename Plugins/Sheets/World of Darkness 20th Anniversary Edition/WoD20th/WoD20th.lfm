@@ -1651,6 +1651,21 @@
 			-- lookups that find nothing when its form is not loaded, and it buys the caller not
 			-- having to know which strip its button belongs to - the same trade selectTab makes
 			-- one line below.
+			--
+			-- A THIRD name family since the 107th round (SPEC I76c, V300): note<X> is a caption
+			-- that belongs to pane tab<X> but cannot live inside it. The affinity note is the one
+			-- there is - the Hedge panes have no free band for it, which is why the 91st round put
+			-- it on the strip - and a caption standing over the pane it does not explain is what
+			-- the user reported. It is hidden HERE and by nothing in the XML, in the same line of
+			-- the same loop that lights the pill, so the two cannot come apart. A pane with no
+			-- note costs one lookup that finds nothing, which is the trade the paragraph above
+			-- already makes for the strip that did not change.
+			-- A FOURTH and FIFTH family since the 109th round (SPEC I78c, V305): lbl<X> is the sub-tab's
+			-- word CLOSED - italic, in the theme's own text colour - and lblOn<X> is the same word OPEN,
+			-- roman and in the era's accent. Two labels and not one word restyled: fontColor belongs to
+			-- applyTheme and a Lua write there is undone on the next repaint (SPEC V57), so the state is
+			-- carried by `visible` - which is what tabOn<X> has always been for the pill. Lit in the same
+			-- loop and from the same `live`, so word, rule and pane cannot come apart.
 			function renderSubTabs(from)
 				local names = {};
 
@@ -1660,6 +1675,9 @@
 					for i = 1, #list, 1 do
 						names["tab" .. list[i]]   = true;
 						names["tabOn" .. list[i]] = true;
+						names["note" .. list[i]] = true;
+						names["lbl" .. list[i]]   = true;
+						names["lblOn" .. list[i]] = true;
 					end;
 				end;
 
@@ -1674,9 +1692,15 @@
 						local live = ("tab" .. grp.list[i]) == grp.active;
 						local pane = found["tab" .. grp.list[i]];
 						local on   = found["tabOn" .. grp.list[i]];
+						local note = found["note" .. grp.list[i]];
+						local lbl   = found["lbl" .. grp.list[i]];
+						local lblOn = found["lblOn" .. grp.list[i]];
 
 						if on   ~= nil then on.visible   = live; end;
 						if pane ~= nil then pane.visible = live; end;
+						if note ~= nil then note.visible = live; end;
+						if lbl   ~= nil then lbl.visible   = not live; end;
+						if lblOn ~= nil then lblOn.visible = live; end;
 					end;
 				end;
 			end;
@@ -2020,7 +2044,7 @@
 			-- 46th round moved the box to the Traits tab and doubled it; a twenty-first row
 			-- added to the XML and to only one of the two loops would be a background nothing
 			-- charges for and nothing shows in the log (SPEC I3, I9).
-			BACKGROUND_ROWS = 22;
+			BACKGROUND_ROWS = 21;
 
 			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
 			-- 2026-08-22). The LAST five, so every reader is 'picker = total - typed' and no list of
@@ -3589,93 +3613,93 @@
 		ours runs (SPEC R47) and sheetReveal is still the one thing that lights it (V166).
 	-->
 	<layout name="sheetBody" align="client" visible="false">
-		<layout name="tabStrip" align="top" height="60">
+		<layout name="tabStrip" align="top" height="40">
 			<rectangle align="client" color="black" strokeColor="#00000000"/>
 
-			<rectangle name="tabOnMain" left="30" top="15" width="99" height="30" color="DimGray"
+			<rectangle name="tabOnMain" left="30" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabMain" left="30" top="15" width="99" height="30" color="#00000000"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabMain" left="30" top="5" width="99" height="30" color="#00000000"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabMain', self);">
 				<label left="0" top="0" width="99" height="30" text="Main" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnTraits" left="133" top="15" width="79" height="30" color="DimGray"
+			<rectangle name="tabOnTraits" left="133" top="5" width="79" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabTraits" left="133" top="15" width="79" height="30" color="#00000000"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabTraits" left="133" top="5" width="79" height="30" color="#00000000"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabTraits', self);">
 				<label left="0" top="0" width="79" height="30" text="Traits" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnNumina" left="216" top="15" width="79" height="30" color="DimGray"
+			<rectangle name="tabOnNumina" left="216" top="5" width="79" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabNumina" left="216" top="15" width="79" height="30" color="#00000000"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabNumina" left="216" top="5" width="79" height="30" color="#00000000"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabNumina', self);">
 				<label left="0" top="0" width="79" height="30" text="Numina" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnDisciplines" left="299" top="15" width="92" height="30" color="DimGray"
+			<rectangle name="tabOnDisciplines" left="299" top="5" width="92" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabDisciplines" left="299" top="15" width="92" height="30" color="#00000000" visible="false"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabDisciplines" left="299" top="5" width="92" height="30" color="#00000000" visible="false"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabDisciplines', self);">
 				<label left="0" top="0" width="92" height="30" text="Ghoul" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnCombat" left="395" top="15" width="86" height="30" color="DimGray"
+			<rectangle name="tabOnCombat" left="395" top="5" width="86" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabCombat" left="395" top="15" width="86" height="30" color="#00000000"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabCombat" left="395" top="5" width="86" height="30" color="#00000000"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabCombat', self);">
 				<label left="0" top="0" width="86" height="30" text="Combat" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnInventory" left="485" top="15" width="105" height="30" color="DimGray"
+			<rectangle name="tabOnInventory" left="485" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabInventory" left="485" top="15" width="105" height="30" color="#00000000"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabInventory" left="485" top="5" width="105" height="30" color="#00000000"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabInventory', self);">
 				<label left="0" top="0" width="105" height="30" text="Inventory" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnBackground" left="594" top="15" width="105" height="30" color="DimGray"
+			<rectangle name="tabOnBackground" left="594" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabBackground" left="594" top="15" width="105" height="30" color="#00000000"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabBackground" left="594" top="5" width="105" height="30" color="#00000000"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabBackground', self);">
 				<label left="0" top="0" width="105" height="30" text="Background" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnProgress" left="703" top="15" width="112" height="30" color="DimGray"
+			<rectangle name="tabOnProgress" left="703" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabProgress" left="703" top="15" width="112" height="30" color="#00000000"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabProgress" left="703" top="5" width="112" height="30" color="#00000000"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabProgress', self);">
 				<label left="0" top="0" width="112" height="30" text="Experience" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnNotes" left="819" top="15" width="99" height="30" color="DimGray"
+			<rectangle name="tabOnNotes" left="819" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabNotes" left="819" top="15" width="99" height="30" color="#00000000"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabNotes" left="819" top="5" width="99" height="30" color="#00000000"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabNotes', self);">
 				<label left="0" top="0" width="99" height="30" text="Notes" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnSettings" left="922" top="15" width="125" height="30" color="DimGray"
+			<rectangle name="tabOnSettings" left="922" top="5" width="125" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabSettings" left="922" top="15" width="125" height="30" color="#00000000"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabSettings" left="922" top="5" width="125" height="30" color="#00000000"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabSettings', self);">
 				<label left="0" top="0" width="125" height="30" text="Settings" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
-			<rectangle name="tabOnStoryteller" left="1051" top="15" width="112" height="30" color="DimGray"
+			<rectangle name="tabOnStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
 			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabStoryteller" left="1051" top="15" width="112" height="30" color="#00000000" visible="false"
-			           strokeColor="#FFFFFF" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+			<rectangle name="btnTabStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" visible="false"
+			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabStoryteller', self);">
 				<label left="0" top="0" width="112" height="30" text="Storyteller" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>

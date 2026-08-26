@@ -70,7 +70,7 @@
 			<textEditor left="35" top="41" width="370" height="540" field="stNotes1"/>
 		</layout>
 
-		<layout left="460" top="0" width="440" height="601">
+		<layout left="455" top="0" width="440" height="601">
 			<rectangle left="0" top="0" width="440" height="601" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="20" width="400" height="20" text="Notes" horzTextAlign="center"/>
 			<textEditor left="35" top="41" width="370" height="540" field="stNotes2"/>
@@ -93,7 +93,7 @@
 			round added two flags and Save moved 60 with everything under them, so the box went
 			339 -> 399 and the gap under it is still 10 (SPEC I71, V274e).
 		-->
-		<layout left="920" top="0" width="445" height="419">
+		<layout left="910" top="0" width="445" height="419">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="20" width="405" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 

@@ -5266,14 +5266,23 @@ foreach ($pair in @(@("WoD20th.lfm", "tabStrip", 11), @("WoD20.11.lfm", "vampStr
     if ($btns.Count -ne $pair[2]) { $stripBad += "$($pair[1]) offers $($btns.Count) button(s), expected $($pair[2])" }
     foreach ($b in $btns) {
         $btnSeen++
+        # ONE label on the top bar, TWO on a sub-tab since the 109th round: the sub-tab says its
+        # state in colour as well as weight, and one label cannot carry two colours without a Lua
+        # write applyTheme undoes (SPEC I78c, V57, V305). What this leg measures is that the word
+        # is a <label> the theme reaches - never how many the pair needs (SPEC B67).
         $lbl = @($b.SelectNodes("label"))
-        if ($lbl.Count -ne 1) { $stripBad += "$($b.GetAttribute('name')) carries $($lbl.Count) label(s) - one says the title, and the theme paints it" }
-        elseif ($lbl[0].GetAttribute("hitTest") -ne 'false') { $stripBad += "$($b.GetAttribute('name'))'s label is hit-testable - it would eat the click meant for the rectangle" }
+        $lblWant = if ($pair[1] -eq 'tabStrip') { 1 } else { 2 }
+        if ($lbl.Count -ne $lblWant) { $stripBad += "$($b.GetAttribute('name')) carries $($lbl.Count) label(s), expected $lblWant - the word is a label the theme paints on both ends, and on a sub-tab it is the pair V305 measures" }
+        else {
+            foreach ($l226 in $lbl) {
+                if ($l226.GetAttribute("hitTest") -ne 'false') { $stripBad += "$($b.GetAttribute('name'))'s label '$($l226.GetAttribute('name'))' is hit-testable - it would eat the click meant for the rectangle" }
+            }
+        }
     }
 }
 if ($btnSeen -lt 19) { Fail "V226 only $btnSeen strip button(s) were read, expected 19 - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($stripBad) { foreach ($b in $stripBad) { Fail "V226 $b" } }
-else { Pass "V226 all $btnSeen tab buttons are a rectangle over a label, the one pair the theme reaches on both ends" }
+else { Pass "V226 all $btnSeen tab buttons are a rectangle over a label - one on the top bar, the pair of V305 on a sub-tab - the one pair the theme reaches on both ends" }
 
 # ---- V227: which tab is open is SESSION state, never a field ---------------------
 # A field on a Firecast sheet syncs to every client at the table - that is what makes
@@ -5388,18 +5397,13 @@ else {
         }
     }
 }
-$pillSeen = 0
-foreach ($pr in @(@("WoD20th.lfm", "tabStrip"), @("WoD20.11.lfm", "vampStrip"), @("WoD20.7.lfm", "numStrip"), @("WoD20.7.lfm", "hedgeStrip"))) {
-    $st229 = (Doc (Join-Path $dir $pr[0])).SelectSingleNode("//layout[@name='$($pr[1])']")
-    if ($null -eq $st229) { continue }
-    foreach ($p in $st229.SelectNodes("rectangle[starts-with(@name,'tabOn')]")) {
-        $pillSeen++
-        if ($p.GetAttribute("color") -ne 'DimGray') { $stripSkin += "$($p.GetAttribute('name')) is filled '$($p.GetAttribute('color'))', not DimGray - the open tab would wear the floor's own colour and vanish into it (SPEC I33)" }
-    }
-}
-if ($pillSeen -lt 19) { Fail "V229 only $pillSeen open-tab fill(s) were read, expected 19 - this check is covering less than the sheet has (SPEC V209)" }
-elseif ($stripSkin) { foreach ($t in $stripSkin) { Fail "V229 $t" } }
-else { Pass "V229 the strip floor is black and square and all $pillSeen open-tab fills are DimGray - two palette keys, so the open tab shows in every period" }
+# The pills' half of this moved out in the 108th round. The open tab is no longer a DimGray
+# lozenge - it is a foot rule the marker draws itself (SPEC I77b) - so what used to be measured
+# here is measured by V301b, in the shape the marker has now. The FLOOR stays: it is the same
+# rectangle, black and square, and V68 still steps aside for it. Two owners for one fact is the
+# no-op V20 forbids, which is why this half left rather than being rewritten in both places.
+if ($stripSkin) { foreach ($t in $stripSkin) { Fail "V229 $t" } }
+else { Pass "V229 the strip floor is black and square - V301b carries the other half now, that the open tab cannot wear the floor's own colour" }
 # ---- V230: the credit to the base plugin is ONE reference, not a block ----------------
 # The user cut the roll-call down to a single line (SPEC C, 2026-08-22). Two ways that
 # can rot, and they pull in opposite directions: the block grows back, or the line gets
@@ -5553,14 +5557,22 @@ $v287Others = @()
 foreach ($f in $files) {
     foreach ($n287 in (Doc $f.FullName).SelectNodes("//*[@strokeColor='#00000000']")) {
         if ($f.Name -eq 'WoD20th.lfm' -and $n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("align") -eq 'client' -and $n287.ParentNode.GetAttribute("name") -eq 'tabStrip') { continue }
+        # 108th round: the 19 tab buttons lost their box and author the same transparent contour
+        # (SPEC I77a, V301a). They are admitted by NAME, so the idiom still cannot spread to a
+        # section box - which is the direction this leg exists to guard.
+        if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -like 'btnTab*') { continue }
+        # 109th round: the 19 markers and the 5 separators carry a path and paint nothing of their
+        # own, so they author the same transparent contour (SPEC I78a, I78d). Admitted by NAME, so
+        # the second direction below still catches the idiom leaking onto a section box.
+        if ($n287.LocalName -eq 'rectangle' -and ($n287.GetAttribute("name") -like 'tabOn*' -or $n287.GetAttribute("name") -like 'sep*')) { continue }
         $v287Others += "$($f.Name) <$($n287.LocalName) name='$($n287.GetAttribute('name'))'>"
     }
 }
 if ($v287Others.Count) {
-    $v287Bad += "a transparent contour is authored outside the strip floor, on $($v287Others -join ', ') - the era paints a rule on every black rectangle and this idiom silently erases it (SPEC I74b, I5)"
+    $v287Bad += "a transparent contour is authored outside the strip floor, the 19 buttons, the 19 markers and the 5 separators, on $($v287Others -join ', ') - the era paints a rule on every black rectangle and this idiom silently erases it (SPEC I74b, I5)"
 }
 if ($v287Bad) { foreach ($b in $v287Bad) { Fail "V287 $b" } }
-else { Pass "V287 the strip floor is the one control authoring a transparent contour, and it does author it" }
+else { Pass "V287 the strip floor, the 19 buttons, the 19 markers and the 5 separators are the only controls authoring a transparent contour, and the floor does author it" }
 
 # ---- V288..V292: the five alignments the 106th round was asked for -----------------
 # Every one of them is a RELATION between two things in the sheet, never a literal here: the
@@ -7145,8 +7157,8 @@ else {
     [void][int]::TryParse($domBox.GetAttribute("width"), [ref]$domW)
     [void][int]::TryParse($poolBox.GetAttribute("left"), [ref]$poolL)
     if ($domW -le 0 -or $poolL -lt 0) { Fail "V259 the two boxes do not both declare their geometry (width=$domW, left=$poolL) - the gap cannot be read" }
-    elseif ($poolL -ne ($domW + 20)) { Fail "V259 BLOOD POOL opens at $poolL beside a DOMINATOR $($domW) wide - that is $($poolL - $domW)px of gap where the house leaves 20, and the difference is dead space no other check can see (SPEC I55)" }
-    else { Pass "V259 BLOOD POOL sits 20 to the right of DOMINATOR ($domW + 20 = $poolL) - no dead space between the two" }
+    elseif ($poolL -ne ($domW + 15)) { Fail "V259 BLOOD POOL opens at $poolL beside a DOMINATOR $($domW) wide - that is $($poolL - $domW)px of gap where the house leaves 15, and the difference is dead space no other check can see (SPEC I55, I76a)" }
+    else { Pass "V259 BLOOD POOL sits 15 to the right of DOMINATOR ($domW + 15 = $poolL) - no dead space between the two" }
 }
 
 # ---- V260: the order of the log is the STAMP, and there is one stamp ------------------
@@ -7309,7 +7321,7 @@ else {
         # What the old leg was really protecting is that no strip of dead space opens anywhere
         # across a row, so that is what is measured now, and it is STRICTER than before: every
         # row of boxes has to TILE - open at 0, close on the ruler the widest row sets, and hand over
-        # to its neighbour with the 20px gutter I73 gives every pair. Shrinking one box of a pair passes
+        # to its neighbour with the 15px gutter I76a gives every pair. Shrinking one box of a pair passes
         # old leg (the sibling still closes the line) and fails this one on the gutter.
         # Since the 91st round the Hedge pane holds panes of its OWN (SPEC I64), and the list
         # that used to sit here moved into one of them. A collector that reads only the three
@@ -7371,7 +7383,7 @@ else {
                 if ($row[$row.Count - 1].R -ne $numRuler) { $v262Bad += "row $k closes at x=$($row[$row.Count - 1].R), not on the $numRuler the widest row of the three panes sets: $shape" }
                 for ($i = 1; $i -lt $row.Count; $i++) {
                     $gut = $row[$i].L - $row[$i - 1].R
-                    if ($gut -ne 20) { $v262Bad += "row $k hands over with a $($gut)px gutter, not the 20 I73 gives every pair of boxes: $shape" }
+                    if ($gut -ne 15) { $v262Bad += "row $k hands over with a $($gut)px gutter, not the 15 I76a gives every pair of boxes: $shape" }
                 }
             }
         }
@@ -8369,89 +8381,140 @@ else {
 if ($ornBad) { foreach ($b in $ornBad) { Fail $b } }
 else { Pass "V276/V277/V278/V283 the filigree is a runtime path, placed by align, hidden and never destroyed, filtered by construction, and it draws OVER the content without taking a click" }
 
-# ---- V282: the tab pills carry the era too -----------------------------------------
-# Without this, the failure is V229's shape all over again: the whole sheet Victorian and the
-# tab bar still Modern, with nothing red anywhere. The gate cannot RUN the Lua (SPEC B30, B34)
-# so what it cannot count it FORBIDS - the same doctrine V198, V275 and V283 already use.
+# ---- V304: the open tab is marked in all FOUR eras, and the line is thin (SPEC I78a, I78e)
+# This replaces V282 whole. V282 tied the bar's line work to `ornament`, which only the Victorian
+# palette declares - so the marker existed in ONE era of four and the sheet opened with no tab
+# looking open in the other three. That is V229's failure shape, arriving through the door the
+# check meant to guard it.
 #
-# The pill motif is its OWN (SPEC R111): 2*ORN_ARM is 80 and a pill is 30 tall, so reusing
-# ornPath here would be the frame shrunk, which is the one thing R111 ruled out.
-$pillBad = @()
-$pillFn = LuaFn $hh6 'pillRule'
-$pillGeo = LuaFn $hh6 'pillPath'
-if (-not $pillFn) { $pillBad += "pillRule() is gone from WoD20.6 - the tab bar has no era (SPEC I72, V282)" }
-elseif (-not $pillGeo) { $pillBad += "pillPath() is gone - the pill has no geometry of its own and only ornPath is left, which is the frame R111 refused (SPEC R111, V282)" }
-else {
-    $pillBody = NoComments $pillFn
-    $pillGeoBody = NoComments $pillGeo
+# The carrier is transparent BOTH ways and authors no sides: a rectangle that draws anything at
+# all draws it 3px thick, because applyTheme writes THEME_STROKE onto every rectangle it repaints
+# (SPEC V67), and the drawing the user picked is a hairline. So the rectangle carries and the
+# path draws - and the path is fed the era's stroke accent, which all four palettes have.
+$v304Bad = @()
+$carriers304 = 0
+foreach ($pr304 in @(@("WoD20th.lfm", "tabStrip"), @("WoD20.11.lfm", "vampStrip"), @("WoD20.7.lfm", "numStrip"), @("WoD20.7.lfm", "hedgeStrip"))) {
+    $st304 = (Doc (Join-Path $dir $pr304[0])).SelectSingleNode("//layout[@name='$($pr304[1])']")
+    if ($null -eq $st304) { $v304Bad += "$($pr304[1]) is gone from $($pr304[0]) (SPEC I32, I58, V209)"; continue }
+    foreach ($on304 in $st304.SelectNodes("rectangle[starts-with(@name,'tabOn')]")) {
+        $carriers304++
+        $nm304 = $on304.GetAttribute("name")
 
-    # (a) it runs off the SAME traversal the boxes do. A painter nothing calls is a feature
-    # that ships hidden, which is the state I72 was in before the 98th round specced it.
-    if ($hh6 -notmatch '(?m)^\s*pillRule\(\s*c\s*,\s*fill\s*,\s*t\.ornament\s*\);') {
-        $pillBad += "V282 nothing calls pillRule with the era's ornament colour - the pills would never be painted and no other check would notice (SPEC V282)"
-    }
-
-    # (b) a plainer era HIDES it and never destroys it - V277's promise, for the bar.
-    if ($pillBody -notmatch 'visible\s*=\s*false;') { $pillBad += "V282 the pill rule is never hidden - Modern would ship with a gold hairline on every tab (SPEC V56, V277)" }
-    if ($pillBody -match 'destroy') { $pillBad += "V282 the pill rule is DESTROYED rather than hidden - the memo would keep a dead handle (SPEC V277)" }
-
-    # (c) who gets one is CONSTRUCTION, and it has to REFUSE on both halves. Reading the
-    # authored fill and then painting anyway is how the two health marks - transparent, and
-    # carrying a radius of 2 of their own (V68) - would get a rule they are not tabs to have.
-    if ($pillBody -notmatch 'normColor\(\s*fill\s*\)') { $pillBad += "V282 the filter does not read the AUTHORED fill - by the time this runs the pill is already painted (SPEC V62, V278)" }
-    $radP = [regex]::Match($pillBody, '(?m)^\s*local\s+(\w+)\s*=\s*c\.xradius;')
-    if (-not $radP.Success) { $pillBad += "V282 nothing reads the pill's own corner radius - the health marks are transparent too and would be ruled like tabs (SPEC V68, V278)" }
-    else {
-        $rnP = [regex]::Escape($radP.Groups[1].Value)
-        # The refusal has to name the CONSTANT, not merely the local. `if rad == nil then
-        # return` reads the radius and refuses something - and lets a transparent rectangle of
-        # ANY radius through, which is the health marks. Proved by mutation: the nil-only form
-        # left this leg green until it was written this way.
-        if ($pillBody -notmatch "(?m)^\s*if\s+[^\r\n]*\b$rnP\b[^\r\n]*\bORN_PILLR\b[^\r\n]*then return;") {
-            $pillBad += "V282 the radius is read but the refusal never compares it to ORN_PILLR - a transparent rectangle of any shape would be ruled like a tab, and the two health marks are exactly that (SPEC V68, V278)"
+        # (a) transparent both ways, and no sides - a CARRIER, not a drawing.
+        if ($on304.GetAttribute("color") -ne '#00000000') {
+            $v304Bad += "$nm304 is filled '$($on304.GetAttribute('color'))' - the marker carries a path now and paints nothing itself (SPEC I78a)"
         }
-    }
-
-    # (d) it draws its OWN motif. ornPath here would be 80px of corner asked of 30px of pill.
-    if ($pillBody -notmatch '\bpillPath\s*\(') { $pillBad += "V282 pillRule does not build its path from pillPath - the pill motif is its own (SPEC R111)" }
-    if ($pillBody -match '\bornPath\s*\(') { $pillBad += "V282 pillRule reaches for ornPath - 2*ORN_ARM is 80 and the pill is 30 tall, which is the frame R111 ruled out (SPEC R111, V282)" }
-
-    # (e) the geometry REFUSES a run with no positive length, the way ornEdge does. Without it
-    # a pill narrower than its own two corners gets a line drawn backwards across itself.
-    if ($pillGeoBody -notmatch '(?m)^\s*if\s+[^\r\n]*>\s*0\s+then') {
-        $pillBad += "V282 pillPath emits every run unconditionally - on a pill narrower than its two corner arcs the rule is drawn end-before-start (SPEC V279)"
-    }
-
-    # (f) and the XML has to still LOOK like what the Lua filters on. This is the leg that ties
-    # the two together: the radius the Lua names is read out of it, never spelled here, and the
-    # count is what says so out loud when a pill stops matching.
-    $pillR = [regex]::Match($hh6, '(?m)^\s*local ORN_PILLR\s*=\s*(\d+);')
-    if (-not $pillR.Success) { $pillBad += "V282 ORN_PILLR could not be read out of WoD20.6 - the radius this leg measures the XML against is unreadable, so the leg is a no-op (SPEC V209, V20)" }
-    else {
-        $rWant = $pillR.Groups[1].Value
-        $pills = 0
-        $strips = @{}
-        foreach ($f in $files) {
-            foreach ($r in (Doc $f.FullName).SelectNodes("//rectangle[@color='#00000000']")) {
-                if ($r.GetAttribute("xradius") -ne $rWant) { continue }
-                $pills++
-                $pn = $r.ParentNode.GetAttribute("name")
-                if ($pn) { $strips[$pn] = $strips[$pn] + 1 }
-            }
+        if ($on304.GetAttribute("strokeColor") -ne '#00000000') {
+            $v304Bad += "$nm304 authors strokeColor='$($on304.GetAttribute('strokeColor'))' - applyTheme would hand it the 3px rule of V67 and the drawing is a 1px hairline (SPEC I78a, V67)"
         }
-        if ($pills -ne 19) {
-            $pillBad += "V282 $pills rectangle(s) match what pillRule filters on (transparent, radius $rWant), expected the 19 tab buttons - the Lua and the XML have stopped describing the same control (SPEC V209, V226)"
+        if ($on304.GetAttribute("sides")) {
+            $v304Bad += "$nm304 authors sides='$($on304.GetAttribute('sides'))' - that was the 108th round's foot rule, and it comes back at 3px over the path that replaced it (SPEC I78a)"
         }
-        elseif ($strips.Count -ne 4) {
-            $pillBad += "V282 the $pills pills live in $($strips.Count) strip(s), expected 4 - tabStrip, vampStrip, numStrip and hedgeStrip (SPEC I73, V209)"
+
+        # (c) authored hidden, because applyTabVisibility and renderSubTabs are what light it -
+        # and the path rides that same visible, which is why it needs no state of its own.
+        if ($on304.GetAttribute("visible") -ne 'false') {
+            $v304Bad += "$nm304 is authored visible='$($on304.GetAttribute('visible'))' - the sheet would open with every tab marked at once, until the first render (SPEC V94, I78a)"
         }
     }
 }
-if ($pillBad) { foreach ($b in $pillBad) { Fail $b } }
-else { Pass "V282 all 19 pills across the four strips are ruled by pillRule, filtered by construction, hidden by a plainer era, and drawn from a motif of their own" }
+
+# (b) the colour the painter is handed comes from the STROKE map, which all four palettes key,
+# and never from t.ornament, which one of them declares. This is the whole of why V282 died.
+if ($hh6 -notmatch '(?m)^\s*local accent = t\.stroke\[normColor\("#FFFFFF"\)\];') {
+    $v304Bad += "applyTheme does not read the era's accent out of t.stroke - without it the bar has no colour that exists in all four palettes (SPEC I78e, V304b)"
+}
+if ($hh6 -match '(?m)^\s*markRule\([^\r\n]*t\.ornament') {
+    $v304Bad += "markRule is handed t.ornament - only the Victorian palette declares one, so the open tab would vanish in three eras of four with nothing red anywhere (SPEC I78e, V229, B66)"
+}
+
+if ($carriers304 -lt 19) { Fail "V304 only $carriers304 marker carrier(s) were read, expected 19 - this check is covering less than the four bars hold (SPEC V209)" }
+elseif ($v304Bad) { foreach ($b in $v304Bad) { Fail "V304 $b" } }
+else { Pass "V304 all $carriers304 markers are transparent carriers authored hidden, and the painter is handed the era's stroke accent - so the open tab shows in every era, at 1px" }
+
+
+# ---- V306: one painter, three motifs, each picked by construction (SPEC I78b, I78d) -----
+# The old filter - transparent fill plus the house radius - died when the button lost its box:
+# since I77a both halves of every pair match it. What tells them apart now is the NAME, and the
+# level comes from the bar the control sits in. That is one name read (tabStrip) and two family
+# prefixes, which is the idiom note<X> and lbl<X> already established - not a roster of 24.
+#
+# (c) is why nothing here knows which tab is open: the path is a CHILD of the carrier, and the
+# carrier's visible is already written by applyTabVisibility and renderSubTabs. A second opinion
+# on that is exactly what V227 keeps off the sheet.
+$v306Bad = @()
+$markFn = LuaFn $hh6 'markRule'
+$markKindFn = LuaFn $hh6 'markKind'
+$markGeo = LuaFn $hh6 'markPath'
+if (-not $markFn) { Fail "V306 markRule is gone from WoD20.6 - the bar has no painter to measure (SPEC I78e, V209)" }
+elseif (-not $markKindFn) { Fail "V306 markKind is gone - nothing picks the motif and (b) has nothing to read (SPEC I78b, V209)" }
+elseif (-not $markGeo) { Fail "V306 markPath is gone - the marker has no geometry of its own and only ornPath is left, which is the frame R111 refused (SPEC R111, V306)" }
+else {
+    $markBody = NoComments $markFn
+    $kindBody = NoComments $markKindFn
+    $geoBody = NoComments $markGeo
+
+    # (a) it runs off the SAME traversal the boxes do, and it is handed the era's accent. A
+    # painter nothing calls is the state I72 shipped in until the 98th round specced it.
+    if ($hh6 -notmatch '(?m)^\s*markRule\(\s*c\s*,\s*nm\s*,\s*accent\s*\);') {
+        $v306Bad += "nothing calls markRule with the name and the era's accent - the bar would never be drawn and no other check would notice (SPEC I78e, V306a)"
+    }
+
+    # (b) three motifs, and the two families are CLOSED - every control the painter accepts is
+    # named tabOn* or sep*, and the level is read off the parent bar.
+    foreach ($lit306 in @('"sep"', '"tabOn"', '"tabStrip"', '"sub"', '"tab"')) {
+        if ($kindBody -notmatch [regex]::Escape($lit306)) {
+            $v306Bad += "markKind never mentions $lit306 - one of the three motifs cannot be reached, and an unreachable branch is a drawing that silently never appears (SPEC I78b, V306b)"
+        }
+    }
+    if ($kindBody -notmatch '\.parent') {
+        $v306Bad += "markKind does not read the parent bar - without the level the top bar and a sub-bar get the same motif and the hierarchy the user asked for is gone (SPEC I78b, V306b)"
+    }
+    foreach ($k306 in @('"sep"', '"sub"')) {
+        if ($geoBody -notmatch [regex]::Escape($k306)) {
+            $v306Bad += "markPath has no branch for kind $k306 - markKind hands it a motif the geometry does not know and the path comes out empty (SPEC I78b, V306b)"
+        }
+    }
+
+    # every sep<X> names a real sub-tab: an orphan separator raises nothing at runtime, it just
+    # stands there forever between two names that are not there. Same shape as V300a.
+    $subNames306 = @()
+    foreach ($g306 in @($subTabRe.Matches($rootTxt))) {
+        foreach ($m306 in [regex]::Matches($g306.Groups[1].Value, '"([^"]+)"')) { $subNames306 += $m306.Groups[1].Value }
+    }
+    $seps306 = 0
+    $carr306 = 0
+    foreach ($f in $files) {
+        foreach ($s306 in (Doc $f.FullName).SelectNodes("//rectangle[starts-with(@name,'sep')]")) {
+            $seps306++
+            $sn306 = $s306.GetAttribute("name").Substring(3)
+            if ($subNames306 -notcontains $sn306) { $v306Bad += "$($f.Name) 'sep$sn306' names no sub-tab in SUB_TABS - a separator between two names that do not exist (SPEC I78d, V306b)" }
+            if ($s306.GetAttribute("hitTest") -ne 'false') { $v306Bad += "sep$sn306 authors hitTest='$($s306.GetAttribute('hitTest'))' - it sits over the gap between two buttons and would eat the click meant for one of them (SPEC I78d)" }
+            if ($s306.GetAttribute("color") -ne '#00000000' -or $s306.GetAttribute("strokeColor") -ne '#00000000') { $v306Bad += "sep$sn306 is not transparent both ways - it carries a path and paints nothing itself, exactly like the markers (SPEC I78d, I78a)" }
+        }
+        foreach ($c306 in (Doc $f.FullName).SelectNodes("//rectangle[starts-with(@name,'tabOn')]")) { $carr306++ }
+    }
+    if ($seps306 -ne 5) { $v306Bad += "$seps306 separator(s) on the sheet, expected 5 - two on vampStrip, two on numStrip, one on hedgeStrip (SPEC I78d, V209)" }
+
+    # (c) created once, parented to the carrier, hidden and never destroyed (SPEC V277).
+    if ($markBody -notmatch 'setParent\(\s*c\s*\)') {
+        $v306Bad += "the path is not parented to the control the painter picked - on the strip itself an align='client' child fills the whole band, and the carrier's visible would stop hiding it (SPEC I78b, V306c, V283a)"
+    }
+    if ($markBody -notmatch 'visible\s*=\s*false;') { $v306Bad += "the line work is never hidden - the painter must be able to take it back, the way V277 promises for the filigree (SPEC V277, V306c)" }
+    if ($markBody -match 'destroy') { $v306Bad += "the line work is DESTROYED rather than hidden - the memo would keep a dead handle (SPEC V277, V306c)" }
+    if ($markBody -notmatch '\bmarkPath\s*\(') { $v306Bad += "markRule does not build its path from markPath - the marker's motif is its own (SPEC R111)" }
+    if ($markBody -match '\bornPath\s*\(') { $v306Bad += "markRule reaches for ornPath - 2*ORN_ARM is 80 and a marker is 30 tall, which is the frame R111 ruled out (SPEC R111)" }
+
+    $targets306 = $carr306 + $seps306
+    if ($targets306 -lt 24) { Fail "V306 the painter has $targets306 target(s) on the sheet, expected 24 - 19 markers and 5 separators; a painter with nothing to paint passes forever (SPEC V209, B7)" }
+    elseif ($v306Bad) { foreach ($b in $v306Bad) { Fail "V306 $b" } }
+    else { Pass "V306 one painter reaches $targets306 targets - 19 markers and 5 separators - picks its motif from the name and the bar, and hangs the path on the carrier that already knows which tab is open" }
+}
 
 # ---- V280: what a section box is spaced BY (SPEC I73, V280, user 2026-08-24) -----------
-# Three legs. What they replace is the thing that made I73 necessary in the first place: a
+# TWO legs since the 107th round - (b), the gap between two boxes, left for V298 when the user
+# took it from 20 to 15 (SPEC I76a). What is left here is the INTERNAL margin, still 20.
+# What they replace is the thing that made I73 necessary in the first place: a
 # mixture of 10, 15 and 20 measured across the sheet on 2026-08-24, every one of them derived
 # box by box because nothing here held a single number for either question.
 #
@@ -8511,14 +8574,29 @@ else {
     # (a) starts reading a pre-rotation box as a margin, which is B61 arriving a second time.
     if ($v280Rot -eq 0) { $v280Bad += "no rotated child was skipped by (a) - the cut V27/V239/V240 make is not firing here, and the next rotated label would be read as a margin it is not (SPEC V209, V280c, B61)" }
 
-    # (b) the gap BETWEEN two section boxes, on BOTH axes. B52 cost a whole round proving that
-    # a mutation on X says nothing about Y (SPEC V222), and here Y is the axis that carried the
-    # 5px of WoD20.4 while X had nothing under 10.
-    #
-    # Neighbours, not every pair: two boxes under one parent that face each other with no third
-    # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
-    # (12 and 4) belong to V281 and V232, and T616 froze those on purpose, so reddening on them
-    # would be a false alarm on numbers this round agreed not to touch (SPEC I73).
+    if ($v280Bad) { foreach ($b in $v280Bad) { Fail "V280 $b" } }
+    else { Pass "V280 all $($v280Boxes.Count) section boxes clear 20 on four sides, and $v280Rot rotated child(ren) were cut out of the margin" }
+}
+
+# ---- V298: the gap BETWEEN two section boxes (SPEC I76a, V298, user 2026-08-25) --------
+# This IS V280b, moved out and re-numbered because the number changed: 20 -> 15 on both axes.
+# The old leg is gone rather than loosened - two rules over one gap is the shape B7 warns
+# about, and a check that accepts either number accepts the drift it exists to catch.
+#
+# 15 and the INTERNAL margin of 20 are now DIFFERENT numbers, on purpose (SPEC I76a): the
+# margin pays for the ornament's palmette, which reaches 23 on the diagonal, and a gap pays
+# for nothing but telling two 3px strokes apart. V280a keeps the 20 and this keeps the 15.
+#
+# BOTH axes, because B52 cost a whole round proving a mutation on X says nothing about Y
+# (SPEC V222), and Y is the axis that carried the 5px of WoD20.4 while X had nothing under 10.
+#
+# Neighbours, not every pair: two boxes under one parent that face each other with no third
+# box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
+# (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
+# on them would be a false alarm on numbers this round agreed not to touch.
+if ($v280Boxes.Count -ne 73) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 73 I73 measures - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73)" }
+else {
+    $v298Bad = @()
     $gapsX = 0; $gapsY = 0
     foreach ($grp in ($v280Boxes | Group-Object { $_.F + '|' + $_.P.GetHashCode() })) {
         $arr = @($grp.Group)
@@ -8533,7 +8611,7 @@ else {
                 if (-not $between) {
                     $gapsX++
                     $g = $c.L - ($a.L + $a.W)
-                    if ($g -ne 20) { $v280Bad += "$($a.F) '$($a.N)' closes at x=$($a.L + $a.W) and '$($c.N)' opens at x=$($c.L) - $($g)px between two section boxes where the house leaves 20 (SPEC I73, V280b)" }
+                    if ($g -ne 15) { $v298Bad += "$($a.F) '$($a.N)' closes at x=$($a.L + $a.W) and '$($c.N)' opens at x=$($c.L) - $($g)px between two section boxes where the house leaves 15 (SPEC I76a, V298)" }
                 }
             }
             if (($a.L -lt ($c.L + $c.W)) -and ($c.L -lt ($a.L + $a.W)) -and ($c.T -ge ($a.T + $a.H))) {
@@ -8545,21 +8623,23 @@ else {
                 if (-not $between) {
                     $gapsY++
                     $g = $c.T - ($a.T + $a.H)
-                    if ($g -ne 20) { $v280Bad += "$($a.F) '$($a.N)' closes at y=$($a.T + $a.H) and '$($c.N)' opens at y=$($c.T) - $($g)px between two section boxes where the house leaves 20 (SPEC I73, V280b)" }
+                    if ($g -ne 15) { $v298Bad += "$($a.F) '$($a.N)' closes at y=$($a.T + $a.H) and '$($c.N)' opens at y=$($c.T) - $($g)px between two section boxes where the house leaves 15 (SPEC I76a, V298)" }
                 }
             }
         } }
     }
-    if ($gapsX -eq 0 -or $gapsY -eq 0) { $v280Bad += "(b) measured $gapsX gap(s) on X and $gapsY on Y - an axis with no gap read is an axis with no rule, which is exactly the half of B52 that shipped green (SPEC V209, V222, V280b)" }
-
-    if ($v280Bad) { foreach ($b in $v280Bad) { Fail "V280 $b" } }
-    else { Pass "V280 all $($v280Boxes.Count) section boxes clear 20 on four sides, $gapsX gaps on X and $gapsY on Y are 20 apart, and $v280Rot rotated child(ren) were cut out of the margin" }
+    if ($gapsX -eq 0 -or $gapsY -eq 0) { $v298Bad += "measured $gapsX gap(s) on X and $gapsY on Y - an axis with no gap read is an axis with no rule, which is exactly the half of B52 that shipped green (SPEC V209, V222)" }
+    if ($v298Bad) { foreach ($b in $v298Bad) { Fail "V298 $b" } }
+    else { Pass "V298 $gapsX gaps on X and $gapsY on Y between section boxes are all 15 apart" }
 }
 
-# ---- V281: what a tab BUTTON is spaced by (SPEC I73, V281, T616) -----------------------
-# The same request as V280, one level out: 15 above and below each pill, 30 in from the end of
-# the bar it opens, and the 4 between two buttons left alone because it was the one number the
-# four bars already agreed on.
+# ---- V281: what a tab BUTTON is spaced by, HORIZONTALLY (SPEC I73, V281, T616) ---------
+# The same request as V280, one level out: 30 in from the end of the bar it opens, and the 4
+# between two buttons left alone because it was the one number the four bars already agreed on.
+#
+# The VERTICAL half - 15 above and below each pill - left for V299 in the 107th round, when the
+# user took it to 5 and the four bars went 60 -> 40 (SPEC I76b). Nothing here loosened: the leg
+# moved whole, and what stayed is the axis the request did not touch.
 #
 # Leg (c) is NOT the sentence V281 was written with. "The last button closes 30 before the end"
 # describes a bar whose buttons fill it edge to edge, and none of the four is: a pill is as wide
@@ -8587,12 +8667,6 @@ foreach ($f in $files) {
         $v281Bars++; $v281Pills += $pills.Count
         $bn = $bar.GetAttribute("name")
 
-        # (a) 15 above and 15 below, which is what makes the bar 60 tall around a 30px pill.
-        foreach ($p in $pills) {
-            if ($p.T -ne 15 -or ($barH - $p.T - $p.H) -ne 15) {
-                $v281Bad += "$($f.Name) $($p.N) sits $($p.T) from the top and $($barH - $p.T - $p.H) from the bottom of a $($barH)px bar - a tab button breathes 15 on both (SPEC I73, V281a)"
-            }
-        }
         # (b) the first button opens 30 in, the horizontal half of the same margin.
         if ($pills[0].L -ne 30) { $v281Bad += "$($f.Name) $bn opens its first button at left=$($pills[0].L) - the bar hands over 30 before the first pill (SPEC I73, V281b)" }
         # (c) the bar FITS: see the note above for why this is not "closes at exactly 30".
@@ -8612,7 +8686,295 @@ foreach ($f in $files) {
 if ($v281Bars -ne 4 -or $v281Pills -ne 19) { Fail "V281 $v281Pills button(s) were read across $v281Bars bar(s), expected the 19 across 4 that I73 measures - this check is covering less than the sheet has (SPEC V209, I73)" }
 elseif ($v281Fit -eq 0) { Fail "V281 no bar was measured for fit by (c) - every one of the four came back without an authored width, so the leg is a no-op (SPEC V209, V20)" }
 elseif ($v281Bad) { foreach ($b in $v281Bad) { Fail "V281 $b" } }
-else { Pass "V281 all $v281Pills tab buttons breathe 15 above and below, open 30 in and sit 4 apart; $v281Fit of $v281Bars bars hold their buttons plus the margin ($v281NoWidth author no width and is align-driven)" }
+else { Pass "V281 all $v281Pills tab buttons open 30 in and sit 4 apart; $v281Fit of $v281Bars bars hold their buttons plus the margin ($v281NoWidth author no width and is align-driven)" }
+
+# ---- V299: the bar is 40 tall and its panes came down with it (SPEC I76b, V299) --------
+# This is V281a, moved out and re-numbered because the number changed: 15 above and below a
+# 30px pill became 5, so the four bars went 60 -> 40 (user 2026-08-25, "diminuir bastante a
+# altura"). The old leg is gone rather than loosened, for V298's reason: two rules over one
+# gap is B7. The HORIZONTAL half of I73 - 30 in from the end, 4 between two pills - did not
+# move and stays in V281, which is why that check keeps three legs and loses one.
+#
+# (a) is a RELATION, not a literal: the bar measures twice the pill's top plus the pill. A
+# bar shrunk with one pill left behind reddens, and so does a pill moved inside a bar that
+# stayed - both sides of one equation, which is what V222 asks of a relation.
+#
+# (b) is LITERAL and says so. The three ABSOLUTE bars carry their panes; tabStrip is
+# align="top" and the scrollBox under it reflows on its own, which is what I74a bought when
+# it zeroed the top gap. Nothing else would catch a bar that shrank while its panes stayed:
+# V262a asks only that a pane open at or below the end of the bar, so a 20px hole reads
+# GREEN there. The two numbers are I73's, frozen on purpose, and this is their only reader
+# in the gate. V293 could measure hedgeStrip as a relation because that bar has content on
+# both sides of it; numStrip and vampStrip have one side, and inventing a relation where the
+# second side does not exist is how B64 was born.
+$v299Bad = @()
+$v299Bars = 0; $v299Pills = 0
+$v299Panes = @{
+    'numStrip'   = @{ File = 'WoD20.7.lfm';  Gap = 12; Panes = @('tabHedge', 'tabPsychic', 'tabFaith') }
+    'hedgeStrip' = @{ File = 'WoD20.7.lfm';  Gap = 12; Panes = @('tabHedgePaths', 'tabHedgeRituals') }
+    'vampStrip'  = @{ File = 'WoD20.11.lfm'; Gap = 4;  Panes = @('tabDisc', 'tabPaths', 'tabRituals') }
+}
+$v299Seen = @{}
+foreach ($f in $files) {
+    $doc299 = Doc $f.FullName
+    foreach ($bar in $doc299.SelectNodes("//layout[rectangle[starts-with(@name,'btnTab')]]")) {
+        $barH = 0
+        if (-not [int]::TryParse($bar.GetAttribute("height"), [ref]$barH)) { continue }
+        $pills = @($bar.SelectNodes("rectangle[starts-with(@name,'btnTab')]") | ForEach-Object {
+            $pt = 0; $ph = 0
+            [void][int]::TryParse($_.GetAttribute("top"), [ref]$pt); [void][int]::TryParse($_.GetAttribute("height"), [ref]$ph)
+            [pscustomobject]@{ T = $pt; H = $ph; N = $_.GetAttribute("name") } })
+        if ($pills.Count -eq 0) { continue }
+        $v299Bars++; $v299Pills += $pills.Count
+        $bn = $bar.GetAttribute("name")
+
+        # (a) height = 2 * pill top + pill height, and every pill in the bar agrees on both.
+        foreach ($p in $pills) {
+            if ((2 * $p.T + $p.H) -ne $barH) {
+                $v299Bad += "$($f.Name) $($p.N) sits $($p.T) from the top of a $($barH)px bar around a $($p.H)px pill - the bar is twice the pill's top plus the pill, which is 40 around the 30 the house draws (SPEC I76b, V299a)"
+            }
+            if (($barH - $p.T - $p.H) -ne $p.T) {
+                $v299Bad += "$($f.Name) $($p.N) leaves $($barH - $p.T - $p.H) under it and $($p.T) over it - a tab button breathes the same on both (SPEC I76b, V299a)"
+            }
+        }
+
+        # (b) the panes of an ABSOLUTE bar open the frozen gap under it.
+        if ($v299Panes.ContainsKey($bn)) {
+            $spec = $v299Panes[$bn]
+            $v299Seen[$bn] = $true
+            $barT = 0
+            if (-not [int]::TryParse($bar.GetAttribute("top"), [ref]$barT)) {
+                $v299Bad += "$($f.Name) $bn authors no top - an absolute bar whose own position cannot be read cannot be measured against the panes it carries (SPEC V209, V299b)"
+            } else {
+                foreach ($pn in $spec.Panes) {
+                    $pane = $doc299.SelectSingleNode("//layout[@name='$pn']")
+                    if ($pane -eq $null) { $v299Bad += "$($f.Name) pane '$pn' was not found under $bn - V299b is measuring nothing for it (SPEC V209)"; continue }
+                    $paneT = 0
+                    if (-not [int]::TryParse($pane.GetAttribute("top"), [ref]$paneT)) { $v299Bad += "$($f.Name) pane '$pn' authors no top (SPEC V209, V299b)"; continue }
+                    $g299 = $paneT - ($barT + $barH)
+                    if ($g299 -ne $spec.Gap) {
+                        $v299Bad += "$($f.Name) '$pn' opens $($g299)px under $bn, which ends at $($barT + $barH) - I73 froze that gap at $($spec.Gap), and a bar that shrank without its panes leaves exactly this hole with V262a still green (SPEC I76b, V299b)"
+                    }
+                }
+            }
+        }
+    }
+}
+if ($v299Bars -ne 4 -or $v299Pills -ne 19) { Fail "V299 $v299Pills button(s) were read across $v299Bars bar(s), expected the 19 across 4 that I73 measures - this check is covering less than the sheet has (SPEC V209, I73)" }
+elseif ($v299Seen.Count -ne 3) { Fail "V299 (b) reached $($v299Seen.Count) of the 3 absolute bars - a bar that stopped being found takes its panes out of the check in silence, which is B7 (SPEC V209)" }
+elseif ($v299Bad) { foreach ($b in $v299Bad) { Fail "V299 $b" } }
+else { Pass "V299 all $v299Pills tab buttons breathe the same above and below across $v299Bars bars, and the 8 panes of the 3 absolute bars open the gap I73 froze" }
+
+
+# ---- V300: the caption lives and dies with the pane it explains (SPEC I76c, V300) ------
+# The affinity note is a caption for tabHedgePaths that cannot live inside it: the pane is 472
+# tall, its seventeen rows measure 466, and the note plus its gap wants 30 more, which is why
+# the 91st round parked it on hedgeStrip. Parked there it also stood over Rituals, explaining a
+# list that was not on screen - the user's report of 2026-08-25.
+#
+# So nothing in the XML hides it and renderSubTabs does, by the SAME `live` that lights the
+# pill, in the same loop. Three legs, and (b) is the one that matters: collecting a control and
+# never writing to it is B6 exactly - guarded by `if ~= nil`, exit 0, gate green and dead.
+#
+# The zero-guard is not decoration here. There is ONE note on the sheet, so a check that goes
+# quiet when it stops being found is a check that passes forever on nothing (SPEC B7).
+$v300Bad = @()
+$noteCtrls = @()
+foreach ($f in $files) {
+    foreach ($n300 in (Doc $f.FullName).SelectNodes("//*[starts-with(@name,'note')]")) {
+        $noteCtrls += [pscustomobject]@{ F = $f.Name; N = $n300.GetAttribute("name"); V = $n300.GetAttribute("visible") }
+    }
+}
+$subNames300 = @()
+foreach ($g300 in @($subTabRe.Matches($rootTxt))) {
+    foreach ($m300 in [regex]::Matches($g300.Groups[1].Value, '"([^"]+)"')) { $subNames300 += $m300.Groups[1].Value }
+}
+$subFn300 = LuaFn $rootTxt 'renderSubTabs'
+
+if ($noteCtrls.Count -eq 0) { Fail "V300 no note<X> control was found on the sheet - the affinity note is the one there is, and a check that measures nothing passes forever (SPEC V209, B7)" }
+elseif ($subNames300.Count -eq 0) { Fail "V300 SUB_TABS gave up no pane names - (a) has nothing to match a note against (SPEC V209)" }
+elseif (-not $subFn300) { Fail "V300 renderSubTabs was not found on the root form - (b) cannot read what it does (SPEC V209)" }
+else {
+    # (a) a note belongs to a pane the strip actually knows. An orphan note raises nothing at
+    # runtime: it simply never hides, which is the state the user reported.
+    foreach ($nc in $noteCtrls) {
+        $suffix300 = $nc.N.Substring(4)
+        if ($subNames300 -notcontains $suffix300) {
+            $v300Bad += "$($nc.F) '$($nc.N)' names no pane in SUB_TABS - a caption whose pane the strip does not know is a caption nothing ever hides (SPEC I76c, V300a)"
+        }
+    }
+
+    # (b) renderSubTabs COLLECTS the name and WRITES visible on it. Both, or B6.
+    if ($subFn300 -notmatch 'names\["note"\s*\.\.\s*list\[i\]\]') {
+        $v300Bad += "renderSubTabs never asks xpFind for a note<X> - the caption is not in the map, so the write below it can only find nil (SPEC I76c, V300b)"
+    }
+    if ($subFn300 -notmatch 'note\.visible\s*=\s*live') {
+        $v300Bad += "renderSubTabs collects the note and never writes its visibility - collected and unwritten, guarded by `if ~= nil`, is B6 with a new door (SPEC I76c, V300b)"
+    }
+
+    # (c) authored state = the pane's authored state, so the open does not flash the caption
+    # over the wrong pane. This is V94 applied to one label.
+    foreach ($nc in $noteCtrls) {
+        $paneName300 = 'tab' + $nc.N.Substring(4)
+        $paneVis300 = $null
+        foreach ($f in $files) {
+            $p300 = (Doc $f.FullName).SelectSingleNode("//layout[@name='$paneName300']")
+            if ($p300 -ne $null) { $paneVis300 = $p300.GetAttribute("visible"); break }
+        }
+        if ($paneVis300 -eq $null) { $v300Bad += "'$($nc.N)' has no pane '$paneName300' anywhere on the sheet - (c) has nothing to compare against (SPEC V209, V300c)"; continue }
+        if ($nc.V -ne $paneVis300) {
+            $v300Bad += "$($nc.F) '$($nc.N)' is authored visible='$($nc.V)' and '$paneName300' is authored visible='$paneVis300' - the two disagree, so the open paints the caption over the wrong pane until renderSubTabs runs (SPEC I76c, V300c, V94)"
+        }
+    }
+
+    if ($v300Bad) { foreach ($b in $v300Bad) { Fail "V300 $b" } }
+    else { Pass "V300 the $($noteCtrls.Count) note caption(s) name a real pane, are hidden by renderSubTabs in the same line as the pill, and open in the state their pane opens in" }
+}
+
+# ---- V301: the bar wears no box, and the marker is a rule (SPEC I77a, I77b) -----------
+# The 108th round took the pill away. Eleven gold outlines side by side divided the eye evenly
+# and the OPEN tab was told apart by its fill alone - the weakest signal on the band. So the
+# button keeps every number it had and loses its contour, and the marker keeps every number it
+# had and becomes a foot rule: transparent fill, an authored contour, sides="bottom". The 3px
+# THEME_STROKE applyTheme already writes lands as a 3px rule in the era's own accent, which is
+# why no palette was touched for any of this (SPEC V53, V67).
+#
+# (b) is the leg with teeth. The three attributes are ONE state: a transparent fill with no
+# sides draws NOTHING, in every era, and the sheet opens with no tab looking open. That is the
+# silent and total failure V229 was written to stop, inherited here now that the pill it used
+# to measure is gone.
+$v301Bad = @()
+$pairs301 = 0
+foreach ($pr301 in @(@("WoD20th.lfm", "tabStrip"), @("WoD20.11.lfm", "vampStrip"), @("WoD20.7.lfm", "numStrip"), @("WoD20.7.lfm", "hedgeStrip"))) {
+    $st301 = (Doc (Join-Path $dir $pr301[0])).SelectSingleNode("//layout[@name='$($pr301[1])']")
+    if ($null -eq $st301) { $v301Bad += "$($pr301[1]) is gone from $($pr301[0]) - the bar it names has no buttons to measure (SPEC I32, I58, V209)"; continue }
+    foreach ($on301 in $st301.SelectNodes("rectangle[starts-with(@name,'tabOn')]")) {
+        $nm301 = $on301.GetAttribute("name")
+        $sfx301 = $nm301.Substring(5)
+        $btn301 = $st301.SelectSingleNode("rectangle[@name='btnTab$sfx301']")
+        if ($null -eq $btn301) { $v301Bad += "'$nm301' has no 'btnTab$sfx301' beside it - the PAIR is what (c) measures (SPEC I32, V209)"; continue }
+        $pairs301++
+
+        # (a) the button is a click target and nothing else.
+        if ($btn301.GetAttribute("color") -ne '#00000000') {
+            $v301Bad += "btnTab$sfx301 is filled '$($btn301.GetAttribute('color'))' - the button is the target of a click and paints nothing (SPEC I77a)"
+        }
+        if ($btn301.GetAttribute("strokeColor") -ne '#00000000') {
+            $v301Bad += "btnTab$sfx301 authors strokeColor='$($btn301.GetAttribute('strokeColor'))' - the box is what the 108th round removed, and applyTheme hands a 3px rule to every contour it knows (SPEC I77a, V67)"
+        }
+
+        # (b) LEFT for V304 in the 109th round. The marker stopped drawing anything of its own -
+        # it carries a path now (SPEC I78a) - so what used to be measured here is measured there,
+        # in the shape the marker has. What stays HERE is the button and the pair.
+
+        # (c) the pair is one control drawn twice: same four numbers, so the rule is exactly as
+        # wide as the word it underlines. V232a already welds the width on tabStrip; this is the
+        # same weld on four bars and both axes - measuring one axis is how B52 cost a round.
+        foreach ($a301 in @('left', 'top', 'width', 'height')) {
+            $va301 = $on301.GetAttribute($a301)
+            $vb301 = $btn301.GetAttribute($a301)
+            if ($va301 -ne $vb301) {
+                $v301Bad += "$nm301 has $a301='$va301' and btnTab$sfx301 has $a301='$vb301' - the rule and the word it marks have come apart (SPEC I77b, V301c)"
+            }
+        }
+    }
+}
+if ($pairs301 -lt 19) { Fail "V301 only $pairs301 button/marker pair(s) were read, expected 19 - this check is covering less than the four bars hold (SPEC V209)" }
+elseif ($v301Bad) { foreach ($b in $v301Bad) { Fail "V301 $b" } }
+else { Pass "V301 all $pairs301 tab buttons author no contour and sit on the same four numbers as the marker they pair with - no box on the bar, and the rule is as wide as the word" }
+
+# ---- V305: the sub-tab says its state in WEIGHT and in COLOUR (SPEC I78c) --------------
+# The 108th round said the colour could not move, because fontColor belongs to applyTheme and a
+# Lua write there is undone on the next repaint (SPEC V57). True - and the way around it was the
+# one the sheet already uses everywhere else: author BOTH states and toggle `visible`. That is
+# what tabOn<X> has always been for the pill. B66 is the record of choosing the first answer that
+# respected the invariants over the one that delivered the drawing.
+#
+# So each sub-tab is two labels on the same four numbers with the same text: closed is italic in
+# the theme's own text colour, open is roman in the era's accent. (d) is the leg that keeps the
+# accent an ACCENT: four palettes, four different values, none of them equal to that palette's
+# own text colour - a palette mapping the two together shows an open word no one can pick out.
+$v305Bad = @()
+$grp305 = @($subTabRe.Matches($rootTxt))
+$subFn305 = LuaFn $rootTxt 'renderSubTabs'
+$want305 = @{}
+foreach ($g305 in $grp305) {
+    $act305 = $g305.Groups[2].Value
+    foreach ($m305 in [regex]::Matches($g305.Groups[1].Value, '"([^"]+)"')) {
+        $want305[$m305.Groups[1].Value] = ($act305 -eq ("tab" + $m305.Groups[1].Value))
+    }
+}
+if ($want305.Count -lt 8) { Fail "V305 only $($want305.Count) sub-tab name(s) were read from SUB_TABS, expected 8 across the three bars (SPEC V209)" }
+elseif (-not $subFn305) { Fail "V305 renderSubTabs was not found on the root form - (c) cannot read what it does (SPEC V209)" }
+else {
+    foreach ($n305 in @($want305.Keys)) {
+        $off305 = $null; $on305 = $null
+        foreach ($f in $files) {
+            $doc305 = Doc $f.FullName
+            if ($null -eq $off305) { $off305 = $doc305.SelectSingleNode("//label[@name='lbl$n305']") }
+            if ($null -eq $on305) { $on305 = $doc305.SelectSingleNode("//label[@name='lblOn$n305']") }
+        }
+        if ($null -eq $off305 -or $null -eq $on305) {
+            $v305Bad += "sub-tab '$n305' is missing one of its two words (lbl$n305 / lblOn$n305) - one label cannot carry two colours without a Lua write the theme undoes (SPEC I78c, V57, V305a)"
+            continue
+        }
+
+        # (a) closed is italic in the theme's colour; open is roman in the accent; and the two are
+        # the same word in the same place, or it jumps as it opens.
+        if ($off305.GetAttribute("fontStyle") -ne 'italic') { $v305Bad += "lbl$n305 authors fontStyle='$($off305.GetAttribute('fontStyle'))', expected italic - the closed word is the italic one (SPEC I78c, V305a)" }
+        if ($off305.GetAttribute("fontColor") -ne 'white') { $v305Bad += "lbl$n305 authors fontColor='$($off305.GetAttribute('fontColor'))', expected white - the closed word wears the theme's own text colour (SPEC I78c, V53)" }
+        if ($on305.GetAttribute("fontStyle")) { $v305Bad += "lblOn$n305 authors fontStyle='$($on305.GetAttribute('fontStyle'))' - the open word is the ROMAN one, which is how the pair reads as a state (SPEC I78c, V305a)" }
+        if ($on305.GetAttribute("fontColor") -ne '#C2A14D') { $v305Bad += "lblOn$n305 authors fontColor='$($on305.GetAttribute('fontColor'))', expected #C2A14D - that is the accent key the four palettes map (SPEC I78c, V53)" }
+        if ($off305.GetAttribute("text") -ne $on305.GetAttribute("text")) { $v305Bad += "lbl$n305 and lblOn$n305 carry different text - the sub-tab would rename itself as it opens (SPEC I78c, V305a)" }
+        foreach ($a305 in @('left', 'top', 'width', 'height')) {
+            if ($off305.GetAttribute($a305) -ne $on305.GetAttribute($a305)) {
+                $v305Bad += "lbl$n305 has $a305='$($off305.GetAttribute($a305))' and lblOn$n305 has '$($on305.GetAttribute($a305))' - the word would jump as it opens (SPEC I78c, V305a)"
+            }
+        }
+
+        # (b) authored OPPOSITE, and on the side its group opens on - V94 on a pair of labels.
+        $vOff305 = $off305.GetAttribute("visible"); $vOn305 = $on305.GetAttribute("visible")
+        if ($vOff305 -eq $vOn305) { $v305Bad += "lbl$n305 and lblOn$n305 are both authored visible='$vOff305' - roman stacked on italic until the first render (SPEC V94, V305b)" }
+        elseif ($want305[$n305] -and $vOn305 -ne 'true') { $v305Bad += "the group opens on '$n305' but lblOn$n305 is authored visible='$vOn305' - the sheet opens italic and straightens a frame later (SPEC V94, V305b)" }
+        elseif (-not $want305[$n305] -and $vOff305 -ne 'true') { $v305Bad += "the group does not open on '$n305' but lbl$n305 is authored visible='$vOff305' - the closed word is the one that shows (SPEC V94, V305b)" }
+    }
+
+    # (c) collected AND written, both of them - and no style or colour written anywhere.
+    foreach ($fam305 in @('lbl', 'lblOn')) {
+        if ($subFn305 -notmatch ('names\["' + $fam305 + '"\s*\.\.\s*list\[i\]\]')) {
+            $v305Bad += "renderSubTabs never asks xpFind for a $fam305<X> - the word is not in the map and the write below it can only find nil (SPEC I78c, V305c)"
+        }
+    }
+    if ($subFn305 -notmatch 'lbl\.visible\s*=\s*not live' -or $subFn305 -notmatch 'lblOn\.visible\s*=\s*live') {
+        $v305Bad += "renderSubTabs does not write BOTH halves of the pair from the same live - one written and one collected is B6 with the door repainted (SPEC I78c, V305c)"
+    }
+    if ($rootTxt -match 'fontStyle\s*=' -or $rootTxt -match '\.fontColor\s*=') {
+        $v305Bad += "the root form writes fontStyle or fontColor from Lua - applyTheme undoes a colour on the next repaint, and a write before it poisons the authored ledger (SPEC V57, V305c)"
+    }
+
+    # (d) the accent is an accent: four palettes, four values, none equal to that palette's text.
+    # `local fill, stroke, font = {}, {}, {}` in the normaliser matches the naive pattern too, so
+    # a map is a map only if it holds keys - five was the count before this line existed.
+    $fonts305 = @([regex]::Matches($hh6, '(?s)font\s*=\s*\{(.*?)\}') | Where-Object { $_.Groups[1].Value -match '\["' })
+    if ($fonts305.Count -ne 4) { $v305Bad += "read $($fonts305.Count) font map(s) out of THEMES, expected 4 - (d) cannot compare what it cannot find (SPEC V209)" }
+    else {
+        $seen305 = @{}
+        foreach ($fm305 in $fonts305) {
+            $body305 = $fm305.Groups[1].Value
+            $acc305 = [regex]::Match($body305, '\["#C2A14D"\]\s*=\s*"(#[0-9A-Fa-f]{6})"')
+            $whi305 = [regex]::Match($body305, '\["white"\]\s*=\s*"(#[0-9A-Fa-f]{6})"')
+            if (-not $acc305.Success) { $v305Bad += "a palette does not map #C2A14D - the open word would keep the authored gold in an era that is not gold, or fall out of paint's guard entirely (SPEC V53, V61, V305d)"; continue }
+            if ($whi305.Success -and $acc305.Groups[1].Value -eq $whi305.Groups[1].Value) {
+                $v305Bad += "a palette maps #C2A14D and white to the same $($whi305.Groups[1].Value) - open and closed would differ by italic alone in that era (SPEC V305d)"
+            }
+            $seen305[$acc305.Groups[1].Value] = $true
+        }
+        if ($seen305.Count -lt 4) { $v305Bad += "the four palettes give the accent only $($seen305.Count) distinct value(s) - the accent is the era's own, not one gold everywhere (SPEC V305d)" }
+    }
+
+    if ($v305Bad) { foreach ($b in $v305Bad) { Fail "V305 $b" } }
+    else { Pass "V305 all $($want305.Count) sub-tabs carry both words, authored opposite on the side their group opens, and the accent is four different colours across the four palettes" }
+}
 
 # ---- V284: the filigree of a box that RESIZES is redrawn, not inherited ---------------
 # SPEC I72d, the 100th round, item 2 of the request. HEALTH is the one section box whose size

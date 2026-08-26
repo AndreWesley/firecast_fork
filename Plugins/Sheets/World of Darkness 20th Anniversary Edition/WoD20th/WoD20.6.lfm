@@ -1622,6 +1622,7 @@
 					},
 					font = {
 						["white"] = "#E6E8EC",
+						["#C2A14D"] = "#A83232",   -- era accent: the open sub-tab wears it (SPEC I78c, V305d)
 					},
 					-- Plugin-absolute, NOT the relative form the XML uses. The rdk resolves
 					-- src=/checkedImage= at COMPILE time - the generated Lua reads
@@ -1653,6 +1654,7 @@
 					},
 					font = {
 						["white"] = "#E8DCC0",        -- cream
+						["#C2A14D"] = "#D8BC72",   -- era accent: the open sub-tab wears it (SPEC I78c, V305d)
 					},
 					dotOn  = "/WoD20th/images/prime_on_gold.png",
 					dotOff = "/WoD20th/images/prime_off_gold.png",
@@ -1681,6 +1683,7 @@
 					},
 					font = {
 						["white"] = "#E3D8BE",        -- candle on vellum
+						["#C2A14D"] = "#C0C6CC",   -- era accent: the open sub-tab wears it (SPEC I78c, V305d)
 					},
 					dotOn  = "/WoD20th/images/prime_on_silver.png",
 					dotOff = "/WoD20th/images/prime_off_silver.png",
@@ -1709,6 +1712,7 @@
 					},
 					font = {
 						["white"] = "#F0EAD9",        -- ivory
+						["#C2A14D"] = "#BFA05A",   -- era accent: the open sub-tab wears it (SPEC I78c, V305d)
 					},
 					dotOn  = "/WoD20th/images/prime_on_gold.png",
 					dotOff = "/WoD20th/images/prime_off_gold.png",
@@ -1869,16 +1873,23 @@
 			local ORN_FLEUR = 150;     -- an edge run shorter than this carries no centre motif
 			local ORN_KAPPA = 0.5523;  -- cubic approximation of a quarter arc
 
-			-- SPEC R111, V282. The pill is its OWN motif and not the box frame shrunk: 2*ORN_ARM is
-			-- 80 against a pill 30 tall. What the user chose is the plainest of the three candidates -
-			-- a double rule, no figure - and MEASURING it is what decided its shape. A rule inset by d
-			-- follows radius ORN_PILLR + d and meets the short edge at sqrt((r+d)^2 - d^2): at d=1 that
-			-- is 14.97 against a half-height of 15, and at d=2 it is 15.87, so the two end arcs CROSS
-			-- instead of meeting. The wrap is impossible, and d=1 would sit under the 3px THEME_STROKE
-			-- applyTheme gives the pill anyway. So the rules run on the LONG edges and stop where the
-			-- corner arc starts - which is exactly what ornEdge does on a short run.
-			local ORN_PILLR = 14;      -- the radius V228 authors on every tab button
-			local ORN_PILL  = { 4, 7 };-- the two rules, in from the pill edge
+			-- SPEC R111, I78b, V306. The bar's line work is the MARKER's own motif and not the box frame
+			-- shrunk: 2*ORN_ARM is 80 against a marker 30 tall. Three motifs, one per LEVEL, because the
+			-- two bars are not the same thing on screen (SPEC I78b): the top bar carries two rules with a
+			-- fleuron opening the lower one, a sub-bar carries ONE short rule, and a separator carries the
+			-- fleuron alone. MEASURING still decides the shape - a rule inset by d from the foot follows
+			-- radius ORN_PILLR + d and meets the concave corner at sqrt((r+d)^2 - d^2), so it stops there.
+			--
+			-- 1px, and that is the whole reason this is a <path> and not a rectangle: applyTheme writes
+			-- THEME_STROKE=3 onto every rectangle it repaints (SPEC V67), and the drawing the user chose
+			-- is a hairline. The rectangle underneath is a CARRIER now - transparent both ways (SPEC I78a).
+			local ORN_PILLR    = 14;    -- the radius V228 authors on every tab button
+			local ORN_MARK     = 7;     -- the lower rule, up from the marker's foot
+			local ORN_MARK2    = 11;    -- the upper rule, on the top bar only
+			local ORN_MARK_RX  = 4;     -- fleuron half-width
+			local ORN_MARK_RY  = 3.5;   -- fleuron half-height
+			local ORN_MARK_GAP = 4;     -- clear space each side of the fleuron
+			local ORN_SUB      = 0.18;  -- a sub-bar rule is short: this much of the width in from each end
 
 			-- Path data is parsed as SVG, where a comma separates x from y. The C library float
 			-- verbs follow LC_NUMERIC, so on a pt-BR host they write a decimal COMMA and every
@@ -2120,20 +2131,63 @@
 			-- run there to be a rule on. A run is emitted only where it has positive length, the
 			-- same refusal ornEdge makes, so a pill narrower than its own two corners simply gets
 			-- less rule rather than a line drawn backwards across itself (SPEC V279, V282).
-			local function pillPath(w, h)
-				local o = {};
+			-- One motif per level (SPEC I78b). kind comes from markKind, which reads the NAME and the
+			-- bar the control sits in - construction the gate can see from disk, not a roster of 24.
+			local function markPath(w, h, kind)
+				local o  = {};
+				local cx = w / 2;
+				local cy = h / 2;
 
-				for i = 1, #ORN_PILL, 1 do
-					local d = ORN_PILL[i];
-					local s = math.sqrt((ORN_PILLR + d) * (ORN_PILLR + d) - d * d);
+				-- The separator is the fleuron alone, centred in its 16x30 carrier (SPEC I78d).
+				if kind == "sep" then
+					o[#o + 1] = "M" .. ornNum(cx) .. "," .. ornNum(cy - ORN_MARK_RY);
+					o[#o + 1] = "L" .. ornNum(cx + ORN_MARK_RX) .. "," .. ornNum(cy);
+					o[#o + 1] = "L" .. ornNum(cx) .. "," .. ornNum(cy + ORN_MARK_RY);
+					o[#o + 1] = "L" .. ornNum(cx - ORN_MARK_RX) .. "," .. ornNum(cy);
+					o[#o + 1] = "Z";
 
-					if w - 2 * s > 0 then
-						o[#o + 1] = "M" .. ornNum(s) .. "," .. ornNum(d);
-						o[#o + 1] = "L" .. ornNum(w - s) .. "," .. ornNum(d);
-						o[#o + 1] = "M" .. ornNum(s) .. "," .. ornNum(h - d);
-						o[#o + 1] = "L" .. ornNum(w - s) .. "," .. ornNum(h - d);
-					end;
+					return table.concat(o, " ");
 				end;
+
+				-- A sub-tab is marked by ONE short rule (SPEC I78b): the level below says less, and it says
+				-- it in less width. Proportional and not a literal inset - the eight sub-tabs run from 90 to
+				-- 235 wide and a fixed inset would swallow the narrow ones.
+				if kind == "sub" then
+					local i = w * ORN_SUB;
+
+					if w - 2 * i <= 0 then return ""; end;
+
+					o[#o + 1] = "M" .. ornNum(i) .. "," .. ornNum(h - ORN_MARK);
+					o[#o + 1] = "L" .. ornNum(w - i) .. "," .. ornNum(h - ORN_MARK);
+
+					return table.concat(o, " ");
+				end;
+
+				-- The top bar: two rules, the lower one opened in the middle for the fleuron.
+				local s  = math.sqrt((ORN_PILLR + ORN_MARK) * (ORN_PILLR + ORN_MARK) - ORN_MARK * ORN_MARK);
+				local y1 = h - ORN_MARK;
+				local y2 = h - ORN_MARK2;
+				local g  = ORN_MARK_RX + ORN_MARK_GAP;
+
+				-- No room for both halves of the lower rule: the marker draws nothing rather than a fleuron
+				-- sitting on a rule drawn end-before-start. The narrowest button on the top bar is 79 against
+				-- a half of 39.5, so this cannot fire today - and one that CANNOT fire is B59's hole (V279).
+				if cx - g <= s then return ""; end;
+
+				o[#o + 1] = "M" .. ornNum(s) .. "," .. ornNum(y2);
+				o[#o + 1] = "L" .. ornNum(w - s) .. "," .. ornNum(y2);
+
+				o[#o + 1] = "M" .. ornNum(s) .. "," .. ornNum(y1);
+				o[#o + 1] = "L" .. ornNum(cx - g) .. "," .. ornNum(y1);
+				o[#o + 1] = "M" .. ornNum(cx + g) .. "," .. ornNum(y1);
+				o[#o + 1] = "L" .. ornNum(w - s) .. "," .. ornNum(y1);
+
+				-- Line work, unfilled, like everything else here.
+				o[#o + 1] = "M" .. ornNum(cx) .. "," .. ornNum(y1 - ORN_MARK_RY);
+				o[#o + 1] = "L" .. ornNum(cx + ORN_MARK_RX) .. "," .. ornNum(y1);
+				o[#o + 1] = "L" .. ornNum(cx) .. "," .. ornNum(y1 + ORN_MARK_RY);
+				o[#o + 1] = "L" .. ornNum(cx - ORN_MARK_RX) .. "," .. ornNum(y1);
+				o[#o + 1] = "Z";
 
 				return table.concat(o, " ");
 			end;
@@ -2248,59 +2302,70 @@
 				e.p.visible = true;
 			end;
 
-			-- The pill's rule. Same contract as ornament(): created once, HIDDEN by a plainer era and
-			-- never destroyed (SPEC V277), filtered by CONSTRUCTION and not by a roster of names.
+			-- The MARKER's line work (SPEC I78, V306). Same contract as ornament(): created once, HIDDEN
+			-- by nothing here and never destroyed (SPEC V277).
 			--
-			-- The filter is a transparent fill PLUS the house radius. MEASURED across the sheet: 21
-			-- rectangles author #00000000 and only two of them are not tab buttons - the health marks,
-			-- which author a radius of 2 of their own for the reason V68 records. Reading the AUTHORED
-			-- fill matters here for the same reason it does in ornament(): by now the pill is painted.
+			-- Who gets one is the NAME and the BAR, not a transparent fill plus a radius. That filter
+			-- died with the box: since I77a the button is transparent and carries the same radius as the
+			-- marker, so construction alone stopped telling the pair apart. 	abOn and sep are FAMILY
+			-- prefixes - the same idiom note<X> and lbl<X> already use - and the parent's name picks the
+			-- level between the two 	abOn motifs. One name read, not a roster of 24.
 			--
-			-- Parented to the PILL and not to the strip, which is the one place this cannot copy V283a:
-			-- align="client" on a child of tabStrip would fill the whole 1280px band. Under the label
-			-- is harmless HERE and only here - the rules live in the border band and the label's glyphs
-			-- sit in the middle, so there is nothing for the text to cover.
-			local pillPainted = {};
+			-- Parented to the CARRIER, which is what makes the open tab need no state of its own: a
+			-- child of something invisible does not paint, and applyTabVisibility and renderSubTabs
+			-- already write that visible. The separator's carrier never hides, so its fleuron stands.
+			local markPainted = {};
 
-			local function pillRule(c, fill, colour)
-				local p = pillPainted[c.handle];
+			local function markKind(c, nm)
+				if nm == nil then return nil; end;
+				if string.sub(nm, 1, 3) == "sep" then return "sep"; end;
+				if string.sub(nm, 1, 5) ~= "tabOn" then return nil; end;
+
+				local p = c.parent;
+
+				if p ~= nil and p.name == "tabStrip" then return "tab"; end;
+
+				return "sub";
+			end;
+
+			local function markRule(c, nm, colour)
+				local e = markPainted[c.handle];
 
 				if colour == nil then
-					if p ~= nil then p.visible = false; end;
+					if e ~= nil then e.visible = false; end;
 					return;
 				end;
 
-				if p == nil then
-					if normColor(fill) ~= "#00000000" then return; end;
+				if e == nil then
+					local kind = markKind(c, nm);
 
-					local rad = c.xradius;
+					if kind == nil then return; end;
 
-					if rad == nil or rad ~= ORN_PILLR then return; end;
-
+					-- READ, never written - the theme still writes no geometry (SPEC V57).
 					local bw, bh = c.width, c.height;
 
 					if bw == nil or bh == nil then return; end;
 
-					local d = pillPath(bw, bh);
+					local d = markPath(bw, bh, kind);
 
 					if d == "" then return; end;
 
-					p = gui.newPath();
+					e = gui.newPath();
 
-					p:setParent(c);
+					e:setParent(c);
 
-					p.align = "client";
-					p.mode = "original";
-					p.hitTest = false;
-					p.color = "#00000000";
-					p.strokeSize = 1;
-					p.data = d;
+					e.align = "client";
+					e.mode = "original";
+					e.hitTest = false;
+					e.color = "#00000000";
+					e.strokeSize = 1;
+					e.data = d;
 
-					pillPainted[c.handle] = p;
+					markPainted[c.handle] = e;
 				end;
 
-				p.strokeColor = colour;
-				p.visible = true;
+				e.strokeColor = colour;
+				e.visible = true;
 			end;
 
 			-- SPEC I72d / V284. The HEALTH box is resized by renderHealthTrack, which lives on the
@@ -2354,6 +2419,11 @@
 				-- believes in can never differ from the era the boxes are wearing.
 				ornColour = t.ornament;
 
+				-- The bar's accent, read ONCE for the whole repaint (SPEC V205). It is the stroke key the
+				-- markers and every framed box already share, so the bar cannot drift from the sheet - and
+				-- it exists in all FOUR palettes, which t.ornament does not (SPEC I78e, V304b).
+				local accent = t.stroke[normColor("#FFFFFF")];
+
 				collect(root, all);
 
 				-- Once for the whole repaint, not once per picker (SPEC V205).
@@ -2391,7 +2461,7 @@
 						-- The filigree rides the same walk and the same authored value the fill does,
 						-- so the frame and the box can never disagree about which era is in force.
 						ornament(c, fill, t.ornament);
-						pillRule(c, fill, t.ornament);
+						markRule(c, nm, accent);
 					elseif THEME_TEXTS[cls] then
 						local fc = authored(c, "fontColor");
 
@@ -2523,7 +2593,7 @@
 			and the same 14px above the first line as below the last - it was 10 and 5, and the
 			lopsided pair is what showed. Both boxes on this tab went 330 -> 380 wide with it.
 		-->
-		<layout left="0" top="165" width="420" height="170">
+		<layout left="0" top="160" width="420" height="170">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<label left="20" top="20" width="380" height="20" text="Credits" horzTextAlign="center"/>

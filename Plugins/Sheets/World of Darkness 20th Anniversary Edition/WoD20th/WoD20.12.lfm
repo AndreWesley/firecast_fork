@@ -232,7 +232,7 @@
 		</layout>
 
 		<!-- 15 open slots. 25 + 15*25 + 25 = 425. -->
-		<layout left="0" top="201" width="390" height="436">
+		<layout left="0" top="196" width="390" height="441">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="20" width="350" height="20" text="DISCIPLINES" horzTextAlign="center"/>
 			<layout left="32" top="41" width="326" height="25">
@@ -284,10 +284,10 @@
 
 		<!-- Read-only and field-less: book text must never be typed over, and never saved onto
 		     the character (SPEC V29, R12). Closes level with the left column at y=585. -->
-		<layout left="410" top="20" width="660" height="617">
+		<layout left="405" top="20" width="665" height="617">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="620" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtDiscDesc" left="30" top="41" width="600" height="556" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveDiscDesc(self);"/>
+			<label left="20" top="20" width="625" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtDiscDesc" left="30" top="41" width="605" height="556" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveDiscDesc(self);"/>
 		</layout>
 	</scrollBox>
 
