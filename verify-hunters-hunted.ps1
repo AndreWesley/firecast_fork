@@ -1,4 +1,4 @@
-﻿# Build gate for the WoD20th sheet. Checks SPEC.md V1, V3, V4, V5, V8-V40.
+# Build gate for the WoD20th sheet. Checks SPEC.md V1, V3, V4, V5, V8-V40.
 # With -Build it also runs the real compile and checks V6 + V7.
 #
 # Lives at repo root, NOT inside the plugin dir: rdk packs every file under the
@@ -644,11 +644,25 @@ if ($noEn) { foreach ($s in $noEn) { Fail "V10 no [en] key for '$s'" } } else { 
 # text="$(nome)", which the `$(` guard skipped, so EVERY row label in the sheet escaped
 # the check. "Animal Ken" is "Empatia com Animais" (19 chars, ~124px) in a label that
 # was 80px wide, and WILLPOWER is "FORCA DE VONTADE" (16 chars) in a 60px one.
-$PX_PER_CHAR = 6.5
-function NeededPx($txt) {
+# The ruler knows the FONT SIZE since the 114th round (SPEC I86f, V312, R116). It is one
+# constant per size and not one per control: a ruler picked by NAME would be a nominal
+# exception, which is B38 arriving through the width door, while the physics is the same for
+# every control that authors the same size.
+#
+# 6.0 for fontSize="12", and it is still a CEILING. R116 is what earned it: on the running
+# sheet the [pt] item `Sociedade de Ideologias Altruistas Esclarecidas (SEAI)` leaves over a
+# centimetre of slack inside a 362px interior, so 55 characters render at 5.89px or less. 6.0
+# stays above that. Dropping it further without a NEW measurement trades a ceiling for a guess,
+# and what waits on the other side is a comboBox that CLIPS rather than wraps (SPEC V196, B43).
+$PX_PER_CHAR    = 6.5
+$PX_PER_CHAR_12 = 6.0
+function NeededPx($txt, $fontSize) {
     $longest = $txt.Length
     if ($ptVal.ContainsKey($txt) -and $ptVal[$txt].Length -gt $longest) { $longest = $ptVal[$txt].Length }
-    [math]::Ceiling($longest * $PX_PER_CHAR)
+    # Callers that measure a plain label pass nothing and get the default body ruler, which is
+    # the calibration this check has always run on (SPEC V312a).
+    $ruler = if ("$fontSize" -eq '12') { $PX_PER_CHAR_12 } else { $PX_PER_CHAR }
+    [math]::Ceiling($longest * $ruler)
 }
 $tooNarrow = @()
 foreach ($f in $files) {
@@ -1587,7 +1601,11 @@ foreach ($f in $files) {
         $comboSeen++
         if ($isVampRow) { $comboVamp++ }
         $worst = ''; $need = 0
-        foreach ($it in $shown) { $n = NeededPx $it; if ($n -gt $need) { $need = $n; $worst = $it } }
+        # The control's OWN fontSize picks the ruler (SPEC V312a): fourteen of the sheet's
+        # twenty-one pickers author 12, and measuring them against the body ruler was charging
+        # them for glyphs they do not draw (SPEC R116).
+        $cbSize = $cb.GetAttribute("fontSize")
+        foreach ($it in $shown) { $n = NeededPx $it $cbSize; if ($n -gt $need) { $need = $n; $worst = $it } }
         $need += $ARROW
         $id = $cb.GetAttribute("name"); if (-not $id) { $id = $cb.GetAttribute("field") }; if (-not $id) { $id = 'comboBox' }
         if ($need -gt $w) { $comboNarrow += "$($f.Name): picker $id is ${w}px but '$worst' (pt '$($ptVal[$worst])') needs ~${need}px - a comboBox clips, it does not wrap" }
@@ -6671,13 +6689,32 @@ foreach ($f in $files) {
                 if (($kt + $kh) -gt $loC) { $loC = $kt + $kh }
             }
 
-            # Where the body opens is DERIVED from the title, not typed: one hairline under the
-            # title band plus the margin I73 asks under it. It read 41 while the margin was 10
-            # and reads 61 now, and it will not have to be edited the next time the margin moves.
-            $bodyTop = [int]$ttlNode.GetAttribute("top") + [int]$ttlNode.GetAttribute("height") + 1 + 20
+            # Where the body opens, and the 114th round MOVED it (SPEC I86b, V267b, user
+            # 2026-08-26). It used to be the hairline under the title band plus the margin I73
+            # asks under it - title.bottom + 1 + 20, which read 41 while that margin was 10 and
+            # 61 after. That charges the title's margin TWICE: it is a FLOOR for content stacked
+            # under a title, not a band reserved from the box, and counting it as both pushed a
+            # single centred row 21px low. The eye caught it on the Numina tab before any check
+            # did, because both boxes were passing this arm the whole time.
+            #
+            # It opens on the BOX's own margin now - the same 20 V280a charges on four sides -
+            # so the title takes no band of its own. Still DERIVED, not typed: 20 is read from
+            # the one margin the sheet uses everywhere, and the title node is still what proves
+            # this is the titled arm.
+            $bodyTop = 20
             if ($hiC -eq [int]::MaxValue) { $vpadBad += "$($f.Name) '$ttl' is stretched and holds nothing under its title - the exception is for a box that pays centring, not for an empty one (SPEC V267b)" }
             elseif ($hi -lt 20) { $vpadBad += "$($f.Name) '$ttl' opens with $hi above its title - stretched or not, the title still clears 20 (SPEC I40, V267b)" }
-            elseif (($hiC - $bodyTop) -ne ($bh - $loC)) { $vpadBad += "$($f.Name) '$ttl' ($($bh)px tall) leaves $($hiC - $bodyTop) over its content and $($bh - $loC) under it - a stretched box pays CENTRING in place of the 20 (SPEC V267b, I73)" }
+            # The content still clears the title band by the sheet's own margin (SPEC I86c). This
+            # leg is what makes the 114th round's move a CEILING and not a direction: WILLPOWER,
+            # the taller of the two, lands at exactly 20 under its title, so one more pixel up
+            # reddens here. Without it the centring formula alone would happily walk the content
+            # into the title as the box shrank.
+            elseif (($hiC - ([int]$ttlNode.GetAttribute("top") + [int]$ttlNode.GetAttribute("height"))) -lt 20) { $vpadBad += "$($f.Name) '$ttl' leaves $($hiC - ([int]$ttlNode.GetAttribute('top') + [int]$ttlNode.GetAttribute('height')))px between the title and the content, under the 20 every box on this sheet keeps (SPEC I86c, V280a)" }
+            # Centring is DERIVED and not a tolerance: the top gap is the floor of the halved
+            # remainder, so the odd pixel always falls BELOW (SPEC I86c, V267b). Written as one
+            # expected `top` rather than as two gaps compared loosely - a `-le 1` slack would
+            # accept the odd pixel on either side and stop measuring which.
+            elseif ($hiC -ne ($bodyTop + [math]::Floor(($bh - $bodyTop - ($loC - $hiC)) / 2))) { $vpadBad += "$($f.Name) '$ttl' ($($bh)px tall) opens its content at $hiC, not the $($bodyTop + [math]::Floor(($bh - $bodyTop - ($loC - $hiC)) / 2)) that centres it in the body with the odd pixel below - a stretched box pays CENTRING in place of the 20 (SPEC V267b, I73)" }
         }
         elseif ($hi -lt 20 -or $gapB -lt 20) {
             $vpadBad += "$($f.Name) '$ttl' ($($bh)px tall) opens with $hi above its first child and leaves $gapB under its last - neither may drop under 20 (SPEC I40, I73, V280a)"
@@ -9498,5 +9535,109 @@ else {
 
 if ($v310Bad) { foreach ($b in $v310Bad) { Fail "V310 $b" } }
 else { Pass "V310 the ritual filter reads one table of $($hrp310.Count) ritual(s) against a map of all 17 numina rows, answers inside pickAllowed before pickRefusal, rides the memo's own generation, and is woken by 17 names and 85 dots" }
+
+# ---- V312: the width ruler knows the FONT SIZE, and is still a ceiling -------------------
+# SPEC I86f, V312, R116, user 2026-08-26. Leg (c) is the one that gives B43 back if it falls:
+# a ruler that loosens is not a licence to re-tighten, and a comboBox CLIPS rather than wraps.
+$v312Bad = @()
+
+$gateSrc312 = [System.IO.File]::ReadAllText($PSCommandPath)
+$body312    = [regex]::Match($gateSrc312, '(?s)function NeededPx\(([^)]*)\)\s*\{(.*?)\n\}')
+
+# (a) TWO constants, and the 12pt one is picked by the ATTRIBUTE. A ruler chosen by control
+# NAME is a nominal exception wearing a formula's clothes (SPEC V312a).
+$def312 = [regex]::Match($gateSrc312, '(?m)^\$PX_PER_CHAR\s*=\s*([\d.]+)\s*$')
+$s12312 = [regex]::Match($gateSrc312, '(?m)^\$PX_PER_CHAR_12\s*=\s*([\d.]+)\s*$')
+
+if (-not $def312.Success) { $v312Bad += "`$PX_PER_CHAR is gone - the body ruler every label is measured against no longer exists and this check measured nothing (SPEC V209, V16)" }
+elseif (-not $s12312.Success) { $v312Bad += "`$PX_PER_CHAR_12 is gone - the fontSize axis collapsed back to one literal and the four fields of I86d are illegal again (SPEC V312a, V209)" }
+elseif (-not $body312.Success) { $v312Bad += "NeededPx could not be read - the one place that turns characters into pixels is unreadable (SPEC V312d, V209)" }
+else {
+    $defV312 = [double]$def312.Groups[1].Value
+    $s12V312 = [double]$s12312.Groups[1].Value
+
+    if ($defV312 -ne 6.5) { $v312Bad += "the body ruler is $defV312, not the 6.5 it has been calibrated at since the first round - the 114th round added an axis, it did not move this one (SPEC V312a)" }
+    # (b) the 12pt ruler stays ABOVE what the screen draws. R116 measured >1cm of slack beside
+    # a 55-character item in a 362px interior, which puts the truth at 5.89 or less.
+    if ($s12V312 -gt $defV312) { $v312Bad += "the 12pt ruler ($s12V312) is WIDER than the body ruler ($defV312) - smaller glyphs cannot need more pixels, so one of the two is upside down (SPEC V312b)" }
+    if ($s12V312 -lt 5.9) { $v312Bad += "the 12pt ruler is $s12V312, under the 5.9 R116's measurement bounds it at - below that it stops being a CEILING and becomes a guess, and what waits there is a comboBox that clips (SPEC V312b, B43, R116)" }
+
+    $nbody312 = $body312.Groups[2].Value
+    if ($nbody312 -notmatch '\$PX_PER_CHAR_12' -or $nbody312 -notmatch '\$PX_PER_CHAR\b') { $v312Bad += "NeededPx does not read BOTH rulers - whichever it dropped is a constant nothing consults (SPEC V312d)" }
+    if ($nbody312 -notmatch "12") { $v312Bad += "NeededPx never tests for the size 12 - the second ruler exists and no control can ever reach it (SPEC V312a)" }
+    if ($body312.Groups[1].Value -notmatch 'fontSize') { $v312Bad += "NeededPx does not take a fontSize - the ruler cannot be chosen by the attribute, only by the caller's opinion (SPEC V312a)" }
+    # The negative half of (a): the choice is made on the SIZE, never on who is asking.
+    if ($nbody312 -match 'cbo[A-Z]|GetAttribute\("name"\)|hedgeAffiliation') { $v312Bad += "NeededPx picks its ruler from a control NAME - that is a nominal exception, which is B38 arriving through the width door (SPEC V312a)" }
+
+    # (d) ONE place reads the rulers. Two owners for one sum is B70 on another axis - and the
+    # test is where they are READ, not how they are multiplied: the product is written against
+    # the chosen ruler, so counting `*` would measure the spelling of one line.
+    #
+    # Comment lines are cut first, or this check's own prose about $PX_PER_CHAR would count as
+    # a second reader and the leg would redden on itself.
+    $codeOnly312 = ($gateSrc312 -split "`n" | Where-Object { $_ -notmatch '^\s*#' }) -join "`n"
+    $outside312 = 0
+    foreach ($m312 in [regex]::Matches($codeOnly312, '\$PX_PER_CHAR(_12)?')) {
+        $lineAt312 = $codeOnly312.Substring(0, $m312.Index)
+        $lineAt312 = $lineAt312.Substring($lineAt312.LastIndexOf("`n") + 1)
+        if ($lineAt312 -match '^\$PX_PER_CHAR') { continue }          # the two definitions
+        if ($nbody312.Contains($m312.Value)) { continue }             # inside NeededPx
+        $outside312++
+    }
+    if ($outside312 -gt 0) { $v312Bad += "a ruler is read outside NeededPx and outside its own declaration - two owners for one sum is what B70 cost a round to find (SPEC V312d)" }
+
+    # (c) the ruler only LOOSENED. Every 12pt picker keeps the width it had, and the four of
+    # I86d are the whole of this round's narrowing - named, so a fifth cannot slip in quietly.
+    $WIDTH312 = @{
+        'cboHedgeAffiliation' = 360
+        'edtHedgeAffiliation' = 360
+        'cboHedgeAttr'        = 360
+    }
+    $doc312 = Doc (Join-Path $dir "WoD20.7.lfm")
+    $seen312 = 0
+    foreach ($nm312 in $WIDTH312.Keys) {
+        $node312 = @($doc312.SelectNodes("//*[@name='$nm312']"))[0]
+        if ($null -eq $node312) { $v312Bad += "'$nm312' is not on WoD20.7 - one of the controls I86d narrows cannot be found, so this leg measured less than it claims (SPEC V209)"; continue }
+        $seen312++
+        $w312 = [int]$node312.GetAttribute("width")
+        if ($w312 -ne $WIDTH312[$nm312]) { $v312Bad += "'$nm312' is ${w312}px, not the $($WIDTH312[$nm312]) I86d sets - the entry column is a GRID and one control leaving it reopens the ladder the user had removed (SPEC I86d, V297b)" }
+    }
+    if ($seen312 -ne 3) { $v312Bad += "only $seen312 of the 3 named entry controls were measured (SPEC V209)" }
+
+    # The Essence edit carries no name, so it is reached by its field - and it has to land on
+    # the same width as its two neighbours or V297b is the only thing left holding the grid.
+    $ess312 = @($doc312.SelectNodes("//edit[@field='hedgeEssence']"))[0]
+    if ($null -eq $ess312) { $v312Bad += "the hedgeEssence entry is gone from WoD20.7 - the middle row of the HEDGE MAGIC grid is unmeasured (SPEC V209, I86d)" }
+    elseif ([int]$ess312.GetAttribute("width") -ne 360) { $v312Bad += "the hedgeEssence entry is $([int]$ess312.GetAttribute('width'))px, not 360 - it is a free-text field with no list to price it, so nothing but this leg keeps it on the grid (SPEC I86d)" }
+
+    # No OTHER 12pt picker SPENT the slack, and the test says exactly that rather than guessing
+    # at a width: every one of them still clears the OLD 6.5 ruler, which each of them cleared
+    # before this round (the gate was green). The four of I86d are excluded because failing 6.5
+    # is the whole point of them.
+    #
+    # A bare width threshold cannot express this - the sheet has 12pt pickers at 150px holding
+    # three-word lists, and they are correct. The ruler gaining slack is not permission to spend
+    # it: the vampire ritual and path rows carry the longest strings the sheet owns, and they are
+    # exactly where B43 was found.
+    foreach ($f312 in $files) {
+        foreach ($cb312 in (Doc $f312.FullName).SelectNodes("//comboBox[@fontSize='12'][@width]")) {
+            $cn312 = $cb312.GetAttribute("name")
+            if ($WIDTH312.ContainsKey($cn312)) { continue }
+            $cw312 = 0; if (-not [int]::TryParse($cb312.GetAttribute("width"), [ref]$cw312)) { continue }
+            $tpl312 = TplOf $cb312
+            $need312 = 0; $worst312 = ""
+            foreach ($it312 in (ListOf $cb312 $tpl312)) {
+                if ($it312 -eq '') { continue }
+                $n312 = NeededPx $it312
+                if ($n312 -gt $need312) { $need312 = $n312; $worst312 = $it312 }
+            }
+            if ($need312 -eq 0) { continue }
+            if (($need312 + $ARROW) -gt $cw312) { $v312Bad += "$($f312.Name): the 12pt picker '$cn312' is ${cw312}px and would not clear the OLD 6.5 ruler ('$worst312' wants $($need312 + $ARROW)) - it spent slack the 114th round opened for four named controls and nobody else (SPEC V312c, R116)" }
+        }
+    }
+}
+
+if ($v312Bad) { foreach ($b in $v312Bad) { Fail "V312 $b" } }
+else { Pass "V312 the ruler is a pair - 6.5 for the body and $($s12312.Groups[1].Value) for 12pt, chosen by the attribute in the one place that multiplies - and only the 3 named entries plus hedgeEssence spent the slack" }
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

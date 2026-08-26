@@ -485,7 +485,7 @@
 				     compile error - the combo falls through to `or c.values` and opens BLANK
 				     with rdk exiting 0 (SPEC V211a, B6). -->
 				<label left="20" top="41" width="150" height="24" text="Affiliation"/>
-				<comboBox left="180" top="41" width="386" height="24" fontSize="12" name="cboHedgeAffiliation" field="hedgeAffiliation">
+				<comboBox left="180" top="41" width="360" height="24" fontSize="12" name="cboHedgeAffiliation" field="hedgeAffiliation">
 				</comboBox>
 
 				<!-- The typed twin of the picker above, one field and two widgets with exactly one
@@ -503,20 +503,20 @@
 				     ⚠ what is typed here is FREE text while the picker stores the canonical EN
 				     (SPEC V24), so the filters of I67/I68 read an affiliation they do not know and
 				     prune nothing - which is the right answer for homebrew, not an accident. -->
-				<edit name="edtHedgeAffiliation" left="180" top="41" width="386" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
+				<edit name="edtHedgeAffiliation" left="180" top="41" width="360" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
 
 				<!-- The label column is 150 because SPEC V16 prices it there and not by eye:
 				     `Atributo de Conjuracao` is 22 characters, which the house ruler puts at
 				     143px. These two rows share one label x and one entry x, so they are a GRID
 				     and not two controls that happen to line up (SPEC V224, B12, B13). -->
 				<label left="20" top="69" width="150" height="24" text="Essence"/>
-				<edit left="180" top="69" width="386" height="24" field="hedgeEssence"/>
+				<edit left="180" top="69" width="360" height="24" field="hedgeEssence"/>
 
 				<!-- cbo, not cmb: this is a picker of PROSE, so its list lives in PICKER_LIST and
 				     translates with the sheet (SPEC I27, V208 scope, B57). The nine names are the
 				     nine of XP_ATTRS, `Inteligence` in the sheet's own spelling (SPEC I3). -->
 				<label left="20" top="97" width="150" height="24" text="Casting Attribute"/>
-				<comboBox left="180" top="97" width="386" height="24" fontSize="12" name="cboHedgeAttr" field="hedgeAttr">
+				<comboBox left="180" top="97" width="360" height="24" fontSize="12" name="cboHedgeAttr" field="hedgeAttr">
 				</comboBox>
 			</layout>
 
@@ -538,16 +538,16 @@
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="20" width="367" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
 
-				<imageCheckBox left="60" top="91" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="89" top="91" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="118" top="91" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="147" top="91" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="176" top="91" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="205" top="91" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="234" top="91" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="263" top="91" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="292" top="91" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="321" top="91" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="60" top="70" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="89" top="70" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="118" top="70" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="147" top="70" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="176" top="70" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="205" top="70" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="234" top="70" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="263" top="70" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="292" top="70" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="321" top="70" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			</layout>
 
 			<!-- The WILLPOWER box of the Combat tab, moved here and not redesigned (SPEC I63,
@@ -563,7 +563,7 @@
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="20" width="367" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
-				<layout left="78" top="81" width="250" height="45">
+				<layout left="78" top="60" width="250" height="45">
 					<WillpowerNumina/>
 				</layout>
 			</layout>
