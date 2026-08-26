@@ -7139,27 +7139,16 @@ if ($arcSeen -lt 328) { Fail "V258 only $arcSeen opaque entry field(s) were meas
 elseif ($arcBad) { foreach ($b in $arcBad) { Fail "V258 $b" } }
 else { Pass "V258 all $arcSeen opaque entry fields clear the corner bite - none of them enters a radius square" }
 
-# ---- V259: the two Ghoul boxes are NEIGHBOURS ----------------------------------------
-# BLOOD POOL's left is DOMINATOR's width plus the house gap of 10 (SPEC I55). V239 already
-# stops dead tail INSIDE a box and V225 already pins the four boxes to one ruler, but nothing
-# measured the gap BETWEEN these two: shrink DOMINATOR and leave BLOOD POOL parked where it
-# was and every other check stays green over 265px of nothing - the same dead tail three of
-# the fourteen requests in the 82nd round were about, and the silent shape of B6.
+# ---- V259: REVOKED - absorbed by V298 (SPEC B70, user 2026-08-25) --------------------
+# It measured DOMINATOR -> BLOOD POOL, and that pair is box-to-box under one parent, so V298
+# already walks it among the 73 boxes it collects - with a zero-guard of its own. V259 had ONE
+# leg and that leg WAS the gap, so nothing is left standing once the gap has an owner.
 #
-# One leg on purpose. The ruler, the symmetry and the fit inside the pane all have owners.
-$ghoulDoc  = Doc (Join-Path $dir "WoD20.11.lfm")
-$domBox    = $ghoulDoc.SelectSingleNode("//layout[label/@name='lblMaxDisc']")
-$poolBox   = $ghoulDoc.SelectSingleNode("//layout[imageCheckBox/@field='bloodPool_1']")
-if ($null -eq $domBox)  { Fail "V259 the DOMINATOR box is gone from WoD20.11 - there is nothing to measure the gap from (SPEC V209)" }
-elseif ($null -eq $poolBox) { Fail "V259 the BLOOD POOL box is gone from WoD20.11 - there is nothing to measure the gap to (SPEC V209)" }
-else {
-    $domW = -1; $poolL = -1
-    [void][int]::TryParse($domBox.GetAttribute("width"), [ref]$domW)
-    [void][int]::TryParse($poolBox.GetAttribute("left"), [ref]$poolL)
-    if ($domW -le 0 -or $poolL -lt 0) { Fail "V259 the two boxes do not both declare their geometry (width=$domW, left=$poolL) - the gap cannot be read" }
-    elseif ($poolL -ne ($domW + 15)) { Fail "V259 BLOOD POOL opens at $poolL beside a DOMINATOR $($domW) wide - that is $($poolL - $domW)px of gap where the house leaves 15, and the difference is dead space no other check can see (SPEC I55, I76a)" }
-    else { Pass "V259 BLOOD POOL sits 15 to the right of DOMINATOR ($domW + 15 = $poolL) - no dead space between the two" }
-}
+# It is deleted rather than pointed at the new number, because carrying the literal here is
+# what B70 IS: the gap was spelled in THREE checks - this one, V298, and an undeclared leg
+# inside V262 - and two rounds of amendment moved only one of them. This copy also drifted
+# from its own SPEC line, which still read 10 while the check read 15. V298 owns the number;
+# anything measuring a box gap delegates to it instead of writing the number down again.
 
 # ---- V260: the order of the log is the STAMP, and there is one stamp ------------------
 # The rows are a DIFF of the frozen character against this one, and a diff carries no
@@ -7320,9 +7309,9 @@ else {
         #
         # What the old leg was really protecting is that no strip of dead space opens anywhere
         # across a row, so that is what is measured now, and it is STRICTER than before: every
-        # row of boxes has to TILE - open at 0, close on the ruler the widest row sets, and hand over
-        # to its neighbour with the 15px gutter I76a gives every pair. Shrinking one box of a pair passes
-        # old leg (the sibling still closes the line) and fails this one on the gutter.
+        # row of boxes has to TILE - open at 0 and close on the ruler the widest row sets. The gutter
+        # between neighbours is NOT read here any more (SPEC B70); V298 owns that number. Shrinking one
+        # box of a pair passes the old leg (the sibling still closes the line) and fails V298 on the gap.
         # Since the 91st round the Hedge pane holds panes of its OWN (SPEC I64), and the list
         # that used to sit here moved into one of them. A collector that reads only the three
         # top panes would go on passing while measuring one row instead of two - the shape of
@@ -7381,10 +7370,12 @@ else {
                 $shape = ($row | ForEach-Object { "$($_.N) $($_.L)..$($_.R)" }) -join ' | '
                 if ($row[0].L -ne 0) { $v262Bad += "row $k opens at x=$($row[0].L), not at 0 - a row that starts short leaves dead space no other check reads: $shape" }
                 if ($row[$row.Count - 1].R -ne $numRuler) { $v262Bad += "row $k closes at x=$($row[$row.Count - 1].R), not on the $numRuler the widest row of the three panes sets: $shape" }
-                for ($i = 1; $i -lt $row.Count; $i++) {
-                    $gut = $row[$i].L - $row[$i - 1].R
-                    if ($gut -ne 15) { $v262Bad += "row $k hands over with a $($gut)px gutter, not the 15 I76a gives every pair of boxes: $shape" }
-                }
+                # The gutter between two boxes of a row is NOT measured here. It used to be,
+                # spelled 15, and SPEC V262 never declared that leg - a live check the spec did
+                # not know about, the inverse of B7. The four rows it walked are box-to-box, so
+                # V298 already measures every one of them against the one number that owns the
+                # gap (SPEC B70). What (c) keeps is what (c) always said: opens at 0, closes on
+                # the ruler.
             }
         }
     }
@@ -8513,7 +8504,8 @@ else {
 
 # ---- V280: what a section box is spaced BY (SPEC I73, V280, user 2026-08-24) -----------
 # TWO legs since the 107th round - (b), the gap between two boxes, left for V298 when the user
-# took it from 20 to 15 (SPEC I76a). What is left here is the INTERNAL margin, still 20.
+# took it from 20 to 15 to 10 to 5 (SPEC I76a). What is left here is the INTERNAL margin,
+# still 20 - the two numbers diverge by 4x now, and V298 is the single owner of the gap (B70).
 # What they replace is the thing that made I73 necessary in the first place: a
 # mixture of 10, 15 and 20 measured across the sheet on 2026-08-24, every one of them derived
 # box by box because nothing here held a single number for either question.
@@ -8579,16 +8571,22 @@ else {
 }
 
 # ---- V298: the gap BETWEEN two section boxes (SPEC I76a, V298, user 2026-08-25) --------
-# This IS V280b, moved out and re-numbered because the number changed: 20 -> 15 on both axes.
-# The old leg is gone rather than loosened - two rules over one gap is the shape B7 warns
-# about, and a check that accepts either number accepts the drift it exists to catch.
+# This IS V280b, moved out and re-numbered when it split off; the NUMBER since then is amended in
+# place - 20 on the 98th, 15 on the 108th, 10 on the 110th, 5 here - only the literal moves, and a third
+# name for one rule is what T664 chose against. The old value is gone rather than tolerated: two
+# rules over one gap is the shape B7 warns about, and a check that accepts either number accepts
+# the drift it exists to catch - so the mutation this check owes is 10, the value of the round
+# just gone, not the 20 nobody would author by accident any more.
 #
-# 15 and the INTERNAL margin of 20 are now DIFFERENT numbers, on purpose (SPEC I76a): the
-# margin pays for the ornament's palmette, which reaches 23 on the diagonal, and a gap pays
-# for nothing but telling two 3px strokes apart. V280a keeps the 20 and this keeps the 15.
+# 5 and the INTERNAL margin of 20 are DIFFERENT numbers, on purpose (SPEC I76a), and they now
+# diverge by 2x: the margin pays for the ornament's palmette, which reaches 23 on the diagonal,
+# and a gap pays for nothing at all - at 5 it no longer even parts the two 3px strokes it sits
+# between, it BUTTS them (SPEC I76a: centred stroke leaves ~2px of air, inset leaves 5 - the
+# screen answers that, T678 asks it). V280a keeps the 20, this keeps the 5, and they are 4x apart.
 #
 # BOTH axes, because B52 cost a whole round proving a mutation on X says nothing about Y
-# (SPEC V222), and Y is the axis that carried the 5px of WoD20.4 while X had nothing under 10.
+# (SPEC V222), and Y is the axis that carried the 5px of WoD20.4 when I73 first measured the
+# sheet, while X had nothing below 10 even then.
 #
 # Neighbours, not every pair: two boxes under one parent that face each other with no third
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
@@ -8611,7 +8609,7 @@ else {
                 if (-not $between) {
                     $gapsX++
                     $g = $c.L - ($a.L + $a.W)
-                    if ($g -ne 15) { $v298Bad += "$($a.F) '$($a.N)' closes at x=$($a.L + $a.W) and '$($c.N)' opens at x=$($c.L) - $($g)px between two section boxes where the house leaves 15 (SPEC I76a, V298)" }
+                    if ($g -ne 5) { $v298Bad += "$($a.F) '$($a.N)' closes at x=$($a.L + $a.W) and '$($c.N)' opens at x=$($c.L) - $($g)px between two section boxes where the house leaves 5 (SPEC I76a, V298)" }
                 }
             }
             if (($a.L -lt ($c.L + $c.W)) -and ($c.L -lt ($a.L + $a.W)) -and ($c.T -ge ($a.T + $a.H))) {
@@ -8623,14 +8621,14 @@ else {
                 if (-not $between) {
                     $gapsY++
                     $g = $c.T - ($a.T + $a.H)
-                    if ($g -ne 15) { $v298Bad += "$($a.F) '$($a.N)' closes at y=$($a.T + $a.H) and '$($c.N)' opens at y=$($c.T) - $($g)px between two section boxes where the house leaves 15 (SPEC I76a, V298)" }
+                    if ($g -ne 5) { $v298Bad += "$($a.F) '$($a.N)' closes at y=$($a.T + $a.H) and '$($c.N)' opens at y=$($c.T) - $($g)px between two section boxes where the house leaves 5 (SPEC I76a, V298)" }
                 }
             }
         } }
     }
     if ($gapsX -eq 0 -or $gapsY -eq 0) { $v298Bad += "measured $gapsX gap(s) on X and $gapsY on Y - an axis with no gap read is an axis with no rule, which is exactly the half of B52 that shipped green (SPEC V209, V222)" }
     if ($v298Bad) { foreach ($b in $v298Bad) { Fail "V298 $b" } }
-    else { Pass "V298 $gapsX gaps on X and $gapsY on Y between section boxes are all 15 apart" }
+    else { Pass "V298 $gapsX gaps on X and $gapsY on Y between section boxes are all 5 apart" }
 }
 
 # ---- V281: what a tab BUTTON is spaced by, HORIZONTALLY (SPEC I73, V281, T616) ---------
@@ -8974,6 +8972,119 @@ else {
 
     if ($v305Bad) { foreach ($b in $v305Bad) { Fail "V305 $b" } }
     else { Pass "V305 all $($want305.Count) sub-tabs carry both words, authored opposite on the side their group opens, and the accent is four different colours across the four palettes" }
+}
+
+
+# ---- V307: the line work runs where the LEVEL says (SPEC I79, I80) --------------------
+# Amended in the 111th round, not renumbered. It was born measuring the 19 buttons as ONE
+# population, and the user treats the two levels as different things: the 110th round's drop was
+# asked for the ELEVEN of the top bar, and it reached the eight sub-tabs too (B69). A single
+# ruler over populations the user keeps apart is a product decision written as geometry.
+#
+# (a) is the relation the 110th round bought: the word ends, then 3px, then the drawing - with
+# the three constants READ out of WoD20.6 and never spelled here, so moving either side reddens.
+#
+# (b) is the OPPOSITE, and deliberately so: on a sub-bar the label covers the whole button and
+# the short rule runs inside it. That is the state the user saw on screen and approved in the
+# 109th round. The leg measures no clearance - it exists so that undoing this takes a REQUEST,
+# and so the next reader does not "fix" an approved drawing back into the shape B69 produced.
+$v307Bad = @()
+$top307 = 0
+$sub307 = 0
+$mk307 = [regex]::Match($hh6, '(?m)^\s*local ORN_MARK\s*=\s*([\d.]+);')
+$mk2_307 = [regex]::Match($hh6, '(?m)^\s*local ORN_MARK2\s*=\s*([\d.]+);')
+$ry307 = [regex]::Match($hh6, '(?m)^\s*local ORN_MARK_RY\s*=\s*([\d.]+);')
+$sm307 = [regex]::Match($hh6, '(?m)^\s*local ORN_SUB_MARK\s*=\s*([\d.]+);')
+if (-not ($mk307.Success -and $mk2_307.Success -and $ry307.Success -and $sm307.Success)) {
+    Fail "V307 ORN_MARK / ORN_MARK2 / ORN_MARK_RY / ORN_SUB_MARK could not all be read out of WoD20.6 - the Lua side of these relations is unreadable, so the legs are no-ops (SPEC V209, V20)"
+}
+else {
+    $artTop307 = [Math]::Max([double]$mk2_307.Groups[1].Value, [double]$mk307.Groups[1].Value + [double]$ry307.Groups[1].Value)
+    # 3 until the 112th round, when the user asked the drawing closer to the word (SPEC I81). It
+    # is measured on the label BOX, and the gate does not know the height of a GLYPH - PX_PER_CHAR
+    # measures width and nothing measures height (SPEC R102) - so at 1 the four eras, on four
+    # different fonts, are what decide whether it touches. That is a screen question, not a static
+    # one, and §T681 is where it gets answered.
+    $clear307 = 1
+    foreach ($pr307 in @(@("WoD20th.lfm", "tabStrip"), @("WoD20.11.lfm", "vampStrip"), @("WoD20.7.lfm", "numStrip"), @("WoD20.7.lfm", "hedgeStrip"))) {
+        $st307 = (Doc (Join-Path $dir $pr307[0])).SelectSingleNode("//layout[@name='$($pr307[1])']")
+        if ($null -eq $st307) { $v307Bad += "$($pr307[1]) is gone from $($pr307[0]) (SPEC I32, I58, V209)"; continue }
+        $isTop307 = ($pr307[1] -eq 'tabStrip')
+        foreach ($b307 in $st307.SelectNodes("rectangle[starts-with(@name,'btnTab')]")) {
+            $bn307 = $b307.GetAttribute("name")
+            $bh307 = [double]$b307.GetAttribute("height")
+            $seen307 = @()
+            if ($isTop307) { $top307++ } else { $sub307++ }
+            foreach ($l307 in $b307.SelectNodes("label")) {
+                $lt307 = [double]$l307.GetAttribute("top")
+                $lh307 = [double]$l307.GetAttribute("height")
+                $seen307 += "$lt307/$lh307"
+                if ($isTop307) {
+                    # (a) the word ends, the clearance, then the drawing.
+                    if (($lt307 + $lh307) -gt ($bh307 - $artTop307 - $clear307)) {
+                        $v307Bad += "$bn307's word ends at $($lt307 + $lh307) and the line work starts at $($bh307 - $artTop307) - on the TOP bar the drawing runs below the word (SPEC I79, V307a, B68)"
+                    }
+                }
+                else {
+                    # (b) the approved state: the word covers the button, the short rule runs in it.
+                    if ($lh307 -ne $bh307 -or $lt307 -ne 0) {
+                        $v307Bad += "$bn307's word is $($lh307)px at top $lt307 inside a $($bh307)px button - on a SUB-bar the word covers the button, which is the state the user approved in the 109th round; shrinking it here is B69 coming back (SPEC I80b, V307b)"
+                    }
+                    if (($bh307 - [double]$sm307.Groups[1].Value) -ge ($lt307 + $lh307)) {
+                        $v307Bad += "$bn307's short rule runs at $($bh307 - [double]$sm307.Groups[1].Value), at or below the word's box ending at $($lt307 + $lh307) - the sub-bar rule sits INSIDE the label box by decision, and moving it out is the top bar's ruler leaking down again (SPEC I80b, V307b, B69)"
+                    }
+                }
+            }
+            # (c) both words of a pair on the same vertical geometry, or the sub-tab jumps as it opens.
+            if (($seen307 | Sort-Object -Unique).Count -gt 1) {
+                $v307Bad += "$bn307 carries words on different vertical geometry ($($seen307 -join ', ')) - the pair would open at a different height than it closed (SPEC V307c, V305a)"
+            }
+        }
+    }
+    if ($top307 -ne 11 -or $sub307 -ne 8) { Fail "V307 read $top307 top-bar button(s) and $sub307 sub-bar button(s), expected 11 and 8 - this check is covering less than the four bars hold (SPEC V209)" }
+    elseif ($v307Bad) { foreach ($b in $v307Bad) { Fail "V307 $b" } }
+    else { Pass "V307 the $top307 top-bar words clear the line work by $clear307, and the $sub307 sub-bar words keep the 109th round's shape the user approved - two levels, two rulers" }
+}
+
+# ---- V308: a motif's constant does not cross into another motif (SPEC I80c) ------------
+# This measures the CODE, not the drawing, and it is the invariant B69 asks for. markPath grew
+# three motifs in the 109th round and the constants stayed in one heap, so ORN_MARK was read by
+# `tab` AND `sub`, and ORN_MARK_RY by `tab` AND `sep`. The 110th round then moved the top bar
+# and moved two other levels with it - rdk -l exit 0, gate green, and the damage one level away
+# from the edit that caused it, which is the B6 family.
+#
+# ORN_PILLR is the declared exception: it is not a drawing choice but the arc V228 authors on
+# every button, so it is one fact with one owner (SPEC V49) and every motif may read it.
+$v308Bad = @()
+$geo308 = LuaFn $hh6 'markPath'
+if (-not $geo308) { Fail "V308 markPath is gone from WoD20.6 - there are no motifs to read (SPEC I78b, V209)" }
+else {
+    $body308 = NoComments $geo308
+    $iSep308 = $body308.IndexOf('if kind == "sep" then')
+    $iSub308 = $body308.IndexOf('if kind == "sub" then')
+    if ($iSep308 -lt 0 -or $iSub308 -lt 0 -or $iSub308 -le $iSep308) {
+        Fail "V308 markPath does not hold the sep and sub branches in that order - the slices this check reads cannot be cut (SPEC I78b, V209)"
+    }
+    else {
+        # Three slices: sep, sub, and whatever follows them - which is the top bar's motif.
+        $slices308 = @(
+            @{ name = 'sep'; text = $body308.Substring($iSep308, $iSub308 - $iSep308); forbid = @('ORN_MARK', 'ORN_MARK2', 'ORN_MARK_RX', 'ORN_MARK_RY', 'ORN_MARK_GAP', 'ORN_SUB', 'ORN_SUB_MARK') },
+            @{ name = 'sub'; text = $body308.Substring($iSub308, $body308.IndexOf('return table.concat', $iSub308) - $iSub308); forbid = @('ORN_MARK', 'ORN_MARK2', 'ORN_MARK_RX', 'ORN_MARK_RY', 'ORN_MARK_GAP', 'ORN_SEP_RX', 'ORN_SEP_RY') },
+            @{ name = 'tab'; text = $body308.Substring($body308.IndexOf('return table.concat', $iSub308)); forbid = @('ORN_SUB', 'ORN_SUB_MARK', 'ORN_SEP_RX', 'ORN_SEP_RY') }
+        )
+        foreach ($sl308 in $slices308) {
+            foreach ($bad308 in $sl308.forbid) {
+                # ORN_MARK is a prefix of ORN_MARK2 and ORN_MARK_RX; ORN_SUB of ORN_SUB_MARK.
+                if ($sl308.text -match ("\b" + [regex]::Escape($bad308) + "\b(?!_|\d)")) {
+                    $v308Bad += "the `"$($sl308.name)`" motif reads $bad308, which belongs to another motif - that sharing is exactly how the 110th round moved three levels when it was asked to move one (SPEC I80c, B69)"
+                }
+            }
+        }
+        if ($body308 -notmatch '\bORN_SUB_MARK\b') { $v308Bad += "the sub motif has no ORN_SUB_MARK of its own - without it the short rule is back on the top bar's constant (SPEC I80b, I80c)" }
+        if ($body308 -notmatch '\bORN_SEP_RY\b') { $v308Bad += "the sep motif has no ORN_SEP_RY of its own - the separator's fleuron is back on the top bar's constant (SPEC I80c)" }
+        if ($v308Bad) { foreach ($b in $v308Bad) { Fail "V308 $b" } }
+        else { Pass "V308 the three motifs of markPath each read their own family of constants - only ORN_PILLR, the arc V228 authors, is shared" }
+    }
 }
 
 # ---- V284: the filigree of a box that RESIZES is redrawn, not inherited ---------------

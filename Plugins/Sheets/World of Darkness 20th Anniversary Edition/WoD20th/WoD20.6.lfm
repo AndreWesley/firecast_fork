@@ -1883,13 +1883,27 @@
 			-- 1px, and that is the whole reason this is a <path> and not a rectangle: applyTheme writes
 			-- THEME_STROKE=3 onto every rectangle it repaints (SPEC V67), and the drawing the user chose
 			-- is a hairline. The rectangle underneath is a CARRIER now - transparent both ways (SPEC I78a).
+			-- ONE FAMILY PER MOTIF since the 111th round (SPEC I80c, V308). They were one heap until B69:
+			-- ORN_MARK was read by the `tab` motif AND the `sub` one, and ORN_MARK_RY by `tab` AND `sep`,
+			-- so the 110th round moved the top bar and took the other two levels with it - with nothing in
+			-- the code able to say `only the top one`. ORN_PILLR is the declared exception and stays shared:
+			-- it is not a drawing choice, it is the arc V228 authors on all 19 buttons (one fact, one owner).
 			local ORN_PILLR    = 14;    -- the radius V228 authors on every tab button
-			local ORN_MARK     = 7;     -- the lower rule, up from the marker's foot
-			local ORN_MARK2    = 11;    -- the upper rule, on the top bar only
+
+			-- motif `tab`: two rules, the lower one opened for a fleuron
+			local ORN_MARK     = 5;     -- the lower rule, up from the marker's foot
+			local ORN_MARK2    = 9;     -- the upper rule
 			local ORN_MARK_RX  = 4;     -- fleuron half-width
-			local ORN_MARK_RY  = 3.5;   -- fleuron half-height
+			local ORN_MARK_RY  = 3;     -- fleuron half-height
 			local ORN_MARK_GAP = 4;     -- clear space each side of the fleuron
-			local ORN_SUB      = 0.18;  -- a sub-bar rule is short: this much of the width in from each end
+
+			-- motif `sub`: one short rule, where the user approved it in the 109th round (SPEC I80b)
+			local ORN_SUB      = 0.18;  -- short: this much of the width in from each end
+			local ORN_SUB_MARK = 7;     -- the rule, up from the marker's foot
+
+			-- motif `sep`: the fleuron alone, between two sub-tab words
+			local ORN_SEP_RX   = 4;     -- fleuron half-width
+			local ORN_SEP_RY   = 3.5;   -- fleuron half-height
 
 			-- Path data is parsed as SVG, where a comma separates x from y. The C library float
 			-- verbs follow LC_NUMERIC, so on a pt-BR host they write a decimal COMMA and every
@@ -2140,10 +2154,10 @@
 
 				-- The separator is the fleuron alone, centred in its 16x30 carrier (SPEC I78d).
 				if kind == "sep" then
-					o[#o + 1] = "M" .. ornNum(cx) .. "," .. ornNum(cy - ORN_MARK_RY);
-					o[#o + 1] = "L" .. ornNum(cx + ORN_MARK_RX) .. "," .. ornNum(cy);
-					o[#o + 1] = "L" .. ornNum(cx) .. "," .. ornNum(cy + ORN_MARK_RY);
-					o[#o + 1] = "L" .. ornNum(cx - ORN_MARK_RX) .. "," .. ornNum(cy);
+					o[#o + 1] = "M" .. ornNum(cx) .. "," .. ornNum(cy - ORN_SEP_RY);
+					o[#o + 1] = "L" .. ornNum(cx + ORN_SEP_RX) .. "," .. ornNum(cy);
+					o[#o + 1] = "L" .. ornNum(cx) .. "," .. ornNum(cy + ORN_SEP_RY);
+					o[#o + 1] = "L" .. ornNum(cx - ORN_SEP_RX) .. "," .. ornNum(cy);
 					o[#o + 1] = "Z";
 
 					return table.concat(o, " ");
@@ -2157,8 +2171,8 @@
 
 					if w - 2 * i <= 0 then return ""; end;
 
-					o[#o + 1] = "M" .. ornNum(i) .. "," .. ornNum(h - ORN_MARK);
-					o[#o + 1] = "L" .. ornNum(w - i) .. "," .. ornNum(h - ORN_MARK);
+					o[#o + 1] = "M" .. ornNum(i) .. "," .. ornNum(h - ORN_SUB_MARK);
+					o[#o + 1] = "L" .. ornNum(w - i) .. "," .. ornNum(h - ORN_SUB_MARK);
 
 					return table.concat(o, " ");
 				end;
@@ -2593,7 +2607,7 @@
 			and the same 14px above the first line as below the last - it was 10 and 5, and the
 			lopsided pair is what showed. Both boxes on this tab went 330 -> 380 wide with it.
 		-->
-		<layout left="0" top="160" width="420" height="170">
+		<layout left="0" top="150" width="420" height="170">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<label left="20" top="20" width="380" height="20" text="Credits" horzTextAlign="center"/>

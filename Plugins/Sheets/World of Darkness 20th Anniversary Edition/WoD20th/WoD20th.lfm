@@ -3621,7 +3621,7 @@
 			<rectangle name="btnTabMain" left="30" top="5" width="99" height="30" color="#00000000"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabMain', self);">
-				<label left="0" top="0" width="99" height="30" text="Main" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="99" height="20" text="Main" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnTraits" left="133" top="5" width="79" height="30" color="#00000000" strokeColor="#00000000"
@@ -3629,7 +3629,7 @@
 			<rectangle name="btnTabTraits" left="133" top="5" width="79" height="30" color="#00000000"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabTraits', self);">
-				<label left="0" top="0" width="79" height="30" text="Traits" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="79" height="20" text="Traits" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnNumina" left="216" top="5" width="79" height="30" color="#00000000" strokeColor="#00000000"
@@ -3637,7 +3637,7 @@
 			<rectangle name="btnTabNumina" left="216" top="5" width="79" height="30" color="#00000000"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabNumina', self);">
-				<label left="0" top="0" width="79" height="30" text="Numina" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="79" height="20" text="Numina" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnDisciplines" left="299" top="5" width="92" height="30" color="#00000000" strokeColor="#00000000"
@@ -3645,7 +3645,7 @@
 			<rectangle name="btnTabDisciplines" left="299" top="5" width="92" height="30" color="#00000000" visible="false"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabDisciplines', self);">
-				<label left="0" top="0" width="92" height="30" text="Ghoul" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="92" height="20" text="Ghoul" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnCombat" left="395" top="5" width="86" height="30" color="#00000000" strokeColor="#00000000"
@@ -3653,7 +3653,7 @@
 			<rectangle name="btnTabCombat" left="395" top="5" width="86" height="30" color="#00000000"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabCombat', self);">
-				<label left="0" top="0" width="86" height="30" text="Combat" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="86" height="20" text="Combat" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnInventory" left="485" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
@@ -3661,7 +3661,7 @@
 			<rectangle name="btnTabInventory" left="485" top="5" width="105" height="30" color="#00000000"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabInventory', self);">
-				<label left="0" top="0" width="105" height="30" text="Inventory" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="105" height="20" text="Inventory" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnBackground" left="594" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
@@ -3669,7 +3669,7 @@
 			<rectangle name="btnTabBackground" left="594" top="5" width="105" height="30" color="#00000000"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabBackground', self);">
-				<label left="0" top="0" width="105" height="30" text="Background" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="105" height="20" text="Background" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnProgress" left="703" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
@@ -3677,7 +3677,7 @@
 			<rectangle name="btnTabProgress" left="703" top="5" width="112" height="30" color="#00000000"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabProgress', self);">
-				<label left="0" top="0" width="112" height="30" text="Experience" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="112" height="20" text="Experience" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnNotes" left="819" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
@@ -3685,7 +3685,7 @@
 			<rectangle name="btnTabNotes" left="819" top="5" width="99" height="30" color="#00000000"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabNotes', self);">
-				<label left="0" top="0" width="99" height="30" text="Notes" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="99" height="20" text="Notes" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnSettings" left="922" top="5" width="125" height="30" color="#00000000" strokeColor="#00000000"
@@ -3693,7 +3693,7 @@
 			<rectangle name="btnTabSettings" left="922" top="5" width="125" height="30" color="#00000000"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabSettings', self);">
-				<label left="0" top="0" width="125" height="30" text="Settings" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="125" height="20" text="Settings" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 
 			<rectangle name="tabOnStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
@@ -3701,7 +3701,7 @@
 			<rectangle name="btnTabStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" visible="false"
 			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 			           onClick="selectTab('tabStoryteller', self);">
-				<label left="0" top="0" width="112" height="30" text="Storyteller" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				<label left="0" top="0" width="112" height="20" text="Storyteller" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 			</rectangle>
 		</layout>
 

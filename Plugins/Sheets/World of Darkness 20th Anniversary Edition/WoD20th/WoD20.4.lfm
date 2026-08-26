@@ -67,7 +67,7 @@
 			contents - `aparencia` holds languages and `idiomas` holds goals. Recorded in SPEC C
 			so nobody "fixes" the names later and silently drops player text.
 		-->
-		<layout left="0" top="140" width="490" height="196">
+		<layout left="0" top="130" width="490" height="196">
 			<rectangle left="0" top="0" width="490" height="196" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="20" top="20" width="450" height="20" text="Languages" horzTextAlign="center"/>
 			<textEditor left="35" top="41" width="420" height="135" field="aparencia"/>
@@ -81,27 +81,27 @@
 		     in them but own no widget any more - SPEC I3 lists them as declared orphans, and the
 		     gate fails if either name is ever reused for something else. The `Concept` and
 		     `Nature` .lang keys stay: the Main tab still renders both. -->
-		<layout left="0" top="351" width="235" height="196">
+		<layout left="0" top="331" width="235" height="196">
 			<rectangle left="0" top="0" width="235" height="196" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="20" top="20" width="195" height="20" text="Moral Flaws" horzTextAlign="center"/>
 			<textEditor left="35" top="41" width="165" height="135" field="moralFlaws"/>
         </layout>
-        <layout left="250" top="351" width="240" height="196">
-			<rectangle left="0" top="0" width="240" height="196" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="20" top="20" width="200" height="20" text="Fears" horzTextAlign="center"/>
-			<textEditor left="35" top="41" width="170" height="135" field="fears"/>
+        <layout left="240" top="331" width="250" height="196">
+			<rectangle left="0" top="0" width="250" height="196" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+	        <label left="20" top="20" width="210" height="20" text="Fears" horzTextAlign="center"/>
+			<textEditor left="35" top="41" width="180" height="135" field="fears"/>
         </layout>
 
-		<layout left="0" top="562" width="490" height="196">
+		<layout left="0" top="532" width="490" height="196">
 			<rectangle left="0" top="0" width="490" height="196" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="20" top="20" width="450" height="20" text="Goals" horzTextAlign="center"/>
 			<textEditor left="35" top="41" width="420" height="135" field="idiomas"/>
         </layout>
 
-		<layout left="505" top="140" width="675" height="618">
+		<layout left="495" top="130" width="685" height="598">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="20" top="20" width="635" height="20" text="Prelude" horzTextAlign="center"/>
-			<richEdit left="35" top="41" width="605" height="557" field="background" backgroundColor="#333333" defaultFontSize="12" defaultFontColor="white"/>
+	        <label left="20" top="20" width="645" height="20" text="Prelude" horzTextAlign="center"/>
+			<richEdit left="35" top="41" width="615" height="537" field="background" backgroundColor="#333333" defaultFontSize="12" defaultFontColor="white"/>
         </layout>
 	</scrollBox>
 </form>

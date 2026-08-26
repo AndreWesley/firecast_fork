@@ -9,13 +9,13 @@
 			<textEditor left="35" top="41" width="370" height="540" field="anotacoes1"/>
         </layout>
 
-		<layout left="455" top="0" width="440" height="601">
+		<layout left="445" top="0" width="440" height="601">
 			<rectangle left="0" top="0" width="440" height="601" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="20" top="20" width="400" height="20" text="Notes" horzTextAlign="center"/>
 			<textEditor left="35" top="41" width="370" height="540" field="anotacoes2"/>
         </layout>
 
-		<layout left="910" top="0" width="440" height="601">
+		<layout left="890" top="0" width="440" height="601">
 			<rectangle left="0" top="0" width="440" height="601" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 	        <label left="20" top="20" width="400" height="20" text="Notes" horzTextAlign="center"/>
 			<textEditor left="35" top="41" width="370" height="540" field="anotacoes3"/>

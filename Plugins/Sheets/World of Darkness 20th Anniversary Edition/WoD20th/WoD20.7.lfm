@@ -534,20 +534,20 @@
 			     top=107 is the CENTRE of the body, not a row position: the box is stretched to the
 			     band's 178 and 107 - 61 equals 178 - 132, the body opening 20 under the title I73
 			     put at 20 (SPEC I63, V267b, I73). -->
-			<layout left="601" top="0" width="397" height="178">
+			<layout left="591" top="0" width="407" height="178">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="20" top="20" width="357" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
+				<label left="20" top="20" width="367" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
 
-				<imageCheckBox left="55" top="107" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="84" top="107" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="113" top="107" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="142" top="107" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="171" top="107" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="200" top="107" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="229" top="107" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="258" top="107" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="287" top="107" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="316" top="107" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="60" top="107" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="89" top="107" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="118" top="107" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="147" top="107" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="176" top="107" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="205" top="107" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="234" top="107" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="263" top="107" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="292" top="107" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="321" top="107" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			</layout>
 
 			<!-- The WILLPOWER box of the Combat tab, moved here and not redesigned (SPEC I63,
@@ -559,11 +559,11 @@
 
 			     The 250x45 block sits at 105/97: 105 = (460 - 250) / 2 and 97 - 61 = 178 - 142, the
 			     same centring the box beside it pays (SPEC V267b). -->
-			<layout left="1013" top="0" width="397" height="178">
+			<layout left="1003" top="0" width="407" height="178">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="20" top="20" width="357" height="20" text="WILLPOWER" horzTextAlign="center"/>
+				<label left="20" top="20" width="367" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
-				<layout left="73" top="97" width="250" height="45">
+				<layout left="78" top="97" width="250" height="45">
 					<WillpowerNumina/>
 				</layout>
 			</layout>
@@ -673,10 +673,10 @@
 					Read-only on purpose: this block displays book text, it is not a note field. No
 					`field=` either, so nothing here is written to the character (SPEC V29 / R.12).
 				-->
-				<layout left="601" top="0" width="809" height="486">
+				<layout left="591" top="0" width="819" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-					<label left="20" top="20" width="769" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-					<textEditor name="edtHedgeDesc" left="30" top="41" width="749" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'numinaSel');"/>
+					<label left="20" top="20" width="779" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+					<textEditor name="edtHedgeDesc" left="30" top="41" width="759" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'numinaSel');"/>
 				</layout>
 			</layout>
 
@@ -742,10 +742,10 @@
 				     it opens for the storyteller only on a typed row, exactly as the other two do
 				     (SPEC I62, V266). The list is empty until the rituals are entered, so what a
 				     player sees here today is a state sentence, never a blank box (SPEC V33). -->
-				<layout left="601" top="0" width="809" height="486">
+				<layout left="591" top="0" width="819" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-					<label left="20" top="20" width="769" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-					<textEditor name="edtHedgeRitualDesc" left="30" top="41" width="749" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'hedgeRitualSel');"/>
+					<label left="20" top="20" width="779" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+					<textEditor name="edtHedgeRitualDesc" left="30" top="41" width="759" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'hedgeRitualSel');"/>
 				</layout>
 			</layout>
 
@@ -835,10 +835,10 @@
 				</layout>
 			</layout>
 
-			<layout left="465" top="0" width="945" height="661">
+			<layout left="455" top="0" width="955" height="661">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-				<label left="20" top="20" width="905" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-				<textEditor name="edtPsychicDesc" left="30" top="41" width="885" height="600" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'psychicSel');"/>
+				<label left="20" top="20" width="915" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+				<textEditor name="edtPsychicDesc" left="30" top="41" width="895" height="600" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'psychicSel');"/>
 			</layout>
 		</layout>
 
@@ -874,7 +874,7 @@
 				</layout>
 			</layout>
 
-			<layout left="0" top="111" width="1410" height="594">
+			<layout left="0" top="101" width="1410" height="594">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="20" width="1370" height="20" text="DESCRIPTION" horzTextAlign="center"/>
 				<textEditor name="edtFaithDesc" left="30" top="41" width="1350" height="533" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>

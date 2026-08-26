@@ -207,7 +207,7 @@
 			column headings belong to it, the rows belong to the scrollBox below them, and
 			nothing in Lua writes this height any more.
 		-->
-		<layout name="xpLogBox" left="0" top="130" width="541" height="560">
+		<layout name="xpLogBox" left="0" top="120" width="541" height="560">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="20" width="501" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
 

@@ -116,9 +116,9 @@
 			<label name="lblMaxDisc" left="569" top="92" width="56" height="24" text="-"/>
 		</layout>
 
-		<layout left="675" top="0" width="395" height="138">
+		<layout left="665" top="0" width="405" height="138">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="355" height="20" text="BLOOD POOL" horzTextAlign="center"/>
+			<label left="20" top="20" width="365" height="20" text="BLOOD POOL" horzTextAlign="center"/>
 
 			<!-- Twenty FREE dots (SPEC V219). They wear the rating art and they are not rating dots:
 			     blood is spent and regained inside a single scene, so autoChange stays ON and there

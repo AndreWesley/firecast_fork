@@ -377,10 +377,10 @@
 		</layout>
 
 		<!-- Grows with the column on its left, never on its own (SPEC V193). -->
-		<layout left="535" top="20" width="535" height="561">
+		<layout left="525" top="20" width="545" height="561">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="495" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<textEditor name="edtRitualDesc" left="30" top="41" width="475" height="500" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveRitualDesc(self);"/>
+			<label left="20" top="20" width="505" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+			<textEditor name="edtRitualDesc" left="30" top="41" width="485" height="500" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveRitualDesc(self);"/>
 		</layout>
 	</scrollBox>
 
