@@ -608,6 +608,58 @@
 				["1. Armor of Diamond Serenity"] = "1. Armadura da Serenidade de Diamante",
 				["1. Bind the Accusing Tongue"] = "1. Atar a Língua Acusadora",
 				["1. Blood Mastery"] = "1. Domínio do Sangue",
+				["1. Death Curse"] = "1. Maldição da Morte",
+				["1. Deathsight"] = "1. Visão da Morte",
+				["1. Eldritch Mark"] = "1. Marca Arcana",
+				["1. Face Theft"] = "1. Roubo de Rosto",
+				["1. Healing Slumber"] = "1. Sono Curativo",
+				["1. Lifting Shadows"] = "1. Erguer Sombras",
+				["1. Sprint"] = "1. Disparada",
+				["1. Symbol Interpretation"] = "1. Interpretação de Símbolos",
+				["2. Bedtime Story"] = "2. História de Ninar",
+				["2. Cruel Whispers"] = "2. Sussurros Cruéis",
+				["2. Enhance Craftsmanship"] = "2. Aprimorar o Artesanato",
+				["2. Fire's Weal"] = "2. Bênção do Fogo",
+				["2. Hellblade"] = "2. Lâmina Infernal",
+				["2. Jolt"] = "2. Choque",
+				["2. Object Permanence"] = "2. Permanência do Objeto",
+				["2. Quintessence Infusion"] = "2. Infusão de Quintessência",
+				["2. Rest in Peace"] = "2. Descanse em Paz",
+				["2. Step on a Crack"] = "2. Pisar na Rachadura",
+				["2. Teleport Ward"] = "2. Barreira de Teleporte",
+				["3. Always Armed"] = "3. Sempre Armado",
+				["3. Bashert"] = "3. Bashert",
+				["3. Belle/Beau/Bright of the Ball"] = "3. Beldade/Galã/Estrela do Baile",
+				["3. Calm Above, Hell Below"] = "3. Calmaria Acima, Inferno Abaixo",
+				["3. Get Me the Heck Outta Here!"] = "3. Me Tira Daqui!",
+				["3. Grip of Shades"] = "3. Garra das Sombras",
+				["3. Hard-Light Constructs"] = "3. Construtos de Luz Sólida",
+				["3. Invade Demesne"] = "3. Invadir o Domínio",
+				["3. Mike's Cure-All"] = "3. Cura-Tudo do Mike",
+				["3. Purification of the Inferno"] = "3. Purificação do Inferno",
+				["3. Shape Quintessence"] = "3. Moldar Quintessência",
+				["3. Shitstorm"] = "3. Tempestade de Merda",
+				["3. Shroud Bubble"] = "3. Bolha da Mortalha",
+				["3. Shut It Down"] = "3. Desligar Tudo",
+				["3. Wrapped in a Shroud"] = "3. Envolto em Mortalha",
+				["4. Doxxing"] = "4. Doxxing",
+				["4. Dream Scream"] = "4. Grito Onírico",
+				["4. Extraction"] = "4. Extração",
+				["4. Fix the True Form"] = "4. Fixar a Forma Verdadeira",
+				["4. Forced Medium"] = "4. Médium Forçado",
+				["4. Freudian Slip"] = "4. Ato Falho",
+				["4. Humor Alignment"] = "4. Alinhamento dos Humores",
+				["4. Information Superhighway"] = "4. Superestrada da Informação",
+				["4. Instant Feast"] = "4. Banquete Instantâneo",
+				["4. Love Potion Number 9"] = "4. Poção do Amor Número 9",
+				["5. Generational Wealth"] = "5. Riqueza Geracional",
+				["5. Megafauna Transformation"] = "5. Transformação em Megafauna",
+				["5. Oubliette"] = "5. Oubliette",
+				["5. Overwrite"] = "5. Sobrescrever",
+				["5. Shelter for the Dead"] = "5. Abrigo para os Mortos",
+				["5. Smoldering Ruin"] = "5. Ruína Fumegante",
+				["5. Steal Life"] = "5. Roubar a Vida",
+				["5. Teleportal"] = "5. Teleportal",
 				["1. Blood Rush"] = "1. Ímpeto de Sangue",
 				["1. Blood into Water"] = "1. Sangue em Água",
 				["1. Brand"] = "1. Marca a Ferro",
@@ -1055,8 +1107,14 @@
 			-- list by what he already owns would leave a new sheet nineteen empty combos. Same
 			-- lesson as the era axis just above, asked a fourth time - the scope holds by SENSE,
 			-- not by a prefix that happens to match.
+			-- `hedgeRitual` joined them in the 112th round (SPEC I83g, V310f). It goes by ROOT and
+			-- not into FILTER_NAME below, and the two tables are not interchangeable: all twelve
+			-- picked ritual rows answer to ONE question - is the path on the sheet, at the level -
+			-- while only the FIRST numina row is the Affinity Path. Scope by SENSE, the fifth time
+			-- this file has had to say it. The five typed rows carry an `edt` and are never asked
+			-- (SPEC V248c).
 			local FILTER_ROW = {
-				mainPath = true, secPath = true, ritual = true,
+				mainPath = true, secPath = true, ritual = true, hedgeRitual = true,
 			};
 
 			-- A SECOND filter table, keyed by CONTROL NAME instead of by root (SPEC I67, V272a).
@@ -1113,7 +1171,19 @@
 			-- was built under is held right here, which is why no later map can share its
 			-- identity. `levels` starts at false rather than nil so a first caller passing nil
 			-- still opens a generation of its own.
-			local memo = { stamp = nil, levels = false, lists = {} };
+			-- `hedge` rides the same generation (SPEC I83f, V310e). It is the hedge PATH level map,
+			-- and it is built HERE, inside the reset below, rather than handed down like `levels`:
+			-- the identity test above is exactly "a new render started", so one build per reset is
+			-- one build per render, which is what V205 asks. Built outside the reset it would be
+			-- rebuilt once per CONTROL, and read from anywhere the reset cannot reach it would
+			-- serve last render's levels with rdk exiting 0 and the gate green - B48's own lesson,
+			-- through a third door.
+			--
+			-- Threading it as a fifth argument to pickerItems was the alternative and it is worse:
+			-- the four callers that build `levels` would each have to build this one too, and two
+			-- of them - applyLanguage and applyTheme - have no business knowing what a hedge path
+			-- is.
+			local memo = { stamp = nil, levels = false, hedge = nil, lists = {} };
 
 			-- `levels` is the map discLevels() builds, handed in by the caller so it is built once
 			-- per traversal and not once per item (SPEC V205). Callers that filter nothing may
@@ -1171,6 +1241,7 @@
 				if memo.stamp ~= stamp or memo.levels ~= levels then
 					memo.stamp  = stamp;
 					memo.levels = levels;
+					memo.hedge  = hedgePathLevels();
 					memo.lists  = {};
 				end;
 
@@ -1190,7 +1261,7 @@
 				-- served the whole one with its filter silently doing nothing. Neither shows an
 				-- error and both survive rdk (SPEC B48, V272).
 				local root = fieldRoot(nm);
-				local odd  = (current ~= nil and current ~= "" and not pickAllowed(field, current, levels)) and current or "";
+				local odd  = (current ~= nil and current ~= "" and not pickAllowed(field, current, levels, memo.hedge)) and current or "";
 				local per  = (root == "mainPath") and nm or root;
 				local key  = (FILTER_NAME[nm] == true and nm or per) .. "|" .. odd;
 				local hit  = memo.lists[key];
@@ -1207,7 +1278,7 @@
 
 						-- The empty item always passes (SPEC V15), and so does the row's own value.
 						if filter and raw ~= "" and raw ~= current then
-							ok = pickAllowed(field, raw, levels);
+							ok = pickAllowed(field, raw, levels, memo.hedge);
 						end;
 
 						if ok then
@@ -1270,22 +1341,36 @@
 				end;
 			end;
 
-			-- Re-filter the two hedge pickers after the affiliation changed (SPEC I67, I68, V272d).
-			-- Reached from the dataLink on WoD20.7 that watches `hedgeAffiliation` - what the answer
-			-- actually READS - and it is renderVampPickers with TWO names instead of forty-nine.
+			-- Re-filter the hedge pickers of WoD20.7 (SPEC I67, I68, V272d, I83i). Reached from the
+			-- dataLink that watches `hedgeAffiliation` and from the one that watches the seventeen
+			-- numina rows AND their eighty-five dots - what the two answers actually READ - and it
+			-- is renderVampPickers with fourteen names instead of forty-nine.
 			--
-			-- It lives here beside its sister and for the same reason: the two combos are drawn in
+			-- FOURTEEN since the 112th round: the twelve picked ritual rows joined the Affinity
+			-- Path and the casting attribute here rather than in a renderer of their own. One
+			-- function because it is one tab and one xpFind walk; the cost of a numina dot also
+			-- refreshing two combos that do not depend on it is two setValues, and the cost of a
+			-- second renderer is a second name list to keep in step with FILTER_ROW.
+			--
+			-- It lives here beside its sister and for the same reason: the combos are drawn in
 			-- WoD20.7, `form.<name>` does not cross an <import>, and xpFind is the one finder this
 			-- sheet has (SPEC V143, B9).
 			--
-			-- `levels` is still built and handed in, though neither of these two reads it: filter
-			-- is `isFilterRow(nm) and levels ~= nil`, so passing nil would turn both filters OFF
-			-- and leave the round doing nothing at all with rdk exiting 0.
+			-- `levels` is still built and handed in, though none of these read it: filter is
+			-- `isFilterRow(nm) and levels ~= nil`, so passing nil would turn every filter OFF and
+			-- leave the round doing nothing at all with rdk exiting 0. The hedge path map is NOT
+			-- built here - it rides the picker memo's own generation (SPEC I83f).
 			function renderHedgePickers(from)
 				wodTrace("renderHedgePickers");
 				if sheet == nil or from == nil then return; end;
 
 				local names  = { cbonumina_1 = true, cboHedgeAttr = true };
+
+				-- The typed rows are skipped, not just missed (SPEC V248c): they carry an `edt`
+				-- and this walk asks for `cbo`, so naming them would be asking for a control that
+				-- cannot exist.
+				for i = 1, HEDGE_RITUAL_ROWS - HEDGE_RITUAL_FREE_ROWS, 1 do names["cbohedgeRitual_" .. i] = true; end;
+
 				local found  = {};
 				local lang   = sheet.language or "en";
 				local era    = currentTheme();

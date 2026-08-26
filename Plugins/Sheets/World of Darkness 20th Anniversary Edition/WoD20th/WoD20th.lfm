@@ -149,6 +149,58 @@
 				-- (SPEC V269e). The empty first item is V15's, the same one every picker opens with.
 				["hedgeRitual"] = {
 					"",
+					"1. Death Curse",
+					"1. Deathsight",
+					"1. Eldritch Mark",
+					"1. Face Theft",
+					"1. Healing Slumber",
+					"1. Lifting Shadows",
+					"1. Sprint",
+					"1. Symbol Interpretation",
+					"2. Bedtime Story",
+					"2. Cruel Whispers",
+					"2. Enhance Craftsmanship",
+					"2. Fire's Weal",
+					"2. Hellblade",
+					"2. Jolt",
+					"2. Object Permanence",
+					"2. Quintessence Infusion",
+					"2. Rest in Peace",
+					"2. Step on a Crack",
+					"2. Teleport Ward",
+					"3. Always Armed",
+					"3. Bashert",
+					"3. Belle/Beau/Bright of the Ball",
+					"3. Calm Above, Hell Below",
+					"3. Get Me the Heck Outta Here!",
+					"3. Grip of Shades",
+					"3. Hard-Light Constructs",
+					"3. Invade Demesne",
+					"3. Mike's Cure-All",
+					"3. Purification of the Inferno",
+					"3. Shape Quintessence",
+					"3. Shitstorm",
+					"3. Shroud Bubble",
+					"3. Shut It Down",
+					"3. Wrapped in a Shroud",
+					"4. Doxxing",
+					"4. Dream Scream",
+					"4. Extraction",
+					"4. Fix the True Form",
+					"4. Forced Medium",
+					"4. Freudian Slip",
+					"4. Humor Alignment",
+					"4. Information Superhighway",
+					"4. Instant Feast",
+					"4. Love Potion Number 9",
+					"5. Generational Wealth",
+					"5. Megafauna Transformation",
+					"5. Oubliette",
+					"5. Overwrite",
+					"5. Shelter for the Dead",
+					"5. Smoldering Ruin",
+					"5. Steal Life",
+					"5. Teleportal",
 				},
 				["disc"] = {
 					"", "Abombwe", "Abyss Mysticism", "Animalism", "Assamite Sorcery", "Auspex", "Bardo", "Celerity",
@@ -377,6 +429,81 @@
 				["Thal’hun"] = { "Inteligence", "Wits" },
 				["U.S. Government (Project Twilight)"] = { "Dexterity", "Wits" },
 				["Uzoma"] = { "Charisma", "Wits" },
+			};
+
+			-- Which hedge magic PATH each ritual belongs to (SPEC I83b, user 2026-08-26). It is
+			-- the table the level filter reads: a ritual is offered only while the path it comes
+			-- from stands at its level or above, and a path the sheet does not carry answers zero,
+			-- so it opens nothing at all - not even its first level (SPEC I83a).
+			--
+			-- The LEVEL is not in here. It is read off the item text, `<n>. <name>`, the same
+			-- grammar the vampire rituals use and hedgeRitualLevel already reads for the price
+			-- (SPEC V269d, V310c). Two sources for one number is what would let the dots on
+			-- screen say three while the filter measured four.
+			--
+			-- ONE path per ritual, a string and not a list. If a book turns out to print a ritual
+			-- under two paths (SPEC R114 has that open), the value becomes a list and the read
+			-- becomes a max, which is what pathLevel already does for a path with two owners -
+			-- three lines, in one place. Writing the list shape now would be flexibility nobody
+			-- asked for, on data nobody has read yet.
+			--
+			-- It opens EMPTY because PICKER_LIST["hedgeRitual"] opens empty (SPEC V269e): the
+			-- powers are entered in a round of their own (SPEC T690). This is NOT the dead data
+			-- of B55 - that was a table with no READER, and this one is born with its reader in
+			-- the same pass (SPEC T688 is atomic for the reason T605 was).
+			HEDGE_RITUAL_PATH = {
+				["1. Death Curse"] = "Fortune",
+				["1. Deathsight"] = "Necromancy",
+				["1. Eldritch Mark"] = "Enchantment",
+				["1. Face Theft"] = "Shapeshifting",
+				["1. Healing Slumber"] = "Healing",
+				["1. Lifting Shadows"] = "Shadows",
+				["1. Sprint"] = "Conveyance",
+				["1. Symbol Interpretation"] = "Oneiromancy",
+				["2. Bedtime Story"] = "Oneiromancy",
+				["2. Cruel Whispers"] = "Illusion",
+				["2. Enhance Craftsmanship"] = "Enchantment",
+				["2. Fire's Weal"] = "Hellfire",
+				["2. Hellblade"] = "Hellfire",
+				["2. Jolt"] = "Healing",
+				["2. Object Permanence"] = "Conjuration",
+				["2. Quintessence Infusion"] = "Quintessence Manipulation",
+				["2. Rest in Peace"] = "Maelstroms",
+				["2. Step on a Crack"] = "Fortune",
+				["2. Teleport Ward"] = "Conveyance",
+				["3. Always Armed"] = "Conjuration",
+				["3. Bashert"] = "Fortune",
+				["3. Belle/Beau/Bright of the Ball"] = "Fascination",
+				["3. Calm Above, Hell Below"] = "Maelstroms",
+				["3. Get Me the Heck Outta Here!"] = "Conveyance",
+				["3. Grip of Shades"] = "Shadows",
+				["3. Hard-Light Constructs"] = "Illusion",
+				["3. Invade Demesne"] = "Oneiromancy",
+				["3. Mike's Cure-All"] = "Healing",
+				["3. Purification of the Inferno"] = "Hellfire",
+				["3. Shape Quintessence"] = "Quintessence Manipulation",
+				["3. Shitstorm"] = "Conjuration",
+				["3. Shroud Bubble"] = "Necronics",
+				["3. Shut It Down"] = "Necronics",
+				["3. Wrapped in a Shroud"] = "Necromancy",
+				["4. Doxxing"] = "Necronics",
+				["4. Dream Scream"] = "Oneiromancy",
+				["4. Extraction"] = "Conjuration",
+				["4. Fix the True Form"] = "Shapeshifting",
+				["4. Forced Medium"] = "Necromancy",
+				["4. Freudian Slip"] = "Fortune",
+				["4. Humor Alignment"] = "Healing",
+				["4. Information Superhighway"] = "Conveyance",
+				["4. Instant Feast"] = "Illusion",
+				["4. Love Potion Number 9"] = "Fascination",
+				["5. Generational Wealth"] = "Fortune",
+				["5. Megafauna Transformation"] = "Shapeshifting",
+				["5. Oubliette"] = "Illusion",
+				["5. Overwrite"] = "Necronics",
+				["5. Shelter for the Dead"] = "Maelstroms",
+				["5. Smoldering Ruin"] = "Hellfire",
+				["5. Steal Life"] = "Necromancy",
+				["5. Teleportal"] = "Conveyance",
 			};
 
 			-- >>> TAB_LIST_BEGIN (SPEC I32, V228: one list, every reader on it)
@@ -1231,7 +1358,7 @@
 			-- and fails if it stops matching PITCH (SPEC V49) - the same Lua-vs-XML drift that
 			-- produced B12 and B16.
 			HEALTH_ROW_PITCH = 27;
-			HEALTH_BOX_PAD   = 79;
+			HEALTH_BOX_PAD   = 57;
 
 			local function markIndex(v)
 				for i = 1, #HEALTH_MARKS, 1 do
@@ -2056,7 +2183,7 @@
 			-- as BACKGROUND_ROWS: both the loop that lets experience buy them and the loop that
 			-- prices them for the log read this, so a tenth row added to the XML alone would be
 			-- a dot nothing charges for and nothing shows.
-			SPECIALITY_ROWS = 9;
+			SPECIALITY_ROWS = 10;
 
 			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
 			-- 2026-08-22). Same contract as the three on the Ghoul tab: they are the LAST rows, so
@@ -2974,6 +3101,46 @@
 				return levels;
 			end;
 
+			-- The level each hedge magic PATH stands at, as a map (SPEC I83d, V310d). Same shape
+			-- and same reasons as discLevels above it: built once per render and handed down,
+			-- because the ritual filter asks the question once per ITEM and seventeen rows of
+			-- five dots per item is the tab that locks up with no error for anyone to see
+			-- (SPEC V205).
+			--
+			-- All SEVENTEEN rows, the five TYPED ones included - the same reading discLevels
+			-- takes of clanDisc and disc together. A path the storyteller wrote by hand holds
+			-- its dots like any other, and it simply matches no key in HEDGE_RITUAL_PATH, so it
+			-- unlocks nothing. That is the right answer and not an oversight (SPEC I71).
+			--
+			-- A map of its OWN and not discLevels reused, and this is the leg that gives no
+			-- symptom when it is wrong: `Necromancy` and `Weather Control` are BOTH a hedge magic
+			-- path and a vampire Discipline/path. WoD20.6 already measures that collision for the
+			-- era axis. One shared map would let Necromancy the DISCIPLINE, at five, open the
+			-- rituals of Necromancy the hedge PATH (SPEC B15, V34 - one name, two senses).
+			--
+			-- Highest wins if the same path was named twice, for the reason discLevels gives:
+			-- answering with the lower would take away a level the player owns.
+			--
+			-- Global because WoD20.6 builds it inside the picker memo (SPEC I83f).
+			function hedgePathLevels()
+				local levels = {};
+
+				if sheet == nil then return levels; end;
+
+				for i = 1, NUMINA_ROWS, 1 do
+					local f    = "numina_" .. i;
+					local name = sheet[f];
+
+					if name ~= nil and name ~= "" then
+						local n = traitLevel(sheet, f, 1, 5, 0);
+
+						if levels[name] == nil or n > levels[name] then levels[name] = n; end;
+					end;
+				end;
+
+				return levels;
+			end;
+
 			-- The level a path stands at: the rating of its own blood sorcery (SPEC V180). A path
 			-- with two owners takes the higher - the player reaches it through whichever of the
 			-- two Disciplines he actually bought.
@@ -3160,6 +3327,33 @@
 			-- Declared above pickAllowed rather than below it: a local called from above its own
 			-- declaration compiles to a GETGLOBAL that finds nil at runtime, with rdk exiting 0
 			-- (SPEC V223, B51).
+			-- Does the sheet carry the path this ritual comes from, at the ritual's own level
+			-- (SPEC I83a, V310)? The level is read off the item text and nowhere else, the same
+			-- `<n>. ` grammar hedgeRitualLevel prices with (SPEC V269d).
+			--
+			-- A value HEDGE_RITUAL_PATH does not know is left alone, exactly as the two
+			-- affiliation filters leave an unlisted affiliation alone (SPEC V271d, V272e). While
+			-- the ritual list is still empty this is the branch every call takes, and a `false`
+			-- here would open twelve blank dropdowns instead of doing nothing.
+			--
+			-- `levels` is the map hedgePathLevels() builds, handed in by the caller so it is
+			-- built once per render and not once per item (SPEC V205, I83f). Without it there is
+			-- nothing to measure against, so nothing is pruned.
+			--
+			-- Declared above pickAllowed, not below: a local called from above its own
+			-- declaration compiles to a GETGLOBAL that finds nil at runtime (SPEC V223, B51).
+			local function hedgeRitualAllows(value, levels)
+				if value == nil or value == "" or levels == nil then return true; end;
+
+				local path = HEDGE_RITUAL_PATH[value];
+
+				if path == nil then return true; end;
+
+				local need = tonumber(string.match(value, "^(%d+)%. ")) or 0;
+
+				return (levels[path] or 0) >= need;
+			end;
+
 			local function hedgeAllows(t, value)
 				if value == nil or value == "" then return true; end;
 
@@ -3188,9 +3382,22 @@
 			-- `numina_1` alone, never `numina`: the Affinity Path is ONE row, and the book has the
 			-- magician choose one from the list (M20 Sorcerer p. 8). `hedgeAttr` is a SINGLETON
 			-- and carries no row number at all (SPEC I68).
-			function pickAllowed(field, value, levels)
+			--
+			-- The ritual branch is the OPPOSITE scope and by the same rule (SPEC I83g, V203): all
+			-- twelve picked rows answer to one question - does the sheet carry the path, at the
+			-- level - so it is matched by ROW, `^hedgeRitual_%d+$`, and not by a name. The five
+			-- typed rows never reach here: they carry an `edt` and the walk asks for `cbo`
+			-- (SPEC V248c).
+			--
+			-- `hedge` is the FOURTH argument and it is the hedge path map, not the Discipline
+			-- one. Nothing guards these fields, so - like the two above - a ritual whose path
+			-- came DOWN stays on its row and simply stops being offered (SPEC V200, I83h).
+			function pickAllowed(field, value, levels, hedge)
 				if field == "numina_1" then return hedgeAllows(AFFINITY, value); end;
 				if field == "hedgeAttr" then return hedgeAllows(CASTING_ATTR, value); end;
+				if field ~= nil and string.match(field, "^hedgeRitual_%d+$") ~= nil then
+					return hedgeRitualAllows(value, hedge);
+				end;
 
 				return pickRefusal(field, value, levels) == nil;
 			end;

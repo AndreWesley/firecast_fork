@@ -33,14 +33,14 @@
 		-->
 		<comboBox name="cboClan" left="0" top="0" width="215" height="25" visible="false" enabled="false" field="clan"/>
 		<!--
-			Layout grid (SPEC T41, V26, V27). Everything closes on x=1345 / y=844.
+			Layout grid (SPEC T41, V26, V27). Everything closes on x=1345 / y=852.
 
 			  header  0..1010      EXPERIENCE 1015..1345          y   0..125
 			  ATTRIBUTES 0..340    TALENTS 345..675 | SKILLS 680..1010 | KNOWLEDGES 1015..1345   y 130..491
-			  avatar     0..340                                   y 441..844
+			  avatar     0..340                                   y 441..852
 			                       VIRTUES 345..675               y 496..644
-			                       HUMANITY+WILLPOWER 345..675     y 649..844
-			                       SPECIALTIES 680..1010          y 496..844
+			                       HUMANITY+WILLPOWER 345..675     y 649..852
+			                       SPECIALTIES 680..1010          y 496..852
 			                       HEALTH  1015..1345             y 496..845 at ten rows
 
 			Read it as a THREE-COLUMN GRID, which is what V168 measures since the 50th round:
@@ -326,12 +326,32 @@
 			</layout>
 		</layout>
 
-		<!-- 355 tall, not 405: the preview ends on y=760 with the HUMANITY box, which is
-		     where the column closes (SPEC T134, V69). It followed the bottom row up in the
-		     50th round - the request did not name it, but a picture reaching 50px below
-		     every other box is the ragged edge V69 exists to prevent. -->
-		<rectangle left="0" top="471" width="340" height="403" color="DimGray" xradius="5" yradius="5" cornerType="innerRound"/>
-		<image left="0" top="441" width="340" height="403" field="avatar" editable="true" style="autoFit"/>
+		<!-- The picture closes the left column on the line the map above declares, with HUMANITY
+		     and SPECIALTIES (SPEC T134, V69). It has followed that line since the 50th round.
+
+		     The FRAME is the rectangle below, and it carries the same four numbers as the image
+		     on purpose (SPEC V309, B71): it is a loose <rectangle>, so the box collector of I73
+		     never sees it, and three rounds of gap tightening moved the image while it stayed at
+		     top=471 - thirty pixels of grey hanging under the photo, green in the gate the whole
+		     time. V309 is what makes that impossible to repeat; do not move one without the other.
+
+		     It keeps color="DimGray" and is the only carrier of that key in the four palettes
+		     (SPEC V53, T653). The radius matches the section boxes so the corner reads as one
+		     frame family. -->
+		<rectangle left="0" top="441" width="340" height="411" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
+		<image left="0" top="441" width="340" height="411" field="avatar" editable="true" style="autoFit"/>
+
+		<!-- The ornament CARRIER (SPEC I84d, V309, V287). Transparent in both senses and holding
+		     no content of its own: it exists so the filigree has somewhere to hang ABOVE the
+		     photo. applyTheme already reaches it - THEME_SHAPES is { rectangle = true } - and
+		     ornament() parents its path to whatever it paints, so declaring this AFTER the image
+		     is the whole mechanism. Nothing new is painted; the frame below had the filigree all
+		     along, behind the picture where nobody could see it.
+
+		     It carries the picture's own four numbers, which V309 measures across all THREE
+		     controls now. The filigree is Victorian-only (t.ornament, SPEC V277), so the other
+		     three eras show no change here and that is correct. -->
+		<rectangle name="ornAvatar" left="0" top="441" width="340" height="411" color="#00000000" strokeColor="#00000000" xradius="14" yradius="14" cornerType="innerRound" hitTest="false"/>
 
 		<!--
 			The three ability columns stand loose (SPEC T407, V168, V169). Until the 49th round
@@ -515,7 +535,7 @@
 			</layout>
 		</layout>
 
-		<layout left="345" top="649" width="330" height="195">
+		<layout left="345" top="649" width="330" height="203">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<label left="20" top="20" width="290" height="20" text="HUMANITY" horzTextAlign="center"/>
@@ -552,7 +572,7 @@
 			the gate treats as a full-width section title, so V27 still holds for this box.
 			245px per row because "Wounded (-2)" is "Ferido Gravemente (-2)" in pt (V38 / B17).
 		-->
-		<layout name="dynHealth_box" left="1015" top="496" width="330" height="349">
+		<layout name="dynHealth_box" left="1015" top="496" width="330" height="327">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- How long the track is moved to the storyteller's box in the 82nd round (SPEC I35,
 			     V234): it was never the player's call, and it was the last thing on this sheet
@@ -588,7 +608,7 @@
 			match KNOWLEDGES; the 30 came out of the free-text field and not out of the picker,
 			which has to show "Empatia com Animais" at 19 characters (SPEC V16).
 		-->
-		<layout left="680" top="496" width="330" height="348">
+		<layout left="680" top="496" width="330" height="356">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="20" width="290" height="20" text="SPECIALTIES" horzTextAlign="center"/>
 
@@ -598,9 +618,10 @@
 			<layout left="35" top="131" width="260" height="25"><SpecialityRow num="4"/></layout>
 			<layout left="35" top="161" width="260" height="25"><SpecialityRow num="5"/></layout>
 			<layout left="35" top="191" width="260" height="25"><SpecialityRow num="6"/></layout>
-			<layout left="35" top="221" width="260" height="25"><SpecialityFreeRow num="7"/></layout>
+			<layout left="35" top="221" width="260" height="25"><SpecialityRow num="7"/></layout>
 			<layout left="35" top="251" width="260" height="25"><SpecialityFreeRow num="8"/></layout>
 			<layout left="35" top="281" width="260" height="25"><SpecialityFreeRow num="9"/></layout>
+			<layout left="35" top="311" width="260" height="25"><SpecialityFreeRow num="10"/></layout>
 		</layout>
 
 	</scrollBox>

@@ -1,4 +1,4 @@
-# Build gate for the WoD20th sheet. Checks SPEC.md V1, V3, V4, V5, V8-V40.
+﻿# Build gate for the WoD20th sheet. Checks SPEC.md V1, V3, V4, V5, V8-V40.
 # With -Build it also runs the real compile and checks V6 + V7.
 #
 # Lives at repo root, NOT inside the plugin dir: rdk packs every file under the
@@ -1122,9 +1122,15 @@ elseif ($corners.Count -gt 1) {
 # is supposed to close on it, the avatar included: the comment cannot rot either.
 #
 # HEALTH is the declared exception: its authored height is the ten-row case and the renderer
-# shrinks it to the chosen track (V49), so it hangs exactly 6px below the line - a corner
-# taken in the 11th round, and measured here rather than skipped.
-$HEALTH_TEN_ROW_OVERHANG = 1
+# shrinks it to the chosen track (V49), so it does not close on the line - a corner taken in
+# the 11th round, and measured here rather than skipped.
+#
+# The exception changed SIDES in the 112th round and the sign is the whole record of it: it
+# hung BELOW the line from the 11th round until then, and the 30px the tail lost (SPEC I82b,
+# HEALTH_BOX_PAD 79 -> 49) put it ABOVE. Two rounds move this literal for two different
+# reasons - T682 raised the line to 852 and T683 shortened the box to 823 - so a pass that
+# leaves it stale fails here rather than somewhere quieter (SPEC V69, V49).
+$HEALTH_TEN_ROW_OVERHANG = -29
 $mainRawForMap = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.1.lfm")))
 $mapY = [regex]::Match($mainRawForMap, 'Everything closes on x=\d+ / y=(\d+)')
 $mainDocV69 = Doc (Join-Path $dir "WoD20.1.lfm")
@@ -1152,9 +1158,81 @@ else {
     foreach ($c in $closers) { if ($mainBottom[$c] -ne $line) { $off += "$c ends at $($mainBottom[$c])" } }
     if ($avatarBottom -ne $line) { $off += "the avatar ends at $avatarBottom" }
     if ($off.Count -gt 0) { Fail "V69 the map says the tab closes on y=$line but $($off -join ', ') - the Main bottom row must close on one line" }
-    elseif (($mainBottom["HEALTH"] - $line) -ne $HEALTH_TEN_ROW_OVERHANG) { Fail "V69 HEALTH hangs $($mainBottom['HEALTH'] - $line)px below the line, not the $HEALTH_TEN_ROW_OVERHANG px the ten-row case is allowed (SPEC V49)" }
-    else { Pass "V69 HUMANITY, SPECIALTIES and the avatar all close on y=$line; HEALTH hangs the declared $HEALTH_TEN_ROW_OVERHANG px at ten rows" }
+    elseif (($mainBottom["HEALTH"] - $line) -ne $HEALTH_TEN_ROW_OVERHANG) { Fail "V69 HEALTH sits $($mainBottom['HEALTH'] - $line)px off the line, not the $HEALTH_TEN_ROW_OVERHANG px the ten-row case is allowed (SPEC V49)" }
+    else { Pass "V69 HUMANITY, SPECIALTIES and the avatar all close on y=$line; HEALTH sits the declared $HEALTH_TEN_ROW_OVERHANG px off it at ten rows" }
 }
+
+# ---- V309: the avatar FRAME tracks the avatar IMAGE (SPEC I82d, V309, B71) ------------
+# Four numbers, both sides read from the XML - a RELATION, so there is no literal here to go
+# stale at the next tightening of the gap.
+#
+# B71 is why it exists. The frame is a loose <rectangle>, not a section box: V280/V298 collect
+# layout[rectangle[@color='black'][@xradius]] and this one is DimGray with no parent layout, so
+# the collector never saw it; V69 measures the IMAGE's bottom; V48 names it as a deliberate
+# non-black rectangle and stops there. Three families of check walked past the same control,
+# and three rounds of reflow (T647, T668, T675) moved the image from 471 down to 441 while the
+# frame stayed put - thirty pixels of grey hanging below the photo, on screen, green in the gate
+# the whole time. Zero owners for one relation: nothing would ever have reddened on its own.
+# THREE controls since the 113th round (SPEC I84d): the DimGray frame underneath, the picture,
+# and the transparent carrier above that the filigree hangs on. All three share the picture's
+# four numbers - the carrier has to sit exactly over the photo or the ornament draws off it.
+$frameV309 = @($mainDocV69.SelectNodes("//scrollBox/rectangle[@color='DimGray']"))[0]
+$ornCarrier = @($mainDocV69.SelectNodes("//scrollBox/rectangle[@name='ornAvatar']"))[0]
+if ($null -eq $avatarImg)    { Fail "V309 the avatar image is gone from WoD20.1 - there is nothing to track the frame against (SPEC V209)" }
+elseif ($null -eq $frameV309) { Fail "V309 the avatar frame is gone from WoD20.1 - a check that goes quiet when its only target disappears is B7 waiting (SPEC V209, B71)" }
+elseif ($null -eq $ornCarrier) { Fail "V309 the avatar ornament carrier (ornAvatar) is gone from WoD20.1 - the filigree would fall back behind the picture, which is B71's symptom by another door (SPEC V209, I84d)" }
+else {
+    $offV309 = @()
+    foreach ($pair in @(@($frameV309, 'frame'), @($ornCarrier, 'carrier'))) {
+        foreach ($a in @("left", "top", "width", "height")) {
+            $fv = $pair[0].GetAttribute($a); $iv = $avatarImg.GetAttribute($a)
+            if ($fv -ne $iv) { $offV309 += "$a is $fv on the $($pair[1]) and $iv on the image" }
+        }
+    }
+    # The carrier must be declared AFTER the image, or its path draws underneath and the whole
+    # point of I84d is lost - silently, because the filigree still exists and still paints.
+    $kidsV309 = @($ornCarrier.ParentNode.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
+    $iImg = [array]::IndexOf($kidsV309, $avatarImg)
+    $iOrn = [array]::IndexOf($kidsV309, $ornCarrier)
+    if ($iOrn -lt $iImg) { $offV309 += "the carrier is declared before the image, so its filigree draws behind the photo (SPEC I84d)" }
+    if ($offV309.Count -gt 0) { Fail "V309 the avatar frame/carrier has drifted off the picture - $($offV309 -join '; ') (SPEC I82d, I84d, B71)" }
+    else { Pass "V309 the avatar frame and the ornament carrier both carry the picture's own left/top/width/height, and the carrier is declared above it" }
+}
+
+# ---- V311: the health box's tail equals the title's margin (SPEC I84c, V311) ----------
+# The user's rule, not a number: the gap under the last VISIBLE health row reads the same as the
+# gap from the top edge down to the word HEALTH. Three values, all from the XML - box height, the
+# bottom of the last row, and the title's top - so HEALTH_BOX_PAD is a CONSEQUENCE and no id here
+# writes 57 down. V49 chains it to the Lua (height = 10*pitch + pad), so the two together pin the
+# constant without either of them owning a literal.
+#
+# That is the difference from B72, which cost a build: there the number was asserted without being
+# measured. Here there is no number to assert.
+#
+# V280a survives and is not duplicated - it demands >= 20 on all four sides of every box; this
+# demands EQUALITY between two sides of one box. The probe separates them: move the title to
+# top=30 and V280a stays green while this reddens.
+$v311Bad = @()
+$v311Seen = 0
+foreach ($pair in @(@("WoD20.1.lfm", "dynHealth_"), @("WoD20.3.lfm", "dynHealth3_"))) {
+    $d311 = Doc (Join-Path $dir $pair[0])
+    $box311 = $d311.SelectSingleNode("//layout[@name='$($pair[1])box']")
+    if ($null -eq $box311) { $v311Bad += "$($pair[0]) has no <layout name='$($pair[1])box'> - there is no box to measure (SPEC V209)"; continue }
+    $rows311 = @($box311.SelectNodes("layout[starts-with(@name,'$($pair[1])row')]"))
+    $ttl311  = $box311.SelectSingleNode("label[@horzTextAlign='center']")
+    if ($rows311.Count -eq 0) { $v311Bad += "$($pair[0]) health box holds no row - a box with nothing in it has no tail to read (SPEC V209)"; continue }
+    if ($null -eq $ttl311)    { $v311Bad += "$($pair[0]) health box has no centred title - the ruler this leg measures against is gone (SPEC V209)"; continue }
+    $v311Seen++
+    $last311 = ($rows311 | Sort-Object { [int]$_.GetAttribute("top") })[-1]
+    $tail311 = [int]$box311.GetAttribute("height") - ([int]$last311.GetAttribute("top") + [int]$last311.GetAttribute("height"))
+    $head311 = [int]$ttl311.GetAttribute("top")
+    if ($tail311 -ne $head311) {
+        $v311Bad += "$($pair[0]) leaves $tail311 under the last health row but $head311 above the title - the two margins are one rule (SPEC I84c)"
+    }
+}
+if ($v311Seen -ne 2) { Fail "V311 measured $v311Seen health box(es), expected 2 - both tabs carry one and a check that reads half the sheet is B7 waiting (SPEC V209)" }
+elseif ($v311Bad) { foreach ($b in $v311Bad) { Fail "V311 $b" } }
+else { Pass "V311 both health boxes close the same distance under the last row as they open above the title - HEALTH_BOX_PAD follows from it" }
 # ---- V48: a section box is filled black (SPEC B18) -------------------------------
 # ABILITIES shipped with the Mage sheet's transparent fill, so the tab background showed
 # through and it read as grey beside its black siblings. Nothing measured colour until now.
@@ -4488,8 +4566,11 @@ if (-not $pickerFn.Success) {
 } else {
     $pk = NoComments $pickerFn.Groups[1].Value
 
-    if ($pk -notmatch 'pickAllowed\(field, raw, levels\)') {
-        $filterBad += "V199 pickerItems does not ask pickAllowed - whatever drops an item now, it is not the one rule (SPEC V199)"
+    # The FOURTH argument is the hedge path map and it is named here on purpose (SPEC I83f,
+    # V310e): dropping it costs nothing a reader would notice - the ritual filter simply stops
+    # pruning, rdk exits 0 and every other check stays green.
+    if ($pk -notmatch 'pickAllowed\(field, raw, levels, memo\.hedge\)') {
+        $filterBad += "V199 pickerItems does not ask pickAllowed with the level map AND the hedge path map - whatever drops an item now, it is not the one rule (SPEC V199, I83f)"
     }
 
     # V200: the row's own value survives its own list however illegal it went. A comboBox
@@ -4570,7 +4651,12 @@ $filterTbl = [regex]::Match($hh6, '(?ms)local FILTER_ROW = \{(.*?)\}')
 if (-not $filterTbl.Success) {
     $filterBad += "V203 FILTER_ROW is not declared - the filter has no scope of its own and would reuse the era's (SPEC I25)"
 } else {
-    $wantFilter = @('mainPath', 'secPath', 'ritual')
+    # `hedgeRitual` joined the three in the 112th round (SPEC I83g, V310f). It belongs HERE and
+    # not in FILTER_NAME: all twelve picked ritual rows answer to one question, unlike the numina
+    # box where only the first row is the Affinity Path. The list stays closed either way - the
+    # extra-name arm below is what stops a Discipline picker being filtered by what the player
+    # already owns, which would leave a new sheet with nineteen empty combos.
+    $wantFilter = @('mainPath', 'secPath', 'ritual', 'hedgeRitual')
     $gotFilter  = @([regex]::Matches($filterTbl.Groups[1].Value, '(\w+)\s*=\s*true') | ForEach-Object { $_.Groups[1].Value })
     $missF = @($wantFilter | Where-Object { $gotFilter -notcontains $_ })
     $extraF = @($gotFilter | Where-Object { $wantFilter -notcontains $_ })
@@ -4710,7 +4796,7 @@ if ($pickerFn.Success) {
     # The row's own value only changes the list when the filter would otherwise drop it
     # (SPEC V200). Leave it out of the key and a row holding an illegal value hands that value
     # to every other row on the same list.
-    elseif ($pkm -notmatch 'not pickAllowed\(field, current, levels\)' -or $pkm -notmatch '\.\. "\|" \.\. odd') {
+    elseif ($pkm -notmatch 'not pickAllowed\(field, current, levels, memo\.hedge\)' -or $pkm -notmatch '\.\. "\|" \.\. odd') {
         $filterBad += "V205 the memo key ignores a row's own illegal value - it would leak into every other row sharing the list, or split the key for every filled row (SPEC V200)"
     }
 }
@@ -5565,14 +5651,20 @@ foreach ($f in $files) {
         # own, so they author the same transparent contour (SPEC I78a, I78d). Admitted by NAME, so
         # the second direction below still catches the idiom leaking onto a section box.
         if ($n287.LocalName -eq 'rectangle' -and ($n287.GetAttribute("name") -like 'tabOn*' -or $n287.GetAttribute("name") -like 'sep*')) { continue }
+        # 113th round: the avatar's ornament carrier (SPEC I84d, V309). It is transparent in BOTH
+        # senses because the photo has to show through it - it holds no content, it only gives the
+        # filigree somewhere to hang above the picture. Admitted by its exact NAME, not a wildcard:
+        # it is one control, and the second direction below - a section box authoring a transparent
+        # contour - stays exactly as strict as it was.
+        if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -eq 'ornAvatar') { continue }
         $v287Others += "$($f.Name) <$($n287.LocalName) name='$($n287.GetAttribute('name'))'>"
     }
 }
 if ($v287Others.Count) {
-    $v287Bad += "a transparent contour is authored outside the strip floor, the 19 buttons, the 19 markers and the 5 separators, on $($v287Others -join ', ') - the era paints a rule on every black rectangle and this idiom silently erases it (SPEC I74b, I5)"
+    $v287Bad += "a transparent contour is authored outside the strip floor, the 19 buttons, the 19 markers, the 5 separators and the avatar carrier, on $($v287Others -join ', ') - the era paints a rule on every black rectangle and this idiom silently erases it (SPEC I74b, I5)"
 }
 if ($v287Bad) { foreach ($b in $v287Bad) { Fail "V287 $b" } }
-else { Pass "V287 the strip floor, the 19 buttons, the 19 markers and the 5 separators are the only controls authoring a transparent contour, and the floor does author it" }
+else { Pass "V287 the strip floor, the 19 buttons, the 19 markers, the 5 separators and the avatar carrier are the only controls authoring a transparent contour, and the floor does author it" }
 
 # ---- V288..V292: the five alignments the 106th round was asked for -----------------
 # Every one of them is a RELATION between two things in the sheet, never a literal here: the
@@ -9004,7 +9096,7 @@ else {
     # is measured on the label BOX, and the gate does not know the height of a GLYPH - PX_PER_CHAR
     # measures width and nothing measures height (SPEC R102) - so at 1 the four eras, on four
     # different fonts, are what decide whether it touches. That is a screen question, not a static
-    # one, and §T681 is where it gets answered.
+    # one, and Â§T681 is where it gets answered.
     $clear307 = 1
     foreach ($pr307 in @(@("WoD20th.lfm", "tabStrip"), @("WoD20.11.lfm", "vampStrip"), @("WoD20.7.lfm", "numStrip"), @("WoD20.7.lfm", "hedgeStrip"))) {
         $st307 = (Doc (Join-Path $dir $pr307[0])).SelectSingleNode("//layout[@name='$($pr307[1])']")
@@ -9273,5 +9365,138 @@ if ($Build) {
     }
 }
 
+
+# ---- V310: a hedge ritual is offered only while its PATH reaches its level ---------------
+# SPEC I83, V310, user 2026-08-26. Six legs, and (e) and (f) are the two that give no symptom
+# at all when they are wrong: the filter simply stops pruning, rdk exits 0 and every other
+# check on this sheet stays green.
+$v310Bad = @()
+
+# The table maps ONE path per ritual - a string, not a list (SPEC I83b). It parses to zero rows
+# today and that is legal while PICKER_LIST["hedgeRitual"] is empty too; leg (a) below is what
+# ties the two together the moment either one fills.
+$hrpDecl310 = [regex]::Match($rootTxt, '(?s)(?m)^\s*HEDGE_RITUAL_PATH = \{\r?\n(.*?)^\s*\};')
+$hrp310 = [ordered]@{}
+if ($hrpDecl310.Success) {
+    foreach ($row in [regex]::Matches($hrpDecl310.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"([^"]*)"')) {
+        $hrp310[$row.Groups[1].Value] = $row.Groups[2].Value
+    }
+}
+
+$numina310 = @()
+$hritual310 = @()
+if ($region270.Success) {
+    $nl310 = [regex]::Match($region270.Groups[1].Value, '(?s)\["numina"\] = \{(.*?)\},\s*\n')
+    if ($nl310.Success) { $numina310 = @([regex]::Matches($nl310.Groups[1].Value, '"([^"]*)"') | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -ne '' }) }
+    $rl310 = [regex]::Match($region270.Groups[1].Value, '(?s)\["hedgeRitual"\] = \{(.*?)\},\s*\n')
+    if ($rl310.Success) { $hritual310 = @([regex]::Matches($rl310.Groups[1].Value, '"([^"]*)"') | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -ne '' }) }
+}
+
+$rootNoC310 = NoComments $rootTxt
+$hh6NoC310  = NoComments $hh6
+
+# Zero-guard: the three things this check reads have to BE there, or it measures nothing and
+# passes green forever (SPEC V209, V20).
+if (-not $hrpDecl310.Success) { $v310Bad += "HEDGE_RITUAL_PATH is not declared on the root form - the ritual filter has no table to read and this check measured nothing (SPEC I83b, V209)" }
+elseif ($rootNoC310 -notmatch '(?m)^\s*function hedgePathLevels\(\)') { $v310Bad += "hedgePathLevels is gone from the root form - there is no map of path levels and this check measured nothing (SPEC I83d, V209)" }
+elseif (-not $region270.Success) { $v310Bad += "the PICKER_LIST region could not be read - the two lists this check compares against are unreachable (SPEC V209)" }
+else {
+    # (a) both ends of the table stay inside the two lists, and the coverage rule switches on
+    # the moment the ritual list fills. An empty table beside an empty list is the state the
+    # 112th round ships; an empty table beside a FULL list is a filter that prunes nothing.
+    foreach ($k in $hrp310.Keys) {
+        if ($hritual310 -notcontains $k) { $v310Bad += "HEDGE_RITUAL_PATH is keyed on '$k', which PICKER_LIST['hedgeRitual'] does not carry - nobody can ever pick it, so the entry is dead (SPEC V310a, B55)" }
+        if ($numina310 -notcontains $hrp310[$k]) { $v310Bad += "HEDGE_RITUAL_PATH['$k'] names the path '$($hrp310[$k])', which PICKER_LIST['numina'] does not carry - a path no row can hold answers zero, so the ritual is offered to nobody (SPEC V310a)" }
+    }
+    if ($hritual310.Count -gt 0) {
+        $uncovered310 = @($hritual310 | Where-Object { -not $hrp310.Contains($_) })
+        if ($uncovered310.Count -gt 0) { $v310Bad += "$($uncovered310.Count) ritual(s) are on the picker list with no path in HEDGE_RITUAL_PATH, e.g. '$($uncovered310[0])' - an unknown value prunes nothing, so those would be offered at every level of every path (SPEC V310a, I83b)" }
+        $noPrefix310 = @($hritual310 | Where-Object { $_ -notmatch '^\d+\. ' })
+        if ($noPrefix310.Count -gt 0) { $v310Bad += "$($noPrefix310.Count) ritual(s) carry no '<n>. ' prefix, e.g. '$($noPrefix310[0])' - the level is read off the item text and nowhere else, so a missing prefix reads as level 0 and passes for free (SPEC V310a, V310c, I83c)" }
+    }
+
+    # (b) the branch answers in pickAllowed, BEFORE pickRefusal, and an unknown value is left
+    # alone. A `false` on the unknown key would open twelve blank dropdowns while the table is
+    # still empty - V271d/V272e in a third place.
+    # Anchored on the function's OWN indent, never on `^\s*end;`: pickAllowed's branches each
+    # close with an `end;` of their own, so a loose anchor would cut the body off before the
+    # pickRefusal call and the ordering leg below would quietly measure nothing (SPEC V20).
+    $pa310 = [regex]::Match($rootNoC310, "(?s)\n\t\t\tfunction pickAllowed\(([^)]*)\)(.*?)\n\t\t\tend;")
+    if (-not $pa310.Success) { $v310Bad += "pickAllowed could not be read off the root form - the one door to the rule is gone (SPEC V199, V209)" }
+    else {
+        if ($pa310.Groups[1].Value -notmatch 'hedge') { $v310Bad += "pickAllowed does not take the hedge path map - its fourth parameter is what the ritual branch measures against (SPEC I83f, V310e)" }
+        $paBody310 = $pa310.Groups[2].Value
+        $iRit310 = $paBody310.IndexOf('hedgeRitual_%d+$')
+        $iRef310 = $paBody310.IndexOf('pickRefusal')
+        if ($iRit310 -lt 0) { $v310Bad += "pickAllowed has no ritual-row branch - the twelve picked ritual rows would fall through to pickRefusal, which knows nothing about hedge magic (SPEC V310b)" }
+        elseif ($iRef310 -ge 0 -and $iRit310 -gt $iRef310) { $v310Bad += "the ritual branch sits AFTER the pickRefusal call - pickRefusal answers nil for a field it does not know, so the branch would never be reached (SPEC V310b)" }
+    }
+    $hra310 = [regex]::Match($rootNoC310, "(?s)\n\t\t\tlocal function hedgeRitualAllows\(([^)]*)\)(.*?)\n\t\t\tend;")
+    if (-not $hra310.Success) { $v310Bad += "hedgeRitualAllows is gone from the root form - the rule the branch delegates to is unreadable (SPEC V310b, V209)" }
+    else {
+        $hraBody310 = $hra310.Groups[2].Value
+        if ($hraBody310 -notmatch 'if path == nil then return true') { $v310Bad += "hedgeRitualAllows does not answer TRUE for a value HEDGE_RITUAL_PATH has never heard of - while the table is empty that is every value, so the twelve dropdowns would open blank (SPEC V310b, V271d)" }
+        # (c) the level comes off the item text and from nowhere else. A number in the table
+        # would be the second source V269d already closed for the price.
+        if ($hraBody310 -notmatch '\^\(%d\+\)%\. ') { $v310Bad += "hedgeRitualAllows does not read the level off the item-text prefix - a second source for one number is what lets the dots on screen say three while the filter measures four (SPEC V310c, V269d)" }
+        if ($hraBody310 -match 'HEDGE_RITUAL_LEVEL') { $v310Bad += "hedgeRitualAllows reads a level from a table instead of the item text (SPEC V310c)" }
+    }
+    foreach ($v in $hrp310.Values) {
+        if ($v -match '^\d+$') { $v310Bad += "HEDGE_RITUAL_PATH holds the number '$v' as a path - the level is the item's prefix and the table carries the PATH only (SPEC V310c)" }
+    }
+
+    # (d) the path map is its OWN, over all SEVENTEEN rows, and the ritual branch never reads
+    # discLevels: `Necromancy` and `Weather Control` are a hedge path AND a vampire
+    # Discipline/path, so one shared map lets the wrong one open the rituals (SPEC B15, V34).
+    $hpl310 = [regex]::Match($rootNoC310, "(?s)\n\t\t\tfunction hedgePathLevels\(\)(.*?)\n\t\t\tend;")
+    if (-not $hpl310.Success) { $v310Bad += "hedgePathLevels could not be read - this leg measured nothing (SPEC V209)" }
+    else {
+        $hplBody310 = $hpl310.Groups[1].Value
+        if ($hplBody310 -notmatch 'NUMINA_ROWS') { $v310Bad += "hedgePathLevels does not walk NUMINA_ROWS - a literal count here goes stale the next time a row is added, and the five TYPED rows hold dots like any other (SPEC V310d, I83d)" }
+        if ($hplBody310 -notmatch 'traitLevel') { $v310Bad += "hedgePathLevels never reads a dot - it would answer zero for every path and prune the whole list (SPEC V310d)" }
+        if ($hplBody310 -notmatch '>') { $v310Bad += "hedgePathLevels does not keep the HIGHER of two rows naming one path - answering with the lower takes away a level the player owns (SPEC V310d)" }
+    }
+    if ($hra310.Success -and $hra310.Groups[2].Value -match 'discLevels') { $v310Bad += "the ritual rule reads discLevels - Necromancy the DISCIPLINE at five would open the rituals of Necromancy the hedge PATH (SPEC V310d, B15)" }
+
+    # (e) the map rides the memo's own generation. Outside that block it is rebuilt once per
+    # CONTROL; read from anywhere the reset cannot reach it serves last render's levels with
+    # rdk exiting 0 and the gate green - B48 through a third door.
+    $reset310 = [regex]::Match($hh6NoC310, '(?s)if memo\.stamp ~= stamp or memo\.levels ~= levels then(.*?)end;')
+    if (-not $reset310.Success) { $v310Bad += "the picker memo no longer resets on a new generation - there is nothing for the hedge map to ride (SPEC V310e, V209)" }
+    elseif ($reset310.Groups[1].Value -notmatch 'memo\.hedge\s*=\s*hedgePathLevels\(\)') { $v310Bad += "memo.hedge is not built INSIDE the memo reset - built outside it, the map is rebuilt once per control instead of once per render (SPEC V205, V310e)" }
+    $hedgeBuilds310 = @([regex]::Matches($hh6NoC310, 'hedgePathLevels\(\)'))
+    if ($hedgeBuilds310.Count -gt 1) { $v310Bad += "hedgePathLevels() is called $($hedgeBuilds310.Count) times in WoD20.6 - one build per render is the whole point, and a second caller is a second generation nothing invalidates (SPEC V205, V310e)" }
+
+    # (f) reach and trigger, and the two halves fail for different reasons: a link without the
+    # DOTS never wakes on a level, and a renderer without the twelve NAMES reaches no combo.
+    $fr310 = [regex]::Match($hh6, '(?ms)local FILTER_ROW = \{(.*?)\}')
+    if (-not $fr310.Success) { $v310Bad += "FILTER_ROW is not declared - the ritual rows would not be filtered at all (SPEC V310f, V209)" }
+    elseif ($fr310.Groups[1].Value -notmatch 'hedgeRitual\s*=\s*true') { $v310Bad += "FILTER_ROW does not carry hedgeRitual - pickerItems asks isFilterRow first, so the twelve combos would be handed the whole list (SPEC V310f, I83g)" }
+    $fn310 = [regex]::Match($hh6, '(?ms)local FILTER_NAME = \{(.*?)\}')
+    if ($fn310.Success -and $fn310.Groups[1].Value -match 'hedgeRitual') { $v310Bad += "FILTER_NAME carries a hedgeRitual control - all twelve rows answer to the SAME question, so this scope holds by ROOT; by name only the one named row would filter (SPEC V310f, I83g, V203)" }
+
+    $rhp310 = [regex]::Match($hh6NoC310, "(?s)\n\t\t\tfunction renderHedgePickers\(from\)(.*?)\n\t\t\tend;")
+    if (-not $rhp310.Success) { $v310Bad += "renderHedgePickers is gone from WoD20.6 - nothing re-filters the hedge combos (SPEC V310f, V209)" }
+    elseif ($rhp310.Groups[1].Value -notmatch 'cbohedgeRitual_') { $v310Bad += "renderHedgePickers names no cbohedgeRitual control - xpFind would come back with the two old combos and the twelve ritual ones would keep whatever list the last repaint left them (SPEC V310f, I83i)" }
+    elseif ($rhp310.Groups[1].Value -notmatch 'HEDGE_RITUAL_ROWS - HEDGE_RITUAL_FREE_ROWS') { $v310Bad += "renderHedgePickers does not stop at total minus the typed rows - a typed row carries an edt and asking for its cbo is asking for a control that cannot exist (SPEC V248c, V310f)" }
+
+    $doc310 = Doc (Join-Path $dir "WoD20.7.lfm")
+    $link310 = $null
+    foreach ($dl in $doc310.SelectNodes("//dataLink")) {
+        if ($dl.GetAttribute("onChange") -match 'renderHedgePickers' -and $dl.GetAttribute("fields") -match "'numina_1'") { $link310 = $dl }
+    }
+    if ($null -eq $link310) { $v310Bad += "no dataLink on WoD20.7 watches the numina rows and calls renderHedgePickers - buying a level would open no ritual until something else repainted the tab (SPEC V310f, I83i, B48)" }
+    else {
+        $f310 = $link310.GetAttribute("fields")
+        $namesSeen310 = @(1..17 | Where-Object { $f310 -notmatch "'numina_$_'" })
+        if ($namesSeen310.Count -gt 0) { $v310Bad += "the numina dataLink misses row name(s) $($namesSeen310 -join ', ') - renaming the path on a row it does not watch leaves the ritual list built for the OLD path (SPEC V310f)" }
+        $dotsMissing310 = @()
+        foreach ($i in 1..17) { foreach ($d in 1..5) { if ($f310 -notmatch "'numina_${i}_${d}'") { $dotsMissing310 += "numina_${i}_${d}" } } }
+        if ($dotsMissing310.Count -gt 0) { $v310Bad += "the numina dataLink misses $($dotsMissing310.Count) dot field(s), e.g. $($dotsMissing310[0]) - the filter would wake only when a path was RENAMED, so buying a level opens no ritual, with rdk exiting 0 and this gate green (SPEC V310f, B48)" }
+    }
+}
+
+if ($v310Bad) { foreach ($b in $v310Bad) { Fail "V310 $b" } }
+else { Pass "V310 the ritual filter reads one table of $($hrp310.Count) ritual(s) against a map of all 17 numina rows, answers inside pickAllowed before pickRefusal, rides the memo's own generation, and is woken by 17 names and 85 dots" }
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

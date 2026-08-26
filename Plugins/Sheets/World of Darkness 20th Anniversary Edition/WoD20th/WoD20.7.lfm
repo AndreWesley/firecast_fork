@@ -459,7 +459,7 @@
 			whole of the request: 466 = 41 + 25*17, where 41 is the title band plus V240's 10.
 		-->
 		<layout name="tabHedge" left="0" top="52" width="1410" height="748">
-			<layout left="0" top="0" width="586" height="178">
+			<layout left="0" top="0" width="586" height="146">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="20" width="546" height="20" text="HEDGE MAGIC" horzTextAlign="center"/>
 
@@ -484,8 +484,8 @@
 				     lowercases the FIRST letter only, and a key the map does not hold is not a
 				     compile error - the combo falls through to `or c.values` and opens BLANK
 				     with rdk exiting 0 (SPEC V211a, B6). -->
-				<label left="20" top="78" width="150" height="24" text="Affiliation"/>
-				<comboBox left="180" top="78" width="386" height="24" fontSize="12" name="cboHedgeAffiliation" field="hedgeAffiliation">
+				<label left="20" top="41" width="150" height="24" text="Affiliation"/>
+				<comboBox left="180" top="41" width="386" height="24" fontSize="12" name="cboHedgeAffiliation" field="hedgeAffiliation">
 				</comboBox>
 
 				<!-- The typed twin of the picker above, one field and two widgets with exactly one
@@ -503,20 +503,20 @@
 				     ⚠ what is typed here is FREE text while the picker stores the canonical EN
 				     (SPEC V24), so the filters of I67/I68 read an affiliation they do not know and
 				     prune nothing - which is the right answer for homebrew, not an accident. -->
-				<edit name="edtHedgeAffiliation" left="180" top="78" width="386" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
+				<edit name="edtHedgeAffiliation" left="180" top="41" width="386" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
 
 				<!-- The label column is 150 because SPEC V16 prices it there and not by eye:
 				     `Atributo de Conjuracao` is 22 characters, which the house ruler puts at
 				     143px. These two rows share one label x and one entry x, so they are a GRID
 				     and not two controls that happen to line up (SPEC V224, B12, B13). -->
-				<label left="20" top="106" width="150" height="24" text="Essence"/>
-				<edit left="180" top="106" width="386" height="24" field="hedgeEssence"/>
+				<label left="20" top="69" width="150" height="24" text="Essence"/>
+				<edit left="180" top="69" width="386" height="24" field="hedgeEssence"/>
 
 				<!-- cbo, not cmb: this is a picker of PROSE, so its list lives in PICKER_LIST and
 				     translates with the sheet (SPEC I27, V208 scope, B57). The nine names are the
 				     nine of XP_ATTRS, `Inteligence` in the sheet's own spelling (SPEC I3). -->
-				<label left="20" top="134" width="150" height="24" text="Casting Attribute"/>
-				<comboBox left="180" top="134" width="386" height="24" fontSize="12" name="cboHedgeAttr" field="hedgeAttr">
+				<label left="20" top="97" width="150" height="24" text="Casting Attribute"/>
+				<comboBox left="180" top="97" width="386" height="24" fontSize="12" name="cboHedgeAttr" field="hedgeAttr">
 				</comboBox>
 			</layout>
 
@@ -534,20 +534,20 @@
 			     top=107 is the CENTRE of the body, not a row position: the box is stretched to the
 			     band's 178 and 107 - 61 equals 178 - 132, the body opening 20 under the title I73
 			     put at 20 (SPEC I63, V267b, I73). -->
-			<layout left="591" top="0" width="407" height="178">
+			<layout left="591" top="0" width="407" height="146">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="20" width="367" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
 
-				<imageCheckBox left="60" top="107" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="89" top="107" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="118" top="107" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="147" top="107" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="176" top="107" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="205" top="107" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="234" top="107" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="263" top="107" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="292" top="107" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-				<imageCheckBox left="321" top="107" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="60" top="91" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="89" top="91" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="118" top="91" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="147" top="91" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="176" top="91" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="205" top="91" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="234" top="91" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="263" top="91" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="292" top="91" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox left="321" top="91" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			</layout>
 
 			<!-- The WILLPOWER box of the Combat tab, moved here and not redesigned (SPEC I63,
@@ -559,11 +559,11 @@
 
 			     The 250x45 block sits at 105/97: 105 = (460 - 250) / 2 and 97 - 61 = 178 - 142, the
 			     same centring the box beside it pays (SPEC V267b). -->
-			<layout left="1003" top="0" width="407" height="178">
+			<layout left="1003" top="0" width="407" height="146">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="20" width="367" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
-				<layout left="78" top="97" width="250" height="45">
+				<layout left="78" top="81" width="250" height="45">
 					<WillpowerNumina/>
 				</layout>
 			</layout>
@@ -588,7 +588,7 @@
 				V48 - which measure boxes - have nothing to say about it, and V227 is untouched
 				because it carries no field.
 			-->
-			<layout name="hedgeStrip" left="0" top="190" width="1410" height="40">
+			<layout name="hedgeStrip" left="0" top="158" width="1410" height="40">
 				<rectangle name="tabOnHedgePaths" left="30" top="5" width="95" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
 				<rectangle name="btnTabHedgePaths" left="30" top="5" width="95" height="30" color="#00000000"
@@ -611,7 +611,7 @@
 				<label name="noteHedgePaths" left="234" top="5" width="400" height="30" text="* The first path is the Affinity Path" fontSize="12" vertTextAlign="center"/>
 			</layout>
 
-			<layout name="tabHedgePaths" left="0" top="242" width="1410" height="486">
+			<layout name="tabHedgePaths" left="0" top="210" width="1410" height="486">
 				<layout left="0" top="0" width="586" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 					<label left="20" top="20" width="546" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
@@ -680,7 +680,7 @@
 				</layout>
 			</layout>
 
-			<layout name="tabHedgeRituals" left="0" top="242" width="1410" height="486" visible="false">
+			<layout name="tabHedgeRituals" left="0" top="210" width="1410" height="486" visible="false">
 				<layout left="0" top="0" width="586" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 					<label left="20" top="20" width="546" height="20" text="HEDGE MAGIC RITUALS" horzTextAlign="center"/>
@@ -911,6 +911,17 @@
 	     there are twenty-odd links across the fifteen forms and not one of them is nested, and
 	     the handler walks up from `self` anyway (SPEC V143). -->
 	<dataLink field="hedgeAffiliation" onChange="renderHedgePickers(self);"/>
+
+	<!-- The ritual list is filtered by the LEVEL of the path it comes from (SPEC I83, V310),
+	     so it follows what that answer READS: the seventeen path NAMES and the eighty-five
+	     dots that carry their levels. The dots are the half that is easy to leave out and
+	     gives no symptom when missing - the filter would then wake only when a path was
+	     RENAMED, so buying a level would open no ritual at all, with rdk exiting 0 and the
+	     gate green (SPEC B48, V310f).
+
+	     A link of its own and not more fields on the description one above: that one parses
+	     the book for three text blocks, and a level is not a description (SPEC V206). -->
+	<dataLink fields="{'numina_1', 'numina_2', 'numina_3', 'numina_4', 'numina_5', 'numina_6', 'numina_7', 'numina_8', 'numina_9', 'numina_10', 'numina_11', 'numina_12', 'numina_13', 'numina_14', 'numina_15', 'numina_16', 'numina_17', 'numina_1_1', 'numina_1_2', 'numina_1_3', 'numina_1_4', 'numina_1_5', 'numina_2_1', 'numina_2_2', 'numina_2_3', 'numina_2_4', 'numina_2_5', 'numina_3_1', 'numina_3_2', 'numina_3_3', 'numina_3_4', 'numina_3_5', 'numina_4_1', 'numina_4_2', 'numina_4_3', 'numina_4_4', 'numina_4_5', 'numina_5_1', 'numina_5_2', 'numina_5_3', 'numina_5_4', 'numina_5_5', 'numina_6_1', 'numina_6_2', 'numina_6_3', 'numina_6_4', 'numina_6_5', 'numina_7_1', 'numina_7_2', 'numina_7_3', 'numina_7_4', 'numina_7_5', 'numina_8_1', 'numina_8_2', 'numina_8_3', 'numina_8_4', 'numina_8_5', 'numina_9_1', 'numina_9_2', 'numina_9_3', 'numina_9_4', 'numina_9_5', 'numina_10_1', 'numina_10_2', 'numina_10_3', 'numina_10_4', 'numina_10_5', 'numina_11_1', 'numina_11_2', 'numina_11_3', 'numina_11_4', 'numina_11_5', 'numina_12_1', 'numina_12_2', 'numina_12_3', 'numina_12_4', 'numina_12_5', 'numina_13_1', 'numina_13_2', 'numina_13_3', 'numina_13_4', 'numina_13_5', 'numina_14_1', 'numina_14_2', 'numina_14_3', 'numina_14_4', 'numina_14_5', 'numina_15_1', 'numina_15_2', 'numina_15_3', 'numina_15_4', 'numina_15_5', 'numina_16_1', 'numina_16_2', 'numina_16_3', 'numina_16_4', 'numina_16_5', 'numina_17_1', 'numina_17_2', 'numina_17_3', 'numina_17_4', 'numina_17_5'}" onChange="renderHedgePickers(self);"/>
 
 	<!-- The storyteller flag that swaps this tab's Affiliation picker for a typed field
 	     (SPEC I71, V274). It is wired where the control it swaps lives, the same place the
