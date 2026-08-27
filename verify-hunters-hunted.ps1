@@ -1098,6 +1098,12 @@ else { Pass "V77 all $titleCount section titles clear the box border" }
 # the health track's clickable rectangles are not siblings of their box background.
 # The corner is not dropped, it changes owner: V229 requires the floor to author none
 # (SPEC I33, user request 2026-08-22).
+#
+# EMENDED in the 117th round and NOT renumbered (SPEC I89e): what this measures is the AUTHORED
+# corner - the floor every era without a `boxCorner` falls back to - and no longer what is on
+# SCREEN, because Modern Nights rewrites the corner at runtime (SPEC I89a). What it buys is
+# still real: a box copied from an older file lands among its siblings with a different corner
+# and reddens here. What it no longer promises is ONE corner across the four eras.
 $corners = @{}
 $boxSeen = 0
 $floorCut = 0
@@ -1120,7 +1126,7 @@ elseif ($corners.Count -gt 1) {
     }
 } else {
     $p = ($corners.Keys | Select-Object -First 1) -split '\|'
-    Pass "V68 all $boxSeen section boxes share cornerType='$($p[0])' radius $($p[1])/$($p[2]), and the one strip floor is cut out by construction"
+    Pass "V68 all $boxSeen section boxes AUTHOR cornerType='$($p[0])' radius $($p[1])/$($p[2]) - the floor every era without a boxCorner falls back to - and the one strip floor is cut out by construction"
 }
 
 
@@ -1385,6 +1391,16 @@ else {
 # ---- V12: combo items are values - items must agree with the Lua comparison ---
 # The theme combo was removed on 2026-08-17. Absent is fine; present-but-inconsistent is not.
 $hh6 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.6.lfm")))
+
+# The radii and corner types a PALETTE can put on a section box at RUNTIME (SPEC I89a, V316).
+# Read ONCE, here, because three checks downstream need the same fact: V258 measures the corner
+# bite against the LARGEST radius any era can render, V66 fences the write that produces it, and
+# V316 owns the key itself. Anchored at line start so a comment mentioning boxCorner never
+# counts as a declaration.
+$boxCornerDecl  = @([regex]::Matches($hh6, '(?m)^\s*boxCorner\s*=\s*\{\s*type\s*=\s*"([^"]*)"\s*,\s*radius\s*=\s*([0-9.]+)\s*\}\s*,'))
+$boxCornerRadii = @($boxCornerDecl | ForEach-Object { [double]$_.Groups[2].Value })
+$boxCornerTypes = @($boxCornerDecl | ForEach-Object { $_.Groups[1].Value })
+$boxCornerAny   = @([regex]::Matches($hh6, '(?m)^\s*boxCorner\s*=')).Count
 if ($hh6 -match 'field="theme"[^>]*items="\{([^}]*)\}"') {
     $items = ([regex]::Matches($Matches[1], "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
     if ($hh6 -match 'theme\s*==\s*"([^"]+)"') {
@@ -1968,13 +1984,30 @@ else {
     elseif ($hh6 -notmatch 'if rec\[prop\] == nil then rec\[prop\] = original; end;') { Fail "V54 the ledger is overwritten on repaint - it would record Victorian and call it Modern" }
     else { Pass "V54 the authored value is recorded once and never overwritten" }
 
-    # V66: the corner detail belongs to the XML. cornerType="innerLine" over a radius is
-    # authored on 53 boxes, so it already holds in every period - three palettes were writing
-    # corner = 0 over it and flattening it. Three rectangles carry a radius of their own (the
-    # health mark box, the avatar frame), which a single theme-wide radius would deform.
-    if ($themesBlock -match '(?m)^\s+corner\s*=') { Fail "V66 a palette declares `corner` again - a theme-wide radius flattens the boxes that set their own" }
-    elseif ($body -match '"(xradius|yradius)"') { Fail "V66 applyTheme writes a corner radius - the XML owns that detail (SPEC C, 16th round)" }
-    else { Pass "V66 no palette touches the corner radius" }
+    # V66: REVOKED in the letter by the 117th round (SPEC I89d, V316). applyTheme DOES write the
+    # corner now - that is the whole of the coffin bevel - but only where sectionBox says yes.
+    # What this invariant was BUYING is still bought and merely changed owner: a theme-wide
+    # radius must never reach the three rectangles that carry a radius of their own (the health
+    # mark box at 2, the avatar frame at 5), and a palette key `corner` = 0 flattening the lot is
+    # still forbidden outright. The guard stops being "the write does not exist" and becomes "the
+    # write is FENCED", which is a thing this gate can still count.
+    #
+    # The fence is measured by SUBTRACTION: cut the sectionBox block out of applyTheme and demand
+    # that nothing left over mentions a corner property. Asking only that the fence EXISTS would
+    # pass a version that also wrote the radius on the way past every pill.
+    #
+    # The comment strip is inline because NoComments is declared further down this file than this
+    # check runs.
+    $body66  = [regex]::Replace($body, '(?m)^\s*--.*$', '')
+    $fence66 = '(?ms)^(\t+)if sectionBox\(c, fill\) then\r?\n.*?^\1end;'
+    if ($themesBlock -match '(?m)^\s+corner\s*=') { Fail "V66 a palette declares ``corner`` again - a theme-wide radius flattens the boxes that set their own" }
+    elseif ($body66 -notmatch '"(xradius|yradius|cornerType)"') { Fail "V66 applyTheme writes no corner at all - the bevel of I89 reaches not one box, and every leg of V316 below is measuring a feature that is not there (SPEC V209)" }
+    elseif ($body66 -notmatch $fence66) { Fail "V66 the corner write is not fenced by sectionBox - unfenced this branch runs on EVERY rectangle the sheet has and bevels the 19 tab pills, whose width is priced for the concave arc (SPEC V228, V316d)" }
+    else {
+        $outside66 = [regex]::Replace($body66, $fence66, '')
+        if ($outside66 -match '"(xradius|yradius|cornerType)"') { Fail "V66 applyTheme touches a corner property OUTSIDE the sectionBox fence - that reaches the pills, the mark boxes and the avatar frame, which is exactly what this invariant has bought since the 16th round" }
+        else { Pass "V66 no palette declares ``corner``, and every corner write applyTheme makes is fenced inside sectionBox" }
+    }
 
     # V67: one outline width, declared once. The requirement is that the four MATCH, and four
     # copies that agree today can drift tomorrow - so the equality is structural, like
@@ -7184,9 +7217,21 @@ foreach ($f in $files) {
             if ($k.GetAttribute("align") -eq 'client' -or ($kl -eq 0 -and $kt -eq 0 -and $kw -eq $bw)) { $back = $k; break }
         }
         if ($null -eq $back) { continue }
-        $r = 0
-        [void][int]::TryParse($back.GetAttribute("xradius"), [ref]$r)
-        if ($r -le 0) { continue }   # a square box has no bite to clear
+        # The ruler is the LARGEST radius this box can WEAR, not the one the XML spells (SPEC
+        # I89g, V316f). Since the 117th round a palette writes the corner at runtime, so Modern
+        # Nights renders 18 on a rectangle whose XML still says 14 - reading the attribute alone
+        # would quietly measure the SMALLER bite and this check would cover less than the sheet
+        # draws, which is B7 arriving by radius. Both sides are READ: the attribute here, the
+        # palette radii at the top of this file.
+        #
+        # The XML gate stays FIRST and is not folded into the max: a rectangle that authors no
+        # radius has no bite to clear, and sectionBox refuses it too, so no palette can ever put
+        # a corner on it. Folding it in would start measuring the square strip floor.
+        $rXml = 0
+        [void][int]::TryParse($back.GetAttribute("xradius"), [ref]$rXml)
+        if ($rXml -le 0) { continue }   # a square box has no bite to clear
+        $r = $rXml
+        foreach ($pr258 in $boxCornerRadii) { if ($pr258 -gt $r) { $r = [int][Math]::Ceiling($pr258) } }
 
         $title = '(untitled)'
         foreach ($k in $box.ChildNodes) {
@@ -8402,17 +8447,26 @@ else {
 
     # V278: who gets one is decided by CONSTRUCTION - authored black plus a radius of its own.
     # Anchored on what the code READS, not on a roster of names spelled here (SPEC V222).
-    if ($ornBody -notmatch 'normColor\(\s*fill\s*\)') { $ornBad += "V278 the filter does not read the AUTHORED fill - by the time this runs the box is mahogany, so reading the current colour matches nothing (SPEC V62)" }
+    #
+    # RE-POINTED in the 117th round and NOT renumbered (SPEC V316d): the test moved out of
+    # ornament() into sectionBox, so the frame and the CORNER of I89 ask it in ONE place. Left
+    # grepping ornament() this check would find nothing, report nothing and pass by vacancy -
+    # the no-op V20 refuses, and B7 in the letter.
+    $sbFn278 = LuaFn $hh6 'sectionBox'
+    $sbBody278 = NoComments $sbFn278
+    if (-not $sbFn278) { $ornBad += "V278 sectionBox is gone - the one place that says which rectangles ARE section boxes does not exist, so neither caller is filtered (SPEC V209, V316d)" }
+    elseif ($ornBody -notmatch 'sectionBox\(\s*c\s*,\s*fill\s*\)') { $ornBad += "V278 ornament() no longer asks sectionBox - a second copy of the filter is exactly what V67 pays not to have (SPEC V316d)" }
+    elseif ($sbBody278 -notmatch 'normColor\(\s*fill\s*\)') { $ornBad += "V278 the filter does not read the AUTHORED fill - by the time this runs the box is mahogany, so reading the current colour matches nothing (SPEC V62)" }
     else {
         # The radius has to REFUSE, not merely be read. Anchored on the construction (SPEC
         # V222): find the local assigned from c.xradius, then demand a return guarded by it.
         # Asking only that the word appears passes a version that reads the radius and then
         # frames the box anyway - which is how the tab-strip floor would get a gold frame.
-        $radL = [regex]::Match($ornBody, '(?m)^\s*local\s+(\w+)\s*=\s*c\.xradius;')
+        $radL = [regex]::Match($sbBody278, '(?m)^\s*local\s+(\w+)\s*=\s*c\.xradius;')
         if (-not $radL.Success) { $ornBad += "V278 nothing reads the box own corner radius - the tab-strip floor is black and square and would be framed like a section box (SPEC V229, V68)" }
         else {
             $rn278 = [regex]::Escape($radL.Groups[1].Value)
-            if ($ornBody -notmatch "(?m)^\s*if\s+[^\r\n]*\b$rn278\b[^\r\n]*then return;") {
+            if ($sbBody278 -notmatch "(?m)^\s*if\s+[^\r\n]*\b$rn278\b[^\r\n]*then return;") {
                 $ornBad += "V278 the corner radius is read and never REFUSES - a black square would be framed exactly like a section box (SPEC V229, V68)"
             }
         }
@@ -8738,22 +8792,61 @@ else {
     if ($pathBody315 -notmatch 'if style == "filete" then') { $v315Bad += "markPath does not dispatch on the filete style - every era falls to the default drawing and the palette key is dead (SPEC I88a)" }
     if ($pathBody315 -match '\bornStyleNow\b') { $v315Bad += "markPath reads ornStyleNow directly, and that local is declared BELOW it - the read compiles to a GETGLOBAL and calls nil, with exit 0 and nothing to grep (SPEC I88a, V223, B51)" }
     if ($ruleBody315 -notmatch 'markPath\(bw, bh, kind, ornStyleNow\)') { $v315Bad += "markRule does not pass ornStyleNow into markPath - the style arrives nil and the era's own drawing is never reached (SPEC I88a)" }
+    # EMENDED by the 118th round and NOT renumbered (SPEC I90h). The count was "exactly 1
+    # palette declares ornStyle", which the chain makes false: two eras carry a style now. It
+    # becomes a RELATION with both sides READ - as many palettes declaring a style as ornPath has
+    # branches to answer them - so a fifth era with a sixth drawing cannot slip past a number
+    # spelled here.
+    #
+    # And the TYPO test changes painter. It used to demand markPath dispatch on the declared
+    # value, which was right while ornStyle meant one thing; `corrente` changes the BOX and
+    # deliberately leaves the bar alone, so that demand would redden a product decision. What
+    # still has to hold is that the BOX painter answers every style a palette declares - it is
+    # the painter the key exists for, and a style ornPath does not know falls to the filigree
+    # with exit 0, the gate green and only the screen left to tell. A style the BAR does not
+    # dispatch is a declared subset and stays GREEN.
     $decl315 = [regex]::Matches($hh6, '(?m)^\s*ornStyle\s*=\s*"([^"]+)"')
-    if ($decl315.Count -ne 1) { $v315Bad += "$($decl315.Count) palette(s) declare ornStyle, expected exactly 1 - the other three fall to the drawing of I78b BY DECISION, and a second one is a product choice, not a refactor (SPEC I88a, V313a)" }
+    $pathFn315 = NoComments (LuaFn $hh6 'ornPath')
+    $branch315 = @([regex]::Matches($pathFn315, 'if style == "([^"]+)" then') | ForEach-Object { $_.Groups[1].Value })
+    if ($decl315.Count -eq 0) { $v315Bad += "no palette declares ornStyle - leg (a) matched nothing, which is B7 waiting (SPEC V209, V20)" }
+    elseif ($branch315.Count -ne $decl315.Count) {
+        $v315Bad += "$($decl315.Count) palette(s) declare a style and ornPath branches on $($branch315.Count) - a style with no branch draws the filigree instead, and a branch with no palette is a drawing nobody can reach (SPEC I90h, V315a)"
+    }
     else {
-        $val315 = $decl315[0].Groups[1].Value
-        if ($pathBody315 -notmatch ('if style == "' + [regex]::Escape($val315) + '" then')) { $v315Bad += "the palette declares ornStyle = $val315 and markPath dispatches on no such style - a mistyped style falls to the default drawing with exit 0, gate green, and only the screen left to tell (SPEC I88a, V285)" }
+        foreach ($d315 in $decl315) {
+            $val315 = $d315.Groups[1].Value
+            if ($branch315 -notcontains $val315) { $v315Bad += "the palette declares ornStyle = $val315 and ornPath dispatches on no such style - a mistyped style falls to the default drawing with exit 0, gate green, and only the screen left to tell (SPEC I90h, V285)" }
+        }
     }
 
-    # (b) a STYLE's constant does not cross into the other style, the way V308 keeps a MOTIF's
-    # constant out of another motif (B69). Two exceptions, and they are DECLARED rather than
-    # accidental: ORN_PILLR, the arc V228 authors on all nineteen buttons, and ORN_SUB_MARK,
-    # the sub-tab height the user approved in the 109th round - one fact in either style.
-    foreach ($bad315 in @('ORN_MARK', 'ORN_MARK2', 'ORN_MARK_RX', 'ORN_MARK_RY', 'ORN_MARK_GAP', 'ORN_SUB', 'ORN_SEP_RX', 'ORN_SEP_RY')) {
-        if ($filBody315 -match ("\b" + [regex]::Escape($bad315) + "\b(?!_|\d)")) { $v315Bad += "markFilete reads $bad315, which belongs to the DEFAULT style - one constant serving two drawings is how the 110th round moved three levels when it was asked to move one (SPEC I88e, V308, B69)" }
+    # (b) a STYLE's constant does not cross into ANOTHER style's drawing, the way V308 keeps a
+    # MOTIF's constant out of another motif (B69). EMENDED by the 119th round and NOT
+    # renumbered (SPEC I91i): it enumerated the two styles that existed, and a third drawing
+    # arrived - so it is a table now, and a fourth style is one row rather than a rewrite.
+    #
+    # THREE exceptions, and they are DECLARED rather than accidental: ORN_PILLR, the arc V228
+    # authors on all nineteen buttons; ORN_SUB_MARK, the sub-tab height the user approved in
+    # the 109th round, which is one fact in any style; and ORN_KAPPA, which is not a drawing
+    # choice at all but the constant of the arc, so it carries none of B69's risk.
+    $cor315 = LuaFn $hh6 'markCorrente'
+    if (-not $cor315) { $v315Bad += "markCorrente is gone from WoD20.6 - the corrente style's drawing cannot be read, so the row this leg holds for it would measure nothing (SPEC I91a, V209, V20)" }
+    else {
+        $corBody315 = NoComments $cor315
+        $defOwn315 = @('ORN_MARK', 'ORN_MARK2', 'ORN_MARK_RX', 'ORN_MARK_RY', 'ORN_MARK_GAP', 'ORN_SUB', 'ORN_SEP_RX', 'ORN_SEP_RY')
+        $filOwn315 = @('ORN_FIL_MARK', 'ORN_FIL_CROSS', 'ORN_FIL_SEP')
+        $corOwn315 = @('ORN_COR_MARK', 'ORN_COR_MARK2', 'ORN_COR_IN', 'ORN_COR_SPAN', 'ORN_COR_SUB2', 'ORN_COR_SUB_SPAN', 'ORN_COR_DOT')
+        $fam315 = @(
+            @{ fn = 'markPath (the default drawing)'; body = $pathBody315; forbid = ($filOwn315 + $corOwn315); sub = $false },
+            @{ fn = 'markFilete';                     body = $filBody315;  forbid = ($defOwn315 + $corOwn315); sub = $true  },
+            @{ fn = 'markCorrente';                   body = $corBody315;  forbid = ($defOwn315 + $filOwn315); sub = $true  }
+        )
+        foreach ($f315 in $fam315) {
+            foreach ($bad315 in $f315.forbid) {
+                if ($f315.body -match ("\b" + [regex]::Escape($bad315) + "\b(?!_|\d)")) { $v315Bad += "$($f315.fn) reads $bad315, which belongs to ANOTHER style - one constant serving two drawings is how the 110th round moved three levels when it was asked to move one (SPEC I88e, I91i, V308, B69)" }
+            }
+            if ($f315.sub -and $f315.body -notmatch '\bORN_SUB_MARK\b') { $v315Bad += "$($f315.fn) has no ORN_SUB_MARK - its sub-tab rule has come off the height the user saw and approved in the 109th round (SPEC I88e, I91c)" }
+        }
     }
-    if ($filBody315 -notmatch '\bORN_SUB_MARK\b') { $v315Bad += "markFilete has no ORN_SUB_MARK - the sub-tab rule has come off the height the user saw and approved in the 109th round (SPEC I88e)" }
-    if ($pathBody315 -match '\bORN_FIL_') { $v315Bad += "markPath reads an ORN_FIL_ constant - the filete style's numbers have leaked into the default drawing, which is B69 again, by style instead of by motif (SPEC V315b)" }
 
     # (c) THE relation, and the one that keeps the cross off the words. In the default style the
     # topmost ink is the upper rule, at h - ORN_MARK2 = 21, which is the state the user approved
@@ -8797,6 +8890,284 @@ else {
     if ($v315Bad) { foreach ($b in $v315Bad) { Fail "V315 $b" } }
     else { Pass "V315 the bar's drawing comes out of the palette that draws the boxes, each style keeps its own constants, and both styles put their topmost ink at $mark2_315 from the marker's foot" }
 }
+
+# ---- V316: the PALETTE may write the CORNER, and ONE selector says in whom ----------------
+# SPEC I89, the 117th round. The coffin bevel is the first thing a palette writes that is
+# GEOMETRY and not colour, so it is the first that can deform a rectangle rather than recolour
+# it. Every leg below has its other side read out of the Lua: a number spelled on this side is
+# the second truth V49 pays not to have, and the failure each one hides is visual - exit 0,
+# rdk -l 0, gate green, wrong on screen.
+$v316Bad = @()
+
+$sbFn316   = LuaFn $hh6 'sectionBox'
+$ornFn316  = LuaFn $hh6 'ornament'
+$themeM316 = [regex]::Match($hh6, 'local function applyTheme\(v, from\)(.*?)\n\t\t\tend;', 'Singleline')
+$body316   = if ($themeM316.Success) { NoComments $themeM316.Groups[1].Value } else { '' }
+$boxr316   = [regex]::Match($hh6, '(?m)^\s*local ORN_BOXR\s*=\s*([0-9.]+);')
+$props316  = @('cornerType', 'xradius', 'yradius')
+
+# Zero-guard FIRST: a leg that reads nothing passes for the wrong reason, and the whole point of
+# this block is that nothing above it sees the feature at all (SPEC V209, V20).
+if (-not $sbFn316)              { $v316Bad += "sectionBox is not in WoD20.6 - every leg below measures a selector that does not exist (SPEC V209)" }
+if (-not $themeM316.Success)    { $v316Bad += "applyTheme could not be read - the corner write is unmeasurable, so legs (c) and (d) are no-ops (SPEC V209, V20)" }
+if (-not $boxr316.Success)      { $v316Bad += "ORN_BOXR could not be read out of the Lua - leg (b) has no other side and states an opinion instead of a relation (SPEC V209)" }
+if ($boxCornerAny -eq 0)        { $v316Bad += "no palette declares boxCorner - the coffin bevel of I89 is not in the sheet and this whole block is measuring nothing (SPEC V209)" }
+
+# (a) the key is a TABLE with BOTH fields, and it cannot exist by halves. `type` has to be a
+# value the SDK's enum actually answers to (SPEC R117) - anything else is a write the SDK
+# ignores in silence - and `radius` has to be POSITIVE. A radius of 0 is not "a square corner":
+# it UNMAKES the selector, because sectionBox reads c.xradius LIVE and a 0 refuses the box, so
+# one number in Modern Nights would wipe the filigree off the other three eras on an OPEN sheet.
+$enum316 = @('round', 'bevel', 'innerRound', 'innerLine')
+if ($boxCornerAny -ne $boxCornerDecl.Count) {
+    $v316Bad += "$boxCornerAny palette key(s) named boxCorner but only $($boxCornerDecl.Count) is the { type = ..., radius = ... } table this reads - a half-declared key is a corner nobody can measure (SPEC V316a, I89a)"
+}
+foreach ($ty316 in $boxCornerTypes) {
+    if ($enum316 -notcontains $ty316) { $v316Bad += "a palette asks for cornerType '$ty316', which is not one of the $($enum316.Count) the SDK enum answers to ($($enum316 -join ', ')) - the setter would ignore it in silence and the box would keep the concave bite (SPEC V316a, R117)" }
+}
+foreach ($rd316 in $boxCornerRadii) {
+    if ($rd316 -le 0) { $v316Bad += "a palette asks for radius $rd316 - a radius at or under 0 makes sectionBox REFUSE the box, which strips the filigree off every OTHER era rather than squaring one corner (SPEC V316a, V278)" }
+}
+
+# (b) REVOKED by the 118th round and moved to V317a (SPEC I90d). What this leg forbade was the
+# PAIRING - boxCorner beside ornament - on the grounds that the filigree and the filete arc
+# CONCAVE at ORN_BOXR + ORN_IN and would cross a cut corner. That reasoning is intact; the ban
+# built on it is not, because `corrente` is a drawing made FOR the bevel. The rule became "the
+# style and the corner AGREE", which is strictly larger: it still refuses a concave drawing on a
+# cut corner AND it refuses the direction this ban let straight through - a bevelled era asking
+# for `filete`. Deleting the leg without V317a landing in the same commit would leave that whole
+# axis unmeasured, which is why T715 and T716 ship together.
+#
+# (e) stays here and rides the same walk: exactly ONE palette declares the corner and the other
+# three fall to the XML. A second one is a new shape in an era nobody asked for, and the symptom
+# shows up one era away from whoever caused it - the family of B6.
+$declCorner316 = @()
+foreach ($k316 in $themeKeys) {
+    $pal316 = [regex]::Match($themesBlock, "(?ms)^\t{4}\[""$([regex]::Escape($k316))""\] = \{(.*?)^\t{4}\},")
+    if (-not $pal316.Success) { $v316Bad += "palette '$k316' could not be read - leg (e) cannot see what it declares (SPEC V209)"; continue }
+    $pb316 = [regex]::Replace($pal316.Groups[1].Value, '(?m)^\s*--.*$', '')
+    if ($pb316 -match '(?m)^\s*boxCorner\s*=') { $declCorner316 += $k316 }
+}
+if ($declCorner316.Count -ne 1) {
+    $v316Bad += "$($declCorner316.Count) palette(s) declare boxCorner ($($declCorner316 -join ', ')), expected exactly 1 - the other three fall to the corner the XML authored, and a second one changes the shape of an era nobody asked about (SPEC V316e, B6)"
+}
+
+# (c) the WAY BACK OUT is written down. paint() returns early on a nil value (V61), so a write
+# of t.boxCorner ALONE would leave all 73 boxes beveled FOR EVER once Modern Nights had been on:
+# rdk -l exits 0, this gate stays green, and the defect exists only on screen - B58 and B62 on a
+# fourth axis. The value handed to paint has to mention the palette AND the authored value, and
+# the authored one has to be the SAME expression paint records as the original: an `or` onto
+# some other local would restore a corner the box never had.
+#
+# Anchored on the CONSTRUCTION and not on the spelling (SPEC V222): find the local the palette's
+# table is read INTO, then demand each painted value mention that local. Grepping for the literal
+# `t.boxCorner` at the three paint sites would redden the version that reads the table once - the
+# one the code is written in - and green-light the one that reads it three times.
+if ($body316) {
+    $bcL316 = [regex]::Match($body316, '(?m)^\s*local\s+(\w+)\s*=\s*t\.boxCorner;')
+    if (-not $bcL316.Success) { $v316Bad += "applyTheme never reads t.boxCorner - the palette cannot reach the corner it declares (SPEC I89c, V209)" }
+    else {
+        $bcN316 = [regex]::Escape($bcL316.Groups[1].Value)
+        foreach ($pr316 in $props316) {
+            $pm316 = [regex]::Match($body316, "paint\(c, ""$pr316"",\s*(.+?),\s*([A-Za-z_]\w*)\);")
+            if (-not $pm316.Success) { $v316Bad += "applyTheme never paints ``$pr316`` - one of the three properties the coffin bevel is made of is not written at all (SPEC V209, I89c)"; continue }
+            $val316 = $pm316.Groups[1].Value
+            $org316 = $pm316.Groups[2].Value
+            if ($val316 -notmatch "\b$bcN316\b") { $v316Bad += "the value painted onto ``$pr316`` never reads the palette's corner - that property would keep the authored value in every era and the bevel would come out half drawn (SPEC I89c)" }
+            elseif ($val316 -notmatch "\bor\s+$([regex]::Escape($org316))\b") { $v316Bad += "the value painted onto ``$pr316`` does not fall back to the AUTHORED ``$org316`` - paint() returns early on nil (V61), so leaving Modern Nights would leave all 73 boxes beveled for ever, with exit 0 and this gate green (SPEC V316c, B58, B62)" }
+        }
+    }
+}
+
+# (d) the selector is ONE. sectionBox exists, BOTH callers ask it, and the test itself is not
+# copied anywhere else - a second copy of "which rectangles are the boxes" is what V67 pays not
+# to have, and the cost of the two drifting apart here is the 19 pills beveled with a width
+# priced for the concave arc (V228). Counted on the construction rather than on a roster: the
+# authored-black test is the line that would have to be duplicated.
+if ($sbFn316 -and $body316 -notmatch 'sectionBox\(\s*c\s*,\s*fill\s*\)') {
+    $v316Bad += "applyTheme never asks sectionBox - the corner write would run on every rectangle the sheet has (SPEC V316d, V228)"
+}
+if ($sbFn316 -and (NoComments $ornFn316) -notmatch 'sectionBox\(\s*c\s*,\s*fill\s*\)') {
+    $v316Bad += "ornament() never asks sectionBox - the two callers would each carry their own idea of which rectangles are boxes (SPEC V316d, V67)"
+}
+$dupe316 = [regex]::Matches((NoComments $hh6), 'normColor\(\s*fill\s*\)\s*~=\s*"#FF000000"').Count
+if ($dupe316 -ne 1) {
+    $v316Bad += "the authored-black test appears $dupe316 time(s) in WoD20.6, expected exactly 1 - two copies of the selector drift apart in silence and the pills are what pays (SPEC V316d, V67)"
+}
+
+# (f) and V258's ruler READS the palettes rather than the XML alone. This is the one leg whose
+# other side is in THIS file, so it is read out of this file - the same trick V312 uses. Modern
+# Nights renders 18 on a rectangle whose XML says 14: a ruler that consults only the attribute
+# measures the SMALLER bite and quietly covers less than the sheet draws, which is B7 by radius.
+$gateSrc316 = [System.IO.File]::ReadAllText($PSCommandPath)
+$v258Blk316 = [regex]::Match($gateSrc316, '(?ms)^# ---- V258:.*?^if \(\$arcSeen')
+if (-not $v258Blk316.Success) { $v316Bad += "the V258 block could not be read out of this gate - leg (f) is a no-op (SPEC V209, V20)" }
+elseif ($v258Blk316.Value -notmatch '\$boxCornerRadii') { $v316Bad += "V258 measures the corner bite from the XML attribute alone - it would price the 14 the XML spells while Modern Nights draws 18, and cover less than the sheet has (SPEC V316f, I89g, B7)" }
+
+if ($v316Bad) { foreach ($b in $v316Bad) { Fail "V316 $b" } }
+else { Pass "V316 one palette ($($declCorner316 -join ', ')) writes the corner as $($boxCornerTypes -join ', ')/$($boxCornerRadii -join ', '), all $($props316.Count) properties fall back to the authored value, and one sectionBox answers for both callers" }
+
+# ---- V317: the DRAWING and the CORNER agree, and the radius has ONE owner ------------------
+# SPEC I90, the 118th round. This is the heir of V316b: that leg forbade boxCorner beside
+# ornament, which was the only thing measurable while every drawing was built for the concave
+# corner. `corrente` is built FOR the bevel, so the ban becomes an AGREEMENT - and the agreement
+# catches both directions where the ban caught one.
+$v317Bad = @()
+
+$pathFn317 = LuaFn $hh6 'ornPath'
+$pathNC317 = NoComments $pathFn317
+$sig317    = [regex]::Match($pathNC317, 'function\s+ornPath\s*\(([^)]*)\)')
+$boxr317   = [regex]::Match($hh6, '(?m)^\s*local ORN_BOXR\s*=\s*([0-9.]+);')
+$in317     = [regex]::Match($hh6, '(?m)^\s*local ORN_IN\s*=\s*([0-9.]+);')
+$link317   = [regex]::Match($hh6, '(?m)^\s*local ORN_LINK\s*=\s*([0-9.]+);')
+$stroke317 = [regex]::Match($hh6, '(?m)^\s*local THEME_STROKE = ([0-9.]+);')
+
+$fam317 = ''
+foreach ($fn317 in @('ornCorrenteRun', 'ornCorrenteCorner', 'ornCorrenteEdge', 'ornCorrente')) { $fam317 += (LuaFn $hh6 $fn317) }
+$famNC317 = NoComments $fam317
+
+# Zero-guard FIRST - a leg that reads nothing passes for the wrong reason (SPEC V209, V20).
+if (-not $pathFn317)        { $v317Bad += "ornPath is gone from WoD20.6 - there is no dispatch to measure and every leg below is a no-op (SPEC V209)" }
+if (-not $famNC317)         { $v317Bad += "the corrente family is not in WoD20.6 - the drawing this whole block measures does not exist (SPEC V209)" }
+if (-not $link317.Success)  { $v317Bad += "ORN_LINK could not be read out of the Lua - leg (f) has no other side and states an opinion instead of a relation (SPEC V209)" }
+if (-not $boxr317.Success)  { $v317Bad += "ORN_BOXR could not be read out of the Lua - leg (b) is a no-op (SPEC V209)" }
+if (-not $in317.Success)    { $v317Bad += "ORN_IN could not be read out of the Lua - legs (e) and (f) are no-ops (SPEC V209)" }
+if ($boxCornerAny -eq 0)    { $v317Bad += "no palette declares boxCorner - leg (a) has nothing to pair a style with (SPEC V209)" }
+
+# (a) the STYLE and the CORNER agree, and WHICH styles are corner-aware is READ rather than
+# spelled: a branch of ornPath that forwards the radius parameter is drawn to the box's OWN
+# corner, and a branch that does not is drawn to ORN_BOXR, the concave one. So the equivalence
+# the gate measures is
+#
+#     palette declares boxCorner  <=>  its style's branch forwards the radius
+#
+# with both sides out of the Lua. That refuses a concave drawing on a cut corner - what V316b
+# bought - AND the direction V316b let through, a bevelled era asking for `filete`. The default
+# branch must NOT forward it: an era with no style has no corner either.
+#
+# `bevel` is the one value spelled here, and deliberately: the chain's arithmetic is a 45 degree
+# CUT, and `round` or `innerRound` would keep every relation below arithmetically valid while
+# drawing the links across a curve. The SDK enum is already spelled in V316a for the same
+# reason - there is no Lua-side declaration of "which corners are cuts" to read instead.
+if ($pathFn317 -and $sig317.Success) {
+    $args317 = @($sig317.Groups[1].Value -split ',' | ForEach-Object { $_.Trim() })
+    $rad317  = if ($args317.Count -ge 4) { $args317[3] } else { '' }
+    if (-not $rad317) { $v317Bad += "ornPath takes $($args317.Count) parameter(s) and no radius - the chain would have to find the bevel in a constant of its own, which is a second owner for the 18 the palette declares (SPEC V317d, B69)" }
+    else {
+        $aware317 = @()
+        foreach ($m317 in [regex]::Matches($pathNC317, 'if style == "([^"]+)" then return ([^;]+); end;')) {
+            if ($m317.Groups[2].Value -match ('\b' + [regex]::Escape($rad317) + '\b')) { $aware317 += $m317.Groups[1].Value }
+        }
+        $tail317 = [regex]::Match($pathNC317, '(?m)^\s*return\s+(\w+)\(([^)]*)\);')
+        if ($tail317.Success -and $tail317.Groups[2].Value -match ('\b' + [regex]::Escape($rad317) + '\b')) {
+            $v317Bad += "the DEFAULT branch of ornPath forwards the radius - an era that declares no style has no boxCorner either, so it would be drawn to a corner it does not have (SPEC V317a)"
+        }
+        foreach ($k317 in $themeKeys) {
+            $pal317 = [regex]::Match($themesBlock, "(?ms)^\t{4}\[""$([regex]::Escape($k317))""\] = \{(.*?)^\t{4}\},")
+            if (-not $pal317.Success) { $v317Bad += "palette '$k317' could not be read - leg (a) cannot see what it declares (SPEC V209)"; continue }
+            $pb317 = [regex]::Replace($pal317.Groups[1].Value, '(?m)^\s*--.*$', '')
+            $st317 = [regex]::Match($pb317, '(?m)^\s*ornStyle\s*=\s*"([^"]+)"')
+            $bc317 = [regex]::Match($pb317, '(?m)^\s*boxCorner\s*=\s*\{\s*type\s*=\s*"([^"]*)"')
+            $wants317 = $st317.Success -and ($aware317 -contains $st317.Groups[1].Value)
+
+            if ($wants317 -and -not $bc317.Success) {
+                $v317Bad += "palette '$k317' draws '$($st317.Groups[1].Value)', whose branch is built from the box's OWN corner, and declares no boxCorner - it would be drawn to the corner the XML authored, which is not the one it was designed for (SPEC V317a, I90d)"
+            }
+            elseif (-not $wants317 -and $bc317.Success) {
+                $v317Bad += "palette '$k317' cuts the corner and draws $(if ($st317.Success) { "'$($st317.Groups[1].Value)'" } else { 'the default filigree' }), which is built to the CONCAVE ORN_BOXR ($($boxr317.Groups[1].Value)) - the rule would arc across the very outline it decorates, with nothing to say so (SPEC V317a, I90d)"
+            }
+            elseif ($wants317 -and $bc317.Groups[1].Value -ne 'bevel') {
+                $v317Bad += "palette '$k317' cuts its corner as '$($bc317.Groups[1].Value)' and draws a chain built for a 45 degree CUT - every relation below stays arithmetically valid and the links come out across a curve (SPEC V317a)"
+            }
+        }
+    }
+}
+
+# (b) ORN_BOXR is the Lua's COPY of the radius the XML authors, and until this round nothing
+# soldered the two - the 117th round declared the hole and this closes it. Move the XML and
+# leave the constant and the filigree arcs at the old radius over the new corner, with rdk -l
+# exiting 0 and the gate green. Both sides read: the constant here, the attribute off the boxes
+# V68 already counts.
+if ($boxr317.Success) {
+    $xr317 = @{}
+    $seen317 = 0
+    foreach ($f in $files) {
+        foreach ($r317 in (Doc $f.FullName).SelectNodes("//rectangle[@color='black'][@xradius]")) {
+            $seen317++
+            $xr317[$r317.GetAttribute("xradius")] = $true
+        }
+    }
+    if ($seen317 -lt 60) { $v317Bad += "only $seen317 section box(es) were read for leg (b), expected at least 60 - it is measuring less than the sheet has (SPEC V209)" }
+    elseif ($xr317.Keys.Count -ne 1) { $v317Bad += "the boxes author $($xr317.Keys.Count) different radii ($($xr317.Keys -join ', ')) - V68 should already have caught that, and leg (b) has no single number to solder to" }
+    elseif ([double]($xr317.Keys | Select-Object -First 1) -ne [double]$boxr317.Groups[1].Value) {
+        $v317Bad += "ORN_BOXR is $($boxr317.Groups[1].Value) and the XML authors $($xr317.Keys | Select-Object -First 1) on all $seen317 boxes - the filigree would arc to a radius the boxes no longer have (SPEC V317b, I90i)"
+    }
+    else { Pass "V317 ORN_BOXR ($($boxr317.Groups[1].Value)) is soldered to the radius all $seen317 boxes author" }
+}
+
+# (c) one style, one palette. The memo stamps the STYLE (V313c) and the drawing now depends on
+# the RADIUS too - two palettes sharing a style with different radii would make the memo answer
+# "already drawn" about a different drawing, on an OPEN sheet, with nothing to grep. The fix is
+# this rule rather than a fifth field in ornPainted: state nobody has to maintain (SPEC I90g).
+$styleSeen317 = @{}
+foreach ($d317 in [regex]::Matches($hh6, '(?m)^\s*ornStyle\s*=\s*"([^"]+)"')) {
+    $sv317 = $d317.Groups[1].Value
+    if ($styleSeen317.ContainsKey($sv317)) { $v317Bad += "'$sv317' is declared by more than one palette - the memo's style stamp would no longer identify the radius, and switching between those two eras on an OPEN sheet keeps the first one's drawing (SPEC V317c, B58, B62)" }
+    $styleSeen317[$sv317] = $true
+}
+
+# (d) every call to ornPath carries all four arguments. A call that drops the radius reaches the
+# chain with nil and every coordinate below becomes a Lua error inside a path nobody reads.
+if ($pathFn317 -and $sig317.Success) {
+    $want317 = @($sig317.Groups[1].Value -split ',').Count
+    foreach ($c317 in [regex]::Matches((NoComments $hh6), '(?<!function )\bornPath\s*\(([^)]*)\)')) {
+        $got317 = @($c317.Groups[1].Value -split ',').Count
+        if ($got317 -ne $want317) { $v317Bad += "an ornPath call passes $got317 argument(s) against a signature of $want317 - the missing one is the radius and the chain would be drawn from nil (SPEC V317d)" }
+    }
+}
+
+# (e) the chain is RELATION, not literals. R, the cut and the pitch all fall out of the box's
+# radius and ORN_IN, so the gate computes what they come to and demands those numbers do NOT
+# appear spelled in the family. A literal on one side is the second truth V49 pays not to have,
+# and what it hides is a link sitting off the cut - exit 0 everywhere, only the screen to tell.
+if ($famNC317 -and $in317.Success -and $boxCornerRadii.Count -ge 1) {
+    # Distinct names on purpose: PowerShell is case-INSENSITIVE, so $r317v and $R317v are one
+    # variable, and a scalar times an array is array REPETITION rather than arithmetic - the
+    # first draft of this leg built an Object[] and died on the division.
+    $insetV = [double]($in317.Groups[1].Value)
+    $radV   = [double](@($boxCornerRadii)[0])
+    foreach ($rr317 in @($boxCornerRadii)) { if ([double]$rr317 -gt $radV) { $radV = [double]$rr317 } }
+    $k45317 = [Math]::Sqrt(2) - 1
+    $runV   = $radV + ($insetV * $k45317)
+    $cutV   = ([Math]::Sqrt(2) * $radV) - (2 * $insetV * $k45317)
+    $pitchV = $cutV / 3
+    foreach ($lit317 in @($runV, $cutV, $pitchV)) {
+        $rx317 = '(?<![\w.])' + [regex]::Escape([Math]::Round($lit317, 1).ToString([Globalization.CultureInfo]::InvariantCulture)) + '(?![\w.])'
+        $rx317b = '(?<![\w.])' + [regex]::Escape([Math]::Round($lit317).ToString()) + '(?![\w.])'
+        if ($famNC317 -match $rx317 -or ($lit317 -eq [Math]::Round($lit317) -and $famNC317 -match $rx317b)) {
+            $v317Bad += "the corrente family spells $([Math]::Round($lit317, 2)), which is what the radius and ORN_IN already come to - a literal on one side stops moving when the other does (SPEC V317e, V49)"
+        }
+    }
+    $run317 = NoComments (LuaFn $hh6 'ornCorrenteRun')
+    if ($run317 -notmatch 'math\.sqrt\s*\(\s*2\s*\)') { $v317Bad += "ornCorrenteRun does not compute the 45 degree offset from sqrt(2) - the inset of a CUT corner is not the inset of a curve (SPEC V317e)" }
+    if ($run317 -notmatch '\bORN_IN\b') { $v317Bad += "ornCorrenteRun does not read ORN_IN - the run would sit at an inset of its own and drift from the one the user approved (SPEC V317e, V315b)" }
+    if ($famNC317 -notmatch '/\s*3\b') { $v317Bad += "the corrente family never divides the cut in three - the three links are what the plate is, and a hard-coded pitch stops following the cut (SPEC V317e)" }
+    if ($famNC317 -match 'return "";') { $v317Bad += "the corrente refuses a box by size - the cut is the same on every box (I90e), so a refusal here can only ever be the silent skip of B59 (SPEC V317e, V314e)" }
+}
+
+# (f) and it borrows V314's two ceilings rather than inventing clearances. Outward the link may
+# not reach the 3px outline the theme paints on every box; inward it may not reach the 20px
+# margin every box gives its children. Both are the numbers the CROSS already answers to.
+if ($link317.Success -and $in317.Success -and $stroke317.Success) {
+    $lk317 = [double]$link317.Groups[1].Value
+    $dd317 = [double]$in317.Groups[1].Value
+    $ss317 = [double]$stroke317.Groups[1].Value
+    if ($lk317 -ge ($dd317 - $ss317)) { $v317Bad += "ORN_LINK is $lk317 and reaches $($dd317 - $lk317) out, into the $($ss317)px outline the theme paints on every box - the ceiling is $($dd317 - $ss317) (SPEC V317f, V314b, V67)" }
+    if (($dd317 + $lk317) -gt 20) { $v317Bad += "the link reaches $($dd317 + $lk317)px into the box, at or past the 20px margin I73 gives every one - drawn on TOP it would strike through the children (SPEC V317f, V314c)" }
+}
+
+if ($v317Bad) { foreach ($b in $v317Bad) { Fail "V317 $b" } }
+else { Pass "V317 the cut corner and the chain agree - the style whose branch reads the box's own radius is the one whose palette cuts it - the run stops $([Math]::Round($runV, 2)) in, the cut it leaves is $([Math]::Round($cutV, 2)) long and each of the three links spans $([Math]::Round($pitchV, 2)), none of them spelled in the Lua, and the link clears both of V314's ceilings" }
 # ---- V304: the open tab is marked in all FOUR eras, and the line is thin (SPEC I78a, I78e)
 # This replaces V282 whole. V282 tied the bar's line work to `ornament`, which only the Victorian
 # palette declares - so the marker existed in ONE era of four and the sheet opened with no tab
@@ -9935,5 +10306,144 @@ else {
 
 if ($v312Bad) { foreach ($b in $v312Bad) { Fail "V312 $b" } }
 else { Pass "V312 the ruler is a pair - 6.5 for the body and $($s12312.Groups[1].Value) for 12pt, chosen by the attribute in the one place that multiplies - and only the 3 named entries plus hedgeEssence spent the slack" }
+
+# ---- V318: the line ending is CONTENT, and it is MEASURED --------------------------------
+# SPEC B74, the 118th round. The Git Bash text tools rewrite a file WITHOUT its carriage
+# returns - not on the line that matched, on the whole file - and four one-line edits turned a
+# 3027-line CRLF SPEC.md into bare LF in silence. Three things hid it at once: git diff
+# normalises under core.autocrlf=true and showed 11 changed lines rather than 3027, the Git Bash
+# `cat -A` does not print ^M either, and rdk -l compiles LF without a word. There was no symptom
+# at all, and the commit would have carried it.
+#
+# So the only signal that exists is the MEASUREMENT, and it is two counts per file. The 116th
+# round already wrote this warning into HANDOFF.md for awk and for .lfm only; the real reach is
+# every text tool in the shell and every CRLF file in the repo, which is why it is a check now
+# and not a note.
+$eolBad = @()
+$eolSeen = 0
+foreach ($f318 in @($files.FullName) + @((Join-Path $PSScriptRoot 'verify-hunters-hunted.ps1'), (Join-Path $PSScriptRoot 'SPEC.md'))) {
+    if (-not (Test-Path $f318)) { $eolBad += "$(Split-Path $f318 -Leaf) is not where this check looks for it - it cannot be measured (SPEC V209)"; continue }
+    $t318 = [IO.File]::ReadAllText($f318)
+    $cr318 = ([regex]::Matches($t318, "`r")).Count
+    $lf318 = ([regex]::Matches($t318, "`n")).Count
+    $eolSeen++
+    if ($lf318 -eq 0) { $eolBad += "$(Split-Path $f318 -Leaf) has no line break at all - it is not the file this check was written for" }
+    elseif ($cr318 -ne $lf318) { $eolBad += "$(Split-Path $f318 -Leaf) carries $cr318 CR against $lf318 LF - a text tool rewrote it and ate the carriage returns, which git diff hides under autocrlf and rdk -l compiles without a word (SPEC B74)" }
+}
+if ($eolSeen -lt 17) { Fail "V318 only $eolSeen file(s) were measured, expected the 15 .lfm plus the gate and the spec - this check is covering less than the repo has (SPEC V209)" }
+elseif ($eolBad) { foreach ($b in $eolBad) { Fail "V318 $b" } }
+else { Pass "V318 all $eolSeen source files are CRLF end to end - no text tool has eaten a carriage return" }
+
+# ---- V319: the corrente BAR is the THIRD drawing family, and each style pays its own -------
+# The 119th round. I88 gave the Dark Ages its bar through the same palette key that already
+# chose its box frame; this does it for Modern Nights, and REVOKES I90h, which one round ago
+# left that era's bar on the default drawing BY DECISION. Six legs, and (e) and (f) are the two
+# that keep the sheet's first FILLED ink from surviving into an era that never asked for it.
+$v319Bad  = @()
+$path319  = LuaFn $hh6 'markPath'
+$cor319   = LuaFn $hh6 'markCorrente'
+$fil319   = LuaFn $hh6 'markFilete'
+$rule319  = LuaFn $hh6 'markRule'
+$corOwn319 = @('ORN_COR_MARK', 'ORN_COR_IN', 'ORN_COR_MARK2', 'ORN_COR_SPAN', 'ORN_COR_SUB2', 'ORN_COR_SUB_SPAN', 'ORN_COR_DOT')
+$num319 = @{}
+foreach ($k319 in ($corOwn319 + @('ORN_MARK2', 'ORN_PILLR', 'ORN_SUB_MARK'))) {
+    $m319 = [regex]::Match($hh6, '(?m)^\s*local ' + $k319 + '\s*=\s*([\d.]+);')
+    if ($m319.Success) { $num319[$k319] = [double]$m319.Groups[1].Value }
+}
+if (-not ($path319 -and $cor319 -and $fil319 -and $rule319)) {
+    Fail "V319 markPath / markCorrente / markFilete / markRule could not all be read out of WoD20.6 - every leg below measures one of them, so all six would be no-ops (SPEC V209, V20)"
+}
+elseif ($num319.Count -ne 10) {
+    Fail "V319 read $($num319.Count) of the 10 constants this invariant relates, expected 10 - the Lua side of these relations is gone, and a relation with one side is a no-op (SPEC V209, V20)"
+}
+else {
+    $pathBody319 = NoComments $path319
+    $corBody319  = NoComments $cor319
+    $filBody319  = NoComments $fil319
+    $ruleBody319 = NoComments $rule319
+
+    # (a) the style is DISPATCHED to a drawing of its own, and it arrives as an ARGUMENT.
+    # markCorrente is declared ABOVE the local that holds the era's style, so reading it there
+    # compiles to a GETGLOBAL and finds nil - exit 0 and nothing to grep, which is B51.
+    if ($pathBody319 -notmatch 'if style == "corrente" then return markCorrente') { $v319Bad += "markPath does not dispatch corrente to a drawing of its own - the era falls back to the default bar, which is exactly what I90h said and the 119th round revoked (SPEC I91a)" }
+    if ($corBody319 -match '\bornStyleNow\b') { $v319Bad += "markCorrente reads ornStyleNow directly, and that local is declared BELOW it - the read compiles to a GETGLOBAL and answers nil, with exit 0 and nothing to grep (SPEC I91a, V223, B51)" }
+
+    # (b) the topmost ink does not RISE. In the default style it is the upper rule, at
+    # h - ORN_MARK2 = 21, which is the state the user approved on screen in the 112th round.
+    # Here the main rule IS the topmost ink, so one side is enough - and unlike V315c there is
+    # no second owner of the 21 left to age (SPEC I91h, B70, B68).
+    if ($num319['ORN_COR_MARK'] -gt $num319['ORN_MARK2']) { $v319Bad += "ORN_COR_MARK ($($num319['ORN_COR_MARK'])) is above ORN_MARK2 ($($num319['ORN_MARK2'])) - the corrente bar has climbed nearer the words than the drawing the user approved in the 112th round ever was (SPEC I91h, V307a, B68)" }
+
+    # (c) the hierarchy holds on BOTH axes: the tab's main rule runs longer than the sub-tab's
+    # and its second rule is wider. One axis alone leaves the two levels telling themselves
+    # apart by a single number, which is I78b's hierarchy on one leg (SPEC I91b, I91c).
+    $foot319 = [Math]::Sqrt(($num319['ORN_PILLR'] + $num319['ORN_SUB_MARK']) * ($num319['ORN_PILLR'] + $num319['ORN_SUB_MARK']) - $num319['ORN_SUB_MARK'] * $num319['ORN_SUB_MARK'])
+    if ($num319['ORN_COR_IN'] -ge $foot319) { $v319Bad += "ORN_COR_IN ($($num319['ORN_COR_IN'])) is not inside the sub-tab's foot ($([Math]::Round($foot319, 2))) - the tab's main rule has stopped being the longer of the two and the levels read the same (SPEC I91b, V319c)" }
+    if ($num319['ORN_COR_SPAN'] -ge $num319['ORN_COR_SUB_SPAN']) { $v319Bad += "ORN_COR_SPAN ($($num319['ORN_COR_SPAN'])) is not less than ORN_COR_SUB_SPAN ($($num319['ORN_COR_SUB_SPAN'])) - the tab's second rule has stopped being the wider one, and equal spans lose the hierarchy with nothing anywhere to say so (SPEC I91c, V315d)" }
+
+    # (d) the floor is READ, never spelled, and there is ONE per motif - the main rule's. The
+    # second rule is PROPORTIONAL, so it cannot run out of room and has no floor to write: a
+    # guard that CANNOT fire is B59's hole (SPEC I91g, V314e, V315e).
+    $wTop319 = @(); $wSub319 = @(); $sepN319 = 0
+    foreach ($pr319 in @(@("WoD20th.lfm", "tabStrip", $true), @("WoD20.11.lfm", "vampStrip", $false), @("WoD20.7.lfm", "numStrip", $false), @("WoD20.7.lfm", "hedgeStrip", $false))) {
+        $st319 = (Doc (Join-Path $dir $pr319[0])).SelectSingleNode("//layout[@name='$($pr319[1])']")
+        if ($null -eq $st319) { $v319Bad += "$($pr319[1]) is gone from $($pr319[0]) - the bar this invariant measures does not exist (SPEC I32, I58, V209)"; continue }
+        foreach ($r319 in $st319.SelectNodes("rectangle[starts-with(@name,'tabOn')]")) {
+            if ($pr319[2]) { $wTop319 += [double]$r319.GetAttribute("width") } else { $wSub319 += [double]$r319.GetAttribute("width") }
+        }
+        $sepN319 += @($st319.SelectNodes("rectangle[starts-with(@name,'sep')]")).Count
+    }
+    if (($wTop319.Count + $wSub319.Count) -ne 19) { $v319Bad += "read $($wTop319.Count + $wSub319.Count) marker(s) across the four bars, expected 19 - this check is covering less than the bars hold (SPEC V209)" }
+    else {
+        $minAll319 = (($wTop319 + $wSub319) | Measure-Object -Minimum).Minimum
+        $minSub319 = ($wSub319 | Measure-Object -Minimum).Minimum
+        if ($minAll319 -le (2 * $num319['ORN_COR_IN'])) { $v319Bad += "the narrowest marker is $minAll319 against a floor of $(2 * $num319['ORN_COR_IN']) - at that width the corrente tab draws nothing at all, and a bar that quietly disappears is not the one anybody chose (SPEC I91g, V279, B59)" }
+        if ($minSub319 -le (2 * $foot319)) { $v319Bad += "the narrowest sub-tab is $minSub319 against a floor of $([Math]::Round(2 * $foot319, 2)) - its main rule would be drawn end before start, so the marker refuses and the level loses its mark (SPEC I91g, V279, B59)" }
+    }
+    if ($sepN319 -ne 5) { $v319Bad += "read $sepN319 separator carrier(s) across the bars, expected 5 - the dot the user asked for has lost a carrier to stand in (SPEC I78d, I91d, V209)" }
+
+    # (e) the FILL has ONE owner and it is the DRAWING. markPath and markFilete return the path
+    # alone, markCorrente returns a second value in its `sep` branch and nowhere else, and
+    # markRule spells neither a style nor a motif of its own - it only applies what it is
+    # handed. Two owners of "who is filled" is B69 in a third place (SPEC I91e).
+    if ($ruleBody319 -match '"corrente"') { $v319Bad += "markRule spells the corrente style - the painter has taken a second opinion on a question the drawing already answers, which is the sharing B69 is made of (SPEC I91e)" }
+    if ($ruleBody319 -match '"sep"') { $v319Bad += "markRule spells the sep motif - it is markKind that resolves the level and the drawing that decides the fill, and a third reader of either is one that can disagree (SPEC I91e)" }
+    if ($filBody319 -match ', true') { $v319Bad += "markFilete returns a second value - the filete style has taken up the fill flag, and the Dark Ages cross would be painted solid (SPEC I91e)" }
+    if ($pathBody319 -match ', true') { $v319Bad += "markPath returns a second value of its own - the fill would arrive from the dispatcher instead of the drawing, and every era would carry it (SPEC I91e)" }
+    $iSep319 = $corBody319.IndexOf('if kind == "sep" then')
+    $iSub319 = $corBody319.IndexOf('if kind == "sub" then')
+    $iTab319 = $corBody319.IndexOf('local s = w * ORN_COR_SPAN')
+    if ($iSep319 -lt 0 -or $iSub319 -le $iSep319 -or $iTab319 -le $iSub319) {
+        $v319Bad += "markCorrente does not hold the sep, sub and tab motifs in that order - the slices this leg reads cannot be cut, so the per-motif half of it would measure nothing (SPEC I91b, V209, V20)"
+    }
+    else {
+        $sl319 = @(
+            @{ name = 'sep'; text = $corBody319.Substring($iSep319, $iSub319 - $iSep319); forbid = @('ORN_COR_MARK', 'ORN_COR_MARK2', 'ORN_COR_IN', 'ORN_COR_SPAN', 'ORN_COR_SUB2', 'ORN_COR_SUB_SPAN', 'ORN_SUB_MARK') },
+            @{ name = 'sub'; text = $corBody319.Substring($iSub319, $iTab319 - $iSub319); forbid = @('ORN_COR_MARK', 'ORN_COR_MARK2', 'ORN_COR_IN', 'ORN_COR_SPAN', 'ORN_COR_DOT') },
+            @{ name = 'tab'; text = $corBody319.Substring($iTab319); forbid = @('ORN_COR_SUB2', 'ORN_COR_SUB_SPAN', 'ORN_COR_DOT', 'ORN_SUB_MARK') }
+        )
+        foreach ($s319 in $sl319) {
+            foreach ($b319 in $s319.forbid) {
+                if ($s319.text -match ("\b" + [regex]::Escape($b319) + "\b(?!_|\d)")) { $v319Bad += "the corrente $($s319.name) motif reads $b319, which belongs to another motif - that sharing is how the 110th round moved three levels when it was asked to move one (SPEC I91c, V308, B69)" }
+            }
+        }
+        if ($sl319[0].text -notmatch ', true') { $v319Bad += "the corrente sep motif does not return the fill flag - the dot comes out as an outline and the user's choice of a SOLID one is undone with exit 0 and the gate green (SPEC I91d, I91e)" }
+        if ($sl319[1].text -match ', true') { $v319Bad += "the corrente sub motif returns the fill flag - a sub-tab's rules would be filled, and filling an open run is ink nobody asked for (SPEC I91e)" }
+        if ($sl319[2].text -match ', true') { $v319Bad += "the corrente tab motif returns the fill flag - the top bar's rules would be filled, and filling an open run is ink nobody asked for (SPEC I91e)" }
+    }
+
+    # (f) the memo CARRIES the fill and markRule writes the colour on every repaint. Nailed at
+    # creation, `color` survives a swap of era on an OPEN sheet and leaves the next era's cross
+    # filled - rdk -l exit 0, gate green, and only the screen left to tell (SPEC I91f, B58, B62).
+    if ($ruleBody319 -notmatch 'local d, f = markPath\(bw, bh, kind, ornStyleNow\)') { $v319Bad += "markRule does not take the fill flag back from markPath at CREATION - the memo would carry nil and the dot would never be filled (SPEC I91e, I91f)" }
+    if ($ruleBody319 -notmatch 'local d, f = markPath\(c\.width, c\.height, e\.k, ornStyleNow\)') { $v319Bad += "markRule does not take the fill flag back from markPath when the era CHANGES - the memo would keep the previous era's answer for ever (SPEC I91f)" }
+    if ($ruleBody319 -notmatch 'f = f, s = ornStyleNow') { $v319Bad += "the creation entry does not stamp the fill flag with s still LAST - either the memo has lost the flag, or the stamp has moved off the brace V315f tells the creation by (SPEC I91f, V315f)" }
+    if ($ruleBody319 -notmatch 'e\.f = f') { $v319Bad += "markRule never writes the new fill flag back into the memo after redrawing - the entry would answer for the PREVIOUS era's drawing (SPEC I91f, V284)" }
+    if ($ruleBody319 -notmatch 'e\.p\.color = colour') { $v319Bad += "markRule never paints the fill - the dot is drawn and left hollow, which is the drawing the user did NOT pick (SPEC I91d, I91f)" }
+    if ($ruleBody319 -match '(?<![\w.])p\.color') { $v319Bad += "markRule nails p.color shut at creation - swapping era on an OPEN sheet then leaves the next era's separator FILLED, with exit 0, the gate green and only the screen to tell (SPEC I91f, B58, B62)" }
+
+    if ($v319Bad) { foreach ($b in $v319Bad) { Fail "V319 $b" } }
+    else { Pass "V319 the corrente bar is a drawing of its own, its seven constants stay inside their motifs, its ink tops out no higher than $($num319['ORN_MARK2']) from the foot, and the fill comes from the drawing and is repainted every time" }
+}
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

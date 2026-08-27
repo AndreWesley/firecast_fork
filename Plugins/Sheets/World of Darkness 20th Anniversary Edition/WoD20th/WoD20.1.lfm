@@ -338,19 +338,28 @@
 		     It keeps color="DimGray" and is the only carrier of that key in the four palettes
 		     (SPEC V53, T653). The radius matches the section boxes so the corner reads as one
 		     frame family. -->
-		<rectangle left="0" top="441" width="340" height="411" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
+		<rectangle name="avatarFrame" left="0" top="441" width="340" height="411" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
 		<image left="0" top="441" width="340" height="411" field="avatar" editable="true" style="autoFit"/>
 
-		<!-- The ornament CARRIER (SPEC I84d, V309, V287). Transparent in both senses and holding
-		     no content of its own: it exists so the filigree has somewhere to hang ABOVE the
-		     photo. applyTheme already reaches it - THEME_SHAPES is { rectangle = true } - and
-		     ornament() parents its path to whatever it paints, so declaring this AFTER the image
-		     is the whole mechanism. Nothing new is painted; the frame below had the filigree all
-		     along, behind the picture where nobody could see it.
+		<!-- The ornament CARRIER (SPEC I84d, I92, V309, V287, V320). Transparent in both senses
+		      and holding no content of its own: it exists so the era's drawing has somewhere to hang
+		      ABOVE the photo, which is what declaring it AFTER the image buys.
 
-		     It carries the picture's own four numbers, which V309 measures across all THREE
-		     controls now. The filigree is Victorian-only (t.ornament, SPEC V277), so the other
-		     three eras show no change here and that is correct. -->
+		      It is one of the TWO names sectionBox answers for (SPEC I92a, V320a). By CONSTRUCTION it
+		      is indistinguishable from the nineteen tabOn<X> carriers - transparent both ways, its own
+		      radius, hitTest false - so a fill-based arm would bevel the tab pills along with it, and
+		      their width is priced for the concave arc (SPEC V228, V316d). That is why the arm is a
+		      declared roster and not a rule about shape.
+
+		      It is also the only one of the avatar's three controls that DRAWS. The frame above sits
+		      UNDER the image, so a path hung on it lands behind the photo - which is exactly B75, the
+		      round where this carrier was authored for a mechanism that refused it and drew nothing at
+		      all for five rounds.
+
+		      It carries the picture's own four numbers, which V309 measures across all THREE controls.
+		      THREE palettes declare ornament - Victorian filigree, Dark Ages filete, Modern Nights
+		      corrente - so the Classical Age shows no drawing here and that is correct (SPEC V277,
+		      V320f). -->
 		<rectangle name="ornAvatar" left="0" top="441" width="340" height="411" color="#00000000" strokeColor="#00000000" xradius="14" yradius="14" cornerType="innerRound" hitTest="false"/>
 
 		<!--
