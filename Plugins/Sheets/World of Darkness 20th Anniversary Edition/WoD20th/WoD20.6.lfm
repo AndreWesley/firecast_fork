@@ -1773,6 +1773,19 @@
 					dotOn  = "/WoD20th/images/prime_on_silver.png",
 					dotOff = "/WoD20th/images/prime_off_silver.png",
 					paper  = "/WoD20th/images/paper_dark_ages.png",
+
+					-- The era's OWN silver, and not a brighter one (user 2026-08-26). The Victorian
+					-- key above is lighter than its outline so the filigree reads as applied metal;
+					-- here rule and frame are meant to be one family, which is what austerity means
+					-- in a drawing whose whole argument is that there is only one line (SPEC I87a).
+					ornament = "#C0C6CC",
+
+					-- The tenth key, and it is OPTIONAL like the ninth: an era that declares no
+					-- style falls to the default, which is the filigree of I72 - so the Victorian
+					-- palette gains nothing and changes nothing. A style with no `ornament` beside
+					-- it cannot exist: the colour is what hides the path (V277), so the style would
+					-- be a dead key nobody could see was dead (SPEC I87a, V313a).
+					ornStyle = "filete",
 				},
 
 				-- Rome around 200 BC - the Republic, not the Empire, so laurel gold and a
@@ -1958,6 +1971,38 @@
 			local ORN_FLEUR = 150;     -- an edge run shorter than this carries no centre motif
 			local ORN_KAPPA = 0.5523;  -- cubic approximation of a quarter arc
 
+			-- ---- Dark Ages filete (user 2026-08-26, plate `Filete e Cruz`) ------------------
+			--
+			-- A SECOND family of box frame, chosen by the palette (SPEC I87). The plate was the
+			-- floor of a series - "if this is still too much, the answer is no frame at all" - and
+			-- the user picked the floor: ONE hairline at ORN_IN, unbroken the whole way round, a
+			-- minute Greek cross on each run leaving a corner and a slightly larger one at the
+			-- middle of the top and of the bottom. No scroll, no bead, no palmette. It is not the
+			-- filigree shrunk; it is the other drawing, which is why ornPath DISPATCHES.
+			--
+			-- Every number here is a RELATION and the gate measures it as one (SPEC V314):
+			--   * ORN_CROSS_AT lands on the STRAIGHT run. The corner arc gives out at
+			--     sqrt((ORN_BOXR + ORN_IN)^2 - ORN_IN^2) = 21.17 along the edge, so 26 has 4.8px
+			--     of straight in front of it; at 21 the cross sits on the CURVE and comes out
+			--     crooked, with no error and nothing to grep.
+			--   * ORN_CROSS2 is CAPPED at ORN_IN - THEME_STROKE. Centred on a rule 9 in, a
+			--     half-arm of h reaches 9 - h outward against the box's own 3px outline (V67):
+			--     6 touches it, 5 is the last one that clears. It is a ceiling, not a taste.
+			--   * inward it reaches ORN_IN + ORN_CROSS2 = 14 against the 20px margin every box
+			--     carries (V280a), so the frame draws OVER the content (I72c) and still crosses
+			--     no child - with 6px to spare rather than on the tangent.
+			--   * ORN_CROSS < ORN_CROSS2 IS the hierarchy: "one slightly larger in the middle" is
+			--     what the plate says, and equal arms lose the centre with nothing to say so.
+			local ORN_CROSS    = 3;     -- corner cross, half-arm
+			local ORN_CROSS2   = 5;     -- centre cross, half-arm
+			local ORN_CROSS_AT = 26;    -- the corner cross, along the run from the corner
+
+			-- The room a run needs before it can hold its crosses: both corner crosses and the
+			-- centre one, end to end. ONE floor for all three rather than a tighter one per motif -
+			-- one fact, one owner (V49) - and what falls below it is the CROSS, never the rule,
+			-- which is V279's doctrine in the letter T613 wrote it (SPEC V314e, B59).
+			local ORN_CROSS_ROOM = 2 * (ORN_CROSS_AT + ORN_CROSS + ORN_CROSS2);
+
 			-- SPEC R111, I78b, V306. The bar's line work is the MARKER's own motif and not the box frame
 			-- shrunk: 2*ORN_ARM is 80 against a marker 30 tall. Three motifs, one per LEVEL, because the
 			-- two bars are not the same thing on screen (SPEC I78b): the top bar carries two rules with a
@@ -1989,6 +2034,31 @@
 			-- motif `sep`: the fleuron alone, between two sub-tab words
 			local ORN_SEP_RX   = 4;     -- fleuron half-width
 			local ORN_SEP_RY   = 3.5;   -- fleuron half-height
+
+			-- ---- Dark Ages filete: the BAR (user 2026-08-26, plate `Abas em Filete e Cruz`) --
+			--
+			-- A SECOND family of bar drawing, chosen by the same palette key the box frame is
+			-- (SPEC I88a, I87a). One hairline and the Greek cross at all three levels: the tab
+			-- wears the rule with a cross at each foot, the sub-tab the rule alone, and the
+			-- separator the cross alone. No second rule and no fleuron anywhere in it.
+			--
+			-- OWN constants, per STYLE, for the reason V308 gives per MOTIF (B69): a number that
+			-- serves two drawings moves both when only one of them was asked for. Two exceptions,
+			-- and they are declared rather than accidental - ORN_PILLR, the arc V228 authors on
+			-- all nineteen buttons, and ORN_SUB_MARK, the sub-tab height the user approved in the
+			-- 109th round, which is one fact in either style (SPEC I88e, V315b).
+			--
+			-- THE RELATION, and it is why these two numbers are 6 and 3 (SPEC I88d, V315c): in
+			-- the default style the topmost ink IS the upper rule, at h - ORN_MARK2 = 21, and
+			-- that is the state the user approved on screen in the 112th round. Here the topmost
+			-- ink is the cross's UPPER ARM, so keeping the rule at 21 would put the cross at 18 -
+			-- inside the label box, which closes at 20, against a measured clearance of about 2.5
+			-- at 21. So ORN_FIL_MARK + ORN_FIL_CROSS = ORN_MARK2 and the highest ink stays
+			-- exactly where it already was. The GATE welds that; the code does NOT derive one
+			-- from the other, which would be one constant serving two styles all over again.
+			local ORN_FIL_MARK  = 6;    -- motif `tab`: the one rule, up from the marker's foot
+			local ORN_FIL_CROSS = 3;    -- motif `tab`: half-arm of the cross at each end
+			local ORN_FIL_SEP   = 2.5;  -- motif `sep`: half-arm, smaller than the tab's by choice
 
 			-- Path data is parsed as SVG, where a comma separates x from y. The C library float
 			-- verbs follow LC_NUMERIC, so on a pt-BR host they write a decimal COMMA and every
@@ -2204,7 +2274,7 @@
 				return math.min(ORN_ARM, math.floor(math.min(w, h) / 2) - 5);
 			end;
 
-			local function ornPath(w, h)
+			local function ornFiligree(w, h)
 				local o = {};
 				local a = ornArm(w, h);
 
@@ -2226,13 +2296,170 @@
 				return table.concat(o, " ");
 			end;
 
+			-- A Greek cross: two strokes of equal arm crossing on the rule. Drawn in canonical
+			-- space like every other motif, so the same four stamps put it on all four corners
+			-- without four hand-authored copies to drift apart (SPEC I87c).
+			local function ornCross(o, t, u, v, r)
+				ornMove(o, t, u - r, v);
+				ornLine(o, t, u + r, v);
+				ornMove(o, t, u, v - r);
+				ornLine(o, t, u, v + r);
+			end;
+
+			-- Where the rule leaves the box's own concave arc, in from the corner along the edge.
+			-- Same relation ornCorner uses, and it is the one ORN_CROSS_AT has to clear.
+			local function ornFileteStraight()
+				local r = ORN_BOXR + ORN_IN;
+
+				return math.sqrt(r * r - ORN_IN * ORN_IN);
+			end;
+
+			-- One corner: the rule turning on the box's own arc, plus the minute cross on EACH of
+			-- the two runs leaving it. Two per corner and not one - 26 measured on the DIAGONAL
+			-- lands 18.4 deep, off the rule entirely, and the cross has to sit ON the line it marks.
+			local function ornFileteCorner(o, t, uSpan, vSpan)
+				local d  = ORN_IN;
+				local r  = ORN_BOXR + d;
+				local u0 = ornFileteStraight();
+				local a1 = math.atan(d / u0);
+
+				ornMove(o, t, d, u0);
+				ornArc(o, t, r, (math.pi / 2) - a1, a1);
+
+				-- Emitted only where the run can hold them, which is the refusal ornEdge already
+				-- makes for its own motifs. What a small box drops is the CROSS, never the rule.
+				if uSpan >= ORN_CROSS_ROOM then ornCross(o, t, ORN_CROSS_AT, d, ORN_CROSS); end;
+				if vSpan >= ORN_CROSS_ROOM then ornCross(o, t, d, ORN_CROSS_AT, ORN_CROSS); end;
+			end;
+
+			-- One edge, arc end to arc end. `centre` is the top and the bottom only: the user chose
+			-- the plate's reading, where the two SIDES stay clean (2026-08-26). ornEdge puts its
+			-- centre motif on all four; this one does not, and that is a decision, not an omission.
+			local function ornFileteEdge(o, t, span, centre)
+				local u0 = ornFileteStraight();
+
+				if span - 2 * u0 <= 0 then return; end;
+
+				ornMove(o, t, u0, ORN_IN);
+				ornLine(o, t, span - u0, ORN_IN);
+
+				if centre and span >= ORN_CROSS_ROOM then
+					ornCross(o, t, span / 2, ORN_IN, ORN_CROSS2);
+				end;
+			end;
+
+			-- One unbroken rule: the four arcs and the four straight runs meet at the same u0, so
+			-- what the eye gets is a single line all the way round. No size refusal of its own -
+			-- what a small box loses is the cross (SPEC V314e); a guard that CANNOT fire is the
+			-- hole B59 came through, and one that skips the rule is the hole it came through twice.
+			local function ornFilete(w, h)
+				local o = {};
+
+				ornFileteCorner(o, {ox = 0, oy = 0, sx =  1, sy =  1}, w, h);
+				ornFileteCorner(o, {ox = w, oy = 0, sx = -1, sy =  1}, w, h);
+				ornFileteCorner(o, {ox = 0, oy = h, sx =  1, sy = -1}, w, h);
+				ornFileteCorner(o, {ox = w, oy = h, sx = -1, sy = -1}, w, h);
+
+				ornFileteEdge(o, {ox = 0, oy = 0, sx =  1, sy =  1}, w, true);
+				ornFileteEdge(o, {ox = 0, oy = h, sx =  1, sy = -1}, w, true);
+				ornFileteEdge(o, {ox = 0, oy = 0, sx =  1, sy =  1, swap = true}, h, false);
+				ornFileteEdge(o, {ox = w, oy = 0, sx = -1, sy =  1, swap = true}, h, false);
+
+				return table.concat(o, " ");
+			end;
+
+			-- ONE generator, two families, and the PALETTE picks (SPEC I87b). An era that declares
+			-- no style falls to the filigree, so nothing changes for the three that were here first.
+			-- A second copy of ornament() per style is what V67 pays not to have with THEME_STROKE
+			-- and V308 with the marker's three motifs; the price of getting it wrong here is 73
+			-- boxes wearing two frames at once, and no `rdk -l` that would say so.
+			local function ornPath(w, h, style)
+				if style == "filete" then return ornFilete(w, h); end;
+
+				return ornFiligree(w, h);
+			end;
+
+			-- The Dark Ages BAR drawing (SPEC I88c, I88e, I88f). The same shape of answer the
+			-- box frame got in the 115th round: one hairline and the Greek cross, with the level
+			-- said by how much of it is spent rather than by a motif nobody has seen before.
+			local function markFilete(w, h, kind)
+				-- Where a rule inset by d from the marker's foot dies in the concave corner:
+				-- the offset INWARD rides the BIGGER circle, so the run stops where that arc
+				-- gives out. It is the same measuring the box frame does, and it is what puts
+				-- the two crosses on the ENDS of the rule instead of somewhere along it.
+				local function foot(d)
+					return math.sqrt((ORN_PILLR + d) * (ORN_PILLR + d) - d * d);
+				end;
+
+				-- One cross, centred, as two unfilled strokes. Every decimal through ornNum: a
+				-- float verb follows LC_NUMERIC and a pt-BR host writes a COMMA, which splits
+				-- each coordinate into two numbers and kills the whole path, silently (I72b).
+				local function greek(x, y, a)
+					return "M" .. ornNum(x - a) .. "," .. ornNum(y) ..
+					       " L" .. ornNum(x + a) .. "," .. ornNum(y) ..
+					       " M" .. ornNum(x) .. "," .. ornNum(y - a) ..
+					       " L" .. ornNum(x) .. "," .. ornNum(y + a);
+				end;
+
+				-- The separator is the cross alone, centred in its 16x30 carrier, and it is
+				-- SMALLER than the tab's by choice: the level that says least says it in less
+				-- (SPEC I88f, V315d).
+				if kind == "sep" then
+					return greek(w / 2, h / 2, ORN_FIL_SEP);
+				end;
+
+				-- A sub-tab is the rule alone, at the height the user approved in the 109th
+				-- round, and it now runs foot to foot instead of a proportional inset (SPEC
+				-- I88e). A FIXED inset, so the widest two gain and the narrowest loses - which
+				-- is the trade the user took when the plate replaced the short rule.
+				if kind == "sub" then
+					local i = foot(ORN_SUB_MARK);
+					local y = h - ORN_SUB_MARK;
+
+					if w - 2 * i <= 0 then return ""; end;
+
+					return "M" .. ornNum(i) .. "," .. ornNum(y) ..
+					       " L" .. ornNum(w - i) .. "," .. ornNum(y);
+				end;
+
+				-- The top bar: one rule foot to foot, and a cross marking each foot, which is
+				-- what names the model. What falls out for want of room is the CROSS, never the
+				-- rule (SPEC I88h, V279), so the two refusals are ORDERED - and neither can fire
+				-- today, the narrowest of the nineteen being 79 against floors of 38.2 and 44.2.
+				-- A guard that CANNOT fire is B59's hole, which is why the gate measures the
+				-- narrowest button against the floor read from HERE rather than against a number
+				-- of its own (SPEC V315e).
+				local s = foot(ORN_FIL_MARK);
+				local y = h - ORN_FIL_MARK;
+				local o = {};
+
+				if w - 2 * s <= 0 then return ""; end;
+
+				o[#o + 1] = "M" .. ornNum(s) .. "," .. ornNum(y);
+				o[#o + 1] = "L" .. ornNum(w - s) .. "," .. ornNum(y);
+
+				if w - 2 * s > 2 * ORN_FIL_CROSS then
+					o[#o + 1] = greek(s, y, ORN_FIL_CROSS);
+					o[#o + 1] = greek(w - s, y, ORN_FIL_CROSS);
+				end;
+
+				return table.concat(o, " ");
+			end;
+
 			-- Two straight runs per long edge, and NOTHING on the short ones: there is no straight
 			-- run there to be a rule on. A run is emitted only where it has positive length, the
 			-- same refusal ornEdge makes, so a pill narrower than its own two corners simply gets
 			-- less rule rather than a line drawn backwards across itself (SPEC V279, V282).
 			-- One motif per level (SPEC I78b). kind comes from markKind, which reads the NAME and the
 			-- bar the control sits in - construction the gate can see from disk, not a roster of 24.
-			local function markPath(w, h, kind)
+			-- The era's own BAR drawing, picked by the palette exactly as the box frame is (SPEC
+			-- I88a). The style arrives as an ARGUMENT and is never read as an upvalue: this
+			-- function is declared ABOVE the local that holds the era's style, so reading it
+			-- from here compiles to a GETGLOBAL and finds nil, with no error and nothing to
+			-- grep (SPEC V223, B51). An era declaring no style falls to the drawing below.
+			local function markPath(w, h, kind, style)
+				if style == "filete" then return markFilete(w, h, kind); end;
+
 				local o  = {};
 				local cx = w / 2;
 				local cy = h / 2;
@@ -2306,6 +2533,18 @@
 			-- here: it is what a plainer era leaves behind, and it hides rather than repaints.
 			local ornColour = nil;
 
+			-- The era's DRAWING, kept beside its colour and for the same reason (SPEC I87e):
+			-- refreshOrnament runs OUTSIDE the theme traversal and has no palette in hand. Written
+			-- from the same `t` the colour is, so which frame the memo believes in and which era
+			-- the boxes are wearing can never be two different answers. nil is a real value here -
+			-- it is what every palette but the Dark Ages one leaves behind, and it means the
+			-- filigree, not "no frame": that question is ornColour's and stays ornColour's.
+			--
+			-- NOT a sixth parameter on ornament(). V285c counts that signature and demands the
+			-- refresh branch use the fourth and fifth by name; a style riding in beside them would
+			-- be one more thing the refresh path has to be handed and could silently drop.
+			local ornStyleNow = nil;
+
 			-- `w` and `h` are the caller's measurement and they are OPTIONAL. A caller that has
 			-- just written the size passes it; the theme traversal, which writes nothing, leaves
 			-- them out and the control is read instead (SPEC I72e, V285c).
@@ -2331,13 +2570,22 @@
 					local bw = w or c.width;
 					local bh = h or c.height;
 
-					if bw ~= nil and bh ~= nil and (bw ~= e.w or bh ~= e.h) then
-						local d = ornPath(bw, bh);
+					--
+					-- The THIRD thing the stamp has to carry is the DRAWING (SPEC I87d, V313c).
+					-- Switching era on an open sheet moves not one pixel of any box, so the size
+					-- comparison above answers "same" and the memo hands back the frame it built
+					-- for the era before - the Victorian filigree, repainted silver, on all 73.
+					-- rdk -l exits 0, the gate stays green and the defect exists only on screen:
+					-- B58 and B62 on a third axis, where the memo knew "already drawn" and "drawn
+					-- at THIS size" and had no way to know "drawn in THIS drawing".
+					if bw ~= nil and bh ~= nil and (bw ~= e.w or bh ~= e.h or ornStyleNow ~= e.s) then
+						local d = ornPath(bw, bh, ornStyleNow);
 
 						if d ~= "" then
 							e.p.data = d;
 							e.w = bw;
 							e.h = bh;
+							e.s = ornStyleNow;
 						end;
 					end;
 				end;
@@ -2363,7 +2611,7 @@
 					-- The ONLY refusal left is a box too small for the arc to straighten out - no box
 					-- in the sheet is (SPEC V279). The old guard refused anything under 2*ORN_ARM and
 					-- TRUE FAITH, 1270 wide and 76 tall, fell through it silently (SPEC B59).
-					local d = ornPath(bw, bh);
+					local d = ornPath(bw, bh, ornStyleNow);
 
 					if d == "" then return; end;
 
@@ -2392,7 +2640,7 @@
 					p.strokeSize = 1;
 					p.data = d;
 
-					e = {p = p, w = bw, h = bh};
+					e = {p = p, w = bw, h = bh, s = ornStyleNow};
 
 					ornPainted[c.handle] = e;
 				end;
@@ -2431,7 +2679,7 @@
 				local e = markPainted[c.handle];
 
 				if colour == nil then
-					if e ~= nil then e.visible = false; end;
+					if e ~= nil then e.p.visible = false; end;
 					return;
 				end;
 
@@ -2445,26 +2693,48 @@
 
 					if bw == nil or bh == nil then return; end;
 
-					local d = markPath(bw, bh, kind);
+					local d = markPath(bw, bh, kind, ornStyleNow);
 
 					if d == "" then return; end;
 
-					e = gui.newPath();
+					local p = gui.newPath();
 
-					e:setParent(c);
+					p:setParent(c);
 
-					e.align = "client";
-					e.mode = "original";
-					e.hitTest = false;
-					e.color = "#00000000";
-					e.strokeSize = 1;
-					e.data = d;
+					p.align = "client";
+					p.mode = "original";
+					p.hitTest = false;
+					p.color = "#00000000";
+					p.strokeSize = 1;
+					p.data = d;
+
+					-- The entry is {p, k, s} and not the path alone. The nineteen markers never
+					-- change size, so measure is not what this memo has to tell apart - the
+					-- DRAWING is. `k` is the kind already resolved, so a restyle does not go
+					-- back to the parent to ask which level this is (SPEC I88g, V315f).
+					e = {p = p, k = kind, s = ornStyleNow};
 
 					markPainted[c.handle] = e;
+				elseif e.s ~= ornStyleNow then
+					-- The era changed under an OPEN sheet. Without this the bar would wear the
+					-- PREVIOUS era's drawing repainted in the new colour: nothing here resizes,
+					-- so nothing else would ever ask for the path to be rebuilt - exit 0, gate
+					-- green, and the defect only on the screen. It is the hole the box memo had
+					-- to close one round earlier, on a memo that at least carried a measure
+					-- (SPEC I88g, V315f, B58, B62).
+					local d = markPath(c.width, c.height, e.k, ornStyleNow);
+
+					-- An empty path means no room, and the answer to that is to keep what is
+					-- there rather than blank the marker - and to leave `s` alone, so the next
+					-- repaint tries again instead of believing the new style was drawn.
+					if d ~= "" then
+						e.p.data = d;
+						e.s = ornStyleNow;
+					end;
 				end;
 
-				e.strokeColor = colour;
-				e.visible = true;
+				e.p.strokeColor = colour;
+				e.p.visible = true;
 			end;
 
 			-- SPEC I72d / V284. The HEALTH box is resized by renderHealthTrack, which lives on the
@@ -2517,6 +2787,7 @@
 				-- Written from the SAME `t` the walk below paints from, so the era the filigree
 				-- believes in can never differ from the era the boxes are wearing.
 				ornColour = t.ornament;
+				ornStyleNow = t.ornStyle;
 
 				-- The bar's accent, read ONCE for the whole repaint (SPEC V205). It is the stroke key the
 				-- markers and every framed box already share, so the bar cannot drift from the sheet - and

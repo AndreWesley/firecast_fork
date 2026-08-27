@@ -8369,10 +8369,13 @@ $ornBad = @()
 $ornMake = LuaFn $hh6 'ornament'
 $ornGeo = LuaFn $hh6 'ornPath'
 $ornArmFn = LuaFn $hh6 'ornArm'
+$ornFiligFn = LuaFn $hh6 'ornFiligree'
+$ornFileteFn = LuaFn $hh6 'ornFilete'
 
 if (-not $ornMake) { $ornBad += "ornament() is gone from WoD20.6 - the filigree has no painter (SPEC I72c)" }
 elseif (-not $ornGeo) { $ornBad += "ornPath() is gone from WoD20.6 - there is no geometry to paint (SPEC I72)" }
 elseif (-not $ornArmFn) { $ornBad += "ornArm() is gone - the corner cannot shrink to fit and a short box goes back to being skipped (SPEC V279, B59)" }
+elseif (-not $ornFiligFn) { $ornBad += "ornFiligree() is gone from WoD20.6 - the DEFAULT drawing is missing, so three eras of four would have no frame to fall back to (SPEC I87b, V313b)" }
 else {
     $ornBody = NoComments $ornMake
 
@@ -8427,7 +8430,11 @@ else {
     }
     $armCap = [regex]::Match($hh6, '(?m)^\s*local ORN_ARM\s*=\s*(\d+);')
     $armSlack = [regex]::Match($ornArmFn, 'math\.floor\(math\.min\(w, h\) / 2\) - (\d+)')
-    $armFloor = [regex]::Match($ornGeo, '(?m)^\s*if a < (\d+) then return "";')
+    # 115th round: the floor is read PER STYLE (SPEC I87b, T706). ornPath is a dispatcher now
+    # and carries no geometry of its own, so the filigree floor comes out of ornFiligree -
+    # pointing this at the dispatcher would match nothing and turn the leg into the no-op V20
+    # exists to refuse. The filete's own floor is measured below, and it floors the CROSS.
+    $armFloor = [regex]::Match($ornFiligFn, '(?m)^\s*if a < (\d+) then return "";')
     if (-not $armCap.Success -or -not $armSlack.Success -or -not $armFloor.Success) {
         $ornBad += "V279 ORN_ARM, the shrink or the floor could not be read - the guard this measures is unreadable, so the check is a no-op (SPEC V20)"
     } else {
@@ -8501,6 +8508,295 @@ else {
 if ($ornBad) { foreach ($b in $ornBad) { Fail $b } }
 else { Pass "V276/V277/V278/V283 the filigree is a runtime path, placed by align, hidden and never destroyed, filtered by construction, and it draws OVER the content without taking a click" }
 
+# ---- V313: the DRAWING comes out of the PALETTE, and the memo stamps all three axes ----
+# SPEC I87, the 115th round. Until now there was one frame and one era wearing it, so `which
+# drawing` was not a question anybody could get wrong. With two, it is - and the way to get it
+# wrong is silent in both directions: a dispatch that defaults to the new drawing repaints 73
+# boxes in an era nobody asked, and a memo that does not stamp the STYLE hands back the frame
+# it built for the era before. Neither raises anything: rdk -l exits 0 and the sheet is wrong
+# on screen only. This block is the only thing above either.
+$v313Bad = @()
+$ornMake313 = LuaFn $hh6 'ornament'
+$styleVar313 = [regex]::Match($hh6, '(?m)^\s*local (ornStyle\w+) = nil;')
+
+# (a) a style with no colour beside it is a DEAD key: what hides the path is the colour (V277),
+# so the style would never be reached and nothing would say so. Read out of the THEMES block at
+# its own indent, the same way V63 reads the eight required keys - not from a roster here.
+if (-not $themesBlock) { $v313Bad += "V313 the THEMES block could not be read - leg (a) measured nothing (SPEC V209, V20)" }
+else {
+    $styled313 = 0
+    foreach ($k in $themeKeys) {
+        $pal313 = [regex]::Match($themesBlock, "(?ms)^\t{4}\[""$([regex]::Escape($k))""\] = \{(.*?)^\t{4}\},")
+        if (-not $pal313.Success) { $v313Bad += "V313 palette '$k' could not be read - its ornament keys are unchecked (SPEC V209)"; continue }
+        $hasStyle313 = $pal313.Groups[1].Value -match "(?m)^\t{5}ornStyle\s*="
+        $hasCol313 = $pal313.Groups[1].Value -match "(?m)^\t{5}ornament\s*="
+        if ($hasStyle313) {
+            $styled313++
+            if (-not $hasCol313) {
+                $v313Bad += "V313 palette '$k' declares ornStyle and no ornament - the colour is what hides the path (V277), so the style is a key that can never draw and never complain (SPEC V313a, I87a)"
+            }
+        }
+    }
+    if ($styled313 -eq 0) { $v313Bad += "V313 no palette declares ornStyle - leg (a) matched nothing, which is B7 waiting (SPEC V209, V20)" }
+    else { Pass "V313 $styled313 palette(s) declare ornStyle and every one of them declares an ornament colour too" }
+}
+
+# (b) the DEFAULT is the filigree. An era that declares no style has to fall to the drawing
+# that was here first - a dispatch whose fallthrough is the filete changes 73 boxes in three
+# eras that never asked, and the symptom lands an era away from the line that caused it.
+if (-not $ornGeo) { $v313Bad += "V313 ornPath is gone from WoD20.6 - there is no dispatch to measure (SPEC V209)" }
+else {
+    $disp313 = NoComments $ornGeo
+    if ($disp313 -notmatch 'if\s+style\s*==\s*"filete"') {
+        $v313Bad += "V313 ornPath does not branch on the style it is handed - the palette cannot pick a drawing, and the key T703 added would do nothing at all (SPEC I87b)"
+    }
+    if ($disp313 -notmatch 'ornFilete\s*\(') { $v313Bad += "V313 ornPath never reaches ornFilete - the Dark Ages frame is written and never called (SPEC I87b, V209)" }
+    $tail313 = [regex]::Match($disp313, '(?m)^\s*return\s+(\w+)\(w, h\);\s*$')
+    if (-not $tail313.Success) { $v313Bad += "V313 ornPath has no unguarded final return - there is no default drawing, so an era with no style gets NO frame instead of the filigree (SPEC V313b)" }
+    elseif ($tail313.Groups[1].Value -ne 'ornFiligree') {
+        $v313Bad += "V313 ornPath falls through to $($tail313.Groups[1].Value) - the default has to be the filigree, or three eras of four silently change drawing (SPEC V313b, I87b)"
+    }
+    else { Pass "V313 ornPath dispatches on the palette's style and falls through to the filigree" }
+}
+
+# (c) the memo stamps the STYLE. Switching era on an open sheet moves no box, so the size
+# comparison V284 already owns answers `same` and the entry is handed straight back - wearing
+# the drawing of the era before, repainted in the new era's colour. B58 and B62 on a third
+# axis, and the only one of the three with no measurement to notice it.
+if (-not $ornMake313) { $v313Bad += "V313 ornament() is gone from WoD20.6 - there is no memo to measure (SPEC V209)" }
+elseif (-not $styleVar313.Success) {
+    $v313Bad += "V313 no module-level style is kept beside ornColour - refreshOrnament runs outside the theme walk with no palette in hand, so it would have nothing to redraw FROM (SPEC I87e)"
+}
+else {
+    $sv313 = [regex]::Escape($styleVar313.Groups[1].Value)
+    $ornB313 = NoComments $ornMake313
+
+    if ($hh6 -notmatch "(?m)^\s*$sv313 = t\.ornStyle;") {
+        $v313Bad += "V313 the style global is never written from the palette - it would stay nil forever and every era would draw the filigree (SPEC I87e)"
+    }
+
+    $carries313 = $false
+    foreach ($t313 in [regex]::Matches($ornB313, '\{[^{}]*\}')) {
+        if ($t313.Value -match ('\b' + $sv313 + '\b')) { $carries313 = $true; break }
+    }
+
+    if (-not $carries313) {
+        $v313Bad += "V313 the memo entry does not carry the style - it can tell 'already drawn' and 'drawn at THIS size' and not 'drawn in THIS drawing', so changing era keeps the old frame (SPEC I87d, V313c, B58)"
+    }
+    elseif ($ornB313 -notmatch ("~=\s*" + $sv313 + '|' + $sv313 + "\s*~=")) {
+        $v313Bad += "V313 the stored style is written and never COMPARED - the third door never opens for a change of era, and the sheet keeps the frame it had (SPEC V313c)"
+    }
+    else {
+        $calls313 = [regex]::Matches($ornB313, 'ornPath\s*\(([^)]*)\)')
+        $bare313 = @($calls313 | Where-Object { $_.Groups[1].Value -notmatch ('\b' + $sv313 + '\b') })
+
+        if ($calls313.Count -eq 0) { $v313Bad += "V313 ornament() never calls ornPath - there is no drawing to hand a style to (SPEC V209)" }
+        elseif ($bare313.Count -gt 0) {
+            $v313Bad += "V313 $($bare313.Count) of $($calls313.Count) ornPath call(s) in ornament() carry no style - every one has to, or the one that does not rebuilds the box in the default drawing with nothing to say so (SPEC I87b, V313c)"
+        }
+        else { Pass "V313 the memo stamps size AND style, and all $($calls313.Count) ornPath calls carry it" }
+    }
+}
+
+# (d) one painter, one generator. Two copies is what V67 pays not to have with THEME_STROKE and
+# V308 with the marker's three motifs; here the cost of the second copy is 73 boxes wearing two
+# frames at once, with nothing in rdk -l or above to say which one is stale.
+$nOrn313 = [regex]::Matches($hh6, '(?m)^\s*local function ornament\s*\(').Count
+$nPath313 = [regex]::Matches($hh6, '(?m)^\s*local function ornPath\s*\(').Count
+if ($nOrn313 -ne 1) { $v313Bad += "V313 WoD20.6 declares $nOrn313 ornament() - one painter per style is two memos and two creation paths for one <path> (SPEC V313d, V67)" }
+elseif ($nPath313 -ne 1) { $v313Bad += "V313 WoD20.6 declares $nPath313 ornPath() - the dispatch is the single door, and a second one is a second answer to which drawing is in force (SPEC V313d)" }
+else { Pass "V313 one painter and one generator serve both drawings" }
+
+if ($v313Bad) { foreach ($b in $v313Bad) { Fail $b } }
+
+# ---- V314: the filete's geometry is a RELATION, not five literals -----------------------
+# SPEC I87c, the 115th round. Every number in this drawing has the other side of a relation
+# sitting in the same file, so the gate reads BOTH and never spells one here: a literal spelled
+# on this side is the second truth V49 pays not to have, and the failure it hides is visual -
+# a cross sitting on the corner curve, or touching the 3px outline, exits 0 and merely looks wrong.
+$v314Bad = @()
+$c314 = @{}
+foreach ($n314 in @('ORN_BOXR', 'ORN_IN', 'ORN_CROSS', 'ORN_CROSS2', 'ORN_CROSS_AT', 'THEME_STROKE')) {
+    $m314 = [regex]::Match($hh6, "(?m)^\s*local $n314\s*=\s*([0-9.]+);")
+    if ($m314.Success) { $c314[$n314] = [double]$m314.Groups[1].Value }
+}
+
+if ($c314.Count -ne 6) {
+    $v314Bad += "V314 only $($c314.Count) of the 6 constants this measures could be read out of WoD20.6 - the relations are unreadable, so every leg below is a no-op (SPEC V209, V20)"
+} else {
+    $rIn314 = $c314['ORN_BOXR'] + $c314['ORN_IN']
+    $straight314 = [Math]::Sqrt(($rIn314 * $rIn314) - ($c314['ORN_IN'] * $c314['ORN_IN']))
+
+    # (a) the cross lands on the STRAIGHT run. The corner arc gives out where the rule leaves
+    # the box's own concave radius; inside that the cross sits on the curve and comes out
+    # crooked. Both sides read from the Lua: move ORN_BOXR and the floor moves with it.
+    if ($c314['ORN_CROSS_AT'] -le $straight314) {
+        $v314Bad += "V314 the corner cross sits at $($c314['ORN_CROSS_AT']) and the rule is still on its arc until $([Math]::Round($straight314, 2)) - it would be drawn on the CURVE, crooked, with nothing to say so (SPEC V314a, I87c)"
+    } else { Pass "V314 the corner cross at $($c314['ORN_CROSS_AT']) clears the corner arc, which gives out at $([Math]::Round($straight314, 2))" }
+
+    # (b) the centre cross does not touch the frame. Centred on a rule ORN_IN in, a half-arm of
+    # h reaches ORN_IN - h outward against the box's own outline, which applyTheme writes at
+    # THEME_STROKE on every rectangle it repaints (V67). This is a CEILING, not a taste.
+    $cap314 = $c314['ORN_IN'] - $c314['THEME_STROKE']
+    if ($c314['ORN_CROSS2'] -ge $cap314) {
+        $v314Bad += "V314 the centre cross has a half-arm of $($c314['ORN_CROSS2']) and reaches $($c314['ORN_IN'] - $c314['ORN_CROSS2']) out, into the $($c314['THEME_STROKE'])px outline the theme paints on every box - the ceiling is $cap314 (SPEC V314b, V67)"
+    } else { Pass "V314 the centre cross half-arm of $($c314['ORN_CROSS2']) clears the $($c314['THEME_STROKE'])px outline, under the ceiling of $cap314" }
+
+    # (c) and it does not reach the CONTENT. The filete draws on TOP of everything the box
+    # carries (I72c), so what keeps it off the children is the 20px margin every box has - the
+    # same number V283d measures the rule itself against, one motif further in.
+    $reach314 = $c314['ORN_IN'] + $c314['ORN_CROSS2']
+    if ($reach314 -gt 20) {
+        $v314Bad += "V314 the centre cross reaches ${reach314}px into the box, at or past the 20px margin I73 gives every one - drawn on TOP it would strike through the children that fill the box (SPEC V314c, V280a, V283d)"
+    } else { Pass "V314 the deepest the filete reaches is ${reach314}px, clear of the 20px content margin" }
+
+    # (d) the hierarchy IS the drawing. "One slightly larger in the middle" is what the plate
+    # says; equal arms lose the centre and no check above this one would notice.
+    if ($c314['ORN_CROSS'] -ge $c314['ORN_CROSS2']) {
+        $v314Bad += "V314 the corner cross ($($c314['ORN_CROSS'])) is not smaller than the centre one ($($c314['ORN_CROSS2'])) - the plate's whole hierarchy is that one of them is larger (SPEC V314d)"
+    } else { Pass "V314 the corner cross ($($c314['ORN_CROSS'])) stays under the centre one ($($c314['ORN_CROSS2']))" }
+
+    # (e) what a small box drops is the CROSS, never the rule - V279's doctrine in the letter
+    # T613 wrote it for the filigree's arm. The floor is READ out of the Lua and measured
+    # against the smallest box the XML actually authors, so neither can drift from the other.
+    $roomM314 = [regex]::Match($hh6, '(?m)^\s*local ORN_CROSS_ROOM\s*=\s*2 \* \(ORN_CROSS_AT \+ ORN_CROSS \+ ORN_CROSS2\);')
+    $fileteFam314 = ''
+    foreach ($fn314 in @('ornFilete', 'ornFileteCorner', 'ornFileteEdge')) { $fileteFam314 += (LuaFn $hh6 $fn314) }
+    $famNC314 = NoComments $fileteFam314
+    $emitted314 = [regex]::Matches($famNC314, 'ornCross\s*\(').Count
+    $floored314 = [regex]::Matches($famNC314, 'ORN_CROSS_ROOM').Count
+
+    if (-not $fileteFam314) { $v314Bad += "V314 the filete family is gone from WoD20.6 - leg (e) measured nothing (SPEC V209)" }
+    elseif (-not $roomM314.Success) { $v314Bad += "V314 ORN_CROSS_ROOM is not the sum of the three constants it floors - the floor and the motif could drift apart with nothing between them (SPEC V314e, V49)" }
+    elseif ($famNC314 -match 'return "";') {
+        $v314Bad += "V314 the filete refuses a box by size - what a small box drops is the CROSS, never the rule, and a box skipped in silence between ornamented neighbours is exactly B59 (SPEC V314e, T613)"
+    }
+    elseif ($emitted314 -eq 0) {
+        $v314Bad += "V314 the filete emits no cross at all - the motif this leg floors does not exist (SPEC V209)"
+    }
+    elseif ($floored314 -lt $emitted314) {
+        $v314Bad += "V314 the filete emits $emitted314 cross(es) and consults ORN_CROSS_ROOM $floored314 time(s) - a cross drawn without the test overlaps its neighbour on a short run, and counting the family ONCE passed while two of three drew unguarded (SPEC V314e)"
+    }
+    else {
+        $room314 = 2 * ($c314['ORN_CROSS_AT'] + $c314['ORN_CROSS'] + $c314['ORN_CROSS2'])
+        $tiny314 = 0
+        $tinyN314 = ''
+        foreach ($f in $files) {
+            foreach ($r in (Doc $f.FullName).SelectNodes("//rectangle[@color='black'][@xradius]")) {
+                $p314 = $r.ParentNode
+                $bw314 = 0; $bh314 = 0
+                if (-not [int]::TryParse($r.GetAttribute("width"), [ref]$bw314)) { [void][int]::TryParse($p314.GetAttribute("width"), [ref]$bw314) }
+                if (-not [int]::TryParse($r.GetAttribute("height"), [ref]$bh314)) { [void][int]::TryParse($p314.GetAttribute("height"), [ref]$bh314) }
+                if ($bw314 -le 0 -or $bh314 -le 0) { continue }
+                $side314 = [Math]::Min($bw314, $bh314)
+                if ($tiny314 -eq 0 -or $side314 -lt $tiny314) { $tiny314 = $side314; $tinyN314 = "$($f.Name) $($bw314)x$($bh314)" }
+            }
+        }
+        if ($tiny314 -eq 0) { $v314Bad += "V314 no section box was found - leg (e) measured nothing (SPEC V209)" }
+        elseif ($tiny314 -lt $room314) {
+            $v314Bad += "V314 the smallest section box ($tinyN314) is under the ${room314}px a run needs to hold its crosses - it would come out with the bare rule while its neighbours carry the motif (SPEC V314e, B59)"
+        }
+        else { Pass "V314 the smallest section box ($tinyN314) clears the ${room314}px the crosses need - no box loses the motif in silence" }
+    }
+}
+
+if ($v314Bad) { foreach ($b in $v314Bad) { Fail $b } }
+
+# ---- V315: the BAR's drawing comes out of the same palette the BOX's does (SPEC I88) -----
+# The 116th round. I87 gave the era its own BOX frame; this gives it the BAR, through the SAME
+# palette key and the SAME module global, so no era can wear one drawing on its boxes and
+# another on its tabs. Six legs, and (c) is the one that keeps the new drawing off the words.
+$v315Bad = @()
+$fil315  = LuaFn $hh6 'markFilete'
+$path315 = LuaFn $hh6 'markPath'
+$rule315 = LuaFn $hh6 'markRule'
+$mkC315 = [regex]::Match($hh6, '(?m)^\s*local ORN_FIL_MARK\s*=\s*([\d.]+);')
+$crC315 = [regex]::Match($hh6, '(?m)^\s*local ORN_FIL_CROSS\s*=\s*([\d.]+);')
+$spC315 = [regex]::Match($hh6, '(?m)^\s*local ORN_FIL_SEP\s*=\s*([\d.]+);')
+$m2C315 = [regex]::Match($hh6, '(?m)^\s*local ORN_MARK2\s*=\s*([\d.]+);')
+$plC315 = [regex]::Match($hh6, '(?m)^\s*local ORN_PILLR\s*=\s*([\d.]+);')
+if (-not ($fil315 -and $path315 -and $rule315)) {
+    Fail "V315 markFilete / markPath / markRule could not all be read out of WoD20.6 - every leg below measures one of them, so all six would be no-ops (SPEC V209, V20)"
+}
+elseif (-not ($mkC315.Success -and $crC315.Success -and $spC315.Success -and $m2C315.Success -and $plC315.Success)) {
+    Fail "V315 ORN_FIL_MARK / ORN_FIL_CROSS / ORN_FIL_SEP / ORN_MARK2 / ORN_PILLR are not all readable in WoD20.6 - the Lua side of these relations is gone, and a relation with one side is a no-op (SPEC V209, V20)"
+}
+else {
+    $filBody315  = NoComments $fil315
+    $pathBody315 = NoComments $path315
+    $ruleBody315 = NoComments $rule315
+    $filMark315  = [double]$mkC315.Groups[1].Value
+    $filCross315 = [double]$crC315.Groups[1].Value
+    $filSep315   = [double]$spC315.Groups[1].Value
+    $mark2_315   = [double]$m2C315.Groups[1].Value
+    $pillr315    = [double]$plC315.Groups[1].Value
+
+    # (a) the style is DISPATCHED and it arrives as an ARGUMENT. markPath is declared ABOVE the
+    # local that holds the era's style, so reading it there compiles to a GETGLOBAL and finds
+    # nil - rdk -l exits 0 and there is no symptom to grep, which is B51 (SPEC I88a, V223).
+    if ($pathBody315 -notmatch 'function markPath\(w, h, kind, style\)') { $v315Bad += "markPath does not take the style as a fourth argument - the palette has no way to reach the bar (SPEC I88a)" }
+    if ($pathBody315 -notmatch 'if style == "filete" then') { $v315Bad += "markPath does not dispatch on the filete style - every era falls to the default drawing and the palette key is dead (SPEC I88a)" }
+    if ($pathBody315 -match '\bornStyleNow\b') { $v315Bad += "markPath reads ornStyleNow directly, and that local is declared BELOW it - the read compiles to a GETGLOBAL and calls nil, with exit 0 and nothing to grep (SPEC I88a, V223, B51)" }
+    if ($ruleBody315 -notmatch 'markPath\(bw, bh, kind, ornStyleNow\)') { $v315Bad += "markRule does not pass ornStyleNow into markPath - the style arrives nil and the era's own drawing is never reached (SPEC I88a)" }
+    $decl315 = [regex]::Matches($hh6, '(?m)^\s*ornStyle\s*=\s*"([^"]+)"')
+    if ($decl315.Count -ne 1) { $v315Bad += "$($decl315.Count) palette(s) declare ornStyle, expected exactly 1 - the other three fall to the drawing of I78b BY DECISION, and a second one is a product choice, not a refactor (SPEC I88a, V313a)" }
+    else {
+        $val315 = $decl315[0].Groups[1].Value
+        if ($pathBody315 -notmatch ('if style == "' + [regex]::Escape($val315) + '" then')) { $v315Bad += "the palette declares ornStyle = $val315 and markPath dispatches on no such style - a mistyped style falls to the default drawing with exit 0, gate green, and only the screen left to tell (SPEC I88a, V285)" }
+    }
+
+    # (b) a STYLE's constant does not cross into the other style, the way V308 keeps a MOTIF's
+    # constant out of another motif (B69). Two exceptions, and they are DECLARED rather than
+    # accidental: ORN_PILLR, the arc V228 authors on all nineteen buttons, and ORN_SUB_MARK,
+    # the sub-tab height the user approved in the 109th round - one fact in either style.
+    foreach ($bad315 in @('ORN_MARK', 'ORN_MARK2', 'ORN_MARK_RX', 'ORN_MARK_RY', 'ORN_MARK_GAP', 'ORN_SUB', 'ORN_SEP_RX', 'ORN_SEP_RY')) {
+        if ($filBody315 -match ("\b" + [regex]::Escape($bad315) + "\b(?!_|\d)")) { $v315Bad += "markFilete reads $bad315, which belongs to the DEFAULT style - one constant serving two drawings is how the 110th round moved three levels when it was asked to move one (SPEC I88e, V308, B69)" }
+    }
+    if ($filBody315 -notmatch '\bORN_SUB_MARK\b') { $v315Bad += "markFilete has no ORN_SUB_MARK - the sub-tab rule has come off the height the user saw and approved in the 109th round (SPEC I88e)" }
+    if ($pathBody315 -match '\bORN_FIL_') { $v315Bad += "markPath reads an ORN_FIL_ constant - the filete style's numbers have leaked into the default drawing, which is B69 again, by style instead of by motif (SPEC V315b)" }
+
+    # (c) THE relation, and the one that keeps the cross off the words. In the default style the
+    # topmost ink is the upper rule, at h - ORN_MARK2 = 21, which is the state the user approved
+    # on screen in the 112th round. In filete the topmost ink is the cross's UPPER ARM, so the
+    # two constants have to add to the same number or the drawing climbs into the label box,
+    # which closes at 20 (SPEC I88d, B68). Both sides read from Lua, neither spelled here.
+    if (($filMark315 + $filCross315) -ne $mark2_315) { $v315Bad += "ORN_FIL_MARK ($filMark315) + ORN_FIL_CROSS ($filCross315) is $($filMark315 + $filCross315) against ORN_MARK2 = $mark2_315 - the two styles no longer put their topmost ink on the same line, so one of them is nearer the words than was ever approved (SPEC I88d, V307a, B68)" }
+
+    # (d) the tab's cross is BIGGER than the separator's: the level that says least says it in
+    # less, and equal arms lose the hierarchy with nothing anywhere to say so (SPEC I88f).
+    if ($filCross315 -le $filSep315) { $v315Bad += "ORN_FIL_CROSS ($filCross315) is not greater than ORN_FIL_SEP ($filSep315) - the separator stops being the smaller mark and the three levels stop being told apart by quantity (SPEC I88f)" }
+
+    # (e) the floor is READ, never spelled. What falls out for want of room is the CROSS, never
+    # the rule (V279) - and a guard that CANNOT fire is B59's hole, so the narrowest of the
+    # nineteen is measured against a floor built from the Lua's own numbers (SPEC I88h).
+    $wid315 = @()
+    $sep315 = 0
+    foreach ($pr315 in @(@("WoD20th.lfm", "tabStrip"), @("WoD20.11.lfm", "vampStrip"), @("WoD20.7.lfm", "numStrip"), @("WoD20.7.lfm", "hedgeStrip"))) {
+        $st315 = (Doc (Join-Path $dir $pr315[0])).SelectSingleNode("//layout[@name='$($pr315[1])']")
+        if ($null -eq $st315) { $v315Bad += "$($pr315[1]) is gone from $($pr315[0]) - the bar this invariant measures does not exist (SPEC I32, I58, V209)"; continue }
+        foreach ($r315 in $st315.SelectNodes("rectangle[starts-with(@name,'tabOn')]")) { $wid315 += [double]$r315.GetAttribute("width") }
+        $sep315 += @($st315.SelectNodes("rectangle[starts-with(@name,'sep')]")).Count
+    }
+    $foot315  = [Math]::Sqrt(($pillr315 + $filMark315) * ($pillr315 + $filMark315) - $filMark315 * $filMark315)
+    $floor315 = 2 * $foot315 + 2 * $filCross315
+    if ($wid315.Count -ne 19) { $v315Bad += "read $($wid315.Count) marker(s) across the four bars, expected 19 - this check is covering less than the bars hold (SPEC V209)" }
+    elseif ((($wid315 | Measure-Object -Minimum).Minimum) -le $floor315) { $v315Bad += "the narrowest marker is $(($wid315 | Measure-Object -Minimum).Minimum) against a floor of $([Math]::Round($floor315, 2)) - at that width the tab drops its crosses, and a drawing that quietly loses half its motif is not the one anybody chose (SPEC I88h, V279, B59)" }
+    if ($sep315 -ne 5) { $v315Bad += "read $sep315 separator carrier(s) across the bars, expected 5 - the fleuron that became a cross has lost a carrier to stand in (SPEC I78d, V209)" }
+
+    # (f) the marker memo stamps the DRAWING. The nineteen never resize, so measure is not what
+    # this memo has to tell apart - and without the stamp, swapping era on an OPEN sheet leaves
+    # the bar wearing the previous era's drawing repainted in the new colour (SPEC I88g, B62).
+    # The closing brace is what makes this the CREATION stamp and not the rewrite below: the
+    # first draft of this leg matched a bare "s = ornStyleNow", which the restyle branch also
+    # contains, so deleting the stamp left the check green - caught by the mutation V20 asks
+    # for, which is the whole reason it is run before the check is believed (SPEC V20, B7).
+    if ($ruleBody315 -notmatch 's = ornStyleNow\s*\}') { $v315Bad += "markRule never stamps the style into the marker memo at CREATION - swapping era on an OPEN sheet leaves the bar in the previous era's drawing repainted in the new colour, with exit 0 and the gate green (SPEC I88g, B58, B62)" }
+    if ($ruleBody315 -notmatch 'e\.s = ornStyleNow') { $v315Bad += "markRule never writes the new style back into the memo after redrawing - the entry would say the OLD style for ever and every later repaint would rebuild the same path (SPEC I88g, V284)" }
+    if ($ruleBody315 -notmatch 'e\.s ~= ornStyleNow') { $v315Bad += "markRule never compares the stamped style against the era in force - the memo answers already-drawn to a question about a DIFFERENT drawing (SPEC I88g, V284)" }
+
+    if ($v315Bad) { foreach ($b in $v315Bad) { Fail "V315 $b" } }
+    else { Pass "V315 the bar's drawing comes out of the palette that draws the boxes, each style keeps its own constants, and both styles put their topmost ink at $mark2_315 from the marker's foot" }
+}
 # ---- V304: the open tab is marked in all FOUR eras, and the line is thin (SPEC I78a, I78e)
 # This replaces V282 whole. V282 tied the bar's line work to `ornament`, which only the Victorian
 # palette declares - so the marker existed in ONE era of four and the sheet opened with no tab
