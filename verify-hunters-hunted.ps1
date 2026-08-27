@@ -10445,5 +10445,177 @@ else {
     if ($v319Bad) { foreach ($b in $v319Bad) { Fail "V319 $b" } }
     else { Pass "V319 the corrente bar is a drawing of its own, its seven constants stay inside their motifs, its ink tops out no higher than $($num319['ORN_MARK2']) from the foot, and the fill comes from the drawing and is repainted every time" }
 }
+# ---- V320: the AVATAR wears the era's shape by a DECLARED roster, and ONE question says
+# who DRAWS (SPEC I92, the 120th round) ------------------------------------------------------
+# The avatar is the one thing on the sheet that is shaped like a section box and is not one:
+# its frame is DimGray and its carrier is transparent, so the construction test of V278 refuses
+# both and Modern Nights left it with the concave bite while the 73 wore the cut corner. The arm
+# that lets it in cannot be a rule about SHAPE - by construction the carrier IS the nineteen
+# tabOn<X> pills - so it is a roster of two names, and every leg below reads its other side out
+# of the Lua or out of the XML rather than spelling it here.
+$v320Bad = @()
+
+$sbFn320    = LuaFn $hh6 'sectionBox'
+$ornFn320   = LuaFn $hh6 'ornament'
+$sbBody320  = if ($sbFn320)  { NoComments $sbFn320 }  else { '' }
+$ornBody320 = if ($ornFn320) { NoComments $ornFn320 } else { '' }
+
+$themeM320  = [regex]::Match($hh6, 'local function applyTheme\(v, from\)(.*?)\n\t\t\tend;', 'Singleline')
+$themeB320  = if ($themeM320.Success) { NoComments $themeM320.Groups[1].Value } else { '' }
+
+$roster320  = @('avatarFrame', 'ornAvatar')
+$frame320   = $mainDocV69.SelectSingleNode("//rectangle[@name='avatarFrame']")
+$carrier320 = $mainDocV69.SelectSingleNode("//rectangle[@name='ornAvatar']")
+$img320     = $mainDocV69.SelectSingleNode("//image[@field='avatar']")
+
+$allLfm320  = (Get-ChildItem (Join-Path $dir '*.lfm') | ForEach-Object { [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($_.FullName)) }) -join "`n"
+$tabOn320   = ([regex]::Matches($allLfm320, 'name="tabOn')).Count
+
+# Zero-guard FIRST: every leg under this reads the selector, the two rectangles or the pills,
+# and a leg that reads nothing passes for the wrong reason (SPEC V209, V20).
+if (-not $sbFn320)          { $v320Bad += "sectionBox is not in WoD20.6 - the selector this whole block measures does not exist (SPEC V209)" }
+if (-not $ornFn320)         { $v320Bad += "ornament() could not be read - leg (c) cannot tell which answer it takes and is a no-op (SPEC V209, V20)" }
+if (-not $themeM320.Success){ $v320Bad += "applyTheme could not be read - the corner write is unmeasurable and leg (c) is half blind (SPEC V209, V20)" }
+if ($null -eq $frame320)    { $v320Bad += "no rectangle named avatarFrame in WoD20.1 - the roster points at a control that is gone, which is a check that goes quiet on the thing it guards (SPEC V209, V320a, B7)" }
+if ($null -eq $carrier320)  { $v320Bad += "no rectangle named ornAvatar in WoD20.1 - same hole, and this is the one that DRAWS (SPEC V209, V320a, B7)" }
+if ($null -eq $img320)      { $v320Bad += "the avatar image is gone from WoD20.1 - leg (d) has nothing to sit the two rectangles around (SPEC V209)" }
+if ($tabOn320 -lt 19)       { $v320Bad += "only $tabOn320 tabOn<X> carriers were read and there are 19 - leg (b) measures the collision this roster exists to avoid, so reading fewer is measuring less than the sheet has (SPEC V209, V20)" }
+
+# (a) the arm cites EXACTLY the two names, and both are in the XML above. A roster that names a
+# control nobody authored is green over a hole; a roster that grew a third name quietly is a
+# selector nobody declared.
+$cited320 = @([regex]::Matches($sbBody320, 'nm\s*==\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+if ((($cited320 | Sort-Object) -join ',') -ne (($roster320 | Sort-Object) -join ',')) {
+    $v320Bad += "sectionBox's name arm cites [$($cited320 -join ', ')] and the declared roster is [$($roster320 -join ', ')] - the two sides have to be the same list, or the selector answers for a control the spec never let in (SPEC V320a, I92a)"
+}
+
+# (b) by NAME and never by CONSTRUCTION. The carrier is transparent both ways with its own
+# radius and hitTest false - the four properties of every tabOn<X> - so a fill-based arm bevels
+# the nineteen pills, whose width is priced for the concave arc (SPEC V228, V316d). This is the
+# leg the "swap the roster for a shape test" mutation has to turn red.
+if ($sbBody320 -match '#00000000') {
+    $v320Bad += "sectionBox tests the TRANSPARENT fill - that is construction, not a roster, and it lets in all $tabOn320 tabOn<X> carriers along with the avatar's, bevelling pills whose width was priced for the arc (SPEC V320b, V228, V316d)"
+}
+if ($sbBody320 -match 'tabOn') {
+    $v320Bad += "sectionBox mentions tabOn - the selector is reasoning about the tab pills, which means the roster stopped being about the avatar (SPEC V320b)"
+}
+if ($sbBody320 -notmatch 'getName\(\)') {
+    $v320Bad += "sectionBox never asks the control its NAME, so whatever arm it grew is not the declared roster of I92a (SPEC V320b)"
+}
+
+# (c) ONE selector, TWO answers. The corner write takes the FIRST, ornament() takes the SECOND,
+# and neither of them may reason about a name on its own - a second copy of "which rectangles
+# are the boxes" is what V67 pays not to have (SPEC I89b, I92b).
+if (([regex]::Matches($hh6, 'local function sectionBox')).Count -ne 1) {
+    $v320Bad += "sectionBox is declared $((([regex]::Matches($hh6, 'local function sectionBox')).Count)) times - there is exactly one question about who the boxes are (SPEC V320c, V67, I89b)"
+}
+if ($sbBody320 -notmatch 'return true, true') {
+    $v320Bad += "sectionBox has no `"return true, true`" - the pair of answers I92b is built on is not there, so nothing distinguishes wearing the shape from receiving the drawing (SPEC V320c)"
+}
+if ($sbBody320 -notmatch 'return true, false') {
+    $v320Bad += "sectionBox never answers `"wears but does not draw`" - the frame would take a path of its own, and it sits UNDER the image, so that path lands behind the photo (SPEC V320c, I92c, B75)"
+}
+if ($ornBody320 -notmatch 'local _, draws = sectionBox\(c, fill\)') {
+    $v320Bad += "ornament() does not take the SECOND answer from sectionBox - reading the first would hang a path on the avatar frame, behind the photo, which is B75 all over again (SPEC V320c, I92b)"
+}
+if ($ornBody320 -notmatch 'if not draws then return; end;') {
+    $v320Bad += "ornament() does not refuse on the second answer - whatever it refuses on now, it is not the one that says who draws (SPEC V320c)"
+}
+if ($themeB320 -notmatch 'if sectionBox\(c, fill\) then') {
+    $v320Bad += "the corner write no longer reads sectionBox's FIRST answer - either it stopped asking, or it started asking a second question of its own (SPEC V320c, V316d)"
+}
+foreach ($nm320 in $roster320) {
+    if ($ornBody320 -match [regex]::Escape($nm320)) { $v320Bad += "ornament() names $nm320 itself - the roster has a second copy, and two lists of who the avatar is will drift (SPEC V320c, V67)" }
+    if ($themeB320 -match [regex]::Escape($nm320)) { $v320Bad += "the theme walk names $nm320 itself - same second copy, on the corner side this time (SPEC V320c, V67)" }
+}
+
+# (d) the one that DRAWS is the one on TOP, and that is POSITION IN THE FILE rather than a name:
+# the frame is declared BEFORE the image and the carrier AFTER it, so the path the carrier gets
+# lands over the photo. Inverted, the drawing goes behind the picture with exit 0, a green gate
+# and only the screen to tell - which is exactly B75.
+$posFrame320 = $mainRawForMap.IndexOf('name="avatarFrame"')
+$posImg320   = $mainRawForMap.IndexOf('field="avatar"')
+$posCarr320  = $mainRawForMap.IndexOf('name="ornAvatar"')
+if ($posFrame320 -lt 0 -or $posImg320 -lt 0 -or $posCarr320 -lt 0) {
+    $v320Bad += "one of the avatar's three controls could not be found in the raw XML, so the stacking order is unmeasurable (SPEC V209, V320d)"
+} else {
+    if ($posFrame320 -gt $posImg320) { $v320Bad += "avatarFrame is declared AFTER the image - the grey letterbox would paint over the photo (SPEC V320d, I92c)" }
+    if ($posCarr320 -lt $posImg320)  { $v320Bad += "ornAvatar is declared BEFORE the image - its path would land BEHIND the photo, drawn and invisible, which is B75 in one line (SPEC V320d, B75, I92c)" }
+}
+
+# (e) the frame keeps the shape V309 collects it by. The name is new; the DimGray fill is what
+# V309's collector matches on, and losing it would take the avatar out of the check that exists
+# because the frame spent three rounds thirty pixels behind the photo (SPEC B71).
+if ($null -ne $frame320 -and $frame320.GetAttribute('color') -ne 'DimGray') {
+    $v320Bad += "avatarFrame no longer authors color='DimGray' - V309 collects it by that fill, so renaming it out of the collector is B71 waiting to happen again (SPEC V320e, V309, V53)"
+}
+
+# (f) THREE palettes declare ornament, so the avatar draws in three eras and the Classical Age
+# stays clean. V277 is what says so; this leg exists so that "the avatar did not change in the
+# Classical Age" cannot become a bug report in a later round - which is precisely what T695(4)
+# became once Modern Nights grew an ornament of its own.
+$ornDecl320 = ([regex]::Matches($hh6, '(?m)^\s*ornament\s*=\s*"#[0-9A-Fa-f]{6,8}"')).Count
+if ($ornDecl320 -ne 3) {
+    $v320Bad += "$ornDecl320 palette(s) declare ornament and the sheet is built around 3 - the avatar draws in exactly the eras that declare one, so a fourth is a drawing in an era nobody asked for and a second is one era losing it (SPEC V320f, V277)"
+}
+
+if ($v320Bad) { foreach ($b in $v320Bad) { Fail "V320 $b" } }
+else { Pass "V320 the avatar wears the era's shape by a roster of $($roster320.Count) declared names, one selector answers both who wears and who draws, the carrier is the control on top, and $ornDecl320 palettes declare ornament" }
+
+# ---- V321: NO avatar control receives a path, and the PAIR of answers survives (SPEC I93,
+# the 121st round) ---------------------------------------------------------------------------
+# The 120th round let the carrier draw, and the drawing came out over the whole tab: ornament()
+# hangs its path on the control's PARENT with align="client" (SPEC I72c), so the geometry comes
+# from the parent and not from the control. The 73 boxes fill their layout; the carrier is a
+# loose rectangle in the tab's scrollBox and fills nothing. That is B76, and it is invisible to
+# rdk -l and to every check above - the position only exists at runtime. What CAN be measured is
+# the answer the selector gives, so that is what this pins.
+$v321Bad = @()
+
+$sbFn321    = LuaFn $hh6 'sectionBox'
+$ornFn321   = LuaFn $hh6 'ornament'
+$sbBody321  = if ($sbFn321)  { NoComments $sbFn321 }  else { '' }
+$ornBody321 = if ($ornFn321) { NoComments $ornFn321 } else { '' }
+$roster321  = @('avatarFrame', 'ornAvatar')
+
+# Zero-guard FIRST (SPEC V209, V20).
+if (-not $sbFn321)  { $v321Bad += "sectionBox is not in WoD20.6 - every leg here measures its answers and there are none (SPEC V209)" }
+if (-not $ornFn321) { $v321Bad += "ornament() could not be read - leg (c) counts its parent writes and would count zero for the wrong reason (SPEC V209, V20)" }
+
+# (a) each roster name is cited on a line that answers WEARS BUT DOES NOT DRAW. Both sides are
+# read: the name has to be in the arm, and the arm it is in has to say `return true, false`.
+foreach ($nm321 in $roster321) {
+    $arm321 = [regex]::Match($sbBody321, '(?m)^.*nm\s*==\s*"' + [regex]::Escape($nm321) + '".*$')
+    if (-not $arm321.Success) {
+        $v321Bad += "the roster name $nm321 is not cited in sectionBox at all - the arm this leg measures is gone, and a check that goes quiet on a missing target is B7 waiting (SPEC V209, V321a)"
+    } elseif ($arm321.Value -notmatch 'return true, false') {
+        $v321Bad += "sectionBox answers DRAWS for $nm321 - ornament() would hang a path on it, and because the path takes its geometry from the PARENT that path covers the whole tab, not the control (SPEC V321a, I93b, B76)"
+    }
+}
+
+# (b) the PAIR survives the removal. The question "who draws" still exists - today the 73 are
+# the whole answer - and collapsing sectionBox back to one value leaves a selector that cannot
+# say no the next time a loose control joins the roster.
+if ($sbBody321 -notmatch 'return true, true') {
+    $v321Bad += "sectionBox no longer answers `"wears and draws`" for anyone - the 73 boxes are that answer, so this is the section boxes losing their own frame (SPEC V321b, I93a)"
+}
+if ($ornBody321 -notmatch 'local _, draws = sectionBox\(c, fill\)') {
+    $v321Bad += "ornament() stopped taking the SECOND answer - with the pair gone it would draw for whoever merely WEARS the shape, which is B76 by another door (SPEC V321b, V320c)"
+}
+
+# (c) ONE creation path in ornament(), and it is the parent. markRule has its own
+# (p:setParent(c)) and is another painter; copying it in here is the second branch I93b refuses
+# and the second creation path V67 pays not to have.
+$setP321 = [regex]::Matches($ornBody321, 'p:setParent\(')
+if ($setP321.Count -ne 1) {
+    $v321Bad += "ornament() has $($setP321.Count) p:setParent( calls and there is exactly one - a second creation path is how the avatar gets its drawing back through the door I93b closed (SPEC V321c, V67)"
+}
+elseif ($ornBody321 -notmatch 'p:setParent\(c\.parent\)') {
+    $v321Bad += "ornament() no longer parents the path to c.parent - the rule of I72c is what puts the drawing above the box's own fields, and changing it silently moves every one of the 73 frames (SPEC V321c, I72c)"
+}
+
+if ($v321Bad) { foreach ($b in $v321Bad) { Fail "V321 $b" } }
+else { Pass "V321 neither of the $($roster321.Count) avatar controls receives a path, the pair of answers still separates wearing from drawing, and ornament() keeps its single parent write" }
+
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

@@ -1717,6 +1717,38 @@
 					dotOn  = "/WoD20th/images/prime_on_crimson.png",
 					dotOff = "/WoD20th/images/prime_off_slate.png",
 					paper  = "/WoD20th/images/paper_present.png",
+
+					-- The tenth and eleventh keys, and they arrive together in the 118th round: the
+					-- era gets a frame, and it is drawn FOR the cut corner below rather than in
+					-- spite of it (SPEC I90a).
+					--
+					-- The crimson is the one the palette already carries as the era's accent, the
+					-- one the open sub-tab wears (font["#C2A14D"] above). Not a new value: a frame
+					-- that introduced a colour of its own would be the loose colour V53 exists to
+					-- refuse, and the plate's gold is the VICTORIAN key - the plate says shape,
+					-- not colour (user 2026-08-26).
+					ornament = "#A83232",
+					ornStyle = "corrente",
+
+					-- The twelfth key, OPTIONAL like the two above, and the only one that is
+					-- geometry rather than colour (SPEC I89a). ONE table and not two scalars: "a
+					-- type with no radius" and "a radius with no type" are then not representable
+					-- at all, so there is no invariant left to write - the opposite of what
+					-- ornStyle forced V313a to do.
+					--
+					-- A straight 45 degree cut takes LESS corner than the concave arc of the same
+					-- radius, so 18 gives back the weight the bevel loses (user 2026-08-26). The
+					-- other three periods declare nothing and fall to the corner the XML authored,
+					-- which is the ONLY way back out (SPEC V316c).
+					--
+					-- The 117th round forbade an `ornament` beside this key outright (V316b). The
+					-- 118th REVOKES that and puts AGREEMENT in its place (SPEC V317a): what was
+					-- wrong was never the pairing, it was a CONCAVE drawing over a cut corner -
+					-- the filigree and the filete arc at ORN_BOXR + ORN_IN = 23 and would cross
+					-- the outline they decorate. `corrente` is drawn for the bevel, so the rule is
+					-- that the style and the corner AGREE, which also catches the direction the
+					-- old ban let through: a bevelled era asking for `filete`.
+					boxCorner = { type = "bevel", radius = 18 },
 				},
 
 				-- Was "Victorian Era (Dark)" until the 15th round. The suffix went with the
@@ -2003,6 +2035,18 @@
 			-- which is V279's doctrine in the letter T613 wrote it (SPEC V314e, B59).
 			local ORN_CROSS_ROOM = 2 * (ORN_CROSS_AT + ORN_CROSS + ORN_CROSS2);
 
+			-- The CHAIN's one constant (SPEC I90c). Everything else in that drawing is a relation
+			-- of the box's own bevel radius and ORN_IN, so this is the only number the style owns
+			-- - and it obeys the two ceilings V314 already wrote for the cross rather than
+			-- inventing clearances of its own (SPEC I90f):
+			--
+			--   * outward the link reaches ORN_IN - ORN_LINK = 5.8 against the 3px outline the
+			--     theme paints on every box (V67), so 3.2 sits under the ceiling of
+			--     ORN_IN - THEME_STROKE = 6, exactly as ORN_CROSS2 does.
+			--   * inward it reaches ORN_IN + ORN_LINK = 12.2 against the 20px margin every box
+			--     gives its children (V280a), clear by 7.8.
+			local ORN_LINK = 3.2;    -- chain link, half-width across the cut
+
 			-- SPEC R111, I78b, V306. The bar's line work is the MARKER's own motif and not the box frame
 			-- shrunk: 2*ORN_ARM is 80 against a marker 30 tall. Three motifs, one per LEVEL, because the
 			-- two bars are not the same thing on screen (SPEC I78b): the top bar carries two rules with a
@@ -2059,6 +2103,40 @@
 			local ORN_FIL_MARK  = 6;    -- motif `tab`: the one rule, up from the marker's foot
 			local ORN_FIL_CROSS = 3;    -- motif `tab`: half-arm of the cross at each end
 			local ORN_FIL_SEP   = 2.5;  -- motif `sep`: half-arm, smaller than the tab's by choice
+
+			-- ---- Modern Nights corrente: the BAR (user 2026-08-27, plate `Sombra`) ---------
+			--
+			-- The THIRD family of bar drawing, chosen by the same palette key the box frame is
+			-- (SPEC I91a). The chain era gets its own bar, and `sombra` - the name the plate
+			-- carries in its footer - stays out of the code: one era, one key, two painters.
+			-- It REVOKES I90h, which one round ago left this era's bar on the default drawing.
+			--
+			-- TWO rules at every level, and the hierarchy is INSIDE the marker (SPEC I91b, I91c):
+			-- the tab's main rule runs LONGER (a fixed inset of 14 against the sub-tab's foot at
+			-- 19.80) and its second rule WIDER (40% of the width against 30%). Equal on either
+			-- axis and the two bars become the same drawing, which is I78b's hierarchy lost with
+			-- nothing anywhere to say so, so the gate welds both (SPEC V319c).
+			--
+			-- OWN constants, per STYLE and per MOTIF, for the reason V308 gives (B69): a number
+			-- that serves two drawings moves both when only one of them was asked for. That is
+			-- why ORN_COR_MARK2 and ORN_COR_SUB2 are two constants holding the same 3 - equal
+			-- value is not shared ownership, and it is the only shape in which the second rule of
+			-- ONE level can be moved. ORN_SUB_MARK stays the declared exception it already is in
+			-- markFilete: the sub-tab height the user approved in the 109th round is one fact.
+			--
+			-- THE INSET IS LITERAL, and that was measured rather than assumed (SPEC I91b): the
+			-- foot of a rule 7 up from the marker's bottom is sqrt((14+7)^2 - 7^2) = 19.80, so 14
+			-- puts the ends 5.8 OUTSIDE the concave arc. It is not the crossing I72a forbids -
+			-- that one is ink crossing a PAINTED outline, and tabOn<X> is transparent on both
+			-- sides (WoD20th.lfm:3826), so there is no silhouette on screen to cross. The 14 is
+			-- ORN_PILLR's value and NOT its owner: the pill radius moving must not move a rule.
+			local ORN_COR_MARK     = 7;     -- motif `tab`: the main rule, up from the marker's foot
+			local ORN_COR_IN       = 14;    -- motif `tab`: fixed inset of the main rule, each end
+			local ORN_COR_MARK2    = 3;     -- motif `tab`: the second rule, up from the foot
+			local ORN_COR_SPAN     = 0.30;  -- motif `tab`: second rule starts this much of the width in
+			local ORN_COR_SUB2     = 3;     -- motif `sub`: the second rule, up from the foot
+			local ORN_COR_SUB_SPAN = 0.35;  -- motif `sub`: second rule starts this much of the width in
+			local ORN_COR_DOT      = 3.2;   -- motif `sep`: radius of the filled dot
 
 			-- Path data is parsed as SVG, where a comma separates x from y. The C library float
 			-- verbs follow LC_NUMERIC, so on a pt-BR host they write a decimal COMMA and every
@@ -2368,17 +2446,89 @@
 				return table.concat(o, " ");
 			end;
 
-			-- ONE generator, two families, and the PALETTE picks (SPEC I87b). An era that declares
-			-- no style falls to the filigree, so nothing changes for the three that were here first.
-			-- A second copy of ornament() per style is what V67 pays not to have with THEME_STROKE
-			-- and V308 with the marker's three motifs; the price of getting it wrong here is 73
-			-- boxes wearing two frames at once, and no `rdk -l` that would say so.
-			local function ornPath(w, h, style)
+			-- Where the run meets the cut, in from the corner along the edge. The box corner here
+			-- is a straight 45 degree BEVEL (SPEC I89a), not the concave arc ornFileteStraight
+			-- measures: offsetting the cut inward by d moves it out along both edges by
+			-- d * (sqrt(2) - 1), so the run stops at r + that and the cut it leaves behind is
+			-- sqrt(2) * r - 2 * d * (sqrt(2) - 1) long - 18.0 for the 18/9 the sheet uses.
+			--
+			-- The radius is a PARAMETER and never a constant of this file: the 18 lives in the
+			-- palette's boxCorner (SPEC I89a) and a second copy here is B69 all over again. It
+			-- arrives from c.xradius, which is the era's radius by the time this runs only
+			-- because applyTheme writes the corner BEFORE it calls ornament() in the same pass
+			-- (SPEC I89c) - swap those two and this draws to the PREVIOUS era's corner, with
+			-- rdk -l exiting 0 and nothing to grep (SPEC V317d).
+			local function ornCorrenteRun(r)
+				return r + ORN_IN * (math.sqrt(2) - 1);
+			end;
+
+			-- One corner: three links tiling the cut end to end. The run does not turn here - it
+			-- STOPS, and the chain is what crosses (SPEC I90c). Endpoints come from dividing the
+			-- cut in three, so the links touch without overlapping: that is the user's reading of
+			-- the plate (2026-08-26), against the interlocked one where neighbours share a third.
+			--
+			-- ornLeaf is the link: two cubics closing a lens, bulge PERPENDICULAR to the line it
+			-- spans. It is the filigree's own primitive and reusing it is the point - a second
+			-- lens generator for this style is what V67 pays not to have.
+			--
+			-- No size refusal: the cut is sqrt(2)*r - 2*d*(sqrt(2)-1) whatever the box measures,
+			-- so all twelve links are there on the 325x111 as much as on the 1410x574. A guard
+			-- that cannot fire is the hole B59 came through (SPEC I90e).
+			local function ornCorrenteCorner(o, t, r)
+				local d  = ORN_IN;
+				local u0 = ornCorrenteRun(r);
+				local du = (u0 - d) / 3;
+
+				for i = 0, 2, 1 do
+					ornLeaf(o, t,
+					        d + du * i,       u0 - du * i,
+					        d + du * (i + 1), u0 - du * (i + 1),
+					        ORN_LINK);
+				end;
+			end;
+
+			-- One edge, and it is OPEN at both ends - the run is interrupted where the chain
+			-- comes in, which is the whole of what the plate is called (SPEC I90c).
+			local function ornCorrenteEdge(o, t, span, r)
+				local u0 = ornCorrenteRun(r);
+
+				ornMove(o, t, u0, ORN_IN);
+				ornLine(o, t, span - u0, ORN_IN);
+			end;
+
+			-- Four open runs and twelve links: 16 subpaths, 24 cubics.
+			local function ornCorrente(w, h, r)
+				local o = {};
+
+				ornCorrenteCorner(o, {ox = 0, oy = 0, sx =  1, sy =  1}, r);
+				ornCorrenteCorner(o, {ox = w, oy = 0, sx = -1, sy =  1}, r);
+				ornCorrenteCorner(o, {ox = 0, oy = h, sx =  1, sy = -1}, r);
+				ornCorrenteCorner(o, {ox = w, oy = h, sx = -1, sy = -1}, r);
+
+				ornCorrenteEdge(o, {ox = 0, oy = 0, sx =  1, sy =  1}, w, r);
+				ornCorrenteEdge(o, {ox = 0, oy = h, sx =  1, sy = -1}, w, r);
+				ornCorrenteEdge(o, {ox = 0, oy = 0, sx =  1, sy =  1, swap = true}, h, r);
+				ornCorrenteEdge(o, {ox = w, oy = 0, sx = -1, sy =  1, swap = true}, h, r);
+
+				return table.concat(o, " ");
+			end;
+
+			-- ONE generator, THREE families, and the PALETTE picks (SPEC I87b, I90b). An era that
+			-- declares no style falls to the filigree, so nothing changes for the two that were
+			-- here first. A second copy of ornament() per style is what V67 pays not to have with
+			-- THEME_STROKE and V308 with the marker's three motifs; the price of getting it wrong
+			-- here is 73 boxes wearing two frames at once, and no `rdk -l` that would say so.
+			--
+			-- `radius` is the box's own corner radius and only the chain reads it: the filigree
+			-- and the filete are drawn to the CONCAVE ORN_BOXR, which V317b now solders to the
+			-- radius the XML authors. The chain is drawn to the era's BEVEL, which lives in the
+			-- palette, so it has to be handed in rather than looked up (SPEC V317d).
+			local function ornPath(w, h, style, radius)
+				if style == "corrente" then return ornCorrente(w, h, radius); end;
 				if style == "filete" then return ornFilete(w, h); end;
 
 				return ornFiligree(w, h);
 			end;
-
 			-- The Dark Ages BAR drawing (SPEC I88c, I88e, I88f). The same shape of answer the
 			-- box frame got in the 115th round: one hairline and the Greek cross, with the level
 			-- said by how much of it is spent rather than by a motif nobody has seen before.
@@ -2446,6 +2596,77 @@
 				return table.concat(o, " ");
 			end;
 
+			-- The Modern Nights BAR drawing (SPEC I91b, I91c, I91d). Two rules at every level,
+			-- and a filled dot for the separator - the one place in the whole sheet where ink is
+			-- FILLED rather than stroked.
+			--
+			-- It returns TWO values, and the second is the whole of how the fill is decided: the
+			-- DRAWING says whether its own ink is filled and markRule only applies it. The other
+			-- two styles return the path alone, so nil is their answer without a line of their
+			-- own, and markRule spells no style and no motif of its own (SPEC I91e, V319e).
+			local function markCorrente(w, h, kind)
+				-- One horizontal run. Every decimal through ornNum: a float verb follows
+				-- LC_NUMERIC and a pt-BR host writes a COMMA, which splits each coordinate into
+				-- two numbers and kills the whole path, silently (I72b).
+				local function rule(a, b, y)
+					return "M" .. ornNum(a) .. "," .. ornNum(y) ..
+					       " L" .. ornNum(b) .. "," .. ornNum(y);
+				end;
+
+				-- The separator: ONE dot, FILLED, centred in the 16x30 carrier (SPEC I78d, I91d)
+				-- and the size of the chain link that crosses the box's bevel - by the
+				-- RESEMBLANCE the user asked for, never by shared ownership: ORN_COR_DOT belongs
+				-- to the bar painter, so moving ORN_LINK moves the boxes and leaves this alone.
+				--
+				-- Four cubics, because ORN_KAPPA is how a circle is written here and an SVG arc
+				-- verb has no precedent anywhere in this sheet. ORN_KAPPA is the third DECLARED
+				-- exception to V315b and the only one that is not a drawing choice: it is the
+				-- constant of the arc itself, so it carries none of B69's risk.
+				if kind == "sep" then
+					local x, y = w / 2, h / 2;
+					local r    = ORN_COR_DOT;
+					local k    = ORN_KAPPA * r;
+
+					return "M" .. ornNum(x + r) .. "," .. ornNum(y) ..
+					       " C" .. ornNum(x + r) .. "," .. ornNum(y + k) .. " " .. ornNum(x + k) .. "," .. ornNum(y + r) .. " " .. ornNum(x) .. "," .. ornNum(y + r) ..
+					       " C" .. ornNum(x - k) .. "," .. ornNum(y + r) .. " " .. ornNum(x - r) .. "," .. ornNum(y + k) .. " " .. ornNum(x - r) .. "," .. ornNum(y) ..
+					       " C" .. ornNum(x - r) .. "," .. ornNum(y - k) .. " " .. ornNum(x - k) .. "," .. ornNum(y - r) .. " " .. ornNum(x) .. "," .. ornNum(y - r) ..
+					       " C" .. ornNum(x + k) .. "," .. ornNum(y - r) .. " " .. ornNum(x + r) .. "," .. ornNum(y - k) .. " " .. ornNum(x + r) .. "," .. ornNum(y) .. " Z", true;
+				end;
+
+				-- A sub-tab: the main rule foot to foot, at the height the user approved in the
+				-- 109th round (SPEC I80b, I91c), and a second rule NARROWER than the tab's. The
+				-- foot is where a rule inset by d dies in the concave corner, which is the same
+				-- measuring markFilete does - and the only number this style borrows from another
+				-- (ORN_PILLR is the arc V228 authors, ORN_SUB_MARK the approved height).
+				if kind == "sub" then
+					local i = math.sqrt((ORN_PILLR + ORN_SUB_MARK) * (ORN_PILLR + ORN_SUB_MARK) - ORN_SUB_MARK * ORN_SUB_MARK);
+					local s = w * ORN_COR_SUB_SPAN;
+
+					if w - 2 * i <= 0 then return ""; end;
+
+					return rule(i, w - i, h - ORN_SUB_MARK) .. " " ..
+					       rule(s, w - s, h - ORN_COR_SUB2);
+				end;
+
+				-- The top bar: the main rule on a FIXED inset, longer than the sub-tab's, and a
+				-- second rule wider than the sub-tab's. BOTH axes, because one alone leaves the
+				-- two levels telling themselves apart by a single number (SPEC I91b, V319c).
+				--
+				-- The refusal is the MAIN rule's alone, and there is no order of falling to write
+				-- here: the second rule is PROPORTIONAL, so it cannot run out of room. It cannot
+				-- fire today either - the narrowest of the nineteen is 79 against a floor of 28 -
+				-- and a guard that CANNOT fire is B59's hole, which is why the gate measures that
+				-- width against the floor read from HERE rather than one spelled in the check
+				-- (SPEC I91g, V319d, V314e).
+				local s = w * ORN_COR_SPAN;
+
+				if w - 2 * ORN_COR_IN <= 0 then return ""; end;
+
+				return rule(ORN_COR_IN, w - ORN_COR_IN, h - ORN_COR_MARK) .. " " ..
+				       rule(s, w - s, h - ORN_COR_MARK2);
+			end;
+
 			-- Two straight runs per long edge, and NOTHING on the short ones: there is no straight
 			-- run there to be a rule on. A run is emitted only where it has positive length, the
 			-- same refusal ornEdge makes, so a pill narrower than its own two corners simply gets
@@ -2459,6 +2680,7 @@
 			-- grep (SPEC V223, B51). An era declaring no style falls to the drawing below.
 			local function markPath(w, h, kind, style)
 				if style == "filete" then return markFilete(w, h, kind); end;
+				if style == "corrente" then return markCorrente(w, h, kind); end;
 
 				local o  = {};
 				local cx = w / 2;
@@ -2545,6 +2767,49 @@
 			-- be one more thing the refresh path has to be handed and could silently drop.
 			local ornStyleNow = nil;
 
+			-- WHO is a section box, decided by CONSTRUCTION rather than by a roster of names
+			-- (SPEC V278): authored black fill PLUS a corner radius of its own. That is what
+			-- tells the 73 from the tab-strip floor (black and SQUARE, V229), the 19 pills
+			-- (DimGray, and their width is priced for the concave arc, V228), the mark boxes
+			-- and the avatar frame.
+			--
+			-- The fill is the AUTHORED colour and not the painted one: by the time this runs
+			-- the box is already mahogany (SPEC V62), so reading the current colour would
+			-- match nothing.
+			--
+			-- Lifted out of ornament() in the 117th round so the frame and the CORNER ask the
+			-- same question in ONE place (SPEC I89b, V316d). A second copy of "which
+			-- rectangles are the boxes" is what V67 pays not to have, and the cost of getting
+			-- it wrong here is the 19 pills beveled with a width priced for the arc.
+			--
+			-- Declared ABOVE both of its callers on purpose: reached from above it would
+			-- compile to a GETGLOBAL and answer nil, silently (SPEC V223, B51).
+			-- TWO answers and ONE question (SPEC I92b, V320c): the FIRST is who dresses in the era's
+			-- SHAPE - the 73 plus BOTH of the avatar's rectangles - and the SECOND is who receives
+			-- the era's DRAWING - the 73 plus the carrier alone. A second copy of which rectangles
+			-- are the boxes is what V67 pays not to have, and the pair is the shape markPath already
+			-- returns as d, f (SPEC V319e).
+			--
+			-- The avatar arm is a DECLARED ROSTER of two names and cannot be anything else (SPEC
+			-- I92a, V320b): by CONSTRUCTION ornAvatar IS the nineteen tabOn<X> carriers - transparent
+			-- both ways, its own radius, hitTest false - so a fill-based arm would bevel the pills,
+			-- whose width is priced for the concave arc (V228, V316d). The frame wears and does not
+			-- draw: under the image its path lands behind the photo, which is B75 (SPEC I92c).
+			local function sectionBox(c, fill)
+				local nm = c:getName();
+
+				if nm == "ornAvatar" then return true, false; end;
+				if nm == "avatarFrame" then return true, false; end;
+
+				if normColor(fill) ~= "#FF000000" then return; end;
+
+				local rad = c.xradius;
+
+				if rad == nil or rad <= 0 then return; end;
+
+				return true, true;
+			end;
+
 			-- `w` and `h` are the caller's measurement and they are OPTIONAL. A caller that has
 			-- just written the size passes it; the theme traversal, which writes nothing, leaves
 			-- them out and the control is read instead (SPEC I72e, V285c).
@@ -2579,7 +2844,7 @@
 					-- B58 and B62 on a third axis, where the memo knew "already drawn" and "drawn
 					-- at THIS size" and had no way to know "drawn in THIS drawing".
 					if bw ~= nil and bh ~= nil and (bw ~= e.w or bh ~= e.h or ornStyleNow ~= e.s) then
-						local d = ornPath(bw, bh, ornStyleNow);
+						local d = ornPath(bw, bh, ornStyleNow, c.xradius);
 
 						if d ~= "" then
 							e.p.data = d;
@@ -2591,15 +2856,13 @@
 				end;
 
 				if e == nil then
-					-- Section boxes only. Black fill PLUS a corner radius of its own is what tells them
-					-- from the tab-strip floor (black, square), the pills (DimGray / transparent) and
-					-- the mark boxes (V68). `fill` is the AUTHORED colour and not the painted one: by
-					-- the time this runs the box is already mahogany (V62).
-					if normColor(fill) ~= "#FF000000" then return; end;
+					-- Section boxes AND the avatar's carrier, and the question is still asked in ONE place:
+					-- the corner of I89 reads the FIRST answer, this reads the SECOND (SPEC I92b, V316d,
+					-- V320c). The frame wears the era's corner and draws NOTHING - it sits under the image,
+					-- so a path hung on it would land behind the photo, which is B75 in one line.
+					local _, draws = sectionBox(c, fill);
 
-					local rad = c.xradius;
-
-					if rad == nil or rad <= 0 then return; end;
+					if not draws then return; end;
 
 					-- READ, never written - the theme still writes no geometry (V57). A box whose size
 					-- the layout has not resolved gets no ornament rather than a frame drawn to a wrong
@@ -2611,7 +2874,7 @@
 					-- The ONLY refusal left is a box too small for the arc to straighten out - no box
 					-- in the sheet is (SPEC V279). The old guard refused anything under 2*ORN_ARM and
 					-- TRUE FAITH, 1270 wide and 76 tall, fell through it silently (SPEC B59).
-					local d = ornPath(bw, bh, ornStyleNow);
+					local d = ornPath(bw, bh, ornStyleNow, c.xradius);
 
 					if d == "" then return; end;
 
@@ -2693,7 +2956,7 @@
 
 					if bw == nil or bh == nil then return; end;
 
-					local d = markPath(bw, bh, kind, ornStyleNow);
+					local d, f = markPath(bw, bh, kind, ornStyleNow);
 
 					if d == "" then return; end;
 
@@ -2704,15 +2967,21 @@
 					p.align = "client";
 					p.mode = "original";
 					p.hitTest = false;
-					p.color = "#00000000";
+					-- `color` is NOT nailed shut here any more: the fill changes with the era exactly
+					-- as the drawing does, so it is written on every repaint below (SPEC I91f). Nailed
+					-- here it would survive a swap on an OPEN sheet and leave the Dark Ages cross
+					-- FILLED - rdk -l exit 0, gate green, and only the screen left to tell (B58, B62).
 					p.strokeSize = 1;
 					p.data = d;
 
-					-- The entry is {p, k, s} and not the path alone. The nineteen markers never
+					-- The entry is {p, k, f, s} and not the path alone. The nineteen markers never
 					-- change size, so measure is not what this memo has to tell apart - the
 					-- DRAWING is. `k` is the kind already resolved, so a restyle does not go
 					-- back to the parent to ask which level this is (SPEC I88g, V315f).
-					e = {p = p, k = kind, s = ornStyleNow};
+					-- `s` stays LAST in the entry on purpose: the gate tells this CREATION stamp from
+					-- the rewrite below by the brace that closes right after it (V315f), and its first
+					-- draft went green with the stamp deleted for want of exactly that (B7).
+					e = {p = p, k = kind, f = f, s = ornStyleNow};
 
 					markPainted[c.handle] = e;
 				elseif e.s ~= ornStyleNow then
@@ -2722,16 +2991,22 @@
 					-- green, and the defect only on the screen. It is the hole the box memo had
 					-- to close one round earlier, on a memo that at least carried a measure
 					-- (SPEC I88g, V315f, B58, B62).
-					local d = markPath(c.width, c.height, e.k, ornStyleNow);
+					local d, f = markPath(c.width, c.height, e.k, ornStyleNow);
 
 					-- An empty path means no room, and the answer to that is to keep what is
 					-- there rather than blank the marker - and to leave `s` alone, so the next
 					-- repaint tries again instead of believing the new style was drawn.
 					if d ~= "" then
 						e.p.data = d;
+						e.f = f;
 						e.s = ornStyleNow;
 					end;
 				end;
+
+				-- The FILL, written on EVERY repaint and not once at creation: the dot is filled in
+				-- this era and the cross is not in the next (SPEC I91f). The answer comes from the
+				-- DRAWING - markRule spells no style and no motif of its own (SPEC I91e, V319e).
+				if e.f then e.p.color = colour; else e.p.color = "#00000000"; end;
 
 				e.p.strokeColor = colour;
 				e.p.visible = true;
@@ -2827,6 +3102,35 @@
 						paint(c, "color", t.fill[normColor(fill)], fill);
 						paint(c, "strokeColor", t.stroke[normColor(line)], line);
 						paint(c, "strokeSize", THEME_STROKE, authored(c, "strokeSize"));
+
+						-- The CORNER, and only on the 73 that the SAME selector the ornament uses
+						-- says yes to (SPEC I89b, V316d). Without sectionBox this branch runs on
+						-- EVERY rectangle the sheet has and would bevel the 19 tab pills along
+						-- with the boxes - and their width is priced for the concave arc (V228).
+						if sectionBox(c, fill) then
+							local bc = t.boxCorner;
+							local ct = authored(c, "cornerType");
+							local rx = authored(c, "xradius");
+							local ry = authored(c, "yradius");
+
+							-- The palette's value OR THE AUTHORED ONE, and that `or` is the whole
+							-- way back out (SPEC V316c). paint() returns early on a nil value
+							-- (V61), so writing t.boxCorner alone would leave all 73 beveled
+							-- FOREVER once Modern Nights had been on: rdk -l exits 0, the gate
+							-- stays green and the defect exists only on screen - B58 and B62 on a
+							-- fourth axis.
+							--
+							-- Writing the authored value back is safe HERE and is not B21: that
+							-- hazard is the FONT setters, which run _gui_prepareForFontColorChange
+							-- and detach the control from the form's theme BEFORE they write. A
+							-- geometry setter has no such step.
+							--
+							-- Before ornament() below, so the box's own shape is settled before
+							-- anything measures it.
+							paint(c, "cornerType", (bc ~= nil and bc.type) or ct, ct);
+							paint(c, "xradius", (bc ~= nil and bc.radius) or rx, rx);
+							paint(c, "yradius", (bc ~= nil and bc.radius) or ry, ry);
+						end;
 
 						-- The filigree rides the same walk and the same authored value the fill does,
 						-- so the frame and the box can never disagree about which era is in force.
