@@ -1,37 +1,36 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ⛔ CHAT NOVO — LEIA ESTAS 20 LINHAS ANTES DE QUALQUER COMANDO
+## CHAT NOVO - LEIA ESTAS 20 LINHAS ANTES DE QUALQUER COMANDO
 
-**⊥ ∃ §T CONSTRUÍVEL. ⊥ peça `/ck:build`.** Estado MEDIDO 2026-08-25 19:50, ⊥ estimado:
+**Estado MEDIDO 2026-08-26 22:35**, nao estimado:
 
 | coisa | valor |
 |---|---|
-| §T | **587 `x`** · **54 `.`** · **5 `~`** |
-| das 59 abertas | **56** = teste no Firecast [USER] ou probe · **1** = `T159` (arte, o user dá o PNG) · **1** = `T619` REVOGADA (virou §B61) · **1** = `T622`, cujo CÓDIGO já está aplicado & espera só o teste `T625` |
-| §T de código | **ZERO** |
-| gate estático | **VERDE** — 550 `ok`, 0 FAIL |
+| §T | **637 `x`** · **67 `.`** · **7 `~`** |
+| §T de codigo | **ZERO** — as 74 abertas sao teste no Firecast [USER], probe, `T159` (arte) & `T619` (REVOGADA, virou §B61). A quebra fina por tipo é da 107ª & pode ter envelhecido |
+| gate estatico | **VERDE** — 571 `ok`, 0 FAIL |
 | gate `-Build` | **VERDE** — §V6 exit 0 · §V7 ok |
-| `.rpk` | **2.111.082 B** gerado & INSTALADO 19:50 |
+| `.rpk` | **2.149.105 B** gerado & INSTALADO 22:30 |
+| commit | `64a10fa6` levou a 115ª & a 116ª INTEIRAS (codigo · gate · `.rpk` · `SPEC.md`) |
 
-`/ck:build` pelado varre as 54 `.`, começa em `T114` (probe de tela) & erra — aconteceu na 99ª
-& na 103ª. `/ck:build --next` faz o mesmo. **⊥ ∃ id p/ pedir.**
+`/ck:build` pelado varre as 67 `.`, comeca em `T114` (probe de tela) & erra. **Nao existe id de
+codigo p/ pedir.**
+
+⚠ **3 sessoes Claude rodaram neste repo AO MESMO TEMPO em 2026-08-26** & uma buildou a 115ª
+enquanto outra escrevia a spec da 116ª. Nada se perdeu, mas o §T que voce leu no inicio do chat
+pode estar 1 flip atras do disco — **medir antes de planejar**, nunca confiar na 1ª leitura.
 
 ### O que PEDIR neste chat, em ordem de valor
 
-1. **Teste no Firecast** — é o ÚNICO gargalo. **56** testes acumulados, alguns de dezenas de
-   rodadas atrás. Os desta sessão: `T644` (aba Numina, ↓) · `T511` `T515` (as 2 caixas do topo
-   da aba Vampiro, agora c/ o combo `Clan/Family` de **84** itens). Peça ao Claude um ROTEIRO
-   AGRUPADO por tela & por época — a ordem de id é a PIOR p/ executar (abre a mesma aba 8×).
+1. **Teste no Firecast** — segue sendo o UNICO gargalo. Peca um ROTEIRO AGRUPADO por tela & por
+   epoca; a ordem de id e a PIOR p/ executar (abre a mesma aba 8x).
 2. **Spec nova** (`/ck:spec`) p/ o que a tela revelar.
 3. **`T159`** se o user tiver a arte.
 
-### ⚠ Working tree — o que está & o que ⊥ está commitado
+### Working tree — o que esta & o que nao esta commitado
 
-`dcd7e9af` (commit do USER) levou o estado até **§T643**. FICARAM DE FORA, no working tree:
-`SPEC.md` (§I75 emendada · §V297 · §T645 §T646 & os flips) · `verify-hunters-hunted.ps1` (o
-check de §V297) · `WoD20.7.lfm` (os números de §T645) · `HANDOFF.md` · o `.rpk` **2.111.082**.
-⊥ COMMITAR sem o user pedir NAQUELA mensagem (regra do `CLAUDE.md`, & ela vence o skill).
-
+Depois de `64a10fa6` sobrou no working tree so o `SPEC.md` (os flips de `T707` & `T711`) & este
+`HANDOFF.md`. **Nao commitar sem o user pedir NAQUELA mensagem** (regra do `CLAUDE.md`, & ela
 ### ⚠ TUDO abaixo da 107ª rodada é HISTÓRICO & tem afirmação ENVELHECIDA
 
 As seções antigas ainda dizem `T510` **bloqueada em §R93 esperando os livros** (linhas ~856
@@ -48,6 +47,51 @@ tela mostrar folga grande à direita de `Sociedade de Ideologias Altruístas Esc
 a constante desce & abre ~50px A MAIS p/ `QUINTESSENCE`/`WILLPOWER`, em cima dos 32 que §T645
 já cortou. Isso ⊥ se resolve daqui — só a tela responde.
 
+## COMECE AQUI - 116ª rodada 2026-08-26: **ABAS EM FILETE E CRUZ, & so na Idade das Trevas**
+
+`T708` `T709` `T710` `T711` FECHADAS. A 115ª (`T703`…`T707`) fechou junto — o codigo dela foi
+escrito por OUTRA sessao as 22:04 & os §T viraram nesta.
+
+### O que entrou
+
+- **§I88** — 2ª familia de desenho de BARRA, escolhida pela MESMA `ornStyle` que ja escolhe a
+  moldura de caixa (§I87). `markFilete` NOVA (`WoD20.6.lfm:2385`) & `markPath(w, h, kind, style)`
+  DESPACHA. Aba = **1** filete em **24**, de 19,08 a `w-19,08`, + cruz de meio-braco **3** em cada
+  pe (**21**->**27**) · sub-aba = filete em **23**, de **19,80** a `w-19,80`, sem cruz · separador
+  = cruz de meio-braco **2,5**. Constantes proprias: `ORN_FIL_MARK`=6 · `ORN_FIL_CROSS`=3 ·
+  `ORN_FIL_SEP`=2,5
+- **a regra que segura o desenho fora do texto**: `ORN_FIL_MARK + ORN_FIL_CROSS == ORN_MARK2` ∴ o
+  topo da TINTA fica em **21** nos 2 estilos, que e onde o user aprovou na 112ª. No default o topo
+  e o filete; no `filete` e o BRACO DE CIMA DA CRUZ — copiar o 21 poria a cruz em 18, dentro do
+  glifo. Quem solda e o GATE (§V315c); o codigo nao deriva um do outro (isso seria §B69)
+- **§V315** no gate, 6 pernas + zero-guard · **§V307** EMENDADA (texto 3->1) · **§B73**
+
+### 3 armadilhas que esta rodada pagou - NAO repetir
+
+1. **Nao enfiar ramo novo dentro de `markPath`**: §V308 fatia a funcao por `if kind == "sep"`,
+   `if kind == "sub"` & pelo 1º `return table.concat` ∴ ramo novo la dentro TROCA as fatias &
+   deixa §V308 vermelha por construcao. A forma da casa ja existia: `ornPath` despacha p/
+   `ornFiligree`/`ornFilete`, & foi isso que a 116ª copiou.
+2. **`awk` do Git Bash COME os CR**: converteu `WoD20.6.lfm` (CRLF) p/ LF inteiro, calado, na 1ª
+   tentativa. E o `cat -A` do Git Bash TAMBEM nao mostra `^M` ∴ as 2 ferramentas mentem juntas.
+   Editar `.lfm` so por PowerShell, & medir `[regex]::Matches($t,[char]13)` ANTES & DEPOIS.
+3. **o gate reporta por `Write-Host`** ∴ `& .\verify-hunters-hunted.ps1 2>&1 | Where-Object
+   { $_ -match '^FAIL' }` devolve **VAZIO** mesmo com 9 FAIL na tela. Script que meca o gate tem
+   de ler **`$LASTEXITCODE`**. Isso fez a 1ª rodada de mutacao reportar "9 de 9 nao morderam",
+   que era falso nos 2 sentidos & quase virou um check aceito sem prova.
+
+### 1 perna que nao sabia falhar, pega PELA MUTACAO (§V20 funcionando)
+
+§V315(f) assertava `'s = ornStyleNow'` — & o ramo de restyle contem `e.s = ornStyleNow;` ∴ apagar
+o carimbo de CRIACAO deixava o check VERDE. Reancorada em `s = ornStyleNow\s*\}` & partida em 2
+asserçoes (criacao & regravacao). Placar final: **9 mutacoes, 9 vermelhas** · 2 sondas
+(`ORN_SUB`, `ORN_SEP_RX`) VERDES. Sem a mutacao, §V315 teria entrado com 1/6 das pernas morta.
+
+### Como retomar
+
+Nao ha §T de codigo aberto. O gargalo e tela: `T644` `T698` `T702` & as outras ~64.
+
+---
 ## ▶ COMECE AQUI — 107ª rodada: **§T510 DESBLOQUEADA & FECHADA · §T640 NASCEU E FECHOU**
 
 **Estado MEDIDO 2026-08-25 19:50:**
