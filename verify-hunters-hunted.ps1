@@ -2062,9 +2062,75 @@ else {
 
     # V57: no geometry. The overlap checks above measure the static XML; if the theme moved or
     # resized anything, a sheet could collide at runtime with the gate still green.
-    $geo = [regex]::Matches($body, '"(left|top|width|height)"|\.(left|top|width|height)\s*=')
-    if ($geo.Count -gt 0) { Fail "V57 applyTheme writes geometry ($($geo.Count) hit(s)) - V37/V40/V49 only measure the static XML" }
-    else { Pass "V57 applyTheme writes no geometry" }
+    # V57 AMENDED in the 123rd round (SPEC B79, I98a, V327b). Geometry stays FORBIDDEN and the
+    # reason is unchanged - V37/V40/V49 measure the static XML, so anything the theme resizes is
+    # invisible to them. What changed is that there is now ONE declared exception: the height of
+    # the eleven tabStrip labels, which the Classical palette writes through tabLabelHeight so the
+    # word can sit in the middle of its button (SPEC I98).
+    #
+    # The exception is CUT OUT of the body before the count and then measured on its own terms
+    # below. Cutting rather than loosening the pattern is the point: a second `height` write
+    # anywhere else in applyTheme still turns this red, which is exactly what V57 was buying.
+    $tabHRe = 'local lp = c\.parent;[\s\S]*?paint\(c, "height", t\.tabLabelHeight or ah, ah\);'
+    $tabH   = [regex]::Match($body, $tabHRe)
+    $bodyGeo = if ($tabH.Success) { $body.Remove($tabH.Index, $tabH.Length) } else { $body }
+
+    $geo = [regex]::Matches($bodyGeo, '"(left|top|width|height)"|\.(left|top|width|height)\s*=')
+    if ($geo.Count -gt 0) { Fail "V57 applyTheme writes geometry ($($geo.Count) hit(s)) outside the one declared exception - V37/V40/V49 only measure the static XML (SPEC V57, B79)" }
+    else { Pass "V57 applyTheme writes no geometry beyond the declared tabStrip label height" }
+
+    # ---- V327: the era writes the top bar's label height, and the column lets go of the word --
+    # SPEC I98, V327. Four legs, and the first one is the WAY BACK OUT - the same shape V316c
+    # cobbled for the corner, on a second target.
+    if (-not $tabH.Success) {
+        Fail "V327b the tabStrip label-height write is missing or not in the declared shape - without `t.tabLabelHeight or ah` the eleven labels stay at 30 forever once the Classical era has been on, with rdk -l exiting 0 and this gate green (SPEC V327b, B58, B62)"
+    } else {
+        Pass "V327b the label-height write carries the authored value as its way back out"
+    }
+
+    # (a) exactly ONE palette declares the key. A second is a shape nobody asked for in an era
+    # nobody asked, and the symptom shows up one era away from whoever caused it (family B6).
+    $tlh = [regex]::Matches($hh6, 'tabLabelHeight\s*=\s*\d+')
+    if ($tlh.Count -ne 1) { Fail "V327a $($tlh.Count) palette(s) declare tabLabelHeight, expected exactly 1 (SPEC V327a)" }
+    else { Pass "V327a exactly 1 palette declares tabLabelHeight" }
+
+    # (c) the selector is the GRANDPARENT and it reaches the eleven - not ten, not twelve - and
+    # reaches none of the eight sub-bar labels, which are authored 30 already (V122).
+    # Read OUTSIDE the branch: leg (d) measures against the same strip, and a $stripDoc that only
+    # exists on the happy path made the (c) mutation throw instead of failing - a check that dies
+    # is not a check that says no (SPEC V20, V209).
+    $stripDoc = (Doc (Join-Path $dir "WoD20th.lfm")).SelectSingleNode("//layout[@name='tabStrip']")
+    $topLbl   = if ($null -eq $stripDoc) { 0 } else { $stripDoc.SelectNodes("rectangle[@onClick]/label").Count }
+
+    if ($body -notmatch 'lp\.parent\.name == "tabStrip"') {
+        Fail "V327c the label-height write is not fenced by the tabStrip grandparent - unfenced it would resize labels that are not the top bar's (SPEC V327c)"
+    } elseif ($topLbl -ne 11) {
+        Fail "V327c the tabStrip carries $topLbl label(s) under a clickable button, expected 11 - the selector is covering less than the bar has (SPEC V209)"
+    } else {
+        Pass "V327c the grandparent selector reaches the 11 top-bar labels and none of the 8 sub-tab ones"
+    }
+
+    # (d) ORN_COL_EDGE exists inside markCoronaMuralis, and the GAP it buys on the NARROWEST
+    # button is measured with the gate's own estimator - a floor with two owners is B69.
+    $edgeM = [regex]::Match($hh6, 'local ORN_COL_EDGE\s*=\s*([\d.]+)')
+    $wM    = [regex]::Match($hh6, 'local ORN_COL_W\s*=\s*([\d.]+)')
+    if (-not $edgeM.Success -or -not $wM.Success -or $null -eq $stripDoc) {
+        Fail "V327d ORN_COL_EDGE, ORN_COL_W or the tabStrip itself is missing - there is no column position left to measure (SPEC V209, V327d)"
+    } else {
+        $edge = [double]$edgeM.Groups[1].Value
+        $colW = [double]$wM.Groups[1].Value
+        $capEnd = $edge + $colW                      # where the capital closes, in from the rim
+        $worst = $null
+        foreach ($n in $stripDoc.SelectNodes("rectangle[@onClick]")) {
+            $l = $n.SelectSingleNode("label[@text]"); if ($null -eq $l) { continue }
+            $bw = 0; [void][int]::TryParse($n.GetAttribute("width"), [ref]$bw)
+            $gap = ($bw - (NeededPx $l.GetAttribute("text"))) / 2 - $capEnd
+            if ($null -eq $worst -or $gap -lt $worst) { $worst = $gap }
+        }
+        $GAP_FLOOR = 4
+        if ($worst -lt $GAP_FLOOR) { Fail "V327d the narrowest tab leaves ${worst}px between the column and the word, under the $GAP_FLOOR floor - that is the crowding the user named (SPEC I98b, V327d)" }
+        else { Pass "V327d the column clears the word on every tab - worst gap $worst px (capital closes at $capEnd) against a floor of $GAP_FLOOR" }
+    }
 
     # V56: an ornament that is not there must degrade to no ornament, never to a sheet that is
     # half painted or covered by a backdrop it cannot switch off.
@@ -8948,8 +9014,8 @@ foreach ($k316 in $themeKeys) {
     $pb316 = [regex]::Replace($pal316.Groups[1].Value, '(?m)^\s*--.*$', '')
     if ($pb316 -match '(?m)^\s*boxCorner\s*=') { $declCorner316 += $k316 }
 }
-if ($declCorner316.Count -ne 1) {
-    $v316Bad += "$($declCorner316.Count) palette(s) declare boxCorner ($($declCorner316 -join ', ')), expected exactly 1 - the other three fall to the corner the XML authored, and a second one changes the shape of an era nobody asked about (SPEC V316e, B6)"
+if ($declCorner316.Count -ne 2) {
+    $v316Bad += "$($declCorner316.Count) palette(s) declare boxCorner ($($declCorner316 -join ', ')), expected exactly 2 since the 123rd round - Modern Nights cuts and Classical Age steps; the other two fall to the corner the XML authored, and a third changes the shape of an era nobody asked about (SPEC V316e, V324a, B6)"
 }
 
 # (c) the WAY BACK OUT is written down. paint() returns early on a nil value (V61), so a write
@@ -9076,8 +9142,22 @@ if ($pathFn317 -and $sig317.Success) {
             elseif (-not $wants317 -and $bc317.Success) {
                 $v317Bad += "palette '$k317' cuts the corner and draws $(if ($st317.Success) { "'$($st317.Groups[1].Value)'" } else { 'the default filigree' }), which is built to the CONCAVE ORN_BOXR ($($boxr317.Groups[1].Value)) - the rule would arc across the very outline it decorates, with nothing to say so (SPEC V317a, I90d)"
             }
-            elseif ($wants317 -and $bc317.Groups[1].Value -ne 'bevel') {
-                $v317Bad += "palette '$k317' cuts its corner as '$($bc317.Groups[1].Value)' and draws a chain built for a 45 degree CUT - every relation below stays arithmetically valid and the links come out across a curve (SPEC V317a)"
+            elseif ($wants317) {
+                # Which SHAPE each radius-taking style was drawn for. Two entries since the 123rd
+                # round, and the pair is NAMED here rather than derived: the geometry that proves
+                # each one is measured by its own invariant - V317e for the chain across a 45
+                # degree cut, V324c and V324d for the step - and this leg only has to say which
+                # corner the palette is then allowed to declare. A style absent from the map is a
+                # style nobody wrote an agreement for, and that is the loudest failure of the two.
+                $shape317 = @{ 'corrente' = 'bevel'; 'corona-muralis' = 'innerLine' }
+                $st317v = $st317.Groups[1].Value
+                $bc317v = $bc317.Groups[1].Value
+                if (-not $shape317.ContainsKey($st317v)) {
+                    $v317Bad += "palette '$k317' draws '$st317v', which takes the radius and so declares a corner, but no agreement is written for it - the pair style/corner is read from both sides and a style with no side to read is B7 waiting (SPEC V317a, V209)"
+                }
+                elseif ($bc317v -ne $shape317[$st317v]) {
+                    $v317Bad += "palette '$k317' cuts its corner as '$bc317v' and draws '$st317v', which was built for '$($shape317[$st317v])' - every relation below stays arithmetically valid and the drawing comes out across a corner that is not its own, with rdk -l exiting 0 (SPEC V317a, I90d, I97a)"
+                }
             }
         }
     }
@@ -10673,8 +10753,13 @@ $br322 = [regex]::Match($pathNC322, "if style == ""corona-muralis"" then return 
 
 if (-not $br322.Success) { $v322Bad += "ornPath has no corona-muralis branch - the palette names a style the dispatcher never heard of, so the era silently draws the default filigree (SPEC V322b, I94b)" }
 elseif ($br322.Groups[1].Value -ne "ornCoronaMuralis") { $v322Bad += "the corona-muralis branch calls $($br322.Groups[1].Value) and the drawing is ornCoronaMuralis (SPEC V322b)" }
-elseif ($rad322 -and $br322.Groups[2].Value -match ("\b" + [regex]::Escape($rad322) + "\b")) {
-    $v322Bad += "the corona-muralis branch forwards $rad322 - V317a reads exactly this to decide who wants a cut corner, so the gate would start demanding a boxCorner of the Classical palette, which V317a forbids it (SPEC V322b, I94b, V317a)"
+elseif ($rad322 -and $br322.Groups[2].Value -notmatch ("\b" + [regex]::Escape($rad322) + "\b")) {
+    # INVERTED by the 123rd round (SPEC V324b). It used to REFUSE the radius here, and that was
+    # what held the Classical era without a corner of its own. Now the palette declares one, so
+    # the branch has to carry the radius: drop it and the boxCorner above goes orphan, V317a own
+    # derivation stops seeing this style as one that wants a corner, and the failure lands one
+    # level away from whoever caused it - the B6 family.
+    $v322Bad += "the corona-muralis branch does not forward $rad322 - the palette declares a boxCorner and the drawing would be built to the corner the XML authored instead of the one the era writes, with rdk -l exiting 0 (SPEC V324b, V322b, I96c)"
 }
 
 # (c) what a box without room drops is the MERLON, never the RULE. A box skipped in silence
@@ -10890,6 +10975,134 @@ else {
 
 if ($v323Bad) { foreach ($b in $v323Bad) { Fail "V323 $b" } }
 else { Pass "V323 the Classical bar draws the column and the gutta through markPath third branch, the three motifs are three drawings, only sep and sub fill, the narrowest marker ($minTop323) clears the shaft floor ($fSha323), the eight constants stay in their family, and the palette keeps its two keys" }
+
+
+# ---- V324: the CLASSICAL corner holds on the 73 AND on the avatar, and the drawing was REMADE
+# for it (SPEC I96, I97, the 122nd and 123rd rounds) -------------------------------------------
+# Five legs. The era declares a step, the painter takes the radius, the foot stopped arcing, the
+# corner stopped curving, and the avatar rides the FIRST answer of sectionBox.
+$v324Bad = @()
+$murNC324 = NoComments (LuaFn $hh6 "ornCoronaMuralis")
+$secNC324 = NoComments (LuaFn $hh6 "sectionBox")
+$ornNC324 = NoComments (LuaFn $hh6 "ornament")
+
+if (-not $murNC324) { $v324Bad += "ornCoronaMuralis is gone from WoD20.6 - there is no drawing to measure (SPEC V209, V324)" }
+if (-not $secNC324) { $v324Bad += "sectionBox is gone from WoD20.6 - leg (e) cannot ask who wears the shape (SPEC V209, V324e)" }
+
+# (a) the palette declares BOTH fields, and the TYPE is read by VALUE. innerLine and bevel are
+# the two members of the enum that do not arc, and swapping one for the other leaves the foot of
+# I97a correct for the wrong shape, with rdk -l exiting 0.
+$pal324 = [regex]::Match($themesBlock, "(?ms)^\t{4}\[""Classical Age""\] = \{(.*?)^\t{4}\},")
+if (-not $pal324.Success) { $v324Bad += "the Classical Age palette could not be read - leg (a) measured nothing (SPEC V209, V324a)" }
+else {
+    $pb324 = NoComments $pal324.Groups[1].Value
+    $bc324 = [regex]::Match($pb324, "(?m)^\s*boxCorner\s*=\s*\{\s*type\s*=\s*""([^""]*)""\s*,\s*radius\s*=\s*([\d.]+)\s*\}")
+    if (-not $bc324.Success) { $v324Bad += "the Classical Age palette declares no complete boxCorner - half a table is a write the SDK ignores in silence, and the symptom would be a ROUND box under a merlon drawn for a step (SPEC V324a, V316a, I96d)" }
+    else {
+        if ($bc324.Groups[1].Value -ne "innerLine") { $v324Bad += "the Classical Age corner is '$($bc324.Groups[1].Value)' and the era was drawn for innerLine - the two non-arcing members of the enum are not interchangeable, and the foot of I97a would be right for the wrong shape (SPEC V324a, I96a)" }
+        if ([double]$bc324.Groups[2].Value -le 0) { $v324Bad += "the Classical Age corner radius is $($bc324.Groups[2].Value) - a radius of zero or less UNDOES the selector of V278, because ornament() reads c.xradius live and a 0 refuses the box (SPEC V324a, V316a)" }
+    }
+}
+
+# (b) THREE parameters and the branch forwards the radius. Both ends read: V322b now demands
+# exactly what it used to refuse, and dropping either end orphans the boxCorner above.
+$sig324 = [regex]::Match($hh6, "local function ornCoronaMuralis\(([^)]*)\)")
+if (-not $sig324.Success) { $v324Bad += "ornCoronaMuralis has no readable signature (SPEC V209, V324b)" }
+else {
+    $n324 = @($sig324.Groups[1].Value -split "\s*,\s*").Count
+    if ($n324 -ne 3) { $v324Bad += "ornCoronaMuralis takes $n324 parameter(s) and the contract is 3 (w, h, radius) - the era corner would arrive nil and the frame would be drawn to whatever the XML authored (SPEC V324b, I96c)" }
+}
+
+# (c) the FOOT steps: it reads neither ORN_BOXR, nor a root of a difference of squares, nor a
+# sqrt(2) factor. Three refusals, one per shape the sheet carries - a rule of the wrong shape
+# over this corner crosses the outline it decorates, and there is no rdk -l that sees it.
+# Nested since B77: these live INSIDE ornCoronaMuralis at four tabs, so LuaFn - which is
+# written for chunk-scope functions - hands back everything down to the next chunk-level end,
+# and the run count below would add ornMuralEdge to ornMuralCorner. Cut at the OWN indentation.
+function NestedFn($txt, $name) {
+    $m = [regex]::Match($txt, "(?s)\t{4}local function " + [regex]::Escape($name) + "\(.*?\r?\n\t{4}end;")
+    if ($m.Success) { return $m.Value }
+    return ""
+}
+$footNC324 = NoComments (NestedFn $hh6 "ornMuralFoot")
+if (-not $footNC324) { $v324Bad += "ornMuralFoot is gone from WoD20.6 - leg (c) measured nothing (SPEC V209, V324c)" }
+else {
+    if ($footNC324 -match "\bORN_BOXR\b") { $v324Bad += "ornMuralFoot reads ORN_BOXR - that constant is the Lua copy of the radius the XML authors, and this era writes its own through boxCorner, so the frame would be drawn to another era corner (SPEC V324c, V317d, B69)" }
+    if ($footNC324 -match "math\.sqrt") { $v324Bad += "ornMuralFoot still takes a square root - that is what a CONCAVE ARC costs, and the era stopped arcing when it started stepping (SPEC V324c, I97a)" }
+    if ($footNC324 -notmatch "radius") { $v324Bad += "ornMuralFoot does not read the radius - it would step by a number that is not the one the palette declares (SPEC V324c, I97a)" }
+}
+
+# (d) the CORNER stops curving AND emits TWO runs. Two legs and not one: the foot can be right
+# while the curve stays in the corner, which is the PARTIAL defect - half the frame stepped and
+# half arced on the same box - and it would pass (c) with only the screen to tell.
+$cornNC324 = NoComments (NestedFn $hh6 "ornMuralCorner")
+if (-not $cornNC324) { $v324Bad += "ornMuralCorner is gone from WoD20.6 - leg (d) measured nothing (SPEC V209, V324d)" }
+else {
+    if ($cornNC324 -match "\bornArc\b") { $v324Bad += "ornMuralCorner still calls ornArc - the corner would arc across a step, which is exactly the crossing V316b existed to forbid and V317a inherited (SPEC V324d, I96d)" }
+    $runs324 = [regex]::Matches($cornNC324, "\bornLine\s*\(").Count
+    if ($runs324 -ne 2) { $v324Bad += "ornMuralCorner emits $runs324 straight run(s) and a step closes with 2 - ONE is what a 45 degree CUT draws between the same two feet, so it passes every measurement of the pair and is wrong only on screen (SPEC V324d, I97b)" }
+}
+
+# (e) the AVATAR rides along, and it is MEASURED: the corner write sits under the FIRST value of
+# sectionBox, the one that says WEARS, not the second, which says DRAWS. Move it to the second
+# and the avatar loses the corner while the 73 keep it - the user request undone, rdk -l 0, gate
+# green, and only the screen counting (SPEC I92a, I93a).
+if ($secNC324) {
+    foreach ($nm324 in @("avatarFrame", "ornAvatar")) {
+        if ($secNC324 -notmatch [regex]::Escape($nm324)) { $v324Bad += "sectionBox no longer names $nm324 - the roster the avatar rides on is gone, so it stops wearing the era shape (SPEC V324e, V320a)" }
+    }
+}
+$themeB324 = NoComments $themeFn.Groups[1].Value
+if (-not $themeB324) { $v324Bad += "the theme walk could not be read - leg (e) cannot see which answer the corner write sits under (SPEC V209, V324e)" }
+elseif ($themeB324 -notmatch "if sectionBox\(c, fill\) then") { $v324Bad += "the corner write no longer sits under sectionBox FIRST answer - whatever it asks now, it is not the question that puts the avatar and the 73 on the same branch (SPEC V324e, I96b)" }
+
+if ($v324Bad) { foreach ($b in $v324Bad) { Fail "V324 $b" } }
+else { Pass "V324 the Classical Age steps its corner at the radius it declares, the painter takes it as a parameter, the foot is a plain sum, the corner closes with two runs and no arc, and the avatar rides the same first answer the 73 boxes do" }
+
+# ---- V326: the Classical corner goes PAST the ceiling, and the number is DECLARED rather than
+# fallen out of some d (SPEC I97b, the 123rd round) ---------------------------------------------
+# It exists because the step is the first drawing on the sheet to pass 23. The leg does NOT forbid
+# the overshoot - it stops it from MOVING without a round behind it.
+$v326Bad = @()
+$murIn326 = [regex]::Match($hh6, "(?m)^\s*local ORN_MUR_IN\s*=\s*([\d.]+);")
+$murOut326 = [regex]::Match($hh6, "(?m)^\s*local ORN_MUR_OUT\s*=\s*([\d.]+);")
+$pal326 = [regex]::Match($themesBlock, "(?ms)^\t{4}\[""Classical Age""\] = \{(.*?)^\t{4}\},")
+
+if (-not $murIn326.Success -or -not $murOut326.Success) { $v326Bad += "ORN_MUR_IN or ORN_MUR_OUT could not be read - there is no depth to compute (SPEC V209, V326a)" }
+elseif (-not $pal326.Success) { $v326Bad += "the Classical Age palette could not be read (SPEC V209, V326a)" }
+else {
+    $r326 = [regex]::Match((NoComments $pal326.Groups[1].Value), "(?m)^\s*boxCorner\s*=\s*\{[^}]*radius\s*=\s*([\d.]+)")
+    if (-not $r326.Success) { $v326Bad += "the Classical Age boxCorner declares no radius - leg (a) has nothing to add the rule inset to (SPEC V209, V326a)" }
+    else {
+        # (a) computed from BOTH sides - the radius off the palette, the inset off the Lua.
+        $depth326 = [double]$r326.Groups[1].Value + [double]$murIn326.Groups[1].Value
+        if ($depth326 -ne 16) {
+            $v326Bad += "the Classical rule reaches $depth326 into the box and the round declared 16 - AMENDED by the 124th round, which shrank the step to 1 and with it the overshoot: the rule now sits INSIDE the 20px margin of I73 and under the 23 the filigree respects, and this leg keeps it there. At radius 14 it was 29 and at radius 20 it would be 35, with only the screen to warn (SPEC V326a, I97b, I73)"
+        }
+        # (c) the merlon stays INSIDE the rule that frames it.
+        if ([double]$murOut326.Groups[1].Value -ge [double]$murIn326.Groups[1].Value) {
+            $v326Bad += "ORN_MUR_OUT ($($murOut326.Groups[1].Value)) is not inside ORN_MUR_IN ($($murIn326.Groups[1].Value)) - the crenellation would be drawn on or past the rule it hangs under, and the frame would read as two rules instead of a wall (SPEC V326c)"
+        }
+    }
+}
+
+# (b) every OTHER era stays under 23: the two concave ones arc at ORN_BOXR + ORN_IN and Modern
+# Nights cuts. Without this, "the Classical may pass 23" quietly becomes "anyone may", which is
+# how a limit dies with nobody deciding it.
+$deep326 = @()
+foreach ($k326 in $themeKeys) {
+    if ($k326 -eq "Classical Age") { continue }
+    $p326 = [regex]::Match($themesBlock, "(?ms)^\t{4}\[""$([regex]::Escape($k326))""\] = \{(.*?)^\t{4}\},")
+    if (-not $p326.Success) { continue }
+    $b326 = [regex]::Match((NoComments $p326.Groups[1].Value), "(?m)^\s*boxCorner\s*=\s*\{\s*type\s*=\s*""([^""]*)""\s*,\s*radius\s*=\s*([\d.]+)")
+    if ($b326.Success -and $b326.Groups[1].Value -eq "innerLine" -and ([double]$b326.Groups[2].Value + [double]$murIn326.Groups[1].Value) -gt 23) {
+        $deep326 += $k326
+    }
+}
+if ($deep326.Count -gt 0) { $v326Bad += "$($deep326 -join ', ') also step past the 23px ceiling - the overshoot was decided for ONE era at ONE corner, and a second one is the limit dying without anybody deciding it (SPEC V326b)" }
+
+if ($v326Bad) { foreach ($b in $v326Bad) { Fail "V326 $b" } }
+else { Pass "V326 the Classical rule reaches a declared $($depth326)px at the corner - inside the 20px margin since the 124th round - the merlon stays inside it, and no other era steps past the 23px ceiling" }
 
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

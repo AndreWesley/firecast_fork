@@ -1855,11 +1855,44 @@
 					-- one a step lighter than the outline. The plate draws in a lighter gold and that does
 					-- NOT come in: the plate says FORM, never colour, so no loose colour is born (SPEC V53).
 					--
-					-- NO boxCorner beside them, and it is not an omission: V317a gives the cut corner only
-					-- to a style whose branch RECEIVES ornPath radius, and the merlon does not. This era
-					-- falls to the innerRound 14 the XML authors on all 73 boxes (SPEC V68, I94a).
+					-- The 122nd round declared NO boxCorner here, on the grounds that V317a gives the cut
+					-- corner only to a style whose branch receives ornPath radius - and the merlon did not.
+					-- The 123rd round REVOKES that by taking the radius (below), which is what turns the
+					-- same derivation around: the gate now DEMANDS the key instead of forbidding it.
 					ornament = "#BFA05A",
 					ornStyle = "corona-muralis",
+
+					-- The thirteenth key, and the second that is GEOMETRY rather than colour
+					-- (SPEC I98a). The eleven labels on the top bar are authored top="0"
+					-- height="20" inside a 30px button, so vertTextAlign="center" centres them in
+					-- the TOP TWENTY and the word sits 5px above the button's middle. I88d sized
+					-- that box to leave the foot clear for the marker, and in the other three eras
+					-- it still is: they draw ON the foot and they do NOT declare this key.
+					--
+					-- Here the foot is EMPTY - the column is lateral (I95b) - so the word can have
+					-- the middle back, and nothing is under it to collide with. Written the way
+					-- boxCorner is, through paint() with the AUTHORED value as the way back out
+					-- (V316c, V327b): drop the `or` and the eleven stay at 30 forever once this
+					-- era has been on, with rdk -l exiting 0 and the gate green.
+					tabLabelHeight = 30,
+
+					-- The 123rd round gave the era a STEP; the 124th shrinks it to 1 (user 2026-08-27, after
+					-- seeing 14 on screen). At radius 1 the step is a single pixel, so the outline reads as a
+					-- square 90 degree corner while the SELECTOR stays alive: sectionBox refuses radius <= 0
+					-- and a true zero would drop all 73 boxes out of the ornament walk (SPEC V316a, V278).
+					-- It also pulls the rule back to radius + ORN_MUR_IN = 16, inside the 20px margin of I73
+					-- and the 23 the filigree respects - the overshoot I97b measured at 29 is gone with it.
+					--
+					-- innerLine is no longer a guess: the user read the step on screen in the 124th round,
+					-- which closes what R117 left open and answers T741 with its first branch. It is the
+					-- straight partner of innerRound the way bevel is the straight partner of round, and
+					-- V317a is satisfied by AGREEMENT and not by a list: the branch above now takes the
+					-- radius, which is exactly what the gate derives "wants a cut corner" from.
+					--
+					-- The avatar comes along for free and needs no task of its own: sectionBox answers true
+					-- on its FIRST value for both roster names, and the corner write sits under that first
+					-- value (SPEC I96b, V324e).
+					boxCorner = { type = "innerLine", radius = 1 },
 				},
 			};
 
@@ -2548,11 +2581,11 @@
 			-- is what a mural crown is. The rule is what never drops; the merlon is what a box
 			-- without room loses (SPEC V314e, V322c, B59).
 			--
-			-- NO radius parameter, and that is NOT style (SPEC I94b, V322b): the V317a check derives
-			-- from the CODE which branch wants a cut corner, by reading which one carries ornPath
-			-- radius. A third parameter here would make the gate DEMAND a boxCorner of the Classical
-			-- palette - the corner it does not have and, by V317a, cannot have. It reads ORN_BOXR
-			-- instead, exactly as ornFilete and ornFiligree do.
+			-- The radius arrives as a PARAMETER, exactly as the corrente does (SPEC I96c, V324b).
+			-- The V317a check derives from the CODE which branch wants a cut corner, by reading which
+			-- one carries ornPath radius - so this third parameter is what makes the gate DEMAND the
+			-- boxCorner the palette now declares. It INVERTS I94b/V322b, which crossed out two
+			-- parameters and concluded the era could have no corner of its own.
 			--
 			-- OWN constants, per STYLE, for the reason V308 gives per MOTIF (B69): ORN_OUT and
 			-- ORN_IN (5 and 9) belong to the filigree and the filete, and one rule serving two
@@ -2577,33 +2610,44 @@
 			-- Reading only its own family gets STRONGER by it, not weaker (V322d, V308): from in
 			-- here ORN_OUT and ORN_IN are still reachable and still unread, and ORN_MUR_* are now
 			-- unreachable to everyone else by construction rather than by convention.
-			local function ornCoronaMuralis(w, h)
+			local function ornCoronaMuralis(w, h, radius)
 				local ORN_MUR_OUT  = 6;    -- the merlon course, in from the box edge
 				local ORN_MUR_IN   = 15;   -- the inner rule
 				local ORN_MUR_STEP = 12;   -- one merlon plus one embrasure
 				local ORN_MUR_RISE = 5;    -- how far the merlon stands above its course
 
-				-- Where a run at depth d leaves the box own concave arc, in from the corner along the
-				-- edge. Same relation ornFileteStraight measures, but taken at the depth ASKED for: the
-				-- rule and the merlon course sit at different depths, so they leave the arc at different
-				-- feet, and reading one foot for both would push the merlon into the curve.
+				-- Where a run at depth d leaves the corner, in from it along the edge. The era cuts its
+				-- corner as innerLine - a STEP, the straight partner of innerRound the way bevel is the
+				-- straight partner of round (SPEC I97a, R117) - so offsetting it inward by d moves both of
+				-- its legs out by exactly d, and the foot is the plain sum. No root of a difference of
+				-- squares, which is what a CONCAVE ARC costs, and no sqrt(2) factor, which is what a 45
+				-- degree CUT costs: this is the simplest of the three feet the sheet now carries.
+				--
+				-- The radius arrives as an UPVALUE of the painter, never from ORN_BOXR: that constant is the
+				-- Lua copy of the radius the XML authors and it is still 14, but the era writes its own
+				-- through boxCorner, and reading the constant here would give two owners to one number and
+				-- draw this frame to the corner some OTHER era has (SPEC V317d, V324c, B69).
 				local function ornMuralFoot(d)
-					local r = ORN_BOXR + d;
-
-					return math.sqrt(r * r - d * d);
+					return radius + d;
 				end;
 
-				-- One corner: the rule turning on the box own arc, and nothing else. The crown is spent on
-				-- the RUNS - a merlon on the curve would have to shrink to ride it, and the whole reading
-				-- of a wall is that every tooth is the same size.
+				-- One corner, and it is TWO straight runs meeting at the step own inner vertex - never an
+				-- arc. The crown is still spent on the RUNS: a merlon riding the corner would have to shrink
+				-- to fit it, and the whole reading of a wall is that every tooth is the same size.
+				--
+				-- TWO and not one is the difference between this and a 45 degree CUT, which closes the same
+				-- two feet with a single diagonal. Emitting one here would leave the foot correct and the
+				-- shape wrong, pass every measurement of the pair, and show up only on screen (SPEC V324d).
+				--
+				-- The vertex is (f, f) because the offset moves BOTH legs of the step out by d, so it is the
+				-- same number the foot already is - it is not spelled a second time (SPEC V49).
 				local function ornMuralCorner(o, t)
-					local d  = ORN_MUR_IN;
-					local r  = ORN_BOXR + d;
-					local u0 = ornMuralFoot(d);
-					local a1 = math.atan(d / u0);
+					local d = ORN_MUR_IN;
+					local f = ornMuralFoot(d);
 
-					ornMove(o, t, d, u0);
-					ornArc(o, t, r, (math.pi / 2) - a1, a1);
+					ornMove(o, t, f, d);
+					ornLine(o, t, f, f);
+					ornLine(o, t, d, f);
 				end;
 
 				-- One edge: the rule arc end to arc end, then the crenellation on its own shallower course.
@@ -2660,7 +2704,7 @@
 			local function ornPath(w, h, style, radius)
 				if style == "corrente" then return ornCorrente(w, h, radius); end;
 				if style == "filete" then return ornFilete(w, h); end;
-				if style == "corona-muralis" then return ornCoronaMuralis(w, h); end;
+				if style == "corona-muralis" then return ornCoronaMuralis(w, h, radius); end;
 
 				return ornFiligree(w, h);
 			end;
@@ -2832,6 +2876,11 @@
 				local ORN_COL_CAP   = 4;    -- motif `tab`: height of capital and of base
 				local ORN_COL_PAD   = 2;    -- motif `tab`: clear space at head and foot of the 30
 				local ORN_COL_ROOM  = 44;   -- motif `tab`: the width the word itself asks for
+				-- How far in from the button's edge the capital STARTS (SPEC I98d). The 123rd round
+				-- centred the column ON ORN_COL_W, which put the capital at 6..18 and left `Traits`
+				-- and `Numina` - the two 79px buttons - with 2.0px between the column and the word.
+				-- Measured with the gate's own estimator, never a new ruler (SPEC I98b, V327d).
+				local ORN_COL_EDGE  = 2;    -- motif `tab`: the capital starts this far in
 				local ORN_GUT_STEP  = 14;   -- motif `sub`: one gutta to the next
 				local ORN_GUT_W     = 2;    -- motif `sub`: width of one gutta
 				local ORN_GUT_DROP  = 5;    -- motif `sub`: how far a gutta hangs below its rule
@@ -2944,8 +2993,11 @@
 					            " L" .. ornNum(cx + half) .. "," .. ornNum(y1 - ORN_COL_CAP);
 				end;
 
-				column(reach, 1);
-				column(w - reach, -1);
+				-- The capital starts at ORN_COL_EDGE and runs `reach` inward, so the centre it is
+				-- stamped on is EDGE + reach/2 - it is no longer centred on reach itself. That is
+				-- the whole of I98d: the column moves toward the rim and the word gets the middle.
+				column(ORN_COL_EDGE + reach / 2, 1);
+				column(w - ORN_COL_EDGE - reach / 2, -1);
 
 				return table.concat(o, " ");
 			end;
@@ -3428,6 +3480,27 @@
 
 						if type(ff) == "string" and ff ~= "" then
 							paint(c, "fontFamily", t.fontFamily, ff);
+						end;
+
+						-- The HEIGHT of the top bar's eleven labels, and only theirs (SPEC I98a,
+						-- I98b, V327c). The selector is the GRANDPARENT's name - one name read,
+						-- exactly as markKind does it, and not a roster of eleven: the label sits
+						-- inside btnTab<X>, which sits inside tabStrip. The eight labels of the
+						-- three sub-bars are authored height="30" already, so they are outside
+						-- this and stay outside it - writing 30 where 30 already is is the silent
+						-- write V122 exists to refuse.
+						--
+						-- `t.tabLabelHeight or ah` is the WAY BACK OUT, and it is the same shape
+						-- V316c cobbled for the corner: paint() returns early on a nil value
+						-- (V61), so handing it the palette key alone would leave the eleven at 30
+						-- for good the moment another era took over - rdk -l 0, gate green, and
+						-- the defect only on screen (B58, B62).
+						local lp = c.parent;
+
+						if lp ~= nil and lp.parent ~= nil and lp.parent.name == "tabStrip" then
+							local ah = authored(c, "height");
+
+							paint(c, "height", t.tabLabelHeight or ah, ah);
 						end;
 
 						-- The era renames what a picker SHOWS, never what it stores (SPEC I22,
