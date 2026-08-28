@@ -1,5 +1,25 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## 123ª RODADA (2026-08-27) — LEIA ANTES DA SEÇÃO ABAIXO, ELA ESTÁ 1 RODADA ATRÁS
+
+**O teto de locais do chunk de `WoD20.6.lfm` é 105, MEDIDO (§B77).** Passar dele faz `rdk -l`
+sair **1 com saída VAZIA e APAGAR o `.rpk`** — não nomeia arquivo nem linha. Hoje o chunk está
+em **99**; sobram **6**. Antes de declarar `local` nova nesse nível, conte
+(`grep -c` das linhas com 3 tabs + `local `) ou ponha a família **dentro** da função que a lê,
+que é o que a 123ª fez com `ORN_COL_*`/`ORN_GUT_*` e com a família mural inteira.
+
+**§T734 = `x`** (barra clássica: coluna na aba, gotas na sub-aba, gota no separador).
+Gate **VERDE, 0 FAIL**. `.rpk` **2.176.700 B** gerado e INSTALADO 22:08.
+
+**Abertas desta rodada, em ordem:** `T735` (gate §V323) · `T737`+`T738` (chanfro clássico —
+**par atômico**, `T737` sozinha deixa o gate vermelho porque §V322b ainda exige que o 4º ramo
+não passe o raio) · `T740` (gate §V325) · `T736`/`T739` teste na tela `[USER]`, que agrupam
+com `T733`.
+
+⚠ **`git show HEAD:` NÃO é o estado de trabalho deste repo** (§B78): havia `T729`…`T732` sem
+commit, e restaurar do HEAD as apagou junto com o CRLF do arquivo. Quem contou foi o gate
+(§V318 + 4 pernas de §V320/§V322), não o `rdk`. **Backup antes, gate depois.**
+
 ## CHAT NOVO - LEIA ESTAS 20 LINHAS ANTES DE QUALQUER COMANDO
 
 **Estado MEDIDO 2026-08-26 22:35**, nao estimado:

@@ -1847,6 +1847,19 @@
 					dotOn  = "/WoD20th/images/prime_on_gold.png",
 					dotOff = "/WoD20th/images/prime_off_gold.png",
 					paper  = "/WoD20th/images/paper_classical.png",
+
+					-- The 122nd round: of the four palettes this was the ONLY one declaring no ornament,
+					-- so V277 hid its path and the box has been bare outline since the system was written.
+					-- The colour is the laurel gold the palette ALREADY carries in stroke["white"] - the
+					-- Dark Ages choice, where rule and frame are one family (SPEC I87a), not the Victorian
+					-- one a step lighter than the outline. The plate draws in a lighter gold and that does
+					-- NOT come in: the plate says FORM, never colour, so no loose colour is born (SPEC V53).
+					--
+					-- NO boxCorner beside them, and it is not an omission: V317a gives the cut corner only
+					-- to a style whose branch RECEIVES ornPath radius, and the merlon does not. This era
+					-- falls to the innerRound 14 the XML authors on all 73 boxes (SPEC V68, I94a).
+					ornament = "#BFA05A",
+					ornStyle = "corona-muralis",
 				},
 			};
 
@@ -2137,7 +2150,6 @@
 			local ORN_COR_SUB2     = 3;     -- motif `sub`: the second rule, up from the foot
 			local ORN_COR_SUB_SPAN = 0.35;  -- motif `sub`: second rule starts this much of the width in
 			local ORN_COR_DOT      = 3.2;   -- motif `sep`: radius of the filled dot
-
 			-- Path data is parsed as SVG, where a comma separates x from y. The C library float
 			-- verbs follow LC_NUMERIC, so on a pt-BR host they write a decimal COMMA and every
 			-- coordinate parses as two numbers. Build the one decimal by hand instead: integer
@@ -2523,9 +2535,132 @@
 			-- and the filete are drawn to the CONCAVE ORN_BOXR, which V317b now solders to the
 			-- radius the XML authors. The chain is drawn to the era's BEVEL, which lives in the
 			-- palette, so it has to be handed in rather than looked up (SPEC V317d).
+			-- ---- Classical Age corona muralis: the BOX frame (user 2026-08-27, plate `Corona Muralis`)
+			--
+			-- The FOURTH branch of ornPath, and the first that is not born of an era asking for a
+			-- drawing - it is born of the era being EMPTY (SPEC C 122nd round, I94). Of the four
+			-- palettes the Classical was the only one declaring no `ornament`, so V277 hid its path
+			-- and its boxes have been bare outline for as long as the system has existed.
+			--
+			-- TWO things, and the order between them IS the hierarchy (SPEC I94c): one continuous
+			-- RULE following the box own concave corner, and the MERLON course running between
+			-- ORN_MUR_OUT and ORN_MUR_OUT + ORN_MUR_RISE - the crenellation of a city wall, which
+			-- is what a mural crown is. The rule is what never drops; the merlon is what a box
+			-- without room loses (SPEC V314e, V322c, B59).
+			--
+			-- NO radius parameter, and that is NOT style (SPEC I94b, V322b): the V317a check derives
+			-- from the CODE which branch wants a cut corner, by reading which one carries ornPath
+			-- radius. A third parameter here would make the gate DEMAND a boxCorner of the Classical
+			-- palette - the corner it does not have and, by V317a, cannot have. It reads ORN_BOXR
+			-- instead, exactly as ornFilete and ornFiligree do.
+			--
+			-- OWN constants, per STYLE, for the reason V308 gives per MOTIF (B69): ORN_OUT and
+			-- ORN_IN (5 and 9) belong to the filigree and the filete, and one rule serving two
+			-- drawings moves both when only one of them was asked for.
+			--
+			-- MEASURED before drawing (SPEC I94b): deepest ink is the rule on the corner diagonal at
+			-- (ORN_BOXR + ORN_MUR_IN) / sqrt(2) = 20.5, against the 23 the filigree already spends,
+			-- so this is SHALLOWER than the drawing that already exists and the 20px margin of I73 is
+			-- not a new question. The merlon alone reaches 11.
+			-- Four corners and four runs, stamped from ONE drawing each, exactly as the filigree and
+			-- the filete are: four hand-authored copies are four things that drift apart.
+			--
+			-- THE WHOLE FAMILY LIVES IN HERE - the four constants and the three helpers - and that
+			-- is a CEILING and not taste (SPEC B77, V325c). This chunk holds a measured 105 locals:
+			-- the rdk compiler emits its own into it and Lua's limit of 200 is reached in there.
+			-- The family cost the chunk SEVEN of those and nothing outside ever read one of them,
+			-- so they come in here and the chunk gets seven back. What that buys is a build that
+			-- still compiles: at 106 `rdk -l` exits 1 with an EMPTY output, names no file and no
+			-- line, and DELETES the .rpk (B19) - which is the whole of why this move is worth a
+			-- diff on a drawing nobody asked to change.
+			--
+			-- Reading only its own family gets STRONGER by it, not weaker (V322d, V308): from in
+			-- here ORN_OUT and ORN_IN are still reachable and still unread, and ORN_MUR_* are now
+			-- unreachable to everyone else by construction rather than by convention.
+			local function ornCoronaMuralis(w, h)
+				local ORN_MUR_OUT  = 6;    -- the merlon course, in from the box edge
+				local ORN_MUR_IN   = 15;   -- the inner rule
+				local ORN_MUR_STEP = 12;   -- one merlon plus one embrasure
+				local ORN_MUR_RISE = 5;    -- how far the merlon stands above its course
+
+				-- Where a run at depth d leaves the box own concave arc, in from the corner along the
+				-- edge. Same relation ornFileteStraight measures, but taken at the depth ASKED for: the
+				-- rule and the merlon course sit at different depths, so they leave the arc at different
+				-- feet, and reading one foot for both would push the merlon into the curve.
+				local function ornMuralFoot(d)
+					local r = ORN_BOXR + d;
+
+					return math.sqrt(r * r - d * d);
+				end;
+
+				-- One corner: the rule turning on the box own arc, and nothing else. The crown is spent on
+				-- the RUNS - a merlon on the curve would have to shrink to ride it, and the whole reading
+				-- of a wall is that every tooth is the same size.
+				local function ornMuralCorner(o, t)
+					local d  = ORN_MUR_IN;
+					local r  = ORN_BOXR + d;
+					local u0 = ornMuralFoot(d);
+					local a1 = math.atan(d / u0);
+
+					ornMove(o, t, d, u0);
+					ornArc(o, t, r, (math.pi / 2) - a1, a1);
+				end;
+
+				-- One edge: the rule arc end to arc end, then the crenellation on its own shallower course.
+				-- The rule is emitted FIRST and unconditionally, so by the time the merlon can refuse there
+				-- is already ink on this edge - a box skipped in silence between ornamented neighbours is
+				-- B59 in one line, and what a small box drops is the MERLON (SPEC V322c, V314e).
+				local function ornMuralEdge(o, t, span)
+					local u0 = ornMuralFoot(ORN_MUR_IN);
+
+					if span - 2 * u0 <= 0 then return; end;
+
+					ornMove(o, t, u0, ORN_MUR_IN);
+					ornLine(o, t, span - u0, ORN_MUR_IN);
+
+					-- The course is SHALLOWER than the rule, so it leaves the arc at its own foot.
+					local m0  = ornMuralFoot(ORN_MUR_OUT);
+					local run = span - 2 * m0;
+					local n   = math.floor(run / ORN_MUR_STEP);
+
+					if n < 1 then return; end;
+
+					local half = ORN_MUR_STEP / 2;
+					local lo   = ORN_MUR_OUT;
+					local hi   = ORN_MUR_OUT + ORN_MUR_RISE;
+					local u    = m0 + (run - n * ORN_MUR_STEP) / 2;
+
+					ornMove(o, t, u, lo);
+
+					for _ = 1, n, 1 do
+						ornLine(o, t, u + half, lo);
+						ornLine(o, t, u + half, hi);
+						ornLine(o, t, u + ORN_MUR_STEP, hi);
+						ornLine(o, t, u + ORN_MUR_STEP, lo);
+
+						u = u + ORN_MUR_STEP;
+					end;
+				end;
+
+				local o = {};
+
+				ornMuralCorner(o, {ox = 0, oy = 0, sx =  1, sy =  1});
+				ornMuralCorner(o, {ox = w, oy = 0, sx = -1, sy =  1});
+				ornMuralCorner(o, {ox = 0, oy = h, sx =  1, sy = -1});
+				ornMuralCorner(o, {ox = w, oy = h, sx = -1, sy = -1});
+
+				ornMuralEdge(o, {ox = 0, oy = 0, sx =  1, sy =  1}, w);
+				ornMuralEdge(o, {ox = 0, oy = h, sx =  1, sy = -1}, w);
+				ornMuralEdge(o, {ox = 0, oy = 0, sx =  1, sy =  1, swap = true}, h);
+				ornMuralEdge(o, {ox = w, oy = 0, sx = -1, sy =  1, swap = true}, h);
+
+				return table.concat(o, " ");
+			end;
+
 			local function ornPath(w, h, style, radius)
 				if style == "corrente" then return ornCorrente(w, h, radius); end;
 				if style == "filete" then return ornFilete(w, h); end;
+				if style == "corona-muralis" then return ornCoronaMuralis(w, h); end;
 
 				return ornFiligree(w, h);
 			end;
@@ -2673,6 +2808,148 @@
 			-- less rule rather than a line drawn backwards across itself (SPEC V279, V282).
 			-- One motif per level (SPEC I78b). kind comes from markKind, which reads the NAME and the
 			-- bar the control sits in - construction the gate can see from disk, not a roster of 24.
+			-- The Classical Age BAR drawing (SPEC I95b, I95c, I95d). Three motifs from one
+			-- building: the COLUMN carries the level that names the page, and the GUTTA - the peg
+			-- that hangs under a Doric triglyph - carries the two below it. Depth is not how this
+			-- one says level: WIDTH is, above, and the gutta says it by hanging under the word.
+			--
+			-- The style keeps its name. `ornStyle` names the ERA and not the drawing - `filete`
+			-- already names two drawings that look nothing alike (ornFilete is the box's fillet,
+			-- markFilete is a rule and a Greek cross) - so renaming would cost the palette,
+			-- ornPath, V322a and V322b to buy nothing (SPEC I95a).
+			--
+			-- THE EIGHT CONSTANTS LIVE IN HERE, and that is not taste (SPEC I95b, V325c, B77).
+			-- This chunk holds a MEASURED ceiling of 105 locals - the rdk compiler emits its own
+			-- into the same chunk and Lua's limit of 200 is reached in there - and the file
+			-- already spends 97. Eight at chunk level plus this function is 106, and what that
+			-- buys is `rdk -l` exiting 1 with an EMPTY output, no file named, and the .rpk
+			-- DELETED (B19). Inside the function they cost the chunk one local instead of nine,
+			-- and reading only its own family gets STRONGER rather than weaker: from in here
+			-- nothing outside can reach them at all, which is what V308 buys by convention.
+			local function markCoronaMuralis(w, h, kind)
+				local ORN_COL_W     = 12;   -- motif `tab`: capital and base reach, each side
+				local ORN_COL_SHAFT = 6;    -- motif `tab`: the shaft, what survives when room runs out
+				local ORN_COL_CAP   = 4;    -- motif `tab`: height of capital and of base
+				local ORN_COL_PAD   = 2;    -- motif `tab`: clear space at head and foot of the 30
+				local ORN_COL_ROOM  = 44;   -- motif `tab`: the width the word itself asks for
+				local ORN_GUT_STEP  = 14;   -- motif `sub`: one gutta to the next
+				local ORN_GUT_W     = 2;    -- motif `sub`: width of one gutta
+				local ORN_GUT_DROP  = 5;    -- motif `sub`: how far a gutta hangs below its rule
+
+				-- Where a rule inset by d from the marker's foot dies in the concave corner. The
+				-- carrier is still the pill V228 authors, so the run stops where that arc gives
+				-- out - the same measure markFilete makes, and what puts the rule's ends under
+				-- the word instead of somewhere past it.
+				local function foot(d)
+					return math.sqrt((ORN_PILLR + d) * (ORN_PILLR + d) - d * d);
+				end;
+
+				-- One filled peg, as a closed sub-path. Every decimal through ornNum: a float verb
+				-- follows LC_NUMERIC and a pt-BR host writes a COMMA, which splits each coordinate
+				-- into two numbers and kills the whole path, silently (I72b).
+				local function gutta(cx, y0, y1)
+					local a = ORN_GUT_W / 2;
+
+					return "M" .. ornNum(cx - a) .. "," .. ornNum(y0) ..
+					       " L" .. ornNum(cx + a) .. "," .. ornNum(y0) ..
+					       " L" .. ornNum(cx + a) .. "," .. ornNum(y1) ..
+					       " L" .. ornNum(cx - a) .. "," .. ornNum(y1) .. " Z";
+				end;
+
+				-- The separator is ONE gutta, alone, centred in its 16x30 carrier (SPEC I95d): the
+				-- level that says least says it in less, exactly as the Dark Ages cross does
+				-- (I88f), and it is the sub-tab's OWN ink rather than a third vocabulary. FILLED,
+				-- like the guttae it is one of - which is what the second return value says.
+				if kind == "sep" then
+					local cy = h / 2;
+
+					return gutta(w / 2, cy - ORN_GUT_DROP / 2, cy + ORN_GUT_DROP / 2), true;
+				end;
+
+				-- A sub-tab is the rule at the height the user approved in the 109th round, with
+				-- the guttae hanging from it at a FIXED step - a frieze's peg spacing does not
+				-- stretch with the panel, so the COUNT changes and the step does not.
+				--
+				-- The rule is emitted FIRST and unconditionally: what falls out for want of room
+				-- is the GUTTA, never the rule (SPEC I95c, V314e). A sub-tab skipped in silence
+				-- between ornamented neighbours is B59 in one line.
+				if kind == "sub" then
+					local i = foot(ORN_SUB_MARK);
+					local y = h - ORN_SUB_MARK;
+
+					if w - 2 * i <= 0 then return ""; end;
+
+					local o = { "M" .. ornNum(i) .. "," .. ornNum(y) ..
+					            " L" .. ornNum(w - i) .. "," .. ornNum(y) };
+					local n = math.floor((w - 2 * i) / ORN_GUT_STEP);
+
+					-- Centred as a GROUP, so the pegs sit under the word instead of drifting to
+					-- one end as the sub-tab gets wider.
+					if n >= 1 then
+						local x0 = (w - (n - 1) * ORN_GUT_STEP) / 2;
+
+						for k = 1, n, 1 do
+							o[#o + 1] = gutta(x0 + (k - 1) * ORN_GUT_STEP, y, y + ORN_GUT_DROP);
+						end;
+					end;
+
+					return table.concat(o, " "), true;
+				end;
+
+				-- The top bar: a Tuscan column at each edge - capital, shaft, base - and the word
+				-- read as the intercolumniation. TRACED and not filled, which is the whole of why
+				-- there is no second return value here: markRule paints `color` from the drawing's
+				-- own answer, and a filled column is a block of gold where a pair of columns
+				-- should be (SPEC I95e, V323c).
+				--
+				-- What falls out for want of room is the CAPITAL and the BASE, and what survives
+				-- is the SHAFT - two levels of degradation, and no marker that ever vanishes (SPEC
+				-- I95c). Neither refusal can fire today: the narrowest of the eleven is 79 against
+				-- floors of 68 and 56.
+				local o    = {};
+				local y0   = ORN_COL_PAD;
+				local y1   = h - ORN_COL_PAD;
+				local wide = w - 2 * ORN_COL_W >= ORN_COL_ROOM;
+				local reach;
+
+				if wide then
+					reach = ORN_COL_W;
+				else
+					if w - 2 * ORN_COL_SHAFT < ORN_COL_ROOM then return ""; end;
+
+					reach = ORN_COL_SHAFT;
+				end;
+
+				-- Drawn ONCE and stamped twice, mirrored by `s`: one drawing, so the two columns
+				-- cannot drift apart - the same reason ornCorner is authored in canonical space.
+				local function column(cx, s)
+					local half = ORN_COL_SHAFT / 2;
+					local a    = cx - s * reach / 2;
+					local b    = cx + s * reach / 2;
+
+					if wide then
+						o[#o + 1] = "M" .. ornNum(a) .. "," .. ornNum(y0) ..
+						            " L" .. ornNum(b) .. "," .. ornNum(y0) ..
+						            " M" .. ornNum(a) .. "," .. ornNum(y0 + ORN_COL_CAP) ..
+						            " L" .. ornNum(b) .. "," .. ornNum(y0 + ORN_COL_CAP) ..
+						            " M" .. ornNum(a) .. "," .. ornNum(y1 - ORN_COL_CAP) ..
+						            " L" .. ornNum(b) .. "," .. ornNum(y1 - ORN_COL_CAP) ..
+						            " M" .. ornNum(a) .. "," .. ornNum(y1) ..
+						            " L" .. ornNum(b) .. "," .. ornNum(y1);
+					end;
+
+					o[#o + 1] = "M" .. ornNum(cx - half) .. "," .. ornNum(y0 + ORN_COL_CAP) ..
+					            " L" .. ornNum(cx - half) .. "," .. ornNum(y1 - ORN_COL_CAP) ..
+					            " M" .. ornNum(cx + half) .. "," .. ornNum(y0 + ORN_COL_CAP) ..
+					            " L" .. ornNum(cx + half) .. "," .. ornNum(y1 - ORN_COL_CAP);
+				end;
+
+				column(reach, 1);
+				column(w - reach, -1);
+
+				return table.concat(o, " ");
+			end;
+
 			-- The era's own BAR drawing, picked by the palette exactly as the box frame is (SPEC
 			-- I88a). The style arrives as an ARGUMENT and is never read as an upvalue: this
 			-- function is declared ABOVE the local that holds the era's style, so reading it
@@ -2681,6 +2958,7 @@
 			local function markPath(w, h, kind, style)
 				if style == "filete" then return markFilete(w, h, kind); end;
 				if style == "corrente" then return markCorrente(w, h, kind); end;
+				if style == "corona-muralis" then return markCoronaMuralis(w, h, kind); end;
 
 				local o  = {};
 				local cx = w / 2;

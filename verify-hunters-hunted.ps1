@@ -10550,13 +10550,17 @@ if ($null -ne $frame320 -and $frame320.GetAttribute('color') -ne 'DimGray') {
     $v320Bad += "avatarFrame no longer authors color='DimGray' - V309 collects it by that fill, so renaming it out of the collector is B71 waiting to happen again (SPEC V320e, V309, V53)"
 }
 
-# (f) THREE palettes declare ornament, so the avatar draws in three eras and the Classical Age
-# stays clean. V277 is what says so; this leg exists so that "the avatar did not change in the
+# (f) FOUR palettes declare ornament. AMENDED by the 122nd round (SPEC V322e): it read THREE,
+# and the Classical Age was the one staying clean. It now declares an ornament of its own, so the
+# count moves and the leg does NOT go away: what it measures is that the number of ornamented eras
+# is DECLARED and never accidental, which is what stops a fifth from arriving unannounced. The
+# avatar itself draws in NO era since V321 - this count is now about the 73 boxes.
+# The original reason still stands: this leg exists so that "the era did not change" cannot
 # Classical Age" cannot become a bug report in a later round - which is precisely what T695(4)
 # became once Modern Nights grew an ornament of its own.
 $ornDecl320 = ([regex]::Matches($hh6, '(?m)^\s*ornament\s*=\s*"#[0-9A-Fa-f]{6,8}"')).Count
-if ($ornDecl320 -ne 3) {
-    $v320Bad += "$ornDecl320 palette(s) declare ornament and the sheet is built around 3 - the avatar draws in exactly the eras that declare one, so a fourth is a drawing in an era nobody asked for and a second is one era losing it (SPEC V320f, V277)"
+if ($ornDecl320 -ne 4) {
+    $v320Bad += "$ornDecl320 palette(s) declare ornament and the sheet is built around 4 - every era declares its own frame since the 122nd round, so a fifth is a drawing in an era nobody asked for and a third is one era losing it (SPEC V320f, V322e, V277)"
 }
 
 if ($v320Bad) { foreach ($b in $v320Bad) { Fail "V320 $b" } }
@@ -10616,6 +10620,276 @@ elseif ($ornBody321 -notmatch 'p:setParent\(c\.parent\)') {
 
 if ($v321Bad) { foreach ($b in $v321Bad) { Fail "V321 $b" } }
 else { Pass "V321 neither of the $($roster321.Count) avatar controls receives a path, the pair of answers still separates wearing from drawing, and ornament() keeps its single parent write" }
+
+
+# ---- V322: the CORONA MURALIS draws on the 73 and the Classical era stops being the empty
+# one (SPEC I94, the 122nd round) -------------------------------------------------------------
+# Of the four palettes the Classical was the ONLY one declaring no ornament, so V277 hid its
+# path and its boxes were bare outline. Five legs: the palette declares both keys and the colour
+# is one it already carried; the fourth branch exists and does NOT take the radius; the size
+# guard drops the MERLON and never the rule; the constants stay inside their own family; and
+# exactly four palettes now declare an ornament.
+$v322Bad = @()
+
+$muralFam322 = ""
+foreach ($fn322 in @("ornCoronaMuralis", "ornMuralCorner", "ornMuralEdge", "ornMuralFoot")) { $muralFam322 += (LuaFn $hh6 $fn322) }
+$famNC322  = NoComments $muralFam322
+$pathNC322 = NoComments (LuaFn $hh6 "ornPath")
+
+# zero-guard: a leg that reads nothing is a no-op that passes by vacancy (SPEC V20, V209, B7)
+if (-not $muralFam322) { $v322Bad += "the corona muralis family is gone from WoD20.6 - there is no drawing left to measure (SPEC V209, V322)" }
+if (-not $pathNC322)   { $v322Bad += "ornPath is gone from WoD20.6 - nothing dispatches a style at all (SPEC V209)" }
+
+# (a) the palette declares BOTH keys, and the colour is one the palette ALREADY carried. A
+# style with no colour is a key that can never draw and never complain (V313a, V277); a colour
+# from outside the palette is the loose colour V53 exists to refuse, arriving by the one door
+# nobody watches - the ornament.
+$pal322 = [regex]::Match($themesBlock, "(?ms)^\t{4}\[""Classical Age""\] = \{(.*?)^\t{4}\},")
+if (-not $pal322.Success) { $v322Bad += "the Classical Age palette could not be read - leg (a) measured nothing (SPEC V209, V322a)" }
+else {
+    $pb322 = NoComments $pal322.Groups[1].Value
+    $st322 = [regex]::Match($pb322, "(?m)^\t{5}ornStyle\s*=\s*""([^""]+)""")
+    $or322 = [regex]::Match($pb322, "(?m)^\t{5}ornament\s*=\s*""(#[0-9A-Fa-f]{6,8})""")
+    $sb322 = [regex]::Match($pb322, "(?ms)^\t{5}stroke = \{(.*?)^\t{5}\},")
+    $sw322 = [regex]::Match($sb322.Groups[1].Value, "\[""white""\]\s*=\s*""(#[0-9A-Fa-f]{6,8})""")
+
+    if (-not $st322.Success) { $v322Bad += "the Classical Age palette declares no ornStyle - the era falls back to the default filigree and the round drew nothing (SPEC V322a, I94a)" }
+    elseif ($st322.Groups[1].Value -ne "corona-muralis") { $v322Bad += "the Classical Age palette draws $($st322.Groups[1].Value) and the round is built on corona-muralis (SPEC V322a, I94a)" }
+    if (-not $or322.Success) { $v322Bad += "the Classical Age palette declares ornStyle and no ornament - the colour is what hides the path (V277), so the style is a key that can never draw and never complain (SPEC V322a, V313a)" }
+    elseif (-not $sw322.Success) { $v322Bad += "the Classical Age stroke has no white key - leg (a) has nothing to compare the ornament colour against (SPEC V209, V322a)" }
+    elseif ($or322.Groups[1].Value -ne $sw322.Groups[1].Value) {
+        $v322Bad += "the Classical ornament is $($or322.Groups[1].Value) and the palette outline is $($sw322.Groups[1].Value) - a colour the palette did not already carry is a loose colour arriving through the ornament, which is the door V53 exists to shut (SPEC V322a, V53)"
+    }
+}
+
+# (b) the FOURTH branch, and it does NOT forward the radius. The V317a check derives from the
+# CODE which style wants a cut corner, by reading which branch carries ornPath radius - hand it
+# over here and the gate starts DEMANDING a boxCorner of the Classical palette, which by V317a
+# it cannot have. The failure would land one level away from whoever caused it, which is B6.
+$sig322 = [regex]::Match($hh6, "local function ornPath\(([^)]*)\)")
+$rad322 = ""
+if ($sig322.Success) { $sigA322 = $sig322.Groups[1].Value -split "\s*,\s*"; $rad322 = $sigA322[$sigA322.Count - 1] }
+$br322 = [regex]::Match($pathNC322, "if style == ""corona-muralis"" then return (\w+)\(([^)]*)\); end;")
+
+if (-not $br322.Success) { $v322Bad += "ornPath has no corona-muralis branch - the palette names a style the dispatcher never heard of, so the era silently draws the default filigree (SPEC V322b, I94b)" }
+elseif ($br322.Groups[1].Value -ne "ornCoronaMuralis") { $v322Bad += "the corona-muralis branch calls $($br322.Groups[1].Value) and the drawing is ornCoronaMuralis (SPEC V322b)" }
+elseif ($rad322 -and $br322.Groups[2].Value -match ("\b" + [regex]::Escape($rad322) + "\b")) {
+    $v322Bad += "the corona-muralis branch forwards $rad322 - V317a reads exactly this to decide who wants a cut corner, so the gate would start demanding a boxCorner of the Classical palette, which V317a forbids it (SPEC V322b, I94b, V317a)"
+}
+
+# (c) what a box without room drops is the MERLON, never the RULE. A box skipped in silence
+# between ornamented neighbours is B59 in one line - that is how TRUE FAITH (1270x76) fell. The
+# floor is READ out of the Lua and measured against the smallest box the XML actually authors,
+# so neither can drift from the other (same shape as V314e and V315e).
+$c322 = @{}
+foreach ($k322 in @("ORN_MUR_OUT", "ORN_MUR_IN", "ORN_MUR_STEP", "ORN_MUR_RISE")) {
+    $m322 = [regex]::Match($hh6, "(?m)^\s*local $k322\s*=\s*([\d.]+);")
+    if ($m322.Success) { $c322[$k322] = [double]$m322.Groups[1].Value }
+}
+$boxrM322 = [regex]::Match($hh6, "(?m)^\s*local ORN_BOXR\s*=\s*(\d+);")
+
+if ($c322.Count -ne 4) { $v322Bad += "only $($c322.Count) of the 4 ORN_MUR_* constants could be read - leg (c) has no floor to compute (SPEC V209, V322c)" }
+elseif (-not $boxrM322.Success) { $v322Bad += "ORN_BOXR could not be read - the merlon foot cannot be computed (SPEC V209, V322c)" }
+elseif ($famNC322 -match "return """";") {
+    $v322Bad += "the corona muralis refuses a whole box by size - the RULE is what never drops, so a refusal at that level can only ever be the silent skip of B59 (SPEC V322c, V314e)"
+}
+elseif ($famNC322 -notmatch "if n < 1 then return; end;") {
+    $v322Bad += "the merlon has no size refusal at all - a guard that CANNOT fire is the hole B59 came through, and the crenellation would be drawn end before start (SPEC V322c, V20, V279)"
+}
+else {
+    $ftM322 = [Math]::Sqrt([Math]::Pow([double]$boxrM322.Groups[1].Value + $c322["ORN_MUR_OUT"], 2) - [Math]::Pow($c322["ORN_MUR_OUT"], 2))
+    $flr322 = 2 * $ftM322 + $c322["ORN_MUR_STEP"]
+    $dim322 = @()
+    foreach ($f in $files) {
+        foreach ($r322 in (Doc $f.FullName).SelectNodes("//rectangle[@color='black'][@xradius][@width][@height]")) {
+            $dim322 += [double]$r322.GetAttribute("width")
+            $dim322 += [double]$r322.GetAttribute("height")
+        }
+    }
+    if ($dim322.Count -lt 10) { $v322Bad += "only $($dim322.Count) box dimension(s) were read for leg (c), expected at least 10 - it is measuring less than the sheet has (SPEC V209, V20)" }
+    else {
+        $minD322 = ($dim322 | Measure-Object -Minimum).Minimum
+        if ($minD322 -le $flr322) {
+            $v322Bad += "the smallest box side the XML authors is $minD322 against a merlon floor of $([Math]::Round($flr322, 2)) - at that size the crenellation drops and a box wearing only half the crown is not the one anybody chose (SPEC V322c, V279, B59)"
+        }
+    }
+}
+
+# (d) constants stay inside their own family (SPEC V308, B69): a number serving two drawings
+# moves both when only one of them was asked for. ORN_OUT and ORN_IN (5 and 9) belong to the
+# filigree and the filete, and the merlon has four of its own.
+$oldFam322 = ""
+foreach ($fn322 in @("ornFiligree", "ornFilete", "ornFileteCorner", "ornFileteEdge", "ornCorrente")) { $oldFam322 += (LuaFn $hh6 $fn322) }
+$oldNC322 = NoComments $oldFam322
+
+if ($famNC322 -match "\bORN_OUT\b|\bORN_IN\b") { $v322Bad += "the corona muralis reads ORN_OUT or ORN_IN - those are the filigree and filete rules, and one rule serving two drawings moves both when only one was asked for (SPEC V322d, V308, B69)" }
+if ($oldNC322 -match "\bORN_MUR_") { $v322Bad += "the filigree or filete family reads an ORN_MUR_* constant - the merlon owns those four, and a shared owner is B69 in the other direction (SPEC V322d, V308)" }
+if (-not $oldNC322) { $v322Bad += "the filigree and filete families could not be read - the second half of leg (d) measured nothing (SPEC V209, V20)" }
+
+# (e) exactly FOUR palettes declare an ornament. This is the amended V320f seen from the other
+# side: every era carries a frame now, and the count being DECLARED is what stops a fifth from
+# arriving without a round behind it.
+$ornDecl322 = ([regex]::Matches($hh6, "(?m)^\s*ornament\s*=\s*""#[0-9A-Fa-f]{6,8}""")).Count
+$style322 = ([regex]::Matches($hh6, "(?m)^\t{5}ornStyle\s*=\s*""[^""]+""")).Count
+if ($ornDecl322 -ne 4) { $v322Bad += "$ornDecl322 palette(s) declare ornament and every one of the 4 eras is meant to carry a frame since this round (SPEC V322e, V320f)" }
+if ($style322 -lt 3) { $v322Bad += "only $style322 palette(s) declare an ornStyle - the corona muralis was the third, and fewer means an era quietly fell back to the default (SPEC V322e, V313a)" }
+
+if ($v322Bad) { foreach ($b in $v322Bad) { Fail "V322 $b" } }
+else { Pass "V322 the Classical Age draws corona-muralis in the gold it already carried, the fourth branch takes no radius, the merlon floor ($([Math]::Round($flr322, 2))) clears the smallest box side ($minD322), the four ORN_MUR_* stay in their own family, and $ornDecl322 palettes declare an ornament" }
+
+
+# ---- V325: the CHUNK fits under the compiler ceiling for locals, and the ceiling is
+# MEASURED (SPEC B77, the 122nd round) ---------------------------------------------------------
+# What breaks does NOT announce itself: rdk -l exits 1, deletes the .rpk and names neither file
+# nor line, so the round that overflows finds out by bisecting six builds unless the gate says it
+# first. Three legs: the count, and where the two newest families live.
+$v325Bad = @()
+
+# (a) locals at CHUNK scope - three tabs, the level THEMES and the ORN_* families sit at.
+# Ceiling measured at 105; the leg keeps 5 of margin.
+$chunk325 = [regex]::Matches($hh6, "(?m)^\t{3}local ").Count
+if ($chunk325 -eq 0) { $v325Bad += "counted 0 locals at chunk scope in WoD20.6 - the indentation this leg keys on moved, so it is measuring nothing (SPEC V209, V20, V325a)" }
+elseif ($chunk325 -gt 100) {
+    $v325Bad += "WoD20.6 declares $chunk325 locals at chunk scope against a ceiling of 100 (real limit 105, five kept as margin) - over it rdk -l exits 1, deletes the .rpk and names no file or line (SPEC V325a, B77, B19)"
+}
+
+# (c) POSITION, not count, and by PREFIX rather than by a list of names: what this leg measures
+# is WHERE a family lives, never WHO is in it. A constant can be renamed inside its painter and
+# stay correct; the moment one is hoisted to chunk scope the ceiling is back in play, and (a)
+# alone would only catch that once the ceiling was touched - one round late. Same reasoning as
+# V325b, which counts instead of naming owners.
+$colFn325 = LuaFn $hh6 "markCoronaMuralis"
+$murFn325 = LuaFn $hh6 "ornCoronaMuralis"
+
+if (-not $colFn325) { $v325Bad += "markCoronaMuralis is gone from WoD20.6 - leg (c) has no painter to look inside (SPEC V209, V325c)" }
+elseif (-not $murFn325) { $v325Bad += "ornCoronaMuralis is gone from WoD20.6 - leg (c) has no painter to look inside (SPEC V209, V325c)" }
+else {
+    foreach ($px325 in @("ORN_COL_", "ORN_GUT_", "ORN_MUR_")) {
+        $hoist325 = [regex]::Matches($hh6, ("(?m)^\t{3}local " + $px325))
+        if ($hoist325.Count -gt 0) {
+            $v325Bad += "$($hoist325.Count) $px325* constant(s) sit at CHUNK scope - that family lives inside its own painter precisely so the chunk stays under the ceiling, and hoisting one is B77 repeating with a build that fails without naming a line (SPEC V325c, I95b, I94d)"
+        }
+    }
+    foreach ($f325 in @("ornMuralFoot", "ornMuralCorner", "ornMuralEdge")) {
+        if ($hh6 -match ("(?m)^\t{3}local function " + $f325 + "\b")) {
+            $v325Bad += "$f325 is declared at CHUNK scope - the three mural helpers live inside ornCoronaMuralis, and each one hoisted out spends a chunk local the ceiling has no room for (SPEC V325c, B77)"
+        }
+    }
+
+    # zero-guard for the leg itself: with the families gone from their painters there would be
+    # nothing left to place and the loops above would pass by vacancy (SPEC V20, B7).
+    $inCol325 = [regex]::Matches($colFn325, "ORN_COL_\w+|ORN_GUT_\w+").Count
+    $inMur325 = [regex]::Matches($murFn325, "ORN_MUR_\w+").Count
+    if ($inCol325 -lt 8) { $v325Bad += "markCoronaMuralis mentions $inCol325 column/gutta constant(s) and the family is 8 - leg (c) would be placing constants that are not there (SPEC V209, V20, V325c)" }
+    if ($inMur325 -lt 4) { $v325Bad += "ornCoronaMuralis mentions $inMur325 mural constant(s) and the family is 4 - same vacancy on the box side (SPEC V209, V20, V325c)" }
+}
+
+if ($v325Bad) { foreach ($b in $v325Bad) { Fail "V325 $b" } }
+else { Pass "V325 WoD20.6 declares $chunk325 local(s) at chunk scope against a ceiling of 100, and no ORN_COL_/ORN_GUT_/ORN_MUR_ constant and none of the three mural helpers has been hoisted out of its painter" }
+
+# ---- V323: the COLUMN and the GUTTA draw on the Classical bar (SPEC I95, the 122nd round) -----
+# The era stops wearing a new box with the default marker. Six legs.
+$v323Bad = @()
+$markPathNC323 = NoComments (LuaFn $hh6 "markPath")
+$colNC323 = NoComments (LuaFn $hh6 "markCoronaMuralis")
+$murNC323 = NoComments (LuaFn $hh6 "ornCoronaMuralis")
+
+# zero-guard
+if (-not $colNC323)      { $v323Bad += "markCoronaMuralis is gone from WoD20.6 - there is no bar drawing to measure (SPEC V209, V323)" }
+if (-not $markPathNC323) { $v323Bad += "markPath is gone from WoD20.6 - nothing dispatches a marker style (SPEC V209)" }
+else {
+    $branch323 = [regex]::Matches($markPathNC323, "if style == ""[^""]+"" then return \w+\(").Count
+    if ($branch323 -lt 3) { $v323Bad += "markPath has $branch323 style branch(es) and the sheet is built around 3 - the Classical era would fall back to the default marker with nothing to say so (SPEC V209, V323a)" }
+}
+
+# (a) the THIRD branch, and it forwards kind. A branch with no function is nil called on the
+# theme switch; a function with no branch is code that never runs, with rdk -l 0 and the gate
+# green - the B6 family, from both ends.
+$br323 = [regex]::Match($markPathNC323, "if style == ""corona-muralis"" then return (\w+)\(([^)]*)\); end;")
+$sig323 = [regex]::Match($hh6, "local function markCoronaMuralis\(([^)]*)\)")
+if (-not $br323.Success) { $v323Bad += "markPath has no corona-muralis branch - the palette names a style the marker dispatcher never heard of (SPEC V323a, I95a)" }
+elseif ($br323.Groups[1].Value -ne "markCoronaMuralis") { $v323Bad += "the corona-muralis marker branch calls $($br323.Groups[1].Value) (SPEC V323a)" }
+elseif ($br323.Groups[2].Value -notmatch "\bkind\b") { $v323Bad += "the corona-muralis marker branch does not forward kind - all three levels would draw the same motif (SPEC V323a, I95a)" }
+if ($sig323.Success) {
+    $nArg323 = @($sig323.Groups[1].Value -split "\s*,\s*").Count
+    if ($nArg323 -ne 3) { $v323Bad += "markCoronaMuralis takes $nArg323 parameter(s) and the contract is 3 (w, h, kind) - the level it is drawing for arrives nil (SPEC V323a)" }
+} else { $v323Bad += "markCoronaMuralis has no readable signature - leg (a) measured nothing (SPEC V209)" }
+
+# (b) THREE motifs, and three DIFFERENT drawings. A motif that returns "" for one kind is a level
+# gone mute on the bar, and there is no rdk -l that says so - only the screen.
+if ($colNC323) {
+    if ($colNC323 -notmatch 'kind == "sep"') { $v323Bad += "markCoronaMuralis never tests kind == sep - the separator falls through to whatever the tab draws (SPEC V323b, I95d)" }
+    if ($colNC323 -notmatch 'kind == "sub"') { $v323Bad += "markCoronaMuralis never tests kind == sub - the sub-tab and the tab become the same drawing, which is I78b hierarchy lost (SPEC V323b)" }
+}
+
+# (c) the FILL answers per MOTIF, never per style (SPEC I95e): two return values, true on sep and
+# on sub, and NOT true on tab. Without this the column comes out FILLED - markRule writes
+# color = colour when the second value is true - and the Tuscan pair becomes one block of gold.
+if ($colNC323) {
+    $sepRet323 = [regex]::Match($colNC323, '(?s)kind == "sep".{0,400}?return [^;]*?,\s*true')
+    $subRet323 = [regex]::Match($colNC323, '(?s)kind == "sub".{0,1400}?return [^;]*?,\s*true')
+    if (-not $sepRet323.Success) { $v323Bad += "the sep motif does not return a second value of true - the separator gutta would be traced instead of filled, and it is a peg, not an outline (SPEC V323c, I95e)" }
+    if (-not $subRet323.Success) { $v323Bad += "the sub motif does not return a second value of true - its guttae would be traced (SPEC V323c, I95e)" }
+    $tabTail323 = $colNC323.Substring([Math]::Max(0, $colNC323.Length - 700))
+    if ($tabTail323 -match 'return [^;]*?,\s*true') { $v323Bad += "the tab motif returns true for the fill - the Tuscan column would be painted solid instead of traced, which is the one thing I95e exists to keep apart (SPEC V323c)" }
+}
+
+# (d) TWO guards, and what each drops is the SMALLEST thing: on tab the capital and base go and
+# the shaft survives; on sub the gutta goes and the rule survives. Floors READ out of the Lua and
+# measured against the narrowest button of each LEVEL - a floor with two owners is B69.
+$c323 = @{}
+foreach ($k323 in @("ORN_COL_W", "ORN_COL_SHAFT", "ORN_COL_ROOM", "ORN_GUT_STEP", "ORN_SUB_MARK", "ORN_PILLR")) {
+    $m323 = [regex]::Match($hh6, "(?m)^\s*local $k323\s*=\s*([\d.]+);")
+    if ($m323.Success) { $c323[$k323] = [double]$m323.Groups[1].Value }
+}
+if ($c323.Count -ne 6) { $v323Bad += "only $($c323.Count) of the 6 constants leg (d) needs could be read - it has no floor to compute (SPEC V209, V323d)" }
+else {
+    $wTop323 = @(); $wSub323 = @()
+    foreach ($pr323 in @(@("WoD20th.lfm","tabStrip",$true), @("WoD20.11.lfm","vampStrip",$false), @("WoD20.7.lfm","numStrip",$false), @("WoD20.7.lfm","hedgeStrip",$false))) {
+        $st323 = (Doc (Join-Path $dir $pr323[0])).SelectSingleNode("//layout[@name='$($pr323[1])']")
+        if ($null -eq $st323) { continue }
+        foreach ($r323 in $st323.SelectNodes("rectangle[starts-with(@name,'tabOn')]")) {
+            if ($pr323[2]) { $wTop323 += [double]$r323.GetAttribute("width") } else { $wSub323 += [double]$r323.GetAttribute("width") }
+        }
+    }
+    if (($wTop323.Count + $wSub323.Count) -ne 19) { $v323Bad += "read $($wTop323.Count + $wSub323.Count) marker(s) across the four bars, expected 19 - leg (d) is covering less than the bars hold (SPEC V209)" }
+    else {
+        $minTop323 = ($wTop323 | Measure-Object -Minimum).Minimum
+        $minSub323 = ($wSub323 | Measure-Object -Minimum).Minimum
+        $fCap323 = 2 * $c323["ORN_COL_W"] + $c323["ORN_COL_ROOM"]
+        $fSha323 = 2 * $c323["ORN_COL_SHAFT"] + $c323["ORN_COL_ROOM"]
+        $iSub323 = [Math]::Sqrt(($c323["ORN_PILLR"] + $c323["ORN_SUB_MARK"]) * ($c323["ORN_PILLR"] + $c323["ORN_SUB_MARK"]) - $c323["ORN_SUB_MARK"] * $c323["ORN_SUB_MARK"])
+        $fGut323 = 2 * $iSub323 + $c323["ORN_GUT_STEP"]
+        if ($fSha323 -ge $fCap323) { $v323Bad += "the shaft floor ($fSha323) is not below the capital floor ($fCap323) - the two levels of degradation collapse into one and the marker goes straight from full to gone (SPEC V323d, I95c)" }
+        if ($minTop323 -le $fSha323) { $v323Bad += "the narrowest top marker is $minTop323 against a shaft floor of $fSha323 - at that width the tab draws NOTHING, and a marker that quietly disappears is not the one anybody chose (SPEC V323d, V279, B59)" }
+        if ($minSub323 -le $fGut323) { $v323Bad += "the narrowest sub-tab is $minSub323 against a gutta floor of $([Math]::Round($fGut323, 2)) - at that width the pegs drop and the sub-tab keeps only its rule, which is the level losing half its mark (SPEC V323d, V279)" }
+        if ($colNC323 -match 'return "";' -and $colNC323 -notmatch 'ORN_COL_SHAFT') { $v323Bad += "the bar refuses by size without reading the shaft constant - the refusal is not the one the two-step degradation describes (SPEC V323d)" }
+    }
+}
+
+# (e) constants stay inside their own family (SPEC V308, B69). ORN_SUB_MARK is the DECLARED
+# exception and is read by both markers - the sub-tab height the user approved is one fact.
+if ($colNC323) {
+    if ($colNC323 -match "\bORN_MUR_") { $v323Bad += "markCoronaMuralis reads an ORN_MUR_* constant - those belong to the BOX frame, and one number serving the box and the bar moves both when only one was asked for (SPEC V323e, V308, B69)" }
+    if ($colNC323 -match "\bORN_FIL_|\bORN_COR_") { $v323Bad += "markCoronaMuralis reads a filete or corrente constant - it is drawing another era with this one numbers (SPEC V323e, V308)" }
+}
+if ($murNC323 -and $murNC323 -match "\bORN_COL_|\bORN_GUT_") { $v323Bad += "ornCoronaMuralis reads a column or gutta constant - the box frame is reading the bar family, which is B69 in the other direction (SPEC V323e, V308)" }
+
+# (f) the palette keeps its TWO keys and gains no third: the marker reads ornStyle, which already
+# exists, and its colour is t.stroke on #FFFFFF, as I78e set for all four eras. ornament belongs
+# to the BOX. A new key here would be a loose colour arriving through the one door nobody watches.
+$pal323 = [regex]::Match($themesBlock, "(?ms)^\t{4}\[""Classical Age""\] = \{(.*?)^\t{4}\},")
+if (-not $pal323.Success) { $v323Bad += "the Classical Age palette could not be read - leg (f) measured nothing (SPEC V209, V323f)" }
+else {
+    $pb323 = NoComments $pal323.Groups[1].Value
+    $nOrn323 = [regex]::Matches($pb323, "(?m)^\t{5}ornament\s*=").Count
+    $nSty323 = [regex]::Matches($pb323, "(?m)^\t{5}ornStyle\s*=").Count
+    if ($nOrn323 -ne 1) { $v323Bad += "the Classical Age palette declares $nOrn323 ornament key(s) and the contract is exactly 1 - a second is a loose colour entering through the ornament door (SPEC V323f, V53)" }
+    if ($nSty323 -ne 1) { $v323Bad += "the Classical Age palette declares $nSty323 ornStyle key(s) and the contract is exactly 1 (SPEC V323f)" }
+}
+
+if ($v323Bad) { foreach ($b in $v323Bad) { Fail "V323 $b" } }
+else { Pass "V323 the Classical bar draws the column and the gutta through markPath third branch, the three motifs are three drawings, only sep and sub fill, the narrowest marker ($minTop323) clears the shaft floor ($fSha323), the eight constants stay in their family, and the palette keeps its two keys" }
 
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }
