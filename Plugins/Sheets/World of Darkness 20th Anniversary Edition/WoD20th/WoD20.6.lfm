@@ -111,7 +111,7 @@
 				["BLOOD POOL"] = "RESERVA DE SANGUE",
 				["Courage"] = "Coragem",
 				["Crafts"] = "Ofícios",
-				["Credits"] = "Créditos",
+				["CREDITS"] = "CRÉDITOS",
 				["Creep Show"] = "Show de Horrores",
 				["Crippled (-5)"] = "Aleijado (-5)",
 				["Critic"] = "Crítico",
@@ -445,7 +445,7 @@
 				["Survival"] = "Sobrevivência",
 				["Survivor"] = "Sobrevivente",
 				["Synergy"] = "Sinergia",
-				["System: Storyteller"] = "Sistema: Storyteller",
+				["System: Storyteller 20th Anniversary Edition"] = "Sistema: Storyteller edição de aniversário de 20 anos",
 				["TALENTS"] = "TALENTOS",
 				["Technology"] = "Tecnologia",
 				["Telepathy"] = "Telepatia",
@@ -476,6 +476,7 @@
 				["Tyrant"] = "Tirano",
 				["Update"] = "Atualizar",
 				["Version"] = "Versão Atual",
+				["Version: 0.1.0"] = "Versão: 0.1.0",
 				["Victorian Era"] = "Era Vitoriana",
 				-- Latin, and the book leaves it Latin inside English prose - so the entry is the SAME
 				-- string on both sides (SPEC I17). The key still has to exist: V10 collects every picker
@@ -2575,11 +2576,12 @@
 			-- palettes the Classical was the only one declaring no `ornament`, so V277 hid its path
 			-- and its boxes have been bare outline for as long as the system has existed.
 			--
-			-- TWO things, and the order between them IS the hierarchy (SPEC I94c): one continuous
-			-- RULE following the box own concave corner, and the MERLON course running between
+			-- THREE things, and the order between them IS the hierarchy (SPEC I94c): one continuous
+			-- RULE following the box own concave corner, the MERLON course running between
 			-- ORN_MUR_OUT and ORN_MUR_OUT + ORN_MUR_RISE - the crenellation of a city wall, which
-			-- is what a mural crown is. The rule is what never drops; the merlon is what a box
-			-- without room loses (SPEC V314e, V322c, B59).
+			-- is what a mural crown is - and the TOWER standing in each of the four corners, which
+			-- is what a wall carries where two curtains meet (user 2026-08-28). The rule is what
+			-- never drops; the merlon is what a box without room loses (SPEC V314e, V322c, B59).
 			--
 			-- The radius arrives as a PARAMETER, exactly as the corrente does (SPEC I96c, V324b).
 			-- The V317a check derives from the CODE which branch wants a cut corner, by reading which
@@ -2594,11 +2596,12 @@
 			-- MEASURED before drawing (SPEC I94b): deepest ink is the rule on the corner diagonal at
 			-- (ORN_BOXR + ORN_MUR_IN) / sqrt(2) = 20.5, against the 23 the filigree already spends,
 			-- so this is SHALLOWER than the drawing that already exists and the 20px margin of I73 is
-			-- not a new question. The merlon alone reaches 11.
+			-- not a new question. The merlon alone reaches 11, and the tower 14 - still under the
+			-- rule that frames it, so the crown's deepest ink is where it always was.
 			-- Four corners and four runs, stamped from ONE drawing each, exactly as the filigree and
 			-- the filete are: four hand-authored copies are four things that drift apart.
 			--
-			-- THE WHOLE FAMILY LIVES IN HERE - the four constants and the three helpers - and that
+			-- THE WHOLE FAMILY LIVES IN HERE - the five constants and the four helpers - and that
 			-- is a CEILING and not taste (SPEC B77, V325c). This chunk holds a measured 105 locals:
 			-- the rdk compiler emits its own into it and Lua's limit of 200 is reached in there.
 			-- The family cost the chunk SEVEN of those and nothing outside ever read one of them,
@@ -2611,10 +2614,11 @@
 			-- here ORN_OUT and ORN_IN are still reachable and still unread, and ORN_MUR_* are now
 			-- unreachable to everyone else by construction rather than by convention.
 			local function ornCoronaMuralis(w, h, radius)
-				local ORN_MUR_OUT  = 6;    -- the merlon course, in from the box edge
-				local ORN_MUR_IN   = 15;   -- the inner rule
-				local ORN_MUR_STEP = 12;   -- one merlon plus one embrasure
-				local ORN_MUR_RISE = 5;    -- how far the merlon stands above its course
+				local ORN_MUR_OUT   = 6;    -- the merlon course, in from the box edge
+				local ORN_MUR_IN    = 15;   -- the inner rule
+				local ORN_MUR_STEP  = 12;   -- one merlon plus one embrasure
+				local ORN_MUR_RISE  = 5;    -- how far the merlon stands above its course
+				local ORN_MUR_TOWER = 8;    -- the corner tower, side
 
 				-- Where a run at depth d leaves the corner, in from it along the edge. The era cuts its
 				-- corner as innerLine - a STEP, the straight partner of innerRound the way bevel is the
@@ -2650,6 +2654,32 @@
 					ornLine(o, t, d, f);
 				end;
 
+				-- The corner TOWER (user 2026-08-28). What a mural crown carries where two curtains
+				-- meet, and the answer to the note above ornMuralCorner: a merlon riding the corner
+				-- would have to shrink, and every tooth of a wall is the same size. A tower is not a
+				-- shrunken tooth - it stands DEEPER than the merlon course, and the course is what
+				-- runs out OF it rather than past it.
+				--
+				-- A SQUARE on the diagonal, so one drawing serves both legs and `swap` cannot tell the
+				-- two apart. Its outer faces sit on ORN_MUR_OUT itself and NOT on ornMuralFoot: the
+				-- foot says where a RUN leaves the step, and the tower does not leave it - it sits in
+				-- it. Reaching 14, it stays under the rule at 15 and well inside the 20 of I73.
+				--
+				-- FIVE runs and not four: this path vocabulary has no close verb, so the last line is
+				-- the first point spelled again. It is a helper of its own for V324d's reason - the
+				-- corner closes a step with exactly TWO runs, and a square emitted in there would read
+				-- as the 45 degree cut that measures right and draws wrong.
+				local function ornMuralTower(o, t)
+					local a = ORN_MUR_OUT;
+					local b = a + ORN_MUR_TOWER;
+
+					ornMove(o, t, a, a);
+					ornLine(o, t, b, a);
+					ornLine(o, t, b, b);
+					ornLine(o, t, a, b);
+					ornLine(o, t, a, a);
+				end;
+
 				-- One edge: the rule arc end to arc end, then the crenellation on its own shallower course.
 				-- The rule is emitted FIRST and unconditionally, so by the time the merlon can refuse there
 				-- is already ink on this edge - a box skipped in silence between ornamented neighbours is
@@ -2662,8 +2692,12 @@
 					ornMove(o, t, u0, ORN_MUR_IN);
 					ornLine(o, t, span - u0, ORN_MUR_IN);
 
-					-- The course is SHALLOWER than the rule, so it leaves the arc at its own foot.
-					local m0  = ornMuralFoot(ORN_MUR_OUT);
+					-- The course leaves the TOWER now, not the corner, so its start is the tower's far
+					-- face and the foot has nothing to say here: what the step costs was already paid
+					-- by the square standing in it. ORN_MUR_TOWER >= radius is what keeps this at or
+					-- past the ornMuralFoot(ORN_MUR_OUT) it replaces - at 8 against 1 there is room to
+					-- spare, and under it the first merlon would walk back INTO the tower.
+					local m0  = ORN_MUR_OUT + ORN_MUR_TOWER;
 					local run = span - 2 * m0;
 					local n   = math.floor(run / ORN_MUR_STEP);
 
@@ -2692,6 +2726,11 @@
 				ornMuralCorner(o, {ox = w, oy = 0, sx = -1, sy =  1});
 				ornMuralCorner(o, {ox = 0, oy = h, sx =  1, sy = -1});
 				ornMuralCorner(o, {ox = w, oy = h, sx = -1, sy = -1});
+
+				ornMuralTower(o, {ox = 0, oy = 0, sx =  1, sy =  1});
+				ornMuralTower(o, {ox = w, oy = 0, sx = -1, sy =  1});
+				ornMuralTower(o, {ox = 0, oy = h, sx =  1, sy = -1});
+				ornMuralTower(o, {ox = w, oy = h, sx = -1, sy = -1});
 
 				ornMuralEdge(o, {ox = 0, oy = 0, sx =  1, sy =  1}, w);
 				ornMuralEdge(o, {ox = 0, oy = h, sx =  1, sy = -1}, w);
@@ -3618,16 +3657,18 @@
 			and the same 14px above the first line as below the last - it was 10 and 5, and the
 			lopsided pair is what showed. Both boxes on this tab went 330 -> 380 wide with it.
 		-->
-		<layout left="0" top="150" width="420" height="170">
+		<layout left="0" top="150" width="420" height="206">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="20" top="20" width="380" height="20" text="Credits" horzTextAlign="center"/>
+			<label left="20" top="20" width="380" height="20" text="CREDITS" horzTextAlign="center"/>
 
 			<label left="20" top="60" width="380" height="20" text="Developer: Andre (Styllern)" horzTextAlign="center"/>
 
 			<label left="20" top="94" width="380" height="20" text="Based on the sheet plugin by Vinny (Ambesek)" horzTextAlign="center" fontSize="12"/>
 
-			<label left="20" top="130" width="380" height="20" text="System: Storyteller" horzTextAlign="center"/>
+			<label left="20" top="130" width="380" height="20" text="System: Storyteller 20th Anniversary Edition" horzTextAlign="center"/>
+
+			<label left="20" top="166" width="380" height="20" text="Version: 0.1.0" horzTextAlign="center"/>
 		</layout>
 	</scrollBox>
 </form>
