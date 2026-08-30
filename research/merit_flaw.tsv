@@ -1,0 +1,818 @@
+# merit_flaw.tsv - qualidades e defeitos EXTRAIDOS dos 15 livros (T749, 2026-08-28)
+#
+# colunas: nome_EN <TAB> tipo <TAB> custo <TAB> categoria <TAB> livro <TAB> pag_impressa
+#
+# METODO: pdftotext -layout -enc UTF-8 + corte na CALHA (extract_merit_flaw.ps1, reescrito
+# na 135a rodada - armadilhas 8 e 9 do README.md). pagina = indice do split por \f, e
+# pag_impressa = pagina_PDF - offset. Offsets MEDIDOS em 2026-08-28 e gravados no
+# README.md deste diretorio. O metodo se validou sozinho em core=8 e da=1, que ja
+# eram conhecidos.
+#
+# 2 correcoes da 135a rodada, as duas MEDIDAS:
+#   - as 81 linhas do `da` estavam SEM TIPO (notacao 4 nao diz Merit nem Flaw). O extrator
+#     agora guarda o cabecalho de secao e o tipo saiu de la: 27 Merit + 54 Flaw.
+#   - a linha `Japheth  lob  4` SAIU: era ponto de SUMARIO. O item real e
+#     `Disciple of Lazarus / Japheth  lob  48`, que ja estava na lista. 783 -> 782 linhas.
+#
+# SETE NOTACOES, nao tres (o R125 registrou tres; as outras quatro sairam da medicao
+# de 2026-08-28). Um parser que conheca menos perde o resto CALADO:
+#   1 core    Acute Sense (1pt. Merit)
+#   2 anarch  Peacemaker (2-pt. Merit)              hifen entre o numero e pt
+#   3 tos     <nome em linha propria> + (3 pt. Supernatural Merit) na linha seguinte
+#   4 da      Ambidextrous (1 point): <prosa>       nao diz Merit nem Flaw - o tipo vem
+#             do cabecalho de secao (Physical Merits / Physical Flaws / ...)
+#   5 sorc    Path Natural: (5 pt Merit)            dois-pontos ANTES do parentese
+#   6 m20va   * Well-Rounded (1 pt. Mental Merit)   marcador antes do nome
+#   7 m20va   * Construct (Social Flaw):            SEM custo, so categoria
+#
+# custo e VERBATIM do livro (string, nao numero): pode ser "2", "1 or 3", "3-5", "" .
+# Linhas de indice (sumario) foram descartadas: terminam no numero da pagina que apontam.
+#
+# FORA: m20 (o PDF esta em portugues), bcm e trel (zero qualidades). Decisao do user
+# 2026-08-28: os 15 restantes entram todos, sem filtro por tema.
+#
+# ESTE ARQUIVO AINDA NAO E A LISTA FINAL. Nome repetido entre livros continua repetido
+# aqui de proposito: o dedupe por essencia (pedido 12.1) precisa das descricoes lado a
+# lado, e apagar a evidencia antes de decidir e perda calada.
+Acute Sense	Merit	1		core	479
+Ambidextrous	Merit	1		core	480
+Bruiser	Merit	1		core	480
+Catlike Balance	Merit	1		core	480
+Early Riser	Merit	1		core	480
+Eat Food	Merit	1		core	480
+Friendly Face	Merit	1		core	480
+Blush of Health	Merit	2		core	480
+Enchanting Voice	Merit	2		core	480
+Daredevil	Merit	3		core	480
+Efficient Digestion	Merit	3		core	480
+Huge Size	Merit	4		core	480
+Hard of Hearing	Flaw	1		core	480
+Short	Flaw	1		core	481
+Smell of the Grave	Flaw	1		core	481
+Tic/Twitch	Flaw	1		core	481
+Bad Sight	Flaw	1 or 3		core	481
+Fourteenth Generation	Flaw	2		core	481
+Fifteenth Generation	Flaw	4		core	481
+Disfigured	Flaw	2		core	481
+Dulled Bite	Flaw	2		core	481
+Infectious Bite	Flaw	2		core	481
+One Eye	Flaw	2		core	481
+Vulnerability to Silver	Flaw	2		core	482
+Open Wound	Flaw	2 or 4		core	482
+Addiction	Flaw	3		core	482
+Child	Flaw	3		core	482
+Deformity	Flaw	3		core	482
+Glowing Eyes	Flaw	3		core	482
+Lame	Flaw	3		core	482
+Lazy	Flaw	3		core	482
+Monstrous	Flaw	3		core	482
+Permanent Fangs	Flaw	3		core	482
+Permanent Wound	Flaw	3		core	482
+Slow Healing	Flaw	3		core	483
+Disease Carrier	Flaw	4		core	483
+Deaf	Flaw	4		core	483
+Mute	Flaw	4		core	483
+Thin Blood	Flaw	4		core	483
+Flesh of the Corpse	Flaw	5		core	483
+Infertile Vitae	Flaw	5		core	484
+Blind	Flaw	6		core	484
+Coldly Logical	Merit	1		core	484
+Common Sense	Merit	1		core	484
+Concentration	Merit	1		core	484
+Introspection	Merit	1		core	484
+Language	Merit	1		core	484
+Time Sense	Merit	1		core	484
+Useful Knowledge	Merit	1		core	484
+Code of Honor	Merit	2		core	484
+Computer Aptitude	Merit	2		core	484
+Eidetic Memory	Merit	2		core	484
+Light Sleeper	Merit	2		core	485
+Natural Linguist	Merit	2		core	485
+Calm Heart	Merit	3		core	485
+Iron Will	Merit	3		core	485
+Precocious	Merit	3		core	485
+Deep Sleeper	Flaw	1		core	485
+Impatient	Flaw	1		core	485
+Nightmares	Flaw	1		core	485
+Prey Exclusion	Flaw	1		core	485
+Shy	Flaw	1		core	485
+Soft-Hearted	Flaw	1		core	485
+Speech Impediment	Flaw	1		core	485
+Unconvinced	Flaw	1		core	485
+Amnesia	Flaw	2		core	486
+Lunacy	Flaw	2		core	486
+Phobia	Flaw	2		core	486
+Short Fuse	Flaw	2		core	486
+Stereotype	Flaw	2		core	486
+Territorial	Flaw	2		core	486
+Thirst for Innocence	Flaw	2		core	486
+Vengeful	Flaw	2		core	486
+Victim of the Masquerade	Flaw	2		core	486
+Weak-Willed	Flaw	3		core	486
+Conspicuous Consumption	Flaw	4		core	486
+Guilt-Wracked	Flaw	4		core	486
+Flashbacks	Flaw	6		core	487
+Elysium Regular	Merit	1		core	487
+Former Ghoul	Merit	1		core	487
+Harmless	Merit	1		core	487
+Natural Leader	Merit	1		core	487
+Prestigious Sire	Merit	1		core	488
+Rep	Merit	1		core	488
+Sabbat Survivor	Merit	1		core	488
+Boon	Merit	1-6		core	488
+Bullyboy	Merit	2		core	488
+Old Pal	Merit	2		core	488
+Lawman's Friend	Merit	2		core	488
+Open Road	Merit	2		core	488
+Sanctity	Merit	2		core	488
+Scholar of Enemies	Merit	2		core	489
+Scholar of Others	Merit	2		core	489
+Friend of the Underground	Merit	3		core	489
+Mole	Merit	3		core	489
+Rising Star	Merit	3		core	489
+Broken Bond	Merit	4		core	489
+Clan Friendship	Merit	4		core	489
+Primogen/Bishop Friendship	Merit	4		core	489
+Botched Presentation	Flaw	1		core	489
+Dark Secret	Flaw	1		core	489
+Expendable	Flaw	1		core	489
+Incomplete Understanding	Flaw	1		core	490
+Infamous Sire	Flaw	1		core	490
+Mistaken Identity	Flaw	1		core	490
+New Arrival	Flaw	1		core	490
+New Kid	Flaw	1		core	490
+Recruitment Target	Flaw	1		core	490
+Sire's Resentment	Flaw	1		core	490
+Special Responsibility	Flaw	1		core	490
+Sympathizer	Flaw	1		core	490
+Enemy	Flaw	1-5		core	490
+Bound	Flaw	2		core	490
+Catspaw	Flaw	2		core	490
+Escaped Target	Flaw	2		core	491
+Failure	Flaw	2		core	491
+Masquerade Breaker	Flaw	2		core	491
+Hunted	Flaw	4		core	491
+Old Flame	Flaw	2		core	491
+Rival Sires	Flaw	2		core	491
+Uppity	Flaw	2		core	492
+Disgrace to the Blood	Flaw	3		core	492
+Former Prince	Flaw	3		core	492
+Hunted Like a Dog	Flaw	3		core	492
+Narc	Flaw	3		core	492
+Sleeping With the Enemy	Flaw	3		core	492
+Clan Enmity	Flaw	4		core	492
+Loathsome Regnant	Flaw	4		core	492
+Overextended	Flaw	4		core	492
+Probationary Sect Member	Flaw	4		core	493
+Blood Hunted	Flaw	4 or 6		core	493
+Laughingstock	Flaw	5		core	493
+Red List	Flaw	7		core	493
+Deceptive Aura	Merit	1		core	493
+Healing Touch	Merit	1		core	493
+Inoffensive to Animals	Merit	1		core	493
+Medium	Merit	2		core	493
+Magic Resistance	Merit	2		core	493
+Hidden Diablerie	Merit	3		core	493
+Lucky	Merit	3		core	493
+Oracular Ability	Merit	3		core	493
+Spirit Mentor	Merit	3		core	493
+True Love	Merit	4		core	493
+Additional Discipline	Merit	5		core	494
+Unbondable	Merit	5		core	494
+Nine Lives	Merit	6		core	494
+True Faith	Merit	7		core	494
+Cast No Reflection	Flaw	1		core	494
+Cold Breeze	Flaw	1		core	494
+Repulsed by Garlic	Flaw	1		core	494
+Touch of Frost	Flaw	1		core	494
+Cursed	Flaw	1-5		core	494
+Beacon of the Unholy	Flaw	2		core	494
+Deathsight	Flaw	2		core	494
+Eerie Presence	Flaw	2		core	495
+Lord of the Flies	Flaw	2		core	495
+Can't Cross Running Water	Flaw	3		core	495
+Haunted	Flaw	3		core	495
+Repelled by Crosses	Flaw	3		core	495
+Grip of the Damned	Flaw	4		core	495
+Dark Fate	Flaw	5		core	495
+Light-Sensitive	Flaw	5		core	495
+Sectarian Ally	Merit	1		lotc	26
+Thousand Meter Killer	Merit	1		lotc	26
+Outcast	Flaw	2		lotc	26
+Broken Antitribu	Flaw	3		lotc	26
+Multiple Curses	Flaw	3		lotc	26
+Dynamic Personality	Merit	5		lotc	48
+Obvious Predator	Flaw	2		lotc	48
+Drug Resistance	Merit	2		lotc	67
+Addictive Blood	Merit	3		lotc	67
+Setite Initiate	Merit	5		lotc	67
+Scales	Flaw	1-3		lotc	67
+Venomous Bite	Flaw	2		lotc	67
+Forked Tongue	Flaw	2		lotc	67
+Heartless	Flaw	4		lotc	67
+Aura of the Typhon	Flaw	5		lotc	67
+Hive-Minded	Merit	1 or 2		lotc	86
+Skald	Merit	2		lotc	87
+Lesser Mark of the Beast	Merit	4		lotc	87
+Totemic Change	Merit	5		lotc	87
+Member of the Pack	Flaw	2		lotc	87
+Rat in a Cage	Flaw	2		lotc	87
+Cannibal	Merit	1		lotc	106
+Consanguineous Resistance	Merit	1		lotc	106
+Mortuario	Merit	2 or 4		lotc	106
+Sanguine Incongruity	Merit	5		lotc	106
+Inbred	Flaw	1-5		lotc	107
+Shadow Walker	Flaw	6		lotc	107
+Court Favorite	Merit	1-5		lotc	121
+Eyes of Shadow	Merit	1-4		lotc	121
+Bigger Boys Came	Merit	2		lotc	121
+Call of the Sea	Merit	2		lotc	122
+Controllable Night Sight	Merit	2		lotc	122
+Secret Stash	Merit	2-5		lotc	122
+Aura of Command	Merit	3		lotc	122
+King or Queen of Shadow	Merit	4		lotc	122
+Long-Term Planning	Merit	4		lotc	123
+Instrument of God	Merit	5		lotc	123
+Uncontrollable Night Sight	Flaw	2		lotc	123
+Insubordinate	Flaw	3		lotc	123
+Unproven	Flaw	3		lotc	123
+Distracting Aura	Merit	2		lotc	142
+Prophetic Dreams	Merit	2		lotc	142
+Cold Read	Merit	3		lotc	142
+Paper Trail	Flaw	2		lotc	142
+Stigmata	Flaw	2 or 4		lotc	142
+Infectious	Flaw	3		lotc	142
+Overstimulated	Flaw	3		lotc	142
+Dead Inside	Flaw	4		lotc	142
+Foul Blood	Merit	1		lotc	160
+Lizard Limbs	Merit	1		lotc	160
+Long Fingers	Merit	1		lotc	160
+Monstrous Maw	Merit	1		lotc	160
+Piscine	Merit	1		lotc	161
+Slimy	Merit	1		lotc	161
+Spawning Pool	Merit	1-3		lotc	161
+Tunnel Rat	Merit	1-5		lotc	161
+Sleep Unseen	Merit	2		lotc	161
+Tough Hide	Merit	2		lotc	161
+False Reflection	Merit	3		lotc	161
+Patagia	Merit	4		lotc	161
+Rugged Bad Looks	Merit	5		lotc	161
+Stench	Flaw	1		lotc	161
+Dangerous Secret	Flaw	1-5		lotc	161
+Anosmia	Flaw	2		lotc	162
+Parasitic Infestation	Flaw	2		lotc	162
+Bestial	Flaw	3		lotc	163
+Enemy Brood	Flaw	3		lotc	163
+Putrescent	Flaw	4		lotc	163
+Contagious	Flaw	5		lotc	163
+Incoherent	Flaw	5		lotc	163
+Antitoxin Blood	Merit	1		lotc	181
+Brahmin	Merit	1		lotc	182
+Kshatriya	Merit	1		lotc	182
+Legerdemain	Merit	1		lotc	182
+Mute Devotion	Merit	1		lotc	182
+Vaishya	Merit	1		lotc	182
+Critters	Merit	2		lotc	182
+Heart of Needles	Merit	3		lotc	182
+Chandala	Flaw	1		lotc	182
+Flawed Reality	Flaw	2		lotc	182
+Oathbreaker	Flaw	2		lotc	182
+Lost Svadharma	Flaw	3		lotc	183
+Indelible	Merit	1 or 2		lotc	200
+Impressive Restraint	Merit	2		lotc	200
+Master of the Masquerade	Merit	2		lotc	200
+Slowed Degeneration	Merit	5		lotc	200
+Tortured Artist	Flaw	1		lotc	200
+Private Life	Flaw	3		lotc	200
+Embraced without the Cup	Merit	1		lotc	218
+Secret Society Member	Merit	1		lotc	218
+Keys to the Library	Merit	1-5		lotc	218
+Outside Haven	Merit	2		lotc	219
+Unmarked Antitribu	Merit	2 or 5		lotc	219
+Quartermaster	Merit	3		lotc	219
+Arcane Curse	Flaw	1-5		lotc	219
+Cloistered	Flaw	2		lotc	219
+Betrayer's Mark	Flaw	3		lotc	219
+Bound to the Clan	Flaw	3		lotc	219
+Mage Blood	Flaw	5		lotc	219
+Thaumaturgically Inept	Flaw	5		lotc	219
+Dracon's Temperament	Merit	3		lotc	238
+Haven Affinity	Merit	3		lotc	238
+Bioluminescence	Merit	1		lotc	238
+Pain Tolerance	Merit	2		lotc	238
+Revenant Disciplines	Merit	3		lotc	238
+Promethean Clay	Merit	5		lotc	238
+Unblinking	Flaw	1		lotc	239
+Ancestral Soil Dependence	Flaw	2		lotc	239
+Faceless	Flaw	3		lotc	239
+Privacy Obsession	Flaw	3		lotc	239
+Revenant Weakness	Flaw	3		lotc	239
+Consumption	Flaw	5		lotc	239
+Connoisseur	Merit	2		lotc	261
+Blessed by St. Gustav	Merit	4		lotc	261
+Uncommon Vitae Preference	Flaw	2		lotc	261
+Personal Masquerade	Merit	3		lotc	269
+Clan Weakness	Flaw	2		lotc	270
+Fangless	Flaw	2		lotc	270
+Ignorance	Flaw	2		lotc	270
+Bulimia	Flaw	4		lotc	270
+Loyalty	Merit	5		gr	126
+Black and White	Flaw	1		gr	127
+Duplicitous	Flaw	3		gr	128
+Benevolent Domitor	Merit	3		gr	129
+Isolated Upbringing	Flaw	1		gr	129
+Groomed for Embrace	Merit	5		gr	129
+Squeamish	Flaw	1 or 3		gr	130
+Domitor Pariah	Flaw	2		gr	130
+Loose Lips	Flaw	3		gr	131
+Self-Preservation	Flaw	3		gr	132
+Turncoat	Flaw	4		gr	132
+Blood Feud	Flaw	5		gr	132
+Hunted	Flaw	5		gr	133
+Problem with Authority	Flaw	5		gr	133
+Fugitive	Flaw	6		gr	133
+Albino	Flaw	1		gr	134
+Vicissitude Modifications	Merit	1-7		gr	134
+Cannibal	Flaw	3		gr	136
+Hemophiliac	Flaw	3		gr	136
+Seizures	Flaw	3		gr	136
+Pale Aura	Merit	2		gr	137
+Clear-Sighted	Merit	4		gr	137
+Blood Flaw Immunity	Merit	5		gr	137
+Poisonous Blood	Merit	5		gr	137
+Unbondable	Merit	6		gr	137
+Virulent Strike	Merit	7		gr	138
+Finicky Palate	Flaw	1		gr	138
+Artificially Aged	Flaw	2		gr	138
+Offensive to Animals	Flaw	2		gr	138
+Romantic Notions	Flaw	2		gr	138
+Vitae Sink	Flaw	3		gr	139
+Occult Library	Merit	2 or 4		gr	139
+Detached	Merit	4		hh	42
+Black and White	Flaw	1		hh	42
+Combat Novice	Flaw	2		hh	42
+Addicted to Vampire Blood	Flaw	3		hh	42
+Hemophiliac	Flaw	3		hh	43
+Science Laboratory	Merit	2		hh	43
+Pale Aura	Merit	2		hh	43
+Clear-Sighted	Merit	3		hh	44
+Poisonous Blood	Merit	5		hh	44
+Sanctuary	Merit	5		hh	44
+Isolated Upbringing	Flaw	1		hh	123
+Religious Hysteria	Flaw	3		hh	123
+Ecclesial Rank	Merit	1-3		hh	123
+Sanctioned Witch	Merit	2		hh	123
+Rebel	Flaw	1-3		hh	123
+Ecstatic	Merit	2		hh	124
+Ecumenist	Merit	4		hh	124
+Fist of God	Merit	7		hh	124
+Holy Aura	Merit	2		hh	124
+Paradise Lost	Flaw	2		hh	125
+Paranoid	Flaw	2		hh	132
+Siege Mentality	Flaw	3		hh	132
+Manchurian Candidate	Flaw	5		hh	132
+Inter-Agency Liaison	Merit	2		hh	133
+Sanction	Merit	2		hh	133
+Embedded Agent	Merit	3		hh	133
+Non-Standard Access	Merit	3		hh	133
+Credulous	Flaw	3 or 5		hh	133
+Backup Identity	Merit	3		hh	133
+Aging	Flaw	3		hh	141
+Cultural Chameleon	Merit	2		hh	141
+Research Grant	Merit	2		hh	141
+Clear Sighted	Merit	5		hh	141
+Innocent	Merit	1		hh	142
+Sense Influence	Merit	3		hh	151
+Thugs	Merit	1		hh	151
+Legacy	Merit	2		hh	151
+Dead Zone	Merit	2		hh	151
+Methuselah's Thirst	Flaw	7		bh	177
+Discerning Palate	Merit	4		bh	177
+Berserker	Merit	3		bh	177
+Arcane	Merit	1 to 5		bh	177
+Entrepreneur	Merit	2		bh	178
+Paragon	Merit	7		bh	178
+Vulgar	Flaw	1		bh	178
+Oathbreaker	Flaw	4		bh	178
+Apostate	Merit	2		bh	178
+Without a Trace	Merit	2		bh	179
+Psychic Leech	Merit	5		bh	179
+Kiss of Death	Flaw	2		bh	179
+Devil's Mark	Flaw	3		bh	179
+Lord of the Night	Flaw	3		bh	179
+Vassal of the Clan	Flaw	6		bh	179
+Soapbox	Merit	3		anarch	4
+Peacemaker	Merit	2		anarch	102
+Prized Patch	Merit	2		anarch	102
+Expiration Date	Flaw	2		anarch	102
+Black Sheep	Flaw	5		anarch	102
+Soapbox	Merit	3		anarch	102
+Sugar Daddy	Merit	3		anarch	102
+Kashaph	Merit	1		rob	100
+Dark Aura	Flaw	3		lob	3
+Chorus Trained	Merit	3 or 5		lob	3
+Banshee-in-Waiting	Flaw	5		lob	3
+Blood Weakness	Flaw	4 or 7		lob	4
+Half-Life	Merit	6		lob	4
+Unsanctioned Embrace	Flaw	2		lob	4
+Illiterate	Flaw	1-2		lob	4
+Body Trail	Flaw	4		lob	5
+The Eighth	Flaw	6		lob	5
+Stitcher	Merit	3		lob	5
+Fatalist	Merit	3		lob	5
+Carrion Presence	Flaw	2		lob	16
+Dark Aura	Flaw	3		lob	16
+The High Price	Merit	3		lob	16
+Plague of Demons	Flaw	4		lob	16
+Simply Waiting	Merit	4		lob	16
+Chorus Trained	Merit	3 or 5		lob	26
+Fugue Instinct	Merit	3		lob	26
+Banshee-in-Waiting	Flaw	5		lob	26
+Stillness of Death	Merit	2		lob	37
+Heavy Hands	Merit	3		lob	37
+Stone Tongue	Flaw	3		lob	37
+Blood Weakness	Flaw	4 or 7		lob	37
+Disciple of Lazarus / Japheth	Merit	2		lob	48
+Styx Baptism	Merit	3		lob	48
+Half-Life	Merit	6		lob	48
+Unsanctioned Embrace	Flaw	2		lob	48
+Shadow Scarred	Flaw	3		lob	48
+Prized Collection	Merit	1-2		lob	59
+Alien Perfection	Merit	2		lob	59
+Lightweight	Flaw	1		lob	60
+Illiterate	Flaw	1-2		lob	60
+Paranormal Link	Merit	2		lob	60
+Skin of Porcelain	Merit	4		lob	60
+Vitae Mutation	Merit	5		lob	60
+Refined Palate	Flaw	1-3		lob	60
+Dreadful Mara	Flaw	4		lob	60
+Extra Sharp	Merit	2		lob	70
+Wolverine's Palate	Merit	3		lob	70
+The Largest Maw	Flaw	2		lob	70
+Body Trail	Flaw	4		lob	70
+Scent of the Other	Merit	1		lob	80
+Sight Beyond Sight	Merit	3		lob	80
+Warrior's Heart	Merit	3		lob	80
+The Eighth	Flaw	6		lob	80
+Death Grip	Merit	3		lob	91
+Stitcher	Merit	3		lob	91
+Brittle Body	Flaw	2 or 4		lob	91
+Mortal Flashbacks	Flaw	5		lob	91
+Advanced Tech	Merit	1-5		lob	99
+Fatalist	Merit	3		lob	99
+True Celerity	Merit	5		lob	99
+Out of Phase	Flaw	2		lob	99
+Ambidextrous	Merit	1		da	420
+Deceptive Eating	Merit	1		da	420
+Blush of Health	Merit	2		da	420
+Without a Trace	Merit	2		da	420
+Efficient Digestion	Merit	3		da	420
+Sturdy	Merit	4		da	420
+Odd Gait	Flaw	1		da	421
+Ragged Bite	Flaw	2		da	421
+Unclean	Flaw	2 or 3		da	421
+Addiction	Flaw	3		da	421
+Monstrous	Flaw	3		da	421
+Permanent Wound	Flaw	3		da	421
+Slow Healing	Flaw	3		da	421
+Child	Flaw	4		da	421
+Impaired Sense	Flaw	4		da	421
+Mute	Flaw	4		da	421
+Flesh of the Corpse	Flaw	5		da	421
+Celestial Attunement	Merit	1		da	422
+Common Sense	Merit	1		da	422
+Literacy	Merit	1		da	422
+Eidetic Memory	Merit	2		da	422
+Light Sleeper	Merit	2		da	422
+Multi-Lingual	Merit	2		da	422
+Prey Exclusion	Flaw	1		da	422
+Amnesia	Flaw	2		da	422
+Vengeful	Flaw	2		da	422
+Flesh Eater	Flaw	2		da	422
+Ethical Prohibition	Flaw	2 or 4		da	422
+Deep Sleeper	Flaw	1		da	422
+Nightmares	Flaw	1		da	422
+The Company of Saints and Heroes	Merit	1		da	423
+Prestigious Sire	Merit	1		da	423
+Debt of Gratitude	Merit	1 or 3		da	423
+Lingua Franca	Merit	1		da	423
+Patron	Merit	1 to 5		da	423
+Dark Secret	Flaw	1		da	423
+Infamous Sire	Flaw	1		da	423
+Mistaken Identity	Flaw	1		da	423
+Outsider	Flaw	1		da	423
+Sire's Resentment	Flaw	1		da	423
+Smell of the Grave	Flaw	1		da	423
+Vulgar	Flaw	1		da	424
+Enemy	Flaw	1 to 5		da	424
+Rivalry	Flaw	1 to 5		da	424
+Territorial	Flaw	2		da	425
+Apostate	Flaw	2		da	425
+Hunted	Flaw	4		da	425
+Marked for Death	Flaw	4		da	425
+Oathbreaker	Flaw	4		da	425
+Outspoken Heretic	Flaw	4		da	425
+Nameless	Flaw	5		da	425
+Darksight	Merit	2		da	425
+Inoffensive to Animals	Merit	1		da	425
+Lucky	Merit	1 to 5		da	425
+Clan Apostate	Merit	2		da	425
+Medium	Merit	2		da	426
+Oracular Ability	Merit	3		da	426
+Spirit Mentor	Merit	3		da	426
+Unbondable	Merit	3		da	426
+True Love	Merit	4		da	426
+Nine Lives	Merit	6		da	426
+Cast No Reflection	Flaw	1		da	426
+Initiate of the Road	Flaw	1		da	426
+Repulsed by Garlic	Flaw	1		da	426
+Touch of Frost	Flaw	1		da	426
+Cursed	Flaw	1 to 5		da	426
+Demon-Hounded	Flaw	1 to 5		da	427
+Unlucky	Flaw	1 to 5		da	427
+Thirteenth Generation	Flaw	2		da	427
+Cannot Embrace	Flaw	2		da	427
+Eerie Presence	Flaw	2		da	427
+Repulsive to Animals	Flaw	2		da	427
+Animate Shadow	Flaw	3		da	427
+Cloaked in Shadow	Flaw	3		da	427
+Haunted	Flaw	3		da	427
+Can't Cross Running Water	Flaw	4		da	427
+Grip of the Damned	Flaw	4		da	428
+Dark Fate	Flaw	5		da	428
+Harbinger of the Abyss	Flaw	5		da	428
+Light-Sensitive	Flaw	5		da	428
+Weak Blood	Flaw	5		da	428
+Heretical Sympathizer	Merit	2		tos	4
+Hunted by the Hierophants	Flaw	4		tos	4
+Postulant of Echidna	Merit	3		tos	4
+Incantation	Merit	2		tos	4
+Blasphemous Pact	Merit	6		tos	108
+Demonic Patron	Merit	5		tos	108
+Profane Trappings	Merit	4		tos	108
+Unholy Stain	Flaw	3		tos	108
+Tracker's Mark	Merit	2		dac	100
+Blooded by the Code	Merit	5		dac	100
+Ravnos Jati	Merit	2		dac	101
+Acute Senses	Merit	1 or 3		bos	35
+Alcohol /Drug Tolerance	Merit	1 to 2		bos	35
+Ambidextrous	Merit	1		bos	36
+Cast-Iron Stomach	Merit	1		bos	36
+Catlike Balance	Merit	1		bos	36
+Hyperflexible	Merit	1		bos	36
+Light Sleeper	Merit	1		bos	36
+Noble Blood	Merit	1		bos	36
+Enchanting Feature	Merit	2		bos	37
+Physically Impressive	Merit	2		bos	37
+Poison Resistance	Merit	2		bos	37
+Poker Face	Merit	2		bos	38
+Daredevil	Merit	3		bos	38
+Hypersensitivity	Merit	3		bos	38
+Nightsight	Merit	3		bos	38
+Huge Size	Merit	4		bos	38
+Insensate to Pain	Merit	5		bos	38
+Too Tough to Die	Merit	5		bos	39
+Addiction	Flaw	1 or 3		bos	39
+Child	Flaw	1 to 3		bos	39
+Impediment	Flaw	1 to 6		bos	39
+Aging	Flaw	2, 4, 6, 8 or 10		bos	40
+Easily Intoxicated	Flaw	2		bos	40
+Repulsive Feature	Flaw	2		bos	40
+Profiled Appearance	Flaw	2		bos	41
+Degeneration	Flaw	3, 6 or 9		bos	41
+Monstrous	Flaw	3		bos	41
+Permanent Wound	Flaw	3		bos	41
+Short	Flaw	3		bos	41
+Horrific	Flaw	5		bos	41
+Mayfly Curse	Flaw	5 or 10		bos	42
+Artistically Gifted	Merit	1		bos	43
+Common Sense	Merit	1		bos	43
+Computer Aptitude	Merit	1		bos	43
+Concentration	Merit	1		bos	43
+Expert Driver	Merit	1		bos	44
+Language	Merit	1		bos	44
+Lightning Calculator	Merit	1		bos	44
+Mechanical Aptitude	Merit	1		bos	44
+Time Sense	Merit	1		bos	44
+Code of Honor	Merit	2		bos	44
+Eidetic Memory	Merit	2		bos	44
+Inner Strength	Merit	2		bos	45
+Iron Will	Merit	3		bos	45
+Natural Linguist	Merit	2		bos	45
+Hyperfocus	Merit	3		bos	45
+Jack-of-All-Trades	Merit	3		bos	45
+Scientific Mystic /Techgnosi	Merit	3		bos	45
+Berserker	Merit	4		bos	46
+Judge's Wisdom	Merit	4		bos	46
+Self-Confident	Merit	5		bos	46
+Compulsion	Flaw	1		bos	46
+Hero Worship	Flaw	1		bos	46
+Impatient	Flaw	1		bos	46
+Inappropriate	Flaw	1 to 4		bos	46
+Mental Lock	Flaw	1		bos	47
+Nightmares	Flaw	1 or 3		bos	47
+Overconfident	Flaw	1		bos	48
+Shy	Flaw	1		bos	48
+Soft-Hearted	Flaw	1		bos	48
+Speech Impediment	Flaw	1		bos	48
+Vanilla	Flaw	1		bos	48
+Whimsy	Flaw	1		bos	48
+Amnesia	Flaw	2		bos	48
+Curiosity	Flaw	2		bos	48
+Icy	Flaw	2		bos	49
+Intemperate	Flaw	2		bos	49
+Obsession	Flaw	2		bos	49
+Phobia	Flaw	2 or 3		bos	50
+PTSD	Flaw	2 to 5		bos	50
+Rose-Colored Glasses	Flaw	2		bos	50
+Vengeful	Flaw	2		bos	50
+Short Fuse	Flaw	2		bos	50
+Absent-Minded	Flaw	3		bos	50
+Bigot	Flaw	3		bos	50
+Chronic Depression	Flaw	3		bos	51
+Deranged	Flaw	3 or 5		bos	51
+Driving Goal	Flaw	3		bos	51
+Extreme Kink	Flaw	3 to 5		bos	52
+Feral Mind	Flaw	3		bos	52
+Flashbacks	Flaw	3		bos	52
+Hatred	Flaw	3		bos	52
+Lifesaver	Flaw	3		bos	53
+OCPD	Flaw	3		bos	53
+Stress Atavism	Flaw	4		bos	53
+Ability Deficit	Flaw	5		bos	53
+Loyalty	Merit	1		bos	53
+Family Support	Merit	1 to 3		bos	53
+Favor	Merit	1 to 3		bos	54
+Pitiable	Merit	1		bos	54
+Prestigious Mentor	Merit	1		bos	54
+Regal Bearing	Merit	1		bos	54
+Unobtrusive	Merit	1		bos	54
+Animal Magnetism	Merit	2		bos	54
+Confidence	Merit	2		bos	55
+Hideaway /Safehouse	Merit	2, 4 or 6		bos	55
+Natural Leader	Merit	2		bos	56
+Officially Dead	Merit	2		bos	56
+Perfect Liar	Merit	2		bos	56
+Prestige	Merit	2		bos	56
+Property	Merit	2 to 5		bos	56
+Research Grant	Merit	2		bos	57
+Sanctity	Merit	2		bos	57
+Secret Code Language	Merit	2		bos	57
+Socially Networked	Merit	2		bos	57
+Subculture Insider	Merit	2		bos	58
+Dark Triad	Merit	3		bos	58
+Local Hero	Merit	3		bos	58
+Noted Messenger	Merit	3		bos	58
+Rising Star	Merit	3		bos	58
+Ties	Merit	3		bos	58
+Master of Red Tape	Merit	4		bos	58
+True Love	Merit	4		bos	59
+Blacklisted	Flaw	1 to 5		bos	59
+Compulsive Speech	Flaw	1 to 2		bos	59
+Conflicting Loyalties	Flaw	1 to 3		bos	59
+Conniver	Flaw	1		bos	60
+Cultural Other	Flaw	1 to 5		bos	60
+Dark Secret	Flaw	1		bos	61
+Debts	Flaw	1 to 5		bos	61
+Discredited	Flaw	1		bos	62
+Enemy	Flaw	1 to 5		bos	62
+Esoteric Discourse / Technobabbler	Flaw	1		bos	62
+Family Issues	Flaw	1 to 3		bos	62
+Infamy	Flaw	1 to 5		bos	62
+Insane /Infamous Mentor	Flaw	1		bos	63
+Mistaken Identity	Flaw	1		bos	63
+New Kid	Flaw	1		bos	63
+Offline	Flaw	1 or 3		bos	63
+Rival House	Flaw	1 to 5		bos	63
+Sect Enmity	Flaw	1		bos	64
+Special Responsibility	Flaw	1		bos	64
+Sympathizer	Flaw	1		bos	64
+Twisted Apprenticeship	Flaw	1		bos	64
+Catspaw	Flaw	2		bos	64
+Diabolical Mentor	Flaw	2		bos	64
+Dogmatic	Flaw	2		bos	64
+Double Agent	Flaw	2		bos	65
+Failure	Flaw	2		bos	65
+Expendable	Flaw	3		bos	65
+Gullible	Flaw	2		bos	65
+Old Flame	Flaw	2		bos	65
+Troublemaker	Flaw	2		bos	65
+Narc	Flaw	3		bos	65
+Notoriety	Flaw	3		bos	65
+Rivalry	Flaw	3 to 5		bos	66
+Rotten Liar	Flaw	3		bos	66
+Sleeping with the Enemy	Flaw	3		bos	66
+Ward	Flaw	3		bos	66
+Echo Chamber	Flaw	4		bos	66
+Hit List	Flaw	4		bos	67
+Mr. Red Tape	Flaw	4		bos	67
+Overextended	Flaw	4		bos	68
+Probationary Member	Flaw	4		bos	68
+Rogue	Flaw	4		bos	68
+Witch-Hunted	Flaw	4		bos	68
+Fifth Degree	Flaw	5		bos	68
+Burning Aura	Merit	1		bos	68
+Green Thumb	Merit	1		bos	69
+Bardic Gift	Merit	2		bos	69
+Circumspect Avatar	Merit	2		bos	69
+Faerie Affinity	Merit	2		bos	69
+Medium	Merit	2		bos	69
+Unaging	Merit	2		bos	69
+Celestial Affinity	Merit	3		bos	70
+Cloak of the Seasons	Merit	3		bos	70
+Danger Sense	Merit	3		bos	70
+Hands of Daedalus	Merit	3		bos	71
+Lucky	Merit	3		bos	71
+Manifest Avatar	Merit	3		bos	71
+Mark of Favor	Merit	3		bos	71
+Natural Channel	Merit	3		bos	72
+Natural Shapeshifter	Merit	3		bos	72
+Oracular Ability	Merit	3		bos	72
+Parlor Trick	Merit	3		bos	73
+Spirit Mentor	Merit	3		bos	74
+Supernatural Companion	Merit	3		bos	74
+Stormwarden /Quantum Voyager	Merit	3 or 5		bos	74
+Deathwalker	Merit	4		bos	74
+Fae Blood	Merit	4		bos	74
+Shapechanger Kin	Merit	4		bos	74
+Twin Souls	Merit	4		bos	75
+Umbral Affinity	Merit	4		bos	75
+Unbondable	Merit	4		bos	75
+Ghoul	Merit	5		bos	75
+Clear Sighted	Merit	5		bos	75
+Inner Knight	Merit	5		bos	77
+Legendary Attributes	Merit	5		bos	77
+Powerful Ally	Merit	5 to 8		bos	77
+Shattered Avatar	Merit	5		bos	77
+Spark of Life	Merit	5		bos	78
+Guardian Angel	Merit	6		bos	78
+Nine Lives	Merit	6		bos	79
+Avatar Companion	Merit	7		bos	79
+Sphere Natural	Merit	6		bos	79
+Dual Affiliation	Merit	7		bos	79
+Nephilim /Laham	Merit	7		bos	80
+True Faith	Merit	7		bos	81
+Anachronism	Flaw	1 to 3		bos	81
+Apprentice	Flaw	1 to 5		bos	81
+The Bard's Tongue	Flaw	1		bos	82
+Cast No Shadow or Reflection	Flaw	1 to 2		bos	82
+Cursed	Flaw	1 to 5		bos	83
+Devil's Mark	Flaw	1		bos	83
+Echoes	Flaw	1 to 5		bos	83
+Paranormal Prohibition or Imperative	Flaw	2 to 8		bos	83
+Gremlin	Flaw	1 to 5		bos	84
+Locked Vidare	Flaw	1		bos	85
+Strangeness	Flaw	1		bos	85
+Throwback	Flaw	1 to 5		bos	85
+Uncanny	Flaw	1 to 5		bos	86
+Vulnerability	Flaw	1 to 7		bos	86
+Bizarre Hunger	Flaw	2 to 5		bos	87
+Blood-Hungry Soul	Flaw	2, 3 or 5		bos	87
+Crucial Component	Flaw	2 to 5		bos	87
+Faulty Enhancements	Flaw	2 to 5		bos	88
+Jinx /Infernal Contraption	Flaw	2 to 10		bos	88
+Permanent Paradox Flaw	Flaw	2, 4 or 6		bos	89
+Branded	Flaw	3 to 5		bos	89
+Demented Eidolon	Flaw	3		bos	89
+Haunted	Flaw	3		bos	90
+Primal Marks	Flaw	3		bos	90
+Oathbreaker	Flaw	4		bos	90
+Prone to Quiet	Flaw	4 to 5		bos	91
+Beast Within	Flaw	5		bos	92
+Blood Magick	Flaw	5		bos	92
+Bound	Flaw	5		bos	92
+Dark Fate	Flaw	5		bos	92
+Faithless	Flaw	5		bos	93
+Immortal Enemy	Flaw	5 to 8		bos	93
+Psychic Vampire	Flaw	5		bos	93
+Bedeviled	Flaw	6		bos	94
+Sphere Inept	Flaw	6		bos	94
+Phylactery	Flaw	7		bos	94
+Taint of Corruption	Flaw	7		bos	96
+Isolated Upbringing	Flaw	2		sorc	106
+Innocent	Merit	1		sorc	106
+Psychic Awareness	Merit	3		sorc	106
+The Flow of Ki	Merit	3		sorc	106
+Force of Spirit	Merit	2		sorc	107
+Strength of Psyche	Merit	2		sorc	107
+Detached	Merit	4		sorc	107
+Black and White	Flaw	1		sorc	107
+Pacifist	Flaw	5		sorc	107
+Style Sleeper	Merit	2		sorc	107
+Twin Link	Merit	4 or 6		sorc	107
+Path Natural	Merit	5		sorc	108
+Psi Focus	Flaw	3-5		sorc	108
+Path Inept	Flaw	5		sorc	108
+Ritual Sleeper	Flaw	5		sorc	108
+Impossible Ritual	Merit	2		sorcc	53
+Path Dabbler	Merit	7		sorcc	54
+Ritual Dabbler	Merit	3		sorcc	54
+Sympathetic Mastery	Merit	5		sorcc	54
+Magical Signature	Flaw	1		sorcc	54
+Ritual Ineptness	Flaw	7		sorcc	54
+Stubborn Magic	Flaw	1 or 4		sorcc	54
+Well-Rounded	Merit	1		m20va	119
+Construct	Flaw			m20va	122
+Enemy	Flaw			m20va	122
+Language	Merit			m20va	122
+Stormwarden	Merit			m20va	122

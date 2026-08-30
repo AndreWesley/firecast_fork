@@ -32,18 +32,6 @@ return {
 Alchemy
 
 
-The study of transformation and purification, Alchemy is an ancient art and science. Practitioners draw from disparate practices, both magical and scientific, to understand the hidden properties of matter and the soul. The most traditional goal of alchemy is not the more famous transformation of base matter into more “noble” counterparts — such as lead into gold — but rather the perfection of the alchemist.
-
-As a Path, Alchemy creates one-use magic items and transformations. Many of the things it produces are meant to be ingested, though few are made with taste or even the health and wellness of the consumer in mind. Alchemy also produces coatings that may be applied to the skin or objects, and reagents that catalyze transmutations of base elements into other matter.
-
-Though often studied as a means of perfecting the soul, this pursuit is very much bound up with actual Alchemical practice. Other practices put their own spin on it: Practitioners of Witchcraft call the Path Herbalism and focus on natural ingredients and effects related to them, while Hypertech engineers and tinkerers utilizing Weird Science call it Advanced Chemistry, and completely eschew the metaphysical implications the Alchemy practice places on the Path.
-
-In all cases, the Path of Alchemy is expensive. For most versions of the Path, it requires a well-equipped laboratory and strange ingredients. The most powerful applications require increasingly exotic components and extremely specialized Tass. Though the Herbalism variant tends to be cheaper in terms of money, it requires more time and effort, with plants and fungi collected under strict conditions.
-
-Many applications of this Path have passed into legend. Few alchemists are known to have actually completed the so-called “Great Work,” the creation of a Philosopher’s Stone, or any other product conducive to immortality, but most masters of the Path make an attempt.
-
-This Path has no spells. It does everything through rituals called recipes.
-
 System
 
 Modifiers: Once the magician successfully follows a recipe three times, the difficulty is reduced by one.
@@ -66,8 +54,6 @@ Price of Failure: Working with volatile compounds is dangerous in and of itself.
 
 Chronomancy
 
-
-It’s well known that mages are supposedly masters of time and space, and Sorcerers have worked to keep up with this sort of belief as well. While Divination allows a Sorcerer to see aspects of the future, and Fortune allows one to tug the strings of fate, some magic users prefer to focus on manipulations of time within the present. Traveling years through time is beyond the capability of Sorcery, but a user of this Path may gain keener insight on the flow of time, make subtle alterations, or even speed it up and slow it down. Some may consider these effects comparatively minor when measured against some of the things a “true” Mage can do, but most Sorcerers will quickly discover just how useful this Path can be.
 
 System
 
@@ -95,12 +81,6 @@ Chronomancy does not have Aspects, per se, and instead its effects are based on 
 Conjuration
 
 
-Conjuration is the quintessential Path of stage magicians: pulling rabbits from hats and cards from an audience member’s pocket are common examples of its most basic applications. Sorcerers who wish to make a living from their studies often learn Conjuration. Because of this inextricable association with stage magic, Sleepers tend to rationalize Conjuration as simply expert sleight-of-hand.
-
-The path of Conjuration is the ability to move or summon an object or being. While a novice might only perform parlor tricks like coin spinning, an advanced Conjuration sorcerer can hang a spell on their companion before entering a dangerous situation, letting them pull their friend from the (perhaps literal) jaws of death if need be.
-
-Nearly as important as what Conjuration is is what Conjuration is not. Conjuration is very similar to the path of Conveyance mechanically, to the point that there’s often confusion between the two paths — especially among Awakened Mages who can achieve results common to both Paths with the Correspondence Sphere. Conjuration can’t move the sorcerer wielding it, whereas Conveyance can. A sorcerer also may not use this path to “summon” elemental attacks — that’s the domain of Hellfire. Conjuration can summon a bucket of sand but cannot create a sandstorm.
-
 System
 
 Modifiers: For any application that can be played off as — or described similarly enough to — stage magic, keep one success that would’ve otherwise been removed by witnesses. Even rational consensus is primed by pop culture to believe conjuring an elephant from nowhere is possible with clever visual trickery. Note that actions causing obvious physical harm can’t be explained in this manner.
@@ -120,12 +100,6 @@ Price of Failure: While simple failure means no item is transported, a Conjurati
 Conveyance
 
 
-Whether dreaming of teleportation or flying broomsticks, people have always wanted to travel quickly from place to place. No matter how quickly they can manage it, it’s never fast enough, and many turn to magic and strange sciences to get where they’re going that much sooner. To hedge magicians, these feats may not be routine, but few of them worry about being booked to a middle seat on an airline.
-
-Until they reach the pinnacles of Path mastery, a hedge magician using the Path of Conveyance requires some sort of vehicle, which is prepared for a single journey by the magician. Mystics tend to favor seven-league boots, flying carpets and brooms, and stranger things like chariots drawn by divine cats, while the more scientific magicians use jet packs, transforming cars, and the like.
-
-Powerful wielders of this Path, however, can cover distance without crossing the intervening space. Teleportation need not be instantaneous, but it tends not to need a vehicle; usually a ritual or device at the point of origin will suffice to send the magician wherever they want to go.
-
 System
 
 Modifiers: +2 difficulty for each unwilling target, –1 difficulty for well-known locations
@@ -142,22 +116,6 @@ Price of Failure: Mishaps with the Path of Conveyance can be extremely dangerous
 
 Curses
 
-
-The curse is one of the most ancient and potent forms of Hedge Magic. It can take many forms, from the “evil eye” of the Mediterranean and the Middle East to the “jinx” of hoodoo to the “hex” of Eastern European folklore. Curses have been known to cause grave misfortune in a variety of forms: accidents, illnesses, and even death.
-
-At the core of any curse is maleficent intent directed toward an enemy. The Hedge Magician focuses her will, her directed hatred, toward her target and releases that intent in the form of harmful energy. The curse quickly afflicts its victim’s life and slowly fades as the hateful energy dissipates.
-
-The basic mechanic for cursing is simple. The Hedge Magician determines what level of curse she wants to inflict (within her ability), and then she spends one turn per level of severity gathering and honing her mystic hatred. Once the Hedge Magician is prepared, she discharges the curse in a cathartic fashion directly toward the target (who must be visible to her). Examples of a proper discharge include a scream, a dance, rending a puppet that represents her victim, or offensive gestures.
-
-The Hedge Magician’s player makes a Manipulation + Intimidation (difficulty 7) activation roll to determine if the curse is successful and the duration of the curse, as listed under Effects.
-
-Each level of the Path of Curses allows for a greater range of misfortune to occur. Mechanically, a curse takes the form of penalties to difficulties and, eventually, dice pools. The Storyteller should apply the effects of a curse carefully to ensure that this Numina Path does not overwhelm the entire chronicle.
-
-When mucking about with the threads of fate, however, a Hedge Magician runs the risk of entangling herself. Botching a curse will bring the effects back upon her three-fold, in which case, the curse intended for her enemy applies immediately to the Hedge Magician.
-
-A Hedge Magician may attempt to banish any curse, even one of her own, but it isn’t easy. Her player must spend a Willpower point and roll Wits + Subterfuge (difficulty 9). Each level of success reduces the level of the curse inflicted by a single rating. If the roll botches, the Hedge Magician suffers from the very curse she attempted to banish for the remainder of the original duration of the curse, with no further chance at breaking it.
-
-The Path of Curses eventually takes a toll upon the human soul. Practitioners rarely live happy lives, as the hate and anger required to fuel this Path tends to twist their insides. Mechanically, this often translates into a low Humanity score for characters who practice this Path. Storytellers are encouraged to require Humanity rolls for Hedge Magicians who have a high Humanity or who invoke curses more than once per month.
 
 System
 
@@ -192,14 +150,6 @@ Six+ successes — Up to one year, decided upon the activation of the curse]==] 
 
 Divination
 
-
-Reading tea leaves, casting rune stones or bones, studying the night sky — all these are examples of traditional practices of Divination, variations of which span a multitude of cultures. As long as there’s been the concept of a future, there’ve been people wanting to know what it held for them. Some of the newest, though more difficult, practices involve using advanced computer programming based on extraordinary sciences and hypermath.
-
-A hedge magician performing acts of Divination attempts to predict the future. However, the future’s an ever-changing and muddied mess. A sorcerer may use Divination to find clues to the most likely outcomes, but the wise seer knows the value of accurately interpreting the imprecise and dream-like symbolism to judge likely probability changes.
-
-Rarely is anything about the future set in stone. Mortals die, but the where, when, and how are determined by infinite variables: choices of action and inaction alike. The mere decision to scry the future and tell anyone about it could drastically change outcomes.
-
-Because Divination leans on ritualistic practices, there’s no distinction between spells and rituals for this Path save casting time and effort. Divination rarely qualifies as vulgar magic, and many hedge magicians skilled in this art find it profitable to perform in the open. However, some practices such as Haruspicy (predicting the future by studying the entrails of a sacrifice) run the risk of legal consequences if discovered. Most Diviners choose one practice, but it’s not unheard of for sorcerers to have a few practices they use depending on the situation or client, especially if a favored practice is illegal or subject to being thwarted by the weather, such as with astrology.
 
 System
 
@@ -252,14 +202,6 @@ Price of Failure: In the best-case scenario, the sorcerer simply receives no vis
 Dowsing
 
 
-With this Path, a magician uses ritually prepared but ultimately mundane items to answer simple questions, locate elemental sources, and find specific items. This Path is related to Divination in that both allow the magician to use external foci and interpretation to read facts from the world around them. Dowsing is much more results-oriented than Divination, as it is dedicated to specific, limited, practical matters rather than overarching possibilities and circumstances. It might be said that while Divination focuses on the universal, Dowsing attends to the specific.
-
-When dowsing, the magician uses a specific item, or items, made from normal everyday materials, to find some sort of object, person, substance, or location, or to determine an immediate fact. The stereotype of the dowser is that of the peasant yokel with a forked stick looking for water, and indeed, that is a common use of the ability. True dowsers know there is much more to this magic, however. Facts may be learned through the judicious asking of questions. Specific items can be found, and at higher levels even hidden emotions (like malice, hatred, or even love) can be detected in those around you.
-
-Dowsers are more reliant than most on their Foci, which often act as their divining tool. If the Dowser lacks the “Prepare Implement” ritual, he must have a Personalized or Unique focus dedicated to this Path to be able to use it. As such, most do learn that basic ritual early on, to provide them with additional options in how to go about their spells.
-
-Any questions asked with Dowsing should be related to the present or immediate past, and only relating the immediate area/situation; predicting the future or finding information relating to far-reaching circumstances is the purview of Divination. The distance Aspect must cover anything being questioned, as well as the distance to anything being sought out more directly.
-
 System
 
 Roll: Perception + Awareness
@@ -299,12 +241,6 @@ The most obvious failure is simply an inability to discern what the Sorcerer des
 Ephemera
 
 
-Some magicians — those focusing on the Path of Summoning, Binding, and Warding — command spirits. Those who follow the Path of Ephemera seek a relationship of greater familiarity with them. To magicians who use the Path of Ephemera, their relationship to spirits is more like family and friends than master and servant. When they call for a spirit, it’s an invitation, not a subpoena.
-
-Instead of binding and commanding spirits, the Path of Ephemera allows the magician to negotiate with them. This process, called chiminage, is a give-and-take. Each spirit wants something different, related to their nature. The spirit’s request depends on the power of the spirit and the size of the task involved. Asking an Incarna to undertake a difficult and long-term task requires a lot from the magician, perhaps something only possible with a difficult quest of their own. Asking a Gaffling to do something simple that ties directly into their nature (e.g., asking a fire spirit to light a candle) would, conversely, require almost nothing of the magician, perhaps only the opportunity to do it. This process, naturally, has a steep learning curve. Most magicians find themselves on the worse end of a deal or two before they get a sense of it.
-
-This Path almost always focuses on the Middle Umbra and, more rarely, on the Low Umbra. Rumors of versions that work with the High Umbra are persistent but remain nothing more than hearsay.
-
 System
 
 Modifiers: –2 to +2 difficulty depending on the spirit’s opinion of the magician.
@@ -330,12 +266,6 @@ Price of Failure: Dealings with spirits can be dangerous, especially at the earl
 Enchantment
 
 
-The Path of Enchantment rewards patience and forethought more than any other Path. There are no spells in this Path, only rituals, causing the hedge wizard to need to learn — or invent — a new ritual each time they want to make an Artifact they haven’t made before. Each of these Artifacts must be carefully crafted by the Enchanter. The first step is to create the mundane base item. Usually these are hand-crafted by the Enchanter, pushing their mundane skills to their limits to make just the right vessel for their magic. Sometimes, however, the right vessel can be found in the form of a rare or ancient object. Once the vessel has been made or found, the Enchanter can get to the process of infusing the object with magical energy to be used later. The first stage is usually accomplished through Crafts rolls (or, for technosorcerers, Technology or Hypertech rolls), while the latter is a Path roll.
-
-The Artifacts created through Enchantment differ in several key ways from the recipes of Alchemy. Artifacts are usually persistent, or at least can be used many times. Some may be permanent, or nearly so, while others can be used a fixed number of times before their magic dissipates. Additionally, they tend to be weaker than the Wonders created by mages, and more focused. An Artifact can only have a single power, a restriction Wonders don’t have.
-
-Enchanters tend to spend a lot of time and effort on their workshops. Whatever sort of crafting they do to make their Artifacts defines them. They often see themselves as blacksmiths, jewelers, electronics engineers, or woodworkers first, and the magic they can do comes later. This leads Enchanters to pursue high levels of the Resources Background, as well as others representing a safe and secure space to do their work and the ability to acquire high quality and often exotic raw materials.
-
 System
 
 Modifiers: Once a magician creates a Talisman three times, the difficulty is reduced by 1.
@@ -360,12 +290,6 @@ Price of Failure: Failure usually means the magician has wasted days or weeks of
 
 Fascination
 
-
-Stories of the enthralling sorcerer or the bewitching magician are found in folktales across the world. Devious enchanters bring the innocent under their sway, and deals struck for power entrap the hearts and minds of those so foolish as to sign away their souls to such bargains. The kernel of truth to this old trope is solid as diamond. Unscrupulous magicians bending the minds of others to their will have practiced this Path as long as anyone has wished another would just act or think in an agreeable manner.
-
-The methods vary, but the result is the same: Break the subject’s will and enthrall them. A sorcerer employing a mystical practice may apply makeup that makes their eyes sparkle with entrancing radiance. They may spritz themselves with an alluring fragrance, drawing the attention of anyone within wafting distance. Others may simply hone their confidence into a razor’s edge, impossible to resist. Extraordinary Citizens carry tested and approved harmonic resonators that emit a subsonic frequency that rebalances neurotransmitters to facilitate compliance.
-
-Those with mind-altering powers already can resist with powers of their own if they are the specific target of a power. This goes both ways, as a student of this Path may recognize other uses of mind-altering effects and prepare themselves to resist or overcome them.
 
 System
 
@@ -396,12 +320,6 @@ Price of Failure: The consequences of failure when manipulating hearts and minds
 Fortune
 
 
-Fate is fickle, even before accounting for the manipulations of magicians. The Path of Fortune allows them to wield luck like a weapon, cutting down their enemies with curses or fortifying their allies with blessings. While methods and explanations may vary, from the Evil Eye, to the Hand of God, to probability manipulation, the Path of Fortune never makes the truly impossible happen, only the exceedingly unlikely. It’s also one of the least precise Paths: While the hedge magician sets Fortune in motion and controls the magnitude and general range of potential outcomes, the effects of this Path often surprise them or disappear into the noise of daily life.
-
-Night-Folk are harder to curse with this Path than Sleepers are. They make a Willpower roll against 4 + the magician’s Path rating, and effects without an Aspect at 5 require only a single success to negate. Those extremely powerful curses can be ignored with only two successes, though the difficulty will be 9, making it quite challenging. To resist, the victim must be aware of the magician’s curse and actively attempt to resist it. Discovering an unannounced curse can be difficult, but is possible through supernatural perceptions, such as aura reading. Mages with Prime or Entropy might notice it, and magicians with the Path of Fortune can usually recognize the work of one of their own.
-
-The Arcane/Cloaking Background provides an additional layer of protection against curses. Targeting anyone with that Background without their explicit permission subtracts a success from the roll for each dot of Arcane they have.
-
 System
 
 Modifiers: –1 difficulty with a weak sympathetic connection (object owned by the target), –2 difficulty for a strong sympathetic connection (prized possession of target, piece of the target such as hair or nail clippings)
@@ -423,14 +341,6 @@ Price of Failure: Some failed Fortune spells are undetectable. The target is eit
 Healing
 
 
-Wherever humanity thrives, there’s a need for healing. Since the dawn of civilization, healers sprung up out of empathy and community need. Long before science knew what germ theory was, healers learned how to serve their people from tradition, communing with spirits, trial and error, and a host of other ways. Now, even when science can prevent and cure horrifying diseases, many remain without access to such techniques. In medical deserts and communities who have historically been wronged by the medical establishment, there’s still need. People still desperately seek healers. They may not fully believe in magic or miracles, but between the choice of assured agony and a sliver of hope, many take the chance.
-
-Hedge magic can achieve miraculous results. A master healer can cure cancers and speed up the healing of grievous injury beyond what should be possible, but they don’t advertise this. Even when so many are ignored and failed by the medical establishment, it’s illegal to practice medicine without a license. Beyond that, fame can be a heavy burden to carry. Many eager and empathetic hedge magicians begin learning the path of Healing, but few master it — they often burn out early from the cold and thankless world, switching to other Arts if they continue practicing magic at all.
-
-Though not always required by their Practice, many hedge magician Healers do learn some form of medicine. Those who don’t rely on extraordinary science often learn forms of healing not based on modern medicine. At the very least, in instances they do learn the basics of modern medical science, their approach to treatment can be wildly different in philosophy and technique.
-
-A healer might heal mild to moderate congenital illnesses or deformities, but more extreme examples such as regenerating limbs or raising the recently dead are the realm of legend.
-
 System
 
 Modifiers: Fast casting may only be used to stabilize lethal or aggravated damage or reduce wound penalties. All other uses must use regular spells, extended roll spells, or rituals.
@@ -446,10 +356,6 @@ Price of Failure: A failure simply means the magic didn’t work; the damage was
 
 Hellfire
 
-
-The Path of Hellfire remains one of the most popular Paths of hedge magic, despite there being something of a bad reputation associated with it. For most people, the allure of throwing elemental power around and destroying your enemies outweighs the belief it may somehow be tainted by evil, if not outright infernal. Despite these sentiments, many hedge magicians specialize in the pyrotechnics this Path makes available to them, being one of the more dramatic Paths of hedge magic.
-
-Even beginning students of Hellfire are often accorded respect, and not a small amount of fear, by their fellows. They learn early that they can summon lightning and fire, cause earthquakes, and drown their enemies should they so choose, even if they don’t personally know how. Apprentices are also given one essential warning: They are not immune to their own powers. This vulnerability is not limited to botched attempts at magic (see the Price of Failure below). Practitioners must be careful not to be within the areas they target, and fire, once unleashed, can be difficult to control.
 
 System
 
@@ -472,12 +378,6 @@ Price of Failure: When you play with fire sometimes you get burned. Botching whe
 
 Illusion
 
-
-One of the most fundamental magics is the power to deceive others into believing what the magician wants. The Path of Illusion confounds the senses, making its targets perceive things that aren’t there or altering their perception of what is there. Most people trust their senses. “Seeing is believing,” but when an illusionist is nearby, this old adage can kill you.
-
-The Path of Illusion is much less direct in most of its applications than some of the other Paths. Illusionists tend to be clever manipulators, at the least in order to choose just the right false vision for whatever task must be completed. This often requires strange patterns of thought and lateral thinking, leading illusionists to become eccentric over time.
-
-When targeted with the Path of Illusion, avoiding the deception is always a possibility. A Perception + Alertness roll at difficulty (4 + Realism Aspect) for spells, and difficulty (4 + Rank) for rituals reveals the slight imperfections in the illusion. This requires one success for each sense covered by the illusion, though in cases where an essential sense, as determined by the Storyteller, is left out, the number of successes required may decrease. Anyone who makes this roll can tell that what they are perceiving isn’t real, though they perceive both it and the truth. If they alert others to this fact, they can reroll once.
 
 System
 
@@ -508,12 +408,6 @@ Price of Failure: Naive magicians think botching an illusion must be no big deal
 Maelstroms
 
 
-Discovered by accident, the Path of Maelstroms was originally an attempt to rediscover Weather Control. Traditionally referred to as “Whistle” (as in, “whistling up a storm”), the magicians using it sought to conjure intense gales of wind and rain in the world of the living. It took until the 19th century to discover that these tempests were stolen from the Shadowlands.
-
-Maelstrom pulls the energy to create its storms from two sources. The first is the caster’s force of will. Spells and rituals of this Path cost one Willpower point per level rather than the usual flat one point for most Paths. The other source of power is the Shadowlands itself, pulling its energy out and rendering ghosts in the area calm or forcibly driving the dead from the area depending on the size of the storm.
-
-The most common instrument for this Path is, by far, music. Most users say that from the moment they learned it, they could hear music in their head, and some believe it grows louder when the storms they can draw from are stronger. For these people, their Alertness is capped at 3, due to the distraction of the music. Others, however, don’t experience this effect and suffer no penalty.
-
 System
 
 Aspects: Area, Duration, and Intensity
@@ -532,12 +426,6 @@ Price of Failure: The magician’s control over these storms is tenuous at best.
 
 Necromancy
 
-
-Some things should stay buried. Chief among them: the dead. But those who follow the Path of Necromancy see things a bit differently. Like Hellfire, Necromancy has a reputation for being foul, practiced only by the worst of the worst. Unlike Hellfire, this reputation is at least somewhat deserved. Even the simplest of Necromancy spells involve forcibly bending the dead to the magician’s will, and the most powerful of them can manipulate the powers of the Shadowlands to affect the living as well.
-
-Though methods vary wildly with practice, Necromancy always requires that the magician’s first instruments include the preserved piece of the corpse of someone they cared for, almost always a family member. This creates the link between the magician and the underworld, allowing them to become a conduit for the energies of death itself. While for mystical magicians, crafting such an instrument often feels natural, technomagicians tend to find themselves with unique, grisly objects, like keyboards with keys made of bone or computer chips with brain neurons embedded in the circuitry.
-
-Using this Path is difficult. Not in the sense of technique — it is no more complex to use than any other Path. Rather, it takes an emotional toll on the magician. The living are not meant to channel the energies of death so directly. They feel the grief of their ancestors, back for centuries, perhaps millennia. This overwhelming despair at the loss of countless generations leads to complications, particularly for magicians who are low on Willpower. Finally, those energies cause harm to the user, and each spell or ritual causes the caster to take one level of bashing damage per level of the power being invoked, unless otherwise mentioned in the description.
 
 System
 
@@ -558,12 +446,6 @@ Price of Failure: Failure for most Paths simply results in nothing happening. Fo
 Necronics
 
 
-One of the newest Paths, only discovered by ghost hunters in the late 1990s, the Path of Necronics was first studied by “Black Hat” hackers attempting to combine their understanding of electronics with the world of the dead. They use various techniques to manipulate their own bioelectricity, or life energy, to affect the world of the dead in some way. Because living energy is antithetical to the Shadowlands, this tends to result in impeding ghosts’ efforts to manage their hauntings.
-
-As a new Path, there’s a lot not yet understood about Necronics. Almost all current practitioners use electronic devices — usually computers, phones, and tablets — to cast Necronics spells. Though analogues in traditional cultures exist, those Paths may or may not be the same as Necronics, using lower-tech and more traditional methods. Ghost hunters investigating Necronics tend to be fascinated by these practices. They think studying them will provide new techniques they can apply to handle hauntings.
-
-In addition to the consequences of botching noted below, Necronics holds one other great danger for the magician. Because users are manipulating their bioelectricity so strongly, touching them while they are working is dangerous. Even the lightest touch by another living thing throws off the magician’s focus and control of bioelecticity, causing a feedback loop to form. This feedback causes them to take a level of aggravated damage and fail the spell or ritual. The magician needs immediate medical attention to stabilize them and is left weakened (–1 die to all actions) for one week per level of the spell or ritual disrupted.
-
 System
 
 Aspects: Area, Duration, and Impedance:
@@ -583,10 +465,6 @@ Price of Failure: Because the Necronics magician uses their own bioelectricity t
 Oneiromancy
 
 
-The Realm of Dreams is a fluid place that responds to the mood and imagination of the dreamer. Some people, particularly those with the Lucid Dreaming Talent (Mage 20 p. 294), can take control of their own dreams, rendering normal bad dreams controllable, good dreams fun experiences, and other dreams possible sources of insight into themselves. Without magic, though, the greater Realm of Dreams is still locked away, with each dreamer confined to their own psyche.
-
-Magicians who learn the Path of Oneiromancy learn to walk into the dreams of others. Once there, they try to take control, and can glean information or alter dreams to the benefit or harm of the dreamer. At the peak of their power, oneiromancers can even bring several people together in a shared dream. According to legend, some can even make dreams real or become capable of physically entering dreams.
-
 System
 
 Aspects: The Path of Oneiromancy has two Aspects: Sympathetic Connection and Dreamwalking
@@ -605,10 +483,6 @@ Price of Failure: Botching on Oneiromancy tends to be psychologically harmful. M
 
 Quintessence Manipulation
 
-
-Nearly all sorcerers can agree on one fact. There is a flow of power that fuels their works. The name of that power has taken on a multitude of faces and philosophies: mana, qi, gnosis, shakti, sekhem, and many others. Every magician can describe the flow of energy as they work their will on reality. Coursing through them like charge through a powerline, it can be felt, and for some it can be directly harnessed. Through Practices like those of geomancy and feng shui, hedge wizards can sense and redirect the unrefined energy of the universe.
-
-In contrast, very few sorcerers consider this to be a Path of its own. Most look to Quintessence Manipulation as a standard exercise and refinement of their already defined craft. Each magician’s personal style already informs them how to achieve manipulations to perform all their other spells. Wands direct the energy, drawn patterns on boxes create traps to hold it, while knives cut and disrupt as they perform all their other works. Yet, those who focus on mastering this fundamental skill on its own find their work is never without a source to draw on, and their mystical surroundings are rarely a mystery.
 
 System
 
@@ -637,12 +511,6 @@ The flow of energy through an individual’s pattern is essential to their healt
 Shadows
 
 
-Power over darkness is a cliché that some sorcerers have no problem clinging to out of ironic giddiness or genuine belief. One wouldn’t be remiss in guessing the Path of Shadows as the source of the concept that dark forces empower the mystic arts, given how often hucksters make the claim. Regardless of its reputation, the Path does carry a foreboding and intimidating air, as it shapes and shifts the substance of instinctual fear — shadows and darkness.
-
-Practitioners have found the application of the Path of Shadows far more malleable than other Paths. Shadows are omnipresent, and even in the brightest days stand out and provide contrast. The availability of shadows and the potential of adjusting the depth of shades grants greater possibilities than less versatile Paths.
-
-One may think that the Path manipulates the quality of ambient light, focusing it away from darker areas to make shadows appear deeper and more menacing. This is patently false. Whether it’s a magical implement or a dark matter enhancement field of the more technologically minded, this Path manipulates the very stuff of shadows. The actual nature of this substance is the source of much debate in the magical communities, with a range of theories just as diverse as those concerning the mechanism of Awakening. What practitioners do agree on is that shadowstuff can be used to great effect in a variety of useful ways.
-
 System
 
 Aspects: The Aspects of Area, Distance, Duration, and Number of Targets, as well as Shadowgrip listed below:
@@ -665,12 +533,6 @@ The severity and persistence of the controlled shadows is gauged by one’s Shad
 
 Shapeshifting
 
-
-Even among primal magics, the ability to change into an animal stands out as exceptional. Many monsters haunting the night have the power of transformation, including those who are true shapeshifters. Hedge magicians who study the Path of Shapeshifting mimic a certain amount of their power, transforming first pieces of themselves and later their entire body in dramatic ways.
-
-Most think of this Path as turning oneself or others into animals. When shapeshifting magicians choose subtlety, they can be remarkable spies. They can make cosmetic changes to look like a different person, and then supplement their disguise with sharpened senses. They can transform into something more dangerous if their cover is blown.
-
-The biggest risk of this Path is that the human mind is not equipped to change shapes. Every transformation incurs risk, but it’s greatest when making a full shift to an animal form. Then, even without a botch, the magician needs to roll Willpower (difficulty 6) to retain their own mind, rather than losing themself to their animal nature.
 
 System
 
@@ -713,16 +575,6 @@ Price of Failure: When a shapeshifter botches, the best-case scenario consists o
 Spirit-Chasing
 
 
-Practiced primarily by Kinfolk Hedge Magicians and various other scattered shamanic practitioners, this little-known Path can provide unique abilities to those that study it. While this Path’s name implies a similarity to Summoning, it has little relation to Summoning/Binding/Warding of any kind. Spirit Chasing instead creates a bond between a mystic and a chosen plant or animal (or, with Storyteller permission, some other sort of Naturae).
-
-Practitioners of this Path believe, as do werewolves, that within every living creature rest a soul, spirit, animus or similar ephemeral concept. Spirit Chasers try to watch and learn from these beings; unlike the learning of Gifts, however, the animus doesn’t necessarily enter into any kind of “bargain” with the mystic. Instead the practitioner studies the spirit, first by making contact with it, then by asking it questions and mimicking its natural abilities that manifest in this world, and finally by putting what it’s learned into practice through Sorcerous rituals.
-
-For example, a Spirit Chaser studying bears would begin by watching bears and observing their movements and patterns of life. He would then engage in some sort of private ritual of his own devising, pleading for a bear’s particular spirit to appear; sometimes, this process takes years of work. Next, the mystic would explain to the spirit that he’d like to learn the ways of bears in their natural habitat. The spirit might require proof of the mystic’s sincerity. But if it agrees, the Spirit Chaser can learn the rudiments of living like a bear. He could, for example, discover how to survive on raw meat, roots, berries, nuts or insects, even those poisonous to humans. As his understanding progresses, the mystic could also learn to focus his sense like a bear, hibernate or even grow claws. Spirit Chasers by no means restrict themselves only to mammals or even the animal world. A number of them choose plants for their Spirit Chasing. This Path is unique to every practitioner.
-
-While, by default, the practitioners of the Path may only benefit themselves with the abilities they’ve learned, at higher levels a dedicated Sorcerer eventually learns to grant these gifts to another; the mechanics work the same way in that case as if the target had cast it themselves. Any target of this Path’s base effects must be willing; it’s to be treated as a gift, not a burden.
-
-If a Sorcerer wishes to take this Path for more than one type of Spirit, they must re-purchase the Path, going through the whole process again from the beginning.
-
 System
 
 Roll: Manipulation + Occult
@@ -753,12 +605,6 @@ The most likely issue with failing or botching this Path is that the Spirits the
 Starlight
 
 
-There are Paths that go back centuries and then there are some that only arise from the unique environments of the modern night. Urban sprawls gave sorcerers a unique worldview and provided a compass for the lands beyond the Shroud. Peering into the lands of the dead is not a new concept to the magical community, but those who walk the concrete valley started to see a pattern in the stars of the Shadowland skies that matched the lights of their cities. Through study and the broadening of their understanding, the Path known as Starlight was born. Much to the dismay and jealousy of the inhabitants of the Shadowlands, only those gifted in Starlight seem able to see the stars that they use.
-
-Like navigators of the golden age of sail, Starlight practitioners understand the unique sky of the Shadowlands and chart courses to safely travel through the realm of the dead. Simply knowing where they are going is only the start of the power these navigators have. Their minds produce a sort of protection and preservation shield for any mortals traveling with them. This becomes a necessity for travel since the shadowlands have no air and the very ground is anathema to the living. This is no physical shield against all harm, though, and any violent wraith that means them harm can easily indulge that urge. Should the duration of the spell expire, those traveling will be exposed to the lethal environment of the Shadowlands.
-
-It is knowledge of the guiding lights of the Shadowland skies that also allow navigators to open doorways into the Shadowlands directly, completely bypassing the Shroud in the process. Any door can lead to the Shadowlands; it just takes a lot of preparation, and the journey begins. Moving quickly towards the destination is advised, considering few navigators have been able to complete a journey that took longer than one day.
-
 System
 
 Modifiers: Decrease difficulty by –1 if carrying a personal item of the recently deceased
@@ -781,12 +627,6 @@ Wending
 
 Summoning, Binding, and Warding
 
-
-Sorcerers in both fiction and legend are well-known for their ability to summon and control others, both living and ephemeral. With these powers, the magician can summon animals, spirits, ghosts, demons, and other strange beings. They can also defend against these beings, bind them, and compel them to obey the magician. Though overlap exists with the Path of Ephemera, this Path focuses on methods of compulsion, rather than cooperation, with the beings being called and dealt with.
-
-All Summoning, Binding, and Warding magics are rituals, and rituals exist for reaching individual beings or classes of beings. There are separate rituals to summon, bind, and ward each target. This has led many magicians to their doom. Though summoning a being may intrigue it, attempting to bind them tends to incur hostility, and magicians who either don’t know or fail at casting the warding ritual often find themselves in a great deal of trouble.
-
-In addition to the complications of each specific being or type of being the hedge magician intends to work with, there are several versions of this Path which are learned completely separately. Variants exist for summoning material creatures (like animals and people), angels and demons, ghosts, spirits of nature, and other sentient beings. There are even reports of variants focused on inanimate objects and virtual creations, allowing some magicians to ward their computers against viruses or summon their cars at need.
 
 System
 
@@ -815,10 +655,6 @@ Price of Failure: The Path of Summoning, Binding, and Warding has no need for sp
 Via Geniorum
 
 
-Via Geniorum is one of the Ways that is most distrusted by Theurgy’s critics; Theurgists who practice this Via deal with the realm of spirits and the demonic. They argue that all creatures are ultimately under the call of heaven, including spirits and demons. These Theurgists believe that there is an entire spectrum of Spirits who allied neither with Heaven nor Hell, yet can be commanded by the power of Heaven. This Way grants the practitioner power over non-human spiritual entities (demons, elementals, etc.).
-
-Knowledge of a spirit’s true name grants one power over it. A true name is not the title that the spirit commonly goes by, but a more complex, primal invocation. The world warps and flutters when true names are spoken. They are jealously guarded secrets, requiring extended research rolls, Intelligence + Occult (difficulty 9), and a good occult library to decipher. Every success grants a “syllable” of the name. The simplest of spirits might have a single syllable true name, but more powerful demons will have many more (up to the discretion of the Storyteller). A Theurgist may try and trick a spirit into divulging its true name. True name syllables are often a form of currency amongst spirits and occultists, who tend to hoard them.
-
 System
 
 Roll: Varies (see below)
@@ -842,8 +678,6 @@ Via Geniorum Levels
 Via Necromantiae
 
 
-The Via Necromantiae is Theurgy designed to contact or banish the dead. This Via resembles in parts those of the Via Geniorum, but it is, nonetheless, distinct.
-
 System
 
 Roll: Varies (see below)
@@ -866,14 +700,6 @@ Via Necromantiae Levels
 
 Weather Control
 
-
-In societies that relied heavily on agriculture or seafaring, those who could control the weather were prized, often being the difference between life and death in their communities. Famines have been prevented or ended, and the most powerful sorcerers have been known to dispel or divert natural disasters.
-
-Weather control allows sorcerers to do what it says on the package — they can control the weather. While they can’t directly make enormous weather shifts such as El Niños, what they can affect creates ripples through larger areas. No weather pattern happens in a vacuum, and this remains true for magical tampering with the weather. Many weather workers have some dots in Science, to account for being able to discern upcoming weather patterns. Many weather workers also learn at least a small amount of Divination for this purpose, frequently scrying in pools of water and clouds as their practices for such.
-
-Though rarely consulted in the modern era, weather workers still practice in secret. The power they command is dramatic and potentially life-altering. Like healers, weather workers would be constantly pestered to perform miracles if their abilities were commonly known. At the same time, they would have to contend with those claiming out of fear and jealousy that the weather workers gained their powers through evil means.
-
-Weather workers rarely function alone. The amount of effort required to produce adequate effects often necessitates teamwork. Some form covens around the goal of group weather control.
 
 System
 
@@ -904,10 +730,6 @@ Price of Failure: Even intentional weather control effects might have unintended
 Animal Psychics
 
 
-Some people are naturally good with animals, and some psychics supernaturally so. This ability allows a psychic to exert their will to communicate with and control animals. Even the lowest expression of this Phenomenon allows a psychic to put an animal at ease by bridging the communication gap, rendering it more inclined to respond positively to the psychic.
-
-A psychic may speak to and command an animal through a method of their choosing. Examples include silently locking eye contact, imitating noises animals make, dressage gestures, the psychic's native language, or a stream of gibberish. The method matters much less than the psychic's intent and force of will. Even at its highest levels, this phenomenon does not affect insects or any creature, such as jellyfish, which lacks a brain.
-
 • Commune: A psychic may communicate with one animal the psychic can perceive through mundane senses (sight, hearing, etc). They may issue simple commands but cannot command an animal to attack. The psychic can, however, command an animal to stand down from an intended attack. Issuing a command an animal was inclined to do anyway requires no additional roll, but to command an animal to do something against its nature requires a roll of Charisma + Animal Ken with a difficulty of 9 minus the psychic's dots of Animal Psychics.
 
 •• Mass Communication: As with Commune, but the Psychic may now communicate with multiple animals of the same species at once. Commands to animals may be more complex so long as the psychic can adequately describe it; however, animals won't typically attack for the psychic unless already inclined to do so. This level may alternatively target a single animal for expanded command capability.
@@ -922,14 +744,6 @@ A psychic may speak to and command an animal through a method of their choosing.
 
 Anti-Psychic
 
-
-Anti-Psychic is the rarest psychic phenomenon. That said, it is very subtle. Many Anti-Psychics go through life unaware of their ability. It often takes an attack by, or other serious misunderstanding with, another psychic before the Anti-Psychic learns of their gift.
-
-Anti-Psychic Phenomena scramble the abilities of other psychics with mental static. Those with a scientific paradigm theorize Anti-Psychic emanations use a similar basis for function as Telepathy. Instead of projecting a signal the recipient's brain can decode as a message, image, or impression, the theory is the Anti-Psychic projects a signal that interferes with the brainwaves responsible for psychic phenomena. Due to the nature of this Phenomenon, it's impossible for an Anti-Psychic to develop any other psychic phenomena. They are, however, capable of learning other Numina.
-
-An Anti-Psychic disrupts all other psychic phenomena within their range of effect and enjoys a limited effect on those using the Mind Sphere. At higher levels, the Anti-Psychic may even disrupt vampiric Disciplines and Garou gifts. This Phenomenon remains perpetually active, even while the Anti Psychic sleeps, unless the psychic spends a point of Willpower to completely suppress the phenomenon for a turn or direct it to a single individual. If using Anti-Psychic against Mind Sphere effects or Night-Folk, the psychic does not automatically succeed but reflexively rolls activation at difficulty 7 or the mage's Arete, whichever is higher. On a success, the effects of the Anti-Psychic's ranks in the ability applies. For more information on countering Night-Folk powers, see Mage: The Ascension 20th Anniversary Edition page 546.
-
-The rarity of this Phenomenon represents a mixed blessing. While many would not anticipate the ability, lending an element of surprise, the novelty can make the Anti-Psychic a tempting specimen for scientifically inclined supernatural entities. Whispered rumors imply that the Technocratic Union uses Anti-Psychics from their Extraordinary Citizens to bolster raids on known or suspected psychics.
 
 • 5-yard radius. Add +1 difficulty to psychic phenomenon activation within the radius and +1 difficulty to Mind Sphere rolls.
 
@@ -946,14 +760,6 @@ The rarity of this Phenomenon represents a mixed blessing. While many would not 
 Astral Projection
 
 
-Astral Projection allows the psychic to split their spirit, mind, or consciousness — or a combination of those depending on belief — from their body. The astral form is intangible and can cover vast distances in a short time, as it's not beholden to normal laws of physics. Astral travelers can peer into and even visit the Astral Umbra's realms of ideas (see Mage 20 p. 94). The psychic using Astral Projection cannot affect the physical world through normal means, though they may do so through other psychic phenomena at +2 difficulty. Botching Astral Projection activation causes a disorienting psychic backlash, preventing the psychic from leaving their body for 24 hours.
-
-A psychic's body remains vulnerable while they are using astral projection, and the psychic cannot sense what's happening to it. It's a common fear among psychics with this ability that someone might move or harm their bodies while they're away. Many tend to limit their use of drugs and alcohol, because memory lapses can trigger the same fear.
-
-Psychics can interact with astral spirits — denizens of the Astral Umbra and other astral traveling individuals. Astral Projection does not confer the ability to see and interact with ghosts. For combat while astral traveling, substitute Wits for Dexterity, Intelligence for Strength, and Perception for Stamina. Astral travelers usually appear as slightly idealized versions of themselves, including manifestations of gender or stylistic expression, freed from physical or societal limitations on such expressions. Alternatively, those with exceedingly poor self-image sometimes appear with exaggerated perceived flaws. Despite potential differences from physical appearance, astral travelers are typically able to recognize each other should they meet again in the physical realm.
-
-Most psychics are only able to access the Astral Penumbra, but the most powerful have claimed to be able to travel further. Traveling into Otherworlds is risky business, and more than a handful of psychics have gone exploring, never to find their bodies again. Some believe leaving the body uninhabited for too long risks letting something else in.
-
 • Peek: The psychic may spend up to one minute per point of Stamina astral projecting and travel up to one mile away from their body. A psychic can only use sight at this level — their other senses do not function while projecting. A character may also travel into the Astral Penumbra for this amount of time.
 
 •• Errand: The psychic gains the ability to hear while astral traveling. They may travel up to 100 miles away from their body with a limit of 10 minutes per point of Stamina.
@@ -969,12 +775,6 @@ Most psychics are only able to access the Astral Penumbra, but the most powerful
 Biocontrol
 
 
-Most psychic phenomena involve the perception or control of things outside the psychic’s body, but Biocontrol allows the psychic to exert will over their body itself. A psychic can ignore pain, enhance senses, and even divert circulation or regulate hormonal levels at will.
-
-While others can afford themselves minor degrees of control with biofeedback and meditation, psychics with Biocontrol can force their bodies to survive what appear to be hopeless situations. The mother who lifted a car off her child, the man who never seems drunk no matter how many drinks he downs, and the lone survivor of a tragedy are all examples of this phenomenon. The more miraculous the expression, however, the more likely the psychic inadvertently draws the wrong attention.
-
-Beyond potential unwanted attention, Biocontrol isn’t without risk. Botches can cause biological processes to go haywire at exactly the wrong time, proportional to the effect the psychic was trying to achieve. A psychic needing to reduce their oxygen requirement to survive drowning might increase their metabolism and expedite their demise, but a psychic seeking social advantage with pheromones might embarrass themself by causing excessive sweating.
-
 • Mindfulness: The psychic concentrates on altering their biological processes in minor ways. They can stop small wounds from bleeding, raise or lower their core body temperature by up to two degrees, hold their breath for an extended time, ignore pain from minor wounds, including wound penalties of up to half their Biocontrol rating (rounded up), and consciously regulate their blood pressure and pulse within normal range. The effect ends if the psychic’s concentration breaks.
 
 •• Healing Factor: The psychic forces their body to accelerate the metabolic processes responsible for healing and fighting infections far beyond the normal rate. The psychic must spend time resting and meditating, ideally while receiving medical care — the psychic’s still mortal, after all. For every activation success, the psychic reduces the time to heal the highest health level by one level, to a minimum of one hour for bashing damage and one day for lethal or aggravated damage. After the first level of damage heals, the psychic may roll activation again to repeat the process. If using Healing Factor, psychics can ignore the permanent impairment risk (see Mage 20 p. 408) so long as they have sufficient nutrition and rest.
@@ -989,18 +789,6 @@ Beyond potential unwanted attention, Biocontrol isn’t without risk. Botches ca
 
 Channeling
 
-
-A medium stands before a group and calls forth a dead relative with some letter of the alphabet for a name. Some attendee says they know someone dead with that name. The medium lets them know that they crossed over peacefully, and the spirit wants the best for them. They forgive the living for some vague sin that the attendee acknowledges, and nothing further is asked. Solace has been achieved and the medium gets paid. The reality show does great, and popularity grows. That’s all crap.
-
-In the psychic community, there are those that channel the dead. It’s rarely for the purpose of making someone feel better though. The dead are a wealth of untapped experience that would make even the most learned master blush with envy. That knowledge is at the beck and call of the channeler, and when used correctly they are never without the right skill for the task at hand.
-
-Channelers come in all shapes, sizes, and styles. Some of them are into the classic ‘eyes roll back and speak in another tongue’ Victorian-era trope. There are a few that drink home-brewed concoctions they’ve made for themselves that “open them up to the other side.” Modern channelers with a technological bent use spirit boxes and EVP devices to get their knowledge. In the end, the psychic is opening themselves up to a wraith in the Shadowlands that has the knowledge they need. The better they are, the stronger the connection to the skills and talents of the dead.
-
-It’s a dangerous game to play, to be sure. Opening that door can lead to some nasty pieces of work sauntering into the psychic’s psyche if they aren’t careful. When things go wrong, full blown possession awaits the unfortunate channeler. But the flip side is being able to bring in the knowledge of a surgical genius in a medical emergency, an acrobat when crossing a precarious ledge, or a stone-cold killer when self-defense is required. Channelers are the first to say the risk is worth the reward.
-
-When Channeling, the psychic can only bring forth one spirit at a time. The psyche of the channeler could easily be overwhelmed if more than one wraith is given access to their being. Should the psychic summon another spirit while currently hosting another from a previous channeling, the first is released and replaced by the second.
-
-By necessity, the channeler has some insight into the Shadowlands, the realm of the ghosts. As they grow more powerful in their practice, the channeler can peer across the Shroud for a number of minutes equal to successes rolled. This is a separate use of their channeling talent and costs the same as channeling a spirit for their capabilities. The difficulty of this power roll is affected by the strength of the Shroud in their area and has no restriction on frequency of use, so long as the psychic has the Willpower points to spend.
 
 • The channeler can tap into the other side and draw forth a ghost’s Abilities, though they may only access a single Ability per use of this power. Successes on the activation roll become bonus dice for rolls utilizing the desired Talent, Skill, or Knowledge for the remainder of the scene. When gazing across the Shroud, the psychic can gather a vague idea of the wraiths present.
 
@@ -1019,14 +807,6 @@ At the pinnacle of their skill, with one spirit channeled, the medium may open t
 Clairvoyance
 
 
-Clairvoyance refers to the capability to see beyond one’s immediate surroundings and out to great distances. In many cases, the projected sense can be any of the five senses, and the actual input received is rarely something so simple as a one-to-one analogue of the distant location. In most cases, the senses are bombarded with interpretive sensations that all add up to a single unified idea of the location, person, or object being perceived.
-
-The more information a clairsentient has about their target, the clearer the image they receive. Reams of reports sit in government testing facilities with project names like Stargate, Grillflame, and Sunstreak that tell of scouted psychics giving impressions and corollary sensations to target observations. Items they were very familiar with were held in far off locations, mountain bases, desert outposts, and even submarines. The psychics would relay things such as getting a chill, seeing a noon-day sun, or feeling as though they were floating in a swimming pool. While a good start, the practiced clairvoyant can achieve far more accuracy and clarity. The most powerful clairvoyants can see a location hundreds of miles away with crystal clarity, and rumors whisper of powerhouses with global reach.
-
-Some confusion does exist between what constitutes Clairvoyance and what is Astral Projection. There are those that insist they are the same phenomenon when mastery is achieved in either. The discerning psychic sees this conflation as laughable. The most well-informed physic scholars might offer this clarification: “Clairvoyance obviously takes advantage of the inherent connection between points in space, while the inner self leaves the body and is sent traveling via Astral Projection.”
-
-This connection and familiarity with the subject of their viewing has a direct effect on their chances of success as well. Finding more familiar targets requires only one or two successes, while being a stranger to the subject will increase the number of successes needed to locate it. Once a connection is made, the clairsentient can observe the location or the area surrounding a person or object to whatever degree of clarity they achieved. A psychic attempting to refocus their second sight needs to make another roll (with the difficulty adjusted one lower for familiarity, if the new subject was viewed from their first focus).
-
 • Experiencing remote locations is new to the psychic, and most observations are interpretive. This impression can be a physical sensation of cold steel for a knife, the smell of gunpowder for firearms, or a vision of a doghouse for guard dogs. In some cases, an actual image of the subject can be achieved, but this will be hazy at best. The one exception is hearing. Sounds come across the mental bridge garbled and unintelligible, if they can be heard at all. More successes grant more literal symbolic sensations, with five successes affording actual visual perception of the target, cloudy as it may be. Senses have a limited range for novices and reach to approximately one mile around the psychic. Retraining their focus requires another Willpower roll and another expenditure of Willpower to solidify their new remote subject.
 
 •• Remote sight becomes more reliably achievable, albeit still shrouded in mild distortion or haze. Sound comes across far more frequently, with a chance of being clear enough to be understandable. Three successes on the Willpower test affords a near clear image of the subject with distorted sounds, while five successes grant crystal clarity and intelligible sounds that could convey the general subject and mood of conversations near the subject. The psychic can now push their senses further — out to ten miles away from their current location. The difficulty of the roll increases by one past 5 miles and by two at 8 miles.
@@ -1041,10 +821,6 @@ This connection and familiarity with the subject of their viewing has a direct e
 
 Cyberkinesis
 
-
-Cyberkinesis is one of the most recently discovered Psychic Phenomena — the first instance documented less than a century ago — and represents the ability to control electronic machinery by thought. Experts in psychic phenomena theorize that Cyberkinesis is an information age variant of telekinesis. The psychic generates small electromagnetic fields that control and alter the firmware and software of electronics, ranging from fire alarms to super computers.
-
-Though the cyberkinetic may psychically control the machine, they can’t psychically read its contents without Cyberpathy. All powers above dot one require the Cyberkinetic to have either access to the device’s display or to be able to access the device via Cyberpathy.
 
 • Switch: The cyberkinetic may turn electronics off and on without touching them. +2 difficulty to activation if the electronic requires a physical relay rather than an electronic one. The psychic must be able to sense the electronic device to use this power. This is an exception to the usual requirement to access the device’s display and applies to devices without displays such as light fixtures.
 
@@ -1068,10 +844,6 @@ Difficulty Modifier = Example
 Cyberpathy
 
 
-As experts believe Cyberkinesis is an information age variant of telekinesis, they similarly believe Cyberpathy functions on the same premise as telepathy — the Cyberpath decodes electromagnetic patterns in a computer’s hard drives to access information, just as a telepath decodes electrical impulses in the brain.
-
-A Cyberpath must keep the computer in question in sight, except for Remote Access, where they must instead keep the entry point computer in sight. This ability may also target storage devices and media such as flash drives, disks, and external or unconnected hard drives. Typically, Cyberpathy takes 10 to 15 minutes, but each activation success reduces the time required by one minute. Until the psychic possesses dot 5, heavily encrypted systems increase the activation difficulty. Cyberpathy proves most versatile when combined with Cyberkinesis but can also aid mundane hacking attempts.
-
 • Map Structure: The Cyberpath can examine the directory of computers and storage devices. The Cyberpath can find the location and properties of all files stored but cannot access the files using this power. This can be useful for Cyberpath hackers looking for specific data. The psychic can use this level to identify a device by its Augmented Reality Object ID if it is web-capable.
 
 •• Read-only Mode: As Map Structure, but the Cyberpath may also read files. Plain text and graphics files are simple to view, and the Cyberpath may divine the functions of executable files and applications. The Cyberpath is unable to decrypt encrypted files at this stage. The psychic may view the device’s associated ARO if it is Level 1 or below and may divine the ARO’s properties if it’s a higher level.
@@ -1086,12 +858,6 @@ A Cyberpath must keep the computer in question in sight, except for Remote Acces
 
 Ectoplasmic Generation
 
-
-There exist collections of séance photos from the height of the occult entertainment phase of society that display roiling masses of translucent, weightless mucus hovering about the heads of session leaders. Most write these off as simple imperfections in the film and move on to appreciate the relics of photography in their hands. True psychics know otherwise. Ectoplasm is the neutral spirit stuff of the ghost. A substance born from spiritual energy and activity, ectoplasm exists as liminal evidence of something beyond the physical. An entertaining parlor trick for the initiated, this plasm is far more useful than the layman may readily assume.
-
-Through concentration and sheer force of will, a psychic gathers up ambient ghostly energies from around them and brings it into physical being inside their gut. This creates the unsettling sight of this coalesced spirit stuff flowing from the mouth and nose of the practitioner. Manifesting as slick, translucent, and cold gel, ectoplasm flows weightlessly when not given direction. Responding to the will of the generator, the pliable spirit matter can take many ghastly forms to disgust or impede the unwary, while dissolving into nothing mere minutes after concentration is broken. Much to the dismay of witnesses, ectoplasm leaves no physical or spiritual evidence at all once sublimated.
-
-Possibly ectoplasm’s most useful property is that no matter how wispy, slimy, or goopy the ectoplasm may seem to the average person, it will be as hard and immoveable as pure lead to the spiritual. Ghosts, wraiths, spirits and astrally projected souls all find ectoplasm very solid and nigh impassable. This has a myriad of uses ranging from creating a barrier around a room by smearing the walls to coating one’s hands in the stuff to allow the psychic to touch the immaterial Shadowlands, whether with benevolence or violence. This Phenomenon does not allow the psychic to see into the Shadowlands unfortunately. It merely allows them ability to create a substance of both spirit and matter.
 
 • When one first starts exploring their capabilities as a generator, it starts with rather juvenile seeming practices. Novice generators don’t find the act of creating ectoplasm difficult. The real difficulty lies in creating a substantial volume and force. This leads to the fledgling generator being unable to force the semi-liquid plasm from their orifices without assistance. Reaching into their mouth, nose, and ears to draw forth the substance by hand or by relying on peristalsis, the generator must work to bring it forth. Every success on the activation test generates a softball sized volume of the sticky substance. It only lasts a number of turns equal to the generator’s Willpower, but it can be applied as quickly as it is generated. Covering an object with a thin layer of ectoplasm takes no extra steps beyond generating it. The plasm sticks to all surfaces and does not wipe away easily. It will cling and string to anything touching it and only sublimates into nothingness when the duration expires.
 
@@ -1114,14 +880,6 @@ Ectoplasmic mists gain a degree of solidity. No longer just smoky wisps, the mis
 Mind Shields
 
 
-A mind is a terrible thing to waste. Many psychics live by this credo. There are people and things out there in the world that assault the mind directly, but some psychics are gifted with the ability to prepare against this potential threat. Building walls against mental attacks, ensuring thoughts are too chaotic to control, or just inherent mental fortitude are all possible sources for this defense.
-
-As the name implies, Mind Shields only affect powers that affect the psychic's mind. Powers that originate from the mind of another but affect the world around the shielded psychic are unaffected. A psychokinetic has no harder a time lifting and holding a psychic with Mind Shields in place than they would a normal person.
-
-Mind Shields, being a Psychic Phenomenon, have an easier time dealing with Psychic Phenomena than other forms of mental assault. A vampire who wields Dominate taps into the mind in a different manner than a psychic with Psychic Hypnosis. Unfortunately, Mind Shields are only half as effective against mental attacks from non-psychic sources.
-
-When confronted by a mental assault or invasion, the psychic's Mind Shields provide a dice pool to counter the effect. The target rolls these dice (difficulty 6) and subtracts their successes from those of the attacker. A defender that rolls more than the attacker disrupts the assault completely, and the attack fails. For powers that normally call for a defense roll, Mind Shields dice are added directly to the defense roll instead.
-
 • Defenses are thin, but present. The Psychic receives 2 dice to counter mental attack phenomena and 1 dice for mental attacks from other sources. At this point, Shields are always active and cannot discern friendly and hostile effects. The psychic can lower their Mind Shields to allow access to a friendly psychic, but this leaves them open to any other mental ability used before they are raised once again.
 
 •• Layers of mental chaos or thicker walls of the mind are built. The psychic receives 4 dice to counter mental attack phenomena and 2 dice for mental attacks from other sources.
@@ -1136,12 +894,6 @@ When confronted by a mental assault or invasion, the psychic's Mind Shields prov
 
 Precognition
 
-
-The psychic experiences clues about the future. The future isn't fixed and may change depending on the choices people make. The more decisions required for an outcome, the lower the prediction accuracy. No seer has proven 100 percent accurate, except for the mythical Cassandra.
-
-Precognition allows a psychic to judge outcome probabilities with above-human accuracy. Scientifically minded psychics rationalize precognition as conscious manifestations of subconscious perception analysis. Mystical-leaning psychics understand precognition as a sort of sixth sense with no scientific explanation.
-
-While a psychic may activate precognition, a Storyteller may call for activation for story purposes, in which case no Willpower is expended for that activation.
 
 • Intuition: The seer gains a knack for guessing correctly. For purely random events (lottery, dice rolls), the predictions can be rather accurate. The psychic can intuitively know the shortest route to a given destination and enjoys a higher likelihood for beneficial chance meetings. The psychic experiences no visions, they just “have a feeling” and guess very well. Even with five or more successes, predictions are unlikely to be entirely accurate.
 
@@ -1177,12 +929,6 @@ Providing information about the far future can be difficult for the Storyteller.
 Psychic Healing
 
 
-Many cultures have legends of people blessed with the power to heal through little more than a touch. Some of these were likely psychic healers. By channeling their will and energy, a psychic may perform miracles. Many with this gift choose to be discrete about it — fame and pressure to perform miracles can be daunting, and the enemies a psychic healer can make within the medical establishment are detrimental. Practicing medicine without a license, even in areas with little healthcare access, remains illegal.
-
-Though not required, many with this gift have a great deal of medical knowledge, often acquired informally. Nearly all psychic healers have high empathy, which some suspect the gift stems from.
-
-Botches when performing medicine of any kind are devastating, but a psychic healer might transfer the injury or illness to themself. Other possibilities include healing a wound grotesquely or misdirecting healing energies, causing autoimmune or cancerous responses.
-
 • Diagnosis: The healer instantly diagnoses disease or injury through sight or skin contact. The diagnosis terminology depends on the psychic's medical knowledge — one with little knowledge might describe lupus as “the body fighting itself.” A psychic may use Diagnosis successes in a complimentary roll (see Mage 20 p. 389) for Medicine rolls. If using teamwork, the psychic may contribute successes to the medical professional's roll up to the psychic's Medicine rating.
 
 •• Restorative Slumber: With a touch, the healer focuses their patient's body's energies on healing. Treat successful activation as skilled medical treatment for bashing and lethal damage and as magickal stabilization for aggravated damage. The touch must last at least one minute, after which the patient falls into a deep sleep. At 3+ successes, the patient also regains one point of Willpower.
@@ -1197,10 +943,6 @@ Botches when performing medicine of any kind are devastating, but a psychic heal
 
 Psychic Hypnosis
 
-
-While modern hypnosis is a form of therapy anyone could learn, some psychics have a natural gift for it with effects far beyond the trained variety. With the increase in popularity and recent research on hypnotherapy, psychic hypnotists can practice their gifts in the open without much fear of attracting the wrong attention.
-
-Psychic hypnosis is neither as fast as vampiric disciplines nor as versatile as the Mind Sphere. Even so, a particularly gifted hypnotist can achieve many similar effects.
 
 • Trance State: The hypnotist puts a willing target in a calming trance state, though they cannot issue commands. In this state, the target can remember events and details more clearly and gains a difficulty reduction to any rolls involving memory recall equal to activation successes, to a minimum difficulty of 2. The target also regains one point of Willpower for every activation success, though they cannot benefit from this function again until they’ve rested normally. It takes five turns to place the target in the trance and the trance breaks if anyone disturbs the target. The hypnotist may also put themself in a trance.
 
@@ -1217,12 +959,6 @@ Psychic hypnosis is neither as fast as vampiric disciplines nor as versatile as 
 Psychic Invisibility
 
 
-Psychic Invisibility is not true invisibility. This Phenomenon is like Psychic Hypnosis on a larger scale but with limited scope. The psychic tricks others’ minds to simply overlook the psychic, as if projecting the command “don’t notice me.” The psychic shows up on recordings as normal, but those watching a live feed don’t notice the psychic. Their attention diverts to other details in the recording instead. This ability doesn’t prevent tripping electronic or mechanical alarms that require no human input to trigger, such as motion alarms.
-
-Animals can’t be fooled with this Phenomenon unless the psychic also possesses Animal Psychics — their minds are too different from humans and humanoid creatures. If a psychic blocks a door or item someone expects to see, the affected individual won’t notice the door or item either. If a being with enhanced perception searches for the psychic or other supernaturally hidden things generally, they may attempt a contested roll to determine whether the being pierces the psychic’s illusion, pitting their appropriate dice pools against the psychic’s activation successes.
-
-Activation successes determine the strength of the Phenomenon’s effect. One success leaves the psychic noticed but difficult to focus on and unable to be identified. This also adds a +1 difficulty to attack rolls targeting the psychic while active. Three or more successes keeps the psychic completely concealed unless successfully contested. Mind Shields and some Mind Sphere effects can protect against this Phenomenon.
-
 • Wallflower: So long as the psychic remains completely still and silent, they stay unnoticed. However, the psychic needn’t hold their breath — only heavy or loud breathing breaks the effect.
 
 •• Slink: The psychic moves while invisible but can’t interact meaningfully with the world. The power breaks if the psychic does anything to draw attention to themself or interacts with the world, such as writing on a chalkboard or opening a door. A psychic may make a Wits + Stealth roll at difficulty 7 or higher to avoid accidentally breaking their power in unfavorable conditions like twig-covered forest floors or a room with a motion alarm.
@@ -1237,10 +973,6 @@ Activation successes determine the strength of the Phenomenon’s effect. One su
 
 Psychic Vampirism
 
-
-Everyone knows that one person you can’t be around long without feeling emotionally and spiritually drained. A psychic vampire could be anything from a DMV worker, a droning professor, the one too-eager coworker who won’t shut up at a meeting that could’ve been an email, or something far more sinister. For a psychic vampire, the energy and emotions they drain from their unwitting victims gives a euphoric high unlike any drug in addition to other beneficial effects. Like many drugs, the feeling can become addictive.
-
-It’s unclear whether the power develops in those prone to using others as resources, or the effects of the power once it develops greatly changes people. In either case, this Psychic Phenomenon can bring out the worst in people. Of note to those who study the supernatural, psychic vampires often have or develop many of the same psychological idiosyncrasies Kindred are prone to.
 
 • Tap Energy: The vampire feeds on others’ strong emotions, both positive and negative. The vampire senses what the emotions are as they feed and may use this power to gauge an individual’s emotions over time. It only requires one success to taste the nuanced palate of a person’s emotions and give the vampire a pleasant high. At three successes, the vampire regains one lost Willpower, and regains an additional Willpower per success beyond the third. The vampire must be within 10 yards of the victim and be able to sense them. The victim is unnerved, and their emotions are muted — but not absent — until the end of the scene.
 
@@ -1267,16 +999,6 @@ Failure = Nothing happens
 Psychokinesis
 
 
-Every once in a while, there is a YouTube video, a TV special, a variety show, or a book published about some enlightened master who has expanded their minds to the point where they can bend a spoon or shift a book 6 inches across a table. Every person that watches or reads about these feats sit in awe and wonder of the possibility of moving objects with the sheer force of their mind.
-
-Psychokinesis, or telekinesis to some, is beautiful in its simplicity. There are no subtle tricks or illusory veils. There is only the simple movement of matter through space through sheer force of will. As the psychokinetic grows in strength, they hone their accuracy and increase the maximum weight they can set in motion. The inexperienced only moves small objects, and very clumsily at that. On the other hand, a master psychokinetic can lift massive loads and move them at startling speeds, while also being capable of feats of fine motor skill that most have trouble performing with their own hands.
-
-Psychokinesis grants the psychic a Strength and Dexterity score for their actions once activated. This only requires one activation per instance of the Phenomenon and remains active as long as the psychokinetic maintains concentration or until the end of the scene. Using psychokinesis requires the psychic be able to see their intended target with their own eyes. Each success on the activation roll allows for one separate target to be manipulated, but the total weight of all targets cannot exceed the lifting capacity of the psychic. Any time the psychic takes damage, they must make a new Willpower roll to maintain concentration. If they roll fewer successes than the number of targets they are currently manipulating, they must select targets to release until the number of targets matches the new success total. If more successes are rolled, the number of manipulated targets remains unchanged.
-
-A psychokinetic with the power to lift a person may do so unimpeded. The target is allowed a Strength + Athletics test to grab hold of a sturdy anchor point if one is nearby to hold on to. If a secure grip point is not available, the target is helpless to stop the power of the psychokinetic barring supernatural advantages of their own.
-
-Once a target is being manipulated, actions taken with the target use the Strength or Dexterity of the psychic’s Psychokinesis and the appropriate Ability required for the action. For example, a gun being manipulated would call for a psychokinetic Dexterity + Firearms test to fire. “Throwing” a manipulated object requires that the item be released while propelling it with an appropriate Strength + Athletics test. The disconnect and lack of contact with a manipulated target causes all actions taken via psychokinetic manipulation to suffer a +1 difficulty. Attempting to perform a psychokinetic action with more than one manipulated item in the same turn requires the psychic to split their dice pool as normal for taking multiple actions.
-
 • With a mental Strength and Dexterity of 0, the psychic can only lift a maximum of 5 pounds. Objects take a sluggish and clumsy path through space when moved and have a maximum speed of 5+ Wits yards per round.
 
 •• The psychic’s mental Strength and Dexterity rise to 1, and objects have a movement of 7+ Wits yards per round.
@@ -1298,10 +1020,6 @@ Both refined actions of the phenomenon receive upgrades at this level. Levitatio
 Psychometry
 
 
-Psychometry is one of the more emotionally taxing Phenomena to the psychics gifted — or cursed — with it. By touching objects, the psychic can read the emotional resonances left behind and see visions associated with the object. It’s not always clear which objects have strong resonances: an office coffee mug could have only fleeting impressions. However, it could be a cherished gift from a child or even the mug a worker had in her hand when she learned of a loved one’s death.
-
-It takes mere seconds to read the resonances, even if the vision seems to last much longer from the psychic’s perspective. The number of activation success dictates the level of detail the psychic receives. Many successes give clear and vivid impressions, which are prone to making the psychic feel the emotions and pain for a time, where fewer successes only give fleeting impressions. On a botch, the psychic becomes lost in the visions, temporarily merging in personality with one of the individuals from the event and possibly acting it out. When a psychic with Psychometry touches an object with immense emotional resonance, the Storyteller may call for a reflexive Psychometry roll.
-
 • Impression: The psychic can get dreamlike impressions of recent events involving the object or more distant events with strong associated emotions. The psychic at this stage mostly gets emotional readings and vague, figurative imagery. At 3+ successes, the psychic may also see an accurate image of the person most closely associated with the object.
 
 •• Reveal Scar: The psychic gets impressions of the event with the strongest emotional resonance associated with the object. They get dreamlike and imprecise images of the event. With 3+ successes, they also determine the owner’s approximate age, personality cues, connection to the object, and what the owner felt at the time.
@@ -1316,12 +1034,6 @@ It takes mere seconds to read the resonances, even if the vision seems to last m
 
 Psychoportation
 
-
-Psychoportation, also sometimes called teleportation, is a powerful psychic ability to suddenly be elsewhere. This is one of the more powerful and rare psychic phenomena. The occasional narrow-minded Correspondence Sphere Mage has been put in their place by watching a simple psychic psychoport out of danger’s way without earning Reality’s ire.
-
-No one knows for sure how psychoportation works, but some theories include dissipating into the air and reforming in another spot, a variation of astral travel, or personal wormholes. What’s known is a psychic can’t carry more than about 100lb of extra cargo without suffering severe strain, causing the psychic at minimum 6 levels of bashing damage that can be soaked normally. This increases by 1 level of bashing damage for each additional 25 lbs. the psychic attempts to move. Failing to soak the damage results in a disastrous fate for the cargo, such as psychoporting the contents to the wrong location, into a solid object, or the nearest body of water. On rare occasions the cargo seemingly ceases to exist. To travel to a place via psychoportation, the psychic must see the intended destination with mundane senses or psychic abilities — their own or someone else’s.
-
-A psychoportation botch typically means the psychic misjudged the jump and landed inside a solid object — or worse, a person. This causes 8 dice of aggravated damage to the psychic and the unsuspecting object. Occasionally, a botch might transport a psychic to a hazardous or unfamiliar location, or the psychic might leave or inadvertently bring something they weren’t supposed to.
 
 • Short Hop: Range up to 12 + Intelligence yards in a turn.
 
@@ -1338,10 +1050,6 @@ A psychoportation botch typically means the psychic misjudged the jump and lande
 Pyrokinesis
 
 
-Parapsychological lore speaks of “Firestarters,” individuals able to psychically start and sometimes control flame. Some parapsychologists suspect Pyrokinesis is a variant of Psychokinesis, where the psychic causes molecules to vibrate at high speeds, generating combustion rather than moving entire objects cohesively.
-
-Pyrokinesis is one of the more dangerous Psychic Phenomena to the psychics themselves; most psychics have no more defense against the flames they create than any other human. Botches can be spectacularly disastrous, and several pyrokinetics have gone out in a literal blaze of glory.
-
 • Spark: The pyrokinetic can generate small sparks, usually from their fingertips. These sparks are typically only able to light highly flammable substances on fire, such as paper or gasoline, but with 3 or more successes, the psychic’s sparks can light materials on fire as a match could. The sparks can light anything within the pyrokinetic’s reach, though they don’t have to touch the target. Even with many successes, the sparks aren’t hot enough to directly light a person on fire, though the effect of a flame appearing can startle someone. After activation, treat the sparks as a thrown attack with a weapon dealing no damage. This can be dodged normally. If the attack succeeds, the target rolls Willpower at difficulty 6 to avoid being stunned for one turn. On a botch, the target panics. The target may instead spend one Willpower point to suppress a startle response.
 
 •• Combustion: The psychic concentrates on an object within 10 yards, causing it to burst into flame. The psychic can reliably light flammable materials like gasoline, dry wood, charcoal, and vampires on fire. At 3 or more successes, the psychic can light anything combustible, such as people, on fire. The initial fire is as big as a torch and behaves and spreads normally. If the psychic targets a person or person’s clothing, the target may attempt to dodge as normal, treating activation successes as the targeting roll.
@@ -1356,12 +1064,6 @@ Pyrokinesis is one of the more dangerous Psychic Phenomena to the psychics thems
 
 Shadow
 
-
-We live in a world of light and shadow. The psychic that understands this and learns to manipulate one side of that coin is taking advantage of an ever-present resource. Whether it is under an overhang, behind a stack of boxes, or simply within the cracks and crevices of one’s face, the psychic manipulating shadows can put them to use to conceal and confound.
-
-Superstitious theories abound concerning what the psychic wielding Shadows is actually doing. The simple fact is they are manipulating light — and sound to a limited degree — to dampen the world around them. It may seem like the Shadow psychic is wielding darkness, but it all boils down to simple science. Darkness grows darker and sound becomes muffled as the psychic’s sheer will smothers active waveforms in the environment. The spooky atmosphere and reputation are just bonus.
-
-As much as shadows can hide, proper utilization of this Phenomenon can provide significant distractions. Light and sound are intercepted before they can reach the target’s senses, giving the victim the feeling that their head is wrapped in an invisible blanket. As the psychic’s power rises, this is more and more harrowing as the brain can interpret this loss of sense as impending suffocation. While cruel by the reckoning of some, it can be an especially useful tool when getting someone off your back.
 
 • Scattering the edges of cast shadows and disrupting sound is only sufficient to increase the effectiveness of concealment and demoralization. Shadows become slightly longer, reach somewhat further, while sounds are all unnervingly stifled. All Intimidation and Stealth rolls have their difficulty adjusted by −1. Targets distracted by darkening shadows and muffled sounds suffer a +1 difficulty to all rolls reliant on sight and hearing.
 
@@ -1380,10 +1082,6 @@ Victims of shadowy harassment must make a Willpower roll (difficulty 8) to avoid
 Synergy
 
 
-A subtle ability, synergistic psychics often don’t know they have any psychic talent until after meeting other psychics — it’s unusual but not unheard of for them to develop other Psychic Phenomena. This phenomenon is considered rare, but the power’s subtle nature may conceal the true number of synergists in the world. Synergy allows psychics to work together to build effects more powerful than either psychic could create on their own.
-
-Psychics must be touching to form a synergistic link. The synergist may link a number of psychics equal to twice the dots they have in Synergy. Every success above one adds automatic successes that can be spent on actions the linked psychics take using Phenomena. Botches can cause backlashes for all involved, with the best-case scenario being a headache or nosebleed, where the worst case can cause the psychic phenomena of those in the link to activate uncontrollably.
-
 • Like Knows Like: The synergist can sense other psychics. This automatically succeeds if the psychic touches another, but the synergist can roll activation to scan for psychics in line of sight. With 3 or more successes, the synergist can sense the relative power of the other psychics.
 
 •• Share Will: The synergist forms a weak psychic link to enhance the power of the participants. Each psychic can either spend a point of Willpower for an automatic success on another’s effect or allow the psychic to “borrow” the Willpower and temporarily add the point to their pool, up to a maximum of 10. If the Willpower isn’t spent, it can be traded multiple times between the psychics in the link. Any sensory Phenomena (Telepathy, Precognition, etc.) allow all the psychics in the link to share the results.
@@ -1398,12 +1096,6 @@ Psychics must be touching to form a synergistic link. The synergist may link a n
 
 Telepathy
 
-
-It is said that there are two kinds of people in the world: people who wish they could read minds and liars. That statement, in and of itself, is a lie. That is because there are people in the world that can actually read minds and they’re known as telepaths. Once they sense the mind of a target, these psychics can plumb their thoughts for opinions, desires, fantasies, and emotions.
-
-As skill and power improve, the telepath can learn to broadcast their thoughts into others. Communication in this manner can be unsettling at best to the unprepared and potentially outright scarring. Compassionate telepaths take time to inform those they intend to telepathically communicate with of what is coming, to avoid possible screaming and incoherent confusion caused by unannounced mental invasion.
-
-Those who have mastered their talent go one step further and make those broadcasts seem like original thoughts, implanting ideas into the minds of their targets. This is not any kind of mental control or hypnosis as one might think. At its core, this ability is more akin to ventriloquism — a form of ventriloquism essentially akin to psychic gaslighting, and a very dangerous and immoral act, but ventriloquism nonetheless. The telepath mimics the inner dialogue of the target and makes suggestions as though the thought came from the subject’s own mind. The uses of this talent range from the relatively benign thought of “I could use a snack” to projections far more sinister. Reading the target’s thoughts, then mimicking and repeating their darkest impulses to exigence, is but one troubling example of the potential for telepathic abuse.
 
 • All telepaths begin by sensing the surface thoughts and emotions of a subject. Emotions include current mood, immediate desire, and mental wellbeing. Surface thoughts are songs stuck in their head, active recollection of things like a grocery list or a keycode as it’s punched in, or what they think that smell was that they just sniffed.
 
@@ -1428,12 +1120,6 @@ Conversations over telepathic connections are no longer held to sentences. Full 
 
 True Faith
 
-
-Systems for True Faith
-
-Unlike the other Numina Paths, True Faith only has a single Path.
-
-True Faith grants the believers special benefits:
 
 • Each level of True Faith grants an extra point of Willpower.
 

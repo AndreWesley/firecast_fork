@@ -1,0 +1,207 @@
+# bg_essence.tsv - a essencia MECANICA de cada antecedente de PICKER_LIST["background"]
+# (SPEC T764, I105b, R8). Colunas: nome_EN <TAB> jogo <TAB> livro <TAB> pag impressa <TAB>
+# resumo de 1 linha da mecanica.
+#
+# UMA LINHA POR (nome, livro). Um nome que aparece em 2 JOGOS gera 2 linhas, e e a comparacao
+# entre elas que decide o dedupe de I105b - a decisao sai DESTA tabela, nao de memoria (R8).
+#
+# Medido em 2026-08-28 sobre os despejos -layout -enc UTF-8 de research/README.md (armadilhas
+# 8 e 9), cortando na calha. Paginas sao IMPRESSAS.
+#
+# jogo: Vampire | Mage | Werewolf. E o eixo de I105b ("Origem = o jogo, nao o livro") - por isso
+# core, da, hh, anarch e bh sao todos `Vampire` e nao geram homonimo entre si.
+#
+# 2a PASSADA, mesma data: o user pos `Mago/Mage - The Ascension` (o M20 EM INGLES, no lugar do
+# M20.pdf PT) e a pasta `Werewolf/` inteira. As 27 linhas Mage foram REFEITAS sobre o livro
+# ingles - e nao so o texto mudou de fonte, a PAGINA mudou: a edicao PT ordena a lista pelo nome
+# PORTUGUES, entao `Library`/`Biblioteca` era p.309 no PT e e p.318 no EN. As paginas abaixo sao
+# as do livro INGLES, que e o que I21 bloco 1 tem de imprimir.
+#
+# NAO HA MAIS BURACO DE FONTE. Os 5 nomes que a 1a passada deixou com `?` (Ancestors, Fetish,
+# Kinfolk, Pure Breed, Rites) estao medidos em `w20` 135-140, e `Totem` agora tem os DOIS lados.
+#
+# ================ A DECISAO DE DEDUPE DE I105b, TIRADA DESTA TABELA ================
+#
+# 15 dos 46 nomes aparecem em MAIS DE UM JOGO. Um a um:
+#
+# 1 ITEM (mecanica igual nos jogos, so muda a ambientacao):
+#   Allies · Alternate Identity · Contacts · Fame · Influence · Library · Mentor · Rank ·
+#   Requisitions · Resources · Retainers
+#   Sao tracos do mundo MORTAL que os livros descrevem do mesmo jeito - dinheiro, informantes,
+#   um mais-velho que orienta, um posto numa hierarquia. `Resources` chega a repetir a frase
+#   ("actual cash, but as this Background increases...") em V20 p.115 e W20 p.138. Um sufixo
+#   `(Origem)` aqui nao separaria mecanica nenhuma, so encheria a lista.
+#
+# 2 ITENS - `Status (Vampire)` e `Status (Mage)`:
+#   V20 p.118 = pe dentro da comunidade KINDRED, e o Status vem do senhor e da linhagem na
+#   Camarilla ou da matilha no Saba. M20 p.325 = respeito entre os pares DESPERTOS, e so em 4-5
+#   pontos alcanca grupos aliados. Duas escadas sociais diferentes, e uma nao converte na outra.
+#   E o exemplo que o proprio user deu em I105b. Werewolf NAO tem Status (tem Renome, que e
+#   outro eixo) entao nao ha um terceiro irmao.
+#   (hh p.123 e uma TERCEIRA escada - a Society of Leopold - mas hh e Vampire, e I105b manda
+#   dividir por JOGO, nao por livro, entao ela nao gera um 3o item.)
+#
+# 2 ITENS - `Totem (Mage)` e `Totem (Werewolf)`:
+#   M20 p.326 = pacto PESSOAL com um espirito ajudante, comprado pelo personagem. W20 p.140 =
+#   "a Background that applies directly to the character's PACK, rather than the individual",
+#   e a matilha inteira poe os pontos num totem so. O que se compra e diferente (um espirito
+#   seu contra um espirito do grupo) e quem paga e diferente. Esta era a linha que a 1a passada
+#   deixou em aberto por falta do livro de Werewolf; com w20 no disco ela fecha em DOIS.
+#
+# Os 4 nomes so-de-Werewolf (Ancestors · Fetish · Kinfolk · Pure Breed) e o `Rites` NAO geram
+# homonimo: nenhum outro jogo reivindica esses nomes (V20 tem `Rituals`, que e outro nome).
+#
+# ==> LISTA FINAL: 47 itens + o vazio (45 de origem, `Status` e `Totem` valendo 2 cada).
+#
+# ================ 2 ACHADOS QUE A MEDICAO TROUXE JUNTO ================
+#
+# a) O livro escreve `Artifact` e `Requisition` no SINGULAR (hh p.140 e p.134); a lista da ficha
+#    usa o plural. O user DECIDIU manter o plural (2026-08-28) e a lista nao foi renomeada.
+# b) hh p.122 traz 2 antecedentes que a lista nao carrega: `Mob` (comanda uma turba de 2 a 25
+#    pessoas) e `Reliquary` (acesso a uma reliquia da Igreja; perde-la consome os pontos). W20
+#    traz outros 2: `Fate` (w20 p.137) e `Spirit Heritage` (w20 p.139). Incluir qualquer um
+#    seria alargar I105a, que so mandou entrar `Artifacts` - nao entraram.
+#
+nome_EN	jogo	livro	pag	essencia
+Allies	Vampire	core	111	Mortals who help you willingly, without coaxing; may lend their own Backgrounds and indirect access to their contacts, influence and resources.
+Allies	Vampire	da	179	Mortals who support you willingly, without coercion, and are not always available when you call.
+Allies	Mage	m20	303	Folks who have your back in time of need - badass friends, helpful animals, people who owe you.
+Allies	Werewolf	w20	135	People who help and support you out of love or common interest - family, friends, or a group that owes you.
+Alternate Identity	Vampire	core	111	A second persona with papers and documentation; dots buy how deep the cover runs and how much recognition it carries.
+Alternate Identity	Vampire	da	179	A complete alternate identity with proper documentation for the period.
+Alternate Identity	Mage	m20	304	An identity to disappear into, meant for shapechangers, clones and people in dangerous professions.
+Ancestors	Werewolf	w20	136	Contact with the spirits of the Garou who came before; the rating is how readily an ancestor answers and lends what it knew.
+Arcane	Mage	m20	305	The fine art of disappearing: records get lost, cameras glitch, people fail to place you; the Technocratic side is Cloaking.
+Armory	Vampire	hh	37	A stocked and maintained weapons cache; each dot buys more potent weapons plus the ammunition and upkeep to keep them fire-ready.
+Armory	Vampire	anarch	99	Same trait reprinted for Anarch characters: a functional armory plus the ability to maintain every weapon in it.
+Artifacts	Vampire	hh	140	Printed `Artifact`, singular. Arcanum trait: begin play owning a supernaturally potent item, its power set by the dots.
+Avatar	Mage	m20	305	The Awakened self; the rating measures it, sets how much Quintessence the mage can hold and shift, and how real it feels; the Technocratic side is Genius.
+Backup	Mage	m20	306	You can call in the cavalry and expect help, in a limited capacity, through your membership in an organization.
+Base of Operations	Vampire	hh	38	A secure HQ the hunter owns; points are split across three categories - Luxury, Size and Security.
+Certification	Mage	m20	308	In an age of permits for everything, the right certifications open the doors the paperwork guards.
+Chantry	Mage	m20	308	A stronghold shared with like-minded associates that pools territory, resources and mutual defense; the Technocratic side is Construct.
+Contacts	Vampire	core	112	People you bribe, manipulate or coerce for information; dots buy the reach of the network plus a few major Contacts.
+Contacts	Vampire	da	179	People you manipulate or coerce into offering information, with minor contacts spread around.
+Contacts	Mage	m20	309	People who know things - not as helpful or reliable as Allies, but they help you dig things up.
+Contacts	Werewolf	w20	136	Acquaintances from all walks of life who do not mind telling you what is going on.
+Cult	Mage	m20	310	Devotees who go past friendship: they trust you and act on your word.
+Demesne	Mage	m20	310	The mage's mind is her castle: a world of her own making that she can retreat into.
+Destiny	Mage	m20	311	You are a Chosen One with a part to play in the cosmic drama; prophecy hints at your coming greatness.
+Domain	Vampire	core	112	Physical territory whose access you control FOR FEEDING; dots buy its size and the strength of the claim.
+Domain	Vampire	da	180	Feeding territory your character controls, held by leave of the local Prince or elder Cainite.
+Dream	Mage	m20	312	Conduits to cosmic consciousness that feed the mage insight she did not study for; the Technocratic side is Hypercram.
+Enhancement	Mage	m20	312	Enlightened hypertech grafted into living tissue - cyborg implants or genetic biomods - in one of three declared configurations.
+Fame	Vampire	core	114	Recognition in mortal society; dots buy privileges and how far you can sway public opinion.
+Fame	Vampire	da	180	Widespread recognition as entertainer, scholar, warrior or criminal.
+Fame	Mage	m20	313	You are famous within the Sleeper world, for a story-based reason.
+Familiar	Mage	m20	314	An animal ally bound to the mage, in the classic witch's-cat mold; the Technocratic side is Companion.
+Fetish	Werewolf	w20	137	You own a fetish - a physical object with a spirit bound into it, and the spirit is what grants the object its powers.
+Generation	Vampire	core	114	Purity of the blood and closeness to the First Vampire; without dots you start as 13th Generation.
+Generation	Vampire	da	181	Same trait, medieval era: purity of blood and proximity to the First Vampire.
+Generation	Vampire	bh	50	Tal'Mahe'Ra variant: the sect does not recruit the weak, so its characters run to lower Generation.
+Guide	Vampire	hh	39	A spiritual entity that aids the hunter through dreams, signs and portents, with hidden motives and a price of its own.
+Herd	Vampire	core	114	A group of mortals you feed from without fear; dots buy how much blood per night and what minor tasks they will run.
+Herd	Vampire	da	181	A group of mortals to feed on safely, useful for minor tasks besides nourishment.
+Influence	Vampire	core	114	Pull in the mortal community through wealth, office or blackmail; dots buy how far you sway political and social process.
+Influence	Vampire	da	181	Pull in the mortal community through wealth, lineage, prestige, politics or blackmail.
+Influence	Mage	m20	316	Attention and respect within the Sleepers' world - celebrity, gang boss, politician, cult leader.
+Kinfolk	Werewolf	w20	138	Contact with the humans and wolves descended from Garou who did not inherit the spiritual duty; dots buy how many and how useful.
+Legend	Mage	m20	317	Humanity's collective imagination focuses on you; you carry a mythic reputation you did not ask for.
+Library	Vampire	hh	140	Arcanum trait: the research difficulty number drops by the rating, and it does not stack with Axis Mundi access.
+Library	Mage	m20	318	A collection of books and files worth having in the Internet age; dots buy how far the archive reaches.
+Mentor	Vampire	core	115	A Kindred or group of Kindred who guides and aids you now and then; dots buy their power and reach.
+Mentor	Vampire	da	181	A Cainite or group of Cainites who look out for you with guidance and occasional aid.
+Mentor	Vampire	hh	140	Arcanum trait: the Elder Brother or Sister who initiated you; the rating is their standing and your starting reputation.
+Mentor	Mage	m20	318	An elder mage who took an interest in you and provides training, guidance and occasional assistance.
+Mentor	Werewolf	w20	138	A Garou of higher Rank who has taken an interest in you and will look after you, up to a point; the rating is how powerful the mentor is.
+Node	Mage	m20	319	A place of gathered Quintessence where the mage meditates to restore her inner reserves.
+Past Lives	Mage	m20	320	Meditate on an earlier incarnation for help with the situation at hand: once per session the Background pool is added to another task's pool.
+Patron	Mage	m20	320	A faction player who moves you as a piece and conceals his face from the pawns.
+Pure Breed	Werewolf	w20	138	Descent from renowned Garou forbears; the rating is the standing that ancestry alone buys in Garou society.
+Rank	Vampire	hh	134	Position in a government agency's chain of command; the Rank difference is a Social bonus inside the agency and counts two dots lower outside it.
+Rank	Mage	m20	321	A title of some distinction among the masses - military rank, religious office, executive position.
+Requisitions	Vampire	hh	134	Printed `Requisition`, singular. A pool of equipment points per story equal to the dots; no single item above (Rank + 2), and surviving gear goes back at story's end.
+Requisitions	Mage	m20	321	The epic materiel a Technocratic operative can draw on, by chart of cost.
+Resources	Vampire	core	115	Assets you control - cash, property, investments, criminal infrastructure; dots buy holdings and monthly income.
+Resources	Vampire	da	181	Assets the character controls: gold, investments, property, commercial inventory.
+Resources	Vampire	hh	140	Arcanum trait: the society houses new members at about one dot; anything above that comes from family or another job.
+Resources	Mage	m20	322	Money made from magick, and the Syndicate's side of it; dots buy income and holdings.
+Resources	Werewolf	w20	138	Access to and control over valuable assets - cash at first, then investments and property as the rating climbs.
+Retainers	Vampire	core	116	Loyal servants and companions, often ghouls or repeatedly Dominated mortals; dots buy how many and how capable.
+Retainers	Vampire	da	182	Servants, assistants and steadfast companions, mostly ghouls.
+Retainers	Vampire	bh	50	Tal'Mahe'Ra variant: the ghoul servitors come from the three revenant lines that have served the sect for centuries.
+Retainers	Mage	m20	323	A faithful retainer who patches you up and covers the chores.
+Rites	Werewolf	w20	139	How many rites the character knows at the start of play; the rating is the count, not a level of skill.
+Rituals	Vampire	core	117	Sabbat only: knowledge of the ritae; without this Background a Pack Priest's ritae simply do not work.
+Sanctum	Mage	m20	323	A place to get away from the consensual reality that hinders your Arts; the Technocratic side is the Laboratory.
+Secret Weapons	Mage	m20	325	Access to Q Division experimental technology; a new device is issued on a roll against this Background.
+Spies	Mage	m20	325	Little birds in various nests keep you informed; the informants are not necessarily your friends.
+Status	Vampire	core	118	Standing in the local KINDRED community - Camarilla status runs from sire and bloodline, Sabbat status from pack and zeal.
+Status	Vampire	hh	123	Standing as an Inquisitor inside the SOCIETY OF LEOPOLD, earned by dedicated work or by a notable kill.
+Status	Mage	m20	325	Respect within your chosen AWAKENED group; at 4-5 dots it reaches allied groups and outside your faction.
+Totem	Mage	m20	326	A personal pact with a spirit helper, in the shamanic mold; each side of the pact gets something.
+Totem	Werewolf	w20	140	A PACK trait, not a personal one: the pack pools all the points into one totem spirit and shares what it grants.
+Wonder	Mage	m20	328	An item that carries Sphere Effects of its own - Talisman, Device, Fetish, Charm; the Storyteller sets form and function.
+
+# >>> BG_PICK_BEGIN  (gerado por research/resolve_bg_pick.ps1 - SPEC T765)
+#
+# QUAL linha vale quando um nome tem varias: precedencia de LIVRO
+#   core > da > hh > anarch > bh > m20 > w20
+# A ficha e da linha VAMPIRO e mortal (SPEC G) entao o V20 core manda; o eixo Vampire vem
+# antes na ordem que o research/README.md ja usa, e Mage e Werewolf so entram onde Vampire
+# nao tem o traco. E ESTA tabela que T765 le para o bloco 1 de I21 - nao a de cima, que tem
+# uma linha por (nome, livro) e serviu para DECIDIR o dedupe de I105b.
+#
+# O bloco 2 de I21 imprime o nome do PICKER, nao o do livro: `Artifacts` e `Requisitions`
+# ficam no plural por decisao do user 2026-08-28, e o livro escreve os dois no singular.
+#
+# colunas: item do picker <TAB> livro <TAB> pag impressa
+#
+Allies	core	111
+Alternate Identity	core	111
+Ancestors	w20	136
+Arcane	m20	305
+Armory	hh	37
+Artifacts	hh	140
+Avatar	m20	305
+Backup	m20	306
+Base of Operations	hh	38
+Certification	m20	308
+Chantry	m20	308
+Contacts	core	112
+Cult	m20	310
+Demesne	m20	310
+Destiny	m20	311
+Domain	core	112
+Dream	m20	312
+Enhancement	m20	312
+Fame	core	114
+Familiar	m20	314
+Fetish	w20	137
+Generation	core	114
+Guide	hh	39
+Herd	core	114
+Influence	core	114
+Kinfolk	w20	138
+Legend	m20	317
+Library	hh	140
+Mentor	core	115
+Node	m20	319
+Past Lives	m20	320
+Patron	m20	320
+Pure Breed	w20	138
+Rank	hh	134
+Requisitions	hh	134
+Resources	core	115
+Retainers	core	116
+Rites	w20	139
+Rituals	core	117
+Sanctum	m20	323
+Secret Weapons	m20	325
+Spies	m20	325
+Status (Mage)	m20	325
+Status (Vampire)	core	118
+Totem (Mage)	m20	326
+Totem (Werewolf)	w20	140
+Wonder	m20	328
+# <<< BG_PICK_END

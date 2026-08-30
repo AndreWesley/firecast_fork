@@ -7,9 +7,42 @@
 			Traits grid (SPEC T45). Numina moved to the Powers tab, so merits/flaws and
 			derangements moved up into the space they left. Everything closes on x=1670.
 
-			  BACKGROUNDS 0..370                                        y   0..723
-			  MERITS 390..890  FLAWS 910..1410  DERANGEMENTS 1430..1670  y   0..311
-			  background boxes, 5 per row, 240 wide, pitch 260          y 331..723
+			  BACKGROUNDS 0..364                                          y   0..693
+			  MERITS 369..905    ALLIES 910..1135   MENTOR 1140..1365      y   0..153
+			                     RESOURCES 910..    GUIDES 1140..          y 158..311
+			                                        DERANGEMENTS 1370..1595  y 0..311
+			  FLAWS 369..905     CONTACTS 910..  FAME 1140..  ARTIFACTS 1370..   y 341..502
+			                     INFLUENCE 910.. BASE OF OP 1140..  OTHER 1370..  y 507..693
+
+			125th round, on the user's ask: FLAWS dropped under MERITS and ALLIES / MENTOR /
+			RESOURCES / GUIDES rose into the hole it left, and DERANGEMENTS did not move. Their
+			HEIGHT is what changed there, 186 -> 153, and that is what makes two rows fit in the
+			311 the hole gives.
+
+			Width is the axis V298 rules: every gap between two boxes is 5, on both axes, so a box
+			narrows only if the ones beside it move by exactly what it gave up. That is why the
+			136th round walked all three right-hand columns left TOGETHER - the hole the two rows
+			above sit in is 455 = 225 + 5 + 225 now, the way it was 485 = 240 + 5 + 240 then.
+
+			136th round, on the user's ask (SPEC T790): the tab redistributes WIDTH into the
+			merit/flaw NAME. BACKGROUNDS gave 6 - three off each side of its content, which is
+			AIR and not content: the rows keep their 300 and moved 35 -> 32, because the picker
+			inside cannot narrow. V312c holds every 12pt picker to the OLD 6.5 ruler and
+			"Identidade Alternativa" wants 167 of its 170 - the slack R116 measured is not
+			permission to spend it. The eleven boxes on
+			the right gave 15 each, three columns of them. The tables took all of 6 + 3x15 = 51
+			and every pixel of it went to the NAME column: 195 -> 246. The tab still closes on
+			1595 and every gap is still 5: 364 + 5 + 536 + 5 + 225 + 5 + 225 + 5 + 225.
+
+			The name is what the width was FOR. A picker CLIPS - it does not wrap - and at 195
+			two of the 646 merit/flaw names did not fit in Portuguese; at 246 none of them does,
+			because the longest asks 240 (SPEC V196, I107a4). The 20 the name gives back on its
+			left is the column the ? button of I102b will stand in.
+
+			The right block closes on 693 with BACKGROUNDS, which is what V289 measures - it used
+			to name RESOURCES and now names OTHER, because RESOURCES went up into the hole. V290b
+			was re-aimed the same way: Merit/Flaw, MENTOR/FAME and DERANGEMENTS/ARTIFACTS are the
+			pairs standing over each other now.
 
 			The 46th round put BACKGROUNDS in front of all of it and pushed the rest 330 right
 			(SPEC I3, V145). The tab closes 330 further out than it did, and 160 further out
@@ -19,21 +52,65 @@
 			The outer MERITS AND FLAWS frame was removed on request (SPEC T102). The two tables
 			it wrapped are unchanged in shape, just promoted to top level, and each grew from 8
 			to 10 rows inside the space the frame's title and margins gave back.
+
+			143rd round, on the user's ask: ONE more PICKED row at the TOP of each table. It is
+			merit_m0 / merit_f0 and NOT a renumbering: renaming m1..m10 would drop what every
+			saved sheet already holds (SPEC V2), so the new row takes the number BEFORE the
+			first one and the ten keep theirs. Each table went 311 -> 336 and FLAWS fell the 25
+			MERITS took, keeping the 5px gap V298 rules; the column closes on 677 of 693.
 		-->
-		<template name="Merit">
-			<edit left="0" top="0" width="215" height="24" field="merit_$(num)"/>
-			<edit left="215" top="0" width="80" height="24" field="book_$(num)"/>
-			<edit left="295" top="0" width="100" height="24" field="type_$(num)"/>
-			<edit left="395" top="0" width="50" height="24" field="costy_$(num)"/>
+		<!--
+			Two templates where there was one (SPEC I100a, T756), and the picked half carries the
+			search button of I107a instead of a combo: keyboard writes NOTHING into it, only
+			mfConfirm does, which makes V13's guarantee stronger here than a readOnly edit would.
+
+			The name is dyn* on purpose (SPEC I107a3): the language traversal in WoD20.6 covers
+			<button> since T14 and snapshots the AUTHORED text, so without the prefix it would
+			restore `Select Merit` over the name Lua wrote, on the first language switch.
+
+			The data does not live on the button - a button has no field. It lives in the hidden
+			edt* beside it: ONE field, TWO widgets, ONE visible, which is exactly the pair the
+			sheet already runs for cboClanFamily/edtClanFamily (SPEC I107a1, I71, V274).
+
+			NOTHING may be commented INSIDE a <template> - rdk exits 1 with an empty message and
+			deletes the .rpk (SPEC B19).
+		-->
+		<template name="MeritPicked">
+			<button name="btnQmerit_$(num)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Merit', sheet['merit_$(num)'], '$(sub)');"/>
+			<button name="dynMerit_$(num)" left="20" top="0" width="264" height="24" text="$(lbl)" onClick="mfOpen(self, 'merit_$(num)', '$(sub)', 'Merit');"/>
+			<edit name="edtMerit_$(num)" left="20" top="0" width="264" height="24" field="merit_$(num)" visible="false" enabled="false"/>
+			<edit left="284" top="0" width="117" height="24" field="book_$(num)" readOnly="true" opacity="0.75"/>
+			<edit left="401" top="0" width="45" height="24" field="type_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<edit left="446" top="0" width="50" height="24" field="costy_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 		</template>
+		<template name="MeritFree">
+			<edit left="20" top="0" width="264" height="24" field="merit_$(num)"/>
+			<edit left="284" top="0" width="117" height="24" field="book_$(num)"/>
+			<edit left="401" top="0" width="45" height="24" field="type_$(num)" horzTextAlign="center"/>
+			<edit left="446" top="0" width="50" height="24" field="costy_$(num)" horzTextAlign="center"/>
+		</template>
+		<!--
+			PILOT of SPEC I113 (Q30, T808) - the first family to lose its dropdown for the search
+			box. The row keeps its x and its five dots; what changed is the entry: a visible
+			<button> named dyn* so the WoD20.6 traversal leaves the text Lua writes alone
+			(I107a3), and the FIELD on a hidden <edit> beside it - one field, two widgets, one
+			visible, exactly the pair MeritPicked already runs (I107a1, I71, V274).
+		
+			The three arguments are the whole of I113a: FIELD to write, LIST to read out of
+			PICKER_LIST, and the description MODULE the pane and the ? both read.
+		
+			NOTHING may be commented INSIDE a <template> - rdk exits 1 with an empty message and
+			deletes the .rpk (SPEC B19).
+		-->
 		<template name="OpenAbility">
-			<comboBox left="0" top="0" width="170" height="25" fontSize="12" name="cbo$(field)" field="$(field)">
-			</comboBox>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="250" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="275" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<button name="btnQ$(field)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Background', sheet['$(field)']);"/>
+			<button name="dyn$(field)" left="20" top="0" width="170" height="25" text="Select Background" onClick="mfOpen(self, '$(field)', 'background', 'Background');"/>
+			<edit name="edt$(field)" left="20" top="0" width="170" height="25" field="$(field)" visible="false" enabled="false"/>
+			<imageCheckBox left="195" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="220" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="245" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="270" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="295" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
 		<!--
@@ -49,12 +126,12 @@
 			delete the .rpk (SPEC B19, the fifth door, 85th round).
 		-->
 		<template name="OpenAbilityFreeRow">
-			<edit name="edt$(field)" left="0" top="0" width="170" height="25" fontSize="12" field="$(field)"/>
-			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="250" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="275" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<edit name="edt$(field)" left="20" top="0" width="170" height="25" fontSize="12" field="$(field)"/>
+			<imageCheckBox left="195" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
+			<imageCheckBox left="220" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="245" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="270" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="295" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
 		<!-- The storyteller's backgrounds moved here from the Main tab in the 46th round
@@ -69,233 +146,346 @@
 		     The row count lives in BACKGROUND_ROWS on the root form (SPEC V145). A row added
 		     here and nowhere else would be a background nothing prices: free, and invisible
 		     in the log. -->
-		<layout left="0" top="0" width="370" height="693">
+		<layout left="0" top="0" width="364" height="693">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="330" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
+			<label left="20" top="20" width="324" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
 
-			<layout left="35" top="41" width="300" height="25" >
+			<layout left="20" top="41" width="320" height="25" >
 				<OpenAbility field="background_1"/>
 			</layout>
-			<layout left="35" top="71" width="300" height="25" >
+			<layout left="20" top="71" width="320" height="25" >
 				<OpenAbility field="background_2"/>
 			</layout>
-			<layout left="35" top="101" width="300" height="25" >
+			<layout left="20" top="101" width="320" height="25" >
 				<OpenAbility field="background_3"/>
 			</layout>
-			<layout left="35" top="131" width="300" height="25" >
+			<layout left="20" top="131" width="320" height="25" >
 				<OpenAbility field="background_4"/>
 			</layout>
-			<layout left="35" top="161" width="300" height="25" >
+			<layout left="20" top="161" width="320" height="25" >
 				<OpenAbility field="background_5"/>
 			</layout>
-			<layout left="35" top="191" width="300" height="25" >
+			<layout left="20" top="191" width="320" height="25" >
 				<OpenAbility field="background_6"/>
 			</layout>
-			<layout left="35" top="221" width="300" height="25" >
+			<layout left="20" top="221" width="320" height="25" >
 				<OpenAbility field="background_7"/>
 			</layout>
-			<layout left="35" top="251" width="300" height="25" >
+			<layout left="20" top="251" width="320" height="25" >
 				<OpenAbility field="background_8"/>
 			</layout>
-			<layout left="35" top="281" width="300" height="25" >
+			<layout left="20" top="281" width="320" height="25" >
 				<OpenAbility field="background_9"/>
 			</layout>
-			<layout left="35" top="311" width="300" height="25" >
+			<layout left="20" top="311" width="320" height="25" >
 				<OpenAbility field="background_10"/>
 			</layout>
-			<layout left="35" top="341" width="300" height="25" >
+			<layout left="20" top="341" width="320" height="25" >
 				<OpenAbility field="background_11"/>
 			</layout>
-			<layout left="35" top="371" width="300" height="25" >
+			<layout left="20" top="371" width="320" height="25" >
 				<OpenAbility field="background_12"/>
 			</layout>
-			<layout left="35" top="401" width="300" height="25" >
+			<layout left="20" top="401" width="320" height="25" >
 				<OpenAbility field="background_13"/>
 			</layout>
-			<layout left="35" top="431" width="300" height="25" >
+			<layout left="20" top="431" width="320" height="25" >
 				<OpenAbility field="background_14"/>
 			</layout>
-			<layout left="35" top="461" width="300" height="25" >
+			<layout left="20" top="461" width="320" height="25" >
 				<OpenAbility field="background_15"/>
 			</layout>
-			<layout left="35" top="491" width="300" height="25" >
+			<layout left="20" top="491" width="320" height="25" >
 				<OpenAbility field="background_16"/>
 			</layout>
-			<layout left="35" top="521" width="300" height="25" >
+			<layout left="20" top="521" width="320" height="25" >
 				<OpenAbilityFreeRow field="background_17"/>
 			</layout>
-			<layout left="35" top="551" width="300" height="25" >
+			<layout left="20" top="551" width="320" height="25" >
 				<OpenAbilityFreeRow field="background_18"/>
 			</layout>
-			<layout left="35" top="581" width="300" height="25" >
+			<layout left="20" top="581" width="320" height="25" >
 				<OpenAbilityFreeRow field="background_19"/>
 			</layout>
-			<layout left="35" top="611" width="300" height="25" >
+			<layout left="20" top="611" width="320" height="25" >
 				<OpenAbilityFreeRow field="background_20"/>
 			</layout>
-			<layout left="35" top="641" width="300" height="25" >
+			<layout left="20" top="641" width="320" height="25" >
 				<OpenAbilityFreeRow field="background_21"/>
 			</layout>
 		</layout>
 
-		<layout left="375" top="0" width="485" height="311">
+		<layout left="369" top="0" width="536" height="336">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="215" height="20" text="Merit" horzTextAlign="center"/>
-			<label left="235" top="20" width="80" height="20" text="Book" horzTextAlign="center"/>
+			<label left="40" top="20" width="264" height="20" text="Merit" horzTextAlign="center"/>
+			<label left="304" top="20" width="117" height="20" text="Book" horzTextAlign="center"/>
 			<!-- Column renamed to Page on request. The field is still type_* : renaming a
 			     field drops what is already saved in existing sheets (SPEC V2). -->
-			<label left="315" top="20" width="100" height="20" text="Page" horzTextAlign="center"/>
-			<label left="415" top="20" width="50" height="20" text="Cost" horzTextAlign="center"/>
+			<label left="421" top="20" width="45" height="20" text="Page" horzTextAlign="center"/>
+			<label left="466" top="20" width="50" height="20" text="Cost" horzTextAlign="center"/>
 
-			<layout left="20" top="41" width="445" height="25" >
-				<Merit num="m1"/>
+			<layout left="20" top="41" width="496" height="25" >
+				<MeritPicked sub="merit" num="m0" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="66" width="445" height="25" >
-				<Merit num="m2"/>
+			<layout left="20" top="66" width="496" height="25" >
+				<MeritPicked sub="merit" num="m1" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="91" width="445" height="25" >
-				<Merit num="m3"/>
+			<layout left="20" top="91" width="496" height="25" >
+				<MeritPicked sub="merit" num="m2" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="116" width="445" height="25" >
-				<Merit num="m4"/>
+			<layout left="20" top="116" width="496" height="25" >
+				<MeritPicked sub="merit" num="m3" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="141" width="445" height="25" >
-				<Merit num="m5"/>
+			<layout left="20" top="141" width="496" height="25" >
+				<MeritPicked sub="merit" num="m4" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="166" width="445" height="25" >
-				<Merit num="m6"/>
+			<layout left="20" top="166" width="496" height="25" >
+				<MeritPicked sub="merit" num="m5" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="191" width="445" height="25" >
-				<Merit num="m7"/>
+			<layout left="20" top="191" width="496" height="25" >
+				<MeritPicked sub="merit" num="m6" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="216" width="445" height="25" >
-				<Merit num="m8"/>
+			<layout left="20" top="216" width="496" height="25" >
+				<MeritFree num="m7"/>
 			</layout>
-			<layout left="20" top="241" width="445" height="25" >
-				<Merit num="m9"/>
+			<layout left="20" top="241" width="496" height="25" >
+				<MeritFree num="m8"/>
 			</layout>
-			<layout left="20" top="266" width="445" height="25" >
-				<Merit num="m10"/>
+			<layout left="20" top="266" width="496" height="25" >
+				<MeritFree num="m9"/>
+			</layout>
+			<layout left="20" top="291" width="496" height="25" >
+				<MeritFree num="m10"/>
 			</layout>
 		</layout>
 
-		<layout left="865" top="0" width="485" height="311">
+		<layout left="369" top="341" width="536" height="336">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="215" height="20" text="Flaw" horzTextAlign="center"/>
-			<label left="235" top="20" width="80" height="20" text="Book" horzTextAlign="center"/>
-			<label left="315" top="20" width="100" height="20" text="Page" horzTextAlign="center"/>
-			<label left="415" top="20" width="50" height="20" text="Cost" horzTextAlign="center"/>
+			<label left="40" top="20" width="264" height="20" text="Flaw" horzTextAlign="center"/>
+			<label left="304" top="20" width="117" height="20" text="Book" horzTextAlign="center"/>
+			<label left="421" top="20" width="45" height="20" text="Page" horzTextAlign="center"/>
+			<label left="466" top="20" width="50" height="20" text="Cost" horzTextAlign="center"/>
 
-			<layout left="20" top="41" width="445" height="25" >
-				<Merit num="f1"/>
+			<layout left="20" top="41" width="496" height="25" >
+				<MeritPicked sub="flaw" num="f0" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="66" width="445" height="25" >
-				<Merit num="f2"/>
+			<layout left="20" top="66" width="496" height="25" >
+				<MeritPicked sub="flaw" num="f1" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="91" width="445" height="25" >
-				<Merit num="f3"/>
+			<layout left="20" top="91" width="496" height="25" >
+				<MeritPicked sub="flaw" num="f2" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="116" width="445" height="25" >
-				<Merit num="f4"/>
+			<layout left="20" top="116" width="496" height="25" >
+				<MeritPicked sub="flaw" num="f3" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="141" width="445" height="25" >
-				<Merit num="f5"/>
+			<layout left="20" top="141" width="496" height="25" >
+				<MeritPicked sub="flaw" num="f4" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="166" width="445" height="25" >
-				<Merit num="f6"/>
+			<layout left="20" top="166" width="496" height="25" >
+				<MeritPicked sub="flaw" num="f5" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="191" width="445" height="25" >
-				<Merit num="f7"/>
+			<layout left="20" top="191" width="496" height="25" >
+				<MeritPicked sub="flaw" num="f6" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="216" width="445" height="25" >
-				<Merit num="f8"/>
+			<layout left="20" top="216" width="496" height="25" >
+				<MeritFree num="f7"/>
 			</layout>
-			<layout left="20" top="241" width="445" height="25" >
-				<Merit num="f9"/>
+			<layout left="20" top="241" width="496" height="25" >
+				<MeritFree num="f8"/>
 			</layout>
-			<layout left="20" top="266" width="445" height="25" >
-				<Merit num="f10"/>
+			<layout left="20" top="266" width="496" height="25" >
+				<MeritFree num="f9"/>
+			</layout>
+			<layout left="20" top="291" width="496" height="25" >
+				<MeritFree num="f10"/>
 			</layout>
 		</layout>
 
-		<layout left="1355" top="0" width="240" height="311">
+		<layout left="1370" top="0" width="225" height="311">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="DERANGEMENTS" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="DERANGEMENTS" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="250" field="derangements"/>
+			<textEditor left="35" top="41" width="155" height="250" field="derangements"/>
 		</layout>
 
-		<layout left="375" top="316" width="240" height="186">
+		<layout left="910" top="0" width="225" height="153">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="ALLIES" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="ALLIES" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="125" field="allies"/>
+			<textEditor left="35" top="41" width="155" height="92" field="allies"/>
 		</layout>
 
-		<layout left="620" top="316" width="240" height="186">
+		<layout left="1140" top="0" width="225" height="153">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="MENTOR" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="MENTOR" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="125" field="mentor"/>
+			<textEditor left="35" top="41" width="155" height="92" field="mentor"/>
 		</layout>
 
-		<layout left="865" top="316" width="240" height="186">
+		<layout left="910" top="316" width="225" height="186">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="CONTACTS" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="CONTACTS" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="125" field="contacts"/>
+			<textEditor left="35" top="41" width="155" height="125" field="contacts"/>
 		</layout>
 
-		<layout left="1110" top="316" width="240" height="186">
+		<layout left="1140" top="316" width="225" height="186">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="FAME" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="FAME" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="125" field="fame"/>
+			<textEditor left="35" top="41" width="155" height="125" field="fame"/>
 		</layout>
 
-		<layout left="1355" top="316" width="240" height="186">
+		<layout left="1140" top="507" width="225" height="186">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="BASE OF OPERATIONS" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="BASE OF OPERATIONS" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="125" field="baseOfOperation"/>
+			<textEditor left="35" top="41" width="155" height="125" field="baseOfOperation"/>
 		</layout>
 
-		<layout left="375" top="507" width="240" height="186">
+		<layout left="910" top="158" width="225" height="153">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="RESOURCES" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="RESOURCES" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="125" field="resources"/>
+			<textEditor left="35" top="41" width="155" height="92" field="resources"/>
 		</layout>
 
-		<layout left="620" top="507" width="240" height="186">
+		<layout left="1140" top="158" width="225" height="153">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- Retainers was renamed to Guides on request. The field is still `retainers`:
 			     renaming it would drop what is already saved in existing sheets (SPEC V2). -->
-			<label left="20" top="20" width="200" height="20" text="GUIDES" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="GUIDES" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="125" field="retainers"/>
+			<textEditor left="35" top="41" width="155" height="92" field="retainers"/>
 		</layout>
 
-		<layout left="865" top="507" width="240" height="186">
+		<layout left="1370" top="316" width="225" height="186">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="STATUS" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="ARTIFACTS" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="125" field="status"/>
+			<textEditor left="35" top="41" width="155" height="125" field="status"/>
 		</layout>
 
-		<layout left="1110" top="507" width="240" height="186">
+		<layout left="910" top="507" width="225" height="186">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="INFLUENCE" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="INFLUENCE" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="170" height="125" field="influence"/>
+			<textEditor left="35" top="41" width="155" height="125" field="influence"/>
 		</layout>
 
-		<layout left="1355" top="507" width="240" height="186">
+		<layout left="1370" top="507" width="225" height="186">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="200" height="20" text="OTHER" horzTextAlign="center"/>
+			<label left="20" top="20" width="185" height="20" text="OTHER" horzTextAlign="center"/>
 
 			<!-- ponytail: the plain "other" field name is already owned by WoD20.3.lfm sheet-wide; renamed to bgOther per SPEC V1 -->
-			<textEditor left="35" top="41" width="170" height="125" field="bgOther"/>
+			<textEditor left="35" top="41" width="155" height="125" field="bgOther"/>
+		</layout>
+
+		<!--
+			The ? box and the scrim that closes it (SPEC I102, T760). Both are authored LAST
+			in the file because file order is paint order, and an overlay written before the grid
+			would be painted under it. The scrim comes first of the TWO for the same reason: it has
+			to sit between the grid and the box, so a click that misses the box lands on the scrim
+			and on nothing else (SPEC I102a, V333b).
+
+			The scrim is sized to the grid rather than align=client: the backdrop image already
+			holds the client rect of this scrollBox, and two children claiming one rect is what
+			V190 refuses. 1595x693 is what the grid actually covers. It is fully transparent - a
+			hit target and not a tint - and
+			it is the ONE way a click outside closes the box. There is no second closer: the X and
+			the scrim both call popClose (SPEC V333e).
+
+			popDesc is NOT a section box. It wears the same black rectangle every box wears, so the
+			V280/V298 collector would sweep it up, and a floating overlay has no neighbour to be 5px
+			from - it is excluded there BY NAME, the way cboRoad is named in V328c (SPEC I73, I76a).
+		-->
+		<rectangle name="popScrim" left="0" top="0" width="1595" height="693" color="#00000000" visible="false" onClick="popClose(self);"/>
+
+		<layout name="popDesc" left="440" top="110" width="500" height="500" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+
+			<!-- Named dyn* so the language traversal in WoD20.6 leaves it alone: the title is the
+			     canonical EN name Lua writes, and a traversal that snapshots authored text would
+			     restore a stale one over it (SPEC I108a, V31). -->
+			<label name="dynPopDescTitle" left="20" top="20" width="380" height="20" horzTextAlign="center"/>
+			<button name="btnFontDownPop" left="410" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+			<button name="btnFontUpPop" left="435" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
+			<button name="btnPopClose" left="460" top="20" width="20" height="20" text="X" onClick="popClose(self);"/>
+
+			<!-- wordWrap is what kills the horizontal scrollbar the user asked not to see: there is
+			     no scroll property on this control in SDK3, so the only way to have no horizontal
+			     bar is to give it nothing to scroll (SPEC I102c, V333f). -->
+			<textEditor name="edtPopDesc" left="20" top="45" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+		</layout>
+
+		<!--
+			SPEC I107c/I107d/I107l/I107m, T789 - the PROBE SLICE of the merit/flaw search box.
+
+			This is the REAL box with ONE result row instead of twenty and no paging, which is what
+			T789 asks for: every control is named and shaped as I107 declares, so T784 GROWS this
+			rather than replacing it. What the probe still owes the screen is FIRING, not existence -
+			I107n1 already settled the names against the compiler: `onDoubleClick` is REJECTED by rdk
+			(exit 1, empty message, .rpk deleted - the B80 mode), `onDblClick` compiles, and <edit>
+			takes onChange.
+
+			ONE line here is throwaway and it is btnMfProbe, the opener: I107b opens from the NAME
+			button of the row, and that button belongs to MeritPicked (T783), which may NOT be built
+			before this probe answers. It sits in the 66px the column leaves free under FLAWS
+			(y=627..693), so it displaces nothing.
+
+			dynMfProbe is the instrument: mfFilter COUNTS its own calls into it, because "did it fire
+			per keystroke" is not a question the eye can answer off a filtered list of one.
+		-->
+
+
+		<layout name="mfSearch" left="300" top="40" width="1000" height="620" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+
+			<label name="dynMfTitle" left="60" top="20" width="400" height="20" horzTextAlign="center"/>
+			<!-- SPEC I112c, T806 - edtMfDesc is the NINTH pane of I103c, so it carries its own zoom
+			     pair and obeys descFontSize like the other eight. The pair is named off the pane's
+			     own name with edt/ and /Desc stripped, which is the suffix V334b derives. -->
+			<button name="btnFontDownMf" left="890" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+			<button name="btnFontUpMf" left="915" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
+			<button name="btnMfClose" left="960" top="20" width="20" height="20" text="X" onClick="mfClose(self);"/>
+
+			<edit name="edtMfQuery" left="20" top="50" width="480" height="24" onChange="mfConfirm(self);" onKeyUp="mfKey(self);"/>
+			<label name="lblMfLoading" left="20" top="82" width="480" height="20"/>
+
+			<button name="dynMfRow_1" left="20" top="108" width="480" height="20" visible="false" onClick="mfSelect(self, 1);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_2" left="20" top="128" width="480" height="20" visible="false" onClick="mfSelect(self, 2);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_3" left="20" top="148" width="480" height="20" visible="false" onClick="mfSelect(self, 3);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_4" left="20" top="168" width="480" height="20" visible="false" onClick="mfSelect(self, 4);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_5" left="20" top="188" width="480" height="20" visible="false" onClick="mfSelect(self, 5);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_6" left="20" top="208" width="480" height="20" visible="false" onClick="mfSelect(self, 6);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_7" left="20" top="228" width="480" height="20" visible="false" onClick="mfSelect(self, 7);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_8" left="20" top="248" width="480" height="20" visible="false" onClick="mfSelect(self, 8);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_9" left="20" top="268" width="480" height="20" visible="false" onClick="mfSelect(self, 9);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_10" left="20" top="288" width="480" height="20" visible="false" onClick="mfSelect(self, 10);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_11" left="20" top="308" width="480" height="20" visible="false" onClick="mfSelect(self, 11);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_12" left="20" top="328" width="480" height="20" visible="false" onClick="mfSelect(self, 12);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_13" left="20" top="348" width="480" height="20" visible="false" onClick="mfSelect(self, 13);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_14" left="20" top="368" width="480" height="20" visible="false" onClick="mfSelect(self, 14);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_15" left="20" top="388" width="480" height="20" visible="false" onClick="mfSelect(self, 15);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_16" left="20" top="408" width="480" height="20" visible="false" onClick="mfSelect(self, 16);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_17" left="20" top="428" width="480" height="20" visible="false" onClick="mfSelect(self, 17);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_18" left="20" top="448" width="480" height="20" visible="false" onClick="mfSelect(self, 18);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_19" left="20" top="468" width="480" height="20" visible="false" onClick="mfSelect(self, 19);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_20" left="20" top="488" width="480" height="20" visible="false" onClick="mfSelect(self, 20);" onDblClick="mfConfirm(self);"/>
+
+			<button name="btnMfPrev" left="20" top="516" width="80" height="24" text="&lt;" onClick="mfPage(self, -1);"/>
+			<label name="lblMfPage" left="110" top="516" width="300" height="24" horzTextAlign="center"/>
+			<button name="btnMfNext" left="420" top="516" width="80" height="24" text="&gt;" onClick="mfPage(self, 1);"/>
+
+			<button name="btnMfOk" left="390" top="576" width="110" height="24" text="OK" enabled="false" onClick="mfConfirm(self);"/>
+
+			<!-- SPEC I112a/I112b/I112g, Q29 - the description pane. CHILD of mfSearch and not a
+			     sibling: a sibling would be a second closing point and the text would outlive the
+			     box mfClose hides (V135). The result column does not move one pixel - the box grew
+			     to the RIGHT and the pane took the new ground. wordWrap is what kills the horizontal
+			     bar here for the same reason it does on edtPopDesc, and there is no field: what
+			     leaks to the NDB from the panes is the SIZE, never the text (V29, V334d). -->
+			<textEditor name="edtMfDesc" left="520" top="50" width="460" height="550" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 
 	</scrollBox>

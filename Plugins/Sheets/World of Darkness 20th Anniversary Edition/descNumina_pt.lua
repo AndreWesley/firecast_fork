@@ -32,18 +32,6 @@ return {
 Alchemy
 
 
-O estudo da transformação e da purificação, a Alquimia é uma arte e uma ciência antigas. Seus praticantes recorrem a práticas díspares, tanto mágicas quanto científicas, para compreender as propriedades ocultas da matéria e da alma. O objetivo mais tradicional da alquimia não é a mais famosa transformação da matéria base em contrapartes mais “nobres” — como chumbo em ouro — mas sim a perfeição do próprio alquimista.
-
-Como Caminho, a Alquimia cria itens mágicos de uso único e transformações. Muitas das coisas que ela produz são destinadas à ingestão, embora poucas sejam feitas pensando no sabor ou mesmo na saúde e no bem-estar do consumidor. A Alquimia também produz revestimentos que podem ser aplicados sobre a pele ou sobre objetos, e reagentes que catalisam transmutações de elementos base em outra matéria.
-
-Embora muitas vezes estudada como um meio de aperfeiçoar a alma, essa busca está profundamente ligada à prática Alquímica propriamente dita. Outras práticas dão a ela seu próprio toque: os praticantes de Bruxaria (Witchcraft) chamam o Caminho de Herbalismo (Herbalism) e concentram-se em ingredientes naturais e nos efeitos relacionados a eles, enquanto os engenheiros e inventores da Hipertecnologia (Hypertech) que utilizam a Ciência Estranha (Weird Science) o chamam de Química Avançada (Advanced Chemistry), e descartam completamente as implicações metafísicas que a prática da Alquimia impõe ao Caminho.
-
-Em todos os casos, o Caminho da Alquimia é caro. Na maioria das versões do Caminho, ele exige um laboratório bem equipado e ingredientes estranhos. As aplicações mais poderosas requerem componentes cada vez mais exóticos e Tass extremamente especializado. Embora a variante do Herbalismo tenda a ser mais barata em termos de dinheiro, ela exige mais tempo e esforço, com plantas e fungos coletados sob condições estritas.
-
-Muitas aplicações deste Caminho passaram para a lenda. Sabe-se que poucos alquimistas realmente completaram a chamada “Grande Obra”, a criação de uma Pedra Filosofal, ou qualquer outro produto que conduza à imortalidade, mas a maioria dos mestres do Caminho faz a tentativa.
-
-Este Caminho não tem magias. Ele faz tudo por meio de rituais chamados receitas.
-
 Sistema
 
 Modificadores: Uma vez que o mago siga uma receita com sucesso três vezes, a dificuldade é reduzida em um.
@@ -66,8 +54,6 @@ Preço do Fracasso: Trabalhar com compostos voláteis é perigoso por si só. Me
 
 Chronomancy
 
-
-É bem sabido que os magos são supostamente mestres do tempo e do espaço, e os Feiticeiros (Sorcerers) trabalharam para acompanhar esse tipo de crença também. Enquanto a Adivinhação (Divination) permite que um Feiticeiro veja aspectos do futuro, e a Fortuna (Fortune) permite puxar os fios do destino, alguns usuários de magia preferem concentrar-se em manipulações do tempo dentro do presente. Viajar anos através do tempo está além da capacidade da Feitiçaria, mas um usuário deste Caminho pode obter uma percepção mais aguçada do fluxo do tempo, fazer alterações sutis, ou mesmo acelerá-lo e desacelerá-lo. Alguns podem considerar esses efeitos comparativamente menores quando medidos contra algumas das coisas que um “verdadeiro” Mago pode fazer, mas a maioria dos Feiticeiros rapidamente descobrirá o quão útil este Caminho pode ser.
 
 Sistema
 
@@ -95,12 +81,6 @@ A Chronomancy não tem Aspectos, propriamente, e em vez disso seus efeitos basei
 Conjuration
 
 
-A Conjuração é o Caminho por excelência dos mágicos de palco: tirar coelhos de cartolas e cartas do bolso de alguém da plateia são exemplos comuns de suas aplicações mais básicas. Os feiticeiros que desejam ganhar a vida com seus estudos frequentemente aprendem Conjuração. Por causa dessa associação inextricável com a mágica de palco, os Adormecidos (Sleepers) tendem a racionalizar a Conjuração como simples prestidigitação especializada.
-
-O caminho da Conjuração é a capacidade de mover ou convocar um objeto ou ser. Enquanto um novato talvez só consiga realizar truques de salão, como fazer moedas girarem, um feiticeiro avançado de Conjuração pode pendurar uma magia em seu companheiro antes de entrar em uma situação perigosa, permitindo-lhe arrancar o amigo das (talvez literais) garras da morte, se for preciso.
-
-Quase tão importante quanto o que a Conjuração é, é o que a Conjuração não é. A Conjuração é muito semelhante ao caminho do Transporte (Conveyance) em termos de mecânica, a ponto de haver muitas vezes confusão entre os dois caminhos — especialmente entre os Magos Despertos, que podem alcançar resultados comuns a ambos os Caminhos com a Esfera de Correspondência. A Conjuração não pode mover o feiticeiro que a empunha, enquanto o Transporte pode. Um feiticeiro também não pode usar este caminho para “convocar” ataques elementais — esse é o domínio do Fogo Infernal (Hellfire). A Conjuração pode convocar um balde de areia, mas não pode criar uma tempestade de areia.
-
 Sistema
 
 Modificadores: Para qualquer aplicação que possa ser passada como — ou descrita de modo suficientemente semelhante a — mágica de palco, mantenha um sucesso que de outra forma teria sido removido pelas testemunhas. Até o consenso racional está predisposto pela cultura pop a acreditar que conjurar um elefante do nada é possível com truques visuais inteligentes. Observe que ações que causem dano físico óbvio não podem ser explicadas dessa maneira.
@@ -120,12 +100,6 @@ Preço do Fracasso: Enquanto um simples fracasso significa que nenhum item é tr
 Conveyance
 
 
-Sonhando com teletransporte ou com vassouras voadoras, as pessoas sempre quiseram viajar rapidamente de um lugar a outro. Não importa quão rápido consigam fazê-lo, nunca é rápido o bastante, e muitos recorrem à magia e a ciências estranhas para chegar aonde vão bem mais cedo. Para os magos estáticos (hedge magicians), esses feitos podem não ser rotina, mas poucos deles se preocupam em ser alocados numa poltrona do meio de um avião.
-
-Até alcançar os ápices do domínio do Caminho, um mago estático que use o Caminho do Transporte (Conveyance) precisa de algum tipo de veículo, que é preparado pelo mago para uma única viagem. Os místicos tendem a preferir botas de sete léguas, tapetes e vassouras voadoras, e coisas mais estranhas como carruagens puxadas por gatos divinos, enquanto os magos mais científicos usam mochilas a jato, carros transformáveis e afins.
-
-Praticantes poderosos deste Caminho, porém, podem cobrir distância sem atravessar o espaço intermediário. O teletransporte não precisa ser instantâneo, mas costuma não precisar de veículo; normalmente um ritual ou dispositivo no ponto de origem basta para enviar o mago para onde ele quiser ir.
-
 Sistema
 
 Modificadores: +2 de dificuldade para cada alvo relutante, –1 de dificuldade para locais bem conhecidos
@@ -142,22 +116,6 @@ Preço do Fracasso: Os acidentes com o Caminho do Transporte podem ser extremame
 
 Curses
 
-
-A maldição é uma das formas mais antigas e potentes de Magia Estática (Hedge Magic). Ela pode tomar muitas formas, do “mau-olhado” do Mediterrâneo e do Oriente Médio ao “jinx” do hoodoo e ao “hex” do folclore do Leste Europeu. Sabe-se que maldições causam graves infortúnios em uma variedade de formas: acidentes, doenças e até a morte.
-
-No cerne de qualquer maldição está a intenção maléfica dirigida a um inimigo. A Maga Estática concentra sua vontade, seu ódio dirigido, sobre o alvo e libera essa intenção na forma de energia nociva. A maldição aflige rapidamente a vida da vítima e desvanece lentamente à medida que a energia odiosa se dissipa.
-
-A mecânica básica do amaldiçoar é simples. A Maga Estática determina que nível de maldição deseja infligir (dentro de sua capacidade), e então gasta um turno por nível de severidade reunindo e afiando seu ódio místico. Uma vez preparada, ela descarrega a maldição de forma catártica diretamente sobre o alvo (que deve estar visível para ela). Exemplos de uma descarga apropriada incluem um grito, uma dança, rasgar um boneco que representa a vítima, ou gestos ofensivos.
-
-O jogador da Maga Estática faz um teste de ativação de Manipulação + Intimidação (dificuldade 7) para determinar se a maldição é bem-sucedida e qual a sua duração, conforme listado em Efeitos.
-
-Cada nível do Caminho das Maldições permite que uma gama maior de infortúnios ocorra. Mecanicamente, uma maldição toma a forma de penalidades às dificuldades e, eventualmente, às paradas de dados. O Narrador deve aplicar os efeitos de uma maldição com cuidado para garantir que este Caminho de Numina não domine a crônica inteira.
-
-Ao mexer com os fios do destino, contudo, a Maga Estática corre o risco de enredar-se a si mesma. Uma falha crítica em uma maldição traz os efeitos de volta sobre ela em triplo, caso em que a maldição destinada ao inimigo aplica-se imediatamente à Maga Estática.
-
-Uma Maga Estática pode tentar banir qualquer maldição, mesmo uma sua, mas não é fácil. Seu jogador deve gastar um ponto de Força de Vontade e testar Raciocínio + Manha (dificuldade 9). Cada nível de sucesso reduz o nível da maldição infligida em um ponto. Se o teste falhar criticamente, a Maga Estática sofre a própria maldição que tentou banir pelo restante da duração original da maldição, sem nova chance de rompê-la.
-
-O Caminho das Maldições acaba cobrando seu preço da alma humana. Seus praticantes raramente vivem vidas felizes, pois o ódio e a raiva necessários para alimentar este Caminho tendem a retorcer-lhes as entranhas. Mecanicamente, isso muitas vezes se traduz em uma Humanidade baixa para os personagens que praticam este Caminho. Os Narradores são encorajados a exigir testes de Humanidade de Magos Estáticos que tenham Humanidade alta ou que invoquem maldições mais de uma vez por mês.
 
 Sistema
 
@@ -192,14 +150,6 @@ Seis+ sucessos — Até um ano, decidido na ativação da maldição]==] },
 
 Divination
 
-
-Ler folhas de chá, lançar pedras rúnicas ou ossos, estudar o céu noturno — todos esses são exemplos de práticas tradicionais de Divinação (Divination), cujas variações abrangem uma infinidade de culturas. Desde que existe o conceito de futuro, existem pessoas querendo saber o que ele lhes reservava. Algumas das práticas mais recentes, embora mais difíceis, envolvem o uso de programação avançada de computadores baseada em ciências extraordinárias e hipermatemática (hypermath).
-
-Um mago estático (hedge magician) que realiza atos de Divinação tenta prever o futuro. No entanto, o futuro é uma confusão turva e em constante mudança. Um feiticeiro pode usar a Divinação para encontrar pistas dos resultados mais prováveis, mas o vidente sábio conhece o valor de interpretar com precisão o simbolismo impreciso e onírico para julgar as prováveis mudanças de probabilidade.
-
-Raramente algo a respeito do futuro está gravado em pedra. Mortais morrem, mas o onde, o quando e o como são determinados por variáveis infinitas: escolhas de ação e de inação igualmente. A mera decisão de vislumbrar o futuro e contar a alguém sobre isso pode alterar drasticamente os resultados.
-
-Como a Divinação se apoia em práticas ritualísticas, não há distinção entre magias e rituais neste Caminho, exceto pelo tempo e pelo esforço de conjuração. A Divinação raramente se qualifica como magia vulgar, e muitos magos estáticos habilidosos nessa arte acham lucrativo praticá-la abertamente. No entanto, algumas práticas, como a Haruspicina (Haruspicy) (prever o futuro estudando as entranhas de um sacrifício), correm o risco de consequências legais se descobertas. A maioria dos Adivinhos (Diviners) escolhe uma prática, mas não é inédito que feiticeiros tenham algumas práticas que usam dependendo da situação ou do cliente, especialmente se uma prática favorita for ilegal ou estiver sujeita a ser frustrada pelo clima, como no caso da astrologia.
 
 Sistema
 
@@ -252,14 +202,6 @@ Preço do Fracasso (Price of Failure): No melhor cenário, o feiticeiro simplesm
 Dowsing
 
 
-Com este Caminho, um mago usa itens ritualmente preparados mas em última análise mundanos para responder perguntas simples, localizar fontes elementais e encontrar itens específicos. Este Caminho é aparentado à Adivinhação (Divination) no sentido de que ambos permitem ao mago usar focos externos e interpretação para ler fatos do mundo ao seu redor. A Radiestesia (Dowsing) é muito mais orientada a resultados que a Adivinhação, pois é dedicada a assuntos específicos, limitados e práticos, em vez de possibilidades e circunstâncias abrangentes. Poder-se-ia dizer que, enquanto a Adivinhação foca no universal, a Radiestesia atende ao específico.
-
-Ao praticar a radiestesia, o mago usa um item específico, ou itens, feitos de materiais normais do dia a dia, para encontrar algum tipo de objeto, pessoa, substância ou local, ou para determinar um fato imediato. O estereótipo do radiestesista é o do caipira com uma vara bifurcada procurando água, e de fato esse é um uso comum da habilidade. Os verdadeiros radiestesistas sabem, porém, que há muito mais nesta magia. Fatos podem ser aprendidos por meio de perguntas feitas com critério. Itens específicos podem ser encontrados e, em níveis mais altos, até emoções ocultas (como malícia, ódio ou mesmo amor) podem ser detectadas naqueles ao seu redor.
-
-Os radiestesistas dependem mais que a maioria de seus Focos, que muitas vezes atuam como sua ferramenta de adivinhação. Se o Radiestesista não tiver o ritual “Prepare Implement”, ele precisa ter um foco Personalizado ou Único dedicado a este Caminho para poder usá-lo. Por isso, a maioria aprende esse ritual básico cedo, para dispor de opções adicionais sobre como conduzir suas magias.
-
-Quaisquer perguntas feitas com a Radiestesia devem relacionar-se ao presente ou ao passado imediato, e apenas à área/situação imediata; prever o futuro ou obter informações relativas a circunstâncias de longo alcance é da alçada da Adivinhação. O Aspecto de distância deve cobrir tudo o que estiver sendo questionado, bem como a distância até qualquer coisa que esteja sendo buscada mais diretamente.
-
 Sistema
 
 Teste: Percepção + Prontidão
@@ -299,12 +241,6 @@ A falha mais óbvia é simplesmente a incapacidade de discernir o que o Feiticei
 Ephemera
 
 
-Alguns magos — aqueles que se concentram no Caminho da Convocação, Vinculação e Proteção (Path of Summoning, Binding, and Warding) — comandam espíritos. Aqueles que seguem o Caminho da Efêmera (Path of Ephemera) buscam uma relação de maior familiaridade com eles. Para os magos que usam o Caminho da Efêmera, sua relação com os espíritos é mais como família e amigos do que senhor e servo. Quando chamam por um espírito, é um convite, não uma intimação judicial.
-
-Em vez de vincular e comandar espíritos, o Caminho da Efêmera permite que o mago negocie com eles. Esse processo, chamado chiminage, é um dar e receber. Cada espírito quer algo diferente, relacionado à sua natureza. O pedido do espírito depende do poder do espírito e do tamanho da tarefa envolvida. Pedir a um Incarna que empreenda uma tarefa difícil e de longo prazo exige muito do mago, talvez algo só possível com uma difícil missão própria. Pedir a um Gaffling que faça algo simples e diretamente ligado à sua natureza (por exemplo, pedir a um espírito do fogo que acenda uma vela) exigiria, ao contrário, quase nada do mago, talvez apenas a oportunidade de fazê-lo. Esse processo, naturalmente, tem uma curva de aprendizado acentuada. A maioria dos magos se vê no lado pior de um ou dois acordos antes de pegar o jeito.
-
-Este Caminho quase sempre se concentra na Umbra Intermediária (Middle Umbra) e, mais raramente, na Umbra Inferior (Low Umbra). Rumores de versões que funcionam com a Umbra Superior (High Umbra) são persistentes, mas não passam de boatos.
-
 Sistema
 
 Modificadores: –2 a +2 de dificuldade dependendo da opinião do espírito sobre o mago.
@@ -330,12 +266,6 @@ Preço do Fracasso: Lidar com espíritos pode ser perigoso, especialmente nos es
 Enchantment
 
 
-O Caminho do Encantamento (Path of Enchantment) recompensa a paciência e a premeditação mais do que qualquer outro Caminho. Não há magias neste Caminho, apenas rituais, o que faz com que o mago estático (hedge wizard) precise aprender — ou inventar — um novo ritual cada vez que quiser fazer um Artefato (Artifact) que ainda não tenha feito antes. Cada um desses Artefatos deve ser cuidadosamente confeccionado pelo Encantador. O primeiro passo é criar o item mundano de base. Normalmente, esses são feitos à mão pelo próprio Encantador, levando suas habilidades mundanas ao limite para fazer exatamente o receptáculo certo para sua magia. Às vezes, no entanto, o receptáculo certo pode ser encontrado na forma de um objeto raro ou antigo. Uma vez que o receptáculo tenha sido feito ou encontrado, o Encantador pode partir para o processo de infundir o objeto com energia mágica para ser usada depois. O primeiro estágio geralmente é realizado por meio de testes de Ofícios (Crafts) (ou, para tecnofeiticeiros (technosorcerers), testes de Tecnologia ou Hipertecnologia (Hypertech)), enquanto o último é um teste de Caminho.
-
-Os Artefatos criados por meio do Encantamento diferem em vários aspectos essenciais das receitas da Alquimia (Alchemy). Artefatos geralmente são persistentes ou, ao menos, podem ser usados muitas vezes. Alguns podem ser permanentes, ou quase isso, enquanto outros podem ser usados um número fixo de vezes antes que sua magia se dissipe. Além disso, eles tendem a ser mais fracos que os Prodígios (Wonders) criados por magos, e mais focados. Um Artefato só pode ter um único poder, uma restrição que os Prodígios não têm.
-
-Encantadores tendem a gastar muito tempo e esforço em suas oficinas. Qualquer tipo de artesanato que façam para criar seus Artefatos os define. Eles frequentemente se veem primeiro como ferreiros, joalheiros, engenheiros eletrônicos ou marceneiros, e a magia que podem fazer vem depois. Isso leva os Encantadores a buscar altos níveis do Antecedente (Background) Recursos, assim como de outros que representem um espaço seguro e protegido para realizar seu trabalho e a capacidade de adquirir matérias-primas de alta qualidade e muitas vezes exóticas.
-
 Sistema
 
 Modificadores: Uma vez que um mago crie um Talismã (Talisman) três vezes, a dificuldade é reduzida em 1.
@@ -360,12 +290,6 @@ Preço do Fracasso: O fracasso geralmente significa que o mago desperdiçou dias
 
 Fascination
 
-
-Histórias do feiticeiro cativante ou do mágico enfeitiçador são encontradas em contos populares por todo o mundo. Encantadores traiçoeiros trazem os inocentes para sob seu domínio, e pactos firmados em troca de poder aprisionam os corações e as mentes daqueles tolos o bastante para assinar a entrega de suas almas em tais barganhas. O grão de verdade nesse velho clichê é sólido como diamante. Mágicos inescrupulosos que dobram as mentes dos outros à sua vontade praticam este Caminho desde que alguém desejou que outra pessoa simplesmente agisse ou pensasse de maneira agradável.
-
-Os métodos variam, mas o resultado é o mesmo: Quebrar a vontade do sujeito e cativá-lo. Um feiticeiro que empregue uma prática mística pode aplicar maquiagem que faça seus olhos brilharem com um resplendor arrebatador. Ele pode se borrifar com uma fragrância sedutora, atraindo a atenção de qualquer um ao alcance do aroma. Outros podem simplesmente afiar sua confiança como o fio de uma navalha, impossível de resistir. Cidadãos Extraordinários (Extraordinary Citizens) carregam ressonadores harmônicos testados e aprovados que emitem uma frequência subsônica que reequilibra neurotransmissores para facilitar a submissão.
-
-Aqueles que já possuem poderes de alteração mental podem resistir com seus próprios poderes se forem o alvo específico de um poder. Isso funciona nas duas direções, já que um estudante deste Caminho pode reconhecer outros usos de efeitos de alteração mental e se preparar para resistir a eles ou superá-los.
 
 Sistema
 
@@ -396,12 +320,6 @@ Preço do Fracasso: As consequências do fracasso ao manipular corações e ment
 Fortune
 
 
-O destino é volúvel, mesmo antes de considerar as manipulações dos mágicos. O Caminho da Fortuna permite que eles empunhem a sorte como uma arma, abatendo seus inimigos com maldições ou fortalecendo seus aliados com bênçãos. Embora os métodos e as explicações possam variar, do Mau-Olhado (Evil Eye), à Mão de Deus, à manipulação de probabilidade, o Caminho da Fortuna nunca faz o verdadeiramente impossível acontecer, apenas o extremamente improvável. Ele também é um dos Caminhos menos precisos: enquanto o mago estático (hedge magician) põe a Fortuna em movimento e controla a magnitude e a faixa geral de resultados potenciais, os efeitos deste Caminho frequentemente o surpreendem ou desaparecem no ruído da vida cotidiana.
-
-O Povo da Noite (Night-Folk) é mais difícil de maldizer com este Caminho do que os Adormecidos. Eles fazem um teste de Força-de-Vontade contra 4 + o índice de Caminho do mágico, e efeitos sem um Aspecto em 5 exigem apenas um único sucesso para serem anulados. Aquelas maldições extremamente poderosas podem ser ignoradas com apenas dois sucessos, embora a dificuldade seja 9, o que torna isso bastante desafiador. Para resistir, a vítima deve estar ciente da maldição do mágico e tentar ativamente resistir a ela. Descobrir uma maldição não anunciada pode ser difícil, mas é possível por meio de percepções sobrenaturais, como a leitura de aura. Magos com Primórdio (Prime) ou Entropia (Entropy) podem notá-la, e mágicos com o Caminho da Fortuna geralmente conseguem reconhecer o trabalho de um dos seus.
-
-O Antecedente Arcano/Camuflagem (Arcane/Cloaking) fornece uma camada adicional de proteção contra maldições. Ter como alvo qualquer pessoa com esse Antecedente sem sua permissão explícita subtrai um sucesso do teste por cada ponto de Arcano que ela tiver.
-
 Sistema
 
 Modificadores: –1 de dificuldade com uma conexão simpática fraca (objeto pertencente ao alvo), –2 de dificuldade para uma conexão simpática forte (posse valiosa do alvo, parte do alvo como cabelo ou aparas de unha)
@@ -423,14 +341,6 @@ Preço do Fracasso: Algumas magias de Fortuna fracassadas são indetectáveis. O
 Healing
 
 
-Onde a humanidade prospera, há necessidade de cura. Desde o amanhecer da civilização, curandeiros surgiram da empatia e da necessidade da comunidade. Muito antes de a ciência saber o que era a teoria dos germes, curandeiros aprenderam a servir seu povo pela tradição, comungando com espíritos, por tentativa e erro e por uma série de outros meios. Agora, mesmo quando a ciência pode prevenir e curar doenças horríveis, muitos permanecem sem acesso a tais técnicas. Em desertos médicos e em comunidades que foram historicamente injustiçadas pelo establishment médico, ainda há necessidade. As pessoas ainda buscam desesperadamente curandeiros. Elas podem não acreditar plenamente em magia ou milagres, mas entre a escolha de uma agonia garantida e um fio de esperança, muitos arriscam.
-
-A magia estática (hedge magic) pode alcançar resultados miraculosos. Um curandeiro mestre pode curar cânceres e acelerar a cura de ferimentos graves além do que deveria ser possível, mas eles não anunciam isso. Mesmo quando tantos são ignorados e abandonados pelo establishment médico, é ilegal praticar medicina sem licença. Além disso, a fama pode ser um fardo pesado de carregar. Muitos magos estáticos (hedge magicians) ávidos e empáticos começam a aprender o caminho da Cura, mas poucos o dominam — eles frequentemente se esgotam cedo por causa do mundo frio e ingrato, mudando para outras Artes se continuarem a praticar magia de alguma forma.
-
-Embora não seja sempre exigido por sua Prática, muitos Curandeiros magos estáticos aprendem alguma forma de medicina. Aqueles que não confiam na ciência extraordinária muitas vezes aprendem formas de cura não baseadas na medicina moderna. No mínimo, nos casos em que aprendem os fundamentos da ciência médica moderna, sua abordagem ao tratamento pode ser radicalmente diferente em filosofia e técnica.
-
-Um curandeiro pode curar doenças ou deformidades congênitas leves a moderadas, mas exemplos mais extremos, como regenerar membros ou ressuscitar os recém-mortos, são o campo da lenda.
-
 Sistema
 
 Modificadores: A conjuração rápida (fast casting) só pode ser usada para estabilizar dano letal ou agravado ou para reduzir penalidades de ferimento. Todos os outros usos devem empregar magias comuns, magias de rolagem estendida ou rituais.
@@ -446,10 +356,6 @@ Preço do Fracasso: Um fracasso simplesmente significa que a magia não funciono
 
 Hellfire
 
-
-O Caminho do Fogo do Inferno (Hellfire) continua sendo um dos Caminhos mais populares da magia estática (hedge magic), apesar de existir uma certa má reputação associada a ele. Para a maioria das pessoas, o fascínio de lançar poder elemental por aí e destruir seus inimigos supera a crença de que ele possa de alguma forma estar contaminado pelo mal, se não for francamente infernal. Apesar desses sentimentos, muitos magos estáticos (hedge magicians) se especializam nos efeitos pirotécnicos que este Caminho torna disponíveis para eles, sendo um dos Caminhos mais dramáticos da magia estática.
-
-Mesmo os estudantes iniciantes de Fogo do Inferno muitas vezes recebem respeito, e não pouco medo, de seus companheiros. Eles aprendem cedo que podem invocar relâmpagos e fogo, causar terremotos e afogar seus inimigos, se assim escolherem, mesmo que não saibam pessoalmente como. Aos aprendizes também é dado um aviso essencial: eles não são imunes aos seus próprios poderes. Essa vulnerabilidade não se limita às tentativas de magia que resultam em desastre (veja o Preço do Fracasso abaixo). Os praticantes devem ter cuidado para não estarem dentro das áreas que visam, e o fogo, uma vez desencadeado, pode ser difícil de controlar.
 
 Sistema
 
@@ -472,12 +378,6 @@ Preço do Fracasso: Quando você brinca com fogo, às vezes se queima. Obter um 
 
 Illusion
 
-
-Uma das magias mais fundamentais é o poder de enganar os outros para que acreditem no que o mago quer. O Caminho da Ilusão confunde os sentidos, fazendo com que seus alvos percebam coisas que não estão lá ou alterando a percepção deles do que está lá. A maioria das pessoas confia em seus sentidos. “Ver é crer”, mas quando um ilusionista está por perto, esse velho ditado pode matar você.
-
-O Caminho da Ilusão é muito menos direto na maioria de suas aplicações do que alguns dos outros Caminhos. Os ilusionistas tendem a ser manipuladores astutos, ao menos para escolher exatamente a visão falsa certa para qualquer tarefa que deva ser cumprida. Isso muitas vezes exige padrões estranhos de pensamento e raciocínio lateral, levando os ilusionistas a se tornarem excêntricos com o tempo.
-
-Quando alguém é alvo do Caminho da Ilusão, evitar o engano é sempre uma possibilidade. Um teste de Percepção + Prontidão com dificuldade (4 + Aspecto Realismo) para magias, e dificuldade (4 + Nível) para rituais revela as leves imperfeições na ilusão. Isto requer um sucesso para cada sentido coberto pela ilusão, embora nos casos em que um sentido essencial, conforme determinado pelo Narrador, seja deixado de fora, o número de sucessos exigido possa diminuir. Qualquer um que consiga esse teste pode perceber que o que está percebendo não é real, embora perceba tanto isso quanto a verdade. Se alertar os outros sobre esse fato, eles podem rolar novamente uma vez.
 
 Sistema
 
@@ -508,12 +408,6 @@ Preço do Fracasso: Magos ingênuos pensam que obter um desastre em uma ilusão 
 Maelstroms
 
 
-Descoberto por acidente, o Caminho dos Maelstroms foi originalmente uma tentativa de redescobrir o Controle do Clima (Weather Control). Tradicionalmente chamado de “Assobio” (Whistle) (como em “assobiar para chamar uma tempestade”), os magos que o usavam buscavam conjurar intensas rajadas de vento e chuva no mundo dos vivos. Foi só no século XIX que se descobriu que essas tempestades eram roubadas das Terras das Sombras (Shadowlands).
-
-O Maelstrom extrai a energia para criar suas tempestades de duas fontes. A primeira é a força de vontade do conjurador. Magias e rituais deste Caminho custam um ponto de Força-de-Vontade por nível, em vez do usual ponto único fixo da maioria dos Caminhos. A outra fonte de poder são as próprias Terras das Sombras, extraindo sua energia e deixando os fantasmas da área calmos ou expulsando à força os mortos da área, dependendo do tamanho da tempestade.
-
-O instrumento mais comum para este Caminho é, de longe, a música. A maioria dos usuários diz que, a partir do momento em que o aprenderam, podiam ouvir música dentro da cabeça, e alguns acreditam que ela fica mais alta quando as tempestades das quais podem extrair são mais fortes. Para essas pessoas, sua Prontidão é limitada a 3, devido à distração da música. Outros, porém, não experimentam esse efeito e não sofrem penalidade.
-
 Sistema
 
 Aspectos: Área, Duração e Intensidade
@@ -532,12 +426,6 @@ Preço do Fracasso: O controle do mago sobre essas tempestades é tênue, na mel
 
 Necromancy
 
-
-Algumas coisas deveriam permanecer enterradas. A principal delas: os mortos. Mas aqueles que seguem o Caminho da Necromancia (Necromancy) veem as coisas de um modo um pouco diferente. Assim como o Fogo do Inferno (Hellfire), a Necromancia tem a reputação de ser algo vil, praticado apenas pelos piores dos piores. Diferentemente do Fogo do Inferno, essa reputação é, ao menos em parte, merecida. Até os mais simples feitiços de Necromancia envolvem dobrar os mortos à força à vontade do mágico (magician), e os mais poderosos deles podem manipular os poderes das Terras das Sombras (Shadowlands) para afetar também os vivos.
-
-Embora os métodos variem enormemente conforme a prática, a Necromancia sempre exige que os primeiros instrumentos do mágico incluam o pedaço preservado do cadáver de alguém de quem ele gostava, quase sempre um membro da família. Isso cria o vínculo entre o mágico e o submundo (underworld), permitindo que ele se torne um conduto para as energias da própria morte. Enquanto para mágicos místicos a criação de um instrumento desses muitas vezes parece natural, os tecnomágicos tendem a se ver com objetos únicos e macabros, como teclados com teclas feitas de osso ou chips de computador com neurônios cerebrais embutidos na circuitaria.
-
-Usar este Caminho é difícil. Não no sentido da técnica — não é mais complexo de usar do que qualquer outro Caminho. Em vez disso, ele cobra um preço emocional do mágico. Os vivos não foram feitos para canalizar as energias da morte tão diretamente. Eles sentem o luto de seus ancestrais, de séculos atrás, talvez milênios. Esse desespero avassalador pela perda de incontáveis gerações leva a complicações, particularmente para mágicos que estão com pouca Força-de-Vontade. Por fim, essas energias causam dano ao usuário, e cada feitiço ou ritual faz o conjurador sofrer um nível de dano contundente por nível do poder sendo invocado, a menos que a descrição mencione o contrário.
 
 Sistema
 
@@ -558,12 +446,6 @@ Preço do Fracasso: O fracasso, para a maioria dos Caminhos, simplesmente result
 Necronics
 
 
-Um dos Caminhos mais novos, descoberto apenas por caçadores de fantasmas no final da década de 1990, o Caminho da Necrônica (Necronics) foi estudado primeiramente por hackers “Black Hat” que tentavam combinar seu conhecimento de eletrônica com o mundo dos mortos. Eles usam várias técnicas para manipular sua própria bioeletricidade, ou energia vital, a fim de afetar o mundo dos mortos de alguma forma. Como a energia viva é antitética às Terras das Sombras (Shadowlands), isso tende a resultar no impedimento dos esforços dos fantasmas para conduzir suas assombrações.
-
-Sendo um Caminho novo, há muita coisa ainda não compreendida sobre a Necrônica. Quase todos os praticantes atuais usam dispositivos eletrônicos — normalmente computadores, telefones e tablets — para conjurar feitiços de Necrônica. Embora existam análogos em culturas tradicionais, esses Caminhos podem ou não ser os mesmos que a Necrônica, usando métodos de tecnologia mais baixa e mais tradicionais. Caçadores de fantasmas que investigam a Necrônica tendem a ser fascinados por essas práticas. Eles acham que estudá-las fornecerá novas técnicas que poderão aplicar para lidar com assombrações.
-
-Além das consequências do desastre indicadas abaixo, a Necrônica guarda um outro grande perigo para o mágico (magician). Como os usuários estão manipulando sua bioeletricidade tão intensamente, tocá-los enquanto trabalham é perigoso. Até o mais leve toque de outro ser vivo desfaz o foco e o controle da bioeletricidade do mágico, fazendo com que se forme um ciclo de retroalimentação. Essa retroalimentação faz com que ele sofra um nível de dano agravado e falhe no feitiço ou ritual. O mágico precisa de atenção médica imediata para ser estabilizado e fica enfraquecido (–1 dado em todas as ações) por uma semana por nível do feitiço ou ritual interrompido.
-
 Sistema
 
 Aspectos: Área, Duração e Impedância (Impedance):
@@ -583,10 +465,6 @@ Preço do Fracasso: Como o mágico da Necrônica usa sua própria bioeletricidad
 Oneiromancy
 
 
-O Reino dos Sonhos é um lugar fluido que responde ao humor e à imaginação do sonhador. Algumas pessoas, particularmente aquelas com o Talento Sonho Lúcido (Lucid Dreaming) (Mage 20 p. 294), podem assumir o controle de seus próprios sonhos, tornando os pesadelos comuns controláveis, os bons sonhos experiências divertidas e outros sonhos possíveis fontes de percepção sobre si mesmas. Sem magia, porém, o maior Reino dos Sonhos permanece trancado, com cada sonhador confinado à sua própria psique.
-
-Mágicos (magicians) que aprendem o Caminho da Oniromancia (Oneiromancy) aprendem a entrar nos sonhos dos outros. Uma vez lá, eles tentam assumir o controle, e podem colher informações ou alterar os sonhos para o benefício ou o prejuízo do sonhador. No ápice de seu poder, os oniromantes podem até reunir várias pessoas em um sonho compartilhado. Segundo a lenda, alguns podem até tornar os sonhos reais ou se tornar capazes de entrar fisicamente nos sonhos.
-
 Sistema
 
 Aspectos: O Caminho da Oniromancia tem dois Aspectos: Conexão Simpática (Sympathetic Connection) e Caminhada nos Sonhos (Dreamwalking)
@@ -605,10 +483,6 @@ Preço do Fracasso: Obter um desastre na Oniromancia tende a ser psicologicament
 
 Quintessence Manipulation
 
-
-Quase todos os feiticeiros concordam com um fato. Existe um fluxo de poder que alimenta suas obras. O nome desse poder assumiu uma multidão de faces e filosofias: mana, qi, gnosis, shakti, sekhem e muitos outros. Todo mago consegue descrever o fluxo de energia enquanto impõe sua vontade sobre a realidade. Correndo por eles como carga por uma linha de energia, ele pode ser sentido e, para alguns, pode ser diretamente aproveitado. Por meio de Práticas como as da geomancia e do feng shui, os magos estáticos (hedge wizards) conseguem sentir e redirecionar a energia não refinada do universo.
-
-Em contraste, muito poucos feiticeiros consideram isto um Caminho por direito próprio. A maioria vê a Manipulação de Quintessência (Quintessence Manipulation) como um exercício padrão e um refinamento de seu ofício já definido. O estilo pessoal de cada mago já lhe informa como realizar manipulações para executar todas as suas outras magias. Varinhas direcionam a energia, padrões desenhados em caixas criam armadilhas para retê-la, enquanto facas cortam e perturbam conforme realizam todas as suas outras obras. Ainda assim, aqueles que se concentram em dominar essa habilidade fundamental por si só descobrem que seu trabalho nunca fica sem uma fonte da qual extrair, e que seus arredores místicos raramente são um mistério.
 
 Sistema
 
@@ -637,12 +511,6 @@ O fluxo de energia através do padrão de um indivíduo é essencial para sua sa
 Shadows
 
 
-O poder sobre a escuridão é um clichê ao qual alguns feiticeiros não têm problema em se apegar, por deleite irônico ou por crença genuína. Não se estaria errado em supor que o Caminho das Sombras seja a origem da ideia de que forças sombrias fortalecem as artes místicas, dada a frequência com que charlatões fazem tal alegação. Independentemente de sua reputação, o Caminho carrega de fato um ar agourento e intimidador, pois molda e transforma a substância do medo instintivo — sombras e escuridão.
-
-Os praticantes descobriram que a aplicação do Caminho das Sombras é muito mais maleável do que a de outros Caminhos. As sombras são onipresentes e, mesmo nos dias mais luminosos, destacam-se e proporcionam contraste. A disponibilidade das sombras e o potencial de ajustar a profundidade dos matizes concedem possibilidades maiores do que Caminhos menos versáteis.
-
-Pode-se pensar que o Caminho manipula a qualidade da luz ambiente, afastando-a das áreas mais escuras para fazer as sombras parecerem mais profundas e mais ameaçadoras. Isso é patentemente falso. Seja por um implemento mágico ou por um campo de intensificação de matéria escura dos mais tecnologicamente inclinados, este Caminho manipula a própria matéria das sombras. A verdadeira natureza dessa substância é fonte de muito debate nas comunidades mágicas, com uma gama de teorias tão diversa quanto aquelas a respeito do mecanismo do Despertar. O que os praticantes de fato concordam é que a matéria-sombra (shadowstuff) pode ser usada com grande efeito de uma variedade de maneiras úteis.
-
 Sistema
 
 Aspectos: Os Aspectos de Área, Distância, Duração e Número de Alvos, bem como o Domínio das Sombras (Shadowgrip) listado abaixo:
@@ -665,12 +533,6 @@ A severidade e a persistência das sombras controladas são aferidas pelo Domín
 
 Shapeshifting
 
-
-Mesmo entre as magias primais, a habilidade de se transformar em um animal destaca-se como excepcional. Muitos monstros que assombram a noite têm o poder da transformação, incluindo aqueles que são verdadeiros metamorfos. Os magos estáticos (hedge magicians) que estudam o Caminho da Metamorfose (Shapeshifting) imitam certa medida desse poder, transformando primeiro partes de si mesmos e mais tarde todo o seu corpo de maneiras dramáticas.
-
-A maioria pensa neste Caminho como transformar a si mesmo ou a outros em animais. Quando magos metamorfos optam pela sutileza, podem ser espiões notáveis. Podem fazer alterações cosméticas para parecerem uma pessoa diferente e então complementar seu disfarce com sentidos aguçados. Podem se transformar em algo mais perigoso se seu disfarce for descoberto.
-
-O maior risco deste Caminho é que a mente humana não está equipada para mudar de forma. Toda transformação incorre em risco, mas ele é maior ao fazer uma transformação completa em uma forma animal. Então, mesmo sem um desastre, o mago precisa rolar Força-de-Vontade (dificuldade 6) para conservar sua própria mente, em vez de se perder em sua natureza animal.
 
 Sistema
 
@@ -713,16 +575,6 @@ Preço do Fracasso: Quando um metamorfo comete um desastre, o melhor cenário co
 Spirit-Chasing
 
 
-Praticado principalmente por Magos Estáticos Parentes (Kinfolk) e por vários outros praticantes xamânicos dispersos, este Caminho pouco conhecido pode conceder habilidades únicas àqueles que o estudam. Embora o nome deste Caminho sugira semelhança com a Conjuração (Summoning), ele tem pouca relação com Summoning/Binding/Warding de qualquer espécie. A Perseguição de Espíritos (Spirit Chasing) cria, em vez disso, um vínculo entre um místico e uma planta ou animal escolhido (ou, com permissão do Narrador, algum outro tipo de Naturae).
-
-Os praticantes deste Caminho acreditam, como os lobisomens, que dentro de toda criatura viva repousa uma alma, espírito, animus ou conceito efêmero similar. Os Perseguidores de Espíritos tentam observar e aprender com esses seres; ao contrário do aprendizado dos Dons, porém, o animus não necessariamente firma qualquer tipo de “barganha” com o místico. Em vez disso, o praticante estuda o espírito, primeiro fazendo contato com ele, depois fazendo-lhe perguntas e imitando suas habilidades naturais que se manifestam neste mundo, e por fim pondo em prática o que aprendeu por meio de rituais Feiticeiros.
-
-Por exemplo, um Perseguidor de Espíritos que estude ursos começaria observando ursos e seus movimentos e padrões de vida. Ele então se dedicaria a algum tipo de ritual particular de sua própria concepção, suplicando que o espírito de um urso em particular aparecesse; às vezes, esse processo leva anos de trabalho. Em seguida, o místico explicaria ao espírito que gostaria de aprender os modos dos ursos em seu habitat natural. O espírito pode exigir prova da sinceridade do místico. Mas, se concordar, o Perseguidor de Espíritos pode aprender os rudimentos de viver como um urso. Ele poderia, por exemplo, descobrir como sobreviver de carne crua, raízes, frutos, nozes ou insetos, mesmo os venenosos para humanos. Conforme sua compreensão avança, o místico também poderia aprender a focar seus sentidos como um urso, hibernar ou mesmo fazer crescer garras. Os Perseguidores de Espíritos de modo algum se restringem apenas a mamíferos ou mesmo ao mundo animal. Vários deles escolhem plantas para sua Perseguição de Espíritos. Este Caminho é único para cada praticante.
-
-Embora, por padrão, os praticantes do Caminho só possam beneficiar a si mesmos com as habilidades que aprenderam, em níveis mais altos um Feiticeiro dedicado acaba aprendendo a conceder esses dons a outro; a mecânica funciona, nesse caso, do mesmo modo que se o alvo a tivesse conjurado. Qualquer alvo dos efeitos básicos deste Caminho deve estar disposto; isso deve ser tratado como um presente, não como um fardo.
-
-Se um Feiticeiro desejar tomar este Caminho para mais de um tipo de Espírito, deve recomprar o Caminho, passando por todo o processo novamente desde o início.
-
 Sistema
 
 Teste: Manipulação + Ocultismo
@@ -753,12 +605,6 @@ O problema mais provável ao falhar ou falhar criticamente neste Caminho é que 
 Starlight
 
 
-Existem Caminhos que remontam a séculos e há outros que surgem apenas dos ambientes únicos da noite moderna. As metrópoles em expansão deram aos feiticeiros uma visão de mundo única e forneceram uma bússola para as terras além da Mortalha (Shroud). Espiar as terras dos mortos não é um conceito novo para a comunidade mágica, mas aqueles que caminham pelo vale de concreto começaram a ver um padrão nas estrelas dos céus das Terras das Sombras (Shadowlands) que correspondia às luzes de suas cidades. Por meio do estudo e da ampliação de sua compreensão, nasceu o Caminho conhecido como Luz das Estrelas (Starlight). Para grande desgosto e inveja dos habitantes das Terras das Sombras, somente aqueles dotados em Luz das Estrelas parecem capazes de ver as estrelas que utilizam.
-
-Como os navegadores da era de ouro da navegação à vela, os praticantes de Luz das Estrelas compreendem o céu único das Terras das Sombras e traçam rotas para viajar com segurança pelo reino dos mortos. Simplesmente saber para onde estão indo é apenas o começo do poder que esses navegadores possuem. Suas mentes produzem uma espécie de escudo de proteção e preservação para quaisquer mortais que viajem com eles. Isso se torna uma necessidade para a viagem, pois as terras das sombras não têm ar e o próprio solo é um anátema para os vivos. No entanto, este não é um escudo físico contra todo tipo de dano, e qualquer espectro (wraith) violento que pretenda causar-lhes mal pode facilmente satisfazer esse impulso. Caso a duração da magia expire, aqueles que viajam ficarão expostos ao ambiente letal das Terras das Sombras.
-
-É o conhecimento das luzes-guia dos céus das Terras das Sombras que também permite aos navegadores abrir portas diretamente para as Terras das Sombras, contornando completamente a Mortalha no processo. Qualquer porta pode levar às Terras das Sombras; basta muita preparação, e a jornada começa. Aconselha-se avançar rapidamente em direção ao destino, considerando que poucos navegadores conseguiram completar uma jornada que durasse mais de um dia.
-
 Sistema
 
 Modificadores: Reduza a dificuldade em –1 se estiver portando um item pessoal de alguém recentemente falecido
@@ -781,12 +627,6 @@ Percurso
 
 Summoning, Binding, and Warding
 
-
-Feiticeiros, tanto na ficção quanto na lenda, são bem conhecidos por sua capacidade de invocar e controlar outros, tanto vivos quanto efêmeros. Com esses poderes, o mago pode invocar animais, espíritos, fantasmas, demônios e outros seres estranhos. Ele também pode se defender desses seres, vinculá-los e obrigá-los a obedecer ao mago. Embora exista sobreposição com o Caminho do Efêmero (Ephemera), este Caminho se concentra em métodos de coerção, em vez de cooperação, com os seres sendo chamados e tratados.
-
-Todas as magias de Invocação, Vínculo e Proteção (Summoning, Binding, and Warding) são rituais, e existem rituais para alcançar seres individuais ou classes de seres. Existem rituais separados para invocar, vincular e proteger-se de cada alvo. Isso levou muitos magos à sua ruína. Embora invocar um ser possa intrigá-lo, tentar vinculá-lo tende a provocar hostilidade, e magos que não conhecem ou falham ao conjurar o ritual de proteção frequentemente se veem em sérios apuros.
-
-Além das complicações de cada ser específico ou tipo de ser com o qual o mago estático (hedge magician) pretende trabalhar, existem várias versões deste Caminho que são aprendidas de forma completamente separada. Existem variantes para invocar criaturas materiais (como animais e pessoas), anjos e demônios, fantasmas, espíritos da natureza e outros seres sencientes. Há até relatos de variantes voltadas para objetos inanimados e criações virtuais, permitindo que alguns magos protejam seus computadores contra vírus ou invoquem seus carros quando necessário.
 
 Sistema
 
@@ -815,10 +655,6 @@ Preço do Fracasso: O Caminho de Invocação, Vínculo e Proteção não precisa
 Via Geniorum
 
 
-A Via Geniorum é uma das Vias de que os críticos da Teurgia mais desconfiam; os Teurgistas que praticam esta Via lidam com o reino dos espíritos e do demoníaco. Eles argumentam que todas as criaturas estão em última instância sob o chamado do céu, incluindo espíritos e demônios. Esses Teurgistas acreditam que há todo um espectro de Espíritos que não se aliaram nem ao Céu nem ao Inferno, e que ainda assim podem ser comandados pelo poder do Céu. Esta Via concede ao praticante poder sobre entidades espirituais não humanas (demônios, elementais, etc.).
-
-O conhecimento do nome verdadeiro de um espírito concede poder sobre ele. Um nome verdadeiro não é o título pelo qual o espírito comumente atende, mas uma invocação mais complexa e primordial. O mundo se distorce e vibra quando nomes verdadeiros são pronunciados. São segredos zelosamente guardados, que exigem testes estendidos de pesquisa, Inteligência + Ocultismo (dificuldade 9), e uma boa biblioteca ocultista para decifrar. Cada sucesso concede uma “sílaba” do nome. O mais simples dos espíritos pode ter um nome verdadeiro de uma única sílaba, mas demônios mais poderosos terão muitas mais (a critério do Narrador). Um Teurgista pode tentar enganar um espírito para que divulgue seu nome verdadeiro. As sílabas de nomes verdadeiros são frequentemente uma forma de moeda entre espíritos e ocultistas, que tendem a acumulá-las.
-
 Sistema
 
 Teste: Varia (veja abaixo)
@@ -842,8 +678,6 @@ Níveis da Via Geniorum
 Via Necromantiae
 
 
-A Via Necromantiae é a Teurgia concebida para contatar ou banir os mortos. Esta Via lembra em partes as da Via Geniorum, mas é, ainda assim, distinta.
-
 Sistema
 
 Teste: Varia (veja abaixo)
@@ -866,14 +700,6 @@ Níveis da Via Necromantiae
 
 Weather Control
 
-
-Em sociedades que dependiam fortemente da agricultura ou da navegação marítima, aqueles que podiam controlar o clima eram valorizados, muitas vezes sendo a diferença entre a vida e a morte em suas comunidades. Fomes foram evitadas ou encerradas, e os feiticeiros mais poderosos são conhecidos por dissipar ou desviar desastres naturais.
-
-O controle do clima permite que os feiticeiros façam o que está escrito na embalagem — eles podem controlar o clima. Embora não possam causar diretamente mudanças climáticas enormes, como El Niños, o que eles podem afetar cria ondas de efeito por áreas maiores. Nenhum padrão climático acontece no vácuo, e isso permanece verdadeiro para a manipulação mágica do clima. Muitos trabalhadores do clima (weather workers) têm alguns pontos em Ciência, para dar conta de serem capazes de discernir padrões climáticos futuros. Muitos trabalhadores do clima também aprendem pelo menos uma pequena quantidade de Divinação (Divination) para esse propósito, frequentemente praticando vidência em poças de água e nuvens como suas práticas para tal.
-
-Embora raramente consultados na era moderna, os trabalhadores do clima ainda praticam em segredo. O poder que comandam é dramático e potencialmente capaz de alterar vidas. Como os curandeiros, os trabalhadores do clima seriam constantemente importunados para realizar milagres se suas habilidades fossem amplamente conhecidas. Ao mesmo tempo, teriam de lidar com aqueles que, por medo e inveja, alegariam que os trabalhadores do clima obtiveram seus poderes por meios malignos.
-
-Os trabalhadores do clima raramente funcionam sozinhos. A quantidade de esforço necessária para produzir efeitos adequados muitas vezes exige trabalho em equipe. Alguns formam covens em torno do objetivo do controle do clima em grupo.
 
 Sistema
 
@@ -904,10 +730,6 @@ Preço do Fracasso: Até mesmo efeitos intencionais de controle do clima podem t
 Animal Psychics
 
 
-Algumas pessoas são naturalmente boas com animais, e alguns psíquicos o são de forma sobrenatural. Esta habilidade permite que um psíquico exerça sua vontade para se comunicar com e controlar animais. Mesmo a expressão mais baixa deste Fenômeno permite que um psíquico tranquilize um animal ao superar a lacuna de comunicação, tornando-o mais inclinado a responder positivamente ao psíquico.
-
-Um psíquico pode falar com e comandar um animal por um método de sua escolha. Exemplos incluem travar contato visual em silêncio, imitar os ruídos que os animais fazem, gestos de adestramento, o idioma nativo do psíquico, ou um fluxo de balbucios. O método importa muito menos do que a intenção e a força de vontade do psíquico. Mesmo em seus níveis mais altos, este fenômeno não afeta insetos nem qualquer criatura, como as águas-vivas, que não possua cérebro.
-
 • Commune (Comunhão): Um psíquico pode se comunicar com um animal que o psíquico consiga perceber por meio de sentidos mundanos (visão, audição, etc). Ele pode dar comandos simples, mas não pode ordenar que um animal ataque. O psíquico pode, no entanto, ordenar que um animal desista de um ataque pretendido. Dar um comando que o animal já estava inclinado a cumprir não exige nenhum teste adicional, mas ordenar que um animal faça algo contra sua natureza exige um teste de Carisma + Empatia com Animais com dificuldade 9 menos os pontos de Animal Psychics (Psíquicos de Animais) do psíquico.
 
 •• Mass Communication (Comunicação em Massa): Como em Commune, mas o Psíquico agora pode se comunicar com múltiplos animais da mesma espécie de uma só vez. Comandos dados a animais podem ser mais complexos, desde que o psíquico consiga descrevê-los adequadamente; entretanto, animais normalmente não atacam pelo psíquico a menos que já estejam inclinados a fazê-lo. Este nível pode, alternativamente, ter como alvo um único animal para capacidade de comando ampliada.
@@ -922,14 +744,6 @@ Um psíquico pode falar com e comandar um animal por um método de sua escolha. 
 
 Anti-Psychic
 
-
-Anti-Psychic é o fenômeno psíquico mais raro. Dito isso, é muito sutil. Muitos Anti-Psychics (Antipsíquicos) atravessam a vida sem saber de sua habilidade. Muitas vezes é preciso um ataque de, ou outro desentendimento grave com, outro psíquico antes que o Anti-Psychic descubra seu dom.
-
-Os Fenômenos de Anti-Psychic embaralham as habilidades de outros psíquicos com estática mental. Aqueles de paradigma científico teorizam que as emanações de Anti-Psychic usam uma base de funcionamento semelhante à da Telepathy (Telepatia). Em vez de projetar um sinal que o cérebro do receptor possa decodificar como mensagem, imagem ou impressão, a teoria é que o Anti-Psychic projeta um sinal que interfere nas ondas cerebrais responsáveis pelos fenômenos psíquicos. Devido à natureza deste Fenômeno, é impossível que um Anti-Psychic desenvolva qualquer outro fenômeno psíquico. Ele é, entretanto, capaz de aprender outros Numina.
-
-Um Anti-Psychic perturba todos os outros fenômenos psíquicos dentro de seu alcance de efeito e desfruta de um efeito limitado sobre aqueles que usam a Esfera da Mente (Mind Sphere). Em níveis mais altos, o Anti-Psychic pode até perturbar Disciplinas vampíricas e dons Garou. Este Fenômeno permanece perpetuamente ativo, mesmo enquanto o Anti Psychic dorme, a menos que o psíquico gaste um ponto de Força-de-Vontade para suprimir completamente o fenômeno por um turno ou direcioná-lo a um único indivíduo. Ao usar Anti-Psychic contra efeitos da Esfera da Mente ou contra o Povo-da-Noite (Night-Folk), o psíquico não tem sucesso automaticamente, mas testa reflexivamente a ativação com dificuldade 7 ou o Arete do mago, o que for mais alto. Com um sucesso, aplicam-se os efeitos dos níveis do Anti-Psychic na habilidade. Para mais informações sobre como contrapor poderes do Povo-da-Noite, veja Mage: The Ascension 20th Anniversary Edition página 546.
-
-A raridade deste Fenômeno representa uma bênção ambígua. Embora muitos não previssem a habilidade, o que confere um elemento de surpresa, a novidade pode fazer do Anti-Psychic um espécime tentador para entidades sobrenaturais de inclinação científica. Rumores sussurrados sugerem que a União Tecnocrata usa Anti-Psychics de seus Cidadãos Extraordinários para reforçar incursões contra psíquicos conhecidos ou suspeitos.
 
 • Raio de 5 jardas. Adicione +1 de dificuldade à ativação de fenômenos psíquicos dentro do raio e +1 de dificuldade aos testes da Esfera da Mente.
 
@@ -946,14 +760,6 @@ A raridade deste Fenômeno representa uma bênção ambígua. Embora muitos não
 Astral Projection
 
 
-Astral Projection permite que o psíquico separe seu espírito, mente ou consciência — ou uma combinação destes, dependendo da crença — de seu corpo. A forma astral é intangível e pode cobrir vastas distâncias em pouco tempo, pois não está sujeita às leis normais da física. Viajantes astrais podem espiar e até visitar os reinos de ideias da Umbra Astral (veja Mage 20 p. 94). O psíquico que usa Astral Projection não pode afetar o mundo físico por meios normais, embora possa fazê-lo por meio de outros fenômenos psíquicos com +2 de dificuldade. Um desastre na ativação de Astral Projection causa um contragolpe psíquico desorientador, impedindo o psíquico de deixar seu corpo por 24 horas.
-
-O corpo de um psíquico permanece vulnerável enquanto ele está usando projeção astral, e o psíquico não pode sentir o que está acontecendo com ele. É um medo comum entre os psíquicos com esta habilidade que alguém possa mover ou ferir seus corpos enquanto estão ausentes. Muitos tendem a limitar seu uso de drogas e álcool, porque lapsos de memória podem desencadear o mesmo medo.
-
-Psíquicos podem interagir com espíritos astrais — habitantes da Umbra Astral e outros indivíduos em viagem astral. Astral Projection não confere a capacidade de ver e interagir com fantasmas. Para combate durante a viagem astral, substitua Destreza por Raciocínio, Força por Inteligência e Vigor por Percepção. Viajantes astrais normalmente aparecem como versões ligeiramente idealizadas de si mesmos, incluindo manifestações de gênero ou de expressão estilística, livres de limitações físicas ou sociais sobre tais expressões. Alternativamente, aqueles com autoimagem excessivamente ruim às vezes aparecem com defeitos percebidos exagerados. Apesar de possíveis diferenças em relação à aparência física, viajantes astrais normalmente conseguem reconhecer uns aos outros caso se encontrem novamente no plano físico.
-
-A maioria dos psíquicos só consegue acessar a Penumbra Astral, mas os mais poderosos afirmaram ser capazes de viajar mais longe. Viajar para os Outros Mundos (Otherworlds) é um negócio arriscado, e mais do que um punhado de psíquicos saíram explorando para nunca mais encontrar seus corpos. Alguns acreditam que deixar o corpo desabitado por tempo demais corre o risco de permitir a entrada de outra coisa.
-
 • Peek (Espiada): O psíquico pode passar até um minuto por ponto de Vigor em projeção astral e viajar até uma milha de distância de seu corpo. Um psíquico só pode usar a visão neste nível — seus outros sentidos não funcionam durante a projeção. Um personagem também pode viajar para a Penumbra Astral por esse mesmo período de tempo.
 
 •• Errand (Incumbência): O psíquico ganha a capacidade de ouvir durante a viagem astral. Ele pode viajar até 100 milhas de distância de seu corpo com um limite de 10 minutos por ponto de Vigor.
@@ -969,12 +775,6 @@ A maioria dos psíquicos só consegue acessar a Penumbra Astral, mas os mais pod
 Biocontrol
 
 
-A maioria dos fenômenos psíquicos envolve a percepção ou o controle de coisas fora do corpo do psíquico, mas Biocontrol (Biocontrole) permite que o psíquico exerça a vontade sobre o próprio corpo. Um psíquico pode ignorar a dor, aprimorar os sentidos e até desviar a circulação ou regular os níveis hormonais à vontade.
-
-Enquanto outros conseguem para si graus menores de controle com biofeedback e meditação, psíquicos com Biocontrol podem forçar seus corpos a sobreviver ao que parecem ser situações sem esperança. A mãe que ergueu um carro de cima do filho, o homem que nunca parece bêbado por mais bebidas que tome, e o único sobrevivente de uma tragédia são todos exemplos deste fenômeno. Quanto mais miraculosa a manifestação, no entanto, mais provável que o psíquico atraia inadvertidamente a atenção errada.
-
-Além da potencial atenção indesejada, Biocontrol não é isento de risco. Desastres podem fazer processos biológicos enlouquecerem exatamente no momento errado, proporcionalmente ao efeito que o psíquico estava tentando alcançar. Um psíquico que precisa reduzir sua necessidade de oxigênio para sobreviver a um afogamento pode aumentar seu metabolismo e acelerar sua morte, mas um psíquico que busca vantagem social com feromônios pode se envergonhar ao causar sudorese excessiva.
-
 • Mindfulness (Atenção Plena): O psíquico se concentra em alterar seus processos biológicos de maneiras menores. Pode estancar o sangramento de pequenos ferimentos, elevar ou reduzir a temperatura central do corpo em até dois graus, prender a respiração por um tempo prolongado, ignorar a dor de ferimentos menores, incluindo penalidades de ferimento de até metade de seu índice de Biocontrol (arredondado para cima), e regular consciente e voluntariamente sua pressão sanguínea e sua pulsação dentro da faixa normal. O efeito termina se a concentração do psíquico for quebrada.
 
 •• Healing Factor (Fator de Cura): O psíquico força seu corpo a acelerar os processos metabólicos responsáveis pela cura e pelo combate a infecções muito além da taxa normal. O psíquico deve passar tempo descansando e meditando, idealmente enquanto recebe cuidados médicos — o psíquico ainda é mortal, afinal. Para cada sucesso de ativação, o psíquico reduz em um nível o tempo para curar o nível de Vitalidade mais alto, até um mínimo de uma hora para dano contundente e um dia para dano letal ou agravado. Depois que o primeiro nível de dano é curado, o psíquico pode rolar ativação novamente para repetir o processo. Ao usar Healing Factor, psíquicos podem ignorar o risco de sequela permanente (permanent impairment) (ver Mage 20 p. 408), desde que tenham nutrição e descanso suficientes.
@@ -989,18 +789,6 @@ Além da potencial atenção indesejada, Biocontrol não é isento de risco. Des
 
 Channeling
 
-
-Um médium se posta diante de um grupo e invoca um parente morto cujo nome começa com alguma letra do alfabeto. Algum presente diz que conhece alguém morto com aquele nome. O médium lhe informa que essa pessoa cruzou para o outro lado em paz e que o espírito quer o melhor para ele. Ela perdoa os vivos por algum pecado vago que o presente reconhece, e nada mais é pedido. O consolo foi alcançado e o médium é pago. O reality show vai muito bem e a popularidade cresce. Isso é tudo besteira.
-
-Na comunidade psíquica, existem aqueles que canalizam os mortos. Raramente é com o propósito de fazer alguém se sentir melhor, porém. Os mortos são uma riqueza de experiência inexplorada que faria até o mestre mais erudito ruborizar de inveja. Esse conhecimento está à disposição do canalizador, e quando usado corretamente ele nunca está sem a perícia certa para a tarefa em questão.
-
-Canalizadores vêm em todos os formatos, tamanhos e estilos. Alguns deles seguem o clássico clichê vitoriano de ‘revirar os olhos e falar em outra língua’. Há uns poucos que bebem beberagens caseiras que eles mesmos preparam e que “os abrem para o outro lado”. Canalizadores modernos com pendor tecnológico usam spirit boxes (caixas de espíritos) e aparelhos de EVP para obter seu conhecimento. No fim, o psíquico está se abrindo para um espectro (wraith) nas Terras das Sombras (Shadowlands) que possui o conhecimento de que ele precisa. Quanto melhores eles são, mais forte a conexão com as perícias e os talentos dos mortos.
-
-É um jogo perigoso de jogar, sem dúvida. Abrir aquela porta pode levar algumas peças desagradáveis a entrar tranquilamente na psique do psíquico, se ele não tomar cuidado. Quando as coisas dão errado, uma possessão completa aguarda o infeliz canalizador. Mas o outro lado da moeda é poder trazer o conhecimento de um gênio da cirurgia em uma emergência médica, de um acrobata ao cruzar um parapeito precário, ou de um assassino de sangue-frio quando a autodefesa é necessária. Canalizadores são os primeiros a dizer que o risco vale a recompensa.
-
-Ao usar Channeling (Canalização), o psíquico pode trazer apenas um espírito por vez. A psique do canalizador poderia ser facilmente sobrecarregada se mais de um espectro recebesse acesso ao seu ser. Caso o psíquico invoque outro espírito enquanto hospeda outro de uma canalização anterior, o primeiro é liberado e substituído pelo segundo.
-
-Por necessidade, o canalizador tem algum discernimento sobre as Terras das Sombras, o reino dos fantasmas. À medida que se tornam mais poderosos em sua prática, o canalizador pode espiar através da Mortalha (Shroud) por um número de minutos igual aos sucessos obtidos. Este é um uso separado de seu talento de canalização e custa o mesmo que canalizar um espírito por suas capacidades. A dificuldade do teste deste poder é afetada pela força da Mortalha na área e não tem restrição de frequência de uso, desde que o psíquico tenha os pontos de Força-de-Vontade para gastar.
 
 • O canalizador pode se conectar ao outro lado e extrair as Habilidades de um fantasma, embora possa acessar apenas uma única Habilidade por uso deste poder. Sucessos no teste de ativação se tornam dados bônus para testes que utilizem o Talento, a Perícia ou o Conhecimento desejado pelo restante da cena. Ao contemplar através da Mortalha, o psíquico pode obter uma ideia vaga dos espectros presentes.
 
@@ -1019,14 +807,6 @@ No auge de sua habilidade, com um espírito canalizado, o médium pode se abrir 
 Clairvoyance
 
 
-Clairvoyance (Clarividência) refere-se à capacidade de ver além dos arredores imediatos de alguém e alcançar grandes distâncias. Em muitos casos, o sentido projetado pode ser qualquer um dos cinco sentidos, e a informação efetivamente recebida raramente é algo tão simples quanto um análogo um-para-um do local distante. Na maioria dos casos, os sentidos são bombardeados com sensações interpretativas que, somadas, formam uma única ideia unificada do local, da pessoa ou do objeto sendo percebido.
-
-Quanto mais informação um clarissenciente (clairsentient) tem sobre seu alvo, mais clara a imagem que recebe. Montanhas de relatórios repousam em instalações governamentais de testes com nomes de projeto como Stargate, Grillflame e Sunstreak, que falam de psíquicos recrutados fornecendo impressões e sensações correlatas a observações de alvos. Itens com os quais eles eram muito familiarizados eram mantidos em locais distantes, bases nas montanhas, postos avançados no deserto e até submarinos. Os psíquicos relatavam coisas como sentir um calafrio, ver um sol do meio-dia, ou a sensação de estar flutuando em uma piscina. Embora seja um bom começo, o clarividente experiente pode alcançar muito mais precisão e clareza. Os clarividentes mais poderosos podem ver um local a centenas de milhas de distância com clareza de cristal, e rumores sussurram sobre potências com alcance global.
-
-Existe alguma confusão entre o que constitui Clairvoyance e o que é Astral Projection (Projeção Astral). Há aqueles que insistem que são o mesmo fenômeno quando a maestria é alcançada em qualquer um dos dois. O psíquico perspicaz considera essa mistura risível. Os estudiosos psíquicos mais bem informados poderiam oferecer este esclarecimento: “Clairvoyance obviamente se aproveita da conexão inerente entre pontos no espaço, enquanto o eu interior deixa o corpo e é enviado a viajar por meio de Astral Projection.”
-
-Essa conexão e familiaridade com o objeto de sua visualização também tem efeito direto sobre suas chances de sucesso. Encontrar alvos mais familiares exige apenas um ou dois sucessos, enquanto ser um estranho ao objeto aumentará o número de sucessos necessários para localizá-lo. Uma vez feita a conexão, o clarissenciente pode observar o local ou a área ao redor de uma pessoa ou objeto no grau de clareza que tiver alcançado. Um psíquico que tente reorientar sua segunda visão (second sight) precisa fazer outro teste (com a dificuldade ajustada em um a menos por familiaridade, se o novo objeto foi visto a partir de seu primeiro foco).
-
 • Experimentar locais remotos é novo para o psíquico, e a maioria das observações é interpretativa. Essa impressão pode ser uma sensação física de aço frio para uma faca, o cheiro de pólvora para armas de fogo, ou uma visão de uma casinha de cachorro para cães de guarda. Em alguns casos, uma imagem real do objeto pode ser alcançada, mas será nebulosa na melhor das hipóteses. A única exceção é a audição. Os sons atravessam a ponte mental distorcidos e ininteligíveis, se puderem ser ouvidos. Mais sucessos concedem sensações simbólicas mais literais, com cinco sucessos proporcionando percepção visual real do alvo, por turva que seja. Os sentidos têm alcance limitado para novatos e chegam a aproximadamente uma milha ao redor do psíquico. Redirecionar seu foco exige outro teste de Força-de-Vontade e outro gasto de Força-de-Vontade para solidificar seu novo objeto remoto.
 
 •• A visão remota se torna mais confiavelmente alcançável, embora ainda envolta em leve distorção ou névoa. O som atravessa com muito mais frequência, com uma chance de ser claro o bastante para ser compreensível. Três sucessos no teste de Força-de-Vontade proporcionam uma imagem quase clara do objeto com sons distorcidos, enquanto cinco sucessos concedem clareza de cristal e sons inteligíveis que poderiam transmitir o assunto geral e o clima das conversas próximas ao objeto. O psíquico agora pode empurrar seus sentidos mais longe — até dez milhas de distância de sua localização atual. A dificuldade do teste aumenta em um após 5 milhas e em dois a 8 milhas.
@@ -1041,10 +821,6 @@ Essa conexão e familiaridade com o objeto de sua visualização também tem efe
 
 Cyberkinesis
 
-
-Cyberkinesis é um dos Fenômenos Psíquicos descobertos mais recentemente — o primeiro caso documentado há menos de um século — e representa a capacidade de controlar maquinário eletrônico pelo pensamento. Especialistas em fenômenos psíquicos teorizam que Cyberkinesis é uma variante da telecinese (telekinesis) própria da era da informação. O psíquico gera pequenos campos eletromagnéticos que controlam e alteram o firmware e o software de aparelhos eletrônicos, indo de alarmes de incêndio a supercomputadores.
-
-Embora o cinético cibernético (cyberkinetic) possa controlar a máquina psiquicamente, ele não pode ler psiquicamente o conteúdo dela sem Cyberpathy. Todos os poderes acima do ponto um exigem que o cinético cibernético tenha acesso ao display do aparelho ou seja capaz de acessar o aparelho por meio de Cyberpathy.
 
 • Switch (Interruptor): O cinético cibernético pode ligar e desligar aparelhos eletrônicos sem tocá-los. +2 de dificuldade na ativação se o eletrônico exigir um relé físico em vez de um eletrônico. O psíquico precisa ser capaz de sentir o aparelho eletrônico para usar este poder. Esta é uma exceção à exigência usual de acessar o display do aparelho e se aplica a aparelhos sem display, como luminárias.
 
@@ -1068,10 +844,6 @@ Modificador de Dificuldade = Exemplo
 Cyberpathy
 
 
-Como os especialistas acreditam que Cyberkinesis é uma variante da telecinese (telekinesis) própria da era da informação, eles acreditam de modo semelhante que Cyberpathy funciona sob a mesma premissa da telepatia — o ciberpata (Cyberpath) decodifica padrões eletromagnéticos nos discos rígidos de um computador para acessar informações, assim como um telepata decodifica impulsos elétricos no cérebro.
-
-Um ciberpata precisa manter à vista o computador em questão, exceto no caso de Remote Access (Acesso Remoto), em que ele precisa, em vez disso, manter à vista o computador que serve de ponto de entrada. Esta habilidade também pode ter como alvo dispositivos e mídias de armazenamento, como pen drives, discos e discos rígidos externos ou não conectados. Normalmente, Cyberpathy leva de 10 a 15 minutos, mas cada sucesso na ativação reduz o tempo necessário em um minuto. Até que o psíquico possua o ponto 5, sistemas fortemente encriptados aumentam a dificuldade de ativação. Cyberpathy se mostra mais versátil quando combinada com Cyberkinesis, mas também pode ajudar em tentativas mundanas de hackeamento.
-
 • Map Structure (Mapear Estrutura): O ciberpata pode examinar o diretório de computadores e dispositivos de armazenamento. O ciberpata pode encontrar a localização e as propriedades de todos os arquivos armazenados, mas não pode acessar os arquivos usando este poder. Isso pode ser útil para ciberpatas hackers que procuram dados específicos. O psíquico pode usar este nível para identificar um aparelho pelo seu Augmented Reality Object ID (ID de Objeto de Realidade Aumentada) se ele tiver capacidade de acesso à web.
 
 •• Read-only Mode (Modo Somente Leitura): Como Map Structure, mas o ciberpata também pode ler arquivos. Arquivos de texto simples e de imagem são fáceis de visualizar, e o ciberpata pode adivinhar as funções de arquivos executáveis e aplicativos. O ciberpata é incapaz de descriptografar arquivos encriptados neste estágio. O psíquico pode visualizar o ARO associado ao aparelho se ele for de Nível 1 ou inferior e pode adivinhar as propriedades do ARO se ele for de um nível superior.
@@ -1086,12 +858,6 @@ Um ciberpata precisa manter à vista o computador em questão, exceto no caso de
 
 Ectoplasmic Generation
 
-
-Existem coleções de fotos de sessões espíritas (séance) do auge da fase de entretenimento ocultista da sociedade que exibem massas revoltas de muco translúcido e sem peso pairando ao redor das cabeças dos líderes das sessões. A maioria descarta isso como simples imperfeições no filme e segue em frente para apreciar as relíquias da fotografia em suas mãos. Os verdadeiros psíquicos sabem que não é assim. O ectoplasma é a matéria espiritual neutra do fantasma. Uma substância nascida de energia e atividade espirituais, o ectoplasma existe como evidência liminar de algo além do físico. Um truque de salão divertido para os iniciados, este plasma é muito mais útil do que o leigo pode presumir de imediato.
-
-Por meio de concentração e pura força de vontade, um psíquico reúne as energias fantasmagóricas ambientes ao seu redor e as traz à existência física dentro de suas entranhas. Isso cria a visão perturbadora dessa matéria espiritual coalescida fluindo da boca e do nariz do praticante. Manifestando-se como um gel escorregadio, translúcido e frio, o ectoplasma flui sem peso quando não recebe direção. Respondendo à vontade do gerador, a maleável matéria espiritual pode assumir muitas formas macabras para repugnar ou impedir os incautos, enquanto se dissolve no nada meros minutos depois que a concentração é interrompida. Para o desgosto das testemunhas, o ectoplasma não deixa absolutamente nenhuma evidência física ou espiritual depois de sublimar.
-
-Possivelmente a propriedade mais útil do ectoplasma é que, não importa quão tênue, viscoso ou grudento o ectoplasma possa parecer à pessoa comum, ele será tão duro e imóvel quanto chumbo puro para o espiritual. Fantasmas, wraiths, espíritos e almas em projeção astral todos consideram o ectoplasma muito sólido e quase intransponível. Isso tem uma miríade de usos, que vão de criar uma barreira ao redor de um quarto passando a substância nas paredes até revestir as próprias mãos com o material para permitir que o psíquico toque as imateriais Terras das Sombras (Shadowlands), seja com benevolência ou com violência. Este Fenômeno infelizmente não permite que o psíquico veja dentro das Terras das Sombras. Ele meramente lhe concede a habilidade de criar uma substância tanto de espírito quanto de matéria.
 
 • Quando alguém começa a explorar suas capacidades como gerador, isso começa com práticas de aparência bastante juvenil. Geradores novatos não acham difícil o ato de criar ectoplasma. A real dificuldade está em criar um volume e uma força substanciais. Isso leva o gerador iniciante a ser incapaz de forçar o plasma semilíquido para fora de seus orifícios sem assistência. Enfiando a mão na boca, no nariz e nos ouvidos para extrair a substância manualmente ou contando com o peristaltismo, o gerador precisa se esforçar para trazê-la para fora. Cada sucesso no teste de ativação gera um volume do tamanho de uma bola de softbol da substância pegajosa. Ele dura apenas um número de turnos igual à Força-de-Vontade do gerador, mas pode ser aplicado tão rápido quanto é gerado. Cobrir um objeto com uma camada fina de ectoplasma não exige passos extras além de gerá-lo. O plasma adere a todas as superfícies e não é fácil de limpar. Ele vai se agarrar e formar fios em qualquer coisa que o toque e só sublima no nada quando a duração expira.
 
@@ -1114,14 +880,6 @@ As névoas ectoplásmicas ganham um grau de solidez. Não mais apenas fios de fu
 Mind Shields
 
 
-A mente é uma coisa terrível de se desperdiçar. Muitos psíquicos vivem por esse credo. Existem pessoas e coisas por aí no mundo que atacam a mente diretamente, mas alguns psíquicos são dotados da habilidade de se preparar contra essa ameaça em potencial. Erguer muralhas contra ataques mentais, garantir que os pensamentos sejam caóticos demais para serem controlados, ou apenas uma fortaleza mental inerente são todas fontes possíveis para essa defesa.
-
-Como o nome indica, Mind Shields (Escudos Mentais) só afeta poderes que afetam a mente do psíquico. Poderes que se originam da mente de outra pessoa mas afetam o mundo ao redor do psíquico protegido não são afetados. Um psicocinético (psychokinetic) não tem mais dificuldade para erguer e sustentar um psíquico com Mind Shields ativo do que teria com uma pessoa normal.
-
-Mind Shields, sendo um Fenômeno Psíquico, lida mais facilmente com Fenômenos Psíquicos do que com outras formas de agressão mental. Um vampiro que empunha Dominação (Dominate) acessa a mente de uma maneira diferente de um psíquico com Psychic Hypnosis (Hipnose Psíquica). Infelizmente, Mind Shields tem apenas metade da eficácia contra ataques mentais de fontes não psíquicas.
-
-Quando confrontado por uma agressão ou invasão mental, os Mind Shields do psíquico fornecem uma parada de dados para conter o efeito. O alvo rola esses dados (dificuldade 6) e subtrai seus sucessos daqueles do atacante. Um defensor que rola mais que o atacante interrompe a agressão completamente, e o ataque falha. Para poderes que normalmente pedem uma rolagem de defesa, os dados de Mind Shields são somados diretamente à rolagem de defesa.
-
 • As defesas são finas, mas presentes. O Psíquico recebe 2 dados para conter fenômenos de ataque mental e 1 dado para ataques mentais de outras fontes. Nesse ponto, os Escudos estão sempre ativos e não conseguem distinguir efeitos amigáveis e hostis. O psíquico pode baixar seus Mind Shields para permitir acesso a um psíquico amigo, mas isso o deixa aberto a qualquer outra habilidade mental usada antes que eles sejam erguidos novamente.
 
 •• Camadas de caos mental ou muralhas mais grossas da mente são construídas. O psíquico recebe 4 dados para conter fenômenos de ataque mental e 2 dados para ataques mentais de outras fontes.
@@ -1136,12 +894,6 @@ Quando confrontado por uma agressão ou invasão mental, os Mind Shields do psí
 
 Precognition
 
-
-O psíquico experimenta pistas sobre o futuro. O futuro não é fixo e pode mudar dependendo das escolhas que as pessoas fazem. Quanto mais decisões forem necessárias para um resultado, menor a precisão da previsão. Nenhum vidente provou ser 100 por cento preciso, exceto a mítica Cassandra.
-
-Precognition (Precognição) permite que um psíquico julgue probabilidades de resultados com precisão acima da humana. Psíquicos de mente científica racionalizam a precognição como manifestações conscientes de análise perceptiva subconsciente. Psíquicos de tendência mística entendem a precognição como uma espécie de sexto sentido sem explicação científica.
-
-Embora um psíquico possa ativar a precognição, um Narrador pode pedir a ativação por motivos de história, caso em que nenhuma Força-de-Vontade é gasta nessa ativação.
 
 • Intuition (Intuição): O vidente adquire um talento para adivinhar corretamente. Para eventos puramente aleatórios (loteria, rolagens de dados), as previsões podem ser bastante precisas. O psíquico pode saber intuitivamente a rota mais curta até um determinado destino e desfruta de uma probabilidade maior de encontros casuais benéficos. O psíquico não experimenta visões, ele apenas “tem um pressentimento” e adivinha muito bem. Mesmo com cinco ou mais sucessos, é improvável que as previsões sejam inteiramente precisas.
 
@@ -1177,12 +929,6 @@ Fornecer informações sobre o futuro distante pode ser difícil para o Narrador
 Psychic Healing
 
 
-Muitas culturas têm lendas de pessoas abençoadas com o poder de curar por meio de pouco mais que um toque. Alguns deles provavelmente eram curandeiros psíquicos. Ao canalizar sua vontade e energia, um psíquico pode realizar milagres. Muitos com esse dom escolhem ser discretos a respeito — a fama e a pressão para realizar milagres podem ser assustadoras, e os inimigos que um curandeiro psíquico pode fazer dentro do meio médico são prejudiciais. Praticar medicina sem licença, mesmo em áreas com pouco acesso a serviços de saúde, continua ilegal.
-
-Embora não seja exigido, muitos com esse dom têm um grande volume de conhecimento médico, muitas vezes adquirido informalmente. Quase todos os curandeiros psíquicos têm alta empatia, da qual alguns suspeitam que o dom se origine.
-
-Desastres ao praticar medicina de qualquer tipo são devastadores, mas um curandeiro psíquico pode transferir a lesão ou a doença para si mesmo. Outras possibilidades incluem curar um ferimento de forma grotesca ou desviar as energias de cura, causando respostas autoimunes ou cancerígenas.
-
 • Diagnosis (Diagnóstico): O curandeiro diagnostica instantaneamente doença ou lesão pela visão ou pelo contato com a pele. A terminologia do diagnóstico depende do conhecimento médico do psíquico — alguém com pouco conhecimento pode descrever lúpus como “o corpo lutando contra si mesmo”. Um psíquico pode usar os sucessos de Diagnosis em uma rolagem complementar (veja Mage 20 p. 389) para rolagens de Medicina. Se usar trabalho em equipe, o psíquico pode contribuir com sucessos para a rolagem do profissional médico até o valor de Medicina do psíquico.
 
 •• Restorative Slumber (Sono Restaurador): Com um toque, o curandeiro concentra as energias do corpo de seu paciente na cura. Trate uma ativação bem-sucedida como tratamento médico habilidoso para dano contundente e letal e como estabilização magicka para dano agravado. O toque deve durar pelo menos um minuto, após o qual o paciente cai em um sono profundo. Com 3+ sucessos, o paciente também recupera um ponto de Força-de-Vontade.
@@ -1197,10 +943,6 @@ Desastres ao praticar medicina de qualquer tipo são devastadores, mas um curand
 
 Psychic Hypnosis
 
-
-Embora a hipnose moderna seja uma forma de terapia que qualquer um poderia aprender, alguns psíquicos têm um dom natural para ela, com efeitos muito além da variedade treinada. Com o aumento da popularidade e as pesquisas recentes sobre hipnoterapia, hipnotizadores psíquicos podem praticar seus dons abertamente, sem muito medo de atrair a atenção errada.
-
-A hipnose psíquica não é tão rápida quanto as disciplinas vampíricas nem tão versátil quanto a Esfera da Mente (Mind Sphere). Mesmo assim, um hipnotizador particularmente talentoso pode alcançar muitos efeitos semelhantes.
 
 • Trance State (Estado de Transe): O hipnotizador coloca um alvo voluntário em um estado de transe calmante, embora não possa emitir comandos. Nesse estado, o alvo consegue lembrar eventos e detalhes com mais clareza e ganha uma redução de dificuldade em quaisquer testes que envolvam recordação de memória igual aos sucessos de ativação, até uma dificuldade mínima de 2. O alvo também recupera um ponto de Força-de-Vontade por cada sucesso de ativação, embora não possa se beneficiar dessa função novamente até ter descansado normalmente. Leva cinco turnos para colocar o alvo no transe, e o transe se rompe se alguém perturbar o alvo. O hipnotizador também pode colocar a si mesmo em transe.
 
@@ -1217,12 +959,6 @@ A hipnose psíquica não é tão rápida quanto as disciplinas vampíricas nem t
 Psychic Invisibility
 
 
-Psychic Invisibility (Invisibilidade Psíquica) não é invisibilidade verdadeira. Este Fenômeno é como Psychic Hypnosis em uma escala maior, mas com escopo limitado. O psíquico engana as mentes dos outros para que simplesmente o ignorem, como se projetasse o comando “não me note”. O psíquico aparece em gravações normalmente, mas quem assiste a uma transmissão ao vivo não nota o psíquico. A atenção dessas pessoas se desvia para outros detalhes da gravação. Esta habilidade não impede o acionamento de alarmes eletrônicos ou mecânicos que não exigem nenhuma entrada humana para disparar, como alarmes de movimento.
-
-Animais não podem ser enganados com este Fenômeno a menos que o psíquico também possua Animal Psychics (Psiquismo Animal) — suas mentes são muito diferentes das de humanos e criaturas humanoides. Se um psíquico bloqueia uma porta ou item que alguém espera ver, o indivíduo afetado também não notará a porta ou o item. Se um ser com percepção aprimorada procura pelo psíquico ou por coisas sobrenaturalmente ocultas de modo geral, ele pode tentar um teste contestado para determinar se o ser perfura a ilusão do psíquico, opondo suas reservas de dados apropriadas aos sucessos de ativação do psíquico.
-
-Os sucessos de ativação determinam a força do efeito do Fenômeno. Um sucesso deixa o psíquico notado, mas difícil de focar e impossível de identificar. Isso também adiciona +1 de dificuldade aos testes de ataque que tenham o psíquico como alvo enquanto estiver ativo. Três ou mais sucessos mantêm o psíquico completamente oculto, a menos que contestado com sucesso. Escudos Mentais (Mind Shields) e alguns efeitos da Esfera da Mente (Mind Sphere) podem proteger contra este Fenômeno.
-
 • Wallflower (Enfeite de Parede): Enquanto o psíquico permanecer completamente imóvel e silencioso, ele continua não notado. Entretanto, o psíquico não precisa prender a respiração — apenas uma respiração pesada ou ruidosa rompe o efeito.
 
 •• Slink (Esgueirar-se): O psíquico se move enquanto invisível, mas não pode interagir de forma significativa com o mundo. O poder se rompe se o psíquico fizer qualquer coisa para chamar atenção para si mesmo ou interagir com o mundo, como escrever em um quadro-negro ou abrir uma porta. Um psíquico pode fazer um teste de Raciocínio (Wits) + Furtividade em dificuldade 7 ou mais para evitar romper acidentalmente seu poder em condições desfavoráveis, como pisos de floresta cobertos de gravetos ou uma sala com alarme de movimento.
@@ -1237,10 +973,6 @@ Os sucessos de ativação determinam a força do efeito do Fenômeno. Um sucesso
 
 Psychic Vampirism
 
-
-Todo mundo conhece aquela pessoa de quem não se consegue ficar perto por muito tempo sem se sentir emocional e espiritualmente drenado. Um vampiro psíquico pode ser qualquer coisa, de um funcionário do DMV, um professor monótono, o colega de trabalho ansioso demais que não para de falar em uma reunião que poderia ter sido um e-mail, ou algo muito mais sinistro. Para um vampiro psíquico, a energia e as emoções que ele drena de suas vítimas desavisadas dão um barato eufórico diferente de qualquer droga, além de outros efeitos benéficos. Como muitas drogas, a sensação pode se tornar viciante.
-
-Não está claro se o poder se desenvolve naqueles propensos a usar os outros como recursos, ou se os efeitos do poder, uma vez desenvolvido, mudam grandemente as pessoas. Em qualquer dos casos, este Fenômeno Psíquico pode trazer à tona o pior nas pessoas. De nota para aqueles que estudam o sobrenatural, vampiros psíquicos frequentemente têm ou desenvolvem muitas das mesmas idiossincrasias psicológicas às quais os Kindred são propensos.
 
 • Tap Energy (Extrair Energia): O vampiro se alimenta das emoções fortes dos outros, tanto positivas quanto negativas. O vampiro sente quais são as emoções enquanto se alimenta e pode usar este poder para avaliar as emoções de um indivíduo ao longo do tempo. Requer apenas um sucesso para saborear o paladar nuançado das emoções de uma pessoa e dar ao vampiro um barato agradável. Com três sucessos, o vampiro recupera um ponto perdido de Força-de-Vontade, e recupera uma Força-de-Vontade adicional por sucesso além do terceiro. O vampiro deve estar a até 10 jardas da vítima e ser capaz de senti-la. A vítima fica desconcertada, e suas emoções ficam contidas — mas não ausentes — até o fim da cena.
 
@@ -1267,16 +999,6 @@ Falha = Nada acontece
 Psychokinesis
 
 
-De vez em quando, surge um vídeo no YouTube, um especial de TV, um programa de variedades ou um livro publicado sobre algum mestre iluminado que expandiu a mente até o ponto de conseguir dobrar uma colher ou deslocar um livro 6 polegadas sobre uma mesa. Toda pessoa que assiste ou lê sobre esses feitos fica admirada e maravilhada com a possibilidade de mover objetos pela pura força da mente.
-
-A psicoquinese (psychokinesis), ou telequinese (telekinesis) para alguns, é bela em sua simplicidade. Não há truques sutis nem véus ilusórios. Há apenas o simples movimento da matéria através do espaço pela pura força de vontade. Conforme o psicoquineta (psychokinetic) cresce em força, ele aperfeiçoa sua precisão e aumenta o peso máximo que pode pôr em movimento. Os inexperientes só movem objetos pequenos, e de forma muito desajeitada. Por outro lado, um mestre psicoquineta pode levantar cargas enormes e movê-las a velocidades assustadoras, sendo também capaz de feitos de motricidade fina que a maioria tem dificuldade de executar com as próprias mãos.
-
-A psicoquinese concede ao psíquico uma pontuação de Força e Destreza para suas ações, uma vez ativada. Isso exige apenas uma ativação por instância do Fenômeno e permanece ativo enquanto o psicoquineta mantiver a concentração ou até o fim da cena. Usar a psicoquinese exige que o psíquico consiga ver o alvo pretendido com os próprios olhos. Cada sucesso na rolagem de ativação permite que um alvo separado seja manipulado, mas o peso total de todos os alvos não pode exceder a capacidade de levantamento do psíquico. Sempre que o psíquico sofrer dano, ele deve fazer uma nova rolagem de Força-de-Vontade para manter a concentração. Se obtiver menos sucessos do que o número de alvos que está manipulando no momento, deve escolher alvos para liberar até que o número de alvos corresponda ao novo total de sucessos. Se mais sucessos forem obtidos, o número de alvos manipulados permanece inalterado.
-
-Um psicoquineta com poder para levantar uma pessoa pode fazê-lo sem impedimentos. O alvo tem direito a um teste de Força + Esportes para se agarrar a um ponto de ancoragem firme, caso haja algum por perto onde se segurar. Se não houver um ponto de apoio seguro, o alvo fica impotente para deter o poder do psicoquineta, salvo se tiver vantagens sobrenaturais próprias.
-
-Uma vez que um alvo está sendo manipulado, as ações realizadas com o alvo usam a Força ou a Destreza da Psicoquinese do psíquico e a Habilidade apropriada exigida para a ação. Por exemplo, uma arma de fogo sendo manipulada exigiria um teste de Destreza psicoquinética + Arm. Fogo para disparar. “Arremessar” um objeto manipulado exige que o item seja liberado enquanto é propelido com um teste apropriado de Força + Esportes. A desconexão e a falta de contato com um alvo manipulado fazem com que todas as ações realizadas por meio da manipulação psicoquinética sofram +1 de dificuldade. Tentar realizar uma ação psicoquinética com mais de um item manipulado no mesmo turno exige que o psíquico divida sua parada de dados normalmente, como ao realizar ações múltiplas.
-
 • Com Força e Destreza mentais de 0, o psíquico só pode levantar no máximo 5 libras. Os objetos seguem um caminho lento e desajeitado pelo espaço quando movidos e têm velocidade máxima de 5+ Raciocínio (Wits) jardas por rodada.
 
 •• A Força e a Destreza mentais do psíquico sobem para 1, e os objetos têm movimento de 7+ Raciocínio jardas por rodada.
@@ -1298,10 +1020,6 @@ Ambas as ações refinadas do fenômeno recebem melhorias neste nível. A levita
 Psychometry
 
 
-A psicometria (psychometry) é um dos Fenômenos mais desgastantes emocionalmente para os psíquicos dotados — ou amaldiçoados — com ela. Ao tocar objetos, o psíquico pode ler as ressonâncias emocionais deixadas para trás e ver visões associadas ao objeto. Nem sempre é claro quais objetos têm ressonâncias fortes: uma caneca de café de escritório pode ter apenas impressões passageiras. No entanto, ela pode ser um presente querido de um filho ou mesmo a caneca que uma trabalhadora tinha na mão quando soube da morte de uma pessoa amada.
-
-Leva meros segundos para ler as ressonâncias, mesmo que a visão pareça durar muito mais tempo da perspectiva do psíquico. O número de sucessos na ativação determina o nível de detalhe que o psíquico recebe. Muitos sucessos dão impressões claras e vívidas, que tendem a fazer o psíquico sentir as emoções e a dor por um tempo, enquanto menos sucessos dão apenas impressões passageiras. Em um desastre, o psíquico se perde nas visões, fundindo-se temporariamente em personalidade com um dos indivíduos do evento e possivelmente encenando-o. Quando um psíquico com Psicometria toca um objeto de imensa ressonância emocional, o Narrador pode pedir uma rolagem reflexiva de Psicometria.
-
 • Impression (Impressão): O psíquico pode obter impressões oníricas de eventos recentes envolvendo o objeto ou de eventos mais distantes com fortes emoções associadas. O psíquico, neste estágio, obtém principalmente leituras emocionais e imagens vagas e figurativas. Com 3+ sucessos, o psíquico também pode ver uma imagem precisa da pessoa mais intimamente associada ao objeto.
 
 •• Reveal Scar (Revelar Cicatriz): O psíquico obtém impressões do evento com a mais forte ressonância emocional associada ao objeto. Ele recebe imagens oníricas e imprecisas do evento. Com 3+ sucessos, também determina a idade aproximada do dono, indícios de personalidade, a conexão com o objeto e o que o dono sentiu na ocasião.
@@ -1316,12 +1034,6 @@ Leva meros segundos para ler as ressonâncias, mesmo que a visão pareça durar 
 
 Psychoportation
 
-
-A psicoportação (psychoportation), também chamada às vezes de teleportação, é uma poderosa habilidade psíquica de estar subitamente em outro lugar. Este é um dos fenômenos psíquicos mais poderosos e raros. O ocasional Mago da Esfera de Correspondência de mente fechada já foi posto em seu lugar ao ver um simples psíquico se psicoportar para fora do caminho do perigo sem atrair a ira da Realidade.
-
-Ninguém sabe ao certo como a psicoportação funciona, mas algumas teorias incluem dissipar-se no ar e reformar-se em outro ponto, uma variação da viagem astral ou buracos de verme pessoais. O que se sabe é que um psíquico não pode carregar mais de cerca de 100 libras de carga extra sem sofrer tensão severa, causando ao psíquico no mínimo 6 níveis de dano contundente que podem ser absorvidos normalmente. Isso aumenta em 1 nível de dano contundente para cada 25 libras adicionais que o psíquico tentar mover. Falhar em absorver o dano resulta em um destino desastroso para a carga, como psicoportar o conteúdo para o local errado, para dentro de um objeto sólido ou para o corpo de água mais próximo. Em raras ocasiões, a carga aparentemente deixa de existir. Para viajar a um lugar por meio da psicoportação, o psíquico deve ver o destino pretendido com sentidos mundanos ou habilidades psíquicas — próprias ou de outra pessoa.
-
-Um desastre em psicoportação normalmente significa que o psíquico calculou mal o salto e aterrissou dentro de um objeto sólido — ou pior, de uma pessoa. Isso causa 8 dados de dano agravado ao psíquico e ao objeto desavisado. Ocasionalmente, um desastre pode transportar o psíquico para um local perigoso ou desconhecido, ou o psíquico pode deixar para trás ou trazer inadvertidamente algo que não devia.
 
 • Short Hop (Salto Curto): Alcance de até 12 + Inteligência jardas em um turno.
 
@@ -1338,10 +1050,6 @@ Um desastre em psicoportação normalmente significa que o psíquico calculou ma
 Pyrokinesis
 
 
-O saber parapsicológico fala de “Firestarters” (Incendiários), indivíduos capazes de iniciar e às vezes controlar o fogo psiquicamente. Alguns parapsicólogos suspeitam que a Pirocinese (Pyrokinesis) seja uma variante da Psicocinese (Psychokinesis), na qual o psíquico faz as moléculas vibrarem a altas velocidades, gerando combustão em vez de mover objetos inteiros de forma coesa.
-
-A Pirocinese é um dos Fenômenos Psíquicos mais perigosos para os próprios psíquicos; a maioria dos psíquicos não tem mais defesa contra as chamas que cria do que qualquer outro humano. Desastres podem ser espetacularmente desastrosos, e vários pirocinéticos se foram num literal clarão de glória.
-
 • Spark (Faísca): O pirocinético pode gerar pequenas faíscas, normalmente a partir das pontas dos dedos. Essas faíscas normalmente só conseguem incendiar substâncias altamente inflamáveis, como papel ou gasolina, mas com 3 ou mais sucessos as faíscas do psíquico podem incendiar materiais como um fósforo faria. As faíscas podem acender qualquer coisa ao alcance do pirocinético, embora ele não precise tocar o alvo. Mesmo com muitos sucessos, as faíscas não são quentes o bastante para incendiar diretamente uma pessoa, embora o efeito de uma chama surgindo possa assustar alguém. Após a ativação, trate as faíscas como um ataque de arremesso com uma arma que não causa dano. Isso pode ser esquivado normalmente. Se o ataque acertar, o alvo rola Força-de-Vontade com dificuldade 6 para evitar ficar atordoado por um turno. Em um desastre, o alvo entra em pânico. O alvo pode, em vez disso, gastar um ponto de Força-de-Vontade para suprimir a reação de susto.
 
 •• Combustion (Combustão): O psíquico se concentra em um objeto a até 10 jardas, fazendo-o irromper em chamas. O psíquico pode incendiar de forma confiável materiais inflamáveis como gasolina, madeira seca, carvão e vampiros. Com 3 ou mais sucessos, o psíquico pode incendiar qualquer coisa combustível, como pessoas. O fogo inicial é do tamanho de uma tocha e se comporta e se espalha normalmente. Se o psíquico tiver como alvo uma pessoa ou as roupas de uma pessoa, o alvo pode tentar esquivar normalmente, tratando os sucessos de ativação como a rolagem de mira.
@@ -1356,12 +1064,6 @@ A Pirocinese é um dos Fenômenos Psíquicos mais perigosos para os próprios ps
 
 Shadow
 
-
-Vivemos em um mundo de luz e sombra. O psíquico que entende isso e aprende a manipular um lado dessa moeda está aproveitando um recurso sempre presente. Seja sob uma saliência, atrás de uma pilha de caixas, ou simplesmente nas rugas e fendas do rosto de alguém, o psíquico que manipula sombras pode usá-las para ocultar e confundir.
-
-Teorias supersticiosas abundam sobre o que o psíquico que maneja Sombras (Shadow) está realmente fazendo. O fato simples é que ele está manipulando a luz — e o som, em grau limitado — para amortecer o mundo ao seu redor. Pode parecer que o psíquico de Sombra está manejando a escuridão, mas tudo se resume a ciência simples. A escuridão fica mais escura e o som fica abafado conforme a pura vontade do psíquico sufoca as formas de onda ativas no ambiente. A atmosfera assustadora e a reputação são apenas um bônus.
-
-Por mais que as sombras possam esconder, a utilização adequada deste Fenômeno pode fornecer distrações significativas. Luz e som são interceptados antes que possam alcançar os sentidos do alvo, dando à vítima a sensação de que sua cabeça está envolta em uma manta invisível. Conforme o poder do psíquico aumenta, isso é cada vez mais angustiante, pois o cérebro pode interpretar essa perda de sentidos como sufocamento iminente. Embora cruel na avaliação de alguns, pode ser uma ferramenta especialmente útil para tirar alguém do seu caminho.
 
 • Dispersar as bordas das sombras projetadas e perturbar o som só é suficiente para aumentar a eficácia da ocultação e da desmoralização. As sombras ficam ligeiramente mais longas, alcançam um pouco mais longe, enquanto os sons são todos inquietantemente abafados. Todas as rolagens de Intimidação e Furtividade têm sua dificuldade ajustada em −1. Alvos distraídos por sombras que escurecem e por sons abafados sofrem +1 de dificuldade em todas as rolagens que dependem de visão e audição.
 
@@ -1380,10 +1082,6 @@ Vítimas de assédio sombrio devem fazer uma rolagem de Força-de-Vontade (dific
 Synergy
 
 
-Uma habilidade sutil, psíquicos sinergéticos muitas vezes não sabem que têm qualquer talento psíquico até depois de conhecer outros psíquicos — é incomum, mas não inédito, que desenvolvam outros Fenômenos Psíquicos. Este fenômeno é considerado raro, mas a natureza sutil do poder pode ocultar o verdadeiro número de sinergistas no mundo. A Sinergia (Synergy) permite que psíquicos trabalhem juntos para construir efeitos mais poderosos do que qualquer um dos psíquicos poderia criar por conta própria.
-
-Os psíquicos devem estar se tocando para formar um vínculo sinergético. O sinergista pode vincular um número de psíquicos igual ao dobro dos pontos que possui em Sinergia. Cada sucesso acima de um adiciona sucessos automáticos que podem ser gastos em ações que os psíquicos vinculados realizem usando Fenômenos. Desastres podem causar contragolpes para todos os envolvidos, sendo o melhor cenário uma dor de cabeça ou um sangramento nasal, enquanto o pior caso pode fazer os fenômenos psíquicos daqueles no vínculo se ativarem descontroladamente.
-
 • Like Knows Like (Igual Reconhece Igual): O sinergista pode sentir outros psíquicos. Isso tem sucesso automático se o psíquico tocar outro, mas o sinergista pode rolar ativação para varrer em busca de psíquicos na linha de visão. Com 3 ou mais sucessos, o sinergista pode sentir o poder relativo dos outros psíquicos.
 
 •• Share Will (Compartilhar Vontade): O sinergista forma um vínculo psíquico fraco para aumentar o poder dos participantes. Cada psíquico pode gastar um ponto de Força-de-Vontade para um sucesso automático no efeito de outro, ou permitir que o psíquico “empreste” a Força-de-Vontade e adicione temporariamente o ponto à sua reserva, até um máximo de 10. Se a Força-de-Vontade não for gasta, ela pode ser negociada múltiplas vezes entre os psíquicos no vínculo. Quaisquer Fenômenos sensoriais (Telepatia [Telepathy], Precognição [Precognition], etc.) permitem que todos os psíquicos no vínculo compartilhem os resultados.
@@ -1398,12 +1096,6 @@ Os psíquicos devem estar se tocando para formar um vínculo sinergético. O sin
 
 Telepathy
 
-
-Diz-se que existem dois tipos de pessoas no mundo: pessoas que desejariam poder ler mentes e mentirosos. Essa afirmação, em si mesma, é uma mentira. Isso porque existem pessoas no mundo que realmente podem ler mentes, e elas são conhecidas como telepatas. Uma vez que sintam a mente de um alvo, esses psíquicos podem sondar seus pensamentos em busca de opiniões, desejos, fantasias e emoções.
-
-Conforme a perícia e o poder melhoram, o telepata pode aprender a transmitir seus pensamentos para os outros. A comunicação dessa maneira pode ser, na melhor das hipóteses, inquietante para os despreparados, e potencialmente traumatizante. Telepatas compassivos tomam tempo para informar aqueles com quem pretendem se comunicar telepaticamente sobre o que está por vir, para evitar possíveis gritos e confusão incoerente causados por uma invasão mental não anunciada.
-
-Aqueles que dominaram seu talento vão um passo além e fazem essas transmissões parecerem pensamentos originais, implantando ideias nas mentes de seus alvos. Isso não é nenhum tipo de controle mental ou hipnose, como se poderia pensar. Em sua essência, esta habilidade é mais parecida com ventriloquismo — uma forma de ventriloquismo essencialmente semelhante a gaslighting psíquico, e um ato muito perigoso e imoral, mas ventriloquismo, ainda assim. O telepata imita o diálogo interior do alvo e faz sugestões como se o pensamento viesse da própria mente do sujeito. Os usos deste talento vão desde o pensamento relativamente benigno de “eu bem que comeria um lanche” até projeções muito mais sinistras. Ler os pensamentos do alvo e então imitar e repetir seus impulsos mais sombrios até a exigência é apenas um exemplo perturbador do potencial de abuso telepático.
 
 • Todos os telepatas começam sentindo os pensamentos superficiais e as emoções de um sujeito. As emoções incluem o humor atual, o desejo imediato e o bem-estar mental. Pensamentos superficiais são músicas presas na cabeça, a recordação ativa de coisas como uma lista de compras ou um código de acesso enquanto ele é digitado, ou o que eles acham que era aquele cheiro que acabaram de sentir.
 
@@ -1428,12 +1120,6 @@ As conversas por conexões telepáticas não estão mais limitadas a frases. Con
 
 True Faith
 
-
-Sistemas para a Fé Verdadeira
-
-Diferente dos outros Caminhos de Númina, a Fé Verdadeira possui um único Caminho.
-
-A Fé Verdadeira concede aos crentes benefícios especiais:
 
 • Cada nível de Fé Verdadeira concede um ponto extra de Força de Vontade.
 

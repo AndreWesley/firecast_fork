@@ -1,0 +1,51 @@
+# family_caps.tsv — §T774, 125ª rodada 2026-08-28
+# familia <TAB> traco <TAB> teto <TAB> livro <TAB> pag_impressa <TAB> epoca
+#
+# Varredura COMPLETA das 22 familias de §R93 atras de teto NUMERICO de traco.
+# Padroes buscados: "higher than" "maximum" "may not" "cannot exceed" "limited to".
+# Fonte: os blocos "Weakness:" de cada familia, lidos com pdftotext -raw.
+#
+Enrathi	humanity	3	gr	95	modern
+Enrathi	conscience	2	gr	95	modern
+Grimaldi	bloodPool	8	da	454	medieval
+#
+# ---- O QUE A VARREDURA FECHOU --------------------------------------------
+#
+# 1. As 6 MEDIEVAIS do da p.453-454 (Basarab, Bratovich, Danislav, Khavi,
+#    Szantovich, Vlaszy) e a Obertus: NENHUM teto de Humanity nem de Conscience.
+#    O que elas tem e fraqueza de COMPORTAMENTO ou de dano, que nao e teto:
+#      Basarab    repelido por alho
+#      Bratovich  entregue a propria selvageria
+#      Danislav   dano agravado de prata
+#      Khavi      dano de sol (bashing, soakavel com Stamina+Fortitude)
+#      Szantovich vicio: nao pode gastar Willpower para resistir
+#      Vlaszy     Juramento de Sangue ao atingir a maioridade
+#      Obertus    uma area de conhecimento como Obsession Derangement
+# 2. As 4 SEM TRIO (Katayama, Keskinen, Krevcheski, Marijava): so mencao curta,
+#    nenhum teto numerico. Katayama e Keskinen nem aparecem no corpo do gr --
+#    vivem so no quadro-resumo da p.113 que §R93 ja citou.
+# 3. => O teto de Humanity/Conscience segue sendo UM SO: a Enrathi. A tabela de
+#    §I106a nasce com 1 familia, como o spec ja previa.
+#
+# ---- O QUE ELA DESCOBRIU E O SPEC NAO PREVIA -----------------------------
+#
+# A GRIMALDI MEDIEVAL TEM TETO, mas de BLOOD POOL, nao de Humanity:
+#   "Tzimisce blood is weak in this family, who has no native ties to the
+#    Voivodate. They have only eight blood points." (da p.454)
+#
+# Tres coisas fazem dela um caso que §I106 NAO cobre:
+#   (a) o traco e outro. §I106a declara {humanity=, conscience=} e o alvo de
+#       §I106c sao as bolinhas de humanity_* e conscience. Blood pool e a caixa
+#       BLOOD POOL da aba Disciplines, 20 bolinhas.
+#   (b) bate em §V219, que diz "twenty free blood pool dots, NONE OF THEM A
+#       TRAIT" -- as 20 sao livres de proposito, nao custam XP e nao geram linha
+#       de ledger. Por um teto ali seria a primeira regra a tratar blood pool
+#       como traco, e §V219 acenderia.
+#   (c) e de EPOCA. A Grimaldi tem UMA entrada no picker (§R93 decidiu isso: ela
+#       bate nas 2 epocas, sem sufixo), mas a fraqueza medieval e essa e a
+#       moderna do gr e comportamental. Um FAMILY_CAP sem eixo de epoca aplicaria
+#       o teto de 8 a uma Grimaldi de Noites Modernas, que o livro nao limita.
+#
+# => NAO implementado. Precisa de decisao do user (Q14) antes de virar codigo.
+#    Implementar por conta propria seria inventar regra em (c) e brigar com uma
+#    invariante viva em (b).

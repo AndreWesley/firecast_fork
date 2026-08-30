@@ -1,0 +1,664 @@
+# merit_flaw_pt.tsv - traducao PT dos 643 nomes de qualidade/defeito (T750, 2026-08-28)
+#
+# colunas: nome_EN <TAB> nome_PT <TAB> marca
+#
+# marca "R"        = termo consagrado de mesa. Traduzido, mas o user ainda nao conferiu
+#                    contra a edicao brasileira. Sao os que valem revisao.
+# marca "ARTEFATO" = o nome saiu GRUDADO do pdftotext (FleshoftheCorpse). Nao e nome novo:
+#                    e o mesmo item da linha vizinha e some no dedupe de T751.
+# sem marca        = traducao direta, sem jargao envolvido.
+#
+# Opcao C, escolhida pelo user em 2026-08-28: eu traduzo tudo e marco so os duvidosos.
+# O estilo segue as 11 que a ficha JA tinha (Child=Crianca, Legerdemain=Prestidigitacao,
+# True Faith=Fe Verdadeira): termo de jogo TRADUZIDO, nao transliterado.
+#
+# ATENCAO ao reler este arquivo com PowerShell: hashtable comum e CASE-INSENSITIVE e funde
+# "Sleeping with the Enemy" com "Sleeping With the Enemy", que sao DUAS entradas de livros
+# diferentes. Usar [StringComparer]::Ordinal. Ja mordeu uma vez aqui.
+#
+# 2a PASSADA (2026-08-28): a extracao trocou `pdftotext -raw` pelo modo PADRAO. Os 5 nomes
+# GRUDADOS (FleshoftheCorpse, TouchofFrost, SpiritMentor, LinguaFranca, HarbingeroftheAbyss)
+# sumiram sozinhos - o modo padrao nao cola palavra. "Mark of Caine" saiu por ser falso
+# positivo (so aparece em prosa) e "Technobabbler" virou "Esoteric Discourse / Technobabbler",
+# que e o nome inteiro que o livro imprime. Entraram 6 nomes novos.
+Ability Deficit	Déficit de Habilidade
+Absent-Minded	Distraído	R
+Acute Sense	Sentido Aguçado	R
+Acute Senses	Sentidos Aguçados	R
+Addicted to Vampire Blood	Viciado em Sangue de Vampiro
+Addiction	Vício
+Addictive Blood	Sangue Viciante
+Additional Discipline	Disciplina Adicional
+Advanced Tech	Tecnologia Avançada
+Aging	Envelhecimento
+Albino	Albino
+Alcohol /Drug Tolerance	Tolerância a Álcool/Drogas
+Alien Perfection	Perfeição Alienígena
+Ambidextrous	Ambidestria	R
+Amnesia	Amnésia
+Anachronism	Anacronismo
+Ancestral Soil Dependence	Dependência do Solo Ancestral
+Animal Magnetism	Magnetismo Animal
+Animate Shadow	Sombra Animada
+Anosmia	Anosmia
+Antitoxin Blood	Sangue Antitoxina
+Apostate	Apóstata
+Apprentice	Aprendiz
+Arcane	Arcano
+Arcane Curse	Maldição Arcana
+Artificially Aged	Envelhecido Artificialmente
+Artistically Gifted	Talento Artístico
+Aura of Command	Aura de Comando
+Aura of the Typhon	Aura de Tifão	R
+Avatar Companion	Companheiro do Avatar
+Backup Identity	Identidade Reserva
+Bad Sight	Visão Ruim	R
+Banshee-in-Waiting	Banshee em Espera
+Bardic Gift	Dom Bárdico
+Beacon of the Unholy	Farol do Profano
+Beast Within	Besta Interior	R
+Bedeviled	Atormentado por Demônios
+Benevolent Domitor	Domitor Benevolente	R
+Berserker	Furioso	R
+Bestial	Bestial
+Betrayer's Mark	Marca do Traidor
+Bigger Boys Came	Vieram os Maiores	R
+Bigot	Preconceituoso
+Bioluminescence	Bioluminescência
+Bizarre Hunger	Fome Bizarra
+Black and White	Preto e Branco
+Black Sheep	Ovelha Negra
+Blacklisted	Na Lista Negra
+Blasphemous Pact	Pacto Blasfemo
+Blessed by St. Gustav	Abençoado por São Gustavo	R
+Blind	Cego
+Blood Feud	Rixa de Sangue
+Blood Flaw Immunity	Imunidade a Defeito de Sangue
+Blood Hunted	Caçado em Caçada de Sangue	R
+Blood Magick	Mágika de Sangue	R
+Blood Weakness	Fraqueza do Sangue
+Blooded by the Code	Sangrado pelo Código	R
+Blood-Hungry Soul	Alma Faminta de Sangue
+Blush of Health	Rubor da Saúde	R
+Body Trail	Rastro de Corpos
+Boon	Favor	R
+Botched Presentation	Apresentação Malfeita
+Bound	Vinculado	R
+Bound to the Clan	Vinculado ao Clã
+Brahmin	Brâmane	R
+Branded	Marcado a Ferro
+Brittle Body	Corpo Frágil
+Broken Antitribu	Antitribu Quebrado	R
+Broken Bond	Vínculo Rompido	R
+Bruiser	Brutamontes	R
+Bulimia	Bulimia
+Bullyboy	Capanga
+Burning Aura	Aura Ardente
+Call of the Sea	Chamado do Mar
+Calm Heart	Coração Calmo	R
+Cannibal	Canibal
+Cannot Embrace	Incapaz de Abraçar	R
+Can't Cross Running Water	Não Cruza Água Corrente
+Carrion Presence	Presença de Carniça
+Cast No Reflection	Não Reflete	R
+Cast No Shadow or Reflection	Sem Sombra nem Reflexo	R
+Cast-Iron Stomach	Estômago de Ferro	R
+Catlike Balance	Equilíbrio Felino	R
+Catspaw	Testa de Ferro
+Celestial Affinity	Afinidade Celestial
+Celestial Attunement	Sintonia Celestial
+Chandala	Chandala	R
+Child	Criança
+Chorus Trained	Treinado pelo Coro	R
+Chronic Depression	Depressão Crônica
+Circumspect Avatar	Avatar Circunspecto	R
+Clan Apostate	Apóstata do Clã
+Clan Enmity	Inimizade de Clã
+Clan Friendship	Amizade de Clã
+Clan Weakness	Fraqueza de Clã
+Clear Sighted	Vista Clara	R
+Clear-Sighted	Vista Clara	R
+Cloak of the Seasons	Manto das Estações
+Cloaked in Shadow	Envolto em Sombra
+Cloistered	Enclausurado
+Code of Honor	Código de Honra	R
+Cold Breeze	Brisa Fria
+Cold Read	Leitura Fria
+Coldly Logical	Friamente Lógico
+Combat Novice	Novato em Combate
+Common Sense	Bom Senso	R
+Compulsion	Compulsão	R
+Compulsive Speech	Fala Compulsiva
+Computer Aptitude	Aptidão com Computadores	R
+Concentration	Concentração	R
+Confidence	Confiança
+Conflicting Loyalties	Lealdades Conflitantes
+Conniver	Conspirador
+Connoisseur	Conhecedor
+Consanguineous Resistance	Resistência Consanguínea
+Conspicuous Consumption	Consumo Ostensivo
+Construct	Construto	R
+Consumption	Tísica	R
+Contagious	Contagioso
+Controllable Night Sight	Visão Noturna Controlável
+Court Favorite	Favorito da Corte
+Credulous	Crédulo
+Critters	Bichinhos	R
+Crucial Component	Componente Crucial
+Cultural Chameleon	Camaleão Cultural
+Cultural Other	Estrangeiro Cultural
+Curiosity	Curiosidade	R
+Cursed	Amaldiçoado
+Danger Sense	Senso de Perigo	R
+Dangerous Secret	Segredo Perigoso
+Daredevil	Destemido	R
+Dark Aura	Aura Sombria
+Dark Fate	Destino Sombrio	R
+Dark Secret	Segredo Sombrio	R
+Dark Triad	Tríade Sombria
+Darksight	Visão nas Trevas
+Dead Inside	Morto por Dentro
+Dead Zone	Zona Morta
+Deaf	Surdo
+Death Grip	Aperto Mortal
+Deathsight	Visão da Morte
+Deathwalker	Andarilho da Morte
+Debt of Gratitude	Dívida de Gratidão
+Debts	Dívidas
+Deceptive Aura	Aura Enganosa
+Deceptive Eating	Comer Enganoso	R
+Deep Sleeper	Sono Pesado	R
+Deformity	Deformidade	R
+Degeneration	Degeneração
+Demented Eidolon	Eidolon Demente	R
+Demon-Hounded	Perseguido por Demônios
+Demonic Patron	Patrono Demoníaco
+Deranged	Perturbado
+Detached	Desapegado
+Devil's Mark	Marca do Diabo
+Diabolical Mentor	Mentor Diabólico
+Discerning Palate	Paladar Refinado
+Disciple of Lazarus / Japheth	Discípulo de Lázaro/Jafé	R
+Discredited	Desacreditado
+Disease Carrier	Portador de Doença
+Disfigured	Desfigurado	R
+Disgrace to the Blood	Desgraça para o Sangue
+Distracting Aura	Aura Perturbadora
+Dogmatic	Dogmático
+Domitor Pariah	Domitor Pária	R
+Double Agent	Agente Duplo
+Dracon's Temperament	Temperamento do Dracon	R
+Dreadful Mara	Mara Terrível	R
+Driving Goal	Meta Obsessiva	R
+Drug Resistance	Resistência a Drogas
+Dual Affiliation	Afiliação Dupla
+Dulled Bite	Mordida Embotada	R
+Duplicitous	Dissimulado
+Dynamic Personality	Personalidade Dinâmica
+Early Riser	Madrugador	R
+Easily Intoxicated	Embriaga-se Fácil
+Eat Food	Comer Alimentos	R
+Ecclesial Rank	Posto Eclesiástico
+Echo Chamber	Câmara de Eco
+Echoes	Ecos
+Ecstatic	Extático
+Ecumenist	Ecumenista
+Eerie Presence	Presença Sinistra
+Efficient Digestion	Digestão Eficiente	R
+Eidetic Memory	Memória Eidética	R
+Elysium Regular	Frequentador do Elísio	R
+Embedded Agent	Agente Infiltrado
+Embraced without the Cup	Abraçado sem o Cálice	R
+Enchanting Feature	Traço Encantador
+Enchanting Voice	Voz Encantadora
+Enemy	Inimigo
+Enemy Brood	Ninhada Inimiga
+Entrepreneur	Empreendedor
+Escaped Target	Alvo Fugitivo
+Esoteric Discourse / Technobabbler	Discurso Esotérico/Tecnotagarela
+Ethical Prohibition	Proibição Ética
+Expendable	Descartável
+Expert Driver	Motorista Experiente
+Expiration Date	Data de Validade
+Extra Sharp	Extra Afiado
+Extreme Kink	Fetiche Extremo
+Eyes of Shadow	Olhos de Sombra
+Faceless	Sem Rosto
+Fae Blood	Sangue Feérico	R
+Faerie Affinity	Afinidade Feérica	R
+Failure	Fracasso
+Faithless	Descrente
+False Reflection	Reflexo Falso
+Family Issues	Problemas de Família
+Family Support	Apoio da Família
+Fangless	Sem Presas
+Fatalist	Fatalista
+Faulty Enhancements	Melhorias Defeituosas
+Favor	Favor	R
+Feral Mind	Mente Feral
+Fifteenth Generation	Décima Quinta Geração
+Fifth Degree	Quinto Grau
+Finicky Palate	Paladar Exigente
+Fist of God	Punho de Deus
+Flashbacks	Flashbacks	R
+Flawed Reality	Realidade Falha
+Flesh Eater	Comedor de Carne
+Flesh of the Corpse	Carne do Cadáver	R
+Force of Spirit	Força de Espírito
+Forked Tongue	Língua Bífida
+Former Ghoul	Ex-Carniçal	R
+Former Prince	Ex-Príncipe
+Foul Blood	Sangue Impuro
+Fourteenth Generation	Décima Quarta Geração
+Friend of the Underground	Amigo do Submundo
+Friendly Face	Rosto Amigável
+Fugitive	Fugitivo
+Fugue Instinct	Instinto de Fuga
+Ghoul	Carniçal	R
+Glowing Eyes	Olhos Brilhantes
+Green Thumb	Dedo Verde
+Gremlin	Gremlin
+Grip of the Damned	Aperto dos Condenados
+Groomed for Embrace	Preparado para o Abraço	R
+Guardian Angel	Anjo da Guarda
+Guilt-Wracked	Consumido pela Culpa
+Gullible	Ingênuo
+Half-Life	Meia-Vida
+Hands of Daedalus	Mãos de Dédalo	R
+Harbinger of the Abyss	Arauto do Abismo
+Hard of Hearing	Audição Ruim
+Harmless	Inofensivo
+Hatred	Ódio	R
+Haunted	Assombrado
+Haven Affinity	Afinidade com o Refúgio	R
+Healing Touch	Toque Curativo
+Heart of Needles	Coração de Agulhas
+Heartless	Sem Coração
+Heavy Hands	Mãos Pesadas
+Hemophiliac	Hemofílico
+Heretical Sympathizer	Simpatizante Herético
+Hero Worship	Idolatria	R
+Hidden Diablerie	Diablerie Oculta	R
+Hideaway /Safehouse	Esconderijo/Casa Segura
+Hit List	Lista de Alvos
+Hive-Minded	Mente Coletiva
+Holy Aura	Aura Sagrada
+Horrific	Horrendo
+Huge Size	Tamanho Descomunal	R
+Hunted	Caçado
+Hunted by the Hierophants	Caçado pelos Hierofantes
+Hunted Like a Dog	Caçado como um Cão
+Hyperflexible	Hiperflexível
+Hyperfocus	Hiperfoco
+Hypersensitivity	Hipersensibilidade
+Icy	Gélido
+Ignorance	Ignorância
+Illiterate	Analfabeto
+Immortal Enemy	Inimigo Imortal
+Impaired Sense	Sentido Prejudicado
+Impatient	Impaciente
+Impediment	Impedimento
+Impossible Ritual	Ritual Impossível
+Impressive Restraint	Autocontrole Impressionante
+Inappropriate	Inadequado
+Inbred	Consanguíneo
+Incantation	Encantamento
+Incoherent	Incoerente
+Incomplete Understanding	Entendimento Incompleto
+Indelible	Indelével
+Infamous Sire	Senhor Infame	R
+Infamy	Infâmia
+Infectious	Infeccioso
+Infectious Bite	Mordida Infecciosa	R
+Infertile Vitae	Vitae Infértil	R
+Initiate of the Road	Iniciado do Caminho	R
+Inner Knight	Cavaleiro Interior
+Inner Strength	Força Interior
+Innocent	Inocente
+Inoffensive to Animals	Inofensivo aos Animais	R
+Insane /Infamous Mentor	Mentor Louco/Infame
+Insensate to Pain	Insensível à Dor
+Instrument of God	Instrumento de Deus
+Insubordinate	Insubordinado
+Intemperate	Intemperante
+Inter-Agency Liaison	Ligação Interagências
+Introspection	Introspecção
+Iron Will	Vontade de Ferro	R
+Isolated Upbringing	Criação Isolada
+Jack-of-All-Trades	Faz-Tudo	R
+Jinx /Infernal Contraption	Azar/Engenhoca Infernal
+Judge's Wisdom	Sabedoria do Juiz
+Kashaph	Kashaph	R
+Keys to the Library	Chaves da Biblioteca
+King or Queen of Shadow	Rei ou Rainha das Sombras
+Kiss of Death	Beijo da Morte
+Kshatriya	Kshatriya	R
+Lame	Manco	R
+Language	Idioma
+Laughingstock	Motivo de Chacota
+Lawman's Friend	Amigo da Lei
+Lazy	Preguiçoso
+Legacy	Legado
+Legendary Attributes	Atributos Lendários
+Legerdemain	Prestidigitação
+Lesser Mark of the Beast	Marca Menor da Besta
+Lifesaver	Salva-Vidas
+Light Sleeper	Sono Leve	R
+Lightning Calculator	Calculadora Humana	R
+Light-Sensitive	Sensível à Luz
+Lightweight	Fraco para Bebida
+Lingua Franca	Língua Franca
+Literacy	Alfabetização	R
+Lizard Limbs	Membros de Lagarto
+Loathsome Regnant	Regente Repugnante	R
+Local Hero	Herói Local
+Locked Vidare	Vidare Trancado	R
+Long Fingers	Dedos Longos
+Long-Term Planning	Planejamento de Longo Prazo
+Loose Lips	Boca Grande
+Lord of the Flies	Senhor das Moscas
+Lord of the Night	Senhor da Noite
+Lost Svadharma	Svadharma Perdido	R
+Loyalty	Lealdade
+Lucky	Sortudo	R
+Lunacy	Lunacia	R
+Mage Blood	Sangue de Mago
+Magic Resistance	Resistência à Magia
+Magical Signature	Assinatura Mágica
+Manchurian Candidate	Candidato Manchuriano
+Manifest Avatar	Avatar Manifesto	R
+Mark of Favor	Marca de Favor
+Marked for Death	Marcado para Morrer
+Masquerade Breaker	Quebrador da Máscara	R
+Master of Red Tape	Mestre da Burocracia
+Master of the Masquerade	Mestre da Máscara	R
+Mayfly Curse	Maldição da Efêmera
+Mechanical Aptitude	Aptidão Mecânica	R
+Medium	Médium	R
+Member of the Pack	Membro da Matilha
+Mental Lock	Bloqueio Mental
+Methuselah's Thirst	Sede do Matusalém	R
+Mistaken Identity	Identidade Trocada
+Mole	Infiltrado
+Monstrous	Monstruoso	R
+Monstrous Maw	Fauces Monstruosas
+Mortal Flashbacks	Flashbacks Mortais
+Mortuario	Mortuario	R
+Mr. Red Tape	Sr. Burocracia
+Multi-Lingual	Multilíngue
+Multiple Curses	Maldições Múltiplas
+Mute	Mudo	R
+Mute Devotion	Devoção Muda
+Nameless	Sem Nome
+Narc	Dedo-Duro
+Natural Channel	Canal Natural	R
+Natural Leader	Líder Nato	R
+Natural Linguist	Linguista Nato	R
+Natural Shapeshifter	Metamorfo Natural
+Nephilim /Laham	Nefilim/Laham	R
+New Arrival	Recém-Chegado
+New Kid	Novato
+Nightmares	Pesadelos	R
+Nightsight	Visão Noturna	R
+Nine Lives	Sete Vidas	R
+Noble Blood	Sangue Nobre
+Non-Standard Access	Acesso Não Padrão
+Noted Messenger	Mensageiro Notório
+Notoriety	Notoriedade	R
+Oathbreaker	Quebrador de Juramento
+Obsession	Obsessão	R
+Obvious Predator	Predador Óbvio
+Occult Library	Biblioteca Oculta
+OCPD	TPOC	R
+Odd Gait	Andar Estranho
+Offensive to Animals	Ofensivo aos Animais	R
+Officially Dead	Oficialmente Morto
+Offline	Fora da Rede
+Old Flame	Antiga Paixão
+Old Pal	Velho Amigo
+One Eye	Um Olho	R
+Open Road	Estrada Aberta
+Open Wound	Ferida Aberta	R
+Oracular Ability	Habilidade Oracular	R
+Out of Phase	Fora de Fase
+Outcast	Proscrito
+Outside Haven	Refúgio Externo	R
+Outsider	Forasteiro
+Outspoken Heretic	Herege Declarado
+Overconfident	Autoconfiante Demais	R
+Overextended	Sobrecarregado
+Overstimulated	Superestimulado
+Pacifist	Pacifista
+Pain Tolerance	Tolerância à Dor	R
+Pale Aura	Aura Pálida
+Paper Trail	Rastro de Papel
+Paradise Lost	Paraíso Perdido
+Paragon	Paradigma
+Paranoid	Paranoico
+Paranormal Link	Elo Paranormal
+Paranormal Prohibition or Imperative	Proibição ou Imperativo Paranormal
+Parasitic Infestation	Infestação Parasitária
+Parlor Trick	Truque de Salão
+Patagia	Patágio
+Path Dabbler	Diletante de Trilha	R
+Path Inept	Inepto em Trilha	R
+Path Natural	Talento Natural para Trilha	R
+Patron	Patrono
+Peacemaker	Pacificador
+Perfect Liar	Mentiroso Perfeito
+Permanent Fangs	Presas Permanentes
+Permanent Paradox Flaw	Defeito de Paradoxo Permanente	R
+Permanent Wound	Ferida Permanente	R
+Personal Masquerade	Máscara Pessoal	R
+Phobia	Fobia	R
+Phylactery	Filactério
+Physically Impressive	Fisicamente Impressionante
+Piscine	Piscino
+Pitiable	Digno de Pena
+Plague of Demons	Praga de Demônios
+Poison Resistance	Resistência a Venenos
+Poisonous Blood	Sangue Venenoso
+Poker Face	Cara de Paisagem	R
+Postulant of Echidna	Postulante de Equidna	R
+Powerful Ally	Aliado Poderoso
+Precocious	Precoce
+Prestige	Prestígio
+Prestigious Mentor	Mentor Prestigioso	R
+Prestigious Sire	Senhor Prestigioso	R
+Prey Exclusion	Exclusão de Presa	R
+Primal Marks	Marcas Primais
+Primogen/Bishop Friendship	Amizade com Primogênito/Bispo	R
+Privacy Obsession	Obsessão por Privacidade
+Private Life	Vida Reservada
+Prized Collection	Coleção Preciosa
+Prized Patch	Emblema Cobiçado
+Probationary Member	Membro em Estágio
+Probationary Sect Member	Membro Probatório da Seita
+Problem with Authority	Problema com Autoridade
+Profane Trappings	Adereços Profanos
+Profiled Appearance	Aparência Fichada
+Promethean Clay	Barro Prometeico
+Prone to Quiet	Propenso ao Silêncio
+Property	Propriedade
+Prophetic Dreams	Sonhos Proféticos	R
+Psi Focus	Foco Psíquico	R
+Psychic Awareness	Percepção Psíquica
+Psychic Leech	Sanguessuga Psíquica
+Psychic Vampire	Vampiro Psíquico
+PTSD	TEPT	R
+Putrescent	Putrefato
+Quartermaster	Intendente
+Ragged Bite	Mordida Irregular
+Rat in a Cage	Rato na Gaiola
+Ravnos Jati	Jati Ravnos	R
+Rebel	Rebelde
+Recruitment Target	Alvo de Recrutamento
+Red List	Lista Vermelha	R
+Refined Palate	Paladar Refinado	R
+Regal Bearing	Porte Régio
+Religious Hysteria	Histeria Religiosa
+Rep	Reputação	R
+Repelled by Crosses	Repelido por Cruzes	R
+Repulsed by Garlic	Repelido por Alho	R
+Repulsive Feature	Traço Repulsivo
+Repulsive to Animals	Repulsivo aos Animais	R
+Research Grant	Bolsa de Pesquisa
+Revenant Disciplines	Disciplinas de Revenant	R
+Revenant Weakness	Fraqueza de Revenant	R
+Rising Star	Estrela em Ascensão
+Ritual Dabbler	Diletante em Rituais	R
+Ritual Ineptness	Inépcia Ritual	R
+Ritual Sleeper	Ritual Adormecido	R
+Rival House	Casa Rival
+Rival Sires	Senhores Rivais	R
+Rivalry	Rivalidade
+Rogue	Canalha
+Romantic Notions	Ideias Românticas
+Rose-Colored Glasses	Óculos Cor-de-Rosa
+Rotten Liar	Péssimo Mentiroso
+Rugged Bad Looks	Feiúra Marcante
+Sabbat Survivor	Sobrevivente do Sabá	R
+Sanction	Sanção
+Sanctioned Witch	Bruxa Sancionada
+Sanctity	Santidade	R
+Sanctuary	Santuário
+Sanguine Incongruity	Incongruência Sanguínea
+Scales	Escamas
+Scent of the Other	Cheiro do Outro
+Scholar of Enemies	Estudioso dos Inimigos
+Scholar of Others	Estudioso dos Outros
+Science Laboratory	Laboratório Científico
+Scientific Mystic /Techgnosi	Místico Científico/Tecgnose	R
+Secret Code Language	Linguagem Cifrada
+Secret Society Member	Membro de Sociedade Secreta
+Secret Stash	Reserva Secreta
+Sect Enmity	Inimizade de Seita
+Sectarian Ally	Aliado Sectário
+Seizures	Convulsões
+Self-Confident	Autoconfiante
+Self-Preservation	Autopreservação
+Sense Influence	Sentir Influência
+Setite Initiate	Iniciado Setita	R
+Shadow Scarred	Marcado pelas Sombras
+Shadow Walker	Andarilho das Sombras
+Shapechanger Kin	Parente de Metamorfo	R
+Shattered Avatar	Avatar Despedaçado	R
+Short	Baixinho	R
+Short Fuse	Pavio Curto	R
+Shy	Tímido	R
+Siege Mentality	Mentalidade de Cerco
+Sight Beyond Sight	Visão Além da Visão
+Simply Waiting	Apenas Esperando
+Sire's Resentment	Ressentimento do Senhor	R
+Skald	Escaldo	R
+Skin of Porcelain	Pele de Porcelana
+Sleep Unseen	Dormir Invisível
+Sleeping With the Enemy	Dormindo com o Inimigo	R
+Sleeping with the Enemy	Dormindo com o Inimigo	R
+Slimy	Viscoso
+Slow Healing	Cura Lenta	R
+Slowed Degeneration	Degeneração Retardada
+Smell of the Grave	Cheiro de Túmulo
+Soapbox	Palanque
+Socially Networked	Bem Relacionado
+Soft-Hearted	Coração Mole	R
+Spark of Life	Faísca de Vida
+Spawning Pool	Poço de Desova
+Special Responsibility	Responsabilidade Especial
+Speech Impediment	Problema de Fala	R
+Sphere Inept	Inepto em Esfera	R
+Sphere Natural	Talento Natural para Esfera	R
+Spirit Mentor	Mentor Espiritual	R
+Squeamish	Impressionável
+Stench	Fedor
+Stereotype	Estereótipo
+Stigmata	Estigmas	R
+Stillness of Death	Imobilidade da Morte
+Stitcher	Costureiro
+Stone Tongue	Língua de Pedra
+Stormwarden	Guardião da Tempestade	R
+Stormwarden /Quantum Voyager	Guardião da Tempestade/Viajante Quântico	R
+Strangeness	Estranheza
+Strength of Psyche	Força da Psique
+Stress Atavism	Atavismo sob Estresse
+Stubborn Magic	Magia Teimosa
+Sturdy	Robusto
+Style Sleeper	Estilo Adormecido	R
+Styx Baptism	Batismo do Estige
+Subculture Insider	Iniciado na Subcultura
+Sugar Daddy	Patrocinador
+Supernatural Companion	Companheiro Sobrenatural
+Sympathetic Mastery	Maestria Simpática
+Sympathizer	Simpatizante
+Taint of Corruption	Mácula da Corrupção
+Territorial	Territorial
+Thaumaturgically Inept	Inepto em Taumaturgia	R
+The Bard's Tongue	A Língua do Bardo	R
+The Company of Saints and Heroes	A Companhia dos Santos e Heróis
+The Eighth	O Oitavo
+The Flow of Ki	O Fluxo do Ki
+The High Price	O Preço Alto
+The Largest Maw	As Maiores Fauces
+Thin Blood	Sangue Fraco	R
+Thirst for Innocence	Sede de Inocência
+Thirteenth Generation	Décima Terceira Geração
+Thousand Meter Killer	Matador de Mil Metros
+Throwback	Atavismo	R
+Thugs	Capangas
+Tic/Twitch	Tique/Espasmo	R
+Ties	Vínculos
+Time Sense	Senso de Tempo	R
+Too Tough to Die	Duro de Matar
+Tortured Artist	Artista Atormentado
+Totemic Change	Mudança Totêmica
+Touch of Frost	Toque de Gelo	R
+Tough Hide	Couro Grosso
+Tracker's Mark	Marca do Rastreador
+Troublemaker	Encrenqueiro
+True Celerity	Celeridade Verdadeira	R
+True Faith	Fé Verdadeira
+True Love	Amor Verdadeiro	R
+Tunnel Rat	Rato de Túnel
+Turncoat	Vira-Casaca
+Twin Link	Elo Gêmeo
+Twin Souls	Almas Gêmeas
+Twisted Apprenticeship	Aprendizado Deturpado
+Umbral Affinity	Afinidade Umbral	R
+Unaging	Sem Idade
+Unblinking	Sem Piscar
+Unbondable	Invinculável	R
+Uncanny	Estranho
+Unclean	Impuro
+Uncommon Vitae Preference	Preferência Incomum de Vitae	R
+Uncontrollable Night Sight	Visão Noturna Incontrolável
+Unconvinced	Não Convencido
+Unholy Stain	Mácula Profana
+Unlucky	Azarado	R
+Unmarked Antitribu	Antitribu Sem Marca	R
+Unobtrusive	Discreto
+Unproven	Não Provado
+Unsanctioned Embrace	Abraço Não Sancionado	R
+Uppity	Atrevido
+Useful Knowledge	Conhecimento Útil
+Vaishya	Vaishya	R
+Vanilla	Comum
+Vassal of the Clan	Vassalo do Clã
+Vengeful	Vingativo
+Venomous Bite	Mordida Venenosa
+Vicissitude Modifications	Modificações de Vicissitude	R
+Victim of the Masquerade	Vítima da Máscara	R
+Virulent Strike	Golpe Virulento
+Vitae Mutation	Mutação da Vitae	R
+Vitae Sink	Sorvedouro de Vitae	R
+Vulgar	Vulgar
+Vulnerability	Vulnerabilidade
+Vulnerability to Silver	Vulnerabilidade à Prata	R
+Ward	Protegido	R
+Warrior's Heart	Coração de Guerreiro
+Weak Blood	Sangue Fraco	R
+Weak-Willed	Vontade Fraca	R
+Well-Rounded	Versátil
+Whimsy	Capricho
+Witch-Hunted	Caçado por Bruxas	R
+Without a Trace	Sem Deixar Rastro	R
+Wolverine's Palate	Paladar de Carcaju

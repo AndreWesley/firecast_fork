@@ -1,7 +1,19 @@
 # research/ — listas extraídas dos livros
 
-Dados DERIVADOS dos PDFs em (pasta ÚNICA dos livros de Vampiro & de Ghoul, registrada 2026-08-25)
+Dados DERIVADOS dos PDFs em (raiz dos livros, REORGANIZADA pelo user 2026-08-28 — §R126)
 `C:\Users\awlol\OneDrive\Documents\RPG\Storyteller V20\Vampiro\Vampiro - A Máscara\Books`.
+
+⚠ **Deixou de ser pasta única.** Agora são **3 subpastas + 2 soltos na raiz**, e a coluna
+`arquivo .pdf` da tabela lá embaixo passa a levar o prefixo. Nenhum livro sumiu — só mudou de
+lugar. Os 7 marcados **NOVO** entraram nesta reorganização e ainda não foram varridos.
+
+| subpasta | livros |
+|---|---|
+| `Vampiro/` | os 8 de sempre + `Vampire V20 - Anarchs Unbound` (**NOVO**) |
+| `Mago/` | `Mage - The Ascension` (**o M20 EM INGLES**, entrou 2026-08-28 no lugar do `M20.pdf` PT) · `M20_Victorian_Age_(Final_Download)` · `Mage - Book of Common Magicks` · `Mage - Book of Secrets` · `Mage - Technocracy Reloaded` |
+| `Werewolf/` | **PASTA NOVA 2026-08-28**: `Werewolf W20` (core, EN) · `Werewolf W20 - Changing Breeds` · `Werewolf W20 - Changing Ways` · `Werewolf W20 - Kinfolk` · `Werewolf W20 - Rage Across the World` · `Werewolf W20 - Charactersheet` · `Lobisomem W20 - A idade das Trevas` (**PT**, unico do lote que nao esta em ingles) |
+| `Sorcerer/` | `M20 Sorcerer` (saiu de `~\Downloads\`) · `Sorcerer_s_Companion` (**NOVO**) |
+| (raiz) | `Ghouls_and_Revnants_(Final_Download)` · `TheHuntersHunted_II_Revised_ (2)` |
 Só nome, nível, dona e página — **⊥ ∃ prosa de livro aqui**. O texto corrido de §T444–446
 sai do PDF na hora, ⊥ deste diretório.
 
@@ -35,17 +47,33 @@ grava por extenso. O bloco 1 de §I21 quer o **título**, e o título **⊥ trad
 `p.`/`pág.` muda de idioma). Tabela abaixo = a tradução do código, o offset de página e o
 arquivo PDF de onde o texto sai.
 
-| código | título p/ o bloco 1 | offset | arquivo `.pdf` |
+| código | título p/ o bloco 1 | offset | caminho a partir de `Books/` |
 |---|---|---|---|
-| `core` | `Vampire: The Masquerade 20th Anniversary Edition` | **8** | `vampire the masquerade - 20th anniversary edition` |
-| `da` | `Vampire: The Dark Ages 20th Anniversary Edition` | 1 | `_Vampiro V20 - Dark Ages - Livro Base` |
-| `rob` | `Rites of Blood` | 1 | `Vampire V20 - Rites of Blood` |
-| `lotc` | `Lore of the Clans` | 1 | `Vampiro V20 - Lore of the Clans` |
-| `lob` | `Lore of the Bloodlines` | 1 | `Vampiro V20 - Dark Ages - Lore of the Bloodlines` |
-| `tos` | `Dark Ages Tome of Secrets` | 1 | `Vampiro V20 - Dark Ages - Tome of Secrets` |
-| `dac` | `Dark Ages Companion` | 1 | `Vampiro V20 - Dark Ages - Companion` |
-| `bh` | `The Black Hand: A Guide to the Tal’Mahe’Ra` | 1 | `Vampiro V20 - The Black Hand A Guide to the TalMaRahe` |
+| `core` | `Vampire: The Masquerade 20th Anniversary Edition` | **8** | `Vampiro/vampire the masquerade - 20th anniversary edition` |
+| `da` | `Vampire: The Dark Ages 20th Anniversary Edition` | 1 | `Vampiro/_Vampiro V20 - Dark Ages - Livro Base` |
+| `rob` | `Rites of Blood` | 1 | `Vampiro/Vampire V20 - Rites of Blood` |
+| `lotc` | `Lore of the Clans` | 1 | `Vampiro/Vampiro V20 - Lore of the Clans` |
+| `lob` | `Lore of the Bloodlines` | 1 | `Vampiro/Vampiro V20 - Dark Ages - Lore of the Bloodlines` |
+| `tos` | `Dark Ages Tome of Secrets` | 1 | `Vampiro/Vampiro V20 - Dark Ages - Tome of Secrets` |
+| `dac` | `Dark Ages Companion` | 1 | `Vampiro/Vampiro V20 - Dark Ages - Companion` |
+| `bh` | `The Black Hand: A Guide to the Tal’Mahe’Ra` | 1 | `Vampiro/Vampiro V20 - The Black Hand A Guide to the TalMaRahe` |
 | `gr` | `Ghouls & Revenants` | 1 | `Ghouls_and_Revnants_(Final_Download)` |
+| `anarch` | `Anarchs Unbound` | **1** | `Vampiro/Vampire V20 - Anarchs Unbound` — offset MEDIDO 2026-08-28. **12** qualidades/defeitos
+| `hh` | `The Hunters Hunted II` | **1** | `TheHuntersHunted_II_Revised_ (2)` — offset MEDIDO 2026-08-28. **42** qualidades/defeitos
+| `sorc` | `M20 Sorcerer` | 1 | `Sorcerer/M20 Sorcerer` — era `~\Downloads\M20 Sorcerer.pdf` até 2026-08-28 |
+| `sorcc` | `Sorcerer's Companion` | **0** | `Sorcerer/Sorcerer_s_Companion` — offset MEDIDO 2026-08-28. **ÚNICO livro com offset 0.** 7 qualidades/defeitos
+| `m20` | `Mage: The Ascension 20th Anniversary Edition` | **1** | `Mago/Mage - The Ascension` — offset MEDIDO 2026-08-28 (333 votos, rodapé `Chapter Six: Creating the Character 299` na pdf 300). **EM INGLÊS.** SUBSTITUI o `M20.pdf` PT, que o user trocou; a nota velha ("⊥ serve de fonte") CAIU
+| `w20` | `Werewolf: The Apocalypse 20th Anniversary Edition` | **2** | `Werewolf/Werewolf W20` — offset MEDIDO 2026-08-28 (46 votos, rodapé `298  WEREWOLF...` na pdf 300). EN. Antecedentes em **135-140**
+| `w20kin` | `W20 Kinfolk` | **1** | `Werewolf/Werewolf W20 - Kinfolk` — offset MEDIDO 2026-08-28. EN
+| `w20da` | `Lobisomem W20: A Idade das Trevas` | `?` | `Werewolf/Lobisomem W20 - A idade das Trevas` — **EM PORTUGUÊS** (0 "Merit", 26 "Antecedente"), 81 págs. Único do lote que ⊥ está em inglês. Offset ⊥ medido — ninguém precisou dele ainda
+| `m20va` | `M20 Victorian Age` | **1** | `Mago/M20_Victorian_Age_(Final_Download)` — offset MEDIDO 2026-08-28. **5** qualidades/defeitos
+| `bcm` | `Book of Common Magicks` | **2** | `Mago/Mage - Book of Common Magicks` — offset MEDIDO 2026-08-28. **0** qualidades/defeitos
+| `bos` | `Book of Secrets` | **1** | `Mago/Mage - Book of Secrets` — offset MEDIDO 2026-08-28. **245** qualidades/defeitos, o MAIOR de todos
+| `trel` | `Technocracy Reloaded` | **1** | `Mago/Mage - Technocracy Reloaded` — offset MEDIDO 2026-08-28. **0** qualidades/defeitos
+
+Os `?` de offset e de título dos 7 NOVOS são **honestos**: ninguém abriu esses PDFs ainda.
+Medir o offset antes de usar a página — a regra de sempre é `impressa = PDF − offset`, e
+chutar o offset põe página errada no bloco 1 de §I21, que é texto que o jogador lê.
 
 `core` · `da` · `rob` · `lotc` são os 4 títulos que §T444 já gravou no `HH.12.lfm` — copie
 a grafia de lá, ⊥ reinvente. `lob` & `bh` saem do rodapé corrido do próprio livro; `tos` &
@@ -84,8 +112,140 @@ contagem de termo antes de atribuir, nunca pelo nome do arquivo.
 5. **`Path of X` ⊥ é classificável por nome** (§R85). `The Path of Lilith` é moralidade,
    `The Nightshade Path` é Necromancy — mesmo prefixo. A dona vem da SEÇÃO onde o item
    mora, nunca do padrão do nome. Duas tentativas por nome falharam (§R75, §R82).
+6. **O Git Bash desta máquina ⊥ abre o caminho dos livros.** O `á` de `Máscara` chega ao
+   `pdftotext` como `M<e1>scara` e ele sai `I/O Error: Couldn't open file`. O caminho está
+   certo, o `ls` lista, e mesmo assim ⊥ abre. Duas saídas: **glob** —
+   `B=$(echo /c/Users/.../Vampiro\ -\ A\ M*scara/Books)` — ou **PowerShell**, onde o caminho
+   literal funciona. Registrado 2026-08-28 (§R126), e ela custou a 1ª tentativa da 125ª.
+7. **`Merit`/`Flaw` tem 7 notações, ⊥ 3** (§R125 dizia 3; as outras 4 foram MEDIDAS em
+   2026-08-28, ao rodar §T749). Um parser que conheça menos perde o resto **CALADO**:
+   1. `core` `lotc` `lob` `gr` `hh` `bh` `dac` `rob` `bos` `sorcc` — `Acute Sense (1pt. Merit)`
+   2. `anarch` — `Peacemaker (2-pt. Merit)`, **hífen** entre o número e `pt`. A 1ª varredura
+      deu **0** para este livro e as 12 sumiram sem aviso.
+   3. `tos` — o nome fica **na linha de cima** e a linha do custo vem sozinha:
+      `(3 pt. Supernatural Merit)`
+   4. `da` — `Ambidextrous (1 point):` + prosa, **sem dizer `Merit` nem `Flaw`**. O tipo vem do
+      cabeçalho de seção (`Physical Merits` / `Physical Flaws` / …), ⊥ da linha.
+   5. `sorc` — `Path Natural: (5 pt Merit)`, **dois-pontos ANTES** do parêntese.
+   6. `m20va` — `• Well-Rounded (1 pt. Mental Merit)`, com marcador antes do nome.
+   7. `m20va` — `• Construct (Social Flaw):` — **sem custo**, só a categoria.
+
+   Linha de SUMÁRIO termina no número da página que aponta (`(2 pt. Social Merit) 61`) e
+   ! ser descartada, senão o item entra 2×. Só no `lob` são 37 dessas.
+
+8. **LAYOUT DE 2 COLUNAS — RESOLVIDO na 135ª rodada.** O fim de um corpo só é confiável
+   quando se acha o **cabeçalho seguinte**, e em página de 2 colunas esse cabeçalho está na
+   OUTRA coluna, a centenas de linhas de distância na ordem de leitura. Era daí que vinham os
+   **17 corpos inchados** (`Simply Waiting` `lob` p.16 saía com **4425** chars contra os
+   **488** reais) e os **2 vazios** — a mesma doença pelos 2 lados.
+
+   **A cura: `pdftotext -layout` + corte na CALHA**, implementada em
+   `research/extract_merit_flaw.ps1` (`Find-Gutter` + `Split-Page`). O `-layout` põe as
+   colunas lado a lado na mesma linha, separadas por uma calha de espaços; o extrator acha a
+   calha **por página** (a coluna com o pico de brancura na faixa do meio), corta cada linha
+   nela e lê coluna esquerda inteira → coluna direita. Aí o cabeçalho seguinte volta a ficar
+   logo abaixo do corpo.
+
+   ⚠ O corte de brancura é **RELATIVO ao pico da própria página**, ⊥ fixo em 90%: coluna
+   justificada entra na calha de vez em quando, e um corte fixo perdia página boa (`dac`
+   p.100 chega só a **78%**, `bos` p.35 a **81%**) — e página perdida = colunas FUNDIDAS, que
+   é como `Tracker's Mark` e `Alcohol /Drug Tolerance` sumiam.
+
+   ⚠ O `-layout` **⊥ cola palavras**: **1397** coladas contra **1399** do modo padrão, medido
+   nos 15 livros. Nesse eixo os dois empatam.
+
+   Medido depois da reescrita: **774 linhas · 641 nomes · 0 corpo vazio · `Simply Waiting` =
+   488** · **714** corpos terminam no cabeçalho seguinte (o único fim confiável) e **46** no
+   corte por título. Sobram **14** duvidosos, listados pelo próprio script.
+
+9. **`-enc UTF-8` é OBRIGATÓRIO, & foi ele que quase saiu da receita por um defeito que era do
+   SCRIPT, ⊥ da flag.** Sem `-enc`, o pdftotext cai em Latin-1 & o travessão, a reticência & as
+   aspas duplas curvas viram **U+FFFD** dentro do corpo — losango preto no meio da frase que o
+   jogador LÊ. Com `-enc UTF-8` o texto sai `–` `…` `“ ”` como no livro.
+
+   ⚠ A versão ANTIGA do extrator PERDIA **15** entradas com `-enc UTF-8` — as que têm apóstrofo
+   (`Lawman's Friend` · `Sire's Resentment` · `Can't Cross Running Water` · `Betrayer's Mark` ·
+   `Dracon's Temperament` · `Methuselah's Thirst` · `Devil's Mark` · `Wolverine's Palate` ·
+   `Warrior's Heart` · `Tracker's Mark` · `Judge's Wisdom` · `The Bard's Tongue`) — & **783
+   linhas viravam 768 sem 1 aviso**. A causa ⊥ era a flag: era que o `.ps1` tinha os caracteres
+   curvos **LITERAIS** dentro dos regex & o **PowerShell 5.1 lê `.ps1` sem BOM como ANSI** ∴ o
+   `’` do regex chegava mojibake & ⊥ casava com o `’` do texto. O extrator de hoje monta os
+   regex a partir de `[char]0x2019`, é **100% ASCII**, & normaliza SÓ a aspa simples curva
+   (`U+2018`/`U+2019` → `'`) porque a chave canônica de `merit_flaw.tsv` usa a reta —
+   trocá-la orfanaria as 640 traduções. Travessão, reticência & aspa dupla FICAM.
+
+   **Regra: `.ps1` que casa texto de livro ! ser ASCII puro.** Caractere não-ASCII em regex de
+   script sem BOM ⊥ dá erro — dá SILÊNCIO.
+
+10. **O `tos` embaralha o dígito e o parêntese: `2( pt. Social Merit)`.** É a **8ª** notação,
+   descoberta em 2026-08-28. Sem desembaralhar, `Heretical Sympathizer`,
+   `Hunted by the Hierophants` e `Postulant of Echidna` somem do corpo do livro e só sobram os
+   pontos de SUMÁRIO deles (que apontam p/ a p.4 e trazem texto de índice como corpo). O
+   extrator normaliza `^(\d+)\(` → `($1 ` antes de casar.
+
+11. **Cabeçalho que QUEBRA em 2 linhas.** A coluna do `-layout` é estreita e 3 formas
+   aparecem: parêntese aberto que fecha na linha de baixo (`tos`: `Demonic Patron (5 pt.` /
+   `Supernatural Merit)`), nome cortado na barra (`bos`: `Esoteric Discourse /` /
+   `Technobabbler (...)`) e dois-pontos do `sorc` (`Isolated Upbringing:` / `(5 pt Merit)`).
+   Sem juntar, o item **some E o item de cima engole o corpo dele** — `Blasphemous Pact` ia de
+   963 p/ 1487 chars. O extrator junta o par quando o resultado casa o regex de cabeçalho, e
+   recusa quando ∃ 3+ espaços seguidos (ponto de sumário).
+
+12. **Cortar o corpo por "linha com cara de título" no corpus INTEIRO come 24% do texto bom.**
+   Tentado e revertido em 2026-08-28. O que FUNCIONA é aplicá-lo **só aos corpos que já se
+   sabem não confiáveis** — os que ⊥ acharam o cabeçalho seguinte. Nesses, o corte derrubou
+   `Plague of Demons` de 4686 p/ **527** (fim exato) e `Unholy Stain` de 3826 p/ **518**, sem
+   tocar em 1 char dos 714 corpos confiáveis.
 
 ## Comando de reextração
+
+### Os 15 livros de qualidade/defeito (T749/T751, reescrito na 135ª rodada)
+
+Passo 1 — despejar o texto. **`-layout -enc UTF-8`** (armadilhas 8 e 9). O Git Bash ⊥ abre
+o caminho com acento; rodar por PowerShell, que abre:
+
+```powershell
+$PT = "$env:ProgramFiles\Git\mingw64\bin\pdftotext.exe"
+$B  = (Get-ChildItem "$env:USERPROFILE\OneDrive\Documents\RPG\Storyteller V20\Vampiro" -Directory |
+       Where-Object { $_.Name -like "*scara*" } | Select-Object -First 1).FullName + "\Books"
+$out = "$env:TEMP\wod_books_layout"; New-Item -ItemType Directory -Force $out | Out-Null
+$all = Get-ChildItem $B -Recurse -Filter *.pdf
+# <codigo> = <nome do arquivo>, os 15 da tabela de offsets deste README
+foreach ($k in $books.Keys) { & $PT -layout -enc UTF-8 ($all | Where-Object { $_.Name -eq $books[$k] })[0].FullName "$out\$k.txt" }
+```
+
+Passo 2 — o parser: **`research/extract_merit_flaw.ps1`**, que já está no repo.
+
+```powershell
+powershell -File research\extract_merit_flaw.ps1 -TxtDir $env:TEMP\wod_books_layout -OutCsv $env:TEMP\mf.csv
+```
+
+Deve reproduzir **641 nomes distintos em 774 linhas**, `Simply Waiting` = **488** chars e
+**0** corpo vazio. Se ⊥ reproduzir, alguma coisa mudou — conferir antes de seguir.
+
+A coluna **`Stop`** do CSV diz POR QUE cada corpo parou, e é ela — ⊥ o comprimento — que
+separa o confiável do duvidoso:
+
+| `Stop` | n | o que significa |
+|---|---|---|
+| `head` | 714 | achou o cabeçalho da entrada seguinte. **Único fim confiável por construção** |
+| `cut` | 46 | parou por teto & o corte por título achou onde a seção acaba. Confiável na prática |
+| `sect` | 10 | bateu num cabeçalho de categoria (`Physical Merits`). **Conferidos 1 a 1: os 10 estão certos** |
+| `page` | 4 | atravessou 2 viradas de página. **2 inchados**, ver abaixo |
+
+**Os 2 corpos INCHADOS que sobraram** (⊥ têm cura mecânica; vão p/ `merit_flaw_overrides.tsv`
+com o texto do livro):
+
+- `Clear Sighted` (`bos` p.75, 6334 chars) — a calha falha na página seguinte, que é um quadro
+  de largura inteira, ∴ a cauda sai com as 2 colunas FUNDIDAS
+- `Stubborn Magic` (`sorcc` p.54, 921 chars) — a cauda cai num ANÚNCIO do livro
+  (`2 brand new Paths of Sorcery. 75+ new Rituals.`)
+
+Os corpos acima de 3000 chars que terminam em `head` ⊥ são defeito: `bos` e `gr` têm entradas
+longas de verdade (`Black and White` 6296, `Impediment` 6021, `Mayfly Curse` 5083). O
+comprimento sozinho ⊥ acusa nada — a coluna `Stop` acusa.
+
+
 
 ```bash
 export PATH="/mingw64/bin:$PATH"
@@ -197,3 +357,83 @@ bash research/rebuild_ritual_desc.sh "$SP"           # reescreve a tabela inteir
 `--split` é obrigatório na 1ª chamada da rodada, senão o rebuild apaga o que já estava lá.
 O script aborta sem tocar o `.lfm` em chave fora do mapa ou duplicada, e confere
 `[==[`/`]==]`, `]]>` == 1 e a ordem no fim. `--split` + rebuild devolve o arquivo byte a byte.
+
+
+## Antecedentes — do PDF ao `descBackground_*.lua` (§T765, 139ª rodada)
+
+**4 peças, em ordem. Nenhuma é opcional.**
+
+```powershell
+# 1. corpo EN, dos 4 livros. Aplica research/bg_body_overrides.tsv sozinho.
+research\bg_body.ps1 -Tsv research\bg_body_en.tsv -Out $env:TEMP\bg_raw.txt
+# 2. (a metade PT nao tem gerador: research/bg_body_pt.tsv e traducao escrita a mao)
+# 3. os 2 modulos, direto na raiz do plugin
+research\gen_bg_desc.ps1
+```
+
+| arquivo | papel |
+|---|---|
+| `bg_essence.tsv`, bloco `BG_PICK` | `<item do picker>\t<livro>\t<pág impressa>`, 47 linhas, 0 ambiguidade (§T764) |
+| `bg_body.ps1` | acha o cabeçalho, corta na calha, para no cabeçalho SEGUINTE, junta linha em parágrafo |
+| `bg_body_overrides.tsv` | **12** corpos consertados a mão — o script cai aqui só p/ o item listado |
+| `bg_body_en.tsv` | a saída, 47 linhas, `\n` de 2 chars = quebra de parágrafo |
+| `bg_body_pt.tsv` | a tradução, mesmas 47 chaves (§V210a cobra isso no `.lua`) |
+| `gen_bg_desc.ps1` | os 2 `.lua`, forma de §I21, **LF puro** (§V345) |
+
+**⚠ `bg_body_en.tsv` é REGENERÁVEL, `bg_body_pt.tsv` NÃO.** Reescrever o EN é rodar o script;
+reescrever o PT é traduzir 131 KB de novo. Se o EN mudar, o PT muda à mão junto — as chaves
+têm de bater 1:1 ou `gen_bg_desc.ps1` grava um módulo a menos & §V210a reprova.
+
+### As 4 armadilhas que esta bancada custou
+
+13. **`Find-Gutter` erra em página de 1 coluna com escada de bolinha.** `core` p.113 (o corpo
+    do `Domain`) é 1 coluna, mas a indentação da escada faz pico de brancura no meio & o corte
+    mandou as últimas palavras de 8 linhas p/ uma "coluna B" — buracos no meio da frase & 7
+    fragmentos órfãos no fim. **⊥ mexer na `Find-Gutter`**: é a mesma que `extract_merit_flaw`
+    usa nos 641 nomes. O caso vai p/ o override, que é o instrumento que ∃ p/ isso.
+14. **A de-hifenização come hífen de verdade.** `fami-`+`ly` (certo) e `name-`+`recognition`
+    (errado) são a mesma regra, & ⊥ ∃ dicionário aqui. O script IMPRIME todas as colagens no
+    fim & `$HYPHEN_KEEP` (10 palavras) desfaz as erradas. Colagem nova ! entra na lista.
+15. **`U+FFFD` no COMEÇO de linha é bolinha; no MEIO é acentuada.** O V20 core mapeia as 2 no
+    mesmo ponto. Trocar tudo escrevia `prot•g•` no lugar de `protégé` (core p.115, `Mentor`).
+    Só a corrida inicial vira bolinha; o resto sai no relatório & tem conserto NOMEADO.
+16. **Cabeçalho do M20 vem decorado** (`Enhancement $` · `Secret Weapons*` · `Totem $` ·
+    `Sanctum/ Laboratory $`) & o `Wonder` é `Wonder (Device/ Fetish/ Talisman, etc.)`. O `Bare`
+    tira a decoração — mas veja a armadilha de PowerShell abaixo, que é como ele falhou calado.
+
+### A armadilha de PowerShell que fez os 4 sumirem calados
+
+**A vírgula liga mais forte que o `+` no operando direito de `-replace`.**
+
+```powershell
+$t -replace '[\*\$' + $x + ']+$', ''   # vira -replace @('[\*\$'+$x+']+$'+''): 1 argumento so
+$pat = '[\*\$' + $x + ']+$'; $t -replace $pat, ''   # o jeito certo
+```
+
+O 1º **⊥ dá erro** — devolve a string intacta. Foi assim que 4 dos 47 antecedentes ⊥ acharam
+cabeçalho. Padrão montado por concatenação vai p/ **variável** antes, sempre.
+
+## `gen_desc_system.ps1` — o bloco `System` dos 8 módulos de poder (§T768)
+
+```powershell
+research\gen_desc_system.ps1 -OutDir $env:TEMP\descgen        # SO MEDE
+research\gen_desc_system.ps1 -OutDir $env:TEMP\descgen -Apply # grava por cima dos 8
+```
+
+Fonte = os `.lua` INSTALADOS, ⊥ o PDF: os 3 blocos de §I21 já estão lá & o texto já foi
+conferido rodada a rodada. Só o RECORTE do bloco 3 muda.
+
+**2 formas, ⊥ 1** (§I104e, §R133): `descDisc`/`descPath`/`descRitual` escrevem `System:` com
+dois-pontos DENTRO de cada nível ∴ o recorte é por nível, do marcador p/ baixo.
+**`descNumina` é o INVERSO**: `System` é cabeçalho de seção, linha sozinha, sem dois-pontos, &
+os níveis moram DENTRO dela ∴ o recorte é do cabeçalho até o fim da entrada.
+
+**A escada de bolinha decide o que é NÍVEL**: nível é a bolinha SEGUINTE da escada (1, 2, 3…).
+`Auspex` põe `• Obfuscate:` `• Chimerstry:` `• Other Powers:` como LISTA dentro do `System` de
+um nível; contadas como nível, elas cortam o `System` do dono no meio.
+
+**Escreve em LF** (§V345, §B87) — a versão velha devolvia CRLF só no bloco reescrito, que é o
+arquivo quebrando linha de 2 jeitos & o `diff` mentindo sobre a rodada.
+
+A trava de §B88 segue armada: área que render **0** recorte recusa o `-Apply` & ⊥ toca nenhum
+dos 8. As exceções de §I104c saem em `-OutDir\excecoes.tsv` — são elas que §V335c pede.

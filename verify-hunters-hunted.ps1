@@ -341,7 +341,16 @@ else { Pass "V36 all $($mirrors.Count) declared mirrors really are mirrored" }
 # player by having no widget at all, so the usual "some input owns it" test reads it as a dead
 # link (SPEC B25). The list is closed and declared in SPEC I3 - a name has to be put here on
 # purpose, which is not the same as letting any unowned field through.
-$luaOwned = @('baseline', 'xpTotal', 'xpFree', 'xpManual', 'xpOrder')
+$luaOwned = @('baseline', 'xpTotal', 'xpFree', 'xpManual', 'xpOrder', 'descFontSize')
+
+# The floating overlays (SPEC I102a, T760). They are <layout> boxes wearing the same black
+# rectangle every section box wears, so V40's neighbour rule and V280/V298's 5px ruler both
+# sweep them up - and neither sentence is true of one: an overlay is drawn OVER the grid on
+# purpose, and it has no neighbour to stand 5px from. Named and not pattern-matched, for
+# V328c's reason - a wildcard would excuse the next box that is simply in the wrong place.
+# Both sites below COUNT what they skipped and fail on a count that is not the list's own
+# length, so the exclusion cannot go quiet the way B7 describes.
+$OVERLAY_BOXES = @('popDesc', 'mfSearch')
 foreach ($l in $linkFields) {
     if ($allFields.ContainsKey($l.Field)) { Pass "V8 dataLink '$($l.Field)' observes a real field" }
     elseif ($luaOwned -contains $l.Field) { Pass "V8 dataLink '$($l.Field)' observes a declared Lua-owned field (SPEC I3)" }
@@ -528,6 +537,14 @@ foreach ($f in $files) {
             $v = $n.GetAttribute($a)
             if (-not $v -or $v -match '\$\(' -or $v.Trim() -eq '') { continue }
             if ($n.LocalName -in @('label','checkBox','button') -or $a -eq 'nome') {
+                # The ? of the description buttons is the ONE declared exception (SPEC I102b),
+                # and it is the numeral precedent of V17 again: punctuation is not language, it
+                # is the SAME glyph in both halves, and wod.?=? would be a translation entry no
+                # translator can change. Narrow on purpose - only a btnQ* button whose whole text
+                # is the single question mark opts out, so every other untranslated button still
+                # fails exactly as it did. A wildcard here would be B7 arriving through the
+                # exception door, which is the mistake V15's comment names twenty lines below.
+                if ($n.LocalName -eq 'button' -and $v.Trim() -eq '?' -and $n.GetAttribute("name") -like 'btnQ*') { continue }
                 [void]$visible.Add($v.Trim())
                 if ($v -match '   ') { $padded += "$($f.Name): '$v'" }   # 3+ spaces
             }
@@ -588,14 +605,25 @@ foreach ($l in $listReport) {
     # default, not prose to be cleared - there is no such thing as a sheet with no theme.
     # cboGame joined it in the 32nd round for the same reason and one more: it is locked, so an
     # empty row would be a value nobody could get back out of (SPEC V109).
-    if ($l.Name -like '*cboSheetTheme*' -or $l.Name -like '*cboGame*') { Pass "V15 $($l.Name) n/a - state combo with a default (declared exception)" }
+    # cboRoad joined in the 125th round (SPEC V328d): a character with no road IS on Humanity,
+    # so there is no empty road to clear back to. Named one by one on purpose - a wildcard that
+    # let any combo opt out would kill V15 for the thirty-odd pickers that do need the empty
+    # row, which is B7 arriving through the exception door.
+    if ($l.Name -like '*cboSheetTheme*' -or $l.Name -like '*cboGame*' -or $l.Name -like '*cboRoad*') { Pass "V15 $($l.Name) n/a - state combo with a default (declared exception)" }
     elseif ($l.Items[0] -eq '') { Pass "V15 $($l.Name) starts empty" } else { Fail "V15 $($l.Name) first entry is '$($l.Items[0])', expected empty" }
+    # V328b/c: the road combo's default and its leading item are the SAME literal, and both are
+    # `Humanity`. Two owners for one default is how B70 started, so they are compared, not
+    # assumed - and the zero-guard is that cboRoad reached this loop at all (named below).
+    if ($l.Name -like '*cboRoad*') {
+        if ($l.Items[0] -ne 'Humanity') { Fail "V328c cboRoad leads on '$($l.Items[0])', not the Humanity SPEC I99b declares" }
+        else { Pass "V328c cboRoad leads on Humanity, the declared V15 exception" }
+    }
 }
 
 # The three checks above are only worth as much as what the collector saw: a picker named
 # without the `cbo` prefix, or one that lost its inline `items=`, drops out of $listReport
 # and every check on it becomes a silent no-op (SPEC V20 / B.7). Name the new ones.
-foreach ($must in @('WoD20.6.lfm/cboGame','WoD20.7.lfm/cboHedgeAttr','WoD20.6.lfm/cboSheetTheme')) {
+foreach ($must in @('WoD20.6.lfm/cboGame','WoD20.7.lfm/cboHedgeAttr','WoD20.6.lfm/cboSheetTheme','WoD20.1.lfm/cboRoad')) {
     if ($listReport | Where-Object { $_.Name -eq $must }) { Pass "V14/V15/V17 $must reaches the list checks" }
     else { Fail "V14/V15/V17 $must was never collected - its list is unchecked" }
 }
@@ -809,6 +837,7 @@ else { Pass "V37 no sibling row draws over its neighbour" }
 $boxHits = @()
 $boxCount = 0
 $paneByRect = 0
+$v40Overlay = 0
 foreach ($f in $files) {
     $xml = Doc $f.FullName
     foreach ($sb in $xml.SelectNodes("//scrollBox")) {
@@ -835,6 +864,7 @@ foreach ($f in $files) {
         }
         foreach ($bx in $sb.SelectNodes("layout")) {
             if ($bx.SelectSingleNode("import")) { continue }
+            if ($OVERLAY_BOXES -contains $bx.GetAttribute("name")) { $v40Overlay++; continue }
             $pk = "$($bx.GetAttribute('left'))/$($bx.GetAttribute('top'))/$($bx.GetAttribute('width'))/$($bx.GetAttribute('height'))"
             if ($paneRect.ContainsKey($pk) -and $paneRect[$pk] -gt 1) { $paneByRect++; continue }
             $bl = 0; $bt = 0; $bw = 0; $bh = 0
@@ -859,7 +889,8 @@ foreach ($f in $files) {
 }
 if ($boxHits) { foreach ($o in ($boxHits | Sort-Object -Unique)) { Fail "V40 $o" } }
 elseif ($boxCount -eq 0) { Fail "V40 measured zero boxes - the check reads nothing (SPEC V20)" }
-else { Pass "V40 none of the $boxCount positioned boxes draws over its neighbour" }
+elseif ($v40Overlay -ne $OVERLAY_BOXES.Count) { Fail "V40 $v40Overlay overlay box(es) were skipped, expected $($OVERLAY_BOXES.Count) - the exclusion is reading a name nothing carries, and the next overlay would be weighed against the grid it is drawn over (SPEC V20, B7)" }
+else { Pass "V40 none of the $boxCount positioned boxes draws over its neighbour, and $v40Overlay overlay(s) were cut out of the weighing" }
 
 # ---- V38: a checkBox with text needs the same width check as a label (SPEC B17) ---
 # V16 only ever looked at //label. "Wounded (-2)" is "Ferido Gravemente (-2)" in pt, ~143px,
@@ -1150,7 +1181,11 @@ elseif ($corners.Count -gt 1) {
 # HEALTH_BOX_PAD 79 -> 49) put it ABOVE. Two rounds move this literal for two different
 # reasons - T682 raised the line to 852 and T683 shortened the box to 823 - so a pass that
 # leaves it stale fails here rather than somewhere quieter (SPEC V69, V49).
-$HEALTH_TEN_ROW_OVERHANG = -29
+# -29 until the 125th round, when the bottom line went 852 -> 878 to seat the ROAD box
+# (SPEC I99i, I99j). HEALTH did NOT move - it is the declared exception that does not close
+# on the line - so the gap it sits at grew by exactly the 26 the line rose: -29 - 26 = -55.
+# The literal is the whole point: it moves only with a round behind it, never on its own.
+$HEALTH_TEN_ROW_OVERHANG = -30   # a linha desceu 878 -> 853 em T801 e o box do HEALTH nao se mexeu (SPEC I99l, V49)
 $mainRawForMap = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.1.lfm")))
 $mapY = [regex]::Match($mainRawForMap, 'Everything closes on x=\d+ / y=(\d+)')
 $mainDocV69 = Doc (Join-Path $dir "WoD20.1.lfm")
@@ -1166,7 +1201,7 @@ foreach ($bx in $mainDocV69.SelectNodes("//scrollBox/layout")) {
 }
 $avatarImg = @($mainDocV69.SelectNodes("//scrollBox/image[@field='avatar']"))[0]
 $avatarBottom = if ($avatarImg) { [int]$avatarImg.GetAttribute("top") + [int]$avatarImg.GetAttribute("height") } else { -1 }
-$closers = @("HUMANITY", "SPECIALTIES")
+$closers = @("ROAD", "SPECIALTIES")
 $missing = @($closers | Where-Object { -not $mainBottom.ContainsKey($_) })
 if (-not $mapY.Success) { Fail "V69 the tab's grid comment no longer says where the tab closes - the ruler would be a literal in the gate again (SPEC V20)" }
 elseif ($missing.Count -gt 0) { Fail "V69 $($missing -join '/') not found on WoD20.1 - the check measured nothing (SPEC V20)" }
@@ -1179,7 +1214,7 @@ else {
     if ($avatarBottom -ne $line) { $off += "the avatar ends at $avatarBottom" }
     if ($off.Count -gt 0) { Fail "V69 the map says the tab closes on y=$line but $($off -join ', ') - the Main bottom row must close on one line" }
     elseif (($mainBottom["HEALTH"] - $line) -ne $HEALTH_TEN_ROW_OVERHANG) { Fail "V69 HEALTH sits $($mainBottom['HEALTH'] - $line)px off the line, not the $HEALTH_TEN_ROW_OVERHANG px the ten-row case is allowed (SPEC V49)" }
-    else { Pass "V69 HUMANITY, SPECIALTIES and the avatar all close on y=$line; HEALTH sits the declared $HEALTH_TEN_ROW_OVERHANG px off it at ten rows" }
+    else { Pass "V69 ROAD, SPECIALTIES and the avatar all close on y=$line; HEALTH sits the declared $HEALTH_TEN_ROW_OVERHANG px off it at ten rows" }
 }
 
 # ---- V309: the avatar FRAME tracks the avatar IMAGE (SPEC I82d, V309, B71) ------------
@@ -1574,6 +1609,14 @@ elseif ($hh6 -notmatch 'pickerItems\(c, \(sheet ~= nil and sheet\.language\) or 
 elseif ($hh6 -match 'dataLink[^>]*field="sheetTheme"[^>]*pickerItems') { Fail "V194 a second era trigger was added - the era must ride applyTheme's own walk (SPEC T469)" }
 else { Pass "V194 one reader of ERA_NAME, called from both switches, with no era trigger of its own" }
 
+# The ONE named width exception on the sheet, read by V196 and by V312c and asserted by V351d
+# (SPEC C Q27, I99m). Q27 put the ROAD label on the combo's own line, which is 25px of height
+# off three boxes and leaves the combo 239 where the ruler wants 246/265. MEASURED: exactly one
+# item of the 55 clips, and the next longest wants 204. A NAME and never a wildcard - a pattern
+# here would take the ruler off the other sixteen pickers in one line, which is B7 arriving
+# through the exception door. ONE list because two would age apart (SPEC V135).
+$NARROW_OK = @('cboRoad')
+
 # ---- V196: a picker must be wide enough for what it offers (SPEC B43) ---------------
 # V16 has measured //label since the first round and never once looked at a comboBox, so
 # every picker on the sheet went 58 rounds unmeasured. That was survivable while the lists
@@ -1624,7 +1667,7 @@ foreach ($f in $files) {
         foreach ($it in $shown) { $n = NeededPx $it $cbSize; if ($n -gt $need) { $need = $n; $worst = $it } }
         $need += $ARROW
         $id = $cb.GetAttribute("name"); if (-not $id) { $id = $cb.GetAttribute("field") }; if (-not $id) { $id = 'comboBox' }
-        if ($need -gt $w) { $comboNarrow += "$($f.Name): picker $id is ${w}px but '$worst' (pt '$($ptVal[$worst])') needs ~${need}px - a comboBox clips, it does not wrap" }
+        if ($need -gt $w -and $NARROW_OK -notcontains $id) { $comboNarrow += "$($f.Name): picker $id is ${w}px but '$worst' (pt '$($ptVal[$worst])') needs ~${need}px - a comboBox clips, it does not wrap" }
     }
 }
 # Two zero-guards, and neither is a control count: the old one asked whether ANY combo had
@@ -2385,7 +2428,13 @@ foreach ($f in $files) {
             $enclosing = $lines[$j]
             break
         }
-        if ($null -eq $enclosing -or $enclosing -notmatch '(?:^|\s)function\b') {
+        # \bfunction\b and not (?:^|\s)function\b: the enclosing header can be ANONYMOUS -
+        # setTimeout(function() is a function body every bit as much as unction mfOpen( is,
+        # and I112e puts the descMerit require inside exactly that one. The old form asked for a
+        # space before the word and so read setTimeout(function() as NOT a function, which
+        # reddens correct code. The mutation this leg exists for is untouched: at the top of the
+        # CDATA the shallower line is <![CDATA[, which carries no unction either way.
+        if ($null -eq $enclosing -or $enclosing -notmatch '\bfunction\b') {
             $reqBad += "$($f.Name):$($i + 1) '$($lines[$i].Trim())' sits outside a function body - it would run on every sheet open (SPEC I24, V198)"
         }
     }
@@ -2506,11 +2555,24 @@ else { Pass "V189 all $($descModules.Count) description module(s) return one tab
 # of an entry -> green, because the shape of the text belongs to V192 and V273, not here.
 $v210Bad = @()
 $v210Keys = 0
-foreach ($a210 in @(
+# quantas entradas cada metade carrega, medido AQUI e lido por V335e: a regeneracao de T768
+# reescreve o bloco 3 dos 8 e uma entrada que sumisse no caminho passaria em V210a (as duas
+# metades cairiam juntas) e so apareceria numa contagem.
+$v210Count = @{}
+# descMerit joined the list in T751: it is the fifth area and it is generated, which is
+# exactly why leg (a) has to cover it - the generator writes the [pt] half only when all
+# bodies are translated, and this is the check that says so about the SHIPPED file.
+# descBackground is the sixth, from T765, and it is generated the same way. The list is
+# LITERAL on purpose: an area that nobody adds here is an area born outside V210, which is
+# how descMerit would have shipped unchecked in T751.
+$v210Areas = @(
     @('descDisc', 'DISC_DESC'),
     @('descNumina', 'DESC'),
     @('descPath', 'PATH_DESC'),
-    @('descRitual', 'RITUAL_DESC'))) {
+    @('descRitual', 'RITUAL_DESC'),
+    @('descMerit', 'MERIT_DESC'),
+    @('descBackground', 'BACKGROUND_DESC'))
+foreach ($a210 in $v210Areas) {
     $half210 = @{}
     $gone210 = $false
     foreach ($lang210 in @('en', 'pt')) {
@@ -2523,6 +2585,7 @@ foreach ($a210 in @(
         continue
     }
     $v210Keys += $half210['en'].Count
+    foreach ($lang210 in @('en', 'pt')) { $v210Count["$($a210[0])|$lang210"] = $half210[$lang210].Count }
     $set210 = @{}
     foreach ($lang210 in @('en', 'pt')) {
         $s = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
@@ -2553,7 +2616,382 @@ foreach ($f210 in $files) {
 }
 if ($v210Req -eq 0) { $v210Bad += "no .lfm builds a description module name out of the language - leg (b) read nothing and would pass on anything (SPEC V209, B7)" }
 if ($v210Bad) { foreach ($b210 in $v210Bad) { Fail "V210 $b210" } }
-else { Pass "V210 four areas in eight modules, $v210Keys entries keyed alike on both sides, and all $v210Req require(s) name the half by language" }
+else { Pass "V210 $($v210Areas.Count) areas in $($v210Areas.Count * 2) modules, $v210Keys entries keyed alike on both sides, and all $v210Req require(s) name the half by language" }
+
+# ---- V335: a power description carries the System block and no prose (SPEC I104, T768) ----
+# T768 rewrote block 3 of the eight power modules to hold only the mechanics: the discipline's
+# introductory prose and each level's narrative prose came out, and what the book prints under
+# `System:` stayed (SPEC I104b). This check is what stops that regeneration from being undone,
+# and from having eaten something on the way in.
+#
+# Five legs plus the zero-guard:
+#   (a) blocks 1 and 2 of I21 survived VERBATIM - three blocks and block 2 is still the key;
+#   (b) every LEVEL block (the one that opens with a dot) carries the system marker - `System`
+#       in _en, `Sistema` in _pt. A level block without it is either prose that stayed or
+#       mechanics that went, and both are errors;
+#   (c) the exception is a NAMED, FINITE list, written out below and MEASURED by
+#       research/gen_desc_system.ps1 - never an `if empty then skip`. A name on the list that
+#       no longer fires is stale and reddens too, so the list cannot rot into a blanket pardon;
+#   (d) no entry with an EMPTY block 3 - V210a catches an entry that VANISHED, not one that
+#       went hollow, and hollow is exactly what a bad cut produces (Q9);
+#   (e) the entry count per file has not dropped below the number T768 measured - a LITERAL,
+#       because V210a counts the same files in the same run: an entry deleted from BOTH halves
+#       keeps V210a green and only a fixed number sees it (SPEC B7).
+#
+# descNumina is the INVERSE form and leg (b) knows it (SPEC I104e, R133): there `System` is a
+# section HEADER on a line of its own, without the colon, and the dot levels live INSIDE it
+# next to `Modifiers:` `Time:` `Duration:` `Effects:` `Price of Failure:`. When block 3 opens
+# with that header the whole block IS the mechanics and there is nothing to ask per level.
+# Reading I104b onto descNumina is what would have wiped the mechanics off 50 numina in
+# silence, which is why gen_desc_system.ps1 refused -Apply until the rule was written.
+#
+# The LADDER is why a bullet is not automatically a level: a level header is the NEXT dot of
+# the ladder (1, then 2, then 3). `Auspex` puts `* Obfuscate:` `* Chimerstry:` `* Other
+# Powers:` as a LIST inside one level's System, and `Sanguinus` and `Grave~s Decay` do the
+# same. Counting those as levels cut the owner's System in half (SPEC R133, I104c(i)).
+#
+# Mutation (SPEC V20): drop the `System:` line out of one level -> red on (b); blank one
+# entry's block 3 -> red on (d); delete an entry from one module -> red on (e); take one name
+# off the list below while its entry still lacks the marker -> red on (b); leave a name on the
+# list whose entry now carries the marker -> red on (c).
+$v335Bad = @()
+$DOT335 = [char]0x2022
+# `~` stands for the curly apostrophe: this file is 100% ASCII on purpose, because PowerShell
+# 5.1 reads a .ps1 without BOM as ANSI and a literal accented char in a comparison arrives
+# mojibake and fails SILENTLY (SPEC B84). Nothing in these names is a real tilde.
+$v335ExcRaw = @'
+descDisc|Abyss Mysticism
+descDisc|Assamite Sorcery
+descDisc|Dark Thaumaturgy
+descDisc|Flight
+descDisc|Koldunic Sorcery
+descDisc|Setite Sorcery
+descDisc|Thaumaturgy
+descNumina|Animal Psychics
+descNumina|Anti-Psychic
+descNumina|Astral Projection
+descNumina|Biocontrol
+descNumina|Channeling
+descNumina|Clairvoyance
+descNumina|Cyberkinesis
+descNumina|Cyberpathy
+descNumina|Ectoplasmic Generation
+descNumina|Mind Shields
+descNumina|Precognition
+descNumina|Psychic Healing
+descNumina|Psychic Hypnosis
+descNumina|Psychic Invisibility
+descNumina|Psychic Vampirism
+descNumina|Psychokinesis
+descNumina|Psychometry
+descNumina|Psychoportation
+descNumina|Pyrokinesis
+descNumina|Shadow
+descNumina|Synergy
+descNumina|Telepathy
+descNumina|True Faith
+descPath|Iter Pernix
+descPath|Lure of Flames
+descPath|Movement of the Mind
+descPath|Rego Calatio
+descPath|The Covenant of Enki
+descPath|The Fires of the Inferno
+descPath|The Flow of Ashe
+descPath|The Hand of the Magi
+descPath|The Keeper~s Way
+descPath|The Laws of Suleiman
+descPath|The Path of Jinn~s Gift
+descPath|The Path of Life~s Waters
+descPath|The Path of Praapti
+descPath|The Path of the Ailing Jackal
+descPath|The Revelations of Eden
+descPath|The Taking of the Spirit
+descPath|The Way of the Spirit
+descPath|Ushabti
+descPath|Weather Control
+descRitual|1. Ambrus Kelemen~s Aegis
+descRitual|1. Call of the Hungry Dead
+descRitual|1. Eldritch Beacon
+descRitual|1. Final Sight
+descRitual|1. Foxfire
+descRitual|1. Insight
+descRitual|1. Knowing Stone
+descRitual|1. Memento Mori
+descRitual|1. Minestra di Morte
+descRitual|1. Preserve Corpse
+descRitual|1. Rite of Introduction
+descRitual|1. Ritual of Return
+descRitual|1. Ritual of the Smoking Mirror
+descRitual|1. Shew-Stone
+descRitual|1. Strength of Haqim
+descRitual|1. Tame the Maddening Flame
+descRitual|2. Antonius~s Denial
+descRitual|2. Banning Rituals
+descRitual|2. Blade of Smoke and Shadow
+descRitual|2. Blood Calls to Blood
+descRitual|2. Commune with Cainite
+descRitual|2. Eyes of the Grave
+descRitual|2. Flaming Weapon
+descRitual|2. Generation of the Acheron Vortex
+descRitual|2. Haunting Breeze
+descRitual|2. Occhio d~Uomo Morto
+descRitual|2. Prepare the Vessel
+descRitual|2. Puppet
+descRitual|2. Summon Guardian Spirit
+descRitual|2. The Hand of Glory
+descRitual|2. The Ritual of Pochtli
+descRitual|2. Totenpass
+descRitual|2. Two Centimes
+descRitual|2. Ward
+descRitual|2. Witch Eye
+descRitual|2. Witness of Whispers
+descRitual|3. A Shield of Mirror
+descRitual|3. Animated Assistants
+descRitual|3. Balthazar~s Revelation
+descRitual|3. Bind the Familiar
+descRitual|3. Blood Dance
+descRitual|3. Death~s Head
+descRitual|3. Din of the Damned
+descRitual|3. Displacement of the Pneuma
+descRitual|3. Divine Sign
+descRitual|3. Nightmare Drums
+descRitual|3. Ritual of The Unearthed Fetter
+descRitual|3. Samira~s Kihanah
+descRitual|3. Scry the Hearthstone
+descRitual|3. Strength in Wisdom
+descRitual|3. Tempesta Scudo
+descRitual|3. The Third Eye of Rickard Argentis
+descRitual|3. Wield the Spear of Damnation
+descRitual|4. Animated Weapon
+descRitual|4. Baleful Doll
+descRitual|4. Bastone Diabolico
+descRitual|4. Cadaver~s Touch
+descRitual|4. Candle of Haunting
+descRitual|4. Impregnable Soul
+descRitual|4. Invisible Chains of Binding
+descRitual|4. Peek Past the Shroud
+descRitual|4. Rebirth in the Light of Haqim
+descRitual|4. Return of the Heart
+descRitual|4. Ritual of Xipe Totec
+descRitual|4. Vision of St. Anthony
+descRitual|5. Cheat the Scale of Hades
+descRitual|5. Chill of Oblivion
+descRitual|5. Dead Man~s Hand
+descRitual|5. Dedicate the Haven
+descRitual|5. Enochian Passage
+descRitual|5. Esilio
+descRitual|5. From Marduk~s Throat
+descRitual|5. Grasp the Ghostly
+descRitual|5. Occlude the Western Road
+descRitual|5. Orphic Sojourn
+descRitual|5. Ravening Walls of Ceoris
+descRitual|5. Rickard Argentis~s Homunculus
+descRitual|5. Rite of Marduk Slain and Risen
+descRitual|5. Stone Slumber
+descRitual|5. Treasures of Hades
+descRitual|7. Evocation of the Oubliette
+descRitual|8. Lord Aludian~s Claim
+'@
+$v335Exc = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+foreach ($l335 in ($v335ExcRaw -split "`r?`n")) {
+    $t335 = $l335.Trim()
+    if ($t335 -eq '') { continue }
+    [void]$v335Exc.Add($t335.Replace('~', [char]0x2019))
+}
+$v335Seen = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+# Quantas entradas cada modulo tem, MEDIDO por research/gen_desc_system.ps1 ao regenerar em
+# T768. Literal de proposito - ver o comentario da perna (e) mais abaixo.
+$v335Expect = @{ descDisc = 36; descNumina = 50; descPath = 64; descRitual = 284 }
+$v335Entries = 0
+$v335Blocks = 0
+$v335Inverse = 0
+foreach ($a335 in @(@('descDisc', 'DISC_DESC'), @('descNumina', 'DESC'), @('descPath', 'PATH_DESC'), @('descRitual', 'RITUAL_DESC'))) {
+    foreach ($lang335 in @('en', 'pt')) {
+        $ent335 = DescEntries (Join-Path $plugin "$($a335[0])_$lang335.lua") $a335[1] $lang335
+        if ($null -eq $ent335 -or $ent335.Count -eq 0) {
+            $v335Bad += "$($a335[0])_$lang335.lua parsed to nothing - the module or its $($a335[1]) markers are gone and every leg below would pass on an empty list (SPEC V209)"
+            continue
+        }
+        # (e) a contagem tem de bater com o LITERAL medido em T768. Comparar so com V210a seria
+        # NO-OP (SPEC B7): V210 conta os MESMOS arquivos na MESMA rodada, entao uma entrada
+        # apagada das duas metades derruba as duas contagens juntas e nada acende. O literal e
+        # o unico lado da comparacao que nao anda junto com o artefato. A checagem contra V210a
+        # fica, mas com outro papel: as duas leituras tem de CONCORDAR, senao um dos dois
+        # parsers esta lendo o arquivo errado.
+        $k335 = "$($a335[0])|$lang335"
+        if ($ent335.Count -lt $v335Expect[$a335[0]]) {
+            $v335Bad += "$($a335[0])_$lang335.lua holds $($ent335.Count) entries and T768 measured $($v335Expect[$a335[0]]) - the regeneration lost one, and V210a cannot see it because both halves fell together (SPEC V335e)"
+        }
+        if ($v210Count.ContainsKey($k335) -and $ent335.Count -ne $v210Count[$k335]) {
+            $v335Bad += "$($a335[0])_$lang335.lua counts $($ent335.Count) here and $($v210Count[$k335]) in V210 - the two parsers disagree about the same file (SPEC V209)"
+        }
+        $mk335 = $(if ($lang335 -eq 'en') { 'System' } else { 'Sistema' })
+        foreach ($e335 in $ent335) {
+            $v335Entries++
+            $body335 = $e335.Body -replace "`r", ''
+            $bl335 = $body335 -split "`n`n`n"
+            if ($bl335.Count -lt 3) {
+                $v335Bad += "$($a335[0])_$lang335.lua '$($e335.Key)' has $($bl335.Count) block(s) - the regeneration ate the source header or the name (SPEC V335a, I104a)"
+                continue
+            }
+            if ($bl335[1] -cne $e335.Key) {
+                $v335Bad += "$($a335[0])_$lang335.lua '$($e335.Key)' opens block 2 with '$($bl335[1])' - block 2 is the key, VERBATIM (SPEC V335a, I104a)"
+            }
+            $b3335 = ($bl335[2..($bl335.Count - 1)] -join "`n`n`n")
+            if ($b3335.Trim() -eq '') {
+                $v335Bad += "$($a335[0])_$lang335.lua '$($e335.Key)' has an EMPTY block 3 - V210a sees the key and passes; a hollow entry is what a bad cut leaves behind (SPEC V335d)"
+                continue
+            }
+            $lines335 = $b3335 -split "`n"
+            # A forma INVERSA do descNumina: o bloco 3 abre com o cabecalho `System` sozinho e
+            # a secao inteira e mecanica (SPEC I104e, R133).
+            if ($lines335[0].Trim() -ceq $mk335) { $v335Inverse++; $v335Blocks++; continue }
+            $heads335 = @()
+            $want335 = 1
+            for ($i335 = 0; $i335 -lt $lines335.Count; $i335++) {
+                $mm335 = [regex]::Match($lines335[$i335], '^(' + $DOT335 + '+) \S')
+                if (-not $mm335.Success) { continue }
+                if ($mm335.Groups[1].Value.Length -ne $want335) { continue }
+                $heads335 += $i335
+                $want335++
+            }
+            $ex335 = "$($a335[0])|$($e335.Key)"
+            $rxMk335 = '(?m)^' + [regex]::Escape($mk335) + ':'
+            $chunks335 = @()
+            if ($heads335.Count -eq 0) { $chunks335 += $b3335 }
+            else {
+                for ($h335 = 0; $h335 -lt $heads335.Count; $h335++) {
+                    $s335 = $heads335[$h335]
+                    $z335 = $(if ($h335 -lt ($heads335.Count - 1)) { $heads335[$h335 + 1] - 1 } else { $lines335.Count - 1 })
+                    $chunks335 += (@($lines335[$s335..$z335]) -join "`n")
+                }
+            }
+            foreach ($c335 in $chunks335) {
+                $v335Blocks++
+                if ($c335 -match $rxMk335) { continue }
+                if ($v335Exc.Contains($ex335)) { [void]$v335Seen.Add($ex335); continue }
+                $head335 = ($c335 -split "`n")[0]
+                if ($head335.Length -gt 48) { $head335 = $head335.Substring(0, 48) + '...' }
+                $v335Bad += "$($a335[0])_$lang335.lua '$($e335.Key)' has a block with no $mk335 marker ('$head335') and is not on the I104c list - either the prose stayed or the mechanics went (SPEC V335b)"
+            }
+        }
+    }
+}
+# (c) a lista nao pode apodrecer: nome que nunca dispara e perdao em branco esperando a
+# proxima entrada cair nele por acidente.
+foreach ($x335 in $v335Exc) {
+    if (-not $v335Seen.Contains($x335)) {
+        $v335Bad += "V335c list names '$($x335.Replace([char]0x2019, [char]0x27))' but that entry carries the marker now (or no longer exists) - a pardon nobody uses is a pardon waiting for the wrong entry (SPEC V335c)"
+    }
+}
+if ($v335Entries -eq 0 -or $v335Blocks -eq 0) {
+    $v335Bad += "V335 measured $v335Entries entry(ies) and $v335Blocks block(s) - zero on either side means this check verified nothing (SPEC V209, B7)"
+}
+if ($v335Bad) { foreach ($b335 in $v335Bad) { Fail "V335 $b335" } }
+else { Pass "V335 $v335Entries power descriptions across 8 modules keep blocks 1 and 2, none hollow, and all $v335Blocks mechanics block(s) carry the System marker - $v335Inverse of them in the descNumina section form (SPEC I104e) and $($v335Exc.Count) named I104c exceptions, every one of them still firing" }
+
+# ---- V346: pickerItems keeps the SAVED value in EVERY picker's list (SPEC V200, B91) ----
+# The user's report was "the dropdown choices are not being saved - I close the sheet, reopen
+# it and they are gone". Nothing was lost: pickerItems built `field` INSIDE `if filter then`
+# and `current` reads from `field`, so for the fourteen unfiltered roots `current` was nil and
+# V200's rule - the row's own value stays in the list however illegal it has become - had no
+# executor. While no list changed its TEXT there was no symptom, because the saved value had
+# come from that same list and was in it anyway. Two rounds of renaming woke it up.
+#
+# Five legs plus the zero-guard:
+#   (a) neither `field` nor `current` is assigned under a `filter` gate - both are born at the
+#       function's own indent and hold for every combo;
+#   (b) AFTER the loop that builds kept/shown there is ONE explicit append of `current` when it
+#       is not already in `kept`, and it sits inside the `if hit == nil` branch, before the memo
+#       stores the pair - one place appends, never two (SPEC V135, B38);
+#   (c) the memo key carries that orphan value in EVERY case and not just the road one: two
+#       controls of the same root holding DIFFERENT orphans must not share a list (SPEC B48,
+#       V272), and the way to know is a scan of the authored list for `current`;
+#   (d) `cboSpeciality<n>` is the NAMED spelling exception: the control has no underscore before
+#       the number and the field has one, so string.sub(nm, 4) answers `Speciality1` and
+#       sheet[field] comes out nil in silence. The field is built from fieldRoot plus the number;
+#   (e) zero-guard: pickerItems not found, or zero cbo* combos on the sheet.
+#
+# Mutation (SPEC V20, V222): put `current` back inside `if filter then` -> red on (a); delete
+# the append -> red on (b); take `odd` out of the memo key, or drop the vals scan -> red on
+# (c); build the field with string.sub(nm, 4) again -> red on (d).
+$v346Bad = @()
+$v346Combos = 0
+foreach ($f346 in $files) {
+    $v346Combos += ([regex]::Matches((CodeOf $f346.FullName), '<comboBox[^>]*name="cbo')).Count
+}
+$code346 = CodeOf (Join-Path $dir 'WoD20.6.lfm')
+# Fecha no `end;` do MESMO indent da declaracao, por backreferencia. Um `(.*?)\n\t+end;`
+# preguicoso fecharia no primeiro `end;` de dentro - o do laco - e todas as pernas abaixo
+# mediriam meia funcao, vermelhas por engano.
+$m346 = [regex]::Match($code346, '(?s)(\t+)local function pickerItems\(c, lang, era, levels\)\r?\n(.*?)\r?\n\1end;')
+if (-not $m346.Success) {
+    $v346Bad += "pickerItems is not in WoD20.6.lfm under the name this check reads - every leg below would measure nothing (SPEC V346e, V209)"
+}
+else {
+    $body346 = $m346.Groups[2].Value
+    $base346 = ([regex]::Match($body346, '(?m)^(\t+)local nm = c:getName\(\);')).Groups[1].Value
+    if ($base346 -eq '') {
+        $v346Bad += "pickerItems does not open with `local nm = c:getName();` - the indent of the function body is what leg (a) measures against (SPEC V209)"
+    }
+    else {
+        # (a) as duas nascem no indent da FUNCAO. Dentro de `if filter then` elas ficariam mais
+        # fundo, que e exatamente a forma que B91 tinha.
+        if ($body346 -notmatch ('(?m)^' + $base346 + 'local field = ')) {
+            $v346Bad += "pickerItems does not assign `field` at its own indent - inside a filter gate it is nil for the fourteen unfiltered roots and V200 loses its executor (SPEC V346a, B91)"
+        }
+        if ($body346 -notmatch ('(?m)^' + $base346 + 'local current = ')) {
+            $v346Bad += "pickerItems does not assign `current` at its own indent - that is the B91 shape, and it has no symptom until a list changes an item's text (SPEC V346a)"
+        }
+        if ($body346 -match '(?m)^\s*if\s+filter\s+then\s*$') {
+            $v346Bad += "pickerItems still opens an `if filter then` block - `field` and `current` belong to every combo, not to the six filtered ones (SPEC V346a)"
+        }
+        # (d) a grafia do speciality
+        $fl346 = [regex]::Match($body346, '(?m)^\s*local field = .*$').Value
+        if ($fl346 -match 'string\.sub\(nm, 4\)') {
+            $v346Bad += "pickerItems builds the field with string.sub(nm, 4) - cboSpeciality1 answers `Speciality1`, sheet[field] is nil and nothing says so (SPEC V346d)"
+        }
+        if ($fl346 -notmatch 'fieldRoot\(nm\)') {
+            $v346Bad += "pickerItems does not build the field from fieldRoot(nm) - that is the one spelling that serves both the rows and the singletons (SPEC V346d)"
+        }
+        if ($body346 -notmatch '_\?\(%d\+\)\$') {
+            $v346Bad += "pickerItems does not match the row number with `_?(%d+)`\$` - cboSpeciality1 has no underscore before its number and cbonumina_1 has one (SPEC V346d)"
+        }
+        # (b) o append, DEPOIS do laco e ANTES do memo, e UM so
+        $nApp346 = ([regex]::Matches($body346, 'kept\[#kept \+ 1\]\s*=\s*current;')).Count
+        if ($nApp346 -eq 0) {
+            $v346Bad += "pickerItems never appends `current` to kept - a comboBox whose value is not among its values renders BLANK, so the sheet looks like it threw the data away (SPEC V346b, V200)"
+        }
+        elseif ($nApp346 -gt 1) {
+            $v346Bad += "pickerItems appends `current` in $nApp346 places - one place appends or the two drift apart (SPEC V346b, V135, B38)"
+        }
+        else {
+            $iLoop346 = $body346.IndexOf('for k = 1, #vals, 1 do')
+            $iApp346 = $body346.IndexOf('kept[#kept + 1]   = current;')
+            if ($iApp346 -lt 0) { $iApp346 = ([regex]::Match($body346, 'kept\[#kept \+ 1\]\s*=\s*current;')).Index }
+            $iMemo346 = $body346.IndexOf('memo.lists[key] = {')
+            if ($iLoop346 -lt 0 -or $iMemo346 -lt 0) {
+                $v346Bad += "pickerItems no longer has the vals loop or the memo store this check anchors on (SPEC V209)"
+            }
+            elseif (-not ($iLoop346 -lt $iApp346 -and $iApp346 -lt $iMemo346)) {
+                $v346Bad += "the append of `current` is not between the vals loop and the memo store - appended before the loop it would be filtered back out, appended after the store the memo would serve the list without it (SPEC V346b)"
+            }
+        }
+        # (c) a chave do memo carrega o orfao, e o orfao e medido contra a lista AUTORADA
+        $k346 = [regex]::Match($body346, '(?m)^\s*local key\s*=.*$').Value
+        if ($k346 -eq '' -or $k346 -notmatch '\bodd\b') {
+            $v346Bad += "the memo key does not carry `odd` - two controls of one root holding different orphans would share a list, which is B48 through the same door (SPEC V346c, V272)"
+        }
+        if ($body346 -notmatch 'vals\[k\] == current') {
+            $v346Bad += "`odd` is never measured against the authored list - then it means only `the filter would drop it` and a renamed item is invisible to the memo key (SPEC V346c, B91)"
+        }
+    }
+}
+if ($v346Combos -eq 0) {
+    $v346Bad += "zero cbo* comboBox scanned across the sheet - pickerItems would have nothing to serve and this check verified nothing (SPEC V346e, B7)"
+}
+if ($v346Bad) { foreach ($b346 in $v346Bad) { Fail "V346 $b346" } }
+else { Pass "V346 pickerItems builds field and current for all $v346Combos cbo* combos, appends the saved value in exactly one place between the loop and the memo, keys the memo on the orphan, and spells cboSpeciality<n> through fieldRoot" }
 
 # ---- V192: a DESCRIPTION entry carries its source header (SPEC I21) ------------------
 # 54th round, the user's ask: a description opens with the book and the exact page it came
@@ -3320,13 +3758,13 @@ foreach ($empty in $emptyShells) {
 $DIM_TEXT = '0.75'
 $DIM_ART  = '0.40'
 
-# The six description panes are the ONE read-only thing that stays bright (SPEC V111(2),
+# The nine description panes are the ONE read-only thing that stays bright (SPEC V111(2),
 # user 2026-08-22). They are read-only and they are also the text the player opened the tab
 # to read, and dimming the content to signal "do not edit" charges legibility for a warning
 # the frame and the missing caret already give. Named, like bloodPool_* in V219 and
 # willpower_c* in V99 - loosening (a) instead would let ANY read-only widget go bright, and
 # (a) exists because a mirror dot and a real dot are the same art.
-$DESC_BRIGHT = @('edtDiscDesc','edtPathDesc','edtRitualDesc','edtHedgeDesc','edtPsychicDesc','edtFaithDesc','edtHedgeRitualDesc')
+$DESC_BRIGHT = @('edtDiscDesc','edtPathDesc','edtRitualDesc','edtHedgeDesc','edtPsychicDesc','edtFaithDesc','edtHedgeRitualDesc','edtPopDesc','edtMfDesc')
 $comboBright = 0
 $descSeen = 0
 $dimSeen = 0
@@ -3397,6 +3835,12 @@ if ($fail -eq $imgBefore) { Pass "V111 the fixed dot1 art is dimmed on the mirro
 # Every runtime write on this sheet lands on a TEXT control (a button, an edit), so the ART
 # literal has no business inside Lua at all. `1` and `0.75` are the two legal values: `1` is
 # "not dimmed" and is not a third number for the same reason `opacity` absent is not one.
+# The numbers Lua is allowed to write, NAMED. 0.75 is read-only TEXT (I43); 0.60 is the empty
+# picker button of I107a2 - "not filled in", which is a different sentence from "read-only" and
+# needs a different weight or the two cues collapse into one (user 2026-08-29). The ART number
+# is deliberately NOT here: every runtime write on this sheet lands on text, so 0.40 inside Lua
+# is the side door this check was written to shut. A number added here has to earn a clause.
+$LUA_OPACITY = @($DIM_TEXT, '0.60')
 $luaDimBad  = @()
 $luaDimSeen = 0
 foreach ($f in $files) {
@@ -3405,15 +3849,15 @@ foreach ($f in $files) {
         $luaDimSeen++
         $expr = $m.Groups[1].Value.Trim()
         foreach ($num in [regex]::Matches($expr, '\d+\.\d+')) {
-            if ($num.Value -ne $DIM_TEXT) {
-                $luaDimBad += "$($f.Name) writes .opacity = $expr - Lua only ever dims TEXT, and text dims at $DIM_TEXT (SPEC I43, V244)"
+            if ($LUA_OPACITY -notcontains $num.Value) {
+                $luaDimBad += "$($f.Name) writes .opacity = $expr - the runtime numbers are a NAMED list and that is not one of them: $($LUA_OPACITY -join ", ") (SPEC I43, V244)"
             }
         }
     }
 }
 if ($luaDimSeen -lt 1) { Fail "V244 no runtime opacity write was found at all - the Lua leg is reading nothing (SPEC V20, V209)" }
 elseif ($luaDimBad) { foreach ($b in $luaDimBad) { Fail "V244 $b" } }
-else { Pass "V244 all $luaDimSeen runtime opacity writes use the text number ($DIM_TEXT) or 1" }
+else { Pass "V244 all $luaDimSeen runtime opacity writes use one of the named numbers ($($LUA_OPACITY -join ", ")) or 1" }
 
 # ---- V112: a control that locks at runtime dims in the same breath ----------------
 # btnSaveBaseline is the only one. Writing `enabled` without writing `opacity` leaves a dead
@@ -3599,16 +4043,17 @@ else {
     $g     = NoComments $guardFn.Groups[1].Value
     $buy   = [regex]::Match($g, 'if want then(.*?)else', 'Singleline')
     $warns = @([regex]::Matches($g, 'xpWarn\("([^"]*)"\)'))
-    # Six refusals speak, and each one says its own reason: want of experience (this check),
+    # EIGHT refusals speak, and each one says its own reason: want of experience (this check),
     # the three a speciality row adds - no trait chosen, the storyteller allowing none
     # (SPEC V154/V156), a gift that is not the player's to drop - and the two a secondary path
-    # adds: an empty row, and a dot above what its blood sorcery allows (SPEC V183). The count
+    # adds: an empty row, and a dot above what its blood sorcery allows (SPEC V183) - and since
+    # 2026-08-28 the family ceiling on a trait, which is the one T781 brought (SPEC V337). The count
     # is a census on purpose: a refusal added without coming here first turns this red.
     # What may NOT happen is a second voice inside the balance branch, or
     # the sale refusal of V103 growing one.
     $buyWarns = @([regex]::Matches($buy.Groups[1].Value, 'xpWarn\("([^"]*)"\)'))
     if (-not $buy.Success) { Fail "V129 xpClick has no purchase branch" }
-    elseif ($warns.Count -ne 7) { Fail "V129 xpClick raises $($warns.Count) pop-ups - seven refusals speak: the balance, the empty trait, the closed door, the generation ceiling (SPEC V220), the gift that is not the player's to take off (SPEC V161), the secondary path row with nothing picked in it, and the secondary path above what its blood sorcery allows (SPEC V183)" }
+    elseif ($warns.Count -ne 8) { Fail "V129 xpClick raises $($warns.Count) pop-ups - eight refusals speak: the balance, the empty trait, the closed door, the generation ceiling (SPEC V220), the gift that is not the player's to take off (SPEC V161), the secondary path row with nothing picked in it, the secondary path above what its blood sorcery allows (SPEC V183), and the family ceiling on a trait (SPEC V337, T781)" }
     elseif ($buyWarns.Count -ne 1) { Fail "V129 the balance branch raises $($buyWarns.Count) pop-ups - only the refusal for want of experience may speak there" }
     elseif ($buy.Groups[1].Value -notmatch 'xpWarn\(') { Fail "V129 the refusal for want of experience says nothing" }
     elseif ($buy.Groups[1].Value -match 'markDot\(') { Fail "V129 the refused purchase marks the dot anyway (SPEC V135)" }
@@ -4273,7 +4718,7 @@ else { Pass "V167 the reveal is idempotent, armed by a $($timerArm.Groups[1].Val
 $bTal = BoxOf $mainDoc "TALENTS"; $bSki = BoxOf $mainDoc "SKILLS"; $bKno = BoxOf $mainDoc "KNOWLEDGES"
 $bExp = BoxOf $mainDoc "EXPERIENCE"
 $GRID = @(
-    @{ col = "TALENTS";    under = @("VIRTUES", "HUMANITY") },
+    @{ col = "TALENTS";    under = @("VIRTUES", "ROAD") },
     @{ col = "SKILLS";     under = @("SPECIALTIES") },
     @{ col = "KNOWLEDGES"; under = @("HEALTH") }
 )
@@ -5094,7 +5539,7 @@ if (-not $UNION_REGION.Success) {
         if (-not $enK.Contains($x)) { $v294Bad += "'$x' has no [en] entry - the dropdown shows the raw key, and the list lives in Lua where V16 does not reach it (SPEC V294d)" }
     }
 }
-if ($famList.Count -lt 22) { Fail "V294 PICKER_LIST['family'] parsed to $($famList.Count) entries, expected at least the 22 SPEC R93 froze - this check is covering less than the sheet has (SPEC V209)" }
+if ($famList.Count -lt 24) { Fail "V294 PICKER_LIST['family'] parsed to $($famList.Count) entries, expected at least the 24 SPEC R93 froze, with I108b and Q21 splitting two of them - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($v294Bad) { foreach ($b in ($v294Bad | Select-Object -First 12)) { Fail "V294 $b" } }
 else { Pass "V294 the ghoul dropdown is clan + family exactly - $($PICKER['clanFamily'].Count) entries, no overlap, no growth, all $($famList.Count) families translated in both languages" }
 
@@ -5243,16 +5688,41 @@ elseif ($ceilReads.Count -lt 3) { Fail "V218 maxDiscLevel has $($ceilReads.Count
 else { Pass "V218 one GEN_MAX, read by the label and by the refusal" }
 
 # ---- V219: the blood pool is free, and is not a trait -----------------------------
-# Blood is spent and regained inside a scene, so these mark themselves. What must stay true
-# is that nothing prices them: no declareTrait, no ledger line, no xpClick on the click.
+# What V219 buys has never been "the host paints them": it is that NOTHING PRICES these dots -
+# no declareTrait, no ledger line, nothing reaching xpClick. That half is untouched.
+#
+# The OTHER half - autoChange on, no onClick - was amended on 2026-08-28 (SPEC I108c, Q20). A
+# revenant family can be capped at eight blood points (Grimaldi, da p.454); V337d demands that a
+# cap refuse BEFORE the write; and a self-marking dot has no before, because the host has already
+# written by the time any Lua runs. So the dots are Lua-driven now, through a refuser of their
+# OWN. What replaces the old rule is STRICTER, not looser: every dot carries autoChange="false"
+# AND names bloodClick with its own field, and bloodClick reaches nothing that prices.
 $bpDoc = Doc (Join-Path $dir "WoD20.11.lfm")
 $bpDots = @($bpDoc.SelectNodes("//imageCheckBox") | Where-Object { $_.GetAttribute("field") -match '^bloodPool_\d+$' })
-if ($bpDots.Count -ne 20) { Fail "V219 the blood pool has $($bpDots.Count) dots, expected 20 (SPEC I29)" }
-elseif (@($bpDots | Where-Object { $_.GetAttribute("autoChange") -eq 'false' }).Count) { Fail "V219 a blood pool dot was told not to mark itself - it is a resource, not a rating" }
-elseif (@($bpDots | Where-Object { $_.GetAttribute("onClick") -ne "" }).Count) { Fail "V219 a blood pool dot runs something on the click - nothing here may reach xpClick" }
-elseif ($rootCode -match 'declareTrait\("bloodPool') { Fail "V219 bloodPool is declared in XP_TRAIT - it would be priced and would write ledger lines" }
-elseif ($rootCode -notmatch 'bloodPool_1 == nil') { Fail "V219 the ten-dot seed is gone - a new sheet would open empty (SPEC I29)" }
-else { Pass "V219 twenty free blood pool dots, none of them a trait" }
+$bpBad = @()
+if ($bpDots.Count -ne 20) { $bpBad += "the blood pool has $($bpDots.Count) dots, expected 20 - and with the count wrong every leg below is reading a fraction of the box (SPEC I29, V209)" }
+else {
+    foreach ($d219 in $bpDots) {
+        $f219 = $d219.GetAttribute("field")
+        if ($d219.GetAttribute("autoChange") -ne 'false') { $bpBad += "$f219 still marks itself - with autoChange on there is no BEFORE for a family cap to refuse in (SPEC I108c, V337d)" }
+        $c219 = $d219.GetAttribute("onClick")
+        if ($c219 -notmatch "^bloodClick\('$f219', self\);$") { $bpBad += "$f219 runs '$c219' on the click, expected bloodClick('$f219', self); - one refuser, named, and each dot hands it its OWN field" }
+    }
+}
+if ($rootCode -match 'declareTrait\("bloodPool') { $bpBad += "bloodPool is declared in XP_TRAIT - it would be priced and would write ledger lines" }
+if ($rootCode -notmatch 'bloodPool_1 == nil') { $bpBad += "the ten-dot seed is gone - a new sheet would open empty (SPEC I29)" }
+$bc219 = LuaFn $rootTxt 'bloodClick'
+if (-not $bc219) { $bpBad += "bloodClick is not on the root form - twenty dots name a function that does not exist, and every one of them is dead (SPEC V209)" }
+else {
+    $bcb219 = NoComments $bc219
+    foreach ($banned219 in @('xpClick', 'declareTrait')) {
+        if ($bcb219 -match "\b$banned219\b") { $bpBad += "bloodClick reaches $banned219 - the dots are FREE, and that is the half of V219 the amendment did NOT touch (SPEC I108c)" }
+    }
+    if ($bcb219 -notmatch 'familyCap\("bloodPool"\)') { $bpBad += "bloodClick never asks familyCap for the ceiling - the cap would be data nobody reads, which V337a calls worse than absent (SPEC V337c)" }
+    if ($bcb219 -notmatch 'setField\(field, false\)') { $bpBad += "bloodClick cannot turn a dot OFF - a cap limits what the family HOLDS, and spending blood is the one thing it never refuses" }
+}
+if ($bpBad) { foreach ($b in $bpBad) { Fail "V219 $b" } }
+else { Pass "V219 twenty free blood pool dots, Lua-driven through one refuser that prices nothing and reads the family ceiling from familyCap" }
 
 # ---- V220: the ceiling refuses BEFORE anything is written -------------------------
 # Same spot and same shape as the path ceiling it sits beside. A guard that lets the mark
@@ -5858,11 +6328,11 @@ else {
 $v289Bad = @()
 $doc289 = Doc (Join-Path $dir "WoD20.2.lfm")
 $bg289 = BoxByTitle $doc289 "BACKGROUNDS"
-$rs289 = BoxByTitle $doc289 "RESOURCES"
-if ($null -eq $bg289 -or $null -eq $rs289) { Fail "V289 BACKGROUNDS or RESOURCES was not found on WoD20.2 - this check measured nothing (SPEC V209)" }
+$rs289 = BoxByTitle $doc289 "OTHER"
+if ($null -eq $bg289 -or $null -eq $rs289) { Fail "V289 BACKGROUNDS or OTHER was not found on WoD20.2 - this check measured nothing (SPEC V209)" }
 else {
     $a = BoxRect $bg289; $b = BoxRect $rs289
-    if ($a.B -ne $b.B) { Fail "V289 BACKGROUNDS closes at y=$($a.B) and RESOURCES at y=$($b.B) - the two columns of the Traits tab end on one line" }
+    if ($a.B -ne $b.B) { Fail "V289 BACKGROUNDS closes at y=$($a.B) and OTHER at y=$($b.B) - the two columns of the Traits tab end on one line" }
     else { Pass "V289 BACKGROUNDS and RESOURCES both close on y=$($a.B)" }
 }
 
@@ -5873,17 +6343,41 @@ else {
 # (b) the top row of the tab lands on the grid the bottom row already keeps.
 $v290Bad = @()
 $doc290 = Doc (Join-Path $dir "WoD20.2.lfm")
-$tpl290 = $doc290.SelectSingleNode("//template[@name='Merit']")
-if ($null -eq $tpl290) { $v290Bad += "the Merit template is gone - the two tables have no shared column order left to check (SPEC V209)" }
-else {
-    $cols290 = @($tpl290.SelectNodes("edit") | ForEach-Object {
+# T783 split the one template in two (SPEC I100a, I107a): the PICKED half carries the search
+# BUTTON where the free half carries a plain edit, and the field of the picked half moved to a
+# HIDDEN edit behind that button. So the columns are collected from what is VISIBLE - and the
+# two templates then have to AGREE, because the twelve picked rows and the eight typed ones sit
+# in ONE table and a seam between them is exactly what the eye catches first.
+$colsBy290 = @{}
+foreach ($tn290 in @('MeritPicked', 'MeritFree')) {
+    $node290 = $doc290.SelectSingleNode("//template[@name='$tn290']")
+    if ($null -eq $node290) { $v290Bad += "the $tn290 template is gone - the two tables have no shared column order left to check (SPEC V209)"; continue }
+    # The ? is NOT a column of the table: it stands in the 20px gutter the name column gave
+    # back and the entry x does not move for it (SPEC I102b, I102f). Read as a column it would
+    # be a fifth one in the picked half that the typed half has no answer for, and the seam leg
+    # below would redden on a table that lines up perfectly on screen.
+    $colsBy290[$tn290] = @($node290.SelectNodes("edit|button") | Where-Object { $_.GetAttribute("visible") -ne "false" -and $_.GetAttribute("name") -notlike 'btnQ*' } | ForEach-Object {
         $l = 0; $w = 0
         [void][int]::TryParse($_.GetAttribute("left"), [ref]$l)
         [void][int]::TryParse($_.GetAttribute("width"), [ref]$w)
-        [pscustomobject]@{ L = $l; W = $w; Root = ($_.GetAttribute("field") -replace '\$\(num\)$', '') }
+        $root290 = if ($_.HasAttribute("field")) { $_.GetAttribute("field") -replace '\$\(num\)$', '' }
+                   elseif ($_.GetAttribute("name") -like 'dynMerit_*') { 'merit_' }
+                   else { '?' }
+        [pscustomobject]@{ L = $l; W = $w; Root = $root290 }
     } | Sort-Object L)
+}
+if ($colsBy290.Count -eq 2) {
+    $sigP290 = (($colsBy290['MeritPicked'] | ForEach-Object { "$($_.Root)@$($_.L)+$($_.W)" }) -join ' ')
+    $sigF290 = (($colsBy290['MeritFree'] | ForEach-Object { "$($_.Root)@$($_.L)+$($_.W)" }) -join ' ')
+    if ($sigP290 -ne $sigF290) {
+        $v290Bad += "MeritPicked tiles '$sigP290' and MeritFree tiles '$sigF290' - both halves draw rows of the SAME table and a column that moves in one is a seam in the middle of it (SPEC V290a, I100a)"
+    }
+}
+$cols290 = @($colsBy290['MeritFree'])
+if ($cols290.Count -eq 0) { $v290Bad += "no visible column was collected from MeritFree - the collector is reading the wrong node and every leg below would pass on the empty set (SPEC V209, V20, B7)" }
+else {
     $want290 = @('merit_', 'book_', 'type_', 'costy_')
-    if ($cols290.Count -ne 4) { $v290Bad += "the Merit template draws $($cols290.Count) column(s), expected 4 (SPEC V209)" }
+    if ($cols290.Count -ne 4) { $v290Bad += "MeritFree draws $($cols290.Count) visible column(s), expected 4 (SPEC V209)" }
     elseif ((($cols290 | ForEach-Object { $_.Root }) -join ',') -ne ($want290 -join ',')) {
         $v290Bad += "the columns run $((($cols290 | ForEach-Object { $_.Root }) -join ' ')) - Book goes between the name and Page (SPEC I74, V290a)"
     } else {
@@ -5914,7 +6408,11 @@ else {
         }
     }
 }
-foreach ($pair in @(@('Merit', 'MENTOR', 'R'), @('Flaw', 'FAME', 'R'), @('DERANGEMENTS', 'BASE OF OPERATIONS', 'LR'))) {
+# Re-aimed in the 125th round: the user moved ALLIES/MENTOR/RESOURCES/GUIDES up into the hole
+# FLAWS left, so the boxes standing under the top row are no longer the ones named here. The
+# RULE is untouched - the top row lands on the grid the bottom row keeps - only its occupants
+# moved, and both edges are checkable now where before only the right one was.
+foreach ($pair in @(@('Merit', 'Flaw', 'LR'), @('MENTOR', 'FAME', 'LR'), @('DERANGEMENTS', 'ARTIFACTS', 'LR'))) {
     $top = BoxByTitle $doc290 $pair[0]
     $bot = BoxByTitle $doc290 $pair[1]
     if ($null -eq $top -or $null -eq $bot) { $v290Bad += "$($pair[0]) or $($pair[1]) was not found on WoD20.2 (SPEC V209)"; continue }
@@ -6405,7 +6903,7 @@ $discRows = 0
 if ($rootTxt -match 'CLAN_DISC_ROWS\s*=\s*(\d+)') { $discRows = [int]$Matches[1] }
 $released = 0
 
-if ($clanList.Count -lt 83) { $clanBad += "the clan picker offers $($clanList.Count) entries, expected at least the 83 it carries (61 clans + 22 revenant families) - this check would be reading less than the sheet has (SPEC V209)" }
+if ($clanList.Count -lt 85) { $clanBad += "the clan picker offers $($clanList.Count) entries, expected at least the 85 it carries (61 clans + 24 revenant families) - this check would be reading less than the sheet has (SPEC V209)" }
 elseif ($discSet.Count -lt 36) { $clanBad += "the disc picker offers $($discSet.Count) names, expected at least 36 - the spelling leg below would pass on a short list" }
 elseif ($discRows -lt 1) { $clanBad += "CLAN_DISC_ROWS is not declared - there is no slot count to measure against" }
 else {
@@ -6424,9 +6922,9 @@ else {
         if ($clanList -notcontains $k) { $clanBad += "CLANS carries '$k', which the clan picker does not offer (SPEC V236a)" }
     }
 }
-if ($clanSeen -lt 83) { Fail "V236 only $clanSeen clan(s) were measured, expected 83 - this check is covering less than the picker offers (SPEC V209)" }
+if ($clanSeen -lt 85) { Fail "V236 only $clanSeen clan(s) were measured, expected 85 - this check is covering less than the picker offers (SPEC V209)" }
 elseif ($clanBad) { foreach ($b in ($clanBad | Select-Object -First 12)) { Fail "V236 $b" } }
-else { Pass "V236 CLANS answers all 83 clans and families in the picker's own spelling, $released of them released by choice or open" }
+else { Pass "V236 CLANS answers all 85 clans and families in the picker's own spelling, $released of them released by choice or open" }
 
 # ---- V295: an entry PROMISES a number of slots, and that number has to fit ------------
 # B65: `choice` never said how MANY slots it opens, so renderClanDisc treated every slot
@@ -8228,7 +8726,12 @@ else {
 
     # (c) the field a SINGLETON writes. string.sub(nm,4) hands back `HedgeAttr` with the capital
     # still on it, sheet[field] is nil, and V200 lets go of the stored value in silence.
-    if ($body272 -notmatch 'string\.match\(nm, "_%d\+\$"\)') { $v272Bad += "pickerItems never asks whether the control name ends in _<n> - that question is what tells a ROW from a SINGLETON, and without it cboHedgeAttr resolves to 'HedgeAttr' with the capital still on, sheet[field] comes back nil, and the row's own value is dropped with no symptom anywhere (SPEC V272c, I68, V200)" }
+    # T793 re-spelled the question and this literal moved with it. The OLD `_%d+$` asked only
+    # about the underscored rows and answered `no` for cboSpeciality1, which HAS a number and
+    # writes speciality_1 - the field came out `speciality` and the value was dropped in silence
+    # (SPEC V346d). `_?(%d+)$` is the same question asked once for both spellings, and accepting
+    # the old literal here would be letting that hole back in.
+    if ($body272 -notmatch 'string\.match\(nm, "_\?\(%d\+\)\$"\)') { $v272Bad += "pickerItems never asks whether the control name ends in a row number - that question is what tells a ROW from a SINGLETON, and without it cboHedgeAttr resolves to 'HedgeAttr' with the capital still on, sheet[field] comes back nil, and the row's own value is dropped with no symptom anywhere (SPEC V272c, V346d, I68, V200)" }
     elseif ($body272 -notmatch 'fieldRoot\(nm\)\s*;') { $v272Bad += "the singleton branch of the field line does not end at fieldRoot - nothing lowercases the first letter and sheet[field] is nil (SPEC V272c, I68)" }
     if ($body272 -match 'local field = filter and string\.sub\(nm, 4\) or nil;') { $v272Bad += "the pre-94th field line is back - it serves ROWS and lies to every SINGLETON picker (SPEC V272c)" }
 }
@@ -9398,10 +9901,12 @@ else {
 $v280Bad = @()
 $v280Boxes = @()
 $v280Rot = 0
+$v280Overlay = 0
 foreach ($f in $files) {
     foreach ($box in (Doc $f.FullName).SelectNodes("//layout[rectangle[@color='black'][@xradius]]")) {
         $bl = 0; $bt = 0; $bw = 0; $bh = 0
         if (-not ([int]::TryParse($box.GetAttribute("width"), [ref]$bw) -and [int]::TryParse($box.GetAttribute("height"), [ref]$bh))) { continue }
+        if ($OVERLAY_BOXES -contains $box.GetAttribute("name")) { $v280Overlay++; continue }
         [void][int]::TryParse($box.GetAttribute("left"), [ref]$bl)
         [void][int]::TryParse($box.GetAttribute("top"), [ref]$bt)
         $t280 = $box.SelectSingleNode("label[@horzTextAlign='center']")
@@ -9440,6 +9945,7 @@ else {
     # (c) zero-guard: the exclusion has to FIRE. If the three rotated headings ever stop being
     # matched - renamed attribute, a different way of turning them - this leg goes quiet and
     # (a) starts reading a pre-rotation box as a margin, which is B61 arriving a second time.
+    if ($v280Overlay -ne $OVERLAY_BOXES.Count) { $v280Bad += "$v280Overlay overlay box(es) were skipped, expected $($OVERLAY_BOXES.Count) - the exclusion is reading a name nothing carries, and a floating box would be measured for a margin and a neighbour it does not have (SPEC V20, B7)" }
     if ($v280Rot -eq 0) { $v280Bad += "no rotated child was skipped by (a) - the cut V27/V239/V240 make is not firing here, and the next rotated label would be read as a margin it is not (SPEC V209, V280c, B61)" }
 
     if ($v280Bad) { foreach ($b in $v280Bad) { Fail "V280 $b" } }
@@ -9822,8 +10328,24 @@ else {
     if ($subFn305 -notmatch 'lbl\.visible\s*=\s*not live' -or $subFn305 -notmatch 'lblOn\.visible\s*=\s*live') {
         $v305Bad += "renderSubTabs does not write BOTH halves of the pair from the same live - one written and one collected is B6 with the door repainted (SPEC I78c, V305c)"
     }
-    if ($rootTxt -match 'fontStyle\s*=' -or $rootTxt -match '\.fontColor\s*=') {
-        $v305Bad += "the root form writes fontStyle or fontColor from Lua - applyTheme undoes a colour on the next repaint, and a write before it poisons the authored ledger (SPEC V57, V305c)"
+    # fontColor stays absolute: applyTheme repaints colour off an `authored` ledger, and a Lua
+    # write landing before the first snapshot enters that ledger as if the author had typed it.
+    if ($rootTxt -match '\.fontColor\s*=') {
+        $v305Bad += "the root form writes fontColor from Lua - applyTheme repaints colour off an authored ledger, and a write before the snapshot enters it as if it had been typed (SPEC V57, V305c)"
+    }
+    # fontStyle is NOT the same risk, and the blanket ban came off on 2026-08-29 with the reason
+    # MEASURED rather than assumed: the theme owner touches fontStyle NOWHERE, so nothing
+    # repaints it and nothing snapshots it. The one writer allowed is mfLabel, which says "this
+    # row is empty" in italic exactly the way I78c's sub-tab pair says "closed". Three legs hold
+    # the exception honest - the count, the owner, and the premise.
+    $fsRoot305 = @([regex]::Matches((CodeOf (Join-Path $dir "WoD20th.lfm")), '\.fontStyle\s*='))
+    $fsFn305   = LuaFn $rootTxt 'mfLabel'
+    $fsIn305   = if ($fsFn305) { @([regex]::Matches((NoComments $fsFn305), '\.fontStyle\s*=')).Count } else { 0 }
+    if ($fsRoot305.Count -ne $fsIn305) {
+        $v305Bad += "the root form writes fontStyle $($fsRoot305.Count) time(s) and only $fsIn305 of them are inside mfLabel - the empty-row cue is the ONE exception, and a second writer is the blanket ban coming back with a reason (SPEC V305c, V135)"
+    }
+    if ((CodeOf (Join-Path $dir "WoD20.6.lfm")) -match 'fontStyle') {
+        $v305Bad += "WoD20.6 - the theme owner - now names fontStyle: the exception above rests on the theme never repainting it, so it has to be argued again before it stands (SPEC V57, V305c)"
     }
 
     # (d) the accent is an accent: four palettes, four values, none equal to that palette's text.
@@ -9880,7 +10402,7 @@ else {
     # is measured on the label BOX, and the gate does not know the height of a GLYPH - PX_PER_CHAR
     # measures width and nothing measures height (SPEC R102) - so at 1 the four eras, on four
     # different fonts, are what decide whether it touches. That is a screen question, not a static
-    # one, and Â§T681 is where it gets answered.
+    # one, and T681 is where it gets answered.
     $clear307 = 1
     foreach ($pr307 in @(@("WoD20th.lfm", "tabStrip"), @("WoD20.11.lfm", "vampStrip"), @("WoD20.7.lfm", "numStrip"), @("WoD20.7.lfm", "hedgeStrip"))) {
         $st307 = (Doc (Join-Path $dir $pr307[0])).SelectSingleNode("//layout[@name='$($pr307[1])']")
@@ -10379,13 +10901,151 @@ else {
                 if ($n312 -gt $need312) { $need312 = $n312; $worst312 = $it312 }
             }
             if ($need312 -eq 0) { continue }
-            if (($need312 + $ARROW) -gt $cw312) { $v312Bad += "$($f312.Name): the 12pt picker '$cn312' is ${cw312}px and would not clear the OLD 6.5 ruler ('$worst312' wants $($need312 + $ARROW)) - it spent slack the 114th round opened for four named controls and nobody else (SPEC V312c, R116)" }
+            if (($need312 + $ARROW) -gt $cw312 -and $NARROW_OK -notcontains $cn312) { $v312Bad += "$($f312.Name): the 12pt picker '$cn312' is ${cw312}px and would not clear the OLD 6.5 ruler ('$worst312' wants $($need312 + $ARROW)) - it spent slack the 114th round opened for four named controls and nobody else (SPEC V312c, R116)" }
         }
     }
 }
 
 if ($v312Bad) { foreach ($b in $v312Bad) { Fail "V312 $b" } }
 else { Pass "V312 the ruler is a pair - 6.5 for the body and $($s12312.Groups[1].Value) for 12pt, chosen by the attribute in the one place that multiplies - and only the 3 named entries plus hedgeEssence spent the slack" }
+
+# ---- V338: defaultValue lives on <dataLink>, and nowhere else ----------------------------
+# SPEC I99b, V338, B80. This one exists because the XML parser ACCEPTS the attribute anywhere
+# and rdk refuses it silently: exit 1, no message, .rpk deleted - the B19 mode. It cost a
+# three-step bisection to find, and the first two steps blamed innocent Lua written that same
+# round. A wrong-home attribute has no symptom until the build dies, so the check is the symptom.
+$v338Bad = @()
+$dv338 = @()
+foreach ($f338 in $files) {
+    foreach ($n338 in (Doc $f338.FullName).SelectNodes("//*[@defaultValue]")) {
+        $dv338 += [pscustomobject]@{ File = $f338.Name; Tag = $n338.LocalName; Field = $n338.GetAttribute("field") }
+    }
+}
+# (c) zero-guard FIRST: the attribute exists in seven places, so an empty sweep means the
+# collector broke, not that the sheet got tidy (SPEC V20, B7).
+if ($dv338.Count -eq 0) { $v338Bad += "no defaultValue was found anywhere on the sheet - it is authored in several places, so this is the collector failing, not the sheet being clean (SPEC V20)" }
+else {
+    # (a) every one of them is on a dataLink.
+    foreach ($d338 in $dv338) {
+        if ($d338.Tag -ne 'dataLink') { $v338Bad += "$($d338.File): defaultValue is authored on a <$($d338.Tag)> for field '$($d338.Field)' - it belongs to <dataLink>, and anywhere else rdk exits 1 with an EMPTY message and deletes the .rpk (SPEC B80, B19)" }
+    }
+    # (b) the road default is the pair of the cboRoad that no longer carries it (SPEC I99b).
+    $road338 = @($dv338 | Where-Object { $_.Field -eq 'road' })
+    if ($road338.Count -ne 1) { $v338Bad += "the road default sits on $($road338.Count) dataLink(s), not the one I99b declares - without it a sheet saved before the 125th round opens with no road at all" }
+    $cbo338 = @((Doc (Join-Path $dir "WoD20.1.lfm")).SelectNodes("//comboBox[@name='cboRoad'][@defaultValue]"))
+    if ($cbo338.Count -ne 0) { $v338Bad += "cboRoad carries defaultValue again - this is the exact authoring that killed the build in the 125th round (SPEC B80)" }
+}
+
+if ($v338Bad) { foreach ($b in $v338Bad) { Fail "V338 $b" } }
+else { Pass "V338 all $($dv338.Count) defaultValue attributes sit on a dataLink, the road default among them, and cboRoad carries none" }
+# ---- V329 / V330: the bearing ladder and the one writer that owns the road line ----------
+# SPEC I99g, I99h, V329, V330, the 125th round. The ladder is the half a screen test cannot
+# reach cheaply - five rungs and a road roster of 55 - so it is measured here instead.
+$v329Bad = @()
+$rootLua = [System.IO.File]::ReadAllText((Join-Path $dir "WoD20th.lfm"))
+
+# (a) five rungs, DESCENDING, with the four cuts of core p.310 / da p.114 spelled literally,
+# and a bare `return` for the last so no rating falls through (SPEC R120).
+$mod329 = [regex]::Match($rootLua, '(?s)function bearingMod\(n\)(.*?)\n\t{3}end;')
+if (-not $mod329.Success) { $v329Bad += "bearingMod is gone - the ladder that turns a dot count into a modifier does not exist and this check measured nothing (SPEC V20, V209)" }
+else {
+    $body329 = $mod329.Groups[1].Value
+    $cuts329 = @([regex]::Matches($body329, 'n >= (\d+)') | ForEach-Object { [int]$_.Groups[1].Value })
+    if (($cuts329 -join ',') -ne '10,8,4,2') { $v329Bad += "bearingMod cuts at [$($cuts329 -join ',')], not the 10,8,4,2 both books print - the rungs moved without a round behind them (SPEC R120, V329a)" }
+    foreach ($sig329 in @('"-2"','"-1"','"0"','"+1"','"+2"')) {
+        if (-not $body329.Contains($sig329)) { $v329Bad += "bearingMod never returns $sig329 - one of the five rungs is unreachable (SPEC V329b)" }
+    }
+    if ($body329 -notmatch '(?m)^\s*return "\+2";') { $v329Bad += "the last rung is not a bare return - a fifth test would leave a rating with no answer, and a blank modifier is the silent kind (SPEC V329a)" }
+}
+
+# (b)/(c)/(d) BEARING is TOTAL over the road list and carries nothing the list does not offer.
+$roadItems329 = @()
+$rl329 = [regex]::Match($rootLua, '(?s)\["road"\] = \{(.*?)\n\t{4}\},')
+if (-not $rl329.Success) { $v329Bad += "PICKER_LIST[""road""] could not be read - the roster this leg compares against is gone (SPEC V209)" }
+else { $roadItems329 = @([regex]::Matches($rl329.Groups[1].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value }) }
+
+$bearKeys329 = @{}
+$bt329 = [regex]::Match($rootLua, '(?s)\n\t{4}BEARING = \{(.*?)\n\t{4}\};')
+if (-not $bt329.Success) { $v329Bad += "BEARING could not be read - the name half of the line has no table (SPEC V209)" }
+else { foreach ($m in [regex]::Matches($bt329.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"([^"]*)"')) { $bearKeys329[$m.Groups[1].Value] = $m.Groups[2].Value } }
+
+if ($roadItems329.Count -eq 0 -or $bearKeys329.Count -eq 0) { $v329Bad += "the road roster or BEARING came back EMPTY - both legs below would pass on nothing (SPEC V20)" }
+else {
+    foreach ($r329 in $roadItems329) { if (-not $bearKeys329.ContainsKey($r329)) { $v329Bad += "'$r329' is offered by the picker and has no BEARING row - the line would open blank, which is the failure only an eye catches (SPEC V329c)" } }
+    foreach ($k329 in $bearKeys329.Keys) { if ($roadItems329 -notcontains $k329) { $v329Bad += "BEARING carries '$k329', which the picker never offers - a name nobody can reach (SPEC V329d)" } }
+    foreach ($k329 in $bearKeys329.Keys) { if ($bearKeys329[$k329] -eq '') { $v329Bad += "BEARING['$k329'] is EMPTY - the five the book leaves unnamed were given names by the user on 2026-08-28, so a blank one is a row that got lost (SPEC I99c5)" } }
+    if ($bearKeys329['Humanity'] -ne 'Normalcy') { $v329Bad += "BEARING['Humanity'] is '$($bearKeys329['Humanity'])', not the Normalcy core p.310 prints - it is the default road, so this is the row every new sheet shows (SPEC V329e, R121)" }
+}
+
+# (e) ROAD_ERA answers for the same 55 and nothing else, and Humanity is the one row that is
+# not era-bound: an era whose list dropped it would leave the field holding no legal value.
+$eraKeys329 = @{}
+$et329 = [regex]::Match($rootLua, '(?s)\n\t{4}ROAD_ERA = \{(.*?)\n\t{4}\};')
+if (-not $et329.Success) { $v329Bad += "ROAD_ERA could not be read - the era axis I99c2 declares has no table (SPEC V209)" }
+else {
+    foreach ($m in [regex]::Matches($et329.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"([^"]*)"')) { $eraKeys329[$m.Groups[1].Value] = $m.Groups[2].Value }
+    foreach ($r329 in $roadItems329) { if (-not $eraKeys329.ContainsKey($r329)) { $v329Bad += "'$r329' has no ROAD_ERA row - it would be filtered out of every era at once (SPEC I99c2)" } }
+    foreach ($k329 in $eraKeys329.Keys) { if ($eraKeys329[$k329] -ne 'modern' -and $eraKeys329[$k329] -ne 'medieval') { $v329Bad += "ROAD_ERA['$k329'] is '$($eraKeys329[$k329])', which is neither of the two eras the .tsv measures (SPEC I99c2)" } }
+}
+
+# (f) the era axis is APPLIED, not merely declared. ROAD_ERA existing and nothing reading it is
+# the born-dead shape of B75, and it would look exactly like a working feature: the dropdown
+# just shows all 55 in every era and only an eye catches it.
+$pi329 = [System.IO.File]::ReadAllText((Join-Path $dir "WoD20.6.lfm"))
+if ($pi329 -notmatch 'root == "road" and raw ~= current') { $v329Bad += "pickerItems has no road branch - ROAD_ERA is declared and never read, so every era offers all 55 roads (SPEC I99c2, B75)" }
+if ($pi329 -notmatch 'local roadEra = \(era == "Dark Ages" or era == "Classical Age"\)') { $v329Bad += "the two medieval themes are not named where the road list is filtered - a fifth theme would fall into one era by default instead of being decided (SPEC I99c2)" }
+if ($pi329 -notmatch 'raw == "Humanity"') { $v329Bad += "Humanity is not exempted from the era filter - an era whose list drops it leaves the field holding a value its own list does not offer (SPEC I99c3)" }
+# V330: ONE writer for the three states, and the predicate is `clanFamily` FILLED - not the
+# revenant set, which Q1 retired. A leg that still looked for REVENANT would be measuring code
+# that no longer exists, which is B7 wearing a green tick.
+$rb330 = [regex]::Match($rootLua, '(?s)function renderBearing\(from\)(.*?)\n\t{3}end;')
+if (-not $rb330.Success) { $v329Bad += "renderBearing is gone - nothing writes the bearing line and the two labels are born dead, which is exactly B75 (SPEC V330a)" }
+else {
+    $body330 = $rb330.Groups[1].Value
+    foreach ($c330 in @('cboRoad','dynBearingName')) {
+        if (-not $body330.Contains($c330)) { $v329Bad += "renderBearing never touches '$c330' - one of the three states it is supposed to own has another writer or none (SPEC V330a)" }
+    }
+    if ($body330 -notmatch 'fam ~= nil and fam ~= ""') { $v329Bad += "renderBearing does not gate on clanFamily being FILLED - Q1 opened the road to clans, and a leg testing anything else is measuring the retired rule (SPEC I99d, V330b)" }
+    if ($body330 -match 'REVENANT') { $v329Bad += "renderBearing still reads a REVENANT set - Q1 retired it as the gate, so this is the old predicate surviving next to the new one (SPEC I99d)" }
+    if ($body330 -notmatch 'sheet\["humanity_" \.\. i\]') { $v329Bad += "renderBearing does not count the dots off the NDB - reading widgets scores a silent zero for a row not built yet (SPEC I99g)" }
+}
+# (c) the three controls have NO other toucher anywhere on the sheet. The write shape here is
+# `found["cboRoad"].enabled` plus two local aliases, so a regex hunting `.visible` beside the
+# name finds zero writes even INSIDE renderBearing and passes on the empty set - which is what
+# the loop that stood here did: it counted into $writers330 and then asserted nothing at all
+# (SPEC B7, V20). What is measured instead is every mention that is not the XML declaration,
+# because reaching one of these controls means naming it first, and the one place allowed to
+# name them is renderBearing (SPEC V330c, V199, B12).
+$rootCode330 = CodeOf (Join-Path $dir "WoD20th.lfm")
+$rbCode330   = [regex]::Match($rootCode330, '(?s)function renderBearing\(from\)(.*?)\n\t{3}end;')
+$reach330    = 0
+$own330      = 0
+$where330    = @()
+foreach ($nm330 in @('cboRoad','dynBearingName')) {
+    foreach ($lf330 in $files) {
+        # the pattern goes to a VARIABLE first: `-replace 'a' + $x, ''` binds as one argument
+        # and the replacement silently does not happen, with no error to show for it.
+        $decl330 = 'name="' + $nm330 + '"'
+        $k330 = ([regex]::Matches(((CodeOf $lf330.FullName) -replace $decl330, ''), [regex]::Escape($nm330))).Count
+        if ($k330 -gt 0) { $reach330 += $k330; $where330 += "$($lf330.Name) names $nm330 $k330 time(s)" }
+    }
+    if ($rbCode330.Success) { $own330 += ([regex]::Matches($rbCode330.Groups[1].Value, [regex]::Escape($nm330))).Count }
+}
+if ($reach330 -eq 0) { $v329Bad += "not one of the three bearing control names survives into the Lua - either the comment stripper ate the code or all three were renamed, and every count here would agree on zero (SPEC V20, B7)" }
+elseif ($reach330 -ne $own330) { $v329Bad += "the three bearing controls are named $reach330 time(s) in the sheet's Lua and only $own330 of those sit inside renderBearing ($($where330 -join '; ')) - a second toucher is a second ruler for one rule, and the two disagree on screen with nothing to say so (SPEC V330c, V199, B12)" }
+$cnt330 = ([regex]::Matches($rootLua, 'renderBearing\(self\);')).Count
+if ($cnt330 -lt 2) { $v329Bad += "renderBearing is called from $cnt330 dataLink(s) - clanFamily, road and the ten dots all have to reach it or a rating can move without the line following (SPEC V330d)" }
+# V328b: the default is on a dataLink AND the value is `Humanity`. Two failures, and they read
+# nothing alike - the wrong HOME kills the build with an empty message and no .rpk (SPEC B80),
+# the wrong VALUE builds clean and opens every pre-125th sheet on a road nobody chose. One test
+# for both answered "not on a dataLink" to a value drift and sent the reader after a dead build
+# that had not happened (SPEC I99b, V328b).
+$dl328 = [regex]::Match($rootLua, 'dataLink field="road" defaultValue="([^"]*)"')
+if (-not $dl328.Success) { $v329Bad += "the road default is not on a dataLink - authored on the comboBox it is accepted by the XML and REJECTED by rdk, silently, with the .rpk deleted (SPEC I99b, B80)" }
+elseif ($dl328.Groups[1].Value -ne 'Humanity') { $v329Bad += "the road dataLink defaults to '$($dl328.Groups[1].Value)', not the Humanity I99b declares - a character with no road IS on Humanity, and a sheet saved before the 125th round would open on a road it never walked (SPEC V328b)" }
+
+if ($v329Bad) { foreach ($b in $v329Bad) { Fail "V329/V330 $b" } }
+else { Pass "V329/V330 the ladder cuts at 10,8,4,2 with a bare last rung; BEARING and ROAD_ERA both answer for all $($roadItems329.Count) roads and nothing else; renderBearing owns all three states off one clanFamily test, is the only place on the sheet that names the three, and the road default sits on its dataLink at Humanity" }
 
 # ---- V318: the line ending is CONTENT, and it is MEASURED --------------------------------
 # SPEC B74, the 118th round. The Git Bash text tools rewrite a file WITHOUT its carriage
@@ -10872,6 +11532,123 @@ else {
 if ($v325Bad) { foreach ($b in $v325Bad) { Fail "V325 $b" } }
 else { Pass "V325 WoD20.6 declares $chunk325 local(s) at chunk scope against a ceiling of 100, and no ORN_COL_/ORN_GUT_/ORN_MUR_ constant and none of the three mural helpers has been hoisted out of its painter" }
 
+# ---- V347: the ROOT chunk has a ceiling too, and it is a DIFFERENT one (SPEC B93, T789) ---
+# V325 has guarded WoD20.6 since B77, and the number there is 105. That number is NOT a
+# property of the SDK: the rdk compiler emits locals of its own into the same chunk, so the
+# visible ceiling is what is LEFT of Lua's 200 after the file's own code has taken its share -
+# which makes it a per-FILE number. The root form is four times the size of WoD20.6, and its
+# share is correspondingly bigger: MEASURED on 2026-08-29 by adding plain unused locals one at
+# a time, +4 compiles and +5 exits 1, so the root's visible ceiling is 53 against the 49 it
+# declares. Four slots in the whole file, and the T789 slice wanted six.
+#
+# The failure mode is B19's, which is why this is worth a check rather than a comment: rdk -l
+# exits 1, prints NOTHING, deletes the .rpk and names no file and no line. It cost a six-build
+# bisection here, exactly as B77 says it cost one there.
+$v347Bad = @()
+$chunk347 = [regex]::Matches($rootTxt, "(?m)^\t{3}local ").Count
+
+# zero-guard FIRST: the indentation this keys on is the whole measurement, and a chunk that
+# counts zero means the level moved, not that the form got tidy (SPEC V20, B7).
+if ($chunk347 -eq 0) { $v347Bad += "counted 0 locals at chunk scope in WoD20th.lfm - the indentation this leg keys on moved, so it is measuring nothing (SPEC V209, V20)" }
+elseif ($chunk347 -gt 50) {
+    $v347Bad += "WoD20th.lfm declares $chunk347 local(s) at chunk scope against a ceiling of 50 (real limit 53, three kept as margin) - over it rdk -l exits 1, deletes the .rpk and names no file or line (SPEC B93, B77, B19)"
+}
+
+# A `local function` at chunk scope spends a slot exactly like a variable does, and that is the
+# half a reader gets wrong: the mf* helpers of T789 were written as local functions first and
+# cost four slots before they cost anything else. Named so the next round reads it here rather
+# than rediscovering it in a bisection (SPEC B93).
+$fn347 = [regex]::Matches($rootTxt, "(?m)^\t{3}local function ").Count
+if ($chunk347 -gt 0 -and $fn347 -eq 0) { $v347Bad += "no local function at chunk scope in WoD20th.lfm - the form declares them by the dozen, so this count is reading the wrong level (SPEC V209, V20)" }
+
+if ($v347Bad) { foreach ($b in $v347Bad) { Fail "V347 $b" } }
+else { Pass "V347 WoD20th.lfm declares $chunk347 local(s) at chunk scope - $fn347 of them local functions - against a ceiling of 50, measured at 53" }
+
+# ---- V339: the merit/flaw search box (SPEC I107, Q16, T785) -----------------------------
+# Q16 killed the dropdown for these twelve rows and put a search box in its place. Most of what
+# can go wrong here is SILENT: a row short cuts results with no symptom, a require outside the
+# timer just never paints the loading, a find without its fourth argument only throws on the
+# names carrying a parenthesis. None of it reddens a build.
+$v339Bad = @()
+$doc339 = Doc (Join-Path $dir "WoD20.2.lfm")
+$traits339 = [System.IO.File]::ReadAllText((Join-Path $dir "WoD20.2.lfm"))
+
+# (a) the twelve picked rows carry the BUTTON and its hidden twin, and no comboBox. V13 still
+# rules the other combos on the sheet - the revocation is NAMED here, not a general loosening.
+$btn339 = @($doc339.SelectNodes("//template[@name='MeritPicked']/button[starts-with(@name,'dynMerit_')]"))
+$twin339 = @($doc339.SelectNodes("//template[@name='MeritPicked']/edit[@visible='false'][starts-with(@field,'merit_')]"))
+$picked339 = @([regex]::Matches($traits339, '<MeritPicked '))
+if ($btn339.Count -ne 1) { $v339Bad += "MeritPicked declares $($btn339.Count) dynMerit_ button(s), expected 1 - the name column of a picked row IS the opener (SPEC I107a, V339a)" }
+if ($twin339.Count -ne 1) { $v339Bad += "MeritPicked declares $($twin339.Count) hidden merit_ edit(s), expected 1 - a button has no field, so the data lives in the twin behind it (SPEC I107a1, V339a)" }
+if ($picked339.Count -ne 14) { $v339Bad += "$($picked339.Count) MeritPicked row(s) authored, expected 14 - m0..m6 and f0..f6 are picked and the other eight are typed (SPEC I100a, V339a)" }
+$cbo339 = @($doc339.SelectNodes("//template[@name='MeritPicked']/comboBox")) + @($doc339.SelectNodes("//template[@name='MeritFree']/comboBox"))
+if ($cbo339.Count -gt 0) { $v339Bad += "$($cbo339.Count) comboBox survives in the merit templates - Q16 retired the dropdown for these rows (SPEC V339a, V13)" }
+
+# (b) one box, and EXACTLY twenty rows: the page size of I107k. One short cuts a result with no
+# symptom anywhere; one over is a control nothing ever paints.
+$box339 = @($doc339.SelectNodes("//layout[@name='mfSearch']"))
+if ($box339.Count -ne 1) { $v339Bad += "mfSearch is authored $($box339.Count) time(s), expected 1 - one box per sheet is what makes opening another mean overwriting this one (SPEC I107c, V339b)" }
+$rows339 = @($doc339.SelectNodes("//layout[@name='mfSearch']/button[starts-with(@name,'dynMfRow_')]"))
+if ($rows339.Count -ne 20) { $v339Bad += "the box carries $($rows339.Count) dynMfRow_ button(s), expected the 20 the page size of I107k declares - one short cuts a result silently, one over is a dead control (SPEC V339b)" }
+foreach ($i339 in 1..20) {
+    if (-not ($doc339.SelectSingleNode("//layout[@name='mfSearch']/button[@name='dynMfRow_$i339']"))) {
+        $v339Bad += "dynMfRow_$i339 is missing - the rows are read by index, so a gap is a page that stops early (SPEC V339b)"
+    }
+}
+
+# (f) the box owns no field: book text may not be written onto the character (SPEC V29).
+if ($doc339.SelectSingleNode("//layout[@name='mfSearch'][@field]")) { $v339Bad += "mfSearch owns a field - the box is furniture and V29 keeps furniture out of the data contract (SPEC V339f)" }
+$okBorn339 = $doc339.SelectSingleNode("//button[@name='btnMfOk']")
+if ($null -eq $okBorn339) { $v339Bad += "btnMfOk is gone - nothing confirms a marking (SPEC V209)" }
+elseif ($okBorn339.GetAttribute("enabled") -ne "false") { $v339Bad += "btnMfOk is not authored enabled=false - it would confirm before anything was marked (SPEC I107m, V339)" }
+
+# (c) the require lives INSIDE the timer. Outside it the loading never paints, because require
+# is synchronous and the screen repaints only after the turn ends (SPEC I107f, R44, R47).
+$openFn339 = LuaFn $rootTxt 'mfOpen'
+if (-not $openFn339) { $v339Bad += "mfOpen is gone - legs (c) and (d) measured nothing (SPEC V209)" }
+else {
+    $reqAll339 = @([regex]::Matches($rootTxt, 'require\("meritData\.lua"\)'))
+    if ($reqAll339.Count -ne 1) { $v339Bad += "meritData is required $($reqAll339.Count) time(s) in the root chunk, expected exactly 1 - a second require is a second parse of 60KB (SPEC I107e, V135)" }
+    $timer339 = [regex]::Match($openFn339, '(?s)setTimeout\(function\(\)(.*?)end, 1\);')
+    if (-not $timer339.Success) { $v339Bad += "mfOpen schedules no setTimeout - the loading text would never reach the screen before the parse (SPEC I107f, V339c)" }
+    elseif ($timer339.Groups[1].Value -notmatch 'require\("meritData\.lua"\)') { $v339Bad += "the require sits OUTSIDE the mfOpen timer - require is synchronous, so the box would appear already full and the loading would never paint (SPEC I107f, V339c)" }
+}
+
+# (d) the animation STOPS - on close and when the parse ends. A timer that outlives its box has
+# nothing left to stop it, and there is no clearTimeout to cancel with (SPEC I107g).
+$closeFn339 = LuaFn $rootTxt 'mfClose'
+if (-not $closeFn339) { $v339Bad += "mfClose is gone - leg (d) measured nothing (SPEC V209)" }
+elseif ($closeFn339 -notmatch 'MF\.load = MF\.load \+ 1') { $v339Bad += "mfClose does not bump MF.load - the loading animation would go on ticking into a closed box, which is the leak I107g names (SPEC V339d)" }
+$tickFn339 = LuaFn $rootTxt 'mfTick'
+if (-not $tickFn339) { $v339Bad += "mfTick is gone - there is no animation left to stop (SPEC I107g, V209)" }
+elseif ($tickFn339 -notmatch 'MF\.load ~= mine') { $v339Bad += "mfTick does not compare its captured generation against MF.load - without that test nothing can stop it (SPEC I107g, V339d)" }
+elseif ($tickFn339 -notmatch 'end, 300\);') { $v339Bad += "mfTick does not reschedule on 300ms - that is the interval I107g declares (SPEC V339d)" }
+
+# (e) the find is LITERAL. Without the fourth argument a name carrying a parenthesis - and the
+# lists carry plenty - is read as a PATTERN and the search throws (SPEC I107h).
+$filterFn339 = LuaFn $rootTxt 'mfFilter'
+if (-not $filterFn339) { $v339Bad += "mfFilter is gone - leg (e) measured nothing (SPEC V209)" }
+else {
+    $finds339 = @([regex]::Matches($filterFn339, 'string\.find\('))
+    $literal339 = @([regex]::Matches($filterFn339, 'string\.find\((?:[^()]|\([^()]*\))*, 1, true\)'))
+    if ($finds339.Count -eq 0) { $v339Bad += "mfFilter calls string.find nowhere - the filter is not filtering and every leg here would pass on it (SPEC V209, V20)" }
+    elseif ($literal339.Count -ne $finds339.Count) { $v339Bad += "$($finds339.Count - $literal339.Count) of $($finds339.Count) string.find call(s) in mfFilter omit the fourth argument - without it a name carrying a parenthesis is read as a PATTERN and the search throws (SPEC I107h, V339e)" }
+}
+
+# ONE point of write, three doors into it (SPEC I107i, I107l as amended, V135, B38).
+$writes339 = @([regex]::Matches((NoComments $rootTxt), 'setField\(MF\.field, MF\.picked\)'))
+if ($writes339.Count -ne 1) { $v339Bad += "the picked row is written in $($writes339.Count) place(s), expected exactly 1 - btnMfOk, the double click and ENTER are three DOORS into one writer, not three writers (SPEC I107i, V135, B38)" }
+$confirmFn339 = LuaFn $rootTxt 'mfConfirm'
+if ($confirmFn339 -and $confirmFn339 -notmatch 'setField\(MF\.field, MF\.picked\)') { $v339Bad += "the write does not live in mfConfirm - that is the one function the three doors open onto (SPEC I107i, V339)" }
+
+# (g) zero-guard: with the box gone every leg above passes by vacancy (SPEC V20, B7).
+if ($box339.Count -eq 0 -and $rows339.Count -eq 0 -and $picked339.Count -eq 0) {
+    $v339Bad += "the search box, its rows and the picked rows all count zero - the collector is reading the wrong file and this check verified nothing (SPEC V209, V20, B7)"
+}
+
+if ($v339Bad) { foreach ($b in $v339Bad) { Fail "V339 $b" } }
+else { Pass "V339 the search box stands once with its $($rows339.Count) rows, the $($picked339.Count) picked rows carry button plus hidden twin and no combo, the require sits inside the timer, the animation stops on close, every find is literal, and the row is written in one place behind three doors" }
+
 # ---- V323: the COLUMN and the GUTTA draw on the Classical bar (SPEC I95, the 122nd round) -----
 # The era stops wearing a new box with the default marker. Six legs.
 $v323Bad = @()
@@ -11103,6 +11880,1568 @@ if ($deep326.Count -gt 0) { $v326Bad += "$($deep326 -join ', ') also step past t
 
 if ($v326Bad) { foreach ($b in $v326Bad) { Fail "V326 $b" } }
 else { Pass "V326 the Classical rule reaches a declared $($depth326)px at the corner - inside the 20px margin since the 124th round - the merlon stays inside it, and no other era steps past the 23px ceiling" }
+
+# ---- V333: the ? box is ONE, and the scrim is painted under it -------------------------
+# SPEC I102, V333, T760. The box is a floating overlay on the Traits tab, so two of the rules
+# the rest of the sheet lives by do not apply to it and it is cut out of V40 and V280/V298 by
+# name up top. What replaces them is here: one box, one scrim, the scrim first, both born
+# hidden, and one closer behind both doors.
+$v333Bad = @()
+$traits333 = Doc (Join-Path $dir "WoD20.2.lfm")
+$traitsRaw = [System.IO.File]::ReadAllText((Join-Path $dir "WoD20.2.lfm"))
+$rootLua333 = [System.IO.File]::ReadAllText((Join-Path $dir "WoD20th.lfm"))
+
+# (a) ONE of each on the WHOLE sheet, not just on this tab. A second box opens under the first
+# and nothing closes it, which is the state I102d exists to make impossible.
+$pop333   = 0
+$scrim333 = 0
+foreach ($f333 in $files) {
+    $d333 = Doc $f333.FullName
+    $pop333   += @($d333.SelectNodes("//layout[@name='popDesc']")).Count
+    $scrim333 += @($d333.SelectNodes("//rectangle[@name='popScrim']")).Count
+}
+if ($pop333 -ne 1)   { $v333Bad += "popDesc is authored $pop333 time(s), expected exactly 1 - one box per sheet is what makes 'open another' mean 'overwrite this one' (SPEC I102d, V333a)" }
+if ($scrim333 -ne 1) { $v333Bad += "popScrim is authored $scrim333 time(s), expected exactly 1 - a second scrim is a second click-outside, and each would only close half of what is open (SPEC I102a, V333a)" }
+
+# (b) file order IS paint order, the sentence V320 already measures for ornament. The scrim has
+# to sit BETWEEN the grid and the box: authored after it, it paints over the box and the X
+# becomes unclickable while the grid underneath stays live.
+$iScrim = $traitsRaw.IndexOf('name="popScrim"')
+$iPop   = $traitsRaw.IndexOf('name="popDesc"')
+if ($iScrim -lt 0 -or $iPop -lt 0) { $v333Bad += "the Traits tab carries no popScrim/popDesc pair - leg (b) measured nothing and would pass on the absence (SPEC V20, V209)" }
+elseif ($iScrim -gt $iPop) { $v333Bad += "popScrim is authored AFTER popDesc - it would paint over the box it is meant to sit under, and every click inside the box would land on the scrim and close it (SPEC I102a, V333b)" }
+
+# (c) both born hidden. A box that ships visible covers the grid from the first paint.
+foreach ($n333 in @('popScrim', 'popDesc')) {
+    $c333 = $traits333.SelectSingleNode("//*[@name='$n333']")
+    if ($null -eq $c333) { $v333Bad += "$n333 is not on the Traits tab (SPEC V209)" }
+    elseif ($c333.GetAttribute("visible") -ne 'false') { $v333Bad += "$n333 is authored visible - it would cover the grid from the moment the tab opens (SPEC I102a, V333c)" }
+}
+
+# (e) ONE closer, reached from BOTH doors and from nowhere else. Two closers is how the scrim
+# ends up hidden with the box still on screen - the V135 disease in its geometry form.
+$close333 = @($traits333.SelectNodes("//*[@onClick]") | Where-Object { $_.GetAttribute("onClick") -match 'popClose\(' })
+$closeNames333 = @($close333 | ForEach-Object { $_.GetAttribute("name") })
+if ($closeNames333 -notcontains 'btnPopClose') { $v333Bad += "btnPopClose does not call popClose - the X is one of the two doors I102c declares (SPEC V333e)" }
+if ($closeNames333 -notcontains 'popScrim')    { $v333Bad += "popScrim does not call popClose - a click outside would leave the box standing (SPEC V333e)" }
+if ($close333.Count -ne 2) { $v333Bad += "$($close333.Count) control(s) call popClose, expected the X and the scrim - a third door is a third place the two visibles can disagree (SPEC V135, V333e)" }
+
+# (f) wordWrap is the ONLY thing between this box and the horizontal scrollbar the user ruled
+# out: SDK3 has no scroll property on textEditor, so the fix is to give it nothing to scroll.
+$edt333 = $traits333.SelectSingleNode("//textEditor[@name='edtPopDesc']")
+if ($null -eq $edt333) { $v333Bad += "edtPopDesc is gone - the box has nothing to write into (SPEC V209)" }
+else {
+    if ($edt333.GetAttribute("wordWrap") -ne 'true') { $v333Bad += "edtPopDesc is authored without wordWrap - one long line puts a horizontal scrollbar in the box, which is the single thing the user ruled out (SPEC I102c, V333f)" }
+    if ($edt333.GetAttribute("readOnly") -ne 'true') { $v333Bad += "edtPopDesc is writable - it shows book text, and what is typed there has no reader (SPEC V29, R12)" }
+    if ($edt333.HasAttribute("field")) { $v333Bad += "edtPopDesc owns field '$($edt333.GetAttribute('field'))' - book text would be saved onto the character (SPEC V29)" }
+}
+
+# (d) and (g) landed with T761. Both are counts of CALL SITES and not of authored nodes: the
+# twenty-eight ? buttons are two <button> elements, one inside MeritPicked and one inside
+# OpenAbility, and a grep for btnQ* over the XML finds exactly those two. A leg written against
+# the authored nodes would read 2, never move again, and pass forever on nothing - B7 arriving
+# through the template door.
+#
+# The roster is CLOSED and named, the way V109 names cboGame's three: a third template growing
+# a ? has to redden here rather than be absorbed into a total that still says 28.
+$V333_SRC   = @{ MeritPicked = 14; OpenAbility = 16 }   # template -> rows it draws the ? on
+$q333       = @{}
+$qCalls333  = 0
+$qOpen333   = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+foreach ($f333b in $files) {
+    $doc333b = Doc $f333b.FullName
+    $raw333b = [System.IO.File]::ReadAllText($f333b.FullName)
+    foreach ($tpl333 in $doc333b.SelectNodes("//template[@name]")) {
+        $tn333 = $tpl333.GetAttribute("name")
+        foreach ($b333 in $tpl333.SelectNodes(".//button")) {
+            if ($b333.GetAttribute("name") -notlike 'btnQ*') { continue }
+            # the call sites of the template that draws it, in the file that declares it
+            $calls333 = @([regex]::Matches($raw333b, '<' + [regex]::Escape($tn333) + '[ />]')).Count
+            if (-not $q333.ContainsKey($tn333)) { $q333[$tn333] = 0 }
+            $q333[$tn333] += $calls333
+            $qCalls333 += $calls333
+
+            # (d) ONE opener for all twenty-eight, and each one hands it the value of ITS OWN
+            # row. A literal key would compile, look right and open the same description from
+            # every button on the sheet - the failure that has no symptom until someone reads.
+            $oc333 = $b333.GetAttribute("onClick")
+            $call333 = [regex]::Match($oc333, '^\s*([A-Za-z_]\w*)\s*\(')
+            if (-not $call333.Success) { $v333Bad += "$($f333b.Name) $($b333.GetAttribute('name')) calls nothing on click - the ? would open no box at all (SPEC V333d)" }
+            else { [void]$qOpen333.Add($call333.Groups[1].Value) }
+            if ($oc333 -notmatch 'sheet\[') { $v333Bad += "$($f333b.Name) $($b333.GetAttribute('name')) passes no row value to the opener - a literal key opens one description from every row (SPEC V333d, I102b)" }
+        }
+    }
+}
+# (g) zero-guard FIRST: everything under it is a count, and a count over an empty set is the
+# check that measures nothing and says PASS (SPEC V20, B7, B92).
+if ($qCalls333 -eq 0) { $v333Bad += "no ? button was reached at all - legs (d) and (g) are measuring an empty set (SPEC V209, V20, B92)" }
+else {
+    foreach ($k333 in $q333.Keys) {
+        if (-not $V333_SRC.ContainsKey($k333)) { $v333Bad += "template '$k333' draws a ? button and is not on the named roster - the total below would swallow it and still read 28 (SPEC V333g, V109)" }
+        elseif ($q333[$k333] -ne $V333_SRC[$k333]) { $v333Bad += "'$k333' draws the ? on $($q333[$k333]) row(s), expected $($V333_SRC[$k333]) - a row short is a description the player cannot reach, a row over is a button on a TYPED row, which I102f refuses (SPEC V333g)" }
+    }
+    foreach ($k333 in $V333_SRC.Keys) {
+        if (-not $q333.ContainsKey($k333)) { $v333Bad += "'$k333' carries no ? button - the $($V333_SRC[$k333]) rows it draws lost their description door (SPEC I102b, V333g)" }
+    }
+    if ($qCalls333 -ne 30) { $v333Bad += "$qCalls333 ? button(s) on the sheet, expected the 30 of I102b - 14 on the picked merit/flaw rows and 16 on the picked background rows (SPEC V333g)" }
+    if ($qOpen333.Count -gt 1) { $v333Bad += "the ? buttons call $($qOpen333.Count) different functions ($(($qOpen333 | Sort-Object) -join ', ')) - one opener owns the box, or the two disagree about what is open (SPEC V135, V333d)" }
+    elseif ($qOpen333.Count -eq 1 -and -not $qOpen333.Contains('popOpen')) { $v333Bad += "the ? buttons call '$(@($qOpen333)[0])' and not popOpen - the opener I102d declares is the one that also raises the scrim (SPEC V333d)" }
+}
+
+# The opener itself still has to exist and keep its shape, because every btnQ names it.
+# `sub` joined the signature in T791 and is OPTIONAL - it names the list ("merit"/"flaw") and
+# only matters where one name lives in both (SPEC I102g). The first three stay pinned in order
+# because every btnQ names them; the fourth is allowed to be there or not.
+if ($rootLua333 -notmatch 'function popOpen\(from, kind, key(, sub)?\)') { $v333Bad += "popOpen is gone or changed shape - it is the ONE opener every btnQ will name, with the row's key as an argument (SPEC I102d, V333d, I102g)" }
+if ($rootLua333 -notmatch 'function popClose\(from\)') { $v333Bad += "popClose is gone - the X and the scrim both name it (SPEC V333e)" }
+
+if ($v333Bad) { foreach ($b in $v333Bad) { Fail "V333 $b" } }
+else { Pass "V333 one ? box and one scrim, the scrim painted under it, both born hidden, one closer behind both doors, edtPopDesc wrapping so no horizontal bar can appear, and $qCalls333 ? buttons - $(($V333_SRC.Keys | Sort-Object | ForEach-Object { "$($q333[$_]) on $_" }) -join ', ') - all reaching popOpen with their own row's value" }
+
+# ---- V334: the zoom has ONE ceiling and ONE floor --------------------------------------
+# SPEC I103, V334, T762, and the user's answer to Q7 ("Salvar"). The size is ONE field for all
+# nine panes and not nine fields: the user asked for it saved, not for it saved per pane, and
+# nine keys in the data contract cannot be taken back later (SPEC V2).
+$v334Bad = @()
+$PANES334 = @('edtDiscDesc','edtPathDesc','edtRitualDesc','edtHedgeDesc','edtHedgeRitualDesc','edtPsychicDesc','edtFaithDesc','edtPopDesc','edtMfDesc')
+
+# (b) nine panes, each with its pair, found BY NAME off the pane's own suffix - so a button
+# that drifts onto another box is a miss here and not a silent pass on a total that still adds up.
+$btn334 = @()
+foreach ($f334 in $files) {
+    foreach ($b334 in (Doc $f334.FullName).SelectNodes("//button[starts-with(@name,'btnFont')]")) {
+        $btn334 += [pscustomobject]@{ File = $f334.Name; Name = $b334.GetAttribute("name"); Click = $b334.GetAttribute("onClick") }
+    }
+}
+if ($btn334.Count -eq 0) { $v334Bad += "no btnFont* button was collected - the zoom has no controls at all and every leg below would pass on an empty set (SPEC V20, B7)" }
+else {
+    foreach ($p334 in $PANES334) {
+        $sfx334 = ($p334 -replace '^edt', '') -replace 'Desc$', ''
+        foreach ($way334 in @('Up', 'Down')) {
+            $want334 = "btnFont$way334$sfx334"
+            if (@($btn334 | Where-Object { $_.Name -eq $want334 }).Count -ne 1) {
+                $v334Bad += "$want334 is missing or authored twice - each of the nine panes carries exactly one + and one - (SPEC I103b, V334b)"
+            }
+        }
+    }
+    if ($btn334.Count -ne 18) { $v334Bad += "$($btn334.Count) btnFont* button(s) on the sheet, expected 18 - nine panes and a pair each (SPEC I112c, V334b)" }
+
+    # (c) every one of them goes through fontStep with the step and nothing else. A button that
+    # writes .fontSize itself is a second place the ceiling lives (SPEC V135, V334a, V334c).
+    foreach ($b334 in $btn334) {
+        $wantClick334 = if ($b334.Name -like 'btnFontUp*') { 'fontStep(self, 2);' } else { 'fontStep(self, -2);' }
+        if ($b334.Click -ne $wantClick334) { $v334Bad += "$($b334.File) $($b334.Name) calls '$($b334.Click)', expected '$wantClick334' - one function owns the step and both limits (SPEC V334c)" }
+    }
+}
+
+# (a) the floor, the ceiling and the step are written ONCE, inside fontStep.
+$fs334 = [regex]::Match($rootLua333, '(?s)function fontStep\(from, delta\)(.*?)\n\t{3}end;')
+if (-not $fs334.Success) { $v334Bad += "fontStep is gone - it is the one place the 10, the 32 and the 2 are allowed to live, and without it this leg measured nothing (SPEC I103a, V334a, V209)" }
+else {
+    $body334 = $fs334.Groups[1].Value
+    if ($body334 -notmatch 'if s < 10 then s = 10; end;') { $v334Bad += "fontStep has no floor at 10 - the minus button would run the text down to nothing (SPEC I103a, V334a)" }
+    if ($body334 -notmatch 'if s > 32 then s = 32; end;') { $v334Bad += "fontStep has no ceiling at 32 - the plus button would run past what the box can hold (SPEC I103a, V334a)" }
+    if ($body334 -notmatch 'setField\("descFontSize", s\)') { $v334Bad += "fontStep does not write descFontSize - the size would die with the session, and the user asked for it SAVED (SPEC I103c, Q7)" }
+
+    # and nowhere else in the chunk: a hardcoded size on any pane is the second copy of the
+    # number, which is how two buttons end up disagreeing about where the zoom stops.
+    $outside334 = $rootLua333.Replace($fs334.Value, '')
+    $hard334 = @([regex]::Matches($outside334, '\.fontSize\s*=\s*\d+'))
+    if ($hard334.Count -gt 0) { $v334Bad += "$($hard334.Count) fontSize assignment(s) to a literal number outside fontStep ($(($hard334 | ForEach-Object { $_.Value.Trim() }) -join ', ')) - the size has one writer and it reads the field (SPEC V334a, V135)" }
+}
+
+# (e) the way back, which is the half V316c asks of theme and Q7 asks of this: the field is READ
+# on open and applied to all eight, and a sheet that never had one opens at 12 and not at nil.
+$ad334 = [regex]::Match($rootLua333, '(?s)function applyDescFont\(from\)(.*?)\n\t{3}end;')
+if (-not $ad334.Success) { $v334Bad += "applyDescFont is gone - nothing would put the saved size back, and descFontSize would be a field written and never read (SPEC V334e)" }
+else {
+    $adBody334 = $ad334.Groups[1].Value
+    if ($adBody334 -notmatch 'local size = 12;') { $v334Bad += "applyDescFont has no 12 to fall back on - a sheet saved before this round would open at nil (SPEC V334e)" }
+    if ($adBody334 -notmatch 'DESC_PANES') { $v334Bad += "applyDescFont does not walk DESC_PANES - it would put the size back on fewer than the nine (SPEC I103c, I112c)" }
+}
+# and the walk has to REACH the nine: naming DESC_PANES inside applyDescFont says nothing about
+# what DESC_PANES HOLDS, and a pane left out of the table wears its + and - and ignores them -
+# a zoom that does nothing is the silent half B7 describes (SPEC I103c, I112c, T806).
+$dp334 = [regex]::Match($rootLua333, '(?s)local DESC_PANES = \{(.*?)\};')
+if (-not $dp334.Success) { $v334Bad += "DESC_PANES is gone from WoD20th.lfm - applyDescFont would walk nothing and every pane would keep the authored 12 (SPEC I103c, V209)" }
+else {
+    $inPanes334 = @([regex]::Matches($dp334.Groups[1].Value, '(\w+)\s*=\s*true') | ForEach-Object { $_.Groups[1].Value })
+    if ($inPanes334.Count -eq 0) { $v334Bad += "DESC_PANES parsed to 0 pane(s) - the table's shape moved and this leg is measuring nothing (SPEC V20, B7)" }
+    else {
+        foreach ($want in $PANES334) { if ($inPanes334 -notcontains $want) { $v334Bad += "$want is not in DESC_PANES - it carries a zoom pair the walk never reaches, so its + and - do nothing (SPEC I103c, I112c)" } }
+        foreach ($got in $inPanes334) { if ($PANES334 -notcontains $got) { $v334Bad += "DESC_PANES carries '$got', which is not one of the $($PANES334.Count) description panes - the walk would resize a control that is not one (SPEC I103c)" } }
+    }
+}
+$ready334 = [regex]::Match($rootLua333, '(?s)<event name="onNodeReady">(.*?)</event>')
+if (-not $ready334.Success) { $v334Bad += "the root form has no onNodeReady - there is nowhere for the way back to run (SPEC V209)" }
+elseif ($ready334.Groups[1].Value -notmatch 'applyDescFont\(self\);') { $v334Bad += "the root onNodeReady never calls applyDescFont - the size would be written and never read, which is V316c's half-loop (SPEC V334e)" }
+
+# (d) the panes still own no field. What leaks to the NDB on purpose is the SIZE; the TEXT does
+# not, and V29 is untouched by this round.
+foreach ($f334 in $files) {
+    foreach ($n334 in (Doc $f334.FullName).SelectNodes("//textEditor[@name]")) {
+        if ($PANES334 -notcontains $n334.GetAttribute("name")) { continue }
+        if ($n334.HasAttribute("field")) { $v334Bad += "$($f334.Name) $($n334.GetAttribute('name')) owns a field - book text would be written onto the character (SPEC V29, V334d)" }
+    }
+}
+
+# (f) descFontSize has no widget of its own, so it has to be DECLARED Lua-owned - otherwise the
+# exception V8 grants would be a generic escape hatch instead of a closed list (SPEC I3, B25).
+if ($luaOwned -notcontains 'descFontSize') { $v334Bad += "descFontSize is not in the declared Lua-owned list - a field with no widget owner needs the declaration, or V8's exception stops being a closed list (SPEC I3, V334f, B25)" }
+
+if ($v334Bad) { foreach ($b in $v334Bad) { Fail "V334 $b" } }
+else { Pass "V334 nine description panes carry eighteen zoom buttons, all of them through the one fontStep that owns the 10, the 32 and the 2, with descFontSize written on the click and read back on open" }
+
+# ---- V337: a family ceiling refuses, and never tidies up (SPEC I106, I108c, T781) ---------
+# The table is SPARSE by design: only the family a book actually limits has a row, and having no
+# row is the normal case for twenty-one of the twenty-three. What this measures is that the rows
+# that DO exist can fire, fire before anything is written, and never reach back to take away a
+# dot the player had already marked.
+$v337Bad = @()
+$cap337 = @{}
+$capBlock337 = [regex]::Match($rootTxt, '(?s)\n\t{3}FAMILY_CAP = \{(.*?)\n\t{3}\};')
+if (-not $capBlock337.Success) {
+    $v337Bad += "FAMILY_CAP is not declared on the root form - the ceilings I106 measured out of the books are not on the sheet at all (SPEC I106a, V209)"
+} else {
+    foreach ($m337 in [regex]::Matches($capBlock337.Groups[1].Value, '\["([^"]+)"\]\s*=\s*\{([^}]*)\}')) {
+        $row337 = @{}
+        foreach ($kv337 in [regex]::Matches($m337.Groups[2].Value, '(\w+)\s*=\s*(\d+)')) { $row337[$kv337.Groups[1].Value] = [int]$kv337.Groups[2].Value }
+        $cap337[$m337.Groups[1].Value] = $row337
+    }
+}
+
+# (g) zero-guard FIRST: two families are capped today, so an empty table is the parser breaking
+# and not the sheet getting tidy - and every leg below would pass on the empty set (SPEC B7).
+if ($cap337.Count -eq 0) { $v337Bad += "FAMILY_CAP parsed to no rows at all - two families carry a ceiling, so this is the collector failing and every leg below would pass on nothing (SPEC V20, B7)" }
+else {
+    # (a) a ceiling on a family the dropdown does not offer can never fire, which V337a calls
+    # worse than absent: it reads like the rule is enforced when nothing enforces it.
+    $famFor337 = @()
+    if ($PICKER.ContainsKey('family')) { $famFor337 = @($PICKER['family'] | Where-Object { $_ }) }
+    foreach ($k337 in $cap337.Keys) {
+        if ($famFor337 -notcontains $k337) { $v337Bad += "FAMILY_CAP caps '$k337', which PICKER_LIST['family'] does not offer - a ceiling nobody can select never fires (SPEC V337a)" }
+    }
+
+    # (b) the Enrathi numbers, LITERAL, off gr p.95 - "may not have a Humanity rating higher
+    # than 3" and a Conscience of two. Asserted rather than merely counted, because a cap that
+    # drifts by one is a cap that reads correct and refuses the wrong dot (SPEC R127, V337b).
+    if (-not $cap337.ContainsKey('Enrathi')) { $v337Bad += "FAMILY_CAP has no Enrathi row - it is the one cap R127 measured before this round and the one V337b names (SPEC V209)" }
+    else {
+        if ($cap337['Enrathi']['humanity'] -ne 3) { $v337Bad += "Enrathi caps humanity at '$($cap337['Enrathi']['humanity'])', expected 3 (SPEC R127, V337b)" }
+        if ($cap337['Enrathi']['conscience'] -ne 2) { $v337Bad += "Enrathi caps conscience at '$($cap337['Enrathi']['conscience'])', expected 2 (SPEC R127, V337b)" }
+    }
+}
+
+# (c) the NUMBER is read in one place. The entry points HAVE to be two - a blood pool dot may not
+# reach xpClick (SPEC V219) and a rating dot may not skip it - but a second reader of the table
+# is a second place the ceiling can be got wrong, which is what V135 is really about.
+$fc337 = LuaFn $rootTxt 'familyCap'
+if (-not $fc337) { $v337Bad += "familyCap is gone - each refuser would have to find the ceiling for itself, which is the two-owners disease V135 exists for (SPEC V337c)" }
+$readers337 = @([regex]::Matches($rootTxt, 'FAMILY_CAP\['))
+if ($readers337.Count -ne 1) { $v337Bad += "FAMILY_CAP is indexed $($readers337.Count) time(s) in the root chunk, expected exactly once, inside familyCap (SPEC V337c, V135)" }
+
+# (d) BOTH refusers say no BEFORE they write. A guard that lets the mark land and argues
+# afterwards cost three rounds once already (SPEC B38, V135, V337d).
+$click337 = NoComments (LuaFn $rootTxt 'xpClick')
+if (-not $click337) { $v337Bad += "xpClick not found - leg (d) measured nothing on the rating side (SPEC V209)" }
+else {
+    $capAt337 = $click337.IndexOf('familyCap(trait)')
+    $markAt337 = $click337.IndexOf('markDot(')
+    if ($capAt337 -lt 0) { $v337Bad += "xpClick never asks familyCap - humanity and conscience would take the dot with no ceiling in the way (SPEC I106b, I106c)" }
+    elseif ($markAt337 -ge 0 -and $capAt337 -gt $markAt337) { $v337Bad += "xpClick asks familyCap AFTER it marks - the dot would land and the refusal would arrive too late to mean anything (SPEC V337d, B38)" }
+}
+$blood337 = NoComments (LuaFn $rootTxt 'bloodClick')
+if (-not $blood337) { $v337Bad += "bloodClick not found - leg (d) measured nothing on the blood pool side (SPEC V209)" }
+else {
+    $bCap337 = $blood337.IndexOf('familyCap("bloodPool")')
+    $bSet337 = $blood337.IndexOf('setField(field, true)')
+    if ($bCap337 -lt 0) { $v337Bad += "bloodClick never asks familyCap - the blood ceiling would be data nobody reads (SPEC V337c)" }
+    elseif ($bSet337 -lt 0) { $v337Bad += "bloodClick never turns a dot ON - the twenty dots would be one-way (SPEC V209)" }
+    elseif ($bCap337 -gt $bSet337) { $v337Bad += "bloodClick asks familyCap AFTER it writes - that is the write-then-undo the whole amendment of V219 was made to avoid (SPEC V337d, Q20)" }
+}
+
+# (e) nothing REACHES BACK. Choosing a capped family with a rating already above it must not
+# clear a single dot: an aged value stays, exactly as it does under the generation ceiling
+# (SPEC I106d, V187, Q18). This is the leg that catches the tidy-up that looks like kindness.
+$reach337 = @([regex]::Matches($rootTxt, 'setField\("(humanity_\d+|conscience[_\d]*|bloodPool_\d+)"\s*,\s*false'))
+if ($reach337.Count -gt 0) { $v337Bad += "$($reach337.Count) place(s) write a capped trait to false - a cap stops the NEXT dot and never takes back one the player marked (SPEC I106d, V187, B75)" }
+
+# (f) the refusal SPEAKS, and in both languages (SPEC I106f, V10, V130).
+foreach ($side337 in @(@('pt', $ptK), @('en', $enK))) {
+    if (-not $side337[1].Contains('That family caps this trait')) { $v337Bad += "the refusal has no [$($side337[0])] key - it would show the raw English to a player reading Portuguese, and V130 exists because a string living only in Lua escapes the XML checks (SPEC I106f)" }
+}
+
+if ($v337Bad) { foreach ($b in $v337Bad) { Fail "V337 $b" } }
+else { Pass "V337 $($cap337.Count) family ceiling(s), all on families the dropdown offers, the number read in one place, both refusers saying no before they write, nothing reaching back to unmark a dot, and the refusal keyed in both languages" }
+
+# ---- V341: Grimaldi is TWO families, split on the weakness (SPEC I108b, R129, Q14) --------
+# R93 put Grimaldi on one line because the Discipline TRIO matches in both books. It does -
+# Celerity, Dominate, Fortitude in da p.454 and in gr p.98 alike - and that was the whole
+# comparison. The WEAKNESS is the second axis and it does NOT match: the medieval family is
+# capped at eight blood points, the modern one carries a behavioural flaw with no number in it.
+# One line was an INCOMPLETE decision rather than a wrong one, and this is what stops it from
+# quietly closing back up.
+$v341Bad = @()
+$fam341 = @()
+if ($PICKER.ContainsKey('family')) { $fam341 = @($PICKER['family'] | Where-Object { $_ }) }
+
+# zero-guard FIRST: an empty list means the parser broke, and every leg below would pass on it.
+if ($fam341.Count -eq 0) { $v341Bad += "PICKER_LIST['family'] parsed to nothing - the collector broke and every leg below would pass on the empty set (SPEC V20, B7)" }
+else {
+    # (a) 23 entries, both era names present, and the bare name GONE. A bare Grimaldi surviving
+    # beside the two would be a third family nobody decided on, and CLANS would answer for it.
+    if ($fam341.Count -ne 24) { $v341Bad += "PICKER_LIST['family'] holds $($fam341.Count) entries, expected 24 - the 22 R93 froze, with Grimaldi split by era and Obertus by line (SPEC I108b, V341a, V342a)" }
+    foreach ($want341 in @('Grimaldi (Dark Ages)', 'Grimaldi (Modern)')) {
+        if ($fam341 -notcontains $want341) { $v341Bad += "'$want341' is not in the family list - the split R129 measured is not on the sheet (SPEC V341a)" }
+    }
+    if ($fam341 -contains 'Grimaldi') { $v341Bad += "the bare 'Grimaldi' is still in the family list beside the two era entries - a third family nobody decided on, and a sheet saved on it would go on answering (SPEC V341a)" }
+
+    # (b) both carry the SAME trio, because the trio is exactly what did NOT diverge. A check
+    # that only asserted "two entries exist" would pass on two entries disagreeing about the
+    # Disciplines, which is the opposite of what R129 found.
+    $trio341 = @('Celerity', 'Dominate', 'Fortitude')
+    foreach ($k341 in @('Grimaldi (Dark Ages)', 'Grimaldi (Modern)')) {
+        if (-not $clanEntries.ContainsKey($k341)) { $v341Bad += "CLANS has no entry for '$k341' - the dropdown would offer a family that fills no Discipline slot (SPEC V341b, V236a)"; continue }
+        $got341 = @($clanEntries[$k341].fixed)
+        if (($got341 -join '|') -ne ($trio341 -join '|')) { $v341Bad += "CLANS gives '$k341' the trio '$($got341 -join ', ')', expected '$($trio341 -join ', ')' - the trio is what MATCHED in both books, and the weakness is what split them (SPEC R129, V341b)" }
+    }
+
+    # (d) the union grows with the list, and the union is what the ghoul dropdown shows.
+    $union341 = 0
+    if ($PICKER.ContainsKey('clanFamily')) { $union341 = @($PICKER['clanFamily']).Count }
+    if ($union341 -ne 86) { $v341Bad += "the clan+family union counts $union341, expected 86 - 62 clans counting the empty item, and 24 families (SPEC I29b, V341d)" }
+}
+
+# (c) the medieval family is capped at eight blood points and the modern one is NOT. The user
+# settled how on 2026-08-28 (Q20): V219 was amended so the dots stop marking themselves, which
+# is what gave the cap a BEFORE to stand in. The pair matters more than either half - a cap on
+# both would be the sheet outvoting gr p.98, which gives the modern family a behavioural flaw
+# with no number in it at all (SPEC R129, I108c, V341c).
+if ($cap337.Count -gt 0) {
+    if (-not $cap337.ContainsKey('Grimaldi (Dark Ages)')) { $v341Bad += "FAMILY_CAP has no 'Grimaldi (Dark Ages)' row - da p.454 caps the family at eight blood points and the split exists to carry that (SPEC I108c, V341c)" }
+    elseif ($cap337['Grimaldi (Dark Ages)']['bloodPool'] -ne 8) { $v341Bad += "the medieval Grimaldi caps bloodPool at '$($cap337['Grimaldi (Dark Ages)']['bloodPool'])', expected 8 (SPEC R129, V341c)" }
+    if ($cap337.ContainsKey('Grimaldi (Modern)')) { $v341Bad += "the MODERN Grimaldi carries a cap - gr p.98 gives it a behavioural flaw with no number in it, and a ceiling invented here would be the sheet outvoting the book (SPEC R129, V341c)" }
+}
+
+if ($v341Bad) { foreach ($b in $v341Bad) { Fail "V341 $b" } }
+else { Pass "V341 Grimaldi stands as two families on the 24-entry list, the bare name gone, both carrying the one trio that did not diverge, and the ghoul union grown to 86" }
+# ---- V342: the Obertus Narov LINE is its own entry, not a choice slot (SPEC T786, Q21) ----
+# The number V342 is RESERVED here and /ck:spec still owes its SPEC text - the check is written
+# first so the decision cannot regress while the spec catches up (the same order V333's deferred
+# legs are recorded in).
+#
+# gr p.102: "Obertus revenants, who display signs of the Narov line, should swap Obfuscate for
+# Dominate." That is a CONDITION, not a free pick, and the difference is the whole reason this
+# is two entries instead of one entry with an open third slot: a choice slot would hand Dominate
+# to ANY Obertus, which is permission the book does not give. Splitting by era would have been
+# wrong for the other reason - the era does NOT diverge here (SPEC T786): the trio matches in
+# both books and the weakness differs only in which Derangement, which this sheet never models.
+$v342Bad = @()
+$OBERTUS342 = @{ 'Obertus' = @('Auspex', 'Obfuscate', 'Vicissitude'); 'Obertus (Narov)' = @('Auspex', 'Dominate', 'Vicissitude') }
+$fam342 = @()
+if ($PICKER.ContainsKey('family')) { $fam342 = @($PICKER['family'] | Where-Object { $_ }) }
+
+# zero-guard FIRST - an empty roster passes every leg below on nothing (SPEC V20, B7).
+if ($fam342.Count -eq 0) { $v342Bad += "PICKER_LIST['family'] parsed to nothing - every leg below would pass on the empty set (SPEC V20, B7)" }
+else {
+    foreach ($k342 in $OBERTUS342.Keys) {
+        if ($fam342 -notcontains $k342) { $v342Bad += "'$k342' is not in the family list - the pair Q21 settled is not on the sheet (SPEC V342a)" ; continue }
+        if (-not $clanEntries.ContainsKey($k342)) { $v342Bad += "CLANS has no entry for '$k342' - the dropdown would offer a family that fills no Discipline slot (SPEC V236a)"; continue }
+        $got342 = @($clanEntries[$k342].fixed)
+        $want342 = $OBERTUS342[$k342]
+        if (($got342 -join '|') -ne ($want342 -join '|')) { $v342Bad += "CLANS gives '$k342' the trio '$($got342 -join ', ')', expected '$($want342 -join ', ')' (SPEC R129, T786, V342b)" }
+        # (d) the swap is a CONDITION: a fixed trio each, never an open slot. An open slot would
+        # hand Dominate to any Obertus, which gr p.102 does not allow.
+        if ($clanEntries[$k342].choice.Count -gt 0 -or $clanEntries[$k342].open -gt 0) {
+            $v342Bad += "'$k342' is released by choice or open - the Narov swap is a condition the book ties to the LINE, and an open slot would offer Dominate to any Obertus (SPEC V342d, Q21)"
+        }
+    }
+    # the two must actually DIFFER, and by exactly the one Discipline the book swaps. A check
+    # that only asserted "two entries exist" would pass on two identical ones, which is the
+    # split quietly closing back up.
+    if ($clanEntries.ContainsKey('Obertus') -and $clanEntries.ContainsKey('Obertus (Narov)')) {
+        $a342 = @($clanEntries['Obertus'].fixed)
+        $b342 = @($clanEntries['Obertus (Narov)'].fixed)
+        $diff342 = @(Compare-Object $a342 $b342 | ForEach-Object { $_.InputObject })
+        $dl342 = ($diff342 | Sort-Object) -join '|'
+        if ($dl342 -ne 'Dominate|Obfuscate') {
+            $v342Bad += "the two Obertus trios differ by '$($diff342 -join ', ')', expected exactly Obfuscate for Dominate - that one swap IS the line (SPEC R129, V342b)"
+        }
+    }
+    # (c) neither era gives Obertus a NUMBER, so neither entry may carry a ceiling. This is the
+    # leg that stops T786's reading from being re-litigated as a cap nobody measured.
+    foreach ($k342 in $OBERTUS342.Keys) {
+        if ($cap337.ContainsKey($k342)) { $v342Bad += "FAMILY_CAP caps '$k342' - neither da p.454 nor gr p.102 puts a NUMBER on this family's weakness, and a ceiling invented here is the sheet outvoting the book (SPEC T774, V342c)" }
+    }
+}
+
+if ($v342Bad) { foreach ($b in $v342Bad) { Fail "V342 $b" } }
+else { Pass "V342 Obertus stands as two entries, one per line, differing by exactly the Obfuscate/Dominate swap gr p.102 names, each with a FIXED trio and neither carrying a ceiling" }
+
+
+# ---- V340: the two merit/flaw tables ARE the list now (SPEC I100d, T750, B82) ----
+# SPEC I100d asked for ONE table and said "no name is shared between merits and flaws -
+# CONFIRMED before it holds". The confirmation ran in T750 and found `Cannibal`: a 1pt Merit
+# in Lore of the Clans p.106 and a 3pt Flaw in Ghouls & Revenants p.136, opposite mechanics
+# the dedupe keeps apart. So the module ships TWO tables and (b) below is per-table, with the
+# crossing names NAMED here - an unnamed crossing is a dedupe that never happened (SPEC B82).
+$v340Bad = @()
+$V340_BOTH    = @('Cannibal')                     # name allowed in BOTH tables
+$V340_NO_COST = @('Construct', 'Stormwarden')     # M20 Victorian Age p.122 prints no cost at all
+$V340_N       = @{ MERIT_DATA = 380; FLAW_DATA = 493 }   # Q24 split them: 311/336 = 647 -> 380/493 = 873 (SPEC T796, V348c)
+$V340_PICK    = @{ MERIT_DATA = 'merit'; FLAW_DATA = 'flaw' }
+$mdPath = Join-Path $plugin "meritData.lua"
+$mdTbl  = @{}
+if (-not (Test-Path $mdPath)) {
+    $v340Bad += "meritData.lua is not in the plugin folder - every leg below would pass on nothing (SPEC V20, B7)"
+} else {
+    $mdTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($mdPath))
+    foreach ($tn in @('MERIT_DATA', 'FLAW_DATA')) {
+        $blk = [regex]::Match($mdTxt, "(?s)local $tn = \{(.*?)\r?\n\};")
+        if (-not $blk.Success) { $v340Bad += "table $tn is not in meritData.lua (SPEC I100d)"; continue }
+        $d = New-Object 'System.Collections.Generic.Dictionary[string,object]' ([StringComparer]::Ordinal)
+        foreach ($m in [regex]::Matches($blk.Groups[1].Value, '\["((?:[^"\\]|\\.)*)"\]\s*=\s*\{\s*book\s*=\s*"((?:[^"\\]|\\.)*)"\s*,\s*page\s*=\s*"([^"]*)"\s*,\s*cost\s*=\s*"([^"]*)"\s*\}')) {
+            $k = $m.Groups[1].Value -replace '\\"', '"' -replace '\\\\', '\'
+            # (b) no duplicate key INSIDE a table - Lua would keep the last one silently
+            if ($d.ContainsKey($k)) { $v340Bad += "(b) '$k' appears twice in $tn - Lua keeps the last one and the first is lost without a word" ; continue }
+            $d[$k] = [pscustomobject]@{
+                Book = ($m.Groups[2].Value -replace '\\"', '"' -replace '\\\\', '\')
+                Page = $m.Groups[3].Value
+                Cost = $m.Groups[4].Value
+            }
+        }
+        $mdTbl[$tn] = $d
+    }
+}
+# (g) zero-guard FIRST - an empty table passes every leg below on nothing (SPEC V20, B7)
+foreach ($tn in @('MERIT_DATA', 'FLAW_DATA')) {
+    if (-not $mdTbl.ContainsKey($tn) -or $mdTbl[$tn].Count -eq 0) { $v340Bad += "(g) $tn parsed to nothing" }
+}
+if ($v340Bad.Count -eq 0) {
+    foreach ($tn in @('MERIT_DATA', 'FLAW_DATA')) {
+        $d = $mdTbl[$tn]
+        # (f) the count T750 measured, and the picker list that stands beside it
+        if ($d.Count -ne $V340_N[$tn]) { $v340Bad += "(f) $tn holds $($d.Count) entries, expected $($V340_N[$tn]) - a smaller table is an entry the regeneration dropped without a word (SPEC T750)" }
+        $pk = @()
+        if ($PICKER.ContainsKey($V340_PICK[$tn])) { $pk = @($PICKER[$V340_PICK[$tn]] | Where-Object { $_ -ne '' }) }
+        if ($pk.Count -eq 0) { $v340Bad += "(f) PICKER_LIST['$($V340_PICK[$tn])'] parsed to nothing - the dropdown and the table cannot be compared" }
+        else {
+            $only = @($pk | Where-Object { -not $d.ContainsKey($_) })
+            $miss = @($d.Keys | Where-Object { $pk -notcontains $_ })
+            if ($only.Count) { $v340Bad += "(f) PICKER_LIST['$($V340_PICK[$tn])'] offers $($only.Count) item(s) $tn has no data for, first '$($only[0])' - picking it would write an empty book, page and cost" }
+            if ($miss.Count) { $v340Bad += "(f) $tn carries $($miss.Count) key(s) the list never offers, first '$($miss[0])' - data nobody can reach" }
+        }
+        foreach ($k in $d.Keys) {
+            $e = $d[$k]
+            # (a) book and page are never empty; cost MAY be, in the two the book prints bare
+            if ($e.Book -eq '') { $v340Bad += "(a) '$k' in $tn has no book title (SPEC I100e)" }
+            if ($e.Page -eq '') { $v340Bad += "(a) '$k' in $tn has no page" }
+            if ($e.Cost -eq '' -and $V340_NO_COST -notcontains $k) {
+                $v340Bad += "(a) '$k' in $tn has an empty cost and is not one of the two M20 Victorian Age p.122 entries the book prints without one - an empty cost anywhere else means the parser lost it, and widening this exception turns it into a door (SPEC B82)"
+            }
+            # (c) every key is keyed in both languages AND in the PT map of WoD20.6
+            if (-not $ptK.Contains($k)) { $v340Bad += "(c) '$k' has no [pt] key in localization.lang (SPEC V17)" }
+            if (-not $enK.Contains($k)) { $v340Bad += "(c) '$k' has no [en] key in localization.lang (SPEC V17)" }
+            if (-not $embedded.ContainsKey($k)) { $v340Bad += "(c) '$k' is not in the PT map of WoD20.6.lfm - it has a [pt] key nothing ever reads (SPEC V28, B14)" }
+            # (d) a parenthesis without a collision is noise: it must have a sibling
+            $mm = [regex]::Match($k, '^(.+) \([^)]+\)$')
+            if ($mm.Success) {
+                $stem = $mm.Groups[1].Value
+                # o irmao pode ser outro sufixo OU o nome PELADO: o dedupe deixou `Oathbreaker`
+                # sem sufixo (bh/bos/da, 4pt) ao lado de `Oathbreaker (Ravnos)` (lotc, 2pt). O que
+                # V336d proibe e parentese SEM colisao, e essa colisao existe.
+                $sib = 0
+                foreach ($tn2 in @('MERIT_DATA', 'FLAW_DATA')) {
+                    foreach ($k2 in $mdTbl[$tn2].Keys) { if ($k2 -ne $k -and ($k2 -like "$stem (*)" -or $k2 -eq $stem)) { $sib++ } }
+                }
+                if ($sib -eq 0) { $v340Bad += "(d) '$k' wears an origin suffix with no sibling '$stem' or '$stem (...)' anywhere - a parenthesis without a collision is noise (SPEC V336d)" }
+            }
+        }
+    }
+    # (b) a name in BOTH tables has to be one the dedupe NAMED
+    $inBoth = @($mdTbl['MERIT_DATA'].Keys | Where-Object { $mdTbl['FLAW_DATA'].ContainsKey($_) })
+    foreach ($k in $inBoth) {
+        if ($V340_BOTH -notcontains $k) { $v340Bad += "(b) '$k' is in BOTH tables and is not on the named list - two mechanics under one name is the silent loss rule 0 of the dedupe exists to stop (SPEC B82)" }
+    }
+    foreach ($k in $V340_BOTH) {
+        if (-not ($mdTbl['MERIT_DATA'].ContainsKey($k) -and $mdTbl['FLAW_DATA'].ContainsKey($k))) { $v340Bad += "(b) '$k' is named as crossing both tables but no longer does - the exception outlived the reason for it" }
+    }
+    # (e) neither table may be read from a .lfm <script>: the CDATA is copied per open sheet
+    foreach ($f340 in (Get-ChildItem -LiteralPath $dir -Filter *.lfm)) {
+        $t340 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f340.FullName))
+        foreach ($tn in @('MERIT_DATA', 'FLAW_DATA')) {
+            if ($t340 -match "(?<![A-Za-z_])$tn(?![A-Za-z_])") { $v340Bad += "(e) $($f340.Name) names $tn inside its own script - the CDATA is copied raw into constructNew_*, so every open sheet would parse its own copy (SPEC I24, I100g, T479)" }
+        }
+    }
+}
+if ($v340Bad) { foreach ($b in $v340Bad) { Fail "V340 $b" } }
+else { Pass "V340 meritData.lua ships $($mdTbl['MERIT_DATA'].Count) merits and $($mdTbl['FLAW_DATA'].Count) flaws, each with a book and a page, cost empty only in the two the book prints bare, every key matching its picker list and keyed in [pt], [en] and the PT map, every origin suffix with a sibling, `Cannibal` the one name in both, and neither table read from a .lfm script" }
+
+# ---- V343: the SOURCE of those tables, measured (SPEC I100d, T750, B83, B84) ----
+# The .lua above is derived. research/merit_flaw.tsv is where the data actually lives, and it
+# is the file that rotted quietly: 81 `da` rows sat with no TYPE from T749 until T750 went to
+# build the lists, because nothing read them in between (SPEC B83). Data nobody reads has no
+# gate, so it rots - this is the gate.
+$v343Bad = @()
+$V343_BOOKS = @('core','lotc','gr','hh','bh','anarch','rob','lob','da','tos','dac','bos','sorc','sorcc','m20va')
+$V343_ROWS  = 782
+# 641 e ORDINAL de proposito. `Sleeping With the Enemy` (core p.492) e
+# `Sleeping with the Enemy` (bos p.66) diferem so no W e sao 2 linhas de livros diferentes -
+# uma hashtable comum do PowerShell e case-insensitive e funde as duas, que e o aviso que
+# merit_flaw_pt.tsv ja carrega no cabecalho. O gerador FUNDE por nome (o core vence a precedencia).
+$V343_NAMES = 641
+$tsv343 = Join-Path $PSScriptRoot "research\merit_flaw.tsv"
+
+$pt343  = Join-Path $PSScriptRoot "research\merit_flaw_pt.tsv"
+
+if (-not (Test-Path $tsv343)) { $v343Bad += "research/merit_flaw.tsv not found at '$tsv343' - every leg below would pass on nothing (SPEC V20, B7)" }
+elseif (-not (Test-Path $pt343)) { $v343Bad += "research/merit_flaw_pt.tsv not found at '$pt343'" }
+else {
+    $rows343 = @([System.IO.File]::ReadAllLines($tsv343, [System.Text.Encoding]::UTF8) | Where-Object { $_ -notmatch '^#' -and $_.Trim() -ne '' })
+    $tr343 = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+    foreach ($l in [System.IO.File]::ReadAllLines($pt343, [System.Text.Encoding]::UTF8)) {
+        if ($l -match '^#' -or $l.Trim() -eq '') { continue }
+        $c = $l -split "`t"
+        if ($c.Count -ge 2 -and $c[1].Trim() -ne '') { [void]$tr343.Add($c[0].Trim()) }
+    }
+    # (e) zero-guard FIRST
+    if ($rows343.Count -eq 0) { $v343Bad += "(e) merit_flaw.tsv is empty or all comment" }
+    elseif ($tr343.Count -eq 0) { $v343Bad += "(e) merit_flaw_pt.tsv is empty or all comment" }
+    else {
+        $names343 = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+        foreach ($l in $rows343) {
+            $c = $l -split "`t"
+            if ($c.Count -lt 6) { $v343Bad += "(b) a row has $($c.Count) columns, expected 6: '$($l.Substring(0, [Math]::Min(50, $l.Length)))'" ; continue }
+            [void]$names343.Add($c[0].Trim())
+            # (a) the column that rotted
+            if ($c[1].Trim() -eq '') { $v343Bad += "(a) '$($c[0].Trim())' ($($c[4].Trim()) p.$($c[5].Trim())) has no TYPE - it has no list on the sheet to enter, and nothing downstream would say so (SPEC B83)" }
+            elseif ($c[1].Trim() -notin @('Merit', 'Flaw')) { $v343Bad += "(a) '$($c[0].Trim())' has type '$($c[1].Trim())', which is neither Merit nor Flaw" }
+            if ($V343_BOOKS -notcontains $c[4].Trim()) { $v343Bad += "(b) '$($c[0].Trim())' names book '$($c[4].Trim())', which is not one of the 15 in research/README.md" }
+            if ($c[5].Trim() -notmatch '^\d+$') { $v343Bad += "(b) '$($c[0].Trim())' has page '$($c[5].Trim())', which is not a number" }
+        }
+        # (c) no orphan in EITHER direction - an orphan is the trail of a name changed on one side
+        foreach ($n in $names343) { if (-not $tr343.Contains($n)) { $v343Bad += "(c) '$n' has no translation in merit_flaw_pt.tsv" } }
+        foreach ($n in $tr343)   { if (-not $names343.Contains($n)) { $v343Bad += "(c) merit_flaw_pt.tsv translates '$n', which merit_flaw.tsv no longer carries" } }
+        # (d) the count - smaller is an entry the re-extraction lost without a word (SPEC B84)
+        if ($rows343.Count -ne $V343_ROWS)   { $v343Bad += "(d) merit_flaw.tsv holds $($rows343.Count) rows, expected $V343_ROWS - a re-extraction that loses entries exits 0 and says nothing (SPEC B84)" }
+        if ($names343.Count -ne $V343_NAMES) { $v343Bad += "(d) merit_flaw.tsv holds $($names343.Count) distinct names, expected $V343_NAMES" }
+    }
+}
+if ($v343Bad) { foreach ($b in $v343Bad) { Fail "V343 $b" } }
+else { Pass "V343 research/merit_flaw.tsv holds $V343_ROWS rows and $V343_NAMES names, every one typed Merit or Flaw, every book among the 15 and every page a number, and merit_flaw_pt.tsv matches it with no orphan in either direction" }
+
+
+# ---- V336: the background list - Artifacts in place, the two translations changed, and a
+# parenthesis ONLY where a collision exists (SPEC V336, I105, T764, T766, T767) ------------
+# Six legs:
+#   (a) `Artifacts` is in PICKER_LIST["background"], between `Armory` and `Avatar` (I105a);
+#   (b) [pt] wod.Node = Nodo and wod.Pure Breed = Raca Pura, LITERAL, and [en] still reads
+#       the English word on both (I105c);
+#   (c) no item appears twice - V14 covers the general case, this leg is the one the
+#       parenthesis opened: `Status (Mage)` written twice reads as two games and is one;
+#   (d) every `Name (Origin)` item has at least one SIBLING `Name (OtherOrigin)`. A
+#       parenthesis with no collision behind it is noise, and it is also the shape a
+#       half-applied split leaves (I105b, measured in research/bg_essence.tsv);
+#   (e) every item has a key in descBackground_en AND _pt, so the ? button never opens an
+#       empty box (I102e). T765 has not shipped those modules yet, and this leg says so OUT
+#       LOUD in the Pass line rather than passing quietly on nothing (SPEC B7, V209);
+#   (f) zero-guard on all of it: an empty list, or a list with no parenthesised item at all,
+#       makes (c) and (d) true by vacuum.
+#
+# ASCII source on purpose (SPEC B84): PowerShell 5.1 reads a .ps1 without BOM as ANSI, so a
+# literal `Raca Pura` with the cedilla would arrive mojibake and the comparison would fail
+# SILENTLY. The accented string is built from its code point, the way V273 already does.
+$V336_PURE_PT = "Ra" + [char]0xE7 + "a Pura"
+$v336Bad = @()
+$bg336 = @($PICKER['background'])
+$v336Paren = @()
+$v336DescNote = ''
+if ($bg336.Count -lt 2) {
+    $v336Bad += "(f) PICKER_LIST[`"background`"] read $($bg336.Count) item(s) - every leg below would be true by vacuum (SPEC V209, B7)"
+} else {
+    # (a) position, not mere presence: I105a named the two neighbours
+    $i336 = [Array]::IndexOf($bg336, 'Artifacts')
+    if ($i336 -lt 0) { $v336Bad += "(a) 'Artifacts' is not in the background list at all (SPEC I105a)" }
+    elseif ($i336 -eq 0 -or $bg336[$i336 - 1] -cne 'Armory' -or $i336 -eq ($bg336.Count - 1) -or $bg336[$i336 + 1] -cne 'Avatar') {
+        $v336Bad += "(a) 'Artifacts' sits between '$(if ($i336 -gt 0) { $bg336[$i336 - 1] } else { '<start>' })' and '$(if ($i336 -lt ($bg336.Count - 1)) { $bg336[$i336 + 1] } else { '<end>' })', not between 'Armory' and 'Avatar' (SPEC I105a)"
+    }
+
+    # (b) the two translations the user changed, LITERAL on the [pt] side and untouched on [en]
+    $v336LangTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($langFile))
+    $v336En = [regex]::Match($v336LangTxt, '(?s)\[en\](.*?)(\n\[|$)')
+    $v336EnTxt = $(if ($v336En.Success) { $v336En.Groups[1].Value } else { '' })
+    if ($v336EnTxt.Length -eq 0) { $v336Bad += "(f) the [en] section of localization.lang read empty - the [en] half of leg (b) would pass on nothing (SPEC V209)" }
+    foreach ($p336 in @(@('Node', 'Nodo'), @('Pure Breed', $V336_PURE_PT))) {
+        if (-not $ptVal.ContainsKey($p336[0])) { $v336Bad += "(b) '$($p336[0])' has no [pt] key in localization.lang (SPEC I105c, V17)" }
+        elseif ($ptVal[$p336[0]] -cne $p336[1]) { $v336Bad += "(b) [pt] wod.$($p336[0]) reads '$($ptVal[$p336[0]])', and I105c fixed it at '$($p336[1])'" }
+        if ($v336EnTxt.IndexOf("wod.$($p336[0])=$($p336[0])") -lt 0) { $v336Bad += "(b) the [en] key wod.$($p336[0])=$($p336[0]) is gone - I105c changed the [pt] side only" }
+    }
+
+    # (c) and (d) - the two the parenthesis opened
+    $seen336 = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+    foreach ($it336 in $bg336) {
+        if ($it336 -eq '') { continue }
+        if (-not $seen336.Add($it336)) { $v336Bad += "(c) '$it336' is in the background list twice - the second one is a row the player can pick that means the same as the first" }
+        if ($it336 -match '^(.+?) \(([^()]+)\)$') { $v336Paren += ,@($it336, $Matches[1], $Matches[2]) }
+    }
+    foreach ($p336 in $v336Paren) {
+        $sib336 = 0
+        foreach ($q336 in $v336Paren) { if ($q336[1] -ceq $p336[1] -and $q336[2] -cne $p336[2]) { $sib336++ } }
+        if ($sib336 -eq 0) { $v336Bad += "(d) '$($p336[0])' wears an origin suffix with no sibling '$($p336[1]) (...)' in the list - a parenthesis without a collision is noise, and it is what a half-applied split looks like (SPEC I105b)" }
+    }
+    if ($v336Paren.Count -eq 0) { $v336Bad += "(f) no background item carries an origin suffix - leg (d) measured nothing, and I105b put at least the Status pair in this list (SPEC V209, B7)" }
+
+    # (e) the description modules T765 owes. Absent is reported, never assumed away.
+    $en336 = DescEntries (Join-Path $plugin "descBackground_en.lua") 'BACKGROUND_DESC' 'en'
+    $pt336 = DescEntries (Join-Path $plugin "descBackground_pt.lua") 'BACKGROUND_DESC' 'pt'
+    if ($null -eq $en336 -and $null -eq $pt336) {
+        $v336DescNote = ", and leg (e) MEASURED NOTHING because descBackground_en.lua and _pt.lua are not at the plugin root yet (SPEC T765)"
+    } elseif ($null -eq $en336 -or $null -eq $pt336) {
+        $v336Bad += "(e) only one half of descBackground is at the plugin root, or its BACKGROUND_DESC markers are gone - one language would open an empty box (SPEC I102e, V210)"
+    } else {
+        $k336 = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+        foreach ($e336 in $en336) { [void]$k336.Add($e336.Key) }
+        $j336 = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+        foreach ($e336 in $pt336) { [void]$j336.Add($e336.Key) }
+        foreach ($it336 in $bg336) {
+            if ($it336 -eq '') { continue }
+            if (-not $k336.Contains($it336)) { $v336Bad += "(e) '$it336' has no entry in descBackground_en.lua - its ? button opens an empty box (SPEC I102e)" }
+            if (-not $j336.Contains($it336)) { $v336Bad += "(e) '$it336' has no entry in descBackground_pt.lua - its ? button opens an empty box (SPEC I102e)" }
+        }
+        $v336DescNote = ", and all $($bg336.Count - 1) carry a description on both sides"
+    }
+}
+if ($v336Bad) { foreach ($b in $v336Bad) { Fail "V336 $b" } }
+else { Pass "V336 the background list holds $($bg336.Count - 1) items with 'Artifacts' between 'Armory' and 'Avatar', Node/Pure Breed translated on the [pt] side only, no item twice, and each of the $($v336Paren.Count) origin suffixes with a sibling$v336DescNote" }
+
+
+# ---- V344: the DESCRIPTION module of merits and flaws has no key that eats another --------
+# (SPEC V344, I102g, B89, T791/T792)
+# V340b already forbids a duplicate INSIDE each table of meritData.lua, and nothing looked at
+# descMerit_* at all - that gap is how `Cannibal` got in twice (Merit in Lore of the Clans
+# p.106, Flaw in Ghouls & Revenants p.136) and the second entry ate the first in silence, so
+# one of the two opened the other's text. Five legs:
+#   (a) no key appears twice in either half;
+#   (b) every name V340 marks as living in BOTH lists exists ONLY in composite form
+#       (`merit|<name>` AND `flaw|<name>`), and the bare form of that name is gone;
+#   (c) a name from one list only carries NO prefix - a prefix without a collision is noise,
+#       the same rule leg (d) of V336 applies to the origin suffix;
+#   (d) popOpen builds the key by CONCATENATION, never as a literal, or the renderer ends up
+#       nailed to one of the two halves the same way V210b describes;
+#   (e) zero-guard: nothing read, or no name in both lists, means (b) measured nothing.
+$v344Bad = @()
+$half344 = @{}
+foreach ($lang344 in @('en', 'pt')) {
+    $half344[$lang344] = DescEntries (Join-Path $plugin "descMerit_$lang344.lua") 'MERIT_DESC' $lang344
+    if ($null -eq $half344[$lang344]) { $v344Bad += "descMerit_$lang344.lua is not at the plugin root, or its MERIT_DESC markers are gone (SPEC I102e, V209)" }
+}
+# the names that live in both lists come from meritData.lua, which is the list's real artifact
+$both344 = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+$md344 = Join-Path $plugin 'meritData.lua'
+if (-not (Test-Path $md344)) { $v344Bad += "meritData.lua is not at the plugin root - there is nothing to say which names live in both lists (SPEC V209)" }
+else {
+    $mdTxt344 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($md344))
+    $tbl344 = @{}
+    foreach ($t344 in @('MERIT_DATA', 'FLAW_DATA')) {
+        $r344 = [regex]::Match($mdTxt344, '(?s)' + $t344 + '\s*=\s*\{(.*?)\n\};')
+        $s344 = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+        if ($r344.Success) { foreach ($m344 in [regex]::Matches($r344.Groups[1].Value, '\["([^"]+)"\]\s*=')) { [void]$s344.Add($m344.Groups[1].Value) } }
+        $tbl344[$t344] = $s344
+    }
+    if ($tbl344['MERIT_DATA'].Count -eq 0 -or $tbl344['FLAW_DATA'].Count -eq 0) {
+        $v344Bad += "(e) meritData.lua parsed to $($tbl344['MERIT_DATA'].Count) merit(s) and $($tbl344['FLAW_DATA'].Count) flaw(s) - leg (b) would have no name to check (SPEC V209, B7)"
+    }
+    foreach ($n344 in $tbl344['MERIT_DATA']) { if ($tbl344['FLAW_DATA'].Contains($n344)) { [void]$both344.Add($n344) } }
+}
+if ($both344.Count -eq 0 -and $v344Bad.Count -eq 0) {
+    $v344Bad += "(e) no name lives in both lists - leg (b) measured nothing, and `Cannibal` has been in both since T750 (SPEC V209, B7, B89)"
+}
+foreach ($lang344 in @('en', 'pt')) {
+    if ($null -eq $half344[$lang344]) { continue }
+    $seen344 = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+    foreach ($e344 in $half344[$lang344]) {
+        if (-not $seen344.Add($e344.Key)) { $v344Bad += "(a) descMerit_$lang344.lua carries '$($e344.Key)' twice - Lua keeps the LAST one, so the first entry's text is unreachable and its row opens the other one's description (SPEC B89)" }
+    }
+    foreach ($n344 in $both344) {
+        foreach ($p344 in @('merit', 'flaw')) {
+            if (-not $seen344.Contains("$p344|$n344")) { $v344Bad += "(b) '$n344' is in both lists but descMerit_$lang344.lua has no '$p344|$n344' - the row on the $p344 side has no text of its own (SPEC I102g)" }
+        }
+        if ($seen344.Contains($n344)) { $v344Bad += "(b) descMerit_$lang344.lua still carries the BARE key '$n344' next to the composite pair - the bare one is what the flat table used to eat (SPEC I102g, B89)" }
+    }
+    foreach ($k344 in $seen344) {
+        if ($k344 -cmatch '^(merit|flaw)\|(.+)$') {
+            if (-not $both344.Contains($Matches[2])) { $v344Bad += "(c) descMerit_$lang344.lua prefixes '$k344', but '$($Matches[2])' lives in one list only - a prefix without a collision is noise (SPEC I102g)" }
+        }
+    }
+}
+# (d) the key is BUILT, never a literal - read off the code with comments stripped (SPEC V222)
+$v344Cat = 0
+foreach ($f344 in $files) {
+    $code344 = CodeOf $f344.FullName
+    $v344Cat += ([regex]::Matches($code344, 'DESC\[\s*sub\s*\.\.')).Count
+    foreach ($m344 in [regex]::Matches($code344, 'DESC\[\s*"(?:merit|flaw)\|')) {
+        $v344Bad += "$($f344.Name) reads DESC with a LITERAL composite key - the side is then hard-wired and the other row can never reach its text (SPEC I102g, V210b)"
+    }
+}
+if ($v344Cat -eq 0) { $v344Bad += "(d) no .lfm builds the description key out of the list name - leg (d) read nothing and would pass on anything (SPEC V209, B7)" }
+if ($v344Bad) { foreach ($b in $v344Bad) { Fail "V344 $b" } }
+else { Pass "V344 descMerit_en/pt carry no key twice, the $($both344.Count) name(s) in both lists ship only as merit|/flaw| pairs, no one-list name wears a prefix, and popOpen builds the key by concatenation" }
+
+# ---- V348: the cost is a NUMBER, and the split of Q24 lost nothing --------------------
+# SPEC C Q24, I109, T796. A range is not a cost, it is N costs printed short; `1 or 3` ships as
+# `Acute Senses (1)` and `Acute Senses (3)`, each with its own number and the same book, page
+# and text. 87 entries became 313 and the two tables went 311/336 = 647 -> 380/493 = 873.
+#
+# What is NOT here, on purpose (SPEC V135, the T776 lesson): the cost being non-empty except in
+# the two the book prints bare, every key being in PICKER_LIST both ways, every key carrying a
+# [pt]/[en]/PT-map entry, and a parenthesis needing a sibling. V340 owns all four and measures
+# them over the same table - a second copy is a second ruler to age. What is left is what only
+# Q24 can break.
+$v348Bad = @()
+$V348_N = 873
+if ($mdTbl.Count -ne 2) {
+    $v348Bad += "meritData.lua did not parse into two tables - every leg below would read an empty set (SPEC V209, V20)"
+} else {
+    $all348 = 0
+    $sfx348 = 0
+    $stem348 = @{}
+    foreach ($tn348 in @('MERIT_DATA', 'FLAW_DATA')) {
+        foreach ($k348 in $mdTbl[$tn348].Keys) {
+            $e348 = $mdTbl[$tn348][$k348]
+            $all348++
+            # (a) THE Q24 rule, and nothing else measures it: V340a only asks that the cost is
+            # not empty, so `1-5` would sail through it exactly as it did for six rounds.
+            if ($e348.Cost -notmatch '^\d+$' -and $V340_NO_COST -notcontains $k348) {
+                $v348Bad += "(a) '$k348' in $tn348 costs '$($e348.Cost)', which is not a fixed number - a range is N entries printed short and Q24 splits them (SPEC I109a)"
+            }
+            # (d) the N in the parenthesis and the cost are the SAME number. V340d already asks
+            # that a suffix has a sibling; it never ties the suffix to the price, so `Boon (3)`
+            # costing 5 passes there - and on screen the player buys a number nobody printed.
+            $m348 = [regex]::Match($k348, '^(.+) \((\d+)\)$')
+            if ($m348.Success) {
+                $sfx348++
+                if ($e348.Cost -ne $m348.Groups[2].Value) {
+                    $v348Bad += "(d) '$k348' in $tn348 costs '$($e348.Cost)' and its suffix says $($m348.Groups[2].Value) - the number in the name IS the price (SPEC I109b)"
+                }
+                $key348 = $tn348 + '|' + $m348.Groups[1].Value
+                if (-not $stem348.ContainsKey($key348)) { $stem348[$key348] = New-Object 'System.Collections.Generic.List[object]' }
+                $stem348[$key348].Add([pscustomobject]@{ K = $k348; Book = $e348.Book; Page = $e348.Page })
+            }
+        }
+    }
+    # (c) the count, EXACT. Smaller is an entry the regeneration dropped without a word.
+    if ($all348 -ne $V348_N) { $v348Bad += "(c) the two tables hold $all348 entries, expected the $V348_N of Q24 - 380 merits and 493 flaws (SPEC T796)" }
+
+    # (f) the N sisters come from ONE entry of ONE book: same book, same page. A sister with a
+    # page of her own means the split ran over two different entries that share a name.
+    foreach ($s348 in $stem348.Keys) {
+        $g348 = $stem348[$s348]
+        $b348 = @($g348 | ForEach-Object { $_.Book } | Sort-Object -Unique)
+        $p348 = @($g348 | ForEach-Object { $_.Page } | Sort-Object -Unique)
+        if ($b348.Count -gt 1) { $v348Bad += "(f) the sisters of '$s348' name $($b348.Count) different books - one entry of one book was split, so they share it (SPEC I109b)" }
+        if ($p348.Count -gt 1) { $v348Bad += "(f) the sisters of '$s348' name pages $($p348 -join ', ') - the book prints one entry (SPEC I109b, I109d)" }
+    }
+
+    # (e) every key opens a description, on BOTH sides. V344 guards the composite keys and the
+    # duplicates; it never asks that a key HAS an entry, which is the leg V336e keeps for the
+    # backgrounds. A merit with no body opens an empty ? box and nothing says so.
+    $desc348 = @{}
+    foreach ($lang348 in @('en', 'pt')) {
+        $d348 = DescEntries (Join-Path $plugin "descMerit_$lang348.lua") 'MERIT_DESC' $lang348
+        $s = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+        if ($null -ne $d348) { foreach ($e in $d348) { [void]$s.Add($e.Key) } }
+        $desc348[$lang348] = $s
+    }
+    if ($desc348['en'].Count -eq 0 -or $desc348['pt'].Count -eq 0) {
+        $v348Bad += "(e) descMerit_en.lua or descMerit_pt.lua parsed to nothing - leg (e) would pass on the empty set (SPEC V209, V20)"
+    } else {
+        $miss348 = 0
+        $first348 = ''
+        foreach ($tn348 in @('MERIT_DATA', 'FLAW_DATA')) {
+            $kind348 = if ($tn348 -eq 'MERIT_DATA') { 'merit' } else { 'flaw' }
+            foreach ($k348 in $mdTbl[$tn348].Keys) {
+                # composite where the name lives in BOTH lists, bare otherwise - the rule I102g
+                # sets and V344 polices; here it only decides WHICH key to look for.
+                $want348 = if ($mdTbl['MERIT_DATA'].ContainsKey($k348) -and $mdTbl['FLAW_DATA'].ContainsKey($k348)) { "$kind348|$k348" } else { $k348 }
+                foreach ($lang348 in @('en', 'pt')) {
+                    if (-not $desc348[$lang348].Contains($want348)) {
+                        $miss348++
+                        if ($first348 -eq '') { $first348 = "$want348 (descMerit_$lang348)" }
+                    }
+                }
+            }
+        }
+        if ($miss348 -gt 0) { $v348Bad += "(e) $miss348 key(s) of meritData.lua open an EMPTY ? box, first '$first348' - the split has to carry the description with it (SPEC I109c, I102e)" }
+    }
+
+    # (g) zero-guard: no suffixed key at all means legs (d) and (f) read nothing, and Q24 put
+    # 313 of them in (SPEC V20, B7, B92).
+    if ($all348 -eq 0) { $v348Bad += "(g) no entry was read at all" }
+    if ($sfx348 -eq 0) { $v348Bad += "(g) no key carries a ( N ) suffix - legs (d) and (f) measured an empty set, and Q24 split 87 entries into 313 (SPEC V209, V20)" }
+}
+if ($v348Bad) { foreach ($b in $v348Bad) { Fail "V348 $b" } }
+else { Pass "V348 all 873 merit/flaw entries cost one fixed number, the 313 split keys price exactly what their suffix says, each family of sisters shares one book and page, and every key opens a description on both sides" }
+
+# ---- V349: the four columns, and the ruler the NAME never had -------------------------
+# SPEC I107a5, C Q25, T797, and B94 for why leg (c) is new. The user asked for the Page column
+# to shrink to its label and the room to go to Book; the ( N ) of Q24 pushed the widest [pt]
+# name from 240 to 264, so 18 of the 55 had to go to the name instead - and NOTHING measured
+# that column, because V196 reads comboBox and T783 turned the name into a <button>.
+$v349Bad = @()
+$doc349 = Doc (Join-Path $dir "WoD20.2.lfm")
+# left;width of every column, per template. The ? is in the gutter and is not a column (I102f).
+$V349_COLS = @{
+    'MeritPicked' = @{ 'merit_' = '20;264'; 'book_' = '284;117'; 'type_' = '401;45'; 'costy_' = '446;50' }
+    'MeritFree'   = @{ 'merit_' = '20;264'; 'book_' = '284;117'; 'type_' = '401;45'; 'costy_' = '446;50' }
+}
+$seen349 = 0
+foreach ($tn349 in @('MeritPicked', 'MeritFree')) {
+    $t349 = $doc349.SelectSingleNode("//template[@name='$tn349']")
+    if ($null -eq $t349) { $v349Bad += "the $tn349 template is gone (SPEC V209)"; continue }
+    foreach ($c349 in $t349.SelectNodes("edit|button")) {
+        $f349 = $c349.GetAttribute("field")
+        if ($f349 -eq '') { continue }
+        $root349 = $f349 -replace '\$\(num\)$', ''
+        if (-not $V349_COLS[$tn349].ContainsKey($root349)) { continue }
+        $got349 = "$($c349.GetAttribute('left'));$($c349.GetAttribute('width'))"
+        $seen349++
+        if ($got349 -ne $V349_COLS[$tn349][$root349]) {
+            $v349Bad += "(a) $tn349 draws '$root349' at $got349, expected $($V349_COLS[$tn349][$root349]) - the four columns tile 20..496 and a seam is what the eye catches first (SPEC I107a5)"
+        }
+    }
+}
+# the visible name of the picked half is the BUTTON, and it moves with the hidden twin or the
+# text sits over a field of another width (SPEC I107a1).
+$btn349 = $doc349.SelectSingleNode("//template[@name='MeritPicked']/button[starts-with(@name,'dynMerit_')]")
+if ($null -eq $btn349) { $v349Bad += "MeritPicked has no dynMerit_ button - the name column has no widget (SPEC I107a)" }
+else {
+    $w349 = 0
+    [void][int]::TryParse($btn349.GetAttribute("width"), [ref]$w349)
+    if ("$($btn349.GetAttribute('left'));$w349" -ne '20;264') { $v349Bad += "(a) the dynMerit_ button is at $($btn349.GetAttribute('left'));$w349, expected 20;264 - the button and its hidden twin are one column (SPEC I107a1, I107a5)" }
+
+    # (c) THE RULER. 6.0 px/char and not 6.5: T790 measured this column at 6.0 and R116 found
+    # real rendering at 5.89 or less, so 6.0 is a measured ceiling. NeededPx takes the longer of
+    # the [en] and [pt] halves, which is the whole point - the [pt] names are the long ones.
+    $worst349 = 0
+    $who349 = ''
+    $n349 = 0
+    foreach ($lst349 in @('merit', 'flaw')) {
+        if (-not $PICKER.ContainsKey($lst349)) { continue }
+        foreach ($it349 in $PICKER[$lst349]) {
+            if ($it349 -eq '') { continue }
+            $n349++
+            $px349 = NeededPx $it349 '12'
+            if ($px349 -gt $worst349) { $worst349 = $px349; $who349 = $it349 }
+        }
+    }
+    if ($n349 -eq 0) { $v349Bad += "(d) neither merit list reached the ruler - leg (c) measured nothing, which is the shape B94 already cost once (SPEC V209, V20)" }
+    elseif ($worst349 -gt $w349) {
+        $v349Bad += "(c) the name column is $w349 wide and '$who349' needs $worst349 at 6.0 px/char - a button CLIPS, and T790 closed this exact gap once already (SPEC B94, I107a4)"
+    }
+}
+# (b) the Page column still has to hold its own heading. Shrinking it to the label was the
+# request; shrinking it PAST the label is the way that request goes wrong.
+$pg349 = NeededPx 'Page'
+$hdr349 = @($doc349.SelectNodes("//label[@text='Page']"))
+if ($hdr349.Count -eq 0) { $v349Bad += "(b) no Page heading was found - the column check read nothing (SPEC V209)" }
+foreach ($h349 in $hdr349) {
+    $hw349 = 0
+    [void][int]::TryParse($h349.GetAttribute("width"), [ref]$hw349)
+    if ($hw349 -lt $pg349) { $v349Bad += "(b) the Page heading is $hw349 wide and 'Page'/'Pagina' needs $pg349 - the column was shrunk past its own label (SPEC C Q25, V16)" }
+}
+if ($seen349 -lt 8) { $v349Bad += "(d) only $seen349 of the 8 field columns were measured - this check is covering less than the two templates draw (SPEC V209)" }
+if ($v349Bad) { foreach ($b in $v349Bad) { Fail "V349 $b" } }
+else { Pass "V349 the four merit/flaw columns tile 20;264 284;117 401;45 446;50 in both templates, the Page heading still holds its own label, and the name column fits all $n349 items in both languages at 6.0 px/char" }
+
+# ---- V350: the dropdown comes out in the order it is READ ------------------------------
+# SPEC I110, C Q26, T799. The gate cannot RUN Lua (SPEC B30, B34), so every leg here measures
+# the SOURCE - and the source is where each of these can go wrong silently. None of them raises
+# an error at runtime: an unsorted pair renders a list that lies about which value it stores, a
+# sort before the orphan leaves the one visible item at the bottom, and a byte comparison looks
+# perfectly sorted right up to the first accent.
+$v350Bad = @()
+$w6txt350 = [System.IO.File]::ReadAllText((Join-Path $dir "WoD20.6.lfm"))
+# comment lines OUT before any of this is read: a call that is commented out is not a call, and
+# IndexOf cannot tell the difference. That is how the zero-guard below first shipped GREEN over
+# a dead sort (SPEC V330c, B92, V20).
+$w6code350 = [regex]::Replace($w6txt350, '(?m)^\s*--.*$', '')
+$pk350 = LuaFn $w6code350 'pickerItems'
+$fold350 = LuaFn $w6code350 'foldKey'
+$cmb350 = LuaFn $w6code350 'cmbItems'
+
+if (-not $pk350) { $v350Bad += "pickerItems is gone from WoD20.6 - there is nothing left that builds a dropdown (SPEC V209)" }
+else {
+    # (f) zero-guard FIRST: no sort at all and every leg below is measuring an absence.
+    $iSort350 = $pk350.IndexOf('table.sort(ord')
+    if ($iSort350 -lt 0) { $v350Bad += "(f) pickerItems never calls table.sort - Q26 asked for alphabetical order and the list would come out in the order the constant is authored (SPEC I110a, V20)" }
+    else {
+        # (a) ONE permutation, both halves. The pair is what V202 guarantees - item N shows value
+        # N - so a sort that reordered `shown` alone would leave every dropdown showing one name
+        # and storing another, with no error anywhere (SPEC V24, V202).
+        $kLine350 = [regex]::Match($pk350, 'k2\[#k2 \+ 1\]\s*=\s*kept\[(.+?)\];')
+        $sLine350 = [regex]::Match($pk350, 's2\[#s2 \+ 1\]\s*=\s*shown\[(.+?)\];')
+        if (-not $kLine350.Success -or -not $sLine350.Success) {
+            $v350Bad += "(a) the rebuild of the sorted pair is gone - one of `kept` and `shown` is no longer rebuilt from the permutation (SPEC I110a, V202)"
+        } elseif ($kLine350.Groups[1].Value -ne $sLine350.Groups[1].Value) {
+            $v350Bad += "(a) the pair is rebuilt from TWO different indexes ('$($kLine350.Groups[1].Value)' and '$($sLine350.Groups[1].Value)') - item N would stop showing value N (SPEC V202, V24)"
+        }
+        if ($pk350 -notmatch 'kept\s*=\s*k2;' -or $pk350 -notmatch 'shown\s*=\s*s2;') {
+            $v350Bad += "(a) the sorted arrays are built and never assigned back - the sort would run and change nothing, which is the shape B7 describes (SPEC I110a)"
+        }
+
+        # (b) AFTER the orphan. V200/V346b appends the value the row is holding when the list no
+        # longer offers it; sorted before that append, the one item the player can actually see
+        # is the one stuck at the bottom out of order (SPEC I110a).
+        # the source ALIGNS this assignment with the one under it, so the landmark is matched by
+        # pattern and not by a literal with one space in it (that literal is what this leg first
+        # shipped with, and it reddened on correct code).
+        $mOrphan350 = [regex]::Match($pk350, 'kept\[#kept \+ 1\]\s*=\s*current;')
+        $iOrphan350 = if ($mOrphan350.Success) { $mOrphan350.Index } else { -1 }
+        if ($iOrphan350 -lt 0) { $v350Bad += "(b) the orphan append of V200 is gone from pickerItems - this leg has no landmark to sit after (SPEC V209, V346b)" }
+        elseif ($iSort350 -lt $iOrphan350) { $v350Bad += "(b) the sort runs BEFORE the orphan is appended - the saved value would land at the end of the list, out of order (SPEC I110a, V200)" }
+
+        # (c) the blank row stays first. It is not a name (SPEC V15, I110b).
+        if ($pk350 -notmatch 'if kept\[1\] == "" then first = 2; end;') {
+            $v350Bad += "(c) the empty item is not pinned at index 1 - V15's blank row would sort in among the names (SPEC I110b)"
+        }
+
+        # (d) the comparison goes through the FOLD and not through the raw bytes.
+        if ($pk350 -notmatch 'foldKey\(') { $v350Bad += "(d) pickerItems sorts without foldKey - table.sort compares bytes, so in [pt] `Acido` would land after `Zebra` and the list would look sorted until the first accent (SPEC I110c)" }
+    }
+    # (e) ONE place sorts. cmbItems is the value combo - cmbHealthLevels is 7, 8, 9, 10 and the
+    # order IS the data - so it is the named exception, not an oversight (SPEC I110d).
+    if (-not $cmb350) { $v350Bad += "(e) cmbItems is gone from WoD20.6 - the other half of the pair this leg compares (SPEC V209)" }
+    elseif ($cmb350 -match 'table\.sort') { $v350Bad += "(e) cmbItems sorts its items - a value combo's order is its meaning, and cmbHealthLevels would come out 10, 7, 8, 9 (SPEC I110d)" }
+}
+
+# the two cbo* whose order IS the answer, named and counted: a third name here is a combo
+# quietly opting out of Q26, and a wildcard would take the whole rule with it.
+$ns350 = [regex]::Match($w6code350, '(?m)^\s*PICKER_NOSORT\s*=\s*\{(.*?)\};')
+if (-not $ns350.Success) { $v350Bad += "(e) PICKER_NOSORT is gone - every cbo* would be sorted, including the roster V109 pins (SPEC I110d)" }
+else {
+    $names350 = @([regex]::Matches($ns350.Groups[1].Value, '(\w+)\s*=\s*true') | ForEach-Object { $_.Groups[1].Value } | Sort-Object)
+    $want350 = @('cboGame', 'cboSheetTheme')
+    if (($names350 -join ',') -ne ($want350 -join ',')) {
+        $v350Bad += "(e) PICKER_NOSORT names $($names350.Count) combo(s) [$($names350 -join ', ')], expected exactly cboGame and cboSheetTheme - the opt-out is a named list, not a door (SPEC I110d, V15)"
+    }
+}
+
+# (d)/(f) the fold itself. An ASCII-only map is the failure that passes: gsub finds nothing,
+# every accented name sorts by its 0xC3 lead byte, and the check above still sees foldKey called.
+if (-not $fold350) { $v350Bad += "(d) foldKey is gone from WoD20.6 - the sort would fall back to byte order (SPEC I110c)" }
+else {
+    if ($fold350 -notmatch 'string\.lower') { $v350Bad += "(d) foldKey does not lowercase - `Zebra` would sort before `abelha`, which is byte order wearing a fold's name (SPEC I110c)" }
+    if ($fold350 -notmatch 'FOLD_MAP\[') { $v350Bad += "(d) foldKey never reads FOLD_MAP - the accents would survive the fold (SPEC I110c)" }
+}
+$fm350 = [regex]::Match($w6code350, '(?s)FOLD_MAP\s*=\s*\{(.*?)\n\t+\};')
+if (-not $fm350.Success) { $v350Bad += "(f) FOLD_MAP is gone - foldKey would map nothing and leg (d) would pass on an empty table (SPEC V20, B7)" }
+else {
+    $pairs350 = @([regex]::Matches($fm350.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"([^"]*)"'))
+    $accent350 = @($pairs350 | Where-Object { $_.Groups[1].Value -match '[^\x00-\x7F]' })
+    if ($accent350.Count -eq 0) {
+        $v350Bad += "(f) FOLD_MAP carries $($pairs350.Count) pair(s) and NOT ONE of them is an accented letter - the fold would be a no-op and the list would sort by byte with every check above still green (SPEC I110c, V20, B92)"
+    }
+    foreach ($p350 in $accent350) {
+        if ($p350.Groups[2].Value -match '[^\x00-\x7F]') { $v350Bad += "(f) FOLD_MAP maps '$($p350.Groups[1].Value)' onto '$($p350.Groups[2].Value)', which is itself accented - the fold has to land on ASCII or it sorts by byte again (SPEC I110c)" }
+    }
+}
+if ($v350Bad) { foreach ($b in $v350Bad) { Fail "V350 $b" } }
+else { Pass "V350 pickerItems sorts the value/item pair by one permutation, after the orphan and with the blank row pinned, through a fold of $($accent350.Count) accented letters, and only cboGame and cboSheetTheme opt out" }
+
+# ---- V351: the ROAD label rides on the picker's own line -------------------------------
+# SPEC C Q27, I99k-m, T801. The user asked for the label beside the dropdown; what it BUYS is
+# 25px of height off three boxes, and what it COSTS is 51px of picker width - measured, one
+# road name of fifty-five clips, and the next longest wants 204 against 239.
+#
+# Leg (b) of the spec is NOT here and that is deliberate (SPEC I99j): "the three bottom boxes
+# close on ONE y" is V69's ruler, it reads the y off the tab's own map comment, and it already
+# reddened on this very change until the map was rewritten. A second copy would be the same
+# rule with two owners, which is the defect V199/B12 are about.
+$v351Bad = @()
+$m351 = Doc (Join-Path $dir "WoD20.1.lfm")
+$lbl351 = $null
+foreach ($n351 in $m351.SelectNodes("//label[@text='ROAD']")) { $lbl351 = $n351; break }
+$cbo351 = $m351.SelectSingleNode("//comboBox[@name='cboRoad']")
+if ($null -eq $lbl351) { $v351Bad += "(e) the ROAD label is gone from WoD20.1 - every leg here measured nothing (SPEC V209, V20)" }
+if ($null -eq $cbo351) { $v351Bad += "(e) cboRoad is gone from WoD20.1 (SPEC V209)" }
+if ($null -ne $lbl351 -and $null -ne $cbo351) {
+    $lt351 = 0; $ll351 = 0; $lw351 = 0; $ct351 = 0; $cl351 = 0
+    [void][int]::TryParse($lbl351.GetAttribute("top"), [ref]$lt351)
+    [void][int]::TryParse($lbl351.GetAttribute("left"), [ref]$ll351)
+    [void][int]::TryParse($lbl351.GetAttribute("width"), [ref]$lw351)
+    [void][int]::TryParse($cbo351.GetAttribute("top"), [ref]$ct351)
+    [void][int]::TryParse($cbo351.GetAttribute("left"), [ref]$cl351)
+
+    # (a) ONE line, and the two do not sit on top of each other. Same top is the request; the
+    # non-overlap is what keeps "same line" from meaning "same pixels" (SPEC I99k).
+    if ($lt351 -ne $ct351) { $v351Bad += "(a) the ROAD label is at top=$lt351 and cboRoad at top=$ct351 - Q27 asked for the two on ONE line, and a label back on its own row puts the 25px back into the box (SPEC I99k)" }
+    if (($ll351 + $lw351) -gt $cl351) { $v351Bad += "(a) the ROAD label runs to x=$($ll351 + $lw351) and cboRoad opens at x=$cl351 - they would draw over each other (SPEC I99k, V37)" }
+
+    # (c) the label still has to hold its own word. `CAMINHO` is the long half.
+    $need351 = NeededPx 'ROAD'
+    if ($lw351 -lt $need351) { $v351Bad += "(c) the ROAD label is $lw351 wide and 'ROAD'/'CAMINHO' needs $need351 - the label was squeezed to buy the picker room, which trades one clip for another (SPEC V16, I99k)" }
+}
+# (e) the picker gave 14px to the label in the 143rd, so the NAME has to be able to shrink into
+# what is left. renderBearing owns cboRoad (V330) and is the one place allowed to size it; the
+# ruler is fitSize, the same one mfLabel uses, so the sheet and this gate measure text alike.
+$rb351 = LuaFn $rootTxt 'renderBearing'
+if (-not $rb351) { $v351Bad += "(e) renderBearing is gone - nothing sizes the road name to the picker it has to fit (SPEC V209, V330)" }
+elseif ((NoComments $rb351) -notmatch 'cbo\.fontSize = fitSize\(') { $v351Bad += "(e) renderBearing does not size cboRoad through fitSize - the picker gave 14px to the label and a long road name would simply be cut off, which is the clip leg (c) refuses on the other side (SPEC V196, V312)" }
+if (-not (LuaFn $rootTxt 'fitSize')) { $v351Bad += "(e) fitSize is gone - it is the ruler leg (e) and mfLabel both size text with (SPEC V16, V312a)" }
+# (d) the width exception is a LIST OF ONE, and it is read by V196 and V312c both. A second
+# name is how a named exception becomes a general loosening one line at a time - the door B7
+# describes, and the reason V15's own exception is spelled out combo by combo.
+if ($null -eq $NARROW_OK) { $v351Bad += "(d) NARROW_OK is gone - V196 and V312c would go back to failing cboRoad, or worse, someone would widen the rule instead (SPEC I99m)" }
+else {
+    $got351 = @($NARROW_OK | Sort-Object)
+    if (($got351 -join ',') -ne 'cboRoad') {
+        $v351Bad += "(d) the width exception names [$($got351 -join ', ')], expected cboRoad and nothing else - one measured cost was accepted, not a category (SPEC I99m, B7)"
+    }
+}
+if ($v351Bad) { foreach ($b in $v351Bad) { Fail "V351 $b" } }
+else { Pass "V351 the ROAD label and cboRoad share one line without overlapping, the label still holds 'CAMINHO', cboRoad is the only picker allowed to be narrow, and its name is sized to fit what is left" }
+
+# ---- V331: the picked rows and the typed rows do not mix -------------------------------
+# SPEC V331 as REWRITTEN in the 141st (user 2026-08-29). Five of the seven legs the first
+# writing asked for are NOT here, and each absence is measured, not lazy:
+#   (c)(d)(f) - every list item having table data, every key being offered, and book/page/cost
+#              being filled - are V340f and V340a, over the same two tables (verify:12234, :12242).
+#   (e)       - "the two lists are disjoint" - is REVOKED BY FACT: `Cannibal` is in both on
+#              purpose (B82, I102g, B89), V340b names the exception, and the user confirmed the
+#              rule. Written as asked, this leg would redden correct code.
+# What is left is what nothing else measures.
+$v331Bad = @()
+$doc331 = Doc (Join-Path $dir "WoD20.2.lfm")
+$raw331 = [System.IO.File]::ReadAllText((Join-Path $dir "WoD20.2.lfm"))
+
+# (a) WHICH rows, not how many. V339a already counts twelve <MeritPicked and never looks at the
+# nums, so swapping m3 for m9 sails through it - and a picked row on m9 is a search box writing
+# into a row the player is also typing in.
+$want331 = @{
+    'MeritPicked' = @(0..6 | ForEach-Object { "m$_" }) + @(0..6 | ForEach-Object { "f$_" })
+    'MeritFree'   = @(7..10 | ForEach-Object { "m$_" }) + @(7..10 | ForEach-Object { "f$_" })
+}
+foreach ($tpl331 in @('MeritPicked', 'MeritFree')) {
+    $got331 = @([regex]::Matches($raw331, "<$tpl331\b[^>]*\bnum=""([^""]+)""") | ForEach-Object { $_.Groups[1].Value } | Sort-Object)
+    $exp331 = @($want331[$tpl331] | Sort-Object)
+    if ($got331.Count -eq 0) { $v331Bad += "(c) no <$tpl331 call was read at all - every leg on this template measured nothing (SPEC V209, V20)"; continue }
+    if (($got331 -join ',') -ne ($exp331 -join ',')) {
+        $v331Bad += "(a) $tpl331 is called on [$($got331 -join ', ')], expected [$($exp331 -join ', ')] - the picked half and the typed half are decided by the ROW, and a swap here gives one row two behaviours (SPEC I100a, V339a)"
+    }
+}
+
+# (b) the three book columns of a PICKED row are readOnly and the typed row's are not. mfConfirm
+# writes all three in one step (I107i); a keyboard in them is exactly what the search box exists
+# to stop, and it is item (3) of T787. The typed row is the opposite by design.
+$cols331 = @('book_$(num)', 'type_$(num)', 'costy_$(num)')
+foreach ($pair331 in @(@('MeritPicked', $true), @('MeritFree', $false))) {
+    $t331 = $doc331.SelectSingleNode("//template[@name='$($pair331[0])']")
+    if ($null -eq $t331) { $v331Bad += "(c) the $($pair331[0]) template is gone (SPEC V209)"; continue }
+    foreach ($c331 in $cols331) {
+        $e331 = $t331.SelectSingleNode("edit[@field='$c331']")
+        if ($null -eq $e331) { $v331Bad += "(c) $($pair331[0]) has no edit on '$c331' (SPEC I100f, V209)"; continue }
+        $ro331 = ($e331.GetAttribute("readOnly") -eq 'true')
+        if ($pair331[1] -and -not $ro331) {
+            $v331Bad += "(b) $($pair331[0]) leaves '$c331' writable - the player could type over what mfConfirm wrote and the row would disagree with the book it names (SPEC I107i, T787)"
+        } elseif (-not $pair331[1] -and $ro331) {
+            $v331Bad += "(b) $($pair331[0]) locks '$c331' - a TYPED row is the storyteller's own entry and nothing else fills it (SPEC I50, V255)"
+        }
+    }
+}
+if ($v331Bad) { foreach ($b in $v331Bad) { Fail "V331 $b" } }
+else { Pass "V331 m0-m6 and f0-f6 are picked, m7-m10 and f7-f10 are typed, and the three book columns are locked on the picked half and open on the typed one" }
+
+# ---- V332: the Traits map is what the XML HAS, measured --------------------------------
+# SPEC V332 as REWRITTEN in the 141st. The first writing measured against I101a-e and T790 (x)
+# had already redrawn the whole tab: it asked for 1580 where the tab closes on 1595 and for
+# 235x155 boxes that are 225x153 and 225x186. Written as asked it would redden correct code.
+# Leg (f) - "the map comment at the top agrees" - is gone for the same reason: T790 decided the
+# opposite in as many words, keeping B73 as PRACTICE, and nothing in the gate reads the .2 map.
+$v332Bad = @()
+# the 14 are the UNNAMED children of the scrollBox; popDesc and mfSearch are named overlays and
+# float over the grid by design (I102a, I107c), which is why V40 and V280 cut them out too.
+$boxes332 = @()
+foreach ($b332 in $doc331.SelectNodes("//scrollBox/layout")) {
+    if ($b332.HasAttribute("name")) { continue }
+    $l = 0; $t = 0; $w = 0; $h = 0
+    [void][int]::TryParse($b332.GetAttribute("left"), [ref]$l)
+    [void][int]::TryParse($b332.GetAttribute("top"), [ref]$t)
+    [void][int]::TryParse($b332.GetAttribute("width"), [ref]$w)
+    [void][int]::TryParse($b332.GetAttribute("height"), [ref]$h)
+    $boxes332 += [pscustomobject]@{ L = $l; T = $t; W = $w; H = $h }
+}
+# (f) zero-guard first: fewer than fourteen and every count below is reading a short list.
+if ($boxes332.Count -ne 14) {
+    $v332Bad += "(f) $($boxes332.Count) top-level box(es) on the Traits tab, expected the 14 of I101h - the map and the tab have to be the same thing (SPEC V209, V20)"
+} else {
+    # (a) the map of I101h, LITERAL. Measured off the XML on 2026-08-29 and written down there
+    # so the next round reads a number instead of re-deriving one (SPEC B73).
+    $want332 = @(
+        '0;0;364;693', '369;0;536;336', '369;341;536;336', '1370;0;225;311',
+        '910;0;225;153', '1140;0;225;153', '910;158;225;153', '1140;158;225;153',
+        '910;316;225;186', '1140;316;225;186', '1370;316;225;186',
+        '910;507;225;186', '1140;507;225;186', '1370;507;225;186'
+    )
+    $got332 = @($boxes332 | ForEach-Object { "$($_.L);$($_.T);$($_.W);$($_.H)" } | Sort-Object)
+    $extra332 = @($got332 | Where-Object { $want332 -notcontains $_ })
+    $miss332 = @($want332 | Where-Object { $got332 -notcontains $_ })
+    if ($extra332.Count -or $miss332.Count) {
+        $v332Bad += "(a) the tab draws [$($extra332 -join ' ')] where I101h says [$($miss332 -join ' ')] - left;top;width;height, and the map is the one T790 left (SPEC I101h)"
+    }
+
+    # (b) no two of the fourteen overlap. O(n^2) over fourteen is nothing, and a box drawn over
+    # another is the failure that looks fine in the XML and hides half a table on screen.
+    for ($i = 0; $i -lt $boxes332.Count; $i++) {
+        for ($j = $i + 1; $j -lt $boxes332.Count; $j++) {
+            $a = $boxes332[$i]; $b = $boxes332[$j]
+            if ($a.L -lt ($b.L + $b.W) -and $b.L -lt ($a.L + $a.W) -and $a.T -lt ($b.T + $b.H) -and $b.T -lt ($a.T + $a.H)) {
+                $v332Bad += "(b) the boxes at $($a.L),$($a.T) and $($b.L),$($b.T) overlap - one is drawing over the other (SPEC V37)"
+            }
+        }
+    }
+
+    # (c) the tab closes on 1595 and the columns keep the 5px gutter V298 measures elsewhere.
+    $right332 = ($boxes332 | ForEach-Object { $_.L + $_.W } | Measure-Object -Maximum).Maximum
+    if ($right332 -ne 1595) { $v332Bad += "(c) the rightmost box closes at $right332, not the 1595 T790's arithmetic lands on (364+5+536+5+225+5+225+5+225) - this tab reaches for a horizontal scrollbar first (SPEC I101h)" }
+    $colL332 = @($boxes332 | ForEach-Object { $_.L } | Sort-Object -Unique)
+    foreach ($cl332 in $colL332) {
+        if ($cl332 -eq 0) { continue }
+        $prev332 = @($boxes332 | Where-Object { ($_.L + $_.W) -eq ($cl332 - 5) })
+        if ($prev332.Count -eq 0) { $v332Bad += "(c) the column at x=$cl332 does not open 5px after any box's right edge - the gutters on this tab are all 5 (SPEC V298)" }
+    }
+
+    # (d) the ten background boxes are one width; only the HEIGHT tells the two bands apart.
+    $small332 = @($boxes332 | Where-Object { $_.W -eq 225 -and $_.H -ne 311 })
+    if ($small332.Count -ne 10) { $v332Bad += "(d) $($small332.Count) background box(es) are 225 wide, expected 10 (SPEC I101h)" }
+    else {
+        $hh332 = @($small332 | ForEach-Object { $_.H } | Sort-Object -Unique)
+        if (($hh332 -join ',') -ne '153,186') { $v332Bad += "(d) the ten background boxes come in heights [$($hh332 -join ', ')], expected 153 on the top band and 186 on the bottom (SPEC I101h)" }
+    }
+}
+# (e) the rename was TEXT only: the field kept its old spelling, because renaming it drops what
+# saved sheets already hold (SPEC V2, I101g).
+$art332 = @($doc331.SelectNodes("//label[@text='ARTIFACTS']"))
+$sta332 = @($doc331.SelectNodes("//label[@text='STATUS']"))
+if ($sta332.Count -ne 0) { $v332Bad += "(e) the label STATUS is back on the Traits tab - the rename of I101g was undone in the text (SPEC I101g)" }
+if ($art332.Count -ne 1) { $v332Bad += "(e) the ARTIFACTS label appears $($art332.Count) time(s), expected 1 (SPEC I101g)" }
+if (@($doc331.SelectNodes("//*[@field='status']")).Count -ne 1) { $v332Bad += "(e) the field 'status' is no longer owned exactly once on this tab - renaming it drops what saved sheets hold (SPEC V2)" }
+if ($v332Bad) { foreach ($b in $v332Bad) { Fail "V332 $b" } }
+else { Pass "V332 the Traits tab draws the 14 boxes of I101h with no overlap, closes on 1595 with 5px gutters, keeps its ten background boxes 225 wide in two bands, and still owns 'status' once under the ARTIFACTS label" }
+
+# ---- V345: every description module breaks lines the SAME way, and that way is LF ---------
+# (SPEC V345, B87) The ten modules are written by script, and a module coming out with the
+# other kind of line break changes not one character of text yet makes the file differ from
+# the shipped one on thousands of lines - descMerit_en.lua showed up with 6486 changed lines
+# and zero changed words, which is a diff that lies about what a round did.
+# The house style is LF, MEASURED byte by byte: descDisc/descNumina/descPath/descRitual carry
+# 0 CR between them. The two descMerit_* were the odd ones out and were regenerated to match.
+# Counting with `grep -c $'\r'` is what made the first reading say the opposite - the byte
+# count below is the one that answers.
+$v345Bad = @()
+$v345Files = @(Get-ChildItem -LiteralPath $plugin -Filter 'desc*.lua' | Sort-Object Name)
+if ($v345Files.Count -eq 0) { $v345Bad += "no desc*.lua at the plugin root - this check read nothing (SPEC V209, B7)" }
+foreach ($f345 in $v345Files) {
+    $b345 = [System.IO.File]::ReadAllBytes($f345.FullName)
+    $lf345 = 0; $crlf345 = 0
+    for ($i = 0; $i -lt $b345.Length; $i++) {
+        if ($b345[$i] -eq 10) { $lf345++; if ($i -gt 0 -and $b345[$i - 1] -eq 13) { $crlf345++ } }
+    }
+    if ($lf345 -eq 0) { $v345Bad += "$($f345.Name) has no line break at all - it was not read as text (SPEC V209)" }
+    elseif ($crlf345 -ne 0) { $v345Bad += "$($f345.Name) has $crlf345 CRLF among $lf345 line breaks - the other description modules are LF throughout, and a module that disagrees makes its own diff lie about what changed (SPEC B87)" }
+}
+if ($v345Bad) { foreach ($b in $v345Bad) { Fail "V345 $b" } }
+else { Pass "V345 all $($v345Files.Count) desc*.lua at the plugin root break lines the same way - LF throughout, inside the [==[ ]==] literal too" }
+
+# ---- V352: the description lives INSIDE the search box, and dies with it ------------------
+# SPEC I112, V352, Q29, T806/T807. The user asked for the description "inside the window", and
+# that is not decoration: a pane authored as a SIBLING of mfSearch would be a second closing
+# point, and the text would stand on screen after the box that explains it is gone (I112g).
+$v352Bad = @()
+$doc352 = Doc (Join-Path $dir "WoD20.2.lfm")
+
+# (g) zero-guard FIRST: with the pane gone every leg below passes by vacancy (SPEC V20, B7).
+$pane352 = @($doc352.SelectNodes("//textEditor[@name='edtMfDesc']"))
+if ($pane352.Count -ne 1) {
+    $v352Bad += "(g) edtMfDesc is authored $($pane352.Count) time(s) in WoD20.2.lfm, expected 1 - without it legs (a) and (b) read an empty set (SPEC I112b, V20, B7)"
+} else {
+    # (a) CHILD of mfSearch and not a sibling - the whole of I112g in one XPath.
+    if (@($doc352.SelectNodes("//layout[@name='mfSearch']/textEditor[@name='edtMfDesc']")).Count -ne 1) {
+        $v352Bad += "(a) edtMfDesc is not a child of mfSearch - a sibling would be a second closing point and the text would outlive the box mfClose hides (SPEC I112g, V135)"
+    }
+    # (b) read-only, wrapping, no field. wordWrap is the only thing keeping the horizontal bar
+    # off - there is no scroll property in SDK3 - and a field would write book text onto the
+    # character, which is the line V29 draws and V334d keeps for the other eight panes.
+    $p352 = $pane352[0]
+    if ($p352.GetAttribute("readOnly") -ne 'true') { $v352Bad += "(b) edtMfDesc is not readOnly - book text typed over would look to the player like it saved (SPEC I112b)" }
+    if ($p352.GetAttribute("wordWrap") -ne 'true') { $v352Bad += "(b) edtMfDesc has no wordWrap - with no scroll property in SDK3 the only way to have no horizontal bar is to give it nothing to scroll (SPEC I112b, V333f)" }
+    if ($p352.HasAttribute("field")) { $v352Bad += "(b) edtMfDesc owns a field - book text would be written onto the character (SPEC V29, V334d)" }
+}
+
+# (c) the box grew to the RIGHT and the result column did not move one pixel. Absolute: 300+1000
+# closes at 1300 of the 1595 the tab has, 40+620 at 660 of 693 (SPEC I112a).
+$box352 = $doc352.SelectSingleNode("//layout[@name='mfSearch']")
+if ($null -eq $box352) { $v352Bad += "(c) mfSearch is gone - there is no box for the pane to live in (SPEC I107c, V209)" }
+else {
+    foreach ($want352 in @(@('left','300'), @('top','40'), @('width','1000'), @('height','620'))) {
+        $got352 = $box352.GetAttribute($want352[0])
+        if ($got352 -ne $want352[1]) { $v352Bad += "(c) mfSearch $($want352[0])='$got352', expected $($want352[1]) - the box closes at 1300 of 1595 and at 660 of 693, and it grew to the RIGHT (SPEC I112a)" }
+    }
+    foreach ($nm352 in @('edtMfQuery','lblMfLoading','dynMfRow_1','dynMfRow_20')) {
+        $c352 = $doc352.SelectSingleNode("//layout[@name='mfSearch']/*[@name='$nm352']")
+        if ($null -eq $c352) { $v352Bad += "(c) $nm352 is gone from the box (SPEC I107c, V209)" }
+        elseif ($c352.GetAttribute("left") -ne '20' -or $c352.GetAttribute("width") -ne '480') {
+            $v352Bad += "(c) $nm352 sits at left=$($c352.GetAttribute('left')) width=$($c352.GetAttribute('width')), expected 20/480 - the result column does not move, the pane took the ground the box GREW (SPEC I112a)"
+        }
+    }
+}
+
+# (d) the pane is CLEARED wherever the marking is dropped. Text left standing with no marking
+# under it is precisely the lie I107m exists to stop.
+$sel352 = LuaFn $rootTxt 'mfSelect'
+foreach ($fn352 in @('mfFilter', 'mfPage')) {
+    $body352 = LuaFn $rootTxt $fn352
+    if (-not $body352) { $v352Bad += "(d) $fn352 is gone - the pane would keep the text of a row that is no longer marked (SPEC V209)" }
+    elseif ($body352 -notmatch '\["edtMfDesc"\]\.text = ""') { $v352Bad += "(d) $fn352 does not clear edtMfDesc - the marking drops and the description stays, which is what I107m refuses (SPEC I112f)" }
+}
+
+# (e) the 563KB module is parsed in mfOpen's TIMER and nowhere else. Inside mfSelect it would
+# freeze the tab on the first click of a row, which is I107f coming in the other door.
+$open352 = LuaFn $rootTxt 'mfOpen'
+if (-not $open352) { $v352Bad += "(e) mfOpen is gone - leg (e) measured nothing (SPEC V209)" }
+else {
+    $timer352 = [regex]::Match($open352, '(?s)setTimeout\(function\(\)(.*?)end, 1\);')
+    if (-not $timer352.Success) { $v352Bad += "(e) mfOpen schedules no setTimeout - there is nowhere for the parse to go (SPEC I107f)" }
+    elseif ($timer352.Groups[1].Value -notmatch 'require\("desc" \.\. ') { $v352Bad += "(e) the description-module require is not inside mfOpen's timer - either package.loaded is never warmed and the first marking parses 563KB, or the parse lands in the turn the box is drawn (SPEC I112e, R92, T479)" }
+}
+if (-not $sel352) { $v352Bad += "(e) mfSelect is gone - nothing paints the pane (SPEC V209)" }
+elseif ($sel352 -match 'require\(') { $v352Bad += "(e) mfSelect requires a module - 563KB parsed on the first click of a row freezes the tab in the middle of the choice (SPEC I112e, I107f, T479)" }
+
+# (f) ONE function returns the text and BOTH readers come through it. Two readers are two
+# rulers for the composite key of I102g, and the second one drifts in silence (SPEC V344d).
+$readers352 = @([regex]::Matches((CodeOf (Join-Path $dir "WoD20th.lfm")), 'DESC\[\s*sub\s*\.\.'))
+if ($readers352.Count -ne 1) { $v352Bad += "(f) the composite key is built in $($readers352.Count) place(s), expected exactly 1 - one ruler for the key, and the ? box and the pane both come through it (SPEC I112d, V344d, V135)" }
+if (-not (LuaFn $rootTxt 'descText')) { $v352Bad += "(f) descText is gone - it is the one reader I112d declares (SPEC V209)" }
+$pop352 = LuaFn $rootTxt 'popOpen'
+if (-not $pop352) { $v352Bad += "(f) popOpen is gone - leg (f) measured nothing (SPEC V209)" }
+elseif ($pop352 -notmatch 'descText\(') { $v352Bad += "(f) popOpen does not read through descText - the ? box would be a second reader carrying its own copy of the key rule (SPEC I112d, V135)" }
+if ($sel352 -and $sel352 -notmatch 'descText\(') { $v352Bad += "(f) mfSelect does not read through descText - the pane would be the second reader (SPEC I112d, V135)" }
+
+if ($v352Bad) { foreach ($b in $v352Bad) { Fail "V352 $b" } }
+else { Pass "V352 edtMfDesc is a child of mfSearch, read-only and wrapping with no field, the box closes at 1300/660 with the result column still at 20/480, mfFilter and mfPage clear the pane, the 563KB module is parsed in mfOpen's timer and never in mfSelect, and one descText serves both readers" }
+# ---- V354: the generic box loses nothing the dropdown it replaces had ---------------------
+# SPEC I113, V354, Q30, T808/T809. Legs are written per WAVE and each one measures what the
+# wave ACTUALLY converted - a leg written for a family that has not moved yet is a check that
+# passes by vacancy, which is the whole of B7. WAVE 1 is the PILOT: backgrounds, sixteen picked
+# rows, PICKER_LIST['background'] and no runtime filter, so leg (c) - the filter - belongs to
+# wave 3 and is deliberately not here.
+#
+# The roster is NAMED and not pattern-matched: a wildcard would swallow wave 2 the day someone
+# writes it and report it as measured (SPEC V328c).
+$V354_WAVE = @(
+    @{ Tpl = 'OpenAbility'; File = 'WoD20.2.lfm'; Root = 'background'; Mod = 'Background'; Rows = 16; FieldAttr = '$(field)' }
+)
+$v354Bad = @()
+$v354Seen = 0
+foreach ($w354 in $V354_WAVE) {
+    $doc354 = Doc (Join-Path $dir $w354.File)
+    $tpl354 = $doc354.SelectSingleNode("//template[@name='$($w354.Tpl)']")
+
+    # (g) zero-guard for THIS wave: with the template gone every leg under it reads an empty set.
+    if ($null -eq $tpl354) { $v354Bad += "(g) $($w354.File) declares no $($w354.Tpl) - the wave's rows have no shape and legs (a) to (e) would measure nothing (SPEC V209, V20, B7)"; continue }
+    $v354Seen++
+
+    # (a) the I107a1 pair that REPLACES V13: one visible button that opens the box, one twin
+    # <edit> carrying the field, and the twin cannot be typed into. Hidden AND disabled is a
+    # stronger guarantee than readOnly, and it is the form MeritPicked already ships.
+    $cbo354 = @($tpl354.SelectNodes(".//comboBox"))
+    if ($cbo354.Count -ne 0) { $v354Bad += "(a) $($w354.Tpl) still carries $($cbo354.Count) comboBox - the row would keep the dropdown Q30 replaced (SPEC I107a1, V13)" }
+    $btn354 = @($tpl354.SelectNodes("button[contains(@onClick,'mfOpen(')]"))
+    if ($btn354.Count -ne 1) { $v354Bad += "(a) $($w354.Tpl) has $($btn354.Count) button(s) opening the box, expected 1 - two openers are two doors onto one row (SPEC I107a1, V135)" }
+    $twin354 = @($tpl354.SelectNodes("edit[@field='" + $w354.FieldAttr + "']"))
+    if ($twin354.Count -ne 1) { $v354Bad += "(a) $($w354.Tpl) hands its field to $($twin354.Count) edit(s), expected the one hidden twin (SPEC I107a1)" }
+    else {
+        if ($twin354[0].GetAttribute("visible") -ne 'false') { $v354Bad += "(a) the twin edit of $($w354.Tpl) is not authored visible=false - two entries would stand on the same pixels and the button's text would be the one nobody sees (SPEC I107a1)" }
+        if ($twin354[0].GetAttribute("enabled") -ne 'false') { $v354Bad += "(a) the twin edit of $($w354.Tpl) is not authored enabled=false - the field would take the keyboard again, and 'only a choice from the list writes it' is exactly what V13 used to guarantee (SPEC I107a1, V13)" }
+        if ($btn354.Count -eq 1 -and $twin354[0].GetAttribute("left") -ne $btn354[0].GetAttribute("left")) { $v354Bad += "(a) the twin sits at x=$($twin354[0].GetAttribute('left')) and the button at x=$($btn354[0].GetAttribute('left')) - one field, two widgets, one place (SPEC I107a1)" }
+    }
+
+    # (b) the LIST is PICKER_LIST's, named in the opener, and the description MODULE the opener
+    # names really is at the plugin root in both halves. V215 used to answer that second half
+    # off the literal require; the module is a PARAMETER now (I113a) and no static reader can
+    # resolve it, so the wave roster answers in its place.
+    if ($btn354.Count -eq 1) {
+        $click354 = $btn354[0].GetAttribute("onClick")
+        if ($click354 -notmatch "mfOpen\(self,\s*'[^']+',\s*'$($w354.Root)',\s*'$($w354.Mod)'\)") {
+            $v354Bad += "(b) $($w354.Tpl) opens with '$click354' - the three arguments of I113a are the FIELD, the PICKER_LIST root '$($w354.Root)' and the description module '$($w354.Mod)' (SPEC I113a)"
+        }
+    }
+    if (-not $PICKER.ContainsKey($w354.Root)) { $v354Bad += "(b) PICKER_LIST has no '$($w354.Root)' key - the box would open on nothing at all (SPEC I113b, V211)" }
+    elseif (@($PICKER[$w354.Root]).Count -eq 0) { $v354Bad += "(b) PICKER_LIST['$($w354.Root)'] is empty - every leg reading it below measures nothing (SPEC V211, V20)" }
+    foreach ($half354 in @('en', 'pt')) {
+        if (-not (Test-Path -LiteralPath (Join-Path $plugin "desc$($w354.Mod)_$half354.lua"))) {
+            $v354Bad += "(b) desc$($w354.Mod)_$half354.lua is not at the plugin root - the description pane and the ? would both open empty for '$($w354.Root)' (SPEC I102e, V210, V215)"
+        }
+    }
+
+    # (e) EXACT count. A row short is a picker orphaned without a list; a row over is a row that
+    # lost its combo and never got the box.
+    $raw354 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir $w354.File)))
+    $calls354 = @([regex]::Matches($raw354, "<$($w354.Tpl)\s+field=`"$($w354.Root)_\d+`""))
+    if ($calls354.Count -ne $w354.Rows) { $v354Bad += "(e) $($w354.File) draws $($calls354.Count) $($w354.Tpl) row(s) and this wave converts $($w354.Rows) (SPEC I113e)" }
+
+    # (d, second half) the items of the converted list are still covered as VISIBLE strings.
+    # While the combo stood, V9/V22/V28 swept them in through ListOf; taking the combo away took
+    # the whole family out of that census without a word - 44 names on the pilot alone. The box
+    # searches on translateSheetText, so a missing key is a name the pt player cannot find.
+    if ($PICKER.ContainsKey($w354.Root)) {
+        $noPt354 = @(); $noMap354 = @()
+        foreach ($it354 in @($PICKER[$w354.Root])) {
+            if ($it354 -eq '') { continue }
+            if (-not $ptK.Contains($it354)) { $noPt354 += $it354 }
+            if (-not $embedded.ContainsKey($it354)) { $noMap354 += $it354 }
+        }
+        if ($noPt354.Count -gt 0) { $v354Bad += "(d) $($noPt354.Count) item(s) of PICKER_LIST['$($w354.Root)'] carry no [pt] key ($((@($noPt354) | Select-Object -First 3) -join ', ')) - with the combo gone nothing else sweeps them into the visible set (SPEC V10, V28, B7)" }
+        if ($noMap354.Count -gt 0) { $v354Bad += "(d) $($noMap354.Count) item(s) of PICKER_LIST['$($w354.Root)'] are absent from the PT map ($((@($noMap354) | Select-Object -First 3) -join ', ')) - they would never translate (SPEC V28, B14)" }
+    }
+}
+
+# (d, first half) the two things the dropdown guaranteed and the box has to keep. Measured on
+# the BOX and not per wave: one box serves every family (SPEC I113f).
+$open354 = LuaFn $rootTxt 'mfOpen'
+if (-not $open354) { $v354Bad += "(d) mfOpen is gone - there is no box left to measure (SPEC V209)" }
+else {
+    $timer354 = [regex]::Match($open354, '(?s)setTimeout\(function\(\)(.*?)end, 1\);')
+    if (-not $timer354.Success) { $v354Bad += "(d) mfOpen schedules no setTimeout - the pool is built nowhere (SPEC I107f)" }
+    else {
+        $body354 = NoComments $timer354.Groups[1].Value
+        if ($body354 -notmatch 'PICKER_LIST\[MF\.list\]') { $v354Bad += "(d) the box does not read PICKER_LIST[MF.list] - it is carrying a list of its own, and a second copy of a list is what V208 exists to stop (SPEC I113b, V211)" }
+        if ($body354 -notmatch 'MF\.pool\[#MF\.pool \+ 1\] = cur;') { $v354Bad += "(d) the box never appends the value the row is HOLDING - a renamed item would vanish from the only door the field has left, which is B91 walking back in (SPEC V200, V346b)" }
+        else {
+            $iOrph354 = $body354.IndexOf('MF.pool[#MF.pool + 1] = cur;')
+            $iPool354 = $body354.IndexOf('MF.pool = {};')
+            if ($iPool354 -ge 0 -and $iOrph354 -lt $iPool354) { $v354Bad += "(d) the orphan is appended BEFORE the pool is built, so the append is thrown away one line later - the same order V350b pins on the dropdown (SPEC V200)" }
+        }
+    }
+}
+$filt354 = LuaFn $rootTxt 'mfFilter'
+if (-not $filt354) { $v354Bad += "(d) mfFilter is gone - nothing orders what the box shows (SPEC V209)" }
+else {
+    $fb354 = NoComments $filt354
+    if ($fb354 -notmatch 'table\.sort\(hits, function') { $v354Bad += "(d) mfFilter does not sort its hits - the box would come out in whatever order the pool happens to hold, and for a merit map that is hash order (SPEC V350, I110)" }
+    if ($fb354 -notmatch 'for i = 1, #MF\.pool, 1 do') { $v354Bad += "(d) mfFilter does not walk MF.pool - it is reading a source the generic opener no longer fills (SPEC I113b)" }
+}
+
+# (g) the roster itself: no wave read means every leg above passed by vacancy.
+if ($v354Seen -eq 0) { $v354Bad += "(g) not one wave of I113e was read - the roster is empty or its templates are gone (SPEC V20, B7)" }
+
+if ($v354Bad) { foreach ($b in $v354Bad) { Fail "V354 $b" } }
+else { Pass "V354 $v354Seen wave(s) of I113e converted - $((@($V354_WAVE | ForEach-Object { "$($_.Rows) $($_.Root) row(s)" })) -join ', ') - each on the button-plus-hidden-twin of I107a1 with no comboBox left, opening on its own PICKER_LIST root and description module, with the saved value appended before the sort and every item still covered by the PT map" }
+
+# ---- V355: the picker says what it HAS and what it has NOT, in the language in force -------
+# SPEC I114, V355, T813/T815, user 2026-08-29. Every leg below is the SHAPE of code and is
+# measurable NOW. I114i - whether a Lua-written fontStyle and a Lua-read ctrl.width actually
+# land on screen - is the tab test of T816 and is deliberately NOT asked here: a check that
+# guesses at runtime is a check that is green for the wrong reason.
+$shownFn355   = LuaFn $rootTxt 'mfShown'
+$labelFn355   = LuaFn $rootTxt 'mfLabel'
+$paintFn355   = LuaFn $rootTxt 'mfPaint'
+$filterFn355  = LuaFn $rootTxt 'mfFilter'
+$openFn355    = LuaFn $rootTxt 'mfOpen'
+$confirmFn355 = LuaFn $rootTxt 'mfConfirm'
+$fitFn355     = LuaFn $rootTxt 'fitSize'
+$rootNC355    = NoComments $rootTxt
+$v355Bad = @()
+
+# (i) the zero-guard runs FIRST and on purpose: with mfShown gone, or nothing dimmed, or
+# nothing shrunk, every leg under it reads an empty set and passes by VACANCY, which is the
+# whole of B7 and the reason V20 asks for a mutation before a check is believed.
+$dim355 = @([regex]::Matches($rootNC355, '\.opacity\s*=\s*0\.60\b'))
+$fitCalls355 = @([regex]::Matches($rootNC355, '=\s*fitSize\('))
+if (-not $shownFn355) { $v355Bad += "(i) mfShown was not found on the root form - every leg of the display contract below would measure nothing (SPEC V209, V20, B7)" }
+if (-not $fitFn355) { $v355Bad += "(i) fitSize was not found on the root form - leg (g) and the callers that shrink text would measure nothing (SPEC V209, V20, B7)" }
+if ($dim355.Count -eq 0) { $v355Bad += "(i) not one write of opacity 0.60 is left on the root form - the 'not filled in' cue of I114e is gone and leg (b) would pass by vacancy (SPEC V244, V20, B7)" }
+if ($fitCalls355.Count -eq 0) { $v355Bad += "(i) fitSize is called nowhere - the ruler exists and nothing shrinks, which is leg (g) green with the feature absent (SPEC I114d, V20, B7)" }
+
+# (a) ONE function says what a pool entry READS as, and BOTH readers go through it - the
+# painter of the box and the sort key of the filter. A second place deciding the shown text is
+# V135 walking in through the door translation opened: the day one learns a name and the other
+# does not, the row the player clicks is not the row the box sorted.
+if ($shownFn355) {
+    $sb355 = NoComments $shownFn355
+    if ($sb355 -notmatch 'translateSheetText\(') { $v355Bad += "(a) mfShown never translates - the box would show the canonical English V24 stores while the sheet is in pt (SPEC I114a, V28)" }
+    if ($sb355 -notmatch ([regex]::Escape('"-- " .. t .. " --"'))) { $v355Bad += "(a) mfShown does not build the dashed form of the blank entry - the way OUT of the row would read as an empty line, and V15's blank is not a name (SPEC I114b)" }
+}
+foreach ($rd355 in @(@{ N = 'mfPaint'; B = $paintFn355 }, @{ N = 'mfFilter'; B = $filterFn355 })) {
+    if (-not $rd355.B) { $v355Bad += "(a) $($rd355.N) was not found - one of the two readers of the display contract is gone (SPEC V209)"; continue }
+    $rb355 = NoComments $rd355.B
+    if ($rb355 -notmatch 'mfShown\(') { $v355Bad += "(a) $($rd355.N) does not call mfShown - it is deciding on its own what the player reads, and two deciders disagree the day one is translated and the other is not (SPEC I114a, V135)" }
+    if ($rb355 -match 'translateSheetText\(') { $v355Bad += "(a) $($rd355.N) calls translateSheetText itself - that is the SECOND place building the shown text, which is exactly what routing both readers through mfShown was for (SPEC I114a, V135)" }
+}
+
+# (b) the two states are painted in ONE place. Two writers are two states that DRIFT: the day
+# one learns a new dimming number the other keeps the old one, and the sheet then says "empty"
+# in two different voices with the gate green over both.
+if (-not $labelFn355) { $v355Bad += "(b) mfLabel was not found - nothing paints either state of a picker row (SPEC V209)" }
+else {
+    $lb355 = NoComments $labelFn355
+    foreach ($mk355 in @(
+        @{ Rx = '\.opacity\s*=\s*1\b';                     W = 'the FILLED state at opacity 1' },
+        @{ Rx = '\.opacity\s*=\s*0\.60\b';                 W = 'the EMPTY state at opacity 0.60 (SPEC V244 as amended on 2026-08-29)' },
+        @{ Rx = [regex]::Escape('"-- " .. t .. " --"');    W = 'the dashed empty label of I114e' },
+        @{ Rx = '\.fontStyle\s*=\s*"italic"';              W = 'the italic of the EMPTY state' },
+        @{ Rx = '\.fontStyle\s*=\s*""';                    W = 'the roman of the FILLED state' }
+    )) {
+        if ($lb355 -notmatch $mk355.Rx) { $v355Bad += "(b) mfLabel does not paint $($mk355.W) - one of the two states is missing and a row would keep the look of the other (SPEC I114e)" }
+    }
+    # The dimming number is mfLabel's ALONE. V244 was amended to carry TWO legal weights in Lua
+    # - 0.75 for read-only and 0.60 for not-filled-in - precisely so the two cues stay two
+    # sentences; a second writer of 0.60 collapses them back into one.
+    $dimIn355 = @([regex]::Matches($lb355, '\.opacity\s*=\s*0\.60\b')).Count
+    if ($dim355.Count -ne $dimIn355) { $v355Bad += "(b) the root form writes opacity 0.60 $($dim355.Count) time(s) and only $dimIn355 of them are inside mfLabel - 'not filled in' has grown a second voice, and V244 gave it exactly one (SPEC I114e, V244, V135)" }
+}
+
+# (c) the SAME count V305c already charges, read off V305c's OWN numbers rather than measured a
+# second time. Two owners for one ruler is V135, and the two DIVERGING is B70 and B73 in the
+# letter - there the spec said one number and the check said another for rounds on end. What
+# this leg ADDS is the two VALUES: V305c counts writers, I114e names what they write.
+if ($null -eq $fsRoot305) { $v355Bad += "(c) V305c did not measure fontStyle this run - leg (c) rests on its count, and a count that stopped being taken is the exception of I114e standing on nothing (SPEC V305c, B7)" }
+elseif ($fsRoot305.Count -ne $fsIn305) { $v355Bad += "(c) the root form writes fontStyle $($fsRoot305.Count) time(s) and $fsIn305 of them are inside mfLabel - the exception I114e bought is for ONE writer, and V305c is saying the same thing about the same number (SPEC V305c, V135)" }
+
+# (d) the way OUT of a row is offered only when there is something to get out of, and mfConfirm
+# lets the blank THROUGH. The old guard refused "" as if it were "nothing marked": nil is
+# unmarked, "" is a real choice, and one guard for the two hands the player an item that does
+# nothing.
+if (-not $openFn355) { $v355Bad += "(d) mfOpen was not found - nothing builds the pool (SPEC V209)" }
+else {
+    $tm355 = [regex]::Match($openFn355, '(?s)setTimeout\(function\(\)(.*?)end, 1\);')
+    if (-not $tm355.Success) { $v355Bad += "(d) mfOpen schedules no setTimeout - the pool is built nowhere (SPEC I107f)" }
+    else {
+        $ob355 = NoComments $tm355.Groups[1].Value
+        foreach ($cd355 in @(
+            @{ Rx = 'local has = cur ~= nil and cur ~= "";';        W = 'does not read whether the row is HOLDING something before it builds the pool - both the blank entry and the orphan append hang off that one answer (SPEC I114c)' },
+            @{ Rx = 'if vals[i] ~= "" or has then';                 W = 'copies the blank first entry of a prose list in unconditionally - an empty row would be offered a Remove that removes nothing (SPEC I114c, V15)' },
+            @{ Rx = 'if has then MF.pool[#MF.pool + 1] = ""; end;'; W = 'does not put the merit/flaw blank behind the same condition - meritData is a map of NAMES and carries none of its own, so the row could be changed and never emptied (SPEC I114c, I100d)' }
+        )) {
+            if ($ob355 -notmatch ([regex]::Escape($cd355.Rx))) { $v355Bad += "(d) the opener $($cd355.W)" }
+        }
+    }
+}
+if (-not $confirmFn355) { $v355Bad += "(d) mfConfirm was not found - nothing writes what the box chose (SPEC V209)" }
+else {
+    $cb355 = NoComments $confirmFn355
+    if ($cb355 -notmatch ([regex]::Escape('if MF.picked == nil or MF.field == nil then return; end;'))) { $v355Bad += "(d) mfConfirm does not guard on nil alone - nil is UNMARKED and the empty string is a real CHOICE, and one guard for the two refuses the blank at the door (SPEC I114b, V15)" }
+    if ($cb355 -match 'MF\.picked\s*==\s*""[^\r\n]*then return') { $v355Bad += "(d) mfConfirm still returns on MF.picked == the empty string - that is the OLD guard, and with it the box offers an item that cannot be chosen (SPEC I114b, V15)" }
+}
+
+# (e) I107i by the other door: the four fields that land TOGETHER leave together. A row holding
+# a book, a page and a cost for a merit it no longer names is exactly the half-filled row that
+# writing all four in one step exists to avoid.
+if ($confirmFn355) {
+    $ce355 = NoComments $confirmFn355
+    $br355 = 'elseif MF.picked == "" and num ~= nil and MF.data ~= nil then'
+    if ($ce355 -notmatch ([regex]::Escape($br355))) { $v355Bad += "(e) mfConfirm has no branch for the blank being CHOSEN - the name would empty and its book, page and cost would stay behind (SPEC I114, I107i)" }
+    else {
+        $tail355 = $ce355.Substring($ce355.IndexOf($br355))
+        foreach ($col355 in @('book_', 'type_', 'costy_')) {
+            if ($tail355 -notmatch ([regex]::Escape('setField("' + $col355 + '" .. num, "");'))) { $v355Bad += "(e) clearing the name does not clear $col355 - one of the three columns that came WITH it is left behind, and the row then reads a page for a merit it does not name (SPEC I114, I107i)" }
+        }
+    }
+}
+
+# (f) the title is DERIVED and never looked up. A roster here ages one row per wave of I113e
+# and ages SILENTLY - the wave that forgets its row gets the title of nothing, and no static
+# reader can tell that from a wave that has not been written yet.
+if ($openFn355) {
+    $of355 = NoComments $openFn355
+    if ($of355 -notmatch ([regex]::Escape('MF.title = "Select " .. string.upper(string.sub(list, 1, 1)) .. string.sub(list, 2);'))) { $v355Bad += "(f) mfOpen does not DERIVE its title from the list - I114f says the three strings the .lang already carries come out of the list NAME, so a new wave adds a .lang key and not a roster row (SPEC I114f)" }
+    foreach ($ttl355 in @('Select Merit', 'Select Flaw', 'Select Background')) {
+        if ($of355 -match ([regex]::Escape('"' + $ttl355 + '"'))) { $v355Bad += "(f) mfOpen names the literal '$ttl355' - that is the roster the derivation replaced, back under another name (SPEC I114f)" }
+    }
+}
+$ttlW355 = @([regex]::Matches($rootNC355, 'MF\.title\s*=[^=]'))
+if ($ttlW355.Count -ne 1) { $v355Bad += "(f) MF.title is written $($ttlW355.Count) time(s) on the root form, expected the one derivation - a second writer is the label table coming back (SPEC I114f, V135)" }
+
+# (g) the GATE's own ruler ported into the Lua (V16, V312a), and the only one there. It only
+# ever DIMINISHES: there is no text-measuring call in SDK3, which is why every width check
+# lives in this file and not in the sheet, and a ruler that claimed a fit would be answering a
+# question it cannot answer (I114d).
+if ($fitFn355) {
+    $gb355 = NoComments $fitFn355
+    if ($gb355 -notmatch 'while size > 7\b') { $v355Bad += "(g) fitSize has no floor of 7 - a long enough name shrinks until the row reads as blank, which is worse than the clipping it was written to stop (SPEC I114d)" }
+    if ($gb355 -notmatch ([regex]::Escape('string.gsub(txt, "[\128-\191]", "")'))) { $v355Bad += "(g) fitSize does not fold UTF-8 continuation bytes away before it counts - a pt accent would count twice and the name would shrink for nothing (SPEC I114d)" }
+    if ($gb355 -notmatch ([regex]::Escape('local size = 12;'))) { $v355Bad += "(g) fitSize does not start at the authored 12 - a ruler that only diminishes has to start where the XML left off (SPEC I114d)" }
+    if ($gb355 -match 'size = size \+ ') { $v355Bad += "(g) fitSize GROWS the size - it is an estimate and may only shrink, because claiming a fit is what V196 and V312 are for (SPEC I114d)" }
+}
+$rulers355 = @([regex]::Matches($rootNC355, '\*\s*0\.5\b'))
+$rulersIn355 = if ($fitFn355) { @([regex]::Matches((NoComments $fitFn355), '\*\s*0\.5\b')).Count } else { 0 }
+if ($rulers355.Count -ne $rulersIn355) { $v355Bad += "(g) the root form carries $($rulers355.Count) px-per-character ruler(s) and only $rulersIn355 of them are inside fitSize - a second ruler is two answers to 'does this fit', and B86 is what one ruler with two OWNERS already cost (SPEC I114d, V135)" }
+
+# (h) the order is the order of what is READ. Sorting on the canonical English while the box
+# shows Portuguese is an order the eye cannot follow - and it is a GREEN failure, because every
+# name is present and only the sequence is wrong.
+if ($filterFn355) {
+    $hb355 = NoComments $filterFn355
+    if ($hb355 -notmatch ([regex]::Escape('key[name] = (foldKey ~= nil) and foldKey(shown)'))) { $v355Bad += "(h) mfFilter does not build its sort key from foldKey over the SHOWN name - comparing accented bytes raw puts a name in A after one in Z (SPEC I114g, I110c, V350)" }
+    if ($hb355 -notmatch 'table\.sort\(hits, function\(a, b\)') { $v355Bad += "(h) mfFilter sorts with no comparator - the box comes out in whatever order the pool happens to hold, and for a merit map that is hash order (SPEC I114g, V350)" }
+}
+if ($rootNC355 -match '(?m)^\s*(local\s+)?function\s+foldKey\b' -or $rootNC355 -match '(?m)^\s*(local\s+)?FOLD_MAP\s*=') { $v355Bad += "(h) the root form declares a fold of its OWN - foldKey and FOLD_MAP are WoD20.6's and already GLOBAL, and a second fold is two orderings of one list (SPEC I114g, I110c, V135)" }
+
+if ($v355Bad) { foreach ($b in $v355Bad) { Fail "V355 $b" } }
+else { Pass "V355 one mfShown decides what both readers show, mfLabel paints the two states alone - roman at opacity 1, dashed italic at 0.60 - its fontStyle count agrees with V305c's, the blank joins the pool only for a row that HOLDS a value and mfConfirm lets it through and clears book, page and cost with it, the title is derived from the list with no roster, fitSize is the one width ruler with a floor of 7 counting characters and never growing, and the order is foldKey's over what is read" }
+# ---- V356: the two SETTINGS tabs stay on dropdowns ----------------------------------------
+# SPEC C 144th, V356, I113e as widened, T817, user 2026-08-30. Six combos across the two tabs
+# that hold SETTINGS rather than character prose - Settings is WoD20.6 and Storyteller is
+# WoD20.10, the mapping the root form's <layout> imports declare. What makes them combos is
+# not their names but what they CARRY: an authored items/values pair on a field that is a
+# setting. I113e's waves convert PROSE pickers off PICKER_LIST and touch neither file, so this
+# leg is not narrowing that programme - it is closing the door B94 left open, where a future
+# ruler reading "no comboBox anywhere on the sheet" eats these six without a word.
+#
+# This REPLACES V354(f), which said the same thing about two of the six and never became a
+# check at all (SPEC B95): its legs are written per WAVE, and (f) is the NEGATION of a wave,
+# so the foreach had nowhere to hang it.
+#
+# The roster of six is the kind that GUARDS, not the kind that AGES. I114f forbids a roster
+# that must GROW a row per wave, because the wave that forgets its row passes silently. This
+# one lists what must NOT change, so losing an entry LIGHTS it - the opposite failure
+# direction. Do not "fix" it into a derivation on the grounds that rosters age.
+$V356_KEEP = @(
+    @{ File = 'WoD20.6.lfm';  Tab = 'Settings';    Field = 'language' },
+    @{ File = 'WoD20.6.lfm';  Tab = 'Settings';    Field = 'game' },
+    @{ File = 'WoD20.6.lfm';  Tab = 'Settings';    Field = 'sheetTheme' },
+    @{ File = 'WoD20.10.lfm'; Tab = 'Storyteller'; Field = 'healthLevels' },
+    @{ File = 'WoD20.10.lfm'; Tab = 'Storyteller'; Field = 'stSpecCost' },
+    @{ File = 'WoD20.10.lfm'; Tab = 'Storyteller'; Field = 'stBackgroundCost' }
+)
+$v356Bad = @()
+$v356Seen = 0
+foreach ($k356 in $V356_KEEP) {
+    $doc356 = Doc (Join-Path $dir $k356.File)
+
+    # (a) EXACTLY one comboBox on the field, in the file its tab imports. Zero is the dropdown
+    # having become something else; two is an undeclared mirror on a field that is a single
+    # setting, which is a second place to change one answer from.
+    $cb356 = @($doc356.SelectNodes("//comboBox[@field='$($k356.Field)']"))
+    if ($cb356.Count -eq 0) { $v356Bad += "(a) the $($k356.Tab) tab has no comboBox on '$($k356.Field)' in $($k356.File) - the dropdown the user asked on 2026-08-30 to KEEP has become something else, and the button of I107a1 was never called for here (SPEC C 144th, I113e)"; continue }
+    if ($cb356.Count -gt 1) { $v356Bad += "(a) the $($k356.Tab) tab carries $($cb356.Count) comboBox on '$($k356.Field)' in $($k356.File) - one setting with two widgets is an undeclared mirror (SPEC V1, V36)"; continue }
+    $v356Seen++
+
+    # (b) what makes it a SETTING and not prose, and it is the REASON the leg names it rather
+    # than the name itself: the pair is AUTHORED in the XML and nothing here reads PICKER_LIST.
+    # Losing the authored items is the combo turning into a picker by the back door.
+    foreach ($at356 in @('items', 'values')) {
+        if ([string]::IsNullOrEmpty($cb356[0].GetAttribute($at356))) { $v356Bad += "(b) the '$($k356.Field)' combo of the $($k356.Tab) tab authors no $at356 - the authored pair is what separates a VALUE combo from a prose picker, and prose is the only thing I113e converts (SPEC C 144th, V15, I110d)" }
+    }
+}
+
+# (c) the zero-guard, and it is written to catch the SILENT shortfall: a leg that skipped its
+# file and reported nothing is a leg passing by vacancy (B7), which is worse than one that
+# fails loudly.
+if ($v356Seen -lt $V356_KEEP.Count -and $v356Bad.Count -eq 0) { $v356Bad += "(c) only $v356Seen of the $($V356_KEEP.Count) combos were read and nothing above complained - the roster lost an entry without a word (SPEC V20, B7)" }
+if ($v356Seen -eq 0) { $v356Bad += "(c) not ONE of the $($V356_KEEP.Count) combos was read - the roster is empty or the two tab files are gone, and every leg above measured nothing (SPEC V209, V20, B7)" }
+
+if ($v356Bad) { foreach ($b in $v356Bad) { Fail "V356 $b" } }
+else { Pass "V356 all $v356Seen settings combos stay dropdowns - $((@($V356_KEEP | ForEach-Object { $_.Field })) -join ', ') - one comboBox each on the file its tab imports, every one still authoring its own items and values" }
 
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

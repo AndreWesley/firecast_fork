@@ -1,0 +1,122 @@
+# road_bearing.tsv — §T748, 125ª rodada 2026-08-28
+# nome_EN <TAB> bearing_EN <TAB> livro <TAB> pag_impressa <TAB> epoca
+#
+# COMO foi extraido, e por que importa (armadilhas 1 e 6 do README):
+#   pdftotext -raw  ->  ordem do content stream = ordem de LEITURA por coluna.
+#   Isso resolve a fusao de colunas que o -layout causa: no -raw o titulo, o
+#   "Nickname:" e o "Bearing:" saem contiguos, e o pareamento deixa de ser chute.
+#   A pagina vem do RODAPE de cada pagina (awk RS="\f"), NUNCA de contar \f por
+#   linha: a contagem por linha DERRAPA (media 136 onde o rodape diz 139) e poria
+#   citacao errada na frente do jogador.
+#
+# bearing "?" = o livro DESCREVE a aura em prosa e NAO lhe da nome. Sao 6, e a
+#   lista precisa decidir o que mostrar nelas (ver o bloco no fim do arquivo).
+# bearing "=X" = Path que herda a aura do Road dono; pagina vem do SUMARIO do
+#   livro, NAO de leitura da pagina -> conferir antes de virar citacao.
+#
+Humanity	Normalcy	core	310	modern
+The Path of Blood	Resolve	core	316	modern
+The Path of the Bones	Silence	core	318	modern
+The Path of Caine	Faith	core	320	modern
+The Path of Cathari	Seduction	core	323	modern
+The Path of the Feral Heart	Menace	core	324	modern
+The Path of Honorable Accord	Devotion	core	326	modern
+The Path of Lilith	Tribulation	core	329	modern
+The Path of Metamorphosis	Inhumanity	core	331	modern
+The Path of Night	Darkness	core	332	modern
+The Path of Paradox	Confidence	core	335	modern
+The Path of Power and the Inner Voice	Command	core	336	modern
+The Path of Typhon	Devotion	core	338	modern
+The Path of the Hive	Justice	bh	53	modern
+The Path of the Scorched Heart	Intellect	bh	55	modern
+The Path of Self-Focus	Balance	bh	58	modern
+The Path of Asakku	Otherworldly	bh	115	modern
+The Path of Entelechy	Stoicism	lotc	51	modern
+The Path of Ecstasy	Rapture	lotc	70	modern
+The Path of the Warrior	Fury	lotc	72	modern
+Road of the Beast	Menace	da	117	medieval
+Road of Heaven	Holiness	da	120	medieval
+Road of Humanity	Normalcy	da	122	medieval
+Road of Kings	Command	da	126	medieval
+Road of Lilith	Carved and bleeding	da	129	medieval
+Road of Metamorphosis	Inhumanity	da	133	medieval
+Road of Sin	Temptation	da	135	medieval
+Road of Bones	Silence	da	140	medieval
+Road of Yasa	Trust	da	141	medieval
+Road of Blood	Resolve	da	432	medieval
+Road of Paradox	Confidence	da	445	medieval
+The Code of Samiel	Sacrifice	da	448	medieval
+Road of the Abyss	Darkness	da	442	medieval
+Road of Set	Devotion	da	449	medieval
+Path of the Archangel	Melancholia	dac	70	medieval
+Road of Angra Mainyu	Corruption	dac	84	medieval
+Road of Ahura Mazda	Holiness	dac	84	medieval
+Path of the Hunter	=Road of the Beast	da	117	medieval
+Path of Journeys	=Road of the Beast	da	118	medieval
+Path of Liberation	=Road of the Beast	da	118	medieval
+Path of Christianity	=Road of Heaven	da	120	medieval
+Path of Life/Judaism	=Road of Heaven	da	120	medieval
+Path of Breath	=Road of Humanity	da	123	medieval
+Path of Community	=Road of Humanity	da	124	medieval
+Path of Illumination	=Road of Humanity	da	124	medieval
+Path of Chivalry	=Road of Kings	da	126	medieval
+Path of Devaraja	=Road of Kings	da	126	medieval
+Path of Daena	=Road of Kings	da	128	medieval
+Path of Thorns	=Road of Lilith	da	130	medieval
+Path of Veils	=Road of Lilith	da	131	medieval
+Path of Making	=Road of Lilith	da	131	medieval
+Path of Pleasure	=Road of Sin	da	135	medieval
+Path of the Devil	=Road of Sin	da	135	medieval
+Path of Screams	=Road of Sin	da	136	medieval
+Path of Watchful Gods	=Road of Sin	da	137	medieval
+#
+# ---- AS 5 QUE O LIVRO NAO NOMEIA: NOME DADO PELO USER 2026-08-28 ------------
+#
+# ATENCAO A QUEM VIER DEPOIS: estes 5 bearings NAO ESTAO EM LIVRO NENHUM.
+# Sao decisao do user, exatamente como os 4 trios de revenant de §R93 ("fonte =
+# user, nao livro -- NAO reextrair procurando"). Varrer os PDFs atras deles so
+# gasta tempo: o livro descreve a aura em prosa e nunca lhe da nome.
+#
+#   Road of Humanity     -> Normalcy    (da 122)  o UNICO com apoio de livro: o
+#                                                 core p.310 da "Normalcy" para
+#                                                 a mesma regua na era moderna
+#   Road of the Abyss    -> Darkness    (da 442)  o livro so diz "Their Aura
+#                                                 affects any attempt to chase
+#                                                 the darkness"
+#   Road of Set          -> Devotion    (da 449)  bate com o Path of Typhon do
+#                                                 core, que e a mesma trilha na
+#                                                 era moderna
+#   The Code of Samiel   -> Sacrifice   (da 448)  o livro diz "helps with any
+#                                                 attempt to put oneself in harm's
+#                                                 way for another"
+#   Road of Ahura Mazda  -> Holiness    (dac 84)  o livro so diz "mechanically
+#                                                 similar to the Via Humanitas"
+#
+# Efeito no spec: §V329c ("todo item de PICKER_LIST[road] tem chave em BEARING")
+# volta a ser satisfazivel COMO ESTA ESCRITA. NAO precisa de emenda, e nao existe
+# mais entrada de bearing sem nome. O bloqueio que este arquivo registrava na
+# versao anterior esta RESOLVIDO.
+## ---- O QUE ESTA EXTRACAO DESCOBRIU E O SPEC NAO PREVIA -----------------------
+#
+# 1. CINCO entradas nao tem aura NOMEADA no livro: Road of Humanity, Road of the
+#    Abyss, Road of Set, The Code of Samiel, Road of Ahura Mazda. (Angra Mainyu SAIU:
+#    da nome em PROSA -- 'carry an aura of corruption', dac p.84 -- e nao em linha
+#    'Aura: <Nome>.'; nome derivado de prosa, e o unico assim.) O livro escreve "Their Aura affects any attempt to..." e segue. Isso
+#    bate de frente com §V329c, que exige chave em BEARING para TODO item de
+#    PICKER_LIST["road"] justamente para nao existir linha de bearing sem nome.
+#    O numero (o modificador) existe para as 6 -- so o NOME falta.
+#    -> §V329 precisa de emenda por /ck:spec ANTES de §T753. Nao inventar nome.
+#    Road of Humanity tem saida propria: o core p.310 da "Normalcy" para a mesma
+#    regua na era moderna, e a 1a linha deste arquivo ja a usa.
+#
+# 2. O core chama "The Path of the Bones", NAO "Path of Death and the Soul".
+#    §R122 escreveu o segundo -- foi leitura de coluna fundida. CORRIGIDO aqui.
+#
+# 3. "Devotion" serve DUAS entradas (Honorable Accord e Typhon) e "Menace",
+#    "Silence", "Command", "Inhumanity", "Confidence" e "Resolve" servem uma
+#    moderna e uma medieval. BEARING nao e bijecao: nao da para derivar a trilha
+#    a partir do bearing, e nada no desenho tenta.
+#
+# 4. As 18 ultimas linhas (Path de Road) saem do SUMARIO, nao da pagina. A aura
+#    delas e herdada por leitura do da p.114 ("ao escolher um Road, o personagem
+#    pode escolher um Path"), nao por bloco proprio. Conferir antes de citar.

@@ -676,6 +676,8 @@
 				<layout left="591" top="0" width="819" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 					<label left="20" top="20" width="779" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+					<button name="btnFontDownHedge" left="754" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+					<button name="btnFontUpHedge" left="779" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
 					<textEditor name="edtHedgeDesc" left="30" top="41" width="759" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'numinaSel');"/>
 				</layout>
 			</layout>
@@ -745,6 +747,8 @@
 				<layout left="591" top="0" width="819" height="486">
 					<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 					<label left="20" top="20" width="779" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+					<button name="btnFontDownHedgeRitual" left="754" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+					<button name="btnFontUpHedgeRitual" left="779" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
 					<textEditor name="edtHedgeRitualDesc" left="30" top="41" width="759" height="425" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'hedgeRitualSel');"/>
 				</layout>
 			</layout>
@@ -838,6 +842,8 @@
 			<layout left="455" top="0" width="955" height="661">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="20" width="915" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+				<button name="btnFontDownPsychic" left="890" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+				<button name="btnFontUpPsychic" left="915" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
 				<textEditor name="edtPsychicDesc" left="30" top="41" width="895" height="600" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveNuminaDesc(self, 'psychicSel');"/>
 			</layout>
 		</layout>
@@ -877,6 +883,8 @@
 			<layout left="0" top="101" width="1410" height="594">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="20" width="1370" height="20" text="DESCRIPTION" horzTextAlign="center"/>
+				<button name="btnFontDownFaith" left="1345" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+				<button name="btnFontUpFaith" left="1370" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
 				<textEditor name="edtFaithDesc" left="30" top="41" width="1350" height="533" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 			</layout>
 		</layout>

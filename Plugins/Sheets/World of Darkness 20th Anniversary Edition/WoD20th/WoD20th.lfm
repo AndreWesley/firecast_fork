@@ -50,14 +50,58 @@
 				-- somewhere else WITHOUT the families, and only the ghoul dropdown wants both at once.
 				--
 				-- No empty item here - the empty one comes from `clan`, which leads the union.
-				-- Bratovich is the only name that carries an era: its Dark Ages trio (Potence) and its
-				-- modern one (Fortitude) DISAGREE, while Grimaldi and Obertus read the same in both
-				-- books and stay one line each (SPEC R93).
+				-- TWO names carry an era, and they split on DIFFERENT axes. Bratovich splits on the
+				-- TRIO: Dark Ages has Potence where Modern has Fortitude. Grimaldi splits on the
+				-- WEAKNESS, which is the second axis R93 never compared - the trio is the same
+				-- Celerity/Dominate/Fortitude in both books, but da p.454 caps the family at eight
+				-- blood points and gr p.98 gives it a behavioural flaw with no number in it at all
+				-- (SPEC R129, I108b, the user 2026-08-28).
+				--
+				-- Obertus was re-read on 2026-08-28 (SPEC T786, Q17) and does NOT split by era: the trio
+				-- matches in both books, and the weakness diverges only in WHICH Derangement - da p.454
+				-- says Obsession, gr p.102 says Obsessive-Compulsive - which this sheet does not model,
+				-- because a Derangement here is a box the player types into.
+				--
+				-- What the re-read DID turn up is a third kind of variant: a LINE inside a family.
+				-- gr p.102 - "Obertus revenants, who display signs of the Narov line, should swap
+				-- Obfuscate for Dominate." That is a CONDITION and not a free pick, so it is carried as
+				-- its own entry rather than as a choice slot: a choice slot would hand Dominate to any
+				-- Obertus, which is permission the book does not give. The shape is the one
+				-- Gargoyles (Scout)/(Sentinel)/(Warrior) already set (Q21, the user 2026-08-28).
 				["family"] = {
 					"Basarab", "Bratovich (Dark Ages)", "Bratovitch (Modern)", "D'Habi", "Danislav",
-					"Ducheski", "Enrathi", "Grimaldi", "Kairouan Brotherhood", "Katayama", "Keskinen",
-					"Khavi", "Krevcheski", "Marijava", "Obertus", "Oprichniki", "Rafastio", "Rossellini",
+					"Ducheski", "Enrathi", "Grimaldi (Dark Ages)", "Grimaldi (Modern)",
+					"Kairouan Brotherhood", "Katayama", "Keskinen",
+					"Khavi", "Krevcheski", "Marijava", "Obertus", "Obertus (Narov)", "Oprichniki",
+					"Rafastio", "Rossellini",
 					"Servants of Anushin-Rawan", "Szantovich", "Vlaszy", "Zantosa",
+				},
+				-- The morality roster (SPEC I99c). 55 rows, GENERATED from research/road_bearing.tsv,
+				-- which is the MEASURED source: the three R rows are what was known before it.
+				--
+				-- `Humanity` leads and is NOT the empty item - a character without a road IS on Humanity,
+				-- so there is no empty road to clear back to (SPEC C, the declared V15 exception).
+				--
+				-- `values` carries all 55 in every era; only the `items` filter, on the ROAD_ERA axis
+				-- further down (SPEC I99c2) - the second axis V24 already declares. Names collide with
+				-- other lists ON PURPOSE: `The Path of Blood` is BOTH a road and a Thaumaturgy path,
+				-- which is trap 5 of research/README.md. Separate lists in separate places, and the one
+				-- .lang key serves both because both read `A Trilha do Sangue`.
+				["road"] = {
+					"Humanity", "The Path of Blood", "The Path of the Bones", "The Path of Caine", "The Path of Cathari",
+					"The Path of the Feral Heart", "The Path of Honorable Accord", "The Path of Lilith",
+					"The Path of Metamorphosis", "The Path of Night", "The Path of Paradox",
+					"The Path of Power and the Inner Voice", "The Path of Typhon", "The Path of the Hive",
+					"The Path of the Scorched Heart", "The Path of Self-Focus", "The Path of Asakku",
+					"The Path of Entelechy", "The Path of Ecstasy", "The Path of the Warrior", "Road of the Beast",
+					"Road of Heaven", "Road of Humanity", "Road of Kings", "Road of Lilith", "Road of Metamorphosis",
+					"Road of Sin", "Road of Bones", "Road of Yasa", "Road of Blood", "Road of Paradox",
+					"The Code of Samiel", "Road of the Abyss", "Road of Set", "Path of the Archangel",
+					"Road of Angra Mainyu", "Road of Ahura Mazda", "Path of the Hunter", "Path of Journeys",
+					"Path of Liberation", "Path of Christianity", "Path of Life/Judaism", "Path of Breath",
+					"Path of Community", "Path of Illumination", "Path of Chivalry", "Path of Devaraja", "Path of Daena",
+					"Path of Thorns", "Path of Veils", "Path of Making", "Path of Pleasure", "Path of the Devil",
+					"Path of Screams", "Path of Watchful Gods",
 				},
 				["nature"] = {
 					"", "Activist", "Architect", "Autocrat", "Benefactor", "Bon Vivant", "Bravo", "Bureaucrat", "Caregiver",
@@ -79,13 +123,22 @@
 					"Ride", "Ritual", "Science", "Seneschal", "Stealth", "Streetwise", "Subterfuge", "Survival",
 					"Technology", "Theology",
 				},
+				-- Forty-seven items since T764, which MEASURED where each name is defined and wrote
+				-- research/bg_essence.tsv. TWO names carry an origin suffix because their games do
+				-- not share a mechanic: `Status` (V20 p.118 is standing among the Kindred, M20
+				-- p.325 is respect among Awakened peers) and `Totem` (M20 p.326 is a personal pact
+				-- with a spirit, W20 p.140 is a PACK trait the whole pack pools its points into).
+				-- Every other cross-game homonym (Allies, Contacts, Fame, Influence, Library,
+				-- Mentor, Rank, Requisitions, Resources, Retainers) reads the same in every book -
+				-- `Resources` repeats the sentence word for word in V20 p.115 and W20 p.138 - and
+				-- stays ONE item: a suffix there would separate nothing (SPEC I105b).
 				["background"] = {
-					"", "Allies", "Alternate Identity", "Ancestors", "Arcane", "Armory", "Avatar", "Backup",
+					"", "Allies", "Alternate Identity", "Ancestors", "Arcane", "Armory", "Artifacts", "Avatar", "Backup",
 					"Base of Operations", "Certification", "Chantry", "Contacts", "Cult", "Demesne", "Destiny", "Domain",
 					"Dream", "Enhancement", "Fame", "Familiar", "Fetish", "Generation", "Guide", "Herd", "Influence",
 					"Kinfolk", "Legend", "Library", "Mentor", "Node", "Past Lives", "Patron", "Pure Breed", "Rank",
 					"Requisitions", "Resources", "Retainers", "Rites", "Rituals", "Sanctum", "Secret Weapons", "Spies",
-					"Status", "Totem", "Wonder",
+					"Status (Mage)", "Status (Vampire)", "Totem (Mage)", "Totem (Werewolf)", "Wonder",
 				},
 				-- Twenty-seven hedge paths since the 94th round, when the three books were swept whole
 				-- and six the sheet did not carry came back with a page each (SPEC I69, R106, R107, R108).
@@ -305,6 +358,187 @@
 					"5. Warding Circle versus Technology", "5. Warding Circles versus Spirits, Ghosts, and Demons",
 					"5. Way of the Wendigo", "5. Whispers in the Dark", "6. Into the Chasm", "7. Evocation of the Oubliette",
 					"8. Cry That Slays the Light", "8. Lord Aludian’s Claim", "9. Boukephos’ Chosen Oubliette",
+				},
+				-- Merit and Flaw, 872 items across the two: 380 merits and 493 flaws (SPEC V340f).
+				-- TWO lists and not one seam like I29b: the Merits table must not offer a Flaw. Both open
+				-- with the empty item, because a blank merit row is a valid state (SPEC I100c, V15).
+				-- Cannibal is in BOTH on purpose - a 1pt Merit in Lore of the Clans p.106 and a 3pt Flaw
+				-- in Ghouls & Revenants p.136, opposite mechanics that dedupe rule 0 keeps apart (SPEC B82).
+				-- Generated by research/gen_merit_data.ps1 from research/merit_flaw.tsv (SPEC T750).
+				["merit"] = {
+					"", "Acute Sense", "Acute Senses (1)", "Acute Senses (3)", "Addictive Blood", "Additional Discipline",
+					"Advanced Tech (1)", "Advanced Tech (2)", "Advanced Tech (3)", "Advanced Tech (4)", "Advanced Tech (5)",
+					"Alcohol /Drug Tolerance (1)", "Alcohol /Drug Tolerance (2)", "Alien Perfection", "Ambidextrous",
+					"Animal Magnetism", "Antitoxin Blood", "Apostate (Modern)", "Arcane (1)", "Arcane (2)", "Arcane (3)",
+					"Arcane (4)", "Arcane (5)", "Artistically Gifted", "Aura of Command", "Avatar Companion",
+					"Backup Identity", "Bardic Gift", "Benevolent Domitor", "Berserker (Mage)", "Berserker (Vampire)",
+					"Bigger Boys Came", "Bioluminescence", "Blasphemous Pact", "Blessed by St. Gustav",
+					"Blood Flaw Immunity", "Blooded by the Code", "Blush of Health", "Boon (1)", "Boon (2)", "Boon (3)",
+					"Boon (4)", "Boon (5)", "Boon (6)", "Brahmin", "Broken Bond", "Bruiser", "Bullyboy", "Burning Aura",
+					"Call of the Sea", "Calm Heart", "Cannibal", "Cast-Iron Stomach", "Catlike Balance",
+					"Celestial Affinity", "Celestial Attunement", "Chorus Trained (3)", "Chorus Trained (5)",
+					"Circumspect Avatar", "Clan Apostate", "Clan Friendship", "Clear Sighted (Hunter)",
+					"Clear Sighted (Mage)", "Clear-Sighted", "Cloak of the Seasons", "Code of Honor", "Cold Read",
+					"Coldly Logical", "Common Sense", "Computer Aptitude", "Concentration", "Confidence", "Connoisseur",
+					"Consanguineous Resistance", "Controllable Night Sight", "Court Favorite (1)", "Court Favorite (2)",
+					"Court Favorite (3)", "Court Favorite (4)", "Court Favorite (5)", "Critters", "Cultural Chameleon",
+					"Danger Sense", "Daredevil", "Dark Triad", "Darksight", "Dead Zone", "Death Grip", "Deathwalker",
+					"Debt of Gratitude (1)", "Debt of Gratitude (3)", "Deceptive Aura", "Deceptive Eating",
+					"Demonic Patron", "Detached", "Discerning Palate", "Disciple of Lazarus / Japheth", "Distracting Aura",
+					"Dracon's Temperament", "Drug Resistance", "Dual Affiliation", "Dynamic Personality", "Early Riser",
+					"Eat Food", "Ecclesial Rank (1)", "Ecclesial Rank (2)", "Ecclesial Rank (3)", "Ecstatic", "Ecumenist",
+					"Efficient Digestion", "Eidetic Memory", "Elysium Regular", "Embedded Agent",
+					"Embraced without the Cup", "Enchanting Feature", "Enchanting Voice", "Entrepreneur", "Expert Driver",
+					"Extra Sharp", "Eyes of Shadow (1)", "Eyes of Shadow (2)", "Eyes of Shadow (3)", "Eyes of Shadow (4)",
+					"Fae Blood", "Faerie Affinity", "False Reflection", "Family Support (1)", "Family Support (2)",
+					"Family Support (3)", "Fatalist", "Favor (1)", "Favor (2)", "Favor (3)", "Fist of God",
+					"Force of Spirit", "Former Ghoul", "Foul Blood", "Friend of the Underground", "Friendly Face",
+					"Fugue Instinct", "Ghoul", "Green Thumb", "Groomed for Embrace", "Guardian Angel", "Half-Life",
+					"Hands of Daedalus", "Harmless", "Haven Affinity", "Healing Touch", "Heart of Needles", "Heavy Hands",
+					"Heretical Sympathizer", "Hidden Diablerie", "Hideaway /Safehouse (2)", "Hideaway /Safehouse (4)",
+					"Hideaway /Safehouse (6)", "Hive-Minded (1)", "Hive-Minded (2)", "Holy Aura", "Huge Size",
+					"Hyperflexible", "Hyperfocus", "Hypersensitivity", "Impossible Ritual", "Impressive Restraint",
+					"Incantation", "Indelible (1)", "Indelible (2)", "Inner Knight", "Inner Strength", "Innocent",
+					"Inoffensive to Animals", "Insensate to Pain", "Instrument of God", "Inter-Agency Liaison",
+					"Introspection", "Iron Will", "Jack-of-All-Trades", "Judge's Wisdom", "Kashaph",
+					"Keys to the Library (1)", "Keys to the Library (2)", "Keys to the Library (3)",
+					"Keys to the Library (4)", "Keys to the Library (5)", "King or Queen of Shadow", "Kshatriya",
+					"Language", "Lawman's Friend", "Legacy", "Legendary Attributes", "Legerdemain",
+					"Lesser Mark of the Beast", "Light Sleeper", "Lightning Calculator", "Lingua Franca", "Literacy",
+					"Lizard Limbs", "Local Hero", "Long Fingers", "Long-Term Planning", "Loyalty (Mage)",
+					"Loyalty (Vampire)", "Lucky", "Magic Resistance", "Manifest Avatar", "Mark of Favor",
+					"Master of Red Tape", "Master of the Masquerade", "Mechanical Aptitude", "Medium", "Mole",
+					"Monstrous Maw", "Mortuario (2)", "Mortuario (4)", "Multi-Lingual", "Mute Devotion", "Natural Channel",
+					"Natural Leader", "Natural Linguist", "Natural Shapeshifter", "Nephilim /Laham", "Nightsight",
+					"Nine Lives", "Noble Blood", "Non-Standard Access", "Noted Messenger", "Occult Library (2)",
+					"Occult Library (4)", "Officially Dead", "Old Pal", "Open Road", "Oracular Ability", "Outside Haven",
+					"Pain Tolerance", "Pale Aura", "Paragon", "Paranormal Link", "Parlor Trick", "Patagia", "Path Dabbler",
+					"Path Natural", "Patron (1)", "Patron (2)", "Patron (3)", "Patron (4)", "Patron (5)", "Peacemaker",
+					"Perfect Liar", "Personal Masquerade", "Physically Impressive", "Piscine", "Pitiable",
+					"Poison Resistance", "Poisonous Blood", "Poker Face", "Postulant of Echidna", "Powerful Ally (5)",
+					"Powerful Ally (6)", "Powerful Ally (7)", "Powerful Ally (8)", "Precocious", "Prestige",
+					"Prestigious Mentor", "Prestigious Sire", "Primogen/Bishop Friendship", "Prized Collection (1)",
+					"Prized Collection (2)", "Prized Patch", "Profane Trappings", "Promethean Clay", "Property (2)",
+					"Property (3)", "Property (4)", "Property (5)", "Prophetic Dreams", "Psychic Awareness",
+					"Psychic Leech", "Quartermaster", "Ravnos Jati", "Regal Bearing", "Rep", "Research Grant",
+					"Revenant Disciplines", "Rising Star", "Ritual Dabbler", "Rugged Bad Looks", "Sabbat Survivor",
+					"Sanction", "Sanctioned Witch", "Sanctity", "Sanctuary", "Sanguine Incongruity", "Scent of the Other",
+					"Scholar of Enemies", "Scholar of Others", "Science Laboratory", "Scientific Mystic /Techgnosi",
+					"Secret Code Language", "Secret Society Member", "Secret Stash (2)", "Secret Stash (3)",
+					"Secret Stash (4)", "Secret Stash (5)", "Sectarian Ally", "Self-Confident", "Sense Influence",
+					"Setite Initiate", "Shapechanger Kin", "Shattered Avatar", "Sight Beyond Sight", "Simply Waiting",
+					"Skald", "Skin of Porcelain", "Sleep Unseen", "Slimy", "Slowed Degeneration", "Soapbox",
+					"Socially Networked", "Spark of Life", "Spawning Pool (1)", "Spawning Pool (2)", "Spawning Pool (3)",
+					"Sphere Natural", "Spirit Mentor", "Stillness of Death", "Stitcher", "Stormwarden",
+					"Stormwarden /Quantum Voyager (3)", "Stormwarden /Quantum Voyager (5)", "Strength of Psyche", "Sturdy",
+					"Style Sleeper", "Styx Baptism", "Subculture Insider", "Sugar Daddy", "Supernatural Companion",
+					"Sympathetic Mastery", "The Company of Saints and Heroes", "The Flow of Ki", "The High Price",
+					"Thousand Meter Killer", "Thugs", "Ties", "Time Sense", "Too Tough to Die", "Totemic Change",
+					"Tough Hide", "Tracker's Mark", "True Celerity", "True Faith", "True Love", "Tunnel Rat (1)",
+					"Tunnel Rat (2)", "Tunnel Rat (3)", "Tunnel Rat (4)", "Tunnel Rat (5)", "Twin Link (4)",
+					"Twin Link (6)", "Twin Souls", "Umbral Affinity", "Unaging", "Unbondable", "Unmarked Antitribu (2)",
+					"Unmarked Antitribu (5)", "Unobtrusive", "Useful Knowledge", "Vaishya", "Vicissitude Modifications (1)",
+					"Vicissitude Modifications (2)", "Vicissitude Modifications (3)", "Vicissitude Modifications (4)",
+					"Vicissitude Modifications (5)", "Vicissitude Modifications (6)", "Vicissitude Modifications (7)",
+					"Virulent Strike", "Vitae Mutation", "Warrior's Heart", "Well-Rounded", "Without a Trace",
+					"Wolverine's Palate",
+				},
+				["flaw"] = {
+					"", "Ability Deficit", "Absent-Minded", "Addicted to Vampire Blood", "Addiction", "Aging", "Albino",
+					"Amnesia", "Anachronism (1)", "Anachronism (2)", "Anachronism (3)", "Ancestral Soil Dependence",
+					"Animate Shadow", "Anosmia", "Apostate (Dark Ages)", "Apprentice (1)", "Apprentice (2)",
+					"Apprentice (3)", "Apprentice (4)", "Apprentice (5)", "Arcane Curse (1)", "Arcane Curse (2)",
+					"Arcane Curse (3)", "Arcane Curse (4)", "Arcane Curse (5)", "Artificially Aged", "Aura of the Typhon",
+					"Bad Sight (1)", "Bad Sight (3)", "Banshee-in-Waiting", "Beacon of the Unholy", "Beast Within",
+					"Bedeviled", "Bestial", "Betrayer's Mark", "Bigot", "Bizarre Hunger (2)", "Bizarre Hunger (3)",
+					"Bizarre Hunger (4)", "Bizarre Hunger (5)", "Black and White", "Black Sheep", "Blacklisted (1)",
+					"Blacklisted (2)", "Blacklisted (3)", "Blacklisted (4)", "Blacklisted (5)", "Blind", "Blood Feud",
+					"Blood Hunted (4)", "Blood Hunted (6)", "Blood Magick", "Blood Weakness (4)", "Blood Weakness (7)",
+					"Blood-Hungry Soul (2)", "Blood-Hungry Soul (3)", "Blood-Hungry Soul (5)", "Body Trail",
+					"Botched Presentation", "Bound (Mage)", "Bound (Vampire)", "Bound to the Clan", "Branded (3)",
+					"Branded (4)", "Branded (5)", "Brittle Body (2)", "Brittle Body (4)", "Broken Antitribu", "Bulimia",
+					"Cannibal", "Cannot Embrace", "Can't Cross Running Water", "Carrion Presence", "Cast No Reflection",
+					"Cast No Shadow or Reflection (1)", "Cast No Shadow or Reflection (2)", "Catspaw", "Chandala", "Child",
+					"Chronic Depression", "Clan Enmity", "Clan Weakness", "Cloaked in Shadow", "Cloistered", "Cold Breeze",
+					"Combat Novice", "Compulsion", "Compulsive Speech (1)", "Compulsive Speech (2)",
+					"Conflicting Loyalties (1)", "Conflicting Loyalties (2)", "Conflicting Loyalties (3)", "Conniver",
+					"Conspicuous Consumption", "Construct", "Consumption", "Contagious", "Credulous (3)", "Credulous (5)",
+					"Crucial Component (2)", "Crucial Component (3)", "Crucial Component (4)", "Crucial Component (5)",
+					"Cultural Other (1)", "Cultural Other (2)", "Cultural Other (3)", "Cultural Other (4)",
+					"Cultural Other (5)", "Curiosity", "Cursed (1)", "Cursed (2)", "Cursed (3)", "Cursed (4)", "Cursed (5)",
+					"Dangerous Secret (1)", "Dangerous Secret (2)", "Dangerous Secret (3)", "Dangerous Secret (4)",
+					"Dangerous Secret (5)", "Dark Aura", "Dark Fate", "Dark Secret", "Dead Inside", "Deaf", "Deathsight",
+					"Debts (1)", "Debts (2)", "Debts (3)", "Debts (4)", "Debts (5)", "Deep Sleeper", "Deformity",
+					"Degeneration (3)", "Degeneration (6)", "Degeneration (9)", "Demented Eidolon", "Demon-Hounded (1)",
+					"Demon-Hounded (2)", "Demon-Hounded (3)", "Demon-Hounded (4)", "Demon-Hounded (5)", "Deranged (3)",
+					"Deranged (5)", "Devil's Mark", "Diabolical Mentor", "Discredited", "Disease Carrier", "Disfigured",
+					"Disgrace to the Blood", "Dogmatic", "Domitor Pariah", "Double Agent", "Dreadful Mara", "Driving Goal",
+					"Dulled Bite", "Duplicitous", "Easily Intoxicated", "Echo Chamber", "Echoes (1)", "Echoes (2)",
+					"Echoes (3)", "Echoes (4)", "Echoes (5)", "Eerie Presence", "Enemy (1)", "Enemy (2)", "Enemy (3)",
+					"Enemy (4)", "Enemy (5)", "Enemy Brood", "Escaped Target", "Esoteric Discourse / Technobabbler",
+					"Ethical Prohibition (2)", "Ethical Prohibition (4)", "Expendable", "Expiration Date",
+					"Extreme Kink (3)", "Extreme Kink (4)", "Extreme Kink (5)", "Faceless", "Failure", "Faithless",
+					"Family Issues (1)", "Family Issues (2)", "Family Issues (3)", "Fangless", "Faulty Enhancements (2)",
+					"Faulty Enhancements (3)", "Faulty Enhancements (4)", "Faulty Enhancements (5)", "Feral Mind",
+					"Fifteenth Generation", "Fifth Degree", "Finicky Palate", "Flashbacks", "Flawed Reality", "Flesh Eater",
+					"Flesh of the Corpse", "Forked Tongue", "Former Prince", "Fourteenth Generation", "Fugitive",
+					"Glowing Eyes", "Gremlin (1)", "Gremlin (2)", "Gremlin (3)", "Gremlin (4)", "Gremlin (5)",
+					"Grip of the Damned", "Guilt-Wracked", "Gullible", "Harbinger of the Abyss", "Hard of Hearing",
+					"Hatred", "Haunted", "Heartless", "Hemophiliac", "Hero Worship", "Hit List", "Horrific", "Hunted",
+					"Hunted by the Hierophants", "Hunted Like a Dog", "Icy", "Ignorance", "Illiterate (1)",
+					"Illiterate (2)", "Immortal Enemy (5)", "Immortal Enemy (6)", "Immortal Enemy (7)",
+					"Immortal Enemy (8)", "Impaired Sense", "Impatient", "Impediment (1)", "Impediment (2)",
+					"Impediment (3)", "Impediment (4)", "Impediment (5)", "Impediment (6)", "Inappropriate (1)",
+					"Inappropriate (2)", "Inappropriate (3)", "Inappropriate (4)", "Inbred (1)", "Inbred (2)", "Inbred (3)",
+					"Inbred (4)", "Inbred (5)", "Incoherent", "Incomplete Understanding", "Infamous Sire", "Infamy (1)",
+					"Infamy (2)", "Infamy (3)", "Infamy (4)", "Infamy (5)", "Infectious", "Infectious Bite",
+					"Infertile Vitae", "Initiate of the Road", "Insane /Infamous Mentor", "Insubordinate", "Intemperate",
+					"Isolated Upbringing", "Jinx /Infernal Contraption (10)", "Jinx /Infernal Contraption (2)",
+					"Jinx /Infernal Contraption (3)", "Jinx /Infernal Contraption (4)", "Jinx /Infernal Contraption (5)",
+					"Jinx /Infernal Contraption (6)", "Jinx /Infernal Contraption (7)", "Jinx /Infernal Contraption (8)",
+					"Jinx /Infernal Contraption (9)", "Kiss of Death", "Lame", "Laughingstock", "Lazy", "Lifesaver",
+					"Light-Sensitive", "Lightweight", "Loathsome Regnant", "Locked Vidare", "Loose Lips",
+					"Lord of the Flies", "Lord of the Night", "Lost Svadharma", "Lunacy", "Mage Blood", "Magical Signature",
+					"Manchurian Candidate", "Marked for Death", "Masquerade Breaker", "Mayfly Curse (10)",
+					"Mayfly Curse (5)", "Member of the Pack", "Mental Lock", "Methuselah's Thirst", "Mistaken Identity",
+					"Monstrous", "Mortal Flashbacks", "Mr. Red Tape", "Multiple Curses", "Mute", "Nameless", "Narc",
+					"New Arrival", "New Kid", "Nightmares", "Notoriety", "Oathbreaker", "Oathbreaker (Ravnos)", "Obsession",
+					"Obvious Predator", "OCPD", "Odd Gait", "Offensive to Animals", "Offline (1)", "Offline (3)",
+					"Old Flame", "One Eye", "Open Wound (2)", "Open Wound (4)", "Out of Phase", "Outcast", "Outsider",
+					"Outspoken Heretic", "Overconfident", "Overextended", "Overstimulated", "Pacifist", "Paper Trail",
+					"Paradise Lost", "Paranoid", "Paranormal Prohibition or Imperative (2)",
+					"Paranormal Prohibition or Imperative (3)", "Paranormal Prohibition or Imperative (4)",
+					"Paranormal Prohibition or Imperative (5)", "Paranormal Prohibition or Imperative (6)",
+					"Paranormal Prohibition or Imperative (7)", "Paranormal Prohibition or Imperative (8)",
+					"Parasitic Infestation", "Path Inept", "Permanent Fangs", "Permanent Paradox Flaw (2)",
+					"Permanent Paradox Flaw (4)", "Permanent Paradox Flaw (6)", "Permanent Wound", "Phobia", "Phylactery",
+					"Plague of Demons", "Prey Exclusion", "Primal Marks", "Privacy Obsession", "Private Life",
+					"Probationary Member", "Probationary Sect Member", "Problem with Authority", "Profiled Appearance",
+					"Prone to Quiet (4)", "Prone to Quiet (5)", "Psi Focus (3)", "Psi Focus (4)", "Psi Focus (5)",
+					"Psychic Vampire", "PTSD (2)", "PTSD (3)", "PTSD (4)", "PTSD (5)", "Putrescent", "Ragged Bite",
+					"Rat in a Cage", "Rebel (1)", "Rebel (2)", "Rebel (3)", "Recruitment Target", "Red List",
+					"Refined Palate (1)", "Refined Palate (2)", "Refined Palate (3)", "Religious Hysteria",
+					"Repelled by Crosses", "Repulsed by Garlic", "Repulsive Feature", "Repulsive to Animals",
+					"Revenant Weakness", "Ritual Ineptness", "Ritual Sleeper", "Rival House (1)", "Rival House (2)",
+					"Rival House (3)", "Rival House (4)", "Rival House (5)", "Rival Sires", "Rivalry (1)", "Rivalry (2)",
+					"Rivalry (3)", "Rivalry (4)", "Rivalry (5)", "Rogue", "Romantic Notions", "Rose-Colored Glasses",
+					"Rotten Liar", "Scales (1)", "Scales (2)", "Scales (3)", "Sect Enmity", "Seizures", "Self-Preservation",
+					"Shadow Scarred", "Shadow Walker", "Short", "Short Fuse", "Shy", "Siege Mentality", "Sire's Resentment",
+					"Sleeping With the Enemy", "Slow Healing", "Smell of the Grave", "Soft-Hearted",
+					"Special Responsibility", "Speech Impediment", "Sphere Inept", "Squeamish (1)", "Squeamish (3)",
+					"Stench", "Stereotype", "Stigmata (2)", "Stigmata (4)", "Stone Tongue", "Strangeness", "Stress Atavism",
+					"Stubborn Magic (1)", "Stubborn Magic (4)", "Sympathizer", "Taint of Corruption", "Territorial",
+					"Thaumaturgically Inept", "The Bard's Tongue", "The Eighth", "The Largest Maw", "Thin Blood",
+					"Thirst for Innocence", "Thirteenth Generation", "Throwback (1)", "Throwback (2)", "Throwback (3)",
+					"Throwback (4)", "Throwback (5)", "Tic/Twitch", "Tortured Artist", "Touch of Frost", "Troublemaker",
+					"Turncoat", "Twisted Apprenticeship", "Unblinking", "Uncanny (1)", "Uncanny (2)", "Uncanny (3)",
+					"Uncanny (4)", "Uncanny (5)", "Unclean (2)", "Unclean (3)", "Uncommon Vitae Preference",
+					"Uncontrollable Night Sight", "Unconvinced", "Unholy Stain", "Unlucky (1)", "Unlucky (2)",
+					"Unlucky (3)", "Unlucky (4)", "Unlucky (5)", "Unproven", "Unsanctioned Embrace", "Uppity", "Vanilla",
+					"Vassal of the Clan", "Vengeful", "Venomous Bite", "Victim of the Masquerade", "Vitae Sink", "Vulgar",
+					"Vulnerability (1)", "Vulnerability (2)", "Vulnerability (3)", "Vulnerability (4)", "Vulnerability (5)",
+					"Vulnerability (6)", "Vulnerability (7)", "Vulnerability to Silver", "Ward", "Weak Blood",
+					"Weak-Willed", "Whimsy", "Witch-Hunted",
 				},
 				-- <<< PICKER_LIST_END
 			};
@@ -734,7 +968,8 @@
 				["Danislav"]                  = { fixed = {"Auspex", "Protean", "Vicissitude"} },
 				["Ducheski"]                  = { fixed = {"Auspex", "Dominate", "Thaumaturgy"} },
 				["Enrathi"]                   = { fixed = {"Dominate", "Obfuscate", "Potence"} },
-				["Grimaldi"]                  = { fixed = {"Celerity", "Dominate", "Fortitude"} },
+				["Grimaldi (Dark Ages)"]      = { fixed = {"Celerity", "Dominate", "Fortitude"} },
+				["Grimaldi (Modern)"]         = { fixed = {"Celerity", "Dominate", "Fortitude"} },
 				["Kairouan Brotherhood"]      = { fixed = {"Auspex", "Celerity", "Obfuscate"} },
 				["Katayama"]                  = { fixed = {"Auspex", "Dominate", "Obfuscate"} },
 				-- One fixed and TWO picked from the same short list, which is the only entry in the
@@ -747,6 +982,7 @@
 				["Krevcheski"]                = { fixed = {"Auspex", "Dominate"} },
 				["Marijava"]                  = { fixed = {"Celerity", "Obfuscate", "Presence"} },
 				["Obertus"]                   = { fixed = {"Auspex", "Obfuscate", "Vicissitude"} },
+				["Obertus (Narov)"]           = { fixed = {"Auspex", "Dominate", "Vicissitude"} },
 				["Oprichniki"]                = { fixed = {"Animalism", "Obfuscate", "Potence"} },
 				["Rafastio"]                  = { fixed = {"Animalism", "Auspex", "Thaumaturgy"} },
 				["Rossellini"]                = { fixed = {"Dominate", "Fortitude", "Necromancy"} },
@@ -1351,6 +1587,138 @@
 
 				return ERA_NAME[v] or v;
 			end;
+
+
+			-- BEARING and ROAD_ERA (SPEC I99c2, I99f). Globals for the same reason ERA_ABILITIES is:
+			-- the tables belong on the root form and the labels reading them live on WoD20.1.
+			--
+			-- BEARING is TOTAL over PICKER_LIST["road"], so the bearing line can never open blank
+			-- (SPEC V329c). FIVE names were given BY THE USER on 2026-08-28 because the book describes
+			-- the aura in prose and never names it: Road of Humanity, Road of the Abyss, Road of Set,
+			-- The Code of Samiel, Road of Ahura Mazda. Source is the USER, not a book - do not go
+			-- re-extracting for them; same standing as the four revenant trios of R93.
+			--
+			-- NOT a bijection: Devotion serves two roads and six more names serve one modern road and
+			-- one medieval. Nothing derives the road back from the bearing.
+			--
+			-- ROAD_ERA reads `modern` or `medieval` off WHICH BOOK prints the entry, so the filter is
+			-- measured, not opinion. Humanity is the one row in BOTH: it is the default, and an era
+			-- whose list omitted it would leave the field holding no legal value (SPEC I99c3).
+				BEARING = {
+					["Humanity"] = "Normalcy",
+					["The Path of Blood"] = "Resolve",
+					["The Path of the Bones"] = "Silence",
+					["The Path of Caine"] = "Faith",
+					["The Path of Cathari"] = "Seduction",
+					["The Path of the Feral Heart"] = "Menace",
+					["The Path of Honorable Accord"] = "Devotion",
+					["The Path of Lilith"] = "Tribulation",
+					["The Path of Metamorphosis"] = "Inhumanity",
+					["The Path of Night"] = "Darkness",
+					["The Path of Paradox"] = "Confidence",
+					["The Path of Power and the Inner Voice"] = "Command",
+					["The Path of Typhon"] = "Devotion",
+					["The Path of the Hive"] = "Justice",
+					["The Path of the Scorched Heart"] = "Intellect",
+					["The Path of Self-Focus"] = "Balance",
+					["The Path of Asakku"] = "Otherworldly",
+					["The Path of Entelechy"] = "Stoicism",
+					["The Path of Ecstasy"] = "Rapture",
+					["The Path of the Warrior"] = "Fury",
+					["Road of the Beast"] = "Menace",
+					["Road of Heaven"] = "Holiness",
+					["Road of Humanity"] = "Normalcy",
+					["Road of Kings"] = "Command",
+					["Road of Lilith"] = "Carved and bleeding",
+					["Road of Metamorphosis"] = "Inhumanity",
+					["Road of Sin"] = "Temptation",
+					["Road of Bones"] = "Silence",
+					["Road of Yasa"] = "Trust",
+					["Road of Blood"] = "Resolve",
+					["Road of Paradox"] = "Confidence",
+					["The Code of Samiel"] = "Sacrifice",
+					["Road of the Abyss"] = "Darkness",
+					["Road of Set"] = "Devotion",
+					["Path of the Archangel"] = "Melancholia",
+					["Road of Angra Mainyu"] = "Corruption",
+					["Road of Ahura Mazda"] = "Holiness",
+					["Path of the Hunter"] = "Menace",
+					["Path of Journeys"] = "Menace",
+					["Path of Liberation"] = "Menace",
+					["Path of Christianity"] = "Holiness",
+					["Path of Life/Judaism"] = "Holiness",
+					["Path of Breath"] = "Normalcy",
+					["Path of Community"] = "Normalcy",
+					["Path of Illumination"] = "Normalcy",
+					["Path of Chivalry"] = "Command",
+					["Path of Devaraja"] = "Command",
+					["Path of Daena"] = "Command",
+					["Path of Thorns"] = "Carved and bleeding",
+					["Path of Veils"] = "Carved and bleeding",
+					["Path of Making"] = "Carved and bleeding",
+					["Path of Pleasure"] = "Temptation",
+					["Path of the Devil"] = "Temptation",
+					["Path of Screams"] = "Temptation",
+					["Path of Watchful Gods"] = "Temptation",
+				};
+
+				ROAD_ERA = {
+					["Humanity"] = "modern",
+					["The Path of Blood"] = "modern",
+					["The Path of the Bones"] = "modern",
+					["The Path of Caine"] = "modern",
+					["The Path of Cathari"] = "modern",
+					["The Path of the Feral Heart"] = "modern",
+					["The Path of Honorable Accord"] = "modern",
+					["The Path of Lilith"] = "modern",
+					["The Path of Metamorphosis"] = "modern",
+					["The Path of Night"] = "modern",
+					["The Path of Paradox"] = "modern",
+					["The Path of Power and the Inner Voice"] = "modern",
+					["The Path of Typhon"] = "modern",
+					["The Path of the Hive"] = "modern",
+					["The Path of the Scorched Heart"] = "modern",
+					["The Path of Self-Focus"] = "modern",
+					["The Path of Asakku"] = "modern",
+					["The Path of Entelechy"] = "modern",
+					["The Path of Ecstasy"] = "modern",
+					["The Path of the Warrior"] = "modern",
+					["Road of the Beast"] = "medieval",
+					["Road of Heaven"] = "medieval",
+					["Road of Humanity"] = "medieval",
+					["Road of Kings"] = "medieval",
+					["Road of Lilith"] = "medieval",
+					["Road of Metamorphosis"] = "medieval",
+					["Road of Sin"] = "medieval",
+					["Road of Bones"] = "medieval",
+					["Road of Yasa"] = "medieval",
+					["Road of Blood"] = "medieval",
+					["Road of Paradox"] = "medieval",
+					["The Code of Samiel"] = "medieval",
+					["Road of the Abyss"] = "medieval",
+					["Road of Set"] = "medieval",
+					["Path of the Archangel"] = "medieval",
+					["Road of Angra Mainyu"] = "medieval",
+					["Road of Ahura Mazda"] = "medieval",
+					["Path of the Hunter"] = "medieval",
+					["Path of Journeys"] = "medieval",
+					["Path of Liberation"] = "medieval",
+					["Path of Christianity"] = "medieval",
+					["Path of Life/Judaism"] = "medieval",
+					["Path of Breath"] = "medieval",
+					["Path of Community"] = "medieval",
+					["Path of Illumination"] = "medieval",
+					["Path of Chivalry"] = "medieval",
+					["Path of Devaraja"] = "medieval",
+					["Path of Daena"] = "medieval",
+					["Path of Thorns"] = "medieval",
+					["Path of Veils"] = "medieval",
+					["Path of Making"] = "medieval",
+					["Path of Pleasure"] = "medieval",
+					["Path of the Devil"] = "medieval",
+					["Path of Screams"] = "medieval",
+					["Path of Watchful Gods"] = "medieval",
+				};
 
 			-- Box geometry, named rather than written into the height sum further down: PITCH is
 			-- the distance between two rows in the .lfm files and PAD is the room above the first
@@ -3409,6 +3777,803 @@
 			-- `enabled` and `opacity` are written on the SAME line (SPEC V162): a combo that looks
 			-- locked and is not - or the reverse - is the exact failure V111 exists to stop. Found
 			-- through xpFind from the tab root, the one finder this sheet has (SPEC V143).
+
+			-- The bearing ladder (SPEC I99g, V329a). Five rungs, DESCENDING, and the last is an `else`
+			-- rather than a fifth test, so there is no rating the ladder can fall through - a gap here
+			-- would read as a silent zero on a sheet nobody would think to check.
+			--
+			-- The table is IDENTICAL in both books - core p.310 and Dark Ages p.114 print the same five
+			-- rungs (SPEC R120) - so there is no era branch here, and there should never be one.
+			--
+			-- The sign is literal: `+1` and `+2` carry it because the request asked for the sign, and
+			-- `0` does not, because `+0` reads as a bonus that is not there.
+			function bearingMod(n)
+				if n >= 10 then return "-2"; end;
+				if n >= 8  then return "-1"; end;
+				if n >= 4  then return "0";  end;
+				if n >= 2  then return "+1"; end;
+
+				return "+2";
+			end;
+
+			-- ONE writer for all three states of the road line (SPEC I99h, V330a): the combo`s lock and
+			-- the two bearing labels. Splitting them would give one pixel two owners, which is exactly
+			-- what V135 forbids and what B38 cost.
+			--
+			-- The gate is `clanFamily` FILLED, not "is a revenant". Q1 (user 2026-08-28) opened it to
+			-- clans as well, so the road is editable for any sheet that has declared what it is, and
+			-- locked for one that has not (SPEC I99d). The bearing line rides the SAME predicate - read
+			-- once, written to all three, so the two can never disagree on screen.
+			function renderBearing(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = { cboRoad = true, dynBearingName = true };
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				local fam  = sheet.clanFamily;
+				local open = fam ~= nil and fam ~= "";
+
+				if found["cboRoad"] ~= nil then found["cboRoad"].enabled = open; end;
+
+				-- The rating is the DOT COUNT taken off the NDB and never off the widgets: a row that has
+				-- not been built yet answers nil, and counting widgets would score a silent zero.
+				local dots = 0;
+
+				for i = 1, 10, 1 do
+					if sheet["humanity_" .. i] == true then dots = dots + 1; end;
+				end;
+
+				-- A sheet saved before this round has no `road` at all. It falls to Humanity, which is
+				-- what such a character always was (SPEC I99b), rather than to a blank line.
+				local road = sheet.road;
+
+				if road == nil or road == "" then road = "Humanity"; end;
+
+				local lang = (sheet.language == "pt") and "pt" or "en";
+				local bear = BEARING[road] or "";
+
+				-- WoD20.6 owns the PT map and may not have loaded yet, so the call is guarded the same way
+				-- xpWarn guards it further up this file.
+				if translateSheetText ~= nil then bear = translateSheetText(bear, lang); end;
+
+				-- The road NAME has to fit the picker the 143rd narrowed to make room for the label
+				-- (user 2026-08-29). Same ruler mfLabel uses - the gate's own - and the 24 is the arrow
+				-- the combo draws over its own right edge, which V312 has priced in since it was
+				-- written. A row with nothing chosen keeps the authored size: fitSize answers 12 for an
+				-- empty string, and for a width it cannot read.
+				local cbo = found["cboRoad"];
+
+				if cbo ~= nil then
+					local shownRoad = sheet.road;
+
+					if shownRoad ~= nil and shownRoad ~= "" and translateSheetText ~= nil then
+						shownRoad = translateSheetText(shownRoad, lang) or shownRoad;
+					end;
+
+					cbo.fontSize = fitSize(shownRoad, (cbo.width or 0) - 24);
+				end;
+
+				-- ONE line, centred, name and modifier joined (user 2026-08-29). Two labels each
+				-- centred in their own half never read as one sentence, which is what was asked.
+				local nm = found["dynBearingName"];
+
+				if nm ~= nil then
+					nm.visible = open;
+					nm.text    = bear .. " (" .. bearingMod(dots) .. ")";
+				end;
+			end;
+
+			-- ---- The ? box and the font zoom (SPEC I102, I103, T760, T762) --------------------
+			--
+			-- ONE box for the whole sheet and ONE size for all eight panes, and both are the same
+			-- decision: opening the box on another row overwrites what is in it, so there is no list
+			-- of open boxes to keep in step (SPEC I102d), and the size is a single field so the eight
+			-- panes can never disagree about it (SPEC I103c, Q7).
+			--
+			-- Both walk from the tab root rather than reaching for form.<name>: a tab form cannot see
+			-- its siblings, and the walk is what crosses the import (SPEC R9, B9).
+			local POP_BOX = { popScrim = true, popDesc = true, dynPopDescTitle = true, edtPopDesc = true };
+			local DESC_PANES = { edtDiscDesc = true, edtPathDesc = true, edtRitualDesc = true, edtHedgeDesc = true,
+				edtHedgeRitualDesc = true, edtPsychicDesc = true, edtFaithDesc = true, edtPopDesc = true,
+				edtMfDesc = true };
+
+			-- kind names the module family and key is the canonical EN name the row stores
+			-- (SPEC V24), which is also what the title shows. The require is lazy - the module is
+			-- parsed on the first click and package.loaded caches it (SPEC I58) - and it is a PLAIN
+			-- require, like the other five: the pcall that stood here was scaffolding for the round
+			-- where descMerit_* and descBackground_* did not exist yet; T751 and T765 landed them and
+			-- V210 keeps all twelve halves at the plugin root, so it came out (SPEC I102e).
+			-- `sub` names the LIST the row belongs to ("merit" / "flaw") and is optional: it only
+			-- matters where one name lives in BOTH lists. `Cannibal` is a Merit in Lore of the
+			-- Clans and a Flaw in Ghouls & Revenants, and the description table is FLAT by name,
+			-- so before the composite key the second entry overwrote the first and one of the two
+			-- opened the other's text in silence (SPEC I102g, B89). Composite first, bare second:
+			-- the 645 names that live in one list only keep the bare key and nothing changed for
+			-- them.
+			--
+			-- ONE reader for the text, and BOTH the ? box and the search pane come through it
+			-- (SPEC I112d, V352f). Two readers would be two rulers for the composite key below and
+			-- the second one drifts in silence, which is what V135 is about. GLOBAL like every other
+			-- helper in this chunk: a local function spends a slot the root does not have - it
+			-- declares 50 against the 53 rdk allows (SPEC B93, V347).
+			function descText(kind, key, sub, lang)
+				if kind == nil or key == nil or key == "" then return ""; end;
+
+				local DESC = require("desc" .. kind .. "_" .. lang .. ".lua");
+				local txt = "";
+
+				if type(DESC) == "table" then
+					if sub ~= nil and sub ~= "" then txt = DESC[sub .. "|" .. key]; end;
+					if txt == nil or txt == "" then txt = DESC[key] or ""; end;
+				end;
+
+				return txt;
+			end;
+
+			-- popOpen paints the ? box - title, text, scrim, box - and reads the text through descText.
+			function popOpen(from, kind, key, sub)
+				if from == nil or key == nil or key == "" then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), POP_BOX, found);
+
+				if found["popDesc"] == nil then return; end;
+
+				local lang = "en";
+
+				if sheet ~= nil and sheet.language == "pt" then lang = "pt"; end;
+
+				local txt = descText(kind, key, sub, lang);
+
+				if found["dynPopDescTitle"] ~= nil then found["dynPopDescTitle"].text = key; end;
+				if found["edtPopDesc"] ~= nil then found["edtPopDesc"].text = txt; end;
+				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+
+				found["popDesc"].visible = true;
+			end;
+
+			function popClose(from)
+				if from == nil then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), POP_BOX, found);
+
+				if found["popScrim"] ~= nil then found["popScrim"].visible = false; end;
+				if found["popDesc"] ~= nil then found["popDesc"].visible = false; end;
+			end;
+			-- ---- The merit/flaw search box (SPEC I107) ----------------------------------------
+			--
+			-- Grown from the T789 probe slice, not rebuilt: the probe instrument and its opener
+			-- came out when T783 put the NAME button in their place, and every other control
+			-- stayed and GREW - one result row became twenty, and paging arrived beside them.
+			--
+			-- What the SCREEN settled, and none of it was guessable (SPEC I107n3, I107n7, I107n10):
+			--   * onChange does NOT fire per keystroke - it fires on ENTER. So it is the ACCEPT,
+			--     the third road into mfConfirm (SPEC I107l as amended 2026-08-29).
+			--   * onKeyUp is not "key up": it fires on DOWN, on UP, and once per auto-repeat. It
+			--     gives the incremental filter Q16 asks for, two to twenty times over - hence the
+			--     debounce.
+			--   * onDoubleClick is REJECTED by rdk; onDblClick compiles AND fires (I107n1, B80).
+			--
+			-- ONE local at chunk scope, and that is NOT style: B93 measured this form ceiling at
+			-- 53 while it already declares 49. A local function costs a slot exactly like a
+			-- variable does, so every helper here is GLOBAL, as popOpen and fontStep already are.
+			local MF = {
+				rows = 20, gen = 0, load = 0, page = 1, names = nil, hits = nil, pool = nil,
+				picked = nil, mark = 0, data = nil, field = nil, list = nil, mod = nil,
+				btn = nil, title = nil
+			};
+
+			-- Built once and kept: xpFind takes a ready table, and rebuilding twenty-nine keys on
+			-- every keystroke would be work the debounce exists to avoid.
+			function mfNames()
+				if MF.names ~= nil then return MF.names; end;
+
+				local n = { mfSearch = true, popScrim = true, dynMfTitle = true, edtMfQuery = true,
+					lblMfLoading = true, btnMfOk = true, btnMfPrev = true, btnMfNext = true,
+					lblMfPage = true, edtMfDesc = true };
+
+				for i = 1, MF.rows, 1 do n["dynMfRow_" .. i] = true; end;
+
+				MF.names = n;
+
+				return n;
+			end;
+
+			-- I107g: the loading animation - text plus cycling dots on a 300ms timer, and no icon
+			-- because there is no animated art in the plugin. It STOPS when the box closes and
+			-- when the parse ends, and it stops the way the debounce does: by generation. A timer
+			-- that outlives its box is a leak with nothing left to stop it.
+			function mfTick(from, mine, n)
+				if from == nil or MF.load ~= mine then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				if found["lblMfLoading"] == nil then return; end;
+
+				found["lblMfLoading"].text = "loading" .. string.rep(".", (n % 3) + 1);
+
+				setTimeout(function() mfTick(from, mine, n + 1); end, 300);
+			end;
+
+			-- I107m: born off, and off again whenever the marking stops meaning what is on screen.
+			function mfArm(found, on)
+				if found["btnMfOk"] ~= nil then found["btnMfOk"].enabled = on; end;
+			end;
+
+			function mfClose(from)
+				if from == nil then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				-- every pending debounce AND the loading animation die here: a timer that outlives
+				-- its box would filter into a closed one, which is the leak I107g refuses.
+				MF.gen = MF.gen + 1;
+				MF.load = MF.load + 1;
+
+				if found["popScrim"] ~= nil then found["popScrim"].visible = false; end;
+				if found["mfSearch"] ~= nil then found["mfSearch"].visible = false; end;
+			end;
+
+			-- I107k: only the twenty of the CURRENT page carry text; the rest go invisible. That
+			-- is what makes showing 311 or 336 cost the same as showing 20.
+			function mfPaint(from)
+				if from == nil then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				local total = 0;
+
+				if MF.hits ~= nil then total = #MF.hits; end;
+
+				local pages = math.ceil(total / MF.rows);
+
+				if pages < 1 then pages = 1; end;
+				if MF.page > pages then MF.page = pages; end;
+				if MF.page < 1 then MF.page = 1; end;
+
+				local first = (MF.page - 1) * MF.rows;
+				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+
+				for i = 1, MF.rows, 1 do
+					local c = found["dynMfRow_" .. i];
+
+					if c ~= nil then
+						local name = nil;
+
+						if MF.hits ~= nil then name = MF.hits[first + i]; end;
+
+						if name == nil then
+							c.visible = false;
+						else
+							c.text = mfShown(name, lang);
+							c.visible = true;
+						end;
+					end;
+				end;
+
+				if found["lblMfPage"] ~= nil then
+					found["lblMfPage"].text = MF.page .. " / " .. pages .. "     -     " .. total;
+				end;
+
+				if found["btnMfPrev"] ~= nil then found["btnMfPrev"].enabled = MF.page > 1; end;
+				if found["btnMfNext"] ~= nil then found["btnMfNext"].enabled = MF.page < pages; end;
+			end;
+
+			-- I107h: LITERAL find, never a pattern - a name carrying a parenthesis would blow a
+			-- pattern find up, and these lists carry plenty. The term is matched against the name
+			-- in the CURRENT language and against the canonical EN as well, or a player reading
+			-- Portuguese searches for what is not on screen.
+			function mfFilter(from)
+				if from == nil then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				MF.picked = nil;
+				MF.mark = 0;
+				mfArm(found, false);
+
+				-- SPEC I112f: text left standing with no marking standing under it is the lie I107m
+				-- exists to stop - the same reason the marking itself drops here.
+				if found["edtMfDesc"] ~= nil then found["edtMfDesc"].text = ""; end;
+
+				local term = "";
+
+				if found["edtMfQuery"] ~= nil and found["edtMfQuery"].text ~= nil then
+					term = string.lower(found["edtMfQuery"].text);
+				end;
+
+				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local hits = {};
+				local key = {};
+
+				if MF.pool ~= nil then
+					for i = 1, #MF.pool, 1 do
+						local name = MF.pool[i];
+						local shown = mfShown(name, lang);
+						local keep = term == "";
+
+						if not keep and string.find(string.lower(name), term, 1, true) ~= nil then
+							keep = true;
+						end;
+
+						if not keep and string.find(string.lower(shown), term, 1, true) ~= nil then
+							keep = true;
+						end;
+
+						if keep then
+							hits[#hits + 1] = name;
+							key[name] = (foldKey ~= nil) and foldKey(shown) or string.lower(shown);
+						end;
+					end;
+				end;
+
+				-- SPEC I110c, V350d, V354d: the order is the order of what is READ. The box shows the
+				-- translated name now, so sorting on the canonical English would be an order the eye
+				-- cannot follow, and comparing accented bytes raw puts a name in A after one in Z.
+				-- foldKey and FOLD_MAP are WoD20.6's and GLOBAL, so there is no second fold here.
+				table.sort(hits, function(a, b) return (key[a] or a) < (key[b] or b); end);
+
+				MF.hits = hits;
+				MF.page = 1;
+
+				mfPaint(from);
+			end;
+
+			-- DEBOUNCE by generation, because there is no clearTimeout to cancel with: every event
+			-- bumps MF.gen and captures the value, and the scheduled run filters only if nothing
+			-- has bumped it since. The last event before a pause survives, and mfFilter reads the
+			-- text LIVE - so the DOWN event, which fires before the character lands and would read
+			-- the text one keystroke behind, is never the one that runs (SPEC I107n8).
+			function mfKey(from)
+				if from == nil then return; end;
+
+				MF.gen = MF.gen + 1;
+
+				local mine = MF.gen;
+
+				setTimeout(function()
+					if MF.gen == mine then mfFilter(from); end;
+				end, 200);
+			end;
+
+			-- I107m: paging drops the marking. What was marked is not on screen any more, and a
+			-- confirm button that still referred to it would write what the player cannot see.
+			function mfPage(from, delta)
+				if from == nil or delta == nil then return; end;
+
+				MF.page = MF.page + delta;
+				MF.picked = nil;
+				MF.mark = 0;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), mfNames(), found);
+				mfArm(found, false);
+
+				-- SPEC I112f: paging drops the marking, so the description goes with it.
+				if found["edtMfDesc"] ~= nil then found["edtMfDesc"].text = ""; end;
+
+				mfPaint(from);
+			end;
+
+			-- I107f: require is SYNCHRONOUS. Painting the loading text and requiring in the same
+			-- turn shows nothing - the screen only repaints afterwards. The text goes up, the box
+			-- is made visible, and the parse is scheduled for the NEXT turn.
+			--
+			-- I107c/I100c: the box opens on the list its ROW belongs to - merits or flaws, never
+			-- the two together - on page ONE with the whole list, not empty waiting to be typed in.
+			function mfOpen(from, field, list, mod)
+				if from == nil or field == nil or list == nil then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				if found["mfSearch"] == nil then return; end;
+
+				MF.field = field;
+				MF.list = list;
+				MF.mod = mod or "Merit";
+				MF.btn = from;
+				MF.picked = nil;
+				MF.mark = 0;
+				MF.page = 1;
+				MF.hits = nil;
+				MF.pool = nil;
+				MF.data = nil;
+				MF.gen = MF.gen + 1;
+
+				-- SPEC I113a: the title is DERIVED from the list and not looked up in a roster that
+				-- would need a row per wave. "Select " plus the list with its first letter raised gives
+				-- back the three strings the .lang already carries, and the SAME string is the button's
+				-- fallback when the row is cleared (I107a2, V15).
+				MF.title = "Select " .. string.upper(string.sub(list, 1, 1)) .. string.sub(list, 2);
+
+				mfArm(found, false);
+
+				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local title = MF.title;
+
+				if translateSheetText ~= nil then title = translateSheetText(title, lang); end;
+
+				if found["dynMfTitle"] ~= nil then found["dynMfTitle"].text = title; end;
+				if found["edtMfQuery"] ~= nil then found["edtMfQuery"].text = ""; end;
+				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+
+				MF.load = MF.load + 1;
+
+				mfTick(from, MF.load, 0);
+
+				for i = 1, MF.rows, 1 do
+					if found["dynMfRow_" .. i] ~= nil then found["dynMfRow_" .. i].visible = false; end;
+				end;
+
+				found["mfSearch"].visible = true;
+
+				setTimeout(function()
+					-- SPEC I112e: the description module is parsed HERE, in the same turn the list is, and
+					-- NEVER in mfSelect - a parse on the first click of a row would freeze the screen in
+					-- the middle of the choice, which is I107f by the other door (R92, T479). The module is
+					-- a PARAMETER now (I113a), so this one line serves the 563KB descMerit and the
+					-- descBackground of the pilot alike.
+					require("desc" .. MF.mod .. "_" .. lang .. ".lua");
+
+					-- SPEC I113b: the list comes from PICKER_LIST, the artifact pickerItems already reads,
+					-- so no second copy of any list is born here (V208, V211). meritData stays its own
+					-- source: it is a MAP carrying book, page and cost, not a list of names (I100d).
+					-- What the row is HOLDING, read BEFORE the pool is built: it decides both whether the
+					-- blank entry is offered at all and whether the value has to be appended below.
+					local cur = (sheet ~= nil) and sheet[MF.field] or nil;
+					local has = cur ~= nil and cur ~= "";
+
+					MF.pool = {};
+
+					if MF.list == "merit" or MF.list == "flaw" then
+						local ALL = require("meritData.lua");
+
+						if type(ALL) == "table" then MF.data = ALL[MF.list]; end;
+
+						-- meritData is a map of NAMES and carries no blank of its own, so the way out of a
+						-- merit row has to be put here or the row could be changed and never emptied.
+						if has then MF.pool[#MF.pool + 1] = ""; end;
+						if MF.data ~= nil then for nm in pairs(MF.data) do MF.pool[#MF.pool + 1] = nm; end; end;
+					else
+						local vals = PICKER_LIST[MF.list];
+
+						-- V15's blank first entry is what CLEARS the row, and an empty row has nothing to
+						-- clear: it joins the pool only once something is chosen, and it reads "-- Remove --"
+						-- when it does (user 2026-08-29).
+						if vals ~= nil then
+							for i = 1, #vals, 1 do
+								if vals[i] ~= "" or has then MF.pool[#MF.pool + 1] = vals[i]; end;
+							end;
+						end;
+					end;
+
+					-- SPEC V200/V346b: the value the row is HOLDING is offered however illegal a rename has
+					-- made it. The box is the only door to this field now, so a value missing from the pool
+					-- is a value the player cannot put back. Appended BEFORE the sort mfFilter does, which
+					-- is what V350b asks of the dropdown for exactly this reason.
+					if has then
+						local seen = false;
+
+						for i = 1, #MF.pool, 1 do if MF.pool[i] == cur then seen = true; break; end; end;
+
+						if not seen then MF.pool[#MF.pool + 1] = cur; end;
+					end;
+
+					local f2 = {};
+
+					xpFind(tabRootOf(from), mfNames(), f2);
+
+					MF.load = MF.load + 1;
+
+					if f2["lblMfLoading"] ~= nil then f2["lblMfLoading"].text = ""; end;
+
+					mfFilter(from);
+				end, 1);
+			end;
+
+			-- I107l: CHOOSING IS NOT ACCEPTING. One click MARKS and writes nothing.
+			function mfSelect(from, idx)
+				if from == nil or idx == nil then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				local name = nil;
+
+				if MF.hits ~= nil then name = MF.hits[(MF.page - 1) * MF.rows + idx]; end;
+
+				if name == nil then return; end;
+
+				MF.picked = name;
+				MF.mark = idx;
+
+				-- SPEC I112d/I112f: the pane shows the MARKED row and nothing else. The module is
+				-- already in package.loaded - mfOpen's timer required it - so this costs a table
+				-- lookup and not a parse (I112e), and the key is built by descText, never here.
+				if found["edtMfDesc"] ~= nil then
+					local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+
+					found["edtMfDesc"].text = descText(MF.mod, name, MF.list, lang);
+				end;
+
+				mfArm(found, true);
+			end;
+
+			-- I107i: the ONE point of WRITE. Three roads reach it - btnMfOk, the double click and
+			-- ENTER - and V135 is about one WRITER, not one entrance: three doors, one owner.
+			function mfConfirm(from)
+				if from == nil or sheet == nil then return; end;
+
+				-- The empty item is a real CHOICE, not "nothing marked": nil is unmarked, "" is the
+				-- blank first entry V15 puts at the head of every prose list, and picking it CLEARS
+				-- the row. Refusing it would leave the box offering an item that does nothing.
+				if MF.picked == nil or MF.field == nil then return; end;
+
+				setField(MF.field, MF.picked);
+
+				-- I107i/I100f: the name and its three book fields land in the SAME step. Choosing
+				-- a merit and then typing its page by hand is what the search box exists to stop,
+				-- and a name written without them would leave the row half filled.
+				--
+				-- The column reading `page` is the field named `type_` - it was renamed on screen
+				-- and the field kept its old spelling, because renaming a field drops what saved
+				-- sheets already hold (SPEC V2).
+				-- Only a source that CARRIES the three columns has them to write: meritData is a map of
+				-- name to book/page/cost, PICKER_LIST is a list of names. The suffix is taken off the
+				-- field - merit_m1 -> m1 - because the three siblings are named by it (I113a).
+				local info = nil;
+				local num = string.match(MF.field, "^[^_]+_(.+)$");
+
+				if MF.data ~= nil then info = MF.data[MF.picked]; end;
+
+				if info ~= nil and num ~= nil then
+					setField("book_" .. num, info.book or "");
+					setField("type_" .. num, info.page or "");
+					setField("costy_" .. num, info.cost or "");
+				elseif MF.picked == "" and num ~= nil and MF.data ~= nil then
+					-- Emptying the name empties what came WITH it: a row holding a book and a page for a
+					-- merit it no longer names is the half-filled row I107i writes all four to avoid.
+					setField("book_" .. num, "");
+					setField("type_" .. num, "");
+					setField("costy_" .. num, "");
+				end;
+
+				-- SPEC I107a2: the button that OPENED the box is the one whose text has to change, and
+				-- the box knows which it was. mfLabel and not a plain write, because clearing the row
+				-- has to put the label back rather than leave an empty button.
+				if MF.btn ~= nil then
+					local lang = (sheet.language == "pt") and "pt" or "en";
+
+					mfLabel(MF.btn, MF.picked, MF.title, lang);
+				end;
+
+				mfClose(from);
+			end;
+
+			-- I107a2: the button TEXT is not data - it does not come back on its own when the
+			-- sheet opens. This rewrites the twelve from the field, and an empty field falls back
+			-- to the authored label in the language in force.
+			-- What a pool entry READS as. The list stores the canonical English (SPEC V24) and the box
+			-- shows the language in force; the blank entry of V15 is not a name at all - it is the way
+			-- OUT of the row, and it says so in words (user 2026-08-29).
+			function mfShown(name, lang)
+				if name == nil then return ""; end;
+
+				local t = name;
+
+				if name == "" then t = "Remove"; end;
+				if translateSheetText ~= nil then t = translateSheetText(t, lang) or t; end;
+				if name == "" then return "-- " .. t .. " --"; end;
+
+				return t;
+			end;
+
+			-- The GATE's own ruler, ported (SPEC V16, V312a): 6.0px per character at 12pt, linear in
+			-- the size. There is no text-measuring call in SDK3 - which is why every width check lives
+			-- in the gate and not here - so this is an ESTIMATE and it is only ever used to make text
+			-- SMALLER, never to claim something fits. Bytes are folded down to CHARACTERS first: a PT
+			-- name is UTF-8, and counting the accented one twice would shrink it for nothing.
+			function fitSize(txt, width)
+				local size = 12;
+
+				if txt == nil or width == nil or width < 1 then return size; end;
+
+				local _, cont = string.gsub(txt, "[\128-\191]", "");
+				local n = #txt - cont;
+
+				while size > 7 and (n * size * 0.5) > width do size = size - 1; end;
+
+				return size;
+			end;
+
+			-- SPEC I107a2, user 2026-08-29. An EMPTY row says so in place: the label between dashes,
+			-- italic and dimmed, so the eye reads "nothing here" before it reads the word. A FILLED
+			-- row reads its value plain, in the language in force, at whatever size it takes to fit -
+			-- a button clips the way a comboBox does, and a name cut in half is worse than a name one
+			-- point smaller. 0.60 is neither of the two dimming numbers of I43/V244 and is not trying
+			-- to be: those say "read-only", this one says "not filled in".
+			function mfLabel(ctrl, value, fallback, lang)
+				if ctrl == nil then return; end;
+
+				if value ~= nil and value ~= "" then
+					local shown = value;
+
+					if translateSheetText ~= nil then shown = translateSheetText(value, lang) or value; end;
+
+					ctrl.text = shown;
+					ctrl.fontStyle = "";
+					ctrl.opacity = 1;
+					ctrl.fontSize = fitSize(shown, ctrl.width);
+
+					return;
+				end;
+
+				local t = fallback;
+
+				if translateSheetText ~= nil then t = translateSheetText(fallback, lang) or fallback; end;
+
+				local empty = "-- " .. t .. " --";
+
+				ctrl.text = empty;
+				ctrl.fontStyle = "italic";
+				ctrl.opacity = 0.60;
+				ctrl.fontSize = fitSize(empty, ctrl.width);
+			end;
+
+			-- The sixteen background name buttons, the same shape as the twelve above and for the same
+			-- reason (SPEC I107a2, I113): a button's TEXT is not data, so nothing brings it back when
+			-- the sheet opens. The bound is BACKGROUND_ROWS minus the typed ones - "picker = total -
+			-- typed", the rule the row spec of V204/V248 rests on: the last five rows are <edit>s and
+			-- have no button to paint (SPEC I50, V255).
+			function renderBgButtons(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = {};
+				local last = BACKGROUND_ROWS - BACKGROUND_FREE_ROWS;
+
+				for i = 1, last, 1 do names["dynbackground_" .. i] = true; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				local lang = (sheet.language == "pt") and "pt" or "en";
+
+				for i = 1, last, 1 do
+					mfLabel(found["dynbackground_" .. i], sheet["background_" .. i], "Select Background", lang);
+				end;
+			end;
+
+			function renderMeritButtons(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = {};
+
+				-- from ZERO: the 143rd put one more picked row at the TOP of each table, and it is
+				-- numbered m0/f0 rather than renumbering m1..m10 out from under saved sheets (V2).
+				for i = 0, 6, 1 do
+					names["dynMerit_m" .. i] = true;
+					names["dynMerit_f" .. i] = true;
+				end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), names, found);
+
+				local lang = (sheet.language == "pt") and "pt" or "en";
+
+				for i = 0, 6, 1 do
+					mfLabel(found["dynMerit_m" .. i], sheet["merit_m" .. i], "Select Merit", lang);
+					mfLabel(found["dynMerit_f" .. i], sheet["merit_f" .. i], "Select Flaw", lang);
+				end;
+			end;
+
+
+			-- The ceiling, the floor and the step live HERE and nowhere else (SPEC V334a): a second
+			-- copy of 32 is how two buttons end up disagreeing about where the zoom stops.
+			--
+			-- The "from" argument is the button that was clicked. It is the anchor for the walk and NOT the pane:
+			-- one field drives all eight, so a per-pane argument would promise a per-pane size that
+			-- does not exist (SPEC I103a as amended by I103c).
+			function fontStep(from, delta)
+				if sheet == nil or from == nil then return; end;
+
+				local s = (sheet.descFontSize or 12) + delta;
+
+				if s < 10 then s = 10; end;
+				if s > 32 then s = 32; end;
+
+				setField("descFontSize", s);
+				applyDescFont(from);
+			end;
+
+			-- The way back (SPEC V334e, the pair V316c asks of theme): the field is read on open, so
+			-- a reopened sheet keeps the size the player chose. A sheet that never had one opens at
+			-- 12 and not at nil.
+			function applyDescFont(from)
+				if from == nil then return; end;
+
+				local size = 12;
+
+				if sheet ~= nil and sheet.descFontSize ~= nil then size = sheet.descFontSize; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), DESC_PANES, found);
+
+				for nm, c in pairs(found) do c.fontSize = size; end;
+			end;
+
+			-- ---- Family caps (SPEC I106, I108c, V337, T781) -----------------------------------
+			--
+			-- SPARSE on purpose: only the family a book actually limits has a row, and having no row
+			-- is the NORMAL case, not a hole waiting to be filled (SPEC I106a). Two rows today, and
+			-- both were MEASURED, not remembered - research/family_caps.tsv carries the page numbers.
+			FAMILY_CAP = {
+				["Enrathi"]              = { humanity = 3, conscience = 2 },
+				["Grimaldi (Dark Ages)"] = { bloodPool = 8 },
+			};
+
+			-- ONE reader for the number, and the two refusers below both come through here. The
+			-- entry points HAVE to be two - a blood pool dot may not reach xpClick (SPEC V219) and a
+			-- rating dot may not skip it - but the ceiling itself is read in a single place, which is
+			-- what V135 is really about (SPEC V337c).
+			function familyCap(trait)
+				if sheet == nil or trait == nil then return nil; end;
+
+				local row = FAMILY_CAP[sheet.clanFamily];
+
+				if row == nil then return nil; end;
+
+				return row[trait];
+			end;
+
+			-- The blood pool toggle, and the refusal that comes with it (SPEC I108c, Q20). Nothing
+			-- here prices anything, declares a trait or writes a ledger line: the dots are still free,
+			-- they are only Lua-driven now so that a cap has a BEFORE to stand in (SPEC V219, V337d).
+			function bloodClick(field, ctrl)
+				if sheet == nil or field == nil then return; end;
+
+				-- Going DOWN is never refused. A cap limits what the family can HOLD; spending blood is
+				-- the one thing nobody needs permission for.
+				if sheet[field] == true then setField(field, false); return; end;
+
+				local cap = familyCap("bloodPool");
+
+				if cap ~= nil then
+					local n = 0;
+
+					for i = 1, 20, 1 do
+						if sheet["bloodPool_" .. i] == true then n = n + 1; end;
+					end;
+
+					-- The COUNT is what the book limits, not the dot position: the dots are independent and
+					-- a sheet can carry a gap. A character already ABOVE the cap keeps every dot it has -
+					-- the cap stops the NEXT one and never tidies away what the player marked, which is the
+					-- silent loss I106d and B75 both refuse (SPEC I108d, Q18).
+					if n >= cap then xpWarn("That family caps this trait"); return; end;
+				end;
+
+				setField(field, true);
+			end;
+
 			function renderClanDiscLock(from)
 				if sheet == nil or from == nil then return; end;
 
@@ -3639,6 +4804,26 @@
 
 					if genCap ~= nil and (level + 1) > genCap then
 						xpWarn("That Discipline is above what the dominator's generation allows");
+						return;
+					end;
+				end;
+
+				-- The FAMILY ceiling, third in the row and the same shape as the two above (SPEC I106,
+				-- V337, T781). It caps a TRAIT rather than a Discipline, so it reads the trait name itself
+				-- instead of a pattern: `humanity` is the road track whatever road the character walks, which
+				-- is exactly what the book means by "may not have a Humanity rating higher than 3" (I106c).
+				--
+				-- Only the PURCHASE is asked, and a dot already lit above the ceiling STAYS lit: choosing the
+				-- family later never takes away what the player had marked (SPEC I106d, V187, Q18).
+				--
+				-- The blood pool does NOT arrive here - it may not reach xpClick at all (SPEC V219) - and
+				-- that is why the entry points are two while the ceiling itself is read in one place,
+				-- familyCap, which is what V135 is really about (SPEC V337c).
+				if want and trait ~= nil then
+					local famCap = familyCap(trait);
+
+					if famCap ~= nil and (level + 1) > famCap then
+						xpWarn("That family caps this trait");
 						return;
 					end;
 				end;
@@ -3972,6 +5157,56 @@
 	<dataLink field="clanFamily">
 		<event name="onChange">
 			renderClanDisc(self);
+			renderBearing(self);
+		</event>
+	</dataLink>
+
+	<!--
+		`defaultValue` belongs to dataLink and NOT to the comboBox. Authoring it on the combo is
+		accepted by the XML parser and REJECTED by rdk, which exits 1 with an empty message and
+		deletes the .rpk - the B19 failure mode, and it cost a file-level bisection to find. The
+		six other defaultValues on this sheet all sit on a dataLink; this is the seventh.
+		
+		It does not WRITE the field (SPEC I51, V12), so a sheet saved before this round still
+		arrives with road = nil - renderBearing falls back to Humanity for exactly that reason.
+	-->
+	<dataLink field="road" defaultValue="Humanity"/>
+	<!--
+		The road line, watched from HERE for the same reason clanFamily is: the labels are drawn
+		on WoD20.1, but what moves them lives in three different places - the family on the
+		Disciplines tab, the road combo on Main, and the ten dots beside it. One watcher over all
+		twelve fields means no entry can move the rating without the line being recomputed
+		(SPEC I99h, V330d).
+		
+		The ten humanity fields are listed one by one and not by prefix: `fields` takes a literal
+		table, and a dot that fell out of the list would go unwatched in silence.
+	-->
+	<dataLink fields="{'road', 'humanity_1', 'humanity_2', 'humanity_3', 'humanity_4', 'humanity_5', 'humanity_6', 'humanity_7', 'humanity_8', 'humanity_9', 'humanity_10'}">
+		<event name="onChange">
+			renderBearing(self);
+		</event>
+	</dataLink>
+
+	<!--
+		The fourteen name buttons carry TEXT and text is not data (SPEC I107a2): nothing brings it
+		back when the sheet opens, so one watcher over the twelve fields repaints them. Listed one
+		by one and not by prefix, for the reason the ten humanity fields are: `fields` takes a
+		literal table and a row that fell out of it would go unwatched in silence.
+	-->
+	<dataLink fields="{'merit_m0', 'merit_m1', 'merit_m2', 'merit_m3', 'merit_m4', 'merit_m5', 'merit_m6', 'merit_f0', 'merit_f1', 'merit_f2', 'merit_f3', 'merit_f4', 'merit_f5', 'merit_f6'}">
+		<event name="onChange">
+			renderMeritButtons(self);
+		</event>
+	</dataLink>
+
+	<!--
+		The sixteen background name buttons, the same watcher for the same reason (SPEC I107a2,
+		I113, T808). The last five background rows are TYPED and carry no button, so they are
+		not in this list - "picker = total - typed" (SPEC I50, V255).
+	-->
+	<dataLink fields="{'background_1', 'background_2', 'background_3', 'background_4', 'background_5', 'background_6', 'background_7', 'background_8', 'background_9', 'background_10', 'background_11', 'background_12', 'background_13', 'background_14', 'background_15', 'background_16'}">
+		<event name="onChange">
+			renderBgButtons(self);
 		</event>
 	</dataLink>
 
@@ -4040,6 +5275,19 @@
 		xpQuiet = false;
 
 		applyTabVisibility(self);
+
+		-- The font the player last chose, put back on all eight description panes (SPEC I103c,
+		-- V334e). One walk, at open, and it writes nothing: the field is READ here and only
+		-- fontStep writes it, so this is not the sheet writing to itself (SPEC V107).
+		applyDescFont(self);
+
+		-- The fourteen merit/flaw name buttons, repainted from the fields (SPEC I107a2). Same
+		-- reason as applyDescFont above it: a button's text is not a field, so nothing restores
+		-- it on its own.
+		renderMeritButtons(self);
+
+		-- The sixteen background name buttons, same reason (SPEC I107a2, I113, T808).
+		renderBgButtons(self);
 
 		-- The floor under the reveal (SPEC V167, I15). The theme paint is what normally
 		-- lights the sheet, and it is the last load paint there is - but which of this

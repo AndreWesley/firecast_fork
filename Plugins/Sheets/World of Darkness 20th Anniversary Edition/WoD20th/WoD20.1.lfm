@@ -33,15 +33,22 @@
 		-->
 		<comboBox name="cboClan" left="0" top="0" width="215" height="25" visible="false" enabled="false" field="clan"/>
 		<!--
-			Layout grid (SPEC T41, V26, V27). Everything closes on x=1345 / y=852.
+			Layout grid (SPEC T41, V26, V27). Everything closes on x=1345 / y=853.
+
+			The bottom line moved 852 -> 878 in the 125th round and 878 -> 853 in the 141st, and
+			both moves are the same rule: V69 reads all three bottom boxes closing on ONE y, so
+			they travel together or the check reddens. The 125th GREW them 26 to seat the road
+			picker over the dot track (SPEC I99i, user Q8); the 141st took 25 back, because Q27
+			put the ROAD label on the picker's own line and the box no longer needs a title row
+			(SPEC I99k, I99l).
 
 			  header  0..1010      EXPERIENCE 1015..1345          y   0..125
 			  ATTRIBUTES 0..340    TALENTS 345..675 | SKILLS 680..1010 | KNOWLEDGES 1015..1345   y 130..491
-			  avatar     0..340                                   y 441..852
+			  avatar     0..340                                   y 441..853
 			                       VIRTUES 345..675               y 496..644
-			                       HUMANITY+WILLPOWER 345..675     y 649..852
-			                       SPECIALTIES 680..1010          y 496..852
-			                       HEALTH  1015..1345             y 496..845 at ten rows
+			                       ROAD + BEARING + WILLPOWER 345..675  y 649..853
+			                       SPECIALTIES 680..1010          y 496..853
+			                       HEALTH  1015..1345             y 496..823 at ten rows
 
 			Read it as a THREE-COLUMN GRID, which is what V168 measures since the 50th round:
 			each box on the bottom row shares both x edges with the column above it - VIRTUES
@@ -55,9 +62,11 @@
 			by exactly that 50, and the avatar came with it - it was not in the request, but
 			leaving it at 810 would have made it the only thing 50px below everything else.
 
-			HEALTH is the one box that does not end on 760: its height is the ten-row case and
-			the renderer shrinks it to the chosen track length (SPEC V49), so at the default of
-			seven rows it ends at 685 and only a player who picks ten pushes 6px past the rest.
+			HEALTH is the one box that does not close on the bottom line: what is AUTHORED is the
+			ten-row case, which ends at 823, and the renderer shrinks it to the chosen track
+			length (SPEC V49). So it sits 30px SHORT of the 853 the other three close on, and
+			that overhang is DECLARED in the gate rather than guessed - it is the one number
+			V69 lets a box off with.
 
 			Label widths are sized for the LONGER of [en] and [pt]: "Animal Ken" is
 			"Empatia com Animais" (19 chars) in pt, so the ability label is 135px, not 80.
@@ -338,8 +347,8 @@
 		     It keeps color="DimGray" and is the only carrier of that key in the four palettes
 		     (SPEC V53, T653). The radius matches the section boxes so the corner reads as one
 		     frame family. -->
-		<rectangle name="avatarFrame" left="0" top="441" width="340" height="411" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
-		<image left="0" top="441" width="340" height="411" field="avatar" editable="true" style="autoFit"/>
+		<rectangle name="avatarFrame" left="0" top="441" width="340" height="412" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
+		<image left="0" top="441" width="340" height="412" field="avatar" editable="true" style="autoFit"/>
 
 		<!-- The ornament CARRIER (SPEC I84d, I92, V309, V287, V320). Transparent in both senses
 		      and holding no content of its own: it exists so the era's drawing has somewhere to hang
@@ -360,7 +369,7 @@
 		      THREE palettes declare ornament - Victorian filigree, Dark Ages filete, Modern Nights
 		      corrente - so the Classical Age shows no drawing here and that is correct (SPEC V277,
 		      V320f). -->
-		<rectangle name="ornAvatar" left="0" top="441" width="340" height="411" color="#00000000" strokeColor="#00000000" xradius="14" yradius="14" cornerType="innerRound" hitTest="false"/>
+		<rectangle name="ornAvatar" left="0" top="441" width="340" height="412" color="#00000000" strokeColor="#00000000" xradius="14" yradius="14" cornerType="innerRound" hitTest="false"/>
 
 		<!--
 			The three ability columns stand loose (SPEC T407, V168, V169). Until the 49th round
@@ -544,16 +553,52 @@
 			</layout>
 		</layout>
 
-		<layout left="345" top="649" width="330" height="203">
+		<layout left="345" top="649" width="330" height="204">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="20" top="20" width="290" height="20" text="HUMANITY" horzTextAlign="center"/>
-			<layout left="40" top="45" width="250" height="25" >
+			<!--
+				HUMANITY became ROAD in the 125th round (SPEC I99a). Only the LABEL moved: the ten
+				dots are still `humanity_1`..`_10`, so a saved sheet keeps its rating (SPEC V2, V5) -
+				the same trade `retainers`->GUIDES and `items`->TRANSPORTATION already made.
+
+				`cboRoad` sits ABOVE the track, so the box title says what the track IS and the combo
+				says WHICH road. It leads on `Humanity` and carries no empty item: a character with no
+				road IS on Humanity, which is the V15 exception SPEC C declares (SPEC I99b).
+
+				The bearing line is glued to the bottom of the dots at top=99 - the dots close exactly
+				there - because the request asked for it with no gap. Two labels and not one padded
+				string: V11 forbids padding to line a column up, and the modifier is its own column
+				(SPEC I99e). They carry the `dyn` prefix and NO text=: that prefix is what keeps the
+				WoD20.6 language traversal off a Lua-written label, which would otherwise snapshot the
+				authored English and restore it stale (SPEC V31) - the same reason the health rows use
+				it. SPEC I99e names them lbl*, and that spelling is wrong for a Lua-written label.
+
+				cboRoad is 290 and not 250: the ruler wants 241px for `The Path of Power and the Inner
+				Voice` plus the 24px arrow (SPEC V312), so the dot track's width would clip it. It
+				spans the box interior instead.
+
+				WILLPOWER fell 49 and the box grew 26 to fit, which is the second branch the user chose
+				in Q8. SPECIALTIES and the avatar grew the SAME 26 in the same commit - V69 reads all
+				three closing on one y, and moving one alone turns it red (SPEC I99i, I99j).
+			-->
+			<label left="20" top="20" width="80" height="24" text="ROAD" vertTextAlign="center"/>
+			<comboBox name="cboRoad" left="105" top="20" width="205" height="24" fontSize="12" field="road"/>
+			<layout left="40" top="49" width="250" height="25" >
 				<Advantages field="humanity"/>
 			</layout>
+			<!-- ONE label and not two (user 2026-08-29): the bearing and its modifier read as a
+			     single centred sentence, which two labels cannot do - each would centre in its own
+			     half and the pair would drift off centre as the name grows. This REVOKES the
+			     "the modifier is its own column" half of I99e; V11 is untouched, because what
+			     joins them is a real space and a real parenthesis, not padding.
+			
+			     0.80 is neither of the two dimming numbers of I43/V244 and is not trying to be:
+			     those two say "read-only", this one is the emphasis the user asked for on a line
+			     that was never editable. Authored, so no runtime write reaches V244. -->
+			<label name="dynBearingName" left="20" top="74" width="290" height="20" horzTextAlign="center" opacity="0.80"/>
 
-			<label left="20" top="90" width="290" height="20" text="WILLPOWER" horzTextAlign="center"/>
-			<layout left="40" top="115" width="250" height="45" >
+			<label left="20" top="114" width="290" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<layout left="40" top="139" width="250" height="45" >
 				<Willpower field="willpower"/>
 			</layout>
 		</layout>
@@ -617,7 +662,7 @@
 			match KNOWLEDGES; the 30 came out of the free-text field and not out of the picker,
 			which has to show "Empatia com Animais" at 19 characters (SPEC V16).
 		-->
-		<layout left="680" top="496" width="330" height="356">
+		<layout left="680" top="496" width="330" height="357">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="20" width="290" height="20" text="SPECIALTIES" horzTextAlign="center"/>
 

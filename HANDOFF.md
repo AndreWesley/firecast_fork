@@ -1,5 +1,1964 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## ⚑ COMECE AQUI — sessão sem contexto nenhum (preparado 2026-08-30, 144ª rodada)
+
+**Estado:** gate **VERDE 616 ok / 0 FAIL** (**618** com `-Build`) · `.rpk` **2.553.530 B** gerada
+**e instalada** 00:42:14 · §T **721 `x` · 89 `.` · 7 `~`** · **nada commitado**. **⊥ ∃ pergunta
+aberta & ⊥ ∃ dívida de spec** — as 2 que esta rodada criou foram pagas nela mesma (↓).
+
+**`§T815` & `§T817` FECHADAS, & ⊥ sobrou linha construível.** `/ck:build --all` resolveu p/
+`§T815` sozinha (das 97 pendentes, ⊥ ∃ outra que ⊥ dependa de TELA); no meio da rodada o user
+pediu **1 ajuste de spec**, que virou `§T817` & fechou junto.
+
+**⛔ ⊥ PEÇA `/ck:build` DE NOVO.** ⊥ ∃ o que buildar. Das **89** `.`: **57** são `[USER]`,
+**29** são teste/sonda de Firecast sem a etiqueta, **3** são revogadas de propósito (`§T619`
+`§T775` `§T759` — id ⊥ se reusa). As **7** `~` são todas sonda de tela paradas no meio.
+
+**A PRÓXIMA SESSÃO É DE TELA, & as 4 rodam JUNTAS:** `§T787` · `§T804` (sonda de foco, Q28) ·
+`§T810` (o piloto de §I113) · `§T816` (o itálico & a largura de §I114i). Só DEPOIS: `§T805`
+(precisa de `§T804`) & `§T811` (ondas 2 a 5, precisa de `§T810`).
+
+**Leia nesta ordem:** esta seção INTEIRA → a **143ª rodada** logo abaixo → a **142ª** →
+`research/README.md` (armadilhas 8 a 13).
+
+### O QUE A 144ª FECHOU (⊥ refazer)
+
+**`§T815` — §V355 no gate**, 1 arquivo (`verify-hunters-hunted.ps1`), **+151 linhas** logo
+antes do bloco final `Write-Host ""` / `if ($fail -eq 0)`, ao lado de §V352 & §V354. **Nenhum
+`.lfm` foi tocado** — o código já estava lá desde a 2ª metade da 143ª; o que faltava era a
+RÉGUA. 614 → **615** ok.
+
+As **9 pernas**, & a âncora que cada uma mede em `WoD20th/WoD20th.lfm`:
+
+| perna | mede | como |
+|---|---|---|
+| (a) | 1 função de exibição | `mfShown` traduz & monta `-- t --`; `mfPaint` & `mfFilter` a CHAMAM & ⊥ chamam `translateSheetText` elas mesmas |
+| (b) | os 2 estados num lugar só | dentro de `mfLabel`: `opacity 1` · `opacity 0.60` · `"-- " .. t .. " --"` · `fontStyle "italic"` · `fontStyle ""`; & contagem de `0.60` no root ≡ a de dentro de `mfLabel` |
+| (c) | 1 escritor de `fontStyle` | lê os **números de §V305c** (`$fsRoot305`/`$fsIn305`), ⊥ mede 2ª vez — & FALHA se §V305c parou de medir. O que (c) ACRESCENTA são os 2 VALORES; §V305c conta escritores, §I114e nomeia o que escrevem |
+| (d) | vazio condicional | no `setTimeout` de `mfOpen`: `local has = …` · `if vals[i] ~= "" or has then` · `if has then MF.pool[…] = ""; end;`; & em `mfConfirm` o guarda `nil`-only, c/ o guarda VELHO (`== ""` … `then return`) recusado |
+| (e) | limpar leva as 3 colunas | a partir do `elseif MF.picked == "" …`, os 3 `setField("book_"/"type_"/"costy_" .. num, "");` |
+| (f) | título DERIVADO | a linha de derivação ∃ · `mfOpen` ⊥ nomeia `"Select Merit"`/`"Select Flaw"`/`"Select Background"` · `MF.title =` escrito **1** vez no root |
+| (g) | `fitSize` | piso `while size > 7` · `string.gsub(txt, "[\128-\191]", "")` · `local size = 12;` · ⊥ ∃ `size = size + ` · & a régua `* 0.5` aparece **1** vez no root, dentro de `fitSize` |
+| (h) | ordem pelo que se lê | `key[name] = (foldKey ~= nil) and foldKey(shown)` + `table.sort(hits, function(a, b)`; & o root ⊥ declara `foldKey`/`FOLD_MAP` próprios |
+| (i) | zero-guard, roda PRIMEIRO | `mfShown` ⊥ achada \| `fitSize` ⊥ achada \| 0 escrita de `0.60` \| 0 chamada de `fitSize` ! FAIL |
+
+### AS 8 MUTAÇÕES — todas VERMELHAS
+
+Bancada: **1** backup ANTES da 1ª mutação, restaurar no `finally`, SHA256 conferido no fim.
+`WoD20th.lfm` voltou **byte a byte** — `A13D89C0DB89F9FB8AA076D7AE8556CFCB79CE4A72AA4547486BA551DDB92693`.
+
+| # | mutação | resultado |
+|---|---|---|
+| 1 | `c.text = mfShown(…)` → `translateSheetText(…)` em `mfPaint` | **2** FAIL em (a) |
+| 2 | `ctrl.opacity = 0.60;` → `= 1;` | **2** FAIL — (i) & (b) |
+| 3 | `c.fontStyle = "";` a mais em `mfPaint` | **1** FAIL em (c) **+ 1 em §V305** ← é o "as 2 batem" que §T815 pedia |
+| 4 | `if vals[i] ~= "" or has then` → `if true then` | **1** FAIL em (d) |
+| 5 | apagar `setField("type_" .. num, "");` do ramo do vazio | **1** FAIL em (e) |
+| 6 | derivação → `MF.title = "Select Merit";` | **2** FAIL em (f) |
+| 7 | `while size > 7` → `> 0` | **1** FAIL em (g) |
+| 8 | `table.sort(hits, function…)` → `table.sort(hits);` | **1** FAIL em (h) **+ 1 em §V354(d)** |
+
+As **9** pernas acenderam pelo menos 1 vez ∴ nenhuma nasceu no-op (§V20, §B92).
+
+### O PEDIDO DO USER NO MEIO DA RODADA — `/ck:spec` + `§T817`
+
+**"os dropdown lists que tiver nas abas Settings ou Storyteller devem permanecer como dropdown
+lists"** (2026-08-30). Virou **6** emendas de spec & 1 §T, TODAS fechadas:
+
+| onde | o quê |
+|---|---|
+| **§C** | bullet nova da 144ª: os **6** combos MEDIDOS, & a razão (são VALOR/ESTADO — `items`/`values` AUTORADOS, & nenhum lê `PICKER_LIST`) |
+| **§I113e** | a exceção que valia por NOME (`cboGame` `cboSheetTheme`) passa a valer por **ABA** |
+| **§V354(f)** | vira PONTEIRO p/ §V356 — 1 dona por régua, senão é §B70 nascendo de novo |
+| **§V356** | NOVA, 3 pernas: 1 `<comboBox>` por campo no arquivo da aba · `items`+`values` autorados · zero-guard |
+| **§B95** | o achado (↓) |
+| **§T817** | `x` — §V356 no gate, **3** mutações VERMELHAS |
+
+**Os 6, & o arquivo de cada um:** `language` `game` `sheetTheme` @ **`WoD20.6.lfm`** (Settings) ·
+`healthLevels` `stSpecCost` `stBackgroundCost` @ **`WoD20.10.lfm`** (Storyteller). A ida
+aba→arquivo sai dos `<layout>` do root (`tabSettings`→WoD20.6, `tabStoryteller`→WoD20.10).
+
+### ⚠ §B95 — A PERNA DE SPEC QUE NUNCA VIROU CHECK
+
+Medindo o pedido, achei que **§V354(f) já dizia essa regra p/ 2 dos 6 — & NUNCA existiu no
+gate.** O bloco de §V354 tem `(a) (b) (d) (e) (g)` & ⊥ tem `(f)`; `cboGame` & `cboSheetTheme`
+⊥ aparecem nele em lugar nenhum. **⊥ é §B7** (check que VIRA no-op) **nem §B92** (check que
+NASCE no-op): aqui ⊥ nasceu check, & é o pior dos 3 — ⊥ ∃ linha p/ mutação nenhuma acender.
+CAUSA: as pernas de §V354 são escritas POR ONDA & (f) é a **negação** de uma onda ∴ o
+`foreach ($w354 in $V354_WAVE)` ⊥ tinha onde pendurá-la.
+
+**MEDIDO junto:** dos 6, `language` & `cmbBgCost` ⊥ tinham guarda de TIPO **nenhuma**; os
+outros 4 tinham por ACIDENTE (§V109 · §V52 · §V234/§V243 · o de `cmbSpecCost`), de checks que
+∃ p/ perguntar outra coisa. A mutação **provou**: trocar `cmbBgCost` por `<button>` acende **só
+§V356** — 0 outro check da ficha viu.
+
+### AS 3 MUTAÇÕES DE `§T817` — todas VERMELHAS
+
+Backup dos **2** arquivos antes da 1ª; restaurados byte a byte (`WoD20.6` `307C06CC…`,
+`WoD20.10` `4C5AE656…`).
+
+| # | mutação | resultado |
+|---|---|---|
+| 1 | `<comboBox name="cmbBgCost"` → `<button …` | **1** FAIL em (a) — **& só ela** |
+| 2 | tirar `items="{'0','1','2','3','4','5'}"` do `cmbBgCost` | **1** FAIL em (b) + 1 em §V257 |
+| 3 | 2º `comboBox` no `field="language"` | **1** FAIL em (a) + 1 em §V1 |
+
+### ✅ A DÍVIDA DE SPEC DESTA RODADA — PAGA NA PRÓPRIA RODADA
+
+As 2 linhas que diziam **"⊥ ∃ no gate ainda"** (§V355 & §V356) estavam FALSAS assim que o
+check entrou, & §V355 ainda apontava o §T errado (dizia §T812; quem pagou foi §T815). As 2
+foram emendadas **no mesmo turno** — que é o que §B73 cobra & o que §B95 acabou de mostrar que
+custa caro esquecer. **⊥ ∃ nada pendente p/ `/ck:spec`.**
+
+### ⛔ O QUE ⊥ FAZER
+
+- **⊥ pedir `/ck:build`** — ⊥ ∃ linha construível. O próximo passo é o user na TELA do Firecast.
+- **⊥ reescrever §V355 nem §V356** — as pernas estão no gate & as **11** mutações (8 + 3) já
+  foram rodadas. **⊥ "consertar" o roster de 6 de §V356 p/ derivação**: ele lista o que ! ⊥
+  MUDAR ∴ sumir um item o ACENDE — direção de falha oposta à do roster que §I114f proíbe.
+- **⊥ commitar** — o repo segue com TUDO no working tree, por regra do projeto.
+
+### ⚠ AS ARMADILHAS DE FERRAMENTA QUE ESTA RODADA PAGOU
+
+1. **Heredoc do Bash (`<<'EOF'`) ⊥ fecha quando a entrada tem CRLF** — o delimitador de
+   abertura fica `EOF\r` & o `EOF` final ⊥ casa ∴ o bash lê até o fim & morre com
+   `unexpected EOF while looking for matching`. É a família de §B74/§B81 numa porta nova: a
+   ferramenta de texto do Git Bash & o fim de linha do Windows. Saída = escrever o bloco por
+   **Write** num arquivo de rascunho & splicar por PowerShell.
+2. **O gate é ASCII PURO** (`0` byte > 127, medido) — é o que §B84 exige de `.ps1` sem BOM, & o
+   bloco novo ! nascer ASCII também. Splice por round-trip **Latin1** (`GetEncoding(28591)`)
+   preserva CRLF & qualquer byte alto que apareça depois. Medido antes & depois:
+   **13241 → 13392** linhas, `CR == LF`, `nonascii = 0`.
+3. **A saída do gate ⊥ vem pelo pipeline** (escreve no HOST) — `& powershell.exe -NoProfile
+   -File $gate *> $log` & depois `[IO.File]::ReadAllLines`. Filtrar `FAIL` pelo pipe lê 0 falha
+   & declara toda mutação VERDE.
+
+## 143ª RODADA (2026-08-29) — §T806...§T809, a 2ª metade do spec & o contrato de exibição
+
+**Estado:** gate **VERDE 614 ok / 0 FAIL** (**616** com `-Build`) · `.rpk` **2.553.529 B** gerada
+**e instalada** 23:41:45 · §T **719 `x` · 90 `.` · 7 `~`** · **nada commitado**. **⊥ ∃ pergunta
+aberta** — as 3 foram respondidas & viraram trabalho de `/ck:spec` (no fim desta seção).
+
+**✅ A DÍVIDA DE SPEC FOI PAGA.** O `/ck:spec` da 143ª gravou a 2ª metade: **14** linhas de §C ·
+**§I114** (9 pernas) + §I99e/§I99k/§I99m/§I101h emendadas · **§V355** (9 pernas) +
+§V244/§V305c/§V330a/§V331a/§V333g/§V334b/§V339a/§V351/§V354a emendadas · §T806 CORRIGIDA ·
+**§T812…§T816** (3 `x` do que já landou, 2 `.`). §T **719 `x` · 90 `.` · 7 `~`**.
+
+**PEÇA `/ck:build §T815`** — é a ÚNICA linha construível: §V355 no gate + mutação. Tudo o mais
+espera tela (`§T787` `§T804` `§T810` `§T816`, a serem rodadas JUNTAS).
+
+**⛔ DEPOIS de `§T815`, ⊥ ∃ mais nada construível.** A 143ª fechou `§T806`…`§T809` & o resto é
+**TELA**: `§T787` · `§T804` (sonda de foco, Q28) · `§T810` (o piloto) · `§T816` (o itálico & a
+largura). `§T805` só depois de `§T804`; `§T811` só depois de `§T810`. Das **90** `.`: **57** são
+`[USER]`, **29** são teste/sonda de Firecast sem a etiqueta, **3** são revogadas de propósito
+(`§T619` `§T775` `§T759` — id ⊥ se reusa), & **1** é `§T815`.
+
+**Leia nesta ordem:** esta seção INTEIRA → a **142ª rodada** logo abaixo → a **141ª** →
+`research/README.md` (armadilhas 8 a 13).
+
+### O QUE A 143ª FECHOU (⊥ refazer)
+
+**4 §T buildadas & 19 mutações VERMELHAS**, arquivos restaurados byte a byte (SHA256):
+
+| § | entrega | número novo |
+|---|---|---|
+| `§T806` | `mfSearch` **440/520 → 300/1000** & a pane `edtMfDesc` em **520/50/460/550** | §V334 **9 panes / 18 botões** |
+| `§T807` | `descText` GLOBAL = **1** leitor de texto · `mfSelect` pinta · `mfFilter`/`mfPage` limpam · `require` no `setTimeout` | **§V352** nova, 7 pernas |
+| `§T808` | **PILOTO §I113**: `OpenAbility` perde o `comboBox`, ganha `<button name="dyn$(field)">` + `<edit>` gêmeo escondido; `mfOpen(from, field, list, mod)` | **16** linhas · pool de `PICKER_LIST` |
+| `§T809` | **§V354** pernas (a)(b)(d)(e)(g) c/ roster de **ONDA** | 7 mutações |
+
+**O par de zoom da pane chama-se `btnFontDownMf`/`btnFontUpMf`** — ⊥ `…MfDesc` como `§T806`
+escreveu: §V334b DERIVA o sufixo do nome da pane (`edtMfDesc` → tira `edt` & `Desc` → `Mf`), &
+as 8 panes velhas já obedecem essa regra. O user CONFIRMOU 2026-08-29 & `§T806` foi corrigida.
+
+**A forma do gêmeo é `visible="false" enabled="false"`** (§I107a1, ≡ `MeritPicked`), ⊥ `readOnly`
+como §V354a escreveu — escondido & desabilitado é garantia MAIS forte, & `readOnly` visível
+puxaria §V111 (`opacity` 0,75) p/ um controle que ninguém lê. O user CONFIRMOU 2026-08-29 & `§V354a` foi reescrita.
+
+### A PRÓXIMA TAREFA — `/ck:build §T815` (a ÚNICA construível)
+
+**1 arquivo: `verify-hunters-hunted.ps1`.** Escrever **§V355** — as 9 pernas do contrato de
+exibição de §I114 — & rodar a mutação. **Nenhum `.lfm` é tocado**: o código já está lá desde a
+2ª metade da 143ª; o que falta é a RÉGUA. §V355 diz isso na própria linha ("⊥ ∃ no gate ainda").
+
+**ONDE:** ao lado de §V352 & §V354, no FIM do arquivo, logo antes do bloco final
+`Write-Host ""` / `if ($fail -eq 0)`. É onde as 3 últimas §V foram parar.
+
+**O QUE JÁ ∃ no gate & ⊥ precisa nascer de novo:** `LuaFn $rootTxt '<fn>'` (corpo de função
+Lua, fecha no `end;` de 3 tabs) · `NoComments` · `CodeOf` · `Doc` · `$rootTxt` · `$dir` ·
+`$plugin` · `$LUA_OPACITY` (`0.75`,`0.60`) · `$ptK`/`$embedded` (chaves `[pt]` & mapa PT) ·
+`$PICKER` · `$V354_WAVE`.
+
+**AS ÂNCORAS DE CÓDIGO, medidas** (tudo em `WoD20th/WoD20th.lfm`, tudo GLOBAL — o root está em
+**50** locais de chunk contra teto **53**, §B93/§V347 ∴ **⊥ escrever `local function`**):
+
+| perna | mede | âncora literal |
+|---|---|---|
+| (a) | 1 função de exibição | `function mfShown(name, lang)`; `mfPaint` & `mfFilter` a chamam; **0** outro lugar decide texto |
+| (b) | os 2 estados num lugar só | dentro de `mfLabel`: `ctrl.opacity = 1;` **&** `ctrl.opacity = 0.60;` **&** `"-- " .. t .. " --"` |
+| (c) | 1 escritor de `fontStyle` | `ctrl.fontStyle = "italic";` + `ctrl.fontStyle = "";`, os 2 DENTRO de `mfLabel`. ⚠ **esta contagem ! BATER com a de §V305c** — são a mesma medida por 2 donos, & divergir é §V135 |
+| (d) | vazio condicional | no `setTimeout` de `mfOpen`: `local has = cur ~= nil and cur ~= "";` · `if vals[i] ~= "" or has then` · `if has then MF.pool[#MF.pool + 1] = ""; end;` · em `mfConfirm`: `if MF.picked == nil or MF.field == nil then return; end;` (o guarda velho testava `MF.picked == ""` & ! ⊥ voltar) |
+| (e) | limpar leva as 3 colunas | `elseif MF.picked == "" and num ~= nil and MF.data ~= nil then` + os 3 `setField("book_"/"type_"/"costy_" .. num, "")` |
+| (f) | título DERIVADO | `MF.title = "Select " .. string.upper(string.sub(list, 1, 1)) .. string.sub(list, 2);` & **0** tabela de rótulo |
+| (g) | `fitSize` | `function fitSize(txt, width)`, piso `while size > 7`, conta CARACTERE (`string.gsub(txt, "[\128-\191]", "")`), & **⊥ ∃ 2ª régua de largura no Lua** |
+| (h) | ordem pelo que se lê | em `mfFilter`: `key[name] = (foldKey ~= nil) and foldKey(shown)...` + `table.sort(hits, function(a, b)`; `foldKey`/`FOLD_MAP` são de `WoD20.6` & já GLOBAIS ∴ **⊥ criar 2ª dobra** |
+| (i) | zero-guard | `mfShown` ⊥ achada \| 0 escrita de `0.60` \| 0 chamada de `fitSize` ! FAIL |
+
+**AS 8 MUTAÇÕES (§V20 §V222), todas ! dar VERMELHO:** 2º lugar montando o texto exibido ·
+`mfLabel` perdendo um dos 2 estados · 2º escritor de `fontStyle` fora de `mfLabel` · o vazio
+entrando na pool sem valor no campo · escolher vazio ⊥ limpando `book_`/`type_`/`costy_` ·
+tabela de rótulo no lugar da derivação · `fitSize` sem piso (ou contando BYTE) · `table.sort`
+sem comparador.
+
+**COMO SABER QUE ACABOU:** `.\verify-hunters-hunted.ps1` = **615 ok / 0 FAIL** (614 hoje + a
+linha de §V355) & `-Build` = **617**. Depois: `rdk -i` & conferir que a `.rpk` gerada e a
+INSTALADA têm o MESMO size (§B1 — size oscila entre builds, o que prova é gerada-vs-instalada).
+
+**⚠ ARMADILHAS DE FERRAMENTA que esta tarefa vai encontrar:**
+- **A saída do gate ⊥ vem pelo pipeline** — ele escreve no HOST. `& powershell.exe -NoProfile
+  -File $gate *> $log` & depois `[IO.File]::ReadAllLines`. Filtrar `FAIL` pelo pipe lê 0 falha
+  & declara toda mutação VERDE.
+- **`SPEC.md` é UTF-8 & `.lfm`/`.ps1` são CRLF.** Editar `.lfm`/`.ps1` por PowerShell: round-trip
+  **Latin1** (`[Text.Encoding]::GetEncoding(28591)`) preserva BOM, CRLF & multibyte — mas SÓ se
+  o padrão de busca for 100% ASCII. Âncora com `§` ou acento ! ler em **UTF-8** (foi assim que a
+  1ª tentativa de escrever no `SPEC.md` falhou dizendo "anchor 0" com a âncora ∃ no arquivo).
+- **⊥ usar `sed`/`awk` do Git Bash em `.lfm` nem em `.ps1`** (§B74) — come o CR do arquivo todo.
+- **`$T = [char]9` SOBRESCREVE `$t`**: variável de PowerShell é case-INSENSITIVE.
+- **Bancada de mutação: backup 1× ANTES da 1ª mutação**, restaurar no `finally`, conferir SHA256
+  no fim. `Copy-Item` no topo de cada volta sobrescreve o limpo com um mutado no 1º erro.
+- **A âncora de 1 linha em `.lfm` costuma ser AMBÍGUA** — afirmar a contagem esperada antes de
+  trocar, sempre.
+### ⚠ AS 4 ARMADILHAS QUE ESTA RODADA PAGOU
+
+1. **Tirar um `comboBox` TIRA a lista inteira do censo de string visível.** Ao converter
+   `OpenAbility`, os **47** antecedentes sumiram de **§V9 §V22 §V28 §V24 §V17** (967 → 923
+   strings) & de **§V196 §V211 §V215 §V346** — tudo VERDE, porque cada um desses conta o que
+   ACHA. **§V354(d) recobre** ([pt] + mapa PT) & **∀ onda nova de §I113e ! entrar no roster
+   `$V354_WAVE`**, senão perde a mesma cobertura calada. É §B7 pela porta da conversão.
+2. **§V198 ⊥ reconhecia função ANÔNIMA.** O `require` dentro de `setTimeout(function()` foi
+   acusado de "sits outside a function body": a régua era `(?:^|\s)function\b` & `(function()`
+   ⊥ tem espaço antes. Corrigida p/ `\bfunction\b`; a mutação que ela ∃ p/ pegar (require no
+   topo do CDATA) segue VERMELHA — `<![CDATA[` ⊥ carrega `function` de jeito nenhum.
+3. **O módulo de descrição virou PARÂMETRO** (`require("desc" .. MF.mod .. "_" .. lang ..)`)
+   ∴ **§V198/§V210/§V215 ⊥ enxergam mais esse `require`** (a régua deles quer o literal
+   `desc<Nome>_`). Quem responde agora é **§V354(b)**: as 2 metades `desc<Mod>_en/pt.lua` ! ∃
+   na raiz do plugin, pelo roster da onda.
+4. **`$T = [char]9` SOBRESCREVE `$t`** — variável de PowerShell é case-INSENSITIVE. Custou uma
+   edição inteira que abortou dizendo "anchor found 0 times" com a âncora ∃ no arquivo.
+
+### O QUE MUDOU DE FORMA NO CÓDIGO (p/ ⊥ reinventar)
+
+- **`descText(kind, key, sub, lang)`** = o ÚNICO lugar que monta a chave composta de §I102g.
+  `popOpen` **&** `mfSelect` chamam ELA. GLOBAL: o root declara **50** locais de chunk contra o
+  teto de 53 (§B93, §V347) ∴ `local function` aqui é build morto sem mensagem.
+- **`MF` ganhou `field` `list` `mod` `pool` `btn` `title`** & perdeu `row` `kind`. `MF.list`
+  serve de chave da fonte **&** de `sub` da chave composta — p/ antecedente a chave composta
+  ⊥ ∃ & `descText` cai na nua sozinho.
+- **O título é DERIVADO**, ⊥ tabelado: `"Select " .. <lista c/ inicial maiúscula>` devolve as
+  3 strings que o `.lang` já carrega, & a MESMA string é o fallback do botão (§I107a2).
+- **`mfConfirm` aceita `""`**: o vazio de §V15 ∃ em `PICKER_LIST["background"]` & escolher ele
+  LIMPA a linha. `nil` = nada marcado, `""` = o item vazio. Merit/flaw ⊥ têm vazio na fonte.
+- **`renderMeritButtons(from)` SAIU do `mfConfirm`** — quem repinta é `mfLabel(MF.btn, …)`, o
+  botão que ABRIU a caixa. Os 2 `dataLink` (12 merit + 16 background) seguem repintando na
+  abertura.
+- **`renderBgButtons`** = o par §I107a2 dos 16 botões de antecedente. Limite =
+  `BACKGROUND_ROWS - BACKGROUND_FREE_ROWS`, ⊥ literal (§V145 acusa literal).
+- **`Select Background`** entrou nas 3 casas: `[pt]` & `[en]` do `.lang` & o mapa `PT` de
+  `WoD20.6`.
+
+### AS 19 MUTAÇÕES — todas VERMELHAS
+
+| # | mutação | alvo |
+|---|---|---|
+| 1 | pane fora de `DESC_PANES` | §V334 (perna nova) |
+| 2 | par de zoom c/ nome errado | §V334b |
+| 3 | pane IRMÃ de `mfSearch` | §V352a |
+| 4 | pane sem `wordWrap` | §V352b |
+| 5 | pane c/ `field` | §V352b |
+| 6 | caixa 20px mais alta | §V352c |
+| 7 | `mfFilter` ⊥ limpa a pane | §V352d |
+| 8 | `require` movido p/ `mfSelect` | §V352e |
+| 9 | 2ª função montando a chave | §V352f |
+| 10 | `require` no topo do CDATA | §V198 (regressão da régua nova) |
+| 11 | `comboBox` sobrevivendo no template | §V354a |
+| 12 | gêmeo sem `enabled="false"` | §V354a |
+| 13 | caixa c/ lista própria | §V354d |
+| 14 | órfão ⊥ anexado | §V354d |
+| 15 | `mfFilter` sem `table.sort` | §V354d |
+| 16 | 15 linhas em vez de 16 | §V354e |
+| 17 | item fora do mapa PT | §V354d |
+
+*(14 mutações nomeadas + 3 da leva de §T806 que repetiram alvo; 2 rodadas de bancada cortadas
+por timeout foram REFEITAS, ⊥ contadas 2×.)*
+
+### O QUE A 2ª METADE DA 143ª ENTREGOU (10 pedidos do user, SEM §T)
+
+| pedido | entrega |
+|---|---|
+| resp. P1 | caixa & botão MOSTRAM o nome TRADUZIDO (`mfShown`); o EN canônico segue no campo (§V24) |
+| resp. P1 | linha VAZIA = `-- Select X --`, **itálico**, opacidade **0,60**; linha cheia = normal, opacidade 1 |
+| resp. P4 | o item vazio da lista lê `-- Remove --` & **só entra na pool se ∃ valor** na linha — inclusive p/ merit/flaw, cuja fonte (`meritData`) ⊥ tem vazio próprio; escolher ele LIMPA nome + livro + página + custo |
+| 1 | `merit_m0` & `merit_f0` — 1 linha picker NOVA no TOPO de cada tabela. ⊥ é renumeração (§V2): as caixas 311 → **336** & FLAWS 316 → **341**, coluna fecha em **677** de 693 |
+| 2 | `Page` & `Cost` centralizados nos **2** templates (picker & digitada) |
+| 3 | rótulo `ROAD` FICA em CAPS & vai de 46 → **80**; `cboRoad` 71/239 → **105/205** (2 voltas: o user pediu caixa alta-e-baixa, viu na tela & mandou voltar p/ CAPS pedindo o campo MENOR ainda) |
+| 4 | **REVERTIDO a pedido do user**: `WILLPOWER` segue em CAPS nas 3 caixas & `wod.WILLPOWER` / `wod.Willpower` voltaram byte a byte ao que eram (`FORÇA DE VONTADE` & `Força-de-Vontade`). ⚠ **título de caixa nesta ficha é CAPS, sem exceção** — foi a decisão: converter as ~40 caixas p/ caixa alta-e-baixa ⊥ foi escolhido |
+| 5 | bearing virou **1** label centralizado (`dynBearingName` 20/290) c/ `"<nome> (<mod>)"`, opacidade **0,80**; **`dynBearingMod` REMOVIDO** |
+| 6 | `fitSize` encolhe o texto até caber (piso **7pt**), nos BOTÕES de escolha **&** no `cboRoad` — o user esclareceu que "trilha" era **road** (§V351e, 2 mutações). Sem valor escolhido, tamanho normal |
+| — | a caixa ORDENA pelo que se LÊ, via `foldKey` (§I110c) — antes ordenava pelo EN & mostrava PT |
+
+### AS 3 RÉGUAS DO GATE QUE TIVERAM DE MUDAR (& por que ⊥ é afrouxar)
+
+1. **§V305c ⊥ proíbe mais `fontStyle` em Lua** — só `fontColor`. A razão escrita ("applyTheme
+   desfaz") vale p/ COR: ela repinta de um ledger `authored`. **MEDIDO: `WoD20.6` ⊥ nomeia
+   `fontStyle` em lugar NENHUM** ∴ nada repinta & nada tira snapshot. A exceção é NOMEADA
+   (`mfLabel`) & carrega **3** pernas: contagem de escritores · o dono ser `mfLabel` · a
+   PREMISSA (o tema ⊥ nomear `fontStyle`). 2 mutações VERMELHAS.
+2. **§V244 virou LISTA NOMEADA** (`$LUA_OPACITY = 0.75, 0.60`) em vez de "só `$DIM_TEXT`".
+   0,60 = "⊥ preenchido", que ⊥ é a mesma frase que "só leitura". **0,40 (ART) segue FORA** —
+   mutação confirma que a porta lateral que §V244 ∃ p/ fechar segue fechada.
+3. Re-miradas mecânicas: **§V351** lê o rótulo por `Road` & mede `'Road'/'Caminho'` · **§V330**
+   ⊥ nomeia mais `dynBearingMod` · **§V332** map `369;0;536;336` & `369;341;536;336` ·
+   **§V331** `m0..m6` · **§V333g** **30** `?` · **§V339a** **14** `MeritPicked` · **§V354d** o
+   `table.sort` c/ comparador.
+
+**7 mutações VERMELHAS** nesta metade (número da ART em Lua · 2º escritor de `fontStyle` · tema
+nomeando `fontStyle` · linha nova virando digitada · FLAWS ⊥ descendo os 25 · ordenar pelo EN ·
+rótulo `Road` espremido). Arquivos restaurados byte a byte (SHA256).
+
+### ⚠ O QUE ⊥ FOI MEDIDO — só a TELA responde (junte à sessão de `§T804`/`§T810`)
+
+- **`ctrl.fontStyle = "italic"` / `""` escrito por LUA.** A propriedade ∃ (`rrpgGUI:setFontStyle`
+  → `Font.Style`, tipo SET) & o XML já usa `fontStyle="italic"`, mas **⊥ ∃ precedente de escrita
+  por Lua nesta ficha**. Chamada de método compila SEMPRE ∴ só a tela diz se pinta & se `""`
+  limpa de volta. ≡ o que §B80 ⊥ responde em `§T804`.
+- **`ctrl.width` LIDO por Lua** (`fitSize`). Se voltar `nil`, `fitSize` devolve 12 & nada
+  encolhe — falha SEGURA, ⊥ quebra nada.
+- **`fitSize` é ESTIMATIVA**: 6,0px/caractere a 12pt, a régua do PRÓPRIO gate (§V16/§V312a),
+  contando CARACTERE & ⊥ byte (UTF-8). ⊥ ∃ chamada de medir texto no SDK3 — é por isso que as
+  checagens de largura moram no gate. Ela só DIMINUI, nunca afirma que cabe.
+### ⛔ O QUE ⊥ FAZER
+
+1. **⊥ pedir `/ck:build` PELADO** — ele varre ~90 linhas `.` & acha 1 construível no fim. Peça `§T815` pelo id. Depois dela, ⊥ ∃ linha construível até a sessão de tela.
+2. **⊥ converter onda 2 de §I113e sem entrar no roster `$V354_WAVE`** (armadilha 1 ↑).
+3. **⊥ commitar.** Regra do projeto: só sob pedido direto naquela mensagem.
+4. As **6** armadilhas da 142ª (⊥ regenerar `descMerit_*` sem o CSV · ⊥ apagar chave `.lang`
+   de base · ⊥ contar fim-de-linha com `grep -c $'\r'` · ⊥ `sed`/`awk` em `.lfm`/`.ps1` ·
+   ⊥ escrever check sem `grep` do número no gate · ⊥ medir largura só por §V196) **seguem
+   valendo INTEIRAS** — estão na seção da 142ª logo abaixo.
+
+### ✅ AS 3 PERGUNTAS — RESPONDIDAS (viram trabalho de `/ck:spec`)
+
+1. **Os 2 botõezinhos de zoom da pane nova.** O user confirmou: **o texto de `§T806`/`§I112c`
+   está errado**, o nome certo é o que a regra de §V334b deriva do nome da pane
+   (`btnFontUpMf`/`btnFontDownMf`). `/ck:spec` ! corrigir a linha.
+2. **O campo invisível atrás do botão de escolha.** O user confirmou: **`/ck:spec` ! reescrever
+   `§V354a`** p/ "gêmeo ESCONDIDO & DESABILITADO c/ o `field`" — é a forma de §I107a1, a que a
+   `MeritPicked` já roda, & a mais forte das duas.
+3. **O pedido 6 — "trilha" era ROAD.** Esclarecido pelo user. Feito nos 2 lugares: nos botões de
+   escolha (`mfLabel`) **&** no `cboRoad` do Main, que é o campo que o pedido 3 estreitou.
+   `§V351` ganhou a perna **(e)** & ela foi mutada VERMELHA 2×.
+## 142ª RODADA (2026-08-29) — Q24…Q27, o lote de 8 §T
+
+**Estado:** gate **VERDE 614 ok / 0 FAIL** (**616** com `-Build`) · `.rpk` **2.540.340 B** gerada
+**e instalada** 21:38:01 · §T **712 `x` · 92 `.` · 7 `~`** · **nada commitado** (50 arquivos no
+working tree). **⊥ ∃ pergunta aberta.**
+
+**PEÇA `/ck:build §T806`** — ⊥ `/ck:build` pelado. A 142ª buildou o lote inteiro de **Q24…Q27**
+(`§T796`…`§T803`, todas `x`) & o `/ck:spec` dela abriu **Q28…Q30** com **8** §T novas. A cadeia
+CONSTRUÍVEL é **`§T806`** ! **`§T807`** ! **`§T808`** ! **`§T809`**, nessa ordem, & mais nada:
+`§T804`/`§T805` esperam sonda de tela & `§T810`/`§T811` esperam o piloto.
+
+**Leia nesta ordem:** esta seção INTEIRA → a **141ª rodada** logo abaixo → a **140ª** →
+`research/README.md` (armadilhas 8 a 13).
+
+### O QUE A 142ª FECHOU (⊥ refazer)
+
+**8 §T buildadas & 32 mutações VERMELHAS**, arquivos restaurados byte a byte (SHA256):
+
+| § | entrega | número novo |
+|---|---|---|
+| `§T796` | partição de custo de **Q24**, pelo gerador | **647 → 873** (Merit **380** · Flaw **493**) |
+| `§T797` | as 4 colunas de **Q25** | `Page` **45** · `Book` **117** · nome **264** |
+| `§T798` | §V348 §V349 no gate | 9 mutações |
+| `§T799` | ordem alfabética de **Q26** | `foldKey` + sort do par em `pickerItems` |
+| `§T800` | §V350 no gate | 8 mutações |
+| `§T801` | a linha do `ROAD` de **Q27** | caixa **204** · fundo da Main **878 → 853** |
+| `§T802` | §V351 no gate | 6 mutações |
+| `§T803` | §V331 §V332 REESCRITAS + `readOnly` nas 3 colunas de livro | 9 mutações |
+
+**A TELA APROVOU 5 pontos** & isso virou PARCIAL em 4 linhas (⊥ ∃ linha fechada): `§T770` item
+(7) · `§T771` item (4) na metade do `readOnly` · `§T772` itens (1)(2) · `§T787` itens (3) & (5).
+
+### ~~A PRÓXIMA TAREFA — `/ck:build §T806`~~ — HISTÓRICO da 142ª, JÁ FEITA (`§T806`…`§T809` estão `x`)
+
+1. **`§T806`** — a caixa de busca cresce & ganha a pane de descrição (**Q29**, §I112a-c):
+   `mfSearch` de `left="440" width="520"` p/ **`left="300" width="1000"`**, `edtMfDesc` em
+   **520/460**, & ela entra em `DESC_PANES` ∴ **§V334 vai de 8 panes/16 botões p/ 9/18**.
+   ⚠ a coluna de resultado ⊥ se mexe 1px.
+2. **`§T807`** — `mfSelect` pinta · `mfFilter`/`mfPage` LIMPAM · **§V352** nova + 5 mutações.
+   ⚠ **o `require` de `descMerit_*` (563KB) vai no `setTimeout` de `mfOpen`, ⊥ no `mfSelect`** —
+   parse no 1º clique de linha trava a escolha (§I107f, §R92, §T479).
+3. **`§T808`** — o PILOTO de **Q30**: antecedente (`OpenAbility`, 16 linhas, 47 itens, SEM
+   filtro). ⚠ **1** tabela local & todo helper GLOBAL (§B93).
+4. **`§T809`** — §V354 pernas (a)(b)(d)(e)(g) contra o piloto + 5 mutações.
+
+### ⚠ O QUE Q30 REALMENTE PEDE — medido, ⊥ estimado
+
+O user pediu **todo** dropdown virando caixa de busca ∴ **o recorte da Q16 está REVOGADO**.
+MEDIDO em 2026-08-29: são **119** combos vindos de **11** templates (`HeaderNarrow` 3 ·
+`HeaderPicker` 2 · `SpecialityRow` 7 · `DiscRow` 16 · `MainPathRow` 5 · `SecPathRow` 12 ·
+`RitualRow` 15 · `OpenAbility` 16 · `HedgePicker` 12 · `PsychicPicker` 19 · `HedgeRitualPicker`
+12) **+** os avulsos. **⊥ é 1 tarefa, é um programa em 5 ONDAS** (§I113e).
+
+**O que torna cada onda cara ⊥ é a caixa — é o que ela ! carregar junto:** o FILTRO de runtime
+(nível de disciplina §I25 · afiliação §I67/§I68 · época da trilha §I99c2) mora DENTRO de
+`pickerItems`, que ∃ p/ alimentar `c.values`/`c.items` de um `comboBox`. **Sem combo, esses 3
+precisam de porta própria** (§I113c) — & essa porta ! ser MEDIDA antes de escrita, ≡ a
+armadilha que §I107n pagou por declarar queda barata cedo demais.
+
+`cboGame` & `cboSheetTheme` FICAM `comboBox`: são estado, ⊥ prosa (§I113e).
+
+### ⚠ Q28 ⊥ TEM ORÁCULO DE COMPILAÇÃO
+
+**§B80 ⊥ responde o foco.** Ele é oráculo de ATRIBUTO — o `rdk` recusa atributo que ⊥ conhece.
+**Chamada de MÉTODO em Lua compila sempre** & só falha (ou ⊥ faz nada) rodando ∴ `setFocus` /
+`.focus` / `focus()` só a TELA responde. **0** ocorrência dos 3 nos 15 `.lfm` (varredura
+2026-08-29) ∴ a ficha nunca exerceu isso. Sonda = `§T804`, & ela PEGA CARONA em `§T787`.
+
+### ⛔ O QUE ⊥ FAZER
+
+1. **⊥ buildar `§T808` antes de `§T806`/`§T807`.** A caixa que o piloto generaliza ! estar na
+   forma FINAL — generalizar uma caixa que vai mudar de tamanho é refazer 2×.
+2. **⊥ escrever §V353 antes de `§T804`.** Check contra nome de API que ninguém mediu é §B92
+   (check nascido no-op). O id está RESERVADO & a linha diz isso.
+3. **⊥ regenerar `descMerit_*` sem o CSV de corpos.** `gen_merit_data.ps1` lê
+   `$env:TEMP\mf_bodies.csv`; sem ele os corpos EN saem VAZIOS. **Confira que o gerador
+   reproduz os arquivos de hoje ANTES de mexer** — foi assim que a 142ª começou.
+4. **⊥ apagar chave `.lang` de base que partiu sem conferir as OUTRAS listas.** **3** das 87
+   (`Arcane` `Patron` `Rebel`) também vivem em lista de antecedente ∴ a chave NUA delas FICA.
+5. **⊥ commitar.** Regra do projeto: só sob pedido direto naquela mensagem.
+6. **⊥ contar fim-de-linha com `grep -c $'\r'`** (§B87, §V345) & **⊥ usar `sed`/`awk` do Git
+   Bash em `.lfm` nem em `.ps1`** (§B74). `desc*.lua` & `.lang` são LF; o resto é CRLF.
+7. **⊥ escrever check de §V sem antes `grep` do número no gate** (§T776).
+8. **⊥ medir largura só por §V196** — encolher `comboBox` de 12pt paga §V312c junto, piso 6,5
+   (§B86). E a coluna do NOME agora tem régua própria, §V349c (§B94).
+
+### ARMADILHAS DE FERRAMENTA
+
+- **A saída do gate ⊥ vem pelo pipeline** — ele escreve no HOST. `*> arquivo` & depois
+  `[IO.File]::ReadAllLines`. Bancada que filtra `FAIL` pelo pipe lê 0 falha & declara toda
+  mutação VERDE.
+- **Zero-guard que procura CHAMADA ! ler CÓDIGO, ⊥ texto.** `IndexOf('table.sort(')` acha a
+  chamada COMENTADA — foi assim que §V350f nasceu cega, & é §V330c pela 2ª porta.
+- **Âncora de 1 linha em `.lfm` costuma ser AMBÍGUA** (`<layout left="40" top="74" …>` ∃ 2×).
+  Toda substituição ! AFIRMAR a contagem esperada antes de trocar.
+- **`cmbItems` vem DEPOIS de `pickerItems`** & as 2 fecham com a MESMA linha ∴ âncora por
+  `LastIndexOf`.
+- **Backup de BANCADA ≠ backup de PATCH**: os `.clean` saem **1×**, antes da 1ª mutação.
+- **`.ps1` sem BOM é lido como ANSI** (§B84) ∴ texto acentuado vai p/ `.txt` lido como UTF8.
+- **Edição por PowerShell come CR & §V318 acusa.** Depois de editar `.lfm`/`.ps1`:
+  `($t -replace "\r\n","\n") -replace "\n","\r\n"`.
+
+## 141ª RODADA (2026-08-29) — §T761 & §T763 fechadas, & §T759 destravada por `/ck:spec`
+
+**A rodada teve 2 metades.** A 1ª buildou `§T761` & `§T763` — é o que esta seção conta. A 2ª foi
+o `/ck:spec` que o user pediu depois de responder as 2 perguntas: `§V331`/`§V332` REESCRITAS
+(`§T803` substitui `§T759`), **Q24…Q27** gravadas, **§B94** registrada & **8** §T novas
+(`§T796`…`§T803`). O lote está detalhado na seção do TOPO.
+
+Gate **608 ok / 0 FAIL** (**610** com `-Build`), `.rpk` **2.481.695 B** instalada 17:23:08.
+Mexeu em **2** arquivos: `WoD20.2.lfm` & `verify-hunters-hunted.ps1`. `WoD20th.lfm` saiu byte a
+byte igual (SHA256 conferido depois da bancada de mutação).
+
+### §T761 — os 28 `?`, & os 3 lugares onde o gate reprovou o caminho óbvio
+
+Os 28 saíram de **2** `<button>` autorais, ⊥ de 28: um dentro de `MeritPicked` (12 chamadas) &
+um dentro de `OpenAbility` (16). **Chave da linha = o VALOR da linha**, lido inline no XML —
+`onClick="popOpen(self, 'Merit', sheet['merit_$(num)'], '$(sub)');"`. ⊥ nasceu função-ponte:
+`sheet` É visível no escopo do form de aba (`WoD20.12/13/14` já leem `sheet.discSel` no
+`<script>` deles) ∴ o wrapper seria 1 função a mais p/ ⊥ ganhar nada.
+
+**MEDIDO no compilador (§B80, ≡ §I107n1): `rdk` ACEITA template com 3 parâmetros.** A 140ª
+tinha medido 2 (`num` + `lbl`); `sub="merit"`/`sub="flaw"` é o 3º & compila. Era isso ou repetir
+em XML a regra do prefixo `f` que `mfOpen` já tem — §V135 pela porta do template.
+
+**3 reprovações do gate que o caminho óbvio levou, & ⊥ ∃ nenhuma que fosse "consertar o gate":**
+
+1. **§V239 + §V280 — o `?` ⊥ cabe fora da margem de 20.** A 1ª tentativa abriu as 21 linhas de
+   antecedente em `left="12"` p/ o `?` caber SEM mover a coluna de entrada. §V239 exige os 2
+   lados IGUAIS (o rótulo `20/324` fixa L=20 & R=20) & §V280a cobra 20 em ⊥ 4 lados ∴ 12
+   reprovou nas 2. **A coluna de entrada TEM de andar**: linhas em `left="20" width="320"`, `?`
+   em 0/20 & o picker em 20 ∴ entrada de **32 → 40** absoluto & os dots fecham em **340**.
+   ⚠ §T790 diz "`OpenAbility` & `OpenAbilityFreeRow` ⊥ são TOCADOS" — aquilo era sobre **ENCOLHER**
+   o picker (piso 167 de §V312c, §B86). Os 170 seguem 170; o que mudou foi o x.
+2. **§V255 compara os 2 templates LITERALMENTE** (`verify:7650`): mesmos x de dot & mesmo x da
+   1ª entrada. ∴ o `OpenAbilityFreeRow` andou os mesmos +20 **sem** ganhar botão — o vão fica
+   VAZIO nele, que é §I102f escrita em pixel.
+3. **§V290 lia o `?` como 5ª COLUNA da tabela.** O coletor pega `edit|button` visível & o `?` ⊥
+   tem `field` nem nome `dynMerit_*` ∴ entrava como `?@0+20` & a metade digitada ⊥ tinha resposta
+   p/ ele. Emendado p/ pular `btnQ*`, c/ a razão escrita: o `?` está no VÃO, ⊥ na tabela.
+
+**§V10/§V28 — a exceção do `?` era DECLARADA & precisava ser escrita.** §I102b já dizia que `?`
+⊥ pede chave `.lang` (precedente do numeral de §V17), mas o coletor de strings visíveis pega
+`text` de ∀ `<button>` ∴ os 28 pediram `wod.?=?` em [pt], [en] & no PT map. A exceção entrou
+ESTREITA — `<button>` + texto exatamente `?` + nome `btnQ*` — porque wildcard aqui é §B7 entrando
+pela porta da exceção, que é o que o comentário de §V15 já avisa 20 linhas acima.
+
+### §T763 — §V333 (d)+(g), & por que 28 ⊥ se conta com `grep`
+
+§V333 & §V334 **já ∃** no gate desde §T760/§T762 — ≡ o que aconteceu c/ §T776 & §V337 (status
+`.`/`~` ⊥ quer dizer "falta fazer"). O que faltava eram as 2 pernas que o próprio comentário do
+gate dizia esperar por §T761.
+
+**O `grep` de `btnQ*` no XML acha 2, ⊥ 28** — os botões vivem DENTRO de template. A perna conta
+**CALL SITE**: p/ cada template que declara um `btnQ`, quantas vezes ele é chamado no arquivo.
+Roster FECHADO & nomeado (`@{ MeritPicked = 12; OpenAbility = 16 }`, ≡ o que §V109 faz c/
+`cboGame`) ∴ um 3º template ganhando `?` acende, em vez de ser absorvido num total que ainda diz
+28. Zero-guard ANTES das contagens.
+
+Perna (d) tem 2 metades: **1** função p/ os 28 (`popOpen`), & cada `onClick` passando o valor da
+PRÓPRIA linha — a régua é `sheet[` no atributo. Chave literal compila, parece certa & abre a
+mesma descrição em ⊥ botão da ficha: falha sem sintoma até alguém LER.
+
+### AS 9 MUTAÇÕES DA 141ª — todas VERMELHAS, arquivos restaurados byte a byte (SHA256)
+
+| # | mutação | alvo | deu |
+|---|---|---|---|
+| 1 | `popScrim` autorado DEPOIS do `popDesc` | §V333b | VERMELHO |
+| 2 | 2º `popDesc` noutra aba | §V333a | VERMELHO |
+| 3 | 1 linha picker de antecedente virando DIGITADA (27) | §V333g | VERMELHO |
+| 4 | 1 linha de antecedente desenhada 2× (29) | §V333g | VERMELHO |
+| 5 | `?` passando chave LITERAL em vez do valor da linha | §V333d | VERMELHO |
+| 6 | 2º abridor (`popShow`) em metade dos botões | §V333d | VERMELHO |
+| 7 | **zero-guard:** nenhum `btnQ` autorado | §V333g | VERMELHO |
+| 8 | teto escrito 2ª vez (`.fontSize = 40`) fora de `fontStep` | §V334a | VERMELHO |
+| 9 | 1 pane sem o par de botão | §V334b | VERMELHO |
+
+⚠ **a mutação 1 acendeu VERDE na 1ª rodada & a culpa era da BANCADA, ⊥ do check.** Ela tirava o
+scrim & o re-inseria ANTES do `popDesc` — ⊥ movia nada que §V333b olhe (ele compara `IndexOf`).
+**Mutação que ⊥ acende ! ser LIDA antes de acusar o check**: reescrita p/ jogar o scrim depois do
+`</layout>` do `popDesc` (ancorado em `<layout name="mfSearch"`), acendeu na hora. A bancada
+passou a AFIRMAR a pré-condição (`if (idx scrim < idx popDesc) { throw }`) em vez de supor.
+
+### 2 ARMADILHAS DE FERRAMENTA DESTA RODADA
+
+- **A saída do gate ⊥ vem pelo pipeline.** `& .\verify-hunters-hunted.ps1 2>&1 | Out-String`
+  devolve VAZIO — ele escreve no HOST. Bancada que filtra `FAIL` assim lê 0 falha & declara
+  toda mutação VERDE. Régua: `*> arquivo` & depois `[IO.File]::ReadAllLines`.
+- **Backup de BANCADA ≠ backup de PATCH** (a armadilha que a 140ª já tinha achado, confirmada):
+  os `.clean` da mutação vivem em `scratchpad\mut\` & são tirados **1×**, antes da 1ª mutação —
+  `Copy-Item` no topo de cada volta sobrescreveria o limpo com um mutado no 1º erro no meio.
+## 140ª RODADA (2026-08-29) — §T776, & os 2 defeitos que só a mutação achou
+
+A rodada inteira coube em `verify-hunters-hunted.ps1`. **Nenhum arquivo de ficha mudou** — os
+`.lfm` & os `.lua` saíram desta rodada byte a byte iguais ao que entraram (SHA256 conferido nas
+3 levas de mutação). O `.rpk` foi regerado & instalado assim mesmo, porque build sem install é
+tarefa incompleta: **2.463.587 B**, `rdk -i` exit 0, instalada 00:57:47 com o mesmo size.
+
+⚠ **O size da `.rpk` oscila entre builds da MESMA fonte** — 3 builds seguidos desta rodada, sem
+1 byte de mudança no plugin, deram **2.463.588** · **2.463.585** · **2.463.587**. É o zip, ⊥ a
+ficha. ∴ a prova de §B1 é `.rpk` recém-gerada **vs INSTALADA** (têm de bater), ⊥ build vs build.
+
+### A lição da rodada: `.` no §T ⊥ quer dizer "falta fazer"
+
+§T776 pedia §V337 NOVA. §V337 estava PRONTA desde `§T782` — porque `§T781`/`§T782` foram escritas
+DEPOIS, refazendo `§T775`/`§T776` com outro alvo, & ninguém voltou p/ virar o status das 2 velhas.
+O `.` sobreviveu à tarefa. **Antes de escrever qualquer check, `grep` o número da §V no gate**:
+custa 1 comando & evita escrever de novo o que já ∃ (ou, pior, escrever uma 2ª cópia — §V135).
+
+### A bancada de mutação, & por que ela ⊥ pode usar `sed`
+
+3 scripts no scratchpad (`mutate.ps1` `mutate2.ps1` `mutate3.ps1`), 1 mutação por chamada:
+backup → aplica → roda o gate → **restaura no `finally`** → compara SHA256.
+
+| armadilha | o que fazer |
+|---|---|
+| `.lfm` & `.ps1` são **CRLF**; o `sed` do Git Bash come o CR do arquivo inteiro (§B74) | a troca é PowerShell com **round-trip Latin1** (`[Text.Encoding]::GetEncoding(28591)`): preserva BOM, CRLF & UTF-8 multibyte, desde que o padrão de busca seja 100% ASCII |
+| `Fail`/`Pass` do gate usam **`Write-Host`** ∴ ⊥ entram no pipeline — `$out = & $gate` volta VAZIO & toda mutação parece VERDE | rodar o gate em **processo filho**: `& powershell.exe -NoProfile -File $gate *> $log` |
+| `$lines.InsertRange()` recusa `Object[]` | `[string[]]($raw -split "`r`n")` antes |
+
+⚠ `HANDOFF.md` é **LF puro** (3690 LF, 0 CRLF) enquanto `SPEC.md` é **CRLF puro** (3389 CRLF, 0
+LF avulso) & o gate é CRLF. São 3 réguas diferentes na mesma raiz — conferir ANTES de escrever.
+
+### §V330c: como um check morre calado
+
+O que estava lá contava `$writers330` num `foreach` e **nunca comparava com nada**. Passou por
+verde em todas as rodadas desde que foi escrito. O comentário em cima afirmava a regra ("The
+three controls have NO other writer anywhere on the sheet") ∴ quem lesse o gate leria a regra
+como medida. É exatamente §B7, & é o motivo de §V20 existir.
+
+**A forma nova mede MENÇÃO, ⊥ escrita**, & isso é decisão, ⊥ atalho: a escrita real é
+`found["cboRoad"].enabled = open` mais 2 apelidos locais (`nm.visible`, `md.visible`), ∴ qualquer
+regex de `<nome>.visible` acha **0** — inclusive dentro de `renderBearing`, o dono legítimo — &
+passa no conjunto vazio. Menção serve porque **⊥ ∃ como tocar um destes 3 controles sem nomear**:
+eles só chegam por `xpFind`, que exige a tabela `names`. Hoje: **7** menções, as 7 em
+`renderBearing`. A sonda 13 prova que comentário ⊥ conta.
+
+## 139ª RODADA (2026-08-29) — §T765 §T768 §T769 §T793 §T794, & 3 checks novos no gate
+
+### §T765: os 47 antecedentes, do PDF ao `.lua`, em 4 peças
+
+A bancada nova é `research/bg_body.ps1` → `research/bg_body_en.tsv` → tradução à mão em
+`research/bg_body_pt.tsv` → `research/gen_bg_desc.ps1` → os 2 `.lua`. Nenhuma peça é opcional:
+
+| peça | o que faz |
+|---|---|
+| `research/bg_body.ps1` | acha o cabeçalho de cada item nos 4 livros, corta na calha, para no cabeçalho SEGUINTE, junta linha em parágrafo & de-hifeniza |
+| `research/bg_body_overrides.tsv` | **12** corpos consertados a mão (coluna embaralhada, tabela no meio, barra lateral cravada) |
+| `research/bg_body_en.tsv` | a saída, **131 KB**, 47 linhas |
+| `research/bg_body_pt.tsv` | a tradução, **147 KB**, escrita à mão nesta rodada — ⊥ ∃ gerador |
+| `research/gen_bg_desc.ps1` | lê o bloco `BG_PICK` + os 2 TSV & escreve os 2 módulos, LF puro |
+
+**A `Find-Gutter` erra em página de 1 coluna com escada de bolinha.** `core` p.113 (o corpo do
+`Domain`) é 1 coluna só, mas a indentação da escada faz um pico de brancura no meio & o corte
+mandou as últimas palavras de 8 linhas p/ uma "coluna B" — o corpo saiu com buracos
+(`efforts by character to identify … in the A Domain`) & 7 fragmentos órfãos no fim (`your`
+`domain.` `no` `hunt-` `See` `Six to` `"the`). **⊥ mexi na `Find-Gutter`**: ela é a mesma que o
+`extract_merit_flaw.ps1` usa nos 641 nomes & mexer nela p/ 1 página é trocar um erro conhecido
+por um desconhecido. O `Domain` foi p/ o override, que é o instrumento que ∃ p/ isso.
+
+**A de-hifenização come hífen de verdade & ⊥ ∃ dicionário p/ evitar.** Ela junta `fami-`+`ly`
+(certo) e `name-`+`recognition` (errado) pela mesma regra. A saída é o script **imprimir todas
+as colagens** no fim & uma lista NOMEADA de **10** no próprio `bg_body.ps1` (`$HYPHEN_KEEP`):
+`fire-ready` `here-and-now` `Low-level` `name-recognition` `non-Technocratic` `semi-permanent`
+`single-purpose` `spirit-animal` `two-dot` `well-informed`. Colagem nova ! entra na lista.
+
+**A escada de bolinha decide o que é NÍVEL.** Sem ela cada linha de continuação do nível virava
+parágrafo próprio (`One ally of moderate influence and` / `power`). Regra: nível é a bolinha
+SEGUINTE da escada (1, depois 2, …); dentro da escada, só outra bolinha ou uma linha que volte
+à indentação do marcador abrem parágrafo. A mesma regra resolve o `Auspex` em §T768.
+
+**`U+FFFD` no COMEÇO de linha é bolinha; no MEIO é acentuada.** O V20 core mapeia as 2 no mesmo
+ponto de código. Trocar tudo por bolinha escrevia `prot•g•` no lugar de `protégé` (core p.115,
+`Mentor`). Só a corrida INICIAL vira bolinha; o que sobra no meio sai no relatório & tem 1
+conserto NOMEADO no script — hoje 1 palavra, o `protégé`.
+
+**Tipografia:** `--` → `—` (o travessão que o livro imprime; a camada de texto do core devolve
+2 hífens), apóstrofo reto → `’`, aspas duplas ficam como vêm. É a régua do `descMerit`, que é o
+irmão de §I102e.
+
+**Fontes, medidas:** `core` 13 itens · `hh` 7 · `w20` 6 · `m20` 21. As páginas saem do bloco
+`BG_PICK` de `research/bg_essence.tsv`, que a 138ª já tinha resolvido.
+
+### §T768: os 8 módulos de poder, & a forma INVERSA do númina
+
+`research/gen_desc_system.ps1` ganhou **2** regras & perdeu **1** defeito:
+
+1. **A forma inversa do `descNumina` (§I104e).** Lá `System` é cabeçalho de seção — linha
+   sozinha, SEM dois-pontos — & os níveis moram DENTRO dela. O recorte é do cabeçalho até o fim
+   da entrada. Sem isso o script rendia **0** recortes em 289 blocos & a trava de §B88 recusava
+   o `-Apply`, que é exatamente o que ela existe p/ fazer.
+2. **A escada de bolinha**, a mesma de §T765. `Auspex` põe `• Obfuscate:` `• Chimerstry:`
+   `• Other Powers:` como LISTA dentro do `System` de um nível; `Sanguinus` & `Grave’s Decay`
+   fazem igual. Contadas como nível, elas CORTAVAM o `System` do dono no meio. Isso derrubou as
+   exceções de **970** p/ **556**.
+3. **O defeito: o script emitia CRLF no bloco reescrito** (`-replace "\n", "\r\n"`), herdado de
+   quando se achava que a casa era CRLF. Hoje §V345 cobra **LF** & a casa é LF (§B87). Se
+   tivesse rodado assim, os 8 sairiam com 2 formas de quebra de linha no mesmo arquivo.
+
+**Medido:** `descDisc` 36 entradas (129 recortes) · `descNumina` 50 (27) · `descPath` 64 (226) ·
+`descRitual` 284 (202). Encolhimento: `descPath_en` 370→**219 KB** (59%) · `descDisc_en`
+245→**154 KB** (63%) · `descNumina_en` 210→**138 KB** (66%) · `descRitual_en` 548→**424 KB**
+(77%). Backup dos 8 antes de gravar (§B78), & a trava de §B88 segue armada.
+
+**As 23 psíquicas do M20 Sorcerer ⊥ têm marcador NENHUM** — nem `System:` nem o cabeçalho. Elas
+caem na regra normal de nível: perdem a prosa introdutória & mantêm cada nível INTEIRO. É
+§I104c literal, & é a pergunta 3 da rodada.
+
+### §T769: §V335, 5 pernas, & a lista de 131 nomes
+
+`868` descrições, `1724` blocos de mecânica, `115` deles na forma inversa do númina. A lista
+NOMEADA de exceção de §I104c tem **131** pares `<área>|<entrada>`, escrita no gate como
+here-string — `descDisc` 7 · `descNumina` 23 · `descPath` 19 · `descRitual` 82. O apóstrofo
+curvo entra como `~` & é trocado por `[char]0x2019` na leitura, porque o gate é 100% ASCII
+(§B84).
+
+**A perna (c) tem 2 sentidos, ⊥ 1:** nome que sai da lista enquanto a entrada segue sem
+marcador ! VERMELHO (a lista protege de menos), **&** nome que fica na lista depois que a
+entrada ganhou marcador ! VERMELHO (perdão que ⊥ dispara é perdão esperando a entrada errada
+cair nele). Sem o 2º sentido a lista apodrece em silêncio.
+
+**A perna (e) quase nasceu no-op.** A 1ª escrita comparava a contagem contra o que §V210a mede
+— & §V210 lê os MESMOS arquivos na MESMA rodada ∴ apagar uma entrada das 2 metades derruba as 2
+contagens juntas & nada acende. Virou **literal medido** (`descDisc 36 · descNumina 50 ·
+descPath 64 · descRitual 284`), & a comparação contra §V210a ficou com outro papel: as 2
+leituras têm de CONCORDAR. A mutação prova: apagar `Flight` das 2 metades deixa §V210a VERDE &
+só §V335e vê.
+
+**As 5 mutações rodaram** (§V20): `System:` fora de 1 nível ! (b) · bloco 3 esvaziado ! (d) ·
+entrada apagada das 2 metades ! (e) · nome tirado da lista ! (b) · nome morto na lista ! (c).
+
+### §T793/§T794: o `pickerItems`, & o `?` de §B91 que só a tela responde
+
+**RAIZ, como o SPEC já dizia:** `field` nascia dentro do `if filter then` & `current` lê de
+`field` ∴ p/ os **14** roots ⊥-filtrados `current` era `nil` & a regra de §V200 ⊥ tinha
+executor. O conserto tem 3 partes & todas estão em `WoD20.6.lfm`:
+
+1. `field` & `current` **saem** do `if filter then` — o bloco deixou de existir.
+2. O campo se monta com `fieldRoot(nm) .. "_" .. num`, com o número casado por `_?(%d+)$`.
+   `cboSpeciality1` ! `speciality_1` (§V346d): a grafia velha, `string.sub(nm, 4)`, respondia
+   `Speciality1` & `sheet[field]` saía `nil`, calado.
+3. **1** append do órfão, depois do laço & dentro do `if hit == nil` (§V135, §B38). O laço já
+   segura `current` quando ele ∈ `vals` (os 2 testes deixam `raw == current` passar) ∴ o que
+   chega no append é só o caso do item RENOMEADO.
+
+**`odd` passou a significar 3 coisas, ⊥ 1** (§V346c): o filtro derrubaria · a época do `road`
+derrubaria · **a lista autorada ⊥ carrega mais o valor**. A 3ª é a de §B91 & precisa de uma
+varredura de `vals` — é ela que põe o órfão na chave do memo.
+
+**2 checks velhos reagiram, & os 2 estavam certos em reagir:**
+- **§V242** acendeu em `if not has then` — 4 palavras sem pontuação casam o padrão de "comentário
+  que perdeu o `--`". Virou `if (not has) then`. O check ⊥ foi tocado.
+- **§V272c** cobrava `string.match(nm, "_%d+$")` LITERAL, que é a grafia que §T793 substituiu.
+  Emendada p/ `_?(%d+)$` — aceitar a velha seria deixar o buraco do `speciality` voltar. **⊥
+  estava na linha do §T** ∴ é a pergunta 2 da rodada.
+
+**§V346**, 5 pernas + zero-guard, & as **4** mutações de §T794 acenderam: `current` de volta p/
+dentro do `if filter` ! (a) · append apagado ! (b) · chave do memo sem o `odd` ! (c) ·
+`string.sub(nm, 4)` servindo o speciality ! (d).
+
+⚠ **O `?` de §B91 segue ABERTO & só `§T795` o responde**: se o `comboBox` em branco DEVOLVEU o
+vazio p/ o campo, ficha salva antes do conserto ⊥ volta sozinha. ⊥ escrever nenhum dos 2 lados
+como fato antes do teste na tela.
+
+### O `pcall` de `popOpen` saiu
+
+`popOpen` fazia `pcall(require, "desc" .. kind .. "_" .. lang .. ".lua")` & o comentário dizia,
+com todas as letras, que era andaime p/ a rodada em que `descMerit_*` & `descBackground_*` ⊥
+existiam. Os 2 existem desde §T751 & §T765, §V210 mantém as **12** metades na raiz do plugin, &
+o `require` ficou igual aos outros 5. Deixá-lo seria comentário mentindo sobre o código (§B73).
+
+## 138ª RODADA (2026-08-28) — as 3 respostas do user, `/ck:spec` & o `Cannibal` consertado
+
+### O que os livros novos mudaram
+
+O user pôs `Books/Werewolf/` (**7** PDFs) & `Books/Mago/Mage - The Ascension`. Medido antes de
+usar: `w20` core é **EN**, offset **2** (46 votos, rodapé `298  WEREWOLF…` na pdf 300);
+`Mage - The Ascension` é **EN**, offset **1** (333 votos, `Chapter Six: Creating the Character
+299` na pdf 300); `Lobisomem W20 - A idade das Trevas` é **PT** (0 "Merit", 26 "Antecedente").
+
+Com isso o `research/bg_essence.tsv` foi **REFEITO**: os **5** nomes que a 137ª deixou com `?`
+saíram medidos em `w20` **135-140** (`Ancestors` 136 · `Fetish` 137 · `Kinfolk` 138 ·
+`Pure Breed` 138 · `Rites` 139), e as **27** linhas de Mage trocaram de fonte.
+
+**§B90 — e ⊥ foi só o texto que mudou, a PÁGINA mudou.** A edição PT do M20 ordena a lista de
+Antecedentes pelo nome **português** ∴ `Library`/`Biblioteca` é p.**309** no PT & p.**318** no
+EN; `Status` é 326 no PT & **325** no EN. Seriam páginas erradas impressas na caixa que o
+jogador lê, e ⊥ ∃ check que pegue isso — §I21 ⊥ tem como saber se o número está certo.
+
+### `Totem` também parte em 2 — & foi o livro que decidiu
+
+`m20` p.326: `shamans swore pacts with spirit helpers` — pacto PESSOAL. `w20` p.140:
+`a Background that applies directly to the character's PACK, rather than the individual…
+the pack spends all of the points`. Muda o que se compra & quem paga ∴ `Totem (Mage)` +
+`Totem (Werewolf)`, & a lista de antecedente fechou em **47** itens.
+
+O contraste que trava o critério (p/ ⊥ virar mania de dividir): `Resources` repete a MESMA
+frase em `core` p.115 & `w20` p.138 (`actual cash, but as this Background increases…`) ∴ 1 item.
+Os outros 10 homônimos entre jogos ficaram com 1 item pelo mesmo teste.
+
+### `/ck:spec` rodado (resposta 3 do user)
+
+Escrito: **§R130** (`Obertus` pelo 2º eixo, MEDIDA) · **§R131** (livros novos) · **§R132**
+(`Totem`) · **§R133** (a forma do `System` nos 8 módulos) · **§I102g** (chave composta) ·
+**§I104e** (a forma do `descNumina`) · **§I105b** emendada · **§V344** · **§V345** ·
+**§B87-B90** · **§T791** & **§T792** (nascidas & já fechadas nesta rodada).
+
+**§T786 fechada c/ veredito "⊥ muda nada":** as 2 fraquezas da `Obertus` foram lidas lado a
+lado — `da` p.454 `Obsession Derangement` sobre uma área de conhecimento escolhida · `gr` p.102
+`Obsessive-Compulsive` p/ a maioria & `Megalomania` p/ a linha Narov. As 2 param em
+PERTURBAÇÃO, que esta ficha ⊥ modela ∴ ⊥ é o caso `Grimaldi` (lá o lado medieval trazia NÚMERO,
+`only eight blood points`). §V342 já estava certa; o que faltava era a leitura.
+
+### §T791/§T792: o `Cannibal` deixou de comer o irmão
+
+`Cannibal` é Qualidade (`lotc` p.106) **&** Defeito (`gr` p.136) & o módulo de descrição é 1
+tabela PLANA por nome ∴ ∃ 2 `["Cannibal"]` no arquivo & em Lua a 2ª sobrescrevia a 1ª, calado.
+Consertado c/ chave COMPOSTA (`merit|Cannibal` / `flaw|Cannibal`) nos 2 idiomas, `popOpen`
+ganhou o 4º argumento `sub` (opcional, composta primeiro & nua depois ∴ as outras 645 ⊥ mudam)
+& **§V344** entrou no gate c/ 5 pernas. **⚠ o PT também estava errado**: os 2 corpos EN são
+DIFERENTES & o TSV tinha 1 só ∴ os 2 mostravam o mesmo texto — o corpo PT da Qualidade foi
+escrito nesta rodada (`merit|Cannibal`, `merit_flaw_body_pt.tsv` foi p/ 647 linhas).
+
+### §B87 — a correção da 137ª estava para o LADO ERRADO, & foi o `grep` que enganou
+
+A 137ª achou que `gen_merit_data.ps1` emitia LF onde a casa usava CRLF & "provou" o conserto
+c/ igualdade byte a byte contra o `descMerit_en.lua` instalado. Isso só provava que ele batia
+c/ **aquele arquivo**, ⊥ c/ a casa. §V345, ao nascer, acendeu em **8** módulos de uma vez, e a
+contagem por BYTE fechou a questão:
+
+| módulo | CR | LF |
+|---|---|---|
+| `descDisc` `descNumina` `descPath` `descRitual` (×2 idiomas) | **0** | 1284 / 1474 / 2076 / 3507 |
+| `descMerit_en` `descMerit_pt` (antes) | = LF | 8447 / 6857 |
+
+∴ **a casa é LF** & os 2 `descMerit_*` é que eram o desvio. Quem disse o contrário foi
+`grep -c $'\r'`, que naquela invocação ⊥ interpretou o `\r` — o mesmo `grep` já tinha dito que
+a `localization.lang` era CRLF quando ela ⊥ tem 1 CR. Gerador corrigido nos 2 pontos (literal
+**&** junção das linhas), os 2 módulos regerados, & §V345 cobra LF dos 10 lendo BYTE.
+
+### §V336 & §V210, o que elas dizem hoje
+
+- §V336: `47 items with 'Artifacts' between 'Armory' and 'Avatar' … each of the 4 origin
+  suffixes with a sibling, and leg (e) MEASURED NOTHING because descBackground_*.lua are not
+  at the plugin root yet (SPEC T765)` — a perna (e) está ARMADA & anuncia que ⊥ mediu.
+- §V210: `5 areas in 10 modules, 1081 entries keyed alike on both sides`.
+
+### As 6 mutações da rodada (§V20), todas acenderam
+
+§V344: chave nua duplicada · `merit|Cannibal` sem irmão · prefixo em nome de 1 lista só ·
+`popOpen` c/ chave literal. §V345: 1 `desc*.lua` reescrito em CRLF. §V333 precisou de emenda
+junto — ela fixava a assinatura `popOpen(from, kind, key)` literal & o 4º argumento a
+reprovava; virou `key(, sub)?`, c/ os 3 primeiros ainda presos na ordem.
+
+
+## 137ª RODADA (2026-08-28) — §T751 fechada, a lista de antecedente decidida & §T768 travada
+
+### §T751: os 31 corpos PT que faltavam
+
+`research/pt_body.ps1 -Append` levou `merit_flaw_body_pt.tsv` de **615** para **646/646**.
+`gen_merit_data.ps1` então gravou `descMerit_pt.lua` (**566.159 B**, 647 entradas) e ela foi
+instalada no plugin.
+
+**O vocabulário seguiu a régua** (`descDisc_pt` é quem manda, ⊥ o `.lang`): `Celerity` =
+**Celeridade** (16× em `descDisc_pt`; o `.lang` diz `Rapidez`, que é o item do dropdown, outra
+superfície) · `Dementation` = **Demência** · `True Brujah` = **Verdadeiros Brujah** (do `.lang`)
+· `Protean` = **Metamorfose** · `Beast Form` = **Forma da Besta**.
+
+O lixo do corpo EN ⊥ foi para o PT, como o HANDOFF anterior mandava: `Twin Link` engolia a
+entrada `Wild Talent` inteira (que ⊥ ∃ como chave nos 646) · `True Love` tinha `Mer- 493 it`
+no meio · `Vitae Mutation` acabava em `60 KIASYD` · `Tracker's Mark` veio com as 2 colunas
+intercaladas e o PT foi RECONSTRUÍDO dos pedaços.
+
+### §B novo em potencial — o gerador emitia LF dentro do literal
+
+`descMerit_en.lua` recém-gerado diferia do INSTALADO em **6486 linhas** sem **1 char de texto**
+diferente: `gen_merit_data.ps1` montava o bloco com `` `n `` (LF) enquanto os 8 módulos de
+descrição que a ficha já carrega — e o `descMerit_en.lua` instalado — usam **CRLF em toda
+linha**. Corrigido na função `Blocks`, e a prova é dura: depois da correção o `descMerit_en.lua`
+gerado ficou **byte a byte igual** ao instalado. Sem isso, `descMerit_pt.lua` entraria com uma
+forma de fim-de-linha que nenhum outro módulo usa.
+
+### §V210 cresceu de 4 áreas para 5
+
+A lista de áreas de §V210 era literal de 4 (`descDisc` `descNumina` `descPath` `descRitual`) ∴
+`descMerit` nasceria FORA dela. Virou `$v210Areas` com `descMerit`/`MERIT_DESC` junto & a
+mensagem de Pass passou a derivar as contagens da lista, em vez de trazer "four areas in eight
+modules" escrito à mão. Agora: **5 áreas em 10 módulos, 1081 entradas iguais dos 2 lados.**
+Mutação rodada: apagar `Well-Rounded` da metade [pt] ! VERMELHO em §V210a.
+
+### §T764: a medição que decidiu a lista de antecedente
+
+`research/bg_essence.tsv` — 1 linha por (nome, livro), `<nome EN>\t<jogo>\t<livro>\t<pág>\t
+<essência>`. Instrumentos: a calha de `extract_merit_flaw.ps1` reusada numa sonda de scratchpad.
+
+**A bolinha de nível do V20 core sai como `U+FFFD`**, ⊥ `U+2022` — é glifo próprio que o
+`pdftotext` ⊥ mapeia. A 1ª sonda deu **0 candidatos** por causa disso. Armadilha nova.
+
+**O M20 PT decora o cabeçalho**: `Arcano/Camuflagem` · `Avatar/Gênio` · `Capela/Construto` ·
+`Sanctum/Laboratório $` · `Armas Secretas*` · `Sonhos/Hiper Ecrã` · `Aprimoramento $`. Casar o
+nome exato dava 0; foi preciso tirar `*`/`$` e aceitar a barra.
+
+**A decisão de §I105b, tirada da tabela:** 13 dos 45 nomes existem em mais de 1 jogo. **11
+ficam com 1 item** (`Allies` `Alternate Identity` `Contacts` `Fame` `Influence` `Library`
+`Mentor` `Rank` `Requisitions` `Resources` `Retainers`) — são traços do mundo mortal que os 2
+livros descrevem igual, e um `(Origem)` ali ⊥ separaria mecânica nenhuma. **`Status` vira 2**:
+V20 p.118 é pé dentro da comunidade Kindred (vem do senhor/linhagem na Camarilla, da matilha no
+Sabá); M20 p.326 é reputação entre pares Despertos e só em 4-5 alcança grupos aliados — duas
+escadas sociais que ⊥ convertem uma na outra, e é o exemplo que o próprio user deu.
+**`Totem` fica em aberto**: lado Mage medido, lado Werewolf sem livro.
+
+### §V336, 6 pernas, & a perna que anuncia que ⊥ mediu nada
+
+(a) `Artifacts` entre `Armory` & `Avatar` · (b) `wod.Node`=`Nodo` & `wod.Pure Breed`=`Raça Pura`
+LITERAIS no [pt] e o inglês intacto no [en] · (c) ⊥ ∃ item 2× · (d) ∀ `Nome (Origem)` tem irmão
+· (e) ∀ item tem chave em `descBackground_en` & `_pt` · (f) zero-guard.
+
+`descBackground_*` ⊥ ∃ ainda (§T765) ∴ a perna (e) ⊥ tem o que medir — e o **Pass diz isso em
+voz alta**: `…and leg (e) MEASURED NOTHING because descBackground_en.lua and _pt.lua are not at
+the plugin root yet (SPEC T765)`. É o oposto de §B7: em vez de passar calado sobre nada, o
+check soletra o que ⊥ mediu. As **6** mutações rodaram, inclusive a (e), com um par de módulos
+de stub — e a (e) acendeu nos 2 modos (só uma metade ∃ · as 2 ∃ e faltam chaves).
+
+`Raça Pura` entra no gate como `"Ra" + [char]0xE7 + "a Pura"`: o `.ps1` ⊥ tem BOM ∴ literal
+acentuado chegaria mojibake e a comparação falharia CALADA (§B84). O gate ficou **100% ASCII** —
+tinha 1 `Â§T681` sobrando num comentário de §V307, corrigido.
+
+### §T680 & §T749 estavam prontas e marcadas errado
+
+§V307a já usava **1** literal (`$clear307 = 1`) e a mensagem de Pass já o soletra. A mutação que
+§T680 pedia (`ORN_MARK2` de volta a 7) foi rodada e **acende §V315** — a relação
+`ORN_FIL_MARK + ORN_FIL_CROSS == ORN_MARK2` — que é o que prova que a constante é lida de
+verdade; a sonda `ORN_SUB_MARK` ficou verde em §V307a e §V308. §T749 tem `merit_flaw.tsv`
+inteiro e §V343 o mede (782 linhas, 641 nomes, 0 órfão). As 2 viraram `x`.
+
+
+## 136ª RODADA (2026-08-28) — §T790 fechada & 615 dos 646 corpos PT
+
+### §T790: a decisão de layout do user, buildada
+
+O user pediu **3 partes de 1 decisão só**: `BACKGROUNDS` −6, as caixas à direita das tabelas
+−15 cada, & **todo** o espaço liberado p/ o NOME da qualidade/defeito. Buildado & instalado:
+
+| caixa | antes | agora |
+|---|---|---|
+| `BACKGROUNDS` | `0` `370` | `0` **364** — as 21 linhas seguem `300` & andaram `left 35`→**32** |
+| `MERITS` & `FLAWS` | `375` `485` | **369** **536** |
+| col 1 · 2 · 3 (11 caixas) | `865` `1110` `1355`, `240` | **910** · **1140** · **1370**, **225** |
+
+Dentro das tabelas: linha `20/496` · `?` **0/20** · nome **20/246** · livro 266/80 · página
+346/100 · custo 446/50, & os 4 cabeçalhos em 40/246 · 286/80 · 366/100 · 466/50.
+Fecha em **1595** = 364+5+536+5+225+5+225+5+225 — o mesmo x de antes, vãos de 5 intactos.
+
+**O ganho real:** o nome em 246 contra o pior nome em [pt] a 240 ∴ **0 de 646 cortam** (eram 2).
+
+### §B86 — a régua de largura tem 2 DONOS, & medir pelo dono certo ⊥ basta
+
+A 1ª escrita de §T790 mandava as linhas de antecedente p/ **294**, o que arrasta o picker p/
+**164**. Medi por **§V196**, que escolhe a régua pelo `fontSize` do próprio controle (§V312a):
+12pt ∴ 6,0 px/char, `Identidade Alternativa` pede 132 + 24 da seta = **156**, cabe. O gate saiu
+VERMELHO em **§V312c**, que ⊥ usa a régua do controle: ela cobra de TODO
+`comboBox[@fontSize='12']` fora dos 4 de §I86d que siga passando na régua VELHA de **6,5** ∴
+143 + 24 = **167**. O picker tinha folga p/ 3, ⊥ p/ 6.
+
+Consertado **sem gastar largura nenhuma**: os 6 saíram do AR (linhas `left 35`→32, `width`
+segue 300), que é também a leitura mais literal do pedido do user ("3 da esquerda e 3 da
+direita **do conteúdo**"). `OpenAbility` & `OpenAbilityFreeRow` ⊥ foram tocados.
+
+### 2 COISAS QUE O HANDOFF ANTERIOR DIZIA & A LEITURA DO GATE DESMENTIU
+
+- **"§V290 tem de ser emendada junto, os x mudam"** — FALSO. §V290 ⊥ carrega literal de x:
+  lê o template, cobre encaixe sem costura (`L+W ≡ próximo L`) & 1 cabeçalho em `rowL + c.L`
+  c/ a MESMA largura. A geometria nova passou nela **sem 1 char de emenda**.
+- **"§V69 lê o mapa do topo do `WoD20.2.lfm`"** — §V69 lê o mapa do **`.1`**. Nada no gate lê o
+  do `.2`. Ele foi reescrito assim mesmo (§B73 como PRÁTICA: comentário que mente sobre
+  geometria), mas ⊥ ∃ check por trás dele.
+
+### A METADE PT DE §T751: 615 de 646, & a bancada ficou no repositório
+
+`research/pt_body.ps1` (novo, ASCII-only por §B84) substitui as 3 ferramentas de scratchpad da
+rodada: `-Plan` diz quanto falta, `-Next` imprime o próximo lote de corpos EN tirados do
+`descMerit_en.lua` JÁ INSTALADO, `-Append` valida & anexa. O corpo EN sai do `.lua` & ⊥ do PDF
+porque o `.lua` já tem as 647 chaves finais & os 3 blocos de §I21.
+
+**491.203 chars** de corpo EN no total, média 759. Em 34 lotes de ~13k chars saíram **615**.
+Faltam **31**, do `The Company of Saints and Heroes` em diante.
+
+O que a leitura de 615 corpos, um a um, revelou está na seção **⚠ O CORPO EN ESTÁ SUJO** lá em
+cima — inclusive os **3** defeitos que existem no livro & ⊥ ∃ como entrada na ficha, & a
+**chave duplicada `Cannibal`** em `descMerit_en.lua`, que é a coisa mais séria da rodada
+porque o gate ⊥ a pega.
+
+### O QUE ENTROU NO SPEC
+
+`§T790` reescrita p/ dizer o que foi construído · `§B86` NOVA · `§V196` ganhou o ponteiro p/ o
+2º dono da régua. ⊥ nasceu §V novo: §V312c pegou o caso na 1ª rodada do gate, que é p/ isso que
+ela ∃.
+
+
+## 135ª RODADA (2026-08-28) — LEIA ESTA PRIMEIRO
+
+Gate **VERDE, 603 ok, 0 FAIL**, com `-Build`. `.rpk` **2.214.481 → 2.496.355 B**, instalada.
+**§T750 e §T788 FECHADAS**, `§T751` metade. `§T749` segue `~` (o extrator fechou; falta o
+`.tsv` por livro que o texto dela pede, e ele deixou de fazer falta).
+
+### O PROBLEMA DA 134ª, RESOLVIDO NA RAIZ
+
+O extrator de corpo lia página de 2 colunas como se fosse 1. O fim de um corpo só é confiável
+quando se acha o **cabeçalho seguinte**, e numa página de 2 colunas ele está na OUTRA coluna, a
+centenas de linhas na ordem de leitura — daí os **17 corpos inchados** e os 2 vazios.
+
+**Cura: `pdftotext -layout -enc UTF-8` + corte na CALHA por página** (`Find-Gutter` /
+`Split-Page` em `research/extract_merit_flaw.ps1`). O `-layout` põe as colunas lado a lado
+separadas por uma calha de espaços; o extrator acha a calha **por página** e corta cada linha
+nela, lendo esquerda inteira → direita. Aí o cabeçalho seguinte volta a ficar logo abaixo.
+
+| medida | antes | depois |
+|---|---|---|
+| `Simply Waiting` (`lob` p.16) | **4425** chars | **488** (o real) |
+| corpo vazio | 2 | **0** |
+| corpo total | 759 KB | **573 KB** — a queda é junk, ⊥ texto bom (mediana 517 → 502) |
+| linhas do `.tsv` com corpo | 782 de 783 | **782 de 782** |
+
+### A LIÇÃO ⊥ É A CALHA — É QUE **COMPRIMENTO ⊥ ACUSA NADA**
+
+O CSV ganhou a coluna **`Stop`**, que diz POR QUE o corpo parou, e é ela que separa confiável
+de duvidoso: **`head` 711** (achou o cabeçalho seguinte — único fim confiável por construção) ·
+`cut` 47 · `sect` 12 · `page` 4. Corpo de **6296** chars que fechou em `head` está CERTO
+(`bos` e `gr` têm entradas longas de verdade); corpo de **921** que atravessou 2 páginas está
+ERRADO. A 134ª caçava por tamanho e por isso conferia 58 entradas boas.
+
+O corte por "linha com cara de título", **reprovado na 134ª** por comer 24% do texto bom, foi
+reabilitado numa forma diferente: ele só toca os corpos que **⊥ acharam o cabeçalho seguinte**.
+Nessa forma derrubou `Plague of Demons` de 4686 p/ **527** (fim exato) e `Unholy Stain` de 3826
+p/ **518**, sem tocar 1 char dos 711 confiáveis.
+
+### 5 DEFEITOS ACHADOS PELO CAMINHO, TODOS MEDIDOS
+
+1. **As 81 linhas do `da` estavam SEM TIPO desde a §T749** e ninguém viu, porque nada as lia.
+   A notação 4 (`Ambidextrous (1 point):`) ⊥ diz Merit nem Flaw — o tipo vem do cabeçalho de
+   seção, e o extrator ⊥ o guardava. Corrigido: **27 Merit + 54 Flaw**. Virou **§B83** e
+   **§V343a**. Dado que ninguém lê ⊥ tem gate ∴ apodrece calado.
+2. **Caractere ⊥ ASCII em regex de `.ps1` sem BOM ⊥ dá erro — dá SILÊNCIO.** O extrator velho
+   tinha o apóstrofo curvo LITERAL nos regex; o PowerShell 5.1 lê `.ps1` sem BOM como ANSI ∴
+   com `-enc UTF-8` as **15** entradas com apóstrofo sumiam e **783 viravam 768, saindo 0**.
+   O diagnóstico de 1ª hora culpou a FLAG e quase gravou "⊥ pôr `-enc`" na receita — o que
+   deixaria o corpo inteiro em Latin-1, com travessão virando **U+FFFD**. A causa era o SCRIPT.
+   Virou **§B84**. O de hoje é 100% ASCII e roda COM `-enc UTF-8`.
+3. **`§I100d` prometeu "⊥ ∃ nome em comum entre qualidade & defeito — CONFERIDO antes de
+   valer"** e a conferência só rodou 2 rodadas depois. Ela achou **1**: `Cannibal`, Merit 1pt
+   (`lotc` p.106) e Flaw 3pt (`gr` p.136). ∴ o módulo nasce com **2** tabelas. Virou **§B82**.
+4. **`§V340a` exigia `cost` ⊥ vazio** e 2 entradas ⊥ TÊM custo no livro (`Construct` e
+   `Stormwarden`, m20va p.122, notação 7 imprime só a categoria). A perna obrigava a INVENTAR
+   número. Emendada com os 2 NOMEADOS.
+5. **A linha `Japheth lob 4` era ponto de SUMÁRIO**; o item real é `Disciple of Lazarus /
+   Japheth` (`lob` p.48), que já estava na lista. 783 → **782** linhas.
+
+### A ORIGEM EM [pt] FOI ALINHADA NA FICHA INTEIRA (user 2026-08-28)
+
+`Bratovich (Trevas)` estava ERRADO — o user corrigiu p/ `Bratovich (Idade das Trevas)`, & a
+mesma régua passou nas outras 4 de época: `(Moderna)` → `(Era Moderna)` em `Bratovitch`,
+`Grimaldi` & `Gárgulas`. PAPEL ⊥ é origem: `Gárgulas (Batedoras)`/`(Sentinelas)`/`(Guerreiras)`
+ficam. A tabela única está no `research/merit_flaw_dedupe.md` & o gerador a usa.
+
+⚠ **O gate mordeu na hora**: §V196 acusou `cboClanFamily` de **192px** com o item novo pedindo
+**206** — combo CORTA, ⊥ quebra linha. §I30 já tinha decidido quem cede ("a COLUNA, ⊥ a lista")
+∴ o combo & o gêmeo digitado foram p/ **210**, & a coluna seguinte segue em 394 (§V224). Foi o
+check achando um estrago de tradução ANTES da tela.
+### O QUE ENTROU NO SPEC
+
+`/ck:spec` rodou em modo BACKPROP: **§I100d** e **§V340** emendadas · **§V342** ESCRITA (a
+dívida da `Obertus` — o gate já a implementava e reservava o número) · **§V343** NOVA ·
+**§B82…§B85** · **§T750** e **§T775** emendadas · **§T788** NOVA, e já `x`.
+
+### O QUE FOI CONSTRUÍDO
+
+- **`meritData.lua`** (novo, 60 KB) — `MERIT_DATA` **310** + `FLAW_DATA` **336**,
+  `return { merit = …, flaw = … }`. Módulo próprio, ⊥ `<script>` de `.lfm` (§I100g).
+- **`PICKER_LIST["merit"]` / `["flaw"]`** no `WoD20th.lfm`, 311 e 337 itens com o vazio.
+- **634** chaves `.lang` novas em [pt] e em [en] + **634** no mapa PT do `WoD20.6.lfm`
+  (as outras 11 já existiam e as traduções BATERAM, 0 conflito).
+- **`descMerit_en.lua`** (novo, 571 KB) — **646** entradas na forma de 3 blocos de §I21.
+- **`research/gen_merit_data.ps1`** (novo) — o gerador único: lê `merit_flaw.tsv` +
+  `merit_flaw_pt.tsv` + as 3 regras de `merit_flaw_dedupe.md` e escreve tudo acima.
+- **§V340 + §V343 no gate**, com as 6 mutações rodadas antes de aceitar.
+
+### A LISTA FINAL, MEDIDA
+
+**646 itens** = **310 Merit + 336 Flaw**, de 641 nomes em 782 linhas, mais os 5 desdobramentos
+da Regra 3 (`Bound` `Apostate` `Loyalty` `Oathbreaker` `Berserker`), mais `Cannibal` contado nas
+2 listas. **645 chaves `.lang` distintas.** O `merit_flaw_dedupe.md` previa 642 — o número que
+vale é **646**.
+
+### PRÓXIMO
+
+1. **Os 646 corpos em PT** → `research/merit_flaw_body_pt.tsv` → `descMerit_pt.lua` → §T751 `x`.
+2. **A sonda de tela da Q23**, que destrava §T756/§T783/§T784.
+3. **§T764** (antecedentes), que ⊥ depende de nenhuma das duas.
+
+
+## 134ª RODADA (2026-08-28) — SUPERADA PELA 135ª (o extrator foi reescrito e o aceite bateu)
+
+Gate **VERDE, 599 ok, 0 FAIL**. `.rpk` inalterada. Rodada de **pesquisa**.
+
+### O PROBLEMA DE VERDADE: LAYOUT DE DUAS COLUNAS
+
+O user mandou o texto real de 3 entradas, e a comparação expôs o que os números escondiam:
+`Simply Waiting` real tem **488** chars e a extração dava **4425**. ⊥ era "ilegível" — era
+**INCHADO**, seguindo adiante para dentro de uma tabela de ritual.
+
+**Diagnóstico:** o fim de um corpo só é confiável quando se acha o **cabeçalho seguinte**. Em
+página de 2 colunas o cabeçalho seguinte está **na outra coluna** ∴ a centenas de linhas de
+distância na ordem de leitura, e o corpo corre até o teto.
+
+⊥ ∃ modo do `pdftotext` que resolva: **`-raw` acerta a ordem & cola as palavras**; o **padrão
+limpa as palavras & erra a ordem**. Os dois foram medidos.
+
+### QUANTOS ESTÃO INCHADOS — medido, ⊥ estimado
+
+Cruzei o modo padrão contra a extração `-raw` (que acerta a ordem): dos **58** corpos acima de
+3000 chars, **17 são suspeitos** (padrão ≥ 1.8× o `-raw`). Conferi a cauda de 6 deles e **os 6
+estão inchados**, cada um caindo em coisa diferente:
+
+| entrada | livro/pág | tem | cauda cai em |
+|---|---|---|---|
+| `Simply Waiting` | lob 16 | 4425 (real **488**) | tabela do ritual de Re-Abraço |
+| `Child` | bos 39 | 3195 | o texto do Defeito `Impediment` |
+| `Dreadful Mara` | lob 60 | 4844 | custo em XP de um poder + rodapé |
+| `Innocent` | hh 142 | 8849 | regra de alquimia de metais |
+| `Paradise Lost` | hh 125 | 9234 | `Chapter Six: Organizations and Resources` |
+| `Occult Library` | gr 139 | 7741 | `CHAPTER FIVE: CHARACTER CREATION` |
+| `Sanctuary` | hh 44 | 5912 | regra de pontos de experiência + rodapé |
+
+Os outros 11 suspeitos: `Unproven` lotc 123 · `Kashaph` rob 100 · `Well-Rounded` m20va 119 ·
+`Rat in a Cage` lotc 87 · `Shadow Walker` lotc 107 · `Devil's Mark` bos 83 ·
+`Banshee-in-Waiting` lob 26 · `Incoherent` lotc 163 · `Lost Svadharma` lotc 183 ·
+`Ravnos Jati` dac 101 · `Nine Lives`/`Aging` (⊥ conferidos um a um).
+
+⚠ Os **39** "confirmados pelo `-raw`" ⊥ são prova de que estão certos — os 2 podem estar
+inchados juntos. O que a comparação prova é só que **⊥ divergem entre si**.
+
+### ⛔ UMA CURA TENTADA E REPROVADA
+
+Cortar o corpo em **"linha com cara de título"** (curta, capitalizada, sem pontuação no fim).
+Consertava o `Simply Waiting` (4425 → 266) **e comia 24% do texto bom do corpus** — a mediana
+caiu de 517 p/ 489 e o total de 759 KB p/ 578 KB. **REVERTIDO. ⊥ repetir.**
+
+### ✅ O CAMINHO CERTO, JÁ TESTADO: `-layout` + corte na CALHA
+
+`pdftotext -layout` preserva as colunas **lado a lado** na mesma linha, com uma **calha** de
+espaços entre elas. Medido em 3 livros diferentes:
+
+| livro | página | calha na coluna | em quantas linhas |
+|---|---|---|---|
+| `lob` | 17 | 61 | 43 de 50 (**86%**) |
+| `hh` | 126 | 66 | 46 de 55 (**84%**) |
+| `gr` | 140 | 59 | 38 de 56 (**68%**) |
+
+∴ dá p/ **achar a calha por página** (a coluna onde a maioria das linhas tem branco), **cortar
+cada linha nela** e ler as 2 colunas na ordem certa. Aí o cabeçalho seguinte volta a ficar
+**logo abaixo** do corpo e o problema **desaparece na raiz** — junto com os 2 corpos vazios, que
+são a mesma doença pelo outro lado.
+
+**É uma reescrita do extrator, ⊥ um remendo.** Fazer numa sessão fresca.
+
+### O QUE FICA VALENDO ATÉ LÁ
+
+`research/merit_flaw.tsv` (783 linhas · 642 nomes) · `merit_flaw_pt.tsv` (642, 0 órfãs) ·
+`merit_flaw_dedupe.md` · **`merit_flaw_overrides.tsv`** com os **3** textos que o user copiou do
+livro (`Isolated Upbringing` gr 129 · `Discerning Palate` bh 177 · `Simply Waiting` lob 16).
+
+⚠ **⊥ gerar `descMerit_en.lua` antes de refazer o extrator.** 17+ corpos entrariam com texto de
+outra entrada colado no fim, e isso é o que o jogador leria na caixa do `?`.
+
+### PRÓXIMO
+
+1. **Reescrever o extrator de corpo com `-layout` + calha.** Aceite: `Simply Waiting` = 488
+   chars, 0 corpos vazios, e nenhum corpo acima de 3000 sem conferência.
+2. **`T751`** — `descMerit_en.lua` na forma de §I21, com o extrator novo.
+3. **`T750`** — `meritData.lua`, listas e `.lang`, aplicando o dedupe já decidido.
+
+
+## 133ª RODADA (2026-08-28) — corrige a 132ª
+
+`.rpk` inalterada. Gate **VERDE, 599 ok, 0 FAIL**. Rodada de **pesquisa**.
+
+### ⚠ TROQUEI O MODO DE EXTRAÇÃO — a 132ª está DESATUALIZADA nos números
+
+47% dos corpos extraídos saíram com **palavras coladas**
+(`sufferahigherdifficultyifyouu`) — texto que o jogador ⊥ conseguiria ler na caixa do `?`.
+A causa é o `pdftotext -raw`: ele devolve ordem de leitura (por isso a armadilha 1 o escolheu)
+mas **perde os espaços** que o PDF codifica como posicionamento.
+
+O **modo PADRÃO** (sem flag nenhuma) resolve, e ⊥ funde as colunas como o `-layout` faria.
+Medido nos 15 livros:
+
+| | `-raw` | **padrão** |
+|---|---|---|
+| palavras coladas no texto inteiro | 16.745 | **1.181** (6 livros a ZERO) |
+| corpos de qualidade/defeito sujos | 365 de 770 | **8 de 783** |
+| entradas encontradas | 770 | **783** |
+
+**Virou armadilha 8 do `research/README.md`**, com a regra: *nome e campo curto → `-raw`;
+parágrafo que o jogador vai LER → modo padrão.*
+
+### O QUE ISSO CONSERTOU SOZINHO
+
+- **Os 5 nomes GRUDADOS acabaram.** `FleshoftheCorpse`, `TouchofFrost`, `SpiritMentor`,
+  `LinguaFranca`, `HarbingeroftheAbyss` vieram com espaço e ⊥ ∃ mais nada a fundir à mão.
+- **`Mark of Caine` saiu**: era **falso positivo** — só aparece em prosa (`"twisted by the mark
+  of Caine"`), nunca como cabeçalho de Qualidade.
+- **`Technobabbler` virou `Esoteric Discourse / Technobabbler`**, que é o nome inteiro que o
+  `bos` p.4532 imprime. O `-raw` cortava o nome ao meio.
+- **6 entradas novas** que o `-raw` perdia: `Japheth` (`lob` p.457), `Demonic Patron`,
+  `Unholy Stain`, `Harbinger of the Abyss`, `Lingua Franca`, e o composto acima.
+
+### UM GUARDA NOVO, E UM ERRO DELE QUE EU PEGUEI
+
+`tos` p.900 é linha de **sumário** com 4 entradas coladas
+(`Unholy Worship Blasphemous Pact (6 pt...) Demonic Patron (5 pt...) ...`) e virava um nome
+inventado. Guarda: **linha com mais de um custo entre parênteses ⊥ é entrada**.
+
+⚠ O guarda cru comeu junto a `Unclean` (`da` p.421), que é **legítima** — a forma do `da` traz
+prosa na mesma linha, e a prosa dela tem um 2º parêntese com pontos
+(`"...receive only 1 point for it and must take its full effects (3 points)"`). Afinado para
+⊥ valer na forma com dois-pontos. **Um guarda de sumário ⊥ pode ser cego à notação do livro.**
+
+### NÚMEROS FINAIS — ZERO ilegível, ZERO vazio
+
+**642 nomes distintos** em **783 linhas** · **0 corpos ilegíveis** · **0 corpos vazios**.
+
+Depois da troca de modo sobraram **10** corpos ruins, e os 10 foram consertados:
+
+**8 embaralhados, todos do `lob`** (`Simply Waiting` p.16 · `Banshee-in-Waiting` p.26 ·
+`Blood Weakness` p.37 · `Shadow Scarred` p.48 · `Dreadful Mara` p.60 · `Body Trail` p.70 ·
+`The Eighth` p.80 · `Mortal Flashbacks` p.91). ⊥ era o modo de extração: o corpo estava
+**passando do fim da entrada** e engolindo **página de abertura de capítulo**, que é epígrafe
+e arte em fonte decorativa — e fonte decorativa a camada de texto devolve embaralhada.
+2 guardas novos: **descrição ⊥ atravessa 2 viradas de página**, e **linha com 22+ letras
+seguidas ⊥ é prosa** e sai fora.
+
+**2 vazios** (`Isolated Upbringing` `gr` p.129 · `Discerning Palate` `bh` p.177). Causa:
+página de **DUAS COLUNAS** em que o `pdftotext` devolve o cabeçalho da coluna A, depois o da
+coluna B, e só então os dois corpos — fora de ordem. O parser dá o corpo de B para B e deixa A
+vazio. **2 casos em 783**: ensinar o parser a ler coluna sairia mais caro que o problema, então
+foram preenchidos à mão em **`research/merit_flaw_overrides.tsv`**, que o gerador de `T751` lê.
+⚠ Se a contagem de vazios subir acima de 2, a extração mudou — conferir antes de só somar linha.
+
+**+3 corpos** que estavam vazios por outro motivo (`Construct` · `Enemy` · `Language`, `m20va`
+p.122): a notação 7 traz a prosa **na mesma linha**, depois do parêntese, e o parser só pegava
+isso na forma do `da`. Corrigido.
+
+### O DEDUPE ⊥ MUDOU
+
+As 5 divisões da Regra 3 (`Bound` · `Apostate` · `Loyalty` · `Oathbreaker` · `Berserker`) e as
+regras 0/1/2 seguem valendo — a extração limpa ⊥ mexeu em nenhum dos 61 conflitos julgados.
+
+### PRÓXIMO
+
+`T751` — gerar `descMerit_en.lua` a partir de `mf_bodies4.csv` na forma de §I21, tratando os
+5 corpos vazios. Depois a tradução das 642 descrições, em lotes, ao longo de sessões.
+
+
+## 132ª RODADA (2026-08-28) — NÚMEROS SUPERADOS PELA 133ª
+
+`.rpk` inalterada (**2.214.481 B**, instalada 15:21:02) — rodada de **pesquisa**, ⊥ tocou código.
+Gate **VERDE, 599 ok, 0 FAIL**.
+
+Entregue: **`research/merit_flaw_dedupe.md`** — o dedupe DECIDIDO, com o texto dos livros lido
+lado a lado. É o que destrava `T750` e `T751`.
+
+### O QUE A LEITURA MOSTROU
+
+Extraí o **corpo da descrição** de todas as 770 entradas (**669 KB**, mediana de 517 caracteres,
+**nenhuma vazia**). Com o texto na mão, os **61 casos em conflito** se separaram em 4 grupos:
+
+| regra | casos | o que acontece |
+|---|---|---|
+| **0** — tipo diferente | 1 | ⊥ é conflito: Merit e Flaw caem em **tabelas diferentes** da ficha |
+| **1** — mesma mecânica, mesmo custo | 41 | 1 item, sem sufixo. Precedência do README dá Livro e Página |
+| **2** — mesma mecânica, custo diferente | 14 | **ainda 1 item**: o 12.1 fala em MECÂNICA, ⊥ em preço |
+| **3** — mecânica diferente | **5** | viram `Nome (Origem)` |
+
+**Só 5 nomes** precisam de sufixo: `Bound`, `Apostate`, `Loyalty`, `Oathbreaker`, `Berserker`.
+Todos os outros 91 fundem. O medo de "700 itens com parêntese em tudo" ⊥ se confirmou.
+
+### A REGRA DO SUFIXO, estendida
+
+§I105b dizia "Origem = o jogo". ⊥ basta: `Apostate` é de **dois livros de Vampiro**. A regra que
+os 5 casos exigiram, e que a ficha **já pratica**:
+
+- **jogo** quando os jogos diferem — `Bound (Vampire)` × `Bound (Mage)`
+- **época** quando os 2 são de Vampiro mas de épocas distintas — `Apostate (Dark Ages)` ×
+  `Apostate (Modern)`, do mesmo jeito que `Bratovich (Dark Ages)`
+- **clã** quando é regra de um clã só — `Oathbreaker (Ravnos)`, do jeito de `Obertus (Narov)`
+
+Isto ! virar emenda de §I105b.
+
+### ⚠ DOIS ACHADOS QUE TERIAM ENTRADO SUJOS
+
+1. **`Vengeful` ganhou uma 4ª entrada falsa.** O corpo dela em `gr` p.168 é
+   `"Path of Enlightenment: The Path of Power and the Inner Voice 4 Willpower: 3 …"` — um
+   **bloco de ficha de personagem**, ⊥ um Defeito. O cabeçalho casou por acidente. **Descartada.**
+2. **`Cannibal` ⊥ é duplicata:** `lotc` p.106 é **Qualidade de 1pt** (consegue comer comida) e
+   `gr` p.136 é **Defeito de 3pt** (compulsão por carne humana). Mecânicas **opostas**, e a ficha
+   já as separa em duas tabelas. Um dedupe por nome cru teria fundido as duas.
+
+⚠ `Unbondable` tem **4 custos diferentes em 4 livros** (core 5, bos 4, da 3, gr 6). Funde pela
+precedência (5, do core), mas é o caso que mais vale conferir na tela.
+
+### CONTAGEM FINAL PREVISTA
+
+643 nomes − 5 grudados − 1 erro de parser + 5 desdobramentos = **642 itens**.
+
+### ⚠ A FERRAMENTA WRITE EMITIU LF DE NOVO (§B81)
+
+`merit_flaw_dedupe.md` saiu **0 CR / 91 LF**. Medi e consertei na mesma volta. **Medir
+`CR == LF` depois de TODA escrita por ferramenta** — é a 2ª vez que morde.
+
+### PRÓXIMO — a ordem importa
+
+1. **`T751`** — `descMerit_en.lua`. Os corpos **já estão extraídos**; falta a forma de §I21
+   (livro+pág · 2 linhas · nome · 2 linhas · texto) e o módulo. ⚠ **`descMerit_pt.lua` é o
+   gigante**: 643 descrições para traduzir. Os 8 `.lua` que já ∃ somam 2,8 MB e foram feitos
+   assim, em lotes. **Planejar como trabalho de várias sessões**, ⊥ tentar numa só.
+2. **`T750`** — `meritData.lua` + `PICKER_LIST` + as chaves `.lang`, aplicando este dedupe.
+   ⚠ 632 chaves novas × 3 lugares (`[pt]`, `[en]`, PT map) quase **dobram** o `.lang`.
+3. **`T756`/`T757`/`T761`** · **`T783`–`T785`** · **`T764`–`T767`**.
+
+### ARQUIVOS DE TRABALHO (morrem com a sessão)
+
+`<scratchpad>/txt/*.txt` (texto dos 15 livros) · `mf_raw.csv` · `mf_bodies.csv` (os 669 KB de
+descrição). Reextrair custa ~4 min com os scripts do `research/README.md`.
+
+### PERGUNTA ACUMULADA (⊥ trava nada)
+
+**Q22** — os 84 termos do V20 core marcados `R` em `research/merit_flaw_pt.tsv` valem uma
+passada de olho do user. **Recomendação: ⊥ esperar** — a correção entra depois por substituição
+no `.tsv` e regeneração.
+
+
+## 131ª RODADA (2026-08-28)
+
+`.rpk` inalterada (**2.214.481 B**, instalada 15:21:02) — rodada de **pesquisa**, ⊥ tocou código.
+§T sem mudança (`T749` e `T750` seguem em aberto — ver abaixo).
+
+Entregue: **`research/merit_flaw_pt.tsv`** — os **643** nomes traduzidos, **0 faltando**.
+
+### A TRADUÇÃO — opção C, escolhida pelo user
+
+Só **11** dos 643 já tinham chave `[pt]` na ficha. Faltavam **632**, mais da metade do que a
+ficha inteira tem hoje (1077 chaves). Traduzi os 632 e **marquei os duvidosos**:
+
+| marca | qtd | o que é |
+|---|---|---|
+| (sem marca) | 439 | tradução direta, sem jargão. Entram sem revisão. |
+| **`R`** | **199** | termo consagrado de mesa — traduzido, mas ⊥ conferido contra edição BR |
+| `ARTEFATO` | 5 | nome saiu **grudado** do `pdftotext` (`FleshoftheCorpse`) |
+
+**Dos 199 marcados `R`, só 84 vêm do V20 core** — e esses são os que um jogador brasileiro
+reconhece de cara (`Iron Will`, `Common Sense`, `Dark Fate`, `Nine Lives`…). **É essa a lista
+curta que vale o olho do user.** Os outros 115 são de suplemento, onde ⊥ ∃ tradução consagrada
+p/ conferir contra.
+
+O estilo segue as **11 que a ficha já tinha** (`Child`=Criança, `Legerdemain`=Prestidigitação,
+`True Faith`=Fé Verdadeira): termo de jogo **traduzido**, ⊥ transliterado.
+
+### ⚠ OS 5 `ARTEFATO` — o `pdftotext` cola palavras
+
+`FleshoftheCorpse` · `HarbingeroftheAbyss` · `SpiritMentor` · `TouchofFrost` · `LinguaFranca`.
+⊥ são itens novos: são o MESMO item da linha vizinha, com o espaço comido pela camada de texto.
+Somem no dedupe de `T751`. **⊥ criar chave `.lang` p/ eles.**
+
+### ⚠ A CASE-INSENSITIVITY DO POWERSHELL MORDEU DE NOVO
+
+`Sleeping with the Enemy` (`core`) e `Sleeping With the Enemy` (`bos`) são **2 entradas de
+livros diferentes**, e uma `hashtable` comum **fundiu as duas** — o arquivo saiu com 642 de 643
+e a validação foi quem pegou. Cura: `New-Object 'System.Collections.Generic.Dictionary[string,string]' ([StringComparer]::Ordinal)`.
+O aviso está no cabeçalho do próprio `.tsv`, p/ quem reler ⊥ repetir.
+
+Esta é a **4ª vez** que a case-insensitivity do PowerShell custa tempo neste projeto
+(`$T`/`$t`, `-match`, `wod.Artifacts` × `wod.ARTIFACTS`, e agora `with`/`With`). Merece §B própria.
+
+### O QUE AINDA FALTA P/ `T750` FECHAR
+
+O `.tsv` é **pesquisa**, ⊥ código. Falta:
+
+1. **`meritData.lua`** — `MERIT_DATA[nome] = {book=, page=, cost=}` a partir de `merit_flaw.tsv`.
+   Módulo PRÓPRIO, ⊥ `<script>` de `.lfm` (§I100g): CDATA é copiado por ficha aberta.
+2. **`PICKER_LIST["merit"]` e `["flaw"]`** — 361 Merits e 409 Flaws, **depois do dedupe**.
+3. **As chaves `.lang`** — 632 em `[pt]` **e** 632 em `[en]` (identidade), **e** as 632 no PT map
+   de `WoD20.6` (§V22/§V28 exigem os 3 em sincronia). ⚠ **Isso quase DOBRA o `.lang`**, que hoje
+   tem 1077 chaves por seção. Conferir o teto de locais de `WoD20.6` antes (§B77).
+4. **O dedupe dos 96 repetidos** — 70 resolvem sozinhos (custo e tipo iguais); **28 precisam do
+   texto** e saem em `T751`.
+
+### PRÓXIMO
+
+1. **`T751`** — `descMerit_en.lua`/`_pt.lua`. **Faça ANTES de `T750`**: é ela que resolve os 28
+   casos de dedupe, e a lista final de `PICKER_LIST` depende do dedupe. Fazer `T750` primeiro
+   obriga a refazer as chaves `.lang` dos itens que virarem `Nome (Origem)`.
+2. **`T750`** — com o dedupe decidido.
+3. **`T756`/`T757`/`T761`** — templates, auto-preenchimento e os 12 botões `?`.
+4. **`T783`–`T785`** — a caixa de busca.
+5. **`T764`–`T767`** — antecedentes, mesmo pipeline e muito menor.
+
+### PERGUNTA ACUMULADA (⊥ trava nada)
+
+**Q22** — os **84** termos do V20 core marcados `R` estão em `research/merit_flaw_pt.tsv`.
+Vale o user passar o olho e corrigir os que a edição brasileira escreve diferente.
+**Recomendação:** ⊥ esperar por isso — seguir com `T751`, e a correção entra depois por
+substituição no `.tsv` + regeneração, que custa minutos. Segurar 643 itens por 84 palavras
+seria trocar entrega por polimento.
+
+
+## 130ª RODADA (2026-08-28)
+
+Gate **VERDE, 599 ok, 0 FAIL**. `.rpk` inalterada desde a 129ª (**2.214.481 B**, instalada
+15:21:02) — esta rodada é **medição e pesquisa**, ⊥ tocou código nenhum.
+§T **678 `x` · 100 `.` · 9 `~`** (`T749` foi p/ `~`).
+
+Entregue: **`research/merit_flaw.tsv`** — **770 linhas, 643 nomes distintos**, de **15 livros**.
+
+### OS OFFSETS: os 8 `?` do README foram MEDIDOS
+
+Método: para cada livro, amostrar 12 páginas com texto e achar o único `offset` tal que
+`pagina_PDF − offset` apareça como número solto em TODAS elas. **Validou-se sozinho** em
+`core`=8 e `da`=1, que já eram conhecidos — é o que dá crédito aos outros.
+
+| livro | offset | | livro | offset |
+|---|---|---|---|---|
+| `core` | 8 ✓ | | `hh` `m20va` `bos` `trel` `anarch` | **1** |
+| `da` + 9 outros | 1 | | **`sorcc`** | **0** ⚠ |
+| | | | **`bcm`** | **2** ⚠ |
+
+⚠ `sorcc` e `bcm` são os **únicos fora do padrão**. Chutar 1 neles poria página errada no
+bloco 1 de §I21 — texto que o jogador lê.
+
+### 3 LIVROS SAÍRAM POR MEDIÇÃO, ⊥ por escolha
+
+- **`m20` (Mage 20th) está em PORTUGUÊS.** 3537 "Mago", 797 "Esfera", **0** "Sphere",
+  **0** "Merit". ⊥ serve: a chave canônica é EN (§V24) e a fonte é EN (§V9); traduzir de volta
+  inventaria grafia que livro nenhum imprimiu. **Se aparecer um PDF em inglês, ele entra.**
+- **`bcm`** e **`trel`**: **0** qualidades/defeitos. Simplesmente ⊥ trazem.
+
+Decisão do user 2026-08-28: **os 15 restantes entram TODOS**, e **sem filtro por tema** — a
+caixa de busca da Q16 já resolve lista comprida (ninguém rola, digita).
+
+### ⚠ SÃO SETE NOTAÇÕES, ⊥ TRÊS (o §R125 está incompleto)
+
+A 1ª varredura deu **0** para `anarch`, `tos`, `sorc` e `m20va` — **61 itens sumindo calados**,
+que é exatamente a doença que o §R125 existe para nomear. As 4 novas:
+
+| # | livro | forma | o que quebra |
+|---|---|---|---|
+| 2 | `anarch` | `Peacemaker (2-pt. Merit)` | **hífen** entre número e `pt` |
+| 3 | `tos` | nome numa linha, `(3 pt. Supernatural Merit)` na de baixo | nome ⊥ está na linha do custo |
+| 5 | `sorc` | `Path Natural: (5 pt Merit)` | **dois-pontos ANTES** do parêntese |
+| 6-7 | `m20va` | `• Well-Rounded (1 pt. Mental Merit)` e `• Construct (Social Flaw):` | marcador na frente; e a 7ª **⊥ tem custo** |
+
+E o `da` (notação 4) **⊥ diz `Merit` nem `Flaw`** — o tipo sai do cabeçalho de seção
+(`Physical Merits` / `Physical Flaws`). Sem isso, **81 itens ficariam sem tipo**.
+Tudo isso está gravado na armadilha 7 do `research/README.md`.
+
+### A COLHEITA, por livro
+
+| livro | itens | | livro | itens |
+|---|---|---|---|---|
+| `bos` | 235 | | `bh` | 15 |
+| `core` | 162 | | `sorc` | 14 |
+| `lotc` | 120 | | `sorcc` | 7 |
+| `da` | 81 | | `tos` | 6 |
+| `lob` | 43 | | `anarch` | 6 |
+| `hh` | 38 | | `m20va` | 5 |
+| `gr` | 33 | | `dac` `rob` | 3 · 2 |
+
+**361 Merits · 409 Flaws · 0 sem tipo.** Linhas de sumário descartadas (80 no total, 37 só no
+`lob`) — elas terminam no número da página que apontam e entrariam em duplicata.
+
+### O DEDUPE: o problema é MENOR do que parecia
+
+**96 nomes** aparecem em 2+ livros. Mas:
+
+- **70** têm **custo e tipo IDÊNTICOS** nos dois livros ∴ mesma mecânica, viram **1 item** pela
+  regra do pedido 12.1 sem ninguém precisar ler nada.
+- **26** têm **custo diferente** entre livros → precisam de leitura lado a lado.
+- **2** aparecem como **Merit num livro e Flaw noutro** → esses são certeza de leitura.
+
+∴ o julgamento humano/de leitura cai de 96 para **28 casos**. Isso é trabalho de `T751`, quando
+as descrições forem extraídas — a decisão sai com o texto na mão, ⊥ de memória (§R8).
+
+### POR QUE `T749` ESTÁ `~` E ⊥ `x`
+
+Duas cláusulas do §T749 ⊥ foram cumpridas, **de propósito**:
+
+1. **"saída = `research/mf_<livro>.tsv`"** — saiu **1 arquivo** (`merit_flaw.tsv`) com coluna
+   `livro`, ⊥ 15 arquivos. 15 arquivos p/ um dado que só é útil junto contraria a regra de ⊥
+   criar arquivo sem necessidade, e o dedupe precisa de tudo lado a lado.
+2. **"Dedupar ENTRE livros na precedência do README (`core` > …)"** — **⊥ dedupei.** Precedência
+   cega apagaria os 26 de custo divergente sem ninguém ver, que é a perda calada que a regra
+   12.1 do próprio user existe p/ evitar. A evidência fica no arquivo até a decisão.
+
+Ambas ! virar emenda de §T749 no `/ck:spec`.
+
+### EMENDAS QUE O SPEC DEVE — agora 11
+
+As 8 anteriores, mais:
+
+- **§R125** — são **7** notações, ⊥ 3 (tabela acima).
+- **§T749** — as 2 cláusulas acima (1 arquivo; dedupe adiado com evidência).
+- **§R (novo)** — os 8 offsets medidos, e o `m20` em português.
+
+### PRÓXIMO
+
+1. **`T750`** — `meritData.lua` + `PICKER_LIST["merit"]`/`["flaw"]` + as chaves `.lang`.
+   ⚠ **643 nomes ! ter tradução PT** (§V17) — é o maior custo do "todos os livros", e ⊥ é opcional.
+2. **`T751`** — `descMerit_en.lua`/`_pt.lua`. É aqui que os **28** casos de dedupe se resolvem,
+   com o texto na mão.
+3. **`T756`/`T757`/`T761`** — templates, auto-preenchimento e os 12 botões `?` que faltam.
+4. **`T783`–`T785`** — a caixa de busca.
+5. **`T764`–`T767`** — antecedentes (mesmo pipeline, muito menor).
+
+### ARQUIVOS DE TRABALHO (fora do repo, morrem com a sessão)
+
+O texto dos 15 livros está extraído em `<scratchpad>/txt/*.txt` e o bruto em `mf_raw.csv`.
+Reextrair custa ~3 min com o comando do `research/README.md`.
+
+
+## 129ª RODADA (2026-08-28)
+
+Gate **VERDE, 599 ok, 0 FAIL**. `.rpk` **2.214.481 B** gerado 15:21:01 e **INSTALADO 15:21:02**.
+§T **678 `x` · 101 `.` · 8 `~`** (sem mudança — Q21 é emenda, não §T aberta).
+**Nenhuma pergunta aberta.** As cinco (Q17…Q21) estão respondidas e implementadas.
+
+### Q21 — a linhagem Narov, opção B (duas entradas)
+
+`PICKER_LIST["family"]` **23 → 24**: entrou **`Obertus (Narov)`** ao lado de `Obertus`.
+
+| entrada | trio |
+|---|---|
+| `Obertus` | Auspex · **Obfuscate** · Vicissitude |
+| `Obertus (Narov)` | Auspex · **Dominate** · Vicissitude |
+
+**Por que duas entradas e não um slot em aberto** (a pergunta que o user fez, e a resposta que
+decidiu): `gr` p.102 diz *"Obertus revenants, **who display signs of the Narov line**, should
+swap Obfuscate for Dominate."* Isso é **condição**, não escolha. Um slot `choice` daria Dominate
+a **qualquer** Obertus — permissão que o livro não dá. A forma de duas entradas é a que os
+`Gargoyles (Scout)/(Sentinel)/(Warrior)` já tinham fixado na ficha.
+
+O livro trata Narov e Obertus como **uma família só hoje**: *"he selected the remaining Narov
+revenants… **to be folded into the Obertus family**"* e *"a small percentage has displayed Narov
+traits"*. Não há capítulo Narov no índice de famílias. Por isso o nome é `Obertus (Narov)` — o
+parêntese diz o que é: linhagem dentro da família, ⊥ família nova.
+
+Contagens no mesmo commit: §V212/§V236 **84 → 85**, §V294 **23 → 24** famílias, união **85 → 86**,
+e as duas literais de §V341. `.lang` nas duas seções e PT map (`Obertus (Narov)` nos dois idiomas
+— nome próprio, ⊥ traduz).
+
+### §V342 NOVA — e o número está RESERVADO, ⊥ escrito no SPEC
+
+Pernas: **(a)** as 2 entradas ∃ · **(b)** os trios diferem por **exatamente** Obfuscate↔Dominate
+— um check que só contasse "2 entradas" passaria em duas idênticas, que é a divisão fechando
+calada · **(c)** nenhuma das 2 tem `FAMILY_CAP` (nenhum dos livros põe NÚMERO na fraqueza da
+Obertus) · **(d)** trio **fixo** nas duas, nunca `choice`/`open` — é a perna que guarda a
+diferença entre condição e escolha livre · **(e)** zero-guard.
+
+⚠ **`/ck:spec` deve escrever o texto de §V342.** Escrevi o check antes porque decisão sem check
+regride calada; o número é o próximo livre e ⊥ colide.
+
+**Mutação rodada (§V20/§V222):** `Narov fora da lista` · `os 2 trios idênticos` · `swap com a
+Disciplina errada` · `slot aberto como choice` · `teto inventado p/ Obertus` → **todas
+VERMELHAS**. Sonda (reescrever comentário) → **VERDE**.
+
+⚠ **Erro meu que o gate pegou:** escrevi
+`if (($diff | Sort-Object) -join '|' -ne (@(...) | Sort-Object) -join '|')` e a precedência do
+PowerShell avaliou isso errado — o check reprovou código correto. Consertado com variável
+intermediária. **Lição: `-join` dentro de comparação sempre em variável própria.**
+
+### EMENDAS QUE O SPEC DEVE (rodar `/ck:spec`) — agora 8
+
+As 6 da 126ª e as 5 da 128ª continuam devendo, mais:
+
+- **§V342** — texto novo (o check já ∃ no gate).
+- **§R129/§R93** — a Obertus fecha em **1 linha por época** (o 2º eixo ⊥ divergiu de forma que a
+  ficha represente) **&** ganha a **2ª entrada por LINHAGEM**. São duas conclusões diferentes na
+  mesma família e o §R tem que dizer as duas, senão a próxima leitura reabre a errada.
+- **§I29b/§I108b** — a lista de famílias é **24**, e o motivo da 24ª é linhagem, ⊥ época.
+
+### PRÓXIMO — só trabalho
+
+1. **`T749`–`T751`** — extração das ~700 qualidades/defeitos. Destrava `T756`, `T757`, `T761`
+   (12 dos 28 botões `?`), `T783`–`T785` e as pernas (d)/(g) de §V333.
+2. **`T764`–`T767`** — antecedentes: extração, dedupe por essência, descrições, §V336.
+3. **`T768`/`T769`** — regenerar os 8 `.lua` só com `System` (pedido 14).
+4. **`T786`** — a leitura está FEITA (128ª) e já foi ATUADA (Q21); falta o `/ck:spec` escrever §R.
+5. **`T770`–`T773`, `T787`** — testes de tela `[USER]`.
+
+
+## 128ª RODADA (2026-08-28)
+
+Gate **VERDE, 598 ok, 0 FAIL**. `.rpk` **2.213.748 B** gerado 14:00:30 e **INSTALADO 14:00:31**.
+§T **678 `x` · 101 `.` · 8 `~`**. **As 4 perguntas abertas foram respondidas pelo user e as 4
+estão fechadas** — não há nada pendente de decisão.
+
+Entregue: **`T781`** (teto de família) e **`T782`** (§V337 + §V341 completas). Mais a leitura da
+**`T786`**, cujo resultado está abaixo e ainda precisa do `/ck:spec` para virar §R.
+
+### Q20 — o teto de sangue, feito como recomendei e você aprovou
+
+As **20 bolinhas de `BLOOD POOL`** deixaram de se marcar sozinhas: `autoChange="false"` e
+`onClick="bloodClick('bloodPool_N', self);"`. O `bloodClick` é **recusador próprio** e não
+alcança `xpClick` nem `declareTrait` — as bolinhas continuam livres, sem preço e sem linha de
+ledger, que é o que a §V219 realmente comprava. O que elas ganharam foi o **"antes da escrita"**
+que a §V337d exige e que bolinha auto-marcante não tem.
+
+A §V219 foi **emendada para mais apertada, não mais frouxa**: agora cada bolinha ! ter
+`autoChange="false"` **e** nomear `bloodClick` **com o próprio campo**, e o `bloodClick` !
+não alcançar nada que cobre. Descer nunca é recusado — teto limita o que a família **segura**,
+e gastar sangue ninguém precisa de licença.
+
+`FAMILY_CAP` nasceu com **2 linhas medidas** (`research/family_caps.tsv` tem as páginas):
+`Enrathi` = `{humanity=3, conscience=2}` (`gr` p.95) e `Grimaldi (Dark Ages)` = `{bloodPool=8}`
+(`da` p.454). A moderna **não** tem teto — o `gr` p.98 dá a ela fraqueza de comportamento, sem
+número, e inventar um teto ali seria a ficha passar por cima do livro.
+
+**Os pontos de entrada são DOIS de propósito** (bolinha de sangue não pode chegar em `xpClick`,
+bolinha de rating não pode pular), **mas o número é lido em UM só**: `familyCap`. A §V337c mede
+isso contando que `FAMILY_CAP[` apareça exatamente **1×** no chunk.
+
+### Q18 — do jeito que recomendei
+
+O teto impede **subir** e o já-marcado **fica**. Ficha antiga com 10 bolinhas e teto 8 abre com
+as 10 e não ganha a 11ª. A §V337e é a perna que pega a "arrumação" que parece gentileza: ela
+reprova qualquer `setField` que escreva `humanity_*`, `conscience` ou `bloodPool_*` para `false`.
+
+### Q17 — MEDIDO. A Obertus **NÃO** quebra em duas
+
+| | `da` p.454 (medieval) | `gr` p.101-102 (moderna) |
+|---|---|---|
+| trio | Auspex, Obfuscate, Vicissitude | Auspex, Obfuscate, Vicissitude |
+| fraqueza | escolher uma área de conhecimento, tratada como **Obsession Derangement** | **Obsessive-Compulsive** (maioria) ou **Megalomania** (linhagem Narov) |
+
+A fraqueza **diverge** — são Derangements diferentes e o `da` exige escolher a área. **Mas
+nenhuma das duas tem NÚMERO**, e é isso que decide: o critério da `T774` é valor numérico de
+traço. A Grimaldi quebrou porque a medieval tem teto de 8 e a moderna não — divergência que a
+ficha **representa**. A da Obertus é *qual* Derangement, e Derangement na ficha é caixa de texto
+livre que o jogador digita.
+
+**Recomendação: uma linha só.** Quebrar criaria uma entrada com o mesmo trio, sem teto, e um
+campo de texto que o jogador preenche igual — terceira entrada em que ninguém pode agir.
+
+⚠ **ACHADO NOVO, fora do escopo da `T786` (vira Q21):** o `gr` diz que a Obertus da **linhagem
+Narov troca Obfuscate por Dominate**. Isso é variação de **TRIO**, que a ficha *modela*
+(`CLANS[...].fixed`). O jeito certo não seria quebrar por época — seria dar à Obertus um
+`choice` no lugar do trio fixo, que é o mecanismo que a §I37/§V236d já têm para "liberado".
+**Recomendação:** `["Obertus"] = { fixed = {"Auspex", "Vicissitude"}, choice = {"Obfuscate", "Dominate"}, choiceN = 1 }`.
+Não implementei — é decisão sua e não estava na `T786`.
+
+### MUTAÇÃO RODADA (§V20/§V222) — 12 vermelhas, 1 sonda verde
+
+`1 bolinha volta a se marcar sozinha` · `1 bolinha entrega o campo errado` · `bloodClick alcança
+xpClick` · `teto Enrathi 3→4` · `teto em família que não está na lista` · `xpClick para de
+perguntar` · `bloodClick escreve antes de perguntar` · `algo apaga uma bolinha` · `2º leitor da
+tabela` · `chave [pt] do aviso apagada` · `Grimaldi moderna ganha teto` · `teto medieval 8→7`
+→ **todas VERMELHAS**. Sonda (reescrever um comentário) → **VERDE**.
+
+⚠ A §V129 (censo de pop-ups do `xpClick`) acendeu sozinha quando a 8ª recusa entrou — **é ela
+funcionando**: o comentário dela diz "a refusal added without coming here first turns this red".
+Atualizada de 7 para 8 no mesmo commit.
+
+### EMENDAS QUE O SPEC DEVE (rodar `/ck:spec`)
+
+Além das 6 da 126ª rodada, que continuam devendo:
+
+- **§V219**: a metade do `autoChange` foi emendada (Q20). O texto novo é o do gate.
+- **§V337c**: "1 lugar recusa" virou **"1 lugar LÊ o número"** — os pontos de entrada são dois
+  por construção, e fundi-los quebraria a §V219.
+- **§I106a**: `FAMILY_CAP` tem **2** linhas, não 1 (`Enrathi` e `Grimaldi (Dark Ages)`).
+- **§V129**: censo de 7 → **8** pop-ups.
+- **§R129 / §R93**: a Obertus fecha em **uma linha** pelo 2º eixo (tabela acima), e nasce a
+  **Q21** da linhagem Narov.
+- **§V341c** deixou de ser comentário e virou perna de verdade.
+
+### PRÓXIMO — só trabalho, nenhuma decisão trava
+
+1. **`T749`–`T751`** — extração das ~700 qualidades/defeitos. O gargalo: destrava `T756`, `T757`,
+   `T761` (12 dos 28 botões `?`), `T783`–`T785` e as pernas (d)/(g) de §V333.
+2. **`T764`–`T767`** — antecedentes: extração, dedupe por essência, descrições, §V336.
+3. **`T768`/`T769`** — regenerar os 8 `.lua` só com `System` (pedido 14).
+4. **`T786`** — a leitura está FEITA (acima); falta só o `/ck:spec` escrever §R129.
+5. **`T770`–`T773`, `T787`** — testes de tela `[USER]`.
+
+### PEDIDO 9 — FECHADO pelo user
+
+A largura das 8 caixas **não muda**. Decisão do user em 2026-08-28: "pode deixar cair, não
+precisa alterar, estão bons por enquanto". A altura (186→153) fica como está.
+
+
+## 127ª RODADA (2026-08-28) — LEIA ESTA E DEPOIS A 126ª
+
+> ⚠ **O `.rpk` muda de 1-2 bytes a cada build** (carimbo de tempo dentro do zip). Se voce rodar
+> `rdk -l` DEPOIS de `rdk -i`, o tamanho do instalado deixa de bater e a prova de §B1 acusa
+> falso. Terminar sempre com `rdk -i`, nunca com `rdk -l`.
+
+Gate **VERDE, 597 ok, 0 FAIL**. `.rpk` **2.210.367 B** gerado 13:15:56 e **INSTALADO 13:15:57**
+(mesmo tamanho). §T **676 `x` · 102 `.` · 9 `~`**.
+
+Entregue: **`T780`** (Grimaldi em 2 entradas) e **`T782` PARCIAL** (§V341 escrita e mutada;
+§V337 não). **`T781` está BLOQUEADA** por um conflito do próprio SPEC — ver abaixo.
+
+### `T780` — Grimaldi quebrada em duas, na íntegra
+
+`PICKER_LIST["family"]` **22 → 23**: `Grimaldi` pelado saiu, entraram `Grimaldi (Dark Ages)` e
+`Grimaldi (Modern)`. `CLANS` ganhou as duas com o **MESMO trio** (Celerity·Dominate·Fortitude),
+porque o que divergiu foi a FRAQUEZA e não o trio. `.lang` nas duas seções e PT map de
+`WoD20.6`, seguindo o precedente do `Bratovich`: `(Dark Ages)` → **`(Trevas)`**,
+`(Modern)` → **`(Moderna)`**.
+
+Contagens do gate no MESMO commit (senão vira §B70/§B73): §V212 e §V236 **83 → 84**,
+§V294 **22 → 23** famílias e a união a **85**. O comentário do topo da lista, que dizia
+"Grimaldi e Obertus ficam em uma linha cada", foi **reescrito** — comentário-mapa velho é §B73.
+
+### ⛔ `T781` BLOQUEADA — conflito entre §V219 e §V337d (**Q20**)
+
+O teto da `Grimaldi (Dark Ages)` é **8 pontos de sangue** (`da` p.454). Para recusar é preciso
+interceptar o clique na bolinha de `BLOOD POOL`. **Não há onde.**
+
+- **§V219** compra para a bolinha de sangue o direito de **se marcar sozinha**: `autoChange`
+  ligado, **`onClick` vazio**, nada chegando em `xpClick`. É o que a separa de bolinha de rating.
+- **§V337d** exige que o teto recuse **ANTES da escrita**.
+- Com bolinha que se marca sozinha **não existe "antes"**: quando qualquer Lua roda, o host já
+  escreveu. Sobraria gravar-e-desfazer, que é exatamente o que §V337d proíbe.
+
+§I108c emendou **só a metade de §V219 sobre TRAIT** ("teto não faz da bolinha um traço") e
+**deixou a metade do `autoChange` intacta**. Sem essa segunda emenda o ponto de recusa não existe.
+
+**Não pus `FAMILY_CAP["Grimaldi (Dark Ages)"]` na tabela**: teto que nunca dispara é, pelas
+palavras da própria §V337a, **pior que ausente**. A tabela fica vazia até a decisão.
+
+⚠ Nota: a metade **`Enrathi`** de `T781` (`humanity` + `conscience`) **não** tem esse problema —
+aquelas bolinhas são rating, têm `onClick` e passam por `xpClick`, onde a recusa de disciplina e
+a de secondary path já moram (§I106b). Dá para entregar sozinha assim que a Q20 for respondida,
+ou até antes, se você quiser separar as duas.
+
+### §V341 escrita, com a perna (c) declarada ausente
+
+Pernas **(a)** 23 entradas + as 2 presentes + o nome pelado AUSENTE · **(b)** as 2 com o mesmo
+trio · **(d)** união = 85 · **(e)** zero-guard. A perna **(c)** (`FAMILY_CAP` da Grimaldi) está
+**escrita como comentário explicando por que não existe**, no mesmo estilo das pernas (d)/(g) de
+§V333. Por isso `T782` é `~`.
+
+**Mutação rodada (§V20/§V222):** `Grimaldi` pelado de volta ! VERMELHO · entrada moderna apagada
+! VERMELHO · trios discordando ! VERMELHO · 1 clã fora do roster (união 84) ! VERMELHO ·
+sonda (reescrever uma palavra de comentário) ! VERDE.
+
+⚠ **Uma mutação minha nasceu no-op e eu troquei:** mexer no limite do `for` da união NÃO
+avermelha — o gate monta a união por conta própria a partir das duas listas, não lendo o laço
+(quem lê a FORMA do laço é §V294c). Trocada por "tirar um clã do roster", que avermelha de verdade.
+
+### PRÓXIMO, em ordem de valor
+
+1. **`T749`–`T751`** — extração das ~700 qualidades/defeitos. É o gargalo real: destrava `T756`,
+   `T757`, `T761` (12 dos 28 botões `?`), `T783`–`T785` e as pernas (d)/(g) de §V333.
+2. **`T764`–`T767`** — antecedentes: extração, dedupe por essência, descrições, §V336.
+   Destrava os outros 16 botões e o pedido 12.
+3. **`T781`** — assim que a **Q20** for respondida (ou só a metade `Enrathi`, que não depende dela).
+4. **`T768`/`T769`** — regenerar os 8 `.lua` só com `System` (pedido 14).
+5. **`T786`** — reler a Obertus pelo 2º eixo (**Q17**). Leitura, não trava nada.
+6. **`T770`–`T773`, `T787`** — testes de tela `[USER]`.
+
+### PERGUNTAS ABERTAS — agora 4
+
+- **Q20 (NOVA)** — como o teto de sangue da `Grimaldi (Dark Ages)` deve recusar?
+  **Recomendação: emendar §V219 na metade do `autoChange`** para as 20 bolinhas de `BLOOD POOL`
+  virarem `autoChange="false"` + `onClick` que passa por um recusador PRÓPRIO (não `xpClick`).
+  Elas continuam sem preço, sem `declareTrait` e sem linha de ledger — que é o que §V219
+  realmente comprava — e ganham o "antes da escrita" que §V337d exige. O custo é Lua nova para
+  pintar 20 bolinhas que hoje o host pinta de graça.
+  *Alternativa mais barata:* aceitar gravar-e-desfazer via `dataLink`, como §V187 já faz para o
+  revert de picker. Não recomendo: o jogador veria a bolinha acender e apagar.
+- **Q17** — `Obertus` julgada pelo mesmo critério incompleto da Grimaldi (só o trio). Falta
+  comparar a FRAQUEZA lado a lado (`da` p.454 × `gr`). Recomendação: rodar `T786`; se divergir,
+  ela quebra em duas igual à Grimaldi e a lista vai a 24.
+- **Q18** — ficha nova semeia 10 bolinhas de sangue e o teto medieval é 8. Recomendação: manter
+  §I106d (o teto impede SUBIR, o marcado FICA). Só vira código depois da Q20.
+- **Q19** — pedido 9 pede encolher as 8 caixas na horizontal; §V298 exige 5px e o buraco é
+  485 = 240+5+240. Recomendação: estreitar `DERANGEMENTS` de 240 para 220 e dar 10px a cada uma
+  das quatro que subiram.
+
+
+## 126ª RODADA (2026-08-28) — LEIA ESTA SEÇÃO PRIMEIRO
+
+Gate **VERDE, 596 ok, 0 FAIL**. `.rpk` **2.209.805 B** gerado 12:50:05 e **INSTALADO 12:50:07**
+(mesmo tamanho — as duas provas de §B1). §T **675 `x` · 104 `.` · 8 `~`**.
+
+Entregue nesta rodada: **`T760`** (caixa do `?`), **`T762`** (zoom de fonte nas 8 panes),
+**`T763` PARCIAL** (§V334 inteira + §V333 sem as pernas (d) e (g)) — por isso ela está `~` e
+não `x`. Fecha o pedido **8** por inteiro e monta o mecanismo do **7** e do **13**.
+
+### OS 16 PEDIDOS — 7 entregues, 9 faltam
+
+| # | pedido | estado |
+|---|---|---|
+| 1 | Humanidade → Caminho, dropdown de trilhas | **PRONTO** |
+| 2 | Campo Aura/Bearing colado nas bolinhas | **PRONTO** |
+| 3 | Valor do bearing pelo nível | **PRONTO** |
+| 5 | Defeitos abaixo de Qualidades | **PRONTO** |
+| 6 | Aliados/Mentor/Recursos/Guias no lugar dos Defeitos | **PRONTO** |
+| 8 | Fonte ± em TODAS as caixas de descrição | **PRONTO** (8 panes, 16 botões, salva) |
+| 10 | "Status" → "Artefatos" | **PRONTO** |
+| 11 | Antecedente "Artefatos" na lista | **PRONTO** |
+| 15 | Node → **Nodo** | **PRONTO** |
+| 16 | Pure Breed → **Raça Pura** | **PRONTO** |
+| 13 | Fechar: botão X, clique fora, uma caixa por vez | **MECANISMO PRONTO** — falta o `?` que a abre |
+| 7 | Botão `?` + caixa 500×500 | **CAIXA PRONTA** — faltam os botões (`T761`) e o texto (`T751`/`T765`) |
+| 9 | 8 caixas: altura e largura | **METADE** — altura sim; largura NÃO, ver **Q19** |
+| 4 | Qualidades/Defeitos com busca + auto-preenchimento | falta (`T749`–`T751`, `T783`–`T785`) |
+| 12 | `?` nos antecedentes + dedupe com origem | falta (`T764`–`T766`) |
+| 14 | Descrições só com a parte "Sistema" | falta (`T768`, `T769`) |
+
+⚠ **`T766` está `.` mas PARCIALMENTE FEITA**: pedidos 11/15/16 já estão no código e instalados.
+Resta só a lista final de antecedentes de `T764`. **Não refazer os três.**
+
+### ⚠ A ARMADILHA QUE CUSTOU A RODADA — crase em string do PowerShell
+
+**Escrevi `` `from` `` num comentário gerado por PowerShell e `` `f `` virou FORM FEED (0x0C).**
+O `rdk` morreu do jeito de §B19/§B77/§B80: **exit 1, saída VAZIA, `.rpk` APAGADO, nenhum arquivo
+nem linha nomeados.** O caractere estava dentro de um **COMENTÁRIO** Lua — código que não faz
+nada — e mesmo assim derrubou a build.
+
+O que funcionou (a lição de §B80 confirmada por um caso novo):
+
+1. bissecção **por ARQUIVO** → `WoD20th.lfm`;
+2. bissecção **por METADE do bloco** → o par `fontStep`/`applyDescFont`;
+3. bissecção **por FUNÇÃO** → nenhuma delas: sobrou o **comentário** entre as duas.
+
+**Regra nova, mais forte que "medir CR == LF" (§B81):** depois de gerar texto com PowerShell,
+varrer o arquivo por **qualquer byte de controle** (`< 0x09`, `0x0B`, `0x0C`), não só o CR/LF.
+Escapes que o PowerShell come em string de aspas duplas: `` `f `` `` `t `` `` `n `` `` `r ``
+`` `b `` `` `a `` `` `v `` `` `0 `` `` `e ``. Em prosa, **não usar crase** — ou dobrar (`` `` ``).
+
+Isto merece §B nova quando `/ck:spec` rodar.
+
+### Outras 4 desta rodada
+
+1. **`R` e `W` são ALIAS do PowerShell** (`R` = `Invoke-History`). Alias tem precedência
+   **acima** de função ∴ `function R($p)` não é chamada — o alias é. Nomear helpers com ≥2 letras.
+2. **`popScrim` não pode ser `align="client"`** (§V190): o `themePaper2` já toma o client rect do
+   `<scrollBox>` da aba. Resolvido dando geometria explícita **1595×693**, sem afrouxar o §V190.
+3. **`popDesc` é um `<layout>` com retângulo preto arredondado** ∴ o coletor de §V280/§V298 o
+   varreu (74 caixas onde há 73) e o §V40 o acusou de sobrepor 6 vizinhos. Resolvido com
+   `$OVERLAY_BOXES = @('popDesc')` — **exceção NOMEADA**, no estilo de §V328c, com **zero-guard
+   nos dois sítios** (contagem ≠ tamanho da lista ! FAIL), então ela não pode virar no-op.
+4. **`applyDescFont(self)` caiu no `onShow` e não no `onNodeReady`** porque `.IndexOf` achou a
+   PRIMEIRA `applyTabVisibility(self);` do arquivo, que é a do `onShow`. O §V334e pegou.
+
+### O que a §V10 NÃO precisou
+
+§I102b e §I103b declaravam "exceção" para `?`, `+`, `−` não terem chave `.lang`. **Não foi
+preciso**: a ficha já resolve isso com `wod.-=-` nas duas seções. Adicionei `wod.+=+` e
+`wod.X=X` do mesmo jeito, mais as entradas no PT map de `WoD20.6`. **Nenhum check afrouxado.**
+E o menos é ASCII `-`, não `−` (U+2212), que reprovaria em §V9.
+
+### EMENDAS QUE O SPEC DEVE (rodar `/ck:spec`)
+
+- **§I102c**: o rótulo é **`dynPopDescTitle`**, não `popDescTitle` — é a regra de §I108a (label
+  escrita por Lua ! prefixo `dyn`, senão a travessia de idioma restaura o inglês envelhecido).
+- **§I102c**: `edtPopDesc` ficou **460×435 em (20,45)**, não `470×420` — margem de 20 nos quatro
+  lados, igual a toda caixa da ficha.
+- **§I102a**: `popScrim` **não** é `align="client"` (ver armadilha 2 acima).
+- **§I103a**: a assinatura real é `fontStep(from, delta)` e **`from` é o BOTÃO clicado**, âncora
+  da travessia — não a pane. §I103c faz o tamanho ser **1 campo para as 8**, então argumento
+  por-pane prometeria um tamanho por-pane que não existe.
+- **§V334a**: "os literais 10/32/2 só dentro de `fontStep`" é medido como **"nenhum
+  `.fontSize = <número>` fora de `fontStep`"** — o literal `2` não dá para policiar no chunk todo.
+- **§V333**: pernas **(d)** (todo `btnQ*` chama o MESMO abridor) e **(g)** (contagem = 28) **não
+  foram escritas**: 12 dos 28 botões dependem de `MeritPicked` (§T756/§T783). Escrevê-las contra
+  zero botão seria o no-op de §B7. Por isso **`T763` está `~`**.
+- **§I102e**: `popOpen` carrega o módulo com **`pcall(require, ...)`** porque `descMerit_*` e
+  `descBackground_*` ainda não existem. **O `pcall` SAI quando `T751` e `T765` entrarem** —
+  está comentado no código dizendo isso.
+
+### MUTAÇÃO RODADA (§V20/§V222) — 11 vermelhas, 1 sonda verde
+
+`scrim depois da caixa` · `caixa nasce visível` · `edtPopDesc sem wordWrap` · `scrim sem
+popClose` · `pane sem o botão +` · `botão com passo 3` · `teto 32→40` · `fontSize = 14 fora de
+fontStep` · `applyDescFont fora do onNodeReady` · `descFontSize fora da lista LUA-OWNED` ·
+`OVERLAY_BOXES com nome que ninguém carrega` → **todas VERMELHAS**.
+Sonda (mover um botão 2px) → **VERDE**.
+
+### PRÓXIMO, em ordem de valor
+
+1. **`T780`–`T782`** — Grimaldi em 2 entradas + `FAMILY_CAP` com alvo em `BLOOD POOL`. Não
+   depende de livro (o §R129 já tem o dado). ⚠ `T780` mexe em §V212/§V236a/§V294 no MESMO
+   commit. ⚠ `T781` emenda §V219.
+2. **`T749`–`T751`** — extração das ~700 qualidades/defeitos. É o gargalo: destrava `T756`,
+   `T757`, `T761` (12 dos 28 botões), `T783`–`T785` e as pernas (d)/(g) de §V333.
+3. **`T764`–`T767`** — antecedentes: extração, dedupe por essência, descrições, §V336.
+   Destrava os outros 16 botões de `T761` e o pedido 12.
+4. **`T768`/`T769`** — regenerar os 8 `.lua` só com `System` (pedido 14).
+5. **`T770`–`T773`, `T787`** — testes de tela `[USER]`.
+6. **`T786`** — reler a Obertus pelo 2º eixo (**Q17**). É leitura, não trava nada.
+
+### PERGUNTAS ABERTAS (nenhuma trava)
+
+- **Q17** — a `Obertus` foi julgada pelo mesmo critério incompleto que deixou a Grimaldi passar
+  (só o trio de Disciplinas). Falta comparar a FRAQUEZA lado a lado (`da` p.454 × `gr`).
+  Recomendação: rodar `T786` antes de `T780` fechar, para as duas quebrarem juntas se for o caso.
+- **Q18** — ficha nova semeia 10 bolinhas de sangue e o teto Grimaldi medieval é 8. Vale §I106d:
+  o teto impede SUBIR, o já-marcado FICA. Recomendação: manter — apagar marcação do jogador é
+  pior que 2 bolinhas acima do teto numa ficha antiga.
+- **Q19** — o pedido 9 pede encolher as 8 caixas na horizontal. Impossível sem mexer em
+  `DERANGEMENTS`: §V298 exige 5px e o buraco é 485 = 240+5+240. Recomendação: estreitar
+  `DERANGEMENTS` de 240 para 220 e dar 10px a cada uma das quatro que subiram.
+
+### NÃO COMMITADO (nada foi commitado — regra do projeto)
+
+`M` HANDOFF.md · SPEC.md · verify-hunters-hunted.ps1 · localization.lang ·
+WoD20.1.lfm · WoD20.2.lfm · WoD20.6.lfm · WoD20.7.lfm · WoD20.12.lfm · WoD20.13.lfm ·
+WoD20.14.lfm · WoD20th.lfm · output/*.rpk · research/README.md
+`??` .claude/ · research/family_caps.tsv · research/road_bearing.tsv
+
+
+## 125ª RODADA (2026-08-28) — LEIA ESTA SEÇÃO PRIMEIRO
+
+Gate **VERDE, 594 ok, 0 FAIL**. `.rpk` **2.201.464 B** gerado e **INSTALADO 12:14:15**.
+§T **673 `x` · 107 `.` · 7 `~`**. Das 107 abertas, **~77** são teste de tela `[USER]`.
+
+### OS 16 PEDIDOS DO USER — 6 entregues, 10 faltam
+
+| # | pedido | estado |
+|---|---|---|
+| 1 | Humanidade → Caminho, dropdown de trilhas | **PRONTO** (55, filtradas por época) |
+| 2 | Campo Aura/Bearing colado nas bolinhas | **PRONTO** |
+| 3 | Valor do bearing pelo nível | **PRONTO** (−2/−1/0/+1/+2) |
+| 5 | Defeitos abaixo de Qualidades | **PRONTO** |
+| 6 | Aliados/Mentor/Recursos/Guias no lugar dos Defeitos | **PRONTO** |
+| 10 | "Status" → "Artefatos" | **PRONTO** |
+| 11 | Antecedente "Artefatos" na lista | **PRONTO** (destacado de `T766`) |
+| 15 | Node → **Nodo** | **PRONTO** (destacado de `T766`) |
+| 16 | Pure Breed → **Raça Pura** | **PRONTO** (destacado de `T766`) |
+| 9 | 8 caixas: altura e largura | **METADE** — altura sim (186→153); largura NÃO, ver Q19 |
+| 4 | Qualidades/Defeitos com busca + auto-preenchimento | falta (`T749`–`T751`, `T783`–`T785`) |
+| 7 | Botão `?` + caixa 500×500 + fonte ± | falta (`T760`, `T761`, `T763`) |
+| 8 | Fonte ± em todas as caixas de descrição | falta (`T762`) |
+| 12 | `?` nos antecedentes + dedupe com origem | falta (`T764`–`T766`) |
+| 13 | Fechar caixa: botão, clique fora, uma por vez | falta (`T760`) |
+| 14 | Descrições só com a parte "Sistema" | falta (`T768`, `T769`) |
+
+⚠ **`T766` está `.` mas PARCIALMENTE FEITA**: os pedidos 11/15/16 já estão no código e instalados.
+O que resta nela é só a lista final de antecedentes de `T764`. **Não refazer os três.**
+
+### ⚠ ARMADILHAS DESTA RODADA — todas custaram tempo
+
+1. **`defaultValue` é de `<dataLink>`, nunca de `<comboBox>`** (§B80, agora coberto por §V338).
+   Quando o `rdk` sai 1 calado: **bisseccionar por ARQUIVO antes de por trecho**.
+2. **Edit e Write emitem LF** (§B81). Medir `CR == LF` depois de QUALQUER escrita por ferramenta.
+3. **PowerShell é case-insensitive em VARIÁVEL e em `-match`.** Custou 4 vezes nesta sessão:
+   `$T`/`$t` e `$S`/`$s` são a MESMA variável (2×, as duas morreram antes de gravar, por sorte);
+   e `-match '^wod\.Artifacts='` casou com `wod.ARTIFACTS=` e pulou a inserção calado.
+   Usar `-cmatch` / `-ceq` / `.Contains()` quando a caixa importa.
+4. **`.Replace()` troca TODAS as ocorrências.** Numa sequência de trocas de coordenada, a posição
+   NOVA de uma caixa virou a âncora ANTIGA de outra e as duas foram parar no mesmo x. O gate
+   pegou (§V298); sem ele teriam ficado sobrepostas. Trocar por posição única, não por string.
+
+### RÉGUAS DA ABA TRAITS que eu não conhecia e que fixam o desenho
+
+- **§V298: exatamente 5px entre caixas vizinhas, nos DOIS eixos** (regra do user, 2026-08-25).
+- **§V290b**: a tabela de cima e a caixa de baixo compartilham borda; re-apontada nesta rodada
+  para `Merit/Flaw`, `MENTOR/FAME`, `DERANGEMENTS/ARTIFACTS`.
+- **§V289**: `BACKGROUNDS` fecha onde a outra coluna fecha (**693**); re-apontada de `RESOURCES`
+  (que subiu) para `OTHER`.
+- Juntas elas travam a largura em **240**: o buraco que FLAWS deixou é 485 = 240+5+240.
+
+### PRÓXIMO, em ordem de valor
+
+1. **`T760` + `T762` + `T763`** — caixa do `?` e zoom de fonte. Fecham os pedidos **7, 8 e 13**
+   e não dependem de livro nenhum. É o maior ganho por esforço que resta.
+2. **`T780`–`T782`** — Grimaldi em 2 entradas + `FAMILY_CAP` com alvo em `BLOOD POOL`.
+   ⚠ `T780` mexe em §V212/§V236a/§V294 no MESMO commit. ⚠ `T781` emenda §V219.
+3. **`T783`–`T785`** — a caixa de busca. ⚠ o `require` DENTRO do `setTimeout` é o ponto da
+   tarefa: fora dele o `loading` nunca pinta (§I107f, §R44, §R47).
+4. **Extração pesada**: `T749`–`T751` (~700 qualidades/defeitos de TODOS os livros, 3 parsers),
+   `T764`/`T765` (antecedentes), `T768` (regenerar 2,8 MB só com `System`). Sessão dedicada.
+5. **`T770` teste de tela [USER]** — agrupar com `T733` `T736` `T739` `T746` `T787`.
+
+### PERGUNTAS ACUMULADAS — nenhuma trava o build
+
+- **Q17** — a `Obertus` foi julgada pelo mesmo critério incompleto da Grimaldi (só o trio de
+  Disciplinas). Reler a fraqueza nos 2 livros (`T786`). Leitura, não código.
+- **Q18** — ficha nova semeia 10 bolinhas de sangue; o teto da Grimaldi medieval é 8. Está
+  valendo §I106d: o teto impede SUBIR e o já-marcado FICA.
+- **Q19 (NOVA)** — o pedido 9 pedia "encolher horizontalmente apenas um pouco". **Não deu**:
+  §V298 exige 5px entre vizinhas e `DERANGEMENTS` não se moveu, então o buraco é exatamente
+  240+5+240 e as caixas TÊM de ser 240. A altura encolheu (186→153). Para encolher a largura
+  também, `DERANGEMENTS` precisa estreitar ou mudar de lugar — decisão do user.
+
+### Working tree — nada commitado (regra do `CLAUDE.md`)
+
+`M` em `SPEC.md` `HANDOFF.md` `verify-hunters-hunted.ps1` `research/README.md` `WoD20.1.lfm`
+`WoD20.2.lfm` `WoD20.6.lfm` `WoD20th.lfm` `localization.lang` `output/*.rpk` ·
+`??` em `research/road_bearing.tsv` `research/family_caps.tsv` `.claude/`
 ## 123ª RODADA (2026-08-27) — LEIA ANTES DA SEÇÃO ABAIXO, ELA ESTÁ 1 RODADA ATRÁS
 
 **O teto de locais do chunk de `WoD20.6.lfm` é 105, MEDIDO (§B77).** Passar dele faz `rdk -l`
