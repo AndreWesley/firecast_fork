@@ -4382,6 +4382,12 @@ else {
     $rowCells = @()
     foreach ($w in $specTpl.ChildNodes) {
         if ($w.NodeType -ne 'Element') { continue }
+        # The hidden twin of I107a1 occupies NO pixels and is REQUIRED to stand on the button's
+        # own left (SPEC V354a) - measuring it as a cell would make V146 and V354 contradict each
+        # other, and one of them has to be wrong. It is this one: a widget authored visible=false
+        # is not on the row. Keyed on the AUTHORED attribute and not on a name, so a VISIBLE
+        # widget laid over another is still caught (T842, B100).
+        if ($w.GetAttribute("visible") -eq 'false') { continue }
         $wl = 0; $ww = 0
         if ([int]::TryParse($w.GetAttribute("left"), [ref]$wl) -and [int]::TryParse($w.GetAttribute("width"), [ref]$ww)) {
             $rowCells += [pscustomobject]@{ L = $wl; R = $wl + $ww; N = $w.LocalName }
@@ -4626,11 +4632,22 @@ elseif ($iSpecGuard -gt $iBaseTest) { Fail "V161 the lock is tested after the ba
 elseif ($specGuard.Groups[1].Value -notmatch 'if not want and isFreeRow\(trait\) then') { Fail "V161 selling a stamped row is not refused - the gift would go with one click" }
 elseif ($specGuard.Groups[1].Value -notmatch 'xpWarn\("Free specialties are lost only by lowering the trait"\);') { Fail "V161 the locked dot refuses in silence" }
 elseif ($specDotOpacity.Count -gt 0) { Fail "V161 the speciality dot carries opacity - a dot with an onClick is editable and must not read as read-only (SPEC V111)" }
-elseif ($renderSpecFn -notmatch 'c\.enabled = not locked;') { Fail "V161 the trait combo of a gift row is never switched off - it is the only lock a comboBox has" }
-elseif ($renderSpecFn -notmatch '(?m)^\s*c\.enabled = not locked;') { Fail "V162 the free-row lock does not write c.enabled - a granted speciality could be retyped" }
-elseif ($renderSpecFn -match 'c\.opacity') { Fail "V162 the speciality combo still paints opacity - a locked dropdown has to keep its text readable (SPEC I41, V241)" }
-elseif ($renderSpecFn -match 'specialityName|markDot') { Fail "V163 the renderer touches the text or the dot - it paints the lock and nothing else" }
-else { Pass "V161/V162 a gift row locks its combo and refuses its dot, and the look is written with the state" }
+# V161 REWRITTEN by T842: the lock is of the WIDGET, not of the gift. It used to read
+# `c.enabled = not locked` on the row's comboBox, and the reason written for that was "a
+# comboBox has no click hook, so this is the only lock available here" - true of the combo,
+# false of the gift. Wave 2 of I113e replaced the combo with a button, and a button HAS an
+# onClick, so the refusal moved into the OPENER: the box does not open at all on a stamped
+# row, which is the same answer at the same moment the disabled combo gave. The button stays
+# fully legible - reading WHICH speciality the trait handed over is the point of the row
+# (SPEC V161 amended in the 146th, I41, V241).
+elseif ($renderSpecFn -match 'c\.enabled') { Fail "V161 renderSpecialities still writes enabled on a control - the combo it locked is gone, and a lock left behind on a widget nobody draws is a lock that stopped locking (SPEC V161, T842)" }
+elseif (-not ($mfOpen161 = LuaFn $rootTxt 'mfOpen')) { Fail "V161 mfOpen is gone - the lock of a picker row now lives in the opener and there is no opener left (SPEC V161, V209)" }
+elseif ($mfOpen161 -notmatch 'if sheet ~= nil and isFreeRow\(field\) then return; end;') { Fail "V161 mfOpen does not refuse a stamped row - with the combo gone this is the ONLY thing standing between the player and a gift the trait handed out (SPEC V161, T842)" }
+elseif ($mfOpen161.IndexOf('isFreeRow(field)') -gt $mfOpen161.IndexOf('MF.field = field;')) { Fail "V161 the refusal is tested AFTER the box has taken the field - a box that opens and then refuses is a lock the player finds at the end (SPEC V161)" }
+elseif ($renderSpecFn -notmatch 'mfLabel\(found\["dynspeciality_" \.\. i\]') { Fail "V161 renderSpecialities does not paint the seven buttons - a button's text is not a field, so the granted speciality would show as an empty row (SPEC I107a2, T842)" }
+elseif ($renderSpecFn -match 'c\.opacity') { Fail "V162 the speciality row still paints opacity - a locked row has to keep its text readable (SPEC I41, V241)" }
+elseif ($renderSpecFn -match 'specialityName|markDot') { Fail "V163 the renderer touches the text or the dot - it paints the button and nothing else" }
+else { Pass "V161/V162 a gift row is refused in the opener before the box can open, its button is painted from the field and stays legible, and the dot refuses inside xpClick" }
 
 # ---- V164: the lock is painted from three places, and finds its controls the one way ---
 # The click covers the sheet in front of the player; onNodeReady covers the sheet being
@@ -4641,7 +4658,10 @@ $renderCalls = @([regex]::Matches($rootTxt, 'renderSpecialities\('))
 $specLinks2  = @($mainDoc.SelectNodes("//dataLink[@field='xpFree']"))
 if (-not $renderSpecFn) { Fail "V164 renderSpecialities not found on the root form" }
 elseif ($renderSpecFn -notmatch 'xpFind\(tabRootOf\(from\), names, found\);') { Fail "V164 the renderer does not use the one control finder - form.<name> does not cross the import (SPEC V143, B9)" }
-elseif ($renderCalls.Count -ne 3) { Fail "V164 renderSpecialities is called from $($renderCalls.Count - 1) place(s) on the root form - the two accepted click paths and no more" }
+# 4 since T842: the declaration, the two accepted click paths, and the speciality dataLink the
+# BUTTON needs. The combo painted itself from the field; a button's text is not a field, so the
+# seven rows need the same watcher the sixteen backgrounds have had since T808 (SPEC I107a2).
+elseif ($renderCalls.Count -ne 4) { Fail "V164 renderSpecialities is called from $($renderCalls.Count - 1) place(s) on the root form - the two accepted click paths, the speciality dataLink, and no more" }
 elseif ($specLinks2.Count -ne 1) { Fail "V164 WoD20.1 carries $($specLinks2.Count) xpFree links - one, so a grant made on another client locks the row here too" }
 elseif ($mainRawTxt -notmatch '<dataLink field="xpFree" onChange="renderSpecialities\(self\);"/>') { Fail "V164 the xpFree link does not repaint the lock" }
 elseif ($mainRawTxt -notmatch '(?s)<event name="onNodeReady">.*?renderSpecialities\(self\);.*?</event>') { Fail "V164 opening the sheet does not paint the lock - a saved gift would show as editable" }
@@ -11944,7 +11964,7 @@ else {
 #
 # The roster is CLOSED and named, the way V109 names cboGame's three: a third template growing
 # a ? has to redden here rather than be absorbed into a total that still says 28.
-$V333_SRC   = @{ MeritPicked = 14; OpenAbility = 16 }   # template -> rows it draws the ? on
+$V333_SRC   = @{ MeritPicked = 14; OpenAbility = 16; HeaderPicker = 2 }   # template -> rows it draws the ? on
 $q333       = @{}
 $qCalls333  = 0
 $qOpen333   = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
@@ -11983,16 +12003,20 @@ else {
     foreach ($k333 in $V333_SRC.Keys) {
         if (-not $q333.ContainsKey($k333)) { $v333Bad += "'$k333' carries no ? button - the $($V333_SRC[$k333]) rows it draws lost their description door (SPEC I102b, V333g)" }
     }
-    if ($qCalls333 -ne 30) { $v333Bad += "$qCalls333 ? button(s) on the sheet, expected the 30 of I102b - 14 on the picked merit/flaw rows and 16 on the picked background rows (SPEC V333g)" }
+    if ($qCalls333 -ne 32) { $v333Bad += "$qCalls333 ? button(s) on the sheet, expected the 32 of I102b/I102h - 14 on the picked merit/flaw rows, 16 on the picked background rows and 2 on the nature/demeanor headers (SPEC V333g, T846)" }
     if ($qOpen333.Count -gt 1) { $v333Bad += "the ? buttons call $($qOpen333.Count) different functions ($(($qOpen333 | Sort-Object) -join ', ')) - one opener owns the box, or the two disagree about what is open (SPEC V135, V333d)" }
     elseif ($qOpen333.Count -eq 1 -and -not $qOpen333.Contains('popOpen')) { $v333Bad += "the ? buttons call '$(@($qOpen333)[0])' and not popOpen - the opener I102d declares is the one that also raises the scrim (SPEC V333d)" }
 }
 
 # The opener itself still has to exist and keep its shape, because every btnQ names it.
-# `sub` joined the signature in T791 and is OPTIONAL - it names the list ("merit"/"flaw") and
-# only matters where one name lives in both (SPEC I102g). The first three stay pinned in order
-# because every btnQ names them; the fourth is allowed to be there or not.
-if ($rootLua333 -notmatch 'function popOpen\(from, kind, key(, sub)?\)') { $v333Bad += "popOpen is gone or changed shape - it is the ONE opener every btnQ will name, with the row's key as an argument (SPEC I102d, V333d, I102g)" }
+# `sub` joined the signature in T791 and `row` in T845. `sub` is OPTIONAL - it names the
+# list ("merit"/"flaw") and only matters where one name lives in both (SPEC I102g); `row` names
+# the FIELD of the line that opened the box, which is what the storyteller's write needs to know
+# to land anywhere (SPEC I102i, V365f). The first three stay pinned in order because every btnQ
+# names them, and `row` joins them pinned: BOTH call sites pass it, and a popOpen that quietly
+# loses it still compiles while the storyteller types into a box that saves nowhere. A sixth
+# parameter is allowed after it, the way this line was extended twice already.
+if ($rootLua333 -notmatch 'function popOpen\(from, kind, key, sub, row[,)]') { $v333Bad += "popOpen is gone or changed shape - it is the ONE opener every btnQ will name, with the row's key as an argument (SPEC I102d, V333d, I102g)" }
 if ($rootLua333 -notmatch 'function popClose\(from\)') { $v333Bad += "popClose is gone - the X and the scrim both name it (SPEC V333e)" }
 
 if ($v333Bad) { foreach ($b in $v333Bad) { Fail "V333 $b" } }
@@ -12000,12 +12024,44 @@ else { Pass "V333 one ? box and one scrim, the scrim painted under it, both born
 
 # ---- V334: the zoom has ONE ceiling and ONE floor --------------------------------------
 # SPEC I103, V334, T762, and the user's answer to Q7 ("Salvar"). The size is ONE field for all
-# nine panes and not nine fields: the user asked for it saved, not for it saved per pane, and
+# every pane and not one field per pane: the user asked for it saved, not saved per pane, and
 # nine keys in the data contract cannot be taken back later (SPEC V2).
 $v334Bad = @()
-$PANES334 = @('edtDiscDesc','edtPathDesc','edtRitualDesc','edtHedgeDesc','edtHedgeRitualDesc','edtPsychicDesc','edtFaithDesc','edtPopDesc','edtMfDesc')
+# REWRITTEN by T847: the roster is DERIVED from the code, never typed. This line was written out
+# as a literal three times and aged three times - eight panes, then nine, then I103 promised two -
+# and a typed number is what made each of those a separate edit somebody had to remember. Now the
+# XML is the source, the Lua table and the button pairs are compared AGAINST it, and a pane that
+# arrives or leaves moves all three together or the gate names which one lagged (SPEC V334b, B102).
+$PANES334 = @()
+foreach ($f334 in $files) {
+    foreach ($te334 in @((Doc $f334.FullName).SelectNodes("//textEditor[@name]"))) {
+        $nm334 = $te334.GetAttribute("name")
+        if ($nm334 -match '^edt.*Desc$') { $PANES334 += $nm334 }
+    }
+}
+$PANES334 = @($PANES334 | Sort-Object -Unique)
 
-# (b) nine panes, each with its pair, found BY NAME off the pane's own suffix - so a button
+# zero-guard FIRST: everything under this compares against the derived set, and a set that comes
+# back empty makes every one of those comparisons pass on nothing (SPEC V20, B7, B92).
+if ($PANES334.Count -eq 0) { $v334Bad += "no edt*Desc textEditor was found in any .lfm - the roster this leg derives is empty, so every count below measures nothing (SPEC V209, V20)" }
+
+# The Lua half has to name the SAME set: DESC_PANES is what applyDescFont walks, so a pane the
+# XML carries and the table does not is a pane the zoom skips in silence (SPEC V334e, V135).
+$luaPanes334 = @()
+if ($rootTxt -match '(?s)local DESC_PANES = \{(.*?)\};') {
+    $luaPanes334 = @([regex]::Matches($Matches[1], 'edt[A-Za-z]*Desc') | ForEach-Object { $_.Value } | Sort-Object -Unique)
+}
+if ($luaPanes334.Count -eq 0) { $v334Bad += "DESC_PANES is gone or unreadable in WoD20th.lfm - it is the list applyDescFont walks, and without it the Lua half of this roster measures nothing (SPEC V334e, V209)" }
+else {
+    foreach ($p334x in $PANES334) {
+        if ($luaPanes334 -notcontains $p334x) { $v334Bad += "'$p334x' is authored in the XML and absent from DESC_PANES - the zoom would skip it in silence (SPEC V334b, V135)" }
+    }
+    foreach ($l334x in $luaPanes334) {
+        if ($PANES334 -notcontains $l334x) { $v334Bad += "'$l334x' is named in DESC_PANES and authored in no .lfm - the table is carrying a pane that does not exist (SPEC V334b, V209)" }
+    }
+}
+
+# (b) every derived pane with its pair, found BY NAME off the pane's own suffix - so a button
 # that drifts onto another box is a miss here and not a silent pass on a total that still adds up.
 $btn334 = @()
 foreach ($f334 in $files) {
@@ -12020,11 +12076,11 @@ else {
         foreach ($way334 in @('Up', 'Down')) {
             $want334 = "btnFont$way334$sfx334"
             if (@($btn334 | Where-Object { $_.Name -eq $want334 }).Count -ne 1) {
-                $v334Bad += "$want334 is missing or authored twice - each of the nine panes carries exactly one + and one - (SPEC I103b, V334b)"
+                $v334Bad += "$want334 is missing or authored twice - each derived pane carries exactly one + and one - (SPEC I103b, V334b)"
             }
         }
     }
-    if ($btn334.Count -ne 18) { $v334Bad += "$($btn334.Count) btnFont* button(s) on the sheet, expected 18 - nine panes and a pair each (SPEC I112c, V334b)" }
+    if ($btn334.Count -ne ($PANES334.Count * 2)) { $v334Bad += "$($btn334.Count) btnFont* button(s) on the sheet against $($PANES334.Count) derived pane(s) - the sheet carries a pair per pane, and the expected number comes off the panes rather than out of a literal that ages (SPEC I112c, V334b, B102)" }
 
     # (c) every one of them goes through fontStep with the step and nothing else. A button that
     # writes .fontSize itself is a second place the ceiling lives (SPEC V135, V334a, V334c).
@@ -12090,7 +12146,7 @@ foreach ($f334 in $files) {
 if ($luaOwned -notcontains 'descFontSize') { $v334Bad += "descFontSize is not in the declared Lua-owned list - a field with no widget owner needs the declaration, or V8's exception stops being a closed list (SPEC I3, V334f, B25)" }
 
 if ($v334Bad) { foreach ($b in $v334Bad) { Fail "V334 $b" } }
-else { Pass "V334 nine description panes carry eighteen zoom buttons, all of them through the one fontStep that owns the 10, the 32 and the 2, with descFontSize written on the click and read back on open" }
+else { Pass "V334 $($PANES334.Count) description panes - counted off the XML, matched against DESC_PANES - carry $($btn334.Count) zoom buttons, all of them through the one fontStep that owns the 10, the 32 and the 2, with descFontSize written on the click and read back on open" }
 
 # ---- V337: a family ceiling refuses, and never tidies up (SPEC I106, I108c, T781) ---------
 # The table is SPARSE by design: only the family a book actually limits has a row, and having no
@@ -13111,10 +13167,10 @@ if (-not $open352) { $v352Bad += "(e) mfOpen is gone - leg (e) measured nothing 
 else {
     $timer352 = [regex]::Match($open352, '(?s)setTimeout\(function\(\)(.*?)end, 1\);')
     if (-not $timer352.Success) { $v352Bad += "(e) mfOpen schedules no setTimeout - there is nowhere for the parse to go (SPEC I107f)" }
-    elseif ($timer352.Groups[1].Value -notmatch 'require\("desc" \.\. ') { $v352Bad += "(e) the description-module require is not inside mfOpen's timer - either package.loaded is never warmed and the first marking parses 563KB, or the parse lands in the turn the box is drawn (SPEC I112e, R92, T479)" }
+    elseif ($timer352.Groups[1].Value -notmatch 'require[,(]\s*"desc" \.\. ') { $v352Bad += "(e) the description-module require is not inside mfOpen's timer - either package.loaded is never warmed and the first marking parses 563KB, or the parse lands in the turn the box is drawn (SPEC I112e, R92, T479)" }
 }
 if (-not $sel352) { $v352Bad += "(e) mfSelect is gone - nothing paints the pane (SPEC V209)" }
-elseif ($sel352 -match 'require\(') { $v352Bad += "(e) mfSelect requires a module - 563KB parsed on the first click of a row freezes the tab in the middle of the choice (SPEC I112e, I107f, T479)" }
+elseif ($sel352 -match '\brequire\s*[,(]') { $v352Bad += "(e) mfSelect requires a module - 563KB parsed on the first click of a row freezes the tab in the middle of the choice (SPEC I112e, I107f, T479). The pattern reads the GUARDED form too: pcall(require, ...) is still a parse, and V364's guard changed the call shape without changing what this leg is for" }
 
 # (f) ONE function returns the text and BOTH readers come through it. Two readers are two
 # rulers for the composite key of I102g, and the second one drifts in silence (SPEC V344d).
@@ -13129,25 +13185,57 @@ if ($sel352 -and $sel352 -notmatch 'descText\(') { $v352Bad += "(f) mfSelect doe
 if ($v352Bad) { foreach ($b in $v352Bad) { Fail "V352 $b" } }
 else { Pass "V352 edtMfDesc is a child of mfSearch, read-only and wrapping with no field, the box closes at 1300/660 with the result column still at 20/480, mfFilter and mfPage clear the pane, the 563KB module is parsed in mfOpen's timer and never in mfSelect, and one descText serves both readers" }
 # ---- V354: the generic box loses nothing the dropdown it replaces had ---------------------
-# SPEC I113, V354, Q30, T808/T809. Legs are written per WAVE and each one measures what the
-# wave ACTUALLY converted - a leg written for a family that has not moved yet is a check that
-# passes by vacancy, which is the whole of B7. WAVE 1 is the PILOT: backgrounds, sixteen picked
-# rows, PICKER_LIST['background'] and no runtime filter, so leg (c) - the filter - belongs to
-# wave 3 and is deliberately not here.
+# SPEC I113, V354, Q30, T808/T809, and REWRITTEN by T841 after B100. Legs are written per WAVE,
+# but a leg is the FORM that wave adds - never the rule of the FAMILY. V354 was born when ONE
+# wave stood on disk and the two collapsed into each other, so the PILOT's shape - numbered
+# rows, a description module on disk - became a requirement of every wave and forbade exactly
+# what V364/I116c made legal in the same round (SPEC B100).
 #
-# The roster is NAMED and not pattern-matched: a wildcard would swallow wave 2 the day someone
-# writes it and report it as measured (SPEC V328c).
+# Per wave: Tpl/File are the template and the file that draws it. Mod is the description module
+# and is OPTIONAL - a wave with NO module is legal, its call site names none, and its pane falls
+# to V360c's sentence through the path V364b already opens. RootArg is the third argument of
+# mfOpen AS AUTHORED: a literal root, or the $(field) indirection when one template serves more
+# than one root. Roots lists the PICKER_LIST keys the wave really opens, each with the FORM its
+# rows are drawn in and how many of them there are:
+#
+#   numbered  <Tpl field="<root>_N">   N rows of ONE root          (the pilot: 16 background_N)
+#   bare      <Tpl field="<root>">     no number, >1 root per tpl  (HeaderPicker: nature/demeanor)
+#   indirect  <Tpl num="N">            the call site names NO root - the field is built INSIDE
+#                                      the template (SpecialityRow: field="speciality_$(num)")
+#
+# The roster is NAMED and not pattern-matched: a wildcard would swallow the next wave the day
+# someone writes it and report it as measured (SPEC V328d). Leg (i) is what keeps a named roster
+# honest - it asks the CODE which templates open the box and refuses any nobody declared.
 $V354_WAVE = @(
-    @{ Tpl = 'OpenAbility'; File = 'WoD20.2.lfm'; Root = 'background'; Mod = 'Background'; Rows = 16; FieldAttr = '$(field)' }
+    @{ Tpl = 'OpenAbility'; File = 'WoD20.2.lfm'; Mod = 'Background'; FieldAttr = '$(field)'; RootArg = 'background';
+       Roots = @( @{ Root = 'background'; Form = 'numbered'; Rows = 16 } ) },
+    # Wave 2, and the two shapes that B100 was opened over. HeaderPicker draws its rows BARE -
+    # field="nature" and field="demeanor", no number - and one template carries TWO roots, whose
+    # PICKER_LIST entries are the same authored list by identity (V211c). SpecialityRow draws
+    # them INDIRECT: the call site is <SpecialityRow num="N"> and names no root at all, the
+    # field being built inside the template. NEITHER declares a module: nature/demeanor waits on
+    # the extraction of T838, and speciality will never have one (SPEC Q33, user 2026-08-30).
+    @{ Tpl = 'HeaderPicker'; File = 'WoD20.1.lfm'; FieldAttr = '$(field)'; RootArg = '$(field)';
+       Roots = @( @{ Root = 'nature'; Form = 'bare'; Rows = 1 }, @{ Root = 'demeanor'; Form = 'bare'; Rows = 1 } ) },
+    @{ Tpl = 'SpecialityRow'; File = 'WoD20.1.lfm'; FieldAttr = 'speciality_$(num)'; RootArg = 'speciality';
+       Roots = @( @{ Root = 'speciality'; Form = 'indirect'; Rows = 7 } ) }
 )
+
+# Templates allowed to open the box WITHOUT being a wave of I113e. NAMED, never a generic skip:
+# a whitelist that took any template would kill leg (i) for every wave (SPEC V328d, B7).
+# MeritPicked is the merit/flaw box, older than I113 - its root is $(sub), resolved at runtime,
+# so no static reader can follow it, and it already has owners (SPEC I107a, V331, V332).
+$V354_EXEMPT = @('MeritPicked')
+
 $v354Bad = @()
 $v354Seen = 0
+$v354Rooted = 0
 foreach ($w354 in $V354_WAVE) {
     $doc354 = Doc (Join-Path $dir $w354.File)
     $tpl354 = $doc354.SelectSingleNode("//template[@name='$($w354.Tpl)']")
 
     # (g) zero-guard for THIS wave: with the template gone every leg under it reads an empty set.
-    if ($null -eq $tpl354) { $v354Bad += "(g) $($w354.File) declares no $($w354.Tpl) - the wave's rows have no shape and legs (a) to (e) would measure nothing (SPEC V209, V20, B7)"; continue }
+    if ($null -eq $tpl354) { $v354Bad += "(g) $($w354.File) declares no $($w354.Tpl) - the wave's rows have no shape and legs (a) to (h) would measure nothing (SPEC V209, V20, B7)"; continue }
     $v354Seen++
 
     # (a) the I107a1 pair that REPLACES V13: one visible button that opens the box, one twin
@@ -13165,43 +13253,99 @@ foreach ($w354 in $V354_WAVE) {
         if ($btn354.Count -eq 1 -and $twin354[0].GetAttribute("left") -ne $btn354[0].GetAttribute("left")) { $v354Bad += "(a) the twin sits at x=$($twin354[0].GetAttribute('left')) and the button at x=$($btn354[0].GetAttribute('left')) - one field, two widgets, one place (SPEC I107a1)" }
     }
 
-    # (b) the LIST is PICKER_LIST's, named in the opener, and the description MODULE the opener
-    # names really is at the plugin root in both halves. V215 used to answer that second half
-    # off the literal require; the module is a PARAMETER now (I113a) and no static reader can
-    # resolve it, so the wave roster answers in its place.
+    # (b) REWRITTEN by T841 (SPEC B100): the LIST is mandatory, the description MODULE is NOT.
+    # The list half is unchanged - the box reads PICKER_LIST and no second copy of a list is
+    # born (V208, V211). The module half went from EXISTENCE to COHERENCE: the wave DECLARES
+    # whether it has one, and BOTH outcomes are legal. Demanding the file either way forbids
+    # converting a list with no module, which is what I116c/V364 made legal and what Q33
+    # OBLIGES - speciality will never have one, by the user's decision of 2026-08-30.
     if ($btn354.Count -eq 1) {
         $click354 = $btn354[0].GetAttribute("onClick")
-        if ($click354 -notmatch "mfOpen\(self,\s*'[^']+',\s*'$($w354.Root)',\s*'$($w354.Mod)'\)") {
-            $v354Bad += "(b) $($w354.Tpl) opens with '$click354' - the three arguments of I113a are the FIELD, the PICKER_LIST root '$($w354.Root)' and the description module '$($w354.Mod)' (SPEC I113a)"
+        $rootPat354 = [regex]::Escape($w354.RootArg)
+        if ($w354.Mod) {
+            $want354 = "mfOpen\(self,\s*'[^']+',\s*'" + $rootPat354 + "',\s*'" + [regex]::Escape($w354.Mod) + "'\)"
+            $shape354 = "the FIELD, the PICKER_LIST root '$($w354.RootArg)' and the description module '$($w354.Mod)'"
+        }
+        else {
+            $want354 = "mfOpen\(self,\s*'[^']+',\s*'" + $rootPat354 + "'\)"
+            $shape354 = "the FIELD and the PICKER_LIST root '$($w354.RootArg)' - and NO module, because this wave declares none"
+        }
+        if ($click354 -notmatch $want354) {
+            $v354Bad += "(b) $($w354.Tpl) opens with '$click354' - the arguments of I113a are $shape354 (SPEC I113a, B100)"
         }
     }
-    if (-not $PICKER.ContainsKey($w354.Root)) { $v354Bad += "(b) PICKER_LIST has no '$($w354.Root)' key - the box would open on nothing at all (SPEC I113b, V211)" }
-    elseif (@($PICKER[$w354.Root]).Count -eq 0) { $v354Bad += "(b) PICKER_LIST['$($w354.Root)'] is empty - every leg reading it below measures nothing (SPEC V211, V20)" }
-    foreach ($half354 in @('en', 'pt')) {
-        if (-not (Test-Path -LiteralPath (Join-Path $plugin "desc$($w354.Mod)_$half354.lua"))) {
-            $v354Bad += "(b) desc$($w354.Mod)_$half354.lua is not at the plugin root - the description pane and the ? would both open empty for '$($w354.Root)' (SPEC I102e, V210, V215)"
+    if ($w354.Mod) {
+        foreach ($half354 in @('en', 'pt')) {
+            if (-not (Test-Path -LiteralPath (Join-Path $plugin "desc$($w354.Mod)_$half354.lua"))) {
+                $v354Bad += "(b) $($w354.Tpl) DECLARES the module '$($w354.Mod)' and desc$($w354.Mod)_$half354.lua is not at the plugin root - a declared module that is not on disk is the pane opening empty on a wave that promised text (SPEC I102e, V210, V215)"
+            }
+        }
+    }
+    else {
+        foreach ($half354 in @('en', 'pt')) {
+            if (Test-Path -LiteralPath (Join-Path $plugin "desc$($w354.Tpl)_$half354.lua")) {
+                $v354Bad += "(b) $($w354.Tpl) declares NO module and desc$($w354.Tpl)_$half354.lua is on disk - text nobody opens is text nobody maintains; either the wave names it or the file goes (SPEC B100, V135)"
+            }
         }
     }
 
-    # (e) EXACT count. A row short is a picker orphaned without a list; a row over is a row that
-    # lost its combo and never got the box.
+    # (e) REWRITTEN by T841 (SPEC B100): there are THREE forms of row and the ruler reads all
+    # three. A row short is a picker orphaned without a list; a row over is a row that lost its
+    # combo and never got the box. Counting only the NUMBERED form let the whole nature/demeanor
+    # wave through by VACANCY - 924 measured strings fell to 856 and the gate stayed green.
     $raw354 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir $w354.File)))
-    $calls354 = @([regex]::Matches($raw354, "<$($w354.Tpl)\s+field=`"$($w354.Root)_\d+`""))
-    if ($calls354.Count -ne $w354.Rows) { $v354Bad += "(e) $($w354.File) draws $($calls354.Count) $($w354.Tpl) row(s) and this wave converts $($w354.Rows) (SPEC I113e)" }
+    foreach ($r354 in @($w354.Roots)) {
+        $v354Rooted++
+        $pat354 = $null
+        if     ($r354.Form -eq 'numbered') { $pat354 = "<$($w354.Tpl)\s+field=`"" + [regex]::Escape($r354.Root) + "_\d+`"" }
+        elseif ($r354.Form -eq 'bare')     { $pat354 = "<$($w354.Tpl)\s+field=`"" + [regex]::Escape($r354.Root) + "`"" }
+        elseif ($r354.Form -eq 'indirect') { $pat354 = "<$($w354.Tpl)\s+num=`"\d+`"" }
+        else { $v354Bad += "(e) wave $($w354.Tpl) declares form '$($r354.Form)' for root '$($r354.Root)', which is none of numbered/bare/indirect - a form the ruler cannot read is a wave that passes by vacancy (SPEC V354e, B100)" }
 
-    # (d, second half) the items of the converted list are still covered as VISIBLE strings.
-    # While the combo stood, V9/V22/V28 swept them in through ListOf; taking the combo away took
-    # the whole family out of that census without a word - 44 names on the pilot alone. The box
-    # searches on translateSheetText, so a missing key is a name the pt player cannot find.
-    if ($PICKER.ContainsKey($w354.Root)) {
-        $noPt354 = @(); $noMap354 = @()
-        foreach ($it354 in @($PICKER[$w354.Root])) {
-            if ($it354 -eq '') { continue }
-            if (-not $ptK.Contains($it354)) { $noPt354 += $it354 }
-            if (-not $embedded.ContainsKey($it354)) { $noMap354 += $it354 }
+        if ($null -ne $pat354) {
+            $n354 = @([regex]::Matches($raw354, $pat354)).Count
+            if ($n354 -ne $r354.Rows) { $v354Bad += "(e) $($w354.File) draws $n354 $($w354.Tpl) row(s) for root '$($r354.Root)' in the $($r354.Form) form and this wave converts $($r354.Rows) (SPEC I113e, V354e)" }
+            # (g) per ROOT, and not per wave: with more than one root on one template the
+            # whole-wave guard above cannot see the root that vanished (SPEC B100).
+            if ($n354 -eq 0) { $v354Bad += "(g) root '$($r354.Root)' of $($w354.Tpl) has not one row in $($w354.File) - every leg reading that root measures nothing (SPEC V20, B7, B100)" }
         }
-        if ($noPt354.Count -gt 0) { $v354Bad += "(d) $($noPt354.Count) item(s) of PICKER_LIST['$($w354.Root)'] carry no [pt] key ($((@($noPt354) | Select-Object -First 3) -join ', ')) - with the combo gone nothing else sweeps them into the visible set (SPEC V10, V28, B7)" }
-        if ($noMap354.Count -gt 0) { $v354Bad += "(d) $($noMap354.Count) item(s) of PICKER_LIST['$($w354.Root)'] are absent from the PT map ($((@($noMap354) | Select-Object -First 3) -join ', ')) - they would never translate (SPEC V28, B14)" }
+
+        # (h) NAMED by T841 (SPEC B100). This lived INSIDE leg (d) since T809 and a leg with no
+        # name cannot be charged wave by wave. While the combo stood, V9/V22/V28 swept these
+        # names into the visible census through ListOf; taking the combo away took the whole
+        # family out of that census without a word - 68 archetypes on the wave that measured it.
+        if (-not $PICKER.ContainsKey($r354.Root)) { $v354Bad += "(b) PICKER_LIST has no '$($r354.Root)' key - the box would open on nothing at all (SPEC I113b, V211)" }
+        elseif (@($PICKER[$r354.Root]).Count -eq 0) { $v354Bad += "(b) PICKER_LIST['$($r354.Root)'] is empty - every leg reading it measures nothing (SPEC V211, V20)" }
+        else {
+            $noPt354 = @(); $noMap354 = @()
+            foreach ($it354 in @($PICKER[$r354.Root])) {
+                if ($it354 -eq '') { continue }
+                if (-not $ptK.Contains($it354)) { $noPt354 += $it354 }
+                if (-not $embedded.ContainsKey($it354)) { $noMap354 += $it354 }
+            }
+            if ($noPt354.Count -gt 0) { $v354Bad += "(h) $($noPt354.Count) item(s) of PICKER_LIST['$($r354.Root)'] carry no [pt] key ($((@($noPt354) | Select-Object -First 3) -join ', ')) - with the combo gone nothing else sweeps them into the visible set (SPEC V10, V28, B7, B100)" }
+            if ($noMap354.Count -gt 0) { $v354Bad += "(h) $($noMap354.Count) item(s) of PICKER_LIST['$($r354.Root)'] are absent from the PT map ($((@($noMap354) | Select-Object -First 3) -join ', ')) - they would never translate (SPEC V28, B14, B100)" }
+        }
+    }
+
+    # (i, per ROOT) MEASURED by the T842 bench: leg (i) below charges completeness of the
+    # TEMPLATE roster, and that is not enough for the BARE form. Dropping 'demeanor' from this
+    # wave's Roots left the gate GREEN - HeaderPicker was still declared, so (i) was satisfied,
+    # and the second root simply stopped being measured. That is B100's hole surviving inside
+    # the fix for B100, and the cure is the same one: ask the CODE. A bare row NAMES its root in
+    # the .lfm, so the set of roots drawn has to EQUAL the set declared - no more, no less.
+    #
+    # Only the bare form: numbered and indirect carry ONE root each and the count in (e) already
+    # pins it. Asking this of a numbered wave would read background_1..16 as sixteen roots.
+    $bare354 = @(@($w354.Roots) | Where-Object { $_.Form -eq 'bare' } | ForEach-Object { $_.Root })
+    if ($bare354.Count -gt 0) {
+        $drawn354 = @([regex]::Matches($raw354, "<$($w354.Tpl)\s+field=`"([^`"]+)`"") | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+        foreach ($d354 in $drawn354) {
+            if ($bare354 -notcontains $d354) { $v354Bad += "(i) $($w354.File) draws a $($w354.Tpl) on root '$d354' and this wave does not declare it - an undeclared root is measured by nothing at all, which is how 68 archetypes lost their guard with the gate green (SPEC V354i, B100)" }
+        }
+        foreach ($b354 in $bare354) {
+            if ($drawn354 -notcontains $b354) { $v354Bad += "(i) this wave declares the bare root '$b354' and $($w354.File) draws no $($w354.Tpl) on it - a declared root with no row excuses nothing (SPEC V354i, V20)" }
+        }
     }
 }
 
@@ -13231,11 +13375,33 @@ else {
     if ($fb354 -notmatch 'for i = 1, #MF\.pool, 1 do') { $v354Bad += "(d) mfFilter does not walk MF.pool - it is reading a source the generic opener no longer fills (SPEC I113b)" }
 }
 
+# (i) NEW with T841 (SPEC B100). The roster is NAMED on purpose, and a named roster only stays
+# honest if the CODE is asked which templates open the box: a wave converted and never added to
+# it passes by VACANCY - every leg above reads an empty set and the gate stays green, which is
+# the third lesson B100 wrote. The cure is not a wildcard, it is completeness charged from the
+# other side (SPEC V354i, V328d).
+$v354Opens = @()
+foreach ($f354 in $files) {
+    $d354 = Doc $f354.FullName
+    foreach ($t354 in @($d354.SelectNodes("//template[@name]"))) {
+        if (@($t354.SelectNodes(".//button[contains(@onClick,'mfOpen(')]")).Count -gt 0) { $v354Opens += $t354.GetAttribute("name") }
+    }
+}
+$v354Opens = @($v354Opens | Sort-Object -Unique)
+$v354Known = @(@($V354_WAVE | ForEach-Object { $_.Tpl }) + $V354_EXEMPT)
+foreach ($o354 in $v354Opens) {
+    if ($v354Known -notcontains $o354) { $v354Bad += "(i) template '$o354' opens the box with mfOpen( and is in NEITHER the wave roster nor the named exemption list - a converted wave nobody declared passes by vacancy, which is exactly what B100 measured (SPEC V354i, V328d)" }
+}
+foreach ($e354 in $V354_EXEMPT) {
+    if ($v354Opens -notcontains $e354) { $v354Bad += "(i) '$e354' is on the exemption list and opens no box - an exemption for a template that no longer opens one excuses nothing, and a stale line here is how a real wave slips in later (SPEC V354i, V20)" }
+}
+
 # (g) the roster itself: no wave read means every leg above passed by vacancy.
 if ($v354Seen -eq 0) { $v354Bad += "(g) not one wave of I113e was read - the roster is empty or its templates are gone (SPEC V20, B7)" }
+if ($v354Rooted -eq 0) { $v354Bad += "(g) not one ROOT was read across the roster - a wave with no roots declared measures nothing at all (SPEC V20, B100)" }
 
 if ($v354Bad) { foreach ($b in $v354Bad) { Fail "V354 $b" } }
-else { Pass "V354 $v354Seen wave(s) of I113e converted - $((@($V354_WAVE | ForEach-Object { "$($_.Rows) $($_.Root) row(s)" })) -join ', ') - each on the button-plus-hidden-twin of I107a1 with no comboBox left, opening on its own PICKER_LIST root and description module, with the saved value appended before the sort and every item still covered by the PT map" }
+else { Pass "V354 $v354Seen wave(s) of I113e converted over $v354Rooted root(s) - $((@($V354_WAVE | ForEach-Object { $w = $_; (@($w.Roots | ForEach-Object { "$($_.Rows) $($_.Root) row(s) [$($_.Form)]" })) -join ', ' })) -join ' | ') - each on the button-plus-hidden-twin of I107a1 with no comboBox left, opening on its own PICKER_LIST root, coherent with the description module it declares or with declaring none, every root drawing the rows it says and every item still covered by the PT map, and the $($v354Opens.Count) template(s) that open the box all accounted for" }
 
 # ---- V355: the picker says what it HAS and what it has NOT, in the language in force -------
 # SPEC I114, V355, T813/T815, user 2026-08-29. Every leg below is the SHAPE of code and is
@@ -13388,30 +13554,56 @@ if ($rootNC355 -match '(?m)^\s*(local\s+)?function\s+foldKey\b' -or $rootNC355 -
 
 if ($v355Bad) { foreach ($b in $v355Bad) { Fail "V355 $b" } }
 else { Pass "V355 one mfShown decides what both readers show, mfLabel paints the two states alone - roman at opacity 1, dashed italic at 0.60 - its fontStyle count agrees with V305c's, the blank joins the pool only for a row that HOLDS a value and mfConfirm lets it through and clears book, page and cost with it, the title is derived from the list with no roster, fitSize is the one width ruler with a floor of 7 counting characters and never growing, and the order is foldKey's over what is read" }
-# ---- V356: the two SETTINGS tabs stay on dropdowns ----------------------------------------
-# SPEC C 144th, V356, I113e as widened, T817, user 2026-08-30. Six combos across the two tabs
-# that hold SETTINGS rather than character prose - Settings is WoD20.6 and Storyteller is
-# WoD20.10, the mapping the root form's <layout> imports declare. What makes them combos is
-# not their names but what they CARRY: an authored items/values pair on a field that is a
-# setting. I113e's waves convert PROSE pickers off PICKER_LIST and touch neither file, so this
-# leg is not narrowing that programme - it is closing the door B94 left open, where a future
-# ruler reading "no comboBox anywhere on the sheet" eats these six without a word.
+# ---- V356: the combos of VALUE stay dropdowns ---------------------------------------------
+# SPEC C 144th, V356, I113e as widened, T817, T843, user 2026-08-30. EIGHT combos, and the rule
+# is no longer "the two settings tabs" - Q31 broke that framing on 2026-08-30 by ruling that
+# dominatorGen (4..14) and hedgeAttr STAY dropdowns, and neither of those lives on WoD20.6 or
+# WoD20.10. What separates a combo of VALUE from a picker of PROSE is what the leg already
+# measured and not where it sits: an authored items/values pair on a field that is a setting,
+# and nothing here reading PICKER_LIST.
 #
-# This REPLACES V354(f), which said the same thing about two of the six and never became a
+# Widening it was not optional. The tab framing had the two new ones outside the foreach, and
+# B95 already measured what that costs: cmbBgCost and language carried no TYPE guard at all
+# while four others were covered by ACCIDENT, through checks resolving //comboBox[@name=...] to
+# ask something else entirely. That is the cover B94 showed evaporates the moment the target
+# changes type, and here it was never anyone's intention in the first place.
+#
+# I113e's waves convert PROSE pickers off PICKER_LIST and touch none of these files, so this
+# leg is not narrowing that programme - it is closing the door B94 left open, where a future
+# ruler reading "no comboBox anywhere on the sheet" eats these eight without a word.
+#
+# This REPLACES V354(f), which said the same thing about two of the eight and never became a
 # check at all (SPEC B95): its legs are written per WAVE, and (f) is the NEGATION of a wave,
 # so the foreach had nowhere to hang it.
 #
-# The roster of six is the kind that GUARDS, not the kind that AGES. I114f forbids a roster
-# that must GROW a row per wave, because the wave that forgets its row passes silently. This
-# one lists what must NOT change, so losing an entry LIGHTS it - the opposite failure
-# direction. Do not "fix" it into a derivation on the grounds that rosters age.
+# The roster is the kind that GUARDS, not the kind that AGES. I114f forbids a roster that must
+# GROW a row per wave, because the wave that forgets its row passes silently. This one lists
+# what must NOT change, so losing an entry LIGHTS it - the opposite failure direction. Do not
+# "fix" it into a derivation on the grounds that rosters age.
+#
+# Anchored on the FIELD and not on coordinates: WoD20.7 and WoD20.11 are being restructured by
+# T830/T832, and a left/top anchor here would break the day those land. Not on the NAME either,
+# and that is MEASURED rather than assumed - the language combo authors no name attribute at
+# all, which is half of why B95 found it unguarded.
 $V356_KEEP = @(
-    @{ File = 'WoD20.6.lfm';  Tab = 'Settings';    Field = 'language' },
-    @{ File = 'WoD20.6.lfm';  Tab = 'Settings';    Field = 'game' },
-    @{ File = 'WoD20.6.lfm';  Tab = 'Settings';    Field = 'sheetTheme' },
-    @{ File = 'WoD20.10.lfm'; Tab = 'Storyteller'; Field = 'healthLevels' },
-    @{ File = 'WoD20.10.lfm'; Tab = 'Storyteller'; Field = 'stSpecCost' },
-    @{ File = 'WoD20.10.lfm'; Tab = 'Storyteller'; Field = 'stBackgroundCost' }
+    @{ File = 'WoD20.6.lfm';  Where = 'Settings';    Field = 'language' },
+    @{ File = 'WoD20.6.lfm';  Where = 'Settings';    Field = 'game' },
+    @{ File = 'WoD20.6.lfm';  Where = 'Settings';    Field = 'sheetTheme' },
+    @{ File = 'WoD20.10.lfm'; Where = 'Storyteller'; Field = 'healthLevels' },
+    @{ File = 'WoD20.10.lfm'; Where = 'Storyteller'; Field = 'stSpecCost' },
+    @{ File = 'WoD20.10.lfm'; Where = 'Storyteller'; Field = 'stBackgroundCost' },
+    # SEVEN, not the eight Q31 seemed to name, and the difference was MEASURED by T843 rather
+    # than assumed. Q31 ruled on 2026-08-30 that dominatorGen and hedgeAttr both STAY dropdowns
+    # "because they are combos of VALUE like the other six - authored items/values, reading no
+    # PICKER_LIST". That is true of dominatorGen and FALSE of hedgeAttr: WoD20.7 authors no
+    # items and no values on it and says so in its own comment - "cbo, not cmb: this is a picker
+    # of PROSE, so its list lives in PICKER_LIST and translates with the sheet" (SPEC I27, B57).
+    # Listing it here would demand an authored pair, and authoring one is a SECOND copy of a
+    # list that V208 exists to forbid - and it would stop translating.
+    #
+    # So hedgeAttr is NOT guarded here and is NOT silently converted either: which way it goes
+    # is the user's call on a premise that has now actually been read, and it waits (SPEC T843).
+    @{ File = 'WoD20.11.lfm'; Where = 'Ghoul';       Field = 'dominatorGen' }
 )
 $v356Bad = @()
 $v356Seen = 0
@@ -13422,15 +13614,15 @@ foreach ($k356 in $V356_KEEP) {
     # having become something else; two is an undeclared mirror on a field that is a single
     # setting, which is a second place to change one answer from.
     $cb356 = @($doc356.SelectNodes("//comboBox[@field='$($k356.Field)']"))
-    if ($cb356.Count -eq 0) { $v356Bad += "(a) the $($k356.Tab) tab has no comboBox on '$($k356.Field)' in $($k356.File) - the dropdown the user asked on 2026-08-30 to KEEP has become something else, and the button of I107a1 was never called for here (SPEC C 144th, I113e)"; continue }
-    if ($cb356.Count -gt 1) { $v356Bad += "(a) the $($k356.Tab) tab carries $($cb356.Count) comboBox on '$($k356.Field)' in $($k356.File) - one setting with two widgets is an undeclared mirror (SPEC V1, V36)"; continue }
+    if ($cb356.Count -eq 0) { $v356Bad += "(a) the $($k356.Where) tab has no comboBox on '$($k356.Field)' in $($k356.File) - the dropdown the user asked on 2026-08-30 to KEEP has become something else, and the button of I107a1 was never called for here (SPEC C 144th, I113e)"; continue }
+    if ($cb356.Count -gt 1) { $v356Bad += "(a) the $($k356.Where) tab carries $($cb356.Count) comboBox on '$($k356.Field)' in $($k356.File) - one setting with two widgets is an undeclared mirror (SPEC V1, V36)"; continue }
     $v356Seen++
 
     # (b) what makes it a SETTING and not prose, and it is the REASON the leg names it rather
     # than the name itself: the pair is AUTHORED in the XML and nothing here reads PICKER_LIST.
     # Losing the authored items is the combo turning into a picker by the back door.
     foreach ($at356 in @('items', 'values')) {
-        if ([string]::IsNullOrEmpty($cb356[0].GetAttribute($at356))) { $v356Bad += "(b) the '$($k356.Field)' combo of the $($k356.Tab) tab authors no $at356 - the authored pair is what separates a VALUE combo from a prose picker, and prose is the only thing I113e converts (SPEC C 144th, V15, I110d)" }
+        if ([string]::IsNullOrEmpty($cb356[0].GetAttribute($at356))) { $v356Bad += "(b) the '$($k356.Field)' combo of the $($k356.Where) tab authors no $at356 - the authored pair is what separates a VALUE combo from a prose picker, and prose is the only thing I113e converts (SPEC C 144th, V15, I110d)" }
     }
 }
 
@@ -13441,7 +13633,453 @@ if ($v356Seen -lt $V356_KEEP.Count -and $v356Bad.Count -eq 0) { $v356Bad += "(c)
 if ($v356Seen -eq 0) { $v356Bad += "(c) not ONE of the $($V356_KEEP.Count) combos was read - the roster is empty or the two tab files are gone, and every leg above measured nothing (SPEC V209, V20, B7)" }
 
 if ($v356Bad) { foreach ($b in $v356Bad) { Fail "V356 $b" } }
-else { Pass "V356 all $v356Seen settings combos stay dropdowns - $((@($V356_KEEP | ForEach-Object { $_.Field })) -join ', ') - one comboBox each on the file its tab imports, every one still authoring its own items and values" }
+else { Pass "V356 all $v356Seen combos of VALUE stay dropdowns - $((@($V356_KEEP | ForEach-Object { $_.Field })) -join ', ') - one comboBox each on the file that draws it, every one still authoring its own items and values" }
 
+
+# ---- V357: `self` on an inline handler is the FORM, so nothing writes a widget through it --
+# SPEC V357, B96, R134, T818/T819, user 2026-08-30. mfOpen kept the button that opened the box
+# in MF.btn and mfConfirm painted the row's label through it - but the `self` an inline <event>
+# hands a function is the FORM (the generated `local self = obj;`, SPEC R134), so the write
+# landed on the whole TAB: choosing the blank dimmed every widget on it to 0.60 and turned it
+# italic. The other branch writes opacity 1, which is the half that UNDOES it - and that is why
+# only EMPTYING a row ever showed the defect.
+#
+# The label was never at risk: the two dataLink of I107a2 repaint it from the field and find
+# their control by NAME, so the direct write was a SECOND writer (V135) and the whole of the
+# cure is that it goes away. mfLabel itself is untouched - its two states and its two numbers
+# are V355(b)'s and stay whole.
+$rootNC357  = NoComments $rootTxt
+$labelFn357 = LuaFn $rootTxt 'mfLabel'
+$v357Bad = @()
+
+# The zero-guard runs FIRST and on purpose: with mfLabel gone, or called from nowhere, leg (a)
+# reads an empty set and passes by VACANCY, which is the whole of B7 and why V20 asks for a
+# mutation before a check is believed.
+$calls357 = @([regex]::Matches($rootNC357, '(?<!function )mfLabel\(\s*([^,\)]+)\s*,'))
+if (-not $labelFn357) { $v357Bad += "(zero) mfLabel was not found on the root form - the label painter is gone and every leg below would measure nothing (SPEC V209, V20, B7)" }
+if ($calls357.Count -eq 0) { $v357Bad += "(zero) mfLabel is called nowhere on the root form - no row would ever be repainted and leg (a) would pass over an empty set (SPEC V209, V20, B7)" }
+
+# (a) every call site hands mfLabel a control found by NAME. MF.btn, from and self are the
+# three ways to hand it the FORM instead, and the first argument is the only place that
+# mistake can enter (SPEC V143, R134).
+foreach ($c357 in $calls357) {
+    $arg357 = $c357.Groups[1].Value.Trim()
+    if ($arg357 -match '^(MF\.btn|from|self)$') { $v357Bad += "(a) mfLabel is called with '$arg357' as its control - an inline handler's self is the FORM, so this paints the whole tab instead of the row (SPEC R134, B96)" }
+    elseif ($arg357 -notmatch '^found\[') { $v357Bad += "(a) mfLabel is called with '$arg357' as its control - every call site has to pass a control found by NAME, and that is found[...] (SPEC V143, V357a)" }
+}
+
+# (b) the door stays SHUT, and shutting it means the VALUE is not kept either: a table field
+# nothing reads is a field that lies about what it is to whoever opens the file next.
+if ($rootNC357 -match 'MF\.btn') { $v357Bad += "(b) MF.btn is written or read again on the root form - the button that opened the box is not the control an inline handler receives (SPEC B96, V357b)" }
+$mfTbl357 = [regex]::Match($rootNC357, '(?s)local MF = \{.*?\};')
+if (-not $mfTbl357.Success) { $v357Bad += "(b) the MF table was not found on the root form (SPEC V209, I107f)" }
+elseif ($mfTbl357.Value -match '(?m)\bbtn\s*=') { $v357Bad += "(b) the MF table still declares btn - the slot the removed writer filled is kept with no reader, which is a field that lies (SPEC V357b, V135)" }
+
+# (c) the GENERAL rule B96 is one case of, across EVERY file: what the XML hands a handler is
+# an ANCHOR to search from (tabRootOf), never a target to write a property on.
+foreach ($f357 in $files) {
+    $code357 = CodeOf $f357.FullName
+    foreach ($who357 in @('from', 'self')) {
+        $w357 = @([regex]::Matches($code357, "(?m)\b$who357\.[A-Za-z_][A-Za-z0-9_]*\s*=[^=]"))
+        if ($w357.Count -gt 0) { $v357Bad += "(c) $($f357.Name) writes a property through '$who357' $($w357.Count) time(s) - what an inline handler receives is the FORM, so the write lands on the whole tab (SPEC R134, B96, V357c)" }
+    }
+}
+
+if ($v357Bad) { foreach ($b in $v357Bad) { Fail "V357 $b" } }
+else { Pass "V357 all $($calls357.Count) mfLabel call sites pass a control found by name, MF neither declares nor writes btn, and no .lfm writes a property through the self or from an inline handler receives" }
+
+# ---- V358: the measure the ornament stamps is the RESOLVED one ----------------------------
+# SPEC V358, B97, T821/T822, user 2026-08-30. The load-time measure is taken with the sheet
+# body HIDDEN - applyTheme runs from the sheetTheme dataLink and the reveal is the LAST line of
+# that same handler - so every align="client" box can be asked for a size the layout has not
+# resolved. getWidth is _obj_getProp and answers the last value written rather than nil, so the
+# nil guard in ornament() has nothing to catch, the memo stamps the wrong measure, and
+# applyTheme has ONE call site: the crown stayed drawn at its smallest in the top-left corner
+# of all 73 boxes for the rest of the session, with rdk -l at 0 and this gate green (B97).
+#
+# The cure measured here is MEASURE AGAIN, never REFUSE. A floor would leave a box plain, which
+# is what V279 forbids in letter, and the number would be invented in a file that cannot read
+# the XML the boxes are authored in.
+$t358  = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.6.lfm")))
+$nc358 = NoComments $t358
+$remFn358 = LuaFn $t358 'ornRemeasure'
+$ornFn358 = LuaFn $t358 'ornament'
+$v358Bad = @()
+
+# The zero-guard runs FIRST: with the re-pass gone, or walking nothing, every leg under it
+# reads an empty set and passes by VACANCY (SPEC V209, V20, B7).
+$doc358   = Doc (Join-Path $dir "WoD20.6.lfm")
+$ev358    = $doc358.SelectSingleNode("//dataLink[@field='sheetTheme']/event[@name='onChange']")
+$evTxt358 = if ($ev358) { NoComments $ev358.InnerText } else { '' }
+if (-not $remFn358) { $v358Bad += "(zero) ornRemeasure was not found in WoD20.6 - the boxes are measured once, with the sheet hidden, and never again (SPEC V209, V20, B7, B97)" }
+elseif ($remFn358 -notmatch 'pairs\(ornPainted\)') { $v358Bad += "(zero) ornRemeasure does not walk ornPainted - it re-measures nothing and every leg below passes over an empty set (SPEC V358f, V20, B7)" }
+if (-not $ornFn358) { $v358Bad += "(zero) ornament() was not found in WoD20.6 - there is no memo to re-measure (SPEC V209)" }
+if (-not $ev358) { $v358Bad += "(zero) the sheetTheme dataLink onChange handler was not found - leg (a) would have no body to read the order from (SPEC V209, I6)" }
+
+# (a) ONE re-pass, and it stands AFTER the reveal. Placed BEFORE it, the re-pass reads the very
+# same unresolved size and is an expensive no-op - exit 0, gate green, and the screen still
+# wrong, which is the whole shape of B97.
+if ($ev358) {
+    $calls358 = @([regex]::Matches($evTxt358, 'ornRemeasure\('))
+    if ($calls358.Count -eq 0) { $v358Bad += "(a) the theme handler never reaches ornRemeasure - the load-time measure stays the last word and B97 is back (SPEC V358a)" }
+    elseif ($calls358.Count -gt 1) { $v358Bad += "(a) the theme handler calls ornRemeasure $($calls358.Count) times - one re-pass, or two owners of when the boxes are measured (SPEC V358a, V135)" }
+    else {
+        $revealAt358 = $evTxt358.IndexOf('sheetReveal(')
+        if ($revealAt358 -lt 0) { $v358Bad += "(a) the theme handler no longer reveals the sheet - the order leg (a) measures has one end missing (SPEC V166, I15)" }
+        elseif ($calls358[0].Index -lt $revealAt358) { $v358Bad += "(a) ornRemeasure is called BEFORE the reveal - it re-reads the same size the layout has not resolved yet, which is an expensive no-op and leaves B97 exactly where it was (SPEC V358a, B97)" }
+    }
+    if ($evTxt358 -match 'setTimeout\(\s*function\(\)\s*ornRemeasure\(\);\s*end,\s*0\s*\)') { $v358Bad += "(a) the re-pass is scheduled at interval 0 - setTimeout is only asynchronous with a POSITIVE interval, so at 0 it runs in the same tick, ahead of the align pass (SPEC R44, V358a)" }
+}
+
+# (b) the re-pass does NOT repaint the sheet. A whole applyTheme after the reveal is what V167
+# and B40 pay not to have: the player watches the sheet being painted.
+if ($remFn358 -and $remFn358 -match 'applyTheme\s*\(') { $v358Bad += "(b) ornRemeasure calls applyTheme - a full repaint AFTER the reveal is the load paint the player was never meant to watch (SPEC V358b, V167, B40)" }
+
+# (c) the re-pass hands `w` and `h` in as NIL and lets the control decide. This is the INVERSE
+# of refreshOrnament, and the two coexist because the competitor differs: there a caller has
+# just WRITTEN the height and reading it back can answer with the size the box is leaving
+# (V285c, B62); here nothing was written and what is missing is the align pass.
+if ($remFn358) {
+    $inner358 = @([regex]::Matches($remFn358, 'ornament\(([^)]*)\)'))
+    if ($inner358.Count -eq 0) { $v358Bad += "(c) ornRemeasure never calls ornament() - it walks the memo and re-measures nothing (SPEC V358c, V209)" }
+    foreach ($i358 in $inner358) {
+        $args358 = @($i358.Groups[1].Value -split ',')
+        if ($args358.Count -ne 3) { $v358Bad += "(c) ornRemeasure calls ornament() with $($args358.Count) arguments - the re-pass passes the control, nil and the colour and NOTHING else, or the stale measure walks back in through the fourth (SPEC V358c, V285c)" }
+        elseif ($args358[1].Trim() -ne 'nil') { $v358Bad += "(c) ornRemeasure hands ornament() '$($args358[1].Trim())' where the measure goes - it has to be nil so c.width decides, which is the whole cure (SPEC V358c, B97)" }
+    }
+    if ($remFn358 -match '\.width|\.height') { $v358Bad += "(c) ornRemeasure reads a width or a height of its own - the control is read INSIDE ornament(), and a second reader is a second answer to the one question (SPEC V358c, V67)" }
+}
+
+# (d) GLOBAL, and that is not style: B93 measured this chunk against a ceiling of 100 and a
+# `local function` costs a slot exactly like a variable does. Declared BELOW ornament() because
+# it calls it - the other order compiles to a GETGLOBAL and finds nil, silently (V223, B51).
+if ($nc358 -match 'local\s+function\s+ornRemeasure') { $v358Bad += "(d) ornRemeasure is declared local - it costs the chunk a slot it does not have, and B93 measured that ceiling at 100 with 99 already spent (SPEC V358d, V325, V347)" }
+$defAt358 = $nc358.IndexOf('function ornRemeasure')
+$ornAt358 = $nc358.IndexOf('local function ornament(')
+if ($defAt358 -ge 0 -and $ornAt358 -ge 0 -and $defAt358 -lt $ornAt358) { $v358Bad += "(d) ornRemeasure is declared ABOVE ornament() - reached from there the call compiles to a GETGLOBAL and answers nil, with nothing to grep (SPEC V358d, V223, B51)" }
+
+# (e) the memo carries the CONTROL, so the re-pass measures again without a second walk of the
+# tree. A second collect would be a second owner of "which rectangles are the boxes", which is
+# the one thing sectionBox exists to be the only answer to (V316d, I89b).
+if ($ornFn358) {
+    $memo358 = [regex]::Match($ornFn358, 'e = \{[^}]*\}')
+    if (-not $memo358.Success) { $v358Bad += "(e) the memo entry could not be read in ornament() - leg (e) measured nothing (SPEC V209)" }
+    elseif ($memo358.Value -notmatch '\bc\s*=\s*c\b') { $v358Bad += "(e) the memo entry does not carry the box - ornRemeasure would have to walk the tree a second time to find what to measure, which is a second owner of the question sectionBox answers (SPEC V358e, V316d, I89b)" }
+}
+if ($remFn358 -and $remFn358 -notmatch '\be\.c\b') { $v358Bad += "(e) ornRemeasure never reads the box off the memo entry - the field is stamped and never used, which is a memo that lies about what it holds (SPEC V358e)" }
+
+if ($v358Bad) { foreach ($b in $v358Bad) { Fail "V358 $b" } }
+else { Pass "V358 ornRemeasure is global, declared below ornament, walks the memo for the box it stamped and re-measures each one AFTER the reveal on a positive timer, handing the measure in as nil so the control decides, and never repaints the sheet" }
+
+# ---- V363: the version walks in every place that spells it --------------------------------
+# SPEC V363, I120, T824/T825, user 2026-08-30. The label's own text IS the .lang key (V10), so
+# a bump that touches one and not the other leaves the [pt] sheet showing the version that was,
+# or the key orphaned and [pt] falling back to English - both silent, and both only visible to
+# a player who reads the Settings tab in the other language.
+#
+# I120 said TWO places and MEASURED FOUR: the <label>, the Lua PT map, and wod.Version in the
+# [pt] AND [en] halves of localization.lang. The spec undercounted; the check counts what is
+# there.
+$verLbl363 = @()
+foreach ($f363 in $files) {
+    $d363 = Doc $f363.FullName
+    foreach ($n363 in $d363.SelectNodes("//label[@text]")) {
+        if ($n363.GetAttribute('text') -cmatch '^Version: ') { $verLbl363 += [pscustomobject]@{ File = $f363.Name; Text = $n363.GetAttribute('text') } }
+    }
+}
+$v363Bad = @()
+
+# (c) the zero-guard runs FIRST: with no version label at all, (a) and (b) below read an empty
+# set and pass by VACANCY, which is the whole of B7.
+if ($verLbl363.Count -eq 0) { $v363Bad += "(c) no 'Version: ' label was found on any tab - the sheet stopped telling the player which build it is, and every leg below would measure nothing (SPEC I120, V209, V20, B7)" }
+
+# (b) ONE label spells it. A second is a second owner of one number, and the day they disagree
+# nothing says which is the build (V135, B70).
+elseif ($verLbl363.Count -gt 1) { $v363Bad += "(b) $($verLbl363.Count) labels spell a version - $((@($verLbl363 | ForEach-Object { "$($_.File) '$($_.Text)'" })) -join ', ') - one number, one owner (SPEC V135, B70)" }
+
+# (a) the CAMINHO DE VOLTA of a bumped version: the text is the key, so both halves of the
+# .lang have to carry the NEW string. Missing in [pt] is the Portuguese sheet showing English;
+# missing in [en] is a key the English half never declared.
+else {
+    $vt363 = $verLbl363[0].Text
+    if (-not $ptK.Contains($vt363)) { $v363Bad += "(a) '$vt363' has no [pt] entry in localization.lang - the label text IS the key (V10), so a bumped version leaves the Portuguese sheet on the string that was (SPEC V363a, I120)" }
+    if (-not $enK.Contains($vt363)) { $v363Bad += "(a) '$vt363' has no [en] entry in localization.lang - the key the label asks for was never declared on the English side (SPEC V363a, V10)" }
+}
+
+# NOT MEASURED, and deliberately: <version> in module.xml belongs to the rdk, which rewrites it
+# at prepare (SPEC C, B2). Tying the two would hand the toolchain the power to turn this check
+# red on a build nobody asked to change.
+if ($v363Bad) { foreach ($b in $v363Bad) { Fail "V363 $b" } }
+else { Pass "V363 one label spells the version - '$($verLbl363[0].Text)' in $($verLbl363[0].File) - and both halves of localization.lang carry it as a key" }
+
+# ---- V360: the description pane says what it has and what it has NOT ----------------------
+# SPEC V360, I116, B98, T827/T828, user 2026-08-30 (pedido 3). The right half of the search box
+# was empty space with a text editor floating in it: no rule dividing it from the list, no
+# heading naming it, and nothing said when a list simply has no text to show.
+#
+# V359 - the box in two sizes - is NOT written here. Specialties is still a comboBox, so the
+# narrow variant would have no caller, and a mechanism with no caller is the dead flexibility
+# this repo keeps deleting. It arrives with T826, after T836 converts that row.
+$t360   = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.2.lfm")))
+$doc360 = Doc (Join-Path $dir "WoD20.2.lfm")
+$sel360 = LuaFn $rootTxt 'mfSelect'
+$dsc360 = LuaFn $rootTxt 'descText'
+$v360Bad = @()
+
+$rule360  = $doc360.SelectSingleNode("//layout[@name='mfSearch']/rectangle[@name='mfDescRule']")
+$title360 = $doc360.SelectSingleNode("//layout[@name='mfSearch']/label[@name='lblMfDescTitle']")
+$pane360  = $doc360.SelectSingleNode("//layout[@name='mfSearch']/textEditor[@name='edtMfDesc']")
+
+# (f) the zero-guard runs FIRST - with the heading or descText gone, the legs below read an
+# empty set and pass by VACANCY, which is the whole of B7.
+if (-not $title360) { $v360Bad += "(f) lblMfDescTitle was not found inside mfSearch - the pane lost the heading that names it and every leg below would measure nothing (SPEC I116a, V209, V20, B7)" }
+if (-not $pane360)  { $v360Bad += "(f) edtMfDesc was not found inside mfSearch - there is no pane to name (SPEC I112g, V352a, V209)" }
+if (-not $dsc360)   { $v360Bad += "(f) descText was not found on the root form - nothing resolves a description key (SPEC V344, V209)" }
+if (-not $sel360)   { $v360Bad += "(f) mfSelect was not found - nothing fills the pane (SPEC I112d, V209)" }
+
+# (a) the heading is a <label> like every other visible string, so V10 reaches it and BOTH
+# halves of the .lang carry it. Spelling it in the XML with no [pt] pair is the half-translated
+# sheet V10 refuses, and it would read "Description" to a player on the Portuguese sheet.
+if ($title360) {
+    $tx360 = $title360.GetAttribute('text')
+    if ([string]::IsNullOrEmpty($tx360)) { $v360Bad += "(a) the description heading carries no text - a heading that names nothing is not a heading (SPEC I116a)" }
+    else {
+        if (-not $ptK.Contains($tx360)) { $v360Bad += "(a) the heading '$tx360' has no [pt] entry in localization.lang - the Portuguese sheet would read it in English (SPEC V9, V10, I116a)" }
+        if (-not $enK.Contains($tx360)) { $v360Bad += "(a) the heading '$tx360' has no [en] entry in localization.lang (SPEC V10)" }
+    }
+}
+
+# (b) the DIVIDER is a sibling of the pane, never a border on it: a border decorates ONE
+# control, a rule SEPARATES two, and the user asked for a division down the middle.
+if (-not $rule360) { $v360Bad += "(b) mfDescRule was not found inside mfSearch - the two halves of the box run together with nothing between them (SPEC I116a, V360b)" }
+else {
+    $rw360 = [int]$rule360.GetAttribute('width')
+    if ($rw360 -gt 4) { $v360Bad += "(b) mfDescRule is $rw360 wide - a rule divides, a panel fills; past four this is a second box inside the box (SPEC I116a)" }
+    if ($title360 -and $rule360.GetAttribute('left') -ge $title360.GetAttribute('left')) { $v360Bad += "(b) mfDescRule stands at $($rule360.GetAttribute('left')) and the heading at $($title360.GetAttribute('left')) - the rule divides the list from the pane, so it comes BEFORE the pane's own column (SPEC I116a)" }
+    # V53 owns which colours a palette can repaint. A rule the theme cannot reach keeps its
+    # Modern colour in all four eras, which is the defect V53 exists for - named here because
+    # this is the control that made it happen (T827, first build red).
+    $rs360 = $rule360.GetAttribute('strokeColor')
+    if ($rs360 -and $rs360 -notin @('white', '#FFFFFF', 'black', '#00000000')) { $v360Bad += "(b) mfDescRule strokes '$rs360', which no palette's stroke map carries - the rule would keep one colour through all four eras (SPEC V53, V67)" }
+}
+
+# (c) a list with no module in disk SAYS so. A blank pane cannot tell "the book does not carry
+# this" from "the sheet broke" - the lie I107m exists to stop, on a new target. MEASURED
+# 2026-08-30: six of sixteen lists have a module, and `speciality` never will, by the user's
+# call (R135, C 146th), so this is a permanent state and not a gap waiting to close.
+if ($sel360) {
+    $sb360 = NoComments $sel360
+    if ($sb360 -notmatch 'No description available') { $v360Bad += "(c) mfSelect has no fallback for a list with no text - the pane goes blank and the player cannot tell an empty book from a broken sheet (SPEC V360c, I116c, R135)" }
+    else {
+        if ($sb360 -notmatch 'translateSheetText\(\s*"No description available"') { $v360Bad += "(c) the fallback is written without translateSheetText - it would read English on the Portuguese sheet, which is the half-translation V9 refuses (SPEC V360c, V9)" }
+        if (-not $ptK.Contains('No description available')) { $v360Bad += "(c) 'No description available' has no [pt] entry in localization.lang (SPEC V10)" }
+        if (-not $enK.Contains('No description available')) { $v360Bad += "(c) 'No description available' has no [en] entry in localization.lang (SPEC V10)" }
+    }
+}
+
+# (d) the list -> module map is DERIVED from MF.mod, which is already a parameter of mfOpen
+# (I113a). A roster here would need a row per wave of I113e, and the wave that forgets its row
+# passes in silence - the ageing roster I114f forbids.
+if ($sel360) {
+    if ((NoComments $sel360) -match '(?m)\{[^}]*\bmerit\b[^}]*=\s*"[Dd]esc') { $v360Bad += "(d) mfSelect carries a list-to-module roster - MF.mod already answers this and a roster ages one row per wave (SPEC I116d, I114f, V208)" }
+    if ((NoComments $sel360) -notmatch 'descText\(\s*MF\.mod') { $v360Bad += "(d) mfSelect does not resolve the module from MF.mod - the parameter I113a added is being ignored and something else decides (SPEC I116d)" }
+}
+
+# (e) ONE function resolves the text and every reader goes through it. A second place building
+# the key is B89 walking in through the door the pane opened.
+if ($dsc360) {
+    $callers360 = @([regex]::Matches((NoComments $rootTxt), 'descText\('))
+    if ($callers360.Count -lt 2) { $v360Bad += "(e) descText has fewer than two call sites - the ? box and the pane BOTH read through it, so one of the two readers is building its own key (SPEC V344d, V135, I102g)" }
+    if ((NoComments $rootTxt) -match '(?m)require\("desc"\s*\.\.\s*[A-Za-z_.]+\s*\.\.\s*"_"[^)]*\)\s*;[^\n]*\n[^\n]*\[\s*sub') { $v360Bad += "(e) a second place assembles a composite description key - descText owns that shape (SPEC V344d, B89)" }
+}
+
+if ($v360Bad) { foreach ($b in $v360Bad) { Fail "V360 $b" } }
+else { Pass "V360 the pane is divided by a themable rule and named by a translated heading, mfSelect resolves its module from MF.mod through the one descText both readers share, and a list with no text in disk says so in the language in force" }
+
+# ---- V364: a description module that is NOT there degrades to the SENTENCE ----------------
+# SPEC V364, I116c, I107f, B99, T839, T840. `require` on a file that is not on disk RAISES - it
+# does not answer nil - and the load runs inside mfOpen's setTimeout, so an unguarded raise
+# takes the rest of the handler with it: the list is never built, mfFilter never runs, and the
+# player watches the box open EMPTY. speciality is the PERMANENT case (Q33) and seven more
+# lists are waiting on extraction (R135).
+#
+# Legs (f) and (g) were added in the 146th and they are not theory: T842 MEASURED them by
+# reverting each fix and finding the gate GREEN. They are the two ways this invariant can be
+# undone silently, and neither had anything watching it.
+$v364Bad = @()
+$open364 = LuaFn $rootTxt 'mfOpen'
+$desc364 = LuaFn $rootTxt 'descText'
+
+# (e) zero-guard FIRST: with the opener gone every leg below reads an empty string and passes.
+if (-not $open364) { $v364Bad += "(e) mfOpen is gone - every leg below would read an empty function and pass by vacancy (SPEC V209, V20)" }
+else {
+    $body364 = NoComments $open364
+    $pc364 = @([regex]::Matches($body364, 'pcall\('))
+
+    # (e) exactly ONE pcall in the opener: zero is the guard gone, two is a second owner.
+    if ($pc364.Count -eq 0) { $v364Bad += "(e) mfOpen carries no pcall - the description module is loaded unguarded and the first list without one opens the box EMPTY (SPEC V364a, B99)" }
+    if ($pc364.Count -gt 1) { $v364Bad += "(e) mfOpen carries $($pc364.Count) pcall - a second guard is a second owner of the same rule (SPEC V364e, V135)" }
+
+    # (a) the guard is on the DESCRIPTION module, and the failure branch goes on building.
+    if ($body364 -notmatch 'pcall\(require,\s*"desc"') { $v364Bad += "(a) the pcall in mfOpen does not guard the description require - it is guarding something else, and the raise V364 exists to catch is still live (SPEC V364a)" }
+
+    # (d) the guard covers ONLY the description module. meritData ships always, and a pcall
+    # there would hide a broken build behind an empty picker - B19 through the door of silence.
+    if ($body364 -match 'pcall\(\s*require\s*,\s*"meritData|pcall\(function[^)]*require\("meritData') { $v364Bad += "(d) the meritData require is guarded too - that file always ships, and a pcall there hides a broken build behind an empty picker (SPEC V364d, B19)" }
+
+    # (f) NO fallback for mod. `mod or "Merit"` was left from when the box was merit-only, and
+    # with the GENERIC box it makes a module-LESS wave show MERIT text for an archetype. A wrong
+    # answer is worse than none: the sentence of V360c says "the book does not carry it", merit
+    # text LIES, and the player has no way to tell.
+    if ($body364 -match 'MF\.mod\s*=\s*mod\s+or\b') { $v364Bad += "(f) mfOpen falls back to a module when the caller names none - a wave with no module would show another list's description as if it were its own, which is a wrong answer where V360c promises no answer (SPEC V364f, B100)" }
+    if ($body364 -notmatch 'MF\.mod\s*=\s*mod;') { $v364Bad += "(f) mfOpen does not hand mod straight to MF.mod - nil is the whole signal a module-less wave has, and anything in its way is the fallback under another name (SPEC V364f)" }
+
+    # (g) the concatenation is an ARGUMENT, so it runs BEFORE pcall is called: with mod nil,
+    # "desc" .. nil raises OUTSIDE the guard and kills the timer - B99 wearing a new coat, under
+    # the very guard T839 installed.
+    $req364 = [regex]::Match($body364, '(?m)^(.*)pcall\(require,\s*"desc"')
+    if ($req364.Success -and $req364.Groups[1].Value -notmatch 'if\s+MF\.mod\s*~=\s*nil\s+then') { $v364Bad += "(g) the description require is not behind a nil test on MF.mod - the concatenation is an argument and runs BEFORE pcall, so a module-less wave raises OUTSIDE the guard and takes the rest of the timer with it (SPEC V364g, B99)" }
+}
+
+# (b) failure is not silence, and it is not a SECOND path either: descText answers "" for a nil
+# kind and for a module that would not load, and V360c keys on exactly that.
+if (-not $desc364) { $v364Bad += "(b) descText is gone - the pane has no reader left and the sentence of V360c is keyed to nothing (SPEC V209, V360e)" }
+else {
+    $db364 = NoComments $desc364
+    if ($db364 -notmatch 'if kind == nil') { $v364Bad += "(b) descText does not answer for a nil kind - a module-less wave hands it nil and it would raise on the concatenation instead of falling to the sentence (SPEC V364b, V360c)" }
+    if ($db364 -notmatch 'pcall\(require,\s*"desc"') { $v364Bad += "(b) descText loads its module unguarded - it is the READER, so the raise would land on the pane instead of on the opener and the box would still die (SPEC V364a)" }
+}
+
+# (c) there is NO roster of "which lists have a module" - the question is answered by the
+# ATTEMPT. A roster here ages one line per wave of I113e and per round of T838 (I114f).
+foreach ($ros364 in @('HAS_DESC', 'DESC_LISTS', 'MODULE_LIST', 'WITH_DESC')) {
+    if ($rootTxt -match "\b$ros364\b") { $v364Bad += "(c) the root form declares '$ros364' - a roster of which lists carry a module ages one line per wave and per extraction round, and the attempt already answers it (SPEC V364c, I114f)" }
+}
+
+if ($v364Bad) { foreach ($b in $v364Bad) { Fail "V364 $b" } }
+else { Pass "V364 mfOpen guards the description require with exactly one pcall, behind a nil test so the concatenation cannot raise outside it, hands mod on with no fallback, leaves meritData unguarded, and descText answers empty for a module that is not there so the pane falls to V360c's sentence - with no roster of which lists have one" }
+
+# ---- V365: every picker has a ?, and the ? is the ONE place a description is read and written
+# SPEC V365, I102h, I102i, T845, T846; amended three times in one day by B104, B105 and B106.
+#
+# The roster is CODE on BOTH sides, the shape V354i settled: asking the XML which templates open
+# the box is what stops a converted family from passing by VACANCY. It reuses $v354Opens on
+# purpose - two derivations of "which template opens a picker" is exactly the drift V135 refuses -
+# and if that block ever moves, leg (g) below fires loudly instead of this one passing on an
+# empty set.
+$v365Bad = @()
+$V365_EXEMPT = @('SpecialityRow')             # named exception, and it cuts BOTH ways (V365a, B105)
+$V365_BRIGHT = @('edtPopDesc', 'edtMfDesc')   # the ? box and the search pane - the two that stay
+
+# Which templates draw a ?, read off the same XML the opener list comes from.
+$q365 = @()
+foreach ($f365 in $files) {
+    foreach ($t365 in @((Doc $f365.FullName).SelectNodes("//template[@name]"))) {
+        if (@($t365.SelectNodes(".//button[@text='?']")).Count -gt 0) { $q365 += $t365.GetAttribute("name") }
+    }
+}
+$q365 = @($q365 | Sort-Object -Unique)
+$pop365 = LuaFn $rootTxt 'popOpen'
+$sav365 = LuaFn $rootTxt 'savePopDesc'
+
+# (g) zero-guard FIRST: every leg under this compares two SETS, and a comparison over an empty
+# set is the check that measures nothing and says PASS (SPEC V365g, V20, B7, B92).
+if (@($v354Opens).Count -eq 0) { $v365Bad += "(g) not one template that opens a picker was found - legs (a) and (d) would compare against an empty set (SPEC V365g, V209, V20)" }
+if ($q365.Count -eq 0) { $v365Bad += "(g) not one template draws a ? - the sheet has no description door at all and leg (a) would pass by vacancy (SPEC V365g, V209, V20)" }
+if (-not $pop365) { $v365Bad += "(g) popOpen is gone - legs (c) and (f) have nothing to read (SPEC V365g, V209)" }
+
+# (a) the family in scope is the one ALREADY CONVERTED, and converting means calling mfOpen(
+# (SPEC B106). A comboBox still waiting on its wave of I113e is NOT a violation - it is a family
+# whose turn has not come - and charging it would make this leg red at birth against correct
+# code, which is B92 from the other side: nineteen comboBox tags on the sheet and none with a ?.
+#
+# The scope AUTO-ENFORCES I102h rather than restating it: the moment a wave swaps comboBox for
+# mfOpen(, that template enters here, and the round that does not bring the ? with it goes red.
+foreach ($o365 in @($v354Opens)) {
+    if ($V365_EXEMPT -contains $o365) {
+        if ($q365 -contains $o365) { $v365Bad += "(a) '$o365' is the NAMED exception and draws a ? anyway - the exception cuts both ways, and speciality will never have a module for it to open (SPEC V365a, Q33, B105)" }
+        continue
+    }
+    if ($q365 -notcontains $o365) { $v365Bad += "(a) template '$o365' opens a picker with mfOpen( and draws no ? - the family converted without its description door, which is what I102h forbids in the SAME round (SPEC V365a, I102h)" }
+}
+foreach ($k365 in $q365) {
+    if (@($v354Opens) -notcontains $k365) { $v365Bad += "(a) template '$k365' draws a ? and opens no picker - an orphan ? opens the description of a row that chooses nothing (SPEC V365a)" }
+}
+foreach ($e365 in $V365_EXEMPT) {
+    if (@($v354Opens) -notcontains $e365) { $v365Bad += "(a) '$e365' is on the named exception list and opens no picker - a stale exemption excuses a family that no longer exists, and that is how a real one slips through later (SPEC V365a, V20)" }
+}
+
+# (b) a TYPED row carries no ? (SPEC I102f). The exception is named by FORM - *Free / *FreeRow -
+# and never by a list of names, because a list of names ages one line per row the sheet grows.
+foreach ($k365 in $q365) {
+    if ($k365 -match '(Free|FreeRow)$') { $v365Bad += "(b) template '$k365' is a typed row by its FORM and draws a ? - a typed row has no book entry to open (SPEC V365b, I102f)" }
+}
+
+# (c) a list with no module on disk falls to the SENTENCE, never to an empty box: suppressing it
+# would teach the player the row has no description when what it has no is a FILE (SPEC V365c).
+if ($pop365) {
+    $pb365 = NoComments $pop365
+    if ($pb365 -notmatch 'translateSheetText\("No description available"') { $v365Bad += "(c) popOpen does not fall to the No description available sentence - the six lists still waiting on T838 would open a BLANK box (SPEC V365c, V360c, V364b)" }
+    if ($pb365 -notmatch 'descText\(') { $v365Bad += "(c) popOpen does not read through descText - the ? box would be a second reader carrying its own copy of the key rule (SPEC I112d, V135)" }
+}
+
+# (d) REWRITTEN by B105: no description textEditor outside the ? PER FAMILY ALREADY CONVERTED,
+# not for the sheet at once. Each pane leaves in the round its own family gains the ?, which is
+# what the user decided on 2026-08-30; charging all seven before that is a ruler ahead of the
+# code. Measured per FILE: a file that holds a converted template and still holds its old pane
+# is the second owner of one text that V135 refuses, and B98 cost a round finding one.
+foreach ($f365 in $files) {
+    $d365 = Doc $f365.FullName
+    if (@($d365.SelectNodes("//template[@name]") | Where-Object { @($_.SelectNodes(".//button[contains(@onClick,'mfOpen(')]")).Count -gt 0 }).Count -eq 0) { continue }
+    foreach ($te365 in @($d365.SelectNodes("//textEditor[@name]"))) {
+        $nm365 = $te365.GetAttribute("name")
+        if ($nm365 -notmatch '^edt.*Desc$') { continue }
+        if ($V365_BRIGHT -contains $nm365) { continue }
+        $v365Bad += "(d) $($f365.Name) holds a converted picker and still carries the description pane '$nm365' - two surfaces for one text is the second owner V135 refuses (SPEC V365d, B98)"
+    }
+}
+
+# (e) the WINDOW goes, the DATA stays (SPEC I45, V362a). Statically that is one question: is the
+# field still DERIVED? A literal <base>Desc_<n> written anywhere is a field somebody pinned by
+# hand, and a pinned name goes on pointing at the old row after the row moves - which is how the
+# text stops being "moved" and starts being lost.
+if ($rootTxt -notmatch 'function descFieldOf\(') { $v365Bad += "(e) descFieldOf is gone - it is the ONE derivation of where a row keeps its text, and without it the fields are unreachable rather than moved (SPEC V365e, I45, V209)" }
+$lit365 = @()
+foreach ($f365 in $files) {
+    foreach ($m365 in [regex]::Matches((NoComments ([System.IO.File]::ReadAllText($f365.FullName))), '"[a-z][A-Za-z]*Desc_\d+"')) { $lit365 += "$($f365.Name) $($m365.Value)" }
+}
+if ($lit365.Count -gt 0) { $v365Bad += "(e) $($lit365.Count) description field(s) written as a LITERAL ($($lit365 -join ', ')) - descFieldOf derives the name from the row, and a hand-pinned one survives the row moving while the data does not (SPEC V365e, I45)" }
+
+# (f) the storyteller's WRITE survives the move, and the pane stays BRIGHT while it does.
+# V162 pairs readOnly with opacity for a widget of VALUE (edtSpentXP, I8). edtPopDesc is a pane
+# of TEXT on the DESC_BRIGHT roster, where opacity fades the text with the frame (V241) - so the
+# pair is REFUSED here, and the comboBox left V162's scope on this same argument in 2026-08-22
+# (I41). One write, so there are no two halves to disagree (SPEC V365f, V111(2), B104).
+$edt365 = $null
+foreach ($f365 in $files) {
+    $n365 = (Doc $f365.FullName).SelectSingleNode("//textEditor[@name='edtPopDesc']")
+    if ($null -ne $n365) { $edt365 = $n365 }
+}
+if ($null -eq $edt365) { $v365Bad += "(f) edtPopDesc is gone - the ? box has nothing to write into (SPEC V365f, V209)" }
+else {
+    if ($edt365.GetAttribute("readOnly") -ne 'true') { $v365Bad += "(f) edtPopDesc is not born readOnly - a player would type over the book text in the moment before popOpen runs (SPEC V365f, V333)" }
+    if ($edt365.HasAttribute("opacity")) { $v365Bad += "(f) edtPopDesc carries opacity '$($edt365.GetAttribute('opacity'))' - it is on the DESC_BRIGHT roster and opacity fades the TEXT with the frame, so dimming it charges the player legibility of the thing he opened the box to read (SPEC V365f, V111(2), V241, B104)" }
+    if ($edt365.GetAttribute("onChange") -notmatch 'savePopDesc') { $v365Bad += "(f) edtPopDesc has no savePopDesc on change - what the storyteller types would have no reader, the feature erased sideways I102i exists to stop (SPEC V365f)" }
+}
+if ($pop365) {
+    $pc365 = NoComments $pop365
+    if ($pc365 -notmatch 'readOnly = not isStoryteller\(\)') { $v365Bad += "(f) popOpen does not write readOnly = not isStoryteller() - a readOnly pinned true IS the storyteller's write erased sideways (SPEC V365f, I102i)" }
+    if ($pc365 -match 'edtPopDesc"\]\.opacity') { $v365Bad += "(f) popOpen writes opacity on edtPopDesc - the V162 pair is for a widget of VALUE and this is a pane of TEXT (SPEC V365f, V111(2), V241, B104)" }
+}
+if (-not $sav365) { $v365Bad += "(f) savePopDesc is gone - the ? box would open editable for the storyteller and save nowhere (SPEC V365f, I102i)" }
+else {
+    $sb365 = NoComments $sav365
+    if ($sb365 -notmatch 'descFieldOf\(') { $v365Bad += "(f) savePopDesc does not write through descFieldOf - a second path to the text is a second owner (SPEC V365f, V135, I45)" }
+    if ($sb365 -notmatch 'isStoryteller\(\)') { $v365Bad += "(f) savePopDesc does not ask isStoryteller() again - the flag on the control is a look, and the rule is a rule (SPEC V266b, V80)" }
+    if ($sb365 -notmatch 'descQuiet') { $v365Bad += "(f) savePopDesc does not check descQuiet - the renderer's own write comes back through the door the typing uses, so opening the ? would SAVE the book text onto that row in silence (SPEC V107, V249d, B39)" }
+}
+
+if ($v365Bad) { foreach ($b in $v365Bad) { Fail "V365 $b" } }
+else { Pass "V365 $(@($v354Opens).Count) converted picker template(s) read from the code, $($q365.Count) carrying a ? and SpecialityRow named out of it, no ? on a typed row, popOpen falling to V360c's sentence through the one descText, no description pane left in a file whose family converted, every description field still derived by descFieldOf, and edtPopDesc born readOnly with no opacity on either side while savePopDesc writes through descFieldOf behind descQuiet" }
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

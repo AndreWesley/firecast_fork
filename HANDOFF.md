@@ -1,6 +1,524 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ⚑ COMECE AQUI — sessão sem contexto nenhum (preparado 2026-08-30, 144ª rodada)
+## ⚑ COMECE AQUI — 149ª rodada (2026-08-30). A seção da 148ª logo abaixo está SUPERADA
+
+**Estado:** gate **VERDE 618 ok / 0 FAIL** · `.rpk` **2.568.343 B**, instalada 17:57 na 148ª & **⊥
+mudou nesta rodada** (§T847 é só gate, & gate ⊥ entra no `.rpk`) · §T **740 `x` · 95 `.` · 12 `~`** ·
+**nada commitado**.
+
+### ⛔ A FILA DE BUILD ESTÁ ESGOTADA, & ⊥ por falta de tarefa
+
+**⊥ ∃ §T construível sem o user.** Varrido 2026-08-30: das **95** abertas, **58** são teste de tela
+`[USER]`, & TODA cadeia restante funila por uma delas. ⊥ adianta pegar "a próxima da lista" — ela
+está bloqueada, & buildar assim escreve régua contra estado que ainda ⊥ ∃ (§B92, & já custou 3 §B
+só hoje: §B104 §B105 §B106).
+
+| cadeia | trava em | destrava |
+|---|---|---|
+| §T811 (ondas 2-5) → ondas 3-5 → panes saem → §T830/§T831/§T832 → §T834/§T840/§T844 | **§T810** `[USER]` — o piloto na tela, 6 itens | user rodar §T810 |
+| §T826 (caixa em 2 tamanhos) · §T836 (resto das ondas) | **§T827** `~` — ! **VER a pane pintando** antes de `x` (§B98) | user confirmar na tela |
+| §T805 (§V353 no gate) | **§T804** `[USER]` | user rodar §T804 |
+| §T838 (texto de 6 listas) | `/ck:research` + os livros | pedido do user |
+
+**∴ o que pedir ao user:** rodar as de tela TODAS numa sessão — `§T787` · `§T804` · `§T810` ·
+`§T816` · `§T820` · `§T823` — mais as 2 novas de §T845/§T846 (↓). §T810 & §T827 são as que mais
+destravam.
+
+---
+
+### O QUE A 149ª FECHOU (⊥ refazer)
+
+| §T | o quê | arquivo |
+|---|---|---|
+| `§T847` | `x` — **§V365 no gate**, 7 pernas + zero-guard, & **§V334 REESCRITA p/ contar do CÓDIGO** | `verify-hunters-hunted.ps1` |
+
+**§B novo:** `§B106` — §V365a nasceria VERMELHA contra código certo (mandava `?` em `comboBox` que
+lê `PICKER_LIST`, & ∃ **19** tags c/ **0** `?`). Achado ao PLANEJAR, ANTES de escrever régua ∴ custo
+ZERO. **§V365a emendada pela 3ª vez**: escopo é a família **JÁ CONVERTIDA**, & converter = chamar
+`mfOpen(`.
+
+**A lição de §B106, & ela é de método:** emendar UMA perna ⊥ é emendar a invariante. §B105 consertou
+(d) & deixou (a) com a redação do piloto, no MESMO commit. Quem toca 1 perna ! reler as outras que
+dividem a mesma definição.
+
+**§V365 como ficou** — 4 templates convertidos lidos do código, 3 c/ `?`, `SpecialityRow` nomeado
+fora. A perna (a) **AUTO-APLICA §I102h**: no instante em que uma onda troca `comboBox` por `mfOpen(`,
+o template entra no escopo & a rodada que ⊥ trouxer o `?` junto fica VERMELHA. ⊥ ∃ número escrito.
+
+**§V334 ⊥ tem mais número escrito**: as panes saem de `//textEditor[@name='edt*Desc']`, são
+conferidas contra `DESC_PANES` no Lua, & os botões contra `panes × 2`. Ela envelheceu 3× (8 → 9 →
+2 prometidos) porque o número era digitado.
+
+**MUTAÇÕES: 9 VERMELHAS + 1 sonda VERDE**, todas c/ backup & SHA256 conferido. Script em
+`scratchpad/mut847.sh` — reusável.
+
+---
+
+### ⚠ ARMADILHA DE FERRAMENTA — 1 NOVA, & ela invalida mutação
+
+**Mutação que ⊥ aplicou dá FALSO VERDE, & o gate ⊥ tem como avisar.** Na 148ª um `perl -i -pe
+s/…$/…/` ⊥ casou (o `$` ancora antes do `\n` & o `\r` do CRLF fica no caminho), a mutação nunca
+entrou, o gate saiu 0 & isso quase passou por "a régua ⊥ morde". **Régua: depois de mutar, PROVAR
+que o arquivo mudou (`grep -c` do texto novo) ANTES de rodar o gate.** O driver `mut847.sh` já faz
+isso & recusa contar mutação ⊥ aplicada — usar ele.
+
+*(reconfirmadas)* `grep -c $'\r'` MENTE em arquivo CRLF (usar `tr -dc '\r' | wc -c`) · `sed -n`
+come o CR · heredoc do bash grava LF & o `SPEC.md` é CRLF (`perl -pe 's/\n/\r\n/'` antes de anexar)
+· pegar nº de linha c/ `grep -n`, nunca contando em cima de amostra de `sed`.
+
+---
+
+### ⛔ O QUE ⊥ FAZER
+
+- ⊥ pegar "a próxima §T" sem olhar a tabela de travas acima — todas as restantes esperam tela.
+- ⊥ construir §T834 (§V361) antes de §T830/§T832: §V361a mede "⊥ declaram `tabControl`" & hoje a
+  Numina TEM sub-aba ∴ nasceria VERMELHA (§B92).
+- ⊥ emendar §V334 p/ número escrito — ela agora deriva, & foi o número que a fez envelhecer 3×.
+- ⊥ rodar `rdk -i` com ficha ABERTA sem avisar — 1× no fim da rodada (§B103).
+- ⊥ commitar sem pedido direto na mensagem (`CLAUDE.md`).
+- ⊥ escrever §V/§I/§B por `/ck:build` — só `/ck:spec` escreve seção.
+
+### DE TELA, & só o user roda — TODAS juntas numa sessão
+
+`§T787` · `§T804` · `§T810` · `§T816` · `§T820` · `§T823` · `§T827` (ver a pane PINTANDO, §B98)
+· **§T845**: o `?` de mérito/antecedente abre EDITÁVEL p/ o narrador & o que ele escrever sobrevive
+a fechar & reabrir a ficha · **§T846**: o `?` de Nature/Demeanor abre & diz `No description
+available` (⊥ é buraco — o texto chega em §T838).
+
+---
+## 148ª RODADA (2026-08-30) — SUPERADA pela 149ª acima; guardada pelas armadilhas & pelas 4 decisões
+
+**Estado:** gate **VERDE 617 ok / 0 FAIL** · `.rpk` **2.568.343 B** gerada **e instalada** 17:57 ·
+§T **739 `x` · 96 `.` · 12 `~`** · **nada commitado**.
+
+**⊥ ∃ nada bloqueando `/ck:build`** — mas a fila mudou de forma, ↓ leia A FILA antes de pegar §T.
+
+---
+
+### O QUE A 148ª FECHOU (⊥ refazer)
+
+| §T | o quê | arquivo |
+|---|---|---|
+| `§T845` | `x` — o `?` abre EDITÁVEL p/ o narrador. `popOpen` ganhou 5º param `row`; global `popRow`; `savePopDesc` grava por `descFieldOf`; texto do narrador VENCE o livro & esvaziar devolve o livro | `WoD20th.lfm` `WoD20.2.lfm` gate |
+| `§T846` | `x` — **REESCRITA & encolhida**: `?` só no `HeaderPicker` (nature/demeanor). 0 pane saiu | `WoD20.1.lfm` `WoD20th.lfm` gate |
+
+**§B novos:** `§B103` (install c/ ficha aberta = form velho na tela; a regra é de OPERAÇÃO) ·
+`§B104` (§V365f copiou `edtSpentXP` p/ pane que §V111(2) promete brilhante — o gate acendeu) ·
+`§B105` (§V365 vetou o dono 2×; **3ª vez** do padrão de §B99/§B100).
+
+**§V365 EMENDADA em 4 pernas:** (a) ganhou `SpecialityRow` como exceção NOMEADA & ela corta nos
+2 sentidos · (c) reescrita p/ separar "ainda ⊥ tem arquivo" de "⊥ TERÁ arquivo" · (d) mede
+**por família JÁ convertida**, ⊥ a ficha de uma vez · (f) `readOnly` SOZINHO & `opacity` PROIBIDA.
+
+**`CLAUDE.md` emendado** (§B103): `rdk -i` **1× por RODADA, no fim** — ⊥ por §T — & avisar antes
+se a ficha puder estar aberta. + bullet: diferença de size que ⊥ muda nada p/ o user ⊥ é motivo
+p/ reinstalar.
+
+**4 DEFEITOS que só CONSTRUIR achou:**
+1. `popOpen` escrevia `.text` SEM `descQuiet` — `gui.TextEditor` só tem `onChange` ∴ abrir o `?`
+   teria GRAVADO o texto do livro em toda linha que o narrador olhasse, calado.
+2. Escrever sem LER de volta = narrador digita, fecha, reabre & acha o livro. Recurso apagado
+   de lado (§I102i).
+3. `popOpen` ⊥ tinha a frase de §V360c ∴ o `?` de nature/demeanor (sem módulo até §T838) abriria
+   caixa VAZIA. Corrigido c/ o mesmo one-liner de `mfSelect`.
+4. **§V26 acendeu & mudou o desenho de §T846**: o `?` ⊥ pode deslocar a entrada, & a coluna
+   `left=326` mistura `HeaderPicker` (nature, demeanor) c/ `Header` (concept) ∴ o `<edit>` de
+   **`Header` também foi de 112/215 p/ 132/195** — é por isso que um template que ⊥ ganhou `?`
+   mudou de geometria. Modelo de §I102f: o vão do `?` é da FAMÍLIA & a linha sem picker o deixa
+   VAZIO, ≡ `MeritFree`. ⚠ o label ⊥ encolhe: `WoD20.1.lfm:92` diz que os 105px são o que
+   `Comportamento` precisa em pt. §V16 ⊥ é problema — o placeholder (24 chars = 156px) cabe nos
+   195 c/ 39 de folga, MEDIDO, & a ressalva que a 1ª escrita de §T846 abriu foi RETIRADA.
+
+---
+
+### DECISÕES DO USER 2026-08-30 (148ª) — já ∈ `SPEC.md`, ⊥ perguntar de novo
+
+1. **`speciality` ⊥ leva `?`** — é EXCEÇÃO NOMEADA de §V365a, & pôr `?` nele ! FAIL igual.
+2. **As 7 panes ⊥ saem de uma vez** — CADA pane sai na rodada em que a família DELA ganha `?`.
+   ∴ §T830 & §T832 seguem BLOQUEADAS, & o custo foi ACEITO.
+3. **O corte do `HeaderPicker` sai do BOTÃO** (215→195), ⊥ do label.
+4. **Install 1× por rodada, no fim**, & avisar antes se a ficha puder estar aberta.
+
+---
+
+### A FILA, na ordem
+
+`§T847` (gate §V365, 7 pernas) → `§T834`/`§T840` (§V361/§V362) → `§T838` (`/ck:research`, texto
+p/ 6 listas) → ondas 3-5 de §I113e, & CADA uma leva o `?` da família + a saída da pane DELA
+junto → só então `§T830`/`§T831` (Numina) & `§T832` (Ghoul).
+
+**Notas p/ quem construir:**
+- **§T847:** a perna (f) ! nascer c/ `opacity` PROIBIDA, ⊥ pareada — §B104. A perna (a) ! excetuar
+  `SpecialityRow` por NOME — §B105. A perna (d) mede POR FAMÍLIA CONVERTIDA, ⊥ as 7 de uma vez.
+- ⚠ **§I117e §I118d §I103 §V334 estão ADIANTADAS em relação ao código**: prometem as 7 panes fora
+  & o zoom em 2 alvos. §V334 mede por CONTAGEM ∴ **⊥ emendar §V334 p/ 2 panes/4 botões** antes de
+  as panes saírem, senão nasce VERMELHA contra código certo (§B92).
+- **§T830/§T832** seguem bloqueadas por decisão 2 acima, ⊥ por §T846 — ela já fechou.
+
+---
+
+### ⚠ ARMADILHAS DE FERRAMENTA — 5 NOVAS medidas nesta rodada
+
+1. **`grep -c $'\r'` MENTE no Git Bash** — devolve **0** num arquivo que É CRLF. Custou um susto de
+   "estraguei o arquivo" com o arquivo intacto. Régua: `tr -dc '\r' < f | wc -c` & comparar c/ `\n`.
+2. **Perl `s/…$/…/` ⊥ casa em arquivo CRLF**: o `$` ancora antes do `\n` & o `\r` fica no caminho.
+   Isso deu **mutação FALSO-VERDE** — o gate saiu 0 porque a mutação nunca aplicou. Régua: depois
+   de mutar, **conferir que o arquivo mudou** (`grep -c` do texto novo) ANTES de rodar o gate.
+3. **Número de linha de `sed -n 'N,Mp'` de amostra ⊥ é o número real** — errei em 1 & o splice comeu
+   o `-->` que fechava um comentário, quebrando o XML inteiro (`FAIL XML … DotNetMethodException`).
+   Régua: pegar a linha com `grep -n` do texto exato, nunca contar em cima de uma amostra.
+4. **`paste -d''` corrompe** — junta errado & clobbera. Régua p/ montar linha:
+   `{ tr -d '\n' < corpo; printf '|%s\n' "$cites"; } > row`.
+5. **§V318 pega heredoc no `SPEC.md`**: heredoc grava LF & o `SPEC.md` é CRLF ∴ toda linha nova !
+   passar por `perl -pe 's/\n/\r\n/'` antes de anexar. 2 linhas minhas acenderam o gate.
+
+*(já conhecidas, reconfirmadas)* `sed -i` normaliza p/ LF · o tool `Write` escreve ESPAÇOS & os
+`.lfm` usam TABS · `$o = .\gate.ps1 2>&1` vem VAZIO no PS 5.1.
+
+---
+
+### ⛔ O QUE ⊥ FAZER
+
+- ⊥ rodar `rdk -i` com ficha ABERTA sem avisar — **1× no fim da rodada** (§B103, `CLAUDE.md`).
+- ⊥ perseguir diferença de bytes entre `output/` & o instalado: 2 bytes entre 2 compilações é
+  normal & ⊥ muda nada p/ o user.
+- ⊥ pôr `?` em `SpecialityRow` nem em linha DIGITADA.
+- ⊥ emendar §V334 p/ 2/4 antes de as panes saírem.
+- ⊥ commitar. Neste projeto o Claude **⊥ commita** sem pedido direto na mensagem (`CLAUDE.md`).
+- ⊥ escrever §V/§I/§B por `/ck:build` — só `/ck:spec` escreve seção.
+
+### DE TELA, & só o user roda — TODAS juntas numa sessão
+
+`§T787` · `§T804` · `§T810` · `§T816` · `§T820` · `§T823` · **+ §T845/§T846 novas**: o `?` de
+nature/demeanor abre & diz `No description available`; o `?` de mérito/antecedente abre EDITÁVEL
+p/ o narrador & o que ele escrever sobrevive a fechar & reabrir.
+
+---
+## 147ª RODADA (2026-08-30) — SUPERADA pela 148ª acima; guardada pelas medidas do bug das abas
+
+**Estado:** gate **VERDE 617 ok / 0 FAIL** · `.rpk` **2.564.393 B** gerada **e instalada** 15:23 ·
+§T **737 `x` · 98 `.` · 12 `~`** · **nada commitado**.
+
+**A 1ª COISA:** o "bug das abas" da 147ª foi **RESOLVIDO & ⊥ era código** ↓. Pode ir direto p/ a
+FILA. ⊥ ∃ nada bloqueando `/ck:build`.
+
+**Leia nesta ordem:** ABAS (resolvido, mas a REGRA vale) → O QUE A 147ª FECHOU → A DECISÃO NOVA →
+A FILA → ARMADILHAS.
+
+---
+
+### ✅ O "BUG DAS ABAS" — RESOLVIDO, & a lição é OPERACIONAL, ⊥ de código
+
+Relato do user 2026-08-30: `Show Numina` & `Show Ghoul` MARCADOS & as 2 abas **⊥ apareciam**.
+**FECHADO no mesmo dia pelo teste do user**, & o resultado ⊥ deixa dúvida:
+
+| teste | resultado | o que MATA |
+|---|---|---|
+| desmarcar & marcar os 2 checkboxes | aba **⊥ volta** | mata a hipótese do `== true` estrito |
+| **fechar & reabrir a ficha** | **volta a funcionar normalmente** | mata TODA hipótese de código |
+| a aba `Storyteller` aparece? | **aparece** | a barra & `applyTabVisibility` estão sãos |
+
+**CAUSA: o `.rpk` foi instalado 3× (14:52 · 14:54 · 15:23) c/ o Firecast aberto & a ficha
+carregada.** Plugin trocado por baixo de ficha aberta deixa o FORM VELHO na tela c/ o código novo
+atrás ∴ controle some & nenhum handler o traz de volta — só reabrir a ficha. Se fosse defeito de
+código, reabrir ⊥ curaria: as mesmas 8 `dataLink` seguiriam lá.
+
+**REGRA, & ela é p/ o Claude, ⊥ p/ o user:** `rdk -i` com ficha ABERTA no Firecast ⊥ é neutro.
+Ou avisar ANTES de instalar, ou instalar **1×** no fim da rodada, ⊥ a cada §T. Esta rodada
+instalou 3× & gastou meia sessão perseguindo um fantasma. ⊥ ∃ check estático p/ isto — o que ∃
+é a regra, & ela mora aqui & em §B103 (se `/ck:spec` a escrever).
+
+**O que a caçada MEDIU & segue valendo (⊥ refazer):** o `.rpk` contém os 5 `.lfm` das 2 abas · o
+Lua COMPILADO tem `applyTabVisibility` (7×) `tabNumina` (12×) `tabDisciplines` (12×) · §V347 media
+**50/50** JÁ no 1º gate, antes de código novo · `git diff HEAD` na região da barra = **0 linhas**
+(`tabNumina` `tabDisciplines` `btnTab*` `tabOn*` `TAB_LIST` `TAB_W` `applyTabVisibility` `STRIP_*`
+são byte a byte o commit) · `xpFind` é walker recursivo simples, sem saída antecipada.
+
+⚠ **⊥ trocar `stShowDisciplines == true` por `~= false`.** A leitura estrita ⊥ tem culpa nenhuma
+aqui, & afrouxá-la mudaria o DEFAULT do Ghoul de desligado p/ ligado — decisão de produto que ⊥
+está pedida em §Q nenhuma.
+
+---
+### O QUE A 147ª FECHOU (⊥ refazer)
+
+| §T | o quê | arquivo |
+|---|---|---|
+| `§T839` | só o STATUS — o `pcall` já estava no código, o `SPEC.md` é que estava atrás | — |
+| `§T841` | **§V354 REESCRITA** no gate: (b) coerência · (e) 3 formas · (g) por raiz · (h) nomeada · (i) completude | `verify-hunters-hunted.ps1` |
+| `§T842` | **onda 2 de §I113e**: `HeaderPicker` (nature/demeanor) & `SpecialityRow` viram caixa de busca | `WoD20.1.lfm` `WoD20th.lfm` `WoD20.6.lfm` `localization.lang` |
+| `§T619` `§T759` `§T775` | `.` → `x` — fechadas por revogação/supersessão, ⊥ por construção | — |
+| `§T843` | `~` — §V356 de 6 p/ **7** (só `dominatorGen`); `hedgeAttr` RECUSADO c/ motivo medido | `verify-hunters-hunted.ps1` |
+| `§T840` | `~` — metade **§V364** no gate (7 pernas). A metade §V362 espera §T830/§T832 | `verify-hunters-hunted.ps1` |
+
+**MUTAÇÕES RODADAS & TODAS CONFORMES:** §V354 (8 VERMELHAS + 1 sonda VERDE) · onda 2 (5 VERMELHAS
++ 1 sonda) · §V356 (2 VERMELHAS) · §V364 (5 VERMELHAS + 1 sonda). Bancada c/ backup ANTES & SHA256
+conferido; todos os arquivos voltaram byte a byte.
+
+**§B novos:** `§B100` (§V354 virou régua de 1 onda) · `§B101` (§Q31 respondida sobre premissa
+falsa) · `§B102` (§I117/§I118 desenharam 3 colunas sem somar se cabiam).
+
+**4 DEFEITOS que só CONSTRUIR achou, & os 2 primeiros estavam SEM GUARDA:**
+1. `MF.mod = mod or "Merit"` — onda sem módulo mostraria descrição de MÉRITO p/ arquétipo.
+   Corrigido & agora guardado por §V364f.
+2. `pcall(require, "desc" .. MF.mod ..)` — a concatenação é ARGUMENTO ∴ roda ANTES do `pcall` &
+   c/ `mod` nil levanta FORA do guarda. Era §B99 de volta. Corrigido & guardado por §V364g.
+3. A perna (i) de §V354 cobria TEMPLATE & ⊥ RAIZ — tirar `demeanor` do roster ficava VERDE.
+   Corrigido c/ completude por raiz na forma avulsa.
+4. §Q31 dizia que `hedgeAttr` é combo de VALOR; o `WoD20.7.lfm` diz o contrário no próprio
+   comentário (`cbo, not cmb: this is a picker of PROSE`). §B101.
+
+---
+
+### A DECISÃO NOVA DO USER 2026-08-30 — já ∈ `SPEC.md`, ⊥ perguntar de novo
+
+**`?` ao lado de TODO picker, & clicar mostra a descrição** (§I102h). ⊥ é regra das 2 abas que a
+pediram — é da ficha inteira. E o **`?` abre EDITÁVEL p/ o narrador** (§I102i, confirmado).
+
+∴ **as 7 panes de DESCRIPTION SAEM** (§I117e, §I118d): `edtHedgeDesc` `edtHedgeRitualDesc`
+`edtPsychicDesc` `edtFaithDesc` (`WoD20.7`) · `edtDiscDesc` (`.12`) · `edtPathDesc` (`.13`) ·
+`edtRitualDesc` (`.14`). **O TEXTO ⊥ sai junto** — ele mora em `descFieldOf(<linha>)` (§I45) &
+segue lá; some a JANELA, ⊥ o dado (§V365e).
+
+**A aritmética que destravou tudo (MEDIDA, §B102):** Numina — listas somam **1622** (450+586+586)
+contra **1410**; Ghoul — **1475** (390+565+520) contra **1070**. ⊥ cabia ANTES de contar pane
+nenhuma. Com as panes fora, as colunas encolhem p/ ~460 (Numina) & ~350 (Ghoul).
+
+⚠ **o Ghoul já vem QUASE pronto**: `WoD20.12` = col.1 (`Clan Disciplines`+`Disciplines`) ·
+`WoD20.13` = col.2 (`Main Paths`+`Secondary Paths`) · `WoD20.14` = col.3 (`Rituals`) ∴ §T832 é
+tirar o `vampStrip`, tirar as panes & pôr os 3 `<import>` lado a lado — ⊥ redesenhar caixa nenhuma.
+
+---
+
+### A FILA, na ordem
+
+`§T845` (o `?` editável — MECANISMO) → `§T846` (`?` em toda família + as 7 panes saem) →
+`§T830`/`§T831` (Numina) → `§T832` (Ghoul) → `§T847` (gate §V365 + §V334) → `§T834`/`§T840`
+(§V361/§V362) → `§T844` (`hedgeAttr` vira caixa) → `§T838` (extração, precisa dos livros).
+
+**Notas p/ quem construir, MEDIDAS nesta rodada:**
+- **§T845:** `popOpen` recebe `kind`+`key`+`sub` mas **⊥ a LINHA** — p/ gravar ela precisa saber
+  qual linha abriu, & isso é 1 parâmetro a mais ≡ `mod` já é em `mfOpen`. ⊥ inventar roster.
+- **§T846:** MEDIDO que só **2** templates autoram `?` hoje (`MeritPicked` `OpenAbility`).
+  ⚠ **⊥ foi medido se ∃ VÃO p/ o `?` nas outras famílias** — nos antecedentes/qualidades ele cabe
+  no vão que já ∃ (§I102f); se ⊥ houver vão, alguém encolhe & isso é **decisão do user**, ⊥ chute.
+- **§T846 leva §I103 & §V334 junto**: zoom de fonte cai de 8 alvos p/ **2** & §V334b de 9 panes/18
+  botões p/ **2/4**. As 2 réguas JÁ foram emendadas; §T846 ⊥ fecha sem §V334 VERDE.
+- **§T830:** `psychic` = 15 picker (`_1`…`_15`) + 5 digitadas (`_20`…`_24`), c/ BURACO de
+  numeração assumido (§Q32). As constantes **⊥ mudam**: `PSYCHIC_ROWS` fica **24** (é o MAIOR
+  ÍNDICE & `XP_NUMINA[g].count` anda `1..count` p/ alcançar `psychic_24`) & `TYPED_ROW_FROM.psychic
+  = 24−5+1 = 20` segue certa. O que quebra é **§V263(a)**, já emendada p/ ler o buraco.
+- **§T834/§T840:** ⊥ antes de §T830/§T832 — §V362 mede o ANTES contra o DEPOIS (§B92).
+
+---
+
+### ⚠ ARMADILHAS DE FERRAMENTA — 4 NOVAS medidas nesta rodada, & todas custaram tempo
+
+1. **`sed -i` do Git Bash NORMALIZA o arquivo inteiro p/ LF.** Um `sed -i 's/^T839|\.|/T839|x|/'`
+   no `SPEC.md` (CRLF) apagou **3620 CR** de uma vez. Régua: `cp` ANTES, & trocar linha por
+   NÚMERO via `head`/`tail`, nunca `sed -i`.
+2. **`sed -n 'N,Mp'` também come o CR na SAÍDA.** Splice feito com ele gerou arquivo meio-LF.
+   `head -n N` & `tail -n +N` preservam bytes; `sed`/`awk` ⊥.
+3. **O tool `Write` escreve com ESPAÇOS.** Os `.lfm` usam TABS, & o `LuaFn` do gate extrai função
+   até `\n\t\t\tend;` ∴ um bloco indentado com espaço fez o extrator PASSAR DIRETO pelo fim da
+   função & capturar **13.213 caracteres**, acendendo §V163 por motivo falso. Régua: depois de
+   escrever bloco em `.lfm`, converter espaço→tab (`sed ':a;s/^\(\t*\)  /\1\t/;ta'`) & conferir
+   `grep -c '^ '` = 0.
+4. **§V164 conta `renderSpecialities(` por TEXTO CRU, comentário incluído** — comentário novo c/ o
+   nome derruba o gate. É a família de §V166 (`sheetBody`). Régua: ⊥ escrever o nome da função
+   dentro de comentário que fale dela.
+5. *(já conhecida, reconfirmada)* **`$o = .\gate.ps1 2>&1` vem VAZIO no PS 5.1** — o gate usa
+   `Write-Host`. Rodar `powershell.exe -NoProfile -File … > log 2>&1` & contar NO ARQUIVO, c/
+   `sed '1s/^\xef\xbb\xbf//'` antes (o `>` grava BOM & come a 1ª linha do `grep`).
+
+---
+
+### ⛔ O QUE ⊥ FAZER
+
+- ⊥ rodar `rdk -i` com ficha ABERTA no Firecast sem avisar — instalar **1×** no fim da rodada.
+- ⊥ trocar `stShowDisciplines == true` por `~= false`: mudaria o DEFAULT do Ghoul (§Q nenhuma pede).
+- ⊥ construir §T846 chutando onde o `?` cabe nas famílias sem vão medido.
+- ⊥ commitar. Neste projeto o Claude **⊥ commita** sem pedido direto na mensagem (`CLAUDE.md`).
+- ⊥ escrever §V/§I/§B por `/ck:build` — só `/ck:spec` escreve seção.
+
+### DE TELA, & só o user roda — TODAS juntas numa sessão
+
+`§T787` · `§T804` · `§T810` · `§T816` · `§T820` · `§T823`.
+
+---
+
+
+## 146ª RODADA (2026-08-30) — SUPERADA pela 147ª acima; guardada pela receita da onda & pelas armadilhas
+
+**Estado:** gate **VERDE 620 ok / 0 FAIL** (**622** com `-Build`) · `.rpk` **2.560.293 B** gerada
+**e instalada** 13:09 · §T **731 `x` · 99 `.` · 10 `~`** · **nada commitado**.
+
+**⛔ ⊥ COMECE POR `/ck:build`.** A 1ª coisa desta sessão é **1 `/ck:spec`**, & o texto exato dele
+está em **"O QUE PEDIR AGORA"** ↓. Sem ele, **§T836 & §T826 seguem impossíveis** — ⊥ difíceis,
+IMPOSSÍVEIS: o check de §V354 PROÍBE o que §V364 tornou legal (↓ §B100 a escrever).
+
+**Leia nesta ordem:** esta seção INTEIRA → **O QUE PEDIR AGORA** → **ARMADILHAS** → a 145ª abaixo.
+
+### O QUE A 146ª FECHOU (⊥ refazer)
+
+| §T | o quê | arquivo |
+|---|---|---|
+| `§T824` | versão → `0.1.1` | `WoD20.6.lfm` + `localization.lang` |
+| `§T825` | **§V363** no gate, 3 pernas | `verify-hunters-hunted.ps1` |
+| `§T833` | Ghoul: DOMINATOR 136→138 & `Clan/Family` 92→88 | `WoD20.11.lfm` |
+| `§T835` | Experience +20px (baixo: tudo p/ `Trait`) | `WoD20.9.lfm` |
+| `§T839` | `pcall` nos **2** sítios de `require` de descrição | `WoD20th.lfm` |
+
+**`§T827` & `§T828` ficaram `~` DE PROPÓSITO** — §T827 espera TELA (§B98), §T828 espera §V359,
+que espera §T826.
+
+**MUTAÇÕES RODADAS & TODAS CONFORMES:** §V357 (4) · §V358 (6+1 refeita) · §V363 (3) · §V360 (7) ·
+§V352(e) alargada (3). Bancada c/ backup antes & SHA256 conferido; os `.lfm` voltaram byte a byte.
+
+### DECISÕES DO USER 2026-08-30 — já ∈ `SPEC.md` §C, ⊥ perguntar de novo
+
+- **§Q32:** `psychic` vai a **20** & os 4 excedentes são **APAGADOS DE VEZ** (⊥ órfão). JULGAMENTO
+  meu de QUAIS: saem `psychic_16`…`_19` (pickers), ⊥ `_21`…`_24` — assim ⊥ ∃ campo mudando de
+  SENTIDO. `numina` vai a 20 c/ **3** pickers novos, `_18` `_19` `_20`
+- **§Q31:** `dominatorGen` & `hedgeAttr` **FICAM dropdown** (combos de VALOR) ∴ §V356 cobre **8**
+- **§Q33:** extrair descrição p/ **6** listas; **`speciality` ⊥ terá descrição NUNCA**
+
+### ⚠ O BLOQUEIO REAL, & é o motivo do `/ck:spec` vir antes
+
+`§V354` nasceu quando ∃ **1** onda (antecedentes) & virou a régua DAQUELA onda em vez da regra da
+FAMÍLIA. **MEDIDO na 146ª, construindo a onda `nature`/`demeanor` INTEIRA & desfazendo depois:**
+
+1. **§V354(b) exige que `desc<Mod>_en.lua` EXISTA.** ∴ o check **proíbe converter lista sem
+   módulo** — que é EXATAMENTE o que §V364/§I116c tornaram legal na mesma rodada, & o que §Q33
+   OBRIGA a permitir (`speciality` nunca terá módulo, & ela é o motivo de §T826 ∃)
+2. **§V354(e) conta `<Tpl field="root_N">`.** As linhas de `HeaderPicker` são `field="nature"` &
+   `field="demeanor"` — SEM número & c/ 2 raízes ∴ ⊥ cabem no roster
+
+**A onda FOI construída, buildou 0 & o gate deu 618/0** — & foi REVERTIDA porque os contadores
+caíram **924→856** strings, **21→20** pickers, **16→15** combos: os **68** arquétipos saíram do
+conjunto medido & o guarda deles (§V354) ⊥ os aceitava. Gate verde que parou de medir 68 strings
+é §B94 outra vez. **A receita da onda está toda aqui ↓ — refazer custa minutos.**
+
+### A ONDA `nature`/`demeanor`, MEDIDA & PRONTA (refazer DEPOIS do `/ck:spec`)
+
+- **`WoD20.1.lfm`** template `HeaderPicker` (linha ~96) — o `<comboBox name="cbo$(field)">` vira:
+  - `<button name="dyn$(field)" left="112" top="0" width="215" height="25" text="Select $(nome)" onClick="mfOpen(self, '$(field)', '$(field)', 'Nature');"/>`
+  - `<edit name="edt$(field)" left="112" top="0" width="215" height="25" field="$(field)" visible="false" enabled="false"/>`
+- **`WoD20th.lfm`** — `function renderHeaderButtons(from)` **GLOBAL** (teto de locais é 53 c/ 49
+  usados, §V347), ≡ `renderBgButtons`: `xpFind` por `dynnature`/`dyndemeanor` & `mfLabel(...,
+  "Select Nature"/"Select Demeanor", lang)`. Declarar ANTES de `renderMeritButtons`
+- **`WoD20th.lfm`** — `<dataLink fields="{'nature', 'demeanor'}">` c/ `renderHeaderButtons(self);`,
+  ao lado do dos 16 antecedentes (~linha 5255), **&** 1 chamada no `onNodeReady` depois de
+  `renderBgButtons(self);`
+- **`localization.lang`** (LF, ⊥ CRLF) — `wod.Select Nature=` & `wod.Select Demeanor=` nas **2**
+  metades · **`WoD20.6.lfm`** mapa PT — as 2 chaves depois de `["Select Merit"]`
+- `mod` = `'Nature'` p/ AS DUAS: 1 módulo servirá as 2, ≡ `PICKER_LIST["demeanor"]` já é o de
+  `nature` por identidade
+
+### ⚠ ARMADILHAS MEDIDAS (as 3 primeiras são de FERRAMENTA & já custaram caro)
+
+1. **`Write-Host` ⊥ entra em `$o = .\gate.ps1 2>&1` no PS 5.1.** A 1ª bancada de mutação leu `$o`
+   VAZIO & deu **GREEN nas 3 que deviam ser RED** — teria "provado" um check no-op. Régua: rodar
+   por `& powershell.exe -File … > log 2>&1` & contar **no arquivo**
+2. **O `>` do PowerShell grava BOM** ∴ `grep '^ok'` perde a 1ª linha & a contagem sai 1 a menos,
+   parecendo regressão. `sed '1s/^\xef\xbb\xbf//'` antes de contar
+3. **`sed` c/ regex mal escapado escreveu o GATE VAZIO (0 bytes).** Salvou o backup feito no mesmo
+   comando. Régua: `cp` ANTES de tocar, & p/ linha complexa trocar a LINHA INTEIRA por número
+4. **§V166 conta o literal `sheetBody` em TODO `.lfm`, comentário incluído** — comentário novo c/
+   a palavra derruba o gate. Escrever "a ficha"
+5. **§V53:** `strokeColor` ! ser chave dos mapas `stroke` — só `white` `#FFFFFF` `black`
+   `#00000000`. `DimGray` acende 4×
+6. **§V280/§V240:** ∀ lado de caixa de seção limpa **20px**. As bolinhas da bloodpool JÁ estão no
+   limite (58/93): centralizar de verdade pede 59 & derruba a margem p/ 19
+7. **§V256:** mover um campo ! mover o `<rectangle>` de fundo dele JUNTO
+
+### O QUE PEDIR AGORA — 1º `/ck:spec`, DEPOIS `/ck:build`
+
+O texto exato do `/ck:spec` está na mensagem que o Claude entregou junto deste handoff. Ele emenda
+**§V354** em 2 pontos (módulo deixa de ser exigência & vira coerência · forma "raiz sem número") &
+abre **§B100** registrando que §V354 virou régua-de-1-onda. Depois dele, na ORDEM:
+
+`§T836` (onda `nature`/`demeanor`, receita ↑) → `§T826` (caixa estreita) → `§T828` (§V359) →
+`§T830`/`§T831` (Numina) → `§T832` (Ghoul) → `§T834` (§V361/§V362) → `§T840` (§V364) → `§T838`
+(extração, precisa dos livros).
+
+⚠ **`§T840` ⊥ pode vir antes de `§T830`/`§T832`**: §V362 mede o ANTES contra o DEPOIS de uma
+reestruturação que ainda ⊥ aconteceu ∴ escrita agora ela passa verde medindo o nada (§B92).
+
+### DE TELA, & só o user roda — TODAS juntas numa sessão
+
+`§T787` (4 pontos abertos; o **(5)** DESTRAVOU — §T761 está `x`, & o texto da linha ainda diz
+BLOQUEADO) · `§T804` (a linha de foco JÁ está no código; `setFocus()` ∃ em `rrpgGUI.lua:58` ∴ os
+3 candidatos viraram 1 — falta só saber se o HOST honra) · `§T810` · `§T816` · `§T820` · **`§T823`**
+
+⚠ **`§T823` ganhou uma SONDA de graça:** o fallback de §T827 distingue as 2 causas de §B98 — se a
+pane mostrar **`No description available`**, `descText` devolveu vazio (problema de DADO); se
+continuar **em branco**, a escrita ⊥ chega no controle (problema de CAMINHO). Causas opostas,
+consertos opostos.
+
+**§B98 já teve 3 hipóteses MORTAS pelo print do user:** `edtPopDesc` (que PINTA) & `edtMfDesc`
+(que ⊥ pinta) são **idênticos atributo por atributo** — `readOnly` `wordWrap` `transparent`
+`fontSize`. ∴ ⊥ é a forma do controle, ⊥ é `.text` de `textEditor`, ⊥ é `transparent`. E `mod`/
+`list`/chave também foram conferidos & estão certos.
+
+---
+
+## 145ª RODADA (2026-08-30) — SUPERADA
+
+**Estado:** gate **VERDE 618 ok / 0 FAIL** (**620** com `-Build`) · `.rpk` **2.557.022 B** gerada
+**e instalada** 01:45:17/18 · §T **725 `x`** · **nada commitado**.
+
+**⚠ o "⛔ ⊥ PEÇA `/ck:build` DE NOVO" da 144ª logo abaixo MENTIA quando esta rodada abriu.** Ele
+foi escrito antes de `§B96`/`§V357`/`§T818`…`§T820` entrarem no working tree por outra sessão, e
+esta rodada acrescentou `§B97`/`§V358`/`§T821`…`§T823`. `/ck:build --all` achou **4** linhas
+construíveis e fechou as 4. Lição: o HANDOFF envelhece calado — **conferir `§T` no `SPEC.md`
+antes de acreditar na contagem daqui**.
+
+### O QUE A 145ª FECHOU (⊥ refazer)
+
+| §T | o quê | arquivo |
+|---|---|---|
+| `§T818` | tirar `MF.btn` — a tabela `MF`, a escrita em `mfOpen` e o bloco de `mfConfirm` + o comentário que citava §I107a2 errado | `WoD20th.lfm` (5301→5299 linhas) |
+| `§T819` | **§V357** no gate, 3 pernas + zero-guard | `verify-hunters-hunted.ps1` |
+| `§T821` | o repasse do enfeite: memo ganha `c`, `ornRemeasure()` GLOBAL, `setTimeout(…, 1)` DEPOIS de `sheetReveal` | `WoD20.6.lfm` (4794→4842) |
+| `§T822` | **§V358** no gate, 5 pernas + zero-guard | `verify-hunters-hunted.ps1` |
+
+**§B97 — a causa, medida no fonte:** `ornament()` lê `c.width`/`c.height` na CRIAÇÃO e o único
+guarda é `bw == nil`; as 73 caixas são `<rectangle align="client">` ∴ o tamanho vem da passada de
+alinhamento, e `getWidth` é `_obj_getProp` (`rrpgGUI.lua:95`), que devolve o último valor escrito
+e **nunca nil** ∴ o guarda ⊥ tem o que pegar. A criação roda com o corpo da ficha ESCONDIDO (a
+revelação é a ÚLTIMA linha do MESMO handler) e `applyTheme` tem **1** call site ∴ o memo carimba a
+medida errada p/ sempre. Cura = MEDIR DE NOVO, **⊥ RECUSAR** — piso deixaria a caixa lisa (§V279).
+
+### AS MUTAÇÕES — todas conforme (§V20)
+
+`§V357`: `mfLabel(MF.btn, …)` de volta ! **RED (2)** · `MF.btn = from;` de volta ! **RED** ·
+`from.opacity = 1;` ! **RED** · sonda `mfLabel(found[…])` a mais ! **GREEN**.
+
+`§V358`: repasse antes da revelação **movido** ! **RED (ramo de ORDEM)** · 2º repasse ! **RED
+(ramo de CONTAGEM)** · corpo vira `applyTheme` ! **RED (+§V223 de brinde)** · `c.width` como `w` !
+**RED (2)** · `local function` ! **RED** · memo sem `c = c` ! **RED** · sonda intervalo 1→50 !
+**GREEN**. Bancada c/ backup antes e SHA256 conferido no fim; os 2 `.lfm` voltaram byte a byte.
+
+### ⚠ 2 ARMADILHAS DE FERRAMENTA MEDIDAS NESTA RODADA
+
+1. **`Write-Host` ⊥ entra em `$o = .\gate.ps1 2>&1` no PS 5.1.** A 1ª bancada de mutação leu
+   `$o` VAZIO e deu **GREEN nas 3 que deviam ser RED** — teria "provado" um check no-op. Régua:
+   rodar o gate por `& powershell.exe -File … > log 2>&1` e contar **no arquivo**, ⊥ na variável.
+2. **O `>` do PowerShell grava BOM.** `grep '^ok'` perde a 1ª linha ∴ a contagem sai 1 a menos e
+   parece regressão. `sed '1s/^\xef\xbb\xbf//'` antes de contar.
+
+### ⚠ 1 ARMADILHA DE CÓDIGO
+
+**§V166 conta o literal `sheetBody` em TODO `.lfm`, comentário incluído.** Um comentário novo que
+escrevesse a palavra derrubou o gate. Ao comentar perto da revelação, escrever "a ficha", ⊥ o nome.
+
+**A PRÓXIMA SESSÃO SEGUE DE TELA, & agora são 6 juntas:** `§T787` · `§T804` · `§T810` · `§T816` ·
+**`§T820`** (§B96 — "remover" ⊥ esmaece a aba) · **`§T823`** (§B97 — 3 previsões que confirmam a
+causa ANTES do conserto, + sonda do número que ⊥ foi medido). Só DEPOIS: `§T805` · `§T811`.
+
+---
+
+## 144ª RODADA (2026-08-30) — SUPERADA
 
 **Estado:** gate **VERDE 616 ok / 0 FAIL** (**618** com `-Build`) · `.rpk` **2.553.530 B** gerada
 **e instalada** 00:42:14 · §T **721 `x` · 89 `.` · 7 `~`** · **nada commitado**. **⊥ ∃ pergunta

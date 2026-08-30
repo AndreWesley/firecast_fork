@@ -76,7 +76,7 @@
 			deletes the .rpk (SPEC B19).
 		-->
 		<template name="MeritPicked">
-			<button name="btnQmerit_$(num)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Merit', sheet['merit_$(num)'], '$(sub)');"/>
+			<button name="btnQmerit_$(num)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Merit', sheet['merit_$(num)'], '$(sub)', 'merit_$(num)');"/>
 			<button name="dynMerit_$(num)" left="20" top="0" width="264" height="24" text="$(lbl)" onClick="mfOpen(self, 'merit_$(num)', '$(sub)', 'Merit');"/>
 			<edit name="edtMerit_$(num)" left="20" top="0" width="264" height="24" field="merit_$(num)" visible="false" enabled="false"/>
 			<edit left="284" top="0" width="117" height="24" field="book_$(num)" readOnly="true" opacity="0.75"/>
@@ -103,7 +103,7 @@
 			deletes the .rpk (SPEC B19).
 		-->
 		<template name="OpenAbility">
-			<button name="btnQ$(field)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Background', sheet['$(field)']);"/>
+			<button name="btnQ$(field)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Background', sheet['$(field)'], nil, '$(field)');"/>
 			<button name="dyn$(field)" left="20" top="0" width="170" height="25" text="Select Background" onClick="mfOpen(self, '$(field)', 'background', 'Background');"/>
 			<edit name="edt$(field)" left="20" top="0" width="170" height="25" field="$(field)" visible="false" enabled="false"/>
 			<imageCheckBox left="195" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
@@ -415,7 +415,7 @@
 			<!-- wordWrap is what kills the horizontal scrollbar the user asked not to see: there is
 			     no scroll property on this control in SDK3, so the only way to have no horizontal
 			     bar is to give it nothing to scroll (SPEC I102c, V333f). -->
-			<textEditor name="edtPopDesc" left="20" top="45" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+			<textEditor name="edtPopDesc" left="20" top="45" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePopDesc(self);"/>
 		</layout>
 
 		<!--
@@ -485,7 +485,19 @@
 			     to the RIGHT and the pane took the new ground. wordWrap is what kills the horizontal
 			     bar here for the same reason it does on edtPopDesc, and there is no field: what
 			     leaks to the NDB from the panes is the SIZE, never the text (V29, V334d). -->
-			<textEditor name="edtMfDesc" left="520" top="50" width="460" height="550" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+			<!-- SPEC I116a/V360a/V360b, pedido 3 do user 2026-08-30. The right half stops being empty
+			     space: a rule divides it from the list and a heading names it.
+
+			     The DIVIDER is a sibling of the pane and not a border on it, and that is the point -
+			     a border decorates one control, a rule SEPARATES two. It stands at 510, the middle of
+			     the 20px gutter between the result column (20..500) and the pane (520..980).
+
+			     The heading is a <label> like every other visible string, so V10 reaches it and the
+			     .lang carries `Description` / `Descricao` in both languages. Spelling it in the XML
+			     without the [pt] pair is the half-translated sheet V10 refuses. -->
+			<rectangle name="mfDescRule" left="510" top="50" width="1" height="550" color="#00000000" strokeColor="white" hitTest="false"/>
+			<label name="lblMfDescTitle" left="520" top="50" width="460" height="20" text="Description" horzTextAlign="center"/>
+			<textEditor name="edtMfDesc" left="520" top="76" width="460" height="524" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 
 	</scrollBox>

@@ -3901,10 +3901,23 @@
 			function descText(kind, key, sub, lang)
 				if kind == nil or key == nil or key == "" then return ""; end;
 
-				local DESC = require("desc" .. kind .. "_" .. lang .. ".lua");
+				-- SPEC V364a / I116c / B99. GUARDED, and that is not caution - it is the difference
+				-- between a pane that says nothing and a sheet that stops: `require` on a module
+				-- that is not on disk RAISES, it does not answer nil. Six of the sixteen lists have
+				-- a module today, and `speciality` never will - the user ruled it out on 2026-08-30
+				-- (SPEC Q33, R135).
+				--
+				-- The `type(DESC) == "table"` test below was written for a module that answers
+				-- something odd, and it had never once run for a module that is simply ABSENT: the
+				-- raise came first and took the caller with it.
+				--
+				-- Failure returns "" through the path that ALREADY exists, which is exactly what
+				-- V360c keys on to paint `No description available` (SPEC V364b) - no second branch,
+				-- no flag, nothing new for a reader to learn.
+				local ok, DESC = pcall(require, "desc" .. kind .. "_" .. lang .. ".lua");
 				local txt = "";
 
-				if type(DESC) == "table" then
+				if ok and type(DESC) == "table" then
 					if sub ~= nil and sub ~= "" then txt = DESC[sub .. "|" .. key]; end;
 					if txt == nil or txt == "" then txt = DESC[key] or ""; end;
 				end;
@@ -3912,8 +3925,24 @@
 				return txt;
 			end;
 
+			-- Which row the ONE box is showing. popOpen sets it, popClose clears it, and
+			-- savePopDesc below is the only reader: a keystroke that arrives with no box open
+			-- writes nothing (SPEC T845, I102i).
+			--
+			-- GLOBAL, like descQuiet beside it, and that is not style: a local at chunk scope
+			-- spends a slot the root does not have - it declares 50 against the 50 V347 allows,
+			-- and over the real 53 rdk -l exits 1, prints nothing and deletes the .rpk (SPEC
+			-- B93, B19, V347).
+			popRow = nil;
+
 			-- popOpen paints the ? box - title, text, scrim, box - and reads the text through descText.
-			function popOpen(from, kind, key, sub)
+			--
+			-- `row` is the FIELD NAME of the row that opened the box - `merit_3`, `background_1` -
+			-- and it is a fifth argument for the same reason `sub` became the fourth in T791: the
+			-- box is ONE for the whole sheet, so what it has to be told is which row it is showing.
+			-- A roster of button-to-row would answer the same question and go stale one line per
+			-- wave, which is the thing I114f refuses (SPEC T845, I113a).
+			function popOpen(from, kind, key, sub, row)
 				if from == nil or key == nil or key == "" then return; end;
 
 				local found = {};
@@ -3926,10 +3955,52 @@
 
 				if sheet ~= nil and sheet.language == "pt" then lang = "pt"; end;
 
-				local txt = descText(kind, key, sub, lang);
+				popRow = row;
+
+				-- What the storyteller wrote for THIS row wins over the book, read from the field
+				-- savePopDesc writes - one owner for the text, not two (SPEC V135, I102i, I45).
+				-- Without this read the write has no reader: he would type, close, reopen and find
+				-- the book text back, which is the feature erased sideways that I102i exists to
+				-- stop. Empty override falls through to the book, so clearing the box restores it.
+				local txt = "";
+				local own = nil;
+
+				if sheet ~= nil and row ~= nil and descFieldOf(row) ~= nil then own = sheet[descFieldOf(row)]; end;
+				if own ~= nil and own ~= "" then txt = own; else txt = descText(kind, key, sub, lang); end;
+
+				-- A list with no description module on disk falls to the SENTENCE, never to an
+				-- empty box: descText answers "" for a module that is not there (SPEC V364a), and
+				-- an empty pane would teach the player the row has no description when what it
+				-- has no is a FILE (SPEC V365c, V360c). Same one-liner mfSelect already uses, so
+				-- both readers say the same thing in the same words (SPEC V135).
+				if txt == nil or txt == "" then txt = translateSheetText("No description available", lang); end;
 
 				if found["dynPopDescTitle"] ~= nil then found["dynPopDescTitle"].text = key; end;
-				if found["edtPopDesc"] ~= nil then found["edtPopDesc"].text = txt; end;
+
+				-- descQuiet around the write for the reason the five description panes already
+				-- raise it: gui.TextEditor has onChange and no onUserChange (rrpgGUI.lua:667-675),
+				-- so the renderer's own write comes back through the door the storyteller's typing
+				-- uses (SPEC V107, V249d, B39). Without it, opening the ? would SAVE the book text
+				-- onto that row - every row he ever looked at, in silence.
+				--
+				-- readOnly is written ALONE, and that is V111(2) winning over the edtSpentXP shape
+				-- V365f borrowed. edtPopDesc is on the DESC_BRIGHT roster BY NAME: a description
+				-- pane carries no opacity at all, because opacity on a TextControl fades the TEXT
+				-- along with the frame (SPEC V241) - dimming it would charge the player legibility
+				-- of the very thing he opened the box to read. The comboBox left V162's scope on
+				-- exactly this argument in the 2026-08-22 amendment (SPEC I41), and this is the
+				-- same widget class in the same roster: ONE write, so there are no two halves left
+				-- to disagree about the lock.
+				--
+				-- V365f still pairs the two writes for a pane that is FORBIDDEN the second one, so
+				-- it needs amending - flagged for /ck:spec, not decided here (SPEC V111(2), V241).
+				if found["edtPopDesc"] ~= nil then
+					descQuiet = true;
+					found["edtPopDesc"].text = txt;
+					found["edtPopDesc"].readOnly = not isStoryteller();
+					descQuiet = false;
+				end;
+
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
 
 				found["popDesc"].visible = true;
@@ -3944,6 +4015,32 @@
 
 				if found["popScrim"] ~= nil then found["popScrim"].visible = false; end;
 				if found["popDesc"] ~= nil then found["popDesc"].visible = false; end;
+
+				popRow = nil;
+			end;
+
+			-- What the storyteller types in the ? box lands on the row that OPENED it, read at the
+			-- moment of the write (SPEC V249c, I102i): popRow is set by popOpen and cleared by
+			-- popClose.
+			--
+			-- It asks isStoryteller() again rather than trusting the readOnly popOpen just wrote:
+			-- the flag on the control is a look, and the rule is a rule (SPEC V266b, V80).
+			--
+			-- It does NOT ask isTypedRow, and that is the one place this differs from the five
+			-- panes it copies: the ? lives on PICKER rows only (SPEC I102f, V365b), so their typed
+			-- row test would refuse every write there is.
+			--
+			-- ONE writer, through descFieldOf - the same door saveNuminaDesc uses, so no second
+			-- owner of the text is born (SPEC I45, V135, V365f).
+			function savePopDesc(form)
+				if descQuiet or sheet == nil or form == nil then return; end;
+				if popRow == nil or not isStoryteller() then return; end;
+
+				local fld = descFieldOf(popRow);
+
+				if fld == nil then return; end;
+
+				setField(fld, form.edtPopDesc.text);
 			end;
 			-- ---- The merit/flaw search box (SPEC I107) ----------------------------------------
 			--
@@ -3965,7 +4062,7 @@
 			local MF = {
 				rows = 20, gen = 0, load = 0, page = 1, names = nil, hits = nil, pool = nil,
 				picked = nil, mark = 0, data = nil, field = nil, list = nil, mod = nil,
-				btn = nil, title = nil
+				title = nil
 			};
 
 			-- Built once and kept: xpFind takes a ready table, and rebuilding twenty-nine keys on
@@ -4178,6 +4275,14 @@
 			function mfOpen(from, field, list, mod)
 				if from == nil or field == nil or list == nil then return; end;
 
+				-- The gift is not the player's to change (SPEC V161, amended in the 146th). The lock
+				-- used to be `enabled = false` on the row's comboBox; wave 2 of I113e replaced that
+				-- combo with a button, and a button HAS a click hook, so the refusal sits HERE -
+				-- before the box opens, which is the same answer the disabled combo gave, at the same
+				-- moment. Asked of the FIELD and not of the list: a stamped row is a stamped row, and
+				-- a test on MF.list here would be the hidden roster I114f exists to refuse.
+				if sheet ~= nil and isFreeRow(field) then return; end;
+
 				local found = {};
 
 				xpFind(tabRootOf(from), mfNames(), found);
@@ -4186,8 +4291,11 @@
 
 				MF.field = field;
 				MF.list = list;
-				MF.mod = mod or "Merit";
-				MF.btn = from;
+				-- NO fallback (SPEC T842, V354b, V364b). It read `mod or "Merit"` while the box was
+				-- merit-only; with the generic box that default makes a module-LESS wave show MERIT
+				-- text for an archetype - a wrong answer, which is worse than no answer. nil travels
+				-- to descText, which returns "" for a nil kind, and V360c paints the sentence.
+				MF.mod = mod;
 				MF.picked = nil;
 				MF.mark = 0;
 				MF.page = 1;
@@ -4229,7 +4337,20 @@
 					-- the middle of the choice, which is I107f by the other door (R92, T479). The module is
 					-- a PARAMETER now (I113a), so this one line serves the 563KB descMerit and the
 					-- descBackground of the pilot alike.
-					require("desc" .. MF.mod .. "_" .. lang .. ".lua");
+					-- SPEC V364a / V364d / I116c / B99. The warm-up is GUARDED and the failing branch
+					-- goes ON building the list: the description is an accessory, the LIST is why the
+					-- box exists. This runs inside mfOpen's own timer, so an unguarded raise kills the
+					-- rest of the handler - the pool is never built, mfFilter never runs, and the box
+					-- opens EMPTY on the first list with no text (SPEC B99).
+					--
+					-- The meritData require below is deliberately NOT guarded: that file always ships,
+					-- and a pcall there would hide a broken build behind an empty picker, which is B19
+					-- coming in through the door of silence (SPEC V364d).
+					-- GUARDED by mod ~= nil as well as by pcall, and the order is the point: the
+					-- concatenation is an ARGUMENT, so it runs BEFORE pcall is ever called. With a
+					-- module-less wave (I113e wave 2, SPEC Q33) "desc" .. nil would raise OUTSIDE the
+					-- guard and kill the rest of the timer - which is B99 in a new coat.
+					if MF.mod ~= nil then pcall(require, "desc" .. MF.mod .. "_" .. lang .. ".lua"); end;
 
 					-- SPEC I113b: the list comes from PICKER_LIST, the artifact pickerItems already reads,
 					-- so no second copy of any list is born here (V208, V211). meritData stays its own
@@ -4284,6 +4405,24 @@
 					if f2["lblMfLoading"] ~= nil then f2["lblMfLoading"].text = ""; end;
 
 					mfFilter(from);
+
+					-- SPEC I111c / Q28 / T804: the cursor lands in the field, so the box can be opened
+					-- and typed into with no click in between. LAST in the timer on purpose - after
+					-- the list is painted and long after mfSearch was shown - because asking focus
+					-- for something not on screen yet is the one way this cannot work (I111c). Last
+					-- also means a call that throws cannot cost the box its content: everything the
+					-- player came for is already done above it.
+					--
+					-- `setFocus` is NOT a guess and I111a is narrower than it reads: it measured the
+					-- fifteen .lfm and found nothing, but the SDK in this repo declares
+					-- gui.Control:setFocus() at rrpgGUI.lua:58, invoking "SetFocus" on the handle.
+					-- So the NAME is settled and the three candidates collapse to this one.
+					--
+					-- What is still unmeasured is whether the HOST honours it for an <edit> inside a
+					-- layout that was hidden a tick ago - and that is the screen half of T804, which
+					-- no gate can run. The fall is free: no focus and the box is exactly what it is
+					-- today (I111d).
+					if f2["edtMfQuery"] ~= nil then f2["edtMfQuery"]:setFocus(); end;
 				end, 1);
 			end;
 
@@ -4310,7 +4449,17 @@
 				if found["edtMfDesc"] ~= nil then
 					local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
 
-					found["edtMfDesc"].text = descText(MF.mod, name, MF.list, lang);
+					local txt = descText(MF.mod, name, MF.list, lang);
+
+					-- SPEC V360c / I116c. A list with no module in disk SAYS so. A pane left blank
+					-- cannot tell "the book does not carry this" from "the sheet broke", which is the
+					-- lie I107m exists to stop, on a new target. MEASURED 2026-08-30: six of the
+					-- sixteen lists have a module, and `speciality` will NEVER have one - the user
+					-- ruled it out on the 30th (SPEC R135, C 146th) - so this is the permanent state
+					-- of that list, not a gap waiting to close.
+					if txt == nil or txt == "" then txt = translateSheetText("No description available", lang); end;
+
+					found["edtMfDesc"].text = txt;
 				end;
 
 				mfArm(found, true);
@@ -4355,14 +4504,13 @@
 					setField("costy_" .. num, "");
 				end;
 
-				-- SPEC I107a2: the button that OPENED the box is the one whose text has to change, and
-				-- the box knows which it was. mfLabel and not a plain write, because clearing the row
-				-- has to put the label back rather than leave an empty button.
-				if MF.btn ~= nil then
-					local lang = (sheet.language == "pt") and "pt" or "en";
-
-					mfLabel(MF.btn, MF.picked, MF.title, lang);
-				end;
+				-- Nothing repaints the row from HERE (SPEC V357, B96). `self` on an inline handler
+				-- is the FORM and not the control that was clicked (SPEC R134), so the write that
+				-- used to stand here reached the whole tab: choosing the blank dimmed every widget
+				-- on it to 0.60 and turned it italic, and the other branch writing opacity 1 is
+				-- what kept that invisible until a row was EMPTIED.
+				-- The two dataLink of I107a2 already repaint the label, and they find their control
+				-- by NAME - so this was never the only writer, it was the second one (SPEC V135).
 
 				mfClose(from);
 			end;
@@ -4459,6 +4607,27 @@
 				for i = 1, last, 1 do
 					mfLabel(found["dynbackground_" .. i], sheet["background_" .. i], "Select Background", lang);
 				end;
+			end;
+
+			-- Nature and Demeanor, the two BARE rows of I113e wave 2 (SPEC T842). Same watcher and
+			-- same reason as renderBgButtons above: a button's text is not a field, so nothing
+			-- restores it when the sheet is reopened or the value changes.
+			--
+			-- Two roots on ONE template, and PICKER_LIST["demeanor"] IS PICKER_LIST["nature"] by
+			-- identity (SPEC V211c) - one authored list of 68 archetypes standing behind both doors.
+			-- The pair is written out rather than looped, because two is not a range and a loop over
+			-- a two-name list reads worse than the two names do.
+			function renderHeaderButtons(from)
+				if sheet == nil or from == nil then return; end;
+
+				local found = {};
+
+				xpFind(tabRootOf(from), { dynnature = true, dyndemeanor = true }, found);
+
+				local lang = (sheet.language == "pt") and "pt" or "en";
+
+				mfLabel(found["dynnature"], sheet.nature, "Select Nature", lang);
+				mfLabel(found["dyndemeanor"], sheet.demeanor, "Select Demeanor", lang);
 			end;
 
 			function renderMeritButtons(from)
@@ -4680,27 +4849,31 @@
 			function renderSpecialities(from)
 				if sheet == nil or from == nil then return; end;
 
-				-- Only the PICKER rows: the last three are typed and have no combo to find, let alone
-				-- to lock (SPEC I50, V255d).
+				-- Only the PICKER rows: the last three are typed, carry no button and are locked by
+				-- nothing (SPEC I50, V255d).
 				local names = {};
 
-				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do names["cboSpeciality" .. i] = true; end;
+				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do names["dynspeciality_" .. i] = true; end;
 
 				local found = {};
 
 				xpFind(tabRootOf(from), names, found);
 
+				local lang = (sheet.language == "pt") and "pt" or "en";
+
+				-- The row used to be a comboBox and this function's whole job was the LOCK. The box of
+				-- I113e wave 2 took the combo away, so the same walk now does what renderBgButtons does
+				-- for the sixteen backgrounds: paint the button from the field, because a button's text
+				-- is not a field and nothing restores it on its own (SPEC I107a2, T842).
+				--
+				-- The LOCK moved and did not disappear (SPEC V161, amended in the 146th). It used to be
+				-- `enabled = false` on the combo, and the reason written for that was "a comboBox has no
+				-- click hook, so this is the only lock available here" - true of the WIDGET, never of the
+				-- gift. A button HAS onClick, so the refusal now sits in the opener, before the box can
+				-- open, and the button stays fully legible: reading WHICH speciality the trait handed
+				-- over is the whole point of showing the row (SPEC I41, V241).
 				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do
-					local c = found["cboSpeciality" .. i];
-
-					if c ~= nil then
-						local locked = isFreeRow("speciality_" .. i);
-
-						-- Same as the clan slots: the lock is `enabled`, and the text stays legible
-						-- (SPEC I41, V241). A free speciality is one the trait handed out, and reading
-						-- WHICH one is the whole point of showing the row.
-						c.enabled = not locked;
-					end;
+					mfLabel(found["dynspeciality_" .. i], sheet["speciality_" .. i], "Select Speciality", lang);
 				end;
 			end;
 
@@ -5208,7 +5381,24 @@
 		<event name="onChange">
 			renderBgButtons(self);
 		</event>
-	</dataLink>
+		</dataLink>
+
+		<!--
+			Wave 2 of I113e (SPEC T842): the two header buttons and the seven speciality buttons.
+			Speciality rows 8-10 are TYPED and carry no button, so they are not in this list -
+			"picker = total - typed" (SPEC I50, V255).
+		-->
+		<dataLink fields="{'nature', 'demeanor'}">
+			<event name="onChange">
+				renderHeaderButtons(self);
+			</event>
+		</dataLink>
+
+		<dataLink fields="{'speciality_1', 'speciality_2', 'speciality_3', 'speciality_4', 'speciality_5', 'speciality_6', 'speciality_7'}">
+			<event name="onChange">
+				renderSpecialities(self);
+			</event>
+		</dataLink>
 
 	<dataLink fields="{'stShowNumina', 'stShowDisciplines'}">
 		<event name="onChange">
@@ -5287,7 +5477,13 @@
 		renderMeritButtons(self);
 
 		-- The sixteen background name buttons, same reason (SPEC I107a2, I113, T808).
-		renderBgButtons(self);
+			renderBgButtons(self);
+
+			-- Nature and Demeanor, wave 2 of I113e - same reason (SPEC T842). The seven speciality
+			-- buttons are NOT painted from here: WoD20.1 already paints them when it opens, and a
+			-- second call would be a second owner (V135). The name is left unwritten on purpose -
+			-- V164 counts that call by raw text, comments included, which is the V166 trap.
+			renderHeaderButtons(self);
 
 		-- The floor under the reveal (SPEC V167, I15). The theme paint is what normally
 		-- lights the sheet, and it is the last load paint there is - but which of this

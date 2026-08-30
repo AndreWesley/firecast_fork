@@ -16,6 +16,12 @@ reextrair qualquer coisa dos PDFs).
 Toda vez que terminar de buildar: gerar o `.rpk` **e instalar**. Build sem install =
 tarefa incompleta — o Firecast continua rodando a versão velha.
 
+**Mas 1 install por RODADA, no fim — não por §T (§B103 do SPEC).** `rdk -l` roda quantas
+vezes precisar; `rdk -i` roda uma vez, ao fechar a rodada. Instalar com o Firecast aberto e
+a ficha carregada deixa o form velho na tela com o código novo atrás: o controle some e
+nenhum handler o traz de volta — só fechar e reabrir a ficha cura, e o sintoma se disfarça
+de bug de código. Se a ficha puder estar aberta, **avise antes de instalar**.
+
 Da raiz do plugin (`Plugins/Sheets/World of Darkness 20th Anniversary Edition/`):
 
 ```powershell
@@ -30,6 +36,8 @@ Provas de que funcionou (exit 0 sozinho não prova nada — §B1 do SPEC):
 - build: `output/World of Darkness 20th Anniversary Edition.rpk` mudou de mtime **e** size;
 - install: `%APPDATA%\Firecast\Plugins\andreoliveira.styllern.wod20th.rpk` com o mesmo size do `.rpk`
   recém-gerado e mtime da hora do install.
+- diferença de size entre `output/` e o instalado que não muda nada para o user **não** é
+  motivo para reinstalar: foram 2 dos 3 installs desperdiçados na 147ª rodada (§B103).
 
 `rdk -p` é PREPARE, não build: sai 0 sem tocar no `.rpk` e ainda reescreve o `module.xml`.
 

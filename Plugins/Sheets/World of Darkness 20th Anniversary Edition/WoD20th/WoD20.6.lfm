@@ -8,7 +8,12 @@
 			-- would still get Portuguese. SPEC R.1 / R.5.
 			local PT = {
 				["Remove"] = "Remover",
+				["Description"] = "Descrição",
+				["No description available"] = "Nenhuma descrição disponível",
 				["Select Background"] = "Selecionar Antecedente",
+				["Select Nature"] = "Selecionar Natureza",
+				["Select Demeanor"] = "Selecionar Comportamento",
+				["Select Speciality"] = "Selecionar Especialidade",
 				["Select Flaw"] = "Selecionar Defeito",
 				["Select Merit"] = "Selecionar Qualidade",
 				["OK"] = "OK",
@@ -501,7 +506,7 @@
 				["Tyrant"] = "Tirano",
 				["Update"] = "Atualizar",
 				["Version"] = "Versão Atual",
-				["Version: 0.1.0"] = "Versão: 0.1.0",
+				["Version: 0.1.1"] = "Versão: 0.1.1",
 				["Victorian Era"] = "Era Vitoriana",
 				-- Latin, and the book leaves it Latin inside English prose - so the entry is the SAME
 				-- string on both sides (SPEC I17). The key still has to exist: V10 collects every picker
@@ -4232,11 +4237,16 @@
 			-- One <path> per box, made the first time an era asks for it and hidden - never destroyed
 			-- - when a plainer era takes over. An era that declares no `ornament` gets none, exactly
 			-- as a palette with no `paper` gets no backdrop (V56).
-			-- The entry is {p, w, h} and not the path alone: the memo has to tell "already drawn"
-			-- from "drawn at THIS size". The HEALTH box is the one section box that resizes at
-			-- runtime - renderHealthTrack writes its height from the storyteller's track length
-			-- (SPEC V49) - and a memo that only knew the first would keep serving a frame built
-			-- for the old measure, with no error and no symptom to grep (SPEC I72d, V284).
+			-- The entry is {p, w, h, s, c} and not the path alone: the memo has to tell "already
+			-- drawn" from "drawn at THIS size" and from "drawn in THIS drawing". The HEALTH box is
+			-- the one section box that resizes at runtime - renderHealthTrack writes its height
+			-- from the storyteller's track length (SPEC V49) - and a memo that only knew the first
+			-- would keep serving a frame built for the old measure, with no error and no symptom
+			-- to grep (SPEC I72d, V284).
+			-- `c` is the BOX, and it is what lets ornRemeasure ask the size again after the reveal
+			-- without a second walk of the tree: a second collect would be a second owner of "which
+			-- rectangles are the boxes", which is what sectionBox exists to be the only one of
+			-- (SPEC V358e, V67, I89b).
 			local ornPainted = {};
 
 			-- The era's ornament colour, kept from the last applyTheme so a refresh outside the
@@ -4392,7 +4402,7 @@
 					p.strokeSize = 1;
 					p.data = d;
 
-					e = {p = p, w = bw, h = bh, s = ornStyleNow};
+					e = {p = p, w = bw, h = bh, s = ornStyleNow, c = c};
 
 					ornPainted[c.handle] = e;
 				end;
@@ -4535,6 +4545,39 @@
 						ornament(k, nil, ornColour, w, h);
 						return;
 					end;
+				end;
+			end;
+
+			-- SPEC V358 / B97. The load-time measure is taken with the sheet body HIDDEN: applyTheme
+			-- runs from the sheetTheme dataLink and sheetReveal is the LAST line of that same
+			-- handler, so every align="client" box is asked for a size the layout has not resolved
+			-- yet. `getWidth` is _obj_getProp (rrpgGUI.lua:95) and answers the last value written
+			-- rather than nil, so the nil guard in ornament() has nothing to catch, the memo stamps
+			-- the wrong measure, and applyTheme has ONE call site - nothing ever asks again. The
+			-- crown stayed drawn at its smallest in the top-left corner of all 73 for the rest of
+			-- the session, exit 0 and the gate green the whole time (B97).
+			--
+			-- The cure is to MEASURE AGAIN, never to REFUSE. A floor would leave the box plain,
+			-- which is exactly what V279 forbids, and the number would be invented here - this file
+			-- cannot read the XML the boxes are authored in.
+			--
+			-- `w` and `h` go in as nil ON PURPOSE, and that is the INVERSE of refreshOrnament above
+			-- (SPEC V285c, V358c): there the caller has just WRITTEN the height and reading it back
+			-- in the same tick can answer with the size the box is LEAVING, so the measure has to
+			-- arrive by argument; here nothing was written and what is missing is the align pass, so
+			-- the control is the only source there is. Handing a measure in would put the stale one
+			-- back through another door.
+			--
+			-- Nothing new is compared: the third door of ornament() already opens on `bw ~= e.w`,
+			-- so a box the layout had resolved all along is left exactly as it is (SPEC V284a).
+			--
+			-- GLOBAL like refreshOrnament, and that is not style: B93 measured this chunk at 99 of
+			-- 100 and a `local function` costs a slot exactly like a variable does (SPEC V325,
+			-- V358d). Declared BELOW ornament() because it calls it - the other order compiles to a
+			-- GETGLOBAL and finds nil, silently (SPEC V223, B51).
+			function ornRemeasure()
+				for _, e in pairs(ornPainted) do
+					if e.c ~= nil then ornament(e.c, nil, ornColour); end;
 				end;
 			end;
 
@@ -4760,6 +4803,16 @@
 					-- It lives at the END of this handler on purpose: everything above it is
 					-- what the player would otherwise have watched being applied (SPEC B40).
 					sheetReveal(self);
+
+					-- The boxes measured again, and AFTER the reveal (SPEC V358a, B97). Everything
+					-- above this ran with the sheet still hidden, so an align="client" box could still
+					-- answer the size it had before the layout resolved it. A call placed BEFORE
+					-- sheetReveal re-reads that same unresolved size and is an expensive no-op.
+					--
+					-- The interval is POSITIVE because setTimeout is only asynchronous with one
+					-- (SPEC R44): at 0 it runs in this very tick, ahead of the align pass, which is
+					-- the defect back again.
+					setTimeout(function() ornRemeasure(); end, 1);
 				</event>
 			</dataLink>
 		</layout>
@@ -4788,7 +4841,7 @@
 
 			<label left="20" top="130" width="380" height="20" text="System: Storyteller 20th Anniversary Edition" horzTextAlign="center"/>
 
-			<label left="20" top="166" width="380" height="20" text="Version: 0.1.0" horzTextAlign="center"/>
+			<label left="20" top="166" width="380" height="20" text="Version: 0.1.1" horzTextAlign="center"/>
 		</layout>
 	</scrollBox>
 </form>

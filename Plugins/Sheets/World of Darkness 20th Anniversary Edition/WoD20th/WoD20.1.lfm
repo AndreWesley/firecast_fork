@@ -79,9 +79,16 @@
 			still lines up with itself. Advantages / Willpower carry no label and start at
 			x=0 - they live alone in their own box and are centred by the caller.
 		-->
+		<!-- The input sits at 132, not 112, and the 20px before it is the ? COLUMN: nature and
+		     demeanor draw a ? there (T846, I102h) and concept - a typed field - leaves it empty,
+		     exactly as MeritFree leaves the slot MeritPicked fills (SPEC I102f). V26 compares
+		     SIBLINGS, and left=326 holds two HeaderPicker rows and one Header, so the gap has to
+		     exist in BOTH templates or the column stops lining up (SPEC V26, B12). The label keeps
+		     its 105 - that width is what `Comportamento` needs in pt, and the 20 came out of the
+		     input, which had 215 for a field nobody fills to the edge. -->
 		<template name="Header">
 			<label left="0" top="5" width="105" height="20" text="$(nome)" horzTextAlign="trailing"/>
-			<edit left="112" top="0" width="215" height="25" field="$(field)"/>
+			<edit left="132" top="0" width="195" height="25" field="$(field)"/>
 		</template>
 		<!-- Same row, shorter label. The 105px of `Header` is what `Demeanor` needs in pt
 		     ("Comportamento", ~86px) and Demeanor lives in the middle column - keeping that
@@ -95,8 +102,9 @@
 		</template>
 		<template name="HeaderPicker">
 			<label left="0" top="5" width="105" height="20" text="$(nome)" horzTextAlign="trailing"/>
-			<comboBox left="112" top="0" width="215" height="25" name="cbo$(field)" field="$(field)">
-			</comboBox>
+			<button name="btnQ$(field)" left="108" top="0" width="20" height="20" text="?" onClick="popOpen(self, nil, sheet['$(field)'], nil, '$(field)');"/>
+			<button name="dyn$(field)" left="132" top="0" width="195" height="25" text="Select $(nome)" onClick="mfOpen(self, '$(field)', '$(field)');"/>
+			<edit name="edt$(field)" left="132" top="0" width="195" height="25" field="$(field)" visible="false" enabled="false"/>
 		</template>
 		<template name="Attribute">
 			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
@@ -195,7 +203,8 @@
 			show what Lua wrote (SPEC V148).
 		-->
 		<template name="SpecialityRow">
-			<comboBox name="cboSpeciality$(num)" left="0" top="0" width="150" height="25" field="speciality_$(num)" fontSize="12"/>
+			<button name="dynspeciality_$(num)" left="0" top="0" width="150" height="25" text="Select Speciality" onClick="mfOpen(self, 'speciality_$(num)', 'speciality');"/>
+			<edit name="edtspeciality_$(num)" left="0" top="0" width="150" height="25" field="speciality_$(num)" fontSize="12" visible="false" enabled="false"/>
 			<edit left="155" top="0" width="75" height="25" field="specialityName_$(num)" fontSize="12"/>
 			<imageCheckBox left="235" top="0" width="25" height="25" field="speciality_$(num)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('speciality_$(num)_1', self);"/>
 		</template>

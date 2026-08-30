@@ -163,9 +163,9 @@
 			Stacking costs height - the box went 75 -> 95 - which is why the log below starts at 105
 			and still closes the tab on 640.
 		-->
-		<layout left="0" top="0" width="541" height="115">
+		<layout left="0" top="0" width="561" height="115">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="501" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+			<label left="20" top="20" width="521" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
 			<label left="36" top="48" width="141" height="20" text="Total Experience" horzTextAlign="center"/>
 			<!-- The two locked numbers stand on a darker ground than the box (SPEC V256, user
@@ -181,16 +181,16 @@
 			<rectangle name="bgTotalXP" left="61" top="70" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
 			<edit name="edtTotalXP" left="61" top="70" width="90" height="25" readOnly="true" opacity="0.75" horzTextAlign="center" fontSize="14" transparent="true"/>
 
-			<label left="200" top="48" width="141" height="20" text="Spent Experience" horzTextAlign="center"/>
+			<label left="210" top="48" width="141" height="20" text="Spent Experience" horzTextAlign="center"/>
 			<!-- Authored LOCKED, and the lock moves at runtime with the storyteller's flag
 			     (SPEC I44, V245): the sheet has to read right before any Lua runs, and OFF is
 			     what the flag defaults to. Typing here writes a MANUAL line into the log, never
 			     a second number beside it (SPEC V246). -->
-			<rectangle name="bgSpentXP" left="225" top="70" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
-			<edit name="edtSpentXP" left="225" top="70" width="90" height="25" readOnly="true" opacity="0.75" horzTextAlign="center" fontSize="14" transparent="true" onUserChange="xpSetSpent(self, self.edtSpentXP.text);"/>
+			<rectangle name="bgSpentXP" left="235" top="70" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtSpentXP" left="235" top="70" width="90" height="25" readOnly="true" opacity="0.75" horzTextAlign="center" fontSize="14" transparent="true" onUserChange="xpSetSpent(self, self.edtSpentXP.text);"/>
 
-			<label left="364" top="48" width="141" height="20" text="Current Experience" horzTextAlign="center"/>
-			<edit name="edtCurrentXP" left="389" top="70" width="90" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);"/>
+			<label left="384" top="48" width="141" height="20" text="Current Experience" horzTextAlign="center"/>
+			<edit name="edtCurrentXP" left="409" top="70" width="90" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);"/>
 		</layout>
 
 		<!--
@@ -207,9 +207,9 @@
 			column headings belong to it, the rows belong to the scrollBox below them, and
 			nothing in Lua writes this height any more.
 		-->
-		<layout name="xpLogBox" left="0" top="120" width="541" height="560">
+		<layout name="xpLogBox" left="0" top="120" width="561" height="560">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="501" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
+			<label left="20" top="20" width="521" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
 
 			<!--
 				Widths asked for by the user on top of the measured ones (33rd round): Type -30%,
@@ -231,9 +231,9 @@
 				is how the log would have started poking out of its own frame.
 			-->
 			<label left="35" top="45" width="133" height="20" text="Type" horzTextAlign="center"/>
-			<label left="178" top="45" width="180" height="20" text="Trait" horzTextAlign="center"/>
-			<label left="368" top="45" width="82" height="20" text="Level" horzTextAlign="center"/>
-			<label left="460" top="45" width="45" height="20" text="Cost" horzTextAlign="center"/>
+			<label left="178" top="45" width="200" height="20" text="Trait" horzTextAlign="center"/>
+			<label left="388" top="45" width="82" height="20" text="Level" horzTextAlign="center"/>
+			<label left="480" top="45" width="45" height="20" text="Cost" horzTextAlign="center"/>
 
 			<!--
 				The four columns scroll TOGETHER, inside one box of their own (SPEC I57, user
@@ -250,11 +250,11 @@
 				nothing to hide the horizontal one - so whether 16 is enough is a question for
 				the screen, not for the XML (SPEC R104).
 			-->
-			<scrollBox name="xpLogScroll" left="20" top="70" width="501" height="470">
+			<scrollBox name="xpLogScroll" left="20" top="70" width="521" height="470">
 				<textEditor name="dynXpType" left="15" top="0" width="133" height="470" readOnly="true" opacity="0.75"/>
-				<textEditor name="dynXpTrait" left="158" top="0" width="180" height="470" readOnly="true" opacity="0.75"/>
-				<textEditor name="dynXpLevel" left="348" top="0" width="82" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-				<textEditor name="dynXpCost" left="440" top="0" width="45" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+				<textEditor name="dynXpTrait" left="158" top="0" width="200" height="470" readOnly="true" opacity="0.75"/>
+				<textEditor name="dynXpLevel" left="368" top="0" width="82" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+				<textEditor name="dynXpCost" left="460" top="0" width="45" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 			</scrollBox>
 
 			<!-- Why the log is empty, on a line of its own (SPEC I39, V235). Declared LAST because
@@ -266,7 +266,7 @@
 			     OUTSIDE the scrollBox, and that is the point: it is the state of the BLOCK, not a
 			     row in it, so it must not scroll away from the only state it is ever shown in
 			     (SPEC V261c). -->
-			<label name="dynXpEmpty" left="20" top="70" width="501" height="20" text="" horzTextAlign="center" opacity="0.75" visible="false"/>
+			<label name="dynXpEmpty" left="20" top="70" width="521" height="20" text="" horzTextAlign="center" opacity="0.75" visible="false"/>
 
 		</layout>
 	</scrollBox>
