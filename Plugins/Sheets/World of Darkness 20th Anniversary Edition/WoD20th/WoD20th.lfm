@@ -2572,6 +2572,17 @@
 			-- the picker count is the total minus these and no reader carries a list of indices.
 			SPECIALITY_FREE_ROWS = 0;
 
+			-- The HIGHEST merit/flaw row index, not the count (SPEC V263a): the tables run m0..m10
+			-- and f0..f10, so eleven rows each and 10 is the last one. The suffix is `m7`/`f10` and
+			-- never a bare digit, which is why this family had no constant to begin with and why the
+			-- painter carried a literal `0, 6` instead (SPEC B112).
+			--
+			-- T870 turned the last four of each into pickers and the literal did not follow, so eight
+			-- buttons went unpainted: a filled row read `Select Merit` on every open, because a
+			-- button text is not data (SPEC I107a2). Derived and never literal is the whole of V383b -
+			-- swapping 6 for 10 would be the same literal one conversion later.
+			MERIT_ROWS = 10;
+
 			-- Rows of the Vampire tab (SPEC I16). Same contract as BACKGROUND_ROWS above: the loop
 			-- that lets experience buy a dot and the loop that prices it for the log both read
 			-- these, so a row added to the XML alone would be a dot nothing charges for.
@@ -3714,6 +3725,21 @@
 				-- this the storyteller could not write a secondary path at all - a name no blood
 				-- sorcery claims is exactly what V182 refuses.
 				if isTypedRow(field) then return nil; end;
+
+				-- The Custom line answers to no table either, and for the same reason the typed
+				-- row above does not (SPEC I132, V382). When waves 3 and 4 take the free rows
+				-- away isTypedRow goes false for EVERY family, and a `-- Custom --` name in a
+				-- filtered row would hit the guard below: the player types it, confirms, and
+				-- watches it revert (SPEC I132a).
+				--
+				-- By VALUE and never by row: this exempts the name the slot own custom field
+				-- holds, not every row that HAS a custom field. The wider test would exempt the
+				-- row for good, and the filter would die silently wherever a custom was once
+				-- used (SPEC I132b). Anything else in a filtered row still faces the whole rule,
+				-- so V199 keeps holding: the picker never offers what this would throw back.
+				local cf = customFieldOf(field);
+
+				if sheet ~= nil and cf ~= nil and sheet[cf] == value then return nil; end;
 
 				local isMain = string.match(field, "^mainPath_%d+$") ~= nil;
 
@@ -4948,7 +4974,7 @@
 
 				-- from ZERO: the 143rd put one more picked row at the TOP of each table, and it is
 				-- numbered m0/f0 rather than renumbering m1..m10 out from under saved sheets (V2).
-				for i = 0, 6, 1 do
+				for i = 0, MERIT_ROWS, 1 do
 					names["dynMerit_m" .. i] = true;
 					names["dynMerit_f" .. i] = true;
 				end;
@@ -4959,7 +4985,7 @@
 
 				local lang = (sheet.language == "pt") and "pt" or "en";
 
-				for i = 0, 6, 1 do
+				for i = 0, MERIT_ROWS, 1 do
 					mfLabel(found["dynMerit_m" .. i], sheet["merit_m" .. i], "Select Merit", lang);
 					mfLabel(found["dynMerit_f" .. i], sheet["merit_f" .. i], "Select Flaw", lang);
 				end;

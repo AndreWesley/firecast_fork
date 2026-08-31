@@ -1,176 +1,87 @@
-# EMENDA DE SPEC pedida pela 157ª rodada (2026-08-31)
+# EMENDA DE SPEC — os 5 §T que mentem sobre estar prontos (2026-08-31, 158ª)
 
-Cole o conteúdo abaixo como argumento de `/ck:spec amend` num chat sem contexto.
-São **11** pontos. Nenhum é opinião: cada um foi MEDIDO contra o código em `8cc288be`,
-ou é uma decisão do user já tomada e que o `SPEC.md` ainda não registrou.
+Cole o bloco "O COMANDO" abaixo como argumento de `/ck:spec amend` num chat SEM contexto.
 
-Regras que valem para a emenda: numeração de §V/§B/§T é monotônica (nunca reusar id);
-o idioma-fonte de string visível é inglês; só `/ck:spec` escreve seções.
-
----
-
-## 1. §I113c — o filtro NÃO é "o programa" (o ponto mais caro se ficar como está)
-
-**Hoje diz:** que `pickAllowed`, a época e a afiliação moram dentro de `pickerItems` e que
-"é ISTO, ⊥ o desenho da caixa, que faz a Q30 ser um programa".
-
-**MEDIDO 2026-08-31** (implementado, verde, depois revertido junto com a onda): o filtro é
-**8 linhas** dentro do laço que monta `MF.pool` em `mfOpen` —
-
-    local levels = discLevels();
-    local hedge  = hedgePathLevels();
-    ...
-    if vals[i] ~= "" and pickAllowed(MF.field, vals[i], levels, hedge) then
-        MF.pool[#MF.pool + 1] = vals[i];
-    end;
-
-`levels` e `hedge` são lidos **1×** por abertura e não por nome — `hedgePathLevels` percorre a
-ficha, e fazer isso 600× para uma lista de rituais é a carga que §I107 já pôs atrás de um timer.
-A mesma função dos dois lados mantém §V199: a caixa não pode oferecer o que `guardPick` devolve.
-
-**Emendar para:** o filtro é uma chamada no laço do pool; o que faz a onda 3 ser cara é §V365(d)
-(ver ponto 3), não ele.
-
-## 2. §I117c — §Q32 está RESPONDIDA
-
-**Hoje diz:** "o N ⊥ está decidido — §Q32 ... ⊥ escrever nenhum dos 2 como fato antes da resposta".
-
-**O user respondeu em 2026-08-30** (está no HANDOFF, seção "DECISÕES DO USER"): `psychic` vai a
-**20** e os 4 excedentes são APAGADOS DE VEZ — saem `psychic_16`…`_19` (pickers), não `_21`…`_24`,
-para que nenhum campo mude de sentido. `numina` vai a **20** com 3 pickers novos, `_18` `_19` `_20`.
-
-**Emendar para:** §Q32 RESPONDIDA, com os números acima como fato. §T830 deixa de estar bloqueada.
-
-## 3. §I118d — a contradição, e a saída que §T862 abriu
-
-**Hoje diz** duas coisas incompatíveis: "o trabalho é tirar o `vampStrip`, tirar as panes & pôr
-os 3 `<import>` lado a lado, **⊥ redesenhar caixa nenhuma**" e "as 3 saem & as colunas **encolhem
-p/ ~350** cada".
-
-**MEDIDO:** as listas somam **1475** (`WoD20.12` = 390 · `WoD20.13` = 565 · `WoD20.14` = 520 —
-confirmado contra o XML: a pane de cada arquivo começa em 395 / 570 / 525). Encolher 565 → 350 é
-redesenhar caixa, que a primeira metade proíbe.
-
-A segunda metade só existia porque a aba Ghoul estava presa em **1070**. **§T862 levou a ficha a
-1680**, então três colunas lado a lado pedem `1475 + 2 vãos` = **1485** e cabem. O user aprovou
-alargar em 2026-08-31.
-
-**Emendar para:** aba Ghoul `1070` → **1485**; os 3 `<import>` em `left` **0 / 395 / 965** com
-larguras **390 / 565 / 520**, `top=150` (o strip saiu), todos visíveis. "⊥ redesenhar caixa
-nenhuma" fica VERDADEIRO; a frase dos ~350 sai.
-
-## 4. §I118d / §I117e — o CUSTO real, que nenhuma das duas diz
-
-**Acrescentar (é o achado que evita a próxima rodada tropeçar):** tirar as panes e o strip é uma
-rodada de **GATE**, não de layout. O código são ~30 minutos; as **~20 réguas** são o trabalho.
-
-Contagens que mudam, todas medidas: botões de barra **19 → 16** · barras **4 → 3** · separadores
-**5 → 3** · grupos de `SUB_TABS` **3 → 2** · nomes de sub-aba **8 → 5** · caixas de seção
-**73 → 70** · panes nomeadas **9 → 6** · alvos do pintor **24 → 19**.
-
-Réguas que pedem JULGAMENTO e não literal: **§V188 §V192 §V193 §V225 §V249/§V250 §V299(b) §V307
-§V320**, mais §V221, que tem de passar de "painéis empilhados numa rect" para "colunas DISJUNTAS
-em x" (a régua de §V40 aplicada às 3 colunas).
-
-⚠ **Armadilha medida na tentativa:** apontar §V249/§V250 para `edtHedgeDesc` da Numina supondo
-forma igual **não funciona** — `saveNuminaDesc` escreve `box.text`, não `form.<Edit>.text`.
-Seguir o sujeito para a Numina é o caminho certo (é o que §V255 fez ao perder os dele), mas
-medindo a forma DE LÁ.
-
-## 5. §I129k e §V381(c) — a ordem de `descFor` condiciona em `key`, não em `sheet[slot]`
-
-**Hoje diz:** "(1) slot casa o nome custom & ⊥ vazio → `customDescFieldOf` · (2) → `descFieldOf`".
-
-**Está errado e o código faz outra coisa, de propósito.** Escrita contra `sheet[slot]`, a ordem
-mostraria o texto DA LINHA sob todo candidato enquanto o jogador navega o picker. Os dois
-primeiros passos hangam em **`key`**:
-
-    1. `key` É o nome custom deste slot   -> o texto que o jogador escreveu
-    2. `key` É o que o slot tem AGORA     -> o override do narrador
-    3. senão                              -> o livro, descText
-    4. nada em disco                      -> a frase de §V360c
-
-É isso que deixa UMA ordem servir os dois leitores: o `?` pergunta pelo que a linha TEM (então
-`key` é o valor do slot e 1 e 2 podem disparar); o picker pergunta por um CANDIDATO.
-
-**Emendar §I129k e a perna (c) de §V381 para a ordem acima.**
-
-## 6. §I129c — são 2 chaves novas, não 3
-
-`wod.Name` **já existia** em `localization.lang` (linhas 155 e 2148). As novas são
-`wod.-- Custom --` e `wod.custom description`. Escrever 3 fez nascer uma chave duplicada, que eu
-tive de remover.
-
-## 7. §I129d — `mfCustom` não escreve a pane; passa por `mfDesc`
-
-**Emendar:** `mfDesc(found, name, own)` ganhou um terceiro parâmetro. `mfCustom` chama
-`mfDesc(found, nil, tx)`. Motivo: §V372(a) exige **1** escritor de `edtMfDesc.text`, e
-`mfCustom` escrevendo direto fazia 2. O reset de estado (`MF.custom = false` + `mfCustomPane
-(found, false)`) só roda quando `own == nil` — com a prosa custom na mão, esse É o estado custom.
-
-## 8. §I128e — o XML autora o PIOR caso, não o de [en]
-
-**Hoje sugere** autorar a geometria de [en] (26px). **§V16/§V25 e §V351(c) leem o XML** e um
-rótulo autorado na largura inglesa é um `CAMINHO` cortado esperando alguém abrir em pt.
-
-**Emendar:** o XML autora **pt** (`left=37 width=46`, controle em `88`) e `renderRoadPair`
-encolhe para [en]. É o que §V49 já faz com a altura de dez linhas do `HEALTH`: o arquivo declara
-o maior que pode ser, o Lua reduz.
-
-## 9. §V330c — `cboRoad` tem 2 donos NOMEADOS
-
-**Hoje:** só `renderBearing` pode nomear `cboRoad`.
-
-**Emendar:** dois, e a lista é fechada — `renderBearing` (o que ele MOSTRA) e `renderRoadPair`
-(onde ele FICA). É a mesma divisão que §I128f já faz no rótulo: a travessia de `WoD20.6` é dona
-do texto, o Lua é dono da geometria. A razão de §V330c sobrevive: dois tocadores só são duas
-réguas quando decidem a MESMA coisa.
-
-## 10. §V255 — trocou de sujeito
-
-`SpecialityFreeRow` e `OpenAbilityFreeRow` morreram em §T870. A régua ("linha digitada mantém os
-dots e o x da picker, e nunca ganha combo") passou a medir as **6** famílias que ainda têm linha
-livre: `DiscFreeRow` `SecPathFreeRow` `RitualFreeRow` `NuminaFree` `PsychicFree` `HedgeRitualFree`.
-
-⚠ E o seletor mudou: o dono do nome é o primeiro **`<edit>`**, não o primeiro nó com `field` —
-essas 6 abrem com o `radioButton` que seleciona a linha, e lê-lo como dono reprovava 6 templates
-corretos. As 2 antigas não tinham radio, então a distinção nunca apareceu.
-
-Quando as ondas 3 e 4 rodarem, o último sujeito sai e §V255 sai com ele.
-
-## 11. §V377 / §V378 — os zero-guards são POR TEMPLATE, não literais
-
-**§V377** propunha "< 150 slots colhidos". Ficou: **cada** template que abre picker tem de render
-≥1 slot, e o total > 0 — assim o número não precisa ser levantado à mão a cada onda. Os campos
-são colhidos EXPANDINDO os templates pelas instâncias, e o padrão é lido do FONTE de
-`descFieldOf` (hoje mede 39 slots em 4 templates).
-
-**§V378(b)** propunha medir por prefixo de campo. Não serve: `OpenAbility` liga
-`field="$(field)"` e um teste em `background_` passa direto por ele — a perna cobria 2 famílias
-de 4 sem dizer. Ficou medindo **por template convertido** (`MeritPicked` `OpenAbility`
-`SpecialityRow` `HeaderPicker`): botão visível + gêmeo escondido, que é o fato de §I107a1.
-A exceção de §I130c no gate é `readOnly="true"` (as colunas book/page/cost), mais
-`specialityName_` e os templates `CustomAbility` / `HeaderNarrow`.
+**Estado quando isto foi escrito:** gate **VERDE 634 ok / 0 FAIL** · §T **762 `x` · 104 `.` · 12 `~`**
+· `.rpk` 2.630.249 B instalado 17:07 (Firecast fechado) · §T877 e §T878 construídos · **nada
+commitado** (working tree suja desde `b675cc74`).
 
 ---
 
-## E UMA COISA QUE NÃO É EMENDA: uma decisão do user que ainda não virou §I/§V
+## O PROBLEMA, EM 1 FRASE
 
-O user decidiu em 2026-08-31, ao ser perguntado, que **o `-- Custom --` herda a isenção do filtro
-que a linha digitada tinha**. Isso ainda NÃO está no `SPEC.md` nem no código (foi implementado e
-revertido junto com a onda 3).
+Cinco §T (`§T830` `§T832` `§T872` `§T874` `§T876`) têm **todos os bloqueadores que elas citam
+em `x`**, mas nenhuma das cinco é construível. Quem ler a coluna de bloqueio entra direto na
+tentativa que a 157ª já reverteu.
 
-O problema que ela resolve: `pickRefusal` tem `if isTypedRow(field) then return nil; end;` — a
-linha digitada era a válvula de escape do filtro. Quando §T873/§T875 tirarem as linhas livres,
-`isTypedRow` fica falso para todas, e um nome `-- Custom --` numa linha de disciplina bate em
-`guardPick`, que **reverte o campo e avisa**: o jogador digita, confirma e vê sumir.
+## OS FATOS, TODOS MEDIDOS EM 2026-08-31 CONTRA O CÓDIGO
 
-A forma escolhida (a mais estreita das três oferecidas) é:
+1. **`0` `btnQ` em `WoD20.7.lfm` `WoD20.12.lfm` `WoD20.13.lfm` `WoD20.14.lfm`** — as famílias de
+   disciplina, trilha, ritual, númina e hedge **⊥ têm `?`** hoje. (O gate conta 45 `btnQ` na
+   ficha: 2 `HeaderPicker` + 22 `MeritPicked` + 21 `OpenAbility`, & mais nenhum.)
+2. **`1` pane `<textEditor name="edt*Desc">` em cada** de `WoD20.12` `WoD20.13` `WoD20.14`.
+3. **§T846 está `x` mas ⊥ faz o que §T830/§T832 dizem que ela faz.** Ela foi **REESCRITA na 148ª**
+   (§B105) para ser "`?` no `HeaderPicker` (nature/demeanor), & SÓ nele". Ela **⊥ tira pane
+   nenhuma**. §T830 a cita como "quem tira as 4 panes" & §T832 como quem tira as 3 — as duas
+   descrevem uma §T que ⊥ ∃.
+4. **§T811 proíbe as ondas** — texto dela: "ONDAS 2 a 5 de §I113e — **⊥ buildar antes de §T810
+   passar**". §T810 é `[USER]`, teste de TELA, & está `.`.
+5. **A corrente JÁ está escrita — em §B105**, & os §T é que nunca souberam: "cada pane sai na
+   rodada em que a família DELA ganha `?` — porque as de Numina/Ghoul só ganham `?` nas ondas 3-5
+   de §I113e, & tirar a pane antes deixa a linha **sem superfície de descrição NENHUMA**, nem
+   pane nem `?`, que é o recurso apagado". §V365(d) diz o mesmo pelo lado da régua.
+6. **§I131g** fecha o laço: "∀ família convertida entrega **3** coisas na MESMA rodada: a caixa
+   de busca · o `?` · `-- Custom --`". ∴ o `?` dessas famílias chega COM a onda, ⊥ antes.
 
-    local cf = customFieldOf(field);
-    if sheet ~= nil and cf ~= nil and sheet[cf] == value then return nil; end;
+## A CORRENTE REAL — as 5 têm 1 raiz só
 
-Não é "qualquer linha que tenha custom" — é ESTE valor ser o nome custom deste slot. Qualquer
-outra coisa numa linha filtrada segue enfrentando a regra inteira.
+    §T810 [USER, tela, `.`]
+      └─ §T811 (⊥ buildar onda antes de §T810 passar)
+           ├─ §T872 onda 3  → dá `?` a disc/mainPath/secPath/ritual (§I131g)
+           │     └─ §V365(d)+§B105: só ENTÃO as 3 panes de WoD20.12/13/14 podem sair
+           │           └─ §T832 (aba Ghoul, 3 colunas — precisa das 3 panes fora)
+           ├─ §T874 onda 4  → dá `?` às famílias de Numina/Hedge
+           │     └─ §V365(d)+§B105: só ENTÃO as 4 panes de WoD20.7 podem sair
+           │           └─ §T830 (aba Numina, 3 colunas — precisa das 4 panes fora)
+           └─ §T876 onda 5  → `cboRoad` & `cboClanFamily`
 
-**Escrever como §I nova + §V nova, e como §T** dentro do bloco da onda 3 (as ondas dependem dela).
+∴ **⊥ ∃ §T construível sem o user rodar §T810.** As 5 citam bloqueadores satisfeitos porque
+citam a §T ERRADA (§T846) ou porque a regra que as trava mora em OUTRA linha (§T811).
+
+---
+
+## O COMANDO
+
+```
+amend — 5 §T citam bloqueador satisfeito & nenhuma é construível. MEDIDO 2026-08-31 contra o código, gate verde 634/0. Numeração monotônica; idioma-fonte inglês. Só a coluna de bloqueio & a coluna cites mudam — o CONTEÚDO das 5 tarefas está certo e ⊥ deve ser reescrito.
+
+O fato que as 5 compartilham, e que nenhuma diz: a pane de descrição só pode sair na rodada em que a família DELA ganha `?` (§V365(d), & §B105 escreve o porquê: tirar antes deixa a linha sem superfície de descrição NENHUMA, nem pane nem `?`). As famílias de Numina/Ghoul só ganham `?` nas ondas 3-5 (§I131g: caixa + `?` + `-- Custom --` na MESMA rodada), e §T811 proíbe qualquer onda antes de §T810 passar — que é `[USER]`, de tela, e está `.`. MEDIDO: 0 `btnQ` em WoD20.7/12/13/14 (o gate conta 45 na ficha, todos em HeaderPicker/MeritPicked/OpenAbility) e 1 pane `edt*Desc` em cada de WoD20.12/13/14.
+
+1. §T830 — o bloqueador citado ⊥ ∃.
+Hoje: "DESBLOQUEADA por §T829 `x` & §Q32 RESPONDIDA; **BLOQUEADA por §T846**, que é quem tira as 4 panes". §T846 está `x` mas foi REESCRITA na 148ª (§B105) p/ ser "`?` no HeaderPicker, & SÓ nele" — ela ⊥ tira pane nenhuma, ∴ a premissa nunca se cumpriu & a linha parece pronta. Emendar: BLOQUEADA por §T874 (onda 4), que é quem dá `?` às famílias de Numina — só então as 4 panes saem (§V365(d), §B105). Raiz: §T810. Manter "DESBLOQUEADA por §T829 & §Q32", que é verdade. cites: trocar `T846` por `T874,T810,V365`.
+
+2. §T832 — mesma mentira, outra aba.
+Hoje: "**BLOQUEADA por §T846** (as 3 panes saem antes: listas somam 1475 contra 1070, §I118d)". Emendar: BLOQUEADA por §T872 (onda 3), que é quem dá `?` a disc/mainPath/secPath/ritual — só então as 3 panes de WoD20.12/13/14 saem. Raiz: §T810. ⚠ acrescentar o que a 157ª mediu e que ⊥ está na linha: o CÓDIGO desta §T já saiu inteiro e CERTO uma vez e foi REVERTIDO; o custo dela é de GATE (~20 réguas), ⊥ de layout, e está em §I118e. cites: trocar `T846` por `T872,T810,V365`.
+
+3. §T872 — a regra que a trava mora no §T811, ⊥ nela.
+Hoje: "BLOQUEADA por §T868 (`x`) & §T877" — os 2 estão `x` ∴ a linha lê como PRONTA. Emendar: acrescentar "& por §T811 (⊥ buildar onda antes de §T810 passar) — §T810 é `[USER]`, de tela, & está `.`". Acrescentar também o bloqueio MEDIDO: §V365(d) reprova enquanto WoD20.12/13/14 tiverem pane, & elas têm 1 cada ∴ esta onda ! sair na MESMA rodada que §T832 tira as panes, ou depois. cites += `T811,T810,V365`.
+
+4. §T874 — idem.
+Hoje: "BLOQUEADA por §T868" (`x`). Emendar: acrescentar §T811/§T810, & que ela é quem dá `?` às famílias de Numina ∴ é ELA que destrava §T830. cites += `T811,T810,V365`.
+
+5. §T876 — idem.
+Hoje: "BLOQUEADA por §T868 & §T866" (os 2 `x`). Emendar: acrescentar §T811/§T810. cites += `T811,T810`.
+
+E UM PEDIDO DE FORMA, ⊥ de conteúdo: §T811 ⊥ é tarefa, é REGRA — ela é o que proíbe as ondas, & hoje só quem abre §T811 descobre isso. Escrever a raiz (§T810) na coluna de bloqueio das 5 é o que faz `grep "^T[0-9]*|\.|" SPEC.md` parar de mentir, que é o dashboard que o /ck:build usa.
+```
+
+---
+
+## DEPOIS DA EMENDA
+
+1. **Commitar** o que está pronto (§T877, §T878, a emenda das 11 + esta) — a árvore está suja
+   desde `b675cc74` & sem baseline ⊥ ∃ como reverter o §T832 se ele desandar de novo.
+2. **§T810 é o gargalo real.** Rodar as de tela numa sessão só: `§T787` `§T804` `§T810` `§T816`
+   `§T820` `§T823`. §T810 & §T827 são as que mais destravam.
+3. Só então: §T872 (onda 3) + §T832 na mesma rodada, & §T834 (§V361/§V362 no gate) DEPOIS —
+   régua de layout que ainda ⊥ ∃ nasce vermelha contra código certo (§B106).

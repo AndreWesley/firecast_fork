@@ -15161,5 +15161,213 @@ foreach ($k373 in ($pairs373.Keys | Sort-Object)) {
 
 if ($v373Bad) { foreach ($b in $v373Bad) { Fail "V373 $b" } }
 else { Pass "V373 all $($pairs373.Count) description-opening template(s) agree with themselves - where a row has both a ? and a picker they name one module, and every module named is on disk in both languages" }
+
+# ---- V382: a slot's own Custom name is not refused by that slot's filter ----------------
+# SPEC V382, I132, T877, user 2026-08-31. isTypedRow was the filter's escape valve: a typed
+# row answers to no table, so there was never anything there to refuse. Waves 3 and 4 (T873,
+# T875) take the free rows away and isTypedRow goes false for EVERY family - at which point a
+# `-- Custom --` name in a disciplines row reaches guardPick, which reverts the field and says
+# so. The player types a name, confirms, and watches it vanish (SPEC I132a).
+#
+# The exemption is by VALUE and never by ROW. Testing `cf ~= nil` alone would exempt every row
+# that HAS a custom field, for good, and the filter would die silently wherever a custom was
+# used once - V199 falling over from the inside (SPEC I132b).
+$v382Bad = @()
+$prFn382 = [regex]::Match($rootLua379, '(?s)local function pickRefusal\(field, value, levels\)(.*?)\n\t{3}end;')
+
+# (e) zero-guard FIRST: a rule that measures an exemption inside a function that is not there
+# passes on the empty set, which is B7 born ready (SPEC V20).
+if (-not $prFn382.Success) {
+    $v382Bad += "(e) pickRefusal is gone - it is the ONE place that knows what is legal, and every leg below would pass vacuously without it (SPEC V199, V20, B7)"
+} else {
+    $body382 = $prFn382.Groups[1].Value
+
+    # (a) the exemption asks for the slot's own custom field AND compares the VALUE to it.
+    if ($body382 -notmatch 'customFieldOf\(') {
+        $v382Bad += "(a) pickRefusal never asks customFieldOf - a Custom name in a filtered row is refused and guardPick reverts it in front of the player (SPEC I132a, V382a)"
+    }
+    if ($body382 -notmatch '\[\s*cf\s*\]\s*==\s*value') {
+        $v382Bad += "(a) the exemption does not compare the slot's custom field to the VALUE being picked - exempting on the mere existence of a custom field frees the whole row for good, and the filter dies wherever a custom was used once (SPEC I132b, V382a)"
+    }
+
+    # (b) an early return BESIDE the rules, not the door that replaces them. If the family
+    # rules left pickRefusal, the exemption is letting the sheet through and V199 is gone.
+    foreach ($rule382 in @('mainPath_', 'secPath_', 'ritual_')) {
+        if ($body382 -notmatch [regex]::Escape($rule382)) {
+            $v382Bad += "(b) pickRefusal no longer carries the '$rule382' rule - the custom exemption is an early return beside the others, never the one that replaces them (SPEC V199, V382b)"
+        }
+    }
+
+    # (d) isTypedRow COEXISTS until T875. Pulling it early reopens I132a in every family whose
+    # wave has not run: those still have free rows, and a free row answers to no table.
+    if ($body382 -notmatch 'isTypedRow\(') {
+        $v382Bad += "(d) isTypedRow left pickRefusal while free rows still exist - the families whose waves have not run lose the escape valve that the Custom line does not yet replace for them (SPEC V382d, I130b)"
+    }
+}
+
+# (c) ONE owner of the refusal. guardPick reverts what pickRefusal refuses; it does not get to
+# hold a second copy of the exemption, because two places deciding one thing is two rulers.
+$gpFn382 = [regex]::Match($rootLua379, '(?s)function guardPick\([^)]*\)(.*?)\n\t{3}end;')
+if (-not $gpFn382.Success) { $v382Bad += "(c) guardPick is gone - nothing reverts what pickRefusal refuses (SPEC V199, V209)" }
+elseif ($gpFn382.Groups[1].Value -match 'customFieldOf\(') {
+    $v382Bad += "(c) guardPick asks customFieldOf itself - the exemption belongs to pickRefusal alone, and the second copy is the one that ages quietly (SPEC V135, V382c)"
+}
+
+if ($v382Bad) { foreach ($b in $v382Bad) { Fail "V382 $b" } }
+else { Pass "V382 pickRefusal exempts a slot's own Custom name by VALUE, keeps the family rules and isTypedRow beside it, and guardPick carries no second copy" }
+
+# ---- V383: every authored picker button is PAINTED, and the bound is DERIVED -------------
+# SPEC V383, B112, I107a2, T878, user 2026-08-31. A button's text is not data: nothing brings
+# it back when the sheet opens, so a button no painter reaches shows its AUTHORED label
+# forever - and a row that HOLDS a value reads "Select Merit" as if it were empty. The field
+# is intact, so V2 stays green while the player watches the merit vanish off the screen.
+#
+# T870 converted eight rows to pickers and the painter's literal bound did not follow. Nothing
+# here measured PAINT, so nothing went red: V2 saw the field, V339 counted 22 instances, V378
+# saw the hidden twin. The user found it on the screen (SPEC B112).
+$v383Bad = @()
+$lua383 = CodeOf (Join-Path $dir "WoD20th.lfm")
+
+# The constants a painter derives its bound from, read out of the SOURCE and never copied
+# here: a number pasted into the gate goes green the moment the sheet grows a row.
+$K383 = @{}
+foreach ($kn383 in @('MERIT_ROWS','BACKGROUND_ROWS','BACKGROUND_FREE_ROWS','SPECIALITY_ROWS','SPECIALITY_FREE_ROWS')) {
+    $km383 = [regex]::Match($lua383, '(?m)^\s*' + $kn383 + '\s*=\s*(\d+);')
+    if ($km383.Success) { $K383[$kn383] = [int]$km383.Groups[1].Value }
+}
+
+function Resolve383($expr) {
+    $e = $expr.Trim()
+    if ($e -match '^\d+$') { return @{ Ok = $true; Lit = $true; Val = [int]$e } }
+    if ($K383.ContainsKey($e)) { return @{ Ok = $true; Lit = $false; Val = $K383[$e] } }
+    $s = [regex]::Match($e, '^([A-Z_]+)\s*-\s*([A-Z_]+)$')
+    if ($s.Success -and $K383.ContainsKey($s.Groups[1].Value) -and $K383.ContainsKey($s.Groups[2].Value)) {
+        return @{ Ok = $true; Lit = $false; Val = $K383[$s.Groups[1].Value] - $K383[$s.Groups[2].Value] }
+    }
+    # One hop through a local alias: renderBgButtons writes `local last = BACKGROUND_ROWS -
+    # BACKGROUND_FREE_ROWS` and bounds on `last`. That IS derived - naming the difference
+    # before using it is not a literal, and a rule that could not see through the alias would
+    # report correct code as broken, which is B106 (SPEC V383b).
+    $al = [regex]::Match($lua383, '(?m)^\s*local\s+' + [regex]::Escape($e) + '\s*=\s*([^;]+);')
+    if ($al.Success) {
+        $inner = $al.Groups[1].Value.Trim()
+        if ($inner -ne $e) {
+            $r = Resolve383 $inner
+            if ($r.Ok) { return $r }
+        }
+    }
+    return @{ Ok = $false; Lit = $false; Val = 0 }
+}
+
+# What the sheet AUTHORS, expanded template by instance - the sweep V377a runs on slots.
+$authored383 = @{}
+function Add383($pre, $n) {
+    if (-not $authored383.ContainsKey($pre)) { $authored383[$pre] = @() }
+    $authored383[$pre] += [int]$n
+}
+foreach ($f383 in $files) {
+    $d383 = Doc $f383.FullName
+    foreach ($i383 in $d383.SelectNodes("//MeritPicked")) {
+        $m383 = [regex]::Match($i383.GetAttribute("num"), '^([mf])(\d+)$')
+        if ($m383.Success) { Add383 ('dynMerit_' + $m383.Groups[1].Value) $m383.Groups[2].Value }
+    }
+    foreach ($i383 in $d383.SelectNodes("//OpenAbility")) {
+        $m383 = [regex]::Match($i383.GetAttribute("field"), '^background_(\d+)$')
+        if ($m383.Success) { Add383 'dynbackground_' $m383.Groups[1].Value }
+    }
+    foreach ($i383 in $d383.SelectNodes("//SpecialityRow")) {
+        if ($i383.GetAttribute("num") -match '^\d+$') { Add383 'dynspeciality_' $i383.GetAttribute("num") }
+    }
+}
+
+# Every loop that PAINTS. The bound is the whole point, so the bound is what gets measured.
+$paint383 = @()
+foreach ($lp383 in [regex]::Matches($lua383, '(?s)for\s+i\s*=\s*([^,]+?)\s*,\s*(.+?)\s*,\s*1\s+do(.*?)\bend;')) {
+    if ($lp383.Groups[3].Value -notmatch 'mfLabel\(') { continue }
+    foreach ($pm383 in [regex]::Matches($lp383.Groups[3].Value, 'mfLabel\(\s*found\[\s*"([A-Za-z_]+)"\s*\.\.')) {
+        $paint383 += [pscustomobject]@{ Pre = $pm383.Groups[1].Value; Lo = $lp383.Groups[1].Value; Hi = $lp383.Groups[2].Value }
+    }
+}
+
+# (e) zero-guard FIRST: a rule counting painters over an empty set passes vacuously (SPEC V20, B7).
+if ($authored383.Count -eq 0) { $v383Bad += "(e) not one picker button was expanded out of the templates - the sweep broke and every family below would pass on the empty set (SPEC V20, B7)" }
+if ($paint383.Count -eq 0)    { $v383Bad += "(e) no mfLabel painting loop was read out of the sheet - the check carries no ruler and would pass anything (SPEC V20, B7)" }
+
+if ($v383Bad.Count -eq 0) {
+    foreach ($pl383 in $paint383) {
+        $hi383 = Resolve383 $pl383.Hi
+        if (-not $hi383.Ok) { $v383Bad += "(b) the loop painting '$($pl383.Pre)' bounds on '$($pl383.Hi)', which is neither a row constant nor a difference of two - a bound the gate cannot resolve is a bound nothing is checking (SPEC V383b)"; continue }
+        if ($hi383.Lit)     { $v383Bad += "(b) the loop painting '$($pl383.Pre)' bounds on the LITERAL $($pl383.Hi) - a literal does not follow the family when it grows, which is how T870 left eight rows unpainted (SPEC B112, V383b)"; continue }
+
+        $lo383 = Resolve383 $pl383.Lo
+        if (-not $authored383.ContainsKey($pl383.Pre)) { $v383Bad += "(a) the loop paints '$($pl383.Pre)' but no template authors a row by that name - painter and sheet disagree about what exists (SPEC V209)"; continue }
+        $miss383 = @($authored383[$pl383.Pre] | Where-Object { $_ -lt $lo383.Val -or $_ -gt $hi383.Val } | Sort-Object)
+        if ($miss383.Count -gt 0) {
+            $v383Bad += "(a) $($miss383.Count) authored '$($pl383.Pre)' row(s) fall outside the painted range $($lo383.Val)..$($hi383.Val) [$($miss383 -join ', ')] - a button nothing paints keeps its authored label, so a FILLED row reads as empty on every open (SPEC I107a2, B112, V383a)"
+        }
+    }
+}
+
+# (c) ONE mfLabel and the shape lives inside it. (d) the empty label goes through the
+# translator, so no PT string is ever authored into the painter (SPEC V9, V24).
+$ml383 = [regex]::Matches($lua383, '(?s)function mfLabel\([^)]*\)(.*?)\n\t{3}end;')
+if ($ml383.Count -ne 1) { $v383Bad += "(c) mfLabel is declared $($ml383.Count) time(s), expected 1 - the empty/filled shape is one decision and a second copy is the one that ages quietly (SPEC V135, V383c)" }
+else {
+    $mb383 = $ml383[0].Groups[1].Value
+    foreach ($mk383 in @('"-- "', 'italic', '0.60')) {
+        if ($mb383 -notmatch [regex]::Escape($mk383)) { $v383Bad += "(c) mfLabel no longer writes $mk383 - the empty row stops saying it is empty, which is the whole of the shape this rule holds (SPEC V383c)" }
+    }
+    if ($mb383 -notmatch 'fontStyle\s*=\s*""') { $v383Bad += "(c) mfLabel never clears fontStyle - a row that gets filled keeps the italic of the empty state and reads as still empty (SPEC V383c)" }
+    if ($mb383 -notmatch 'translateSheetText') { $v383Bad += "(d) mfLabel does not send the fallback through translateSheetText - the placeholder would ship in one language only, or as a PT string authored into the source (SPEC V9, V24, V383d)" }
+}
+
+if ($v383Bad) { foreach ($b in $v383Bad) { Fail "V383 $b" } }
+else { Pass "V383 all $((($authored383.Values | ForEach-Object { $_.Count }) | Measure-Object -Sum).Sum) authored picker button(s) fall inside a painted range, each of the $($paint383.Count) painting loop(s) bounds on a constant read from the source, and mfLabel alone owns the empty/filled shape" }
+
+# ---- V353: the opening focus, now that the screen has answered ---------------------------
+# SPEC V353, I111, Q28, T804/T805. This id was RESERVED, not written: I111a measured fifteen
+# .lfm and found no focus call anywhere, and a rule aimed at an API name nobody had exercised
+# would have been a check born no-op (SPEC B92). T804 ran it on the screen and the name is
+# settled - gui.Control:setFocus(), declared at rrpgGUI.lua:58 in the SDK in this repo - so
+# the three candidates of I111c collapsed to one and the rule can finally measure something.
+$v353Bad = @()
+$lua353 = CodeOf (Join-Path $dir "WoD20th.lfm")
+$mfOpen353 = [regex]::Match($lua353, '(?s)function mfOpen\([^)]*\)(.*?)\n\t{3}end;')
+
+# Comments are already stripped by CodeOf, and they matter here: the block above the call
+# spells `setFocus` four times over, so counting the raw file would find focus calls that are
+# prose and pass leg (b) on them.
+$calls353 = [regex]::Matches($lua353, 'setFocus\s*\(')
+
+# (c) zero-guard FIRST: no focus call at all means the box went back to needing a click and
+# every leg below would pass on the empty set (SPEC V20, B7).
+if ($calls353.Count -eq 0) {
+    $v353Bad += "(c) no setFocus call survives in the sheet - the box is back to opening with the cursor nowhere, which is the whole of Q28, and legs (a) and (b) would pass vacuously (SPEC I111, Q28, V20, B7)"
+} else {
+    # (b) ONE place asks. One per opening path is how two of them drift, and the second is the
+    # one that goes on asking focus for a box that is already gone (SPEC V135).
+    if ($calls353.Count -ne 1) {
+        $v353Bad += "$($calls353.Count) setFocus call(s) in the sheet, expected 1 - focus is asked in one place or it is asked once per opening path, and the paths do not agree for long (SPEC V353b, V135)"
+    }
+
+    if (-not $mfOpen353.Success) {
+        $v353Bad += "(a) mfOpen is gone - the focus request has no opening to sit at the end of (SPEC V209)"
+    } else {
+        $body353 = $mfOpen353.Groups[1].Value
+        $show353 = [regex]::Match($body353, 'found\[\s*"mfSearch"\s*\]\s*\.visible\s*=\s*true')
+        $foc353  = [regex]::Match($body353, 'setFocus\s*\(')
+
+        if (-not $foc353.Success) {
+            $v353Bad += "(a) the setFocus call is not inside mfOpen - it is the opening that has to hand over the cursor, and a call anywhere else fires on a box that may not be open (SPEC I111c, V353a)"
+        } elseif (-not $show353.Success) {
+            $v353Bad += "(a) mfOpen never sets mfSearch.visible = true - the ordering leg has no landmark to measure against, so it would pass whatever the order actually is (SPEC V20, B7)"
+        } elseif ($foc353.Index -lt $show353.Index) {
+            $v353Bad += "(a) focus is asked BEFORE mfSearch is shown - asking a widget that is not on screen yet is the one way this cannot work, and it fails silently: no error, no cursor (SPEC I111c, V353a)"
+        }
+    }
+}
+
+if ($v353Bad) { foreach ($b in $v353Bad) { Fail "V353 $b" } }
+else { Pass "V353 the cursor is handed to the filter field from exactly one place, inside mfOpen and after mfSearch is shown" }
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }
