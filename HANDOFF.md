@@ -1,6 +1,106 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ⚑ COMECE AQUI — 156ª rodada (2026-08-31), preparada para `/ck:build` em CHAT SEM CONTEXTO
+## ⚑ COMECE AQUI — 157ª rodada (2026-08-31), preparada para `/ck:spec` em CHAT SEM CONTEXTO
+
+**Estado:** gate **VERDE 632 ok / 0 FAIL** · §T **760 `x` · 104 `.` · 12 `~`** · `.rpk` **2.629.044 B**
+instalado 12:58 (Firecast FECHADO no install ∴ ⊥ ∃ risco de §B103 desta vez) · **tudo commitado**
+em `8cc288be`, working tree LIMPO (só `.claude/` untracked).
+
+### ▶ O QUE FAZER: **`/ck:spec amend`**, ⊥ `/ck:build`. O texto está pronto ↓ na seção "O COMANDO"
+
+⛔ **⊥ rodar `/ck:build` antes da emenda.** A 157ª deixou **11 pontos** em que o `SPEC.md` está
+ATRÁS do código ou simplesmente ERRADO, & 3 deles fariam o build trabalhar contra fato falso:
+§I113c diz que o filtro do picker é "um programa" (é 8 linhas, MEDIDO), §I117c diz que §Q32 está
+aberta (foi respondida em 2026-08-30) & §I118d se CONTRADIZ. Buildar §T830/§T832 com essas 3
+como estão é reconstruir o que a 157ª já mediu.
+
+---
+
+### O QUE A 157ª FEZ — **§T862…§T871**, os pedidos 1-10, 12 & 13
+
+| §T | entrega |
+|---|---|
+| §T862 | Main vira grade de **5 faixas**: `SPECIALTIES` sai da fileira de baixo p/ `1350..1680` y`120..556` & vira a 4ª caixa do grid · `ROAD` ocupa a coluna vaga (`680..1010`, `top=561`) ao lado de `VIRTUES` · avatar `340×457` · fundo `891`→**888** · aba `1345`→**1680** · `popScrim` junto |
+| §T863 | `EXPERIENCE` da Main recebe a forma da Progress: **3** números, geometria VERBATIM `+32` em x, **4** nomes de controle novos & **0** campo NDB |
+| §T864 | `WILLPOWER` `99`→`104` (vão 5→10) · par `ROAD` centrado por idioma via `ROAD_LABEL_W = {en=26, pt=46}` |
+| §T865/§T866 | **§V375** & **§V376** no gate (SUPERSEDEM §V168 & §V69) · **§V380**. Mutação 4/4 & 4/4 |
+| §T867 | **§B111** consertado — `descFieldOf` alcança os 28 slots que perdia. **§V377**, mutação 2/2 |
+| §T868 | **`-- Custom --`** inteiro: linha fixa, 2 campos derivados por slot, `descFor` leitor único |
+| §T869 | **§V379** & **§V381**, mutação 5/5 |
+| §T870 | **16** linhas livres viram picker & **3** templates saem (`MeritFree` `OpenAbilityFreeRow` `SpecialityFreeRow`). **0** campo renomeado |
+| §T871 | **§V378**, mutação 3/3 |
+
+**Decisões do user 2026-08-31, já ∈ `SPEC.md` §C — ⊥ perguntar de novo:** §Q39 `book_`/`type_`/
+`costy_` TRAVAM · §Q40 o reflow SEGUE · §Q41 `VIRTUES` == `ROAD` == `330×327` · §Q42 as chaves
+[pt] · §Q43 a 11ª especialidade ⊥ entra.
+
+---
+
+### ⚠ AS 2 TENTATIVAS QUE FORAM REVERTIDAS, & o que elas MEDIRAM
+
+Nenhuma das duas está no disco. O valor delas é a MEDIDA — ⊥ re-derivar.
+
+**(1) Onda 3 de §I113e (§T872) — revertida.** O que ela mediu:
+- **§I113c está ERRADO.** O filtro ⊥ é "o programa": `pickAllowed(MF.field, vals[i], levels, hedge)`
+  dentro do laço do pool em `mfOpen`, c/ `discLevels()` & `hedgePathLevels()` lidos **1×** por
+  abertura = **8** linhas. Chegou a funcionar.
+- **O bloqueio real é §V365(d)**: arquivo c/ picker convertido ⊥ pode ter `<textEditor name="edt*Desc">`,
+  & as 3 abas têm. ∴ a onda 3 ⊥ fecha antes de §T832.
+- **O nome do módulo é o do ARQUIVO**: `descText` monta `desc<kind>_<lang>.lua` ∴ `Disc` `Path`
+  `Ritual` `Numina` — **⊥ `Discipline`**. Os 4 módulos JÁ ∃ em disco.
+- ⚠ **ARMADILHA MEDIDA**: `MainPathRow` & `SecPathRow` têm a linha de `comboBox` **IDÊNTICA**.
+  Um replace textual converte os 2 & o segundo fica abrindo a lista do PRIMEIRO. Aconteceu.
+- As **9** réguas que a onda derruba: §V178 §V194 §V196 §V111 §V241 §V333 §V354(i) §V355(d) §V26.
+
+**(2) §T832 (aba Ghoul sem sub-abas) — revertida.** O CÓDIGO saiu inteiro & CERTO:
+- as 3 panes saem c/ `render*Desc` `save*Desc` `*Text` locais & os `dataLink` que só as
+  alimentavam (**−3,2k −2,8k −3,8k** bytes) · `vampStrip` sai · os 3 `<import>` lado a lado em
+  **0 / 395 / 965**, larguras **390 / 565 / 520** · aba **1070**→**1485** · `SUB_TABS` 3→2 grupos ·
+  `DESC_PANES` 6→3 nomes. **Nenhuma caixa redesenhada**, ≡ §I118d promete.
+- ⚠ **§T832 é uma rodada de GATE, ⊥ de layout**: o código são ~30min, as **~20 réguas** são o
+  trabalho. Fui de 47 FAIL a 18 corrigindo contagens (**19→16** botões · **4→3** barras · **5→3**
+  separadores · **73→70** caixas · **9→6** panes) & reescrevendo §V221 p/ medir colunas DISJUNTAS
+  em x em vez de painéis empilhados.
+- As **18** que sobraram pedem JULGAMENTO: §V188 §V192 §V193 §V225 §V249/§V250 §V299(b) §V307 §V320.
+- ⚠ **ONDE EU ERREI, & é o motivo da reversão**: apontei §V249/§V250 p/ `edtHedgeDesc` da Numina
+  supondo forma igual — **⊥ é**: `saveNuminaDesc` escreve `box.text`, ⊥ `form.<Edit>.text`. Régua
+  ajustada no chute é §V20/§B7 ao pé da letra. Ao refazer: seguir o sujeito p/ a Numina é o
+  caminho CERTO (≡ o que §V255 fez), mas medindo a forma DE LÁ.
+- §V225 mede cada import contra o layout de `tabDisc` (390) & precisa do layout de CADA coluna.
+
+---
+
+### ⚠ TESTE DE TELA PENDENTE — nada disto tem check estático
+
+O `.rpk` de 12:58 está instalado & o Firecast estava FECHADO ∴ abrir a ficha basta.
+
+1. **Main, §T862**: `SPECIALTIES` à direita de `KNOWLEDGES` · `VIRTUES` & `ROAD` lado a lado ·
+   a aba fecha em `y=888` & rola até `x=1680`.
+2. **§T863**: `EXPERIENCE` da Main c/ **3** números (Total · Spent · Current), os 2 primeiros
+   travados sobre fundo `#0A0A0A`, & batendo c/ a aba Progress.
+3. **§T864**: o par `ROAD` centrado — **trocar o idioma** & conferir que segue centrado. Os
+   `26`/`46` são TETO de §V312, ⊥ medida: se ficar torto, o número é este.
+4. **§T868, o mais importante**: `-- Custom --` ponta a ponta — escolher, digitar Nome &
+   descrição, OK · trocar o slot p/ outro valor · reabrir & marcar Custom **de novo** (tem de
+   voltar o que foi digitado) · conferir que o `?` da linha mostra o texto custom.
+5. **§T870**: as **16** linhas que eram digitáveis agora abrem picker (merits m7-m10 & f7-f10,
+   backgrounds 17-21, especialidades 8-10).
+
+---
+
+### O COMANDO
+
+Cole isto num chat NOVO, sem contexto:
+
+    /ck:spec amend
+
+E o texto da emenda está em `HANDOFF-SPEC-AMEND.md` na raiz — 11 pontos, cada um c/ o que está
+escrito hoje & o que MEDIDO diz. Depois da emenda o caminho é `/ck:build --next`, que pega
+§T830/§T832 já com §I117c & §I118d consertadas.
+
+---
+
+## 156ª RODADA (2026-08-31) — SUPERADA pelo bloco acima; guardada pelo piso da Main (§I125g) e por Q38
 
 **Estado:** gate **VERDE 627 ok / 0 FAIL** · §T **750 `x` · 99 `.` · 12 `~`** · `.rpk` **2.612.410 B**
 instalado 09:09 · **nada commitado** desde `15512560` (**10** modificados + **9** novos — contados 2026-08-31; o "9+8" que este bloco herdou da 154ª estava errado).
