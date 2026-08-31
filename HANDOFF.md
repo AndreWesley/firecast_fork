@@ -1,6 +1,733 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ⚑ COMECE AQUI — 149ª rodada (2026-08-30). A seção da 148ª logo abaixo está SUPERADA
+## ⚑ COMECE AQUI — 156ª rodada (2026-08-31), preparada para `/ck:build` em CHAT SEM CONTEXTO
+
+**Estado:** gate **VERDE 627 ok / 0 FAIL** · §T **750 `x` · 99 `.` · 12 `~`** · `.rpk` **2.612.410 B**
+instalado 09:09 · **nada commitado** desde `15512560` (**10** modificados + **9** novos — contados 2026-08-31; o "9+8" que este bloco herdou da 154ª estava errado).
+A 155ª rodada fez **§T861** (código) & a 156ª fechou **Q36a** + a **errata §I125g** (só SPEC —
+nenhuma linha de código mudou depois do `.rpk` de 09:09 ∴ ⊥ precisa rebuildar).
+
+### ▶ O QUE FAZER: **`/ck:build --next`.** ⊥ ∃ pergunta travando nada — leia Q38 antes de layout
+
+**⊥ ∃ decisão pendente do user.** As 4 perguntas que a 155ª deixou estão todas resolvidas: **Q36a**
+fechada por emenda (156ª), **Q35** ADIADA pelo próprio user em 2026-08-31 ("pode considerar
+feito"), **Q36b** morta, **Q37** com recomendação de manter & sem sintoma. ∴ o caminho é
+`/ck:build --next` — 99 §T `.` esperando.
+
+⛔ **A aba Main está FECHADA p/ aperto — ⊥ aceitar pedido de encolher sem ler §I125g.** §T861 a
+levou a `y=891` & a 156ª mediu que o piso real é **888**, posto pelo `HEALTH` (`561 + 327`, §V49),
+⊥ pela corrente esquerda. Sobram **3px**, & abaixo de 888 o `HEALTH` ESTOURA sob a linha em vez de
+ficar curto dela (§V69 troca de sinal). A saída que a 155ª recomendava (Q38 **b**, o ar interno de
+`ROAD`) rende 12 na caixa & só 3 na aba ∴ foi **RETIRADA**. Mais aperto = **(b)+(c) juntas**, que é
+rodada de **2 abas** (a Combat espelha `HEALTH` por §V284c). Tudo em **§I125g/g1/g2**.
+
+⚠ **Antes de qualquer coisa: 4 TESTES DE TELA acumulados** ↓, nenhum com check estático, & o
+`.rpk` de 09:09 foi instalado c/ o Firecast ABERTO ∴ **feche & reabra a ficha** (§B103).
+
+---
+
+### O QUE A 155ª FEZ — §T861, os 4px que a aba tinha na mesa
+
+`VIRTUES` abria a 1ª linha em **45** enquanto a hairline do título dela é **41**, e todas as outras
+caixas tituladas da aba já abriam em 41. Foi só isso — e foi tudo o que os 3 pedidos do user
+deixaram (os outros 2 estão no PISO, medidos em §I125; **⊥ tentar de novo**).
+
+| peça | de | para |
+|---|---|---|
+| linhas de `VIRTUES` | `45 70 95` | **`41 66 91`** |
+| caixa `VIRTUES` | `330×140` | **`×136`** (fundo `701`→`697`) |
+| `ROAD` | `top=706` | **`top=702`**, altura `189` intacta ∴ fundo `895`→**891** |
+| `SPECIALTIES` | `330×334` | **`×330`** (`top=561` ⊥ mudou) |
+| avatar — as 3 peças de §V309 | `340×464` | **`×460`** |
+| `$HEALTH_TEN_ROW_OVERHANG` | `-7` | **`-3`** |
+| mapa da aba (comentário do topo) | `y=895` | **`y=891`** |
+
+**§V374 NOVA no gate** (`verify-hunters-hunted.ps1`, logo depois de §V370): ∀ caixa titulada da
+aba abre a 1ª linha em `título.top + título.height + 1`, medido como RELAÇÃO, ⊥ contra o literal
+41. Lista: `ATTRIBUTES` `TALENTS` `SKILLS` `KNOWLEDGES` `VIRTUES` `SPECIALTIES` — cabeçalho fora
+(⊥ tem título) & `HEALTH` fora (mesma fronteira de §V370a, citada ⊥ redesenhada).
+
+**Mutação 4/4 HIT** (harness em `scratchpad/mut374.ps1`, c/ o guarda de log < 200 chars dentro):
+`VIRTUES` de volta p/ 45 ! VERMELHO · `TALENTS` p/ 42 ! VERMELHO · título fora de 1 caixa !
+VERMELHO (zero-guard) · **sonda:** `SPECIALTIES` `330`→`340` (rodapé) ! **V374 VERDE**, como §V374
+manda — rodapé é de §V171/§V240.
+
+---
+
+### ⛔ TESTE DE TELA PENDENTE — **feche & reabra a ficha** (§B103). O Firecast estava ABERTO no install
+
+`.rpk` **2.612.410 B** instalado 09:09 c/ o Firecast rodando desde ontem 18:11 ∴ se a ficha estava
+na tela, ela está c/ o form velho e o código novo atrás. **Fechar & reabrir cura.**
+
+- **§T861 (novo).** Aba Main: `VIRTUES` c/ as 3 linhas 4px mais altas & o rodapé da aba fechando
+  numa linha só, 4px acima de ontem. Nada mais pode ter andado.
+- **§T858a — os 7 nomes** (herdado, ⊥ conferido). Trocando a época em Settings, cada coluna !
+  mostrar **15 linhas**: MN **11·13·13** · Victorian **11·13·12** · Dark Ages **11·13·12** ·
+  Classical **11·13·13**. Em [pt]: `Artes` `Artes Marciais` `Meditação` `Pesquisa` `Cosmologia`
+  `Esotérica`.
+- **§T858b — o par gêmeo** (herdado). Coluna KNOWLEDGES, **13ª linha**: nomeada em Modern/Classical,
+  DIGITÁVEL em Victorian/Dark Ages. ⊥ pode ficar vão nem as 2 ao mesmo tempo.
+- **§T859 — a régua de 25** (herdado).
+- ✅ já aprovados: §T856 · §T854 · §T855/§T838 · §T857 (falta reconfirmar em nature/demeanor).
+
+---
+
+### ⚠ PERGUNTAS ABERTAS
+
+**Q38 — RESPONDIDA em parte, & a resposta MATOU a saída barata. A aba fica em `y=891`.**
+A 156ª mediu de novo e achou o que a 155ª ⊥ tinha visto: **o piso da aba ⊥ é da corrente esquerda,
+é do `HEALTH`, & fica em 888.** `HEALTH` = `561 + 327`, & 327 = `10*27 + 57` (§V49) ∴ entre a
+corrente (891) & o piso real (888) ∃ **3px**, ⊥ mais. **Abaixo de 888 o sinal de §V69 TROCA:**
+`HEALTH` deixa de ficar CURTA da linha & passa a ESTOURAR sob ela — vira a caixa mais baixa da aba.
+Está escrito em **§I125g/g1/g2**. Consequência p/ as 3 saídas:
+- **(b) ar interno de `ROAD` — ⊥ VALE SOZINHA.** Os 3 vãos de 5 caindo p/ a hairline de §V374
+  (5→1) rendem **12** na caixa, mas só **3** chegam na aba enquanto `HEALTH` for 327. 12px de
+  mexida numa caixa que o user apertou À MÃO em §I124d ("diminuir bastante, mas ainda um pequeno
+  espaço") p/ ganhar 3 na aba é mau negócio. **Era a recomendação da 155ª & está RETIRADA.**
+- **(c) `HEALTH` p/ a régua de 25** tira **20** (⊥ os 18 que §I125e escreveu: `10*25+57` = 307
+  contra 327 — erro de conta, corrigido em §I125g2) & leva o piso p/ 868, mas **arrasta a aba
+  Combat junto** (§V49 + §V284c: as 2 caixas leem `HEALTH_ROW_PITCH`/`HEALTH_BOX_PAD`).
+- **(a) altura da linha de entrada 25 → 20** segue sendo a ficha INTEIRA (§V26, §V37, §V370).
+
+**Recomendação nova: NÃO apertar mais a aba Main.** Ela custa (b)+(c) juntas — 2 abas, uma régua
+espelhada & um pedido do user desfeito — p/ 15px numa tela que já fecha numa linha só. Se o user
+quiser mesmo, a ordem é **(c) primeiro** (é ela que abre espaço; (b) sozinha ⊥ chega na aba), e
+aí a rodada é das **2 abas**, ⊥ da Main.
+
+**Q37 — o `field` da metade escondida do gêmeo.** `computer` no `Ability num="13"` de knowledges.
+**Recomendação: manter** (nasce escondida & o renderer religa tudo na 1ª pintura).
+
+**Q35 (da 153ª) — ADIADA pelo user em 2026-08-31, "pode considerar feito". ⊥ reabrir sozinho.**
+Ele disse: *"nenhuma `?` está ao lado de uma linha digitada no momento, podemos deixar isso para
+verificar bem mais tarde — eu levanto essa questão quando for o momento."* **CONFERIDO & está
+certo:** os **3** templates que têm `?` — `HeaderPicker` (WoD20.1), `MeritPicked` & `OpenAbility`
+(WoD20.2) — nascem c/ o gêmeo digitável `visible="false" enabled="false"` (§V274) ∴ o que ∃ ao
+lado do `?` no estado AUTORADO é sempre o BOTÃO de picker, ⊥ um `<edit>`. O caso das 2 leituras só
+aparece se a flag de entrada manual for LIGADA, & é o user quem diz quando isso importa.
+⚠ **⊥ emendar §I102f nem §V365b por causa disto** — as 2 leituras seguem vivas & sem veredito;
+o que mudou é que ⊥ ∃ sintoma na tela p/ forçar a escolha agora.
+
+**Q36a — FECHADA na 156ª.** §V75 & §V146 foram emendadas por `/ck:spec`: §V75 perdeu o "EXATAMENTE
+10 nomes" (a contagem é de §V371e desde §T858) & §V146 perdeu os 3 literais mortos da 103ª rodada
+("9 linhas", "`top=25`", "pitch 30") — hoje são 10 linhas, 1ª na hairline (§V374) & pitch
+`$MAIN_ROW_PITCH` (§V370). O código ⊥ mudou: era o TEXTO que estava atrás.
+
+**Q36b — MORTA.** 11ª linha de especialidade ⊥ cabe: pede 336, a caixa tem 330 (§I125d).
+---
+
+### ⚠ ARMADILHAS — a 1ª & a 2ª morderam DE NOVO nesta rodada
+
+0. **⛔ TODOS os arquivos do projeto são CRLF, o gate INCLUSIVE** — só os `desc*.lua` são LF. E
+   **`sed -n 'Np' arquivo` no Git Bash COME o `\r`** ∴ `cat -A` mente e diz que o arquivo é LF.
+   Um `perl -0777 -pe 's/.../.../'` com `\n` no padrão dá **0 substituições em silêncio**. Confira
+   com `perl -0777 -ne 'print "OK" if /texto\r\n/'` antes de culpar o padrão.
+1. **⛔ O gate fala por `Write-Host`, que ⊥ chega no pipeline do PS 5.1.** `& .\gate.ps1 | Out-String`
+   devolve **string VAZIA** ∴ `$out -match 'FAIL'` é sempre falso ∴ **TODA mutação lê VERDE**.
+   Cura — processo FILHO + ler o arquivo, & **abortar se o log vier com < 200 chars**:
+   `& powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-hunters-hunted.ps1 > $log 2>&1`
+   Harnesses prontos c/ o guarda dentro: `scratchpad/mut374.ps1` (o desta rodada), `mut370.ps1`,
+   `mut371.ps1`. ⚠ `Select-String -Pattern 'FAIL'` pega `fail-closed` no texto dos `ok` — ancore em
+   `'^FAIL'`.
+2. **⛔ Splice por perl COME o `\r\n` anterior & gruda 2 blocos numa linha só.** Sempre conferir com
+   `awk 'NR>=X && NR<=Y {printf "%d [%d] %.70s\n", NR, length($0), $0}' arquivo`.
+3. **⛔ Heredoc do bash MORRE em corpo grande de PowerShell**, mesmo com delimitador entre aspas; e
+   `python -c '...'` no Git Bash quebra em qualquer `'`. **Corpo grande → ferramenta de ESCRITA,
+   depois splice por perl lendo o arquivo (`open`/`local $/`), ⊥ colando o corpo no `-pe`.**
+4. **⛔ String perl entre ASPAS engole `@{`** — usar `q^...^` p/ todo trecho de PS.
+5. **⛔ ⊥ canalizar `rdk` por `tail`** — devolve o status do `tail`, sempre 0. Rodar sem pipe &
+   conferir o `=)`.
+
+*(reconfirmadas)* `\Q…\E` ⊥ impede interpolação de `$var` · PowerShell sombreia `.Name` de
+`XmlElement` com o ATRIBUTO `name` (usar `.LocalName`).
+
+---
+
+### GIT — nada commitado, e é assim de propósito (`CLAUDE.md`)
+
+**10** modificados + **9** novos desde `15512560`. **⊥ commitar sem o user pedir NAQUELA mensagem.**
+Modificados: `SPEC.md` · `HANDOFF.md` · `verify-hunters-hunted.ps1` · `research/README.md` ·
+`WoD20th.lfm` · `WoD20.1.lfm` · `WoD20.2.lfm` · `WoD20.6.lfm` · `localization.lang` · o `.rpk` de
+`output/` (10). Novos: `.claude/` · `descNature_en.lua` · `descNature_pt.lua` · 6 em `research/`
+(`arch_body_en.tsv` `arch_body_pt.tsv` `arch_extract.pl` `arch_names.txt` `arch_qa_words.pl`
+`gen_nature.pl`) = 9.
+
+---
+
+## 155ª RODADA (2026-08-31) — SUPERADA pelo bloco acima; ela É o bloco acima, guardada só pelo §I125
+
+O que a 155ª executou está inteiro no topo. O que ela **⊥ mexeu e é preciso saber** está em §I125
+do `SPEC.md`: a medição caixa a caixa da aba Main, feita antes dela, que respondeu **⊥ DÁ** a 2 dos
+3 encolhimentos que o user pediu. Resumo, p/ ⊥ ser re-derivado no 4º pedido sobre a mesma coluna:
+
+1. **"diminua o box de name/player/nature/demeanor/residence" — ⊥ DÁ.** Ele é `20 + 3 linhas de 25
+   em passo 25 + 20 = 115`, & **passo == altura de linha** ∴ as linhas se TOCAM, ⊥ ∃ ar dentro.
+   Margem de 20 é §V280a; passo de 25 é §V370. Só encolhe trocando a ALTURA DA LINHA DE ENTRADA,
+   que é 25 na ficha inteira → é **Q38(a)**, ⊥ é aperto.
+2. **"suba o fundo de talents/skills/knowledges respeitando a margem" — JÁ ESTÁ.** Rodapé = **20**,
+   igual ao de `ATTRIBUTES`, que é exatamente o que §V171 cobra. Subir mais pede LINHA A MENOS, &
+   as 15 linhas são o pedido de §I123a atendido na 154ª.
+3. **"diminua `VIRTUES` respeitando a margem" — deu 4px, & virou §T861**, feita.
+
+⚠ **o vão entre caixas é `5` EXATO (§V298), ⊥ 20.** §I73 diz 20 & foi **REVOGADA nesse ponto** por
+§I76a. ⊥ tentar fechar vão.
+
+⚠ **`SPECIALTIES` fica com 39px de rodapé & isso ⊥ é bug** (§I125d): ela ! fechar na linha de §V69,
+a linha é da coluna do MEIO (`VIRTUES`→`ROAD`), & o rodapé dela é o RESTO da conta (§I124f, §V370b).
+
+## 154ª RODADA (2026-08-31) — SUPERADA pela 155ª acima; guardada pelo par gêmeo & pelas armadilhas
+
+**Estado:** gate **VERDE 626 ok / 0 FAIL** · §T **749 `x` · 99 `.` · 12 `~`** · `.rpk` **2.612.225 B**
+instalado 00:11 · **nada commitado** desde `15512560` (9 arquivos modificados + 8 novos).
+
+### ⚠ AS 3 PRIMEIRAS COISAS
+
+1. **⊥ ∃ nada a refazer. §T858 & §T859 SAÍRAM as 2**, c/ gate verde, `.rpk` instalado &
+   mutação provada (§V371 **7/7 VERMELHA** + sonda · §V370 **5/5 VERMELHA** + sonda).
+2. **⚠ 3 TESTES DE TELA novos** (↓) — a Main mudou de altura & de conteúdo, & ⊥ ∃ check
+   estático que veja "ficou bonito".
+3. **⚠ 3 perguntas ABERTAS: Q35 (herdada), Q36 & Q37 (novas)** — nenhuma bloqueia a próxima
+   §T, mas **Q36 é dívida de SPEC**, ⊥ de código: 2 réguas ficaram c/ o texto atrás do gate.
+
+---
+
+### O QUE A 154ª FEZ
+
+**§T858 — os 7 nomes, os 3 digitáveis & o par GÊMEO.** `ABILITY_FIELD` foi de **41** p/ **47**
+(`arts` `martialArts` `meditation` `research` `cosmology` `esoterica`; `enigmas` já ∃), as 4
+listas de época viraram **11·13·13 / 11·13·12 / 11·13·12 / 11·13·13**, `PICKER_LIST["speciality"]`
+cresceu junto & os 6 nomes ganharam `wod.<nome>` em [pt]+[en] & no mapa `PT`. O grid foi de **12**
+p/ **15** linhas por coluna (talents 11+4 · skills 13+2 · knowledges 12|13 + o gêmeo + 2).
+
+⚠ **o par gêmeo é a peça nova, & ela mora em 2 lugares:** no XML, `dynAbilRow_knowledges_13`
+(escondido, `field="computer"`) & `dynAbilFill_knowledges_13` (visível, `customKnowledge_3`) no
+MESMO `top="341"`; no Lua, **2 ramos novos** em `renderAbilityLabels` que leem o MESMO índice em
+sentidos OPOSTOS. O `else` que §I123c pedia ⊥ é o rótulo — é a **LINHA** que some, porque esconder
+só o rótulo deixaria 5 bolinhas vivas numa linha sem nome.
+
+⚠ **`Computer` no slot 13 foi ESCOLHA minha, ⊥ do SPEC** (Q37 ↓): a linha escondida precisa de um
+`field`, o autorado é Victorian (§V76) & Victorian ⊥ tem 13º conhecimento. `computer` é o único
+conhecimento que **nenhuma** época de 12 lista ∴ a coluna autorada continua 1 campo por linha.
+
+**§T859 — a régua de 25.** cabeçalho `20 50 80`→`20 45 70` · VIRTUES `45 74 103`→`45 70 95` ·
+SPECIALTIES `41 71 …311`→`41 66 …266` · `WILLPOWER` `114`→`99` & trilha `139`→`124` · `ROAD` ganhou
+`horzTextAlign="trailing"`. Linha da aba: **853 → 928 (§T858, desceu 75) → 895 (§T859, subiu 33)**.
+
+⚠ **2 coisas caíram de barato & ⊥ estavam no plano:**
+- **`EXPERIENCE` teve de encolher junto** (`125`→`115`): o cabeçalho encolhendo põe a fileira de
+  habilidade em `top=120`, & uma caixa parada em `0..125` **sobrepõe** (§V40). C/ 115 ela quebrava
+  §V240/§V280 (10px embaixo, mínimo 20) ∴ o `edtCurrentXPMain` foi de `height=60` p/ **50**.
+- **`$HEALTH_TEN_ROW_OVERHANG` foi de `-30` p/ `-7`.** HEALTH tem trilha de **27** & ⊥ segue régua
+  nenhuma: ele andou c/ a fileira nas 2 vezes & ⊥ mudou de altura ∴ o vão é o que as 2 mexidas
+  deixaram. **2 rodadas, 2 motivos, 1 literal** — está comentado no gate.
+
+⚠ **as 2 colunas ⊥ pouparam igual & isso VIRA FOLGA, ⊥ passo** (§I124f, §V370b): esquerda poupa
+23, SPECIALTIES poupa 45 ∴ a linha é da ESQUERDA (895) & SPECIALTIES fecha **22 curta**, ganhando
+o resto como margem. Hoje SPECIALTIES tem **43px** embaixo da última linha — é **Q36b** ↓.
+
+---
+
+### ⚠ 3 ARMADILHAS — a 1ª explica os "4 vereditos falsos" da 153ª
+
+1. **⛔ O gate fala por `Write-Host`, que ⊥ chega no pipeline do PS 5.1.** `& .\gate.ps1 | Out-String`
+   devolve **string VAZIA** ∴ `$out -match 'FAIL'` é sempre falso ∴ **TODA mutação lê VERDE**. Foi
+   exatamente isto na 1ª passada desta rodada: **7/7 MISS** c/ `applied=True`. A cura é rodar como
+   **processo FILHO** & ler o arquivo:
+   `& powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-hunters-hunted.ps1 > $log 2>&1`
+   — & **abortar se o log vier c/ menos de 200 chars**, senão o veredito é mentira. Os 2 harnesses
+   ficaram em `scratchpad/mut370.ps1` & `mut371.ps1` c/ o guarda dentro.
+2. **⛔ Heredoc do bash MORRE em corpo grande de PowerShell** (`unexpected EOF while looking for
+   matching '`), mesmo c/ delimitador entre aspas — 2 tentativas perdidas. E `python -c '...'` no
+   Git Bash quebra em qualquer `'` do código. **Corpo grande → ferramenta de ESCRITA, depois
+   splice por perl.** (Já estava na lista da 153ª; custou 3 passos assim mesmo.)
+3. **⛔ String perl entre ASPAS engole `@{`** (`Can't modify constant item in scalar assignment`):
+   `@{ L = $l }` do PowerShell vira deref de bloco. Usar `q^...^` p/ todo trecho de PS.
+
+*(reconfirmadas)* ⊥ canalizar `rdk` por `tail` · os `desc*.lua` são LF & o resto é CRLF ·
+`\Q…\E` ⊥ impede interpolação de `$var`.
+
+---
+
+### ⛔ TESTE DE TELA — 3 novos. **Feche & reabra a ficha antes** (§B103). `.rpk` 2.612.225 B de 00:11
+
+- **§T858a — os 7 nomes.** Trocando a época em Settings, cada coluna ! mostrar **15 linhas** & a
+  contagem nomeada ! bater: MN **11·13·13** · Victorian **11·13·12** · Dark Ages **11·13·12** ·
+  Classical **11·13·13**. Em [pt]: `Artes` `Artes Marciais` `Meditação` `Pesquisa` `Cosmologia`
+  `Esotérica`.
+- **§T858b — o par gêmeo, & é o único jeito de ver o bug que ele cura.** Na coluna KNOWLEDGES,
+  **13ª linha**: em Modern Nights/Classical ela é um traço NOMEADO; em Victorian/Dark Ages ela
+  vira um campo DIGITÁVEL. ⊥ pode ficar **vão** nem **as 2** ao mesmo tempo, & marcar pontos numa
+  ⊥ pode acender a outra.
+- **§T859 — a régua.** Tudo mais junto na vertical, `ROAD` encostado no combo, & o rodapé da aba
+  fechando numa linha só. ⚠ **olhe o pé de SPECIALTIES**: ∃ 43px de preto embaixo da 10ª linha
+  (Q36b) — é aritmética, ⊥ descuido, mas é o user que decide se fica.
+- ✅ já aprovados: §T856 · §T854 · §T855/§T838 · §T857 (falta reconfirmar em nature/demeanor,
+  que §T860 destravou & ⊥ foi reconferido).
+
+---
+
+### ⚠ PERGUNTAS ABERTAS
+
+**Q35 (herdada da 153ª, ⊥ bloqueia nada) — o `?` em campo digitável.** As 2 leituras seguem
+opostas: (1) pôr `?` ao lado de linha DIGITADA pede emenda em §I102f + §V365b; (2) o `?` abrir
+EDITÁVEL já é o comportamento certo (`isStoryteller()` só é `true` numa MESA & como MESTRE).
+
+**Q36 — dívida de SPEC que ESTA rodada criou, & `/ck:build` ⊥ pode escrever seção.**
+- **(a)** §V75 ainda diz "EXATAMENTE **10** nomes" & isso virou FALSO: o gate agora mede só
+  *distinto + tem campo*, & a CONTAGEM por época mudou de dono p/ §V371e (§V135, 1 dona por régua).
+  §V146 idem: o literal `30` virou `$MAIN_ROW_PITCH` & quem manda no passo é §V370.
+  **Recomendação:** `/ck:spec` emendar §V75 (tirar o "10", citar §V371e) & §V146 (citar §V370).
+  Sem isso o `/ck:check` da próxima rodada vai acusar drift em cima de código CERTO.
+- **(b)** **43px de folga no pé de SPECIALTIES.** A linha da aba é pinada pela coluna ESQUERDA
+  (VIRTUES+ROAD) & pelo HEALTH de 10 linhas; SPECIALTIES poupou 45 & só tinha 23 p/ gastar.
+  **Recomendação: uma 11ª linha de especialidade** — as 11 fechariam em `41..291`+20 = **336**
+  contra os 334 de hoje, ∴ 2px de ajuste & a folga vira LINHA ÚTIL. Alternativa barata: deixar
+  como está (é o que §V370b manda quando ⊥ ∃ o que pôr lá).
+
+**Q37 — o `field` da metade escondida do gêmeo.** Autorei `computer`/`Computer` no
+`Ability num="13"` de knowledges porque a linha precisa de um campo, o autorado ! ser Victorian
+(§V76) & Victorian ⊥ tem 13º. `computer` é o único conhecimento que nenhuma época de 12 lista.
+**Recomendação: manter** — ⊥ tem efeito nenhum em tela (a linha nasce escondida & o renderer
+religa tudo na 1ª pintura), & qualquer outro nome ou repetiria um campo da própria coluna ou
+inventaria um traço. Se preferir explícito, o passo é um `field` morto declarado em §I3.
+
+---
+
+## 153ª RODADA (2026-08-30) — SUPERADA pela 154ª acima; guardada pelo picker de nature/demeanor & por Q35
+
+**Estado:** gate **VERDE 624 ok / 0 FAIL** · §T **747 `x` · 101 `.` · 12 `~`** · `.rpk` **2.599.655 B**
+instalado 23:27 · **nada commitado** desde `15512560` (8 arquivos modificados + 8 novos).
+
+### ⚠ AS 2 PRIMEIRAS COISAS
+
+1. **⊥ ∃ nada a refazer. Retome em §T858**, & o plano dela está MEDIDO no `SPEC.md` (§I123, §V371).
+   **Q34 já foi RESPONDIDA** (↓). §T859 vem DEPOIS dela.
+2. **⚠ Q35 ABERTA & ela ⊥ bloqueia §T858/§T859** — é sobre o `?` em campo digitável (↓). Dá p/
+   construir as 2 sem a resposta; ela só decide se nasce trabalho NOVO depois.
+
+---
+
+### O QUE A 153ª FEZ — §T860, o 3º disfarce da mesma doença
+
+**§B110:** o picker de nature/demeanor abria & **nada que se clicasse mostrava descrição**, enquanto
+o `?` da MESMA linha mostrava o texto do livro. `HeaderPicker` tem as 2 portas & só o `?` nomeava o
+módulo: o `mfOpen` ia **sem o 4º argumento** ∴ `MF.mod` nil & a pane caía na frase de §V360c.
+Antecedente & mérito ⊥ tinham o problema porque as 2 chamadas deles já passavam o módulo.
+Conserto = **1 argumento**.
+
+⚠ **o sintoma MENTE sobre a causa, & é a 3ª vez na mesma semana:** a pane dizia
+`No description available`, que lê como "o livro ⊥ traz este arquétipo" — falta de DADO — quando o
+que faltava era um ARGUMENTO, & os 46 textos estavam em disco desde a 150ª. ≡ §B99 (o `require` que
+levantava) & §B109 (a tabela devolvida no lugar da string). **Falha silenciosa se disfarça de lacuna
+de conteúdo** — quando a pane disser que ⊥ ∃ texto, DESCONFIE do caminho antes de acusar o livro.
+
+⚠ **por que 623 checks ⊥ pegaram:** §V354b mede o `mfOpen` sozinho (declarar módulo | ⊥ declarar,
+as 2 legais) & §V365 mede o `?` sozinho. **Nenhuma cruzava as 2 portas da mesma linha**, & o defeito
+morava exatamente no cruzamento. ∴ **§V373**, que mede por TEMPLATE: template c/ as 2 portas nomeia
+**1** módulo pelas 2, & módulo nomeado ! ∃ em disco nos 2 idiomas. Mutação **4/4 VERMELHA** (o bug
+literal · as 2 discordando · módulo inexistente · a mesma discordância no antecedente) + sonda verde.
+
+⚠ **dívida de roster junto:** o gate DECLARAVA `HeaderPicker` sem módulo — certo enquanto §T838
+extraía, falso no minuto em que `descNature_en/_pt` nasceram. **Declaração ⊥ envelhece sozinha**, &
+foi ela que deixou o argumento faltando passar por 2 rodadas. Agora declara `Nature`.
+
+---
+
+### ▶ RETOMADA: §T858 & depois §T859 — plano já medido no SPEC
+
+**§T858** (`WoD20th.lfm` + `WoD20.1.lfm` + `WoD20.6.lfm` + `localization.lang`, §I123, §V371):
+
+- `Arts` em `BASE_TALENTS` (serve 3 épocas) & na lista PRÓPRIA de Dark Ages
+- `Martial Arts` `Meditation` `Research` nas **4** listas de skills
+- `Cosmology` `Enigmas` `Esoterica` nas de knowledges, **PULANDO `Enigmas` em Victorian Era &
+  Dark Ages, que já o têm** ∴ t·s·k: MN **11·13·13** · VE **11·13·12** · DA **11·13·12** ·
+  CA **11·13·13**
+- **6** entradas em `ABILITY_FIELD` (`arts` `martialArts` `meditation` `research` `cosmology`
+  `esoterica`) ∴ §V74 de 41 → **47**; `PICKER_LIST["speciality"]` cresce junto
+- **3** digitáveis novos c/ 5 pontos cada: `customTalent_3` `customTalent_4` `customKnowledge_3`
+  ∴ toda coluna fecha em **15** linhas visíveis
+- ⚠ **par GÊMEO** na 13ª posição de knowledges: `Ability num="13"` & `CustomAbility
+  customKnowledge_3` no MESMO `top`, & o render mostra **1**
+- ⚠ **o `else` do render** (§I123c): `renderAbilityLabels` é `if name ~= nil then show(c, name)`
+  & o MESMO teste guarda a religação do `imageCheckBox` ∴ slot ⊥ preenchido fica c/ rótulo **& o
+  CAMPO** da época anterior. Os controles de `CustomAbility` ⊥ têm `name=` ∴ o laço de nomes ⊥ os
+  alcança — a troca ! ser feita pelo PAR, achado pelo lado nomeado
+- §V371 no gate + mutação (a de guarda da decisão do dono: dar um 13º conhecimento a Victorian
+  ! ficar VERMELHO)
+
+**§T859** (`WoD20.1.lfm`, §I124, §V370) — DEPOIS de §T858: grid a 15 linhas · cabeçalho
+`20 50 80`→`20 45 70` (−10) · VIRTUES `45 74 103`→`45 70 95` (−8) · SPECIALTIES `41 71 …311`→
+`41 66 …266` (−45) · `WILLPOWER` `114`→**99** & trilha `139`→`124` (−15) · rótulo `ROAD` ganha
+`horzTextAlign="trailing"`. ⚠ §V69: as 2 colunas ⊥ poupam igual (esq. 23, dir. 45) ∴ o y comum sai
+RECALCULADO, & quem sobrar curto ganha FOLGA, nunca passo maior.
+
+---
+
+### ⚠ Q34 RESPONDIDA — regra DURÁVEL do dono
+
+> **"Uma era ⊥ deve ganhar habilidades de outra era. Apenas adicionar aquelas que eu falei. No
+> máximo, para manter estética, campos digitáveis serão adicionados."**
+
+∴ Victorian & Dark Ages FICAM c/ 12 conhecimentos. `Philosophy` & `Ritual` custariam 0 campo & 0
+tradução & foram RECUSADAS. §V371e guarda: contagem de época que mude sem §T é nome emprestado.
+
+### ⚠ Q35 ABERTA — o `?` em campo digitável
+
+O user reportou 2026-08-30: **"⊥ ta aparecendo nenhum `?` em nenhum campo editável no momento"**,
+& na MESMA mensagem confirmou que o `?` abre na aba certa & mostra o texto do livro. MEDIDO: ∃
+**3** botões `?` (`HeaderPicker` · `MeritPicked` · antecedente) & os 3 funcionam. As 2 leituras:
+
+1. **`?` ao lado de linha DIGITADA** — hoje ⊥ ∃ **por desenho**: §I102f tira o `?` de `*Free`/
+   `*FreeRow` (linha digitada ⊥ é autorada ∴ ⊥ tem entrada de livro p/ abrir), & §V365b REPROVA
+   quem puser. Mudar isso é decisão do dono & pede emenda em §I102f + §V365b.
+2. **o `?` abrir EDITÁVEL (§T845)** — `popOpen` escreve `readOnly = not isStoryteller()`, &
+   `isStoryteller()` só é `true` se a ficha estiver **numa MESA** & o espectador for o **MESTRE**.
+   Ficha aberta fora de mesa, ou como jogador, abre SÓ-LEITURA — comportamento CERTO.
+
+⊥ construir por cima disto sem a resposta: as 2 leituras pedem trabalho OPOSTO (uma acrescenta
+botão, a outra ⊥ acrescenta nada).
+
+---
+
+### ⚠ ARMADILHAS — as da 152ª seguem valendo, & a 1ª é a mais cara
+
+1. **⊥ CANALIZE o `rdk` por `tail` & leia `$?`** — devolve o status do `tail`, sempre 0. Custou 3
+   passos c/ o build QUEBRADO & só apareceu quando o `rdk -i` entrou no modo §B80 (exit 1, mensagem
+   VAZIA, **`.rpk` APAGADO**). Rode sem pipe & confira o `=)`.
+2. **Recorte de bloco Lua por `index`+`substr` deixa `end;` órfão** — ler a função inteira depois.
+3. **`q{...}` do perl conta chave; `q!...!` quebra em `!`.** Usar `q^...^`. E heredoc do bash
+   engasga em corpo grande c/ aspas & `$(...)`: escrever o arquivo pela ferramenta de escrita.
+4. **Mutação VERDE ! provar que APLICOU** — 4 vereditos falsos nesta sessão.
+
+*(reconfirmadas)* `\Q…\E` ⊥ impede interpolação de `$var` · os `desc*.lua` são **LF** & o resto é
+CRLF · PowerShell sombreia `.Name` de `XmlElement` com o ATRIBUTO `name` (usar `.LocalName`).
+
+---
+
+### ⛔ TESTE DE TELA — 1 novo, & 3 já APROVADOS pelo user
+
+**Feche & reabra a ficha antes** (§B103). `.rpk` 2.599.655 B de 23:27.
+
+- **§T860 [NOVO]** — no picker de **Nature/Demeanor**, clicar num arquétipo mostra a descrição na
+  pane da direita (os 46 c/ texto; os 22 c/ a frase). É o conserto desta rodada.
+- ✅ §T856 (o `-- Remove --` separado & na página 2) · ✅ §T854 (abre na aba certa) · ✅ §T855/§T838
+  (o `?` de Nature/Demeanor mostra o livro) — **aprovados pelo user 2026-08-30**.
+- ✅ §T857 aprovado p/ antecedente, mérito & defeito; **falta reconfirmar em nature/demeanor**,
+  que é o que §T860 destrava.
+
+---
+## 152ª RODADA (2026-08-30) — SUPERADA pela 153ª acima; guardada pelo picker & pelas armadilhas
+
+**Estado:** gate **VERDE 623 ok / 0 FAIL** · §T **746 `x` · 101 `.` · 12 `~`** · `.rpk` **2.599.634 B**
+instalado 23:11 · **nada commitado** desde `15512560` (8 arquivos modificados + 8 novos).
+
+### ⚠ A PRIMEIRA COISA: ⊥ ∃ nada a refazer. Retome em §T858.
+
+`/ck:build --all` da 151ª entregou **§T856** & **§T857** (as 2 do picker) c/ gate verde, mutação
+provada & `.rpk` INSTALADO. Sobram **§T858** & **§T859**, & elas ⊥ dependem de decisão nenhuma:
+**Q34 já foi RESPONDIDA** (↓). O plano das 2 está escrito no `SPEC.md`, medido — ⊥ remedir.
+
+---
+
+### O QUE A 152ª ENTREGOU
+
+**§T856 — `-- Remove --` saiu da paginação.** O `""` de §V15 viajava dentro de `MF.pool` ∴ ordenava,
+paginava & **sumia depois da página 1**, na linha cuja ÚNICA saída ele era; & ainda comia 1 dos 20
+slots de §I107k. Agora é `btnMfRemove`, controle próprio em `top="106"` contra a 1ª linha em `131`
+(passo 20 ∴ vão de 25 > passo, §V369c), fora de `MF.pool`/`MF.hits`/`total`/`pages`, visível ⟺
+`MF.canRemove`. As 20 linhas desceram 23 & o rodapé de paginação junto; a caixa ⊥ mudou de tamanho
+(`1000×620`) ∴ §V352c intacta. **§V369** NASCEU, mutação **6/6 VERMELHA** + sonda verde.
+
+**§T857 — o picker abre PRÉ-MARCADO & o `-- Remove --` empresta a descrição do slot.** A pintura da
+pane saiu de dentro de `mfSelect` p/ **`mfDesc`**, & os **3** chamadores compartilham: a abertura
+(pré-marca em `MF.picked = cur`), a linha de resultado & a linha de remoção (que mostra o que está
+NO SLOT — ela ⊥ tem descrição própria & cair na frase de §V360c diria "o livro ⊥ traz" sobre algo
+que ⊥ é item). **§V372** NASCEU, mutação **3/3 VERMELHA** + sonda verde.
+
+**4 réguas foram REPONTADAS, & nenhuma afrouxada** — o mecanismo mudou de casa, ⊥ de exigência:
+§V355d (media o vazio DENTRO da pool; agora cobra `MF.canRemove = has` **&** a AUSÊNCIA do vazio na
+pool) · §V352f · §V360c · §V360d (as 3 prendiam a pane a `mfSelect`; agora leem `mfDesc`, que é
+alvo MAIS forte — de "um chamador entre os possíveis" p/ "o único escritor").
+
+---
+
+### ▶ RETOMADA: §T858 & depois §T859 — o plano já está medido no SPEC
+
+**§T858** (`WoD20th.lfm` + `WoD20.1.lfm` + `WoD20.6.lfm` + `localization.lang`, §I123, §V371):
+- `Arts` em `BASE_TALENTS` (serve 3 épocas) & na lista PRÓPRIA de Dark Ages
+- `Martial Arts` `Meditation` `Research` nas **4** listas de skills
+- `Cosmology` `Enigmas` `Esoterica` nas de knowledges, **PULANDO `Enigmas` em Victorian Era &
+  Dark Ages, que já o têm** ∴ contagem final t·s·k: MN **11·13·13** · VE **11·13·12** ·
+  DA **11·13·12** · CA **11·13·13**
+- **6** entradas em `ABILITY_FIELD` (`arts` `martialArts` `meditation` `research` `cosmology`
+  `esoterica`) ∴ §V74 de 41 → **47**, & `PICKER_LIST["speciality"]` cresce junto
+- **3** campos digitáveis novos c/ 5 pontos cada: `customTalent_3` `customTalent_4`
+  `customKnowledge_3` ∴ toda coluna fecha em **15** linhas visíveis
+- ⚠ **o par GÊMEO**: na 13ª posição de knowledges vivem os 2 controles no MESMO `top` —
+  `Ability num="13"` & `CustomAbility customKnowledge_3` — & o render mostra **1**. `top`
+  diferente deixaria vão de 25px na época que esconde o de cima
+- ⚠ **o `else` do render** (§I123c): `renderAbilityLabels` é `if name ~= nil then show(c, name)`
+  & o MESMO teste guarda a religação do `imageCheckBox` ∴ slot ⊥ preenchido fica c/ o rótulo **&
+  o CAMPO** da época anterior. Os controles do `CustomAbility` ⊥ têm `name=` ∴ o laço de nomes ⊥
+  os alcança — a troca ! ser feita pelo par, achado pelo lado NOMEADO
+- §V371 no gate + mutação (a de guarda da decisão do dono: dar um 13º conhecimento a Victorian
+  ! ficar VERMELHO)
+
+**§T859** (`WoD20.1.lfm`, §I124, §V370) — DEPOIS de §T858, porque a altura depende das linhas:
+grid a 15 linhas · cabeçalho `20 50 80`→`20 45 70` (−10) · VIRTUES `45 74 103`→`45 70 95` (−8) ·
+SPECIALTIES `41 71 …311`→`41 66 …266` (−45) · `WILLPOWER` `114`→**99** & trilha `139`→`124` (−15) ·
+rótulo `ROAD` ganha `horzTextAlign="trailing"`. ⚠ §V69: as 2 colunas ⊥ poupam igual (esq. 23,
+dir. 45) ∴ o y comum sai RECALCULADO, & quem sobrar curto ganha FOLGA, nunca passo maior.
+
+---
+
+### ⚠ Q34 RESPONDIDA — regra DURÁVEL do dono, ⊥ resposta de uma vez
+
+> **"Uma era ⊥ deve ganhar habilidades de outra era. Apenas adicionar aquelas que eu falei. No
+> máximo, para manter estética, campos digitáveis serão adicionados."**
+
+∴ Victorian & Dark Ages FICAM c/ 12 conhecimentos. `Philosophy` & `Ritual` custariam **0** campo &
+**0** tradução (já ∃ em `ABILITY_FIELD`) & foram RECUSADAS. §V371e guarda isso: contagem de época
+que mude sem §T é nome emprestado entrando pela porta dos fundos.
+
+### ⚠ 3 ARMADILHAS NOVAS — a 1ª é a mais cara da sessão
+
+1. **⊥ CANALIZE o `rdk` por `tail` & leia `$?`** — `rdk -l 2>&1 | tail -3; echo $?` devolve o
+   status do **`tail`**, sempre 0. Eu li "EXIT=0" c/ o build QUEBRADO & segui por 3 passos; só
+   apareceu quando o `rdk -i` entrou no modo §B80 (exit 1, mensagem VAZIA, **`.rpk` APAGADO**).
+   Rode `rdk -l` **sem pipe** & confira o `=)` na saída — `$?` sozinho ⊥ prova nada (§B1).
+2. **Recorte de bloco Lua por `index`+`substr` deixa `end;` órfão.** O fecho do `if` interno
+   sobreviveu ao corte & o Lua ficou inválido — & é exatamente o que (1) escondeu. Depois de
+   cortar bloco, LER o corpo da função inteira antes de compilar.
+3. **`q{...}` do perl conta chave & quebra em texto com `{` solto; `q!...!` quebra em texto com
+   `!` (mordeu num `(?!"")`).** Usar `q^...^` p/ trecho de PowerShell, & sempre `quotemeta`.
+
+*(reconfirmadas)* `\Q…\E` ⊥ impede interpolação de `$var` · mutação VERDE ! provar que APLICOU ·
+os `desc*.lua` são **LF** & o resto é CRLF · PowerShell sombreia `.Name` de `XmlElement` com o
+ATRIBUTO `name` (usar `.LocalName`).
+
+---
+
+### ⛔ TESTE DE TELA ACUMULADO — 5 coisas, & o `.rpk` de 23:11 tem todas
+
+**Feche & reabra a ficha antes** (§B103).
+
+1. **§T856** — o `-- Remove --` aparece SEPARADO acima da lista, & continua lá na **página 2**.
+2. **§T857** — abrir um picker que JÁ tem valor mostra a descrição dele de cara; clicar em
+   `-- Remove --` (sem confirmar) mostra a descrição do que está no slot.
+3. **§T854** — o `?` & o picker abrem NA aba em que se está (Main & Traits).
+4. **§T855/§T838** — o `?` de Nature/Demeanor mostra o texto do livro nos 46 & a frase
+   `No description available` nos 22.
+5. **§T845** — o `?` abre editável p/ o narrador & o texto sobrevive a fechar/reabrir.
+
+⚠ **teste "MOSTRA", ⊥ "ABRE"** — foi essa distinção que deixou §B109 passar por 3 rodadas.
+
+---
+## 151ª RODADA (2026-08-30) — SUPERADA pela 152ª acima; guardada pelos 2 bugs do ? & pelas armadilhas
+
+**Estado:** gate **VERDE 621 ok / 0 FAIL** · §T **744 `x` · 99 `.` · 12 `~`** · `.rpk` **2.597.418 B**
+instalado 21:59 · **nada commitado** desde `15512560`.
+
+### O QUE A 151ª FEZ — §T854 & §T855, DOIS bugs de tela do mesmo `?`
+
+**§T854 / §B107 — a caixa abria na ABA errada.** `popScrim` `popDesc` `mfSearch` eram filhos do
+`<scrollBox>` da aba **Traits**; aba é `visible="false"` quando o jogador está em outra & filho de
+pai invisível é invisível ∴ o `?` da Main acendia caixa que ninguém via. 2º sintoma do mesmo pai:
+o overlay ROLAVA com a grade. **Conserto:** os 3 viraram filhos DIRETOS de `sheetBody` em
+`WoD20th.lfm`, DEPOIS de ∀ aba. `top` +40 (`popDesc` 110→150, `mfSearch` 40→80) & scrim 693→**733**.
+**0 linha de Lua.** **§V367** NASCEU & mede **PARENTESCO**; mutação **3/3 VERMELHA**.
+
+**§T855 / §B109 — & este é o que importa: a caixa abria VAZIA, p/ ∀ LISTA, desde sempre.**
+`descText` fazia `txt = DESC[key] or ""` — mas ∀ módulo é `{nome = {<idioma> = texto}}` (§I21) ∴
+`DESC[key]` é **TABELA**. As 4 panes de `WoD20.7`/`.12`/`.13`/`.14` sempre desembrulharam c/
+`pick(tbl, lang)`; `descText`, que serve a caixa do `?` **&** a pane da busca, ⊥. **Conserto:**
+`ent[lang] or ent.en or ""`, o MESMO `pick`. **§V368** NASCEU; mutação **5/5 VERMELHA**.
+
+⚠ **A LIÇÃO DAS 2, & ela é a mesma:** o teste de tela que fechou §T845/§T846 provou **"a caixa
+ABRE"**, ⊥ **"a caixa MOSTRA"**. E o gate tinha o mesmo buraco: §V360c/§V364 provam que a FRASE
+aparece quando o módulo ⊥ ∃, & **nada** provava que o TEXTO aparece quando o módulo ∃ — ninguém
+comparava o que os módulos GUARDAM com o que os leitores TIRAM. §T838 entregou 46 textos certos
+p/ um leitor que ⊥ lia nenhum, & 3 rodadas acharam que o que faltava era ARQUIVO.
+
+⚠ **tabela ⊥ é nil & ⊥ é `""`** ∴ ela atravessou o `if txt == nil or txt == ""` do próprio
+`popOpen`, que ∃ EXATAMENTE p/ esse caso. **Resposta errada vestida de certa passa por fallback**
+— é a forma de §V364f (`mod or "Merit"`) voltando por outra porta.
+
+### ⚠ 5 ARMADILHAS NOVAS — 4 fabricaram veredito falso
+
+1. **PowerShell sombreia `.Name` de `XmlElement` com o ATRIBUTO `name`.** `$el.Name` devolve
+   `"tabStrip"`, ⊥ `"layout"` ∴ `.Name -eq 'layout'` é falso p/ ∀ filho. Usar **`.LocalName`**.
+   Só o zero-guard salvou a perna de nascer medindo nada.
+2. **Mutação que sai VERDE ! provar que APLICOU** — 3 vezes nesta rodada. `,\n` num arquivo
+   **CRLF**; `\r\n` num `.lua` que é **LF**; & um `s/pick\(/pk(/` que deixou `pick(` na definição.
+   As 3 pareceram buraco na régua. **⊥ ∃ veredito de mutação sem prova de aplicação.**
+3. **`\Q…\E` do perl ⊥ impede interpolação de variável.** `\Q$doc339 = …\E` vira `\Q = …\E`.
+   Escrever o script em ARQUIVO & usar `quotemeta(q!…!)`; `q{…}` conta chave & quebra em texto
+   com `{` solto.
+4. **`\` numa regex vira `\` ao gravar pelo heredoc** ∴ `[^"\]` chegou como `[^"\]` & o
+   PowerShell morreu de `ArgumentException` NO MEIO do gate — o bloco inteiro ⊥ rodou & o total
+   de `ok` ⊥ mudou, que é fácil de ler como "passou". Conferir que o check NOVO imprimiu linha.
+5. **Os 14 `desc*.lua` são LF**, & o resto do repo é CRLF. Regex de mutação neles ! usar `\n`.
+
+### ⚠ ACHADO QUE VALE MAIS QUE O BUG — §B108, régua mais apertada que a própria spec
+
+**§V166** diz "a ÚNICA **escrita**" & o gate contava **menção** da string `sheetBody` em texto
+cru, **comentário XML incluso**. Enquanto ninguém nomeava o corpo em prosa a diferença dormia —
+§B107 obrigou a nomear & o comentário que EXPLICA o conserto acendeu o gate CONTRA o conserto
+(§B92). Curado ignorando `<!-- … -->` antes de somar, MEDIDO nos 2 sentidos (2ª escrita segue
+VERMELHA, menção em comentário fica VERDE). **A tentação era reescrever o comentário p/
+contornar** — isso deixaria a armadilha armada & pagaria com documentação pior.
+
+⚠ **procure irmãos disto:** proxy (contar o nome) ⊥ é a coisa (contar a escrita), & proxy só se
+comporta enquanto o nome ⊥ tem outro uso legítimo.
+
+### ⛔ TESTE DE TELA PENDENTE — 3 coisas, & a 3ª nunca foi testável até agora
+
+**Feche & reabra a ficha antes** — `.rpk` 2.597.418 B instalado 21:59 (§B103).
+
+1. **§T854** — o `?` & o picker abrem NA aba em que se está (**Main** & **Traits**).
+2. **§T855 / §T838** — o `?` de Nature/Demeanor mostra o **texto do livro** p/ os 46 & a frase
+   `No description available` p/ os 22. ⚠ **a 2ª metade nunca foi testável**: até §B109 o leitor
+   devolvia tabela ∴ ⊥ ∃ caminho pela frase. Valem os 2 lados.
+3. **§T845** — o `?` abre EDITÁVEL p/ o narrador & o texto dele sobrevive a fechar/reabrir.
+
+⚠ **teste "a caixa MOSTRA", ⊥ "a caixa ABRE"** — foi essa distinção que deixou §B109 passar por
+3 rodadas & 2 §T fechadas em `x`.
+
+Depois disso a tabela de travas da 149ª volta (**§T810** é a que mais desentope).
+
+**Sem tela & sem o user:** `/ck:research` das 5 listas — **§T848** `clan` (61) é a 1ª.
+
+---
+## 150ª RODADA (2026-08-30) — SUPERADA pela 151ª acima; guardada pelo pipeline de pesquisa & pela dívida de spec já paga
+
+**Estado:** gate **VERDE 619 ok / 0 FAIL** · §T **742 `x` · 99 `.` · 12 `~`** · **nada commitado**
+desde `15512560` (13 arquivos modificados + 8 novos).
+
+### ✅ AS 2 PRIMEIRAS COISAS DA 150ª — AS DUAS FEITAS, ⊥ REFAZER
+
+1. ✅ **INSTALADO.** `output/` & `%APPDATA%\Firecast\Plugins\andreoliveira.styllern.wod20th.rpk`
+   têm os MESMOS **2.599.438 B** de 20:35, c/ os 2 módulos de descrição dentro. O user fechou &
+   reabriu a ficha depois. ⚠ **⊥ reinstalar sem arquivo do plugin ter mudado** — foram 2 dos 3
+   installs desperdiçados na 147ª (§B103), & `verify -Build` puxa `rdk -l` junto ∴ ele reescreve
+   o `.rpk` & deixa o instalado velho DE NOVO. Só rode o gate ESTÁTICO enquanto a rodada ⊥ tocar
+   no plugin.
+2. ✅ **A dívida de spec foi paga & §T853 saiu junto** (↓). ⚠ **a fila voltou a travar em tela**:
+   §T853 era o único §T que dava p/ construir sem o user, & ele FECHOU. O que sobra `.` depende
+   dos testes de tela da tabela de travas, ou é `/ck:research` de livro (§T848…§T852), que ⊥ pede
+   tela nenhuma — **é por aí que a próxima rodada anda sem depender do user**, & `clan` (§T848) é
+   a 1ª da fila.
+
+---
+
+### O QUE A 150ª FEZ — §T838, a lista `nature`/`demeanor`
+
+**ENTREGUE:** `descNature_en.lua` & `descNature_pt.lua` na raiz do plugin, **46 entradas cada**,
+na forma de §I21 (`<Livro>, p./pág. <n>` · 2 brancos · nome · 2 brancos · texto). PT é TRADUÇÃO,
+⊥ extração — ⊥ ∃ livro em português desses arquétipos, & é o que `descBackground_pt.lua` já faz.
+Terminologia seguida dos módulos PT que já ∃: **Força de Vontade** · **Narrador** · **Cainita** ·
+**Príncipe** · **Clã** · **Sabá** · **Anarquista** · **Abraço** · `Masquerade` fica em INGLÊS.
+
+**`popOpen` agora passa `'Nature'`** em vez de `nil` no `?` de nature/demeanor (`WoD20.1.lfm:105`)
+∴ o `pcall` de §V364a carrega o módulo. Antes disso o `?` NUNCA acenderia, por mais que o arquivo
+existisse — `descText` devolve `""` na 1ª guarda quando `kind` é nil.
+
+**PARCIAL POR MEDIDA, & o user decidiu assim:** 68 arquétipos no picker, **46** c/ descrição nos
+livros do disco. Os outros **22** abrem o `?` & caem na frase de §V360c, que é a resposta CERTA —
+o que falta a eles é ARQUIVO. **6 deles ⊥ ∃ em livro nenhum** dos 25 PDFs (`Bureaucrat` `Comedian`
+`Grifter` `Optimist` `Pragmatist` `Trendsetter`) ∴ vêm de um livro que o user ⊥ tem.
+
+**O pipeline ficou versionado em `research/`** (`arch_extract.pl` `gen_nature.pl`
+`arch_qa_words.pl` `arch_body_en.tsv` `arch_body_pt.tsv` `arch_names.txt`) c/ a receita & as
+armadilhas no `research/README.md`. ⊥ refazer do zero: rodar de novo é `$env:ARCH_DIR` + 2 linhas.
+
+---
+
+### ✅ A DÍVIDA DE SPEC DESTA RODADA — PAGA NA PRÓPRIA RODADA (`/ck:spec amend`, gate VERDE 618/0)
+
+Os 4 itens entraram no `SPEC.md`. §T **741 `x` · 100 `.` · 12 `~`** (era 740/94/13).
+
+1. ✅ **§T838 ENCOLHEU p/ `nature`/`demeanor` & fechou em `x`.** As outras 5 listas viraram
+   **§T848** `clan` (61) · **§T849** `road` (55) · **§T850** `family` (24) · **§T851**
+   `hedgeAffiliation` (26) · **§T852** `hedgeAttr` (9), contadas do `PICKER_LIST` & ⊥ de memória.
+2. ✅ **§R135 emendada c/ a fonte MEDIDA — & o número que este HANDOFF trazia estava ERRADO.**
+   Ele dizia "V20 39 · M20 5 · DA 3 · LotC 2 · W20 1", que soma **50** & ⊥ 46. Contado do
+   cabeçalho de §I21 das 46 entradas de `descNature_en.lua`: **V20 33 · DA20 6 · M20 5 · W20 2**
+   = 46, & **0** de LotC. Multi-livro segue certo; a repartição, ⊥. Os 22 & os 6 entraram
+   NOMEADOS, & ⊥ ∃ chave órfã (medido nos 2 sentidos).
+3. ✅ **§I102e diz as DUAS raízes** — & ganhou a metade que quase ficou p/ trás: `popOpen` ! NOMEAR
+   o módulo (`'Nature'`, `WoD20.1.lfm:105`), senão `mod` nil devolve `""` em `descText` & o `?`
+   ⊥ acende c/ o arquivo em disco.
+4. ✅ **§V366 NASCEU** cobrando PARTIÇÃO — 46 ⊎ 22 NOMEADOS = 68, disjunta & completa — nunca 68
+   como alvo, & **§T853 já a levou p/ o gate na MESMA rodada** (`x`, gate **619 ok / 0 FAIL**).
+
+### ✅ §T853 CONSTRUÍDA — §V366 no gate, & a mutação passou 7/7
+
+**⊥ ∃ literal `46` nem `68` no gate, & isso é DECISÃO**: §V366c abençoa o número andar ("verde de
+novo em 46+1/22−1") ∴ um `46` cravado ficaria VERMELHO exatamente no movimento que a spec pede.
+O único literal é a **lista dos 22 nomes**; a partição deriva o resto, & os 3 números do `Pass`
+são MEDIDOS, ⊥ afirmados.
+
+**⊥ rodou `rdk` & ⊥ reinstalou, de propósito:** §T853 mexeu em **0** arquivo do plugin ∴ o `.rpk`
+⊥ mudou. `rdk -l` só reescreveria o mesmo pacote & deixaria o instalado velho de novo — é o
+install desperdiçado de §B103. O `.rpk` instalado segue o de **2.599.438 B**.
+
+| mutação | esperado | resultado |
+|---|---|---|
+| **esvaziar a lista dos 22** (= alvo vira **68**) | VERMELHO | ✅ **22** FAIL |
+| apagar 1 entrada do `_en` | VERMELHO | ✅ 2 FAIL, pernas (a)+(b) |
+| tirar 1 chave só do `_pt` | VERMELHO | ✅ 2 FAIL, perna (a) |
+| chave que ⊥ ∃ no picker (órfã) | VERMELHO | ✅ 2 FAIL, perna (b) |
+| arquétipo novo no picker sem texto & sem nomear | VERMELHO | ✅ 1 FAIL, perna (b) |
+| nome rançoso na lista de exceção | VERMELHO | ✅ 1 FAIL, perna (b) |
+| `descNature_en.lua` some | VERMELHO | ✅ 1 FAIL, zero-guard (d) |
+| **sonda:** reordenar as 46 entradas | VERDE | ✅ VERDE — mede CONJUNTO, ⊥ ordem |
+
+⚠ **ARMADILHA NOVA, & ela quase virou acusação falsa contra a régua:** a mutação do picker passou
+VERDE na 1ª tentativa & parecia buraco na invariante. **⊥ era — o regex da MUTAÇÃO é que ⊥ tinha
+aplicado**, porque `WoD20th.lfm` é CRLF & o `s/…,\n/` pedia `,` colado no `\n` (os bytes reais são
+`,\r\n`). Com `\r\n` no padrão, acendeu na hora. ∴ **mutação que sai VERDE ! provar que APLICOU
+antes de virar veredito** — senão o teste que existe p/ pegar régua morta vira o que fabrica
+régua morta.
+
+⚠ **A lição da correção do item 2:** a repartição por livro foi ESCRITA neste HANDOFF sem ser
+recontada do arquivo, & ela é da MESMA safra dos números que a armadilha 1 (↓) diz que eram
+sorteio. Número que sobreviveu ao extrator ⊥ determinístico ! ser recontado antes de virar fato
+de spec — foi o que salvou §R135 de nascer errada.
+
+---
+
+### ⛔ A FILA SEGUE TRAVADA EM TESTE DE TELA (medido na 149ª, ⊥ mudou)
+
+| cadeia | trava em |
+|---|---|
+| ondas 2-5 → panes saem → 3 colunas Numina/Ghoul → §V361/§V362 → `hedgeAttr` | **§T810** `[USER]` |
+| caixa em 2 tamanhos · resto das ondas | **§T827** `~` — ! VER a pane pintando (§B98) |
+| §V353 no gate | **§T804** `[USER]` |
+
+**De tela, & só o user roda:** `§T787` · `§T804` · `§T810` · `§T816` · `§T820` · `§T823` · `§T827`
+· **§T845** (o `?` abre EDITÁVEL p/ o narrador & o texto dele sobrevive a fechar/reabrir) ·
+**§T846/§T838** (o `?` de Nature/Demeanor agora mostra a descrição do livro — **depois de instalar**).
+
+---
+
+### ⚠ ARMADILHAS — 5 NOVAS, & as 3 primeiras geraram texto ERRADO que parecia certo
+
+1. **`for my $b (...)` sombreia o `$b` do `sort`** ∴ a extração era NÃO determinística: 31, 34,
+   39, 42 aceitas do MESMO input. Todo número medido antes disso era sorteio. ⊥ usar `$a`/`$b`
+   como variável de laço em script que ordena.
+2. **Calha de coluna de outra página corta palavra no meio & o resultado LÊ como prosa**
+   (`"apathet cowards"`). Calha inferida ! passar o teste NAQUELA página antes de valer.
+3. **QA automático ⊥ pega truncamento dentro da palavra** — `effi cient`, `judgt es`,
+   `littl esteem` passaram por 6 regras & só cairam na LEITURA das 46 inteiras. **Ler o texto é
+   parte do processo.** Eu declarei "limpo, nenhum apontamento" & estava errado.
+4. **`use utf8;` ou os literais do script ⊥ casam** com dado decodificado (mordeu no `—` e no `pág.`).
+5. **`pdftotext` sem `-enc UTF-8` sai em Latin-1** & o Perl morre na 1ª linha acentuada.
+
+*(reconfirmadas)* `grep -c $'\r'` MENTE em arquivo CRLF (usar `tr -dc '\r' | wc -c`) · `sed -n`
+come o CR · heredoc do bash grava LF & `SPEC.md` é CRLF · pegar nº de linha c/ `grep -n`.
+
+---
+## 149ª RODADA (2026-08-30) — SUPERADA pela 150ª acima; guardada pela tabela de travas & pelas armadilhas
 
 **Estado:** gate **VERDE 618 ok / 0 FAIL** · `.rpk` **2.568.343 B**, instalada 17:57 na 148ª & **⊥
 mudou nesta rodada** (§T847 é só gate, & gate ⊥ entra no `.rpk`) · §T **740 `x` · 95 `.` · 12 `~`** ·

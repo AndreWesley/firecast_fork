@@ -116,10 +116,11 @@
 				},
 				["speciality"] = {
 					"", "Strength", "Dexterity", "Stamina", "Charisma", "Manipulation", "Appearance", "Perception",
-					"Inteligence", "Wits", "Academics", "Alertness", "Animal Ken", "Archery", "Athletics", "Awareness",
-					"Brawl", "Commerce", "Computer", "Crafts", "Drive", "Empathy", "Enigmas", "Etiquette", "Expression",
-					"Finance", "Firearms", "Hearth Wisdom", "Intimidation", "Investigation", "Larceny", "Law", "Leadership",
-					"Legerdemain", "Medicine", "Melee", "Occult", "Performance", "Philosophy", "Politics", "Religion",
+					"Inteligence", "Wits", "Academics", "Alertness", "Animal Ken", "Archery", "Arts", "Athletics",
+					"Awareness", "Brawl", "Commerce", "Computer", "Cosmology", "Crafts", "Drive", "Empathy", "Enigmas",
+					"Esoterica", "Etiquette", "Expression", "Finance", "Firearms", "Hearth Wisdom", "Intimidation",
+					"Investigation", "Larceny", "Law", "Leadership", "Legerdemain", "Martial Arts", "Medicine",
+					"Meditation", "Melee", "Occult", "Performance", "Philosophy", "Politics", "Religion", "Research",
 					"Ride", "Ritual", "Science", "Seneschal", "Stealth", "Streetwise", "Subterfuge", "Survival",
 					"Technology", "Theology",
 				},
@@ -1816,6 +1817,7 @@
 				regroupHealthMarks();
 			end;
 
+
 			-- `form` is the tab form; `prefix` names its ten rows: the layout `<prefix>rowN`
 			-- holds the level label `<prefix>N` and the clickable mark box.
 			-- The `dyn` prefix is what tells the WoD20.6 traversal to leave them alone.
@@ -1912,6 +1914,7 @@
 			ABILITY_FIELD = {
 				-- talents
 				["Alertness"]     = "alertness",
+				["Arts"]          = "arts",
 				["Athletics"]     = "athletics",
 				["Awareness"]     = "awareness",
 				["Brawl"]         = "brawl",
@@ -1932,8 +1935,11 @@
 				["Etiquette"]     = "etiquette",
 				["Firearms"]      = "firearms",
 				["Larceny"]       = "larceny",
+				["Martial Arts"]  = "martialArts",
+				["Meditation"]    = "meditation",
 				["Melee"]         = "melee",
 				["Performance"]   = "performance",
+				["Research"]      = "research",
 				["Ride"]          = "ride",
 				["Stealth"]       = "stealth",
 				["Survival"]      = "survival",
@@ -1941,7 +1947,9 @@
 				-- knowledges
 				["Academics"]     = "academics",
 				["Computer"]      = "computer",
+				["Cosmology"]     = "cosmology",
 				["Enigmas"]       = "enigmas",
+				["Esoterica"]     = "esoterica",
 				["Finance"]       = "finance",
 				["Hearth Wisdom"] = "hearthWisdom",
 				["Investigation"] = "investigation",
@@ -1958,31 +1966,37 @@
 				["Theology"]      = "theology",
 			};
 
-			-- Ten names per column per era, in reading order (alphabetical). The lists are the
+			-- One era's own names per column, in reading order (alphabetical). The lists are the
 			-- user's, from the 19th round; the 21st only stopped expressing them as renames of
 			-- rows, which is what made ratings walk between traits.
-			local BASE_TALENTS = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Streetwise", "Subterfuge"};
+			--
+			-- It was ten a column in every era until the 154th round, which added the seven names
+			-- the user asked for (SPEC I123). The columns run 11/13/13 now - except knowledges in
+			-- the Victorian era and the Dark Ages, whose books give twelve. An era borrows a trait
+			-- from no other era (Q34), so the short column is paid for with a TYPED row and never
+			-- with a name lifted from a book that era is not in (SPEC V371, I123a).
+			local BASE_TALENTS = {"Alertness", "Arts", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Streetwise", "Subterfuge"};
 
 			ERA_ABILITIES = {
 				["Modern Nights"] = {
 					talents    = BASE_TALENTS,
-					skills     = {"Animal Ken", "Crafts", "Drive", "Etiquette", "Firearms", "Larceny", "Melee", "Performance", "Stealth", "Survival"},
-					knowledges = {"Academics", "Computer", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
+					skills     = {"Animal Ken", "Crafts", "Drive", "Etiquette", "Firearms", "Larceny", "Martial Arts", "Meditation", "Melee", "Performance", "Research", "Stealth", "Survival"},
+					knowledges = {"Academics", "Computer", "Cosmology", "Enigmas", "Esoterica", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
 				},
 				["Victorian Era"] = {
 					talents    = BASE_TALENTS,
-					skills     = {"Animal Ken", "Crafts", "Etiquette", "Firearms", "Larceny", "Melee", "Performance", "Ride", "Stealth", "Survival"},
-					knowledges = {"Academics", "Enigmas", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
+					skills     = {"Animal Ken", "Crafts", "Etiquette", "Firearms", "Larceny", "Martial Arts", "Meditation", "Melee", "Performance", "Research", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Cosmology", "Enigmas", "Esoterica", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
 				},
 				["Dark Ages"] = {
-					talents    = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Legerdemain", "Subterfuge"},
-					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Melee", "Performance", "Ride", "Stealth", "Survival"},
-					knowledges = {"Academics", "Enigmas", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Politics", "Seneschal", "Theology"},
+					talents    = {"Alertness", "Arts", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Legerdemain", "Subterfuge"},
+					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Martial Arts", "Meditation", "Melee", "Performance", "Research", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Cosmology", "Enigmas", "Esoterica", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Politics", "Seneschal", "Theology"},
 				},
 				["Classical Age"] = {
 					talents    = BASE_TALENTS,
-					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Melee", "Performance", "Ride", "Stealth", "Survival"},
-					knowledges = {"Academics", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Philosophy", "Politics", "Religion", "Ritual"},
+					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Martial Arts", "Meditation", "Melee", "Performance", "Research", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Cosmology", "Enigmas", "Esoterica", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Philosophy", "Politics", "Religion", "Ritual"},
 				},
 			};
 
@@ -2544,7 +2558,7 @@
 			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
 			-- 2026-08-22). The LAST five, so every reader is 'picker = total - typed' and no list of
 			-- indices exists to drift from this number.
-			BACKGROUND_FREE_ROWS = 5;
+			BACKGROUND_FREE_ROWS = 0;
 
 
 			-- How many speciality rows the box on the Main tab draws (SPEC V147). Same reason
@@ -2556,7 +2570,7 @@
 			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
 			-- 2026-08-22). Same contract as the three on the Ghoul tab: they are the LAST rows, so
 			-- the picker count is the total minus these and no reader carries a list of indices.
-			SPECIALITY_FREE_ROWS = 3;
+			SPECIALITY_FREE_ROWS = 0;
 
 			-- Rows of the Vampire tab (SPEC I16). Same contract as BACKGROUND_ROWS above: the loop
 			-- that lets experience buy a dot and the loop that prices it for the log both read
@@ -2632,22 +2646,108 @@
 				return from ~= nil and tonumber(n) >= from;
 			end;
 
-			-- Where a typed row keeps the text the storyteller wrote for it (SPEC I45): the
-			-- row's own name with `Desc` inside it, so `disc_13` holds its description in
-			-- `discDesc_13` and the two cannot end up pointing at different rows. Derived and
-			-- never listed out, for the same reason the counts above are derived.
+			-- Where a row keeps the text the storyteller wrote for it (SPEC I45): the row's own
+			-- name with `Desc` inside it, so `disc_13` holds its description in `discDesc_13`
+			-- and the two cannot end up pointing at different rows. Derived and never listed
+			-- out, for the same reason the counts above are derived.
 			--
-			-- These eleven fields are written by Lua ALONE - the description block owns no
-			-- `field` and never will (SPEC V29, V249b) - so they are Lua-owned in the sense
-			-- SPEC I3 uses, and nothing but the block itself reads them.
+			-- These fields are written by Lua ALONE - the description block owns no `field` and
+			-- never will (SPEC V29, V249b) - so they are Lua-owned in the sense SPEC I3 uses,
+			-- and nothing but the block itself reads them.
+			--
+			-- %w and not %d, and a second form with no underscore at all (SPEC B111, V377, I129g,
+			-- T867). The old pattern was `^(%a+)_(%d+)$` and it answered nil for TWENTY-EIGHT of
+			-- the rows that own a ?: the twenty-two merits and flaws, whose num is `m0`..`f10`
+			-- and not a bare digit, and six standalone pickers with no underscore in their name
+			-- at all - nature, demeanor, road, hedgeAffiliation, hedgeAttr, clanFamily. Nil
+			-- travels to savePopDesc, which returns on it without a word, so the storyteller
+			-- typed into those descriptions and nothing was ever written. It failed exactly
+			-- where the numbering was unusual and worked everywhere anyone had looked, which is
+			-- why derivation this cheap goes unmeasured until something asks it to spread.
 			function descFieldOf(field)
 				if field == nil then return nil; end;
 
-				local base, n = string.match(field, "^(%a+)_(%d+)$");
+				local base, n = string.match(field, "^(%a+)_(%w+)$");
 
-				if base == nil then return nil; end;
+				if base ~= nil then return base .. "Desc_" .. n; end;
 
-				return base .. "Desc_" .. n;
+				-- The standalone pickers: no row number to carry, so the suffix simply sticks to
+				-- the name. `nature` -> `natureDesc`, and it can never collide with the numbered
+				-- form, which always has an underscore before its tail.
+				if string.match(field, "^%a+$") ~= nil then return field .. "Desc"; end;
+
+				return nil;
+			end;
+
+			-- Where a slot keeps the name and the text the PLAYER made up for it (SPEC I129f,
+			-- V381d, T868, user 2026-08-31 ask 12). Derived exactly like descFieldOf and for the
+			-- same reason - a list of two hundred field names would be a list to keep in step -
+			-- and Lua-owned in the sense SPEC I3 uses: no widget carries them.
+			--
+			-- Two fields and not one, and the second is the whole point: the custom has to
+			-- survive the slot being pointed at something else. Reusing descFieldOf for the text
+			-- would work until the storyteller wrote a description for whatever took the slot
+			-- over, and then "always the last thing the user typed" would be a lie (SPEC C).
+			--
+			-- Per SLOT and never per list: background_1's custom is not background_2's, and
+			-- natureCustom is not demeanorCustom even though the two share one authored list by
+			-- identity (SPEC I102e, I129j). The scoping the user asked for falls out of the
+			-- derivation - there is no rule anywhere that says it.
+			function customFieldOf(field)
+				local f = descFieldOf(field);
+
+				if f == nil then return nil; end;
+
+				return (string.gsub(f, "Desc", "Custom", 1));
+			end;
+
+			function customDescFieldOf(field)
+				local f = customFieldOf(field);
+
+				if f == nil then return nil; end;
+
+				return (string.gsub(f, "Custom", "CustomDesc", 1));
+			end;
+
+			-- THE reader for a row's description, and the order lives here alone (SPEC I129k,
+			-- V381). Before this both readers - popOpen for the ? and mfSelect for the picker
+			-- pane - carried their own copy of it, which is the second copy that ages quietly
+			-- (SPEC V135).
+			--
+			--   1. `key` IS this slot's custom name        -> the text the player wrote for it
+			--   2. `key` IS what the slot holds right now  -> the storyteller's override
+			--   3. otherwise                               -> the book, descText
+			--   4. nothing on disk                         -> the sentence of V360c
+			--
+			-- Both of the first two hang on `key` and NOT on the slot's current value, and that
+			-- is what lets one order serve both readers. The ? asks about what the row HOLDS, so
+			-- key is the slot's value and steps 1 and 2 can fire. The picker asks about a
+			-- CANDIDATE, so while the player is looking at `Allies` neither the custom text nor
+			-- the storyteller's note for that row can leak into a description of Allies - and the
+			-- moment he marks the custom name, step 1 fires for it. An order written against
+			-- sheet[slot] instead would have shown the row's text under every candidate.
+			--
+			-- Empty falls THROUGH at every step, so clearing a box restores what was under it -
+			-- the behaviour popOpen already had for the override alone.
+			function descFor(slot, kind, key, sub, lang)
+				local txt = nil;
+
+				if sheet ~= nil and slot ~= nil and key ~= nil and key ~= "" then
+					local cf = customFieldOf(slot);
+
+					if cf ~= nil and sheet[cf] == key then txt = sheet[customDescFieldOf(slot)]; end;
+
+					if (txt == nil or txt == "") and sheet[slot] == key then
+						local df = descFieldOf(slot);
+
+						if df ~= nil then txt = sheet[df]; end;
+					end;
+				end;
+
+				if txt == nil or txt == "" then txt = descText(kind, key, sub, lang); end;
+				if txt == nil or txt == "" then txt = translateSheetText("No description available", lang); end;
+
+				return txt;
 			end;
 
 			-- The description block writes its own text, and gui.TextEditor has onChange and no
@@ -3080,7 +3180,7 @@
 			-- The three numbers, wherever they are drawn (SPEC I11): the Progress tab has all
 			-- three, the Main tab has the balance only. One is stored and two are worked out,
 			-- which is what stops any of them from disagreeing with the log (SPEC V100).
-			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true };
+			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true, edtTotalXPMain = true, edtSpentXPMain = true };
 
 			-- The painting itself. No xpQuiet here (SPEC V142): the flag exists to keep the
 			-- sheet's OWN writes from dragging a repaint along (SPEC V107), and a flag left
@@ -3111,6 +3211,7 @@
 				local box   = xpFind(node, XP_BOXES, {});
 
 				if box.edtTotalXP       ~= nil then box.edtTotalXP.text       = tostring(total); end;
+				if box.edtTotalXPMain   ~= nil then box.edtTotalXPMain.text   = tostring(total); end;
 
 				-- Spent is the one box whose lock moves (SPEC I44, V245). `== true` and not
 				-- truthiness: a sheet saved before this round answers nil and has to read as
@@ -3121,11 +3222,20 @@
 				-- lock on this sheet (SPEC V112, V162): a box that looks free and refuses the
 				-- key is the lie those two exist to stop. 0.75 because an edit is TEXT
 				-- (SPEC V244).
-				if box.edtSpentXP ~= nil then
-					local stEdit = (sheet.stEditSpentXP == true);
+				--
+				-- The Main copy of Spent takes the SAME dance and not a shortened one (SPEC I127c):
+				-- two views of one number that disagree about whether it is locked is the lie the
+				-- pair above exists to stop, and it would be the Main - the tab the player lives
+				-- on - that showed it unlocked.
+				local stEdit = (sheet.stEditSpentXP == true);
 
+				if box.edtSpentXP ~= nil then
 					box.edtSpentXP.text = tostring(spent);
 					box.edtSpentXP.readOnly = not stEdit; box.edtSpentXP.opacity = stEdit and 1 or 0.75;
+				end;
+				if box.edtSpentXPMain ~= nil then
+					box.edtSpentXPMain.text = tostring(spent);
+					box.edtSpentXPMain.readOnly = not stEdit; box.edtSpentXPMain.opacity = stEdit and 1 or 0.75;
 				end;
 				if box.edtCurrentXP     ~= nil then box.edtCurrentXP.text     = tostring(total - spent); end;
 				if box.edtCurrentXPMain ~= nil then box.edtCurrentXPMain.text = tostring(total - spent); end;
@@ -3918,8 +4028,22 @@
 				local txt = "";
 
 				if ok and type(DESC) == "table" then
-					if sub ~= nil and sub ~= "" then txt = DESC[sub .. "|" .. key]; end;
-					if txt == nil or txt == "" then txt = DESC[key] or ""; end;
+					-- The ENTRY is a TABLE keyed by language, and unwrapping it is not optional: every
+					-- desc module has been {name = {<lang> = text}} since I21, and the four panes in
+					-- WoD20.7/.12/.13/.14 have always read it through pick(tbl, lang) - `tbl[lang] or
+					-- tbl.en`. This reader did NOT, so DESC[key] handed back the TABLE itself: never
+					-- nil, never "", so it sailed straight past popOpen's own fallback and was assigned
+					-- to edtPopDesc.text. The ? box opened EMPTY and could not even fall to V360c's
+					-- sentence, because a table is neither nil nor "" - a wrong answer wearing the
+					-- clothes of a right one (SPEC B109, V368, V360c).
+					--
+					-- The file is ALREADY per language, so ent[lang] is the key the generator wrote and
+					-- ent.en is the same last resort pick() keeps.
+					local ent = nil;
+
+					if sub ~= nil and sub ~= "" then ent = DESC[sub .. "|" .. key]; end;
+					if ent == nil then ent = DESC[key]; end;
+					if type(ent) == "table" then txt = ent[lang] or ent.en or ""; end;
 				end;
 
 				return txt;
@@ -3962,11 +4086,11 @@
 				-- Without this read the write has no reader: he would type, close, reopen and find
 				-- the book text back, which is the feature erased sideways that I102i exists to
 				-- stop. Empty override falls through to the book, so clearing the box restores it.
-				local txt = "";
-				local own = nil;
-
-				if sheet ~= nil and row ~= nil and descFieldOf(row) ~= nil then own = sheet[descFieldOf(row)]; end;
-				if own ~= nil and own ~= "" then txt = own; else txt = descText(kind, key, sub, lang); end;
+				-- ONE reader, and the order lives in it (SPEC V381, I129k). What stood here was
+				-- popOpen's own two-step - override, else book - and mfDesc carried a one-step of
+				-- its own; descFor is now the only place either order is written, and it grew the
+				-- custom step in front without either caller learning about it (SPEC V135).
+				local txt = descFor(row, kind, key, sub, lang);
 
 				-- A list with no description module on disk falls to the SENTENCE, never to an
 				-- empty box: descText answers "" for a module that is not there (SPEC V364a), and
@@ -4062,7 +4186,7 @@
 			local MF = {
 				rows = 20, gen = 0, load = 0, page = 1, names = nil, hits = nil, pool = nil,
 				picked = nil, mark = 0, data = nil, field = nil, list = nil, mod = nil,
-				title = nil
+				title = nil, custom = false
 			};
 
 			-- Built once and kept: xpFind takes a ready table, and rebuilding twenty-nine keys on
@@ -4071,8 +4195,9 @@
 				if MF.names ~= nil then return MF.names; end;
 
 				local n = { mfSearch = true, popScrim = true, dynMfTitle = true, edtMfQuery = true,
-					lblMfLoading = true, btnMfOk = true, btnMfPrev = true, btnMfNext = true,
-					lblMfPage = true, edtMfDesc = true };
+					lblMfLoading = true, btnMfOk = true, btnMfPrev = true, btnMfNext = true, btnMfRemove = true,
+					lblMfPage = true, edtMfDesc = true, btnMfCustom = true, lblMfCustomName = true,
+					edtMfCustomName = true };
 
 				for i = 1, MF.rows, 1 do n["dynMfRow_" .. i] = true; end;
 
@@ -4158,6 +4283,20 @@
 						end;
 					end;
 				end;
+
+				-- SPEC I121/V369. Painted OUTSIDE the row loop above and never from MF.hits: total
+				-- and pages are worked out from the pool, which no longer carries the blank, so the
+				-- page still offers the 20 names I107k declares - not 19.
+				if found["btnMfRemove"] ~= nil then
+					found["btnMfRemove"].text = mfShown("", lang);
+					found["btnMfRemove"].visible = MF.canRemove == true;
+				end;
+
+				-- Always on, filled row or empty (SPEC I129b, V379c): removing needs something to
+				-- remove, customising needs nothing. Its TEXT is written once in mfOpen and not
+				-- here - it is a fixed label, not one of the names, and mfShown is the only thing
+				-- allowed to build what a NAME reads as (SPEC V355a).
+				if found["btnMfCustom"] ~= nil then found["btnMfCustom"].visible = true; end;
 
 				if found["lblMfPage"] ~= nil then
 					found["lblMfPage"].text = MF.page .. " / " .. pages .. "     -     " .. total;
@@ -4302,6 +4441,10 @@
 				MF.hits = nil;
 				MF.pool = nil;
 				MF.data = nil;
+				-- The box opens on the LIST, never in custom mode (SPEC I129d): custom is a state
+				-- of the open box and not of the row, so leaving it set would open the next row
+				-- with the previous row's Name showing.
+				MF.custom = false;
 				MF.gen = MF.gen + 1;
 
 				-- SPEC I113a: the title is DERIVED from the list and not looked up in a roster that
@@ -4309,6 +4452,17 @@
 				-- back the three strings the .lang already carries, and the SAME string is the button's
 				-- fallback when the row is cleared (I107a2, V15).
 				MF.title = "Select " .. string.upper(string.sub(list, 1, 1)) .. string.sub(list, 2);
+
+				mfCustomPane(found, false);
+
+				-- The Custom line's label, written ONCE per opening. It is a fixed string and not
+				-- one of the names, so it does not go through mfShown and it has no business being
+				-- rebuilt on every repaint (SPEC I129c, V355a).
+				if found["btnMfCustom"] ~= nil then
+					local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+
+					found["btnMfCustom"].text = translateSheetText("-- Custom --", lang);
+				end;
 
 				mfArm(found, false);
 
@@ -4360,6 +4514,11 @@
 					local cur = (sheet ~= nil) and sheet[MF.field] or nil;
 					local has = cur ~= nil and cur ~= "";
 
+					-- SPEC I121a/V369b: what the row is holding decides whether removal is OFFERED, and
+					-- that is now a flag instead of an entry in the pool. An empty row has nothing to
+					-- clear, so it gets no remove line at all (V369d).
+					MF.canRemove = has;
+
 					MF.pool = {};
 
 					if MF.list == "merit" or MF.list == "flaw" then
@@ -4369,7 +4528,7 @@
 
 						-- meritData is a map of NAMES and carries no blank of its own, so the way out of a
 						-- merit row has to be put here or the row could be changed and never emptied.
-						if has then MF.pool[#MF.pool + 1] = ""; end;
+						-- the blank left the pool in T856: it is btnMfRemove now (SPEC I121b, V369a).
 						if MF.data ~= nil then for nm in pairs(MF.data) do MF.pool[#MF.pool + 1] = nm; end; end;
 					else
 						local vals = PICKER_LIST[MF.list];
@@ -4379,7 +4538,7 @@
 						-- when it does (user 2026-08-29).
 						if vals ~= nil then
 							for i = 1, #vals, 1 do
-								if vals[i] ~= "" or has then MF.pool[#MF.pool + 1] = vals[i]; end;
+								if vals[i] ~= "" then MF.pool[#MF.pool + 1] = vals[i]; end;
 							end;
 						end;
 					end;
@@ -4406,6 +4565,18 @@
 
 					mfFilter(from);
 
+					-- SPEC I122a/I122b, pedido 2 do user 2026-08-30. A row that already HOLDS something
+					-- opens marked on it, so the pane carries its text from the first frame and the player
+					-- can re-read what he picked without picking something else first. Marked is not
+					-- WRITTEN: this touches MF, never the field, and closing without OK changes nothing
+					-- (I122b, V333e). mfArm follows because a marked box is a box whose OK means something.
+					if has then
+						MF.picked = cur;
+
+						mfDesc(f2, cur);
+						mfArm(f2, true);
+					end;
+
 					-- SPEC I111c / Q28 / T804: the cursor lands in the field, so the box can be opened
 					-- and typed into with no click in between. LAST in the timer on purpose - after
 					-- the list is painted and long after mfSearch was shown - because asking focus
@@ -4426,6 +4597,107 @@
 				end, 1);
 			end;
 
+			-- SPEC I112d / I122a / I122c / V368. The ONE place the description pane is written.
+			-- THREE callers reach it and V135 is about one WRITER, not one entrance: the opening
+			-- (pre-marked on what the row already holds, I122a), a result row (mfSelect) and the
+			-- remove line (mfRemove, I122c). Before T857 the painting lived inside mfSelect, so
+			-- the box opened with an EMPTY pane on a row that already had a value - the player
+			-- could not re-read what he had picked without picking something else first.
+			--
+			-- The module is already in package.loaded - mfOpen's timer required it - so this costs
+			-- a table lookup and not a parse (I112e), and the key is built by descText, never here.
+			-- The pane's two states, in ONE place (SPEC I129d). `on` lights the Name row and drops
+			-- the description under it; `off` puts it back where it was authored. Two panes would
+			-- be two owners of the same text (SPEC V135).
+			--
+			-- The pane is writable only while custom is marked, and then for ANY player - the
+			-- custom is HIS. That is the one place this parts company with I102i, where the ?
+			-- opens for the storyteller alone because the text there describes the BOOK.
+			function mfCustomPane(found, on)
+				if found == nil then return; end;
+
+				if found["lblMfCustomName"] ~= nil then found["lblMfCustomName"].visible = on; end;
+				if found["edtMfCustomName"] ~= nil then found["edtMfCustomName"].visible = on; end;
+
+				if found["edtMfDesc"] ~= nil then
+					found["edtMfDesc"].top = on and 130 or 76;
+					found["edtMfDesc"].height = on and 495 or 549;
+					-- readOnly and opacity on the SAME line, like every other runtime lock on the
+					-- sheet (SPEC V112, V162, B104): a pane that looks writable and refuses the key
+					-- is the lie those two exist to stop.
+					found["edtMfDesc"].readOnly = not on; found["edtMfDesc"].opacity = on and 1 or 0.75;
+				end;
+			end;
+
+			-- Clicking the Custom line (SPEC I129d/I129i, ask 12). It MARKS, exactly as clicking a
+			-- name does - nothing is written until OK (SPEC V333e, I122b) - and it brings back
+			-- what this slot was given last time, name and text, even when the slot is pointing at
+			-- a book entry right now. That is what "choosing custom again always shows what was
+			-- typed" means, and it is why the pair does not live in the slot itself.
+			function mfCustom(from)
+				if from == nil then return; end;
+
+				local found = {};
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				MF.custom = true;
+				MF.picked = nil;
+				MF.mark = 0;
+
+				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local nm = "";
+				local tx = "";
+
+				if sheet ~= nil and MF.field ~= nil then
+					nm = sheet[customFieldOf(MF.field)] or "";
+					tx = sheet[customDescFieldOf(MF.field)] or "";
+				end;
+
+				-- The starting text is EDITABLE prose and not the sentence of V360c: that one is a
+				-- label for absence, and this box is not absent, it is empty and waiting.
+				if tx == "" then tx = translateSheetText("custom description", lang); end;
+
+				mfCustomPane(found, true);
+
+				if found["edtMfCustomName"] ~= nil then found["edtMfCustomName"].text = nm; end;
+
+				mfDesc(found, nil, tx);
+				mfArm(found, true);
+			end;
+
+			-- STILL the one writer of the pane (SPEC V372a). `own` is the custom prose, which does
+			-- not come out of descFor and has nowhere else to come from; handing it in here beats
+			-- letting mfCustom write the control itself, which would make the pane's text two
+			-- people's business.
+			function mfDesc(found, name, own)
+				if found == nil or found["edtMfDesc"] == nil then return; end;
+
+				-- Marking a NAME leaves the custom state (SPEC I129d): the Name row goes dark and
+				-- the pane goes back to read-only, or the player would be typing into a book entry.
+				-- Not when the custom prose is what is being handed in - that IS the custom state.
+				if own == nil then
+					MF.custom = false;
+					mfCustomPane(found, false);
+				end;
+
+				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local txt = "";
+
+				-- ONE reader, and the order lives in it (SPEC V381, I129k). This used to call
+				-- descText straight and popOpen kept its own two-step above it - two copies of an
+				-- order that has to agree, which is the second copy that ages quietly (SPEC V135).
+				--
+				-- SPEC V360c / I116c is the LAST step inside descFor. A list with no module in disk
+				-- SAYS so: a pane left blank cannot tell "the book does not carry this" from "the
+				-- sheet broke", which is the lie I107m exists to stop. `speciality` will never have
+				-- a module (Q33) - a permanent state, not a gap waiting to close.
+				if own ~= nil then txt = own;
+				elseif name ~= nil and name ~= "" then txt = descFor(MF.field, MF.mod, name, MF.list, lang); end;
+				if txt == nil or txt == "" then txt = translateSheetText("No description available", lang); end;
+
+				found["edtMfDesc"].text = txt;
+			end;
+
 			-- I107l: CHOOSING IS NOT ACCEPTING. One click MARKS and writes nothing.
 			function mfSelect(from, idx)
 				if from == nil or idx == nil then return; end;
@@ -4443,24 +4715,33 @@
 				MF.picked = name;
 				MF.mark = idx;
 
-				-- SPEC I112d/I112f: the pane shows the MARKED row and nothing else. The module is
-				-- already in package.loaded - mfOpen's timer required it - so this costs a table
-				-- lookup and not a parse (I112e), and the key is built by descText, never here.
-				if found["edtMfDesc"] ~= nil then
-					local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				-- SPEC I112d/I112f: the pane shows the MARKED row and nothing else - through mfDesc,
+				-- which the opening and the remove line share (I122, V135).
+				mfDesc(found, name);
 
-					local txt = descText(MF.mod, name, MF.list, lang);
+				mfArm(found, true);
+			end;
 
-					-- SPEC V360c / I116c. A list with no module in disk SAYS so. A pane left blank
-					-- cannot tell "the book does not carry this" from "the sheet broke", which is the
-					-- lie I107m exists to stop, on a new target. MEASURED 2026-08-30: six of the
-					-- sixteen lists have a module, and `speciality` will NEVER have one - the user
-					-- ruled it out on the 30th (SPEC R135, C 146th) - so this is the permanent state
-					-- of that list, not a gap waiting to close.
-					if txt == nil or txt == "" then txt = translateSheetText("No description available", lang); end;
+			-- SPEC I121d/V369. Marking the way out. The blank is a real CHOICE - mfConfirm reads ""
+			-- as "clear the row" and always has - so this marks exactly the way a result row marks.
+			-- What it cannot do is go through mfSelect: that one reads MF.hits by page index, and
+			-- this line has no index because it was never in the pool (SPEC I121b).
+			function mfRemove(from)
+				if from == nil or MF.canRemove ~= true then return; end;
 
-					found["edtMfDesc"].text = txt;
-				end;
+				local found = {};
+
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				MF.picked = "";
+				MF.mark = 0;
+
+				-- SPEC I122c. The remove line has no description of its OWN, and falling to V360c's
+				-- sentence here would say "the book does not carry this" about something that is not
+				-- an item at all. It shows what is in the SLOT right now - which is exactly what the
+				-- player is about to throw away. The slot always has one: an empty row is offered no
+				-- remove line (I121a, V369d).
+				mfDesc(found, (sheet ~= nil) and sheet[MF.field] or nil);
 
 				mfArm(found, true);
 			end;
@@ -4473,6 +4754,36 @@
 				-- The empty item is a real CHOICE, not "nothing marked": nil is unmarked, "" is the
 				-- blank first entry V15 puts at the head of every prose list, and picking it CLEARS
 				-- the row. Refusing it would leave the box offering an item that does nothing.
+				-- Confirming with the Custom line marked (SPEC I129h, ask 12). The typed name goes
+				-- into the slot's own field, exactly as any other choice does, so it becomes an
+				-- ORPHAN of the list and V200/V346b hands it back as an item next time the box
+				-- opens - no second write path is born. The pair beside it is what makes the
+				-- custom survive the slot being pointed somewhere else (SPEC I129i).
+				--
+				-- An empty name is NOT a confirm: it would write "" and silently mean remove,
+				-- which is the one mistake with no undo (SPEC V369c).
+				if MF.field == nil then return; end;
+
+				if MF.custom then
+					local found = {};
+					xpFind(tabRootOf(from), mfNames(), found);
+
+					local nm = "";
+					local tx = "";
+
+					if found["edtMfCustomName"] ~= nil then nm = found["edtMfCustomName"].text or ""; end;
+					if found["edtMfDesc"] ~= nil then tx = found["edtMfDesc"].text or ""; end;
+
+					if nm == "" then return; end;
+
+					setField(customFieldOf(MF.field), nm);
+					setField(customDescFieldOf(MF.field), tx);
+					setField(MF.field, nm);
+					mfClose(from);
+
+					return;
+				end;
+
 				if MF.picked == nil or MF.field == nil then return; end;
 
 				setField(MF.field, MF.picked);
@@ -4844,6 +5155,59 @@
 				end;
 
 				renderClanDiscLock(from);
+			end;
+
+			-- How wide the ROAD label's TEXT is, per language (SPEC I128d, V380, T864, user
+			-- 2026-08-31 ask 6). ONE number each, and the two lefts are DERIVED from it below:
+			-- storing both positions would be four numbers for two facts, and the second to go
+			-- stale would go quietly.
+			--
+			-- The pair used to be a label pinned at left=20 with width=80 and a combo at 105, so
+			-- `ROAD` hugged x=100 with forty pixels of nothing to its left - which is what the
+			-- user read as "shifted right". There was no centring to fix; there was none at all.
+			--
+			-- The values are the V312 ruler at 6.5px per char - 4 chars for ROAD, 7 for CAMINHO -
+			-- and that ruler is a CEILING, not a measurement (SPEC V312b, I128e). A ceiling used
+			-- to CENTRE errs to one side, so these two numbers are the SCREEN's to settle. They
+			-- are safe in the meantime: a label wider than its text cannot clip it.
+			--
+			-- There is no text-measuring API on this sheet and I114i already found that reading
+			-- ctrl.width from Lua is unmeasured - so measuring at runtime would be a new mechanism
+			-- bought for precision the screen gives away.
+			ROAD_LABEL_W = { en = 26, pt = 46 };
+
+			-- The interior of the ROAD box is 20..310, so 290 wide, and the control is 205 with a
+			-- 5px gap to the label - the gap every other pair on the sheet uses.
+			--
+			-- The label KEEPS its authored text= and its .lang key: the WoD20.6 traversal owns the
+			-- TEXT and this owns only the geometry, which is why it is not named dyn* - that
+			-- prefix is about text being overwritten, not about position (SPEC V31, I128f). The
+			-- geometry reads sheet.language and never the rendered string, so the two can run in
+			-- either order.
+			--
+			-- The control's width is the LITERAL 205 and not a read of ctrl.width: I114i measured
+			-- that reading a control's width from Lua has no precedent here and was never proven,
+			-- and a silent nil would put the pair at a nonsense left. The cost is that wave 5 of
+			-- I113e - which turns cboRoad into a picker button - has to move this number in the
+			-- same commit that changes the control (SPEC I128g). That is exactly what V380(e)
+			-- reads the control's TYPE from source to catch: B94 is the same promise losing its
+			-- guard when a widget changed type.
+			function renderRoadPair(from)
+				if sheet == nil or from == nil then return; end;
+
+				local found = xpFind(tabRootOf(from), { lblRoad = true, cboRoad = true }, {});
+				local lbl   = found["lblRoad"];
+				local ctrl  = found["cboRoad"];
+
+				if lbl == nil or ctrl == nil then return; end;
+
+				local w = ROAD_LABEL_W[sheet.language or "en"] or ROAD_LABEL_W["en"];
+				local cw = 205;
+				local left = 20 + math.floor((290 - (w + 5 + cw)) / 2);
+
+				lbl.width = w;
+				lbl.left  = left;
+				ctrl.left = left + w + 5;
 			end;
 
 			function renderSpecialities(from)
@@ -5312,6 +5676,176 @@
 
 		<layout name="tabStoryteller" align="client" visible="false">
 			<import file="WoD20.10.lfm"/>
+		</layout>
+
+		<!--
+			The ? box, the search box, and the scrim that closes them (SPEC I102, I107c, T760).
+
+			They live HERE, on sheetBody, and not on a tab. A tab layout is visible="false"
+			whenever the player is somewhere else, and a child of an invisible parent is invisible
+			no matter what its own flag says - so a box parented to Traits and opened from the ?
+			on Main simply did not appear, and was found later sitting open on Traits. They were
+			also inside that tab's scrollBox, which scrolled the overlay along with the grid it is
+			supposed to float over. Neither symptom is reachable from here: sheetBody is the one
+			parent every tab shares (SPEC B107, I102a).
+
+			Nothing in Lua changed for the move. popOpen and mfOpen already walk from
+			tabRootOf(from) - the top of the whole form - so they find these controls from any tab
+			(SPEC B9). One box per sheet stays one box per sheet: a copy per tab would be eleven
+			owners of one text, which is exactly what V135 refuses.
+
+			Authored LAST in sheetBody because file order is paint order: after every tab layout
+			means over whichever tab is showing. The scrim comes first of the three for the same
+			reason - it has to sit between the tabs and the boxes, so a click that misses a box
+			lands on the scrim and on nothing else (SPEC I102a, V333b).
+
+			The tops are 40 higher than they were: sheetBody's origin sits above the 40px tabStrip,
+			while a tab layout's origin sits below it. The scrim is 1595x733 - the strip plus the
+			693 the grid covers - so a click anywhere outside the box closes it, the tab strip
+			included. It is sized rather than align=client because a second child claiming the
+			client rect is what V190 refuses. Fully transparent: a hit target, not a tint, and the
+			ONE way a click outside closes the box. There is no second closer - the X and the
+			scrim both call popClose (SPEC V333e).
+
+			popDesc is NOT a section box. It wears the same black rectangle every box wears, so the
+			V280/V298 collector would sweep it up, and a floating overlay has no neighbour to be 5px
+			from - it is excluded there BY NAME, the way cboRoad is named in V328c (SPEC I73, I76a).
+		-->
+		<rectangle name="popScrim" left="0" top="0" width="1680" height="733" color="#00000000" visible="false" onClick="popClose(self);"/>
+
+		<layout name="popDesc" left="440" top="150" width="500" height="500" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+
+			<!-- Named dyn* so the language traversal in WoD20.6 leaves it alone: the title is the
+			     canonical EN name Lua writes, and a traversal that snapshots authored text would
+			     restore a stale one over it (SPEC I108a, V31). -->
+			<label name="dynPopDescTitle" left="20" top="20" width="380" height="20" horzTextAlign="center"/>
+			<button name="btnFontDownPop" left="410" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+			<button name="btnFontUpPop" left="435" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
+			<button name="btnPopClose" left="460" top="20" width="20" height="20" text="X" onClick="popClose(self);"/>
+
+			<!-- wordWrap is what kills the horizontal scrollbar the user asked not to see: there is
+			     no scroll property on this control in SDK3, so the only way to have no horizontal
+			     bar is to give it nothing to scroll (SPEC I102c, V333f). -->
+			<textEditor name="edtPopDesc" left="20" top="45" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePopDesc(self);"/>
+		</layout>
+
+		<!--
+			SPEC I107c/I107d/I107l/I107m, T789 - the PROBE SLICE of the merit/flaw search box.
+
+			This is the REAL box with ONE result row instead of twenty and no paging, which is what
+			T789 asks for: every control is named and shaped as I107 declares, so T784 GROWS this
+			rather than replacing it. What the probe still owes the screen is FIRING, not existence -
+			I107n1 already settled the names against the compiler: `onDoubleClick` is REJECTED by rdk
+			(exit 1, empty message, .rpk deleted - the B80 mode), `onDblClick` compiles, and <edit>
+			takes onChange.
+
+			ONE line here is throwaway and it is btnMfProbe, the opener: I107b opens from the NAME
+			button of the row, and that button belongs to MeritPicked (T783), which may NOT be built
+			before this probe answers. It sits in the 66px the column leaves free under FLAWS
+			(y=627..693), so it displaces nothing.
+
+			dynMfProbe is the instrument: mfFilter COUNTS its own calls into it, because "did it fire
+			per keystroke" is not a question the eye can answer off a filtered list of one.
+		-->
+
+
+		<layout name="mfSearch" left="300" top="80" width="1000" height="645" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+
+			<label name="dynMfTitle" left="60" top="20" width="400" height="20" horzTextAlign="center"/>
+			<!-- SPEC I112c, T806 - edtMfDesc is the NINTH pane of I103c, so it carries its own zoom
+			     pair and obeys descFontSize like the other eight. The pair is named off the pane's
+			     own name with edt/ and /Desc stripped, which is the suffix V334b derives. -->
+			<button name="btnFontDownMf" left="890" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+			<button name="btnFontUpMf" left="915" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
+			<button name="btnMfClose" left="960" top="20" width="20" height="20" text="X" onClick="mfClose(self);"/>
+
+			<edit name="edtMfQuery" left="20" top="50" width="480" height="24" onChange="mfConfirm(self);" onKeyUp="mfKey(self);"/>
+			<label name="lblMfLoading" left="20" top="82" width="480" height="20"/>
+
+			<!-- SPEC I121/V369, pedido 1 do user 2026-08-30. The way OUT of the row, and it is NOT
+			     one of the paged results. It never enters MF.pool or MF.hits, so it does not spend
+			     one of the 20 slots I107k promises and it is on page 2 exactly as it is on page 1.
+			     Before this it rode INSIDE the pool: it sorted with the names, paged with them and
+			     simply did not exist past the first page - on a filled row whose only way out it
+			     was. Its top is 25 above the first result against a 20px row pitch, so the gap is
+			     VISIBLE: flush against the list it reads as one more option, and emptying a row by
+			     accident is the mistake with no undo (V369c). Text comes from mfShown("") in both
+			     languages, so no new string is born (V369e). -->
+			<button name="btnMfRemove" left="20" top="106" width="480" height="20" visible="false" onClick="mfRemove(self);" onDblClick="mfConfirm(self);"/>
+			<!-- SPEC I129a/I129b/V379, user 2026-08-31 asks 12 and 13. The SECOND fixed line, and
+			     the reason the typed rows could go: it is the only way to put a name of your own
+			     in a slot now that every family is a picker (SPEC I130).
+
+			     Fixed like btnMfRemove and for the same reason - out of MF.pool, out of MF.hits,
+			     out of the total and the page count - so the page still offers the twenty names
+			     I107k promises rather than nineteen.
+
+			     Where it DIFFERS from remove: it is visible ALWAYS, on a filled row and an empty
+			     one alike. Removing needs something to remove; customising needs nothing. It sits
+			     BELOW remove and above the first result, 25 under a 20px row pitch, so the gap
+			     reads as a separation and not as one more option.
+
+			     The label is a string of its OWN and not mfShown("") - remove could borrow the
+			     empty value's label because V15 already gave it one in both languages, and there
+			     is no empty value here to borrow from (SPEC I129c, V369e). -->
+			<button name="btnMfCustom" left="20" top="131" width="480" height="20" onClick="mfCustom(self);" onDblClick="mfConfirm(self);"/>
+
+			<button name="dynMfRow_1" left="20" top="156" width="480" height="20" visible="false" onClick="mfSelect(self, 1);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_2" left="20" top="176" width="480" height="20" visible="false" onClick="mfSelect(self, 2);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_3" left="20" top="196" width="480" height="20" visible="false" onClick="mfSelect(self, 3);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_4" left="20" top="216" width="480" height="20" visible="false" onClick="mfSelect(self, 4);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_5" left="20" top="236" width="480" height="20" visible="false" onClick="mfSelect(self, 5);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_6" left="20" top="256" width="480" height="20" visible="false" onClick="mfSelect(self, 6);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_7" left="20" top="276" width="480" height="20" visible="false" onClick="mfSelect(self, 7);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_8" left="20" top="296" width="480" height="20" visible="false" onClick="mfSelect(self, 8);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_9" left="20" top="316" width="480" height="20" visible="false" onClick="mfSelect(self, 9);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_10" left="20" top="336" width="480" height="20" visible="false" onClick="mfSelect(self, 10);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_11" left="20" top="356" width="480" height="20" visible="false" onClick="mfSelect(self, 11);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_12" left="20" top="376" width="480" height="20" visible="false" onClick="mfSelect(self, 12);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_13" left="20" top="396" width="480" height="20" visible="false" onClick="mfSelect(self, 13);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_14" left="20" top="416" width="480" height="20" visible="false" onClick="mfSelect(self, 14);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_15" left="20" top="436" width="480" height="20" visible="false" onClick="mfSelect(self, 15);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_16" left="20" top="456" width="480" height="20" visible="false" onClick="mfSelect(self, 16);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_17" left="20" top="476" width="480" height="20" visible="false" onClick="mfSelect(self, 17);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_18" left="20" top="496" width="480" height="20" visible="false" onClick="mfSelect(self, 18);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_19" left="20" top="516" width="480" height="20" visible="false" onClick="mfSelect(self, 19);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_20" left="20" top="536" width="480" height="20" visible="false" onClick="mfSelect(self, 20);" onDblClick="mfConfirm(self);"/>
+
+			<button name="btnMfPrev" left="20" top="564" width="80" height="24" text="&lt;" onClick="mfPage(self, -1);"/>
+			<label name="lblMfPage" left="110" top="564" width="300" height="24" horzTextAlign="center"/>
+			<button name="btnMfNext" left="420" top="564" width="80" height="24" text="&gt;" onClick="mfPage(self, 1);"/>
+
+			<button name="btnMfOk" left="390" top="601" width="110" height="24" text="OK" enabled="false" onClick="mfConfirm(self);"/>
+
+			<!-- SPEC I112a/I112b/I112g, Q29 - the description pane. CHILD of mfSearch and not a
+			     sibling: a sibling would be a second closing point and the text would outlive the
+			     box mfClose hides (V135). The result column does not move one pixel - the box grew
+			     to the RIGHT and the pane took the new ground. wordWrap is what kills the horizontal
+			     bar here for the same reason it does on edtPopDesc, and there is no field: what
+			     leaks to the NDB from the panes is the SIZE, never the text (V29, V334d). -->
+			<!-- SPEC I116a/V360a/V360b, pedido 3 do user 2026-08-30. The right half stops being empty
+			     space: a rule divides it from the list and a heading names it.
+
+			     The DIVIDER is a sibling of the pane and not a border on it, and that is the point -
+			     a border decorates one control, a rule SEPARATES two. It stands at 510, the middle of
+			     the 20px gutter between the result column (20..500) and the pane (520..980).
+
+			     The heading is a <label> like every other visible string, so V10 reaches it and the
+			     .lang carries `Description` / `Descricao` in both languages. Spelling it in the XML
+			     without the [pt] pair is the half-translated sheet V10 refuses. -->
+			<rectangle name="mfDescRule" left="510" top="50" width="1" height="575" color="#00000000" strokeColor="white" hitTest="false"/>
+			<label name="lblMfDescTitle" left="520" top="50" width="460" height="20" text="Description" horzTextAlign="center"/>
+			<!-- SPEC I129d, asks 12 and 13. The pane has TWO states and stays ONE pane: with
+			     the Custom line marked these two light up and edtMfDesc drops to top=130; with it
+			     unmarked they go dark and the pane goes back to 76/549. Two panes would be two
+			     owners of the same text (SPEC V135).
+			     Both are born hidden: the box opens on a book entry far more often than on a
+			     custom one, and what is authored is the common case. -->
+			<label name="lblMfCustomName" left="520" top="76" width="460" height="20" text="Name" visible="false"/>
+			<edit name="edtMfCustomName" left="520" top="100" width="460" height="24" visible="false"/>
+			<textEditor name="edtMfDesc" left="520" top="76" width="460" height="549" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 	</layout>
 

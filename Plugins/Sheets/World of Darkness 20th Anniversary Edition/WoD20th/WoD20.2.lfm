@@ -83,12 +83,6 @@
 			<edit left="401" top="0" width="45" height="24" field="type_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 			<edit left="446" top="0" width="50" height="24" field="costy_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 		</template>
-		<template name="MeritFree">
-			<edit left="20" top="0" width="264" height="24" field="merit_$(num)"/>
-			<edit left="284" top="0" width="117" height="24" field="book_$(num)"/>
-			<edit left="401" top="0" width="45" height="24" field="type_$(num)" horzTextAlign="center"/>
-			<edit left="446" top="0" width="50" height="24" field="costy_$(num)" horzTextAlign="center"/>
-		</template>
 		<!--
 			PILOT of SPEC I113 (Q30, T808) - the first family to lose its dropdown for the search
 			box. The row keeps its x and its five dots; what changed is the entry: a visible
@@ -125,14 +119,6 @@
 			No comment lives INSIDE the template - one there makes rdk -l exit 1 with no message and
 			delete the .rpk (SPEC B19, the fifth door, 85th round).
 		-->
-		<template name="OpenAbilityFreeRow">
-			<edit name="edt$(field)" left="20" top="0" width="170" height="25" fontSize="12" field="$(field)"/>
-			<imageCheckBox left="195" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="220" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="245" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="270" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="295" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
-		</template>
 
 		<!-- The storyteller's backgrounds moved here from the Main tab in the 46th round
 		     (SPEC I3, V145): to the LEFT of the merit table, bottom flush with RESOURCES at
@@ -199,19 +185,19 @@
 				<OpenAbility field="background_16"/>
 			</layout>
 			<layout left="20" top="521" width="320" height="25" >
-				<OpenAbilityFreeRow field="background_17"/>
+				<OpenAbility field="background_17"/>
 			</layout>
 			<layout left="20" top="551" width="320" height="25" >
-				<OpenAbilityFreeRow field="background_18"/>
+				<OpenAbility field="background_18"/>
 			</layout>
 			<layout left="20" top="581" width="320" height="25" >
-				<OpenAbilityFreeRow field="background_19"/>
+				<OpenAbility field="background_19"/>
 			</layout>
 			<layout left="20" top="611" width="320" height="25" >
-				<OpenAbilityFreeRow field="background_20"/>
+				<OpenAbility field="background_20"/>
 			</layout>
 			<layout left="20" top="641" width="320" height="25" >
-				<OpenAbilityFreeRow field="background_21"/>
+				<OpenAbility field="background_21"/>
 			</layout>
 		</layout>
 
@@ -246,16 +232,16 @@
 				<MeritPicked sub="merit" num="m6" lbl="Select Merit"/>
 			</layout>
 			<layout left="20" top="216" width="496" height="25" >
-				<MeritFree num="m7"/>
+				<MeritPicked sub="merit" num="m7" lbl="Select Merit"/>
 			</layout>
 			<layout left="20" top="241" width="496" height="25" >
-				<MeritFree num="m8"/>
+				<MeritPicked sub="merit" num="m8" lbl="Select Merit"/>
 			</layout>
 			<layout left="20" top="266" width="496" height="25" >
-				<MeritFree num="m9"/>
+				<MeritPicked sub="merit" num="m9" lbl="Select Merit"/>
 			</layout>
 			<layout left="20" top="291" width="496" height="25" >
-				<MeritFree num="m10"/>
+				<MeritPicked sub="merit" num="m10" lbl="Select Merit"/>
 			</layout>
 		</layout>
 
@@ -288,16 +274,16 @@
 				<MeritPicked sub="flaw" num="f6" lbl="Select Flaw"/>
 			</layout>
 			<layout left="20" top="216" width="496" height="25" >
-				<MeritFree num="f7"/>
+				<MeritPicked sub="flaw" num="f7" lbl="Select Flaw"/>
 			</layout>
 			<layout left="20" top="241" width="496" height="25" >
-				<MeritFree num="f8"/>
+				<MeritPicked sub="flaw" num="f8" lbl="Select Flaw"/>
 			</layout>
 			<layout left="20" top="266" width="496" height="25" >
-				<MeritFree num="f9"/>
+				<MeritPicked sub="flaw" num="f9" lbl="Select Flaw"/>
 			</layout>
 			<layout left="20" top="291" width="496" height="25" >
-				<MeritFree num="f10"/>
+				<MeritPicked sub="flaw" num="f10" lbl="Select Flaw"/>
 			</layout>
 		</layout>
 
@@ -379,125 +365,6 @@
 
 			<!-- ponytail: the plain "other" field name is already owned by WoD20.3.lfm sheet-wide; renamed to bgOther per SPEC V1 -->
 			<textEditor left="35" top="41" width="155" height="125" field="bgOther"/>
-		</layout>
-
-		<!--
-			The ? box and the scrim that closes it (SPEC I102, T760). Both are authored LAST
-			in the file because file order is paint order, and an overlay written before the grid
-			would be painted under it. The scrim comes first of the TWO for the same reason: it has
-			to sit between the grid and the box, so a click that misses the box lands on the scrim
-			and on nothing else (SPEC I102a, V333b).
-
-			The scrim is sized to the grid rather than align=client: the backdrop image already
-			holds the client rect of this scrollBox, and two children claiming one rect is what
-			V190 refuses. 1595x693 is what the grid actually covers. It is fully transparent - a
-			hit target and not a tint - and
-			it is the ONE way a click outside closes the box. There is no second closer: the X and
-			the scrim both call popClose (SPEC V333e).
-
-			popDesc is NOT a section box. It wears the same black rectangle every box wears, so the
-			V280/V298 collector would sweep it up, and a floating overlay has no neighbour to be 5px
-			from - it is excluded there BY NAME, the way cboRoad is named in V328c (SPEC I73, I76a).
-		-->
-		<rectangle name="popScrim" left="0" top="0" width="1595" height="693" color="#00000000" visible="false" onClick="popClose(self);"/>
-
-		<layout name="popDesc" left="440" top="110" width="500" height="500" visible="false">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-
-			<!-- Named dyn* so the language traversal in WoD20.6 leaves it alone: the title is the
-			     canonical EN name Lua writes, and a traversal that snapshots authored text would
-			     restore a stale one over it (SPEC I108a, V31). -->
-			<label name="dynPopDescTitle" left="20" top="20" width="380" height="20" horzTextAlign="center"/>
-			<button name="btnFontDownPop" left="410" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
-			<button name="btnFontUpPop" left="435" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
-			<button name="btnPopClose" left="460" top="20" width="20" height="20" text="X" onClick="popClose(self);"/>
-
-			<!-- wordWrap is what kills the horizontal scrollbar the user asked not to see: there is
-			     no scroll property on this control in SDK3, so the only way to have no horizontal
-			     bar is to give it nothing to scroll (SPEC I102c, V333f). -->
-			<textEditor name="edtPopDesc" left="20" top="45" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePopDesc(self);"/>
-		</layout>
-
-		<!--
-			SPEC I107c/I107d/I107l/I107m, T789 - the PROBE SLICE of the merit/flaw search box.
-
-			This is the REAL box with ONE result row instead of twenty and no paging, which is what
-			T789 asks for: every control is named and shaped as I107 declares, so T784 GROWS this
-			rather than replacing it. What the probe still owes the screen is FIRING, not existence -
-			I107n1 already settled the names against the compiler: `onDoubleClick` is REJECTED by rdk
-			(exit 1, empty message, .rpk deleted - the B80 mode), `onDblClick` compiles, and <edit>
-			takes onChange.
-
-			ONE line here is throwaway and it is btnMfProbe, the opener: I107b opens from the NAME
-			button of the row, and that button belongs to MeritPicked (T783), which may NOT be built
-			before this probe answers. It sits in the 66px the column leaves free under FLAWS
-			(y=627..693), so it displaces nothing.
-
-			dynMfProbe is the instrument: mfFilter COUNTS its own calls into it, because "did it fire
-			per keystroke" is not a question the eye can answer off a filtered list of one.
-		-->
-
-
-		<layout name="mfSearch" left="300" top="40" width="1000" height="620" visible="false">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-
-			<label name="dynMfTitle" left="60" top="20" width="400" height="20" horzTextAlign="center"/>
-			<!-- SPEC I112c, T806 - edtMfDesc is the NINTH pane of I103c, so it carries its own zoom
-			     pair and obeys descFontSize like the other eight. The pair is named off the pane's
-			     own name with edt/ and /Desc stripped, which is the suffix V334b derives. -->
-			<button name="btnFontDownMf" left="890" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
-			<button name="btnFontUpMf" left="915" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
-			<button name="btnMfClose" left="960" top="20" width="20" height="20" text="X" onClick="mfClose(self);"/>
-
-			<edit name="edtMfQuery" left="20" top="50" width="480" height="24" onChange="mfConfirm(self);" onKeyUp="mfKey(self);"/>
-			<label name="lblMfLoading" left="20" top="82" width="480" height="20"/>
-
-			<button name="dynMfRow_1" left="20" top="108" width="480" height="20" visible="false" onClick="mfSelect(self, 1);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_2" left="20" top="128" width="480" height="20" visible="false" onClick="mfSelect(self, 2);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_3" left="20" top="148" width="480" height="20" visible="false" onClick="mfSelect(self, 3);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_4" left="20" top="168" width="480" height="20" visible="false" onClick="mfSelect(self, 4);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_5" left="20" top="188" width="480" height="20" visible="false" onClick="mfSelect(self, 5);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_6" left="20" top="208" width="480" height="20" visible="false" onClick="mfSelect(self, 6);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_7" left="20" top="228" width="480" height="20" visible="false" onClick="mfSelect(self, 7);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_8" left="20" top="248" width="480" height="20" visible="false" onClick="mfSelect(self, 8);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_9" left="20" top="268" width="480" height="20" visible="false" onClick="mfSelect(self, 9);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_10" left="20" top="288" width="480" height="20" visible="false" onClick="mfSelect(self, 10);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_11" left="20" top="308" width="480" height="20" visible="false" onClick="mfSelect(self, 11);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_12" left="20" top="328" width="480" height="20" visible="false" onClick="mfSelect(self, 12);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_13" left="20" top="348" width="480" height="20" visible="false" onClick="mfSelect(self, 13);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_14" left="20" top="368" width="480" height="20" visible="false" onClick="mfSelect(self, 14);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_15" left="20" top="388" width="480" height="20" visible="false" onClick="mfSelect(self, 15);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_16" left="20" top="408" width="480" height="20" visible="false" onClick="mfSelect(self, 16);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_17" left="20" top="428" width="480" height="20" visible="false" onClick="mfSelect(self, 17);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_18" left="20" top="448" width="480" height="20" visible="false" onClick="mfSelect(self, 18);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_19" left="20" top="468" width="480" height="20" visible="false" onClick="mfSelect(self, 19);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_20" left="20" top="488" width="480" height="20" visible="false" onClick="mfSelect(self, 20);" onDblClick="mfConfirm(self);"/>
-
-			<button name="btnMfPrev" left="20" top="516" width="80" height="24" text="&lt;" onClick="mfPage(self, -1);"/>
-			<label name="lblMfPage" left="110" top="516" width="300" height="24" horzTextAlign="center"/>
-			<button name="btnMfNext" left="420" top="516" width="80" height="24" text="&gt;" onClick="mfPage(self, 1);"/>
-
-			<button name="btnMfOk" left="390" top="576" width="110" height="24" text="OK" enabled="false" onClick="mfConfirm(self);"/>
-
-			<!-- SPEC I112a/I112b/I112g, Q29 - the description pane. CHILD of mfSearch and not a
-			     sibling: a sibling would be a second closing point and the text would outlive the
-			     box mfClose hides (V135). The result column does not move one pixel - the box grew
-			     to the RIGHT and the pane took the new ground. wordWrap is what kills the horizontal
-			     bar here for the same reason it does on edtPopDesc, and there is no field: what
-			     leaks to the NDB from the panes is the SIZE, never the text (V29, V334d). -->
-			<!-- SPEC I116a/V360a/V360b, pedido 3 do user 2026-08-30. The right half stops being empty
-			     space: a rule divides it from the list and a heading names it.
-
-			     The DIVIDER is a sibling of the pane and not a border on it, and that is the point -
-			     a border decorates one control, a rule SEPARATES two. It stands at 510, the middle of
-			     the 20px gutter between the result column (20..500) and the pane (520..980).
-
-			     The heading is a <label> like every other visible string, so V10 reaches it and the
-			     .lang carries `Description` / `Descricao` in both languages. Spelling it in the XML
-			     without the [pt] pair is the half-translated sheet V10 refuses. -->
-			<rectangle name="mfDescRule" left="510" top="50" width="1" height="550" color="#00000000" strokeColor="white" hitTest="false"/>
-			<label name="lblMfDescTitle" left="520" top="50" width="460" height="20" text="Description" horzTextAlign="center"/>
-			<textEditor name="edtMfDesc" left="520" top="76" width="460" height="524" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 
 	</scrollBox>

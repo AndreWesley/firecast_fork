@@ -437,3 +437,54 @@ arquivo quebrando linha de 2 jeitos & o `diff` mentindo sobre a rodada.
 
 A trava de §B88 segue armada: área que render **0** recorte recusa o `-Apply` & ⊥ toca nenhum
 dos 8. As exceções de §I104c saem em `-OutDir\excecoes.tsv` — são elas que §V335c pede.
+
+## Arquétipos de nature/demeanor (§T838, 150ª rodada)
+
+Pipeline REPRODUTÍVEL da lista `nature` (que É a de `demeanor` — uma tabela só, `WoD20th.lfm:549`).
+Já gerou `descNature_en.lua` e `descNature_pt.lua` na raiz do plugin; isto fica para regerar.
+
+| arquivo | o que é |
+|---|---|
+| `arch_names.txt` | os **68** nomes de `PICKER_LIST["nature"]`, um por linha |
+| `arch_extract.pl` | extrai a descrição de cada um dos PDFs, com livro e página IMPRESSA |
+| `arch_body_en.tsv` | a saída dele: `nome ⇥ livro ⇥ pág ⇥ texto ⇥ OK\|FB` — **46** linhas |
+| `arch_body_pt.tsv` | as traduções PT-BR: `nome ⇥ texto` |
+| `gen_nature.pl` | monta o `.lua` na forma de §I21 — `gen_nature.pl <tsv> <en\|pt> <saída>` |
+| `arch_qa_words.pl` | varre a saída atrás de lixo de emenda de coluna |
+
+**Como rodar.** Os `.txt` dos livros NÃO ficam versionados (são ~50 MB). Gere-os primeiro, num
+diretório qualquer, e aponte `ARCH_DIR` para ele — o script espera `$ARCH_DIR/books/*.txt` e
+`$ARCH_DIR/arch_names.txt`:
+
+```powershell
+# 1. despejar os PDFs (o acento do caminho derruba o Git Bash; use PowerShell)
+$exe = "C:\Program Files\Git\mingw64\bin\pdftotext.exe"
+Get-ChildItem "<Books>" -Recurse -Filter *.pdf | ForEach-Object {
+  & $exe -layout -enc UTF-8 $_.FullName "<dir>\books\$($_.BaseName -replace '[^A-Za-z0-9]','_').txt" }
+# 2. extrair e gerar
+$env:ARCH_DIR = "<dir>/"; perl research/arch_extract.pl > research/arch_body_en.tsv
+perl research/gen_nature.pl research/arch_body_en.tsv en "<plugin>/descNature_en.lua"
+```
+
+⚠ **`-enc UTF-8` não é opcional**: sem ele o `pdftotext` sai em Latin-1 e o Perl morre na 1ª linha.
+
+### 5 armadilhas MEDIDAS aqui, e as 3 primeiras produziram texto errado que PARECIA certo
+
+1. **`for my $b (...)` sombreia o `$b` do `sort`.** Foi assim que a extração virou NÃO
+   determinística: 31, 34, 39, 42 aceitas do mesmo input, porque a calha de coluna era sorteada
+   a cada processo. Todo número medido antes disso era amostra de moeda. ⊥ usar `$a`/`$b` como
+   variável de laço em script que ordena.
+2. **Calha de outra página fatia palavra no meio & o resultado LÊ como prosa** — `"apathetic
+   cowards"` virou `"apathet cowards"`. A calha do livro só vale como candidata: ! passar o
+   mesmo teste de coluna-em-branco NAQUELA página antes de ser usada.
+3. **Varredura automática ⊥ pega truncamento dentro da palavra.** `effi cient`, `judgt es`,
+   `littl esteem` passaram por 6 regras de QA e só cairam na LEITURA das 46 inteiras. O QA acha
+   pontuação torta e letra solta; ⊥ acha isso. **Ler é parte do processo, ⊥ opcional.**
+4. **Hífen no fim da linha só é quebra se a continuação for MINÚSCULA.** `Thrill-` + `Seeker`
+   virou `ThrillSeeker` até essa regra entrar.
+5. **`use utf8;` ou os literais do próprio script ⊥ casam** com o dado decodificado — mordeu
+   duas vezes, no `—` do `%FIX` e no `pág.` do gerador.
+
+**As 18 emendas de costura** ficam em `%FIX` dentro de `arch_extract.pl`, cada uma conferida
+contra a página pelo user em 2026-08-30. São coisas que régua nenhuma acha: palavra partida pela
+virada de página, letra carregada da coluna vizinha.

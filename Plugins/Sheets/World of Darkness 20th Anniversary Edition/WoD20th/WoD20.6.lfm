@@ -46,6 +46,7 @@
 				["ARMOR"] = "ARMADURA",
 				["Armor"] = "Armadura",
 				["Armory"] = "Arsenal",
+				["Arts"] = "Artes",
 				["Astral Projection"] = "Projeção Astral",
 				["Athetics"] = "Esportes",
 				["Athletics"] = "Esportes",
@@ -112,6 +113,7 @@
 				["Concept"] = "Conceito",
 				["Conformist"] = "Conformista",
 				["Conjuration"] = "Conjuração",
+				["Cosmology"] = "Cosmologia",
 				["Conniver"] = "Conspirador",
 				["Conscience"] = "Consciência",
 				["CONTACTS"] = "CONTATOS",
@@ -180,6 +182,7 @@
 				["Enigmas"] = "Enigmas",
 				["Ephemera"] = "Efêmera",
 				["EQUIPMENT (OWNED)"] = "EQUIPAMENTO (POSSUÍDO)",
+				["Esoterica"] = "Esotérica",
 				["Ethnicity"] = "Etnia",
 				["Etiquette"] = "Etiqueta",
 				["EXPERIENCE"] = "EXPERIÊNCIA",
@@ -283,12 +286,14 @@
 				["Maelstroms"] = "Maelstroms",
 				["Main"] = "Principal",
 				["Manipulation"] = "Manipulação",
+				["Martial Arts"] = "Artes Marciais",
 				["Martyr"] = "Mártir",
 				["Masochist"] = "Masoquista",
 				["Mauled (-2)"] = " Espancado (-2)",
 				["Mediator"] = "Mediador",
 				["Medicine"] = "Medicina",
 				["medicine"] = "Medicina",
+				["Meditation"] = "Meditação",
 				["Melee"] = "Armas Brancas",
 				["Mental"] = "Mentais",
 				["Mentor"] = "Mentor",
@@ -414,6 +419,7 @@
 				["Rebel (3)"] = "Rebelde (3)",
 				["Religion"] = "Religião",
 				["Requisitions"] = "Requisições",
+				["Research"] = "Pesquisa",
 				["Residence"] = "Residência",
 				["Resources"] = "Recursos",
 				["RESOURCES"] = "RECURSOS",
@@ -2787,6 +2793,37 @@
 						end;
 
 						if text ~= "" then show(c, text); end;
+					elseif string.sub(nm, 1, 11) == "dynAbilRow_" then
+						-- The ELSE the two branches above do not have, and it is not cosmetic (SPEC
+						-- I123c, V371). Both are `if name ~= nil then`, so a named slot the era does
+						-- NOT fill keeps the previous era's label AND keeps its dots bound to the
+						-- previous era's field: the player sees a trait this era has not got, and the
+						-- points he puts on it land on the old one. It slept while all four eras had
+						-- ten a column; I123 gives knowledges thirteen in two eras and twelve in two.
+						--
+						-- The row layout is what moves, not the label: hiding the label alone would
+						-- leave five live dots on an unnamed line.
+						local col, num = string.match(string.sub(nm, 12), "^(%a+)_(%d+)$");
+
+						if col ~= nil and lists[col] ~= nil then
+							local want = lists[col][tonumber(num)] ~= nil;
+
+							if c.visible ~= want then c.visible = want; end;
+						end;
+					elseif string.sub(nm, 1, 12) == "dynAbilFill_" then
+						-- The typed twin of that slot, authored on the SAME top: exactly one of the
+						-- pair shows, so the column closes on the same fifteen rows in every era and
+						-- the era that is a name short pays for it with a row the player fills in,
+						-- never with a name borrowed from another book (SPEC I123b, V371b, Q34). Two
+						-- tops instead of one would leave a 25px hole in the era that hides the upper
+						-- row - the same hidden pair MeritPicked already runs (SPEC V354a).
+						local col, num = string.match(string.sub(nm, 13), "^(%a+)_(%d+)$");
+
+						if col ~= nil and lists[col] ~= nil then
+							local want = lists[col][tonumber(num)] == nil;
+
+							if c.visible ~= want then c.visible = want; end;
+						end;
 					end;
 				end;
 
