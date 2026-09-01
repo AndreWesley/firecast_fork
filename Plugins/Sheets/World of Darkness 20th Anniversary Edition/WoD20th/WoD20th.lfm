@@ -2583,6 +2583,19 @@
 			-- swapping 6 for 10 would be the same literal one conversion later.
 			MERIT_ROWS = 10;
 
+			-- The search box has TWO widths and never N (SPEC I115a, V359a). A third would be a
+			-- ruler per list, which is the roster I114f refuses: it grows a line every wave, and the
+			-- line nobody remembers to update is the one that is wrong.
+			--
+			-- NARROW is not a taste. Specialties is the one caller that hands mfOpen no module
+			-- (WoD20.1.lfm, and no descSpeciality_*.lua is on disk), so its pane never renders book
+			-- prose. What it has to hold is the title, the state sentence of V360 and the Name field
+			-- of the Custom line - the longest being the [pt] sentence, about 28 characters, 182px
+			-- under the 6.5px/char ceiling of V312. A 300px pane clears all three, and 520 + 300 + 20
+			-- leaves the right margin equal to the 20 the query column keeps on the left.
+			MF_WIDE   = 1000;
+			MF_NARROW = 840;
+
 			-- Rows of the Vampire tab (SPEC I16). Same contract as BACKGROUND_ROWS above: the loop
 			-- that lets experience buy a dot and the loop that prices it for the log both read
 			-- these, so a row added to the XML alone would be a dot nothing charges for.
@@ -4223,7 +4236,8 @@
 				local n = { mfSearch = true, popScrim = true, dynMfTitle = true, edtMfQuery = true,
 					lblMfLoading = true, btnMfOk = true, btnMfPrev = true, btnMfNext = true, btnMfRemove = true,
 					lblMfPage = true, edtMfDesc = true, btnMfCustom = true, lblMfCustomName = true,
-					edtMfCustomName = true };
+					edtMfCustomName = true, lblMfDescTitle = true, btnFontDownMf = true,
+					btnFontUpMf = true, btnMfClose = true };
 
 				for i = 1, MF.rows, 1 do n["dynMfRow_" .. i] = true; end;
 
@@ -4437,7 +4451,40 @@
 			--
 			-- I107c/I100c: the box opens on the list its ROW belongs to - merits or flaws, never
 			-- the two together - on page ONE with the whole list, not empty waiting to be typed in.
-			function mfOpen(from, field, list, mod)
+			-- SPEC I115, V359, T826, ask 2. The RIGHT half is what shrinks: the result column stays
+			-- at 20/480 in both sizes, and that is what separates "a smaller box" from "a shorter
+			-- list" (V359d, V352c). The footer - prev, page, next, OK - lives in that left half too
+			-- and so it never moves. Only the pane and the three frame buttons ride the right edge.
+			--
+			-- Everything here DERIVES from the one width, so the two constants above are the only
+			-- two numbers the rule has to count (V359a). And this is deliberately NOT in applyTheme:
+			-- V57 guards that function's body, and the size is a per-opening decision, not a theme
+			-- one (SPEC I115c, V359c, B79).
+			function mfSize(found, size)
+				local box = found["mfSearch"];
+
+				if box == nil then return; end;
+
+				local w = MF_WIDE;
+
+				if size == "narrow" then w = MF_NARROW; end;
+
+				box.width = w;
+
+				-- the pane runs from the divider's right shoulder to the same margin the query keeps
+				local pane = w - 520 - 20;
+
+				if found["lblMfDescTitle"]  ~= nil then found["lblMfDescTitle"].width  = pane; end;
+				if found["lblMfCustomName"] ~= nil then found["lblMfCustomName"].width = pane; end;
+				if found["edtMfCustomName"] ~= nil then found["edtMfCustomName"].width = pane; end;
+				if found["edtMfDesc"]       ~= nil then found["edtMfDesc"].width       = pane; end;
+
+				if found["btnFontDownMf"] ~= nil then found["btnFontDownMf"].left = w - 110; end;
+				if found["btnFontUpMf"]   ~= nil then found["btnFontUpMf"].left   = w - 85;  end;
+				if found["btnMfClose"]    ~= nil then found["btnMfClose"].left    = w - 40;  end;
+			end;
+
+			function mfOpen(from, field, list, mod, size)
 				if from == nil or field == nil or list == nil then return; end;
 
 				-- The gift is not the player's to change (SPEC V161, amended in the 146th). The lock
@@ -4508,6 +4555,8 @@
 				for i = 1, MF.rows, 1 do
 					if found["dynMfRow_" .. i] ~= nil then found["dynMfRow_" .. i].visible = false; end;
 				end;
+
+				mfSize(found, size);
 
 				found["mfSearch"].visible = true;
 

@@ -239,7 +239,7 @@
 			show what Lua wrote (SPEC V148).
 		-->
 		<template name="SpecialityRow">
-			<button name="dynspeciality_$(num)" left="0" top="0" width="150" height="25" text="Select Speciality" onClick="mfOpen(self, 'speciality_$(num)', 'speciality');"/>
+			<button name="dynspeciality_$(num)" left="0" top="0" width="150" height="25" text="Select Speciality" onClick="mfOpen(self, 'speciality_$(num)', 'speciality', nil, 'narrow');"/>
 			<edit name="edtspeciality_$(num)" left="0" top="0" width="150" height="25" field="speciality_$(num)" fontSize="12" visible="false" enabled="false"/>
 			<edit left="155" top="0" width="75" height="25" field="specialityName_$(num)" fontSize="12"/>
 			<imageCheckBox left="235" top="0" width="25" height="25" field="speciality_$(num)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('speciality_$(num)_1', self);"/>

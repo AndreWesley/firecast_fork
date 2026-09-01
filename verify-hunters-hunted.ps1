@@ -13953,15 +13953,20 @@ foreach ($w354 in $V354_WAVE) {
     # whether it has one, and BOTH outcomes are legal. Demanding the file either way forbids
     # converting a list with no module, which is what I116c/V364 made legal and what Q33
     # OBLIGES - speciality will never have one, by the user's decision of 2026-08-30.
+    # B113: the tail after the list is OPEN. This matched the WHOLE signature and so it went
+    # red the moment I115b gave mfOpen a fifth argument for the box size - a ruler AHEAD of
+    # the code is B106, and this was the same mistake running backwards. What is mandatory is
+    # the field and the PICKER_LIST root; mod and size and whatever I115b adds next are not
+    # this leg's business, so the shape now closes on [,)] instead of on ) alone.
     if ($btn354.Count -eq 1) {
         $click354 = $btn354[0].GetAttribute("onClick")
         $rootPat354 = [regex]::Escape($w354.RootArg)
         if ($w354.Mod) {
-            $want354 = "mfOpen\(self,\s*'[^']+',\s*'" + $rootPat354 + "',\s*'" + [regex]::Escape($w354.Mod) + "'\)"
+            $want354 = "mfOpen\(self,\s*'[^']+',\s*'" + $rootPat354 + "',\s*'" + [regex]::Escape($w354.Mod) + "'\s*[,)]"
             $shape354 = "the FIELD, the PICKER_LIST root '$($w354.RootArg)' and the description module '$($w354.Mod)'"
         }
         else {
-            $want354 = "mfOpen\(self,\s*'[^']+',\s*'" + $rootPat354 + "'\)"
+            $want354 = "mfOpen\(self,\s*'[^']+',\s*'" + $rootPat354 + "'\s*[,)]"
             $shape354 = "the FIELD and the PICKER_LIST root '$($w354.RootArg)' - and NO module, because this wave declares none"
         }
         if ($click354 -notmatch $want354) {
@@ -15369,5 +15374,76 @@ if ($calls353.Count -eq 0) {
 
 if ($v353Bad) { foreach ($b in $v353Bad) { Fail "V353 $b" } }
 else { Pass "V353 the cursor is handed to the filter field from exactly one place, inside mfOpen and after mfSearch is shown" }
+
+# ---- V359: the box has TWO sizes and the CALL picks -------------------------------------
+# SPEC V359, I115, T826, ask 2. Specialties asked for a shorter box: its pane holds no book
+# prose (it is the one mfOpen caller that passes no module, and no descSpeciality_*.lua is on
+# disk), so stretching the right half to 1000 was stretching it over nothing.
+#
+# What this rule is really holding is the shape of the decision. A third size would be a
+# ruler per list, and "which lists are narrow" is a roster that grows a line every wave -
+# the line nobody updates being the one that is wrong (SPEC I114f, I115a).
+$v359Bad = @()
+$lua359 = CodeOf (Join-Path $dir "WoD20th.lfm")
+$mfSize359 = [regex]::Match($lua359, '(?s)function mfSize\(found, size\)(.*?)\n\t{3}end;')
+$mfOpen359 = [regex]::Match($lua359, 'function mfOpen\(([^)]*)\)')
+
+# (e) zero-guard FIRST: with no sizer, every leg below measures an empty string and passes
+# on it, which is B7 born ready (SPEC V20).
+if (-not $mfSize359.Success) {
+    $v359Bad += "(e) mfSize is gone - nothing sizes the box, and every leg of this rule would pass on the empty set (SPEC I115, V20, B7)"
+} else {
+    $body359 = $mfSize359.Groups[1].Value
+
+    # (a) exactly TWO widths reach the sizer, and both are named constants read from source.
+    $consts359 = @([regex]::Matches($body359, 'MF_[A-Z_]+') | ForEach-Object { $_.Value } | Sort-Object -Unique)
+    if ($consts359.Count -ne 2) {
+        $v359Bad += "(a) mfSize names $($consts359.Count) width constant(s) [$($consts359 -join ', ')], expected exactly 2 - a third size is a ruler per list, which is the roster I114f refuses (SPEC V359a, I115a)"
+    }
+    foreach ($c359 in $consts359) {
+        if ($lua359 -notmatch ('(?m)^\s*' + $c359 + '\s*=\s*\d+;')) {
+            $v359Bad += "(a) $c359 is used by mfSize but never declared as a number in the sheet - the width would come back nil and the box would keep whatever the XML authored (SPEC V359a)"
+        }
+    }
+
+    # (b) the size arrives as a PARAMETER. A test on the list name here is the roster again,
+    # only hidden inside an if where no one greps for it (SPEC V359b, I115b).
+    if ($mfOpen359.Success) {
+        $args359 = ($mfOpen359.Groups[1].Value -split ',') | ForEach-Object { $_.Trim() }
+        if ($args359 -notcontains 'size') {
+            $v359Bad += "(b) mfOpen does not take a size parameter (takes: $($args359 -join ', ')) - the caller is what chooses the size, the way it already chooses the module (SPEC I113a, I115b, V359b)"
+        }
+    } else {
+        $v359Bad += "(b) mfOpen was not found - nothing can hand the size in (SPEC V209)"
+    }
+    foreach ($roster359 in @('MF\.list', 'list\s*==')) {
+        if ($body359 -match $roster359) {
+            $v359Bad += "(b) mfSize tests the LIST to pick a width - that is the roster of I115b hidden inside an if, and it grows a line every wave (SPEC V359b, I114f)"
+        }
+    }
+
+    # (d) the RIGHT half is what shrinks. The result column and the footer under it live in
+    # the left half and must not be touched, or this is a shorter LIST and not a smaller box.
+    foreach ($left359 in @('edtMfQuery', 'lblMfLoading', 'btnMfPrev', 'btnMfNext', 'lblMfPage', 'btnMfOk', 'btnMfRemove', 'btnMfCustom')) {
+        if ($body359 -match [regex]::Escape($left359)) {
+            $v359Bad += "(d) mfSize writes '$left359', which sits in the LEFT half - the result column stays at 20/480 in both sizes, and that is what separates a smaller box from a shorter list (SPEC V359d, V352c)"
+        }
+    }
+}
+
+# (c) the width write does NOT live in applyTheme. V57 guards that body against geometry and
+# this rule must not be the reason anyone loosens it (SPEC I115c, V359c, B79).
+foreach ($f359 in $files) {
+    $at359 = [regex]::Match((CodeOf $f359.FullName), '(?s)function applyTheme\([^)]*\)(.*?)\n\t{3}end;')
+    if (-not $at359.Success) { continue }
+    foreach ($w359 in @('MF_WIDE', 'MF_NARROW', 'mfSize')) {
+        if ($at359.Groups[1].Value -match [regex]::Escape($w359)) {
+            $v359Bad += "(c) applyTheme in $($f359.Name) reaches '$w359' - the size is a per-opening decision, not a theme one, and V57 guards that body against exactly this (SPEC I115c, V359c, B79)"
+        }
+    }
+}
+
+if ($v359Bad) { foreach ($b in $v359Bad) { Fail "V359 $b" } }
+else { Pass "V359 the box has two widths, both declared constants, chosen by the caller through mfOpen; only the right half moves and applyTheme is not the one moving it" }
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }
