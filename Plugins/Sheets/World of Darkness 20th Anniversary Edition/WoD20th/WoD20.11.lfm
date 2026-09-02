@@ -162,52 +162,41 @@
 		</layout>
 
 		<!--
-			Same strip as the root form (SPEC I32, T522), and the panes are ABSOLUTE here rather
-			than align="client": this scrollBox already spends its client rect on themePaper11
-			(SPEC V56), and a second visible align="client" sibling fighting for it is precisely
-			B41. The imported forms are align="client" themselves, so each one fills the layout
-			that holds it and the explicit size is all they need.
+			THREE COLUMNS, side by side, and no sub-tab strip at all (SPEC I118, I118d, V361,
+			pedido 5). The strip and the stacked panes went out together in T832: the three
+			imported forms ALREADY WERE the three columns I118a asks for - WoD20.12 is Clan
+			Disciplines over Disciplines, WoD20.13 is Main Paths over Secondary Paths, WoD20.14
+			is the Rituals - so this is a move, not a redraw. Not one box inside them changed.
+			
+			The lefts are the widths plus the 5px gutter the sheet uses between section boxes
+			(SPEC V298): 0 + 390 -> 395, 395 + 565 -> 960 -> 965, 965 + 520 -> 1485. Each layout
+			is EXACTLY as wide as the form it holds declares itself to be, which is what lets
+			V225(a) read equality here instead of slack, and what keeps the three DISJOINT in x
+			(SPEC V221 as rewritten in T832) - overlapping columns are not stacking, so the old
+			"panes share one rect" proof would have passed three columns lying on top of each
+			other.
+
+			top=150 is where the strip used to start: the boxes above close at 138 and the 12px
+			gutter between a bar and a panel is the one I73 measures. Nothing sits between them
+			any more, so the columns inherit the strip's own y.
+
+			They are ABSOLUTE rather than align="client" for the reason the strip was: this
+			scrollBox already spends its client rect on themePaper11 (SPEC V56), and a second
+			visible align="client" sibling fighting for it is precisely B41. The imported forms
+			are align="client" themselves, so each fills the layout that holds it.
+
+			All three VISIBLE, and no name on them: the names existed for selectTab, and with the
+			group gone from SUB_TABS a name nobody reads is a name that outlives its reader.
 		-->
-		<layout name="vampStrip" left="0" top="150" width="1070" height="40">
-			<rectangle name="tabOnDisc" left="30" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabDisc" left="30" top="5" width="112" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabDisc', self);">
-				<label name="lblDisc" fontStyle="italic" fontColor="white" visible="false" left="0" top="0" width="112" height="30" text="Disciplines" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-				<label name="lblOnDisc" fontColor="#C2A14D" visible="true" left="0" top="0" width="112" height="30" text="Disciplines" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="sepPaths" left="136" top="5" width="16" height="30" color="#00000000" strokeColor="#00000000" hitTest="false"/>
-			<rectangle name="tabOnPaths" left="146" top="5" width="235" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabPaths" left="146" top="5" width="235" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabPaths', self);">
-				<label name="lblPaths" fontStyle="italic" fontColor="white" visible="true" left="0" top="0" width="235" height="30" text="Blood Sorcery: Paths" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-				<label name="lblOnPaths" fontColor="#C2A14D" visible="false" left="0" top="0" width="235" height="30" text="Blood Sorcery: Paths" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="sepRituals" left="375" top="5" width="16" height="30" color="#00000000" strokeColor="#00000000" hitTest="false"/>
-			<rectangle name="tabOnRituals" left="385" top="5" width="235" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabRituals" left="385" top="5" width="235" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabRituals', self);">
-				<label name="lblRituals" fontStyle="italic" fontColor="white" visible="true" left="0" top="0" width="235" height="30" text="Blood Sorcery: Rituals" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-				<label name="lblOnRituals" fontColor="#C2A14D" visible="false" left="0" top="0" width="235" height="30" text="Blood Sorcery: Rituals" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-		</layout>
-
-		<layout name="tabDisc" left="0" top="194" width="1070" height="700">
+		<layout left="0" top="150" width="390" height="700">
 			<import file="WoD20.12.lfm"/>
 		</layout>
 
-		<layout name="tabPaths" left="0" top="194" width="1070" height="700" visible="false">
+		<layout left="395" top="150" width="565" height="700">
 			<import file="WoD20.13.lfm"/>
 		</layout>
 
-		<layout name="tabRituals" left="0" top="194" width="1070" height="700" visible="false">
+		<layout left="965" top="150" width="520" height="700">
 			<import file="WoD20.14.lfm"/>
 		</layout>
 	</scrollBox>
@@ -224,6 +213,5 @@
 	<event name="onNodeReady">
 		renderMaxDisc(self);
 		renderManualEntry(self);
-		renderSubTabs(self);
 	</event>
 </form>

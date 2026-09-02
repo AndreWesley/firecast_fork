@@ -14,6 +14,14 @@
 				["Select Nature"] = "Selecionar Natureza",
 				["Select Demeanor"] = "Selecionar Comportamento",
 				["Select Speciality"] = "Selecionar Especialidade",
+				["Select Discipline"] = "Selecionar Disciplina",
+				["Select Main Path"] = "Selecionar Trilha Principal",
+				["Select Secondary Path"] = "Selecionar Trilha Secundária",
+				["Select Ritual"] = "Selecionar Ritual",
+				["Select Affiliation"] = "Selecionar Afiliação",
+				["Select Hedge Path"] = "Selecionar Caminho de Magia Estática",
+				["Select Phenomenon"] = "Selecionar Fenômeno",
+				["Select Hedge Ritual"] = "Selecionar Ritual de Magia Estática",
 				["Select Flaw"] = "Selecionar Defeito",
 				["Select Merit"] = "Selecionar Qualidade",
 				["OK"] = "OK",
@@ -2094,8 +2102,14 @@
 			-- rows, and only the FIRST is the Affinity Path (M20 Sorcerer p. 8). `cboHedgeAttr` is
 			-- a singleton and rowRoot returns nil for it - it demands a trailing _<n> - so a table
 			-- keyed by root could not reach it at all (SPEC I68).
+			--
+			-- `cbonumina_1` left in T874, with wave 4 of I113e: the Affinity Path row is a picker
+			-- now and there is no combo of that name to filter. The RULE did not move an inch - it
+			-- is still pickAllowed reading AFFINITY - only the door did: mfOpen asks it while it
+			-- builds the pool, once per opening, for every row of every converted family (SPEC
+			-- I113c, V199, V205, V354c). What is left here is the one combo wave 2 has not reached.
 			local FILTER_NAME = {
-				cbonumina_1 = true, cboHedgeAttr = true,
+				cboHedgeAttr = true,
 			};
 
 			local function rowRoot(nm)
@@ -2448,31 +2462,6 @@
 			-- xpFind walking the root, the one finder this sheet has (SPEC V143): `form.<name>`
 			-- does not cross an <import>, and this function lives in WoD20.6 while the combos live
 			-- two files away.
-			function renderVampPickers(from)
-				wodTrace("renderVampPickers");
-				if sheet == nil or from == nil then return; end;
-
-				local names = {};
-
-				-- The typed rows are skipped, not just missed (SPEC I45, V248d): they carry an
-				-- `edt` and the walk asks for `cbo`, so xpFind would come back empty for them
-				-- anyway - naming them here would be asking for a control that cannot exist.
-				for i = 1, MAIN_PATH_ROWS, 1 do names["cbomainPath_" .. i] = true; end;
-				for i = 1, SEC_PATH_ROWS - SEC_PATH_FREE_ROWS, 1 do names["cbosecPath_" .. i] = true; end;
-				for i = 1, RITUAL_ROWS - RITUAL_FREE_ROWS, 1 do names["cboritual_" .. i] = true; end;
-
-				local found  = {};
-				local lang   = sheet.language or "en";
-				local era    = currentTheme();
-				local levels = discLevels();
-
-				xpFind(rootOf(from), names, found);
-
-				for nm, c in pairs(found) do
-					pickerItems(c, lang, era, levels);
-				end;
-			end;
-
 			-- Re-filter the hedge pickers of WoD20.7 (SPEC I67, I68, V272d, I83i). Reached from the
 			-- dataLink that watches `hedgeAffiliation` and from the one that watches the seventeen
 			-- numina rows AND their eighty-five dots - what the two answers actually READ - and it
@@ -2496,12 +2485,13 @@
 				wodTrace("renderHedgePickers");
 				if sheet == nil or from == nil then return; end;
 
-				local names  = { cbonumina_1 = true, cboHedgeAttr = true };
-
-				-- The typed rows are skipped, not just missed (SPEC V248c): they carry an `edt`
-				-- and this walk asks for `cbo`, so naming them would be asking for a control that
-				-- cannot exist.
-				for i = 1, HEDGE_RITUAL_ROWS - HEDGE_RITUAL_FREE_ROWS, 1 do names["cbohedgeRitual_" .. i] = true; end;
+				-- ONE name since T874, and the list is the same list FILTER_NAME holds - that is
+				-- what V272d welds, and it is why the two shrank together. Wave 4 turned the
+				-- Affinity Path row and the twelve picked ritual rows into pickers, so neither
+				-- `cbonumina_1` nor `cbohedgeRitual_*` exists to be re-filtered: their filter is
+				-- asked where the POOL is built now, inside mfOpen, once per opening (SPEC I113c,
+				-- V199, V205). What is left is the casting attribute, whose wave has not run.
+				local names  = { cboHedgeAttr = true };
 
 				local found  = {};
 				local lang   = sheet.language or "en";
@@ -2538,7 +2528,7 @@
 				if sheet == nil or from == nil then return; end;
 
 				local names = {
-					cboHedgeAffiliation = true, edtHedgeAffiliation = true,
+					dynhedgeAffiliation = true, edtHedgeAffiliation = true,
 					cboClanFamily = true, edtClanFamily = true,
 				};
 
@@ -2549,7 +2539,7 @@
 				-- Which of the four is the one on show. The picker is the DEFAULT side of each
 				-- pair, so it reads the flag negated and the typed twin reads it straight.
 				local on = {
-					cboHedgeAffiliation = sheet.stManualAffiliation ~= true,
+					dynhedgeAffiliation = sheet.stManualAffiliation ~= true,
 					edtHedgeAffiliation = sheet.stManualAffiliation == true,
 					cboClanFamily       = sheet.stManualClanFamily ~= true,
 					edtClanFamily       = sheet.stManualClanFamily == true,

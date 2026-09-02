@@ -1,6 +1,645 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ⚑ COMECE AQUI — 157ª rodada (2026-08-31), preparada para `/ck:spec` em CHAT SEM CONTEXTO
+## ⚑ COMECE AQUI — 2026-09-01, 163ª rodada. §T830 §T831 §T843 §T844 §T874 FECHADAS · §T875 PARCIAL · gate VERDE
+
+### ▶ O COMANDO: **`/ck:build --next`** — ⊥ ∃ §T bloqueada por prosa agora
+
+A 162ª fechou §T830 (régua) & a 163ª rodou `/ck:spec` (4 emendas) + fechou **§T831** & **§T874**
+INTEIRA. ⊥ sobra §T travada por spec. Detalhe em "O QUE A 163ª FEZ".
+
+**Estado:** gate **VERDE — 0 FAIL** (`-Build`) · §T **794 `x` (781 arquivadas + 13 vivas) · 89 `.` · 8 `~`** · `.rpk` **2.598.813 B**, mtime **22:50:37**, **INSTALADO** 22:50:38 · último commit
+**`b5111c35`** · **NADA commitado** (a 160ª → a 163ª INTEIRAS no working tree).
+
+✅ **O INSTALL DE §T875 FOI VERIFICADO POR CONTEÚDO, ⊥ só por size** (§B1): o `.rpk` instalado foi
+ABERTO (é ZIP) & traz `HedgePicker`=**20** · `PsychicPicker`=**20** · `NuminaFree`=**0** ·
+`HedgeRitualFree`=**5** — a última INTACTA, que é o que §B122 manda. Size igual sozinho ⊥ provaria
+isto: as 2 conversões & a ⊥-conversão cabem dentro de poucos bytes de diferença.
+
+✅ **BUILD & INSTALL FEITOS & PROVADOS (§B1, §B103):** `.rpk` **2.596.783 B**, mtime 22:10:03, &
+`%APPDATA%\Firecast\Plugins\andreoliveira.styllern.wod20th.rpk` c/ o **MESMO size** & mtime
+22:10:04. Rodou **offline**, c/ o Firecast fechado a pedido do user — que é o caminho obrigatório
+aqui: a conversão da afiliação p/ picker é MUDANÇA DE WIDGET (o combo some & 2 botões nascem) &
+instalar c/ a ficha aberta deixaria o form velho na tela, c/ o controle sumido & nenhum handler
+p/ trazê-lo de volta. ✅ **CONFERIDO NA TELA pelo user 2026-09-01** ("sim, tudo certo"): a linha `Affiliation` da caixa `HEDGE MAGIC` mostra o `?` + botão, o botão pinta a afiliação escolhida, o `?` abre descrição & a linha segue alinhada c/ `Essence` & `Casting Attribute`. ∴ o risco de §T810 (widget novo que só o XML viu) está FECHADO p/ esta rodada.
+
+⚠ **A FILA DE INSTALL ZEROU, & foi ela que produziu o único sintoma da rodada.** O instalado era
+de **13:13** (a 160ª) & **2 rodadas de layout** estavam paradas atrás dele. O user abriu a ficha,
+olhou a aba Numina & disse *"não está certo, ela parece não ter mudado"* — & ⊥ tinha mudado
+mesmo: ⊥ NA TELA. ⊥ era bug de código, era §B103 pelo outro lado (o código novo ⊥ tinha chegado).
+MEDIDO antes de responder, ⊥ suposto: instalado 2.613.533 B / 13:13 contra `output/` 2.595.566 B
+/ 21:12, & o `.rpk` novo é ~18 KB **MENOR** porque a 161ª tirou as 4 panes, o bloco da força de
+vontade & as 2 barras. O install rodou **offline**, c/ o Firecast fechado a pedido do user, que é
+o caminho que §B103 manda tomar. ⚠ **o user ainda ⊥ confirmou ter reaberto & olhado** — se a 163ª
+começar sem essa confirmação, é a 1ª coisa a pedir (mesmo risco de §T810).
+
+---
+
+## HISTÓRICO — o que a 161ª FEZ (as 2 §T saíram dela em `~`, por motivos DIFERENTES)
+
+### §T874 — onda 4 de §I113e, a metade dos 43 pickers · `~` porque falta `cboHedgeAffiliation`
+
+`HedgePicker` · `PsychicPicker` · `HedgeRitualPicker` viraram `?` + botão + gêmeo escondido
+(§I107a1), os **3** declarando o módulo **`Numina`** — o mesmo dos 2 lados de cada linha, que é o
+que §V373(a) cobra (§B110). Veio junto, & ⊥ era opcional (§V365(d) mede por ARQUIVO):
+
+- **as 4 panes de `WoD20.7` SAÍRAM**, `edtFaithDesc` inclusive — a 4ª é a que ⊥ tinha linha:
+  True Faith é 1 Path só ∴ ganhou um `?` c/ a chave `'True Faith'` LITERAL & `row = nil`.
+- **os 3 radios SAÍRAM** & `numinaSel` `psychicSel` `hedgeRitualSel` viraram ÓRFÃOS de §I3.
+- **`renderNuminaButtons`** nasce em `WoD20.7` & reafirma o **negrito de `numina_1`** DEPOIS do
+  `mfLabel` — §V88 promete negrito SEMPRE & `mfLabel` reescreve `fontStyle` a cada pintura.
+- **`WoD20.6`**: `FILTER_NAME` & o `xpFind` de `renderHedgePickers` caem p/ `cboHedgeAttr` só. O
+  filtro ⊥ sumiu, mudou de PORTA: `mfOpen` lê `hedgePathLevels()` 1× por abertura.
+- **3 chaves `.lang`** nos 2 idiomas + no mapa PT: `Select Hedge Path` · `Select Phenomenon` ·
+  `Select Hedge Ritual`.
+- **19 réguas** mexidas, **7 APOSENTADAS** c/ guarda de fantasma: §V29 · §V30 · §V33 · §V176 ·
+  §V206 · §V266 · §V296. **8 mutações** rodadas, todas vermelhas na régua certa.
+
+### §T830 — aba Numina SEM sub-abas, 3 colunas · a 161ª deixou `~`, a 162ª fechou em `x`
+
+**Layout & dados: FEITO.**
+
+| o quê | como ficou |
+|---|---|
+| sub-abas | **`numStrip` & `hedgeStrip` APAGADAS**. `SUB_TABS` & `renderSubTabs` APAGADOS do form raiz; `selectTab` ficou c/ 2 linhas (`activeTab` + `applyTabVisibility`) — a busca que ela fazia sempre caía fora, & agora ⊥ ∃ o que buscar |
+| banda de topo | ⊥ SE MOVEU (§V361a): `HEDGE MAGIC` 0..586 · `QUINTESSENCE` 591..998 · **`TRUE FAITH` 1003..1410**, no rect que era da `WILLPOWER` |
+| força de vontade | **SAIU INTEIRA** (§I117d, §V361c): o template `WillpowerNumina`, `paintNuminaWillpower` & o dataLink. **0 campo foi junto** — `willpower_c1..c10` seguem autorados em `WoD20.3`, & o gate agora COBRA isso (§V267 tem perna nova lendo `WoD20.3`) |
+| 3 colunas | col.1 `PSYCHIC PHENOMENA` 0..466 · col.2 `HEDGE MAGIC PATHS` 471..938 · col.3 `HEDGE MAGIC RITUALS` 943..1410, `top=151`, vão **5**, TODAS visíveis. A linha DENTRO é **426** nas 3 ∴ `?`, entrada & os 5 dots no mesmo x em toda a aba (§V26). Os 2px extras das colunas 2 & 3 vão p/ a MARGEM, que §V280(a) preços em ≥20 |
+| pés | **20 nas 3** — o mínimo de §V280(a) ∴ ⊥ ∃ pé que alguém escolheu. O Ghoul paga diferente (§V280d) porque as colunas dele são forms importados que ! pousar numa linha |
+| `psychic` | **24 → 20 desenhadas**. `psychic_16`…`_19` **APAGADOS DE VEZ** (§Q32): nasce **`PSYCHIC_VACANT`**, `$I3_DELETED` sai de vazio p/ os **4** (o teto de §V362d), & `PSYCHIC_ROWS` FICA em **24** porque é o MAIOR ÍNDICE — as digitadas moram em `_20`…`_24`, ACIMA do buraco |
+| `numina` | **17 → 20**. ⚠ **decisão tomada ao construir, ↓ "A LEITURA DE §I117c"** |
+| nota da afinidade | saiu do `hedgeStrip` & foi p/ DENTRO da col.2, no pé (`noteHedgePaths`, `top=546`) ∴ col.2 tem **586** de altura & as outras 561/486 |
+| §V204 perna (ii) | LIGADA p/ `psychic`: `XP_NUMINA` carrega `vacant` & os **3** leitores (`declareTrait`, `numinaTypeInUse`, o laço do ledger) consultam. O do ledger é o que fazia dano: ficha pré-§T830 tem dots em `_16`…`_19` & o diff os leria como COMPRA |
+
+**Réguas mexidas em §T830 — 24, & 5 APOSENTADAS a mais:** §V262 (as pernas (a)(b)(d) eram da
+barra & das panes; (c) SOBREVIVE & virou a única régua de fila de boxes das 2 abas) · §V268 ·
+§V293 · §V300 · §V305. Re-sujeitadas: §V265 (a pane virou box da banda) · §V267 (a banda é filha
+do FORM agora; a perna da força de vontade aposentou c/ guarda) · §V296/§V297 (`//scrollBox/`) ·
+§V307 (só a barra de cima) · §V227 (`SUB_TABS` some da lista de estado) · §V355(c) (**herdou** a
+contagem de `fontStyle` que era de §V305c — dona que aposenta, regra que migra) · §V5/§V263 (leem
+`PSYCHIC_VACANT`) · §V354/§V333 (12→15 & 19→15) · §V196/§V111/§V241 (12 combos) ·
+§V239/§V240/§V280/§V298 (contagens de box) · §V226/§V228/§V281/§V299/§V301/§V304/§V306/§V315/
+§V319/§V320/§V323 (**3 barras → 1**) · §V240 `$STRETCHED_BAND` (`WILLPOWER` → `TRUE FAITH`).
+
+⚠ **ARMADILHA DE POWERSHELL, & custou 2 execuções**: `@(@("a","b"))` **ACHATA** p/ um array de 2
+strings ∴ `$pair[0]` devolve o CARACTERE `W` de `"WoD20th.lfm"`. Roster de 1 entrada ! ser
+`@(,@("a","b"))`. ∃ **8** desses no gate agora, todos c/ a vírgula.
+
+### ⚠ A LEITURA DE §I117c — a decisão que EU tomei, & o porquê. **CONFIRA**
+
+§I117c diz: "`numina` vai de **17** a **20** c/ **3** pickers NOVOS, `_18` `_19` `_20`". Lida ao
+pé da letra ela dá: pickers `_1`…`_12` + `_18`…`_20`, digitadas `_13`…`_17` — **& isso ⊥ compila
+contra §V263(b)**, que exige as digitadas nos ÚLTIMOS índices, & quebra `TYPED_ROW_FROM`, que é
+`total − typed + 1` & é como `isTypedRow` responde p/ a ficha inteira.
+
+**O que eu construí:** pickers `_1`…`_15`, digitadas `_16`…`_20`, & os **3 ids NOVOS (`_18` `_19`
+`_20`) são as DIGITADAS**. Assim: §V263(b) VERDE · `TYPED_ROW_FROM` segue derivada · §V362(c)
+satisfeita (ids seguintes, ⊥ reusa vago) · as 2 colunas fecham em **15 picker + 5 digitadas**, que
+é a "MESMA estrutura" de §I117b · & `numina_13`…`_15` viram picker **1 rodada antes** — o que
+**§T875 ia fazer com as 5 de qualquer jeito** (§I130b, §V378), & o valor do jogador ⊥ se move
+(`mfOpen` acrescenta o valor da linha ao pool, §V200/§V346b).
+
+**É dívida de PROSA p/ `/ck:spec`**, ⊥ dívida de código: §I117c ! dizer qual das 2 metades os 3
+ids novos ocupam. Se o user quiser a leitura literal, o preço é reescrever §V263(b) & trocar
+`TYPED_ROW_FROM` de fórmula p/ CONJUNTO nas 7 famílias.
+
+---
+
+## O QUE A 162ª FEZ — a metade de RÉGUA de §T830, & só ela. §T830 → `x`
+
+**0 linha de código de ficha mudou.** Os 3 arquivos tocados são `verify-hunters-hunted.ps1`,
+`SPEC.md` (só o status) & este. O `.lfm` & o `.lua` saíram da rodada byte a byte iguais.
+
+### §V361 NASCEU INTEIRA — (a)(c)(d)(e), 1 bloco só, logo depois de §V221
+
+| perna | o que ficou medindo |
+|---|---|
+| **(a) roster** | as **2** abas: exatamente **3** colunas abaixo da banda, cada uma respondendo ao nome do roster, **0** `visible="false"`, **0** `name` sobrevivendo a `selectTab`. **Herdado de §V188** |
+| **(a) banda** | **CONGELADA** em `b5111c35`, ≡ `$FIELD_CONTRACT` fez p/ campo: `$V361_BAND` c/ os **5** rects autorados lá (3 da Numina + 2 do Ghoul). É **PISO ⊥ teto** — caixa NOVA na banda ⊥ custa nada aqui (§V40/§V298 pegam sobreposição & vão) |
+| **(c)** | a exceção é **LISTA**, fechada em **1**: `WILLPOWER` → `TRUE FAITH`. Desvio que a banda acha & a lista ⊥ nomeia = FAIL · & a exceção ! ser **ALCANÇADA** (exceção que ninguém alcança parou de medir, ≡ §V240 guarda a dela) |
+| **(d)** | as 2 abas **CONCORDAM** no desenho: mesmo vão único, 1 `top` só cada, 0 escondida, cada uma abrindo livre da SUA banda. ⚠ **⊥ ∃ literal nenhum aqui de propósito** — §V221 já cobra o 5 do Ghoul & §V298 o das colunas da Numina; 3º dono p/ 1 número é §B70. O que ⊥ tinha dono era o **acordo entre as 2**, & é isso que (d) é |
+| **(e)** | 0 coluna · <2 abas lidas · contrato de banda vazio · 0 rect casado ! FAIL |
+
+**A partição ⊥ tem 2 formas p/ 1 gesto**: `<layout>` filho direto do `<scrollBox>` c/ `top=0` é
+BANDA, abaixo disso é COLUNA. Vale nos 2 arquivos sem 2º leitor, & barra que volta cai no conjunto
+das colunas & quebra a conta de 3 — que é "sem sub-aba" dito em GEOMETRIA. Os NOMES das barras
+(`numStrip` `hedgeStrip` `vampStrip`) ⊥ são varridos aqui: §V268 (aposentada), §V262, §V293 &
+§V221 já os têm, & um 4º dono seria §V135.
+
+**A identidade da coluna**: o `<import>/@file` quando ∃, senão o `<label>/@text`. 1 leitor, 2
+abas — o Ghoul importa forms & a Numina desenha inline, & o roster lista o token de cada uma.
+
+### §V188 ENTREGOU o roster — estava emprestado desde §T832
+
+Some de lá a conta de 3, os 3 arquivos, o `visible` & o `name`. **FICA**: a varredura de fantasma
+(`btnTab*`/`tabOn*`) & o censo de `tabControl` nativo, que nunca foram do empréstimo.
+
+### §V362(c) & (d) c/ NOME PRÓPRIO
+
+- **(c)** 2 metades. 1ª: nenhum dos 4 volta, **como widget OU como observador** — o laço de §I3
+  anda só os ÓRFÃOS ∴ até agora ⊥ ∃ia NADA dizendo que `psychic_17` ⊥ pode ser autorado de novo.
+  2ª, & é a c/ dente: os **2 livros do buraco CONCORDAM** — `$I3_DELETED` (quem o user apagou) vs.
+  `PSYCHIC_VACANT` (quais índices o Lua pula), escritos 1 arquivo de distância. §V204 mede o XML
+  contra §I3, **nunca §I3 contra o Lua**.
+- **(d)** era teto (`> 4`), virou **EXATO** (`≠ 4`): §Q32 respondeu c/ exatamente esses 4 ∴ 4 é
+  piso TAMBÉM. Sem o piso a lista esvazia & (c) anda sobre o vazio, que é §B7.
+
+### ⚠ ACHADO ao construir — a frase de §V362 estava MENTINDO desde §T830
+
+O Pass dizia *"$n have left so far, **every one of them as an orphan**"*. Até a 161ª era verdade;
+no instante em que os 4 de §Q32 saíram pela OUTRA porta virou literal velho (§B46, §B99). Agora
+CONTA as 2 saídas: `7 of them as orphans and 4 deleted by decision`. É o mesmo defeito que §V333(g)
+pegou 3 rodadas seguidas — prosa que envelhece 1 dia depois de escrita.
+
+### MUTAÇÃO — 17 casos + 1 sonda, & 5 deles são a PROVA do empréstimo
+
+Todos vermelhos na régua certa; a sonda (reordenar as entradas de `$V361_BAND`) ficou VERDE ∴ o
+contrato casa por RECT & ⊥ por ordem de documento. Os **5** que acendem **§V361 SOZINHA** — coluna
+do Ghoul escondida · coluna do Ghoul c/ `name` · rect da banda do Ghoul movido · 2ª exceção ·
+roster esvaziado — são a prova de que tirar o roster de §V188 ⊥ abriu buraco.
+`17 V362d` (tirar 1 nome de `$I3_DELETED`) acende onde o `> 4` velho passava.
+
+⚠ **ARMADILHA DE POWERSHELL, & custou 1 execução INTEIRA da bateria** (~10 min): `Write-Host` ⊥
+sai pelo pipeline no PS 5.1 ∴ `& $gate | Out-String` devolve **VAZIO** & TODO caso vira MISS —
+inclusive a sonda, que "passou" por ⊥ ter lido nada. Bateria de mutação ! rodar o gate em
+**processo filho** (`powershell.exe -File`) & ler o stdout dele. É §B7 aplicado ao ARNÊS: o teste
+que mede o vazio passa sempre.
+
+---
+
+
+---
+
+## O QUE A 163ª FEZ — a passada de `/ck:spec` + §T831 & §T874 fechadas
+
+**§T831 `x` sem 1 linha de código**: MEDIDO que §T830 (a caixa) + §T874 metade A (o `?`
+`btnQFaith`, `popOpen(... 'True Faith' ...)`) já a tinham entregue, & o `faithReligion` que §I117
+pedido 4.4 mandava criar **⊥ nasceu** — `faith` É o campo da religião desde antes de `b5111c35`.
+
+**§T874 metade B `x`**: `cboHedgeAffiliation` virou picker. `btnQhedgeAffiliation` (o `?`, l=180
+w=20) + `dynhedgeAffiliation` (o botão, l=205 w=335 ∴ fecha em 540) + `edtHedgeAffiliation` no
+MESMO rect do botão. `renderNuminaButtons` ganhou o avulso (≡ `dynnature`) & o dataLink dele passa
+a observar `hedgeAffiliation` — sem isso o botão diria `Select Affiliation` p/ sempre, porque a
+escolha só faz `setField(MF.field, MF.picked)` & **⊥ ∃ repintura direta** (MEDIDO). 3 lugares de
+idioma: `[pt]`, `[en]` & o mapa PT de `WoD20.6`.
+
+⚠ **O `?` LIDERA A ENTRADA, ⊥ a linha**, & isto ⊥ foi gosto: é a forma que o picker dos
+ANTECEDENTES já veste (`label@0 · ?@108 · dyn@132`, `WoD20.1`) & é o precedente que §I117 nomeia
+c/ "≡ o dos antecedentes". §T844 (`hedgeAttr`) cai na MESMA linha & ! repetir esta forma.
+
+**Emendas de spec da rodada:** §I117 pedido 4.4 (CORRIGIDA) · §I117c (a leitura construída virou a
+decidida) · §V270(a)(d) & §V274(b)(c)(d) (trocam de sujeito p/ o picker) · §V222 (+ a armadilha do
+arnês) · **§B119 §B120 §B121**.
+
+### §T844 CANCELADA pelo user — `hedgeAttr` FICA dropdown, & é decisão FINAL
+
+User 2026-09-01: *"hedgeAttr pode ficar do jeito que está, remova o T844"*. **⊥ foi apagada — foi
+FECHADA**: 6 lugares a citam (§V356 · §T843 · §T852 · §B101 & 2 linhas de §I113e/§I131) & §V384
+cobra que ∀ citação resolva; §V386 só deixa sair do `SPEC.md` tarefa FECHADA. Apagar deixaria 6
+citações penduradas & — pior — apagaria o MOTIVO, & §B101 continua dizendo que `hedgeAttr` é PROSA
+∴ uma rodada futura o reconverteria achando que foi esquecimento.
+
+É a **3ª & última** decisão sobre este campo: §Q31 o chamou de combo de VALOR sobre premissa ⊥
+medida · §T843 MEDIU & o devolveu p/ a onda 2 · o dono olhou a medida & escolheu dropdown MESMO
+ASSIM. §V362(b) é a regra: invariante ⊥ veta escolha informada do dono, ela REGISTRA qual foi.
+
+**§V356 emendada**: ∃ **3** categorias agora, ⊥ 2 — combo de VALOR (os 7 de `$V356_KEEP`) · picker
+de PROSA (§I113e) · & `hedgeAttr`, PROSA que fica dropdown por escolha. Ele ⊥ entra no roster
+(listá-lo exigiria par autorado = 2ª cópia de lista, §V208, & ele pararia de traduzir) ∴ fica
+NOMEADO, ≡ `speciality` em §Q33, p/ que régua futura do tipo "⊥ ∃ `comboBox` na ficha" ⊥ o coma
+calado (§B94). **§T843 fechou junto**: o único bloqueio dela era §T844.
+
+⚠ **§T852 perdeu o motivo** (`/ck:research` do texto de `hedgeAttr`): sem `?` ⊥ ∃ descrição p/
+abrir. ⊥ foi mexida — é decisão p/ a próxima `/ck:spec`.
+### ⚠ A LACUNA QUE A MUTAÇÃO ACHOU & QUE ⊥ FOI FECHADA — p/ a próxima `/ck:spec`
+
+**Tirar `hedgeAffiliation` do `fields` do dataLink do pintor deixa o gate VERDE.** MEDIDO (caso 11
+da bateria). O dano é real: o botão pararia de repintar & mostraria `Select Affiliation` c/ valor
+dentro. **RAIZ, & ela é de ESCOPO:** §V383 promete "∀ botão de picker autorado é PINTADO" mas o
+coletor dele expande **TEMPLATES** ∴ botão AVULSO (autorado inline, ⊥ por template) escapa da
+régua inteira — que é exatamente a vacância que §V333 fechou p/ o `?` c/ o roster `$BARE_Q333`, 1
+porta ao lado, & que §V354(i) nomeia. Hoje ∃ **1** desses (`dynhedgeAffiliation`); §T844 & §T876
+criam mais.
+
+**⊥ foi construída nesta rodada de propósito:** ⊥ bloqueia §T874, & régua nova ! nascer c/ mutação
++ sonda (§V20 §V222) — o que é §T próprio, ⊥ carona numa §T de conversão. **RECOMENDAÇÃO:** §T nova
+que dê a §V383 um `$BARE_DYN` ≡ o `$BARE_Q333` de §V333, c/ 2 pernas: (a) o botão avulso é pintado
+por ALGUM `mfLabel` & (b) o dataLink do pintor OBSERVA o campo que ele pinta. A (b) é a que a
+mutação provou faltar.
+
+### ⚠ 2 ARMADILHAS DE POWERSHELL, as 2 custaram execução, & as 2 são de PARSE
+
+1. **`,@(a, b, c - d)`** — a vírgula unária casa MAIS FRACO que o `-` ∴ o PowerShell lê
+   `(@(a,b,c)) - d` & morre c/ `op_Subtraction` sobre `Object[]`, apontando p/ código que LÊ
+   certo. Conta fora do literal: `$w = $hi - $lo;` & só então `+= ,@(n, $lo, $w)`.
+2. **`@('a', @('x','y'))` ACHATA p/ 3 elementos.** Roster c/ lista aninhada ! ser
+   `[pscustomobject]`. É a mesma família do `@(,@(...))` que custou 2 execuções na 161ª.
+
+⚠ **& 1 de ARNÊS**: mutação mal construída acusa a RÉGUA no lugar do teste. O caso 06 renomeou só
+1 das 2 ocorrências de `dynhedgeAffiliation` em `renderManualEntry` & o gate ficou verde — ⊥ era
+buraco de §V274(d), era a outra ocorrência sustentando o nome. Ao ver "mutação ⊥ pegou", conferir
+PRIMEIRO se ela de fato removeu o sujeito. (Achou 1 defeito de verdade no caminho: §V274(d) casava
+por SUBSTRING ∴ `dynhedgeAffiliationX` passava verde — corrigido c/ `\b` & `-cnotmatch`, & provado
+c/ o caso 06b.)
+## §T875 — PARCIAL (2 de 3) & `~`. O 3º terço APAGAVA DADO, & o gate ficou VERDE
+
+**Entregue:** `NuminaFree`×5 → `HedgePicker` & `PsychicFree`×5 → `PsychicPicker`; os 2 `<template>`
+apagados; `NUMINA_FREE_ROWS` & `PSYCHIC_FREE_ROWS` a **0** (≡ §T873 fez c/ as 3 do Ghoul ∴
+`TYPED_ROW_FROM` segue DERIVADA & `isTypedRow` responde ⊥ p/ as 2 famílias, sem caso especial).
+§V378(a) fecha **8** dos 9. **Diff de campos EXPANDIDOS: 0 perdido.**
+
+⚠ **`HedgeRitualFree` ⊥ CONVERTEU, & é §B122.** A diferença ⊥ é de layout, é de SENTIDO: ritual
+PESCADO tem o nível no prefixo `"<n>. "` do livro ∴ `HedgeRitualPicker` desenha os dots como ARTE
+(⊥ `field`, ⊥ `onClick`, `opacity 0.40`, §V269a); ritual CASEIRO ⊥ tem prefixo ∴ os dots DELE
+**são** o nível (§V269b §V269d). A conversão apagou **25** campos c/ dado (`hedgeRitual_13_1`…
+`_17_5`) & o **gate ficou VERDE**.
+
+**POR QUE §V362 ⊥ viu, & a mutação AFINA isto:** o caso 05 (tirar `<PsychicPicker
+field="psychic_23"/>`) **ACENDE** §V362 ∴ ela ENXERGA o `field=` da INSTÂNCIA. O que ela ⊥ enxerga
+é o nome INTERNO ao template (`$(field)_1` → `psychic_23_1`), porque `$FIELD_CONTRACT` exclui
+placeholder `$(…)` de propósito. O buraco é EXATAMENTE esse, ⊥ "template" em geral.
+
+**Recuperação, & vale guardar:** o `.lfm` de antes de §T875 saiu do **`.rpk` INSTALADO às 22:10**
+(anterior à tarefa) — `.rpk` é ZIP & `[IO.Compression.ZipFile]` abre. ⊥ ∃ backup em git de rodada
+⊥ commitada ∴ o INSTALADO é o único retrato do estado anterior.
+
+**A §T que fecha o 9º ! ESCOLHER** (∈ a linha de §T875): (i) dots ligados no picker — §V269a proíbe
+2º dono do nível · (ii) `hedgeRitualLevel` conta dots quando ⊥ ∃ prefixo · (iii) a família fica c/
+linha livre p/ sempre & §V378(a) fecha em 8, c/ exceção NOMEADA. **RECOMENDAÇÃO: (ii).**
+
+⚠ **REGRA enquanto §V362 ⊥ souber expandir: ∀ troca de `<template>` ! ser precedida do DIFF de
+campos EXPANDIDOS.** Vale p/ **§T876** (onda 5), que mexe em template de 3 arquivos.
+
+**Mutação:** 8 casos + sonda — todos vermelhos na régua certa, sonda verde.
+
+---
+
+## ⚠ §T831 — ENTREGUE DE FATO, & a §T pede 1 campo que ⊥ DEVE NASCER. **⊥ buildar sem `/ck:spec`**
+
+A 162ª foi construí-la (é a única `.` que §T830 desbloqueou sem pedir spec) & PAROU antes de tocar
+em código. **MEDIDO em `b5111c35`**, a caixa `TRUE FAITH` de `tabFaith` já era, dentro dela:
+
+```
+label 'Religion' (l=0 w=95) · edit field="faith" (l=100 w=300) · faith_1…_5 (l=425…541)
+```
+
+∴ **`faith` SEMPRE foi o nome da religião.** A 161ª migrou a linha FIELMENTE p/ a caixa nova
+(mesmo rótulo, mesmo campo, mesmos 5 dots, agora em `l=145 w=90` / dots `245…386`) & o `?`
+(`btnQFaith`) entrou em §T874 c/ a chave `'True Faith'` LITERAL. **⊥ sobra trabalho de layout.**
+
+**O erro está na PROSA de §I117 (pedido 4.4)**, que manda: *"campo p/ o NOME DA RELIGIÃO = **NOVO**
+(`faithReligion`), ⊥ é rename ∴ §V2 intacta"*. As 3 afirmações caem:
+
+| a prosa diz | o que a medida diz |
+|---|---|
+| o campo é NOVO | ∃ desde antes de `b5111c35`, & chama `faith` |
+| ⊥ é rename | **É** rename — `faith` ∈ `$FIELD_CONTRACT` c/ dado salvo em ∀ ficha |
+| §V2 intacta | §V2 é EXATAMENTE o que isto aciona; & 2 campos p/ 1 valor é §V135 |
+
+**A RAIZ, & é o que ⊥ pode ser esquecido:** §I117 leu `faith` como se fosse o **picker do Path**,
+sobrando a religião p/ um campo novo. **§T874 já mediu que ⊥ é**: True Faith é **1 Path só** ∴ o
+`?` ganhou chave LITERAL & `row = nil` (⊥ ∃ linha, ⊥ ∃ lista). ⊥ sobra do que `faith` ser picker.
+
+**RECOMENDAÇÃO p/ `/ck:spec`:** emendar §I117 pedido 4.4 — o campo da religião **já ∃ & chama
+`faith`**; `faithReligion` ⊥ nasce; §T831 fecha `x` como ENTREGUE por §T830+§T874, c/ a nota de
+que a migração é a de §V35 & ⊥ 1 campo novo. Se o user QUISER `faithReligion` mesmo assim, o preço
+é 1 linha de §I3 (ÓRFÃO ou APAGADO p/ `faith`) + §V362(d) subindo de 4 p/ 5 c/ §Q nova — que é
+caro p/ 1 rename que ⊥ muda nada na tela.
+
+⚠ **É o espelho do que a 159ª achou**: lá uma §T "lia como PRONTA" sem estar (§T846/§B105); aqui
+uma §T lê como PENDENTE estando pronta. Os 2 defeitos vêm da mesma porta — prosa de §I escrita
+antes da medida, & a cura é a mesma: MEDIR o `b5111c35` antes de acreditar na linha.
+---
+
+## A PERGUNTA ABERTA — a METADE B de §T874: `cboHedgeAffiliation`
+
+**⊥ virou picker.** §I131c o põe na onda 4 & a linha de §T874 o nomeia — mas a linha NUNCA
+precificou o que ele arrasta, & o que ele arrasta são §V com prosa EXPLÍCITA que só `/ck:spec`
+pode reescrever:
+
+| § | o que a prosa diz | o que a conversão faria |
+|---|---|---|
+| §V270(a) | ∃ EXATAMENTE **1** `comboBox` c/ `field="hedgeAffiliation"`, de nome `cboHedgeAffiliation` | ∄ combo nenhum |
+| §V270(d) | o nome do controle & a chave casam pela conta de `fieldRoot` (tira `cbo`) | o nome vira `dyn*` & a chave sai do argumento de `mfOpen` |
+| §V274(b) | o PAR `cboHedgeAffiliation`+`edtHedgeAffiliation` ∈ ESPELHOS de §I3 (§V36) | sobra **1** widget no `field` ∴ o espelho fica c/ 1 membro |
+| §V274(c) | o `cbo*` nasce SEM `visible=` | quem nasce sem `visible=` é o `<button>` |
+| §V274(d) | `renderManualEntry` escreve `visible`+`enabled` p/ os **4** controles, NOMEADOS | 1 dos 4 troca de nome |
+| — | + 2 rosters no gate: o grid de §V297 & a tabela de larguras (`'cboHedgeAffiliation' = 360`) | |
+
+⊥ ∃ código dependendo de ele ser picker: o filtro lê `sheet.hedgeAffiliation`, ⊥ o widget.
+
+**RECOMENDAÇÃO:** agora que §T830 passou, a geometria da aba Numina está ESTÁVEL & a objeção que
+me fez adiar ("régua escrita contra desenho que morre na rodada seguinte") **caiu**. ∴ o caminho
+é: **`/ck:spec`** emenda as 5 pernas + §I3 ESPELHOS + §I117c (↑) numa passada só, & depois
+**`/ck:build §T874`** fecha a metade B. Mas §T830 vem PRIMEIRO — ela já está construída & falta
+só a régua, & deixá-la `~` mais uma rodada é o tipo de linha que a 159ª descobriu que "lia como
+PRONTA" sem estar.
+
+---
+
+### DEPOIS — o arco que sobra
+
+**§T875** tira as **15** linhas livres da onda 4 (`NuminaFree`×5 · `PsychicFree`×5 ·
+`HedgeRitualFree`×5) & fecha os **9** nomes de §V378(a) ∴ a perna passa a valer INTEIRA; é ela que
+aposenta §V255 & que deixa §V382(d) tirar `isTypedRow` de `pickRefusal`. **§T876** é a onda 5
+(`cboRoad` · `cboClanFamily`).
+
+---
+
+## HISTÓRICO — a 160ª e anteriores
+
+### O QUE A 160ª FEZ
+
+| §T | entrega |
+|---|---|
+| §T879 | `MAIN_PATH_ROWS` **5 → 4** · sai `mainPath_5` (ÓRFÃO de §I3, no gate) · `MAIN PATHS` `height` **186 → 161** · `SECONDARY PATHS` `top` **211 → 186** · 3 `dataLink` limpos ∴ col.2 fecha em **637** |
+| §T880 | rituais **20 → 22 desenhados**, os 2 novos são `ritual_26`/`_27` · `RITUAL_ROWS` **20 → 27** (MAIOR ÍNDICE) · nasce **`RITUAL_VACANT`** · `RITUALS` `height` **561 → 617**, pé **26** ∴ col.3 fecha em **637** · §V204 aprendeu o buraco (2 pernas novas, 4 mutações) |
+| §T881 | **§V280(d)**: as 3 colunas do Ghoul fecham numa ÚNICA linha ∴ o pé deixa de ser livre. RELAÇÃO, ⊥ lista de literais. 2 mutações |
+
+### ⚠ AS 2 COISAS QUE O HANDOFF DA 159ª ERRAVA — as 2 achadas ao construir, & ∈ SPEC como **§B117** & **§B118**
+
+1. **A nota (3) de §T880 quebrava as 2 linhas novas.** Ela mandava o limite dos laços virar
+   `constante − vagos` = **22**. Mas o limite é ÍNDICE, ⊥ contagem: `for i = 1, 22` NUNCA
+   alcança `ritual_26`/`_27` ∴ as 2 linhas que a §T autora nasceriam sem pintor, que é §B112
+   em letra. O certo: limite fica em **27** (maior índice) & o buraco é PULADO dentro do laço.
+   §V263(b) já tinha escrito a distinção — "quem deriva contagem tira os vagos, quem deriva
+   índice ⊥".
+2. **∃ uma 4ª armadilha, ⊥ listada, & é a ÚNICA com dano real.** `sortRituals` **lê & escreve**
+   `sheet["ritual_" .. i]` na faixa inteira. Sem guarda, com o limite em 27, ele puxaria os
+   valores mortos de `ritual_21`…`_25` de ficha pré-85ª **p/ dentro das linhas visíveis** &
+   escreveria por cima dos nomes queimados — CALADO nos 2 sentidos. É por isso que
+   `RITUAL_VACANT` é CONJUNTO & ⊥ número: contagem ⊥ diz QUAL índice falta.
+   (`renderRitualButtons` é inofensivo — `mfLabel` sai em `ctrl == nil` — mas foi guardado
+   igual, p/ os 2 laços lerem parecido.)
+
+### A DÍVIDA DE SPEC — PAGA na mesma data. O que a spec DECIDIU, & ⊥ perguntar de novo
+
+| § | estava | ficou |
+|---|---|---|
+| §I3 órfãos | **17** no SPEC · **26** no gate | **27**, & é **1 conjunto só**. ⚠ **a leitura de "2 leitores" era ERRADA & foi medida**: `xpLog` ⊥ tem `field=` hoje (as 3 ocorrências são 1 comentário & os CONTROLES `xpLogBox`/`xpLogScroll`) mas o bloco da 27ª TINHA campo ∴ é órfão pelo mesmo teste & **entra** (§T882). O que divide de verdade é **QUANDO o nome saiu vs. o congelamento em `b5111c35`**: **4** depois (∈ contrato, §V362(b) cobra 1 a 1) · **23** antes (∄ contrato, §V362(b) NUNCA os visita). Nome extra na lista ⊥ é risco: (b) só a lê como teste de pertinência p/ nome do contrato |
+| §V333(g) | **93** | **105**, & o achado ⊥ é o número: **3º atraso seguido** desta perna (28 → 45 → 93), cada um corrigido 1 rodada depois de deixar de valer. Os 93 nasceram 11 atrás — foram escritos no MESMO dia de §T873 |
+| §V280 | **3** pernas | **4**. Entra **(d)**, o pé como RELAÇÃO. & **(b) SAI**: era de §V298 desde a 107ª & esta linha nunca disse ∴ o "20 de vão" escrito nela estava errado há 50+ rodadas |
+| §V204 | "falta LIGAR" | LIGADA, c/ **2** pernas a mais do que a emenda previa — `<FAMÍLIA>_VACANT` ≡ o buraco do XML, & ∀ laço que anda a família por índice consulta ela |
+| §V383 | — | **buraco de escopo** achado: (b) promete "∀ laço que pinta" & lê só a raiz ∴ **3** pintores sem régua (§T883) |
+
+---
+
+### AS 3 DECISÕES DO USER 2026-09-01 — já ∈ `SPEC.md` §C, ⊥ perguntar de novo
+
+1. **`MAIN_PATH_ROWS` 5 → 4**, tomada de olho no custo: §V181 dá ≤1 main path por feitiçaria &
+   `BLOOD_SORCERY` tem **6** ∴ a ficha vai de 1 p/ **2** slots curta. Ele confirmou assim mesmo.
+2. **Rituais 20 → 22 DESENHADOS, pé 26**, aceitando um **3º** valor de pé na ficha (20·26·35)
+   em troca das 3 colunas do Ghoul fechando EXATO em **637**.
+3. **Os pés 20/35 das outras caixas FICAM.** Normalizar refaz a conta das colunas no meio da
+   rodada ∴ adiado p/ §T881, isolado.
+
+O porquê da geometria está em **§I118f** (medido do XML, ⊥ dos comentários, que mentem):
+`h = 41 + 25·N + pé`. Coluna de 2 caixas fecha em `107 + 25(T+B) + pé₁ + pé₂`, de 1 caixa em
+`61 + 25R + pé₃` ∴ c/ ∀ pé = 20 os restos mod 25 são **22** & **6** & elas NUNCA se encontram.
+⊥ re-derivar: crescer linhas ⊥ muda o resto, só o pé muda.
+
+---
+
+### §T879 · §T880 · §T881 — as 3 receitas SAÍRAM daqui, & de propósito
+
+As 3 estão `x` & instaladas. As receitas linha-a-linha que moravam aqui foram APAGADAS em vez de
+marcadas: 2 delas estavam ERRADAS (↑ "AS 2 COISAS QUE O HANDOFF DA 159ª ERRAVA") & receita errada
+de §T fechada é pior que receita nenhuma — a próxima sessão a leria como estado. O que sobrevive
+delas está ↑ em "O QUE A 160ª FEZ" & na "DÍVIDA DE SPEC", que é o que ainda tem trabalho dentro.
+
+---
+
+### DEPOIS DAS 3 — o arco que sobra
+
+**§T874** (onda 4 de §I113e: `HedgePicker` · `PsychicPicker` · `HedgeRitualPicker` +
+`cboHedgeAffiliation`) destrava **§T830** (Numina em 3 colunas), & §T830 paga **3 dívidas de
+régua já escritas nas linhas dela**: **§V361 INTEIRA** · **§V362(c)(d)** · & a devolução do
+roster das 3 colunas do Ghoul, hoje EMPRESTADO em §V188. **§T875** fecha os 9 nomes de §V378(a)
+& aposenta §V255.
+
+---
+
+## O QUE A 159ª FEZ
+
+| §T | entrega |
+|---|---|
+| §T872 | onda 3 de §I113e FECHADA: as 41 réguas ligadas · **2 lacunas de CÓDIGO** que a 158ª deu por prontas (↓) · **20** §V emendadas ou aposentadas · **§B114** & **§B115** |
+| §T873 | as **11** linhas livres saem: `DiscFreeRow`×3 · `SecPathFreeRow`×3 · `RitualFreeRow`×5 → picker. Os 3 `<template>` APAGADOS · `DISC_FREE_ROWS` `SEC_PATH_FREE_ROWS` `RITUAL_FREE_ROWS` → **0** (ficam declaradas, ≡ §T870) · **0** campo renomeado |
+| — | **§B116** & a perna nova de §V204 (fora da fila de §T, pedida pelo user no fim da rodada): o gate deixava passar índice de linha fora de `1..N`. Ver ↓ |
+| §T834 | **§V362** no gate, c/ `$FIELD_CONTRACT` — os **325** `field=` congelados em `b5111c35`. ⚠ **§V361 SAIU desta §T** & foi p/ §T830 INTEIRA (↓). Mutação 4/4 |
+| §T832 | **aba Ghoul SEM sub-abas**: `vampStrip` APAGADA · os 3 `<import>` lado a lado em `left` **0 / 395 / 965**, `width` **390 / 565 / 520**, `top=150`, TODOS visíveis & SEM `name` · `SUB_TABS` **3 → 2** grupos · **0** caixa redesenhada, ≡ §I118d promete. **17** literais de barra + **10** rosters de barra no gate, & **3** réguas de JULGAMENTO (↓) |
+
+### §T834 — §V362 ENTROU & PAGOU no 1º disparo; §V361 ⊥ entrou, & o porquê é medida
+
+**§V362 (a)(b)(e)**, & a chave é COMO o "ANTES" passa a ∃: um check estático ⊥ tem antes p/
+ler, ∴ ele é **CONGELADO**. `$FIELD_CONTRACT` = os **325** `field=` autorados em `b5111c35` (o
+último commit limpo, ANTES da onda 3 & de §T832), lidos do **XML PARSEADO** ≡ o gate lê.
+Congelado num commit ANTERIOR & ⊥ no estado de hoje **de propósito**: congelado em cima de hoje
+ele ⊥ poderia acender por nada que já aconteceu — arma o futuro & ⊥ certifica o passado.
+
+⚠ **Ela pagou na 1ª execução**: `discSel` `pathSel` `ritualSel` sumiram em §T872 & ⊥ ∃iam em
+lista nenhuma de §I3. Entraram como **ÓRFÃO** (o dado FICA no NDB; só o widget saiu). Fora esses
+3, **nenhum** campo se perdeu em 3 rodadas de layout — 325 → 322, & os 3 são exatamente a
+decisão B do user.
+
+⚠ **ARMADILHA MEDIDA — os 2 lados de um teste de subconjunto ! ser lidos do MESMO jeito.** A 1ª
+tentativa comparou o contrato contra `$allFields` (o censo que §V1 monta) & deu **~200 FAIL** de
+campos que estavam ali na frente: `$allFields` chaveia algumas famílias diferente. Régua que
+compara 2 leitores em vez de 2 estados. O bloco monta o censo DELE, c/ o mesmo XPath.
+
+⚠ **§V361 ⊥ entrou, & ⊥ por metade nenhuma.** Tentei armar a metade Ghoul & as 4 pernas caíram,
+cada uma por motivo DIFERENTE: **(a)** o que ela mediria já é medido por §V188 desde §T832 → 2
+donos p/ 1 régua (§B70), & o resto de (a) ("o box de topo ⊥ se MOVE") pede geometria congelada
+≡ §V362 pediu p/ campo · **(b)** é a versão POR ABA do que §V362(a) mede na ficha inteira, & a
+própria §V362(a) diz que por aba **acende falso** → perna ABSORVIDA, ⊥ perna a construir ·
+**(c)** sem sujeito (a força de vontade ⊥ saiu da Numina, 17 leituras) · **(d)** é
+intrinsecamente de DUAS abas. Vai INTEIRA p/ §T830, c/ as 2 abas na mesa.
+
+### §T832 — as 3 réguas que pediam JULGAMENTO, & o que virou de cada uma
+
+- **§V188**: a metade das SUB-ABAS troca de sujeito (3 panes empilhadas c/ título → 3 colunas
+  visíveis, 1 `<import>` cada, **0** `visible="false"`, **0** `name`); a metade do `tabControl`
+  nativo ⊥ é tocada. ⚠ o roster das 3 colunas fica AQUI **emprestado** — quem herda é §V361(a),
+  & ela só entra em **§T834** ∴ apagar antes deixa as colunas sem régua por 1 §T inteira.
+- **§V221**: REESCRITA, & é a reescrita que §I118e encomendou — de "painéis EMPILHADOS numa
+  rect" p/ **colunas DISJUNTAS em x**. 4 pernas: ⊥ ∃ barra · as 3 abrem no MESMO `top` ≥ 138 ·
+  `left`+`width` de cada ≤ `left` da seguinte, c/ vão **5** · largura da coluna ≡ a que o form
+  DELA declara. ⚠ sem isto, **3 colunas SOBREPOSTAS passariam VERDES**: painel é isento de §V40
+  por §V262(d), justamente porque panes empilhadas PODIAM dividir 1 retângulo.
+- **§V225**: (a) passa a medir ∀ import contra o `<layout>` **DELE**, ⊥ contra o 1º da aba —
+  empilhadas, o 1º servia p/ as 3; lado a lado, isso reprovaria as colunas 2 & 3. **(b) ⊥ VOLTA**,
+  & é correção do que eu mesmo escrevi 1h antes: a promessa era "as 3 colunas & a `BLOOD POOL`
+  fecham no mesmo x" & MEDIDO elas fecham em **390 / 960 / 1485** contra **1070** — ⊥ ∃ desenho
+  que as concilie, porque as 3 larguras são diferentes DE PROPÓSITO. Régua impossível ⊥ é dívida,
+  é §B106 marcado p/ o futuro. O que (b) comprava migrou INTEIRO p/ §V221(3)+(4).
+
+### ⚠ AS 2 LACUNAS DE CÓDIGO QUE O HANDOFF DA 158ª NEGAVA — as 2 CORRIGIDAS
+
+O bloco anterior dizia "**Nada de código a refazer**". Estava errado nos 2 pontos, & nenhum
+dos 2 dava FAIL — as réguas dos 2 apontavam p/ o lado de onde o sujeito tinha ACABADO de sair.
+
+1. **§B114 — o FILTRO ⊥ andou junto.** `mfOpen` montava `MF.pool` DIRETO de `PICKER_LIST` ∴
+   trilha / trilha secundária / ritual passaram a oferecer **TUDO** & `guardPick` reverteria
+   no clique seguinte. Cura: `discLevels()` + `hedgePathLevels()` **1×** por abertura, FORA do
+   laço, & `pickAllowed(MF.field, vals[i], levels, hedge)` DENTRO dele. §V205 aponta p/ lá.
+2. **§B115 — o `pickEra` foi embora c/ as panes.** `descText` fazia `ent[lang] or ent.en` &
+   mais nada ∴ o `?` mostraria o corpo do NÚCLEO em Dark Ages. ⊥ deu FAIL porque ⊥ ∃
+   `daEn`/`daPt` em disco AINDA (**0** ocorrência nos 14 `desc*.lua`). Cura: a época mora
+   INLINE em `descText` (⊥ local novo — o form raiz tem 50 locais contra os 53 do rdk, §B93).
+
+### AS 20 §V QUE MUDARAM — todas ∈ `SPEC.md`, ⊥ reabrir
+
+- **APOSENTADAS** (sujeito ⊥ ∃): §V176 (os 3 radios) · §V193 (a relação c/ a coluna) ·
+  §V207 (absorvida por §V205) · §V249 & §V250 (donos novos: §V266 & §V365f) · §V252**(d)** ·
+  §V225**(b)** — esta VOLTA em §T832.
+- **REAPONTADAS**: §V175 (`renderClanDiscLock` → `clanDiscOpen()` + recusa em `mfOpen`) ·
+  §V178 (`items=` → o botão `dyn*`) · §V192 (`pickEra` → `descText`) · §V194
+  (`//comboBox` → `PICKER_LIST` nas 5 raízes) · §V203 & §V205 (→ `mfOpen`).
+- **SÓ NÚMERO**: §V111 (9→6 panes, 17→15 combo) · §V196 & §V241 (17→15) · §V280 & §V298
+  (73→70) · §V333 (45→**104**) · §V354 (4 ondas novas) · §V255 (roster 6→**3**).
+
+### MUTAÇÃO — 39 rodadas, 39 VERMELHAS (§V20, §V222)
+
+§V175 ×3 · §V176 · §V178 · §V192 ×2 · §V193 · §V203/§V207 · §V205 ×3 · §V249 · §V252 ·
+§V354(i) · §V354(e) ×2 · §V378(a) · §V255 · §V248 · §V333 · §V204 ×5 (a perna nova) ·
+**§V221 ×5** (sobreposição · largura · barra de volta · tops discordando · vão) ·
+**§V188 ×2** (coluna escondida · `name` sobrevivendo ao leitor) · **§V225(a)** no eixo Y ·
+**§V362 ×4** (campo somindo · órfão fora da lista · teto dos apagados · contrato editado).
+
+⚠ As **17** contagens de barra (19→16 · 4→3 · 5→3 · 8→5 · 24→19 · 3→2 grupos) ⊥ pediram
+mutação SEPARADA: elas foram OBSERVADAS vermelhas na passada de **25 FAIL** logo depois do
+código de §T832, ANTES de eu tocar em qualquer uma. Verde-depois-de-vermelho-observado é
+prova mais forte que mutação, porque o vermelho veio do mundo & ⊥ de um teste que eu escrevi.
+
+---
+
+## ✅ BUILD & INSTALL — FEITOS & provados (§B1, §B103)
+
+`rdk -l` ×3, cada um provado por mtime **&** size:
+`2.605.628` → `2.607.433` (§T872) → `2.611.387` (§T873) → **`2.609.043`** (§T832, ENCOLHEU —
+o `vampStrip` saiu); mtime 20:59 → 22:36 → 22:46 → 23:36.
+
+`rdk -i` ×2, **1 por rodada & no fim** (§B103), c/ o user confirmando a ficha FECHADA nas 2:
+22:51:24 (o `.rpk` de §T873) & **01/09 09:53:14** (o de §T832, **2.609.045 B**, mesmo size do
+`output/`). ⚠ **PERGUNTEI DE NOVO na 2ª**: autorização ⊥ é retroativa & o user pôde ter aberto
+a ficha no meio.
+
+⚠ §T834 é rodada de **RÉGUA**: depois do install só `SPEC.md` & o gate mudaram ∴ ⊥ ∃ build a
+refazer. Os `.lfm` de `WoD20.1`/`.2`/`.7`/`.13` têm mtime mais NOVO que o `.rpk` porque a
+mutação os reescreveu & restaurou — `git diff` neles é VAZIO, conferido.
+
+---
+
+## ⛔ TESTE DE TELA — só o user roda, & agora são 5
+
+0. **§T832, a aba Ghoul INTEIRA (o mais visível da rodada)**: ⊥ ∃ mais a barrinha de sub-abas
+   `Disciplines` / `Blood Sorcery: Paths` / `Blood Sorcery: Rituals`. As **3** listas aparecem
+   LADO A LADO de uma vez, fechando em `x=1485` dentro da ficha de `1680`, & **⊥ ∃ barra de
+   rolagem horizontal**. As caixas de cima (`660` + `405`) ficam onde estavam & ⊥ acompanham a
+   largura nova — é assim de propósito (§I118d), mas é a 1ª vez que alguém vê.
+
+Nada disto tem check estático. Fazer c/ a ficha REABERTA depois do install (§B103).
+
+1. **Aba Ghoul**: disciplina · trilha · trilha secundária · ritual abrem a **caixa de busca**.
+2. O **`?`** de cada uma mostra a descrição, & o `-- Custom --` aceita nome digitado
+   **sem ser revertido** (é o que §T877 comprou, & a onda 3 é a 1ª família FILTRADA a usá-lo).
+3. **O FILTRO NOVO (§B114)**: numa ficha SEM feitiçaria de sangue, a lista de ritual / trilha
+   ! abrir **CURTA** (só o que a ficha alcança), ⊥ com os 284 rituais. Numa ficha COM, ! crescer
+   conforme a disciplina sobe. **Este é o teste mais importante da rodada** — é código novo que
+   gate nenhum observa rodando.
+4. As **11** linhas que eram digitadas (`disc_13`…`_15` · `secPath_13`…`_15` ·
+   `ritual_16`…`_20`) agora são picker & **mantêm o valor** que já tinham.
+
+---
+
+## ✅ §B116 — o buraco que a mutação achou, & que o user mandou fechar NA HORA
+
+MEDIDO por mutação nesta rodada: trocar `<DiscRow field="disc_15"/>` por
+`<DiscRow field="disc_99"/>` saía **VERDE no gate inteiro** (0 FAIL). §V204 comparava a
+CONTAGEM c/ a constante & 15 seguiam 15; ⊥ ∃ia régua exigindo que os índices fossem **1..N**.
+Linha fora da faixa é campo que leitor NENHUM alcança (`declareTrait` & o ledger andam
+`1..CONST`) ∴ bolinha que ⊥ custa XP, ⊥ entra no log & guarda o que o jogador escrever.
+
+**FECHADO nesta rodada** (user aprovou): §V204 ganhou a perna `{índices desenhados} == {1..CONST}`
+sobre o roster que a contagem já varre (as 5 do vampiro + `SPECIALITY_ROWS` + `BACKGROUND_ROWS`,
+picker & digitada juntas). **§B116** registra o achado. Mutação **5/5 VERMELHAS**: índice acima
+da faixa · índice `0` · índice repetido · `num=` da especialidade · `background_` fora da faixa.
+
+⚠ A lição do §B116 é do FORMATO da régua & vale p/ o gate INTEIRO: **régua que compara TAMANHO
+de conjunto ⊥ vê troca DENTRO do conjunto.** E o achado veio de uma mutação que ERROU o alvo —
+queria testar §V354(e), que conta LINHAS, & mexeu no ÍNDICE. **Mutação que sai VERDE ! ser LIDA
+antes de ser corrigida**: o verde inesperado é onde mora o buraco.
+
+---
+
+## ARMADILHAS DE FERRAMENTA — as 3 da 158ª SEGUEM VALENDO, & 3 novas
+
+1. **`sed -i` mata CRLF** (§B74) — splice PowerShell (`ReadAllText` → `WriteAllText` c/
+   `UTF8Encoding($false)`). O `file` é o indicador confiável; `grep -c` de CR & `cat -A` do
+   Git Bash comem CR & MENTEM. ⚠ **o `Edit` do Claude Code PRESERVA CRLF** — medido nos 5
+   arquivos desta rodada. É a ferramenta certa p/ edição pontual; o splice fica p/ lote.
+2. **`.ps1` sem BOM é lido como ANSI** ∴ literal c/ acento chega corrompido & `.Contains()`
+   falha SEM erro. `printf` do BOM antes do `cat >>`.
+3. **PowerShell ⊥ distingue maiúscula em variável**: `$T` & `$t` são a MESMA. Usar `$TAB`.
+4. ⚠ **NOVA — here-string `@"…"@` escrita por heredoc do bash nasce c/ LF** & ⊥ casa arquivo
+   CRLF: âncora de várias linhas ⊥ é encontrada & o script diz "0 hits" CALADO. Usar regex c/
+   `\r\n` explícito, ⊥ here-string literal.
+5. ⚠ **NOVA — régua que lê PROSA como código.** 3 arquivos EXPLICAM em comentário por que
+   `renderVampPickers` saiu; o check novo achou o NOME nos comentários & reprovou o próprio
+   bilhete que documentava o conserto. Usar `CodeOf` (tira `<!-- -->` & linhas `--`), ⊥ os
+   bytes crus. ≡ a lição de §B60.
+
+6. ⚠ **NOVA, & foi o gate que a pegou — `[char]0xNNNN + 'texto'` em PowerShell mete CR solto.**
+   Montei o `⚠` das 14 emendas de §T832 como `[char]0x26A0 + ' **EMENDADA…'`: a cauda da string
+   SUMIU (sobrou só o `⚠` colado na palavra seguinte) & entrou **1 `\r` órfão** por emenda —
+   14 CR sem LF, dentro da linha. `file` seguiu dizendo "CRLF", `git diff` ⊥ mostrou nada &
+   o gate acendeu: **§V318**, `SPEC.md carries 3785 CR against 3771 LF`. Foi o ÚNICO aviso.
+   Receita: montar string acentuada como **`[string][char]0xNNNN`** (o cast explícito p/ string
+   ANTES do `+`), & conferir CR≡LF depois de ∀ script que reescreve arquivo. É §B74 por uma
+   porta nova — lá o `sed -i` COMIA CR, aqui o PowerShell ACRESCENTA.
+
+Bônus que continua valendo: comentário inserido no gate ! terminar em quebra de linha, & o
+gate é **ASCII puro sem BOM** — manter adições em ASCII.
+
+---
+
+## GIT — nada commitado, & é assim de propósito (`CLAUDE.md`)
+
+**11** arquivos no working tree, desta rodada & da 158ª:
+
+    HANDOFF.md · SPEC.md · verify-hunters-hunted.ps1
+    WoD20th/WoD20.11.lfm · WoD20.12.lfm · WoD20.13.lfm · WoD20.14.lfm · WoD20.6.lfm · WoD20th.lfm
+    localization.lang · output/*.rpk
+
+Último commit limpo: **`b5111c35`** (gate 636/0, ANTES da onda 3). Voltar tudo:
+
+    git checkout -- "Plugins/Sheets/World of Darkness 20th Anniversary Edition" SPEC.md verify-hunters-hunted.ps1
+
+⊥ fazer isso sem o user pedir: perde a onda 3 inteira, as 20 réguas & os 2 §B.
+
+---
+
+## 158ª RODADA (2026-08-31) — SUPERADA. Ela parou NO MEIO do §T872 & a 159ª fechou. Guardada só pelo que ela MEDIU
+
+⚠ **O bloco dela dizia "nada de código a refazer" & isso era FALSO** — faltavam as 2 lacunas
+que viraram §B114 & §B115 acima. ⊥ confiar em "o código está pronto e COMPILA" como prova:
+compilar ⊥ é a mesma coisa que a regra estar ligada.
+
+O que ela mediu & continua valendo:
+
+- **A decisão B do user (2026-08-31)**: o `?` ocupa o `0..20` que era do `radioButton` ∴ ⊥ ∃
+  deslocamento de geometria; somem `discSel` `pathSel` `ritualSel` & a MARCA de linha.
+  **⊥ reabrir.**
+- ⚠ **`MainPathRow` & `SecPathRow` tinham a linha de `<comboBox>` BYTE A BYTE idêntica**: um
+  `.Replace()` textual converte as 2 & a 2ª fica abrindo a lista da PRIMEIRA (aconteceu na
+  157ª). Editar por ESCOPO de `<template>`. Já registrado em §V354.
+- **O nome do módulo é o do ARQUIVO** (`descText` monta `desc<Mod>_<lang>.lua`): `Disc`
+  `Path` `Ritual` — **⊥ `Discipline`**.
+- **§V365(d)**: arquivo c/ picker convertido ⊥ pode ter `<textEditor name="edt*Desc">` ∴ a
+  pane sai na rodada em que a família DELA ganha o `?`. Foi o que a onda 3 fez.
+
+---
+
+## 157ª RODADA (2026-08-31) — SUPERADA pelo bloco da 158ª acima. A emenda que ela pedia FOI APLICADA (os 11 pontos estao no SPEC.md). Guardada pelas medidas da onda 3 e pelas armadilhas
 
 **Estado:** gate **VERDE 632 ok / 0 FAIL** · §T **760 `x` · 104 `.` · 12 `~`** · `.rpk` **2.629.044 B**
 instalado 12:58 (Firecast FECHADO no install ∴ ⊥ ∃ risco de §B103 desta vez) · **tudo commitado**

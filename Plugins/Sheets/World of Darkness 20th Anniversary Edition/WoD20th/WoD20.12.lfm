@@ -2,161 +2,39 @@
 <form name="frmWoD20_12" align="client" theme="dark">
 	<script>
 		<![CDATA[
-			-- Disciplines area of the Vampire tab (SPEC I16). Same shape as the numina tab: two
-			-- boxes of picker rows on the left, one read-only description block on the right.
+			-- The DESCRIPTION pane is gone with this wave (SPEC V365d, I118d): the family gained its
+			-- ? here, and V365d says a pane leaves in the round its own family gets one. What the
+			-- pane used to be - a block whose text followed a MARKED row - is why every row carried a
+			-- radioButton on discSel. With the pane gone the mark had no reader left, so the radio
+			-- went too and the ? took the 0..20 the radio was holding (user 2026-08-31, ask B).
+			-- Nothing else moved: the entry is still at 25 and the dots still at 200 (SPEC V26).
 			--
-			-- The book text lives in descDisc_en.lua and descDisc_pt.lua (SPEC T495), at the
-			-- plugin root next to module.xml (SPEC I24). The generator markers moved with it
-			-- and then to both halves, so the region keeps its shape;
-			-- only the file it sits in changed. The require that loads it is INSIDE discText,
-			-- never here (SPEC V198): this CDATA is copied raw into constructNew_*(), so a
-			-- top-level require would parse the whole table on every sheet open and the
-			-- deferral would be a silent no-op.
+			-- The TEXT did not go with the window: descDisc_en.lua / descDisc_pt.lua are on disk and
+			-- the ? reads them through descFor, the one reader (SPEC V381, V365e).
+			function renderDiscButtons(form)
+				if sheet == nil or form == nil then return; end;
 
-			local NO_SELECTION = {
-				en = "Pick the selector next to a discipline to read its description here.",
-				pt = "Marque o seletor ao lado de uma disciplina para ler a descrição dela aqui.",
-			};
+				local names = {};
+				local last  = DISC_ROWS - DISC_FREE_ROWS;
 
-			local EMPTY_ROW = {
-				en = "That row is still empty. Choose a discipline in the list first.",
-				pt = "Essa linha ainda está vazia. Escolha uma disciplina na lista primeiro.",
-			};
+				-- DERIVED and never a literal: a bound written 12 here goes stale the day the box grows
+				-- a row, and nothing says so - the button simply never gets painted (SPEC V383b, B112).
+				for i = 1, last, 1 do names["dyndisc_" .. i] = true; end;
+				for i = 1, CLAN_DISC_ROWS, 1 do names["dynclanDisc_" .. i] = true; end;
 
-			local NO_ENTRY = {
-				en = "No description on file for: ",
-				pt = "Sem descrição registrada para: ",
-			};
+				local found = {};
 
-			-- A typed row whose text the storyteller has not written yet, read by anyone else
-			-- (SPEC I45, V250). The storyteller sees the empty box instead: for him it is an
-			-- input he is about to fill, and a sentence sitting in it would have to be deleted
-			-- before he could type.
-			local NO_TEXT_YET = {
-				en = "The storyteller has not written a description for this one yet.",
-				pt = "O narrador ainda não escreveu uma descrição para esta.",
-			};
+				xpFind(tabRootOf(form), names, found);
 
-			local function pick(tbl, lang)
-				return tbl[lang] or tbl.en;
-			end;
+				local lang = (sheet.language == "pt") and "pt" or "en";
 
-			-- SPEC T470 / I21: an entry may carry a SECOND body, written from the Dark Ages book,
-			-- under daEn/daPt. The two medieval themes read it; the two modern ones never do.
-			-- An entry with no medieval body falls back to the core one, so a gap in the Dark
-			-- Ages text shows the core text and never an empty box (SPEC V33).
-			local function pickEra(entry, lang)
-				local era = currentTheme();
-
-				if era == "Dark Ages" or era == "Classical Age" then
-					local da = (lang == "pt" and entry.daPt) or entry.daEn;
-					if da ~= nil and da ~= "" then return da; end;
+				for i = 1, last, 1 do
+					mfLabel(found["dyndisc_" .. i], sheet["disc_" .. i], "Select Discipline", lang);
 				end;
 
-				return pick(entry, lang);
-			end;
-
-			local function discText(lang)
-				wodTrace("discText");
-				local selected = sheet.discSel;
-
-				if selected == nil or selected == "" then
-					return pick(NO_SELECTION, lang);
+				for i = 1, CLAN_DISC_ROWS, 1 do
+					mfLabel(found["dynclanDisc_" .. i], sheet["clanDisc_" .. i], "Select Discipline", lang);
 				end;
-
-				-- A TYPED row never reaches the book (SPEC I45, V250): it carries the
-				-- storyteller's own text, one text for both languages and all four eras - it is
-				-- his, not the book's, so it passes through no translation and has no medieval
-				-- body to fall back to. This return also keeps the require below out of reach
-				-- for these rows (SPEC V206).
-				if isTypedRow(selected) then
-					local own = sheet[descFieldOf(selected)];
-
-					if own ~= nil and own ~= "" then return own; end;
-					if isStoryteller() then return ""; end;
-
-					return pick(NO_TEXT_YET, lang);
-				end;
-
-				-- `selected` is the FIELD NAME of the chosen row (SPEC V176), so the picked
-				-- discipline is one indirection away and changing a row keeps the selection valid.
-				local value = sheet[selected];
-
-				if value == nil or value == "" then
-					return pick(EMPTY_ROW, lang);
-				end;
-
-				-- SPEC V206: the require sits BELOW every early return, so a sheet with no
-				-- selection - and a row that never reaches the book - parses nothing. SPEC V198
-				-- put it inside this body and the gate went green, but onNodeReady called this
-				-- function on EVERY open and the deferral was a no-op nobody could see (SPEC
-				-- B47): position in the FILE is not reach in the FLOW, and the gate reads source,
-				-- not runtime (SPEC B30, B34). `require` still caches in package.loaded, so the
-				-- first row that really needs the book pays the parse and every later one is free.
-				-- SPEC T495 / V210: the book is one module PER LANGUAGE, so what is parsed
-				-- here is the half the reader can actually read - the other half was always
-				-- text this session never opens (SPEC R92f). `lang` comes off the NDB, so
-				-- anything that is not "pt" falls to the English half rather than requiring
-				-- a file that is not there.
-				local half = (lang == "pt") and "pt" or "en";
-				wodTrace("descDisc.REQUIRE." .. half);
-				local DESC = require("descDisc_" .. half .. ".lua");
-
-				local entry = DESC[value];
-
-				-- The name in the message is the one the ROW shows, so it goes through the era
-				-- and then through the language exactly as the picker item does (SPEC I22, T469).
-				-- Naming it by the raw canonical value would send the player looking for a line
-				-- that is not in the list above.
-				if entry == nil then
-					return pick(NO_ENTRY, lang) .. translateSheetText(eraName(value, currentTheme()), lang);
-				end;
-
-				return pickEra(entry, lang);
-			end;
-
-			-- SPEC I26 / V206: painting this block costs a parse of the book module, so it
-			-- happens when the tab is SHOWN, never when the sheet opens. onShow is the trigger
-			-- and this guard is the second leg: whether onShow fires for a form inside an
-			-- INACTIVE tab is not measured yet (SPEC R92b), so the fix hangs on two contracts
-			-- instead of one - the lesson of SPEC B39.
-			--
-			-- Tested against `false`, not falsiness: if the host answers nil the block PAINTS,
-			-- which is today's behaviour. Failing closed would leave an empty box with nothing
-			-- to show for it - the silence SPEC V33 exists to forbid.
-			function renderDiscDesc(form)
-				if sheet == nil then return; end;
-				if form.isShowing == false then return; end;
-
-				-- The lock is written in the SAME step as the text (SPEC V249c). A block showing
-				-- one row's text with another row's lock is the same lie V112 refuses of every
-				-- other control that locks at runtime - and here it would let a player type over
-				-- a description, or leave the storyteller staring at a box that will not take a
-				-- key.
-				local sel   = sheet.discSel;
-				local write = isTypedRow(sel) and isStoryteller();
-
-				descQuiet = true;
-				form.edtDiscDesc.text = discText(sheet.language or "en");
-				form.edtDiscDesc.readOnly = not write;
-				descQuiet = false;
-			end;
-
-			-- What the storyteller types lands in the field of the row that is MARKED, read at
-			-- the moment of the write (SPEC V249c): the selection decides where the text goes,
-			-- so leaving one typed row for another cannot spill into the one just left.
-			--
-			-- It asks BOTH questions again rather than trusting the readOnly it just wrote: the
-			-- flag on the control is a look, and the rule is a rule (SPEC V249a, fail-closed on
-			-- a sheet with no table, SPEC V80).
-			function saveDiscDesc(form)
-				if descQuiet or sheet == nil then return; end;
-
-				local sel = sheet.discSel;
-
-				if not isTypedRow(sel) or not isStoryteller() then return; end;
-
-				setField(descFieldOf(sel), form.edtDiscDesc.text);
 			end;
 		]]>
 	</script>
@@ -180,8 +58,9 @@
 			themselves arrive in SPEC T460, and nothing but items=/values= changes then.
 		-->
 		<template name="DiscRow">
-			<radioButton left="0" top="2" width="20" height="21" field="discSel" fieldValue="$(field)" groupName="discSel"/>
-			<comboBox left="25" top="0" width="170" height="25" fontSize="12" name="cbo$(field)" field="$(field)"/>
+			<button name="btnQ$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Disc', sheet['$(field)'], nil, '$(field)');"/>
+			<button name="dyn$(field)" left="25" top="0" width="170" height="25" text="Select Discipline" onClick="mfOpen(self, '$(field)', 'disc', 'Disc');"/>
+			<edit name="edt$(field)" left="25" top="0" width="170" height="25" field="$(field)" visible="false" enabled="false"/>
 			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
 			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
 			<imageCheckBox left="250" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
@@ -189,28 +68,6 @@
 			<imageCheckBox left="300" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 
-		<!--
-			The last three rows are TYPED, not picked (SPEC I45, V248, user 2026-08-22). Same
-			radio, same dot column, same x for the entry as the picker row above it, so the two
-			templates read as one box (SPEC V26) - only the widget in the middle changes.
-
-			It is `edt` and not `cbo` on purpose: pickerItems only ever touches controls named
-			cbo*, so a typed row is out of the filter and out of PICKER_LIST without an
-			exception written anywhere (SPEC V211a). The guard skips it too - what the
-			storyteller types has no table to be judged against (SPEC V248d).
-
-			The dots are the picker row's dots, unchanged: a discipline the storyteller wrote is
-			still a discipline, and it is bought at the same price (SPEC I9).
-		-->
-		<template name="DiscFreeRow">
-			<radioButton left="0" top="2" width="20" height="21" field="discSel" fieldValue="$(field)" groupName="discSel"/>
-			<edit left="25" top="0" width="170" height="25" fontSize="12" name="edt$(field)" field="$(field)"/>
-			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="250" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="275" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="300" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
-		</template>
 
 		<!-- 4 slots, editable only while the storyteller ticks Edit Clan Disciplines (SPEC I8g,
 		     V175). Height = 25 title + 4 rows of 25 + 25 foot, the arithmetic WoD20.7 uses. -->
@@ -272,46 +129,32 @@
 				<DiscRow field="disc_12"/>
 			</layout>
 			<layout left="32" top="341" width="326" height="25">
-				<DiscFreeRow field="disc_13"/>
+				<DiscRow field="disc_13"/>
 			</layout>
 			<layout left="32" top="366" width="326" height="25">
-				<DiscFreeRow field="disc_14"/>
+				<DiscRow field="disc_14"/>
 			</layout>
 			<layout left="32" top="391" width="326" height="25">
-				<DiscFreeRow field="disc_15"/>
+				<DiscRow field="disc_15"/>
 			</layout>
 		</layout>
 
-		<!-- Read-only and field-less: book text must never be typed over, and never saved onto
-		     the character (SPEC V29, R12). Closes level with the left column at y=585. -->
-		<layout left="395" top="20" width="675" height="617">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="635" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<button name="btnFontDownDisc" left="610" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
-			<button name="btnFontUpDisc" left="635" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
-			<textEditor name="edtDiscDesc" left="30" top="41" width="615" height="556" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveDiscDesc(self);"/>
-		</layout>
 	</scrollBox>
 
-	<!-- Watches only what the renderer READS (SPEC V123): the selection, the 19 rows it points
-	     at, and the language the text comes out in. -->
-	<dataLink fields="{'language', 'sheetTheme', 'discSel', 'clanDisc_1', 'clanDisc_2', 'clanDisc_3', 'clanDisc_4', 'disc_1', 'disc_2', 'disc_3', 'disc_4', 'disc_5', 'disc_6', 'disc_7', 'disc_8', 'disc_9', 'disc_10', 'disc_11', 'disc_12', 'disc_13', 'disc_14', 'disc_15'}" onChange="renderDiscDesc(self);"/>
+	<!-- Watches only what the painter READS (SPEC V123): the sixteen rows whose buttons carry
+	     their value, and the language they carry it in. discSel left the list with the pane -
+	     nothing reads a marked row any more (SPEC V365d, user 2026-08-31). -->
+	<dataLink fields="{'language', 'sheetTheme', 'clanDisc_1', 'clanDisc_2', 'clanDisc_3', 'clanDisc_4', 'disc_1', 'disc_2', 'disc_3', 'disc_4', 'disc_5', 'disc_6', 'disc_7', 'disc_8', 'disc_9', 'disc_10', 'disc_11', 'disc_12', 'disc_13', 'disc_14', 'disc_15'}" onChange="renderDiscButtons(self);"/>
 
-	<!-- The lock follows the storyteller's flag from WoD20.10, where it is owned (SPEC V95), so a
-	     tick made by another client at the table reaches this tab too (SPEC V175). -->
-	<dataLink field="stEditClanDisc" onChange="renderClanDiscLock(self);"/>
+	<!-- The buttons are painted when the tab is SHOWN (SPEC I26 / V206), never on onNodeReady:
+	     that fires on every open and used to drag the whole 502 KB module in with it (SPEC B47).
+	     A button's text is not data, so nothing else brings it back (SPEC I107a2).
 
-	<!-- The description block paints when the tab is SHOWN (SPEC I26 / V206): onNodeReady fires
-	     on every open and dragged the whole 502 KB module in with it (SPEC B47). The lock is a
-	     different animal - it writes no book text, costs no parse, and a tab that opens with an
-	     unlocked combo would let the player edit what the storyteller froze - so it stays on
-	     onNodeReady, where it has always been (SPEC V175). -->
+	     onNodeReady is gone entirely: the clan lock was the one thing left on it, and the lock
+	     is asked at the moment of opening now rather than painted onto a control (SPEC I8g,
+	     V95, and the shape V161 already gave the granted specialty). -->
 	<event name="onShow">
 		wodTrace("WoD20.12.onShow");
-		renderDiscDesc(self);
-	</event>
-
-	<event name="onNodeReady">
-		renderClanDiscLock(self);
+		renderDiscButtons(self);
 	</event>
 </form>

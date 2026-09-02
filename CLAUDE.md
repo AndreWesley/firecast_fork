@@ -11,6 +11,24 @@ qual §T pegar em seguida e quais parecem prontas mas arrastam trabalho junto.
 Dados de pesquisa extraídos dos livros: `research/` (leia o `README.md` de lá antes de
 reextrair qualquer coisa dos PDFs).
 
+## Leitura — as 4 regras que seguram o custo (§I133g, §V387)
+
+O gargalo medido não é disco nem rede: é token. Contexto médio de 323k por request e 650k
+tokens de saída por rodada. Estas 4 regras valem em toda sessão:
+
+1. **Nunca `grep -C` no `SPEC.md`.** Use `.\spec-slice.ps1 <id>` — devolve a linha do id e
+   as que ela cita. Medido em §T826: 10.717 tokens contra 750.
+2. **Gate sempre com `-Quiet`**: `.\verify-hunters-hunted.ps1 -Quiet` imprime só os FAIL e a
+   contagem. Todos os checks rodam igual — 14.093 tokens por rodada contra ~1k.
+3. **`Edit` em vez de `Write`** em arquivo que já existe. Write regrava tudo em tokens de
+   saída, a parte serial e lenta: foram 57 Writes contra 5 Edits, 20% de toda a saída.
+4. **Nunca abrir inteiros** `desc*.lua` (975 KB cada, dado e não lógica),
+   `verify-hunters-hunted.ps1` (1,25 MB) e `SPEC.md` (1,62 MB) — sempre `grep` ou `sed -n`.
+
+⚠ Todo arquivo do repo é **CRLF** e as ferramentas do Git Bash comem o CR do arquivo
+inteiro, sem sintoma (§B74, §V318). Depois de gerar arquivo com `awk`/`>`, converta:
+`awk '{printf "%s\r\n", $0}'`.
+
 ## Build ! terminar em .rpk INSTALADO
 
 Toda vez que terminar de buildar: gerar o `.rpk` **e instalar**. Build sem install =

@@ -777,27 +777,17 @@
 			-- be renamed without dropping what is saved under it (SPEC I3, V2).
 			activeTab = "tabMain";
 
-			-- The sub-tab strips, one entry per strip (SPEC I58). They carry no gating of their
-			-- own: nothing hides a sub-tab, so there is no `shown` map for them.
+			-- SUB_TABS is GONE with T830, and so is the whole sub-tab idea (SPEC I117, I118, pedidos
+			-- 4 and 5). It held two groups, both of them the Numina tab's: the Ghoul group left in
+			-- T832 when that tab became three columns, and wave after wave the same answer came back -
+			-- three panes side by side beat three panes stacked behind a bar. T830 does it for Numina
+			-- and the table has no entry left to hold. The strips went with it: numStrip and
+			-- hedgeStrip are off WoD20.7, so nothing on the sheet declares a sub-tab any more.
 			--
-			-- ONE table and one renderer for BOTH strips since the 90th round, when the Numina
-			-- tab got a strip of its own. It is not generalisation for its own sake - there are
-			-- two readers TODAY - and the alternative is two functions of the same twelve lines
-			-- with nothing measuring that they stay in step, which is the shape of B12 and B13.
-			--
-			-- `active` lives IN the entry, so the open sub-tab is still plain Lua session state
-			-- that no field syncs to the table (SPEC V227), exactly as activeVampTab was.
-			SUB_TABS = {
-				{ list = { "Disc", "Paths", "Rituals" }, active = "tabDisc" },
-				{ list = { "Hedge", "Psychic", "Faith" }, active = "tabHedge" },
-
-				-- The Hedge Magic pane splits in two from the 91st round (SPEC I64). The names
-				-- carry "Hedge" and they HAVE to: renderSubTabs builds one map keyed by NAME and
-				-- selectTab matches a name against every group, so a second "tabPaths" here would
-				-- make a click on the Numina tab flip the Ghoul tab's sub-tab instead - green
-				-- gate, rdk 0, and the symptom two tabs away from its cause (SPEC V268a).
-				{ list = { "HedgePaths", "HedgeRituals" }, active = "tabHedgePaths" },
-			};
+			-- renderSubTabs went too. Kept over an empty table it would walk nothing and paint
+			-- nothing on every tab change, which is dead work no reader can tell from live work
+			-- (SPEC B55). selectTab keeps its name and its ONE job - the eleven root tabs still call
+			-- it - and what it lost is the search that always fell through (SPEC V268 retired).
 			-- >>> GEN_MAX_BEGIN (SPEC I29, V218: one map, both readers)
 			-- The ceiling a domitor's generation puts on a ghoul's Disciplines. Keyed by the VALUE the
 			-- combo stores ("4".."14"), which is why that value is a plain number and the ordinal is
@@ -2151,86 +2141,12 @@
 				end;
 			end;
 
-			-- Down here, not up beside TAB_LIST where it would read better, for the reason B51
-			-- cost a whole round (SPEC V223): both of these call `tabRootOf`, which is a `local`
-			-- declared further down, and Lua resolves a non-local name at COMPILE time - a body
-			-- written above that line gets a GETGLOBAL and calls nil. V223 caught it the same day
-			-- it was written.
-			-- Both strips, every call (SPEC I58). Painting the one that did not change costs six
-			-- lookups that find nothing when its form is not loaded, and it buys the caller not
-			-- having to know which strip its button belongs to - the same trade selectTab makes
-			-- one line below.
-			--
-			-- A THIRD name family since the 107th round (SPEC I76c, V300): note<X> is a caption
-			-- that belongs to pane tab<X> but cannot live inside it. The affinity note is the one
-			-- there is - the Hedge panes have no free band for it, which is why the 91st round put
-			-- it on the strip - and a caption standing over the pane it does not explain is what
-			-- the user reported. It is hidden HERE and by nothing in the XML, in the same line of
-			-- the same loop that lights the pill, so the two cannot come apart. A pane with no
-			-- note costs one lookup that finds nothing, which is the trade the paragraph above
-			-- already makes for the strip that did not change.
-			-- A FOURTH and FIFTH family since the 109th round (SPEC I78c, V305): lbl<X> is the sub-tab's
-			-- word CLOSED - italic, in the theme's own text colour - and lblOn<X> is the same word OPEN,
-			-- roman and in the era's accent. Two labels and not one word restyled: fontColor belongs to
-			-- applyTheme and a Lua write there is undone on the next repaint (SPEC V57), so the state is
-			-- carried by `visible` - which is what tabOn<X> has always been for the pill. Lit in the same
-			-- loop and from the same `live`, so word, rule and pane cannot come apart.
-			function renderSubTabs(from)
-				local names = {};
-
-				for s = 1, #SUB_TABS, 1 do
-					local list = SUB_TABS[s].list;
-
-					for i = 1, #list, 1 do
-						names["tab" .. list[i]]   = true;
-						names["tabOn" .. list[i]] = true;
-						names["note" .. list[i]] = true;
-						names["lbl" .. list[i]]   = true;
-						names["lblOn" .. list[i]] = true;
-					end;
-				end;
-
-				local found = {};
-
-				xpFind(tabRootOf(from), names, found);
-
-				for s = 1, #SUB_TABS, 1 do
-					local grp = SUB_TABS[s];
-
-					for i = 1, #grp.list, 1 do
-						local live = ("tab" .. grp.list[i]) == grp.active;
-						local pane = found["tab" .. grp.list[i]];
-						local on   = found["tabOn" .. grp.list[i]];
-						local note = found["note" .. grp.list[i]];
-						local lbl   = found["lbl" .. grp.list[i]];
-						local lblOn = found["lblOn" .. grp.list[i]];
-
-						if on   ~= nil then on.visible   = live; end;
-						if pane ~= nil then pane.visible = live; end;
-						if note ~= nil then note.visible = live; end;
-						if lbl   ~= nil then lbl.visible   = not live; end;
-						if lblOn ~= nil then lblOn.visible = live; end;
-					end;
-				end;
-			end;
-
 			-- Setting the tab and painting the strip are the same act, so they cannot come apart
-			-- (the shape V112/V162 ask for on enabled+opacity). One entry point for both strips:
-			-- the XML says selectTab everywhere and this decides which strip the name belongs to,
-			-- rather than the caller having to know.
+			-- (the shape V112/V162 ask for on enabled+opacity). ONE strip since T830 and one job:
+			-- the search through SUB_TABS that used to sit here always fell through for the eleven
+			-- root tabs, and after T830 there was nothing left for it to find - the Numina tab was
+			-- the last one with sub-tabs, and it has three columns now (SPEC I117, V268 retired).
 			function selectTab(name, from)
-				for s = 1, #SUB_TABS, 1 do
-					local grp = SUB_TABS[s];
-
-					for i = 1, #grp.list, 1 do
-						if ("tab" .. grp.list[i]) == name then
-							grp.active = name;
-							renderSubTabs(from);
-							return;
-						end;
-					end;
-				end;
-
 				activeTab = name;
 				applyTabVisibility(from);
 			end;
@@ -2527,10 +2443,38 @@
 			--
 			-- The typed rows are the LAST ones, so every reader is 'picker = total - typed' and
 			-- no list of indices exists to drift from these numbers (SPEC V255, V263b).
-			NUMINA_ROWS       = 17;
-			NUMINA_FREE_ROWS  = 5;
+			-- NUMINA_ROWS went 17 -> 20 in T830 (SPEC I117c, Q32): the Hedge Magic column grew three
+			-- slots so it and the Psychic one draw the same twenty, which is what I117b means by the
+			-- same structure. The three NEW ids are the highest ones - numina_18, _19 and _20, the
+			-- next numbers of the root, never a vacant id reused (SPEC V362c) - and they are the
+			-- TYPED rows, which is V263(b) resolving an ambiguity I117c left open: the typed rows
+			-- are the LAST indices, so the three ids that arrive last are the three that are typed.
+			-- numina_13.._15 become pickers a round early; T875 was going to convert all five of
+			-- them anyway (SPEC I130b, V378), and nothing the player holds moves - mfOpen appends
+			-- the row's own value to the pool however it got there (SPEC V200, V346b).
+			NUMINA_ROWS       = 20;
+			NUMINA_FREE_ROWS  = 0;
 			PSYCHIC_ROWS      = 24;
-			PSYCHIC_FREE_ROWS = 5;
+			PSYCHIC_FREE_ROWS = 0;
+
+			-- The second family to carry a HOLE, and the first whose hole was CHOSEN rather than
+			-- inherited (SPEC Q32, I117c, user 2026-08-30). Psychic Phenomena went from 24 rows to
+			-- 20 and the four that came off are PICKERS - psychic_16.._19 - and never the typed
+			-- rows psychic_20.._24, so that not one field changes its SENSE. The price is a hole in
+			-- the numbering, and the price was taken knowingly.
+			--
+			-- These four are APAGADOS POR DECISAO and not orphans: the DATA goes with the widget
+			-- (SPEC V362b, I3). That list is closed at four names and a fifth needs a new Q
+			-- (SPEC V362d) - without the ceiling, "deleted by decision" becomes the door every
+			-- field leaves through.
+			--
+			-- A SET and not a number, the same reason RITUAL_VACANT is one: a count cannot say
+			-- WHICH index is missing, and every reader that walks psychic by index needs to know -
+			-- declareTrait, numinaTypeInUse and the ledger walk all read it through XP_NUMINA
+			-- below. PSYCHIC_ROWS stays 24 because it is the highest INDEX and not the count: the
+			-- typed rows still live at _20.._24 and a bound reduced by the four would stop at 20
+			-- and leave every one of them unwalked, which is B112 exactly (SPEC V263b, V204).
+			PSYCHIC_VACANT = { [16] = true, [17] = true, [18] = true, [19] = true };
 
 			-- The rituals of static magic, on the Rituals sub-tab of Hedge Magic (SPEC I65, 91st
 			-- round). Same contract as the four above: the total covers BOTH kinds of row and the
@@ -2542,9 +2486,14 @@
 			HEDGE_RITUAL_ROWS      = 17;
 			HEDGE_RITUAL_FREE_ROWS = 5;
 
+			-- `count` is the HIGHEST INDEX of the family and `vacant` is the hole inside it, so the
+			-- three loops that walk a numina by index read one table instead of each carrying its
+			-- own guard (SPEC V204, V263a). hedge declares no vacant because it has none - an
+			-- absent key is the honest answer, and a reader written `grp.vacant == nil or not
+			-- grp.vacant[i]` costs that family nothing.
 			local XP_NUMINA = {
 				{ kind = "hedge",   base = "numina",  count = NUMINA_ROWS },
-				{ kind = "psychic", base = "psychic", count = PSYCHIC_ROWS },
+				{ kind = "psychic", base = "psychic", count = PSYCHIC_ROWS, vacant = PSYCHIC_VACANT },
 			};
 
 			-- How many background rows the sheet draws (SPEC V145). Declared ONCE and read by
@@ -2609,16 +2558,42 @@
 			-- word. The gate now measures every one of these against the XML (SPEC V204).
 			CLAN_DISC_ROWS = 4;
 			DISC_ROWS      = 15;
-			MAIN_PATH_ROWS = 5;
+			MAIN_PATH_ROWS = 4;
 			SEC_PATH_ROWS  = 15;
-			RITUAL_ROWS    = 20;
+			RITUAL_ROWS    = 27;
+
+			-- T880 (user 2026-09-01) grew the ritual box by two rows and the two new slots are
+			-- _26 and _27, NOT _21 and _22: the five names that came off in the 85th round are
+			-- burned, and a sheet saved before it still carries what was in them (SPEC I46, V251,
+			-- V2). So the numbering keeps a HOLE, and RITUAL_ROWS above is the highest INDEX and
+			-- no longer the count - the rewrite V263(a) already took for psychic.
+			--
+			-- The hole is a SET and not a number because a count cannot say WHICH index is
+			-- missing, and both readers need to know. sortRituals is the one that would do
+			-- damage: it reads sheet[...] and writes setField(...) across its whole range, so an
+			-- unguarded walk would pull a pre-85th sheet's dead values into the visible rows and
+			-- write back over the burned names, in silence (SPEC V204 amended, B116).
+			--
+			-- The BOUND of those walks stays the highest index and is NOT reduced by these five.
+			-- Subtracting them would stop the loops at 22 and leave the two rows this round adds
+			-- with no painter at all, which is B112 exactly (SPEC V263b - a count drops the
+			-- vacancies, an index does not).
+			RITUAL_VACANT  = { [21] = true, [22] = true, [23] = true, [24] = true, [25] = true };
 
 			-- How many of those rows the storyteller TYPES instead of picking (SPEC I45, V248,
 			-- user 2026-08-22). They are always the LAST ones, so the picker count is the total
 			-- minus these and there is no second list of indices to drift from the first.
-			DISC_FREE_ROWS     = 3;
-			SEC_PATH_FREE_ROWS = 3;
-			RITUAL_FREE_ROWS   = 5;
+			--
+			-- ALL THREE went to zero in T873, the way BACKGROUND_FREE_ROWS and SPECIALITY_FREE_ROWS
+			-- did in T870 (SPEC I130b, V378): every discipline, secondary path and ritual row is a
+			-- picker now, and a name of your own goes in through the Custom line instead (I129).
+			-- The constants STAY at zero rather than being deleted - every reader on the sheet is
+			-- written as `total - typed`, and TYPED_ROW_FROM below derives isTypedRow's answer from
+			-- them. At zero the first typed row is one PAST the last row drawn, so isTypedRow
+			-- answers false for the whole family without a single reader changing shape.
+			DISC_FREE_ROWS     = 0;
+			SEC_PATH_FREE_ROWS = 0;
+			RITUAL_FREE_ROWS   = 0;
 
 			-- The first typed row of each box, keyed by field root. Built from the two counts
 			-- above rather than typed out again: a row moved in the XML changes one number here
@@ -2833,8 +2808,16 @@
 			-- any other from here on: the same click path prices it, refuses it and sells it.
 			for i = 1, SPECIALITY_ROWS, 1 do declareTrait("speciality_" .. i, 1, 1, 0); end;
 
+			-- The hole is SKIPPED, not subtracted: psychic_20.._24 live ABOVE the four vacancies, so
+			-- a bound cut by four would stop at 20 and leave the five typed rows undeclared - dots
+			-- that cost nothing and never reach the log, which is B46 by the door B112 came in
+			-- (SPEC V204, V263b).
 			for g = 1, #XP_NUMINA, 1 do
-				for i = 1, XP_NUMINA[g].count, 1 do declareTrait(XP_NUMINA[g].base .. "_" .. i, 1, 5, 0); end;
+				local grp = XP_NUMINA[g];
+
+				for i = 1, grp.count, 1 do
+					if grp.vacant == nil or not grp.vacant[i] then declareTrait(grp.base .. "_" .. i, 1, 5, 0); end;
+				end;
 			end;
 
 			declareTrait("faith", 1, 5, 0);
@@ -2849,9 +2832,15 @@
 			for i = 1, DISC_ROWS, 1 do declareTrait("disc_" .. i, 1, 5, 0); end;
 			for i = 1, SEC_PATH_ROWS, 1 do declareTrait("secPath_" .. i, 1, 5, 0); end;
 
-			local function numinaTypeInUse(node, base, count)
+			-- The vacant set travels with the count for the reason declareTrait reads it one screen up: a
+			-- pre-T830 sheet still holds dots on psychic_16.._19, and counting a BURNED row as "the
+			-- character already had psychic numina" would waive the 21 that a new kind costs, off a
+			-- row nobody can see (SPEC V204, Q32, I117c).
+			local function numinaTypeInUse(node, base, count, vacant)
 				for i = 1, count, 1 do
-					if traitLevel(node, base .. "_" .. i, 1, 5, 0) > 0 then return true; end;
+					if vacant == nil or not vacant[i] then
+						if traitLevel(node, base .. "_" .. i, 1, 5, 0) > 0 then return true; end;
+					end;
 				end;
 
 				return false;
@@ -2996,7 +2985,7 @@
 				local unlocked = { faith = traitLevel(base, "faith", 1, 5, 0) > 0 };
 
 				for g = 1, #XP_NUMINA, 1 do
-					unlocked[XP_NUMINA[g].kind] = numinaTypeInUse(base, XP_NUMINA[g].base, XP_NUMINA[g].count);
+					unlocked[XP_NUMINA[g].kind] = numinaTypeInUse(base, XP_NUMINA[g].base, XP_NUMINA[g].count, XP_NUMINA[g].vacant);
 				end;
 
 				for g = 1, #XP_NUMINA, 1 do
@@ -3006,6 +2995,11 @@
 						local field = grp.base .. "_" .. i;
 						local from  = traitLevel(base, field, 1, 5, 0);
 						local to    = liveLevel(field, 1, 5, 0);
+
+						-- A burned row is not priced. It cannot RISE - nothing on screen writes it -
+						-- but a pre-T830 sheet carries dots in psychic_16.._19 and the diff would
+						-- read them as a purchase the moment anything else moved (SPEC V204, Q32).
+						if (grp.vacant ~= nil and grp.vacant[i]) then to = from; end;
 
 						if to > from then
 							-- SPEC V88: the affinity path is the FIRST hedge row, always. It is
@@ -4024,9 +4018,11 @@
 			-- Both walk from the tab root rather than reaching for form.<name>: a tab form cannot see
 			-- its siblings, and the walk is what crosses the import (SPEC R9, B9).
 			local POP_BOX = { popScrim = true, popDesc = true, dynPopDescTitle = true, edtPopDesc = true };
-			local DESC_PANES = { edtDiscDesc = true, edtPathDesc = true, edtRitualDesc = true, edtHedgeDesc = true,
-				edtHedgeRitualDesc = true, edtPsychicDesc = true, edtFaithDesc = true, edtPopDesc = true,
-				edtMfDesc = true };
+			-- TWO since T874, and they are the two that are not panes of a TAB: the ? box and the
+			-- search box. Wave 4 took the four Numina panes with it (SPEC V365d), and a name left
+			-- behind here would be a control fontStep walks for and never finds - the roster that
+			-- ages, which I114f refuses and V334 measures from both sides.
+			local DESC_PANES = { edtPopDesc = true, edtMfDesc = true };
 
 			-- kind names the module family and key is the canonical EN name the row stores
 			-- (SPEC V24), which is also what the title shows. The require is lazy - the module is
@@ -4082,7 +4078,28 @@
 
 					if sub ~= nil and sub ~= "" then ent = DESC[sub .. "|" .. key]; end;
 					if ent == nil then ent = DESC[key]; end;
-					if type(ent) == "table" then txt = ent[lang] or ent.en or ""; end;
+
+					if type(ent) == "table" then
+						-- SPEC T470 / I21 / V192: an entry may carry a SECOND body, written from the Dark
+						-- Ages book, under daEn/daPt, and the ERA is asked BEFORE the language. The rule
+						-- used to live in a `pickEra` local inside each of the three panes wave 3 took
+						-- away - the panes went, the rule did not, and it lands here, at the ONE reader
+						-- both the ? box and the search pane come through (SPEC V381, V135).
+						--
+						-- INLINE and not a local of its own: the root form declares fifty locals against
+						-- the fifty-three rdk allows, and a fifty-first buys a build that exits 1, prints
+						-- nothing and deletes the .rpk (SPEC B93, V347).
+						--
+						-- An entry with no medieval body falls back to the core one, so a gap in the Dark
+						-- Ages text shows the core text and never an empty box (SPEC V33).
+						local era = currentTheme();
+
+						if era == "Dark Ages" or era == "Classical Age" then
+							txt = (lang == "pt" and ent.daPt) or ent.daEn or "";
+						end;
+
+						if txt == "" then txt = ent[lang] or ent.en or ""; end;
+					end;
 				end;
 
 				return txt;
@@ -4495,6 +4512,13 @@
 				-- a test on MF.list here would be the hidden roster I114f exists to refuse.
 				if sheet ~= nil and isFreeRow(field) then return; end;
 
+				-- The clan's own three are the TABLE's to set, not the player's (SPEC I8g, V95, V175).
+				-- Same move V161 made one comment up: the lock used to be `enabled = false` on the row's
+				-- comboBox, and wave 3 took that combo away. A disabled dropdown was also unreadable,
+				-- which is the opposite of what a lock is for - so the button stays fully legible and the
+				-- refusal happens HERE, at the same moment the disabled combo used to give it.
+				if sheet ~= nil and string.match(field, "^clanDisc_%d+$") ~= nil and not clanDiscOpen() then return; end;
+
 				local found = {};
 
 				xpFind(tabRootOf(from), mfNames(), found);
@@ -4608,12 +4632,31 @@
 					else
 						local vals = PICKER_LIST[MF.list];
 
+						-- SPEC I113c / V199 / T872: the filter is not a program, it is this call. Wave 3
+						-- converted the three families the rule actually prunes - main path, secondary
+						-- path and ritual - and the dropdown that used to be filtered by pickerItems is
+						-- gone, so the POOL has to ask the same predicate the guard asks. Without it the
+						-- box offers a ritual the character cannot learn and guardPick throws it straight
+						-- back on the click after, which is the list and the guard disagreeing - the one
+						-- thing V199 exists to make impossible.
+						--
+						-- Both maps are read ONCE per opening and handed down, never asked per item: per
+						-- item is 284 rituals against nineteen Discipline rows on every open, the walk
+						-- V205 forbids. pickAllowed answers yes for every family the rule does not reach,
+						-- so the merit, background, speciality and archetype waves pass through untouched
+						-- (SPEC V203). The row's OWN value is appended below, after this loop and however
+						-- illegal it has become, which is what keeps V200/V346b true.
+						local levels = discLevels();
+						local hedge  = hedgePathLevels();
+
 						-- V15's blank first entry is what CLEARS the row, and an empty row has nothing to
 						-- clear: it joins the pool only once something is chosen, and it reads "-- Remove --"
 						-- when it does (user 2026-08-29).
 						if vals ~= nil then
 							for i = 1, #vals, 1 do
-								if vals[i] ~= "" then MF.pool[#MF.pool + 1] = vals[i]; end;
+								if vals[i] ~= "" and pickAllowed(MF.field, vals[i], levels, hedge) then
+									MF.pool[#MF.pool + 1] = vals[i];
+								end;
 							end;
 						end;
 					end;
@@ -5129,37 +5172,21 @@
 				setField(field, true);
 			end;
 
-			function renderClanDiscLock(from)
-				if sheet == nil or from == nil then return; end;
+			-- Whether the four clan slots may be changed at all. ONE function, asked by the opener
+			-- that refuses and by nothing else - two copies of this test would be two rules for one
+			-- decision, and the second is the one that goes stale (SPEC V135, V199).
+			--
+			-- Open when the storyteller says so, and ALSO when the clan itself settles nothing: six
+			-- of the sixty entries carry a `choice` or an `open` instead of a settled trio, and those
+			-- slots have nobody to fill them but the table (SPEC I37, V236d). A clan that DOES settle
+			-- its trio is still fail-closed behind the flag (SPEC V175, V89).
+			function clanDiscOpen()
+				if sheet == nil then return false; end;
 
-				local names = {};
-
-				for i = 1, CLAN_DISC_ROWS, 1 do names["cboclanDisc_" .. i] = true; end;
-
-				local found = {};
-
-				xpFind(tabRootOf(from), names, found);
-
-				-- Open when the storyteller says so, and ALSO when the clan itself settles nothing:
-				-- six of the sixty entries carry a `choice` or an `open` instead of a settled trio,
-				-- and those slots have nobody to fill them but the table (SPEC I37, V236d). A clan
-				-- that DOES settle its trio is still fail-closed behind the flag (SPEC V175, V89).
 				local entry   = CLANS[sheet.clanFamily or ""];
 				local settled = entry ~= nil and entry.choice == nil and entry.open == nil;
-				local open    = (sheet.stEditClanDisc == true) or not settled;
 
-				for i = 1, CLAN_DISC_ROWS, 1 do
-					local c = found["cboclanDisc_" .. i];
-
-					if c ~= nil then
-						-- `enabled` and nothing else (SPEC I41, V241, user 2026-08-22). `opacity` lives on
-						-- gui.Control and dims the WHOLE control, the text with it, and a comboBox has no
-						-- text-only opacity to reach for - so a locked dropdown was unreadable, which is
-						-- the opposite of what a lock is for. What it looks like disabled is the HOST's
-						-- call now, and only the Firecast can answer that (SPEC R98).
-						c.enabled = open;
-					end;
-				end;
+				return (sheet.stEditClanDisc == true) or not settled;
 			end;
 
 
@@ -5228,8 +5255,6 @@
 						end;
 					end;
 				end;
-
-				renderClanDiscLock(from);
 			end;
 
 			-- How wide the ROAD label's TEXT is, per language (SPEC I128d, V380, T864, user

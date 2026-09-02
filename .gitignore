@@ -11,3 +11,7 @@ SDK3/Documentation/MkDocs/site/
 SDK3/Documentation/MkDocs/pyvenv.cfg
 SDK3/Documentation/MkDocs/Lib/
 SDK3/Documentation/MkDocs/Scripts/
+
+# O worktree do Claude e 612 MB / 13.743 arquivos dentro do working dir - metade do repo.
+# Fora do .gitignore ele entra em todo 'git status' como untracked (SPEC I133i, T890).
+.claude/

@@ -2,141 +2,42 @@
 <form name="frmWoD20_14" align="client" theme="dark">
 	<script>
 		<![CDATA[
-			-- Rituals area of the Vampire tab (SPEC I16, I19). Same shape as WoD20.12 and WoD20.13.
+			-- The DESCRIPTION pane went with this wave (SPEC V365d, I118d) and the radioButton on
+			-- ritualSel went with it: the pane was the only thing that read a MARKED row, so the `?`
+			-- took the 0..20 the radio held (user 2026-08-31, ask B). Entry still at 24, and the
+			-- rituals carry no dots to move (SPEC C).
 			--
-			-- Rituals carry NO dots: the user asked for the five-dot scale on disciplines and
-			-- blood sorcery paths, not on rituals, so a ritual is picked and that is all - it
-			-- costs no experience and writes no ledger line (SPEC C, R52 is the open question).
-			--
-			-- The book text lives in descRitual_en.lua and descRitual_pt.lua (SPEC T495), at the
-			-- plugin root next to module.xml (SPEC I24). The generator markers moved with it
-			-- and then to both halves, so the region keeps its shape;
-			-- only the file it sits in changed. The require that loads it is INSIDE ritualText,
-			-- never here (SPEC V198): this CDATA is copied raw into constructNew_*(), so a
-			-- top-level require would parse the whole table on every sheet open and the
-			-- deferral would be a silent no-op.
+			-- V252d went too, and on purpose: it kept the MARK on its ritual across a re-sort, and
+			-- with no mark on the sheet there is nothing left to keep. The sort itself is untouched -
+			-- it still reorders the rows and still flashes the one that landed (SPEC V252, V253).
+			function renderRitualButtons(form)
+				if sheet == nil or form == nil then return; end;
 
-			local NO_SELECTION = {
-				en = "Pick the selector next to a ritual to read its description here.",
-				pt = "Marque o seletor ao lado de um ritual para ler a descrição dele aqui.",
-			};
+				local names = {};
 
-			local EMPTY_ROW = {
-				en = "That row is still empty. Choose a ritual in the list first.",
-				pt = "Essa linha ainda está vazia. Escolha um ritual na lista primeiro.",
-			};
+				-- The bound is the HIGHEST INDEX and stays that way: T880 put the two new rows at
+				-- _26 and _27, so a bound reduced by the five vacancies would stop at 22 and leave
+				-- both of them unpainted for good (SPEC B112, V263b). RITUAL_VACANT is what skips
+				-- the hole in the middle - here it only saves a lookup, since a name that no row
+				-- carries finds nothing and mfLabel returns on a nil control, but the same guard
+				-- is load-bearing in sortRituals below and the two read alike on purpose.
+				local last  = RITUAL_ROWS - RITUAL_FREE_ROWS;
 
-			local NO_ENTRY = {
-				en = "No description on file for: ",
-				pt = "Sem descrição registrada para: ",
-			};
-
-			-- A typed row the storyteller has not written yet, read by anyone else (SPEC I45,
-			-- V250). He sees the empty box: for him it is an input, and a sentence sitting in it
-			-- would have to be deleted before he could type.
-			local NO_TEXT_YET = {
-				en = "The storyteller has not written a description for this one yet.",
-				pt = "O narrador ainda não escreveu uma descrição para este.",
-			};
-
-			local function pick(tbl, lang)
-				return tbl[lang] or tbl.en;
-			end;
-
-			-- SPEC T470 / I21: an entry may carry a SECOND body, written from the Dark Ages book,
-			-- under daEn/daPt. The two medieval themes read it; the two modern ones never do.
-			-- An entry with no medieval body falls back to the core one, so a gap in the Dark
-			-- Ages text shows the core text and never an empty box (SPEC V33).
-			local function pickEra(entry, lang)
-				local era = currentTheme();
-
-				if era == "Dark Ages" or era == "Classical Age" then
-					local da = (lang == "pt" and entry.daPt) or entry.daEn;
-					if da ~= nil and da ~= "" then return da; end;
+				for i = 1, last, 1 do
+					if not RITUAL_VACANT[i] then names["dynritual_" .. i] = true; end;
 				end;
 
-				return pick(entry, lang);
-			end;
+				local found = {};
 
-			local function ritualText(lang)
-				wodTrace("ritualText");
-				local selected = sheet.ritualSel;
+				xpFind(tabRootOf(form), names, found);
 
-				if selected == nil or selected == "" then
-					return pick(NO_SELECTION, lang);
+				local lang = (sheet.language == "pt") and "pt" or "en";
+
+				for i = 1, last, 1 do
+					if not RITUAL_VACANT[i] then
+						mfLabel(found["dynritual_" .. i], sheet["ritual_" .. i], "Select Ritual", lang);
+					end;
 				end;
-
-				-- A TYPED row never reaches the book (SPEC I45, V250): the text is the
-				-- storyteller's, one text for both languages and all four eras, and it keeps the
-				-- require below out of reach for these rows (SPEC V206) - the biggest of the four
-				-- modules at 1.1 MB.
-				if isTypedRow(selected) then
-					local own = sheet[descFieldOf(selected)];
-
-					if own ~= nil and own ~= "" then return own; end;
-					if isStoryteller() then return ""; end;
-
-					return pick(NO_TEXT_YET, lang);
-				end;
-
-				local value = sheet[selected];
-
-				if value == nil or value == "" then
-					return pick(EMPTY_ROW, lang);
-				end;
-
-				-- SPEC V206: the require sits BELOW every early return, so a sheet with no
-				-- selection - and a row that never reaches the book - parses nothing. This is the
-				-- biggest of the four modules (1.1 MB) and it was the one paid on every open.
-				-- SPEC V198 put it inside this body and the gate went green, but onNodeReady
-				-- called this function on EVERY open and the deferral was a no-op nobody could
-				-- see (SPEC B47): position in the FILE is not reach in the FLOW, and the gate
-				-- reads source, not runtime (SPEC B30, B34). `require` still caches in
-				-- package.loaded, so the first row that needs the book pays once.
-				-- SPEC T495 / V210: the book is one module PER LANGUAGE, so what is parsed
-				-- here is the half the reader can actually read - the other half was always
-				-- text this session never opens (SPEC R92f). `lang` comes off the NDB, so
-				-- anything that is not "pt" falls to the English half rather than requiring
-				-- a file that is not there.
-				local half = (lang == "pt") and "pt" or "en";
-				wodTrace("descRitual.REQUIRE." .. half);
-				local DESC = require("descRitual_" .. half .. ".lua");
-
-				local entry = DESC[value];
-
-				-- The name in the message is the one the ROW shows, so it goes through the era
-				-- and then through the language exactly as the picker item does (SPEC I22, T469).
-				-- Naming it by the raw canonical value would send the player looking for a line
-				-- that is not in the list above.
-				if entry == nil then
-					return pick(NO_ENTRY, lang) .. translateSheetText(eraName(value, currentTheme()), lang);
-				end;
-
-				return pickEra(entry, lang);
-			end;
-
-			-- SPEC I26 / V206: painting this block costs a parse of the book module, so it
-			-- happens when the tab is SHOWN, never when the sheet opens. onShow is the trigger
-			-- and this guard is the second leg: whether onShow fires for a form inside an
-			-- INACTIVE tab is not measured yet (SPEC R92b), so the fix hangs on two contracts
-			-- instead of one - the lesson of SPEC B39.
-			--
-			-- Tested against `false`, not falsiness: if the host answers nil the block PAINTS,
-			-- which is today's behaviour. Failing closed would leave an empty box with nothing
-			-- to show for it - the silence SPEC V33 exists to forbid.
-			function renderRitualDesc(form)
-				if sheet == nil then return; end;
-				if form.isShowing == false then return; end;
-
-				-- Text and lock in the SAME step (SPEC V249c): one row's text under another
-				-- row's lock is the lie V112 refuses of every runtime lock on this sheet.
-				local sel   = sheet.ritualSel;
-				local write = isTypedRow(sel) and isStoryteller();
-
-				descQuiet = true;
-				form.edtRitualDesc.text = ritualText(sheet.language or "en");
-				form.edtRitualDesc.readOnly = not write;
-				descQuiet = false;
 			end;
 
 			-- ---- The list keeps itself in order (SPEC I47, V252) -------------------------
@@ -184,13 +85,21 @@
 			function sortRituals(form, field, value)
 				if sortQuiet or sheet == nil then return; end;
 
+				-- RITUAL_VACANT is NOT optional here, and this is the reader that made it a set
+				-- rather than a count (SPEC V204 amended, V251, I46). The five burned indices still
+				-- hold whatever a sheet saved before the 85th round put in them: without the guard
+				-- the gather below would collect those dead values as if they were rituals on the
+				-- sheet, sort them into the visible rows, and the write-back would put fresh values
+				-- INTO the burned names. Nothing on screen would say so.
 				local last = RITUAL_ROWS - RITUAL_FREE_ROWS;
 				local list = {};
 
 				for i = 1, last, 1 do
-					local v = sheet["ritual_" .. i];
+					if not RITUAL_VACANT[i] then
+						local v = sheet["ritual_" .. i];
 
-					if v ~= nil and v ~= "" then list[#list + 1] = v; end;
+						if v ~= nil and v ~= "" then list[#list + 1] = v; end;
+					end;
 				end;
 
 				table.sort(list, function(a, b)
@@ -202,59 +111,36 @@
 					return na < nb;
 				end);
 
-				-- What the marked row is HOLDING, so the mark can follow its ritual to whatever
-				-- slot it lands in (SPEC V252d). A typed row is marked by its own field and
-				-- never moves, so it is left out of this.
-				local sel = sheet.ritualSel;
-				local selValue = nil;
-
-				if sel ~= nil and sel ~= "" and not isTypedRow(sel) then selValue = sheet[sel]; end;
-
 				sortQuiet = true;
 
+				-- `list` is DENSE and the rows are not, so the write-back carries its own cursor:
+				-- the k-th value gathered lands in the k-th row actually drawn. Indexing list by
+				-- the row number instead would leave two rows empty at the bottom for every
+				-- vacancy passed on the way down.
+				local k = 0;
+
 				for i = 1, last, 1 do
-					setField("ritual_" .. i, list[i] or "");
+					if not RITUAL_VACANT[i] then
+						k = k + 1;
+
+						setField("ritual_" .. i, list[k] or "");
+					end;
 				end;
 
 				sortQuiet = false;
 
-				if selValue ~= nil and selValue ~= "" then
-					for i = 1, last, 1 do
-						if sheet["ritual_" .. i] == selValue then
-							setField("ritualSel", "ritual_" .. i);
-							break;
-						end;
-					end;
-				end;
 
 				-- The flash belongs to the row that ENDED UP with the value just written, which
 				-- is why it is looked up after the sort and not before (SPEC V253d). Clearing a
 				-- row writes an empty value and lights nothing.
 				if value ~= nil and value ~= "" then
 					for i = 1, last, 1 do
-						if sheet["ritual_" .. i] == value then
+						if not RITUAL_VACANT[i] and sheet["ritual_" .. i] == value then
 							flashRitual(form, "ritual_" .. i);
 							break;
 						end;
 					end;
 				end;
-			end;
-
-			-- The text lands in the field of the MARKED row, read at the moment of the write
-			-- (SPEC V249c), and both questions are asked again rather than trusting the readOnly
-			-- just written: that flag is a look, the rule is the rule (SPEC V249a, V80).
-			--
-			-- The typed rows are also the ones the sort leaves alone (SPEC V252a), which is what
-			-- keeps this text attached to what it describes: a value that moved slots would have
-			-- left its description behind.
-			function saveRitualDesc(form)
-				if descQuiet or sheet == nil then return; end;
-
-				local sel = sheet.ritualSel;
-
-				if not isTypedRow(sel) or not isStoryteller() then return; end;
-
-				setField(descFieldOf(sel), form.edtRitualDesc.text);
 			end;
 		]]>
 	</script>
@@ -289,29 +175,26 @@
 			the identical text compiles here and kills the build eleven lines lower.
 		-->
 		<template name="RitualRow">
-			<radioButton left="0" top="2" width="20" height="21" field="ritualSel" fieldValue="$(field)" groupName="ritualSel"/>
-			<comboBox left="24" top="0" width="430" height="25" fontSize="12" name="cbo$(field)" field="$(field)"/>
+			<button name="btnQ$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Ritual', sheet['$(field)'], nil, '$(field)');"/>
+			<button name="dyn$(field)" left="24" top="0" width="430" height="25" text="Select Ritual" onClick="mfOpen(self, '$(field)', 'ritual', 'Ritual');"/>
+			<edit name="edt$(field)" left="24" top="0" width="430" height="25" field="$(field)" visible="false" enabled="false"/>
 			<rectangle name="hl$(field)" left="0" top="0" width="456" height="25" color="#55FFFFFF" xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
 		</template>
 
-		<!--
-			The last five rows are TYPED (SPEC I45, V248, user 2026-08-22): same radio, same
-			entry x as the picker row above (SPEC V26), `edt` instead of `cbo` so the filter and
-			the guard pass them by (SPEC V211a, V248d).
 
-			They also sit OUT of the alphabetical sort (SPEC I47, V252a): the sort moves values
-			between slots, and moving a typed ritual would leave the description the storyteller
-			wrote for it attached to the row it came from. They stay at the foot of the box,
-			each one where it was written.
-		-->
-		<template name="RitualFreeRow">
-			<radioButton left="0" top="2" width="20" height="21" field="ritualSel" fieldValue="$(field)" groupName="ritualSel"/>
-			<edit left="24" top="0" width="430" height="25" fontSize="12" name="edt$(field)" field="$(field)"/>
-		</template>
+		<!-- 22 slots since T880 (user 2026-09-01), and the two added are ritual_26 and ritual_27:
+		     the five that came off in the 85th round left their names burned (SPEC I46, V251), so
+		     the numbering carries a hole and RITUAL_ROWS is the highest index, 27.
 
-		<!-- 20 slots since the 85th round: five came off by request (SPEC I46, V251) and the box
-		     came down with them. 10 title gap + 20 title + 20*25 rows + 10 foot = 541 (SPEC V240). -->
-		<layout left="0" top="20" width="520" height="561">
+		     Height by the box law of I118f - 41 title band + 25*22 rows + 26 foot = 617 - and the
+		     foot is 26 and not 20 because THIS is the number that makes the column close at 637,
+		     where columns 1 and 2 close (I118f corollary 2: R=22 with foot 26 is the only pair
+		     that adds slots and still lands on the grid). The 26 is the third foot value on the
+		     sheet, and the user took that trade knowingly; T881 owns the rule for it.
+
+		     The comment that stood here read "10 title gap + 20 title + 20*25 rows + 10 foot =
+		     541" while the attribute said 561 - the arithmetic is spelled from the law now. -->
+		<layout left="0" top="20" width="520" height="617">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="20" width="480" height="20" text="RITUALS" horzTextAlign="center"/>
 			<layout left="32" top="41" width="456" height="25">
@@ -360,33 +243,32 @@
 				<RitualRow field="ritual_15"/>
 			</layout>
 			<layout left="32" top="416" width="456" height="25">
-				<RitualFreeRow field="ritual_16"/>
+				<RitualRow field="ritual_16"/>
 			</layout>
 			<layout left="32" top="441" width="456" height="25">
-				<RitualFreeRow field="ritual_17"/>
+				<RitualRow field="ritual_17"/>
 			</layout>
 			<layout left="32" top="466" width="456" height="25">
-				<RitualFreeRow field="ritual_18"/>
+				<RitualRow field="ritual_18"/>
 			</layout>
 			<layout left="32" top="491" width="456" height="25">
-				<RitualFreeRow field="ritual_19"/>
+				<RitualRow field="ritual_19"/>
 			</layout>
 			<layout left="32" top="516" width="456" height="25">
-				<RitualFreeRow field="ritual_20"/>
+				<RitualRow field="ritual_20"/>
+			</layout>
+			<layout left="32" top="541" width="456" height="25">
+				<RitualRow field="ritual_26"/>
+			</layout>
+			<layout left="32" top="566" width="456" height="25">
+				<RitualRow field="ritual_27"/>
 			</layout>
 		</layout>
 
 		<!-- Grows with the column on its left, never on its own (SPEC V193). -->
-		<layout left="525" top="20" width="545" height="561">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="505" height="20" text="DESCRIPTION" horzTextAlign="center"/>
-			<button name="btnFontDownRitual" left="480" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
-			<button name="btnFontUpRitual" left="505" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
-			<textEditor name="edtRitualDesc" left="30" top="41" width="485" height="500" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="saveRitualDesc(self);"/>
-		</layout>
 	</scrollBox>
 
-	<dataLink fields="{'language', 'sheetTheme', 'ritualSel', 'ritual_1', 'ritual_2', 'ritual_3', 'ritual_4', 'ritual_5', 'ritual_6', 'ritual_7', 'ritual_8', 'ritual_9', 'ritual_10', 'ritual_11', 'ritual_12', 'ritual_13', 'ritual_14', 'ritual_15', 'ritual_16', 'ritual_17', 'ritual_18', 'ritual_19', 'ritual_20'}" onChange="renderRitualDesc(self);"/>
+	<dataLink fields="{'language', 'sheetTheme', 'ritual_1', 'ritual_2', 'ritual_3', 'ritual_4', 'ritual_5', 'ritual_6', 'ritual_7', 'ritual_8', 'ritual_9', 'ritual_10', 'ritual_11', 'ritual_12', 'ritual_13', 'ritual_14', 'ritual_15', 'ritual_16', 'ritual_17', 'ritual_18', 'ritual_19', 'ritual_20', 'ritual_26', 'ritual_27'}" onChange="renderRitualButtons(self);"/>
 
 	<!--
 		The picker guard (SPEC V185). Same door as WoD20.13: a dataLink, never the comboBox
@@ -394,23 +276,7 @@
 		is it on the sheet at all, and is it high enough - and the two refusals are told
 		apart, because they are different problems with different fixes.
 	-->
-	<dataLink fields="{'ritual_1', 'ritual_2', 'ritual_3', 'ritual_4', 'ritual_5', 'ritual_6', 'ritual_7', 'ritual_8', 'ritual_9', 'ritual_10', 'ritual_11', 'ritual_12', 'ritual_13', 'ritual_14', 'ritual_15', 'ritual_16', 'ritual_17', 'ritual_18', 'ritual_19', 'ritual_20'}" onChange="guardPick(field, oldValue, newValue); sortRituals(self, field, newValue); renderVampPickers(self);"/>
-
-	<!--
-		What a ritual may BE is decided by the Disciplines (SPEC V185), so the list has to be
-		rebuilt whenever one of them moves - which is the nineteen picker slots and the
-		ninety-five dots under them, the rating BEING the dots. Same field set, and the same
-		reason, as the link WoD20.13 uses to repaint its main path dots (SPEC V123): a link
-		watches what its handler actually READS.
-
-		It is a link of its own and not fields bolted onto the description link above: that
-		one repaints book prose, and hanging ninety-five dot fields on it would re-render the
-		whole description every time anyone bought anything (SPEC B34).
-
-		Lowering a Discipline does NOT clear a row here (SPEC V187): the ritual the row is
-		holding stays in its own list, and only its sisters stop offering it (SPEC V200).
-	-->
-	<dataLink fields="{'clanDisc_1', 'clanDisc_2', 'clanDisc_3', 'clanDisc_4', 'disc_1', 'disc_2', 'disc_3', 'disc_4', 'disc_5', 'disc_6', 'disc_7', 'disc_8', 'disc_9', 'disc_10', 'disc_11', 'disc_12', 'disc_13', 'disc_14', 'disc_15', 'clanDisc_1_1', 'clanDisc_1_2', 'clanDisc_1_3', 'clanDisc_1_4', 'clanDisc_1_5', 'clanDisc_2_1', 'clanDisc_2_2', 'clanDisc_2_3', 'clanDisc_2_4', 'clanDisc_2_5', 'clanDisc_3_1', 'clanDisc_3_2', 'clanDisc_3_3', 'clanDisc_3_4', 'clanDisc_3_5', 'clanDisc_4_1', 'clanDisc_4_2', 'clanDisc_4_3', 'clanDisc_4_4', 'clanDisc_4_5', 'disc_1_1', 'disc_1_2', 'disc_1_3', 'disc_1_4', 'disc_1_5', 'disc_2_1', 'disc_2_2', 'disc_2_3', 'disc_2_4', 'disc_2_5', 'disc_3_1', 'disc_3_2', 'disc_3_3', 'disc_3_4', 'disc_3_5', 'disc_4_1', 'disc_4_2', 'disc_4_3', 'disc_4_4', 'disc_4_5', 'disc_5_1', 'disc_5_2', 'disc_5_3', 'disc_5_4', 'disc_5_5', 'disc_6_1', 'disc_6_2', 'disc_6_3', 'disc_6_4', 'disc_6_5', 'disc_7_1', 'disc_7_2', 'disc_7_3', 'disc_7_4', 'disc_7_5', 'disc_8_1', 'disc_8_2', 'disc_8_3', 'disc_8_4', 'disc_8_5', 'disc_9_1', 'disc_9_2', 'disc_9_3', 'disc_9_4', 'disc_9_5', 'disc_10_1', 'disc_10_2', 'disc_10_3', 'disc_10_4', 'disc_10_5', 'disc_11_1', 'disc_11_2', 'disc_11_3', 'disc_11_4', 'disc_11_5', 'disc_12_1', 'disc_12_2', 'disc_12_3', 'disc_12_4', 'disc_12_5', 'disc_13_1', 'disc_13_2', 'disc_13_3', 'disc_13_4', 'disc_13_5', 'disc_14_1', 'disc_14_2', 'disc_14_3', 'disc_14_4', 'disc_14_5', 'disc_15_1', 'disc_15_2', 'disc_15_3', 'disc_15_4', 'disc_15_5'}" onChange="renderVampPickers(self);"/>
+	<dataLink fields="{'ritual_1', 'ritual_2', 'ritual_3', 'ritual_4', 'ritual_5', 'ritual_6', 'ritual_7', 'ritual_8', 'ritual_9', 'ritual_10', 'ritual_11', 'ritual_12', 'ritual_13', 'ritual_14', 'ritual_15', 'ritual_16', 'ritual_17', 'ritual_18', 'ritual_19', 'ritual_20', 'ritual_26', 'ritual_27'}" onChange="guardPick(field, oldValue, newValue); sortRituals(self, field, newValue);"/>
 
 	<!-- The description block paints when the tab is SHOWN (SPEC I26 / V206): onNodeReady fires
 	     on every open and dragged the whole 1.1 MB module in with it, the largest of the four
@@ -430,6 +296,6 @@
 	     sibling fires first - the firing order never had to be known. -->
 	<event name="onShow">
 		wodTrace("WoD20.14.onShow");
-		renderRitualDesc(self);
+		renderRitualButtons(self);
 	</event>
 </form>
