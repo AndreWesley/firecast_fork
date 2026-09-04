@@ -1,6 +1,6 @@
 # EMENDA DE SPEC — pronta p/ colar em `/ck:spec`. Escrita 2026-09-03 (fim da 174ª rodada)
 
-**⊥ APLICADA AINDA.** São **4** operações & **1** id novo (**§B145**). Máximos MEDIDOS 2026-09-03:
+**✔ APLICADA 2026-09-03 (175ª rodada), & c/ 1 operação a mais: §Q61 nasceu RESPONDIDA. ⊥ RECOLAR.** São **4** operações & **1** id novo (**§B145**). Máximos MEDIDOS 2026-09-03:
 **§B144 · §V414 · §T938 · §I143 · §R139 · §Q60** ∴ o único id a nascer é §B145; o resto EMENDA
 linha que já ∃.
 

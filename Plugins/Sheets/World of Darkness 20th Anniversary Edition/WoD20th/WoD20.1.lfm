@@ -45,7 +45,7 @@
 			  header  0..1010      EXPERIENCE 1015..1345                y   0..105
 			  ATTRIBUTES 0..340                                        y 110..406
 			                       TALENTS 345..675 | SKILLS 680..1010 | KNOWLEDGES 1015..1345   y 110..536
-			  avatar     0..340                                   y 411..866
+			  avatar     0..340                                   y 411..856
 			                       VIRTUES 345..675                    y 541..667
 			                       ROAD + BEARING + WILLPOWER 345..675  y 672..856
 			                       SPECIALTIES 680..1010               y 541..842
@@ -60,11 +60,20 @@
 			the owner aligned its floor to ROAD on 2026-09-02 (SPEC I136c, V402, I139a).
 
 			The bottom row no longer closes on ONE line, and that is the ask rather than drift:
-			SPECIALTIES and ROAD both end at 856 - ROAD on its own content plus the 15px foot
-			(SPEC V393), SPECIALTIES ALIGNED to it on a 29px one (SPEC V402, user 2026-09-02
-			item 1) - while HEALTH and the avatar end at 866. Which box does NOT close the line
-			is DERIVED from the V393 and V402 rosters and never typed into the gate - a box that
+			SPECIALTIES, ROAD and the AVATAR all end at 856 - ROAD on its own content plus the
+			15px foot (SPEC V393), SPECIALTIES ALIGNED to it on a 29px one (SPEC V402, user
+			2026-09-02 item 1), the avatar PINNED to it since 2026-09-04 (SPEC V415, I144a, user
+			item 1) - while HEALTH alone ends at 866. Which box does NOT close the line is DERIVED
+			from the V393, V402 and V415 rosters and never typed into the gate - a box that
 			quietly stops closing it leaves no other trace (SPEC V376, I136d, I139a, Q47, Q49).
+
+			HEALTH being the ONLY closer is why V376 had to be re-formed in the same commit that
+			moved the avatar (SPEC Q63, T939): an equality over one element is true for whatever
+			height that element has, so the guard moved off the closers and onto the roster - if
+			the names drain away there is nothing left to excuse, and three is the measured floor
+			(SPEC B7, B145). The owner chose that shape deliberately: HEALTH is the one box on the
+			sheet whose height is decided at RUNTIME (SPEC V49), so it cannot be pinned to a line
+			the other three write into the XML.
 
 			The 157th round traded HEIGHT for WIDTH - 891 -> 888 high and 1345 -> 1680 wide -
 			and T908 gave the width back. The sheet does NOT shrink with it: TRAITS closes on
@@ -355,7 +364,8 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="290" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<edit name="edtCurrentXPMain" left="120" top="57" width="90" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPMain.text);"/>
+			<rectangle name="bgCurrentXPMain" left="120" top="57" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtCurrentXPMain" type="number" decimalPlaces="0" left="120" top="57" width="90" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPMain.text);" transparent="true"/>
 		</layout>
 
 		<layout left="0" top="110" width="340" height="296">
@@ -418,8 +428,8 @@
 		     It keeps color="DimGray" and is the only carrier of that key in the four palettes
 		     (SPEC V53, T653). The radius matches the section boxes so the corner reads as one
 		     frame family. -->
-		<rectangle name="avatarFrame" left="0" top="411" width="340" height="455" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
-		<image left="0" top="411" width="340" height="455" field="avatar" editable="true" style="autoFit"/>
+		<rectangle name="avatarFrame" left="0" top="411" width="340" height="445" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
+		<image left="0" top="411" width="340" height="445" field="avatar" editable="true" style="autoFit"/>
 
 		<!-- The ornament CARRIER (SPEC I84d, I92, V309, V287, V320). Transparent in both senses
 		      and holding no content of its own: it exists so the era's drawing has somewhere to hang
@@ -440,7 +450,7 @@
 		      THREE palettes declare ornament - Victorian filigree, Dark Ages filete, Modern Nights
 		      corrente - so the Classical Age shows no drawing here and that is correct (SPEC V277,
 		      V320f). -->
-		<rectangle name="ornAvatar" left="0" top="411" width="340" height="455" color="#00000000" strokeColor="#00000000" xradius="14" yradius="14" cornerType="innerRound" hitTest="false"/>
+		<rectangle name="ornAvatar" left="0" top="411" width="340" height="445" color="#00000000" strokeColor="#00000000" xradius="14" yradius="14" cornerType="innerRound" hitTest="false"/>
 
 		<!--
 			The three ability columns stand loose (SPEC T407, V168, V169). Until the 49th round

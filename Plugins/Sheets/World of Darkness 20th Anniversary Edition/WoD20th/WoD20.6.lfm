@@ -996,8 +996,8 @@
 				["Angellis Ater"] = "Angellis Ater",
 				["Assamite"] = "Assamita",
 				["Assamite Antitribu"] = "Assamitas Antitribu",
-				["Assamite Sorcerers"] = "Feiticeiros Assamitas",
-				["Assamite Viziers"] = "Vizires Assamitas",
+				["Assamite Sorcerers"] = "Assamitas: Feiticeiros",
+				["Assamite Viziers"] = "Assamitas: Vizires",
 				["Baali"] = "Baali",
 				["Blood Brothers"] = "Irmãos de Sangue",
 				["Brahman"] = "Brahman",
@@ -1017,7 +1017,7 @@
 				["Gargoyles (Sentinel)"] = "Gárgulas (Sentinelas)",
 				["Gargoyles (Warrior)"] = "Gárgulas (Guerreiras)",
 				["Giovanni"] = "Giovanni",
-				["Harbingers of Skulls"] = "Arautos das Caveiras",
+				["Harbingers of Skulls"] = "Precursores do Ódio",
 				["Kiasyd"] = "Kiasyd",
 				["Lamia"] = "Lamia",
 				["Lasombra"] = "Lasombra",
@@ -1046,11 +1046,11 @@
 				["Toreador Antitribu"] = "Toreador Antitribu",
 				["Tremere"] = "Tremere",
 				["Tremere Antitribu"] = "Tremere Antitribu",
-				["True Brujah"] = "Verdadeiros Brujah",
+				["True Brujah"] = "Brujah Verdadeiros",
 				["Tzimisce"] = "Tzimisce",
 				["Ventrue"] = "Ventrue",
 				["Ventrue Antitribu"] = "Ventrue Antitribu",
-				["Warrior Setites"] = "Setitas Guerreiros",
+				["Warrior Setites"] = "Seguidores de Set: Guerreiros",
 				["Wu Zao"] = "Wu Zao",
 				["Basarab"] = "Basarab",
 				["Bratovich (Dark Ages)"] = "Bratovich (Idade das Trevas)",
@@ -2456,8 +2456,40 @@
 				-- got their values from the attribute and needed items alone. With the list coming
 				-- from PICKER_LIST (SPEC I27) that attribute is gone, so a guarded write would leave
 				-- them showing every entry and STORING none.
+				--
+				-- The host rebuilds the CLOSED combo's display when it receives a new items list, and
+				-- that rebuild drops the text anchor the XML authored. Measured in Firecast 2026-09-04
+				-- (SPEC B153, T948, I144h): cboGame and cboSheetTheme lose it on BOTH the language and
+				-- the theme switch, the OPEN list stays centred, and the language combo - which never
+				-- reaches this function, it has no name - never loses it. So the two writes below are
+				-- bracketed: READ the anchor first, put the SAME bytes back after.
+				--
+				-- Never a literal here. `c.horzTextAlign = "center"` would fix today's screen and make
+				-- Lua the SECOND owner of what the XML declares (SPEC V208, V419): the day a combo
+				-- authors `leading`, this fix becomes the bug. What goes back is what came out.
+				local hAlign = c.horzTextAlign;
+				local vAlign = c.vertTextAlign;
+
 				c.values = kept;
 				c.items = shown;
+
+				if hAlign ~= nil then c.horzTextAlign = hAlign; end;
+				if vAlign ~= nil then c.vertTextAlign = vAlign; end;
+
+				-- The SELECTION comes back once the LIST exists, and that is a WINDOW and not lost data
+				-- (SPEC V424, B150). The host binds field -> control when the control is CREATED, and a
+				-- combo that authors no items= has ZERO of them at that instant - the list moved to
+				-- PICKER_LIST (SPEC I27) and arrives later, on applyLanguage's walk at LOAD (SPEC B151).
+				-- A selection has nowhere to land in an empty list, so it is simply dropped, and nothing
+				-- put it back: `current` above is READ from sheet[field] for the orphan rule of V200 and
+				-- was never written back. The screen is indistinguishable from data that was thrown away,
+				-- which is how the same report sent two rounds hunting a paint bug (SPEC B146).
+				--
+				-- GUARDED, like cmbMfRevenant (WoD20th.lfm:4968): an unconditional write to .value would
+				-- fire onChange on every theme walk and every language walk. It is written HERE and not in
+				-- renderHedgePickers because this is the one place that already knows `current` and already
+				-- writes the pair - a second site would leave the language walk without it (SPEC V135).
+				if current ~= nil and current ~= "" and c.value ~= current then c.value = current; end;
 			end;
 
 			-- Re-filter the pickers of one Vampire area after the Disciplines moved (SPEC I25).

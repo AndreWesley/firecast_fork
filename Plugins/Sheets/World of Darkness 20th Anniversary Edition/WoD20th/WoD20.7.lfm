@@ -347,7 +347,8 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="203" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<edit name="edtCurrentXPNumina" left="76" top="70" width="91" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPNumina.text);"/>
+			<rectangle name="bgCurrentXPNumina" left="76" top="70" width="91" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtCurrentXPNumina" type="number" decimalPlaces="0" left="76" top="70" width="91" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPNumina.text);" transparent="true"/>
 		</layout>
 
 		<!--
@@ -641,6 +642,7 @@
 	<event name="onShow">
 		wodTrace("WoD20.7.onShow");
 		renderXPBoxes(self);
+		renderHedgePickers(self);
 		renderManualEntry(self);
 		renderNuminaButtons(self);
 		paintHedgeRitualDots(self);

@@ -487,7 +487,7 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="345" height="20" text="REVENANT WEAKNESS" horzTextAlign="center"/>
 
-			<textEditor name="edtRevWeakness" left="20" top="40" width="345" height="73" readOnly="true" wordWrap="true" transparent="true" fontSize="12" opacity="0.75"/>
+			<textEditor name="edtRevWeakness" left="20" top="40" width="345" height="73" readOnly="true" wordWrap="true" transparent="true" fontSize="12" opacity="0.75" horzTextAlign="center"/>
 		</layout>
 
 		<!--
@@ -510,7 +510,8 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="91" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<edit name="edtCurrentXPGhoul" left="20" top="69" width="91" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPGhoul.text);"/>
+			<rectangle name="bgCurrentXPGhoul" left="20" top="69" width="91" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtCurrentXPGhoul" type="number" decimalPlaces="0" left="20" top="69" width="91" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPGhoul.text);" transparent="true"/>
 		</layout>
 
 		<!--

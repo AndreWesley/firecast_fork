@@ -47,6 +47,8 @@ o `.lfm` precisar ser regerado, e para §T444–446 saberem o que procurar em qu
 | `road_sins_pt.tsv` | `<tid>\t<score>\t<wrongdoing PT>\t<rationale PT>` — À MÃO | 483 |
 | `road_aura_pt.tsv` | `<bid>\t<prosa PT>` — À MÃO | 37 |
 | `gen_road_desc.ps1` | escreve `descRoad_{en,pt}.lua` a partir dos 8 acima + os 2 `.lfm` | — |
+| `clan_body_en.tsv` | `<nome do picker>\t<livro>\t<pág impressa>\t<corpo EN>` — §T848 metade EN | 61 |
+| `clan_extract.ps1` | o extrator que escreve o de cima a partir do cache de texto dos livros | — |
 
 Os 5 `rd_*.tsv` de livro já vêm **dedupados entre si**, na precedência
 core > RoB > (LotC/LoB/DAC/BH) > TOS > DA. Somados dão 284 sem repetir nome.

@@ -6254,7 +6254,7 @@ De algum modo, você não conseguiu provar que é digno do nome Lasombra. Talvez
 Unsanctioned Embrace
 
 
-Lázaro decretou que nenhum Arauto deveria Abraçar, mas seu senhor não deu ouvidos. Você é irremediavelmente verde e indigno da vitae que corre nas suas veias. Até realizar atos à altura da nobreza do seu sangue, sua existência é evitada como mau agouro. Aumente em dois as dificuldades de todas as ações Sociais que envolvam sua linhagem.]==],
+Lázaro decretou que nenhum Precursor deveria Abraçar, mas seu senhor não deu ouvidos. Você é irremediavelmente verde e indigno da vitae que corre nas suas veias. Até realizar atos à altura da nobreza do seu sangue, sua existência é evitada como mau agouro. Aumente em dois as dificuldades de todas as ações Sociais que envolvam sua linhagem.]==],
 				},
 				["Uppity"] = {
 					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 492
@@ -6647,7 +6647,7 @@ Você pode adquirir uma Disciplina adicional (a critério do Narrador) como se f
 Advanced Tech (1)
 
 
-Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Verdadeiros Brujah não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
+Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Brujah Verdadeiros não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
 				},
 				["Advanced Tech (2)"] = {
 					pt = [==[Lore of the Bloodlines, pág. 99
@@ -6656,7 +6656,7 @@ Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora 
 Advanced Tech (2)
 
 
-Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Verdadeiros Brujah não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
+Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Brujah Verdadeiros não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
 				},
 				["Advanced Tech (3)"] = {
 					pt = [==[Lore of the Bloodlines, pág. 99
@@ -6665,7 +6665,7 @@ Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora 
 Advanced Tech (3)
 
 
-Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Verdadeiros Brujah não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
+Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Brujah Verdadeiros não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
 				},
 				["Advanced Tech (4)"] = {
 					pt = [==[Lore of the Bloodlines, pág. 99
@@ -6674,7 +6674,7 @@ Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora 
 Advanced Tech (4)
 
 
-Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Verdadeiros Brujah não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
+Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Brujah Verdadeiros não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
 				},
 				["Advanced Tech (5)"] = {
 					pt = [==[Lore of the Bloodlines, pág. 99
@@ -6683,7 +6683,7 @@ Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora 
 Advanced Tech (5)
 
 
-Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Verdadeiros Brujah não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
+Você tem um dispositivo (ou possivelmente alguns) de projeto avançado. Embora os Brujah Verdadeiros não sejam especialmente bons em inovação, são bons em fazer melhorias. Assim, esse dispositivo não tem funções especiais indisponíveis aos seus contemporâneos, mas funciona bem melhor. Ele reduz pela metade a chance de falha mecânica (como um travamento), e todos os usos são feitos com -1 na dificuldade. O Narrador deve decidir o custo desta Qualidade conforme a quantidade de itens que a personagem tem e o quanto eles são poderosos.]==],
 				},
 				["Alcohol /Drug Tolerance (1)"] = {
 					pt = [==[Book of Secrets, pág. 35
@@ -7533,7 +7533,7 @@ Com três ou mais sucessos, você identifica contaminantes específicos que já 
 Disciple of Lazarus / Japheth
 
 
-Você fala pelos poderosos da sua linhagem e ostenta a máscara mortuária branca e limpa de um Arauto respeitado, perdido em um dos expurgos históricos que seu povo sofreu. A maioria dos Arautos das Caveiras ouve o que você diz e toma suas palavras como verdade. Esta Qualidade acrescenta dois dados a qualquer rolagem Social em que você invoque o nome de Lázaro ou de Jafé.]==],
+Você fala pelos poderosos da sua linhagem e ostenta a máscara mortuária branca e limpa de um Precursor respeitado, perdido em um dos expurgos históricos que seu povo sofreu. A maioria dos Precursores do Ódio ouve o que você diz e toma suas palavras como verdade. Esta Qualidade acrescenta dois dados a qualquer rolagem Social em que você invoque o nome de Lázaro ou de Jafé.]==],
 				},
 				["Distracting Aura"] = {
 					pt = [==[Lore of the Clans, pág. 142
@@ -8754,7 +8754,7 @@ Mortuario (2)
 
 Você morreu. Talvez tenha sido assassinado, talvez tenha sofrido um acidente de carro. Seja qual for a causa, você se foi. Mas seu senhor o achou útil demais, ou não conseguiu deixá-lo partir. Você foi Abraçado pelo ritual Chamado do Barqueiro (veja p. 109). O Abraço lhe deixou as cicatrizes da sua morte, lembretes eternos entalhados da sua viagem ao outro lado. Deixou também a pele esticada e pálida dos mortos.
 
-Além da fraqueza tradicional do seu Clã, você sofre a desfiguração do seu tempo como cadáver de verdade. Embora consiga se curar como qualquer outro vampiro, os ferimentos não fecham limpos. Você retém as cicatrizes de cada experiência. Dependendo da natureza do dano, isso pode tornar as relações sociais extremamente difíceis e reduzir seus pontos de Aparência com o tempo (até 0). Por outro lado, seu tempo do outro lado da Mortalha também lhe deu um tino natural para a magia de sangue necromântica. As dificuldades de todas as rolagens de Necromancia são reduzidas em um. Este traço custa 4 pontos para personagens que já tenham Aparência 0 (como Samedi e Arautos das Caveiras), ou 2 pontos para qualquer outro Cainita. É condição incrivelmente rara mesmo entre os Giovanni, e praticamente desconhecida fora do Clã.
+Além da fraqueza tradicional do seu Clã, você sofre a desfiguração do seu tempo como cadáver de verdade. Embora consiga se curar como qualquer outro vampiro, os ferimentos não fecham limpos. Você retém as cicatrizes de cada experiência. Dependendo da natureza do dano, isso pode tornar as relações sociais extremamente difíceis e reduzir seus pontos de Aparência com o tempo (até 0). Por outro lado, seu tempo do outro lado da Mortalha também lhe deu um tino natural para a magia de sangue necromântica. As dificuldades de todas as rolagens de Necromancia são reduzidas em um. Este traço custa 4 pontos para personagens que já tenham Aparência 0 (como Samedi e Precursores do Ódio), ou 2 pontos para qualquer outro Cainita. É condição incrivelmente rara mesmo entre os Giovanni, e praticamente desconhecida fora do Clã.
 
 Giovanni com esta Qualidade em geral despertam a superstição do próprio Clã e são tratados com clara desconfiança, sobretudo pelos anziani. Personagens com a Qualidade Mortuario não podem possuir também a Qualidade Incongruência Sanguínea nem defeitos semelhantes, como Monstruoso.]==],
 				},
@@ -8767,7 +8767,7 @@ Mortuario (4)
 
 Você morreu. Talvez tenha sido assassinado, talvez tenha sofrido um acidente de carro. Seja qual for a causa, você se foi. Mas seu senhor o achou útil demais, ou não conseguiu deixá-lo partir. Você foi Abraçado pelo ritual Chamado do Barqueiro (veja p. 109). O Abraço lhe deixou as cicatrizes da sua morte, lembretes eternos entalhados da sua viagem ao outro lado. Deixou também a pele esticada e pálida dos mortos.
 
-Além da fraqueza tradicional do seu Clã, você sofre a desfiguração do seu tempo como cadáver de verdade. Embora consiga se curar como qualquer outro vampiro, os ferimentos não fecham limpos. Você retém as cicatrizes de cada experiência. Dependendo da natureza do dano, isso pode tornar as relações sociais extremamente difíceis e reduzir seus pontos de Aparência com o tempo (até 0). Por outro lado, seu tempo do outro lado da Mortalha também lhe deu um tino natural para a magia de sangue necromântica. As dificuldades de todas as rolagens de Necromancia são reduzidas em um. Este traço custa 4 pontos para personagens que já tenham Aparência 0 (como Samedi e Arautos das Caveiras), ou 2 pontos para qualquer outro Cainita. É condição incrivelmente rara mesmo entre os Giovanni, e praticamente desconhecida fora do Clã.
+Além da fraqueza tradicional do seu Clã, você sofre a desfiguração do seu tempo como cadáver de verdade. Embora consiga se curar como qualquer outro vampiro, os ferimentos não fecham limpos. Você retém as cicatrizes de cada experiência. Dependendo da natureza do dano, isso pode tornar as relações sociais extremamente difíceis e reduzir seus pontos de Aparência com o tempo (até 0). Por outro lado, seu tempo do outro lado da Mortalha também lhe deu um tino natural para a magia de sangue necromântica. As dificuldades de todas as rolagens de Necromancia são reduzidas em um. Este traço custa 4 pontos para personagens que já tenham Aparência 0 (como Samedi e Precursores do Ódio), ou 2 pontos para qualquer outro Cainita. É condição incrivelmente rara mesmo entre os Giovanni, e praticamente desconhecida fora do Clã.
 
 Giovanni com esta Qualidade em geral despertam a superstição do próprio Clã e são tratados com clara desconfiança, sobretudo pelos anziani. Personagens com a Qualidade Mortuario não podem possuir também a Qualidade Incongruência Sanguínea nem defeitos semelhantes, como Monstruoso.]==],
 				},
@@ -10036,7 +10036,7 @@ Sua personagem sabe que a magia é real e a pratica, mas esses outros pretensos 
 Styx Baptism
 
 
-Você jurou fidelidade aos Arautos das Caveiras e prometeu trabalhar contra as maquinações de Ashur, apesar de não ter sido Abraçado na linhagem. Você foi escoltado até as Terras das Sombras, onde foi batizado de cabeça nas águas revoltas do Estige. A carne da sua cabeça se desprendeu com o contato ao longo do mês seguinte, deixando apenas manchas apodrecidas ou osso exposto, o que reduziu sua Aparência a 0 permanentemente. Agora você é tido em alta conta pelos Lazarenos, e ganha uma das Disciplinas da linhagem como Disciplina de Clã no lugar de uma das suas.]==],
+Você jurou fidelidade aos Precursores do Ódio e prometeu trabalhar contra as maquinações de Ashur, apesar de não ter sido Abraçado na linhagem. Você foi escoltado até as Terras das Sombras, onde foi batizado de cabeça nas águas revoltas do Estige. A carne da sua cabeça se desprendeu com o contato ao longo do mês seguinte, deixando apenas manchas apodrecidas ou osso exposto, o que reduziu sua Aparência a 0 permanentemente. Agora você é tido em alta conta pelos Lazarenos, e ganha uma das Disciplinas da linhagem como Disciplina de Clã no lugar de uma das suas.]==],
 				},
 				["Subculture Insider"] = {
 					pt = [==[Book of Secrets, pág. 58
@@ -10184,7 +10184,7 @@ Bem sintonizado com a alma de sua presa, o terceiro olho da Salubri enxerga a in
 True Celerity
 
 
-Os Verdadeiros Brujah têm uma relação estranha com a Celeridade. Ela costuma vir com facilidade para eles, mas alguns se recusam a aprendê-la, por ter se tornado um símbolo dos Brujah traidores. Ainda assim, muitos a consideram uma habilidade útil para se passar por Brujah dentro da Camarilla ou do Sabá, e por isso alguns Verdadeiros Brujah desenvolveram uma forma ligeiramente diferente da Disciplina.
+Os Brujah Verdadeiros têm uma relação estranha com a Celeridade. Ela costuma vir com facilidade para eles, mas alguns se recusam a aprendê-la, por ter se tornado um símbolo dos Brujah traidores. Ainda assim, muitos a consideram uma habilidade útil para se passar por Brujah dentro da Camarilla ou do Sabá, e por isso alguns Brujah Verdadeiros desenvolveram uma forma ligeiramente diferente da Disciplina.
 
 Um personagem com esta Qualidade tem a capacidade de aprender a Celeridade Verdadeira. Embora funcione exatamente como a Celeridade, a sensação é bem diferente: em vez de o personagem se mover depressa, ele desacelera o tempo ao seu redor. Esta Qualidade não concede ponto nenhum de Disciplina ao personagem, mas permite que ela seja comprada com experiência como se a Celeridade fosse uma Disciplina de Clã. Embora este poder funcione igual à Celeridade, ele não pode ser ensinado a ninguém que não tenha algum nível da Disciplina Temporis.]==],
 				},

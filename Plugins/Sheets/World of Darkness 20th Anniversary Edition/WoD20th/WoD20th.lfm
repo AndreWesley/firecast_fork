@@ -6642,6 +6642,18 @@
 			for i = 1, 10, 1 do setField("bloodPool_" .. i, true); end;
 		end;
 
+		-- The domitor is a thirteenth-generation vampire until somebody says otherwise (the
+		-- owner's ask of 2026-09-04). The value written is "13" and not "13th": items are what
+		-- the box SHOWS and values are what it stores, and a combo handed a value outside its
+		-- own values list paints EMPTY without raising a thing (SPEC B91, I144i).
+		--
+		-- Keyed on nil like the two seeds above, and never on "": the picker authors an empty
+		-- item, so "" is a DECISION and re-seeding would hand 13 back to a player who cleared
+		-- it on purpose (SPEC V15, V104, I29). This does move GEN_MAX on an old sheet that
+		-- never chose one - renderMaxDisc gains a ceiling where it had none - and that is the
+		-- change that was asked for, not a side effect (SPEC V420).
+		if sheet ~= nil and sheet.dominatorGen == nil then setField("dominatorGen", "13"); end;
+
 		-- The Game box is locked (SPEC V109), so a value outside its three would sit there
 		-- with nobody able to clear it: one of the four longer names this sheet used to offer,
 		-- or nothing at all (SPEC V110). It runs here rather than on the Settings tab because

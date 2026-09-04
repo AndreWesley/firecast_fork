@@ -231,7 +231,7 @@
 			(SPEC I3 ESPELHOS, V36). Spending willpower is what a player does mid-fight; raising
 			the permanent rating is not.
 		-->
-		<layout left="425" top="487" width="325" height="101">
+		<layout left="425" top="487" width="325" height="110">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="285" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
@@ -255,10 +255,11 @@
 			their file order because the Lua finds widgets by name (dynHealth3_N, ro_<field>_N),
 			never by position.
 		-->
-		<!-- height=306 is the ten-row case; the renderer shrinks it to the chosen track length
+		<!-- height=325 is the ten-row case; the renderer shrinks it to the chosen track length
 		     (SPEC V49), so the file declares the tallest this box can ever be.
-		     top=330 lines this box up with ARMOR and VIRTUES; the row sits 10 under COMBAT (T150). -->
-		<layout name="dynHealth3_box" left="755" top="346" width="320" height="325">
+		     top=356 opens this box on the same line as ARMOR and VIRTUES - the second row of the
+		     tab starts 5 under the first one, which now closes at 351 (SPEC V418c, V298). -->
+		<layout name="dynHealth3_box" left="755" top="356" width="320" height="325">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- The track length lives on the storyteller's tab since the 82nd round (SPEC I35,
 			     V234). The title spans the box now, so it is centred on the box. -->
@@ -307,7 +308,7 @@
 			Attributes show five dots with the first always lit, matching the Attribute template
 			where dot 1 is a fixed image and only `_2`..`_5` are real fields.
 		-->
-		<layout left="755" top="0" width="320" height="341">
+		<layout left="755" top="0" width="320" height="351">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="280" height="20" text="COMBAT TRAITS" horzTextAlign="center"/>
 

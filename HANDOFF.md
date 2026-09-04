@@ -1,6 +1,226 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ⚑ COMECE AQUI — 175ª rodada. **∃ 1 pergunta pendente (o install) & 1 de gosto (§Q61)**
+## ⚑ COMECE AQUI — 179ª rodada. **A 178ª fechou 7 §T & ⊥ ∃ pergunta bloqueante**
+
+### ▶ O COMANDO: **`/ck:build T954`** — o picker só de `clan` (saída (2) de §Q65). **`T850` vem DEPOIS dela** & é essa a ordem que a §Q65 pede: o picker parte a linha `Clan/Family` em 2 & aí §T850 entrega o módulo sem mexer em resolução de kind
+### ⚠ **ESTE REPO TEVE 2 AGENTES ESCREVENDO AO MESMO TEMPO em 2026-09-04, & 1 emenda FOI PERDIDA.** A de §V421 sumiu numa gravação de 15:39 & foi RESTAURADA às 15:45; §T950 §T951 §T954 §V423 §V426 vieram do outro agente. **Antes de confiar no `SPEC.md`, rode `git diff SPEC.md`** — a perda foi achada por leitura, ⊥ pelo gate, & §V425 ⊥ pega isso (ela mede id repetido, ⊥ linha sumida)
+### ⚑ **§T946 MEDIDA & FECHADA pelo user 2026-09-04: "Casting Attribute está perfeito agora."** ∴ §B146 morre, §T952 confirmada, & o `?` de runtime dela respondido — `c.value` aceita o CANÔNICO EN (o de `values`), ⊥ o traduzido. **⊥ ∃ teste [USER] pendente nesta rodada**
+
+### ⚑ A 2ª METADE DA 178ª — o `Casting Attribute`, & 2 rodadas miraram no lugar errado
+
+| §T | o quê | régua |
+|---|---|---|
+| **T952** `x` | `pickerItems` DEVOLVE a seleção depois de escrever o par, guardada | **§V424** nasce · **§V421** emendada |
+
+⚠ **O bug ⊥ era pintura & ⊥ era dado perdido — era uma JANELA.** MEDIDO pelo user: trocar de aba
+PRESERVA o valor & só fechar/reabrir perde. ∴ escrever `c.values`/`c.items` ⊥ limpa a seleção; o
+que acontece é o host casar `field`→controle na CRIAÇÃO, quando o combo ⊥ autora `items=` & tem
+**0** itens — seleção ⊥ tem onde pousar. A lista chega depois (a varredura de `applyLanguage`, no
+LOAD) & ninguém re-seleciona: `pickerItems` LÊ `sheet[field]` p/ o `current` de §V200 & nunca o
+escrevia de volta. **1 linha guardada, em `pickerItems`** — ⊥ em `renderHedgePickers`, que deixaria
+a varredura de idioma sem ela (§V135).
+
+⚠ **§B146 mediu "1 chamador" & concluiu "⊥ ∃ quem encha na abertura" — a 2ª metade é FALSA.**
+`applyLanguage` (`WoD20.6.lfm:2620`) faz `collect(root, all)` & chama `pickerItems` em TODO
+`comboBox`, & o comentário dela DIZ "on LOAD". O renderer NOMEADO tinha 1 chamador & o
+preenchimento tinha **2** caminhos ∴ `grep` do nome nunca acharia o 2º. Custou §T947 (1 linha
+redundante) & §V421 (razão escrita falsa). **§V421 ⊥ é aposentada**: com §V424 a chamada dela passa
+a valer pela SELEÇÃO. É **§B151**, & a lição é "ausência provada por `grep` de NOME é ausência no
+nome, ⊥ no comportamento — procure as VARREDURAS".
+
+⚠ **§B152: quase reusei `§V423` & `§T950`, & os 2 ∃iam.** Eu derivei "próximo id" da FAIXA que li
+(§T939…§T949) em vez do arquivo — §V423/§T950/§T951 são de outro pedido do user que entrou no
+working tree depois. É a recorrência de §Q62 **1 rodada depois**. §T953 põe a unicidade no GATE:
+hoje §V384 confere que id CITADO ∃ & **nada** confere que ⊥ se repete.
+
+⚠ **& a linha `M0 baseline` de §V222 pagou no MESMO dia em que nasceu**: a bateria de §V424 abriu
+VERMELHA por §V384 — eu tinha escrito §T953 citando **§V425** sem escrever a linha §V425. Sem o M0
+eu leria "M1 & M2 vermelhas, sonda vermelha" & caçaria fantasma numa régua que estava certa.
+### ⊥ pedir `--all`: ele varre **83** §T abertas & **82** são TESTE ou PROBE em Firecast [USER] (99ª, 103ª)
+### ⊥ ∃ §T minha em `~`: as 4 que estão (`T153` `T239` `T252` `T421`) são probes velhas do Firecast
+
+**Estado:** gate **VERDE** (`-Build` também) · **install EM DIA** (offline, Firecast fechado) ·
+o user commitou até `dfbd71a1`; **TUDO da 177ª & da 178ª está no working tree, ⊥ commitado**.
+
+### ⚑ O QUE A 178ª FECHOU — 7 §T, 4 §V novas, 1 emendada, 1 perna nova
+
+| §T | o quê | régua |
+|---|---|---|
+| **T941** `x` | moldura escura nos **4** `CURRENT` de XP | **§V417** nasce · **§V256** emendada 2 → 6 |
+| **T942** `x` | `COMBAT TRAITS` 341→**351** & espelho `HEALTH` `top` 346→**356** | **§V418** nasce (4 pernas) |
+| **T943** `x` | `WILLPOWER` 101→**110** ∴ fecha em 597 c/ `ARMOR` | perna (b) de §V418 |
+| **T944** `x` | `dominatorGen` nasce **`"13"`** no `onNodeReady` da RAIZ | **§V420** nasce |
+| **T945** `x` | `horzTextAlign` em `edtRevWeakness` | **§V412** ganha perna **(g)** |
+| **T949** `x` | `vertTextAlign` nos **6** `<edit>` de XP | **§V422** nasce |
+| **T947** `x` | `renderHedgePickers(self);` no `onShow` de `WoD20.7` | **§V421** nasce |
+
+⚠ **§T947 ⊥ estava bloqueada & o HANDOFF da 178ª dizia que estava — o SPEC é que é mais novo.**
+A linha dela AINDA abre com "BLOQUEADO por §T946 & por §Q64", & o ⚠ do FIM dela desfaz as 2:
+§Q64 foi RESPONDIDA ("faça o que você recomenda") ∴ a entrega é a de **1 linha**, & §T946 deixou
+de ESCOLHER o conserto p/ CONFIRMÁ-lo. **Lição p/ a próxima: ler a linha da §T até o fim antes de
+acreditar no bloqueio que o HANDOFF copiou** — prefixo de §T ⊥ é emendado, o ⚠ do fim é.
+
+⚠ **§V421 nasceu VERMELHA na árvore limpa & os 2 defeitos eram do check, ⊥ do código.** **(1)** o
+roster "todo `cbo*` sem `items=`" pegava **2** & ⊥ 1: `cboClan` (`WoD20.1:34`) é `visible="false"
+enabled="false"`, portador de valor do campo `clan` — & combo que ⊥ se VÊ ⊥ pinta vazio ∴ está FORA
+do modo de falha, ⊥ isento dele. **(2)** a fatia de função corria para DENTRO do comentário de
+trás, que cita `cboClan` em PROSA, & o check certificou um "enchedor" que ⊥ enche nada: régua que
+lê COMENTÁRIO como código ⊥ distingue os 2 ∴ a fatia passa por `--[^\r\n]*` antes de casar.
+⚠ **& a lição de método: bateria de mutação SEM baseline mede o nada.** A 1ª bateria de §V421 deu
+"RED por V421" nas 2 pernas & na sonda, & eu quase li isso como sucesso — o gate estava vermelho
+ANTES de qualquer mutação. Toda bateria daqui p/ frente abre com uma linha `M0 baseline`.
+
+### ⚑ AS MUTAÇÕES, TODAS RODADAS (§V20, §V222) — 20 casos, 0 surpresa
+
+**§V417/§V256** (6): tirar `transparent` → V256 · tirar o `<rectangle>` → V256 · declarar o
+`<rectangle>` DEPOIS → V256 · drenar o roster p/ 5 → **V417** (o zero-guard é perna própria) ·
+`opacity` num dos 4 novos → **V111**, que é quem já cobrava · sonda cor `DimGray` → **VERDE**.
+**§V418** (4): `COMBAT TRAITS` em 341 → V418+V298 · espelho parado em 346 → **V40 & V418 as 2**,
+que é a prova escrita de que (c) ⊥ é §V40 de novo · `WILLPOWER` em 101 → V418 · sonda largura de
+`VIRTUES` → V239/V27/V280/V298 & **⊥ V418**. **§V420** (3): chave `nil or ""` → V420 · semear
+`"13th"` → V420 · sonda `appearance_1` → **V104 só**. **§V422** (2): tirar `vertTextAlign` de 1
+dos 6 → V422 · sonda tirar de um `<label>` → **VERDE**. **§V412(g)** (2): tirar `horzTextAlign`
+de `edtRevWeakness` → V412 · sonda renomear o TÍTULO → **V10/V28 só**. **§V421** (3): tirar a
+chamada do `onShow` → V421 · sonda tirar `renderNuminaButtons` do MESMO `onShow` → **VERDE** ·
+dar `items=` ao combo → V208 **& V421** pelo zero-guard.
+
+⚠ **§V422 & §V417 leem o MESMO roster `$V417_XP`** (os 6 `<edit>` de §I144d) & isso é de propósito:
+1 dono p/ "quais são os 6". Mexer nele move as 2 réguas juntas, que é o que §I144d manda.
+
+⚠ **os comentários-guia que MENTIAM foram corrigidos no mesmo commit (§B119):** `WoD20.9.lfm`
+dizia por escrito "Current is NOT given one" — a frase que §V256 acabou de revogar — & o de
+`WoD20.3.lfm:260` dizia `height=306` (é **325**) & `top=330` (é **356**).
+
+### ⚑ §Q65, 2ª metade — ABERTA, & é o ÚNICO bloqueio que sobrou
+
+**§T850 é a próxima da fila & ela ⊥ fecha sozinha.** `mfOpen` resolve o módulo pelo KIND & o
+ÚNICO botão que abre este texto passa `'Clan'` ∴ `descFamily_*.lua` ⊥ é alcançável por botão
+nenhum enquanto ⊥ ∃ kind `Family`. Entregar só o módulo avermelha §V408 pela perna do §T FECHADO.
+3 saídas na §Q65, & a **recomendação é a (2)**: o picker só de `clan` que o user anunciou chega
+ANTES de §T850, a linha `Clan/Family` vira 2 & cada uma tem seu kind — é a única que ⊥ inventa
+mecanismo p/ um estado que vai ser desfeito.
+
+### ⚑ O QUE SOBROU, & ⊥ é muito
+
+**Buildável sem o Firecast: §T850 & as 2 em `~` (§T950 §T951, os renomes)**, & ela depende da §Q65 acima. Tudo o mais das 11 §T que a
+177ª escreveu está FECHADO. **§T946** & **§T948** são TESTE em Firecast [USER]: §T946 confirma o
+conserto de §T947 (se o valor voltar, a 1 linha bastou; se ⊥ voltar, o dado é APAGADO na abertura
+& isso abre §B novo, ⊥ reabre §Q64) · §T948 mede o que descentraliza os 3 dropdowns de Settings.
+
+**Numeração, & ela é LIDA do arquivo — ⊥ derivada do trecho que a rodada leu:** o próximo §V é o
+**427** · o próximo §T é o **955** · o próximo §B é o **153** · o próximo §Q é o **66**.
+⚠ **a 178ª escreveu "§V 423 / §T 950" aqui & os 3 já ∃iam** — §V423 & §T950 & §T951 são de um
+pedido do user de 2026-09-04 (os 5 renomes de clã/linhagem) que entrou no working tree DEPOIS do
+bloco de abertura da 177ª ∴ quem leu só a faixa §T939…§T949 contou errado. É a recorrência de
+§Q62 uma rodada depois, & agora ∃ §B152. **Contar assim, sempre:**
+`grep -o "^V[0-9]*:" SPEC.md | sed 's/V\(.*\):/\1/' | sort -n | tail -1` (idem `^T[0-9]*|`,
+`^B[0-9]*|`). ⚠ **as §T em `~` são 6 & ⊥ 4**: `T153` `T239` `T252` `T421` são probes velhas do
+Firecast, mas **`T950` & `T951` são TRABALHO ABERTO** — os renomes, buildáveis sem o Firecast.
+
+---
+
+### ⚑ O QUE A 176ª FECHOU — §T848 inteira, & ela achou 2 defeitos na metade EN "conferida"
+
+| o quê | prova |
+|---|---|
+| `descClan_en.lua` + `descClan_pt.lua` | **61** chaves cada, mesmo conjunto, forma de §I21 |
+| `research/clan_body_pt.tsv` | **61** linhas, 2 colunas (≡ `arch_body_pt.tsv`), acento em 61/61 |
+| `research/gen_clan_desc.ps1` | o gerador; **LF**, ⊥ CRLF (§V345 pegou o CRLF na 1ª tentativa) |
+| §V408 mede `Clan` | `'Clan' = 'CLAN_DESC'` em `$DESC_MARKER`; 6 mutações VERMELHAS |
+
+⚠ **A metade EN citava as 61 páginas 1 CEDO, & a QA que "leu os 61" ⊥ pegou porque leu o CORPO,
+⊥ o NÚMERO.** `$OFF` do extrator é relativo ao ÍNDICE 0-based & carregava o número do PDF
+(1-based). MEDIDO no rodapé: `core` idx 55 → impressa **48** (⊥ 47) · idx 401 → **394** (o título
+`Baali`) · `anarch` idx 39 → **39** · `lob` idx 36 → **36** · `bh` idx 167 → **167**. As 13 do core
+viram a sequência **PAR 48..72**, & a impressa 47 ⊥ é arte: são 3.557 chars do fim dos Independents.
+
+⚠ **O `Caitiff` engolia 1.075 chars do verbete BRUJAH.** Em `anarch` p.40 o parágrafo logo após o
+fim do Caitiff é do Brujah, cujo título só aparece MAIS ABAIXO na mesma página ∴ a parada por
+título do próximo verbete dispara tarde. `$TAIL` (1 entrada) corta na última frase. O cabeçalho
+corrido `ANARCHS UNBOUND` entrou no `$FURN` junto. Corpo: 3.904 → **2.829**.
+
+⚠ **O cabeçalho do `.tsv` era escrito À MÃO & a re-extração apagou os 22 comentários calada.**
+Agora `$HEADER` mora no gerador. Cabeçalho que o gerador ⊥ escreve ⊥ sobrevive ao gerador.
+
+⚠ **A dívida em BLOCO de §V408 é lixeira, & foi MEDIDA como tal.** O botão que abre o módulo
+nomeia a lista **`clanFamily`** (`WoD20.11.lfm:396`) = 61 clãs + **23** famílias revenant ∴ o
+módulo é cobertura PARCIAL contra a lista que serve. Com `@{List; Task}` puro, apagar o
+`Nosferatu` das **2** metades deixou o gate INTEIRO **VERDE** — a dívida escrita p/ 23 nomes
+desculpava os 84. A linha ganhou `Names` c/ os **23** NOMEADOS (≡ §V366c) & 2 pernas novas: nome
+que o módulo JÁ tem = FAIL (é o que aposenta a linha quando §T850 pagar) · nome que a lista ⊥
+oferece = FAIL. Linha sem `Names` = FAIL, ⊥ fallback calado.
+
+**As 6 mutações, todas VERMELHAS** (§V20, §V222): tirar chave do `_pt` → §V210(a) · des-acentuar o
+`_pt` → §V411(a) · esvaziar o roster → §V408 (23 nomes) · fechar §T850 → §V408 (a perna do §T roda
+mesmo c/ 0 sobra, senão ela caladava no dia em que o roster começasse a funcionar) · pôr `Ventrue`
+nos `Names` → §V408 (mente sobre texto que ∃) · tirar `Names` → §V408. **Sonda: reordenar os 23
+→ VERDE**, porque o que se mede é CONJUNTO.
+
+---
+
+### ⚑ §T848 — a metade EN ESTÁ PRONTA. **⊥ re-extrair nada**
+
+**Em disco, novo:** `research/clan_body_en.tsv` (**61** linhas, 94 KB) &
+`research/clan_extract.ps1` (o gerador). Formato:
+`<nome do picker>\t<livro>\t<pág impressa>\t<corpo EN com \n escapado>`.
+
+**Os 61 saíram, & a QA foi LENDO os 61** — início & fim de cada um. Corpo: min **192** ·
+mediana **1422** · max **3870** chars · soma **90.417**.
+
+⚠ **As 2 fontes ⊥ são a mesma, & é por isso que 1 parser só ⊥ resolve:**
+- **13 do core** (pp. **47..71**, ímpares): o TÍTULO é ARTE & ⊥ está na camada de texto ∴ o
+  corpo é a página inteira ATÉ a linha `Nickname:`.
+- **os outros 48**: o título É linha de texto ∴ o corpo vai do título até o 1º rótulo mecânico
+  **OU até o título do PRÓXIMO verbete**, o que vier antes. ⚠ **sem a 2ª parada o corpo
+  atravessa o capítulo inteiro** — o `Caitiff` deu **9.495** chars antes dela.
+
+⚠ **4 nomes ⊥ saem do core:** `Gargoyles (Scout|Sentinel|Warrior)` = `lob` p.**35** — **PINADOS**,
+porque o ÍNDICE em `lob` p.3 carrega os mesmos 3 títulos & um corpo MAIOR ∴ "pegar o mais longo"
+escolhe o índice — & `Caitiff` = `anarch` p.**38**.
+
+**O QUE FALTA, & é só isto:** `research/clan_body_pt.tsv` com as **61** traduções, & aí
+`descClan_en.lua` + `descClan_pt.lua` na raiz do plugin, forma de §I21 (`<Livro>, p. <n>` · 2
+linhas em branco · `<Nome>` · 2 em branco · `<corpo>`), chave EN nos 2 (§V24, §V210a).
+
+⚠ **§V210(a) cobra as 2 metades com as MESMAS chaves** ∴ **⊥ dá p/ entregar meio módulo**: ou os
+61 pares ou nada. É por isso que §T848 está `~` & ⊥ `x`.
+
+⚠ o `?` desta lista **já está ligado**: `mfOpen(self, 'clanFamily', 'clanFamily', 'Clan')` em
+`WoD20.11.lfm` já nomeia o módulo `Clan` (§V364f/g) — a metade que quase ficou p/ trás em §T838
+**⊥ é dívida aqui**. E ∃ **§V366** como modelo de régua de cobertura c/ faltantes NOMEADOS.
+
+---
+
+### ⚑ O QUE A 175ª FECHOU
+
+| o quê | prova |
+|---|---|
+| `rdk -i` (o install de 3 rodadas) | instalado ≡ `output/`, **2.745.046** B, mtime 22:32, offline |
+| a emenda de spec, **5** operações | `SPEC.md` +2 linhas; **§B145** & **§Q61** nascem |
+| §T848 metade EN | `clan_body_en.tsv` **61**/61, QA lida uma a uma |
+
+**§Q61 respondida pelo user ("aprovado"):** o texto do box da fraqueza FICA em `opacity="0.75"`,
+& `$DESC_BRIGHT` segue com **2** nomes.
+
+---
+
+### ⚠ AS ARMADILHAS DA 175ª — 3, & as 3 são de EXTRAÇÃO
+
+1. **"pegar o candidato mais longo" escolhe o ÍNDICE.** O sumário do livro carrega os mesmos
+   títulos & um bloco maior atrás. Pinar a página é a cura, & ela ! ser MEDIDA, ⊥ suposta.
+2. **Verbete sem rótulo mecânico ⊥ tem fim.** A parada ! ser DUPLA: o rótulo (`Nickname:`,
+   `Disciplines:`, … & **`Sobriquet:`**, que o `Maeghar` usa) **&** o título do próximo verbete.
+3. **O cache de texto ⊥ está 100% des-hifenizado.** `ob- sessed` sobreviveu em
+   `Assamite Sorcerers` — hífen de quebra de COLUNA, ⊥ de linha. `([a-z])- ([a-z])` cura, & só
+   apareceu LENDO os 61.
+
+& a de ferramenta: **`Set-Location` ⊥ muda o cwd do .NET** — `[IO.File]::ReadAllBytes` com caminho
+relativo lê da pasta errada & ⊥ avisa. Caminho absoluto sempre.
+
+---
+## HISTÓRICO — a 175ª rodada (era o COMECE AQUI até a 176ª)
+
+### ⚑ (era o COMECE AQUI da 175ª, escrito pela 174ª) — ∃ 1 pergunta pendente (o install)
 
 ### ▶ O COMANDO, NESTA ORDEM:
 ### **1º** `rdk -i` — **o install da 174ª NUNCA ACONTECEU: o Firecast estava ABERTO.** Ver abaixo
