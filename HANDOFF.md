@@ -1,6 +1,47 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ⚑ COMECE AQUI — 179ª rodada. **A 178ª fechou 7 §T & ⊥ ∃ pergunta bloqueante**
+## ⚑ COMECE AQUI — 180ª rodada (2026-09-04, tarde). **Fechou §T950 §T951 §T948 §T955; ⊥ ∃ pergunta bloqueante**
+
+### ▶ O COMANDO: **`/ck:build T954`** — o picker só de `clan` (§Q65 saída 2, §I145). Ela destrava §T850
+### ⊥ pedir `--all`: ~82 das abertas são TESTE/PROBE em Firecast [USER]
+### ⚠ ESTA rodada correu em PARALELO com outra sessão (T952/T953/V424/V425/B150-B152 são DELA) — as 2 escreveram em `SPEC.md`, `WoD20.6.lfm` & no gate sem se comer, mas confira `git log` antes de assumir que o HEAD é só seu
+
+**Estado:** gate **VERDE** (`-Build` também) · **instalado** `2.829.123 B` 18:25 · **commitado** pelo user às 18:26 (`08207bfc`), árvore LIMPA.
+
+### ⚑ O QUE A 180ª FECHOU
+
+| §T | o quê | régua |
+|---|---|---|
+| **T950** `x` | 5 renomes de clã (`Precursores do Ódio` · `Brujah Verdadeiros` · `Assamitas: Feiticeiros` · `Assamitas: Vizires` · `Seguidores de Set: Guerreiros`) em `localization.lang` + mapa `PT` | **§V423(a)** |
+| **T951** `x` | varredura da prosa pt (`descMerit/Ritual/Disc_pt.lua` + `research/merit_flaw_body_pt.tsv`); na prosa os 3 com dois-pontos entram SEM dois-pontos (`Assamitas Feiticeiros`) | **§V423(b)** — 0 nome velho, TSV incluída |
+| **T948** `x` | teste da Settings feito pelo user → virou **§B153** | — |
+| **T955** `x` | **APROVADA na tela**: `Game` & `Sheet Theme` (+ 3 do Narrador) seguem centrados na troca de idioma & tema | **§V419** (6 pernas, 5 emendas) · **§V202** & **§V424** EMENDADAS |
+
+### ⚑ §T955 — LEIA ANTES DE TOCAR EM `pickerItems`/`cmbItems`/`keepAnchor` (`WoD20.6.lfm`)
+
+Foram **6 tentativas & 1 medição**, & a medição resolveu. O que ficou, & POR QUÊ — cada peça carrega 1 caso:
+1. **`sameList`** nas 2 rotinas — escrita de `items`/`values` só se a lista MUDOU. Fecha a troca de TEMA sozinho (as escritas eram MUDAS p/ `cboGame`/`cboSheetTheme`, que ⊥ migraram p/ `PICKER_LIST`). **§V202 foi EMENDADA p/ isso**: "incondicional" = "⊥ gated em `filter`", & `sameList` é a ÚNICA guarda aceita (mutação `if filter then` & `if lang == "pt" then` acendem).
+2. **`PICKER_ANCHOR`** (5 entradas, LITERAL) + **`keepAnchor`** no FIM das 2 rotinas — §V419(2) compara o roster com o XML nos 2 sentidos ∴ o literal ⊥ deriva.
+3. **toggle `away`→`a` DENTRO de `setTimeout(…, 1)`** — MEDIDO com `Dialogs.showMessage`: a propriedade LÊ `center` o tempo todo & o host só repinta numa MUDANÇA real; escrever `center` sobre `center` é no-op (as 4 primeiras tentativas). Intervalo ≥ 1 por §R44.
+4. **`c:needRepaint()`** depois do toggle — o combo DESABILITADO (`cboGame`, §V109) ⊥ repinta no toggle, só num repaint de verdade; a sonda do user (trocar de aba centra) decidiu. Precedente: 4 fichas de terceiros do repo.
+⚠ `sameList` & `keepAnchor` são **GLOBAIS** de propósito: `local` estourou §V325 (teto de 100 locais de chunk).
+⚠ **§B153 tem a cronologia inteira & a lição**: 4 rodadas de hipótese custaram mais que 1 build instrumentado. Da próxima vez que "a escrita ⊥ pega", MEDIR primeiro.
+
+### ⚑ LIÇÕES DE FERRAMENTA DESTA RODADA (§B74 de novo)
+- `sed -i` comeu o CR do `SPEC.md` inteiro & deixou 1 CR solto na linha de §V222 — §V318 pegou. **Neste repo: `perl -0777` p/ editar, `head/cat/tail` p/ inserir, NUNCA `sed -i`.**
+- Regex `.NET` `(?m)…$` ⊥ casa antes de `\r`: em arquivo CRLF use `[^\r\n]*\r?$`. Um check de §V202 nasceu MUDO por isso & a bateria pegou.
+- Bateria de mutação SEM a perna de USO passa verde: §V419 conferia definição do `keepAnchor` & ⊥ a chamada — nasceu a perna (4) porque `ME` ⊥ acendeu.
+
+### ⚑ O QUE SOBROU
+- **§T954** (código, próxima) → **§T850** (`/ck:research`, bloqueada por ela).
+- **§T239 §T421 §T496**: probes velhas em `~`/`.` — matar ou manter, decisão do user.
+- ~82 testes em Firecast [USER] agrupados (§T770 §T777 §T795…).
+
+**Numeração MEDIDA 2026-09-04 18:30:** próximo §T = **956** · §V = **427** · §B = **154** (§B153 é o último). Conferir com `grep -o "^B[0-9]*|" SPEC.md | sort -t B -k2 -n | tail -1` antes de usar.
+
+---
+
+## (ARQUIVADO pela 180ª) COMECE AQUI — 179ª rodada. **A 178ª fechou 7 §T & ⊥ ∃ pergunta bloqueante**
 
 ### ▶ O COMANDO: **`/ck:build T954`** — o picker só de `clan` (saída (2) de §Q65). **`T850` vem DEPOIS dela** & é essa a ordem que a §Q65 pede: o picker parte a linha `Clan/Family` em 2 & aí §T850 entrega o módulo sem mexer em resolução de kind
 ### ⚠ **ESTE REPO TEVE 2 AGENTES ESCREVENDO AO MESMO TEMPO em 2026-09-04, & 1 emenda FOI PERDIDA.** A de §V421 sumiu numa gravação de 15:39 & foi RESTAURADA às 15:45; §T950 §T951 §T954 §V423 §V426 vieram do outro agente. **Antes de confiar no `SPEC.md`, rode `git diff SPEC.md`** — a perda foi achada por leitura, ⊥ pelo gate, & §V425 ⊥ pega isso (ela mede id repetido, ⊥ linha sumida)
