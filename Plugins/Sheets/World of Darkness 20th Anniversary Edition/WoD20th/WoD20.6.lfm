@@ -2225,6 +2225,73 @@
 			-- with a `cbo` test - so they need no entry.
 			PICKER_NOSORT = { cboGame = true, cboSheetTheme = true };
 
+			-- Two lists are the SAME when they are the same length with the same bytes in the same
+			-- order. It exists so a write that changes nothing never reaches the host (SPEC V122,
+			-- B153): every such write rebuilds the closed combo's display and drops the text anchor
+			-- the XML authored, and the language combo is centred for exactly one reason - nobody
+			-- ever writes to it, it has no name and pickerItems returns on the first line (I144h).
+			function sameList(a, b)
+				if a == nil or b == nil then return false; end;
+				if #a ~= #b then return false; end;
+
+				for i = 1, #a, 1 do
+					if a[i] ~= b[i] then return false; end;
+				end;
+
+				return true;
+			end;
+
+			-- The combos that author a text anchor in the XML **and** get their items rewritten by
+			-- one of the two routines below. On a LANGUAGE switch the list really does change, so
+			-- the write cannot be skipped the way sameList skips it on a theme walk (SPEC V202,
+			-- B153) - and the host rebuilds the closed combo's display on that write and drops the
+			-- anchor. So it is put back, right after.
+			--
+			-- The value is a LITERAL and not a read-back of c.horzTextAlign. That round-trip was
+			-- tried twice and does not work: the getter maps to _obj_getProp(handle, "TextAlign")
+			-- and there is not ONE read of it in any sheet in this repo - the SDK itself only ever
+			-- WRITES the property, as a literal (SDK3/API/rrpgGUI.lua:349). The literal is safe
+			-- because it cannot drift: V419 builds this same roster out of the XML and compares it
+			-- name for name and value for value, so the day one of them authors `leading` the gate
+			-- goes red instead of the screen going wrong. The language combo is NOT here and that
+			-- is the control - it has no name, neither routine reaches it, and it was the only one
+			-- of the three that never lost its anchor (SPEC I144h).
+			PICKER_ANCHOR = { cboGame = "center", cboSheetTheme = "center",
+							  cmbHealthLevels = "center", cmbSpecCost = "center", cmbBgCost = "center" };
+
+			function keepAnchor(c, nm)
+				local a = PICKER_ANCHOR[nm];
+
+				if a == nil then return; end;
+
+				-- MEASURED in Firecast 2026-09-04 (SPEC B153, 5th cut, the one that was instrumented
+				-- instead of guessed): after setItems the property still READS the authored value -
+				-- in the same tick, at +1ms and at +400ms - and the closed display is left-aligned
+				-- anyway. The host rebuilt the text without looking at the stored anchor, and it only
+				-- looks again when the property CHANGES, so writing `center` over `center` is a
+				-- no-op to it. That is why four cuts that wrote the right value in four different
+				-- places all did nothing. What repaints is a real change: away, then back.
+				--
+				-- DEFERRED with a positive interval (SPEC R44, B97): at +1ms the rebuilt text already
+				-- exists, so the toggle lands on the control that is on screen, not on the one about
+				-- to be replaced. `away` is derived from the roster value and never names the anchor
+				-- itself: the value that STAYS is the authored one, and V419 compares it to the XML.
+				setTimeout(function()
+					local away = (a == "leading") and "center" or "leading";
+
+					c.horzTextAlign = away;
+					c.horzTextAlign = a;
+
+					-- And a REPAINT, explicitly (SDK gui.Control:needRepaint, native "Repaint"). The
+					-- toggle alone repainted cboSheetTheme and not cboGame, which is enabled="false" -
+					-- and the user's own probe closed the gap: leave the tab and come back, and cboGame
+					-- is centred, so the property is right and only the paint is stale. This is what
+					-- the tab switch does, asked for directly; enabled (V109) and opacity (V241) are
+					-- both fenced and neither is touched (SPEC B153, 6th cut).
+					c:needRepaint();
+				end, 1);
+			end;
+
 			local function pickerItems(c, lang, era, levels)
 				local nm = c:getName();
 
@@ -2459,22 +2526,18 @@
 				--
 				-- The host rebuilds the CLOSED combo's display when it receives a new items list, and
 				-- that rebuild drops the text anchor the XML authored. Measured in Firecast 2026-09-04
-				-- (SPEC B153, T948, I144h): cboGame and cboSheetTheme lose it on BOTH the language and
-				-- the theme switch, the OPEN list stays centred, and the language combo - which never
-				-- reaches this function, it has no name - never loses it. So the two writes below are
-				-- bracketed: READ the anchor first, put the SAME bytes back after.
-				--
-				-- Never a literal here. `c.horzTextAlign = "center"` would fix today's screen and make
-				-- Lua the SECOND owner of what the XML declares (SPEC V208, V419): the day a combo
-				-- authors `leading`, this fix becomes the bug. What goes back is what came out.
-				local hAlign = c.horzTextAlign;
-				local vAlign = c.vertTextAlign;
-
-				c.values = kept;
-				c.items = shown;
-
-				if hAlign ~= nil then c.horzTextAlign = hAlign; end;
-				if vAlign ~= nil then c.vertTextAlign = vAlign; end;
+				-- (SPEC B153, T948, I144h): cboGame and cboSheetTheme lose it, the OPEN list stays
+				-- centred, and the language combo never does - it has no name, this function returns
+				-- on its first line, and nothing here ever writes to it. Two rules come out of that.
+				-- GUARDED, and this is the whole of the theme case (SPEC B153, V122). cboGame and
+				-- cboSheetTheme did NOT migrate to PICKER_LIST, so `vals` came out of c.values and
+				-- `kept` goes straight back in byte for byte - on a theme walk BOTH writes below were
+				-- silent, and each one still made the host rebuild the closed display and drop the
+				-- anchor the XML authored. On a language walk only `items` really moves. Guarding
+				-- them separately is what makes these two behave like the language combo, which stays
+				-- centred because nothing ever writes to it at all (SPEC I144h).
+				if not sameList(c.values, kept) then c.values = kept; end;
+				if not sameList(c.items, shown) then c.items = shown; end;
 
 				-- The SELECTION comes back once the LIST exists, and that is a WINDOW and not lost data
 				-- (SPEC V424, B150). The host binds field -> control when the control is CREATED, and a
@@ -2490,6 +2553,10 @@
 				-- renderHedgePickers because this is the one place that already knows `current` and already
 				-- writes the pair - a second site would leave the language walk without it (SPEC V135).
 				if current ~= nil and current ~= "" and c.value ~= current then c.value = current; end;
+
+				-- LAST, after the value write above: the host rebuilds the closed display on that write
+				-- too, so an anchor put back any earlier is undone again (SPEC B153, V424).
+				keepAnchor(c, nm);
 			end;
 
 			-- Re-filter the pickers of one Vampire area after the Disciplines moved (SPEC I25).
@@ -2642,7 +2709,15 @@
 					shown[i] = (lang == "pt") and (PT[v] or v) or v;
 				end;
 
-				c.items = shown;
+				-- Same two rules pickerItems carries, for the same reason and the same three
+				-- symptoms (SPEC B153, V202, V419): never write a list that did not move, and put
+				-- the anchor back when it did. cmbHealthLevels, cmbSpecCost and cmbBgCost author
+				-- horzTextAlign="center" and their items ARE translated, so a language switch
+				-- rewrites them and the host drops the anchor - the same defect as cboGame, on a
+				-- tab nobody had looked at yet.
+				if not sameList(c.items, shown) then c.items = shown; end;
+
+				keepAnchor(c, nm);
 			end;
 
 			-- SPEC V22 / B.8: the authored English is snapshotted once and never overwritten.

@@ -6199,8 +6199,25 @@ if (-not $pickerFn.Success) {
     # values=. The eight unfiltered pickers took their values from the attribute and needed
     # items alone; with the list coming from PICKER_LIST a guarded write leaves them showing
     # every entry and STORING none (SPEC V202, I27).
-    if ($pk -notmatch '(?m)^\s*c\.values = kept;') {
-        $filterBad += "V202 pickerItems does not write values unconditionally - an unfiltered picker would show every entry and store none (SPEC I27)"
+    # The ONLY guard allowed on these two writes is SAME-CONTENT (sameList). It is a no-op by
+    # definition - the control ends up holding the same pair either way - and it is what keeps a
+    # walk that changed nothing from making the host rebuild the closed display and drop the text
+    # anchor the XML authored (SPEC B153, V419, V122). Any OTHER condition is the `if filter then`
+    # shape again, which left the unfiltered pickers showing every entry and STORING none.
+    if ($pk -notmatch '(?m)^\s*(if not sameList\(c\.values, kept\) then )?c\.values = kept;') {
+        $filterBad += "V202 pickerItems does not write values - an unfiltered picker would show every entry and store none (SPEC I27)"
+    }
+    $pairs202 = @(
+        @('c.values = kept;', 'if not sameList(c.values, kept) then c.values = kept; end;'),
+        @('c.items = shown;', 'if not sameList(c.items, shown) then c.items = shown; end;')
+    )
+    foreach ($w202 in $pairs202) {
+        foreach ($m202 in [regex]::Matches($pk, ('(?m)^[^\r\n]*' + [regex]::Escape($w202[0]) + '[^\r\n]*\r?$'))) {
+            $ln202 = $m202.Value.Trim()
+            if ($ln202 -ne $w202[0] -and $ln202 -ne $w202[1]) {
+                $filterBad += "V202 the write carries a guard that is not same-content: '$ln202' - only sameList is allowed, because it alone cannot change what the control ends up holding (SPEC V202, B153)"
+            }
+        }
     }
     if ($pk -match 'if filter then c\.values = kept; end;') {
         $filterBad += "V202 the values write is still gated on `filter` - correct only while the XML authored values=, which T493 removed (SPEC I27)"
@@ -9524,7 +9541,7 @@ if (-not $pi424.Success) {
     Fail "V424 pickerItems is gone from WoD20.6 - the one place that writes a picker's list has no owner left, and every leg below reads nothing (SPEC V424, V209)"
 } else {
     $body424 = $pi424.Value
-    $pair424 = [regex]::Match($body424, '(?m)^[ \t]*c\.values = kept;\r?\n[ \t]*c\.items = shown;')
+    $pair424 = [regex]::Match($body424, '(?m)^[ \t]*(if not sameList\(c\.values, kept\) then )?c\.values = kept;[^\r\n]*\r?\n[ \t]*(if not sameList\(c\.items, shown\) then )?c\.items = shown;')
     if (-not $pair424.Success) {
         Fail "V424 pickerItems no longer writes c.values and c.items as one pair - this rule hangs off that write, and a check that cannot find its subject and passes is B94 (SPEC V424, V202, V209)"
     } else {
@@ -19026,68 +19043,132 @@ foreach ($path423 in $v423Files) {
 if ($v423Bad) { foreach ($b423 in $v423Bad) { Fail "V423 $b423" } }
 else { Pass "V423 the five clans renamed on 2026-09-04 read the same on both sides of the translation, and not one of the five old names survives the sweep of $($v423Files.Count) source files (research tsv included)" }
 
-# ---- V419: the Settings anchors are authored in XML, and Lua only ever GIVES THEM BACK ---
-# SPEC V419 (amended 2026-09-04), B153, T948, T955, I144h.
-# Leg 1 - the three Settings dropdowns author horzTextAlign="center" in the XML. That is what
-# gives leg 2 a value to READ.
-# Leg 2 - the ONE Lua write of horzTextAlign/vertTextAlign in the twelve .lfm is the pair glued
-# to the c.values/c.items writes of pickerItems, and it hands back what it read. The host
-# rebuilds the CLOSED combo's display when it receives a new items list and drops the anchor
-# (B153, measured in Firecast: cboGame and cboSheetTheme lose it on both the language and the
-# theme switch, the language combo - no name, never reaches pickerItems - never does). The rule
-# was born demanding ZERO Lua writes; zero would have meant keeping the defect by rule. A
-# LITERAL in that slot stays red: it would make Lua the second owner of what the XML declares
-# (V208), and the day a combo authors `leading` the fix becomes the bug.
-# The needle wants a DOT - `c.horzTextAlign =` - so the XML attribute never counts as a write.
-$hh6Path419 = Join-Path $dir "WoD20.6.lfm"
-$doc419 = Doc $hh6Path419
+# ---- V419: the anchor roster is the XML's, and Lua only ever GIVES IT BACK ----------------
+# SPEC V419 (amended twice on 2026-09-04), B153, T948, T955, I144h, V202.
+# Leg 1 - the three Settings dropdowns author horzTextAlign="center" in the XML.
+# Leg 2 - PICKER_ANCHOR, the Lua roster, EQUALS the roster the XML implies: every <comboBox>
+# in the twelve .lfm that authors horzTextAlign AND carries a cbo*/cmb* name, which is exactly
+# the set the two rewriting routines can reach. The language combo is excluded by having no
+# name at all, and that is the control - it was the only one of the three that never lost its
+# anchor (B153). The roster holds LITERALS on purpose: reading c.horzTextAlign back was tried
+# twice and does not work - the getter maps to _obj_getProp(handle, "TextAlign") and not one
+# sheet in this repo reads it, the SDK only ever writes it (rrpgGUI.lua:349). The literal
+# cannot drift because THIS check is what compares it to the attribute, both ways.
+# Leg 3 - keepAnchor is the ONE place in the twelve .lfm that writes an alignment in Lua, and
+# what it writes comes out of the roster, never out of a quote at the call site.
+$doc419 = Doc (Join-Path $dir "WoD20.6.lfm")
 $v419Bad = @()
 $seen419 = 0
-foreach ($want419 in @('language', 'cboGame', 'cboSheetTheme')) {
-    if ($want419 -eq 'language') { $cb419 = @($doc419.SelectNodes("//comboBox[@field='language']"))[0] }
-    else                         { $cb419 = @($doc419.SelectNodes("//comboBox[@name='$want419']"))[0] }
-    if ($null -eq $cb419) { $v419Bad += "(1) the Settings combo '$want419' is gone from WoD20.6.lfm - leg 2 restores what leg 1 authors, so a missing author leaves nothing to restore (SPEC V419, I144h)"; continue }
+foreach ($w419 in @('language', 'cboGame', 'cboSheetTheme')) {
+    if ($w419 -eq 'language') { $cb419 = @($doc419.SelectNodes("//comboBox[@field='language']"))[0] }
+    else                      { $cb419 = @($doc419.SelectNodes("//comboBox[@name='$w419']"))[0] }
+    if ($null -eq $cb419) { $v419Bad += "(1) the Settings combo '$w419' is gone from WoD20.6.lfm (SPEC V419, I144h)"; continue }
     $seen419++
     $ha419 = $cb419.GetAttribute('horzTextAlign')
-    if ($ha419 -ne 'center') { $v419Bad += "(1) the Settings combo '$want419' authors horzTextAlign='$ha419' and not 'center' (SPEC V419, I144h)" }
+    if ($ha419 -ne 'center') { $v419Bad += "(1) the Settings combo '$w419' authors horzTextAlign='$ha419' and not 'center' (SPEC V419, I144h)" }
 }
-if ($seen419 -lt 3) { $v419Bad += "(1) only $seen419 of the three Settings combos were read - an anchoring rule over controls it cannot see is true by vacancy (SPEC V419, V209, B7)" }
+if ($seen419 -lt 3) { $v419Bad += "(1) only $seen419 of the three Settings combos were read - a rule over controls it cannot see is true by vacancy (SPEC V419, V209, B7)" }
 
+$want419 = @{}
+foreach ($f419 in $files) {
+    foreach ($cb419 in (Doc $f419.FullName).SelectNodes("//comboBox[@horzTextAlign]")) {
+        $nm419 = $cb419.GetAttribute('name')
+        if ($nm419 -eq '' -or $nm419 -notmatch '^(cbo|cmb)') { continue }
+        $want419[$nm419] = $cb419.GetAttribute('horzTextAlign')
+    }
+}
+if ($want419.Count -eq 0) { $v419Bad += "(2) not one anchored cbo*/cmb* combo was found in the $($files.Count) .lfm - the roster would be compared against nothing (SPEC V419, V209, B7)" }
+
+$got419 = @{}
+$rost419 = [regex]::Match($hh6, '(?s)PICKER_ANCHOR = \{(.*?)\};')
+if (-not $rost419.Success) { $v419Bad += "(2) PICKER_ANCHOR is gone from WoD20.6.lfm - keepAnchor would put nothing back and the anchor dies on the next language switch (SPEC V419, B153)" }
+else {
+    foreach ($m419 in [regex]::Matches($rost419.Groups[1].Value, '(\w+)\s*=\s*"([^"]*)"')) { $got419[$m419.Groups[1].Value] = $m419.Groups[2].Value }
+    foreach ($k419 in $want419.Keys) {
+        if (-not $got419.ContainsKey($k419)) { $v419Bad += "(2) '$k419' authors horzTextAlign='$($want419[$k419])' in the XML and is NOT in PICKER_ANCHOR - its list is rewritten on a language switch and nothing puts the anchor back (SPEC V419, B153)" }
+        elseif ($got419[$k419] -cne $want419[$k419]) { $v419Bad += "(2) '$k419' authors horzTextAlign='$($want419[$k419])' and PICKER_ANCHOR hands back '$($got419[$k419])' - Lua would overwrite what the XML declares (SPEC V419, V208)" }
+    }
+    foreach ($k419 in $got419.Keys) {
+        if (-not $want419.ContainsKey($k419)) { $v419Bad += "(2) PICKER_ANCHOR carries '$k419', which authors no horzTextAlign in any .lfm - writing an anchor onto a control that never asked for one is Lua deciding, not restoring (SPEC V419, V208)" }
+    }
+}
+
+$anch419 = LuaFn (CodeOf (Join-Path $dir "WoD20.6.lfm")) 'keepAnchor'
 $writes419 = @()
 foreach ($f419 in $files) {
     foreach ($m419 in [regex]::Matches((CodeOf $f419.FullName), '\.\s*(horz|vert)TextAlign\s*=\s*([^;\r\n]+)')) {
-        $writes419 += @{ File = $f419.Name; Prop = $m419.Groups[1].Value + 'TextAlign'; Rhs = $m419.Groups[2].Value.Trim() }
+        $writes419 += @{ File = $f419.Name; Prop = $m419.Groups[1].Value + 'TextAlign'; Rhs = $m419.Groups[2].Value.Trim(); At = $m419.Index }
     }
 }
-$slice419 = LuaFn (CodeOf $hh6Path419) 'pickerItems'
-if ($slice419 -eq '') { $v419Bad += "(2) pickerItems was not found in WoD20.6.lfm - the one slot allowed to write an anchor cannot be read, so every write below would be judged against nothing (SPEC V419, V209, B7)" }
-elseif ($slice419.IndexOf('c.items = shown', [System.StringComparison]::Ordinal) -lt 0) {
-    $v419Bad += "(2) the pickerItems slice carries no 'c.items = shown' - the anchor rule is glued to THAT write, and a slice without it is the wrong slice (SPEC V419, V209)"
-} else {
-    $atItems419 = $slice419.IndexOf('c.items = shown', [System.StringComparison]::Ordinal)
-    foreach ($w419 in $writes419) {
-        if ($w419.File -ne 'WoD20.6.lfm') { $v419Bad += "(2) $($w419.File) writes $($w419.Prop) in Lua - the only slot allowed is the restore glued to c.items in pickerItems (SPEC V419, B153)"; continue }
-        $at419 = $slice419.IndexOf('.' + $w419.Prop + ' =', [System.StringComparison]::Ordinal)
-        if ($at419 -lt 0) { $v419Bad += "(2) WoD20.6.lfm writes $($w419.Prop) in Lua OUTSIDE pickerItems - a second site is a second owner (SPEC V419, V208, B153)"; continue }
-        if ($w419.Rhs -notmatch '^[A-Za-z_][A-Za-z0-9_]*$') {
-            $v419Bad += "(2) the restore writes $($w419.Prop) = $($w419.Rhs) - a LITERAL here makes Lua the second owner of what the XML declares, and the day a combo authors 'leading' this fix becomes the bug (SPEC V419, V208, T955)"
-            continue
-        }
-        if ($slice419 -notmatch ("(?m)local\s+" + [regex]::Escape($w419.Rhs) + "\s*=\s*c\.\s*" + [regex]::Escape($w419.Prop) + "\s*;")) {
-            $v419Bad += "(2) '$($w419.Rhs)' is written into $($w419.Prop) but never READ from it - what goes back has to be what came out (SPEC V419, T955)"
-            continue
-        }
-        $read419 = $slice419.IndexOf('local ' + $w419.Rhs + ' = c.' + $w419.Prop, [System.StringComparison]::Ordinal)
-        if (-not ($read419 -lt $atItems419 -and $atItems419 -lt $at419)) {
-            $v419Bad += "(2) the $($w419.Prop) read/restore does not BRACKET the c.items write - read at $read419, items at $atItems419, restore at $at419 - and a restore that runs before the host drops the anchor restores nothing (SPEC V419, B153)"
-        }
+# Leg 3 - the TOGGLE, and it is exactly two writes, both inside keepAnchor: away from the anchor,
+# then back to it. MEASURED 2026-09-04 (B153, 5th cut): after setItems the property still reads
+# the authored value and the closed text is left-aligned anyway - the host only re-reads the
+# anchor when the property CHANGES, so one write of the right value is a no-op to it. The value
+# that STAYS is the roster's, which leg 2 compares to the XML; the transient is derived from it
+# and never names the anchor.
+if ($writes419.Count -ne 2) { $v419Bad += "(3) $($writes419.Count) Lua alignment write(s) across the $($files.Count) .lfm - it has to be exactly the two of the toggle inside keepAnchor, away and back (SPEC V419, V209, B153)" }
+else {
+    $ordered419 = @($writes419 | Sort-Object { $_.At })
+    foreach ($x419 in $ordered419) {
+        if ($x419.File -ne 'WoD20.6.lfm') { $v419Bad += "(3) $($x419.File) writes $($x419.Prop) in Lua - the only slot allowed is keepAnchor (SPEC V419, V208)"; continue }
+        if ($x419.Rhs -notmatch '^[A-Za-z_][A-Za-z0-9_]*$') { $v419Bad += "(3) the write is $($x419.Prop) = $($x419.Rhs) - a quote at the write site is Lua deciding the anchor; what stays has to come out of PICKER_ANCHOR (SPEC V419, V208)"; continue }
+        if ($anch419 -eq '' -or $anch419.IndexOf('.' + $x419.Prop + ' = ' + $x419.Rhs, [System.StringComparison]::Ordinal) -lt 0) { $v419Bad += "(3) the $($x419.Prop) = $($x419.Rhs) write is not inside keepAnchor - a second site is a second owner (SPEC V419, V208, B153)" }
     }
-    if ($writes419.Count -ne 2) {
-        $v419Bad += "(2) $($writes419.Count) Lua anchor write(s) across the $($files.Count) .lfm - it has to be exactly the two of the restore, horzTextAlign and vertTextAlign, and no more (SPEC V419, V209, B153)"
+    if ($anch419 -ne '') {
+        $back419 = $ordered419[1].Rhs
+        $away419 = $ordered419[0].Rhs
+        if ($anch419 -notmatch ("(?m)local\s+" + [regex]::Escape($back419) + "\s*=\s*PICKER_ANCHOR\[")) { $v419Bad += "(3) the value that STAYS, '$back419', is not read from PICKER_ANCHOR - the roster is what this check can vouch for (SPEC V419)" }
+        if ($away419 -eq $back419) { $v419Bad += "(3) both writes are '$back419' - writing the anchor over itself is the no-op the host ignores, the first write has to move AWAY (SPEC V419, B153)" }
+        elseif ($anch419 -notmatch ("(?m)local\s+" + [regex]::Escape($away419) + "\s*=\s*\(\s*" + [regex]::Escape($back419) + "\s*==")) { $v419Bad += "(3) the transient '$away419' is not derived from '$back419' - it has to be whatever the anchor is NOT, or the day the roster says leading the toggle writes leading twice (SPEC V419, B153)" }
+    }
+}
+
+# Leg 4 - and it is CALLED, from both routines that rewrite a list, AFTER the write. Legs 2 and
+# 3 vouch for the roster and for the writes inside keepAnchor; without this one, deleting the
+# call site leaves both of them green over a sheet that loses its anchor on every language
+# switch, which is B7 through the door of a rule that checks a definition and not a use.
+foreach ($fn419 in @('pickerItems', 'cmbItems')) {
+    $sl419 = LuaFn (CodeOf (Join-Path $dir "WoD20.6.lfm")) $fn419
+    if ($sl419 -eq '') { $v419Bad += "(4) $fn419 was not found in WoD20.6.lfm - it is one of the two routines that rewrite a combo's items, and a rule that cannot read it passes over nothing (SPEC V419, V209, B7)"; continue }
+    $atI419 = $sl419.IndexOf('c.items = ', [System.StringComparison]::Ordinal)
+    $atK419 = $sl419.IndexOf('keepAnchor(', [System.StringComparison]::Ordinal)
+    if ($atK419 -lt 0) { $v419Bad += "(4) $fn419 rewrites a combo's items and never calls keepAnchor - the host drops the anchor on that write and nothing puts it back (SPEC V419, B153)" }
+    elseif ($atI419 -lt 0) { $v419Bad += "(4) $fn419 no longer writes c.items - either the routine changed shape or this rule is reading the wrong slice (SPEC V419, V209)" }
+    elseif ($atK419 -lt $atI419) { $v419Bad += "(4) $fn419 calls keepAnchor BEFORE it writes the items - an anchor put back before the write that drops it restores nothing (SPEC V419, B153)" }
+}
+
+# Leg 5 - and the toggle is DEFERRED, both halves of it, with a POSITIVE interval. At +1ms the
+# text the host rebuilt already exists, so the toggle lands on the control that is on screen;
+# setTimeout at 0 runs in this very tick, ahead of that rebuild (SPEC R44, B97), which is the
+# defect again - so the interval is read and not just the call.
+if ($anch419 -eq '') { $v419Bad += "(5) keepAnchor was not found in WoD20.6.lfm (SPEC V419, V209, B7)" }
+else {
+    $def419 = [regex]::Match($anch419, '(?s)setTimeout\(\s*function\(\)(.*?)end\s*,\s*(\d+)\s*\)')
+    if (-not $def419.Success) { $v419Bad += "(5) keepAnchor writes the anchor synchronously - the host rebuilds the closed display after this call returns and throws the write away, which is what the first four cuts all did (SPEC V419, B153, R44)" }
+    else {
+        $inside419 = ([regex]::Matches($def419.Groups[1].Value, '\.horzTextAlign\s*=')).Count
+        if ($inside419 -ne 2) { $v419Bad += "(5) only $inside419 of the two toggle writes sit inside the deferred closure - a half outside it runs in the tick the host is about to overwrite (SPEC V419, R44, B153)" }
+        if ([int]$def419.Groups[2].Value -lt 1) { $v419Bad += "(5) keepAnchor defers the toggle with interval $($def419.Groups[2].Value) - setTimeout is only asynchronous with a POSITIVE one, at 0 it runs in this very tick (SPEC V419, R44, B97)" }
+    }
+}
+
+# Leg 6 - and the closure asks for a REPAINT after the toggle. The toggle alone repainted the
+# enabled combos and not cboGame (enabled="false"); the user's probe showed the property was
+# right all along - leave the tab and come back and it is centred - so what the disabled combo
+# needs is the paint, asked for directly (gui.Control:needRepaint). Without this leg, deleting
+# the call leaves legs 3 and 5 green over a Game combo that is wrong until the next tab switch.
+if ($anch419 -ne '') {
+    $def419b = [regex]::Match($anch419, '(?s)setTimeout\(\s*function\(\)(.*?)end\s*,\s*(\d+)\s*\)')
+    if ($def419b.Success) {
+        $body419 = $def419b.Groups[1].Value
+        $lastW419 = $body419.LastIndexOf('.horzTextAlign =', [System.StringComparison]::Ordinal)
+        $rep419 = $body419.IndexOf(':needRepaint()', [System.StringComparison]::Ordinal)
+        if ($rep419 -lt 0) { $v419Bad += "(6) keepAnchor toggles the anchor and never asks for a repaint - the disabled combo keeps the stale paint until the next tab switch (SPEC V419, B153)" }
+        elseif ($rep419 -lt $lastW419) { $v419Bad += "(6) keepAnchor repaints BEFORE the toggle lands - the paint it asks for is the stale one (SPEC V419, B153)" }
     }
 }
 
 if ($v419Bad) { foreach ($b419 in $v419Bad) { Fail "V419 $b419" } }
-else { Pass "V419 the three Settings combos author their anchor in XML, and the only Lua that touches an anchor is the pair bracketing c.items in pickerItems - it hands back the bytes it read" }
+else { Pass "V419 the three Settings combos author their anchor in XML, PICKER_ANCHOR matches the $($want419.Count) anchored cbo*/cmb* combos name for name and value for value, and keepAnchor is the one Lua that writes an alignment" }
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }
