@@ -1156,5 +1156,892 @@ Miracles are impossible to define mechanically, as they should be specifically t
 • Helping someone trapped under a collapsed building
 
 • Finding yourself at the side of a friend in desperate need]==] },
+				-- The fifty-two SAMPLE RITUALS of the hedge Paths, "HEDGE MAGIC RITUALS" on the
+				-- Numina tab (SPEC T928, I140i, I140l). They are keyed by the picker value, level
+				-- prefix and all, because that is what the sheet saves and what mfOpen hands to
+				-- descText - the box already passes the 'Numina' kind, so no code names them.
+				-- The book prints these as prose with no System block, which is why every one of
+				-- them is on the named V335c list (SPEC I104c).
+				["1. Death Curse"] = { en = [==[M20 Sorcerer, p. 31
+
+
+1. Death Curse
+
+
+One of the most extreme rituals a magician can perform, the Death Curse always results in their death, and usually the destruction of their enemies. The magician spends all of their permanent Willpower, gaining a pool of successes equal to their value for the final spell. This ritual allows them to increase the level of Aspects to 2 higher than their Path rating, allowing relatively powerful magicians to sacrifice themselves for legendary curses (or, more rarely, blessings). Curses that resound for generations with fates worse than death for entire towns aren’t unheard of for the most powerful of magicians who find themselves willing to make the sacrifice. They make their Path roll at a difficulty determined by the Aspects as usual, but with that additional pool of automatic successes. Upon completing the ritual, the magician collapses, having spent their life in the casting; they’re often dead before they even hit the floor.]==] },
+				["1. Deathsight"] = { en = [==[M20 Sorcerer, p. 40
+
+
+1. Deathsight
+
+
+Normally, a necromancer can only see the ghosts around them. They can’t see the environment the ghosts call home. This ritual changes that. With it, a magician not only sees the Restless Dead, but can actually peer into the Shadowlands. This effect lasts for one minute per success on the ritual. While under the influence of this ritual, the necromancer cannot perceive the normal world; only the Shadowlands are visible to them.]==] },
+				["1. Eldritch Mark"] = { en = [==[M20 Sorcerer, p. 29
+
+
+1. Eldritch Mark
+
+
+By inscribing a symbol or mark onto an object or the forehead of a person, the magicians marks them as theirs. The mark is invisible to the naked eye, but obvious to anyone with magically enhanced perceptions of any sort. The mark informs anyone looking at it of the name of the magician who created the mark. This ritual takes five minutes to cast and has no Willpower cost. The mark lasts until the next new moon.]==] },
+				["1. Face Theft"] = { en = [==[M20 Sorcerer, p. 47
+
+
+1. Face Theft
+
+
+The key ritual for Shapeshifting-based spycraft, Face Theft allows the magician to take on the precise form of another human being. They must have some piece of the person, such as strands of hair or nail clippings. The ritual requires one success for a person broadly similar to the caster, and an additional success each if the form differs in race, sex, or by more than 20 years of age.]==] },
+				["1. Healing Slumber"] = { en = [==[M20 Sorcerer, p. 33
+
+
+1. Healing Slumber
+
+
+The healer treats a willing (or unconscious) patient and sends them into a deep, energizing sleep. On success, the patient remains asleep for 9 hours; when they awake, all bashing damage is healed, and the patient regains a point of Willpower. For every success above one, subtract one hour from the required sleep time. The healer cannot treat lethal or aggravated wounds in this way.]==] },
+				["1. Lifting Shadows"] = { en = [==[M20 Sorcerer, p. 46
+
+
+1. Lifting Shadows
+
+
+Shadows and shades hide secrets for those who wish to hide them, but the learned sorcerer may reveal those secrets to those they trust. Smearing ink into a pair of contacts or funneling smoke into tight swimming goggles, the sorcerer brings the sight of the recipient into the realm of shadows. For the next eight hours, night may be as bright as day. Once blessed, the sorcerer or their ally may treat all darkness as daylight when making Alertness tests based on sight.]==] },
+				["1. Sprint"] = { en = [==[M20 Sorcerer, p. 22
+
+
+1. Sprint
+
+
+Sometimes, a magician needs to travel a short distance quickly. Though preparations vary, mostly by practice and Ability, this ritual always concludes by lacing up a pair of blue sneakers. Once they are on, the magician can run faster than any mundane human, so long as no one sees them do so. Each success on the ritual doubles the running speed and grants one minute of running. At the end, the ritual leaves the magician exhausted, and they must rest for five minutes.]==] },
+				["1. Symbol Interpretation"] = { en = [==[M20 Sorcerer, p. 43
+
+
+1. Symbol Interpretation
+
+
+In their rush to control the dreams of others, many oneiromancers forget even the meaning of the name of their Path. Though none forget that oneiros means dream, they think “mancy” simply refers to magic, rather than being derived from manteia, or divination. A growing movement among oneiromancers across Fellowships — spearheaded by Prof. Jeremiah Marquette, who specializes in using dreams to access blocked or forgotten memories — is reviving lost information by gathering aspects of the Path forgotten by many practitioners. He’s popularized a new ritual allowing an oneiromancer to find the answer to any one yes/no question the dreamer has ever known the answer to by reading the symbols of their dreams. The magician must have something of the target’s in their possession. They then must succeed at a Path roll and spend the night observing their target’s dreams with a specific yes or no question in mind. At the end, they must make an Intelligence + Enigmas or Intelligence + Esoterica (Dream Interpretation) roll. If they succeed, they find the answer to their question in the target’s dreams.]==] },
+				["2. Bedtime Story"] = { en = [==[M20 Sorcerer, p. 43
+
+
+2. Bedtime Story
+
+
+The most dangerous moment for an oneiromancer is that first step into a dream. The narrative of the dream is in effect, and they are forcibly adapted to it, sometimes losing themselves to it. Enterprising oneiromancers developed a ritual to take control of the dream as it forms, mitigating the risk that they’ll lose control. This ritual must be completed as the subject goes to sleep and requires the oneiromancer be in the room with them. However, a single success allows the oneiromancer to direct the forming dream, broadly guiding its narrative and themes.]==] },
+				["2. Cruel Whispers"] = { en = [==[M20 Sorcerer, p. 36
+
+
+2. Cruel Whispers
+
+
+Illusionists must often be masters of psychological warfare. They can’t create anything truly real, so they play on the fears and anxieties of their targets to control them. One of the key rituals for this is Cruel Whispers. A purely auditory illusion, Cruel Whispers follows its target around for twenty-four hours. Though the magician may never know what the whispers are saying, the victim hears voices, just barely audible, pointing out every flaw, every insecurity, and ever misstep they make during the day. This distracts them, giving them +1 difficulty on all rolls for the day, and whenever they botch they must make a Willpower roll (difficulty 6) or else suffer the effects of the Chronic Depression Flaw (BoS p. 51) for one week.]==] },
+				["2. Enhance Craftsmanship"] = { en = [==[M20 Sorcerer, p. 29
+
+
+2. Enhance Craftsmanship
+
+
+Sometimes, instead of a magic item, what a magician needs is an otherwise normal but perfectly crafted object. This ritual creates unbreakable blades, sweaters that don’t unravel, and similar objects whose only enhancement is in the extreme quality of their crafting. These objects cannot be enchanted further, however. Enhanced items are not magical, but an Enchanter or Alchemist can roll Perception + Occult (difficulty 6) to recognize that they were created in this manner. This ritual must be cast during the creation of the object, or takes 15-20 minutes after the fact, and costs no Willpower.]==] },
+				["2. Fire's Weal"] = { en = [==[M20 Sorcerer, p. 34
+
+
+2. Fire's Weal
+
+
+Fire is one of the most dangerous hazards in the World of Darkness; even natural flames can easily cause permanent damage to powerful supernatural beings. With this ritual, the magician can give protection against fire of all sorts. With two successes, the ritual allows the target to soak fire damage, even supernatural flame, as though it were bashing, regardless of what damage it causes. Successes in excess of two reduce the difficulty on soak rolls against fire (to a maximum modifier of –3), so four total successes result in soaking fire damage at –2 difficulty.]==] },
+				["2. Hellblade"] = { en = [==[M20 Sorcerer, p. 34
+
+
+2. Hellblade
+
+
+A flashy ritual, Hellblade attunes a weapon, traditionally a sword, to the Path of Hellfire. Once attuned, the magician can spend one Willpower to engulf the weapon in flame. The flame causes the weapon to inflict two additional dice of damage and converts its damage to aggravated. This lasts for a scene, though the ritual ends if the weapon leaves the caster’s hand. This ritual requires a minimum of two successes.]==] },
+				["2. Jolt"] = { en = [==[M20 Sorcerer, p. 33
+
+
+2. Jolt
+
+
+The sorcerer spends a point of Willpower and magically awakens a person who is sleeping, unconscious, or comatose. This normally requires one success but requires the toxin’s rating in successes to wake someone who is drugged, and four successes to wake the comatose.
+
+Reversing a magickal effect requires successes equal to the original effect +1 to reverse it. This power doesn’t heal the underlying illness, injury, or poisoning, and the patient falls unconscious again at the end of the scene if the healer doesn’t resolve the underlying issue. This can be used to help identify the patient and gather information about who or what put them in that state.]==] },
+				["2. Object Permanence"] = { en = [==[M20 Sorcerer, p. 21
+
+
+2. Object Permanence
+
+
+Hedge magicians naturally have an easier time summoning targets they have a strong connection to, such as a beloved pet or the ritual knife their mentor gifted them. With Object Permanence, the hedge magician forces a supernatural connection to objects for future summoning. This treats the target as “well-known to the sorcerer,” even if the sorcerer found it in a dumpster an hour ago. The sorcerer meditates within 10 feet of the target and spends a point of Willpower. Every success represents a day the target maintains the supernatural connection to the sorcerer. A hedge magician may have a maximum number of targets bound this way at once as they have dots in Conjuration.]==] },
+				["2. Quintessence Infusion"] = { en = [==[M20 Sorcerer, p. 45
+
+
+2. Quintessence Infusion
+
+
+The ability to store and redirect Quintessence is useful on a near daily basis for the sorcerer on the go. Thinking in advance, a sorcerer prepares themselves for situations where they may begin to run dry of available quintessence by infusing drinks or snacks with their own reserves for later use. Classically, this was a potion of great power. In modern nights, the savvy sorcerer may decide the espresso in a can or a protein bar may be just as handy, serving as the perfect inconspicuous consumable. The one drawback to this task is the fueling and the resource of the ritual. For every Quintessence stored, another Quintessence must be channeled to infuse the receptacle.]==] },
+				["2. Rest in Peace"] = { en = [==[M20 Sorcerer, p. 38
+
+
+2. Rest in Peace
+
+
+By summoning a thunderstorm from the underworld, the magician can place nearby ghosts into a state of Slumber. Slumber is similar in many ways to sleep for the living. It is restorative for the ghost’s ephemeral form and restful for their minds and personalities. While in Slumber, the ghost loses awareness of their surroundings, instead experiencing vivid dreams. Usually those dreams are lively and colorful, focused on the ghost’s passions, but with a darkness overlaying them due to the Shadow. The Slumber created by this ritual brings better, more peaceful dreams. The Shadow’s influence over them is diminished to nothing, and even Spectres find themselves having positive dreams for the first time since they fell to their Shadows. A single success always puts a willing target into Slumber, but unwilling targets (like most Spectres) roll Willpower (difficulty 6) and must achieve more successes than the ritual in order to stay awake.]==] },
+				["2. Step on a Crack"] = { en = [==[M20 Sorcerer, p. 31
+
+
+2. Step on a Crack
+
+
+A common rhyme among children says, “If you step on a crack, you break your mother’s back.” It’s just a childish version of an ancient belief that touching cracks brings misfortune. This belief is made manifest in this ritual. Unlike most curses, the magician must inform their target of the curse for it to take effect, and the curse doesn’t automatically occur. Instead, the victim can attempt to evade the curse by not touching cracks. This, of course, inevitably proves to be impossible, triggering a curse bringing some non-life-threatening but potentially permanent harm to the victim or to their loved ones. If they can unweave (see p. 15) this curse before stepping on a crack, it is done at –2 difficulty. However, once the curse is triggered, any attempt to rid the victim of it is at +2 difficulty instead, as their actions were the direct cause of their misfortune, unfair as that may be.]==] },
+				["2. Teleport Ward"] = { en = [==[M20 Sorcerer, p. 22
+
+
+2. Teleport Ward
+
+
+Hedge magicians studying the Path of Conveyance quickly learn to defend themselves from it. By marking out a room or building in an appropriate way — a chalk circle, sigils on the walls, or anti-teleportation field projectors, etc. — they can make it harder for other hedge magicians to use the Path to enter the area. After the ritual is set, each success must be overcome by a caster trying to enter the bounded area. This protection degrades at a rate of one success per month, but a single success on another ritual roll restores it.]==] },
+				["3. Always Armed"] = { en = [==[M20 Sorcerer, p. 21
+
+
+3. Always Armed
+
+
+The sorcerer doesn’t have to appear armed to have a weapon at the ready. Due to the nature of this ritual, it’s nearly always hung before the sorcerer enters a potentially dangerous situation. If they need to access the weapon, the sorcerer completes the ritual by reaching into their trenchcoat or a convenient shadow to summon it. Traditionally, sorcerers used this ritual to conjure swords, but in modern times it’s most common for a sorcerer to summon a shotgun or rifle. The summoned weapon can’t be larger than a shotgun or long sword.]==] },
+				["3. Bashert"] = { en = [==[M20 Sorcerer, p. 32
+
+
+3. Bashert
+
+
+Though this ritual existed in ancient times in one form or another, it has been popularized in its current form by Anne Richard and Judith Marquette. Fate may be fickle, but some matches are almost impossible to keep apart. With even a single success, the target of this ritual is nearly guaranteed to meet a perfect match, someone with the potential to be their True Love (as per the Merit on Book of Secrets p. 59), within the next year. Each additional success divides the time: two successes brings them together within six months, three decreases the wait to four months, and so on.]==] },
+				["3. Belle/Beau/Bright of the Ball"] = { en = [==[M20 Sorcerer, p. 30
+
+
+3. Belle/Beau/Bright of the Ball
+
+
+With knowledge of an upcoming social event and proper preparation, a sorcerer can make themselves quite the sensation. With an invitation in hand, whether intended for them or not, the magician infuses their presence into the upcoming gathering. For the duration of the specified party, they receive VIP treatment from all attendees and hired staff. The organizers give their blessing and offer a hearty “have a great night” without second-guessing their guest list.]==] },
+				["3. Calm Above, Hell Below"] = { en = [==[M20 Sorcerer, p. 39
+
+
+3. Calm Above, Hell Below
+
+
+Spells for the Path of Maelstroms generally bring Tempest energy from the Underworld into the physical world. This creates the storms above and calms the below. This ritual reverses that. It can only be performed during a storm, and when complete, any normal storm in the area dies down. Extreme weather events are largely unaffected and can be used to perform this ritual several times, even decreasing the difficulty by one. However, it is rarely a good idea to sit outside in a hurricane for several hours. The storm’s energy enrages the ghosts in the area. On a single success, they must make Willpower rolls (difficulty 6), or they begin lashing out, attacking each other and even the living if they have the power to do so. If the caster achieves five or more successes, this additionally creates a Maelstrom, causing most ghosts to attempt to flee the area, before being attacked by the spectres such disturbances inevitably attract.]==] },
+				["3. Get Me the Heck Outta Here!"] = { en = [==[M20 Sorcerer, p. 22
+
+
+3. Get Me the Heck Outta Here!
+
+
+One of the most useful tools a magician can have in their pocket is an escape route for when things go badly. This ritual instantly brings the magician back to a pre-prepared home location within 50 miles of them. It requires at least four successes to cast, though additional successes 20 miles apiece to the ritual’s range. An additional roll when casting the ritual allows the magician to return to a secondary location if their dedicated home is too far away. This ritual is almost always cast as a hanging ritual.]==] },
+				["3. Grip of Shades"] = { en = [==[M20 Sorcerer, p. 47
+
+
+3. Grip of Shades
+
+
+Within every crevasse hides a little shadow. Within every shadow hides an ally to a sorcerer of the Path of Shadowcasting. It is access to these allies that gives the sorcerer leverage in ways that many would never anticipate. By hardening the shadowstuff within the shadows on their person, the sorcerer may afford themselves a modicum of protection against impacts and benefits from an advantage in hand-to-hand combat. For 24 hours after bathing in coal-infused oils, the sorcerer has rating 2 armor when soaking bashing or lethal damage and adds two to all Brawl and Martial Arts dice pools that involve grappling.]==] },
+				["3. Hard-Light Constructs"] = { en = [==[M20 Sorcerer, p. 37
+
+
+3. Hard-Light Constructs
+
+
+A popular ritual among technosorcerers, Hard-Light Constructs are illusions everyone involved knows are fake. This creates scenery, furniture, etc., that looks and feels real, though putting your weight onto it wouldn’t be the best idea. It’s often used to simulate visuals where every single detail isn’t needed, but which have moving parts. It creates the illusion for all onlookers, rather than a fixed set of targets. At least one Extraordinary Citizen has been reprimanded for using Hard-Light Constructs to run their World of Shadows game.]==] },
+				["3. Invade Demesne"] = { en = [==[M20 Sorcerer, p. 43
+
+
+3. Invade Demesne
+
+
+Normally, the space created by the Demesne background is inviolate. Only powerful mages capable of finding them through astral travel can reach them. oneiromancers, however, have tricks few others can reproduce. This ritual lets the oneiromancer enter the Demesne of their target. Once there, they can try to seize control, though this requires a Path roll at difficulty 9, opposed by the Demesne’s owner rolling Wits + Demesne (difficulty 6). This is highly risky, and only the most well-prepared oneiromancers should try it.]==] },
+				["3. Mike's Cure-All"] = { en = [==[M20 Sorcerer, p. 33
+
+
+3. Mike's Cure-All
+
+
+While similar rituals were performed for centuries, or longer, this version was first recorded in Chicago during Prohibition and was based on Victorian era Cure-Alls. The healer can force a patient’s body to purge all drugs and toxins through any, and sometimes all, possible exits. This includes vomiting, sweat, tears, diarrhea, etc. The process is incredibly unpleasant but can save a poisoning victim or someone who’s overdosed. The sorcerer must get at least as many successes as the Toxin Rating for the most potent toxin in the patient’s system. No damage is healed, but the patient suffers no further ill effects. This can purge magical potions as well.]==] },
+				["3. Purification of the Inferno"] = { en = [==[M20 Sorcerer, p. 35
+
+
+3. Purification of the Inferno
+
+
+After an unfortunate encounter with a vampire, Charles Moran developed this ritual to protect himself in the future. Unfortunately, this ritual does not discriminate friend from foe, making it an extremely risky ritual to cast when the magician might be in close quarters with others, such as in an elevator. Purification of the Inferno acts as a defensive failsafe. The first person to touch the magician after the ritual immediately bursts into flames, suffering four dice of aggravated damage. The flames then become entirely mundane, dealing three lethal damage per turn, which can be soaked at difficulty 8 until they are put out. The ritual requires three successes on casting.]==] },
+				["3. Shape Quintessence"] = { en = [==[M20 Sorcerer, p. 45
+
+
+3. Shape Quintessence
+
+
+Following elaborate diagrams or practices that align with their style, the sorcerer can manipulate the flow of Quintessence within an area. A gambling hall could be made luckier for the house, or a particularly well-respected ER could suffer higher mortality rates despite the best efforts of the staff simply by manipulating the ley lines beneath the surface. The energies will eventually return to their original pattern, as the ritual holds it in an elastic state for only so long. With proper maintenance and continued observation, a location could be made to take on the new aspects permanently.]==] },
+				["3. Shitstorm"] = { en = [==[M20 Sorcerer, p. 21
+
+
+3. Shitstorm
+
+
+The hedge magician surrounds themself and companions within 25 feet of them with a swirling shell of small inanimate objects. This adds +1 difficulty to hit anyone covered by the effect with a ranged attack for every 2 activation successes. Additionally, anyone attempting close combat against those affected by the ritual must soak [activation successes] in damage. This is usually bashing, unless the sorcerer was in a room filled with broken glass, small knives, or other sharp objects, in which case the damage is lethal. The sorcerer doesn’t have to target any enemy in particular for this to occur. Anyone, friend or foe, who gets too close to the flying debris is hit and must soak the damage.]==] },
+				["3. Shroud Bubble"] = { en = [==[M20 Sorcerer, p. 41
+
+
+3. Shroud Bubble
+
+
+Sometimes, when all else fails, the best thing a magician can do when faced with a troublesome haunting is to hide and wait it out. The problem being that ghosts have a nasty tendency to walk through walls and most other protective barriers. They also tend to be relentless, often obsessed when their minds are turned to a task. Desperate magicians being haunted by perseverant ghosts invented the concept of the Shroud Bubble to protect themselves, especially when waiting for backup to arrive to handle the ghost more directly. The ritual requires three successes but increases the Shroud to 10 near the magician. In fact, the Shroud rating increases in a sphere just large enough to contain them. The effect remains stationary, so the magician can’t leave the area without increasing their risk from ghosts and lasts for 8 hours.]==] },
+				["3. Shut It Down"] = { en = [==[M20 Sorcerer, p. 41
+
+
+3. Shut It Down
+
+
+Hauntings can vary in scale. For ones confined to a room or two, it’s fairly simple to shut down the powers the ghosts are using to interact with the physical world. More often, though, there’s a whole building or larger area being haunted, and if the ghost is denied one room, they’ll just go to another. With Shut It Down, a much larger area than usual can be quieted, such that ghostly powers are impossible to use. The magician must mark the corners of the building or area, which can be as large as a full city block of empty land or a single building. The ritual requires at least 3 successes, and ghosts inside can only use their powers if they succeed on a Willpower roll at difficulty 8.]==] },
+				["3. Wrapped in a Shroud"] = { en = [==[M20 Sorcerer, p. 40
+
+
+3. Wrapped in a Shroud
+
+
+The Shroud separates the world of the living from the world of the dead. It can be difficult to cross this barrier, a fact which protects the living and the dead both from each other. Usually, either a necromancer must reach across from the land of the living to the world of the dead, or a ghost must have crossed to accomplish something among the living, in order for them to interact. For one minute per success on this ritual, the necromancer manages to actually stand between worlds, able to interact directly with both without further magic. Both human beings and ghosts can interact freely with the magician, for better or for worse.]==] },
+				["4. Doxxing"] = { en = [==[M20 Sorcerer, p. 42
+
+
+4. Doxxing
+
+
+By reading the currents generated by a ghost and its movements, the magician can glean information from it. Each piece of information comes with a cost and must be declared and paid for before the casting. Any resources spent in this way are not refunded if the ritual fails. No information is gained if the ritual fails to achieve the number of successes required for the information being sought out:
+
+• Identifying a Passion — One success each. This identifies both the Passion and the emotion it is tied to.
+
+• Nature, Demeanor, and Shadow Archetype — One success and one point of Willpower each.
+
+• Identifying a Fetter — Much more difficult, this requires two successes and a point of Willpower.
+
+• The True Name of the ghost — This requires five successes and two points of Willpower.]==] },
+				["4. Dream Scream"] = { en = [==[M20 Sorcerer, p. 43
+
+
+4. Dream Scream
+
+
+While powerful oneiromancers can simply send dreams to people as spells, with this ritual, they can send a message to several people at once through their dreams. The magician chooses a message consisting of a single sentence, fixes it in their mind, and performs the ritual. At completion, they can send the message to one person per success within a 10-mile radius.]==] },
+				["4. Extraction"] = { en = [==[M20 Sorcerer, p. 22
+
+
+4. Extraction
+
+
+Another ritual commonly hung “just in case”, Extraction allows the sorcerer to take fallen or overwhelmed companions out of battle and to safety. The sorcerer first moves out of range of combat, typically behind cover, and pulls their companions out of a shadow. There isn’t a difficulty increase or success penalty if the companions aren’t resisting and aren’t immediately being targeted — the chaos of combat can hide this ritual’s use. Once the sorcerer and their companions are out of range, they aren’t counted as being in combat unless a combatant finds them and attacks. This powerful ritual can work on up to 10 companions, who the sorcerer must define when initially performing the ritual.]==] },
+				["4. Fix the True Form"] = { en = [==[M20 Sorcerer, p. 47
+
+
+4. Fix the True Form
+
+
+Shapeshifters often find themselves in conflict with one another. They also run into stranger things with multiple forms. Fix the True Form was developed by one who claimed descent from werewolves. It forces anyone targeted by it to take on their “true” form if they fail at a Willpower roll (difficulty 8). For magicians, they simply revert to their natural form, as do most other shapeshifters. Ironically, despite being created in part to force werewolves into their human or wolf forms, this ritual forces Garou and Fera to take on their mixed forms instead, often with terrible consequences for an overconfident hedge magician.]==] },
+				["4. Forced Medium"] = { en = [==[M20 Sorcerer, p. 40
+
+
+4. Forced Medium
+
+
+Some people are naturally easier for ghosts to possess. These mediums may view this as a gift or a curse, but it marks them apart. These are the people who deal with the spirit worlds, and who ghosts will come to in order to either ask them to solve a problem or else take over their body to compel them do so. This ritual gives the target the merit Medium (BoS p. 69) for a week, along with a –2 difficulty on attempts by ghosts to possess them.]==] },
+				["4. Freudian Slip"] = { en = [==[M20 Sorcerer, p. 32
+
+
+4. Freudian Slip
+
+
+Speaking your thoughts at the wrong time can be social suicide. It can end friendships, destroy careers, and create lifelong hatreds with other consequences down the line. Magicians who study the Path of Fortune have refined this this ritual to take advantage of this knowledge. Freudian Slip curses its victim to say the worst possible thing they actually believe at their next important social event or encounter. This can include political speeches, job interviews, dates, family events, and more. Whatever the context, the next time they are trying to conceal their true feelings in a situation where revealing them would cause significant and lasting harm, they must make a Willpower roll (difficulty 8) to avoid simply blurting them out. If they avoid significant social events for a year and a day, the curse dies off, leaving them safe.]==] },
+				["4. Humor Alignment"] = { en = [==[M20 Sorcerer, p. 33
+
+
+4. Humor Alignment
+
+
+This is an old ritual for curing chronic and congenital conditions. It dates back to the Middle Ages when Humorism was in vogue. The healer bleeds the patient with leeches, a ritual knife, or another tool suited to their practice, which deals one level of lethal damage. The healer spends a point of Willpower and must roll at least 5 successes. The healer may perform this ritual as an extended action. The patient rests for three days, after which the lethal damage and the condition are healed. This rest needn’t be solely sleep. The patient may move minimally to perform basic bodily functions but otherwise should be laying down. If the patient is too active during the three days, the ritual fails automatically. The ritual will also fail if the patient suffers significant mental or emotional stress, such as trying to work from bed or having a heated argument.]==] },
+				["4. Information Superhighway"] = { en = [==[M20 Sorcerer, p. 23
+
+
+4. Information Superhighway
+
+
+For technology-based magicians, there’s an unusual means of transportation often overlooked by mystics. It’s harder to access than others but can sometimes reach places Conveyance normally can’t. This ritual allows the caster to travel from any electrical outlet to any other, by converting the magician into electricity. The range is limited to 5 miles per success. This travel takes one minute per 5 miles. However, the archetypical sealed room Conveyance can’t access is usually not sealed off from electricity: If an outlet exists, then the magician can get to it.]==] },
+				["4. Instant Feast"] = { en = [==[M20 Sorcerer, p. 37
+
+
+4. Instant Feast
+
+
+Illusory food is deceptively hard to create. Taste, smell, image, and texture all need to be just right to fool someone into thinking they’re eating a real meal. The target rolls Perception + Alertness (difficulty 7). On failure, they believe they are eating real food for the duration of the meal, whatever food the magician can imagine. However, they’re still hungry. This provides no sustenance (unless the illusion is covering up some other food), though if six or more successes are rolled on the casting, hunger cues are suppressed for a number of hours equal to the target’s Stamina, before they feel hungry again. This can’t alleviate the effects of starvation.]==] },
+				["4. Love Potion Number 9"] = { en = [==[M20 Sorcerer, p. 30
+
+
+4. Love Potion Number 9
+
+
+Regardless of its classic and iconic nature, usage of the “love potion” has fallen out of fashion for obvious reasons. As societies have become more insistent on the importance of consent, sorcerers have had less call to take the time and resources required to perform this ritual. Those that are still willing to make the potent mixture of love and loyalty do so with hesitancy and charge a premium price.
+
+A lock of hair, a dram of blood, or a sentimental personal effect is required to create the right connection to the heart in question. When performed for an individual other than the sorcerer themselves, some part of the client is usually required as well. The ritual takes the form of the traditional potion in some practices; in others it is a sort of ritualized binding with a knotted cord. In all cases, the victim is tied to the anchor point of the sorcerer or their client.
+
+Once performed, the victim finds themselves uneasy and sick to their stomach. The lingering nausea vanishes when the anchor is near, or when they are performing a task that they know would please the anchor.]==] },
+				["5. Generational Wealth"] = { en = [==[M20 Sorcerer, p. 32
+
+
+5. Generational Wealth
+
+
+There are only so many ways to become wealthy enough to last for generations. Other than simple luck, all of them require a substantial sacrifice. For most, this sacrifice is borne by others, through exploitative labor practices or criminal enterprise. In fact, due to the fickle nature of luck, exploitation has always been the easier and more reliable path to wealth. This ritual allows luck to be tamed and guaranteed. It still requires a sacrifice; after all, nothing comes for free. But rather than sacrificing others, taking advantage of their desperation, the parent who seeks security for their family voluntarily sacrifices themself. Though the sacrifice must be willing, few magicians are willing to perform this ritual. Those who are willing must perform the sacrifice in some way appropriate to their practice. The beneficiaries of the sacrifice find themselves suddenly extremely lucky, able to win enough money gambling so they, their children, and their children’s children, will never have to work another day in their lives. Even if they somehow manage to throw away this vast wealth, the next generation will be just as lucky and regain it. The blessing lasts for seven generations, after which the descendants are on their own.]==] },
+				["5. Megafauna Transformation"] = { en = [==[M20 Sorcerer, p. 48
+
+
+5. Megafauna Transformation
+
+
+The Path of Shapeshifting allows the caster to assume animal forms, including partial transformations. But in the end, the caster can normally only fully transform into a normal animal. This ritual allows them to become a gigantic version of whatever animal they want to transform into. In most cases, this is a full throwback to an extinct version of the animal, such as the megatherium (giant sloth) of the Americas. This requires at least five successes.]==] },
+				["5. Oubliette"] = { en = [==[M20 Sorcerer, p. 37
+
+
+5. Oubliette
+
+
+One of the most terrifying rituals of the Path of Illusion, Oubliette has broken some of the strongest people in the world. The magician must be within a few feet of their target for the entirety of a three-hour ritual, which requires at least 5 successes. If they can accomplish this, then the ritual removes all five senses from the victim. They are trapped in a world without any sensation until either the magician releases them or they accumulate 5 successes on Perception rolls at difficulty 9, making one every hour. The victim must start over on a botch. Often, the victims of this ritual are being punished for heinous crimes, and have it cast on them before they are thrown into a hole and forgotten, left to starve without even knowing they are starving.]==] },
+				["5. Overwrite"] = { en = [==[M20 Sorcerer, p. 42
+
+
+5. Overwrite
+
+
+The ultimate expression of the Path of Necronics, the practitioner concludes that all ghosts are electromagnetic signals trapped in the matrix of a formerly living person’s personality. This explains why they’re so malleable, for good or ill. With this ritual, the magician can rewrite the nature of the ghost on a fundamental level. To do so, they must know the ghost’s True Name and possess one of the ghost’s Fetters. The ritual takes 12 hours and requires two Stamina rolls (at difficulty 6) to complete. For this entire time, the ghost must be held within the same room as the caster, roughly a 10-foot by 10-foot space. Upon completion of the ritual, significant changes can be made to the ghost, but each has a cost. They last for one lunar cycle by default but become permanent if the costs are doubled. Some of the possible changes are:
+
+• 1 success and 1 Willpower point per level to change Passions, and an extra Willpower to change to a different emotion.
+
+• 2 successes and 1 Health Level — not damage, the Health Level itself disappears for the duration — to add or remove a point of Angst.
+
+• 5 successes and 5 Willpower to overwrite the ghost entirely with another specific personality.]==] },
+				["5. Shelter for the Dead"] = { en = [==[M20 Sorcerer, p. 39
+
+
+5. Shelter for the Dead
+
+
+A powerful but only situationally useful ritual, Shelter for the Dead can only be performed with the largest storms from the Underworld: The Great Maelstroms. No one knows how or when it was developed, but it was first used to protect the ghosts of Constantinople during the Great Maelstrom caused by the Black Death. The ritual is passed down by those few who know it to their students, hoping that it will never be necessary but knowing how valuable it can be if the worst happens. At the cost of risking an extreme storm battering the lands of the living, Shelter for the Dead creates a region, no more than the size of a modern city block, where the Maelstrom cannot enter. Rather, if the pieces of the Great Maelstrom do enter, they immediately are transformed into brutal storms, with extreme wind, hailstones the size of fists, and other strange things, regardless of the usual weather in the area. The ritual requires ten successes, almost always necessitating a group, and lasts for one day, plus one for each additional success beyond the minimal ten.]==] },
+				["5. Smoldering Ruin"] = { en = [==[M20 Sorcerer, p. 35
+
+
+5. Smoldering Ruin
+
+
+The most common target of the Hellfire Path is an individual enemy. It’s directly offensive magic, and magicians know it and use it as such. Sometimes, targeting individuals and even groups is too small scale. Sometimes a magician really wants to just cut loose, and hedge magic doesn’t offer very many outlets to do so. Masters of Hellfire, however, developed this ritual in order to do just that: cut loose and cause damage to their enemies all at once. Smoldering Ruin requires a full three hours to cast, and in all its forms a Stamina roll (difficulty 6) must be made just to complete the exhausting ritual. Once completed, the magician spends 3 points of Willpower and must achieve at least 5 successes. Despite the difficulty, success is worth the effort: The ritual lights a building on fire, burning it to the ground. No mundane efforts can extinguish this fire, fueled by the caster’s desire for destruction, though supernatural means are capable of doing so. It can even burn buildings made out of normally fire-resistant and fireproof materials. Notably, the caster must perform the ritual while inside the building, and then hope they can escape before becoming trapped inside.]==] },
+				["5. Steal Life"] = { en = [==[M20 Sorcerer, p. 40
+
+
+5. Steal Life
+
+
+One of the darkest arts of Necromancy, masters of the Path can steal the life energy from another living person. The caster first fills themself with death energy but doesn’t shape it directly into a spell. Instead, before it can absorb their own life force, they push it into their victim. This transfer takes with it the most recent five health levels of damage the caster currently suffers from. The caster heals those injuries. Most versions of this ritual involve carving sigils into the victim (or piercing them with electrical wires, or any number of other techniques) causing additional harm. Needless to say, very few survive this process, and those who do often hunt the necromancer until the end of their days.]==] },
+				["5. Teleportal"] = { en = [==[M20 Sorcerer, p. 23
+
+
+5. Teleportal
+
+
+Masters of the Path of Conveyance can do more than simply transport themselves and others from place to place. They can create stable gateways between two locations. First, the magician must prepare both sites for the portal to be created. This takes three days of preparation at each site using trappings and materials appropriate to the caster’s Path Ability. Once the appropriate preparations are complete, the magician makes an extended roll, with one roll per hour. It requires at least one success per 10 miles between the portals. Each extra success adds five uses of the portal or a condition at one or both ends, such as a restriction on who can use it or making the portal one way. Creating this portal costs one permanent Willpower point, which is not refunded if the portal dissipates. Teleportal is a complex ritual, best accomplished with assistants.]==] },
+				-- The twenty-six AFFILIATIONS of the Affiliation picker on the Numina tab (SPEC
+				-- T929, I140i, I140m). Same reason the hedge rituals above are here and not in a
+				-- module of their own: the picker hands mfOpen the 'Numina' kind, so descText
+				-- already requires THIS module for them. Twenty come out of M20 Sorcerer chapter
+				-- three, Lone Practitioner off the page before it, four out of Sorcerer's
+				-- Companion chapter two and the Society of Leopold out of The Hunters Hunted II.
+				-- Prose with no System block, like the rituals - all twenty-six are on V335c.
+				["Balamo’ob"] = { en = [==[M20 Sorcerer, p. 81
+
+
+Balamo’ob
+
+
+Favored Attributes: Stamina, Wits
+
+Favored Paths: Alchemy, Healing, Shapeshifting, Summoning, Binding, and Warding
+
+Within the jungles of Mesoamerica, the warrior-priests of the Mayans, the Balamo’ob still watch over their people. They pass down teachings that were ancient at the height of the Mayan empire, bonding with their wayob, a familiar animal and spirit-guide, and in turn, guiding their people to protect them from the dark spirits that come up from Xibalba, the Otherworld, or simply, the Umbra. Vision trances take the Balamo’ob into Xibalba, where the first spirit they contact becomes their wayob. The Wakah-Chan, the World Tree, separates the earth and sky but also connects our world to Xibalba, venerated in symbols of effigies made of rope and wood. The magic sap of the World Tree is found in the sap of sacred trees within the mundane world, as well as various natural liquid secretions of the human body. Bloodletting itself is a sacred act, most especially when offering one’s own blood, and while a few drops of blood are enough to enable smaller magics, the most spectacular or urgent spells require much more. This greater bloodletting is done by piercing the body with coils of rope and dancing about, streaming blood through the air in sacrifice. The dance is part and parcel of the Balamo’ob art. In some festivals, Balamo’ob take on the guise of the wayob, wearing cloaks, pelts, or costumes to emulate them in reenactments of the creation of the world. Those talented enough assume the form of the patron as the festival ends, rushing off into the night, a physical representation of their wayob but also the World Tree, uniting flesh and spirit, the celestial and mundane.
+
+The Balamo’ob come from the local population of Mesoamerica, particularly the Mayan people now spread across the region. Few from afar — archaeologists, anthropologists, or occult seekers — have been initiated into their mysteries. The Balamo’ob have had to keep their knowledge secret from oppression across the centuries. The teachings are passed orally in Mestizo, a dialect of Spanish and Mayan. While the language itself is not sacred, some things might be lost in translation. Along with language studies, the initiate must learn Mayan cosmology and symbology in order to grasp Balamo’ob magic. After learning these things, when the elder thinks them ready, the initiate takes their first vision trance. This trance allows the aspirant to travel into Xibalba in dream-form. The great Vision Serpent guides them through the final secret rites, when the Balamo’ob meets their wayob, an animal spirit in the form of jaguar, snake, eagle, or other, even mythical, animals. From this day forward, their study is their own. The Balamo’ob gains wisdom through experience, learning from other elders, and traveling into Xibalba with their wayob.
+
+The shamans, itzamna, of the Balamo’ob do not take on any formal organization, but settle within personal territories throughout Mesoamerica, for the spirits prefer to stay in places they know best. Relationships between the shamans are always personal, founding alliances to handle problems, rivalries where conflicts develop. There is no politicking between them. As each shaman has their own beliefs and interpretations, it is not for one to judge another, so long as they are continuing with their work. This openness allows for some Balamo’ob to bond with spirits of darker varieties, which can lead the shaman into rage-fueled raids against outsiders, profiteers, and desecrators. Others are drawn into political revolutions or seek a resurgence of the Mayan empire.]==] },
+				["Followers of Set"] = { en = [==[Sorcerer’s Companion, p. 14
+
+
+Followers of Set
+
+
+Initiation
+
+The Followers of Set are well known to treat themselves more as a religious sect than a clan, and so will often take on converts from other clans, mortals, and even other supernatural beings, so long as they’re willing to accept and follow the teachings of Set. Sorcerers, being more powerful than most mortals, and even more prone to feeling like outsiders in an uncertain world, are thus just as likely, if not more so, than any other to find their way into one of the Cults making up the Followers of Set, and the Setites are more than happy to draw them in.
+
+There’s a difference, of course, between a dupe and one who knows what’s behind the curtain, having been fully inducted into the Setites’ philosophy and made a part of the Clan. The former are plentiful, but the latter are much rarer, even among Sorcerers, although some of the former may be taking advantage of the other worshippers in the same way that the Setites themselves do, or are perhaps simply caught up in the whirlwind of vice and experience provided to them.
+
+Either way, the Setite Kindred themselves are generally more than happy to make use of the unique talents of these magic users, putting their spells and rituals to use gathering the resources and secrets they seek to offer upon the indoctrinated masses. The Sorcerers, in turn, are apt to put their new allies to use, and indeed more than one Child of Osiris (common enemies of these Sorcerers, as described in Sorcerer Revised, pg. 34) has found that a rival Setite Sorcerer has a few undead allies willing to help him out.
+
+Organization and Style
+
+Those dabblers that pay lip service to Setite Cults rarely get very far, and rarely follow any recognizable patterns in their magic beyond generally following a mythic, religious sort of bent. Those that find themselves fully indoctrinated into the Setites, meanwhile, find their foci and style matching the teachings of their cult and of the Clan as a whole. While specifics can vary between Cults and even individuals, this usually means “blasphemous” shrines, blood, sacrifices, prayer to or symbols and representations of Set and/or his masks, desecration of symbols of Gods opposing Set, and of course, serpents, either representations thereof or actual physical specimens.
+
+While “dabblers” may find themselves acting as ghouls to the Setites, it’s actually very rare for adopted initiates to be fed Vitae, or at least no more common than it would be for one Setite to attempt to Blood Bond another.
+
+Paths
+
+Fascination, Illusion (pg. 31) and Shapeshifting, with others depending on the Cult the Sorcerer is part of. With Storyteller permission, Sorcerers that have purchased the Setite Initiate merit (Lore of the Clans, pg. 67) may, instead of purchasing Setite Disciplines directly, mirror Setite Sorcery appropriate to their Cult's style of Sorcery (Akhu, Sadhana, etc) as Sorcery Paths, replacing Vitae costs with Willpower, but purchasing them as if one level higher than normal (so, the first dot of that Sorcery is useless, and the second dot provides the first dot of the Path).]==] },
+				["Forn Jafnaðr"] = { en = [==[M20 Sorcerer, p. 85
+
+
+Forn Jafnaðr
+
+
+Favored Attributes: Dexterity, Wits
+
+Favored Paths: Divination, Enchantment, Hellfire, and Summoning, Binding and Warding
+
+Since ancient times, people in Scandinavia primarily, but not always, practiced feminine witchcraft derived from forn seiðr, or “ancient customs” of the Norse. They worship deities from either or both of the Æsir and Vanir families.
+
+Of note is Freyja, the Vanir goddess of fertility, love, war, and magic who taught sorcery to the Æsir. Odin is also notable as the male head of the Æsir, associated with sorcery, war, wisdom, and the runic alphabet, among other things. Historically, practitioners were highly valued for their powers but suffered under stigma and persecution after the region’s Christianization.
+
+Despite opposition, the practice never fully died out. Many hid under the guise of the dominant religion to secretly maintain their faith. Nowadays, it’s more acceptable to openly practice heathen religions and magic, but they still experience prejudicial backlash in some locales. Practitioners are nominally drawn to the Verbena when they involve themselves in Ascension War politics, though many covens are content to keep to themselves and their communities. Forn Jafnaðr is a new and rapidly growing Affiliation that chose neither of those options.
+
+In recent decades, neonazi groups (under whatever names lend them enough plausible deniability for their intentions) appropriated symbolism and other aspects from forn seiðr to justify their bigotry. One of those groups, Asatru Futhark, was a group of Nazi losers who couldn’t bother to fact check, lazily naming themselves after followers of the Æsir and the name of the runic alphabet. Astatru Futhark was a group of criminals who believed themselves racially superior to others, and though they were a group of wannabe-sorcerers, completely failed to understand that the practice they stole from was historically primarily a women’s craft and would’ve had nothing to do with Asatru Futhark’s patriarchal bullshit. The Asatru Futhark caused destruction and death under the pretense of religious belief until a group of Aeon Order sorcerers put an end to them. This prompted local forn seiðr sorcerers to rise up in direct opposition to those who appropriate their beliefs to promote inexcusable hate crimes and rhetoric.
+
+Remaining members of Asatru Futhark attempted to resurrect the defunct faction several times, each time definitively quashed by Forn Jafnaðr. Forn Jafnaðr has their hands full in their fight against Nordic-appropriating neonazi groups, but thankfully they’re not without allies and those ready to join them. While they make it a personal mission to destroy Nordic-appropriating neonazi groups, they also don’t turn down aid offered, especially from other sorcerers. Forn Jafnaðr is now a decentralized Affiliation consisting of multiple covens who all practice some variation of forn seiðr. They’re primarily based in Scandinavia, but they’re spreading into other areas of Europe as the sentiment gains traction. In 2019, they founded the first Forn Jafnaðr coven in the United States.
+
+More experienced sorcerers typically mentor promising interested members of their faith one-on-one to learn their magical practice. The apprentice learns at their teacher’s side and aids their teacher and coven’s ritual work, providing an extra set of hands. Aptitude for magic is secondary to passion and devotion to the cause when choosing initiates. The philosophy is that magic can always be taught to those who wish to learn, but passion for their ideals is imperative.
+
+To the extent Forn Jafnaðr involve themselves in Ascension War politics, they’re most likely to form temporary working relationships with the Disparate Alliance or the Verbena. Normally, they’re too busy with their main goal to bother with combating the Technocracy, but being mystics, they sometimes get dragged into the conflict anyway. Beyond directly and indirectly combating fascism, individual covens are free to act autonomously to best tailor responses to their local communities. Some covens strive to live off the grid as their ancestors did, but others welcome modern technology in their lives if not their magical practices. It’s far easier, after all, to organize with allies over the internet than with handwritten letters.]==] },
+				["Giovanni"] = { en = [==[Sorcerer’s Companion, p. 15
+
+
+Giovanni
+
+
+Initiation
+
+The Giovanni were once mortal Necromancers, many say, and in fact Necromancy (the “Blood Magic” version) itself was based on the precepts of ancient mortal sorcery. While knowledge of such magic is usually kept away from the mortal members of the various families within the Clan, some that are granted a peek behind the curtain find ways to mimic its powers regardless, whether through an approximation of the Blood Sorcery they’re witnessing, a glimpse into necromantic resources from ages past, or perhaps the help of the spiriti bound by the family, for those that inherently have a sensitivity to them.
+
+Still, the Giovanni are rarely very trusting of mortal magicians, and more hesitant still about the living members of their own family taking on such powers, unless they’re someone they’ve already been eying as a protégé for one reason or another. Generally speaking, when the anziana catch wind of a Sorcerer in the family, there’s two possibilities: the Proxy Kiss if you’re seen as worthwhile, or ending up six feet under if you’re not.
+
+Organization and Style
+
+Even if they’re allowed to continue their practice, the best that a Sorcerer in the Giovanni can hope for is the aforementioned Blood Bond, becoming a ghoul to a perhaps powerful member of the Family, but a ghoul nonetheless. Mortals simply won’t be allowed to progress the ranks at all; as far as the family’s concerned, they’re little more than a very useful tool. At least, up until they start being considered for the Embrace.
+
+Depending on the form of Necromancy that they're most familiar with, as well as the tradition of the exact branch of the family they come from, the tools and practice may vary. Some may use Vodoun practices, others might instead follow the trappings of High Ritual, and others that pieced things together themselves may need to rely on what many Mages might call “gutter magic”.
+
+Regardless, all their spells and rituals will usually follow the same precepts as those of the Undead Necromancers; they must incorporate an aspect of the Magic User's authority over the dead (or the wider world), the imprisonment that is death itself (so the spirits and dead know their place), and an item identifying the target or effect (in the case of Wraiths, this usually means incorporating a Fetter). The instruments and foci that represent these vary like the practice itself, and may involve language and invocation, circles and symbols, representations of other worlds, depictions of death, actual elements of death (like corpses), emotional states, sacrifices, or offerings, among other possibilities.
+
+Paths
+
+Divination, Shadowcasting, and Summoning/Binding/Warding (Necromantic or Material). Many Necromancy rituals can be duplicated as rituals of one of the aforementioned Paths, with ST permission (For example, Puppet might be turned into a Summoning/Binding/Warding ritual at level 2).]==] },
+				["Lone Practitioner"] = { en = [==[M20 Sorcerer, p. 79
+
+
+Lone Practitioner
+
+
+Though many hedge wizards learn their arts through the structure of an Affiliation, it is nearly as common for hedge wizards to come to the practice on their own, as myriad avenues of study can ultimately lead to hedge magic. Many who learn hedge magic on their own prefer to remain free of entanglements with other magicians. They might form temporary alliances, friendships, and romantic bonds with other magicians, but when it comes to gathering knowledge and power, the lone practitioner prefers self-reliance. Some lone practitioners do not join covens or Affiliations for the simple fact that they are not aware of them. Many hedge wizards throughout the centuries lived and died without ever meeting another practitioner.
+
+Psychics are even more prone to lone practice. Many psychics don’t know that there are others with similar abilities out in the world. They simply try to survive and gain control of their own power lest they prove to be a danger to everyone in their vicinity. A large portion of psychics shun the use of their powers, manifesting phenomena only when instinct or survival require it. The idea of seeking out others like themselves and joining a team of their fellow freaks has minimal appeal to such psychics.]==] },
+				["Maison Liban"] = { en = [==[M20 Sorcerer, p. 87
+
+
+Maison Liban
+
+
+Favored Attributes: Intelligence, Manipulation
+
+Favored Paths: Fortune, Shadow, Summoning, Binding, and Warding, Quintessence Manipulation
+
+During the 11th Century Hermetic Schism that resulted in the birth of the Tremere vampire Clan, Mathieu de Calice focused his learning on protection and counter-magic, intent on staying safe as the Order began to tear itself apart. Fleeing to safer territory in Northern France, de Calice and his apprentices laid low beneath their arcane obfuscation while the Tremere were busy with local vampires. Separated from the Order of Hermes, fearing for his life from his former mentor and the newly empowered vampire-mages, Magus de Calice worked to hide the Hermetic House. He renamed the group “Liban” in the Visigoth tongue, meaning “live, leave, survive.” Starting with just de Calice’s apprentices, then French and Spanish refugees, the group worked to maintain secrecy and an appearance of normalcy. It would take 250 years for the end of the Order of Hermes’ purge of House Tremere, by which time the Maison Liban had become their own society.
+
+After the formative years of living in secrecy, all students of the Maison Liban are directed to maintain a double life to separate their magical practice from respectable normal lives. They are not to reveal their Art to anyone they know unless they deem the person responsible enough to learn the ways of the Maison Liban. This doesn’t prevent the Liban from using protective magics on loved ones and friends. There are no great acts, no show of power for the Maison Liban, as they continue their study beneath their mundane masque. Students learn as initiates to a master until they know enough to teach others, at which point they are also named a master, a pater or mater. The most venerated of Maison Liban, in deference to their founding, use the honorific, Pontifex.
+
+The Maison Liban originated as a Hermetic House. They maintain the use of seals, rings, and circles in their magic. While Latin is used predominantly, it is combined with the Gothic language from the society’s time in hiding. This blending of the Hermetic origins with the need to hide among the Visigoths during the Order of Hermes’ purge has given the Maison Liban a unique style of magic that is not readily copied by other Hermetic societies.]==] },
+				["Mogen HaLev"] = { en = [==[M20 Sorcerer, p. 87
+
+
+Mogen HaLev
+
+
+Favored Attributes: Intelligence, Perception
+
+Favored Paths: Divination, Ephemera (Ghosts), and Summoning, Binding and Warding (Angels) Female Auxiliary Favored Paths: Fortune, Healing, and Weather Control
+
+In some forms of Jewish mysticism, there’s a belief that there exist 36 righteous people in each generation. These people are dispersed and could come from any background, but without at least 36 of them living at any given time, the world would end. It’s only through these 36’s essential goodness that the world is spared from certain doom. Complicating the matter, the 36 are so humble that they wouldn’t know they were truly one of the 36 righteous, let alone tell anyone.
+
+The Mogen HaLev, Hebrew for “Shield of the 36,” is a loose affiliation of Orthodox Jewish mystic covens with a singular purpose of finding and protecting these 36 righteous individuals. They’re a group of male scholars ranging in age from 45 to nearly 100, though they allow initiates to start study as young as age 40. They believe to study the required magic before maturity invites disaster. Most members are in their 60’s. The oldest of the Mogen HaLev, called the Baal Shem Tov (“Master of the Good Name”), is recognized as a sort of leader throughout the Affiliation, though mostly in the sense of seeking guidance and making tie-breaking decisions. Once an initiate begins study, it’s an intensive process involving not only magic itself, but also philosophy and mundane skills of networking with useful individuals such as doctors and social workers. More frequently in recent years, Mogen HaLev work with sister covens of female Jewish mystics who use different skill sets and Paths to achieve their common goal. Though not official members of the faction, these sister covens focus on practical magics for protecting the 36, rather than the divination and spirit matters the men of Mogen HaLev specialize in.
+
+The main coven (though they wouldn’t call themselves this) of Mogen HaLev meets in a brownstone in Brooklyn, New York City alongside a yeshiva. They maintain an occult and religious library large enough to loan texts to the Affiliation’s other covens as needed. They primarily focus on divination and protection magic, though also learn to speak with spirits for information gathering. All members strictly follow Orthodox Jewish traditions including dietary restrictions, beard and hair grooming, wearing a kippah, as well as charitable work and donations in addition to work within Mogen HaLev. Each coven cultivates connections to aid identifying and protecting the 36, ranging from homeless shelters to medical professionals.
+
+The Mogen HaLev’s group motives begin and end at finding and protecting the 36. They have no time for any of this Ascension War nonsense except when it threatens one of the 36. They aren’t known for keeping lasting grudges and would prefer to keep to themselves and their purpose. They’re similarly unlikely to form even temporary alliances with other magical factions unless in an effort to protect the 36. If one of those they protect is in danger, they’ll go to great lengths to resolve that threat. The notable exception to avoiding magical grudges is with groups like Nebuu-Afef and other groups that explicitly attempt genocide on Jewish populations. The Mogen HaLev won’t hesitate to defend themselves and their communities if one of those groups comes to town.]==] },
+				["Nebuu-Afef, The Order of The Golden Fly"] = { en = [==[M20 Sorcerer, p. 88
+
+
+Nebuu-Afef, The Order of The Golden Fly
+
+
+Favored Attributes: Strength, Stamina
+
+Favored Paths: Conjuration, Hellfire, Shadowcasting, Shapeshifting
+
+After the Exodus of the Israelites from Egypt in the days of Ramses the Great, the Nebuu-Afef was forged in the fires of hate, rage, and sorrow. After the loss of their firstborn children and suffering from plagues visited upon them for Egypt’s enslavement of the Hebrew people, a group of decorated Egyptian soldiers began their quest for revenge upon the fleeing refugees. Awarded a medal in the shape of a golden fly as a badge of honor, these warriors were already skilled with magic, but they desired more to focus their rage into destructive force. Naming themselves after this mark of distinction, the Order of the Golden Fly spent years in research and accumulation of resources. Their devotion finally bore fruit with the discovery of the secret names of the angel of death who had wrought the plagues upon Egypt — the very angel who had taken their firstborn children from them — and the means to summon and control that angel. Through profane ritual, the mystics summoned forth this angel, Mastema, and bound it to their control, demanding further knowledge and charms to bring plague or rain fire. The Order wanted these tools to punish the Israelites.
+
+What the Order had not grasped in their hubris is that Mastema was never bound to them; it was neither contained, nor controlled. Mastema had fallen, corrupted by its destruction of Egypt, discovering a lust for the death and fear it had wrought across the country. As the Order demanded power from the angel, Mastema fed them only the darkest and most destructive magics. For all the Order thought it was in control, Mastema only gave them what it desired, feeding their anger and hate into destructive purpose. The original members of Nebuu-Afef never accomplished their designs against the Israelites, but the Order was founded and continued to plague Egypt for centuries to come. In the Coptic period, Pharoah Ikhnaton drove the small group from Egypt. The Order moved from region to region, kept small due to sharing power of one ‘bound’ angel to serve them all.
+
+It was in Austria in World War II that the Order rose from obscurity to seek the carnage of their initial purpose. They reached out to members of the Nazi party, offering their assistance to the already occult-minded Hitler. This turned out to be the Order’s undoing, as shortly after this contact was made, the Order’s meeting house exploded, destroying most of their records and killing the sect’s senior members. The apprentice of the Order’s priest and a few initiates fled, escaping in the chaos.
+
+The remnants of the Order now exist spread across the globe in small cells, connected by internet communications. Those who remain are utterly under Mastema’s control, though the captive creature still masquerades as a subservient tutor. The angel deftly guides the Order into recruiting those like the original founders — strong, fast, and tactically gifted warriors. Soldiers, police, nightclub bouncers, and sufficiently cautious serial killers are pursued and recruited to the Order’s ranks. Mastema teaches new students death, hate, and fear; the Order teaches their recruits that authority comes from power. A novice is tortured and humiliated, broken down and built back up into a killer.
+
+Playing the Nebuu-Afef
+
+The Nebuu-Afef are an antagonist Order and aren’t intended to be player characters. They are ‘sorcerers’ in name only, duped into believing they control an angel. If players are interested in playing villains such as these, have a discussion with the group as to the purpose of playing them. Is this an attempt to depict reform, rehabilitation, and reparation of those lost to their hate and anger, or just an attempt to be edgy? This should be a serious discussion for everyone at your table. If everyone is onboard, consult Book of the Fallen for further guidance on tools and cautions for incorporating pure evil into your game.
+
+To mechanically depict the Nebuu-Afef’s reliance and the unreliable nature of Mastema’s help, the Storyteller should roll all Summoning, Binding, and Warding Path rolls in secret, and even if the roll is successful, Mastema has only been contacted but may not appear.
+
+While the Order was founded by mystics who had developed rituals and practices of their own before summoning Mastema, the current Order’s magic relies on the angel’s teachings. Every student is taught binding spells intended to call and control Mastema, but these spells are useless against the angel. If the angel deigns to teach a Path to a student, it will be one focused on destruction and suffering. It teaches nothing of Binding or Command, for it will never reveal that every member of the Order is a plaything and tool for the angel.]==] },
+				["Path-Dancers"] = { en = [==[Sorcerer’s Companion, p. 16
+
+
+Path-Dancers
+
+
+Initiation
+
+The Uktena tribe counts more Shamans and lesser practitioners of magic among their kinfolk than most know, even the majority of their Tribe, but many of those Hedge Magicians are made to keep their practice a secret, acting as typical kin when among the Nation at large, since so many other Tribes can't recognize the difference between a respectful Shaman and a Namebreaking Witch. More often than not, the Garou of the Path Dancer camp will take interest in them, organizing them to allow them to both develop their talents for the good of the Nation, and to impart some of their knowledge upon those Uktena deemed worthy of controlling such magic.
+
+More often than not, the Sorcerers of the Path Dancers discover their propensity for magic long before joining the Camp’s secret society of Sorcerers. Many simply start off as simple Mediums and other spirit-talkers, learning mundane rituals for placating and honoring the spirits that eventually take on some level of power. Some others learn their gifts from other Sorcerers (away from the prying eyes of the Garou), but in all cases the Uktena known for similar magics are always keeping an eye out for prospective students (and teachers).
+
+Organization and Style
+
+The Path Dancers are a small group, so their sorcerous kinfolk are generally organized rather simply. They follow the direction of any members of the Camp aligned with the local Caern, and are often claimed by one of the Tribe to make it easier for them to fulfill their purpose, rather than being put to the more typical tasks kinfolk are assigned to. One Garou from this Camp could end up responsible for anywhere between one and a half dozen talented Sorcerers, depending on the area and how many of those Uktena are involved with the Caern.
+
+The methodologies of Path Dancer shamans are often heavily colored by their Garou tutors, and this provides them with a unique view of the cosmology of the universe, even compared to other shamans; in fact, Path Dancers often heavily disagree with the viewpoints of Dreamspeakers of many stripes, even if they both share a basic animistic view of the world and follow the ways most often attributed to Shamans.
+
+Following the teachings of the Uktena specifically, this causes most Path Dancers to subscribe to forms of shamanism or medicine work, and the relation between the material and immaterial; their foci tend to include fetishes (lower case, usually), representations of spirits, smoke, drugs, mirrored practices of Garou rites, totems, and various uses of the elements. They call most often upon the spirits known to the Nation, seeking out the blessings of Gaia and the Wyld more often than the “minor” totems sought by the Dreamspeakers.
+
+Paths
+
+Spirit Chasing (pg. 23) is most common, followed by Summoning/Binding/Warding (particularly for Spirits), Alchemy (Herbalism), and Healing. Some few practice Shapeshifting to mirror their Trueborn family, though few Garou tolerate their Kin stealing what is seen as Gaia's gift to give, even among the Path Dancers.]==] },
+				["Thal’hun"] = { en = [==[M20 Sorcerer, p. 92
+
+
+Thal’hun
+
+
+Favored Attributes: Intelligence, Wits
+
+Favored Paths: Conjuration, Fortune, Hellfire, Quintessence Manipulation
+
+The Thal’hun profess that the idea of magic as put forth by sorcerers is ridiculous, but a grain of truth hides amidst all the bluster and superstition. The Thal’hun are an order of scientists, engineers, and metaphysicians who have found the truth: All “magic” merely consists of tapping into the greatest power of the cosmos, called thal. Thal is the science of harmonics, and a Thal’hun is an engineer of these harmonics. The order claims that they were taught by an ancient race of aliens from the stars, the Hui:xa.
+
+As the Thal’hun explain it, the Hui:xa had thousands of years of culture to develop sciences beyond human understanding, but thal is the crown jewel of their discoveries. It requires supreme intellect and will to harness this power and not harm those around the Thal’hun. While some of the Hui:xa had mastered the thal, there were other sciences they had yet to fully grasp, and a biological disaster led to the destruction of their homeworld, threatening to bring about their extinction. To prevent the total loss of their people, their most learned priest-scientists phased a portion of their great city, Zoraster, into another plane beyond time and space. 300 of the Hui:xa were selected to be Jeva, or Lightbearers, transformed into creatures of pure energy and sent to find a new home for what remains of their people.
+
+A Jeva named Khuvon came to our world when Mesopotamia was on the rise. Intrigued by humanity, he assumed a mortal form and lived among the people for a time, but there was a limit to what he could do. Occasionally, he would rise and teach the arts of thal, creating a new generation of Thal’hun. These early lessons were not of science for that idea was beyond human understanding in those days, so thal was taught couched in the stories and myths of the time. Finally in 1961, as humanity first reached beyond the Earth, Khuvon began to teach again. This time to scientists, not mystics and philosophers. No myths and legends, but pure science of Thal. He spent 5 years with his 7 students, teaching them all he could, and then sent them among humanity to teach in his stead. Satisfied that Earth would be a new home to the Hui:xa, he sent the call out into space, calling to the other Jeva, calling them to him to return Zoraster to this plane. Now Khuvon rests in the core of the Earth, the Thal’hun instruct the next generation, and they wait for the arrival of the Jeva who have been spread across the stars for thousands of years.
+
+New initiates of the Thal’hun come from across several fringe societies, scientifically minded questioners of the status quo, those who delve into pseudoscience, New Age crystal healers, UFO watchers, or ‘genius inventor’ types. The more mystically inclined, occultists, and philosophers are simply too ingrained into their beliefs to consider the truth of thal. These new initiates spend years learning to write and pronounce Luz’at characters, proper mediation, and the history of Khuvon’s activity on Earth before their mind is ready to properly understand the language itself. After this, the new initiate begins to use diadems, metal and crystal devices like rods, staves, tripods, and other antennae to amplify their harmonics and mental attunement to manipulate thal itself by ‘setting a resonance’ with those specific sounds. They assist others in constructing diadems and in their experiments with Thal and study Hui:xa culture, lore, astronomy, and the poems and histories left behind by Khuvon for his human “children.”
+
+Finally, the recruit rests in a sensory deprivation tank for up to a week, starting with silence and then graduating to a series of frequencies generated by elder scientists to open the initiate’s mind. Within a trance state, the initiate meets Khuvon in his spirit form, who initiates and accepts the new disciple. After another hour of silence to come to grips with their experience, the initiate emerges as a new Thal’hun.]==] },
+				["The Ancient Order of The Aeon Rites"] = { en = [==[M20 Sorcerer, p. 80
+
+
+The Ancient Order of The Aeon Rites
+
+
+Favored Attributes: Intelligence, Wits
+
+Favored Paths: Conjuration, Divination, Enchantment, Summon, Binding, and Warding
+
+Within the sacred tabernacles of the Ancient Order of the Aeon Rites, sorcerers study the journals and teachings of Master Johannes Agrippa, who founded the Order in 1873. Based upon even older works, millennia old and from cultures and societies around the globe, the Secret Watchers of the Order had secreted away scraps of Truth within the framework of all occult and mysticism for when humanity would be ready for that Truth. Master Agrippa’s visions from the Secret Watchers and his study of these ancient cultures led to the formation of the Aeon Rites, written in Enochian, the language of the angels. The sorcerers of the Ancient Order work their magic through careful study and precise rituals, couched in symbolism and correspondence that may be familiar to magicians of any other Practice. With ceremonial robes, prescribed motions, and calculated placement of meticulously crafted implements, sorcerers of the AOAR take a hermetic approach to magic, requiring study and execution over more emotional practices.
+
+The Order’s masters act as benevolent teachers, seeing other societies as potential recruits who merely need to be set on the proper path to enlightenment. It is the Order’s belief that all sorcerers should use their abilities to guide humanity into a new golden era of prosperity. This might come across as self-aggrandizing if the AOAR did not match words with deeds, aiding other magicians in their search for enlightenment, founding charitable organizations, and doing other good works. The Order dedicates the first three grades of initiation to these mundane duties. The self-centered and selfish aren’t allowed to progress into the inner circles of the Order. Within the next circle, another 3 grades of the Order oversee the broader work of the society, developing political connections, maintaining their significant coffers, and training the newly initiated, all while pursuing greater truths and mastery of Paths of magic. The final 3 grades of the Order are those who truly devote themselves to study of the Aeon Rites, delving into the most esoteric mysteries.
+
+It is said that in death, those of the AOAR who have proven themselves worthy are accepted by the Secret Watchers into their ranks. These Secret Watchers guide and advise the Order but are rarely seen. Master Agrippa has appeared in ghostly form to provide guidance to initiates and magisters alike, though such manifestations are rare. Rumor abounds that the Order is merely a tool of Master Agrippa, who still lives and pulls the strings of the Order from afar. Most members of the Order dismiss such speculation, as there seems to be no purpose for such deception. As a new generation of magisters begins to take their place within the upper ranks of the Order, they’ve begun to question this final step. Is an afterlife of continuing their work within the spiritual realm a reality, or is it a merely a ploy to prevent fully trained magisters from creating their own factions?]==] },
+				["The Arcanum"] = { en = [==[M20 Sorcerer, p. 80
+
+
+The Arcanum
+
+
+Favored Attributes: Intelligence, Wits
+
+Favored Paths: Alchemy, Conveyance, Enchantment, Summoning, Binding, and Warding
+
+The Arcanum was born of the occult heyday of the late 1800s, when Victorian high society paid lip service to ritual and esoterica. Frustrated with the Hermetic Order of the Rising Day, a new society was born not to walk through the motions, but to seek knowledge and truth. Regardless of culture and source, the Arcanum investigates superstition, myth, pseudoscience, and strange occurrences. The Arcanum believe there is another world that borders our own, a place where the stories told by the ancients are real. Through study of the tales and legends of these ancients, they believe they can find the kernel of truth from which these stories grow. They do not judge this knowledge; they ascribe no morality to the supernatural, serving only as librarians and observers. While the Arcanum is voracious for knowledge and will use other contacts to help gather it, they jealously guard their secrets. The Arcanum only reveals information to outsiders under direction from the Executive Committee.
+
+The Arcanum operates on a series of tiers, starting with the academic community at large, where the Arcanum also does its recruiting. Within those circles, the Arcanum is known simply as a scholarly society, supporting investigations into fringe research. The Arcanum is active in many publications, including traditional media like books and journals. Recently, they’ve begun vetting and supporting the works of individuals and groups across the internet who investigate and report through newer media like videos or podcasts. Arcanum membership is not secret, and they are often approached directly by curious academics about joining the Fellowship. The first tier of the Arcanum are these Associates, the junior scholars, researchers, or other investigators who work with the Arcanum but are not actually held to the rules nor granted the privileges of a full member. The Associates that begin to ask questions of the Arcanum, looking into the purpose of the society and who begin to seek enlightenment beyond just their personal focus, are invited in as Neophytes. These Neophytes study under a mentor, often an Elder Sibling who allows them access to the Arcanum’s literature and resources, as necessary. Neophytes are the “children” of the Arcanum, there to learn and study, but they do not contribute to the greater conversation of the society. With examination and ritual, a Neophyte graduates to a be a full member of the Arcanum, an Arcanist, sometimes referred to as a Brother, Sister, or Sibling. While not a rank above the others, those members who have demonstrated themselves to be knowledgeable and wise are given the honorific of “Elder,” though this has no relevance to age or seniority within the Arcanum.
+
+In terms of organization, the Arcanum society reports to the Executive Committee at the Foundation House, under direction of the Grand Chancellor. The Foundation House itself is an enormous estate and boasts the “Axis Mundi,” which they claim is the most thorough library of all things arcane and supernatural. Chapter Houses around the globe coordinate and support local Arcanists. Each Chapter House has the freedom to organize itself as necessary for the membership’s purposes, taking on roles beneath the local Chancellor such as Financial Officer, Chief Librarian, or Sergeant-at-arms. These Chapter Houses can provide lodging for Arcanists, either on the premises or nearby. They also serve as secure locations that an Arcanist can retreat to in the event of trouble that might turn up during investigations. Within the Chapter Houses, the members are also connected as a “lodge” of several Arcanists, often a graduated class of Neophytes, that work together to help pursue their varied interests, bringing experts of different fields to work on a single problem. These interests are supported by a College, helping to organize research of different fields like the College of Thaumatology, the Hermetic Studies Programme, and the School of Mythoarchaelogy.]==] },
+				["The Children of Osiris"] = { en = [==[M20 Sorcerer, p. 82
+
+
+The Children of Osiris
+
+
+Favored Attributes: Intelligence, Wits
+
+Favored Paths: Ephemera, Healing, Herbalism, and Oneiromancy
+
+In ancient Egypt, long before the pyramids stood, before Pharaoh Narmer united the upper and lower kingdoms, there lived a wise and studious mortal king from western Egypt called Osiris. Osiris had a jealous younger brother named Set, who wanted to rule at any cost. After a dramatic but ultimately failed attempted murder, Osiris’ wife, Isis, saved him with her magic. Set became enraged at Isis thwarting him and searched for more cunning ways to counter her power. He found exactly the edge he sought when he was embraced as a vampire.
+
+Emboldened by his new power, Set demanded Osiris hand him the throne. When Osiris refused, Set frenzied and shredded his brother into 14 pieces. Set scattered the pieces across the land to prevent Isis from reviving him.
+
+This wasn’t enough to stop the determined sorceress from gathering the pieces of her husband’s corpse. After gathering as many fragments as she could, all the magic Isis and Osiris’ coven wielded miraculously brought Osiris back, but imperfectly. He was weak. His skin was irreparably damaged from time spent decomposing. It took the coven’s continuous efforts merely to keep Osiris alive.
+
+Distraught, Isis couldn’t bear to see her husband dead or in constant agony. She frantically searched for a better solution and happened across a mysterious figure who promised to restore her husband. She was too desperate to discuss what the process would entail, or what the cost would be, and agreed. The mysterious figure embraced Osiris as a vampire.
+
+Osiris slaughtered his closest friend in the coven immediately after the embrace. When he realized he’d not only killed his dear friend but consumed his blood in a hunger frenzy, he was horrified. Overcome with grief, he blamed Isis and vowed to find a way to banish his monstrous impulses. The coven fractured in two: those who sympathized with Osiris and those who thought him an irredeemable monster. Those sympathetic few were the first mortal Children of Osiris.
+
+The Affiliation grew, joined by vampires who likewise sought freedom from their Beasts and sorcerers seeking to reconcile life and death to become immortal without the flaws of vampirism. At first, the sorcerer and vampire Children were treated as equals. However, after Set finally killed Osiris, the vampires in the faction took control. The sorcerers became servants to their vampiric masters, though the undead Children supposedly followed Osiris’ command that they never embrace their sorcerer counterparts. Some time ago, the vampire Children disappeared, leaving the sorcerers to their own devices.
+
+The Children of Osiris are small but slowly growing due to increased worldwide interest in ancient Egyptian lore and the recent uncovering of some of Osiris’ tombs. They’re mostly congregated in Egypt and surrounding areas, but those who aren’t based in Egypt make a point to visit as often as feasible. They organize into hidden temples designed after tombs. Children of Osiris are led by the most experienced member of any gender, whether or not they’re the oldest. Initiation takes years to complete and consists of solemn rituals modeled after ancient Egyptian funerary practices followed by guided study of ancient languages and magical texts.
+
+They typically practice healthy living, with simple diets and regular exercise encouraged. All Children regardless of gender keep their heads shaved, though many wear wigs outside their temples. This is as much a ritual practice as a health-conscious one — when the Children of Osiris was in its infancy, the only way to reliably prevent lice and potentially deadly resulting skin infections was to shave one’s head.
+
+The Children still venerate Osiris as a god, claiming he isn’t gone forever but took his rightful place as king of the underworld. Most devote their time to meticulous study of their Paths. Some find time to maintain a one-sided rivalry with the more powerful Cult of Isis, though that generally isn’t encouraged and is considered a distraction from the truth in their studies. The progeny of Set have largely left Osiris’ mortal followers alone since the vampire Children’s disappearance, but if his descendants found a sorcerer Children of Osiris temple, things would get ugly fast.]==] },
+				["The Crystal Circle"] = { en = [==[Sorcerer’s Companion, p. 19
+
+
+The Crystal Circle
+
+
+Initiation
+
+The powerful magic-wielders of the secretive Crystal Circle are shrouded in rumor and mystery, a Changeling organization that’s on the tongue of many, but that most know little about. Widely known as heroes and powerful magicians, few know how it is they've learned to master magic so easily, or how they've managed to survive their treks into the Dreaming. Just about none of them know that a coven of Hedge Magicians have been working directly beside the cabal of the Crystal Circle, an alliance of a sort between Spellcaster and Fae that hasn't been seen since before the Shattering. While the groups aren't technically the same, as the Sorcerers and the Changelings of their respective Circles provide their own organization, they're so incredibly intertwined that they may as well be part of the same group.
+
+A Sorcerer must be well-renowned and well-rounded in their magical talents to join the Crystal Circle, many of them first practicing independently or among another group (mechanically, this means they need at least 10 dots of Paths to join). Those that have the right aptitude and that are seen by the coven to have the right purity of intent, and the right spirit of curiosity and exploration, are approached and offered a chance to join. This initiation generally involves a trip into the Dreaming on the magic user's own, a perilous journey for one without a Kithain's sense of the realm's laws. This journey is usually completed with a simple enough goal; gather an object from the Near Dreaming that can't be seen from a Rath or Freehold, or learn a secret from a Chimera in the area, but to those not experienced with the Realm, this is a difficult enough task as it is.
+
+Organization and Style
+
+In general, the Crystal Circle works closely with its Changeling counterparts, the two sharing their magical knowledge and helping the other to develop their talents in a way that meshes rather uniquely, compared to similar alliances. Some of the coven would claim Naming was developed with the help of mortal magic users, after all, and many rituals cast by the Crystal Circle Sorcerers mirror Changeling Cantrips in turn.
+
+Internally speaking, the group is too small to have a real organization, and it's hard to say if they're equal to or beneath the Sidhe of the Crystal Circle that lead their own numbers. Generally, one's either in charge or not, though those that are more magically adept are given more respect than those with less apparent skill.
+
+Much of the Sorcerer performed by the Crystal circle is done in a manner similar to the bunks and glamour workings of Fae. To perform their effects, Energy (especially Glamour) is most commonly used as an instrument, as are the aforementioned mirrored-bunks, languages and true names, and writings or inscriptions; the basic idea behind it all is that the pure creative energy of Glamour and Mana merely needs to be guided and shaped properly to have an effect on the wider world.
+
+Paths
+
+Mana Manipulation, Oneiromancy, Dowsing (pg. 21), and Enchantment see the most use among the Sorcerers of the Circle, but they pride themselves on having a wide array of capabilities, and so may potentially develop any Path.]==] },
+				["The Cult of Isis"] = { en = [==[M20 Sorcerer, p. 83
+
+
+The Cult of Isis
+
+
+Favored Attributes: Charisma, Manipulation
+
+Favored Paths: Divination, Fascination, Fortune, Healing
+
+The Cult of Isis is a fractured and disparate lot, far flung in time and space from their origins in Egypt at the feet of the goddess of healing, Isis. Branches of the Cult have ranged from peaceful magicians seeking to nurture humanity to sorcerers of nature that blessed both field and womb. After the destruction of the mother-goddess, her son, Horus, took control of the Cult to fight against the murderer, Set, and his cursed children. By the time of Cleopatra, the Cult had fallen into disgrace, a broken shell of their former glory, but as Rome conquered Egypt, the Cult joined with the worship of other goddesses, and Isis’ name was spoken alongside those of Juno, Ceres, and Vesta. Fertility cults spread across the region in her name, and more mystery cults diluted the Cult into a myriad of sects and branches, some with radically different beliefs and purposes.
+
+In modern times, the Cult’s influence can be seen in the teachings of Traditions like the Ecstatics and Verbena, or as corrupted kindred who now follow the teachings of Set, but there is a new Cult of Isis that has blossomed in the wake of the Arab Spring of 2010. Led by a magician who calls herself Semet, this branch of the Cult is dedicated to a new era of healing and peace. This started as a small sect’s attempt to care for the relics and hidden wonders of the past, amid unrest and heartache. The priestess Semet organized the Cult as street medics, nurses, caregivers, and mediators. The Cult takes no points of leadership and no stance in politics, merely caring for the wounded or those caught in the middle, while hoping to keep any conflict from escalating beyond repair. The symbols of Isis’ horned-moondisc or her widespread wings are placed as guideposts for refuge and safety. This sect of the Cult has not forgone the mystic teachings of Isis. Amidst a social media organization of amateur medics, the Cult works their magic, tending to the worst wounds that they promise “are not as bad as they appear.” Behind closed doors, the modern priesthood of Isis performs rituals to bless the hands of the workers, and sacred amulets are enchanted for protection of their members.
+
+While Semet’s branch of the Cult grows and spreads across the region, other Cults have continued in more traditional fashions. Cults of fertility that are tied to sensuality and sex draw on natural drives of humanity — ecstatic experiences that bring one closer to the goddess and power their magic. Egyptian hieroglyphics, Demotic chanting, and precise geomantic architecture empower rituals that have been passed down for more than seven millennia. These Cults have grown and travelled far, first from Egypt to Rome, then across the Roman Empire, and now to every corner of the globe with dozens of faces for the goddess. Secretive sects that work social manipulation and control, caring sororities that revere all sacred goddesses, or some of the few who still support Horus, Isis’ immortal son, in his quest for vengeance, all revere the goddess’ name and count themselves as a Cult of Isis.]==] },
+				["The Cult of Mercury"] = { en = [==[M20 Sorcerer, p. 83
+
+
+The Cult of Mercury
+
+
+Favored Attributes: Charisma, Stamina
+
+Favored Paths: Conjuration, Conveyance, Divination, Fortune for the Roman temple. Replace one with a Path applicable to the local temple’s interpretation of Mercury at Storyteller discretion.
+
+The Cult of Mercury was founded in ancient Rome among many similar cults devoted to specific deities in the local and nearby pantheons. Their first temple was in the Circus Maximus, near a horse racing track and popular merchant site, a fitting location for a god of financial fortune and quick travel.
+
+Local merchants, and later even senators, flocked to the cult to aide their lofty aspirations of power. Despite attracting populations that might otherwise be prone to cutthroat ambitions, the Cult of Mercury requires immense teamwork. The cult exclusively performs ritual magic, organizing up to hundreds of followers in intricate cooperative practice to create their effects. The sheer number of sorcerers performing rituals together require several layers of leadership to organize all the moving parts. During rituals, all sorcerers wear clean white robes, tunics, togas, or other more regionally appropriate white clothing in temples outside Rome. Rituals include incense, coordinated movement, burning candles, holding objects associated with the ritual’s intent, and the entire gathering chanting in Latin and ancient Greek.
+
+Devotees of a god of travel, members of the Cult of Mercury without local political aspirations traveled and formed new congregations as a way to quickly gain rank in the cult. As the Cult of Mercury spread to other regions through both Roman conquests and merchant trade, the cultists likened Mercury to the local deities, claiming these other deities to simply be different aspects and understandings of Mercury. Accordingly, temples may focus on Paths more applicable to their local interpretation of Mercury, such as Shapeshifting for the aspect Mercurius Artaios, a god of bears and hunting in south-eastern France. Practices are similarly localized with ritual elements traditional to the first congregants of the region.
+
+The Cult of Mercury suffered a major blow to leadership and member retention when Constantine converted the Roman Empire to Christianity. Many who joined for favorable luck figured they wouldn’t be testing fate as much to join the new majority and state-sponsored religion rather than stick with what they knew. Those temples that continued to practice hid their religion by masquerading as Christian churches. The effects of this shift linger into the modern day with leadership positions in the Cult of Mercury sharing names with Catholic church ranks.
+
+The Cult of Mercury seeks to capitalize on the recent surge in popularity of ancient religions. Without sufficient converts, entire temples fail when older members die off and the numbers no longer sustain the elaborate ritual work. The cult prefers the ambitious and adventurous, but in the end the leadership isn’t picky so long as there are enough underlings for rituals to function. Parents are encouraged to bring their children into the cult when they’re old enough to perform simple ancillary ritual tasks — and keep secrets in areas where the practice is stigmatized.
+
+The Cult of Mercury can perform amazing feats when in full force, but they’re limited to ritual magic with no fewer than 50 participants. While a cultist can’t use spells cast on the fly, it’s customary for temples to prepare rituals ahead of time that skilled members can finish casting in an emergency. Cult of Mercury characters may learn 2 additional free rituals for every dot in a Path. Herding a large congregation isn’t an easy feat and requires leadership with strong social Attributes. Charisma is typically the favored Attribute for cultists with leadership roles or aspirations, while the average cultist in a congregation may instead favor Stamina for the patience and dedication of being a cog in massive rituals.]==] },
+				["The Dozen Priests of the Pythian Order"] = { en = [==[M20 Sorcerer, p. 84
+
+
+The Dozen Priests of the Pythian Order
+
+
+Favored Attributes: Charisma, Intelligence
+
+Favored Paths: Divination, Healing, Shapeshifting, Weather Control
+
+The Pythian Order itself once crossed the Hellenic and Greek world. Its members were experts of divination who passed on the words of the gods and found their magic within the rhythm and rhyme of poetry. Not merely a form of art, but an expression of numerology, Pythian practice tied music, astrology, and mathematics together, resonating with the music of the spheres. They strove to find just the right poetic meter to encapsulate this magic, binding it to texts to store this power. A delicate and fussy magic, it was rare to master. The number of priests of the Pythian Order diminished over time. When science and learning declined in Europe, the Pythian Order had already fallen from grace. Their numbers dwindled to those few who had extended their lifespan beyond the natural limits of humanity.
+
+By the time of the Renaissance and renewed interest in the classics, the Dozen Priests of the Pythian Order that still lived were sought out. The few Pythian texts that had found their way to the scholars of the age were a marvel, and the Pythian Order gained a handful of new converts. In the Romantic period, further interest swelled, especially among the poets of that time. These artists found the meaning in their poetry grew to new heights when inspired by the esoteric lore of the Pythians. However, surges of popularity have never revitalized the Pythian Order beyond the few ancient scholars that remain, even as new magicians dedicate themselves to the craft.
+
+What remains of the Order — the Dozen Priests are now reduced to four — dwells in a temple on Milos, an island off the coast of Greece. There, the sacred verses are preserved, and the Priests have begun to question whether to fight the inevitable erosion of time and let the Pythian Order finally fall or to seek out new, worthy, and dedicated students to pass on their knowledge. It is not merely a question of their knowledge being lost, for their poetry is stored, and other Pythian works are in archives and museums. There’s more to consider, for the remaining priests have amassed immense power through centuries of study. To let it die with them seems an affront to the gods they once spoke for. They work now to that end, divining the future and their own end of days, to see if students will arrive to learn from them or if they continue clinging to their tradition out of futile stubbornness.]==] },
+				["The Fenian"] = { en = [==[M20 Sorcerer, p. 85
+
+
+The Fenian
+
+
+Favored Attributes: Manipulation, Appearance
+
+Favored Paths: Fascination, Shapeshifting, Weather Control
+
+Many sorcerers who share ancestry with the Celts claim to have fae blood and power in their lineage. Most of the time, it’s either patently false or too far back to matter. The Fenian are different. They’re an unbroken family of fae-blooded shapeshifters who can, if one believes them, trace their lineage all the way back to the Tuatha Dé Danann. Their mastery of shifting to animal forms is further evidence of this claim.
+
+In the family’s early days, they were a group of half-fae adventurers who found more adventure than they bargained for. The spark of exploration hit them, and they left their human connections behind to find the truth of their lineage. On learning about their connection to the fae, some left their humanity behind entirely to join the Dreaming. The others made deals with the Tuatha Dé Danann to learn how to control the magic in their blood. They adopted animal forms according to their personalities: The warriors commonly shifted to bears or large felines while the free-spirited tricksters became foxes or corvids. All Fenian learned to influence mortal opinions, and a few gained true mastery over the weather. The family isn’t a normal family of sorcerers so much as a family of innately magical beings. The magical contracts, or geasa, were tailored to each Fenian based on tradition and personal tendencies. One Fenian who greatly enjoys the pleasures of life might be forbidden from eating certain types of food, while a Fenian who bucks authority might be obligated to always accept guidance — even if the guidance is harmful. A Fenian can enter into a geas for powers when learning a new Path or ritual that may also apply to their descendants.
+
+These days, the Fenian are on the brink of extinction. Some speculate their fae blood is growing too thin; others suspect someone broke geasa with the Tuatha Dé Danann. There’s still hope; a young child in the family named Niamh developed the ability to speak to animals after an entire generation lacked any magical aptitude or predilection. There are only several dozen Fenian sorcerers alive and active currently.
+
+Given their magical heritage, Fenian treat all Fenian favored paths as their Affinity Paths but learn all other hedge magic at a higher cost. They pay 10 xp to learn a new non-Fenian Path, new rating x8 to increase a non-Fenian Path, and rating x2 for non-Fenian rituals. Any Fenian under the effect of broken geasa receives an additional experience penalty for all hedge magic, increasing the rating multiplier by 1, and +1 difficulty to all hedge magic and psychic phenomena. It’s therefore more difficult for entire generations to learn and use hedge magic than the average person if they break geasa. This is the only known extant sorcerer bloodline more likely to go through a Changeling Chrysalis than Awaken as a Mage.]==] },
+				["The Nephite Priesthood"] = { en = [==[M20 Sorcerer, p. 89
+
+
+The Nephite Priesthood
+
+
+Favored Attributes: Stamina, Wits
+
+Favored Paths: Divination, Enchantment, Hellfire, Summoning, Binding, and Warding, and Weather Control
+
+The Nephite Priesthood, also known as “The Dust Prophets,” is an exclusive Affiliation of mystics in The Church of Jesus Christ of Latter-day Saints. They believe that Joseph Smith didn’t publicly reveal the secrets of a priest named Nephi, who God taught through dreams how to perform miracles. Nephi kept a group of disciples to pass on the divine knowledge and serve his people. Nephi and his disciples were killed in the battle of Cumorah and the knowledge destroyed for over a millennia. In 1849, Nephi revealed himself as a celestial being to a pious desert settler named Uriah Spence, so Uriah could restore the Priesthood and protect the Church from an oppressive government and other hostile outsiders. They also prepare for a coming final showdown when the apocalypse comes. All Dust Prophets swear oaths of secrecy. They aren’t allowed to let members of the Church know of their miraculous abilities.
+
+To join the Priesthood, one must be a man in good standing within the Church. Most Nephite Priests were born into the Church, but converts aren’t unheard of. If a man isn’t a Latter-Day Saint, he must first convert to the Church and study for at least several years before a Nephite priest will approach him. They believe that any that strayed from a strict code of conduct would quickly be corrupted by the power and risk damnation. The initiation rites are performed in secret temples. The initiate, known as a Deacon, first fasts for three days. At sunrise on the fourth day, he enters the temple, undresses, and is anointed by oil. He spends the morning in prayer. At noon, the Deacon clothes himself in a pure white robe. A Priest attends at the altar, separated from the Deacon by a veil, and prays with the initiate. As the ceremony concludes, the Deacon is “reborn” into the celestial kingdom, parting the veil and approaching the altar for a final prayer.
+
+After the ritual, the Deacon spends two years studying Nephite miracles and history, including the sacred names of the original Nephite Priests to call on to invoke the miracles. To progress to priesthood and beyond, the Dust Prophet undergoes increasingly longer and more solemn rituals. Priests may operate under their own discretion in the absence of Elders, and after ordination must spend at least two years wandering outside the desert, typically to Central and South America, to spread the faith and learn of the outside world. Elders are older and more experienced priests, typically spending at least a decade wandering and learning after ordination. The High Priest-Prophet is the highest ranking elder, selected by popular vote from the Elders. Most Nephite Priests make an annual journey, wandering for 40 days and 40 nights in the wilderness stretching from Utah to South America, traveling as far away from civilization as possible.
+
+On January 4, 2000, the 104th anniversary of Utah’s statehood, the entire Nephite Priesthood gathered in Salt Lake City for an unknown purpose. What remains of the reports conflict wildly, but one thing is certain — an event of apocalyptic proportions occurred. Only one Nephite Elder, Porter Larsen, remained to pass on the knowledge and rebuild the faction. Some whisper that a mass ritual went horrifically wrong, others speculate the rapture occurred, taking all but one Elder and leaving the rest of the world to its doom. No one openly takes credit for whatever happened, and Elder Larsen hasn’t added to the discussion. His mission is to rebuild the Priesthood, he says, not to waste time concerning himself with what he can’t change. He’s not been seen publicly much since then, and the new Nephite Priesthood hasn’t brought attention to themselves.
+
+The possibility of an outside attack isn’t far-fetched. The Nephite Priesthood had many enemies. US intelligence agencies accrued massive files on the organization, attributing anti-government actions (deserved and undeserved) to them; accordingly, Project Twilight kept tabs on the Priesthood. The Nephite Priesthood believes their powers are divine gifts and considered all other mystical sorcerers devil-worshipers. At best, the Dust Prophets shunned them, even when trespassing on others’ land during the priests’ journeys. They considered friendly interactions with other mystical societies potentially treasonous. Some remain hopeful that the Affiliation, if and when they reemerge, won’t be as contentious as it was under previous leadership.]==] },
+				["The Seven Thunders"] = { en = [==[M20 Sorcerer, p. 90
+
+
+The Seven Thunders
+
+
+Favored Attributes: Charisma, Manipulation
+
+Favored Paths: Divination, Fortune, Healing, Hellfire
+
+Armageddon was due at the turn of the millennium, but the years have continued to accumulate, and the Seven Thunders, the prophets of this apocalypse, have found that their army of believers have fallen out of faith. The True Faith of the seven prophets has not wavered in the decades that have passed. They continue their mission, albeit changed and adjusted as they realize that their mortal understanding of divine visions was flawed. The Seven Thunders have spread across the globe, supported by their few remaining faithful followers, as they work to bring judgement upon the wicked. The Seven Thunders no longer watch the clock, waiting for a specific date for Armageddon to arrive. They believe that it will come at the appointed time and not before. It may be that Armageddon will not arrive until they have fully prepared the earth for it.
+
+With this new outlook on their mission, the Seven Thunders seek out the unholy, the false gods, and the misled. They’ll bring low the high and mighty; bring them into the light of their faith. If necessary, they will destroy them. They are Judgement on Earth, and while the prophets bring the sword of faith against the greatest of threats, their followers seek whatever foes they can find. The Thunders preach the end of the world, showing signs of their faith, healing the sick, and casting out foul spirits. Meanwhile, they command ordinary people armed with rosaries and rifles to combat vampires, werewolves, and mystics.
+
+As time has passed, the Seven Thunders find that they are not in complete accord. While they believe they have the same mission, the path they walk has changed. Now physically separated to cover more territory and hasten the coming of Armageddon, the Seven Thunders’ methods and focuses have diversified based on what each prophet finds most important. The prophets are not dedicated to specific territories but travel across the continents as their visions lead them , reaching out to local support networks for their missions. This means that some supporters find themselves going from shepherd of their local community to suddenly hunting lycanthropes in the woods within the space of a week. This continual shift of priorities and leadership has driven some followers away, but those who remain are dedicated to the cause, at the risk of their relationships and lives.]==] },
+				["The Silver Portal"] = { en = [==[M20 Sorcerer, p. 90
+
+
+The Silver Portal
+
+
+Favored Attributes: Charisma, Perception
+
+Favored Paths: Ephemera (Umbrood), Fascination, Oneiromancy, Shadows
+
+The mind is a powerful thing. When we sleep, even the uninitiated can taste potential in the untamed dream worlds. Chaos is only potential waiting to be tapped. The Silver Portal is unique in this understanding of magical ability among sorcerer Affiliations. Their sacred text is an eldritch work that’s been telephoned across centuries, languages, multiple massive revisions, and cultures into something wholly alien from the 5th century (or even older, as it claims) Persian scroll called Zolondrodere it derives from. It teaches that every possible thought and idea exists drifting in Maya, the Dream Realms, waiting for someone with the power to pluck it from this subliminal realm and bring it into reality.
+
+The secrets of the Zolondrodere defy rational thought, even by mystic standards. The sound mind often rejects the tome’s teachings, so Silver Portal initiates must often begin their study through hypnosis, indulging in mind-altering substances, and ritual sensory and sleep-deprivation. Once the sorcerer begins to feel they understand, they enter a dream-like trance, often in front of a mirror inscribed with mystical symbols thought to promote openness. Once they cross the silver portal into Maya, they encounter strange Umbrood and disorienting, potent imagery — fantastical and horrifying in equal measure. There, they find power to bring into the waking world.
+
+Awakened scholars have likened the Silver Portal’s practices to the chaotic nature of the Marauders, which is a rather horrifying thought to most. The sorcerers allow the dream realms to bestow magic upon them that bleeds into the waking world. For a Silver Portal sorcerer, dream and reality aren’t two distinct concepts and have a lot of overlap. They’re the most flexible of all sorcerers, able to bend the rules of linear magic with their practices without getting slapped by Reality for it.
+
+The Silver Portal sorcerer keeps track of the total number of dots spent in Paths and rituals at all times. Whenever the sorcerer enters the Dream Realm on purpose though a trance, the sorcerer’s player may redistribute these dots among Paths and rituals as they wish, even to Paths the sorcerer doesn’t yet know. For each intended Path, the sorcerer rolls their Favored Attribute plus either Meditation at difficulty 6 or Lucid Dreaming at difficulty 5. The number of successes is the number of dots the sorcerer may possess in that Path, up to the number of dots allotted. All allocated points not gained with successes are inaccessible until the effect ends. The sorcerer travels through the Dream Realm to find these powers and rituals, and the storyteller is encouraged to make use of surreal dream imagery for the journey. They may use these temporary powers in the Dream Realm and waking reality until they have restful sleep. The sorcerer must have restful sleep before they may enter a trance to redistribute Path points again. As the sorcerer doesn’t learn paths directly through normal means, they must redistribute dots into a Path or ritual first and spend the Experience to make it one of their baseline powers.
+
+There is no formal hierarchy in the Silver Portal, given the nature of the sorcerers themselves. New members earn initiation by fascinating a Silver Portal sorcerer as much in the dull waking world as by their dreams.]==] },
+				["The Society of Enlightened Altruistic Ideologies (SEAI)"] = { en = [==[M20 Sorcerer, p. 91
+
+
+The Society of Enlightened Altruistic Ideologies (SEAI)
+
+
+Favored Attributes: Intelligence, Manipulation
+
+Favored Paths: Alchemy, Conjuration, Conveyance, Enchantment
+
+The Enlightened members of the Technocratic Union are some of the greatest opponents of sorcerers around the world, whether they acknowledge the fact that their inner Genius is an Awakened Avatar or not. However, not all members of the Technocracy are Enlightened, and the Society of Enlightened Altruistic Ideologies (SEAI, pronounced sea-ah, for short) work to address the concerns of un-Enlightened associates, ensuring that their needs are met. The SEAI has a bit of a social club feel, with gossip-filled gatherings over coffee and cake, but the topics of discussion are more esoteric and profound compared to the average coffee klatch. Because the SEAI straddles the worlds of Enlightened Science and mundane society, they acquire knowledge of so much beyond their reach. They see the power of sorcerers and mages but are forced to live dull and drab lives. They feel increasing resentment for the Reality Deviants who have tapped into the cosmic energies of the universe, only to squander them; after all, the extraordinary citizens of the SEAI are far more deserving of these powers.
+
+Between pushing papers, fetching coffee, and reporting statistics, the SEAI have overheard things, tracked events, calculated expenditures, and taken careful notes, with a single idea in mind: capture a Tradition mage, mindwipe them, and take their Avatar for themselves. The Progenitors of the Technocracy are already working on the mindwipe technology, so by combining this tech with some spells of the SEAI’s own devising, they have begun to make strides toward their goal. The idea of Nephandic Avatars is ignored as merely propaganda or a fairy tale and has not been truly considered by SEAI. Enlightened operatives who scoff or mock the SEAI may find that they join the Reality Deviants on the list of those that should have their Avatar removed and given to the more worthy, hard-working members of the SEAI. While they have yet to capture a mage alive, the discussions of how to proceed have been made in earnest, and they are ready to strike as soon as the opportunity arises. Occasionally, word of these plans and developments reach the Enlightened members of the Technocratic Union, causing a bit of a concern as members of the SEAI group themselves in accordance with which Tradition they would join, were they Awakened. When these rumors are reported to upper management, SEAI members who have been loose-lipped or been witnessed deviating from protocol are usually taken in for reconditioning.
+
+Sorcerers of all stripes might encounter the Society as the SEAI uses spells to guard their work and experiment with other uses in pursuit of the taking a Tradition mage captive. Some of the SEAI toe the line of information gathering and go ‘undercover’ within sorcerous groups to glean knowledge or discover when a mage might be vulnerable. These citizens risk being caught by the Technocratic Union or the societies they infiltrate, walking a knife’s edge to take power from the undeserving. Other SEAI lose ‘perspective’ and slip from the Technocracy when they get a taste of magic through ritual and study, often when they begin to recognize that the hyperscience they’ve studied seems so similar to Hermetic formulae.]==] },
+				["The Society of Leopold"] = { en = [==[The Hunters Hunted II, p. 117
+
+
+The Society of Leopold
+
+
+And the angel spoke unto me, in a strong voice, crying, “Many are the children of the Dragon, the Serpent, the great Satan, and they are among you now. I tell you, Servants of Christ, that the Parousia is near, that the Second Coming cometh soon. Stronger still grow the children of the Dragon, and they multiply, and they are a wound unto the earth. And we are the balm for this wound, we must cleanse it with fire, and purify it, and then the earth shall be ready for the Parousia, and we shall be judged worthy.”
+
+— Leopold of Murnau, The Testament of Leopold
+
+Call them candles in the dark. Call them wounded angels. Call them sadistic zealots. But do not call them apathetic. Before science lit its night light to make men brave, these sheep dared to defy the predator lords. They are not antiquated crusaders cloistered in monasteries. Tonight, they wield blade and gun in seedy alleys painted with monster blood and the flickering glow of a neon cross. They recruit and coordinate attacks over the Internet. They blast digital choir music through earbuds to drown out the poisonous words of the demons they exorcise. These are the stories of the modern Inquisition. There are no mortals the Children of Caine fear more.
+
+Theme and Mood
+
+The theme of the Inquisition is the modern crusader. All the world is their Holy Land. When an Inquisitor looks down the most mundane street, she cannot help but see the secret war. There is no going back. The stakes cannot be any higher. The Enemy is the Devil himself, and the souls of all humankind hang in the balance. In the direst moments, the Inquisitor knows this is not even the true war. When the world cracks and Hell breaks loose across the earth, then the real battle will begin. And the Inquisition will be ready.
+
+The mood of the Inquisition is faith and doubt. A bladed pendulum swings between the two. Apocalyptic frenzy makes the blade shiver. What gets cut? What bleeds? Can a witch-hunter do the terrible things required and still maintain the faith? Ecstatic passion and drive, and the wonderful and terrible things they can enable us to do, are at the heart of the faithful hunter’s tale.]==] },
+				["The Star Council"] = { en = [==[M20 Sorcerer, p. 92
+
+
+The Star Council
+
+
+Favored Attributes: Perception, Intelligence
+
+Favored Paths: Most modern Star Council are psychics, but some know Enchantment, Healing, Shadow, and Quintessence Manipulation
+
+In July, 1947, news of a possible extraterrestrial crash in Roswell, New Mexico swept the nation. People from all walks of life were enamored with and inspired by the possibility of life beyond Earth. The Star Council originally formed as a handful of like-minded UFO enthusiasts and paranormal researchers. Though they came from different backgrounds, ranging from eccentric professors to delinquent teens, they found community and readily shared their theories and findings about space, extraterrestrials, and related conspiracies among the group.
+
+The Star Council welcomed another smaller group, the Thal’hun, to their ranks in the late 1960s. The Thal’hun were more insular than the rest of the Star Council and largely remained a faction of their own, though they participated in sharing their beliefs and findings. They were the first to introduce the Star Council to proof of the supernatural and gained credibility when supposed extraterrestrial technology they stole from the US Government worked just as they predicted.
+
+As decades passed, the Star Council did their best to remain a low priority to the government. Their efforts were often complicated by actions of the Thal’hun faction, and the Star Council had to rely on younger tech-savvy members and discredited lawyers in their ranks to stay under the radar. The Thal’hun’s diverging goals and rigorous study practices became festering points of contention.
+
+Unbeknownst to the group, the non-Thal’hun Star Council was mostly comprised of psychics by the late 1990s. These members typically believe that they’re either victims of extraterrestrial experimentation or they’re actual descendants of extraterrestrials. They believe genetic differences, natural or otherwise, caused their supernatural powers, while the Thal’hun insisted they could never reach their full potential without Thal’hun education.
+
+When the Thal’hun left law enforcement breathing down the group’s necks after an experiment gone terribly wrong in 2002, the Star Council finally ejected them. The associated explosive argument left soured feelings on both sides, and it took the entire Star Council’s efforts to clean up the mess of both the botched experiment and the resulting conflict. Since then, the Star Council went back to their roots as wide-eyed explorers with the entire universe to discover. The Star Council maintains their practices of individualized study and group presentation and discussion. Some use “alien science” derived from Thal’hun practices, but they also accept other adjacent paradigms of hyperscience and technomagic. The Star Council won’t officially support actions to expose government secrets on extraterrestrials, but they often search where they aren’t supposed to. They usually try to be subtle, but if something goes wrong, a fellow member is always quick to help provide cover. Recently, a couple daring young members inspired a swarm of people to storm Area 51 via a viral meme. It didn’t turn out as useful for gathering secret information as they hoped, but the Star Council initiated several new members following the event.
+
+Initiation is an important social convention in the Star Council. The initiate must meet with the members to establish social chemistry and present an informal thesis of their beliefs on the extraterrestrial and the future of the universe to the rest of the Star Council. If the Star Council feels the initiate is ready and a good fit, they throw a party celebrating the new addition to collective knowledge and creativity. The modern Star Council learned from their mistakes with the Thal’hun and want to be sure new initiates contribute without veering the Affiliation’s mission off on a wildly different path.
+
+The Star Council of today is a generation-spanning band of oft written-off weirdos. Many of them face or have faced difficulties with exclusion from society, so they built their own. They’re quick to help each other when needed, and members who fall on hard times are typically welcome to stay at the small house the Star council owns for group social events.
+
+Not all of them started off as UFO-enthusiasts. Some only got interested in the phenomenon after they found community that accepted them in the Star Council. One of the side effects of the Star Council’s philosophy on extraterrestrials is that no matter how bad the world around them gets, they firmly believe that humanity as a whole can get better. They believe there’s something about the little blue dot of a planet called Earth that’s worth crossing galaxies to find. Their prevailing hope, though devastatingly naive at times, is often their greatest strength.]==] },
+				["U.S. Government (Project Twilight)"] = { en = [==[M20 Sorcerer, p. 93
+
+
+U.S. Government (Project Twilight)
+
+
+Favored Attributes: Dexterity, Wits
+
+Favored Paths: Most are psychics, but hedge magicians commonly learn Divination, Fortune, and Hellfire
+
+There aren’t any U.S. intelligence subdivisions, even classified ones, officially known as “Project Twilight” — that’s just the nickname that stuck. “Project Twilight” includes paraintelligence departments from multiple agencies, such as the Department of Defense, the National Security Agency (NSA), the Central Intelligence Agency (CIA), the FBI Special Affairs Department, and even secret projects within the Center for Disease Control and Department of the Interior. The nickname comes from agents darkly joking that going on a mission was like living in the “Twilight Zone,” though the nickname brings different connotations to younger agents.
+
+All projects that fall under the moniker of Project Twilight are funded through a lump sum called “black book” expenses that Congress authorizes for classified intelligence operations. As such, most individuals, even in some of the highest levels of government, remain unaware of the project’s existence. The agencies would rather things stay that way, since rooting out meddlesome supernatural interference in the government and keeping it secret from the public are the agents’ jobs. All agents have appalling levels of discretion for their duties. Not one would ever be brought up on charges for what would normally be considered gross abuses of power, if it’s justified by stopping vampires and werewolves from running rampant, or preserving “national security” as any official documents code it. Even if an agent’s superior felt the agent crossed a line, or several, the agent would simply be terminated, never to be heard from again. This is doubly true for the hedge magicians and psychics working for the government.
+
+Not all agents in Project Twilight are sorcerers, but many field agents are. It’s much easier to fight rowdy supernaturals with a wider variety of tools at the government’s disposal. And that’s how many Project Twilight sorcerers are viewed: disposable. Agents are sent to deal with everything from Sabbat strikes to egotistical mages on a power trip (which is to say, most of them). At the very least, the pay is better than most other ways a sorcerer can make a legal, if not honest, living.
+
+Many of the higher ups answer to different masters entirely. The Camarilla, Technocracy, Pentex, and others all have their fingers in the paraintelligence divisions to suit their own goals, which often align with keeping the public unaware of the supernatural. Conversely, agents can never get too good at rooting out the supernatural in their own organizations; the supernaturals involved in the agencies won’t let them. Though many agents can be exactingly effective in the field, the inherent conflicts of interest at play in the upper levels work to keep agents focused on matters outside their agency, not their superiors.
+
+Psychics are of particular interest to the government for several reasons. They tend to have much higher-than-average Willpower, and their abilities tend to function without the need for lengthy rituals or specialized equipment. Additionally, they tend to be easier for the non-sorcerers to accept as legitimate because of the massive amounts of media that portray psychics working in the three letter agencies. Because of Technocratic influence in US government and culture, the hedge magicians in the paraintelligence projects are overwhelmingly technosorcerers.
+
+Sorcerers who aren’t affiliated with the Technocracy aren’t likely to trust sorcerers involved in Project Twilight, if their employer (even just the mundane one) is known. Even other Project Twilight sorcerers don’t tend to trust each other, given the sheer frequency with which they end up spying on one another. The government has a long and bloody history oppressing groups from minority ethnicities, religions, and other identities — which make up most sorcerer covens. Historically, magic’s been an outlet for oppressed groups to right wrongs and protect themselves when systems failed them or were never designed to protect them in the first place.]==] },
+				["Uzoma"] = { en = [==[M20 Sorcerer, p. 95
+
+
+Uzoma
+
+
+Favored Attributes: Charisma, Wits
+
+Favored Paths: Alchemy, Healing, Summoning, Binding, and Warding, Quintessence Manipulation
+
+Originating in the Yoruba regions of Africa, the Uzoma are the gatekeepers of the spiritual world, interceding between the orisha, the gods of all creation, and humanity. For years they served as priests and sorcerers, called babalawos, within the holy city-state of Ife, but as other civilizations oppressed and enslaved their people, the Uzoma began to lose influence. The Uzoma gain power from the Orisha, the Orisha gain power from believers, and as their people were taken into slavery their belief faltered. Wherever their people were taken, the Uzoma were taken with them. In the New World, this faith merged with other beliefs, creating new religions: Candomblé, Vodoun, Macumba, and others. The Uzoma faith continued though, hidden alongside these new faiths, both in their homeland and in Africa. As time has passed, the burden of colonization has lessened somewhat, and the old ways have resurfaced among the African diasporas.
+
+The Uzoma organize in “family” groups called ile, taking a hands-off approach as they watch over their people and territory. After hundreds of years of outside influence, the Uzoma allow for no interference with their people. When the Uzoma step in, there is no holding back, and they strike with no reservations. So long as their world remains at peace, the Uzoma are content to watch and remain in the background. They see their task as being gateways for the spirits, not as magicians. The true sorcerers are the Nhanga, who serve other orisha of darker origins. Uzoma dedicate themselves to others and their people while the Nhanga put themselves above others. Often foreign sorcerers and magicians are labelled as Nhanga as well, due to the Uzoma’s past experiences with them.
+
+Each orisha is unique, and there are over 400 of them, though the Uzoma do not necessarily always agree on the names and roles of each of them. Each orisha has a number, color, food, and dance that is specific to them; knowing these characteristics is necessary for properly communicating with them and winning them over. Each individual has a guiding orisha who influences their personality and behavior, villages take on a patron orisha, and Uzoma select specific orisha they serve.
+
+The magic that the Uzoma perform takes place through religious ritual, beginning with praising and thanking Olorun, the Owner of Heaven. The priests then appeal to specific orishas, asking for their magical assistance in return for the Uzoma’s past service and to empower them for further service in the future. The rituals revolve around dancing, drumming, and singing as ways to reach out to the orisha. Different forms of drumming and dance are tied to certain rituals, and they are never performed outside of these rituals. The performance is given to call to the orisha and invite them to join with the Uzoma’s community; the whole ritual is magical rite, religious service, and celebration all together. As the rite ends, the priest is “mounted” by the orisha, who speaks through the priest as a type of possession, though sometimes the orisha chooses not to speak and merely joins with the babalawo for a time.
+
+The start of an Uzoma’s initiation begins with a reading of the Ifa, a collection of patakis (sayings, myths and stories) that are consulted with a shell divination. The elders discern the initiate’s personal guiding orisha, which helps determine which ile they belong with. The initiate is gifted their elekes, necklaces blessed by the ile babalawo and which signify their house. This begins a year of service as a ‘child.’ They dress in white, follow a strict diet, and cannot be touched during their time of service. Days are spent learning the patakis from the priests of the house and learning to cast the Ifa. After their year of service to the ile, the ‘child’ becomes a babalawo and begins their service to their people and the orisha. While all initiates go to the Yoruban homelands of Nigeria, Benin, and Togo, to begin their apprenticeship, many have returned home to the Americas and Europe, continuing the return of the old ways in new places.]==] },
 				-- <<< DESC_END
 };

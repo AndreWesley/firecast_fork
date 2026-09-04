@@ -9,6 +9,7 @@
 			local PT = {
 				["Remove"] = "Remover",
 				["Description"] = "Descrição",
+				["Ritual Level"] = "Nível do Ritual",
 				["No description available"] = "Nenhuma descrição disponível",
 				["Select Background"] = "Selecionar Antecedente",
 				["Select Nature"] = "Selecionar Natureza",
@@ -20,6 +21,8 @@
 				["Select Ritual"] = "Selecionar Ritual",
 				["Select Affiliation"] = "Selecionar Afiliação",
 				["Select Hedge Path"] = "Selecionar Caminho de Magia Estática",
+				["Select Road"] = "Selecionar Estrada",
+				["Select Clan/Family"] = "Selecionar Clã/Família",
 				["Select Phenomenon"] = "Selecionar Fenômeno",
 				["Select Hedge Ritual"] = "Selecionar Ritual de Magia Estática",
 				["Select Flaw"] = "Selecionar Defeito",
@@ -138,6 +141,7 @@
 				["X"] = "X",
 				["Clan/Family"] = "Clã/Família",
 				["BLOOD POOL"] = "RESERVA DE SANGUE",
+				["REVENANT WEAKNESS"] = "FRAQUEZA DE REVENANTE",
 				["Courage"] = "Coragem",
 				["Crafts"] = "Ofícios",
 				["CREDITS"] = "CRÉDITOS",
@@ -253,6 +257,7 @@
 				["Honor"] = "Honra",
 				["HUMANITY"] = "HUMANIDADE",
 				["Humanity"] = "Humanidade",
+				["Path of Humanity"] = "Trilha da Humanidade",
 				["Mortal"] = "Mortal",
 				["Hurt (-1)"] = "Machucado (-1)",
 				["Idealist"] = "Idealista",
@@ -465,6 +470,7 @@
 				["Social"] = "Sociais",
 				["Soldier"] = "Soldado",
 				["SPECIALTIES"] = "ESPECIALIZAÇÕES",
+				["Special thanks to Kazuo (YonHoshiahra)"] = "Agradecimento especial à Kazuo (YonHoshiahra)",
 				["Specialties cannot be bought"] = "Especializações não podem ser compradas",
 				["Specialty"] = "Especialização",
 				["Specialty Cost"] = "Custo por Especialização",
@@ -1056,7 +1062,6 @@
 				["Grimaldi (Dark Ages)"] = "Grimaldi (Idade das Trevas)",
 				["Grimaldi (Modern)"] = "Grimaldi (Era Moderna)",
 				["Kairouan Brotherhood"] = "Irmandade de Kairouan",
-				["Katayama"] = "Katayama",
 				["Keskinen"] = "Keskinen",
 				["Khavi"] = "Khavi",
 				["Krevcheski"] = "Krevcheski",
@@ -1111,7 +1116,6 @@
 				["The Path of Ecstasy"] = "A Trilha do Êxtase",
 				["The Path of the Warrior"] = "A Trilha do Guerreiro",
 				["Road of the Beast"] = "Caminho da Besta",
-				["Road of Heaven"] = "Caminho do Céu",
 				["Road of Humanity"] = "Caminho da Humanidade",
 				["Road of Kings"] = "Caminho dos Reis",
 				["Road of Lilith"] = "Caminho de Lilith",
@@ -1132,6 +1136,7 @@
 				["Path of Liberation"] = "Trilha da Libertação",
 				["Path of Christianity"] = "Trilha do Cristianismo",
 				["Path of Life/Judaism"] = "Trilha da Vida/Judaísmo",
+				["Path of the Prophet/Islam"] = "Trilha do Profeta/Islamismo",
 				["Path of Breath"] = "Trilha do Sopro",
 				["Path of Community"] = "Trilha da Comunidade",
 				["Path of Illumination"] = "Trilha da Iluminação",
@@ -1815,8 +1820,9 @@
 				["Repulsive Feature"] = "Traço Repulsivo",
 				["Repulsive to Animals"] = "Repulsivo aos Animais",
 				["Research Grant"] = "Bolsa de Pesquisa",
-				["Revenant Disciplines"] = "Disciplinas de Revenant",
-				["Revenant Weakness"] = "Fraqueza de Revenant",
+				["Revenant"] = "Revenante",
+				["Revenant Disciplines"] = "Disciplinas de Revenante",
+				["Revenant Weakness"] = "Fraqueza de Revenante",
 				["Rising Star"] = "Estrela em Ascensão",
 				["Ritual Dabbler"] = "Diletante em Rituais",
 				["Ritual Ineptness"] = "Inépcia Ritual",
@@ -2324,7 +2330,7 @@
 				if current ~= nil and current ~= "" then
 					if filter and not pickAllowed(field, current, levels, memo.hedge) then
 						odd = current;
-					elseif root == "road" and current ~= "Humanity"
+					elseif root == "road" and current ~= "Path of Humanity"
 					       and ROAD_ERA ~= nil and ROAD_ERA[current] ~= roadEra then
 						odd = current;
 					else
@@ -2356,9 +2362,9 @@
 						if filter and raw ~= "" and raw ~= current then
 							ok = pickAllowed(field, raw, levels, memo.hedge);
 						elseif root == "road" and raw ~= current then
-							-- Humanity shows in all four eras: it is the default, and an era that dropped it
+							-- The DEFAULT road shows in all four eras: an era that dropped it
 							-- would leave the field holding a value its own list does not offer (SPEC I99c3).
-							ok = (raw == "Humanity") or (ROAD_ERA ~= nil and ROAD_ERA[raw] == roadEra);
+							ok = (raw == "Path of Humanity") or (ROAD_ERA ~= nil and ROAD_ERA[raw] == roadEra);
 						end;
 
 						if ok then
@@ -2529,7 +2535,7 @@
 
 				local names = {
 					dynhedgeAffiliation = true, edtHedgeAffiliation = true,
-					cboClanFamily = true, edtClanFamily = true,
+					dynclanFamily = true, edtClanFamily = true,
 				};
 
 				local found = {};
@@ -2541,7 +2547,7 @@
 				local on = {
 					dynhedgeAffiliation = sheet.stManualAffiliation ~= true,
 					edtHedgeAffiliation = sheet.stManualAffiliation == true,
-					cboClanFamily       = sheet.stManualClanFamily ~= true,
+					dynclanFamily       = sheet.stManualClanFamily ~= true,
 					edtClanFamily       = sheet.stManualClanFamily == true,
 				};
 
@@ -4769,11 +4775,11 @@
 			Options first, credits last (SPEC T141): the settings are what a player opens this
 			tab to change; the credits are a signature.
 		-->
-		<layout left="0" top="0" width="420" height="145">
+		<layout left="0" top="0" width="420" height="135">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="20" top="20" width="80" height="20" text="Language" horzTextAlign="center"/>
-			<comboBox left="100" top="20" width="300" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
+			<label left="20" top="15" width="80" height="20" text="Language" horzTextAlign="center"/>
+			<comboBox left="100" top="15" width="300" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
 			<dataLink field="language" defaultValue="en">
 				<event name="onChange">
 					if sheet == nil then return end;
@@ -4792,8 +4798,8 @@
 			     exception to V15 that cboSheetTheme carries. A sheet holding one of the four
 			     older, longer names is normalised on load (SPEC V110), because a locked box
 			     showing a dead value is one nobody could fix. -->
-			<label left="20" top="60" width="80" height="20" text="Game" horzTextAlign="center"/>
-			<comboBox left="100" top="60" width="300" height="25" name="cboGame" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}">
+			<label left="20" top="55" width="80" height="20" text="Game" horzTextAlign="center"/>
+			<comboBox left="100" top="55" width="300" height="25" name="cboGame" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}">
 			</comboBox>
 			<dataLink field="game" defaultValue="Mortal"/>
 
@@ -4818,8 +4824,8 @@
 				and gave the name to the contemporary palette. Every value paints now, so there
 				is no way back to the sheet as the XML authors it (SPEC C, 16th round).
 			-->
-			<label left="20" top="100" width="80" height="20" text="Theme" horzTextAlign="center"/>
-			<comboBox name="cboSheetTheme" left="100" top="100" width="300" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}"/>
+			<label left="20" top="95" width="80" height="20" text="Theme" horzTextAlign="center"/>
+			<comboBox name="cboSheetTheme" left="100" top="95" width="300" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}"/>
 			<dataLink field="sheetTheme" defaultValue="Modern Nights">
 				<event name="onChange">
 					if sheet == nil then return end;
@@ -4856,19 +4862,30 @@
 			82nd round (user 2026-08-22, items 7 and 8): the box gained the heading it never had
 			and the same 14px above the first line as below the last - it was 10 and 5, and the
 			lopsided pair is what showed. Both boxes on this tab went 330 -> 380 wide with it.
+
+			T911 (user 2026-09-02 item 5): a line of thanks under the developer, and the box grew
+			206 -> 242 to take it, which the owner authorised in the ask. It costs nothing to any
+			neighbour - the Settings tab holds two boxes and this is the lower one (SPEC T141).
+
+			fontSize 12 like the line under it, and that is MEASURED rather than chosen: the pt
+			string is 44 characters and so is "Based on the sheet plugin by Vinny (Ambesek)",
+			which has sat in this width at this size since the 82nd round. V16 asks a label to fit
+			its longest translation, and the sibling is the proof it does (SPEC I136l, V16, V25).
 		-->
-		<layout left="0" top="150" width="420" height="206">
+		<layout left="0" top="140" width="420" height="232">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="20" top="20" width="380" height="20" text="CREDITS" horzTextAlign="center"/>
+			<label left="20" top="15" width="380" height="20" text="CREDITS" horzTextAlign="center"/>
 
-			<label left="20" top="60" width="380" height="20" text="Developer: Andre (Styllern)" horzTextAlign="center"/>
+			<label left="20" top="55" width="380" height="20" text="Developer: Andre (Styllern)" horzTextAlign="center"/>
 
-			<label left="20" top="94" width="380" height="20" text="Based on the sheet plugin by Vinny (Ambesek)" horzTextAlign="center" fontSize="12"/>
+			<label left="20" top="89" width="380" height="20" text="Special thanks to Kazuo (YonHoshiahra)" horzTextAlign="center" fontSize="12"/>
 
-			<label left="20" top="130" width="380" height="20" text="System: Storyteller 20th Anniversary Edition" horzTextAlign="center"/>
+			<label left="20" top="125" width="380" height="20" text="Based on the sheet plugin by Vinny (Ambesek)" horzTextAlign="center" fontSize="12"/>
 
-			<label left="20" top="166" width="380" height="20" text="Version: 0.1.1" horzTextAlign="center"/>
+			<label left="20" top="161" width="380" height="20" text="System: Storyteller 20th Anniversary Edition" horzTextAlign="center"/>
+
+			<label left="20" top="197" width="380" height="20" text="Version: 0.1.1" horzTextAlign="center"/>
 		</layout>
 	</scrollBox>
 </form>

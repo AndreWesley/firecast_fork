@@ -23,46 +23,46 @@
 			must never be reused for a new field, or an old sheet would pour stale content into
 			an unrelated box - the build gate asserts they own no widget.
 		-->
-		<layout left="0" top="0" width="420" height="321">
+		<layout left="0" top="0" width="420" height="311">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="380" height="20" text="GEAR (CARRIED)" horzTextAlign="center"/>
+			<label left="20" top="15" width="380" height="20" text="GEAR (CARRIED)" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="350" height="260" field="gear"/>
+			<textEditor left="35" top="36" width="350" height="260" field="gear"/>
 		</layout>
 
-		<layout left="425" top="0" width="420" height="321">
+		<layout left="425" top="0" width="420" height="311">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="380" height="20" text="EQUIPMENT (OWNED)" horzTextAlign="center"/>
+			<label left="20" top="15" width="380" height="20" text="EQUIPMENT (OWNED)" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="350" height="260" field="equipment"/>
+			<textEditor left="35" top="36" width="350" height="260" field="equipment"/>
 		</layout>
 
-		<layout left="850" top="0" width="420" height="321">
+		<layout left="850" top="0" width="420" height="311">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="380" height="20" text="TRANSPORTATION" horzTextAlign="center"/>
+			<label left="20" top="15" width="380" height="20" text="TRANSPORTATION" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="350" height="260" field="items"/>
+			<textEditor left="35" top="36" width="350" height="260" field="items"/>
 		</layout>
 
-		<layout left="0" top="326" width="420" height="321">
+		<layout left="0" top="316" width="420" height="311">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="380" height="20" text="BASE OF OPERATIONS (DEFENSES)" horzTextAlign="center"/>
+			<label left="20" top="15" width="380" height="20" text="BASE OF OPERATIONS (DEFENSES)" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="350" height="260" field="baseDefenses"/>
+			<textEditor left="35" top="36" width="350" height="260" field="baseDefenses"/>
 		</layout>
 
-		<layout left="425" top="326" width="420" height="321">
+		<layout left="425" top="316" width="420" height="311">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="380" height="20" text="BASE OF OPERATIONS (ARMAMENTS)" horzTextAlign="center"/>
+			<label left="20" top="15" width="380" height="20" text="BASE OF OPERATIONS (ARMAMENTS)" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="350" height="260" field="baseArmaments"/>
+			<textEditor left="35" top="36" width="350" height="260" field="baseArmaments"/>
 		</layout>
 
-		<layout left="850" top="326" width="420" height="321">
+		<layout left="850" top="316" width="420" height="311">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="380" height="20" text="BASE OF OPERATIONS (OTHER)" horzTextAlign="center"/>
+			<label left="20" top="15" width="380" height="20" text="BASE OF OPERATIONS (OTHER)" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="350" height="260" field="baseOther"/>
+			<textEditor left="35" top="36" width="350" height="260" field="baseOther"/>
 		</layout>
 	</scrollBox>
 </form>

@@ -1,38 +1,1094 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ⚑ COMECE AQUI — 2026-09-01, 163ª rodada. §T830 §T831 §T843 §T844 §T874 FECHADAS · §T875 PARCIAL · gate VERDE
+## ⚑ COMECE AQUI — 175ª rodada. **∃ 1 pergunta pendente (o install) & 1 de gosto (§Q61)**
 
-### ▶ O COMANDO: **`/ck:build --next`** — ⊥ ∃ §T bloqueada por prosa agora
+### ▶ O COMANDO, NESTA ORDEM:
+### **1º** `rdk -i` — **o install da 174ª NUNCA ACONTECEU: o Firecast estava ABERTO.** Ver abaixo
+### **2º** `/ck:spec` colando `HANDOFF-SPEC-AMEND.md` da raiz — **4** operações, **1** id novo (§B145)
+### **3º** `/ck:build T848` (`descClan_{en,pt}.lua`, **61** nomes) — a única §T de CÓDIGO que sobra
+### ⊥ pedir `--next`: ele varre **86** §T abertas & **84** são TESTE em Firecast [USER] (99ª, 103ª)
 
-A 162ª fechou §T830 (régua) & a 163ª rodou `/ck:spec` (4 emendas) + fechou **§T831** & **§T874**
-INTEIRA. ⊥ sobra §T travada por spec. Detalhe em "O QUE A 163ª FEZ".
+**Estado:** gate **VERDE** (`-Build`, 0 FAIL, 647 ok) · **NADA commitado**, working tree sujo de
+propósito · **§T936 FECHADA** (`x`), & com ela a última §T de código da aba Ghoul.
 
-**Estado:** gate **VERDE — 0 FAIL** (`-Build`) · §T **794 `x` (781 arquivadas + 13 vivas) · 89 `.` · 8 `~`** · `.rpk` **2.598.813 B**, mtime **22:50:37**, **INSTALADO** 22:50:38 · último commit
-**`b5111c35`** · **NADA commitado** (a 160ª → a 163ª INTEIRAS no working tree).
-
-✅ **O INSTALL DE §T875 FOI VERIFICADO POR CONTEÚDO, ⊥ só por size** (§B1): o `.rpk` instalado foi
-ABERTO (é ZIP) & traz `HedgePicker`=**20** · `PsychicPicker`=**20** · `NuminaFree`=**0** ·
-`HedgeRitualFree`=**5** — a última INTACTA, que é o que §B122 manda. Size igual sozinho ⊥ provaria
-isto: as 2 conversões & a ⊥-conversão cabem dentro de poucos bytes de diferença.
-
-✅ **BUILD & INSTALL FEITOS & PROVADOS (§B1, §B103):** `.rpk` **2.596.783 B**, mtime 22:10:03, &
-`%APPDATA%\Firecast\Plugins\andreoliveira.styllern.wod20th.rpk` c/ o **MESMO size** & mtime
-22:10:04. Rodou **offline**, c/ o Firecast fechado a pedido do user — que é o caminho obrigatório
-aqui: a conversão da afiliação p/ picker é MUDANÇA DE WIDGET (o combo some & 2 botões nascem) &
-instalar c/ a ficha aberta deixaria o form velho na tela, c/ o controle sumido & nenhum handler
-p/ trazê-lo de volta. ✅ **CONFERIDO NA TELA pelo user 2026-09-01** ("sim, tudo certo"): a linha `Affiliation` da caixa `HEDGE MAGIC` mostra o `?` + botão, o botão pinta a afiliação escolhida, o `?` abre descrição & a linha segue alinhada c/ `Essence` & `Casting Attribute`. ∴ o risco de §T810 (widget novo que só o XML viu) está FECHADO p/ esta rodada.
-
-⚠ **A FILA DE INSTALL ZEROU, & foi ela que produziu o único sintoma da rodada.** O instalado era
-de **13:13** (a 160ª) & **2 rodadas de layout** estavam paradas atrás dele. O user abriu a ficha,
-olhou a aba Numina & disse *"não está certo, ela parece não ter mudado"* — & ⊥ tinha mudado
-mesmo: ⊥ NA TELA. ⊥ era bug de código, era §B103 pelo outro lado (o código novo ⊥ tinha chegado).
-MEDIDO antes de responder, ⊥ suposto: instalado 2.613.533 B / 13:13 contra `output/` 2.595.566 B
-/ 21:12, & o `.rpk` novo é ~18 KB **MENOR** porque a 161ª tirou as 4 panes, o bloco da força de
-vontade & as 2 barras. O install rodou **offline**, c/ o Firecast fechado a pedido do user, que é
-o caminho que §B103 manda tomar. ⚠ **o user ainda ⊥ confirmou ter reaberto & olhado** — se a 163ª
-começar sem essa confirmação, é a 1ª coisa a pedir (mesmo risco de §T810).
+⚠⚠ **O INSTALL É A 1ª COISA & ELE ESTÁ 2 RODADAS ATRASADO.** `output/` está em **2.745.046** B
+(22:13) & o instalado em **2.727.493** B (17:09): dentro da diferença estão a linha `Revenant` do
+picker (§T935), a saída do `Katayama` (§T938) & a aba Ghoul INTEIRA redesenhada (§T936). A 174ª
+⊥ instalou porque o **Firecast estava aberto** (processo de 19:48) & instalar com a ficha
+carregada deixa o form velho na tela com o código novo atrás (§B103). **Fechar a ficha (ou o
+Firecast) ANTES de `rdk -i`.**
 
 ---
+
+### ⚑ O QUE A 174ª FECHOU — 1 emenda de spec & **§T936**, que era a maior peça de tela do arco
+
+| o quê | prova |
+|---|---|
+| a emenda de §Q59/§I143j (o `se` deu NÃO) | `SPEC.md` 1.552.012 → **1.554.198** B, 2×1092+2, 0 linha nova |
+| **§T936** `x` — o box `REVENANT WEAKNESS` | **§V412** & **§V414** nascem; **10** mutações + **2** sondas |
+
+**O que está na tela agora** (`WoD20.11.lfm`): a banda do Ghoul tem **4** caixas em vez de 3 —
+`DOMINATOR` **0..578** · `BLOOD POOL` **583..882** · `REVENANT WEAKNESS` **887..1272** ·
+`EXPERIENCE` **1277..1408**, vão de 5 entre elas, & a aba segue fechando em **1408**.
+
+---
+
+### ⚠ O NÚMERO DO HANDOFF DA 174ª ESTAVA ERRADO, & o gate é que disse
+
+A tabela de aperto dizia `DOMINATOR` → **558** com **30** na 4ª coluna do grid. **⊥ dá:**
+`cmbDominatorGen` mora nessa coluna & §V196 preça combo em `NeededPx + ARROW` = 4 chars × 6,5 +
+24 = **50**. ∴ `DOMINATOR` fecha em **578**, o aperto libera **82** (⊥ 102) & o box da fraqueza
+saiu com **385** (⊥ 405). **A conclusão ⊥ mudou** — a aba ⊥ cresce, 385−40 = 345px ÷ 6,0 = 57
+chars × 4 linhas = **228** contra o pior caso pt de **221**. É a operação 1 do
+`HANDOFF-SPEC-AMEND.md`.
+
+⚠ **A lição, & vale p/ ∀ rodada:** o HANDOFF mede com régua de CABEÇA & o gate mede com a régua
+que a ficha usa. **Conta de largura ⊥ é "já medido" até o gate ter rodado sobre ela.**
+
+---
+
+### ⚑ ONDE O TRABALHO FICOU — 4 arquivos, & 1 deles é o gate
+
+| arquivo | o que entrou |
+|---|---|
+| `WoD20th/WoD20.11.lfm` | as 4 caixas da banda · `renderRevWeakness` · 1 `dataLink` novo · `onShow` |
+| `WoD20th/WoD20th.lfm` | `FAMILY_WEAKNESS` (**23**, inglês) irmã de `FAMILY_CAP` · `familyWeakness()` |
+| `WoD20th/WoD20.6.lfm` | 1 linha no mapa `PT`: `REVENANT WEAKNESS` (§V28 cobrou no 1º disparo) |
+| `localization.lang` | **24+24** chaves: as 23 frases + `-- no weakness --`, & o título do box |
+| `verify-hunters-hunted.ps1` | §V412 & §V414 · `$V361_RESIZED` c/ os 2 rects novos · 67→**68** (×2) · 69→**70** (×2) |
+
+**A leitura, em 1 linha:** `familyWeakness()` no root é o **único** leitor — pergunta ao slot
+custom 1º (`customFieldOf("clanFamily")`, & fraqueza vazia É "Não"), depois pertinência em
+`PICKER_LIST["family"]`, & devolve INGLÊS. `renderRevWeakness` na aba traduz & pinta. O box ⊥ tem
+`field` & ⊥ some nunca.
+
+---
+
+### ⚠ AS 5 ARMADILHAS DA 174ª — 3 são do gate cobrando o que a conta ⊥ viu
+
+1. **§V196 preça `NeededPx + ARROW` & o combo sem `fontSize` cai na régua de 6,5**, ⊥ na de 6,0.
+   É o que matou o `30`. **Toda coluna que carrega combo tem piso ≥ 24+texto.**
+2. **O título da caixa ⊥ é `left=0 width=box` nesta ficha: é `left=20 width=box−40`** ∴ ele CONTA
+   em §V239 & §V27 cobra os 2 lados. Errei 518 num box de 578 & §V27 acendeu sozinha.
+3. **Rótulo novo na tela custa 3 lugares, ⊥ 1:** `[pt]` & `[en]` do `.lang` (§V10) **&** o mapa
+   `PT` de `WoD20.6` (§V28). Dado que ⊥ é rótulo (as 23 frases) custa só os 2 do `.lang`.
+4. **`textEditor` chamado `edt*Desc` entra em 2 rosters sozinho** — §V334 (`DESC_PANES`, cobra
+   botão de zoom) & §V365d (proíbe pane fora do `?`). O nome `edtRevWeakness` é escolha, ⊥ gosto.
+5. **`textEditor` `readOnly` fora do roster `$DESC_BRIGHT` ! carregar `opacity="0.75"`** (§V111,
+   §V244). É §Q61 lá embaixo.
+
+& as de sempre, respeitadas: patch no gate SÓ por `GetEncoding(28591)` + `WriteAllBytes` (os 14
+bytes UTF-8 seguiram 14) · `localization.lang` é **LF** & o resto é **CRLF** · `Set-Location` ⊥
+muda o cwd do .NET (mordeu 1× nesta rodada) · here-string `@'...'@` do PS **come a última quebra
+de linha** — a 1ª linha da tabela colou no `FAMILY_WEAKNESS = {`.
+
+---
+
+### ⚑ O QUE MUDOU NO GATE NA 174ª — 2 réguas novas & 4 números
+
+| régua | mudança | mutação |
+|---|---|---|
+| **§V412** | NOVA, 5 pernas: (a) na banda · (b) pertinência · (c) slot custom · (d) ⊥ some · (e)(f) | **6** vermelhas + 1 sonda verde |
+| **§V414** | NOVA: a SOMA das 2 faixas bate, o vão é DERIVADO das colunas | **3** vermelhas + 1 sonda verde |
+| `$V361_RESIZED` | os 2 rects do Ghoul: `T926` → **`T936`**, 660/405 → **578/299** | M7 acende os 2 |
+| §V280·§V298 | censo de caixas **67 → 68** | tirar o fundo do box novo |
+| §V239·§V240 | piso **69 → 70** | idem |
+
+⚠ **§V414(a) chegou a ser escrita ERRADA & a mutação pegou:** `max(left+width)` responde "onde a
+faixa fecha" & é VERDE p/ a caixa que cresce PARA DENTRO da vizinha. É o **§B145** da emenda, & a
+lição é geral: **igualdade entre 2 conjuntos mede a SOMA, ⊥ o extremo** — o extremo é insensível
+a tudo que acontece no meio dele. **∃ mais régua de igualdade no gate & nenhuma foi auditada por
+este ângulo.**
+
+---
+
+### ⚑ A FILA — **86** abertas, & só **2** são construíveis
+
+| §T | o que é |
+|---|---|
+| §T848 | **A PRÓXIMA.** `descClan_{en,pt}.lua`, **61** nomes. Pipeline pronto, ⊥ ∃ `?` de fonte |
+| §T850 | `descFamily_{en,pt}.lua`, **23**. ⚠ a linha ainda diz **24** — §T938 tirou 1 |
+
+As outras **84** são teste em Firecast [USER]. ⚠ **§T153 escreve "testar em Firecast"** ∴ grep por
+1 frase só mente sobre o resto. A fonte das 23 famílias está fechada em
+`research/family_source.tsv` (`gr` 16 · `da` 7).
+
+---
+
+### ⚑ AS §Q — **9** abertas, & 8 são de TELA
+
+§Q47 · §Q48 · §Q49 · §Q50 · §Q51 · §Q52 · §Q53 · §Q54 (todas de 2026-09-02, esperando o user olhar
+o Firecast) & **§Q61, NOVA & de GOSTO:**
+
+> **§Q61 — o texto da fraqueza fica em `opacity="0.75"` ou BRILHANDO?** Como está: 0,75, que é o
+> número de TEXTO read-only da ficha inteira (§I43, §V111/§V244) & ⊥ custa exceção nenhuma. A
+> alternativa é pôr `edtRevWeakness` no roster `$DESC_BRIGHT` do gate, ao lado de `edtPopDesc` &
+> `edtMfDesc` — o argumento de §V111(2) é que "o texto que o jogador abriu a aba p/ LER" fica
+> brilhante, & esta é a única prosa de livro da aba Ghoul. **RECOMENDAÇÃO: deixar 0,75.** É 1
+> atributo p/ mudar depois de você OLHAR, & alargar um roster de exceção sem ver a tela é o que
+> §V20 recusa. **§Q55·56·57·58·59·60 estão RESPONDIDAS.**
+
+---
+## HISTÓRICO — a 174ª rodada (era o COMECE AQUI até a 175ª)
+
+### ⚑ (era o COMECE AQUI da 174ª, escrito pela 173ª) — a 173ª fechou 7 §T
+
+### ▶ O COMANDO, NESTA ORDEM:
+### **1º** `/ck:spec` colando `HANDOFF-SPEC-AMEND.md` da raiz — **1** operação, texto pronto
+### **2º** `/ck:build T936` — **o box `REVENANT WEAKNESS`. A ÚNICA §T de CÓDIGO, & ⊥ tem bloqueio**
+### **3º** `rdk -i` — **∃ install PENDENTE** (`output/` 2.727.812 B × instalado 2.727.493 B)
+### ⊥ pedir `--next`: ele varre **87** §T abertas & **84** são TESTE em Firecast [USER] (99ª, 103ª)
+
+**Estado:** gate **VERDE** (`-Build`, 0 FAIL) · **NADA commitado**, working tree sujo de propósito
+(`CLAUDE.md`) · **44** entradas, **19** novas fora do git.
+
+⚠ **INSTALL PENDENTE, & desta vez a diferença é CONTEÚDO REAL**, ⊥ o ruído de 1 byte que a 173ª
+mediu: a linha `Revenant` do picker, as traduções & a saída do `Katayama` estão no `.rpk` de
+`output/` & ⊥ no instalado. O Firecast estava FECHADO no último install (17:09) — se estiver
+aberto agora, **avisar antes**.
+
+---
+
+### ⚑ O QUE A 173ª FECHOU — **7** §T, & 3 delas ⊥ tinham código a escrever
+
+| §T | o que era | prova |
+|---|---|---|
+| **§T933** `x` | §V411 nasce: metade `_pt` sem ACENTO | 3 mutações; des-acentuar deixou §V411 como ÚNICO FAIL |
+| **§T622** `x` | ⊥ era código: a RAIZ já estava em disco | 6 mutações em §V284, & a 6ª achou LACUNA (§B144) |
+| **§T934** `x` | roster de §V210 vira GLOB (era literal de 6 c/ 8 em disco) | tirar chave de `descRoad_pt` era **0 FAIL** & virou VERMELHO |
+| **§T904** `x` | ⊥ era código: os 3 terços entregues, o 3º por §T876 | `cboRoad` ⊥ ∃; `dynroad` em `WoD20.1.lfm:715` |
+| **§T935** `x` | a linha `Revenant` no picker de `clanFamily` | **§V413** nasce, 8 mutações vermelhas + 1 sonda verde |
+| **§T938** `x` | `Katayama` SAI da lista (`family` 24→**23**, `clanFamily` 85→**84**) | 3 mutações; o `24` estava cravado em **6** lugares do gate |
+| **§T937** `x` | as **23** fraquezas, en+pt, em `research/family_weakness.tsv` | 23 nomes batem **1:1** com `PICKER_LIST["family"]` |
+
+---
+
+### ⚑ §T936 — TUDO o que ela precisa está MEDIDO. ⊥ re-derivar nada
+
+**O box:** `REVENANT WEAKNESS` na banda da aba Ghoul (`WoD20.11.lfm`, `top=10 h=128`), ENTRE
+`BLOOD POOL` & `EXPERIENCE`. A banda soma **1408** & está CHEIA ∴ ele REDIVIDE os outros 3.
+
+**O aperto, box a box** (mínimo de §V280a = **20** nos 4 lados, vão de §V298 = **5**):
+
+| box | hoje | vai p/ | conta | libera |
+|---|---|---|---|---|
+| `DOMINATOR` | 660 | **558** | `20+72+5+`**225**`+20+156+10+30+20` | 102 |
+| `BLOOD POOL` | 405 | **299** | passo das 20 bolinhas **28→26**: `20+259+20` | 106 |
+| `EXPERIENCE` | 333 | **131** | `20+`**91**`+20`, & `(w−91)` ! ser PAR (§V239) | 202 |
+| | | | menos 1 vão de 5 | **= 405** p/ o box |
+
+**Larguras MEDIDAS pela régua `NeededPx` do gate (6.0px/char em fontSize 12), no idioma MAIS
+LONGO:** `Clan/Family` **72** (ocupa 95) · `Generation` **65** (ocupa 165) · `Max Discipline
+Level` **156** (ocupa 165, ∴ este quase ⊥ dá nada) · `BLOOD POOL` **111** (ocupa 365) ·
+`EXPERIENCE` **72** (ocupa 293) · o vão entre as 2 colunas do `DOMINATOR` é **49** & cabe em 20.
+
+⚠ **`dynclanFamily` ⊥ pode encolher abaixo de 225** (§I143i): o prefixo `Família: ` põe o pior
+caso (`Família: Bratovich (Idade das Trevas)`) em **222**px. O pedido de encurtar o picker & o
+pedido do prefixo se encontram AQUI & o prefixo ganha.
+
+**A ABA ⊥ CRESCE.** É a operação 1 do `HANDOFF-SPEC-AMEND.md`: com a frase destilada o pior caso
+pt é **221** chars & cabem **240** em 405px × 4 linhas ∴ `EXPERIENCE` ⊥ é empurrado, as colunas de
+baixo ⊥ mudam, `RITUALS` ⊥ anda.
+
+**O conteúdo:** `textEditor` c/ `wordWrap` + `readOnly` (≡ `edtMfDesc` do picker). O nome leva o
+prefixo `Family: ` / `Família: ` (§I143i). Ausência = **1** frase só, `-- no weakness --`
+autorada & `-- sem fraqueza --` em pt (§Q60) — vale p/ CLÃ & p/ custom com `Revenant = Não`.
+
+**As 2 réguas nascem aqui & ⊥ ∃ nenhuma delas no gate** (MEDIDO: 0 ocorrências de `V412` & de
+`V414`). §V412 tem a perna **(f) de COMPLETUDE**: ∀ nome de `PICKER_LIST["family"]` tem linha em
+`research/family_weakness.tsv` — **23** hoje, & o número sai da lista, ⊥ de literal.
+
+**A tabela** entra como IRMÃ de `FAMILY_CAP` (`WoD20th.lfm:5418`), chave = nome VERBATIM do
+picker, **1** leitor só ≡ `familyCap` (§V337c, §V135). Os dados prontos:
+`research/family_weakness.tsv`, **23** linhas, `nome<TAB>fonte<TAB>pag<TAB>en<TAB>pt`.
+
+---
+
+### ⚑ A FILA — **87** abertas, & só **3** são construíveis
+
+| §T | o que é |
+|---|---|
+| **§T936** | **A PRÓXIMA.** O box. ⊥ tem bloqueio |
+| §T848 | `descClan_{en,pt}.lua`, **61** nomes. Pipeline pronto, ⊥ ∃ `?` de fonte |
+| §T850 | `descFamily_{en,pt}.lua`, **23**. ⚠ a linha ainda diz **24** — §T938 tirou 1 |
+
+As outras **84** são teste em Firecast [USER]. ⚠ **§T153 escreve "testar em Firecast"** ∴ grep por
+1 frase só mente sobre o resto.
+
+⚠ **§T850 ⊥ tem mais `?` de FONTE:** a varredura da 173ª fechou a fonte das famílias —
+`research/family_source.tsv`, **23** linhas com livro & página: **`gr` (Ghouls & Revenants) 16 ·
+`da` (V20 Dark Ages) 7**. O que §T850 entrega é a DESCRIÇÃO na forma de §I21, ⊥ a fraqueza.
+
+---
+
+### ⚠ AS ARMADILHAS DA 173ª — **6**, & 3 são de leitura, ⊥ de ferramenta
+
+1. **"⊥ tem o marcador que procurei" ⊥ é "⊥ ∃".** Eu disse ao user que 4 famílias ⊥ tinham
+   fraqueza; **3 tinham** — `Marijava` & `Keskinen` em PROSA, & `Krevcheski` é o NOME ANTIGO dos
+   `Ducheski`. O parser achou o rótulo `Weakness:` & eu li a ausência do RÓTULO como ausência do
+   DADO. Foi o user quem perguntou. **Ler as entradas inteiras é parte do trabalho.**
+2. **O critério de picker é o PREFIXO de 3 letras, ⊥ a natureza da lista.** `cbo*` cai nas réguas
+   de picker (§V13/§V15/§V208/§V211) & `cmb*` em §V257. 5 FAIL no 1º build de §T935.
+3. **§V257(c) cobra `items` ≡ `values`** — o token guardado É o texto inglês & `applyLanguage`
+   reescreve `items` sozinho.
+4. **`.ps1` com `§` sem BOM: o PS 5.1 lê como ANSI & a âncora ⊥ casa** (§B84, mordeu 2× na 173ª).
+   Todo `.ps1` com não-ASCII ! nascer com BOM.
+5. **`return [string[]](...)` devolve `object[]`** — o pipeline DESENROLA & o tipo se perde.
+   Castar no CHAMADOR: `[string[]]@(Func ...)`.
+6. **`(...)[0]` numa coleção de 1 elemento indexa o CARACTERE**, ⊥ o item — §I142k item (10) de
+   novo, & desta vez no meu próprio verificador. Envolver em `@()`.
+
+& as de sempre, respeitadas: patch no gate SÓ por `GetEncoding(28591)` + `WriteAllBytes` (14 bytes
+UTF-8 lá dentro) · `localization.lang` é **LF**, o resto do repo é **CRLF** (misturei 2 linhas na
+173ª & o gate viu) · `Set-Location` ⊥ muda o cwd do .NET · `Write-Host` ⊥ vai p/ o pipeline
+(`6>&1 | Out-String`) · `’` (U+2019) fecha string no PS 5.1 **& o livro escreve `D’Habi` com ele
+enquanto o picker usa o reto**.
+
+---
+
+### ⚑ O QUE MUDOU NO GATE NA 173ª — 5 réguas novas ou emendadas
+
+| régua | mudança | mutação |
+|---|---|---|
+| **§V411** | NOVA: ∀ `desc*_pt.lua` tem acento, piso `N=1` medido nos 8 pares | des-acentuar → único FAIL |
+| **§V413** | NOVA: a linha `Revenant` é de `clanFamily` & de mais nenhuma | 8 vermelhas, 1 sonda verde |
+| **§V210** | roster LITERAL de 6 → **GLOB** (8 áreas, 16 módulos, 1533 entradas) | chave de `descRoad_pt` |
+| **§V284** | perna (d) ganhou a irmã da PRESENÇA, 2 `if` independentes | apagar `p.mode` |
+| **§V294·§V341·§V236** | o `24`/`85`/`86` viraram `23`/`84`/`85` — **6** literais em 3 réguas | 3 vermelhas |
+
+⚠ **§B144 é a lição do gate inteiro:** perna NEGATIVA passa por AUSÊNCIA. Perna que PROÍBE um
+valor ! ter a irmã que EXIGE a presença dele, & as 2 ! ser `if` INDEPENDENTES. **∃ mais pernas
+negativas no gate & NENHUMA foi auditada por este ângulo** — é o §T de gate mais barato que sobra.
+
+---
+
+### ⚑ AS §Q — **8** abertas, & as 8 são de TELA
+
+§Q47 · §Q48 · §Q49 · §Q50 · §Q51 · §Q52 · §Q53 · §Q54, todas de 2026-09-02 & todas esperando o
+user olhar o Firecast. **§Q55·56·57·58·59·60 estão RESPONDIDAS.**
+
+---
+## HISTÓRICO — o 1º lote da 173ª (era o COMECE AQUI até o 2º lote)
+
+### ⚑ (era o COMECE AQUI da 174ª, escrito no 1º lote da 173ª — antes do pedido da fraqueza de revenante)
+
+### ▶ O COMANDO, NESTA ORDEM:
+### **1º** `/ck:spec` colando `HANDOFF-SPEC-AMEND.md` da raiz — **1** operação só, texto pronto
+### **2º** `/ck:build T848` (`descClan_{en,pt}.lua`, **61** nomes) — **a ÚNICA construível sem resposta**
+### **3º** `/ck:build T850` (`family`, **24**) **SÓ DEPOIS** de responder a pergunta lá embaixo
+### ⊥ pedir `--next`: ele varre **86** §T abertas & **84** são TESTE em Firecast [USER] (99ª, 103ª)
+
+**Estado:** gate **VERDE** (`-Build`, 0 FAIL) · `.rpk` **2.723.888 B** em `output/`, mtime
+2026-09-03 15:25:56 · instalado **2.723.888 B** de 12:49:06 — **os 2 com o MESMO size** ∴ ⊥ ∃
+install pendente · **NADA commitado**, working tree sujo de propósito (`CLAUDE.md`).
+
+**Working tree, MEDIDO 2026-09-03:** **42** entradas — **22** modificadas, **17** NOVAS fora do
+git & **3** apagadas, IGUAL ao fim da 172ª. ⚠ `git status --porcelain | Where-Object { $_ -like
+'??*' }` **MENTE** (o `?` de `-like` é curinga de 1 char): usar `.StartsWith('??')`.
+
+### ✔ ⊥ INSTALAR: a 173ª ⊥ tocou **1 byte** da ficha
+
+As 4 §T foram **gate + SPEC**. Os `.lfm` e os `desc*.lua` mutados foram restaurados & CONFERIDOS
+por SHA256: `WoD20th.lfm` `5695CF90C9B8` · `WoD20.6.lfm` `D4EC3FC77D9B` · `descNature_pt.lua`
+`9C062CF0FA06` · `descRoad_pt.lua` `E26A773DD52C` · `descPath_pt.lua` `0B2A2F52B2D7`. `rdk -l`
+rodou 2× & o `.rpk` fechou no MESMO size do instalado.
+
+⚠ **O size do `.rpk` OSCILA 1 byte entre builds do MESMO conteúdo** (2.723.887 ↔ 2.723.888, os 2
+medidos nesta rodada com a ficha intacta) ∴ **size sozinho ⊥ prova mudança** — bater SHA do que
+está DENTRO do zip, ⊥ o tamanho do zip.
+
+---
+
+### ⚑ O QUE A 173ª FECHOU — **4** §T, & **2** delas ⊥ tinham código a escrever
+
+| §T | o que era | prova |
+|---|---|---|
+| **§T933** `x` | **§V411 nasce**: metade `_pt` sem ACENTO é tradução que ⊥ aconteceu | 3 mutações; a de des-acentuar deixou **§V411 como ÚNICO FAIL** |
+| **§T622** `x` | ⊥ era código: a RAIZ já estava toda em disco | 6 mutações em §V284, & a 6ª achou LACUNA |
+| **§T934** `x` | o roster de §V210 vira GLOB — era lista LITERAL de 6 c/ **8** em disco | tirar 1 chave de `descRoad_pt` era **0 FAIL** & virou VERMELHO |
+| **§T904** `x` | ⊥ era código: os 3 terços entregues, o 3º por §T876 | `cboRoad` ⊥ ∃ como controle; `dynroad` em `WoD20.1.lfm:715` |
+
+⚠ **A lição, & é a MESMA da 172ª:** `~` neste projeto ⊥ significa "código pela metade" — significa
+**critério de aceite ⊥ cumprido**, & em §T622 & §T904 o código estava 100% pronto. **LER o disco
+antes de escrever 1 linha numa §T `~`.** 3 rodadas seguidas, 5 §T: §T828 §T840 §T622 §T904 (+§T690
+na 171ª). Já ⊥ é coincidência, é o formato: quem entrega ⊥ volta p/ virar o status.
+
+---
+
+### ⚠ A LACUNA QUE A MUTAÇÃO ACHOU — **§B144**, & ela vale p/ TODA perna negativa
+
+§V284(d) proibia `mode` ≠ `original`. **Apagar a linha `p.mode = "original";` inteira deixava a
+régua VERDE**: perna NEGATIVA ⊥ acha o que objetar numa AUSÊNCIA. 5 das 6 mutações acendiam ∴ o
+relatório dizia que a régua funcionava.
+
+**A regra que saiu disso (§B144), & ela é p/ o gate inteiro:** perna que PROÍBE um valor ! ter a
+irmã que EXIGE a PRESENÇA dele, & as 2 ! ser `if` INDEPENDENTES — `elseif` faz a ausência ser lida
+pela perna errada & o relatório mente sobre por qual porta o defeito entrou.
+
+⚠ **∃ mais pernas negativas no gate & NENHUMA foi auditada por este ângulo.** Sondar `-notmatch`
+& `-match` com lookahead negativo é trabalho de 1 varredura, & é o candidato mais barato a §T de
+gate que sobrou.
+
+⚠ agrava quando o default é NATIVO & ⊥ medido: `WrapMode` é **`?`** neste repo (§R113 lê o enum de
+`rrpgGUI.lua:1119-1120` & para nos 4 valores) ∴ a linha apagada ⊥ degradava p/ `original`,
+degradava p/ DESCONHECIDO.
+
+---
+
+### ⚑ O BURACO DE COBERTURA QUE **⊥** ERA O QUE A SUPOSIÇÃO DIZIA (§T934)
+
+`$v210Areas` era lista LITERAL de **6** com **8** módulos em disco. A suposição era "2 áreas
+desprotegidas". **A MEDIÇÃO disse outra coisa & é o achado que vale:**
+
+| tirar 1 chave de | antes de §T934 | depois |
+|---|---|---|
+| `descRoad_pt.lua` | **0 FAIL no gate INTEIRO** | §V210(a) VERMELHO |
+| `descNature_pt.lua` | só **§V366(a)** — outra régua, outro motivo | §V210 + §V366 |
+| `descPath_pt.lua` (área da lista) | 3 FAIL | 3 FAIL |
+
+∴ **a cobertura fora da lista era ACIDENTAL** — dependia de outra régua ter se importado — & onde
+ninguém se importou (as **55** `road`, nascidas na 172ª) o buraco era TOTAL. `descNature` escapou
+por sorte. **Sorte ⊥ é cobertura**, & é isso que a lista literal comprava sem dizer.
+
+`$DESC_MARKER` **MUDOU DE LUGAR**: subiu do meio do arquivo p/ junto de `DescMap` (topo), porque
+agora tem **3** leitores (§V210, §V408, §V411). PowerShell lê de cima p/ baixo & hashtable citada
+acima da declaração é `$null` **sem erro**.
+
+---
+
+### ⚑ A FILA — **86** abertas, & só **2** são construíveis
+
+| grupo | quantas | o que dá p/ fazer |
+|---|---|---|
+| `teste no Firecast [USER]` + PROBE | **84** | ⊥ daqui. ⚠ **§T153 escreve "testar em Firecast"** ∴ grep por 1 frase só mente sobre o resto |
+| **§T848** `clan` (**61** nomes) | 1 | **A PRÓXIMA.** Pipeline pronto, ⊥ ∃ `?` de fonte |
+| **§T850** `family` (**24**) | 1 | **TRAVADA numa pergunta** — ver abaixo |
+
+**⊥ ∃ mais §T de CÓDIGO DE FICHA aberta.** §T622 era a última & fechou nesta rodada.
+
+**§T848 em 1 frase:** `descClan_{en,pt}.lua` na raiz do plugin, **61** chaves + o vazio, forma de
+§I21, chave EN nos 2 lados. ⚠ **no minuto em que `descClan_en.lua` tocar o disco, 3 réguas passam
+a cobrá-lo sozinhas**: §V408 (cobertura da lista), §V210 (paridade — **agora por GLOB**, §T934) &
+§V411 (acento na metade pt). Entregar os 61 ou declarar roster. A receita de texto é a mesma das 3
+listas já feitas: `research/README.md`, & o cache de livro em `%TEMP%\wod_books_txt\` (UTF-8, 1
+parágrafo por linha, des-hifenizado — **⊥ reextrair dos PDFs sem olhar lá antes**).
+
+---
+
+### ⚠ A PERGUNTA PENDENTE — **§T850 tem `?` de FONTE na própria linha**
+
+`family` são **24** nomes & **2** deles são o MESMO clã em 2 épocas (`Bratovich (Dark Ages)` /
+`Bratovitch (Modern)` — grafia diferente, de propósito, §V336d/§I102g: a chave é o nome VERBATIM
+da lista, & normalizar apaga a distinção que a lista ∃ p/ fazer).
+
+**⊥ construir §T850 sem responder de qual livro sai o texto de `family`.** §R135 já teve de
+corrigir palpite de fonte na 150ª — é o precedente que a própria linha cita.
+
+---
+
+### ⚑ AS §Q — **11** abertas, & **3** delas ⊥ deviam estar
+
+§Q55 · §Q56 · §Q57 dizem `ABERTA 2026-09-02` & **as 3 foram RESPONDIDAS pelo user em 2026-09-03**;
+§T931 foi construída nelas & as 55 entradas estão em disco. §Q58, da MESMA §T, já carrega a forma
+certa (`RESPONDIDA pelo USER`). **É a operação 1 do `HANDOFF-SPEC-AMEND.md`** — §B141 pela 3ª vez.
+
+As outras 8 (§Q47..§Q54) são de TELA & esperam o user olhar o Firecast.
+
+---
+
+### ⚠ AS ARMADILHAS DESTA RODADA — 3 de ferramenta, & as 3 morderam AQUI
+
+1. **`return [string[]](...)` numa função PS 5.1 devolve `object[]`** — a saída é DESENROLADA
+   pelo pipeline & o tipo se perde. `InsertRange` de `List[string]` recusa. Cura: castar no
+   CHAMADOR (`[string[]]@(Func ...)`), ⊥ no `return`. É §I142k item (10) por outra porta.
+2. **`Set-Location` ⊥ muda o cwd do .NET** (voltou nesta rodada): `[IO.File]::ReadAllBytes('SPEC.md')`
+   resolveu contra o diretório do PROCESSO & foi procurar dentro de `WoD20th\`. **Caminho ABSOLUTO
+   sempre.**
+3. **`Write-Host` ⊥ vai p/ o pipeline** — o gate escreve por `Write-Host` ∴ `| Select-String` ⊥
+   filtra nada & devolve a saída inteira. Usar **`6>&1 | Out-String`** & filtrar depois.
+
+& as de sempre, que ⊥ morderam porque foram respeitadas: patch no gate SÓ por
+`[Text.Encoding]::GetEncoding(28591)` + `WriteAllBytes` (ele tem **14** bytes UTF-8 em comentário
+& ASCII os apaga calado) · nome de função em `.ps1` c/ **≥6 letras** (§B142) · `.ps1` com acento
+precisa de BOM (§B84) — o jeito de ⊥ precisar é **⊥ pôr acento no `.ps1`**: todo texto acentuado
+desta rodada entrou por `.txt` UTF-8 lido com `ReadAllBytes`, & regex de acento entrou por escape
+`ç`.
+
+---
+
+### ⚑ O QUE MUDOU NO GATE NA 173ª — **§V411** nasceu, **§V210** virou glob, **§V284** ganhou perna
+
+| régua | mudança | mutação que a acendeu |
+|---|---|---|
+| **§V411** | **NOVA**: ∀ `desc*_pt.lua` tem acento, piso `N=1` MEDIDO nos 8 pares | des-acentuar 1 módulo → único FAIL do gate · glob quebrado → `(c) only 0 modules` |
+| **§V210** | roster LITERAL de 6 → **GLOB** (8 áreas, 16 módulos, **1533** entradas) | tirar 1 chave de `descRoad_pt` → de 0 FAIL p/ VERMELHO |
+| **§V284** | perna (d) ganhou a irmã da PRESENÇA, 2 `if` independentes | apagar `p.mode` → VERMELHO (antes: VERDE) |
+
+⚠ **`N=1` de §V411 ⊥ é palpite:** acentos por entrada nos 8 pares vão de **24,0** (`descNature`) a
+**100,3** (`descDisc`) & **0** das 1533 entradas tem corpo sem acento ∴ o pior módulo folga o piso
+em **24×**. O que a régua alcança é módulo des-acentuado POR INTEIRO — pedaço des-acentuado (que
+foi o defeito de §T931, 120 de 483 linhas) precisaria de baseline POR MÓDULO, que ninguém pediu.
+Está escrito no comentário da régua p/ ⊥ prometer o que ⊥ entrega.
+
+---
+
+### ⚑ O QUE A 173ª ESCREVEU NA SPEC — **12** operações, & **2** saíram de MEDIÇÃO contrária
+
+Aplicadas as **7** da emenda da 172ª (§B142 · §B143 · §V411 · §T933 · §I141j · §I141k · §V362) &
+mais **5** desta (§V210 · §V284 · §B144 · §T934 · §T904). **⊥ reaplicar** — o
+`HANDOFF-SPEC-AMEND.md` da raiz foi REESCRITO & hoje tem só a operação das §Q.
+
+**§B143 — o `328` de §V362 & a hipótese grave que MORREU.** O texto dizia "os **328** `field=`
+autorados em `b5111c35`" & o gate cobra **325**. Medido com o LEITOR do próprio gate sobre os 15
+`.lfm` tirados de `git show b5111c35`: **325**. & a hipótese "o contrato foi editado" morreu ⊥ por
+contagem mas por **CONTEÚDO** — `$FIELD_CONTRACT` bate NOME A NOME com o censo, 0 diferença.
+Nenhuma outra leitura dá 328 (363 c/ placeholder · 334 por regex · 519 brutas).
+
+**§T933 nasceu dizendo 11 pares `desc*_{en,pt}` & são 8.** Corrigido ANTES de a §T ser construída,
+por medição. É §B141 mordendo no rascunho — o barato.
+
+⚠ **A regra que as 2 ensinam:** número de MEDIÇÃO na SPEC nasce **colado ao COMANDO que o mediu**.
+Sem isso ninguém sabe se `328` era leitura velha ou dedo errado, & §I142i já mediu que a régua
+automática p/ isso é **NO-BUILD** (90% de falso positivo) ∴ a defesa é procedimento.
+## HISTÓRICO — a 173ª rodada (era o COMECE AQUI até a 174ª)
+
+### ⚑ (era o COMECE AQUI da 173ª, escrito pela 172ª) — a 172ª fechou 5 §T
+
+### ▶ O COMANDO, NESTA ORDEM:
+### **1º** `/ck:spec` colando `HANDOFF-SPEC-AMEND.md` da raiz — **7** operações, texto pronto
+### **2º** `/ck:build T933` (nasce §V411 no gate — 1 régua, ⊥ toca a ficha). **Só ∃ depois do 1º**
+### **3º** `/ck:build T622` — a filigrana da vitalidade. **A ÚNICA §T de CÓDIGO que sobra**
+### ⊥ pedir `--next`: ele varre **88** §T abertas & **84** são TESTE em Firecast [USER] (99ª, 103ª)
+
+**Estado:** gate **VERDE** (`-Build`, 0 FAIL) · `.rpk` **2.723.888 B** INSTALADO 2026-09-03
+12:49:06 · **NADA commitado**, working tree sujo de propósito (regra do projeto: commit só sob
+pedido direto, `CLAUDE.md`).
+
+**Working tree, MEDIDO 2026-09-03:** **42** entradas — **22** modificadas, **17** NOVAS fora do
+git & **3** apagadas. As 3 apagadas (`WoD20.12/13/14.lfm`) são PRÉ-EXISTENTES, da onda 3 de §T872,
+& ⊥ são desta rodada. As 17 novas são os **2** `descRoad_*.lua` + **15** de `research/`.
+⚠ **`git status --porcelain | Where-Object { $_ -like '??*' }` MENTE**: em PowerShell o `?` de
+`-like` é curinga de 1 caractere ∴ `'??*'` casa TODA linha & faz parecer que o índice virou pó.
+Usar `.StartsWith('??')`.
+
+### ✔ ⊥ INSTALAR: a 2ª metade da 172ª ⊥ tocou **1 byte** do plugin
+
+§T828 & §T840 foram **mutação**, ⊥ código: os arquivos mutados foram restaurados byte a byte.
+CONFERIDO por SHA256 do disco contra o que está DENTRO do `.rpk` instalado — `WoD20th.lfm`
+(`5695CF90C9B8`) · `WoD20.1.lfm` (`473CE9BDEF4B`) · `localization.lang` (`77845511E90D`), os 3
+IGUAIS. `rdk -l` regravou o `.rpk` com mtime novo & **o mesmo size**. Instalar seria o install
+desperdiçado de §B103. ⚠ mtime NOVO com conteúdo IGUAL é o estado normal depois de uma rodada de
+mutação — ⊥ ler mtime como "mudou".
+
+---
+
+### ⚑ O QUE A 172ª FECHOU — **5** §T, & elas eram 2 trabalhos diferentes
+
+| §T | o que era | prova |
+|---|---|---|
+| **§T932** `x` | `Road of Heaven` SAI do picker & o `Path of the Prophet/Islam` ENTRA | 3 mutações em §V395 |
+| **§T849** `x` | a AURA — 4 peças em `research/`, **55**/55 conferido por varredura | mapa bate 1:1 c/ o picker |
+| **§T931** `x` | `descRoad_{en,pt}.lua`, **55** chaves × **4** blocos | §V409 nova, 3 pernas, 3 mutações |
+| **§T828** `x` | ⊥ era código: §V359/§V360 **já estavam no gate**, faltava a MUTAÇÃO | **6** mutações |
+| **§T840** `x` | idem §V364/§V362 | **8** mutações (as 6 da linha + as pernas (f) e (g)) |
+
+⚠ **A lição das 2 últimas, & ela vale p/ ∀ `~` que sobrou:** `~` neste projeto ⊥ significa
+"código pela metade" — significa **critério de aceite ⊥ cumprido**, & nas 2 o critério era rodar
+a mutação. Antes de escrever 1 linha numa §T `~`, LER se a régua já ⊥ está em disco.
+
+---
+
+### ⚑ A FILA — **88** abertas, & só **1** é código
+
+| grupo | quantas | o que dá p/ fazer |
+|---|---|---|
+| `teste no Firecast [USER]` + PROBE | **84** | ⊥ daqui. ⚠ **§T153 escreve "testar em Firecast", ⊥ "teste no Firecast"** ∴ grep por 1 frase só devolve 83 & mente sobre o resto |
+| **§T622** | 1 | **CÓDIGO. A única.** A filigrana da vitalidade acompanha a caixa |
+| **§T848** `clan` (61 nomes) · **§T850** `family` (24) | 2 | extração. §T848 roda no pipeline pronto; **§T850 ⊥** — tem `?` de FONTE na própria linha |
+| **§T904** | 1 | fechada em 2 de 3 & o 3º terço era §T876, que está `x` — **conferir se é só virar status** |
+
+**§T622 em 1 frase:** `ornPainted[handle]` passa a guardar `{p, w, h}` & `ornament()` ganha a 3ª
+porta (memo ∃ **&** medida ≠ guardada → recalcula & regrava). `renderHealthTrack`
+(`WoD20th.lfm:1261`) ! chamar a filigrana **DEPOIS** de `box.height = ...` (`:1274`), senão lê a
+altura velha. Pega as **2** caixas pelo PREFIXO (`prefix .. "box"`), ⊥ por nome literal.
+
+---
+
+### ⚑ A LISTA `road` — inteira em disco, & **⊥ editar os `.lua` à mão**
+
+| arquivo | o que é |
+|---|---|
+| `descRoad_en.lua` **79.833 B** · `descRoad_pt.lua` **83.814 B** | **55** chaves idênticas, 4 blocos |
+| `research/gen_road_desc.ps1` | **DETERMINÍSTICO.** Lê 8 `.tsv` + os 2 `.lfm` & reescreve os 2 `.lua` |
+| `research/road_aura_parse.ps1` · `road_sins_parse.ps1` | MÁQUINA. `raw.tsv` de cada um |
+| `road_aura_map.tsv` (55) · `road_sins_map.tsv` (55) | nome do picker → `bid`/`tid`, à mão |
+| `road_aura_overrides.tsv` (9) · `road_sins_overrides.tsv` (17) | o que o parser ⊥ alcança |
+| `road_sins_titles.tsv` (56) · `road_sins_pt.tsv` (483) · `road_aura_pt.tsv` (37) | cabeçalho & metade PT |
+
+Texto errado ⇒ o errado está num `.tsv`: conserta lá & roda `gen_road_desc.ps1`. Ele **conta os
+buracos & fala** — `COMPLETO - nenhum buraco de dado` é a única saída que serve. Receita inteira
+com as 5 armadilhas: `research/README.md`.
+
+⚠ **NINGUÉM VIU A CAIXA NA TELA AINDA.** As 55 nasceram nesta rodada & o gate ⊥ prova pixel. O 1º
+teste em Firecast que valer a pena é `?` na linha `ROAD`: um filho (`Path of the Hunter`, tabela
+fundida de 10 níveis) & a troca de idioma (o `pág.` & a aura em pt).
+
+---
+
+### ⚑ O QUE MUDOU NO GATE NA 172ª — **§V409** nasceu, **§V395** virou roster, **§V408** ganhou `Road`
+
+| régua | mudança | mutação que a acendeu |
+|---|---|---|
+| **§V409** | **NOVA**: FORMA (4 blocos) · FUSÃO mãe→filho · AURA ≡ `BEARING` | tirar 1 nível de filha → `(b) shows 9 level(s) and its mother shows 10` · trocar a aura → `(c) prints 'Faith' and BEARING says 'Trust'` · colar os blocos → `(a) holds 2 block(s)` |
+| **§V395** | `$ROAD_RENAMED` (1 nome) → **`$ROAD_RETIRED`** (roster) + lê `ROAD_RETIRED` do Lua | 3, todas vermelhas |
+| **§V408** | `$DESC_MARKER` ganhou `'Road' = 'ROAD_DESC'` | sem isso: `'Road' has a module on disk and no marker here` |
+
+⚠ **§V409 ⊥ mede COBERTURA de propósito** & o texto dela na SPEC diz isso: §V408 já faz essa
+pergunta, & `Road` deixou de ser isento no minuto em que o `.lua` nasceu. 2ª régua de cobertura
+seria a duplicata que §B137 custou.
+
+⚠ **§V359(b) reporta a MESMA linha 2×** — o gate varre 2 padrões de roster (`MF\.list` e
+`list\s*==`) & os 2 casam. É SUPER-relato, ⊥ defeito passando (≡ §V383(b) de §T876, que também ⊥
+virou §B). Fica registrado p/ quem for mexer ⊥ achar que é bug.
+
+---
+
+### ⚠ AS 2 SONDAS TÊM COLATERAL GRANDE, & ele é CERTO — ⊥ ler como regressão
+
+Quem rodar a mutação de novo vai ver FAIL que ⊥ é da §T:
+
+- **sonda de §T828** (trocar o TEXTO do título): §V360/§V359 ficam **VERDES** & **§V28** acende
+  cobrando o mapa PT da string nova. Régua fazendo o trabalho dela.
+- **sonda de §T840** (trocar a MENSAGEM da frase): §V364 fica **VERDE** & acendem **§V360(c)**,
+  **§V365(c)** & **§V381(c)** — **3** réguas grepam `No description available` literal.
+
+∴ o veredito de uma sonda é sobre a régua da §T, ⊥ sobre o gate inteiro.
+
+---
+
+### ⚠⚠ A PIOR COISA DA 172ª: **3 arquivos da ficha foram APAGADOS** — & o `.rpk` salvou
+
+`Rd` é **ALIAS de `Remove-Item`** & alias VENCE função ∴ `function Rd($p){...}` + `Rd $file`
+deletou `WoD20th.lfm`, `WoD20.6.lfm` & `localization.lang`. **0 erro no log** — o script só disse
+"0 matches" em tudo.
+
+**A cura, & é o achado que vale guardar: o `.rpk` de `output/` é um ZIP & carrega os `.lfm` e o
+`localization.lang` ORIGINAIS**, ⊥ só o compilado.
+
+```powershell
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$z=[IO.Compression.ZipFile]::OpenRead('output\World of Darkness 20th Anniversary Edition.rpk')
+# entradas: WoD20th/<arquivo>.lfm · localization.lang · desc*.lua · module.xml
+```
+
+**Regra daqui p/ frente:** nome de função em `.ps1` ! ter ≥6 letras, & `Get-Command <nome>` !
+devolver `Function`, ⊥ `Alias`. Vira **§B142** na emenda que está na raiz.
+
+---
+
+### ⚠ AS 4 ARMADILHAS NOVAS — as 4 são VALOR ERRADO com LOG VERDE (§I142k)
+
+1. **`$bearing` & `$BEARING` são a MESMA variável** → as 55 entradas saíram com
+   `Aura: System.Collections.Hashtable.`, gerador exit 0.
+2. **`String.StartsWith(string)` é CULTURE-SENSITIVE & `U+FEFF` tem peso ZERO** ∴
+   `"#x".StartsWith([char]0xFEFF)` = **TRUE** & o `Substring(1)` come o `#` do cabeçalho.
+3. **`desc*.lua` é LF & o resto do repo é CRLF** (§V345, §B87) → arquivo MISTO, **192** CRLF.
+4. **`@(@('a','b'))` ACHATA** & `$pair[0]` vira o 1º CARACTERE → um harness mediu **18.254**
+   ocorrências de `"t"` & pulou 5 de 6 mutações. Par de substituição = **hashtable**.
+
+& as 2 de sempre: **`’` (U+2019) fecha string no PS 5.1** (§I142h — mordeu no título
+`Tal’Mahe’Ra`, cura `[char]0x2019`) & **`.ps1` com acento PRECISA de BOM** (§B84 — mordeu **2×**).
+
+---
+
+### ⚑ 8 DEFEITOS DE EXTRAÇÃO no `road_sins_raw.tsv`, & ele estava VERDE
+
+Achados na hora de ENTREGAR. **4** por varredura de FORMA (minúscula colada em MAIÚSCULA · sobra
+depois do ponto final) & **4** só de LER as 483 linhas (rodapé da página · título da tabela
+vizinha · as 2 variantes do `dac` p.84 grudadas). Os 8 estão em `road_sins_overrides.tsv` com o
+motivo. **Contar CARACTERE acha bloco poluído barato:** os limpos ficam entre 90 e 390 &
+`da:129:1` tinha **1.690** com a tabela de pecados inteira dentro.
+
+⚠ **Tabela de FILHA no `da` é de 2 COLUNAS** (sem `Rationale`) ∴ `rationale` vazia nas 6 filhas do
+`da` & no `core` p.312 é o LIVRO, ⊥ buraco. Encher "por simetria" inventaria texto.
+
+---
+
+### ⚑ AS §Q — **5** abertas: §Q53 · §Q54 · §Q55 · §Q56 · §Q57
+
+§Q55/§Q56/§Q57 foram **CONSTRUÍDAS pela recomendação** que já estava registrada nelas, & o user
+confirmou as 3 em 2026-09-03. Trocar de ideia custa **1** `gen_road_desc.ps1`, ⊥ 110 entradas.
+A 4ª decisão (a FORMA do bloco 4) ⊥ tinha §Q & vira **§I141j** na emenda da raiz.
+
+---
+
+## HISTÓRICO — a 172ª rodada (era o COMECE AQUI até a 173ª)
+
+## HISTÓRICO — a 171ª rodada (era o COMECE AQUI até a 172ª)
+
+### ▶ O COMANDO, NESTA ORDEM:
+### **1º** `/ck:spec` colando `HANDOFF-SPEC-AMEND.md` da raiz (9 operações, texto ÚNICO & pronto)
+### **2º** `/ck:build T930` (nasce §V410 no gate — 1 régua, ⊥ toca a ficha)
+### **3º** `/ck:build T849` (`descRoad_{en,pt}.lua`, o mesmo trabalho da 170ª na 3ª lista)
+### ⊥ pedir `--next`: ele varre **91** §T abertas & **83** são TESTE em Firecast [USER] (99ª, 103ª)
+
+**Estado:** gate **VERDE** (`-Build`) · `.rpk` **2.675.160 B** INSTALADO 2026-09-02 20:57:15
+(mesmo size, & ⊥ ∃ arquivo do plugin alterado depois disso) · **NADA commitado**, working tree
+sujo de propósito (regra do projeto: commit só sob pedido direto, `CLAUDE.md`) · **2 arquivos
+NOVOS fora do git**: `research/hedge_ritual_pages.tsv` & `research/hedge_affiliation_pages.tsv`.
+
+⚠ **AVISO DE INSTALL:** o install rodou com o **Firecast ABERTO** (processo medido em execução).
+Se a ficha estava carregada, ela está com o form VELHO na tela e o código NOVO atrás — **fechar
+e reabrir a ficha** é a única cura, e o sintoma se disfarça de bug de código (`CLAUDE.md`).
+
+⚑ **A EMENDA DE SPEC É O 1º PASSO & JÁ ESTÁ ESCRITA.** `HANDOFF-SPEC-AMEND.md` na raiz tem as
+**9** operações num bloco só, com os ids já conferidos livres em disco (**I142 · B140 · B141 ·
+V410 · T930**). As **3** linhas que drifavam (§T929 `21`→`26` · §V408 roster vazio · §B137
+`73`→`78`) **já foram emendadas** em 2026-09-02 — ⊥ refazer. §V410 **⊥ entra sozinha**: §V sem
+check no gate é regra sem executor, & é por isso que §T930 existe & vem logo depois.
+
+---
+
+### ⚑ AS 2 §T DA 170ª ESTÃO FECHADAS — o buraco de texto da Numina ACABOU
+
+| §T | lista | quantos | de onde saiu |
+|---|---|---|---|
+| **§T928** `x` | `hedgeRitual` (caixa `HEDGE MAGIC RITUALS`) | **52** | `M20 Sorcerer` p.21–48 |
+| **§T929** `x` | `hedgeAffiliation` (picker `Affiliation`) | **26** | `sorc` p.79–95 (20) · `sorcc` p.14–19 (5) · `hh` p.117 (1) |
+
+`descNumina_{en,pt}.lua` foram de **50** p/ **128** entradas cada. **⊥ mudou 1 linha de código
+da ficha**: o `?` e os 2 pickers já passavam `'Numina'` p/ `mfOpen` ∴ só faltava DADO.
+
+**§V408 CHEGOU AO ESTADO PARA O QUAL FOI ESCRITA: `$V408_DEBT = @()`.** A forma do roster fica no
+gate (as 2 espécies documentadas), mas ⊥ ∃ mais nenhuma linha a excusar — fechar a §T retirou a
+linha, que é exatamente o que uma DÍVIDA que cita §T serve p/ fazer.
+
+---
+
+### ⚑ **A FONTE DE TEXTO QUE NINGUÉM TINHA ACHADO** — e ela vale p/ §T848 §T849 §T850
+
+O HANDOFF da 170ª mandava extrair dos PDFs. **⊥ precisa.** ∃ um cache de texto já convertido, em
+**3 sabores**, e um deles é o certo:
+
+| pasta em `%TEMP%` | forma | serve? |
+|---|---|---|
+| `wod_books_layout\` | `pdftotext -layout`, **CP1252**, 2 colunas, hifenizado | ⊥ — é o que `research/bg_dump.ps1` lê, e o `·` vira `?` se ler como UTF-8 |
+| **`wod_books_txt\`** | **UTF-8**, 1 parágrafo por linha, `•` `’` `—` corretos, **DES-hifenizado** | **SIM. É esta.** |
+| `wod_books_noenc\` | idem sem encoding | ⊥ |
+
+`[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes("$env:TEMP\wod_books_txt\sorc.txt"))`,
+`-split [char]12` dá as páginas em ordem. Offsets: **`impressa = pdf − offset`**, offset em
+`research/bg_dump.ps1` linha 50 (`sorc`=1, `sorcc`=**0**, `hh`=1, `core`=8).
+
+⚠ Se a pasta sumir, ela é regerável — mas **⊥ reextrair sem olhar antes**: foram 3 tentativas
+de parser nesta rodada até achar que ela já existia pronta.
+
+---
+
+### ⚠ AS 6 ARMADILHAS DESTA RODADA — 3 sobre TEXTO e 3 sobre FERRAMENTA
+
+**1. Ler o gate como ASCII APAGA 14 bytes.** `verify-hunters-hunted.ps1` **⊥ é 100% ASCII**: tem
+**14** bytes UTF-8 em comentário (`§` em 2 linhas de §V408, `⊥` e `⚠` em outras 2).
+`[Text.Encoding]::ASCII.GetString()` troca cada um por `?` **calado**. Patch de byte no gate só
+por **`[Text.Encoding]::GetEncoding(28591)`** (Latin-1 preserva byte a byte) + `WriteAllBytes`.
+Medido: 14 → 0 na 1ª tentativa, revertido do backup.
+
+**2. Junção de parágrafo quebrado tem 3 formas, ⊥ 1.** O livro corta parágrafo na quebra de
+página e a cola automática (`próxima linha começa em minúscula` + `anterior ⊥ fecha com pontuação`)
+pega só a 1ª forma. As outras 2 **⊥ acendem em régua nenhuma** e só aparecem lendo:
+- a cauda começa em MAIÚSCULA: `gathered in Salt` / `Lake City` (Nephite), `slip from the` /
+  `Technocracy` (SEAI);
+- a cauda foi impressa **ANTES** do título pelo `pdftotext` (Society of Leopold, `hh` p.117);
+- e o livro escreve o hífen COM espaço: `pro- gress` (Giovanni).
+**Ler as 26/52 entradas inteiras é parte do trabalho, ⊥ é zelo extra.**
+
+**3. §V34 morde tradução inocente.** `magia menor` / `magias menores` é BANIDO no `.lua` inteiro
+(§B.15: magia estática / mago estático), e ele acendeu 2× em prosa que **⊥ falava** de hedge
+magic ("smaller magics", "hedge magic doesn't offer outlets"). Escrever pt aqui = passar o
+`(?i)(mag(o|a|os|as|ia|ias)|brux(o|a|os|as))\s+menor(es)?` no texto ANTES de rodar o gate.
+
+**4. Chave de picker ⊥ é o título do livro.** `2. Fire's Weal` e `3. Mike's Cure-All` usam
+apóstrofo **RETO** na `PICKER_LIST`, e o livro usa `’`. A chave do `desc*` é a do PICKER
+(byte a byte) — casar pelo livro e gravar pelo livro dá 52 entradas que ⊥ cobrem nada.
+
+**5. Nome com ETH (`ð`) ⊥ cabe no roster ASCII do gate.** `Forn Jafnaðr` entrou em §V335c por
+`[void]$v335Exc.Add('descNumina|Forn Jafna' + [char]0xF0 + 'r')` logo abaixo do array — o `~`
+do roster só resolve `’` (U+2019). Mutação feita: tirar a linha → VERMELHO nos 2 idiomas.
+
+**5b. E `’` (U+2019) é DELIMITADOR DE STRING no PowerShell 5.1.** `'Sorcerer’s Companion'` fecha
+a string no apóstrofo curvo e o resto da linha vira código — 12 erros de parse de uma vez, ao
+emendar a SPEC. Prosa com `’` **⊥ pode morar em literal de `.ps1`**: põe num `.txt` UTF-8 ao lado
+e lê por `ReadAllBytes`. Anda junto com o BOM, mas ⊥ é a mesma coisa: `.ps1` com acento **precisa**
+de BOM (senão o 5.1 lê como ANSI, §B84) e o BOM **⊥ salva** do `’`. Vai morder de novo em §T849 —
+a lista `road` tem nome com apóstrofo curvo.
+
+⚠ E a de sempre, que voltou: **`Set-Location` do PowerShell ⊥ muda o cwd do .NET** —
+`[IO.File]::ReadAllBytes('x.lfm')` resolve contra o diretório do PROCESSO. Caminho ABSOLUTO
+sempre. E em PowerShell **`$paras` e `$PARAS` são a MESMA variável** (case-insensitive): um
+hashtable de config e uma lista de trabalho com o mesmo nome viram um erro de método.
+
+---
+
+### ⚑ O QUE MUDOU NO GATE — 5 réguas, & ∀ uma passou por MUTAÇÃO
+
+| régua | mudança | mutação que a acendeu |
+|---|---|---|
+| **§V32** | `$numinaLists` **2 → 4** (`+hedgeRitual`, `+hedgeAffiliation`) — sem isso as 78 chaves novas viram `orphan` | tirar 1 entrada → `picker offers 'X' but DESC has no entry` |
+| **§V273** | contagem **50 → 102 → 128**; `M20 Sorcerer` **18-76 → 18-95** & `Sorcerer’s Companion` **15-31 → 14-31** (as afiliações são o cap. 3, fora da janela dos númina) | tirar 1 entrada → `holds 127, expected 128` |
+| **§V335** | `descNumina` **50 → 128** & **+78** nomes na lista I104c (o livro imprime rituais & afiliações como PROSA, sem bloco `System`) | tirar 1 perdão → `has a block with no System marker ... and is not on the I104c list`, nos 2 idiomas |
+| **§V408** | roster **VAZIO** (`@()`) | tirar 1 entrada → `offers 1 name(s) that descNumina does not hold ... and the list is on no roster` |
+| **§V34** | ⊥ mudou — mas acendeu 2× em texto pt novo (ver armadilha 3) | — |
+
+---
+
+### ⚑ A PRÓXIMA §T, E POR QUE É ELA: **§T849** (`descRoad_{en,pt}.lua`)
+
+É o MESMO trabalho que acabou de rodar 2×, na 3ª lista, e é a única das 3 de texto que ⊥ tem
+`?` de fonte:
+
+- **§T849 `road`** — **55** nomes (37 mães × 18 filhos). Fonte multi-livro & **os 5 livros ∃ em
+  disco**: `da` · `core` · `bh` · `lotc` · `dac`. A metade MECANISMO **já está pronta**
+  (`popOpen(self, 'Road', ...)` em `WoD20.1.lfm:714` desde §T876) ∴ é **só TEXTO**.
+  ⚠ **§V409 ⊥ EXISTE no gate** (medido: 0 ocorrências) — nasce junto, com a forma de **4 blocos**
+  de §I141 (o 4º é a tabela de pecados, **10** níveis SEMPRE) e a fusão mãe→filho.
+  ⚠ **§Q55 está ABERTA** mas **⊥ bloqueia**: decide só a PÁGINA do bloco 1 (3 candidatas que
+  divergem). Os blocos 2·3·4 saem sem resposta — está escrito na própria §T849.
+  ⚠ Assim que `descRoad_en.lua` tocar o disco, **§V408 cobra os 55 sozinha** (a isenção "kind sem
+  módulo em disco" cai sem ninguém editar régua). Entregar os 55 ou declarar roster.
+- **§T848 `clan`** (61 nomes) & **§T850 `family`** (24) vêm depois: §T850 tem `?` de FONTE
+  declarado na própria linha ("palpite de fonte foi o que §R135 teve de corrigir na 150ª").
+
+**O resto das 91 abertas (CONTADO, ⊥ estimado):** **83** são `teste no Firecast [USER]` (⊥ dá p/
+fazer daqui) e as **8** restantes são as ~: §T153 §T239 §T252 §T421 §T622 §T828 §T840 §T904.
+§T904 está **FECHADA em 2 de 3** e o 3º terço é §T876, que é outra §T.
+
+⚠ **§T690 foi para `x` nesta rodada sem ter sido construída:** ela pedia as 4 metades do
+`hedgeRitual` & 3 já estavam feitas desde 2026-09-01 — a 4ª (`as 52 descrições + o módulo
+descNumina_{en,pt}` na forma de §V210) É §T928. Ficar em `~` era mentira de status.
+
+---
+
+## HISTÓRICO — a 170ª rodada (era o COMECE AQUI até a 171ª)
+
+### ⚑ (era o COMECE AQUI da 170ª) — **⊥ ∃ pedido do user pendente.** Sobravam 2 §T de EXTRAÇÃO
+
+### ▶ O COMANDO: **`/ck:build T928`** (& depois `T929`). ⊥ pedir `--next`: ele varre ~60 linhas
+### de §T de TESTE em Firecast & acha 0 construível (aconteceu na 99ª & na 103ª).
+
+**Estado:** gate **VERDE** (`-Build`) · `.rpk` **2.577.638 B** INSTALADO 2026-09-02 19:53:15
+(mesmo size) · **NADA commitado**, working tree sujo de propósito (regra do projeto: commit só
+sob pedido direto, `CLAUDE.md`) · ⊥ ∃ arquivo novo fora do git.
+
+Os **3** pedidos de 2026-09-02 estão INTEIROS: §I136 (12 itens), §I139 (7) & §I140 (6). ⊥ ∃
+§Q aberta — §Q53 & §Q54 foram respondidas pelo user & estão gravadas.
+
+---
+
+### ⚑ AS 2 §T QUE SOBRAM — as 2 são o MESMO trabalho em 2 listas
+
+| §T | lista | quantos | onde o texto entra |
+|---|---|---|---|
+| **§T928** | `hedgeRitual` (caixa `HEDGE MAGIC RITUALS`, aba Numina) | **52** | `descNumina_{en,pt}.lua` |
+| **§T929** | `hedgeAffiliation` (o picker `Affiliation` da mesma aba) | **26** | `descNumina_{en,pt}.lua` |
+
+**⊥ é módulo novo & ⊥ muda 1 linha de código:** o `?` & o picker das 2 JÁ passam `'Numina'` p/
+`popOpen`/`mfOpen` ∴ `descText` já faz `require("descNumina_<lang>.lua")`. O que falta é DADO.
+
+**De onde sai o texto** (medido — ⊥ ∃ nada disso em `research/`):
+`C:\Users\awlol\OneDrive\Documents\RPG\Storyteller V20\Vampiro\Vampiro - A Máscara\Books\Sorcerer\`
+→ `M20 Sorcerer.pdf` & `Sorcerer_s_Companion.pdf`. **en & pt**, ≡ §T444–446 fizeram.
+
+**Como pegar os 78 nomes** (⊥ contar com `awk`/`grep` — §I140n: as listas são array multi-linha
+& a extração para na 1ª quebra; **o gate já tem o parser**):
+`PICKER_LIST_BEGIN…END` em `WoD20th.lfm`, chaves `["hedgeRitual"]` & `["hedgeAffiliation"]`.
+
+**FORMATO do módulo** — `descNumina_*.lua` usa marcador `-- >>> DESC_BEGIN` / `-- <<< DESC_END`
+(⊥ é `NUMINA_DESC`; os outros 6 módulos usam `<KIND>_DESC` & este é a exceção). Entrada:
+`["Nome"] = { en = [==[texto]==] },`. §V210 cobra PARIDADE en/pt: nome em 1 metade & ⊥ na outra
+avermelha nas 2 direções.
+
+**AO FECHAR:** a linha de DÍVIDA sai de `$V408_DEBT` no gate. **§V408 confere no `SPEC.md` se a
+§T citada segue ABERTA** ∴ marcar §T928 `x` sem o texto avermelha — é a mordida da régua, ⊥ um
+detalhe. Fechar as 2 = `$V408_DEBT = @()`, & aí a varredura fica limpa nos 11 pares.
+
+---
+
+### ⚑ O QUE A 169ª FEZ — 9 §T, 8 §V novas, 3 §V emendadas, 8 §B
+
+**FECHADAS:** §T921 §T922 §T923 §T924 §T925 §T926 §T927 (+ §T915…§T920 na 168ª).
+
+**§V NOVAS:** §V399 (as 3 caixas de `EXPERIENCE`) · §V400 (fundo cobre a caixa) · §V401 (colunas
+do Ghoul 5 sob a banda) · §V402 (`SPECIALTIES` fecha no `y` de `ROAD`) · §V403 (bolinhas de
+`BLOOD POOL`) · §V404 (fundo transparente declara contorno) · §V405 (`Esc`) · §V406 (a banda tem
+**1** dona: `BandTop()`, lida por **7** réguas) · §V408 (varredura lista→módulo).
+**∀ uma passou por MUTAÇÃO em processo separado & ficou VERMELHA.**
+
+**§V EMENDADAS:** §V286(a) (roster de vão por aba: `WoD20.7`=10, `WoD20.11`=10, resto 0 EXATO) ·
+§V353(a) (mede a GARANTIA & ⊥ o endereço — §B138) · §V390 (sujeito vira COLUNA, & ganhou o check
+que nunca teve) · §V393 (roster volta a `VIRTUES`+`ROAD`) · §V405(a) (roster → VARREDURA, §B139).
+
+**§B novos:** §B132 (fundo 10px fora da caixa em 9 lugares, 2 sentidos) · §B133 (vão de 32px que
+§V298 ⊥ vê porque compara IRMÃOS) · §B134 (§V390 nasceu SEM CHECK) · §B135 (§V322(c) lia caixa
+ATRAVÉS do fundo) · §B136 (retângulo sem `strokeColor` ganha o contorno da ERA — moldura de
+1595×936 em todo picker & todo `?`) · §B137 (78 nomes apontando p/ módulo que ⊥ tem 1 deles) ·
+§B138 (régua cobrando LUGAR onde a prosa cobra ORDEM) · §B139 (roster onde cabia varredura).
+
+---
+
+### ⚠ AS 4 ARMADILHAS DESTA RODADA — 3 delas são a MESMA
+
+**1. "Só ∃ N" sem varrer.** §B133, §B137 & §B139 são a mesma forma em 3 fantasias: vão que a
+régua ⊥ via porque comparava irmãos; cobertura aplicada a 1 lista de 12; roster de 2 controles
+num overlay que tem 3. **Quando a frase disser "só ∃ N", VARRER antes de escrever o N.**
+
+**2. Partição tem 2 lados.** Mapeei 4 cópias de `top == 0` & eram **7** — as 3 que faltavam
+escreviam o COMPLEMENTO (`top -gt 0`). Ao varrer partição, procurar `-eq` **&** `-gt`.
+
+**3. Prosa de §V & gate DIVERGEM, & o gate mente mais.** §I139b (§V393) & §B138 (§V353) foram
+isso. **SONDAR ANTES:** aplicar o número & rodar o gate custa 1 minuto & devolve a lista exata.
+
+**4. Régua que lê o PRÓPRIO gate acha a si mesma.** O roster de idiomas mortos de §V406, escrito
+por extenso, casava dentro do próprio array. Montar o needle das partes.
+
+⚠ **FERRAMENTA, & as 3 se repetem:** `sed -n`/`sed -i` do Git Bash **come o CR** — escrever
+`.lfm`/`.md` só por `[System.IO.File]::WriteAllLines(path, arr, UTF8Encoding($false))` (CRLF &
+sem BOM). O `verify-hunters-hunted.ps1` é **ASCII sem BOM**: ⊥ escrever acento nele.
+`Set-Location` do PowerShell **⊥ muda o cwd do .NET** — caminho ABSOLUTO sempre. E `R` é ALIAS
+de `Invoke-History` no PS 5.1: nomear função `Get-Frag`, verbo-substantivo.
+
+---
+
+## HISTÓRICO — a 169ª rodada (era o COMECE AQUI até a 170ª)
+
+### ⚑ ATUALIZAÇÃO — **§T926 FECHADA**. §Q53 respondida pelo user, & ⊥ pela recomendação
+
+O user respondeu §Q53 escolhendo a saída **(b)**, as 2 abas ao pé da letra, & mudou o número:
+**10px & ⊥ 5** ("adicionar **mais** uns 5 px… é uma alteração do que eu tinha dito antes"). Ele
+viu os 44 FAIL medidos na mesa & escolheu pagar a régua p/ ⊥ mexer nas outras 9 abas — §V362(b),
+a régua ⊥ veta escolha informada do dono. **⊥ re-perguntar.**
+
+**Geometria hoje:** Numina banda `0 → 10` (4 caixas) & colunas `136 → 146` · Ghoul banda `0 → 10`
+(3 caixas) & colunas `133 → 143`. Vão banda→coluna segue **5** nos 2. `.rpk` **2.573.914 B**
+INSTALADO 19:05:53.
+
+**§V406 NASCEU** & ⊥ é a que eu tinha reservado: virou a régua de DONA ÚNICA da banda. `BandTop()`
+é a definição, & as **7** leitoras (§V361 §V267 §V390 §V401 §V221 §V225 §V280d) leem dela.
+
+### ⚠ 3 ARMADILHAS NOVAS — as 3 achadas ao construir §T926
+
+1. **Partição tem 2 lados: `-eq 0` & `-gt 0`.** Eu tinha mapeado **4** cópias de `top == 0` & eram
+   **7** — as 3 que faltavam escreviam o COMPLEMENTO (`top -gt 0`) ∴ o `grep` do idioma ⊥ as via.
+   Curadas as 4, o gate caiu de 44 p/ **19**, & as 19 eram elas. Ao varrer uma partição, procurar
+   os **2** lados (§I140r).
+2. **Régua que lê o PRÓPRIO gate acha a si mesma.** O roster de idiomas mortos de §V406, escrito
+   por extenso, casava dentro do próprio array: **4** FAIL, o check nascendo vermelho contra
+   código certo. Cura: montar o needle das partes (`variável` + `operador` + `0`) p/ a frase
+   inteira ⊥ existir no arquivo (§I140s).
+3. **`regex` de banda pega os boxes INTERNOS das colunas.** No Ghoul, `left="(0|665|1075)" top="0"`
+   casou **6** & ⊥ 3: desde §T918 os internos moram em `left="0" top="0"`. Separados pela
+   INDENTAÇÃO — banda = 2 tabs, interno = 3. Em `.lfm` de tabs, profundidade é dado (§I140t).
+
+⚠ & 1 que anda junto & ⊥ estava prevista: `noteHedgePaths` (`WoD20.7.lfm:593`) **692 → 702**. É
+caption FORA da caixa (§I134d) ∴ ⊥ segue o pai, & §V300 cobra `nota.top ≥ caixa.bottom`.
+
+---
+
+### ▶ O COMANDO: **`/ck:build --next`** — mas leia as 2 §Q antes: **§Q53 trava §T926.**
+
+3º pedido de 2026-09-02 (§I140, 6 itens): **§T921 §T924 §T925 §T927** `x`. Gate VERDE (`-Build`),
+`.rpk` **2.573.891 B** INSTALADO 18:42:57 (mesmo size). **NADA commitado.**
+
+⚠ **AVISO DE INSTALL:** rodou com o Firecast possivelmente ABERTO — se a ficha estava carregada,
+**fechar & reabrir**, senão o form velho fica na tela com o código novo atrás.
+
+### ⚑ O QUE SOBROU — ⊥ é fila, é bloqueio. **§T926 saiu desta lista: FECHADA, ver abaixo**
+
+| §T | item | bloqueio |
+|---|---|---|
+| **§T922** | 2 (`Esc`) | **teste no Firecast**, ⊥ dá p/ fazer daqui. Responde §R138 & BLOQUEIA §T923 |
+| §T923 | 2 (`Esc`) | §T922 |
+| **§T926** | 3 (5px) | **§Q53** — as 11 abas por 1 nó, ou as 2 por 1 rodada de régua? |
+| §T928 | 6 (texto) | extração de PDF: **52** rituais hedge, en & pt, de `Sorcerer/` |
+| §T929 | 6 (texto) | idem, **26** confrarias. Gêmea de §T928 — 1 varredura serve p/ as 2 |
+
+### ⚑ AS 2 §Q ABERTAS — as 2 c/ recomendação escrita
+
+- **§Q53 (trava §T926):** 5px acima da 1ª fileira. SONDADO: escrito nas 2 abas = **44 FAIL**, porque
+  §V286(a) cobra `min(top)` = **0** EXATO & `top == 0` É a partição banda/coluna em **4** réguas.
+  **RECOMENDO (a)**: `<layout align="top" height="5">` no raiz → 11 abas, **0** régua tocada.
+- **§Q54 (⊥ trava nada):** "blood magic rituals" = a caixa da **Numina** (`hedgeRitual`, 52/52 sem
+  descrição). Os do Ghoul (`ritual`) são **284/284** cobertos. Já segui por essa leitura.
+
+### ⚑ O QUE A 169ª FEZ — 4 §T, 4 §V novas, 2 §B, & 1 §T que nasceu ao construir
+
+**§V NOVAS:** §V403 (bloco de `BLOOD POOL` centrado, passo 30) · §V404 (fundo transparente
+DECLARA o próprio contorno) · §V407 (`clanFamily` é a exceção nomeada ao `?`) · §V408 (a varredura
+lista→módulo). **∀ uma mutada & VERMELHA**, §V407 & §V408 em 2 mutações cada, 1 por perna.
+
+**§V406 fica RESERVADA** — ela só nasce se §Q53 for pela saída (a). ⊥ é buraco de contagem.
+
+**§B novos:** **§B136** (retângulo sem `strokeColor` ganha o contorno da ERA — no `popScrim` isso
+era moldura de **1595×936** por cima da ficha, acesa em todo picker & todo `?`: 1 causa, os 2
+sintomas) · **§B137** (**78** nomes apontavam p/ um módulo que ⊥ tem 1 deles, gate verde).
+
+**§T929 NASCEU ao construir §T927** (§I140m): o roster de §V408 tem 2 espécies de linha, & pôr
+`hedgeAffiliation` como `⊥ TEXTO` era MENTIRA — o livro descreve as 26. Virou `DÍVIDA` & dívida
+! citar §T aberta ∴ a §T teve de existir. **§V408 confere no `SPEC.md` se a §T citada segue `.`**
+— fechar §T928 sem o texto avermelha (mutação feita).
+
+### ⚠ 3 COISAS QUE CUSTARAM EXECUÇÃO — & 1 delas é sobre CONTAR
+
+1. **⊥ contar artefato do repo com `awk`/`grep` quando o gate já tem o parser.** Os números de
+   §I140j saíram baixos (`hedgeAffiliation` 21 em vez de **26**, `ritual` 281 em vez de **284**):
+   as listas são ARRAY multi-linha & a extração parava na 1ª quebra. `$PICKER` do gate já resolve
+   alias & união. Corrigido em §I140n (§B70, §B112).
+2. **Container de coluna É caixa** (herdado da 168ª & repetido aqui): §V40/§V221/§V361(d) medem o
+   retângulo da COLUNA, ⊥ o 1º box dentro dela.
+3. **`Set-Location` do PowerShell ⊥ muda o cwd do .NET.** `[System.IO.File]::ReadAllBytes('x.md')`
+   resolve contra o diretório do PROCESSO — usar caminho ABSOLUTO sempre.
+
+⚠ & 1 que ⊥ é armadilha, é dívida ANOTADA: **§V408 encosta em §V177 & §V366** (§I140o). A mutação
+acendeu as 2 juntas. ⊥ pagar numa rodada em que o user pediu outra coisa — está escrito lá.
+
+---
+
+## HISTÓRICO — a 168ª rodada (era o COMECE AQUI até a 169ª)
+
+### ▶ O COMANDO: **`/ck:build --next`**. ⊥ ∃ fila obrigatória — mas ∃ **3 perguntas** p/ o user.
+
+O **2º pedido de 2026-09-02** (§I139, 7 itens) está INTEIRO: §T915…§T920 todas `x`, gate VERDE
+(`-Build`), `.rpk` **2.573.725 B** INSTALADO 17:01:53 (mesmo size). **NADA commitado** —
+working tree sujo de propósito (regra do projeto: commit só sob pedido direto).
+
+⚠ **AVISO DE INSTALL:** o install rodou com o Firecast possivelmente ABERTO. Se a ficha estava
+carregada, ela está com o form VELHO na tela & o código NOVO atrás — **fechar & reabrir a ficha**
+é a única cura, & o sintoma se disfarça de bug de código (regra do `CLAUDE.md`).
+
+### ⚑ AS 3 §Q ABERTAS — as 3 têm RECOMENDAÇÃO escrita & ⊥ bloqueiam nada
+
+| § | pergunta em 1 linha | recomendação |
+|---|---|---|
+| **§Q50** | quanto o rótulo de `ROAD` cresce p/ `CAMINHO` caber? | **65/176** ENTREGUE — medir na tela; se cortar, +10/−10 |
+| **§Q51** | o item 3 (`TRUE FAITH` centrado) é eixo X ou Y? | **X** ENTREGUE (o buraco de 45px do rótulo); Y é +1 número |
+| **§Q52** | "final do bloco de XP alinhado com `RITUALS`" = direita ou baixo? | **direita (1408)** ENTREGUE |
+
+As 3 foram ENTREGUES pela recomendação — se o user discordar de qualquer uma, é 1 número, ⊥ 1 §T.
+
+### ⚑ O QUE A 168ª FEZ — 6 §T, 4 §V novas, 2 §V emendadas, 4 §B
+
+**FECHADAS:** §T915 (item 1) · §T916 (2) · §T917 (5) · §T918 (4) · §T919 (6) · §T920 (3 & 7).
+
+**§V NOVAS:** §V399 (as 3 caixas de `EXPERIENCE`: 1 `edit`, ⊥ rótulo, centrado sob o título) ·
+§V400 (o fundo cobre a caixa EXATAMENTE) · §V401 (as 3 colunas do Ghoul abrem 5 sob a banda) ·
+§V402 (`SPECIALTIES` fecha no `y` de `ROAD`). **∀ uma passou por MUTAÇÃO & ficou VERMELHA.**
+
+**§V EMENDADAS:** §V393 (roster volta a `VIRTUES`+`ROAD`) · §V390 (sujeito vira COLUNA, ⊥ banda,
+& ela **GANHOU O CHECK que nunca teve**).
+
+**§B novos:**
+
+| § | em 1 linha |
+|---|---|
+| **§B132** | fundo 10px fora da caixa em **9** lugares (⊥ 5) & em 2 SENTIDOS — nenhuma régua olhava p/ fundo |
+| **§B133** | vão de 32px onde o padrão é 5, & §V298 ⊥ viu porque compara IRMÃOS & a caixa é NETA |
+| **§B134** | §V390 nasceu SEM CHECK & a prosa dela AFIRMA um |
+| **§B135** | §V322(c) lia dimensão de caixa ATRAVÉS do fundo — 9 de 67 — & foi a **0** quando o fundo virou `align="client"` |
+
+### ⚠ 4 COISAS QUE CUSTARAM EXECUÇÃO NESTA RODADA — as 4 são de LEITURA, ⊥ de escrita
+
+1. **A prosa de §V & o gate DIVERGEM, & a prosa mente mais.** §I139b escreveu "§V393 exime
+   `SPECIALTIES`" lendo a §V; o gate a tinha no roster desde §T908. **SONDAR ANTES:** aplicar o
+   número & rodar o gate custa 1 minuto & devolve a lista exata (§B125 de novo).
+2. **Container de coluna É caixa.** `top="113"` no Ghoul deu **6** FAIL (§V40 ×4, §V221, §V361d):
+   o retângulo medido é o da COLUNA, ⊥ o do 1º box dentro dela. O certo é `133` + internos em `0`.
+3. **⊥ pôr nome no roster Lua antes do widget existir.** Eu pus `edtCurrentXPNumina` em `XP_BOXES`
+   na §T919 & tirei: nome no roster sem widget é o órfão de §B111/§B123, & ⊥ faz barulho.
+4. **`R` é ALIAS de `Invoke-History` no PS 5.1.** Uma função `function R($f)` ⊥ sobrepõe o alias &
+   as 4 chamadas viraram erro — 2 edits saíram vazios. Nomear `Get-Frag`, verbo-substantivo.
+
+⚠ & 1 de FERRAMENTA que se repete: **`sed -n` do Git Bash come o CR** — a 1ª emenda do `SPEC.md`
+saiu inteira em LF & teve de ser refeita em PowerShell c/ `[System.IO.File]::WriteAllLines`
+(`UTF8Encoding($false)` → CRLF & sem BOM). O `verify-hunters-hunted.ps1` é **ASCII sem BOM**:
+⊥ escrever acento nele.
+
+---
+
+## HISTÓRICO — a 167ª rodada (era o COMECE AQUI até a 168ª)
+
+### ▶ O COMANDO: **`/ck:build --next`**. ⊥ ∃ fila obrigatória — o que sobra é escolha.
+
+O pedido de **12 itens de 2026-09-02** (§I134) está INTEIRO, & as **3** decisões que ele abriu
+(§Q44 §Q45 §Q46) mais as **2** de `road`/`clanFamily` foram respondidas pelo user & gravadas.
+**⊥ ∃ pergunta aberta.** Gate VERDE (`-Build`), `.rpk` INSTALADO, working tree SUJO de propósito.
+
+**Estado:** gate **VERDE — 0 FAIL** · §T **29 `x` vivas · 86 `.` · 9 `~`** · `.rpk` **2.611.569 B**,
+INSTALADO 09:57:38 (mesmo size, mesmo mtime) · último commit **`17df132c`** · **NADA commitado**.
+
+### ⚑ O QUE A ONDA 5 FECHOU, & por que isso importa p/ a próxima rodada
+
+**§T836 fechou** & com ela as **5** ondas de §I113e. A régua de §I131f deixou de ser promessa &
+virou CONTAGEM: restam **9** `comboBox` na ficha & são exatamente os previstos — os **7** de
+§V356 + `cboHedgeAttr` (exceção nomeada de §Q31) + `cboClan` **ADORMECIDO**.
+
+⚠ **`cboClan` é o único dropdown de prosa que sobra, & acordá-lo é DECISÃO do dono** (§I131e,
+§V173) — ⊥ é conversão pendente. Ele é o campo `clan` da Main, que ninguém escreve hoje.
+
+### ⚑ `clanFamily` — o que o user decidiu, & o que ⊥ decidir de novo
+
+**⊥ vai ser partido em 2 campos.** Ele CONTINUA oferecendo clã **ou** família ao jogador, ≡
+sempre ofereceu. A separação que o user quer preservada é a das LISTAS, & ela JÁ é lei:
+`PICKER_LIST["clan"]` (61) & `["family"]` (24) são disjuntas, §V211(c) proíbe fundi-las & §V294
+guarda a região da união. **§T907 nasceu & morreu no mesmo dia** por leitura errada minha —
+§B126 é a lição, & a regra que fica: pedido que nomeia RELAÇÃO ("separados", "iguais",
+"alinhados") ⊥ vira §T antes de a SUPERFÍCIE (lista? campo? tela?) estar escrita.
+
+### ⚑ `road` — 3 coisas que ⊥ são intuitivas & que o gate agora cobra
+
+1. **⊥ tem item vazio.** É o ÚNICO picker da ficha assim (§V328c, §V15). Personagem sem estrada
+   ESTÁ numa estrada.
+2. **`-- Remove --` ⊥ APAGA: devolve a `Path of Humanity`** (§I135d, §V369a). O ramo mora em
+   `mfRemove` & o valor vem de `ROAD_DEFAULT`, a mesma constante que a migração usa.
+3. **`Humanity` foi RENOMEADO p/ `Path of Humanity`** (§T906) & ficha velha migra na carga, 1
+   escrita (§V395). ⚠ `wod.Humanity` SEGUE viva no `.lang` & isso é CERTO: `Humanity` é também o
+   nome do TRAÇO de 10 pontos, que o log de XP mostra. Renomear por grep apagaria a chave dele.
+
+---
+
+### O QUE A 165ª/166ª FIZERAM — 13 §T, 8 §V novas, 17 réguas emendadas, 3 §B
+
+**FECHADAS:** §T895 §T896 §T897 §T898 §T899 §T900 §T901 §T902 §T903 §T905 §T906 §T876 §T836
+§T851 & §T907 (as 2 canceladas). **`~`:** §T904 (2 de 3 — a metade picker virou §T876 & caiu lá).
+
+**§V NOVAS:** §V389 (altura do `popScrim`) · §V390 (1 width p/ Numina & Ghoul) · §V391 (⊥
+`scrollBox` em `scrollBox`) · §V392 (as 4 pernas da Traits) · §V393 (a pilha da Main) · §V394
+(`TRUE FAITH` centrado) · §V395 (migração de valor renomeado). **∀ uma passou por MUTAÇÃO em
+processo FILHO** (§V20, §B120) — & **2** delas passaram verde na 1ª escrita & só a mutação
+mostrou (§V395 & a exceção do road em §V369a).
+
+**§B novos:**
+
+| § | em 1 linha |
+|---|---|
+| **§B124** | `popScrim` cobria a LARGURA da aba mais larga & ⊥ a ALTURA da mais alta — 195px da Main ⊥ fechavam o overlay, c/ o gate VERDE |
+| **§B125** | linha de §I escrita c/ o número de saída decidido SEM abrir as 2 §V que governam aquele número |
+| **§B126** | "X & Y são coisas SEPARADAS" ⊥ diz QUAL superfície separa & eu escolhi a mais cara das 3 sem perguntar |
+
+### ⚠ 4 ARMADILHAS QUE CUSTARAM EXECUÇÃO — as 4 são de FERRAMENTA, ⊥ de desenho
+
+1. **`.ps1` de patch com acento ! ser gravado c/ BOM** (`UTF8Encoding($true)`). Sem BOM o PS 5.1
+   lê como ANSI & o `&` do texto vira OPERADOR: erro de PARSE.
+2. **Here-string do Claude chega em LF & o `.lfm` é CRLF** ∴ âncora multi-linha casa **0**.
+   Normalizar SEMPRE: `$a = $a -replace "\r?\n", "\r\n"` antes de comparar. ⚠ & o INVERSO vale p/
+   `localization.lang`, que é **LF** — normalizar lá QUEBRA a âncora.
+3. **`sed -i` come o CR do arquivo INTEIRO** (§B74). §V318 pega, mas depois do estrago.
+4. **Mutação MAL CONSTRUÍDA acusa a RÉGUA no lugar do teste.** Conferir a CONTAGEM de trocas
+   antes de gravar, & usar âncora de linha (`(?m)^\t<tag …>\r?$`).
+
+⚠ & 1 de LEITURA: `Get-Item` devolve `FileInfo` PREGUIÇOSO — ler `.Length` DEPOIS do build
+devolve o valor NOVO & o "antes/depois" mente. Guardar o número ANTES de compilar.
+
+---
+## HISTÓRICO — o que a 164ª/163ª e anteriores fizeram (íntegro abaixo)
 
 ## HISTÓRICO — o que a 161ª FEZ (as 2 §T saíram dela em `~`, por motivos DIFERENTES)
 

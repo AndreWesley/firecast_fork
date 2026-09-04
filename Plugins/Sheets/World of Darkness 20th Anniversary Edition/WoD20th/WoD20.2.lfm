@@ -7,12 +7,23 @@
 			Traits grid (SPEC T45). Numina moved to the Powers tab, so merits/flaws and
 			derangements moved up into the space they left. Everything closes on x=1670.
 
-			  BACKGROUNDS 0..364                                          y   0..693
-			  MERITS 369..905    ALLIES 910..1135   MENTOR 1140..1365      y   0..153
-			                     RESOURCES 910..    GUIDES 1140..          y 158..311
-			                                        DERANGEMENTS 1370..1595  y 0..311
-			  FLAWS 369..905     CONTACTS 910..  FAME 1140..  ARTIFACTS 1370..   y 341..502
-			                     INFLUENCE 910.. BASE OF OP 1140..  OTHER 1370..  y 507..693
+			  BACKGROUNDS 0..364                                          y   0..695
+			  MERITS 369..905  y 0..345      ALLIES 910..1135   MENTOR 1140..1365      y   0..170
+			                                 RESOURCES 910..    GUIDES 1140..          y 175..345
+			                                 DERANGEMENTS 1370..1595                    y   0..345
+			  FLAWS 369..905   y 350..695    CONTACTS 910..  FAME 1140..  ARTIFACTS 1370..  y 350..520
+			                                 INFLUENCE 910.. BASE OF OP 1140..  OTHER 1370.. y 525..695
+
+			2026-09-02, T901 and T902 (SPEC I134j, I134k): MERITS and FLAWS are ONE height and FLAWS
+			closes where BACKGROUNDS closes; every box right of them is ONE height with DERANGEMENTS
+			the single exception; and all three right-hand columns end on that same line. Three
+			closing lines for the whole tab - 345, 520, 695 - where there used to be six.
+
+			The floor went 693 -> 695 and that is ARITHMETIC, not taste, which is why 2px show up in
+			a round that changed no content: MERITS = FLAWS closing on BACKGROUNDS wants 2h+5 = floor,
+			and the ten right-hand boxes on one height want 4h+15 = floor. At 693 the second gives
+			169.5. At 695 they give 345 and 170, both whole. BACKGROUNDS pays for it in FOOT - its
+			last row still closes at 666, so the margin goes 27 -> 29 and no row moves.
 
 			125th round, on the user's ask: FLAWS dropped under MERITS and ALLIES / MENTOR /
 			RESOURCES / GUIDES rose into the hole it left, and DERANGEMENTS did not move. Their
@@ -39,7 +50,7 @@
 			because the longest asks 240 (SPEC V196, I107a4). The 20 the name gives back on its
 			left is the column the ? button of I102b will stand in.
 
-			The right block closes on 693 with BACKGROUNDS, which is what V289 measures - it used
+			The right block closes on 695 with BACKGROUNDS, which is what V289 measures - it used
 			to name RESOURCES and now names OTHER, because RESOURCES went up into the hole. V290b
 			was re-aimed the same way: Merit/Flaw, MENTOR/FAME and DERANGEMENTS/ARTIFACTS are the
 			pairs standing over each other now.
@@ -57,7 +68,8 @@
 			merit_m0 / merit_f0 and NOT a renumbering: renaming m1..m10 would drop what every
 			saved sheet already holds (SPEC V2), so the new row takes the number BEFORE the
 			first one and the ten keep theirs. Each table went 311 -> 336 and FLAWS fell the 25
-			MERITS took, keeping the 5px gap V298 rules; the column closes on 677 of 693.
+			MERITS took, keeping the 5px gap V298 rules. T901 took the pair to 345 each and the column
+			closes on 695 now, exactly where BACKGROUNDS does - the 18px of slack it used to leave under FLAWS is what the user asked to spend.
 		-->
 		<!--
 			Two templates where there was one (SPEC I100a, T756), and the picked half carries the
@@ -132,239 +144,239 @@
 		     The row count lives in BACKGROUND_ROWS on the root form (SPEC V145). A row added
 		     here and nowhere else would be a background nothing prices: free, and invisible
 		     in the log. -->
-		<layout left="0" top="0" width="364" height="693">
+		<layout left="0" top="0" width="364" height="679">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="324" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
+			<label left="20" top="15" width="324" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
 
-			<layout left="20" top="41" width="320" height="25" >
+			<layout left="20" top="36" width="320" height="25" >
 				<OpenAbility field="background_1"/>
 			</layout>
-			<layout left="20" top="71" width="320" height="25" >
+			<layout left="20" top="66" width="320" height="25" >
 				<OpenAbility field="background_2"/>
 			</layout>
-			<layout left="20" top="101" width="320" height="25" >
+			<layout left="20" top="96" width="320" height="25" >
 				<OpenAbility field="background_3"/>
 			</layout>
-			<layout left="20" top="131" width="320" height="25" >
+			<layout left="20" top="126" width="320" height="25" >
 				<OpenAbility field="background_4"/>
 			</layout>
-			<layout left="20" top="161" width="320" height="25" >
+			<layout left="20" top="156" width="320" height="25" >
 				<OpenAbility field="background_5"/>
 			</layout>
-			<layout left="20" top="191" width="320" height="25" >
+			<layout left="20" top="186" width="320" height="25" >
 				<OpenAbility field="background_6"/>
 			</layout>
-			<layout left="20" top="221" width="320" height="25" >
+			<layout left="20" top="216" width="320" height="25" >
 				<OpenAbility field="background_7"/>
 			</layout>
-			<layout left="20" top="251" width="320" height="25" >
+			<layout left="20" top="246" width="320" height="25" >
 				<OpenAbility field="background_8"/>
 			</layout>
-			<layout left="20" top="281" width="320" height="25" >
+			<layout left="20" top="276" width="320" height="25" >
 				<OpenAbility field="background_9"/>
 			</layout>
-			<layout left="20" top="311" width="320" height="25" >
+			<layout left="20" top="306" width="320" height="25" >
 				<OpenAbility field="background_10"/>
 			</layout>
-			<layout left="20" top="341" width="320" height="25" >
+			<layout left="20" top="336" width="320" height="25" >
 				<OpenAbility field="background_11"/>
 			</layout>
-			<layout left="20" top="371" width="320" height="25" >
+			<layout left="20" top="366" width="320" height="25" >
 				<OpenAbility field="background_12"/>
 			</layout>
-			<layout left="20" top="401" width="320" height="25" >
+			<layout left="20" top="396" width="320" height="25" >
 				<OpenAbility field="background_13"/>
 			</layout>
-			<layout left="20" top="431" width="320" height="25" >
+			<layout left="20" top="426" width="320" height="25" >
 				<OpenAbility field="background_14"/>
 			</layout>
-			<layout left="20" top="461" width="320" height="25" >
+			<layout left="20" top="456" width="320" height="25" >
 				<OpenAbility field="background_15"/>
 			</layout>
-			<layout left="20" top="491" width="320" height="25" >
+			<layout left="20" top="486" width="320" height="25" >
 				<OpenAbility field="background_16"/>
 			</layout>
-			<layout left="20" top="521" width="320" height="25" >
+			<layout left="20" top="516" width="320" height="25" >
 				<OpenAbility field="background_17"/>
 			</layout>
-			<layout left="20" top="551" width="320" height="25" >
+			<layout left="20" top="546" width="320" height="25" >
 				<OpenAbility field="background_18"/>
 			</layout>
-			<layout left="20" top="581" width="320" height="25" >
+			<layout left="20" top="576" width="320" height="25" >
 				<OpenAbility field="background_19"/>
 			</layout>
-			<layout left="20" top="611" width="320" height="25" >
+			<layout left="20" top="606" width="320" height="25" >
 				<OpenAbility field="background_20"/>
 			</layout>
-			<layout left="20" top="641" width="320" height="25" >
+			<layout left="20" top="636" width="320" height="25" >
 				<OpenAbility field="background_21"/>
 			</layout>
 		</layout>
 
-		<layout left="369" top="0" width="536" height="336">
+		<layout left="369" top="0" width="536" height="337">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="40" top="20" width="264" height="20" text="Merit" horzTextAlign="center"/>
-			<label left="304" top="20" width="117" height="20" text="Book" horzTextAlign="center"/>
+			<label left="40" top="15" width="264" height="20" text="Merit" horzTextAlign="center"/>
+			<label left="304" top="15" width="117" height="20" text="Book" horzTextAlign="center"/>
 			<!-- Column renamed to Page on request. The field is still type_* : renaming a
 			     field drops what is already saved in existing sheets (SPEC V2). -->
-			<label left="421" top="20" width="45" height="20" text="Page" horzTextAlign="center"/>
-			<label left="466" top="20" width="50" height="20" text="Cost" horzTextAlign="center"/>
+			<label left="421" top="15" width="45" height="20" text="Page" horzTextAlign="center"/>
+			<label left="466" top="15" width="50" height="20" text="Cost" horzTextAlign="center"/>
 
-			<layout left="20" top="41" width="496" height="25" >
+			<layout left="20" top="36" width="496" height="25" >
 				<MeritPicked sub="merit" num="m0" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="66" width="496" height="25" >
+			<layout left="20" top="61" width="496" height="25" >
 				<MeritPicked sub="merit" num="m1" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="91" width="496" height="25" >
+			<layout left="20" top="86" width="496" height="25" >
 				<MeritPicked sub="merit" num="m2" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="116" width="496" height="25" >
+			<layout left="20" top="111" width="496" height="25" >
 				<MeritPicked sub="merit" num="m3" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="141" width="496" height="25" >
+			<layout left="20" top="136" width="496" height="25" >
 				<MeritPicked sub="merit" num="m4" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="166" width="496" height="25" >
+			<layout left="20" top="161" width="496" height="25" >
 				<MeritPicked sub="merit" num="m5" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="191" width="496" height="25" >
+			<layout left="20" top="186" width="496" height="25" >
 				<MeritPicked sub="merit" num="m6" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="216" width="496" height="25" >
+			<layout left="20" top="211" width="496" height="25" >
 				<MeritPicked sub="merit" num="m7" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="241" width="496" height="25" >
+			<layout left="20" top="236" width="496" height="25" >
 				<MeritPicked sub="merit" num="m8" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="266" width="496" height="25" >
+			<layout left="20" top="261" width="496" height="25" >
 				<MeritPicked sub="merit" num="m9" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="291" width="496" height="25" >
+			<layout left="20" top="286" width="496" height="25" >
 				<MeritPicked sub="merit" num="m10" lbl="Select Merit"/>
 			</layout>
 		</layout>
 
-		<layout left="369" top="341" width="536" height="336">
+		<layout left="369" top="342" width="536" height="337">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="40" top="20" width="264" height="20" text="Flaw" horzTextAlign="center"/>
-			<label left="304" top="20" width="117" height="20" text="Book" horzTextAlign="center"/>
-			<label left="421" top="20" width="45" height="20" text="Page" horzTextAlign="center"/>
-			<label left="466" top="20" width="50" height="20" text="Cost" horzTextAlign="center"/>
+			<label left="40" top="15" width="264" height="20" text="Flaw" horzTextAlign="center"/>
+			<label left="304" top="15" width="117" height="20" text="Book" horzTextAlign="center"/>
+			<label left="421" top="15" width="45" height="20" text="Page" horzTextAlign="center"/>
+			<label left="466" top="15" width="50" height="20" text="Cost" horzTextAlign="center"/>
 
-			<layout left="20" top="41" width="496" height="25" >
+			<layout left="20" top="36" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f0" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="66" width="496" height="25" >
+			<layout left="20" top="61" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f1" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="91" width="496" height="25" >
+			<layout left="20" top="86" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f2" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="116" width="496" height="25" >
+			<layout left="20" top="111" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f3" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="141" width="496" height="25" >
+			<layout left="20" top="136" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f4" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="166" width="496" height="25" >
+			<layout left="20" top="161" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f5" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="191" width="496" height="25" >
+			<layout left="20" top="186" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f6" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="216" width="496" height="25" >
+			<layout left="20" top="211" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f7" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="241" width="496" height="25" >
+			<layout left="20" top="236" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f8" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="266" width="496" height="25" >
+			<layout left="20" top="261" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f9" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="291" width="496" height="25" >
+			<layout left="20" top="286" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f10" lbl="Select Flaw"/>
 			</layout>
 		</layout>
 
-		<layout left="1370" top="0" width="225" height="311">
+		<layout left="1370" top="0" width="225" height="337">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="DERANGEMENTS" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="DERANGEMENTS" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="250" field="derangements"/>
+			<textEditor left="35" top="36" width="155" height="284" field="derangements"/>
 		</layout>
 
-		<layout left="910" top="0" width="225" height="153">
+		<layout left="910" top="0" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="ALLIES" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="ALLIES" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="92" field="allies"/>
+			<textEditor left="35" top="36" width="155" height="109" field="allies"/>
 		</layout>
 
-		<layout left="1140" top="0" width="225" height="153">
+		<layout left="1140" top="0" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="MENTOR" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="MENTOR" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="92" field="mentor"/>
+			<textEditor left="35" top="36" width="155" height="109" field="mentor"/>
 		</layout>
 
-		<layout left="910" top="316" width="225" height="186">
+		<layout left="910" top="342" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="CONTACTS" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="CONTACTS" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="125" field="contacts"/>
+			<textEditor left="35" top="36" width="155" height="109" field="contacts"/>
 		</layout>
 
-		<layout left="1140" top="316" width="225" height="186">
+		<layout left="1140" top="342" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="FAME" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="FAME" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="125" field="fame"/>
+			<textEditor left="35" top="36" width="155" height="109" field="fame"/>
 		</layout>
 
-		<layout left="1140" top="507" width="225" height="186">
+		<layout left="1140" top="513" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="BASE OF OPERATIONS" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="BASE OF OPERATIONS" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="125" field="baseOfOperation"/>
+			<textEditor left="35" top="36" width="155" height="109" field="baseOfOperation"/>
 		</layout>
 
-		<layout left="910" top="158" width="225" height="153">
+		<layout left="910" top="171" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="RESOURCES" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="RESOURCES" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="92" field="resources"/>
+			<textEditor left="35" top="36" width="155" height="109" field="resources"/>
 		</layout>
 
-		<layout left="1140" top="158" width="225" height="153">
+		<layout left="1140" top="171" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- Retainers was renamed to Guides on request. The field is still `retainers`:
 			     renaming it would drop what is already saved in existing sheets (SPEC V2). -->
-			<label left="20" top="20" width="185" height="20" text="GUIDES" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="GUIDES" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="92" field="retainers"/>
+			<textEditor left="35" top="36" width="155" height="109" field="retainers"/>
 		</layout>
 
-		<layout left="1370" top="316" width="225" height="186">
+		<layout left="1370" top="342" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="ARTIFACTS" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="ARTIFACTS" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="125" field="status"/>
+			<textEditor left="35" top="36" width="155" height="109" field="status"/>
 		</layout>
 
-		<layout left="910" top="507" width="225" height="186">
+		<layout left="910" top="513" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="INFLUENCE" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="INFLUENCE" horzTextAlign="center"/>
 
-			<textEditor left="35" top="41" width="155" height="125" field="influence"/>
+			<textEditor left="35" top="36" width="155" height="109" field="influence"/>
 		</layout>
 
-		<layout left="1370" top="507" width="225" height="186">
+		<layout left="1370" top="513" width="225" height="166">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="185" height="20" text="OTHER" horzTextAlign="center"/>
+			<label left="20" top="15" width="185" height="20" text="OTHER" horzTextAlign="center"/>
 
 			<!-- ponytail: the plain "other" field name is already owned by WoD20.3.lfm sheet-wide; renamed to bgOther per SPEC V1 -->
-			<textEditor left="35" top="41" width="155" height="125" field="bgOther"/>
+			<textEditor left="35" top="36" width="155" height="109" field="bgOther"/>
 		</layout>
 
 	</scrollBox>

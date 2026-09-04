@@ -28,6 +28,52 @@ $fail   = 0
 function Fail($msg) { Write-Host "FAIL  $msg"; $script:fail++ }
 function Pass($msg) { if (-not $Quiet) { Write-Host "ok    $msg" } }
 function Doc($path) { $x = New-Object System.Xml.XmlDocument; $x.LoadXml([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($path))); $x }
+# The container that holds a form's section boxes. It was spelled <scrollBox> in every
+# collector until T895 took the scrollBox out of the three Ghoul columns: they are imported
+# INTO WoD20.11's own scrollBox, and a scrollBox inside a scrollBox is the frame the user
+# asked to remove (SPEC V391, I134c). NOT ONE BOX MOVED - only the tag around them changed -
+# so a collector that asks for a TAG NAME reports "declares no top-level layout" about a file
+# whose layouts are all still there. What it has to ask for is the ROOT (SPEC V20: read the
+# real artifact, not one spelling of it).
+# What a COLUMN of the Ghoul or Numina tab calls itself (SPEC V361a, V221, V225, V280d, B70).
+# A column that carries its own title IS the section box; a column that carries boxes answers to
+# the first of them. One reader for both tabs, declared here with the other document helpers
+# because every caller of it runs before V361, where it used to live (T909).
+# The internal margin of a section box, and it is TWO numbers since T913 (SPEC V280a, I137c,
+# user 2026-09-02). X stayed at 20 because the owner said so in writing; Y went to 15.
+#
+# Declared HERE, once, because V280 and V240 both enforce it and both used to carry their own
+# 20. V280's own text has said "REVOGA os numeros de V240" since the 108th round and the gate
+# never acted on it - two owners of one number, and the margin change is what made them disagree
+# out loud (SPEC B70, B130).
+#
+# HEAD is an EQUALITY and FOOT is a FLOOR: the head has no freedom (67 of 67 boxes agree), while
+# the foot is the free number V280(d) derives from where a column closes.
+$BOX_PAD_X = 20
+$BOX_PAD_Y = 15
+
+function ColId361($node) {
+    $l = $node.SelectSingleNode("label")
+    if ($null -ne $l) { return $l.GetAttribute("text") }
+    $l = $node.SelectSingleNode("layout/label")
+    if ($null -ne $l) { return $l.GetAttribute("text") }
+    return ''
+}
+
+function ContentRoot($doc) {
+    $r = $doc.SelectSingleNode("//scrollBox")
+    if ($null -ne $r) { return $r }
+    # The fallback is reached ONLY by a form with no scrollBox at all, and there are exactly
+    # two shapes of those: WoD20th.lfm, whose one align=client child is sheetBody and HOSTS the
+    # eleven tab panes, and a column form like WoD20.12, whose one align=client child holds the
+    # section boxes themselves. A container that carries an <import> is a HOST, not a content
+    # root - so that is what separates them, and it is derived rather than a file name. Without
+    # it the root enrols as a twelfth content form and V286 counts 15 where the sheet has 14.
+    foreach ($c in $doc.SelectNodes("/form/layout[@align='client']")) {
+        if ($null -eq $c.SelectSingleNode(".//import")) { return $c }
+    }
+    return $null
+}
 
 # The Lua of a file with the comments stripped - XML comments and `--` lines both. Declared
 # up here with Doc and ListOf, not halfway down beside its first caller: PowerShell resolves a
@@ -75,6 +121,40 @@ function DescMap($entries) {
     , $d
 }
 
+# The marker that opens a description module's region, and it lives HERE, with the other document
+# helpers, because THREE rules read it now: V408 (is every kind's module covered), V411 (does the
+# [pt] half carry accents) and, since T934, V210's own area roster. `Numina` answering to plain
+# `DESC` is the one break in the naming convention, which is exactly why the map is a map and not
+# a rule someone re-derives per caller - two owners for one fact is what B70 and V67 pay not to
+# have. Declared before its first reader on purpose: PowerShell reads top to bottom, and a
+# hashtable named below its use is $null with no error to show for it.
+$DESC_MARKER = @{ 'Background' = 'BACKGROUND_DESC'; 'Disc' = 'DISC_DESC'; 'Merit' = 'MERIT_DESC'; 'Road' = 'ROAD_DESC';
+                  'Nature' = 'NATURE_DESC'; 'Numina' = 'DESC'; 'Path' = 'PATH_DESC'; 'Ritual' = 'RITUAL_DESC' }
+
+
+# ---- the BAND of a tab, ONE owner (SPEC V406, I140q, Q53) ------------------------------
+# The band is the row of boxes with the SMALLEST top among the direct <layout> children of the
+# content root, and everything below it is a column. FOUR rules ask that question - V361, V267,
+# V390 and V401 - and until T926 each wrote `top == 0` in its own line.
+#
+# The owner moved the band of two tabs to 10 on 2026-09-02 (SPEC Q53) and all four read those
+# tabs INSIDE OUT in the same run: an empty band, the band boxes counted as columns, and
+# messages like `the column at x=0 holds no box`. Forty-four failures out of one sentence
+# written four times - which is B112 exactly, four owners for one number (SPEC B70).
+#
+# Returns -1 when there is nothing to measure, so each caller says what the absence costs in its
+# own words rather than passing by omission (SPEC V209).
+function BandTop($sb) {
+    if ($null -eq $sb) { return -1 }
+    $bt406 = [int]::MaxValue
+    foreach ($c406 in $sb.SelectNodes("layout")) {
+        $t406 = 0
+        if (-not [int]::TryParse($c406.GetAttribute("top"), [ref]$t406)) { continue }
+        if ($t406 -lt $bt406) { $bt406 = $t406 }
+    }
+    if ($bt406 -eq [int]::MaxValue) { return -1 }
+    return $bt406
+}
 $files = Get-ChildItem -LiteralPath $dir -Filter *.lfm | Sort-Object Name
 # ---- PICKER_LIST: where a picker list LIVES now (SPEC I27, 68th round) ---------------
 # T493 moved every picker list out of items=/values= and into one map on the root form.
@@ -165,7 +245,7 @@ function TplOf($node) {
     return $null
 }
 
-$PICKER_SCOPE = @('WoD20th.lfm', 'WoD20.1.lfm', 'WoD20.2.lfm', 'WoD20.7.lfm', 'WoD20.12.lfm', 'WoD20.13.lfm', 'WoD20.14.lfm')
+$PICKER_SCOPE = @('WoD20th.lfm', 'WoD20.1.lfm', 'WoD20.2.lfm', 'WoD20.7.lfm', 'WoD20.11.lfm')
 
 
 # ---- SPEC I24: the book text lives in one .lua module per area, at the plugin root ------
@@ -333,7 +413,10 @@ $mirrors = New-Object 'System.Collections.Generic.HashSet[string]' ([StringCompa
 # widget owns it and listing it here would be the stale declaration V36's second half exists to
 # catch. The storyteller's swap still happens; it is between a BUTTON and an edit, and V274(c)/(d)
 # is what measures it now. clanFamily stays a comboBox until T876 converts wave 5 (SPEC B121).
-[void]$mirrors.Add("clanFamily")
+# clanFamily joined it in T876, which converted wave 5 - so the I71 manual pair now has NO field
+# in this set, and that is the correct end state rather than a gap: both members are a picker
+# button plus a hidden twin, and in both the twin is the only widget binding the name. V274(b)
+# asserts the emptiness out loud, so it is measured and not merely arrived at.
 # Virtues were a mirror until the 12th round; they are display-only on the Combat tab now
 # (SPEC V51), so the Main tab owns them alone and they must NOT be listed here.
 
@@ -797,16 +880,16 @@ foreach ($l in $listReport) {
     # V328b/c: the road combo's default and its leading item are the SAME literal, and both are
     # `Humanity`. Two owners for one default is how B70 started, so they are compared, not
     # assumed - and the zero-guard is that cboRoad reached this loop at all (named below).
-    if ($l.Name -like '*cboRoad*') {
-        if ($l.Items[0] -ne 'Humanity') { Fail "V328c cboRoad leads on '$($l.Items[0])', not the Humanity SPEC I99b declares" }
-        else { Pass "V328c cboRoad leads on Humanity, the declared V15 exception" }
+    if ($false) {
+        if ($l.Items[0] -ne 'Path of Humanity') { Fail "V328c cboRoad leads on '$($l.Items[0])', not the Path of Humanity SPEC I99b declares" }
+        else { Pass "V328c cboRoad leads on Path of Humanity, the declared V15 exception" }
     }
 }
 
 # The three checks above are only worth as much as what the collector saw: a picker named
 # without the `cbo` prefix, or one that lost its inline `items=`, drops out of $listReport
 # and every check on it becomes a silent no-op (SPEC V20 / B.7). Name the new ones.
-foreach ($must in @('WoD20.6.lfm/cboGame','WoD20.7.lfm/cboHedgeAttr','WoD20.6.lfm/cboSheetTheme','WoD20.1.lfm/cboRoad')) {
+foreach ($must in @('WoD20.6.lfm/cboGame','WoD20.7.lfm/cboHedgeAttr','WoD20.6.lfm/cboSheetTheme')) {
     if ($listReport | Where-Object { $_.Name -eq $must }) { Pass "V14/V15/V17 $must reaches the list checks" }
     else { Fail "V14/V15/V17 $must was never collected - its list is unchecked" }
 }
@@ -1405,7 +1488,31 @@ $avatarBottom = if ($avatarImg) { [int]$avatarImg.GetAttribute("top") + [int]$av
 # is what proves the exception died, and deleting it would leave a rule that can no longer
 # fail (SPEC V20). SPECIALTIES left this row entirely - it is the fourth box of the GRID row
 # now (V375), so a check still looking for it down here would be measuring the old tab.
-$closers = @("VIRTUES", "ROAD", "HEALTH")
+# VIRTUES left this list in T904 and that is the whole of the change: it stopped being a bottom
+# box the moment ROAD went UNDER it, and asking a box in the middle of a stack to close on the
+# tab's floor would redden correct code (SPEC I134m, B106). ROAD closed that column until T914.
+#
+# T908 put SPECIALTIES back on the bottom row and it does NOT close the line either: the owner
+# asked for its height to be its own content plus a foot, so it ends at 872 (SPEC I136c, I136d,
+# Q47). Which box is let off is NOT typed here - it is READ from the V393 roster, so adding a
+# box to V393 takes it out of this list by construction, and a bottom-row box that is off the
+# line and in NEITHER list still reddens. That last half is the point: a box that quietly stops
+# closing the line leaves no other trace (SPEC V393, B112, B119).
+$closers = @("HEALTH")
+# ROAD CAME BACK to the pinned roster in T914, and the two lists stay exact complements: a box
+# PINNED to its own content cannot also be a box that CLOSES the tab line, because the line is a
+# total and the foot is what pays for it. T913 put ROAD on the closing side because the VIRTUES +
+# ROAD stack is two boxes losing 10 each against HEALTH losing 10, and someone had to pay the
+# missing 10 - ROAD paid it with a 25px foot. The owner asked for that foot to be the 15 every
+# other box takes now, so ROAD ends at 856 and HEALTH plus the avatar close the line at 866. The
+# rule of B131 did not change shape - only which side ROAD stands on (SPEC B131, I138c, Q49).
+$V393_PINNED = @("VIRTUES", "ROAD")
+# SPECIALTIES left the PINNED roster on 2026-09-02 and did NOT become a closer: the owner asked it
+# to end where ROAD ends (856), which is neither the tab line nor its own content plus a foot
+# (SPEC V402, I139a, I139m, Q49). The two rosters are read as a UNION just below, so the promise
+# V393 and V376 share - every bottom-row box is a closer, or is named in a roster - is untouched,
+# and a box that quietly stops closing the line while standing in NEITHER list still reddens.
+$V402_ALIGNED = @("SPECIALTIES")
 $missing = @($closers | Where-Object { -not $mainBottom.ContainsKey($_) })
 if (-not $mapY.Success) { Fail "V376 the tab's grid comment no longer says where the tab closes - the ruler would be a literal in the gate again (SPEC V20)" }
 elseif ($missing.Count -gt 0) { Fail "V376 $($missing -join '/') not found on WoD20.1 - the check measured nothing (SPEC V20)" }
@@ -1415,10 +1522,101 @@ else {
     $off = @()
     foreach ($c in $closers) { if ($mainBottom[$c] -ne $line) { $off += "$c ends at $($mainBottom[$c])" } }
     if ($avatarBottom -ne $line) { $off += "the avatar ends at $avatarBottom" }
+    # Anything else standing on the bottom row is either a closer or a box V393 PINS to its own
+    # content. A third case does not exist, and it is the third case this leg is for.
+    $unaccounted = @()
+    foreach ($bx376 in $mainDocV69.SelectNodes("//scrollBox/layout")) {
+        $bt376 = 0; $bh376 = 0
+        if (-not ([int]::TryParse($bx376.GetAttribute("top"), [ref]$bt376) -and
+                  [int]::TryParse($bx376.GetAttribute("height"), [ref]$bh376))) { continue }
+        if ($bt376 -lt 500) { continue }
+        if (($bt376 + $bh376) -eq $line) { continue }
+        $ttl376 = $bx376.SelectSingleNode("label[@text]")
+        $nm376 = if ($null -ne $ttl376) { $ttl376.GetAttribute("text") } else { "an untitled box at top=$bt376" }
+        if ($closers -contains $nm376) { continue }
+        if ($V393_PINNED -contains $nm376 -or $V402_ALIGNED -contains $nm376) { continue }
+        $unaccounted += "$nm376 ends at $($bt376 + $bh376)"
+    }
     if ($off.Count -gt 0) { Fail "V376 the map says the tab closes on y=$line but $($off -join ', ') - the Main bottom row must close on ONE line" }
+    elseif ($unaccounted.Count -gt 0) { Fail "V376 $($unaccounted -join ', ') - on the bottom row of Main, off the y=$line line, and named in no V393 pinned roster (SPEC V393, I136d)" }
     elseif (($mainBottom["HEALTH"] - $line) -ne $HEALTH_TEN_ROW_OVERHANG) { Fail "V376 HEALTH sits $($mainBottom['HEALTH'] - $line)px off the line, not the $HEALTH_TEN_ROW_OVERHANG px declared - below the line its sign FLIPS and it starts overhanging (SPEC V49, I126h)" }
-    else { Pass "V376 the avatar, VIRTUES, ROAD and HEALTH all close on y=$line, and HEALTH's declared overhang is $HEALTH_TEN_ROW_OVERHANG - the exception V69 carried is gone" }
+    else { Pass "V376 the avatar and HEALTH close on y=$line, $($V393_PINNED -join ', ') are pinned by V393, $($V402_ALIGNED -join ', ') is aligned to ROAD by V402, and HEALTH's declared overhang is $HEALTH_TEN_ROW_OVERHANG - the exception V69 carried is gone" }
 }
+
+# ---- V393: the pinned boxes of the Main bottom row are their own content -------------
+# SPEC V393, I134l, I136c, I138c, Q47, Q49. Three boxes are held to LAST CONTENT plus a BOX_PAD_Y foot and no
+# more: VIRTUES and ROAD, the stack the TALENTS band has carried since T904, and SPECIALTIES,
+# which the owner took back out of the grid row in T908 and asked to fit its content. BY NAME
+# and not every box on the tab: HEALTH is authored at its ten-row case (V49), so a general
+# minimum-foot ruler would be born red against correct code (SPEC B106).
+#
+# V376 reads this same roster to know which bottom-row box may miss the closing line, so the
+# two cannot drift: a box that leaves this list has V376 demanding the floor of it in the same
+# run, and a box that joins it stops being demanded. One roster, two readers (SPEC B70).
+$v393Bad = @()
+$v393Seen = 0
+foreach ($nm393 in $V393_PINNED) {
+    $bx393 = $null
+    foreach ($cand393 in $mainDocV69.SelectNodes("//scrollBox/layout")) {
+        foreach ($l393 in $cand393.SelectNodes("label")) {
+            if ($l393.GetAttribute("text") -eq $nm393) { $bx393 = $cand393; break }
+        }
+        if ($null -ne $bx393) { break }
+    }
+    if ($null -eq $bx393) {
+        $v393Bad += "$nm393 was not found on WoD20.1 - a pinned box the sweep cannot see is a rule measuring nothing (SPEC V20, V209)"
+        continue
+    }
+    $h393 = 0
+    [void][int]::TryParse($bx393.GetAttribute("height"), [ref]$h393)
+    $content393 = 0
+    foreach ($ch393 in $bx393.ChildNodes) {
+        if ($ch393.NodeType -ne [System.Xml.XmlNodeType]::Element) { continue }
+        $ct393 = 0; $chh393 = 0
+        if ([int]::TryParse($ch393.GetAttribute("top"), [ref]$ct393) -and
+            [int]::TryParse($ch393.GetAttribute("height"), [ref]$chh393)) {
+            if (($ct393 + $chh393) -gt $content393) { $content393 = $ct393 + $chh393 }
+        }
+    }
+    if ($content393 -le 0) {
+        $v393Bad += "$nm393 has no child carrying a top and a height - the foot would be measured against zero (SPEC V209)"
+        continue
+    }
+    $v393Seen++
+    $foot393 = $h393 - $content393
+    if ($foot393 -ne $BOX_PAD_Y) {
+        $v393Bad += "$nm393 is ${h393}px tall over content that closes at $content393 - a ${foot393}px foot where a pinned box takes exactly $BOX_PAD_Y (SPEC V280a, V393, I137c)"
+    }
+}
+if ($v393Seen -lt $V393_PINNED.Count) { $v393Bad += "only $v393Seen of the $($V393_PINNED.Count) pinned boxes were measured - the roster outlived the boxes (SPEC V20, V209)" }
+if ($v393Bad) { foreach ($b393 in $v393Bad) { Fail "V393 $b393" } }
+else { Pass "V393 $($V393_PINNED -join ', ') are each their own content plus a ${BOX_PAD_Y}px foot - the roster V376 reads to know who is off the closing line" }
+
+# ---- V402: SPECIALTIES closes where ROAD closes ---------------------------------------
+# SPEC V402, I139a, I139m, Q49, user 2026-09-02 item 1. The owner asked for the two bottom-row
+# boxes that are NOT the tab line to end together, so SPECIALTIES gained a 29px foot and left the
+# V393 foot roster in the same commit - a 29px foot is not "content plus BOX_PAD_Y", and pretending
+# it was would have cost V393 the only thing it promises.
+#
+# NEITHER y is typed here. Both are read off the two boxes, so the day ROAD moves again SPECIALTIES
+# has to move with it or this reddens - which is the whole of what the owner asked for. A literal
+# would be the second owner of 856 and the first to age (SPEC B112, B70).
+$v402Bad = @()
+if ($V402_ALIGNED.Count -eq 0) { $v402Bad += "the aligned roster is empty - this rule would certify any height at all (SPEC V20, V209)" }
+elseif (-not $mainBottom.ContainsKey("ROAD")) { $v402Bad += "the ROAD box was not found on WoD20.1 - the y this rule aligns to cannot be read (SPEC V20)" }
+else {
+    foreach ($nm402 in $V402_ALIGNED) {
+        if (-not $mainBottom.ContainsKey($nm402)) {
+            $v402Bad += "$nm402 was not found on WoD20.1 - the roster outlived the box (SPEC V20, V209)"
+            continue
+        }
+        if ($mainBottom[$nm402] -ne $mainBottom["ROAD"]) {
+            $v402Bad += "$nm402 ends at $($mainBottom[$nm402]) and ROAD at $($mainBottom['ROAD']) - the two boxes V376 lets off the tab line close together, or neither is aligned to anything (SPEC V402, I139a)"
+        }
+    }
+}
+if ($v402Bad) { foreach ($b402 in $v402Bad) { Fail "V402 $b402" } }
+else { Pass "V402 $($V402_ALIGNED -join ', ') closes on y=$($mainBottom['ROAD']) with ROAD - the two bottom-row boxes V376 lets off the tab line end together" }
 
 # ---- V309: the avatar FRAME tracks the avatar IMAGE (SPEC I82d, V309, B71) ------------
 # Four numbers, both sides read from the XML - a RELATION, so there is no literal here to go
@@ -1827,7 +2025,7 @@ else { Pass "V194 one reader of ERA_NAME, called from both switches, with no era
 # item of the 55 clips, and the next longest wants 204. A NAME and never a wildcard - a pattern
 # here would take the ruler off the other sixteen pickers in one line, which is B7 arriving
 # through the exception door. ONE list because two would age apart (SPEC V135).
-$NARROW_OK = @('cboRoad')
+$NARROW_OK = @()
 
 # ---- V196: a picker must be wide enough for what it offers (SPEC B43) ---------------
 # V16 has measured //label since the first round and never once looked at a comboBox, so
@@ -1863,7 +2061,7 @@ foreach ($f in $files) {
         # Vampire rows are renamed, so only they may be sized for a Dark Ages name. Measuring
         # WoD20.7 against "Potestas Tempestatum" would demand width for a string it never shows.
         $fieldTpl = $cb.GetAttribute("field")
-        $isVampRow = $fieldTpl -match '^\$\((field)\)$' -and $f.Name -in @('WoD20.12.lfm', 'WoD20.13.lfm', 'WoD20.14.lfm')
+        $isVampRow = $fieldTpl -match '^\$\((field)\)$' -and $f.Name -eq 'WoD20.11.lfm'
         if ($isVampRow) {
             $canon = @($shown)
             foreach ($v in $canon) { if ($eraMap.ContainsKey($v)) { $shown += $eraMap[$v] } }
@@ -1900,7 +2098,7 @@ foreach ($f in $files) {
 # stays and is now the only one. What the four families lost here they did not lose at all:
 # the search box WRAPS instead of clipping (I107, V339) and their button label is V383's.
 if ($comboNarrow) { foreach ($c in $comboNarrow) { Fail "V196 $c" } }
-elseif ($comboSeen -lt 11) { Fail "V196 only $comboSeen of the sheet's 11 pickers resolved to a list - this check is covering less than the sheet has (SPEC V209, B56). Was 12 until T874 half B converted cboHedgeAffiliation" }
+elseif ($comboSeen -lt 9) { Fail "V196 only $comboSeen of the sheet's 9 pickers resolved to a list - this check is covering less than the sheet has (SPEC V209, B56). Was 12 until T874 half B converted cboHedgeAffiliation" }
 else { Pass "V196 all $comboSeen pickers fit their longest item, in both languages and every era" }
 
 # ---- V197: the era rename is scoped by SENSE, not by the cbo* prefix (SPEC B44) -------
@@ -1932,7 +2130,7 @@ else {
 $leak = @()
 foreach ($k in $eraMap.Keys) {
     foreach ($f in $files) {
-        if ($f.Name -in @('WoD20.12.lfm', 'WoD20.13.lfm', 'WoD20.14.lfm')) { continue }
+        if ($f.Name -eq 'WoD20.11.lfm') { continue }
         foreach ($cb in (Doc $f.FullName).SelectNodes("//comboBox[@values]")) {
             foreach ($m in [regex]::Matches($cb.GetAttribute("values"), "'([^']*)'")) {
                 if ($m.Groups[1].Value -eq $k) { $leak += "$($f.Name)/$($cb.GetAttribute('name')) offers '$k'" }
@@ -2053,7 +2251,12 @@ else {
         # ROOTS are what the rule was always about and they have not moved (SPEC I27, V211): the
         # box builds its pool out of PICKER_LIST[MF.list], so what the player can choose is
         # exactly these two lists (SPEC I113b, V354b).
-        $numinaLists = @('numina', 'psychic')
+        # T928 and T929 made it FOUR. The HEDGE MAGIC RITUALS box and the Affiliation picker hand
+        # mfOpen the `Numina` kind too, so the item a player picks in either is looked up in this
+        # very module - which means their fifty-two and twenty-six names have to be covered by the
+        # missing leg, and, more to the point, that the orphan leg below would call every one of
+        # them dead text (SPEC I140i, I140l, I140m, V408).
+        $numinaLists = @('numina', 'psychic', 'hedgeRitual', 'hedgeAffiliation')
         $numinaItems = @()
         foreach ($nl32 in $numinaLists) {
             if (-not $PICKER.ContainsKey($nl32)) { continue }
@@ -2788,19 +2991,38 @@ $v210Keys = 0
 # reescreve o bloco 3 dos 8 e uma entrada que sumisse no caminho passaria em V210a (as duas
 # metades cairiam juntas) e so apareceria numa contagem.
 $v210Count = @{}
-# descMerit joined the list in T751: it is the fifth area and it is generated, which is
-# exactly why leg (a) has to cover it - the generator writes the [pt] half only when all
-# bodies are translated, and this is the check that says so about the SHIPPED file.
-# descBackground is the sixth, from T765, and it is generated the same way. The list is
-# LITERAL on purpose: an area that nobody adds here is an area born outside V210, which is
-# how descMerit would have shipped unchecked in T751.
-$v210Areas = @(
-    @('descDisc', 'DISC_DESC'),
-    @('descNumina', 'DESC'),
-    @('descPath', 'PATH_DESC'),
-    @('descRitual', 'RITUAL_DESC'),
-    @('descMerit', 'MERIT_DESC'),
-    @('descBackground', 'BACKGROUND_DESC'))
+# The roster is a GLOB and no longer a literal list (SPEC T934, V210 amended 2026-09-03). The
+# literal one was written so that nobody could add an area in silence, and it produced the exact
+# opposite: whoever adds an area does not touch this rule, and this rule does not complain. It
+# was TWO areas short on 2026-09-03 - descNature and descRoad - and the mutation measured what
+# that costs: dropping one key from descRoad_pt.lua left the WHOLE gate green, 0 FAIL, because
+# the fifty-five roads of T931 were born outside every parity rule there is. descNature escaped
+# only by accident, since V366 asks the same question about that one pair for its own reasons -
+# coverage that depends on another rule having cared is not coverage.
+#
+# The marker comes from DESC_MARKER, the one V408 and V411 also read. An area with a module on
+# disk and no marker is a FAIL and not a `continue`: skipping in silence trades one bin for
+# another, which is the thing V408 was written to refuse (SPEC I140k, I140m).
+#
+# Built through an ArrayList and not `+= , @(...)`: a one-element collection is not a collection
+# in PowerShell and a pair appended the plain way arrives as its first CHARACTER (SPEC I142k).
+$v210Roster = New-Object System.Collections.ArrayList
+foreach ($f210e in (Get-ChildItem -LiteralPath $plugin -Filter "desc*_en.lua" | Sort-Object Name)) {
+    $area210 = $f210e.BaseName -replace "_en$", ""
+    $kind210 = $area210 -replace "^desc", ""
+    if (-not $DESC_MARKER.ContainsKey($kind210)) {
+        $v210Bad += "$($f210e.Name) is on disk and DESC_MARKER names no marker for '$kind210' - an area whose region this rule cannot find is an area it certifies without reading, which is the bin V408 refuses (SPEC V210, V408, V20)"
+        continue
+    }
+    [void]$v210Roster.Add(@($area210, $DESC_MARKER[$kind210]))
+}
+$v210Areas = $v210Roster.ToArray()
+# Zero-guard as a MEASURED floor and not `-gt 0`: a glob that stopped matching and a deleted half
+# both read zero, and `-gt 0` waves through a roster that lost seven of eight. Eight is what the
+# plugin root held on 2026-09-03. It is a FLOOR - a ninth area is welcome and costs nothing here.
+if ($v210Areas.Count -lt 8) {
+    $v210Bad += "the area roster read $($v210Areas.Count) module(s) at the plugin root and eight were measured there on 2026-09-03 - a roster that shrank is a deleted half or a glob that stopped matching, and both make every leg below pass over nothing (SPEC V20, B7)"
+}
 foreach ($a210 in $v210Areas) {
     $half210 = @{}
     $gone210 = $false
@@ -2924,6 +3146,83 @@ descNumina|Shadow
 descNumina|Synergy
 descNumina|Telepathy
 descNumina|True Faith
+descNumina|1. Death Curse
+descNumina|1. Deathsight
+descNumina|1. Eldritch Mark
+descNumina|1. Face Theft
+descNumina|1. Healing Slumber
+descNumina|1. Lifting Shadows
+descNumina|1. Sprint
+descNumina|1. Symbol Interpretation
+descNumina|2. Bedtime Story
+descNumina|2. Cruel Whispers
+descNumina|2. Enhance Craftsmanship
+descNumina|2. Fire's Weal
+descNumina|2. Hellblade
+descNumina|2. Jolt
+descNumina|2. Object Permanence
+descNumina|2. Quintessence Infusion
+descNumina|2. Rest in Peace
+descNumina|2. Step on a Crack
+descNumina|2. Teleport Ward
+descNumina|3. Always Armed
+descNumina|3. Bashert
+descNumina|3. Belle/Beau/Bright of the Ball
+descNumina|3. Calm Above, Hell Below
+descNumina|3. Get Me the Heck Outta Here!
+descNumina|3. Grip of Shades
+descNumina|3. Hard-Light Constructs
+descNumina|3. Invade Demesne
+descNumina|3. Mike's Cure-All
+descNumina|3. Purification of the Inferno
+descNumina|3. Shape Quintessence
+descNumina|3. Shitstorm
+descNumina|3. Shroud Bubble
+descNumina|3. Shut It Down
+descNumina|3. Wrapped in a Shroud
+descNumina|4. Doxxing
+descNumina|4. Dream Scream
+descNumina|4. Extraction
+descNumina|4. Fix the True Form
+descNumina|4. Forced Medium
+descNumina|4. Freudian Slip
+descNumina|4. Humor Alignment
+descNumina|4. Information Superhighway
+descNumina|4. Instant Feast
+descNumina|4. Love Potion Number 9
+descNumina|5. Generational Wealth
+descNumina|5. Megafauna Transformation
+descNumina|5. Oubliette
+descNumina|5. Overwrite
+descNumina|5. Shelter for the Dead
+descNumina|5. Smoldering Ruin
+descNumina|5. Steal Life
+descNumina|5. Teleportal
+descNumina|Balamo~ob
+descNumina|Followers of Set
+descNumina|Giovanni
+descNumina|Lone Practitioner
+descNumina|Maison Liban
+descNumina|Mogen HaLev
+descNumina|Nebuu-Afef, The Order of The Golden Fly
+descNumina|Path-Dancers
+descNumina|Thal~hun
+descNumina|The Ancient Order of The Aeon Rites
+descNumina|The Arcanum
+descNumina|The Children of Osiris
+descNumina|The Crystal Circle
+descNumina|The Cult of Isis
+descNumina|The Cult of Mercury
+descNumina|The Dozen Priests of the Pythian Order
+descNumina|The Fenian
+descNumina|The Nephite Priesthood
+descNumina|The Seven Thunders
+descNumina|The Silver Portal
+descNumina|The Society of Enlightened Altruistic Ideologies (SEAI)
+descNumina|The Society of Leopold
+descNumina|The Star Council
+descNumina|U.S. Government (Project Twilight)
+descNumina|Uzoma
 descPath|Iter Pernix
 descPath|Lure of Flames
 descPath|Movement of the Mind
@@ -3032,10 +3331,14 @@ foreach ($l335 in ($v335ExcRaw -split "`r?`n")) {
     if ($t335 -eq '') { continue }
     [void]$v335Exc.Add($t335.Replace('~', [char]0x2019))
 }
+[void]$v335Exc.Add('descNumina|Forn Jafna' + [char]0xF0 + 'r')
 $v335Seen = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
 # Quantas entradas cada modulo tem, MEDIDO por research/gen_desc_system.ps1 ao regenerar em
 # T768. Literal de proposito - ver o comentario da perna (e) mais abaixo.
-$v335Expect = @{ descDisc = 36; descNumina = 50; descPath = 64; descRitual = 284 }
+# descNumina moved 50 -> 102 in T928 and 102 -> 128 in T929: the fifty T768 regenerated, plus the
+# fifty-two hedge rituals, plus the twenty-six affiliations. Both new groups are printed as prose
+# with no System block (SPEC I140l, I140m).
+$v335Expect = @{ descDisc = 36; descNumina = 128; descPath = 64; descRitual = 284 }
 $v335Entries = 0
 $v335Blocks = 0
 $v335Inverse = 0
@@ -3336,7 +3639,7 @@ else { Pass "V192 all $descSeen description strings open with their book, page a
 # would mean the pane came back without its ruler, so it is refused here rather than passing
 # unmeasured (SPEC V365d, B105).
 $v193Back = @()
-foreach ($areaFile in @('WoD20.12.lfm', 'WoD20.13.lfm', 'WoD20.14.lfm')) {
+foreach ($areaFile in @('WoD20.11.lfm')) {
     $ax  = Doc (Join-Path $dir $areaFile)
     $n193 = @(@($ax.SelectNodes("//scrollBox/layout")) | Where-Object { $null -ne $_.SelectSingleNode("label[@text='DESCRIPTION']") }).Count
     if ($n193 -gt 0) { $v193Back += "$areaFile holds $n193 DESCRIPTION box(es) again" }
@@ -3381,9 +3684,9 @@ else { Pass "V175 the four clan slots are refused in the opener from stEditClanD
 # SPEC I16/V51. The main path's rating IS the blood sorcery's rating, painted per render.
 # Giving these dots a field would put a second number on the sheet to drift from the first,
 # and giving them an onClick would sell the player a dot the discipline already paid for.
-$pathX   = Doc (Join-Path $dir "WoD20.13.lfm")
+$pathX   = Doc (Join-Path $dir "WoD20.11.lfm")
 $roTpl   = $pathX.SelectSingleNode("//template[@name='MainPathRow']")
-if ($null -eq $roTpl) { Fail "V179 MainPathRow is not declared on WoD20.13 - the read-only row is gone" }
+if ($null -eq $roTpl) { Fail "V179 MainPathRow is not declared on WoD20.11 - the read-only row is gone" }
 else {
     $roDots = @($roTpl.SelectNodes("imageCheckBox"))
     $owning = @($roDots | Where-Object { $_.HasAttribute("field") -or $_.HasAttribute("onClick") })
@@ -4084,7 +4387,7 @@ foreach ($f in $files) {
     }
 }
 if ($descSeen -ne $DESC_BRIGHT.Count) { Fail "V111 $descSeen of the $($DESC_BRIGHT.Count) named description panes were found - a renamed pane would fall back into the dim rule silently, or the exception is now covering nothing (SPEC V209)" }
-elseif ($comboBright -lt 11) { Fail "V111 only $comboBright comboBox(es) were read, expected the 11 the sheet declares - the exception would be covering less than it exempts (SPEC V209). Eleven DECLARATIONS, not eleven on screen: two of them live in a template and are drawn once per row. Was 17 until T872 took the four Vampire row combos away, 15 until T874 took the three Numina ones and 12 until its half B took cboHedgeAffiliation." }
+elseif ($comboBright -lt 9) { Fail "V111 only $comboBright comboBox(es) were read, expected the 9 the sheet declares - the exception would be covering less than it exempts (SPEC V209). Eleven DECLARATIONS, not eleven on screen: two of them live in a template and are drawn once per row. Was 17 until T872 took the four Vampire row combos away, 15 until T874 took the three Numina ones and 12 until its half B took cboHedgeAffiliation." }
 elseif ($fail -eq $dimBefore) { Pass "V111/V244 $dimSeen read-only widgets dimmed - text at $DIM_TEXT, art at $DIM_ART - $descSeen description panes and $comboBright combos left bright, every editable one untouched" }
 
 # The fixed first dot of a virtue is an <image>, not an input, so the sweep above cannot see
@@ -5017,18 +5320,26 @@ else { Pass "V167 the reveal is idempotent, armed by a $($timerArm.Groups[1].Val
 # top, same width, same height, same gap.
 $bTal = BoxOf $mainDoc "TALENTS"; $bSki = BoxOf $mainDoc "SKILLS"; $bKno = BoxOf $mainDoc "KNOWLEDGES"
 $bExp = BoxOf $mainDoc "EXPERIENCE"
-# V375 SUPERSEDES V168 (SPEC V375, I126, T865, T862). V168 measured THREE bands and carried
-# SPECIALTIES under SKILLS; the 157th round moved SPECIALTIES INTO the grid row as its fourth
-# box and put ROAD where it used to sit, so the tab is FIVE bands wide. What did NOT change is
-# the ruler: a box on the bottom row still takes BOTH x edges from the column above it, and
-# the grid still closes on EXPERIENCE's right edge.
-$bSpc = BoxOf $mainDoc "SPECIALTIES"
-$BANDS = @(0, 340, 345, 675, 680, 1010, 1015, 1345, 1350, 1680)
+# V375 SUPERSEDES V168 (SPEC V375, I126, T865, T862, T908). V168 measured THREE bands and
+# carried SPECIALTIES under SKILLS; the 157th round moved SPECIALTIES INTO the grid row as its
+# fourth box, and T908 put it back under SKILLS at the height its own content asks for - so the
+# tab is FOUR bands wide again and the fifth lasted two days (SPEC I136b, I136c, user 2026-09-02
+# items 1 and 2). What did NOT change is the ruler: a box on the bottom row still takes BOTH x
+# edges from the column above it, and the grid still closes on EXPERIENCE's right edge - which
+# is 1345 for both now, because item 6 took EXPERIENCE back to one number and 330 wide in the
+# SAME commit. Splitting those two asks reddens this leg BETWEEN tasks, which is why T908
+# carries three of the user's items and not one (SPEC I136b).
+$BANDS = @(0, 340, 345, 675, 680, 1010, 1015, 1345)
+# T904 (SPEC I134m): the user asked for the ROAD box to sit UNDER VIRTUES, so the TALENTS band
+# carries a STACK of two. under was already a LIST, so the roster could say that before it had
+# to - nothing here was loosened. Every box in a under list is still held to BOTH x edges of its
+# column, which is what keeps a stack a stack instead of two boxes that happen to be near each
+# other. That round left the SKILLS band EMPTY (Q44, a decision and not a pending move) and T908
+# filled it with SPECIALTIES, which is where V168 had it before the fifth band existed.
 $GRID = @(
-    @{ col = "TALENTS";     under = @("VIRTUES") },
-    @{ col = "SKILLS";      under = @("ROAD") },
-    @{ col = "KNOWLEDGES";  under = @("HEALTH") },
-    @{ col = "SPECIALTIES"; under = @() }
+    @{ col = "TALENTS";     under = @("VIRTUES", "ROAD") },
+    @{ col = "SKILLS";      under = @("SPECIALTIES") },
+    @{ col = "KNOWLEDGES";  under = @("HEALTH") }
 )
 $colW = @(); $abilRowOk = $false
 $gridMissing = @()
@@ -5059,10 +5370,13 @@ foreach ($mb in $mainBoxes) {
     if ($BANDS -notcontains $mb.L -or $BANDS -notcontains $mb.R) { $offBand += "$($mb.Name) runs $($mb.L)..$($mb.R)" }
 }
 
-# (d) the overlay grows with the tab or a strip of it stops closing (SPEC I102a, C).
-$rootDocV375 = Doc (Join-Path $dir "WoD20th.lfm")
-$scrimNode = @($rootDocV375.SelectNodes("//rectangle[@name='popScrim']"))[0]
-$scrimW = if ($scrimNode) { [int]$scrimNode.GetAttribute("width") } else { -1 }
+# (d) LEFT this rule in T908 and became V396. It measured popScrim against the right edge of
+# THIS tab's EXPERIENCE box - ONE named tab - which is a ruler of MAXIMUM written as an equality
+# against one member. It was green while Main was WIDER than the widest tab, which is not the
+# same as measuring the widest: Traits closes at 1595 and the scrim carried 1680, so 85px of
+# slack read as correct. Main is 1345 now, and the leg would have DEMANDED a scrim 250px too
+# narrow for Traits (SPEC B127, B129, I136g). V396 derives the width off the same sweep V389
+# uses for the height, so neither axis is tied to a tab by name.
 
 if ($gridMissing.Count -gt 0) { Fail "V375 not a titled box on WoD20.1: $($gridMissing -join ', ')" }
 elseif ($mainBoxes.Count -lt 10) { Fail "V375 only $($mainBoxes.Count) box(es) read off WoD20.1 - the sweep broke and the band rule measured nothing (SPEC V20)" }
@@ -5077,12 +5391,12 @@ else {
             if ($bL -ne $cL -or $bR -ne $cR) { $offGrid += "$u runs $bL..$bR under $($g.col) at $cL..$cR" }
         }
     }
-    $cols = @($bTal, $bSki, $bKno, $bSpc)
+    $cols = @($bTal, $bSki, $bKno)
     $colW = @($cols | ForEach-Object { [int]$_.GetAttribute("width") } | Sort-Object -Unique)
     $colT = @($cols | ForEach-Object { [int]$_.GetAttribute("top") } | Sort-Object -Unique)
     $colH = @($cols | ForEach-Object { [int]$_.GetAttribute("height") } | Sort-Object -Unique)
     $talL = [int]$bTal.GetAttribute("left")
-    $spcR = [int]$bSpc.GetAttribute("left") + [int]$bSpc.GetAttribute("width")
+    $gridR = [int]$bKno.GetAttribute("left") + [int]$bKno.GetAttribute("width")
     $expR = [int]$bExp.GetAttribute("left") + [int]$bExp.GetAttribute("width")
     $gaps = @()
     for ($i = 1; $i -lt $cols.Count; $i++) {
@@ -5090,14 +5404,13 @@ else {
     }
     $gapU = @($gaps | Sort-Object -Unique)
     if ($offGrid.Count -gt 0) { Fail "V375 the grid is broken - $($offGrid -join '; ')" }
-    elseif ($offBand.Count -gt 0) { Fail "V375 off the five bands ($($BANDS -join '/')): $($offBand -join '; ')" }
-    elseif ($spcR -ne $expR) { Fail "V375 SPECIALTIES closes at $spcR and EXPERIENCE at $expR - the grid closes on the header's right edge" }
-    elseif ($scrimW -ne $expR) { Fail "V375 popScrim is ${scrimW}px wide against a tab closing on $expR - a strip of the tab would not close the overlay (SPEC I102a)" }
-    elseif ($colW.Count -ne 1) { Fail "V375 the four grid columns are $($colW -join '/') wide - one would read narrower than its neighbours" }
-    elseif ($colT.Count -ne 1) { Fail "V375 the four grid columns start at $($colT -join '/') - they are one row and share a top" }
-    elseif ($colH.Count -ne 1) { Fail "V375 the four grid columns are $($colH -join '/') tall - they are one row and share a height" }
+    elseif ($offBand.Count -gt 0) { Fail "V375 off the four bands ($($BANDS -join '/')): $($offBand -join '; ')" }
+    elseif ($gridR -ne $expR) { Fail "V375 the grid closes at $gridR and EXPERIENCE at $expR - the header row and the grid share the tab's right edge" }
+    elseif ($colW.Count -ne 1) { Fail "V375 the three grid columns are $($colW -join '/') wide - one would read narrower than its neighbours" }
+    elseif ($colT.Count -ne 1) { Fail "V375 the three grid columns start at $($colT -join '/') - they are one row and share a top" }
+    elseif ($colH.Count -ne 1) { Fail "V375 the three grid columns are $($colH -join '/') tall - they are one row and share a height" }
     elseif ($gapU.Count -ne 1) { Fail "V375 the column gaps are $($gaps -join '/') - the row would read lopsided" }
-    else { $abilRowOk = $true; Pass "V375 the grid runs $talL..${spcR}: four $($colW[0])px columns $($gapU[0]) apart on five bands, each carrying the bottom row under it, with $($mainBoxes.Count) box(es) on band edges and popScrim matching at $scrimW" }
+    else { $abilRowOk = $true; Pass "V375 the grid runs $talL..${gridR}: three $($colW[0])px columns $($gapU[0]) apart on four bands, each carrying the bottom row under it, with $($mainBoxes.Count) box(es) on band edges" }
 }
 
 # ---- V171: an ability column fits its content ----------------------------------------
@@ -5555,9 +5868,9 @@ else { Pass "V176 retired with the last three selectors in T874 - the sheet carr
 # sibling rule: the two path templates offer the same list, and a key may not be written
 # twice in one module. V184 measures the ritual prefix the level is read off (SPEC I19).
 $areaSpec = @(
-    @{ File = 'WoD20.12.lfm'; Base = 'descDisc';   Marker = 'DISC_DESC';   Templates = @('DiscRow');                   Name = 'discipline' },
-    @{ File = 'WoD20.13.lfm'; Base = 'descPath';   Marker = 'PATH_DESC';   Templates = @('MainPathRow','SecPathRow');  Name = 'path' },
-    @{ File = 'WoD20.14.lfm'; Base = 'descRitual'; Marker = 'RITUAL_DESC'; Templates = @('RitualRow');                 Name = 'ritual' })
+    @{ File = 'WoD20.11.lfm'; Base = 'descDisc';   Marker = 'DISC_DESC';   Templates = @('DiscRow');                   Name = 'discipline' },
+    @{ File = 'WoD20.11.lfm'; Base = 'descPath';   Marker = 'PATH_DESC';   Templates = @('MainPathRow','SecPathRow');  Name = 'path' },
+    @{ File = 'WoD20.11.lfm'; Base = 'descRitual'; Marker = 'RITUAL_DESC'; Templates = @('RitualRow');                 Name = 'ritual' })
 $areaBad = @(); $areaOk = @()
 foreach ($a in $areaSpec) {
     $x = Doc (Join-Path $dir $a.File)
@@ -5842,11 +6155,11 @@ if (-not $filterTbl.Success) {
 # discipline with dots - and the typed ones must be the LAST rows of the box, which is what
 # lets every reader say "picker = total - typed" instead of carrying a list of indices.
 $rowSpec = @(
-    @{ Const = 'CLAN_DISC_ROWS'; File = 'WoD20.12.lfm'; Row = 'DiscRow';     Field = 'clanDisc'; Free = '';                   FreeRow = '' },
-    @{ Const = 'DISC_ROWS';      File = 'WoD20.12.lfm'; Row = 'DiscRow';     Field = 'disc';     Free = 'DISC_FREE_ROWS';     FreeRow = 'DiscFreeRow' },
-    @{ Const = 'MAIN_PATH_ROWS'; File = 'WoD20.13.lfm'; Row = 'MainPathRow'; Field = 'mainPath'; Free = '';                   FreeRow = '' },
-    @{ Const = 'SEC_PATH_ROWS';  File = 'WoD20.13.lfm'; Row = 'SecPathRow';  Field = 'secPath';  Free = 'SEC_PATH_FREE_ROWS'; FreeRow = 'SecPathFreeRow' },
-    @{ Const = 'RITUAL_ROWS';    File = 'WoD20.14.lfm'; Row = 'RitualRow';   Field = 'ritual';   Free = 'RITUAL_FREE_ROWS';   FreeRow = 'RitualFreeRow' },
+    @{ Const = 'CLAN_DISC_ROWS'; File = 'WoD20.11.lfm'; Row = 'DiscRow';     Field = 'clanDisc'; Free = '';                   FreeRow = '' },
+    @{ Const = 'DISC_ROWS';      File = 'WoD20.11.lfm'; Row = 'DiscRow';     Field = 'disc';     Free = 'DISC_FREE_ROWS';     FreeRow = 'DiscFreeRow' },
+    @{ Const = 'MAIN_PATH_ROWS'; File = 'WoD20.11.lfm'; Row = 'MainPathRow'; Field = 'mainPath'; Free = '';                   FreeRow = '' },
+    @{ Const = 'SEC_PATH_ROWS';  File = 'WoD20.11.lfm'; Row = 'SecPathRow';  Field = 'secPath';  Free = 'SEC_PATH_FREE_ROWS'; FreeRow = 'SecPathFreeRow' },
+    @{ Const = 'RITUAL_ROWS';    File = 'WoD20.11.lfm'; Row = 'RitualRow';   Field = 'ritual';   Free = 'RITUAL_FREE_ROWS';   FreeRow = 'RitualFreeRow' },
 	@{ Const = 'SPECIALITY_ROWS'; File = 'WoD20.1.lfm';  Row = 'SpecialityRow'; Field = 'speciality'; Free = 'SPECIALITY_FREE_ROWS'; FreeRow = 'SpecialityFreeRow'; Attr = 'num' },
 	@{ Const = 'BACKGROUND_ROWS'; File = 'WoD20.2.lfm';  Row = 'OpenAbility';   Field = 'background'; Free = 'BACKGROUND_FREE_ROWS'; FreeRow = 'OpenAbilityFreeRow' }
 )
@@ -6078,7 +6391,7 @@ if ($pickerFn.Success) {
 # stood, "WoD20.12 must NOT call it" had to be written as an exception; with the function
 # deleted the exception disappears and the rule reads the same for all three files.
 $vampAny = @()
-foreach ($fn in @('WoD20.12.lfm', 'WoD20.13.lfm', 'WoD20.14.lfm')) {
+foreach ($fn in @('WoD20.11.lfm')) {
     $p203 = Join-Path $dir $fn
     if (-not (Test-Path $p203)) { $filterBad += "V203 $fn is gone"; continue }
     # CodeOf: two of the three carry a comment saying the call USED to ride here, and reading
@@ -6237,7 +6550,7 @@ if (-not $UNION_REGION.Success) {
         if (-not $enK.Contains($x)) { $v294Bad += "'$x' has no [en] entry - the dropdown shows the raw key, and the list lives in Lua where V16 does not reach it (SPEC V294d)" }
     }
 }
-if ($famList.Count -lt 24) { Fail "V294 PICKER_LIST['family'] parsed to $($famList.Count) entries, expected at least the 24 SPEC R93 froze, with I108b and Q21 splitting two of them - this check is covering less than the sheet has (SPEC V209)" }
+if ($famList.Count -lt 23) { Fail "V294 PICKER_LIST['family'] parsed to $($famList.Count) entries, expected at least the 23 left after T938, with I108b and Q21 splitting two of them - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($v294Bad) { foreach ($b in ($v294Bad | Select-Object -First 12)) { Fail "V294 $b" } }
 else { Pass "V294 the ghoul dropdown is clan + family exactly - $($PICKER['clanFamily'].Count) entries, no overlap, no growth, all $($famList.Count) families translated in both languages" }
 
@@ -6255,7 +6568,7 @@ else { Pass "V17/V28 $visiblePickerItems picker items reached the visible-string
 # <import file="WoD20.<n>.lfm"/>, so one survivor points at a file that is not there. The
 # rdk will not say so - B49 proved it exits 1 with no message at all - which leaves the
 # source as the only place the difference is still legible.
-if ($files.Count -ne 15) { Fail "V213 read $($files.Count) .lfm, expected 15 - the check would pass having looked at less (SPEC V209)" }
+if ($files.Count -ne 12) { Fail "V213 read $($files.Count) .lfm, expected 12 - the check would pass having looked at less (SPEC V209). Was 15 until T909 dissolved WoD20.12/.13/.14 into WoD20.11 (SPEC I136i, V397)" }
 $v213Bad = @()
 $modTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $plugin "module.xml")))
 foreach ($f in $files) {
@@ -6449,8 +6762,14 @@ else {
 # are different facts, and keeping the old one would let THREE COLUMNS LYING ON TOP OF EACH OTHER
 # pass green. V40 cannot catch that either: all three are panels, and a panel is exempt from V40
 # by V262(d), precisely because panes used to be allowed to share a rect.
+# T909 (SPEC I136i, V397): a column used to be a <layout> holding an <import>, and that is how
+# every leg below found one. The three imported forms are gone - each was painting its own theme
+# ground under the paper (SPEC R136, R137, B128) - so a column is now what V361 already called
+# one on the Numina tab: a direct <layout> child of the scrollBox BELOW the band at top=0. The
+# partition is by TOP and needs no name, which is the same reason V361 uses it (SPEC V135).
 $vampDoc = Doc (Join-Path $dir "WoD20.11.lfm")
-$vampCols221 = @($vampDoc.SelectNodes("//scrollBox/layout[import]") | Sort-Object { [int]$_.GetAttribute("left") })
+$bandTop221 = BandTop ($vampDoc.SelectSingleNode("//scrollBox"))
+$vampCols221 = @($vampDoc.SelectNodes("//scrollBox/layout") | Where-Object { [int]$_.GetAttribute("top") -gt $bandTop221 } | Sort-Object { [int]$_.GetAttribute("left") })
 # (1) no strip, and no bar of any kind: a bar coming back is a sub-tab coming back.
 $strip221 = $vampDoc.SelectSingleNode("//layout[@name='vampStrip']")
 if ($null -ne $strip221) { Fail "V221 vampStrip is back in WoD20.11 - the Ghoul tab has no sub-tabs since T832, and a strip here is the arrangement pedido 5 asked to be rid of (SPEC I118)" }
@@ -6459,7 +6778,7 @@ else {
     # the boxes ABOVE: everything that is not one of the columns
     $lowest = 0
     foreach ($l in $vampDoc.SelectNodes("//scrollBox/layout")) {
-        if ($l.SelectSingleNode("import")) { continue }
+        if ([int]$l.GetAttribute("top") -gt $bandTop221) { continue }
         $b = [int]$l.GetAttribute("top") + [int]$l.GetAttribute("height")
         if ($b -gt $lowest) { $lowest = $b }
     }
@@ -6471,16 +6790,18 @@ else {
     $prevEnd = $null
     foreach ($c in $vampCols221) {
         $cl = [int]$c.GetAttribute("left"); $cw = [int]$c.GetAttribute("width")
-        $sub = $c.SelectSingleNode("import").GetAttribute("file")
-        $sp = Join-Path $dir $sub
-        if (-not (Test-Path $sp)) { $bad221 += "$sub is imported and not on disk"; continue }
+        $sub = ColId361 $c
+        if (-not $sub) { $sub = "the column at x=$cl" }
+        # The column is exactly as wide as the boxes it HOLDS, read off the boxes themselves
+        # rather than off a second file. Same subtraction as before T909, one document instead
+        # of two - and this is the artefact the host actually loads (SPEC V20).
         $own = 0
-        foreach ($l in (Doc $sp).SelectNodes("//scrollBox/layout")) {
+        foreach ($l in $c.SelectNodes("layout")) {
             $r = [int]$l.GetAttribute("left") + [int]$l.GetAttribute("width")
             if ($r -gt $own) { $own = $r }
         }
-        if ($own -eq 0) { $bad221 += "$sub declares no top-level layout - its column would be measured against nothing (SPEC V209)" }
-        elseif ($cw -ne $own) { $bad221 += "the column holding $sub is ${cw}px wide and $sub declares $own - slack hides a column that shrank, and a shortfall is the scrollbar V225(a) exists to stop (SPEC V221(4), I118d)" }
+        if ($own -eq 0) { $bad221 += "the column at x=$cl holds no box - it would be measured against nothing (SPEC V209)" }
+        elseif ($cw -ne $own) { $bad221 += "the column holding $sub is ${cw}px wide and its own boxes close at $own - slack hides a column that shrank, and a shortfall is the scrollbar V225(a) exists to stop (SPEC V221(4), I118d)" }
         if ($null -ne $prevEnd -and $cl -lt $prevEnd) { $bad221 += "the column holding $sub opens at x=$cl and the one before it closes at $prevEnd - they overlap, and a panel is exempt from V40 so nothing else on the sheet would say so (SPEC V221(3), V262d)" }
         $prevEnd = $cl + $cw
     }
@@ -6495,7 +6816,7 @@ else {
     elseif ($tops221.Count -ne 1) { Fail "V221 the three columns open at $($tops221 -join ', ') - they are one row of columns and share one top (SPEC V221(2), I118a)" }
     elseif ($tops221[0] -lt $lowest) { Fail "V221 the columns open at $($tops221[0]), inside the boxes that end at $lowest" }
     elseif ($oddGap.Count -gt 0) { Fail "V221 the columns are $($gaps221 -join ', ')px apart, expected 5 - it is the same gutter every section box on the sheet keeps (SPEC V298, V221(3))" }
-    else { Pass "V221 no strip; the three columns open together at $($tops221[0]) clear of the boxes ending at $lowest, are disjoint in x 5px apart, and each is exactly as wide as the form it holds declares" }
+    else { Pass "V221 no strip; the three columns open together at $($tops221[0]) clear of the boxes ending at $lowest, are disjoint in x 5px apart, and each is exactly as wide as the boxes it holds" }
 }
 
 # ---- V361: the two tabs that lost their sub-tabs lost them the SAME way ----------------
@@ -6519,7 +6840,7 @@ else {
 # this block does not sweep them a fourth time (SPEC V135, B70).
 $V361_TABS = @(
     [pscustomobject]@{ F = 'WoD20.7.lfm';  Tab = 'Numina'; Cols = @('PSYCHIC PHENOMENA', 'HEDGE MAGIC PATHS', 'HEDGE MAGIC RITUALS') }
-    [pscustomobject]@{ F = 'WoD20.11.lfm'; Tab = 'Ghoul';  Cols = @('WoD20.12.lfm', 'WoD20.13.lfm', 'WoD20.14.lfm') }
+    [pscustomobject]@{ F = 'WoD20.11.lfm'; Tab = 'Ghoul';  Cols = @('CLAN DISCIPLINES', 'MAIN PATHS', 'RITUALS') }
 )
 # (a) half two: the band does not MOVE. A static check has no BEFORE to read, so it is FROZEN -
 # the same answer $FIELD_CONTRACT gave V362(a) and for the same reason (SPEC V362a). These are the
@@ -6553,6 +6874,32 @@ $V361_BAND = @(
 $V361_EXCEPT = @(
     [pscustomobject]@{ F = 'WoD20.7.lfm'; Was = 'WILLPOWER'; Now = 'TRUE FAITH' }
 )
+# (a) half three, and it is the OWNER's door rather than a leak in the freeze. The frozen band
+# above is HISTORY and stays byte for byte; what this list adds is the rect a named box reads
+# TODAY because the user asked for it after the freeze, each line naming the ask that moved it.
+# The check then matches the frozen rect OR the named one, so an UNNAMED slide still reddens -
+# which is the whole value of leg (a) and the reason the freeze is not simply re-taken at HEAD.
+# V362(b) is the rule being applied: an invariant does not veto an informed choice by the owner,
+# it RECORDS which one was made.
+#
+# 2026-09-02, T896 (SPEC I134e): every box on the Numina tab takes the width of PSYCHIC
+# PHENOMENA, so the top band goes 586/407/407 at 0/591/1003 to 466/466/466 at 0/471/942 and the
+# tab closes on 1408 instead of 1410. The third is keyed by its FROZEN title, WILLPOWER, because
+# leg (c) is what swaps it to TRUE FAITH and the two legs read the same row.
+# 2026-09-02, T913 (SPEC I137): the Y margin of every box went 20 -> 15, so a band box loses
+# 10 like any other. A BAND keeps ONE height or the bar reads ragged, and the tallest member sets
+# it: HEDGE MAGIC needs 131 and the other two would have shrunk to 105 on their own content. The
+# Ghoul band lands at 128 the same way, off BLOOD POOL. These rows REPLACE the T896 ones rather
+# than sitting beside them - a rect has one current value, and two live rows for one box is the
+# stale line V361 exists to refuse.
+$V361_RESIZED = @(
+    [pscustomobject]@{ F = 'WoD20.7.lfm';  T = 'HEDGE MAGIC';  L = 0;   Y = 10; W = 466; H = 131; Ask = 'T926' }
+    [pscustomobject]@{ F = 'WoD20.7.lfm';  T = 'QUINTESSENCE'; L = 471; Y = 10; W = 326; H = 131; Ask = 'T926' }
+    [pscustomobject]@{ F = 'WoD20.7.lfm';  T = 'WILLPOWER';    L = 802; Y = 10; W = 358; H = 131; Ask = 'T926' }
+    [pscustomobject]@{ F = 'WoD20.11.lfm'; T = 'DOMINATOR';    L = 0;   Y = 10; W = 578; H = 128; Ask = 'T936' }
+    [pscustomobject]@{ F = 'WoD20.11.lfm'; T = 'BLOOD POOL';   L = 583; Y = 10; W = 299; H = 128; Ask = 'T936' }
+)
+$v361ResizeHit = @{}
 $v361Bad = @()
 $v361Gesture = @()
 $v361Cols = 0
@@ -6565,25 +6912,25 @@ foreach ($t361 in $V361_TABS) {
     if ($null -eq $sb361) { $v361Bad += "(e) $($t361.F) has no scrollBox - the $($t361.Tab) tab would be measured by nothing (SPEC V209, B7)"; continue }
     $band361 = @()
     $cols361 = @()
+    $bandTop361 = BandTop $sb361
     foreach ($l361 in $sb361.SelectNodes("layout")) {
         $ly361 = 0
         [void][int]::TryParse($l361.GetAttribute("top"), [ref]$ly361)
-        if ($ly361 -eq 0) { $band361 += $l361 } else { $cols361 += $l361 }
+        if ($ly361 -eq $bandTop361) { $band361 += $l361 } else { $cols361 += $l361 }
     }
     $cols361 = @($cols361 | Sort-Object { [int]$_.GetAttribute("left") })
     $v361Cols += $cols361.Count
 
     # (a) half one, the ROSTER, inherited from V188 and now asked of BOTH tabs. A column names
-    # itself by the form it imports when it holds one and by its own title when it is drawn
-    # inline - one reader, two tabs, because the Ghoul columns are imported forms and the Numina
-    # ones are section boxes. The identity is what the roster lists; the reading is not doubled.
+    # itself by its own title when it IS a section box and by the title of its FIRST box when it
+    # is a container of them - one reader, two tabs, and since T909 the two tabs are the same
+    # shape: the Ghoul columns stopped being imported forms and became plain containers, so the
+    # 'name yourself by the file you import' branch has no caller left (SPEC I136i, V397, B128).
     if ($cols361.Count -ne 3) {
         $v361Bad += "(a) the $($t361.Tab) tab holds $($cols361.Count) layout(s) below its band, expected the 3 columns - one per entry of its roster, authored in the XML so a sheet whose Lua did not run still opens with them, and a strip coming back lands in this same set (SPEC I117, I118a, V18, V94)"
     } else {
         foreach ($c361 in $cols361) {
-            $imp361 = $c361.SelectSingleNode("import")
-            $lbl361 = $c361.SelectSingleNode("label")
-            $id361 = if ($null -ne $imp361) { $imp361.GetAttribute("file") } elseif ($null -ne $lbl361) { $lbl361.GetAttribute("text") } else { '' }
+            $id361 = ColId361 $c361
             if ($t361.Cols -notcontains $id361) {
                 $v361Bad += "(a) the $($t361.Tab) tab holds a column calling itself '$id361' and its roster is $($t361.Cols -join ', ') - the tab IS those three and nothing else (SPEC I117, I118a)"
             }
@@ -6597,10 +6944,7 @@ foreach ($t361 in $V361_TABS) {
         foreach ($want361 in $t361.Cols) {
             $found361 = $false
             foreach ($c361 in $cols361) {
-                $imp361 = $c361.SelectSingleNode("import")
-                $lbl361 = $c361.SelectSingleNode("label")
-                $id361 = if ($null -ne $imp361) { $imp361.GetAttribute("file") } elseif ($null -ne $lbl361) { $lbl361.GetAttribute("text") } else { '' }
-                if ($id361 -eq $want361) { $found361 = $true }
+                if ((ColId361 $c361) -eq $want361) { $found361 = $true }
             }
             if (-not $found361) { $v361Bad += "(a) no column of the $($t361.Tab) tab is '$want361' - the roster names three and this one answers to nothing on the sheet (SPEC I117, I118a, V209)" }
         }
@@ -6610,15 +6954,23 @@ foreach ($t361 in $V361_TABS) {
     # standing on it is the frozen one unless leg (c) names the swap.
     $contract361 = @($V361_BAND | Where-Object { $_.F -eq $t361.F })
     foreach ($fr361 in $contract361) {
+        # The rect this box may read: the frozen one, plus any the owner named in $V361_RESIZED.
+        $rects361 = @($fr361) + @($V361_RESIZED | Where-Object { $_.F -eq $fr361.F -and $_.T -eq $fr361.T })
         $hit361 = $null
-        foreach ($b361 in $band361) {
-            if ([int]$b361.GetAttribute("left") -eq $fr361.L -and [int]$b361.GetAttribute("top") -eq $fr361.Y -and
-                [int]$b361.GetAttribute("width") -eq $fr361.W -and [int]$b361.GetAttribute("height") -eq $fr361.H) { $hit361 = $b361 }
+        $via361 = $null
+        foreach ($want in $rects361) {
+            foreach ($b361 in $band361) {
+                if ([int]$b361.GetAttribute("left") -eq $want.L -and [int]$b361.GetAttribute("top") -eq $want.Y -and
+                    [int]$b361.GetAttribute("width") -eq $want.W -and [int]$b361.GetAttribute("height") -eq $want.H) { $hit361 = $b361; $via361 = $want }
+            }
+            if ($null -ne $hit361) { break }
         }
         if ($null -eq $hit361) {
-            $v361Bad += "(a) the $($t361.Tab) band no longer holds a box at $($fr361.L),$($fr361.Y) $($fr361.W)x$($fr361.H) and b5111c35 authored '$($fr361.T)' there - the request that took the sub-tabs out said the top box does not move, and a band that slid is the one change this rearrangement was told not to make (SPEC I117a, I118, V361a)"
+            $alt361 = if ($rects361.Count -gt 1) { " nor at the " + (($rects361 | Select-Object -Skip 1 | ForEach-Object { "$($_.L),$($_.Y) $($_.W)x$($_.H) its $($_.Ask) line names" }) -join ' nor ') } else { '' }
+            $v361Bad += "(a) the $($t361.Tab) band no longer holds a box at $($fr361.L),$($fr361.Y) $($fr361.W)x$($fr361.H) where b5111c35 authored '$($fr361.T)'$alt361 - the request that took the sub-tabs out said the top box does not move, so a band that slid without a line naming the ask is the one change that rearrangement was told not to make (SPEC I117a, I118, V361a)"
             continue
         }
+        if ($null -ne $via361.Ask) { $v361ResizeHit["$($fr361.F)|$($fr361.T)"] = $via361.Ask }
         $v361BandSeen++
         $ttl361 = $hit361.SelectSingleNode("label")
         $now361 = if ($null -ne $ttl361) { $ttl361.GetAttribute("text") } else { '' }
@@ -6676,6 +7028,13 @@ if ($v361Gesture.Count -eq 2) {
 # reaches is an exception that stopped measuring, which is the shape V240 already guards its own
 # stretched-box carve-out with (SPEC V209, B7).
 if ($V361_EXCEPT.Count -ne 1) { $v361Bad += "(c) the exception list holds $($V361_EXCEPT.Count) entr(y/ies) and V361(c) names exactly one - the willpower block leaving Numina. A second needs a new Q, or the list becomes the door (SPEC V361c, V362d, V351d)" }
+# A named resize that nobody reaches is a name outliving its reader - the same shape leg (c)
+# guards its own list with, and the reason V240 guards its carve-out (SPEC V209, B7).
+foreach ($rz361 in $V361_RESIZED) {
+    if (-not $v361ResizeHit.ContainsKey("$($rz361.F)|$($rz361.T)")) {
+        $v361Bad += "(a) $($rz361.Ask) names '$($rz361.T)' as resized to $($rz361.L),$($rz361.Y) $($rz361.W)x$($rz361.H) in $($rz361.F) and the box does not read that rect - either the ask was not built or the line is stale, and a stale line excuses the next slide (SPEC V209, V20)"
+    }
+}
 foreach ($ex361 in $V361_EXCEPT) {
     if (-not $v361ExceptHit.ContainsKey("$($ex361.F)|$($ex361.Was)")) {
         $v361Bad += "(c) the named exception '$($ex361.Was)' -> '$($ex361.Now)' in $($ex361.F) was never reached - the frozen rect still reads '$($ex361.Was)', so either the block the user asked to move is still there or this list is describing a swap that did not happen (SPEC V361c, I117d, V209)"
@@ -6688,7 +7047,7 @@ if ($v361Cols -eq 0) { $v361Bad += "(e) no column was found in either tab - legs
 if ($V361_BAND.Count -eq 0) { $v361Bad += "(e) the frozen band contract is empty - leg (a) would certify any band at all (SPEC V209)" }
 if ($v361BandSeen -eq 0) { $v361Bad += "(e) not one frozen band rect was matched - leg (c) reads the titles of boxes this run never found (SPEC V20, B7)" }
 if ($v361Bad) { foreach ($b in $v361Bad) { Fail "V361 $b" } }
-else { Pass "V361 both tabs that lost their sub-tabs lost them the same way - $v361Cols columns over 2 tabs, each roster answered by name, none hidden and none still named for selectTab; all $($V361_BAND.Count) band rects frozen at b5111c35 still stand where they were, with the one named exception (WILLPOWER -> TRUE FAITH) reached; and the two tabs agree on the drawing - one top each, $($v361Gesture[0].Gutters -join '/')px gutters on both, all three visible, both opening clear of their band" }
+else { Pass "V361 both tabs that lost their sub-tabs lost them the same way - $v361Cols columns over 2 tabs, each roster answered by name, none hidden and none still named for selectTab; all $($V361_BAND.Count) band rects frozen at b5111c35 are still authored, $($v361ResizeHit.Count) of them at a rect their own T-line names and the rest exactly as frozen, with the one named title swap (WILLPOWER -> TRUE FAITH) reached; and the two tabs agree on the drawing - one top each, $($v361Gesture[0].Gutters -join '/')px gutters on both, all three visible, both opening clear of their band" }
 
 # ---- V223: nothing calls a `local function` from above the line declaring it ------
 # Lua resolves a non-local name at COMPILE time, so a body written above the `local` that
@@ -6761,16 +7120,49 @@ else {
     $rectOf = { param($n) "$($n.GetAttribute('left'))|$($n.GetAttribute('top'))|$($n.GetAttribute('width'))|$($n.GetAttribute('height'))" }
     $cells = @()
     foreach ($c in $placed) {
+
+
+
+
+        # The ? does not REPLACE the entry in the count, it STANDS for it: the cell opens where
+        # the ? opens and the button behind it is the same cell, which is exactly how V297 reads
+        # the affiliation entry (SPEC V297a, I107a1). Excluding the ? instead moved the column
+        # from 135 to 160 and reported five columns in a four-column grid.
+        $ledBy = @($placed | Where-Object {
+            $_.GetAttribute("name") -like 'btnQ*' -and
+            $_.GetAttribute("top") -eq $c.GetAttribute("top") -and
+            ([int]$_.GetAttribute("left") + [int]$_.GetAttribute("width") + 5) -eq [int]$c.GetAttribute("left") })
+        if ($ledBy.Count -gt 0) { continue }
         $twins = @($placed | Where-Object { -not [object]::ReferenceEquals($_, $c) -and (& $rectOf $_) -eq (& $rectOf $c) })
         if ($c.GetAttribute("visible") -eq "false" -and $twins.Count -eq 1) { continue }
-        $cells += [int]$c.GetAttribute("left")
+        # The RIGHT edge of the cell, and for a ? it is the SPAN and not the button: the entry is
+        # the ? plus the control it leads, which is the same reading V297(a) makes of the
+        # affiliation row and the same one that keeps the column at 135 instead of 160 above.
+        # Taking the button's own 20px here would compare the Name edit against a question mark
+        # (SPEC V297a, I107a1, I136k).
+        $rr224 = [int]$c.GetAttribute("left") + [int]$c.GetAttribute("width")
+        if ($c.GetAttribute("name") -like 'btnQ*') {
+            foreach ($led224 in $placed) {
+                if ($led224.GetAttribute("top") -ne $c.GetAttribute("top")) { continue }
+                if ([int]$led224.GetAttribute("left") -ne ([int]$c.GetAttribute("left") + [int]$c.GetAttribute("width") + 5)) { continue }
+                $e224 = [int]$led224.GetAttribute("left") + [int]$led224.GetAttribute("width")
+                if ($e224 -gt $rr224) { $rr224 = $e224 }
+            }
+        }
+        $cells += [pscustomobject]@{ L = [int]$c.GetAttribute("left"); R = $rr224 }
     }
-    $cols = $cells | Group-Object | Sort-Object { [int]$_.Name }
+    $cols = $cells | Group-Object L | Sort-Object { [int]$_.Name }
     $offGrid = @($cols | Where-Object { $_.Count -ne 2 })
+    # The right edge, asked of the SAME columns (SPEC I136k, user 2026-09-02 item 4). V224 has
+    # measured where a column OPENS since B12 and never where it closes, so two entries could
+    # share an x and end 18px apart - which is what Name and the Clan/Family picker did, and what
+    # the owner asked to be rid of. It is one grid: both edges or neither.
+    $offRight = @($cols | Where-Object { (@($_.Group | ForEach-Object { $_.R } | Sort-Object -Unique)).Count -ne 1 })
     if ($cells.Count -ne 8) { Fail "V224 the DOMINATOR box holds $($cells.Count) placed controls, expected 8 - four label/input pairs (SPEC I30)" }
     elseif ($cols.Count -ne 4) { Fail "V224 the DOMINATOR box uses $($cols.Count) x positions, expected 4 - two label columns and two input columns (SPEC I30)" }
     elseif ($offGrid.Count) { Fail "V224 x=$($offGrid[0].Name) is used by $($offGrid[0].Count) control(s), not 2 - the two rows left the same column (SPEC B12)" }
-    else { Pass "V224 the DOMINATOR box is a grid: 8 controls on 4 shared columns ($(($cols | ForEach-Object { $_.Name }) -join ", "))" }
+    elseif ($offRight.Count) { Fail "V224 the column opening at x=$($offRight[0].Name) closes at $(@($offRight[0].Group | ForEach-Object { $_.R } | Sort-Object -Unique) -join ' and ') - one column, one right edge, or the two rows only look aligned from the left (SPEC I136k, B12)" }
+    else { Pass "V224 the DOMINATOR box is a grid on both edges: 8 controls on 4 shared columns ($(($cols | ForEach-Object { "$($_.Name)..$($_.Group[0].R)" }) -join ", "))" }
 }
 
 # ---- V225: the right rule of the Vampire tab, in two legs ------------------------
@@ -6800,9 +7192,13 @@ else {
 # three panes were stacked they all shared one container, so the first one served for all three;
 # side by side they have three DIFFERENT widths on purpose (I118d says not one box is redrawn), and
 # reading them all against the first would fail columns 2 and 3 for being wider than column 1.
+# AMENDED again in T909: the columns are no longer imported forms, so leg (a) reads the boxes
+# inside each column instead of opening a second file for them (SPEC I136i, V397). The question
+# it asks is unchanged - does the content fit the container it was given, on both axes.
 $vampTop = Doc (Join-Path $dir "WoD20.11.lfm")
-$cols225 = @($vampTop.SelectNodes("//scrollBox/layout[import]"))
-if ($cols225.Count -eq 0) { Fail "V225 no imported column in WoD20.11 - there is no container left to measure against (SPEC V209)" }
+$bandTop225 = BandTop ($vampTop.SelectSingleNode("//scrollBox"))
+$cols225 = @($vampTop.SelectNodes("//scrollBox/layout") | Where-Object { [int]$_.GetAttribute("top") -gt $bandTop225 })
+if ($cols225.Count -eq 0) { Fail "V225 no column below the band in WoD20.11 - there is no container left to measure against (SPEC V209)" }
 else {
     $tvW = ($cols225 | ForEach-Object { [int]$_.GetAttribute("width") } | Measure-Object -Maximum).Maximum
     $tvH = ($cols225 | ForEach-Object { [int]$_.GetAttribute("height") } | Measure-Object -Maximum).Maximum
@@ -6811,24 +7207,22 @@ else {
     $subsSeen = 0
 
     foreach ($col in $cols225) {
-        $imp = $col.SelectSingleNode("import")
-        $sub = $imp.GetAttribute("file")
-        $p = Join-Path $dir $sub
-        if (-not (Test-Path $p)) { $over += "$sub is imported by the Ghoul tab but is not on disk"; continue }
+        $sub = ColId361 $col
+        if (-not $sub) { $sub = "the column at x=$($col.GetAttribute('left'))" }
         $subsSeen++
-        # the container is the layout that holds THIS import, never the first one on the tab
+        # the container is THIS column, never the first one on the tab
         $cW = [int]$col.GetAttribute("width")
         $cH = [int]$col.GetAttribute("height")
         $widest = 0
         $lowest = 0
-        foreach ($l in (Doc $p).SelectNodes("//scrollBox/layout")) {
+        foreach ($l in $col.SelectNodes("layout")) {
             $r = [int]$l.GetAttribute("left") + [int]$l.GetAttribute("width")
             $b = [int]$l.GetAttribute("top") + [int]$l.GetAttribute("height")
             if ($r -gt $widest) { $widest = $r }
             if ($b -gt $lowest) { $lowest = $b }
             if ($l.SelectSingleNode("textEditor[starts-with(@name,'edt') and contains(@name,'Desc')]")) { $edges[$sub] = $r }
         }
-        if (-not $widest) { $over += "$sub has no top-level layout - leg (a) measured nothing there (SPEC V209)" }
+        if (-not $widest) { $over += "$sub holds no box - leg (a) measured nothing there (SPEC V209)" }
         elseif ($widest -gt $cW) { $over += "$sub closes at x=$widest inside its own column of $cW wide - $($widest - $cW)px of overflow is a horizontal scrollbar (SPEC I31)" }
         elseif ($lowest -gt $cH) { $over += "$sub ends at y=$lowest inside its own column of $cH tall - $($lowest - $cH)px of overflow is a vertical scrollbar (SPEC B52)" }
     }
@@ -6847,10 +7241,10 @@ else {
     # 390 / 565 / 520, so pointing (b) at them would be a ruler born red against correct code
     # (B106). Leg (a) is untouched and is the one that keeps a scrollbar out of the tab.
     $ruler = @($edges.Values | Sort-Object -Unique)
-    if ($subsSeen -lt 3) { Fail "V225 only $subsSeen sub-tab form(s) were read, expected 3 - leg (a) is covering less than the tab holds (SPEC V209)" }
+    if ($subsSeen -lt 3) { Fail "V225 only $subsSeen Ghoul column(s) were read, expected 3 - leg (a) is covering less than the tab holds (SPEC V209)" }
     elseif ($over.Count) { foreach ($o in $over) { Fail "V225 $o" } }
     elseif ($edges.Count -gt 1 -and $ruler.Count -ne 1) { Fail "V225 the $($edges.Count) boxes close on $($ruler.Count) different x ($($ruler -join ', ')) - they are one ruler (SPEC I31): $(($edges.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join '; ')" }
-    else { Pass "V225 (a) each of the $subsSeen Ghoul columns fits its OWN container on both axes, widest $($tvW)x$($tvH); leg (b) retired for good in T832 - the three columns close at three different x by design (I118d), and the cross-file agreement it bought is V221(3)+(4) now" }
+    else { Pass "V225 (a) each of the $subsSeen Ghoul columns fits its OWN container on both axes, widest $($tvW)x$($tvH); leg (b) retired for good in T832, and since T909 there is no second file to disagree with either (I136i)" }
 }
 
 # ---- V226: the strip is themed BY CONSTRUCTION -----------------------------------
@@ -7027,7 +7421,7 @@ foreach ($f in $files) { $v230Src += ,@($f.Name, [System.Text.Encoding]::UTF8.Ge
 $v230Src += ,@("module.xml", [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $plugin "module.xml"))))
 $v230Lang = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($langFile))
 $v230Src += ,@("localization.lang", $v230Lang)
-if ($files.Count -ne 15) { Fail "V230 read $($files.Count) .lfm, expected 15 - the check would pass having looked at less (SPEC V209)" }
+if ($files.Count -ne 12) { Fail "V230 read $($files.Count) .lfm, expected 12 - the check would pass having looked at less (SPEC V209). Was 15 until T909 (SPEC I136i)" }
 elseif ($v230Lang.Length -eq 0) { Fail "V230 localization.lang read empty - every needle below would pass by vacuum (SPEC V209)" }
 else {
     # (a) the brand is gone outright - no exception, comments included
@@ -7093,14 +7487,23 @@ if ($gapBad) { foreach ($b in $gapBad) { Fail "V231 $b" } }
 else { Pass "V231 the strip band is $(2 * $stripGap + $pillH)px - $stripGap above and below a $($pillH)px pill, symmetric by construction" }
 
 # ---- V286: the top gap, BY SCOPE (SPEC I74a, user 2026-08-25) ---------------------
-# Two numbers now, not one. The eleven tabs that hang off the top menu open at ZERO - the box
-# meets the black band and there is no seam. The three SUB-tab forms hang off vampStrip
-# instead, and they keep the 20 they had: zeroing them too would glue a sub-tab to its own
-# sub-bar, which nobody asked for.
+# ONE number again since T909. The eleven tabs that hang off the top menu open at ZERO - the
+# box meets the black band and there is no seam. There used to be a second group: the three
+# SUB-tab forms hanging off vampStrip, which kept the 20 they had so a sub-tab was not glued to
+# its own sub-bar. WoD20.12/.13/.14 WERE that group and they are gone - dissolved into WoD20.11
+# because each was painting its own theme ground under the paper (SPEC I136i, V397, B128).
 #
 # The two groups are DERIVED from the root form - a tab layout is one that imports a file -
 # so a tab added later falls into the right group without anyone editing a list here. Naming
 # the eleven would go stale exactly once, silently, and the zero-guard is what says so.
+# The 0 gained a DECLARED roster on 2026-09-02 (SPEC Q53, I140q, V286 amended): the owner asked
+# for a 10px gap above the first row of Numina and Ghoul, and REFUSED the one-node answer that
+# would have given it to all eleven. Still an EQUALITY on both sides - `= 0` or `= the declared
+# value` - and never `>= 0`, which is the defect leg (a) was written not to have.
+#
+# A roster line may not name 0: a line that changes nothing is a dead line, and a dead line is what
+# excuses the next tab to slide (SPEC V20, V328d).
+$TAB_TOP_GAP = @{ 'WoD20.7.lfm' = 10; 'WoD20.11.lfm' = 10 }
 $v286Bad = @()
 $v286Top = @($(Doc $rootPath).SelectNodes("//layout[@name][import/@file]") | ForEach-Object { $_.SelectSingleNode("import").GetAttribute("file") })
 if ($v286Top.Count -ne 11) {
@@ -7109,7 +7512,7 @@ if ($v286Top.Count -ne 11) {
     $v286Seen = 0
     $v286Sub = 0
     foreach ($f in $files) {
-        $sb = (Doc $f.FullName).SelectSingleNode("//scrollBox")
+        $sb = ContentRoot (Doc $f.FullName)
         if ($null -eq $sb) { continue }
         $tops = @()
         foreach ($c in $sb.ChildNodes) {
@@ -7123,17 +7526,23 @@ if ($v286Top.Count -ne 11) {
         if ($v286Top -contains $f.Name) {
             # (a) top-level: EXACTLY 0, and something has to sit on the ruler. ">= 0" is true
             # of every sheet ever authored and would pass a tab that opened at 200.
-            if ($min -ne 0) { $v286Bad += "$($f.Name) hangs off the top menu and opens its first box at top=$min, not 0 (SPEC I74a, V286a)" }
+            $want286 = 0
+            if ($TAB_TOP_GAP.ContainsKey($f.Name)) { $want286 = $TAB_TOP_GAP[$f.Name] }
+            if ($min -ne $want286) { $v286Bad += "$($f.Name) hangs off the top menu and opens its first box at top=$min, not the $want286 its scope asks for (SPEC I74a, V286a, I140q)" }
         } else {
             # (b) sub-tab: still 20. Their content answers to vampStrip, not to the top menu.
             $v286Sub++
             if ($min -ne 20) { $v286Bad += "$($f.Name) is a sub-tab form and opens at top=$min, not the 20 it keeps - only the eleven that hang off the top menu went to zero (SPEC I74a, V286b)" }
         }
     }
-    if ($v286Seen -ne 14) { $v286Bad += "only $v286Seen content form(s) were measured, expected 14 - this leg is covering less than the sheet has (SPEC V209)" }
-    if ($v286Sub -ne 3) { $v286Bad += "$v286Sub form(s) fell into the sub-tab group, expected 3 - with none there, leg (b) is a rule with nothing under it (SPEC V209)" }
+    if ($v286Seen -ne 11) { $v286Bad += "only $v286Seen content form(s) were measured, expected 11 - this leg is covering less than the sheet has (SPEC V209)" }
+    # LEG (b) RETIRED in T909, and what replaces it is its own complement. The group is empty, and
+    # a rule with nothing under it is a rule that can no longer fail (SPEC V20, B7) - so the count
+    # is inverted: a content form the root does NOT import is a file nothing on the sheet opens,
+    # which is the control-level orphan V2 refuses for fields.
+    if ($v286Sub -ne 0) { $v286Bad += "$v286Sub content form(s) are imported by no tab - since T909 every form hangs off the top menu, so a form outside that list is one nothing opens (SPEC I136i, V209, V286b retired)" }
     if ($v286Bad) { foreach ($b in $v286Bad) { Fail "V286 $b" } }
-    else { Pass "V286 all 11 top-level forms open at top=0 and the 3 sub-tab forms keep 20" }
+    else { Pass "V286 all 11 content forms hang off the top menu and open at top=0 - leg (b) retired with the sub-tab forms in T909" }
 }
 
 # ---- V287: the strip floor has no contour, in any era (SPEC I74b) ----------------
@@ -7179,15 +7588,21 @@ foreach ($f in $files) {
         # filigree somewhere to hang above the picture. Admitted by its exact NAME, not a wildcard:
         # it is one control, and the second direction below - a section box authoring a transparent
         # contour - stays exactly as strict as it was.
+        # 168th round: popScrim (SPEC B136, V404, I140a). It authors the transparent contour for
+        # the same reason the strip floor does - to keep the era's 3px rule off it - and it needs it
+        # more than any of them: it is 1595x936, so the rule it was silently taking was a frame around
+        # the WHOLE sheet, lit on every picker and every ?. Admitted by exact NAME, so the second
+        # direction below stays as strict as it was.
         if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -eq 'ornAvatar') { continue }
+        if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -eq 'popScrim') { continue }
         $v287Others += "$($f.Name) <$($n287.LocalName) name='$($n287.GetAttribute('name'))'>"
     }
 }
 if ($v287Others.Count) {
-    $v287Bad += "a transparent contour is authored outside the strip floor, the 19 buttons, the 19 markers, the 5 separators and the avatar carrier, on $($v287Others -join ', ') - the era paints a rule on every black rectangle and this idiom silently erases it (SPEC I74b, I5)"
+    $v287Bad += "a transparent contour is authored outside the strip floor, the 19 buttons, the 19 markers, the 5 separators, the avatar carrier and popScrim, on $($v287Others -join ', ') - the era paints a rule on every black rectangle and this idiom silently erases it (SPEC I74b, I5)"
 }
 if ($v287Bad) { foreach ($b in $v287Bad) { Fail "V287 $b" } }
-else { Pass "V287 the strip floor, the 19 buttons, the 19 markers, the 5 separators and the avatar carrier are the only controls authoring a transparent contour, and the floor does author it" }
+else { Pass "V287 the strip floor, the 19 buttons, the 19 markers, the 5 separators, the avatar carrier and popScrim are the only controls authoring a transparent contour, and the floor does author it" }
 
 # ---- V288..V292: the five alignments the 106th round was asked for -----------------
 # Every one of them is a RELATION between two things in the sheet, never a literal here: the
@@ -7500,7 +7915,7 @@ if ($null -eq $box297) {
     # PowerShell, so the roster would hand the loop a string where it expects the xpath list and
     # the leg would measure nothing (SPEC B7 - the same flattening that cost T830 two runs).
     foreach ($grp297 in @(
-        [pscustomobject]@{ N = 'affiliation'; X = @("button[@name='btnQhedgeAffiliation']", "button[@name='dynhedgeAffiliation']") }
+        [pscustomobject]@{ N = 'affiliation'; X = @("button[@name='dynhedgeAffiliation']") }
         [pscustomobject]@{ N = 'essence';     X = @("edit[@field='hedgeEssence']") }
         [pscustomobject]@{ N = 'attribute';   X = @("comboBox[@name='cboHedgeAttr']") }
     )) {
@@ -7821,7 +8236,7 @@ $discRows = 0
 if ($rootTxt -match 'CLAN_DISC_ROWS\s*=\s*(\d+)') { $discRows = [int]$Matches[1] }
 $released = 0
 
-if ($clanList.Count -lt 85) { $clanBad += "the clan picker offers $($clanList.Count) entries, expected at least the 85 it carries (61 clans + 24 revenant families) - this check would be reading less than the sheet has (SPEC V209)" }
+if ($clanList.Count -lt 84) { $clanBad += "the clan picker offers $($clanList.Count) entries, expected at least the 84 it carries (61 clans + 23 revenant families) - this check would be reading less than the sheet has (SPEC V209)" }
 elseif ($discSet.Count -lt 36) { $clanBad += "the disc picker offers $($discSet.Count) names, expected at least 36 - the spelling leg below would pass on a short list" }
 elseif ($discRows -lt 1) { $clanBad += "CLAN_DISC_ROWS is not declared - there is no slot count to measure against" }
 else {
@@ -7840,9 +8255,9 @@ else {
         if ($clanList -notcontains $k) { $clanBad += "CLANS carries '$k', which the clan picker does not offer (SPEC V236a)" }
     }
 }
-if ($clanSeen -lt 85) { Fail "V236 only $clanSeen clan(s) were measured, expected 85 - this check is covering less than the picker offers (SPEC V209)" }
+if ($clanSeen -lt 84) { Fail "V236 only $clanSeen clan(s) were measured, expected 84 - this check is covering less than the picker offers (SPEC V209)" }
 elseif ($clanBad) { foreach ($b in ($clanBad | Select-Object -First 12)) { Fail "V236 $b" } }
-else { Pass "V236 CLANS answers all 85 clans and families in the picker's own spelling, $released of them released by choice or open" }
+else { Pass "V236 CLANS answers all 84 clans and families in the picker's own spelling, $released of them released by choice or open" }
 
 # ---- V295: an entry PROMISES a number of slots, and that number has to fit ------------
 # B65: `choice` never said how MANY slots it opens, so renderClanDisc treated every slot
@@ -7925,7 +8340,7 @@ else {
 }
 # the trigger cannot live on the tab that draws the slots: it is managed, and may never open
 if ($rootTxt -notmatch '<dataLink field="clanFamily">') { $orphanBad += "the root form does not watch clanFamily - a tab that is never opened cannot be the thing that keeps the slots correct (SPEC V95, B26)" }
-foreach ($nf in @('WoD20.12.lfm', 'WoD20.13.lfm', 'WoD20.14.lfm', 'WoD20.11.lfm')) {
+foreach ($nf in @('WoD20.11.lfm')) {
     if ((CodeOf (Join-Path $dir $nf)) -match 'renderClanDisc\(') { $orphanBad += "$nf calls renderClanDisc - it is a managed tab, and the sheet must be correct whether or not it is ever opened (SPEC V95)" }
 }
 if (-not $cdFn) { Fail "V237 renderClanDisc is not on the root form - this check has nothing to read (SPEC I37, V209)" }
@@ -7972,7 +8387,7 @@ foreach ($f in $files) {
         }
     }
 }
-if ($proseFiles -lt 15) { Fail "V242 only $proseFiles .lfm were read, expected 15 - this check is covering less than the sheet has (SPEC V209)" }
+if ($proseFiles -lt 12) { Fail "V242 only $proseFiles .lfm were read, expected 12 - this check is covering less than the sheet has (SPEC V209). Was 15 until T909 (SPEC I136i)" }
 elseif ($proseBad) { foreach ($p in $proseBad) { Fail "V242 $p" } }
 else { Pass "V242 no bare prose in the Lua of $proseFiles files - every comment line carries its own -- (SPEC B54)" }
 
@@ -8011,7 +8426,7 @@ foreach ($f in $files) {
         if ($fn -eq 'c') { $dimComboBad += "$($f.Name) writes $($m.Groups[0].Value.Trim()) - the combo painters are the two that used to dim a dropdown (SPEC I41, V241)" }
     }
 }
-if ($dimComboSeen -lt 11) { Fail "V241 only $dimComboSeen comboBox(es) were read, expected the 11 the sheet declares - this check is covering less than the sheet has (SPEC V209). Was 17 until T872 took the four Vampire row combos away, 15 until T874 took the three Numina ones and 12 until its half B took cboHedgeAffiliation; the number is COVERAGE and the prohibition is unchanged" }
+if ($dimComboSeen -lt 9) { Fail "V241 only $dimComboSeen comboBox(es) were read, expected the 9 the sheet declares - this check is covering less than the sheet has (SPEC V209). Was 17 until T872 took the four Vampire row combos away, 15 until T874 took the three Numina ones and 12 until its half B took cboHedgeAffiliation; the number is COVERAGE and the prohibition is unchanged" }
 elseif ($dimComboBad) { foreach ($b in $dimComboBad) { Fail "V241 $b" } }
 else { Pass "V241 none of the $dimComboSeen dropdowns dims itself - a locked one still reads (SPEC I41)" }
 
@@ -8089,9 +8504,58 @@ foreach ($f in $files) {
         }
     }
 }
-if ($symSeen -lt 67) { Fail "V239 only $symSeen box(es) were measured, expected the 67 the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
+if ($symSeen -lt 70) { Fail "V239 only $symSeen box(es) were measured, expected the 70 the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($symBad) { foreach ($b in $symBad) { Fail "V239 $b" } }
 else { Pass "V239 all $symSeen boxes leave the same gap on both sides" }
+
+# ---- V400: the backdrop of a box covers the box EXACTLY --------------------------------
+# SPEC V400, B132, I139d, user 2026-09-02 item 5. Nine boxes across three files authored a
+# backdrop that was not the size of the box it sits in - five Notes boxes and three on Background
+# ten pixels TALLER than their layout, so the rounded bottom corner was clipped off the screen,
+# and one on Background ten pixels SHORTER, so the foot of the box carried no black at all.
+#
+# The gate was green over all nine for as long as they have existed, and that is the finding
+# rather than the drift: V239, V240 and V280(c) all SKIP the backdrop on purpose - it IS the box,
+# not a child of it - so three correct exclusions added up to a node with no owner. The two
+# opposite signs are why this is an EQUALITY and not "the backdrop is at least the box": a number
+# nobody compares walks both ways.
+#
+# The collector is V239's, to the letter. A box is a layout with a backdrop, and the backdrop is
+# align=client or a rect from 0,0 as wide as the box - height deliberately NOT part of finding it,
+# or a backdrop 10px off would stop being a backdrop and this rule would measure the sheet minus
+# exactly the boxes it was written for (SPEC B7).
+$v400Bad = @()
+$v400Seen = 0
+foreach ($f in $files) {
+    foreach ($box in (Doc $f.FullName).SelectNodes("//layout[@width]")) {
+        $bw400 = -1; $bh400 = -1
+        if (-not [int]::TryParse($box.GetAttribute("width"), [ref]$bw400)) { continue }
+        if (-not [int]::TryParse($box.GetAttribute("height"), [ref]$bh400)) { continue }
+        if ($bw400 -le 0 -or $bh400 -le 0) { continue }
+        foreach ($k in $box.ChildNodes) {
+            if ($k.NodeType -ne 'Element' -or $k.LocalName -ne 'rectangle') { continue }
+            if ($k.GetAttribute("align") -eq 'client') { $v400Seen++; break }
+            $kl400 = -1; $kt400 = -1; $kw400 = -1; $kh400 = -1
+            [void][int]::TryParse($k.GetAttribute("left"), [ref]$kl400)
+            [void][int]::TryParse($k.GetAttribute("top"), [ref]$kt400)
+            [void][int]::TryParse($k.GetAttribute("width"), [ref]$kw400)
+            [void][int]::TryParse($k.GetAttribute("height"), [ref]$kh400)
+            if ($kl400 -ne 0 -or $kt400 -ne 0 -or $kw400 -ne $bw400) { continue }
+            $v400Seen++
+            $ttl400 = '(untitled)'
+            foreach ($lb400 in $box.ChildNodes) {
+                if ($lb400.NodeType -eq 'Element' -and $lb400.LocalName -eq 'label' -and $lb400.GetAttribute("text")) { $ttl400 = $lb400.GetAttribute("text"); break }
+            }
+            if ($kh400 -ne $bh400) {
+                $v400Bad += "$($f.Name) '$ttl400' is ${bw400}x${bh400} and its backdrop is ${kw400}x${kh400} - $([math]::Abs($kh400 - $bh400))px of the box is drawn without one, or of the backdrop outside the box where the parent clips it (SPEC V400, B132)"
+            }
+            break
+        }
+    }
+}
+if ($v400Seen -lt 69) { Fail "V400 only $v400Seen backdrop(s) were measured, expected at least the 69 boxes the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
+elseif ($v400Bad) { foreach ($b400 in $v400Bad) { Fail "V400 $b400" } }
+else { Pass "V400 all $v400Seen box backdrops cover their box exactly - none clipped by the parent, none leaving a foot unpainted" }
 
 
 # ---- V240: a box is SYMMETRIC on the Y axis, and the TITLE counts -----------------------
@@ -8221,7 +8685,7 @@ foreach ($f in $files) {
             # this is the titled arm.
             $bodyTop = 20
             if ($hiC -eq [int]::MaxValue) { $vpadBad += "$($f.Name) '$ttl' is stretched and holds nothing under its title - the exception is for a box that pays centring, not for an empty one (SPEC V267b)" }
-            elseif ($hi -lt 20) { $vpadBad += "$($f.Name) '$ttl' opens with $hi above its title - stretched or not, the title still clears 20 (SPEC I40, V267b)" }
+            elseif ($hi -ne $BOX_PAD_Y) { $vpadBad += "$($f.Name) '$ttl' opens with $hi above its title, not the $BOX_PAD_Y the head takes - stretched or not, the head is an equality (SPEC I40, V267b, I137c)" }
             # The content still clears the title band by the sheet's own margin (SPEC I86c). This
             # leg is what makes the 114th round's move a CEILING and not a direction: WILLPOWER,
             # the taller of the two, lands at exactly 20 under its title, so one more pixel up
@@ -8234,12 +8698,12 @@ foreach ($f in $files) {
             # accept the odd pixel on either side and stop measuring which.
             elseif ($hiC -ne ($bodyTop + [math]::Floor(($bh - $bodyTop - ($loC - $hiC)) / 2))) { $vpadBad += "$($f.Name) '$ttl' ($($bh)px tall) opens its content at $hiC, not the $($bodyTop + [math]::Floor(($bh - $bodyTop - ($loC - $hiC)) / 2)) that centres it in the body with the odd pixel below - a stretched box pays CENTRING in place of the 20 (SPEC V267b, I73)" }
         }
-        elseif ($hi -lt 20 -or $gapB -lt 20) {
-            $vpadBad += "$($f.Name) '$ttl' ($($bh)px tall) opens with $hi above its first child and leaves $gapB under its last - neither may drop under 20 (SPEC I40, I73, V280a)"
+        elseif ($hi -ne $BOX_PAD_Y -or $gapB -lt $BOX_PAD_Y) {
+            $vpadBad += "$($f.Name) '$ttl' ($($bh)px tall) opens with $hi above its first child and leaves $gapB under its last - the head is exactly $BOX_PAD_Y and the foot never drops under it (SPEC I40, I73, V280a, I137c)"
         }
     }
 }
-if ($vpadSeen -lt 67) { Fail "V240 only $vpadSeen box(es) were measured, expected the 67 the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
+if ($vpadSeen -lt 70) { Fail "V240 only $vpadSeen box(es) were measured, expected the 70 the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($stretchSeen -ne 2) { Fail "V240 $stretchSeen stretched box(es) took the centring rule, expected the 2 of the tabHedge band - an exception nothing reaches is an exception that stopped measuring (SPEC V209, V267b)" }
 elseif ($vpadBad) { foreach ($b in $vpadBad) { Fail "V240 $b" } }
 else { Pass "V240 all $vpadSeen boxes breathe at least 20 above their title and 20 under their last row, and the $stretchSeen stretched ones centre their content instead" }
@@ -8412,7 +8876,7 @@ foreach ($a in $descAreas) {
 # saying which pane left and why, and a rule that reddens on its own retirement note is the false
 # positive V222 was written for - measured twice already, on 'denied' and on maxDiscLevel( (SPEC
 # V222b). What is refused is the pane coming back in the XML or the saver in the Lua, both code.
-foreach ($gf in @('WoD20.12.lfm', 'WoD20.13.lfm', 'WoD20.14.lfm', 'WoD20.7.lfm')) {
+foreach ($gf in @('WoD20.11.lfm', 'WoD20.7.lfm')) {
     $gt = NoComments ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir $gf))))
     foreach ($ghost in @('edtDiscDesc', 'edtPathDesc', 'edtRitualDesc', 'edtHedgeDesc', 'edtPsychicDesc', 'edtHedgeRitualDesc', 'edtFaithDesc', 'NO_TEXT_YET', 'saveNuminaDesc')) {
         if ($gt -match [regex]::Escape($ghost)) { $typedBad += "$gf names $ghost again - waves 3 and 4 moved the storyteller's write to savePopDesc (V365f) and a pane back here is a second owner of the same text with no ruler on it (SPEC V135, B98, T872, T874)" }
@@ -8444,14 +8908,17 @@ else { Pass "V251 not one of the five burned ritual names (ritual_21..ritual_25)
 # The fifteen PICKED rows are kept in level-then-name order and the five typed ones are left
 # where the storyteller wrote them: the sort moves values between slots, and a typed ritual
 # would leave its own description behind (SPEC I47, V252a, V249).
-$r14 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.14.lfm")))
-$r14Doc = Doc (Join-Path $dir "WoD20.14.lfm")
+$r14 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.11.lfm")))
+$r14Doc = Doc (Join-Path $dir "WoD20.11.lfm")
 $sortFn = LuaFn $r14 'sortRituals'
 $flashFn = LuaFn $r14 'flashRitual'
 $rankFn = LuaFn $r14 'ritualRank'
-$guardLink = @($r14Doc.SelectNodes("//dataLink[contains(@onChange,'guardPick')]") | ForEach-Object { $_.GetAttribute("onChange") })
+# Keyed on sortRituals and not on guardPick since T909: WoD20.11 carries the path guard AND the
+# ritual guard now that the three column forms were dissolved into it, and "the first dataLink
+# with a guardPick" stopped meaning "the ritual one" the moment they shared a file (SPEC I136j).
+$guardLink = @($r14Doc.SelectNodes("//dataLink[contains(@onChange,'sortRituals')]") | ForEach-Object { $_.GetAttribute("onChange") })
 
-if (-not $sortFn) { Fail "V252 sortRituals not found on WoD20.14 - nothing keeps the list in order" }
+if (-not $sortFn) { Fail "V252 sortRituals not found on WoD20.11 - nothing keeps the list in order" }
 elseif (-not $rankFn) { Fail "V252 ritualRank not found - the sort key would be inline and the level read in a second place (SPEC V184)" }
 elseif ($rankFn -notmatch '\^\(%d\+\)%\. ') { Fail "V252 the sort key does not read the level off the name prefix - a second table for the level is exactly what V184 forbids" }
 elseif ($sortFn -notmatch 'local last = RITUAL_ROWS - RITUAL_FREE_ROWS;') { Fail "V252 the sort does not stop at the picked rows - it would move the typed ones and leave their descriptions behind (SPEC V252a, V249)" }
@@ -8477,7 +8944,7 @@ $hlTpl = $r14Doc.SelectSingleNode("//template[@name='RitualRow']")
 $hlRect = $null
 if ($hlTpl) { $hlRect = $hlTpl.SelectSingleNode("rectangle[@name='hl`$(field)']") }
 
-if ($null -eq $hlTpl) { Fail "V253 RitualRow is gone from WoD20.14 (SPEC V20)" }
+if ($null -eq $hlTpl) { Fail "V253 RitualRow is gone from WoD20.11 (SPEC V20)" }
 elseif ($null -eq $hlRect) { Fail "V253 the ritual row carries no highlight rectangle - there is nothing to flash (SPEC I47)" }
 elseif ($hlRect.GetAttribute("visible") -ne 'false') { Fail "V253 the highlight is authored visible - every row would open lit" }
 elseif ($hlRect.GetAttribute("hitTest") -ne 'false') { Fail "V253 the highlight takes the click - the row would be unusable for the second it is up" }
@@ -8639,8 +9106,19 @@ $typedSpec = @(
     # dots ARE the level, bound to $(field)_1.._5 (SPEC V269b, V269d). Converting it MEASURED as
     # deleting 25 fields that hold data - hedgeRitual_13_1..17_5 - so the third stopped and became
     # a question for the spec instead of a silent loss (SPEC V362a, B122).
-    @{ File = 'WoD20.7.lfm';  Tpl = 'HedgeRitualFree';  Pick = 'HedgeRitualPicker' }
+    # EMPTY since T892, and the roster stays DECLARED rather than deleted: it shrank one wave at a
+    # time and the shape of the shrinking is the record. HedgeRitualFree was the last one left, and
+    # it is the one that could not convert while its dots CARRIED the level in $(field)_1.._5 -
+    # swapping the template would have eaten 25 fields holding data (SPEC B122). T892 gave the
+    # picker pane a Ritual Level row, so the level is ASKED there and the five fields are written
+    # by the confirm instead of by a dot the player clicks (SPEC V269b, V378a).
 )
+
+# The guard that replaces the walk above. An empty roster measures NOTHING, so what is held here
+# is the other half of the promise: a retired template coming BACK would put an editable row on a
+# sheet where every row is a picker, and the loop over an empty list cannot notice (SPEC V20, B7).
+$V255_RETIRED = @('SpecialityFreeRow', 'OpenAbilityFreeRow', 'DiscFreeRow', 'SecPathFreeRow',
+                  'RitualFreeRow', 'NuminaFree', 'PsychicFree', 'HedgeRitualFree')
 $typedBad2 = @()
 $typedSeen = 0
 foreach ($ts in $typedSpec) {
@@ -8671,13 +9149,19 @@ foreach ($ts in $typedSpec) {
 $renderSpecFn = LuaFn $rootTxt 'renderSpecialities'
 $grantSpecFn  = LuaFn $rootTxt 'grantSpeciality'
 $bound = 'for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do'
-if ($typedSeen -lt 1) { Fail "V255 only $typedSeen of the one typed template left was read - this check is covering less than the sheet has (SPEC V209). Was six until T873 converted the three on the Ghoul tab and three until T875 converted NuminaFree and PsychicFree; HedgeRitualFree is the one left, and it stayed because its dots CARRY the level (SPEC V269b, B122)" }
-elseif ($typedBad2.Count -gt 0) { foreach ($b in $typedBad2) { Fail "V255 $b" } }
+foreach ($gt255 in $V255_RETIRED) {
+    foreach ($f255 in $files) {
+        if ($null -ne (Doc $f255.FullName).SelectSingleNode("//template[@name='$gt255']")) {
+            $typedBad2 += "$($f255.Name) declares '$gt255' again - that template was retired when its family became pickers, and a typed row back on the sheet is one level with two owners (SPEC V378a, V269b, V135)"
+        }
+    }
+}
+if ($typedBad2.Count -gt 0) { foreach ($b in $typedBad2) { Fail "V255 $b" } }
 elseif (-not $renderSpecFn) { Fail "V255 renderSpecialities is gone - nothing locks a granted specialty" }
 elseif ($renderSpecFn -notmatch [regex]::Escape($bound)) { Fail "V255 renderSpecialities still walks every row - it looks for a combo the typed rows do not have (SPEC V255d)" }
 elseif (-not $grantSpecFn) { Fail "V255 grantSpeciality is gone - the gift a trait hands out has nowhere to land" }
 elseif ($grantSpecFn -notmatch [regex]::Escape($bound)) { Fail "V255 the gift can still land in a typed row - nothing there locks it, so the player could type over a granted specialty and keep the stamp (SPEC V255d, V151)" }
-else { Pass "V255 both typed boxes hand their field to an <edit> on the picker's own column, and the gift stops at the picker rows" }
+else { Pass "V255 none of the $($V255_RETIRED.Count) retired typed-row template(s) is authored anywhere, and the granted specialty stops at the picker rows" }
 
 # ---- V256: the darker ground under the two locked XP numbers is a TRIO --------------------
 # Rectangle behind, transparent edit, palette key: any one of the three missing and the effect
@@ -9278,19 +9762,20 @@ $numTxt267 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllByt
 # one top, one height, and the band closing on the ruler the columns below it use.
 $hedgePane267 = $numDoc267.SelectSingleNode("//scrollBox")
 
-# (a) three boxes, one top, one height, and the band closes where the panes close.
+# (a) FOUR boxes since T920 - the fourth is EXPERIENCE, and it is the count that moved and not the rule: one top, one height, and the band closes where the panes close (SPEC I139g).
 if ($null -eq $hedgePane267) { Fail "V267 WoD20.7 has no scrollBox - this check reads nothing (SPEC V209)" }
 else {
+    $bandTop267 = BandTop $hedgePane267
     $band267 = @()
     foreach ($bx in $hedgePane267.SelectNodes("layout[rectangle]")) {
         $bt = -1; $bl = -1; $bw = -1; $bh = -1
         if (-not ([int]::TryParse($bx.GetAttribute("top"), [ref]$bt) -and [int]::TryParse($bx.GetAttribute("left"), [ref]$bl) -and
                   [int]::TryParse($bx.GetAttribute("width"), [ref]$bw) -and [int]::TryParse($bx.GetAttribute("height"), [ref]$bh))) { continue }
-        if ($bt -ne 0) { continue }
+        if ($bt -ne $bandTop267) { continue }
         $t267 = $bx.SelectSingleNode("label")
         $band267 += [pscustomobject]@{ N = $(if ($t267) { $t267.GetAttribute("text") } else { 'box' }); L = $bl; R = $bl + $bw; H = $bh }
     }
-    if ($band267.Count -ne 3) { $v267Bad += "the band across the top of tabHedge holds $($band267.Count) box(es), expected the 3 the request asks for - HEDGE MAGIC, QUINTESSENCE and, since T830, TRUE FAITH where WILLPOWER stood (SPEC I63, I117d, V209)" }
+    if ($band267.Count -ne 4) { $v267Bad += "the band across the top of tabHedge holds $($band267.Count) box(es), expected 4 - HEDGE MAGIC, QUINTESSENCE, TRUE FAITH where WILLPOWER stood since T830, and EXPERIENCE, which the owner asked for beside them on 2026-09-02 and which pays the band ruler like the other three (SPEC I63, I117d, V209)" }
     else {
         $heights267 = @($band267 | ForEach-Object { $_.H } | Sort-Object -Unique)
         if ($heights267.Count -ne 1) { $v267Bad += "the band closes on $($heights267.Count) different bases ($($heights267 -join ', ')) - 'the same height as the box beside it' is the request in letter (SPEC I63, V267a)" }
@@ -9332,7 +9817,7 @@ foreach ($ff267 in $files) {
         else { $tplHome267[$tn267] = $ff267.Name }
     }
 }
-if ($tplHome267.Count -lt 27) { Fail "V267 only $($tplHome267.Count) template(s) were read across the sheet - this leg is covering less than the sheet has (SPEC V209)" }
+if ($tplHome267.Count -lt 26) { Fail "V267 only $($tplHome267.Count) template(s) were read across the sheet - this leg is covering less than the sheet has (SPEC V209). 27 until T892 deleted HedgeRitualFree, the last typed-row template on the sheet" }
 foreach ($d267b in $tplDup267) { $v267Bad += "$d267b - a template name is module-global, and the duplicate makes rdk exit 1 with no message at all, deleting the .rpk on its way out (SPEC B19, V267d)" }
 
 if ($v267Bad) { foreach ($b in $v267Bad) { Fail "V267 $b" } }
@@ -9373,8 +9858,7 @@ $v269Bad = @()
 
 # (a) the twelve PICKED rows wear the book's level in art: no field, no click, dimmed.
 $ritPick269 = $numDoc267.SelectSingleNode("//template[@name='HedgeRitualPicker']")
-$ritFree269 = $numDoc267.SelectSingleNode("//template[@name='HedgeRitualFree']")
-if ($null -eq $ritPick269 -or $null -eq $ritFree269) { Fail "V269 the ritual row templates are missing from WoD20.7 - this check reads nothing (SPEC V209)" }
+if ($null -eq $ritPick269) { Fail "V269 the ritual row template is missing from WoD20.7 - this check reads nothing (SPEC V209)" }
 else {
     $pickDots269 = @($ritPick269.SelectNodes("imageCheckBox"))
     if ($pickDots269.Count -ne 5) { $v269Bad += "a picked ritual row draws $($pickDots269.Count) dot(s), expected 5 - the level it shows runs 1 to 5 (SPEC I65)" }
@@ -9384,12 +9868,24 @@ else {
         if ($d269.GetAttribute("opacity") -ne '0.40') { $v269Bad += "a dot of HedgeRitualPicker reads live at opacity '$($d269.GetAttribute('opacity'))' - read-only art is dimmed on this sheet (SPEC V111, V269a)" }
     }
 
-    # (b) the five TYPED rows own real dots, and only they are declared as traits.
-    $freeDots269 = @($ritFree269.SelectNodes("imageCheckBox"))
-    if ($freeDots269.Count -ne 5) { $v269Bad += "a typed ritual row draws $($freeDots269.Count) dot(s), expected 5 (SPEC I65)" }
-    foreach ($d269b in $freeDots269) {
-        if (-not $d269b.GetAttribute("field")) { $v269Bad += "a dot of HedgeRitualFree owns no field - the storyteller's homebrew has no prefix to read its level from, so the dots ARE the level (SPEC V269b, V269d)" }
-        if ($d269b.GetAttribute("onClick") -notmatch 'xpClick') { $v269Bad += "a dot of HedgeRitualFree does not reach xpClick - it would mark itself for free (SPEC V99, V134, V269b)" }
+    # (b) REWRITTEN in T892 (user 2026-09-02). It used to read HedgeRitualFree, whose dots were
+    # BOUND to $(field)_1.._5 and clickable. That template is gone: every ritual row is a picker
+    # and the level of a homebrew one is chosen in the picker pane instead (SPEC V378a).
+    #
+    # The five fields did NOT go anywhere - that is the whole reason this shape was chosen over
+    # binding the picker's dots, which would have left every saved sheet's book rituals drawing
+    # blank. They are written by the confirm and read by hedgeRitualLevel, and nothing AUTHORS
+    # them any more, so their existence is held HERE rather than by a field sweep (SPEC B122).
+    if ($null -ne $numDoc267.SelectSingleNode("//template[@name='HedgeRitualFree']")) {
+        $v269Bad += "HedgeRitualFree is back on WoD20.7 - the level of a homebrew ritual is asked for in the picker pane since T892, and an editable dot beside it is a second owner for one number (SPEC V269b, V135)"
+    }
+    $conf269 = LuaFn $rootTxt 'mfConfirm'
+    if (-not $conf269) { $v269Bad += "mfConfirm is gone - nothing carries the pane's level out to the row (SPEC V209)" }
+    elseif ($conf269 -notmatch 'setField\(MF\.field \.\. "_" \.\. d, d <= \(MF\.level or 0\)\)') {
+        $v269Bad += "the picker's confirm does not write the level to the row's five fields - a homebrew ritual would be saved with a name and no level, and the dots beside it would never light again (SPEC V269b, T892)"
+    }
+    elseif ($conf269.IndexOf('setField(MF.field .. "_" .. d') -gt $conf269.IndexOf('setField(MF.field, nm)')) {
+        $v269Bad += "the confirm writes the level AFTER the name - writing the name is what wakes the dot painter, so the row would draw one repaint behind the level it was just given (SPEC V269b, T892)"
     }
 }
 if ($rootTxt -notmatch 'for i = TYPED_ROW_FROM\.hedgeRitual, HEDGE_RITUAL_ROWS, 1 do declareTrait\("hedgeRitual_" \.\. i, 1, 5, 0\); end;') {
@@ -9410,6 +9906,20 @@ if ($rootTxt -notmatch 'if kind == "Ritual" then return 1; end;') { $v269Bad += 
 # (d) ONE reader of the level. The painter on WoD20.7 calls the root's, so the art on screen
 # and the price in the log cannot tell two stories.
 if ($rootTxt -notmatch '(?m)^\s*function hedgeRitualLevel\(field, value, node\)') { $v269Bad += "hedgeRitualLevel is not a global on the root form - the painter on another .lfm could not reach it and would grow a copy of the grammar (SPEC V223, V269d)" }
+# T892: the ORDER inside it carries the rule. The book's prefix answers first and the five fields
+# answer only when there is no prefix to read - reversed, a ritual taken off the list would be
+# priced by whatever those fields happen to still hold from an earlier pick (SPEC V269d).
+$lvl269 = LuaFn $rootTxt 'hedgeRitualLevel'
+if (-not $lvl269) { $v269Bad += "hedgeRitualLevel has no body to read - the level of every ritual on the sheet comes through it (SPEC V209, V269d)" }
+else {
+    $pre269 = $lvl269.IndexOf('%d+')
+    $dot269 = $lvl269.IndexOf('liveLevel(')
+    if ($pre269 -lt 0)      { $v269Bad += "hedgeRitualLevel no longer reads the '<n>. ' prefix - a ritual off the book would lose the level printed on its own name (SPEC V269a, V269d)" }
+    elseif ($dot269 -lt 0)  { $v269Bad += "hedgeRitualLevel never falls back to the row's dot fields - a homebrew ritual has no prefix, so its level would read zero for good (SPEC V269b, T892)" }
+    elseif ($pre269 -gt $dot269) { $v269Bad += "hedgeRitualLevel asks the dot fields BEFORE the prefix - a ritual off the list would be priced by whatever those five fields still hold (SPEC V269d, T892)" }
+    if ($lvl269 -match 'isTypedRow') { $v269Bad += "hedgeRitualLevel still asks isTypedRow - HEDGE_RITUAL_FREE_ROWS is zero since T892, so that branch can never be taken and the level it holds is unreachable (SPEC T892, B7)" }
+}
+if ($rootTxt -notmatch '(?m)^\s*HEDGE_RITUAL_FREE_ROWS = 0;') { $v269Bad += "HEDGE_RITUAL_FREE_ROWS is not zero - T892 converted the last five typed ritual rows, and a non-zero count here would stop the dot painter short of the rows it now owns (SPEC V378a, V383b)" }
 $paintRit269 = LuaFn $numTxt267 'paintHedgeRitualDots'
 if (-not $paintRit269) { $v269Bad += "paintHedgeRitualDots is gone - the picked rows own no dot field, so nothing would ever light them (SPEC V269a)" }
 elseif ($paintRit269 -notmatch 'hedgeRitualLevel\(field, sheet\[field\]\)') { $v269Bad += "the dot painter does not read the level through hedgeRitualLevel - a second copy of the '<n>. ' grammar drifts from the one the log prices with (SPEC V269d)" }
@@ -9666,10 +10176,10 @@ $v273Bad = @()
 $PAG273  = "p" + [char]0xE1 + "g."
 $COMP273 = "Sorcerer" + [char]0x2019 + "s Companion"
 $BOOK273 = @{
-    "M20 Sorcerer"          = @(18, 76)
+    "M20 Sorcerer"          = @(18, 95)
     "The Hunters Hunted II" = @(69, 142)
 }
-$BOOK273[$COMP273] = @(15, 31)
+$BOOK273[$COMP273] = @(14, 31)
 $numEn273 = DescEntries (Join-Path $plugin "descNumina_en.lua") 'DESC' 'en'
 $numPt273 = DescEntries (Join-Path $plugin "descNumina_pt.lua") 'DESC' 'pt'
 if ($null -eq $numEn273) { $v273Bad += "descNumina_en.lua is missing from the plugin root, or its DESC markers are gone - there is no [en] text to measure (SPEC I24, V209, V210)" }
@@ -9707,7 +10217,7 @@ else {
                 if (-not $BOOK273.ContainsKey($bk273)) { $v273Bad += "'$key273' [$lang273] cites '$bk273', which is not one of the three books SPEC R109 names (SPEC V273b)"; continue }
                 # (c) the page is a number inside the range of the book it names.
                 $range273 = $BOOK273[$bk273]
-                if ($pg273 -lt $range273[0] -or $pg273 -gt $range273[1]) { $v273Bad += "'$key273' [$lang273] cites $bk273 p. $pg273, outside the $($range273[0])-$($range273[1]) the numina of that book occupy (SPEC V273c, R107, R108, R109)"; continue }
+                if ($pg273 -lt $range273[0] -or $pg273 -gt $range273[1]) { $v273Bad += "'$key273' [$lang273] cites $bk273 p. $pg273, outside the $($range273[0])-$($range273[1]) the numina, hedge rituals and affiliations of that book occupy (SPEC V273c, R107, R108, R109)"; continue }
                 $cite273[$lang273] = "$bk273|$pg273"
             }
             # (d) one entry is one source: a translation that changed book or page is drift that
@@ -9717,12 +10227,12 @@ else {
             }
         }
         if ($seen273 -eq 0) { $v273Bad += "the DESC region parsed to zero entries - the parser or the generated shape drifted and every leg above passed by default (SPEC V209)" }
-        elseif ($seen273 -ne 50) { $v273Bad += "descNumina_en.lua holds $seen273 entries, expected 50 - the 49 the two pickers offer plus True Faith, which has no picker and is an entry all the same (SPEC I70, I61, V265a)" }
-        elseif ($numPt273.Count -ne 50) { $v273Bad += "descNumina_pt.lua holds $($numPt273.Count) entries, expected 50 - the halves are read one at a time now, and a short [pt] side is text no reader of that language can reach (SPEC V210a, I70)" }
+        elseif ($seen273 -ne 128) { $v273Bad += "descNumina_en.lua holds $seen273 entries, expected 128 - the 49 the two numina pickers offer, plus True Faith, which has no picker and is an entry all the same, plus the 52 hedge rituals of T928 and the 26 affiliations of T929 (SPEC I70, I61, V265a, I140l, I140m)" }
+        elseif ($numPt273.Count -ne 128) { $v273Bad += "descNumina_pt.lua holds $($numPt273.Count) entries, expected 128 - the halves are read one at a time now, and a short [pt] side is text no reader of that language can reach (SPEC V210a, I70)" }
     }
 }
 if ($v273Bad) { foreach ($b in $v273Bad) { Fail "V273 $b" } }
-else { Pass "V273 all 50 numina descriptions open with book and page in both languages, name themselves in the second block, and cite one source per entry" }
+else { Pass "V273 all $seen273 numina descriptions open with book and page in both languages, name themselves in the second block, and cite one source per entry" }
 
 
 # ---- V274: the two manual-entry flags are fail-closed, and the mirror is declared ----------
@@ -9742,17 +10252,23 @@ else {
         if ($stDoc274.SelectSingleNode("//dataLink[@field='$($chk274[1])'][@defaultValue]")) { $v274Bad += "$($chk274[1]) declares a defaultValue - the flag must be fail-closed on nil, and a default is a second place for that answer to live (SPEC V274a, V80, V89)" }
     }
 
-    # (e) the box grew 60 and stayed symmetric: 10 above the title, 10 under the last row, and
-    # Save is still the last input in it (SPEC V240, V238b).
+    # (e) the box grew 60 and stayed symmetric: the head above the title, the same under the last
+    # row, and Save is still the last input in it (SPEC V240, V238b).
+    #
+    # DERIVED off the margin since T913 rather than carrying 419 as a literal: this was the THIRD
+    # place the sheet wrote the same number down, and the margin change is what made the three
+    # disagree out loud (SPEC B70, B130, I137c). Content closes at 419 - 20 = 399 whatever the
+    # margin is; the box is that plus one head and one foot.
     $h274 = [int]$stBox274.GetAttribute("height")
-    if ($h274 -ne 419) { $v274Bad += "the box is $h274 tall, expected 419 - two flags of 25 at a pitch of 30 moved everything under them by 60, and I73 added the 20 (SPEC V274e, I71, I73)" }
+    $want274 = 399 - 20 + (2 * $BOX_PAD_Y)
+    if ($h274 -ne $want274) { $v274Bad += "the box is $h274 tall, expected $want274 - two flags of 25 at a pitch of 30 moved everything under them by 60, and the box carries one head and one foot on top of that (SPEC V274e, I71, I73, I137c)" }
     $kids274 = @($stBox274.ChildNodes | Where-Object { $_.NodeType -eq "Element" -and $_.LocalName -ne "rectangle" -and $_.HasAttribute("top") })
     if ($kids274.Count -eq 0) { $v274Bad += "the box holds no placed control - the two gaps below would be measured against nothing (SPEC V209)" }
     else {
         $minTop274 = ($kids274 | ForEach-Object { [int]$_.GetAttribute("top") } | Measure-Object -Minimum).Minimum
         $maxBot274 = ($kids274 | ForEach-Object { [int]$_.GetAttribute("top") + [int]$_.GetAttribute("height") } | Measure-Object -Maximum).Maximum
-        if ($minTop274 -ne 20) { $v274Bad += "the box breathes $minTop274 above its title, expected 20 (SPEC V240, V274e)" }
-        if (($h274 - $maxBot274) -ne 20) { $v274Bad += "the box breathes $($h274 - $maxBot274) under its last row, expected 20 (SPEC V240, V274e)" }
+        if ($minTop274 -ne $BOX_PAD_Y) { $v274Bad += "the box breathes $minTop274 above its title, expected $BOX_PAD_Y (SPEC V240, V274e, I137c)" }
+        if (($h274 - $maxBot274) -ne $BOX_PAD_Y) { $v274Bad += "the box breathes $($h274 - $maxBot274) under its last row, expected $BOX_PAD_Y (SPEC V240, V274e, I137c)" }
         $lowest274 = @($kids274 | Where-Object { $_.GetAttribute("name") } | Sort-Object { [int]$_.GetAttribute("top") })[-1]
         if ($lowest274.GetAttribute("name") -ne 'btnSaveBaseline') { $v274Bad += "the last named control in the box is '$($lowest274.GetAttribute('name'))' - Save Initial Character is the one irreversible action here and comes after everything (SPEC V238b, V274e)" }
     }
@@ -9763,17 +10279,16 @@ else {
 # losing anything: a picker button carries no field=, so the pair is a button and an edit and one
 # single widget owns the name. Asking for it here would demand the stale declaration V36 refuses
 # (SPEC V274b amended, B121). The leg returns the day T876 converts clanFamily.
-foreach ($fld274 in @('clanFamily')) {
-    if (-not $mirrors.Contains($fld274)) { $v274Bad += "'$fld274' carries two widgets and is not in the mirror declaration - V1 would be reading an accident where SPEC I3 wrote a decision (SPEC V274b, V36)" }
+foreach ($fld274 in @('hedgeAffiliation', 'clanFamily')) {
+    if ($mirrors.Contains($fld274)) { $v274Bad += "'$fld274' is in the mirror declaration - it is a picker since wave 5 of I113e and a picker button binds no field, so the name has ONE owner and the declaration would be the stale one V36 refuses (SPEC V274b, V36, B121)" }
 }
-if ($mirrors.Contains('hedgeAffiliation')) { $v274Bad += "'hedgeAffiliation' is back in the mirror declaration - it is a picker since T874 half B and a picker button binds no field, so the name has ONE owner and the declaration would be the stale one V36's second half catches (SPEC V274b amended, V36, B121)" }
 
 # (c) the AUTHORED state is the flag OFF: the picker visible by default, the typed twin hidden
 # AND disabled. A sheet that never opened the storyteller's tab paints right with no Lua.
 # The visible half is a comboBox for clanFamily and a picker BUTTON for hedgeAffiliation since
 # T874 half B, so the roster carries the element name too - one reader, two shapes, because the
 # shape is what the I113e wave changes and the RULE is not about the shape (SPEC V274c amended).
-foreach ($pair274 in @(@('WoD20.7.lfm', 'dynhedgeAffiliation', 'edtHedgeAffiliation', 'button'), @('WoD20.11.lfm', 'cboClanFamily', 'edtClanFamily', 'comboBox'))) {
+foreach ($pair274 in @(@('WoD20.7.lfm', 'dynhedgeAffiliation', 'edtHedgeAffiliation', 'button'), @('WoD20.11.lfm', 'dynclanFamily', 'edtClanFamily', 'button'))) {
     $doc274 = Doc (Join-Path $dir $pair274[0])
     $cbo274 = $doc274.SelectSingleNode("//$($pair274[3])[@name='$($pair274[1])']")
     $edt274 = $doc274.SelectSingleNode("//edit[@name='$($pair274[2])']")
@@ -9791,7 +10306,7 @@ $manFn274 = LuaFn $hh6 'renderManualEntry'
 if (-not $manFn274) { $v274Bad += "renderManualEntry is not declared in WoD20.6 - the two dataLinks call a global that finds nil, and rdk exits 0 on that (SPEC V274d, V223, B51)" }
 else {
     $mb274 = NoComments $manFn274
-    foreach ($nm274 in @('dynhedgeAffiliation', 'edtHedgeAffiliation', 'cboClanFamily', 'edtClanFamily')) {
+    foreach ($nm274 in @('dynhedgeAffiliation', 'edtHedgeAffiliation', 'dynclanFamily', 'edtClanFamily')) {
         # WORD BOUNDARY and case-SENSITIVE, both, and a mutation is what asked for them: renaming
         # the entry to `dynhedgeAffiliationX` left this leg GREEN, because a bare -notmatch is a
         # SUBSTRING test and the longer name contains the shorter one. That is the anchor V222
@@ -10806,11 +11321,13 @@ foreach ($f in $files) {
             L = $bl; T = $bt; W = $bw; H = $bh; Node = $box; P = $box.ParentNode }
     }
 }
-if ($v280Boxes.Count -ne 65) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 65 I73 measures - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
+if ($v280Boxes.Count -ne 68) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 68 I73 measures - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
 else {
-    # (a) 20 on all four sides. A FLOOR and not an equality, for V240's reason: HEALTH on Main,
-    # HEALTH on Combat and SPECIALTIES are welded to the line V69 draws and carry the 22px it
-    # owes them INSIDE the box, which the user chose over a 42px gap above it (SPEC B63).
+    # (a) TWO numbers since T913: 20 on the X sides, 15 on the Y ones (SPEC I137c, user
+    # 2026-09-02). The X pair is a FLOOR and always was. The Y pair splits: the FOOT is a floor,
+    # for V240's old reason - boxes welded to a closing line carry the slack INSIDE (SPEC B63) -
+    # and the HEAD is an EQUALITY, because it has no freedom at all and a floor there would let a
+    # new box keep 20 and never be told (SPEC I137c).
     foreach ($b in $v280Boxes) {
         $ml = [int]::MaxValue; $mr = [int]::MaxValue; $mt = [int]::MaxValue; $mb = [int]::MaxValue
         foreach ($k in $b.Node.ChildNodes) {
@@ -10829,8 +11346,11 @@ else {
             if (($b.H - $kt - $kh) -lt $mb) { $mb = $b.H - $kt - $kh }
         }
         if ($ml -eq [int]::MaxValue) { $v280Bad += "$($b.F) '$($b.N)' holds nothing this leg can measure - a box with no placed child is a box with no margin to read (SPEC V209)"; continue }
-        if ($ml -lt 20 -or $mr -lt 20 -or $mt -lt 20 -or $mb -lt 20) {
-            $v280Bad += "$($b.F) '$($b.N)' ($($b.W)x$($b.H)) leaves L=$ml R=$mr T=$mt B=$mb - every side of a section box clears 20 (SPEC I73, V280a)"
+        if ($ml -lt $BOX_PAD_X -or $mr -lt $BOX_PAD_X -or $mt -lt $BOX_PAD_Y -or $mb -lt $BOX_PAD_Y) {
+            $v280Bad += "$($b.F) '$($b.N)' ($($b.W)x$($b.H)) leaves L=$ml R=$mr T=$mt B=$mb - a section box clears $BOX_PAD_X on the X sides and $BOX_PAD_Y on the Y ones (SPEC I73, V280a, I137c)"
+        }
+        elseif ($mt -ne $BOX_PAD_Y) {
+            $v280Bad += "$($b.F) '$($b.N)' opens $mt above its first child where the head is exactly $BOX_PAD_Y - the head is the one margin with no freedom, so a floor there would let a box keep the old number and never be told (SPEC I137c, V280a)"
         }
     }
     # (c) zero-guard: the exclusion has to FIRE. If the three rotated headings ever stop being
@@ -10861,14 +11381,19 @@ else {
 # impossible, the three widths being different on purpose (SPEC B106, T832). Heights are the axis
 # where the alignment is real, and this round is what made it real.
 #
-# The three columns are READ from the tab that imports them, never named here - a roster typed
-# into the gate is the fourth literal this leg exists to refuse (SPEC V221, V225a).
+# The three columns are READ off the tab, never named here - a roster typed into the gate is
+# the fourth literal this leg exists to refuse (SPEC V221, V225a). Until T909 they were read
+# through the <import> each column held; the three forms are gone (SPEC I136i, V397), so a
+# column is the direct <layout> child below the band and its boxes are the ones the V280 census
+# already collected under it. Same three columns, one document (SPEC V20).
 $v280dBad = @()
 $colBottoms = @{}
-foreach ($col881 in (Doc (Join-Path $dir "WoD20.11.lfm")).SelectNodes("//scrollBox/layout[import]")) {
-    $sub881 = $col881.SelectSingleNode("import").GetAttribute("file")
-    $in881 = @($v280Boxes | Where-Object { $_.F -eq $sub881 })
-    if ($in881.Count -eq 0) { $v280dBad += "(d) the column importing $sub881 holds no section box the V280 census can see - its foot goes unmeasured and the equality below would be struck between the columns that are left (SPEC V20, B7)"; continue }
+$bandTop881 = BandTop ((Doc (Join-Path $dir "WoD20.11.lfm")).SelectSingleNode("//scrollBox"))
+foreach ($col881 in ((Doc (Join-Path $dir "WoD20.11.lfm")).SelectNodes("//scrollBox/layout") | Where-Object { [int]$_.GetAttribute("top") -gt $bandTop881 })) {
+    $sub881 = ColId361 $col881
+    if (-not $sub881) { $sub881 = "the column at x=$($col881.GetAttribute('left'))" }
+    $in881 = @($v280Boxes | Where-Object { $_.F -eq "WoD20.11.lfm" -and $_.P.LocalName -eq "layout" -and $_.P.GetAttribute("left") -eq $col881.GetAttribute("left") -and $_.P.GetAttribute("top") -eq $col881.GetAttribute("top") })
+    if ($in881.Count -eq 0) { $v280dBad += "(d) the column $sub881 holds no section box the V280 census can see - its foot goes unmeasured and the equality below would be struck between the columns that are left (SPEC V20, B7)"; continue }
     $feet881 = @()
     foreach ($b881 in $in881) {
         # The foot is what the box has under its LAST child, which is the same subtraction leg
@@ -10882,7 +11407,7 @@ foreach ($col881 in (Doc (Join-Path $dir "WoD20.11.lfm")).SelectNodes("//scrollB
             [void][int]::TryParse($k881.GetAttribute("height"), [ref]$kh881)
             if (($kt881 + $kh881) -gt $low881) { $low881 = $kt881 + $kh881 }
         }
-        if ($low881 -eq [int]::MinValue) { $v280dBad += "(d) '$($b881.N)' in $sub881 has no positioned child - its foot is unmeasurable and the box would pass this leg by being empty (SPEC V20)"; continue }
+        if ($low881 -eq [int]::MinValue) { $v280dBad += "(d) '$($b881.N)' in the $sub881 column has no positioned child - its foot is unmeasurable and the box would pass this leg by being empty (SPEC V20)"; continue }
         $feet881 += "$($b881.N) $($b881.H - $low881)"
     }
     $colBottoms[$sub881] = [pscustomobject]@{
@@ -10924,8 +11449,14 @@ else { Pass "V280 (d) the $($colBottoms.Count) Ghoul columns all close at $(@($c
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
 # (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
 # on them would be a false alarm on numbers this round agreed not to touch.
-if ($v280Boxes.Count -ne 65) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 65 I73 measures - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
+if ($v280Boxes.Count -ne 68) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 68 I73 measures - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
 else {
+    # The declared HOLE is GONE with T908 and the 5px rule is whole again. T904 had left the
+    # 680..1010 band of the Main grid with no bottom box, so two boxes faced each other a whole
+    # band apart and 675..1015 was named here BY INTERVAL (SPEC I134m, Q44). The owner filled
+    # that band with SPECIALTIES on 2026-09-02, so the exception lived exactly one round - which
+    # is what naming a hole by interval is good for: it dies the day its reason dies, instead of
+    # sitting here ready to excuse the NEXT 340px gap (SPEC I136c, V209, B7).
     $v298Bad = @()
     $gapsX = 0; $gapsY = 0
     foreach ($grp in ($v280Boxes | Group-Object { $_.F + '|' + $_.P.GetHashCode() })) {
@@ -10962,6 +11493,392 @@ else {
     if ($v298Bad) { foreach ($b in $v298Bad) { Fail "V298 $b" } }
     else { Pass "V298 $gapsX gaps on X and $gapsY on Y between section boxes are all 5 apart" }
 }
+
+# ---- V401: the three Ghoul columns open 5 under the band -------------------------------
+# SPEC V401, B133, I139e, V298, user 2026-09-02 item 4. DOMINATOR and BLOOD POOL close at 128 and
+# the first box of each column opened at 160 - a 32px gap where the sheet's own is 5, visible to
+# the naked eye and green in the gate for as long as the columns have been there.
+#
+# V298 never saw it because it groups by PARENT: the band boxes are children of the scrollBox and
+# the first box of a column is a child of the COLUMN layout, so the two ends of that gap are not
+# siblings and the pair was never in the comparison at all. This rule measures it ABSOLUTE, and it
+# NAMES the file instead of teaching V298 to resolve nesting for every pair on the sheet - that
+# would be a second V298 rather than an amendment of it (SPEC V328d).
+#
+# Nothing is typed: the band bottom is read off the band boxes, the 5 is the gap V298 charges
+# everywhere else, and the column tops are read off the columns.
+$v401Bad = @()
+$doc401 = Doc (Join-Path $dir "WoD20.11.lfm")
+$sb401 = $doc401.SelectSingleNode("//scrollBox")
+$bandTop401 = BandTop $sb401
+$band401 = -1
+$cols401 = @()
+foreach ($n401 in $doc401.SelectNodes("//scrollBox/layout")) {
+    $t401 = -1; $h401 = -1
+    if (-not [int]::TryParse($n401.GetAttribute("top"), [ref]$t401)) { continue }
+    if (-not [int]::TryParse($n401.GetAttribute("height"), [ref]$h401)) { continue }
+    # the partition V361 already uses on this tab: a direct child of the scrollBox at top=0 is the
+    # BAND, anything below it is a COLUMN. No second shape, and no roster of names to keep in step.
+    if ($t401 -eq $bandTop401) { if (($t401 + $h401) -gt $band401) { $band401 = $t401 + $h401 } }
+    else { $cols401 += $n401 }
+}
+if ($band401 -lt 0) { $v401Bad += "no band box was found at top=0 on WoD20.11 - the y this rule measures from cannot be read (SPEC V20, V209)" }
+elseif ($cols401.Count -ne 3) { $v401Bad += "$($cols401.Count) column(s) were found under the band, expected 3 - the sweep broke and the gaps below would be struck over nothing (SPEC V209, V221)" }
+else {
+    foreach ($c401 in $cols401) {
+        $ct401 = [int]$c401.GetAttribute("top")
+        $first401 = [int]::MaxValue
+        $name401 = "(untitled column)"
+        foreach ($bx401 in $c401.SelectNodes("layout")) {
+            $bt401 = -1
+            if (-not [int]::TryParse($bx401.GetAttribute("top"), [ref]$bt401)) { continue }
+            $hasBack401 = $false
+            foreach ($k401 in $bx401.ChildNodes) {
+                if ($k401.NodeType -eq 'Element' -and $k401.LocalName -eq 'rectangle' -and $k401.GetAttribute("align") -eq 'client') { $hasBack401 = $true; break }
+            }
+            if (-not $hasBack401) { continue }
+            if ($bt401 -lt $first401) {
+                $first401 = $bt401
+                $lb401 = $bx401.SelectSingleNode("label[@text]")
+                if ($null -ne $lb401) { $name401 = $lb401.GetAttribute("text") }
+            }
+        }
+        if ($first401 -eq [int]::MaxValue) { $v401Bad += "the column at left=$($c401.GetAttribute('left')) holds no box with a backdrop - the gap would be measured against nothing (SPEC V209)"; continue }
+        $abs401 = $ct401 + $first401
+        if ($abs401 -ne ($band401 + 5)) {
+            $v401Bad += "'$name401' opens at y=$abs401 absolute and the band closes at $band401 - $($abs401 - $band401)px where every other pair of section boxes on the sheet is 5 apart (SPEC V298, B133)"
+        }
+    }
+}
+if ($v401Bad) { foreach ($b401 in $v401Bad) { Fail "V401 $b401" } }
+else { Pass "V401 the 3 Ghoul columns each open 5px under the band that closes at y=$band401 - the gap V298 cannot see, because the two ends of it are not siblings" }
+
+# ---- V404: a transparent FILL declares its own contour ---------------------------------
+# SPEC V404, B136, I140a, I140b, user 2026-09-02 item 1. applyTheme walks every THEME_SHAPES
+# rectangle and writes `t.stroke[normColor(authored(c,"strokeColor"))]` plus THEME_STROKE
+# (WoD20.6.lfm). With NOTHING authored, the era hands the rectangle its default rule - and on a
+# rectangle whose FILL is transparent, that rule is a contour with no box inside it.
+#
+# popScrim was the one of twenty-seven that did not declare, and it is 1595x936: the era drew a
+# frame around the whole sheet, and it lit every time the picker or the ? opened, because mfOpen
+# and popOpen raise the SAME scrim. One cause, the two symptoms the owner reported (SPEC B136).
+#
+# This is NOT V287 said twice. V287 owns WHICH controls may carry a transparent contour - a
+# roster, guarding the idiom from leaking onto a section box and killing its gold fillet. This
+# owns which controls must SAY something about their contour at all, and its subject is the FILL.
+# A rectangle painted black and left silent is correct here and always was: it is asking for the
+# era's rule, and it has a box for the rule to sit on.
+#
+# The floor is what the sheet draws, not a taste: twenty-six of twenty-seven already authored it
+# before this rule existed, so it charges nobody for a new idiom.
+$v404Bad = @()
+$v404Seen = 0
+foreach ($f in $files) {
+    foreach ($r404 in (Doc $f.FullName).SelectNodes("//rectangle[@color='#00000000']")) {
+        $v404Seen++
+        if (-not $r404.HasAttribute("strokeColor")) {
+            $nm404 = $r404.GetAttribute("name")
+            if ($nm404 -eq '') { $nm404 = "(unnamed) at left=$($r404.GetAttribute('left')) top=$($r404.GetAttribute('top'))" }
+            $v404Bad += "$($f.Name) <rectangle name='$nm404'> fills transparent and authors no strokeColor - applyTheme hands it the era's rule, and a contour with no box behind it is what B136 drew over the whole sheet"
+        }
+    }
+}
+if ($v404Seen -lt 27) { Fail "V404 only $v404Seen transparent-fill rectangle(s) were measured, expected the 27 the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
+elseif ($v404Bad) { foreach ($b404 in $v404Bad) { Fail "V404 $b404" } }
+else { Pass "V404 all $v404Seen transparent-fill rectangles declare their own contour - none is left to take the era's rule with no box behind it" }
+
+# ---- V403: the BLOOD POOL dots are one block, centred under the title ------------------
+# SPEC V403, I140f, user 2026-09-02 item 4. Twenty dots in two rows, and the owner asked for the
+# bottom row to rise, the block to sit centred, and the rows to close up a little. All three are
+# one statement: ONE pitch, and the block centred in the body below the title.
+#
+# NOTHING here is a literal top. The two rows are derived from the title's foot, the box height
+# and the pitch, so the day the title or the box moves the dots move with them - and the day
+# somebody nudges one row by hand, the other one no longer answers and this reddens.
+#
+# V240's normal arm was the only thing measuring this box before, and it charges a 15px head and
+# a foot of at least 15: it accepted the bottom row anywhere from 35 to 88. That is why 53/88 -
+# eighteen above the block and fifteen below it - sat there in plain sight (SPEC I140f).
+$v403Bad = @()
+$doc403 = Doc (Join-Path $dir "WoD20.11.lfm")
+$box403 = @($doc403.SelectNodes("//layout[label/@text='BLOOD POOL']"))[0]
+if ($null -eq $box403) { $v403Bad += "the BLOOD POOL box is gone from WoD20.11 - this rule measured nothing (SPEC V20, V209)" }
+else {
+    $bh403 = [int]$box403.GetAttribute("height")
+    $ttl403 = $box403.SelectSingleNode("label[@text='BLOOD POOL']")
+    $tb403 = [int]$ttl403.GetAttribute("top") + [int]$ttl403.GetAttribute("height")
+    $rows403 = @{}
+    $dh403 = 0
+    foreach ($k403 in $box403.ChildNodes) {
+        if ($k403.NodeType -ne 'Element' -or $k403.LocalName -ne 'imageCheckBox') { continue }
+        if ($k403.GetAttribute("field") -notlike 'bloodPool_*') { continue }
+        $kt403 = [int]$k403.GetAttribute("top")
+        $rows403[$kt403] = ($rows403[$kt403] + 1)
+        $dh403 = [int]$k403.GetAttribute("height")
+    }
+    $tops403 = @($rows403.Keys | Sort-Object)
+    if ($tops403.Count -ne 2) { $v403Bad += "the dots sit on $($tops403.Count) row(s), expected 2 - twenty dots in two rows is the shape the box has drawn since it was written (SPEC V219, V209)" }
+    elseif ($rows403[$tops403[0]] -ne $rows403[$tops403[1]]) { $v403Bad += "the two rows hold $($rows403[$tops403[0]]) and $($rows403[$tops403[1]]) dots - a block is two EQUAL rows, or the centring below is measuring a staircase" }
+    else {
+        $pitch403 = $tops403[1] - $tops403[0]
+        $blk403 = $pitch403 + $dh403
+        $want403 = $tb403 + [math]::Floor(($bh403 - $tb403 - $blk403) / 2)
+        if ($pitch403 -ne 30) {
+            $v403Bad += "the two rows are ${pitch403}px apart and the owner set the pitch at 30 - it was 35 until T924, and 'a little less space between them' is the whole of the ask (SPEC I140f)"
+        }
+        elseif ($tops403[0] -ne $want403) {
+            $v403Bad += "the block opens at $($tops403[0]) in a ${bh403}px box whose title closes at $tb403 - centred under the title a ${blk403}px block opens at $want403 (SPEC V403, I140f)"
+        }
+    }
+}
+if ($v403Bad) { foreach ($b403 in $v403Bad) { Fail "V403 $b403" } }
+else { Pass "V403 the 20 BLOOD POOL dots are two rows on one pitch, centred in the body under the title" }
+
+# ---- V407: clanFamily is the NAMED exception to the picker's ? ------------------------
+# SPEC V407, I140g, I140h, V365a, V333g, user 2026-09-02 item 5 - his own word, "e uma excecao".
+#
+# It cuts BOTH ways, the way $V365_EXEMPT and $BARE_Q333 already do: the button is gone from the
+# XML and the name is gone from the bare-? roster, and either one coming back reddens. An
+# exception that only forbids is a door (SPEC V328d).
+#
+# What the exception PAYS is the second leg, and it is why this one is cheap: with no ? leading
+# it, dynclanFamily and edtClanFamily open where <edit field="dominator"> opens and close where
+# it closes, so the two rows of the DOMINATOR box share ONE left and ONE right and are the grid
+# V224 asks for. The ? was the only reason they were not (SPEC I140g).
+$v407Bad = @()
+$doc407 = Doc (Join-Path $dir "WoD20.11.lfm")
+if ($null -ne $doc407.SelectSingleNode("//button[@name='btnQclanFamily']")) {
+    $v407Bad += "btnQclanFamily is back on WoD20.11 - clanFamily is the named exception to V365(a) and the exception cuts both ways (SPEC V407, V328d)"
+}
+$dom407 = @($doc407.SelectNodes("//edit[@field='dominator']"))[0]
+$pick407 = @($doc407.SelectNodes("//button[@name='dynclanFamily']"))[0]
+$twin407 = @($doc407.SelectNodes("//edit[@name='edtClanFamily']"))[0]
+if ($null -eq $dom407 -or $null -eq $pick407 -or $null -eq $twin407) {
+    $v407Bad += "one of dominator / dynclanFamily / edtClanFamily is gone from WoD20.11 - the grid this exception pays for cannot be measured (SPEC V20, V209)"
+} else {
+    $dl407 = [int]$dom407.GetAttribute("left"); $dr407 = $dl407 + [int]$dom407.GetAttribute("width")
+    foreach ($n407 in @($pick407, $twin407)) {
+        $l407 = [int]$n407.GetAttribute("left"); $r407 = $l407 + [int]$n407.GetAttribute("width")
+        if ($l407 -ne $dl407 -or $r407 -ne $dr407) {
+            $v407Bad += "'$($n407.GetAttribute('name'))' spans $l407..$r407 and the dominator entry spans $dl407..$dr407 - with the ? gone the two rows of DOMINATOR are one grid, which is what the exception buys (SPEC V224, I140g)"
+        }
+    }
+}
+if ($v407Bad) { foreach ($b407 in $v407Bad) { Fail "V407 $b407" } }
+else { Pass "V407 clanFamily carries no ? and its entry shares both x edges with the dominator row - the exception cuts both ways and pays for itself in the V224 grid" }
+
+# ---- V408: a list is covered by the module its picker names ---------------------------
+# SPEC V408, B137, I140i, I140j, I140k, I140m, user 2026-09-02 item 6. Every picker on the sheet
+# authors the pair itself - mfOpen(self, field, LIST, KIND) - and KIND is what descText turns into
+# `require("desc<KIND>_<lang>.lua")`. Nothing was checking that the module it names holds the
+# names the list offers, so 78 of them pointed at descNumina, which holds fifty OTHER names, and
+# the player read `No description available` on a ritual the book describes (SPEC B137).
+#
+# V366 asked EXACTLY this question and asked it for `nature` alone, roster of exemptions and all -
+# the right rule applied to one list of twelve. It KEEPS nature: that pair is authored with a
+# template variable for the list, so it never reaches this sweep, and two owners for one fact is
+# the no-op V20 forbids (SPEC B70).
+#
+# A kind with NO module on disk is not a failure here: descText pcalls the require and descFor
+# falls to the sentence, which is V364a working, and `Road` and `Clan` live there on purpose.
+# The roster, and it has TWO species on purpose - one of them is what keeps it from becoming the
+# bin this rule was written to prevent (SPEC I140k, I140m).
+#
+#   NO TEXT - the book does not describe that name. It is a statement about the SOURCE.
+#   DEBT    - the book DOES describe it and nobody has extracted it yet. It is a statement about
+#             US, so it has to name an OPEN §T, and this check reads SPEC.md to confirm the §T is
+#             still open. Close the task without the text and the line stops excusing anything.
+#
+# The roster opened with TWO lines, both DEBT, and is EMPTY now: T928 extracted the fifty-two
+# hedge rituals and T929 the twenty-six affiliations, so both lists are covered by descNumina
+# like any other and neither needs excusing. That is what a debt naming a task is FOR - closing
+# the task retires the line, instead of the line outliving the gap it was written for. The shape
+# stays here, with the two species documented above, because the next list added to the sheet
+# will need it; what it must never become is a bin (SPEC I140k, I140m, V362b).
+$V408_DEBT = @()
+$v408Bad = @()
+$v408Pairs = @{}
+foreach ($f in $files) {
+    $t408 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f.FullName))
+    foreach ($m408 in [regex]::Matches($t408, "mfOpen\(self,\s*'[^']*',\s*'([^']*)',\s*'([^']*)'")) {
+        $l408 = $m408.Groups[1].Value
+        # a LIST named by a template variable cannot be resolved from source, and saying so is the
+        # answer: nature and merit are those two, and V366 and V210 own them where they live.
+        if ($l408 -like '*$(*') { continue }
+        $v408Pairs["$l408|$($m408.Groups[2].Value)"] = $true
+    }
+}
+$v408Seen = 0
+$v408Debt = @{}
+foreach ($r408 in $V408_DEBT) { $v408Debt[$r408.List] = $r408.Task }
+foreach ($k408 in ($v408Pairs.Keys | Sort-Object)) {
+    $parts408 = $k408 -split '\|'
+    $list408 = $parts408[0]; $kind408 = $parts408[1]
+    if (-not $PICKER.ContainsKey($list408)) { $v408Bad += "a picker offers PICKER_LIST['$list408'] and the map has no such list - the roster and the map drifted (SPEC V211, V209)"; continue }
+    $modPath408 = Join-Path $plugin "desc${kind408}_en.lua"
+    if (-not (Test-Path -LiteralPath $modPath408)) { continue }
+    if (-not $DESC_MARKER.ContainsKey($kind408)) { $v408Bad += "'$kind408' has a module on disk and no marker here - the sweep would skip it in silence (SPEC V209, V20)"; continue }
+    $ent408 = DescEntries $modPath408 $DESC_MARKER[$kind408] 'en'
+    if ($null -eq $ent408 -or @($ent408).Count -eq 0) { $v408Bad += "desc${kind408}_en.lua parsed to zero entries - the coverage below would be struck over nothing (SPEC V209, V20)"; continue }
+    $have408 = @{}
+    foreach ($e408 in $ent408) { $have408[$e408.Key] = $true }
+    $miss408 = @(@($PICKER[$list408]) | Where-Object { $_ -ne '' -and -not $have408.ContainsKey($_) })
+    $v408Seen++
+    if ($miss408.Count -eq 0) { continue }
+    if (-not $v408Debt.ContainsKey($list408)) {
+        $show408 = @($miss408 | Select-Object -First 3) -join ', '
+        $v408Bad += "PICKER_LIST['$list408'] offers $($miss408.Count) name(s) that desc${kind408} does not hold - e.g. $show408 - and the list is on no roster. The ? opens on 'No description available' for a name the book describes (SPEC B137)"
+        continue
+    }
+    # a DEBT line is only worth the §T it names, and only while that §T is open
+    $task408 = $v408Debt[$list408]
+    $row408 = @(Select-String -LiteralPath (Join-Path $PSScriptRoot 'SPEC.md') -Pattern "^$task408\|" -Encoding utf8)
+    if ($row408.Count -eq 0) { $v408Bad += "'$list408' is declared a DEBT against $task408 and SPEC.md has no such task - a debt with no creditor excuses everything (SPEC V20, I140k)" }
+    elseif ($row408[0].Line -match "^$task408\|x\|") { $v408Bad += "'$list408' is declared a DEBT against $task408 and $task408 is CLOSED, with $($miss408.Count) name(s) still uncovered - the task that owes the text cannot be marked done while the text is missing (SPEC I140k, V209)" }
+}
+foreach ($r408 in $V408_DEBT) {
+    if (-not $PICKER.ContainsKey($r408.List)) { $v408Bad += "'$($r408.List)' is on the debt roster and PICKER_LIST has no such list - a stale line excuses the next gap (SPEC V20)" }
+}
+if ($v408Seen -lt 6) { Fail "V408 only $v408Seen (list, kind) pair(s) with a module on disk were measured, expected at least 6 - the sweep broke and this rule would certify a sheet with no descriptions at all (SPEC V209, V20)" }
+elseif ($v408Bad) { foreach ($b408 in $v408Bad) { Fail "V408 $b408" } }
+else { Pass "V408 all $v408Seen (list, kind) pairs with a module on disk are covered by it, bar $($V408_DEBT.Count) declared debt(s), each naming an OPEN task" }
+
+# ---- V406: the band has ONE definition, and the four rules read it --------------------
+# SPEC V406, I140q, Q53, B70, B112. Not a geometry rule - a rule about who owns a sentence.
+#
+# What makes it worth a check rather than a comment: while the band sat at zero, a reader that
+# still compared to the literal was INDISTINGUISHABLE from one that asked BandTop. It went quiet
+# for as long as the number happened to be 0, and spoke only on the day somebody moved it - which
+# is the shape of every no-op this file has ever grown (SPEC V20, B7).
+#
+# The four retired idioms are named as DEAD STRINGS. That is deliberate: a literal that proves an
+# exception died stays in the gate rather than being deleted, because a rule with no literal left
+# is a rule that can no longer fail (SPEC V376, V20).
+$v406Bad = @()
+$gate406 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $PSScriptRoot 'verify-hunters-hunted.ps1')))
+$code406 = [regex]::Replace($gate406, '(?m)^\s*#.*$', '')
+if ($code406 -notmatch '(?m)^function BandTop\(') { $v406Bad += "BandTop is gone - the band would go back to being four sentences that agree only while it sits at zero (SPEC B70, B112)" }
+$calls406 = @([regex]::Matches($code406, '=\s*BandTop\s+[\$\(]'))
+if ($calls406.Count -lt 7) { $v406Bad += "$($calls406.Count) rule(s) read BandTop, expected at least the 7 that partition a tab - V361, V267, V390, V401, V221, V225 and V280(d) (SPEC V406, I140q)" }
+# The seven retired idioms are BUILT from their parts and never spelled out whole: this check
+# reads the gate's OWN source, so a roster carrying the literal would find itself and redden on
+# the day it was written. What identifies a reader is its variable and its operator.
+$DEAD406 = @(@('ly361','-eq'), @('bt','-ne'), @('t401','-eq'), @('bt390','-eq'), @('_.GetAttribute("top")','-gt'))
+foreach ($dead406 in $DEAD406) {
+    $needle406 = '$' + $dead406[0] + ' ' + $dead406[1] + ' ' + '0'
+    if ($code406.Contains($needle406)) { $v406Bad += "the retired idiom ``$needle406`` is back in the gate - it agrees with BandTop only while the band sits at zero, and says nothing at all the day it moves (SPEC V406, Q53)" }
+}
+# and the function is not a stub: the two tabs the owner moved really do answer 10
+foreach ($pair406 in @(@('WoD20.7.lfm', 10), @('WoD20.11.lfm', 10))) {
+    $sb406 = ContentRoot (Doc (Join-Path $dir $pair406[0]))
+    $got406 = BandTop $sb406
+    if ($got406 -ne $pair406[1]) { $v406Bad += "BandTop reads $got406 on $($pair406[0]) and the owner set that band at $($pair406[1]) - a definition that answers the wrong number is worse than four that disagree (SPEC V286a, I140p)" }
+}
+if ($v406Bad) { foreach ($b406 in $v406Bad) { Fail "V406 $b406" } }
+else { Pass "V406 the band is defined once, in BandTop, and $($calls406.Count) rules read it - none of the four retired `top == 0` idioms is left" }
+
+# ---- V399: the EXPERIENCE boxes carry ONE edit and centre it ---------------------------
+# SPEC V399, I139h, I139k, user 2026-09-02 item 6. The owner asked for the "Current Experience"
+# name to leave the box so the typed part gets the room, and for what is left to be centred. Both
+# halves are measured here because NOTHING else measures either: V240's normal arm charges 15
+# above the title and at least 15 under the last child, which the edit satisfies anywhere between
+# 35 and 90, and V240's centring arm is NAMED and reaches two boxes of WoD20.7 only.
+#
+# The body opens at the FOOT OF THE TITLE and not at the box margin. Main is 105px tall: centring
+# from 20 would put the edit 15px under its own title, and V280(a) charges 20 there. Derived from
+# the title node, so a box whose title grows moves its number with it.
+#
+# The odd pixel falls BELOW, which is the rule V240's own centring arm already uses - written as
+# one expected `top` and not as two gaps compared loosely, so a slack of one cannot accept the odd
+# pixel on either side and stop measuring which.
+#
+# Progress (WoD20.9) is NOT here and that is not an oversight: it draws three numbers with three
+# labels and is the full VIEW of I11. This rule is about the boxes that show the balance alone.
+$XP_ONE_BOX = @(
+    [pscustomobject]@{ F = 'WoD20.1.lfm';  E = 'edtCurrentXPMain' }
+    [pscustomobject]@{ F = 'WoD20.11.lfm'; E = 'edtCurrentXPGhoul' }
+    [pscustomobject]@{ F = 'WoD20.7.lfm';  E = 'edtCurrentXPNumina' }
+)
+$v399Bad = @()
+foreach ($row399 in $XP_ONE_BOX) {
+    $doc399 = Doc (Join-Path $dir $row399.F)
+    $ed399 = @($doc399.SelectNodes("//edit[@name='$($row399.E)']"))[0]
+    if ($null -eq $ed399) { $v399Bad += "$($row399.E) is not on $($row399.F) - the roster outlived the widget, which is the orphan of B111 one floor up (SPEC V20, V209)"; continue }
+    $box399 = $ed399.ParentNode
+    $bh399 = -1
+    if (-not [int]::TryParse($box399.GetAttribute("height"), [ref]$bh399)) { $v399Bad += "the box holding $($row399.E) on $($row399.F) carries no height - the centring would be struck over nothing (SPEC V209)"; continue }
+    $lbls399 = @($box399.SelectNodes("label"))
+    if ($lbls399.Count -ne 1) { $v399Bad += "the box holding $($row399.E) on $($row399.F) carries $($lbls399.Count) label(s), expected 1 - the title. The 'Current Experience' name is what the owner asked out of these boxes (SPEC I139h)" ; continue }
+    $eds399 = @($box399.SelectNodes("edit"))
+    if ($eds399.Count -ne 1) { $v399Bad += "the box holding $($row399.E) on $($row399.F) carries $($eds399.Count) edit(s), expected 1 - a second number here is a second owner of a computed value (SPEC V1, I11)"; continue }
+    $tb399 = [int]$lbls399[0].GetAttribute("top") + [int]$lbls399[0].GetAttribute("height")
+    $eh399 = [int]$ed399.GetAttribute("height")
+    $want399 = $tb399 + [math]::Floor(($bh399 - $tb399 - $eh399) / 2)
+    $got399 = [int]$ed399.GetAttribute("top")
+    if ($got399 -ne $want399) {
+        $v399Bad += "$($row399.E) opens at top=$got399 in a ${bh399}px box whose title closes at $tb399 - centred under the title it opens at $want399 (SPEC V399, I139k)"
+    }
+}
+if ($XP_ONE_BOX.Count -lt 2) { Fail "V399 the roster names $($XP_ONE_BOX.Count) box(es) - a centring rule over one box is true of every box ever drawn (SPEC V20, B7)" }
+elseif ($v399Bad) { foreach ($b399 in $v399Bad) { Fail "V399 $b399" } }
+else { Pass "V399 the $($XP_ONE_BOX.Count) EXPERIENCE boxes each carry a title and ONE edit, with the number centred in the body under the title" }
+
+# ---- V390: the COLUMN boxes of Numina and Ghoul are one width -------------------------
+# SPEC V390, I134a, I134h, I139n, B134, B112. The user asked for every box of the two rearranged
+# tabs to take the width of PSYCHIC PHENOMENA, and the number is READ off that box - a literal
+# here would be its second owner and the first to age.
+#
+# This rule existed as PROSE ONLY until T920, which is B134: the sentence "nunca um literal no
+# check" asserts a check, and there was none - `PSYCHIC PHENOMENA` appeared three times in this
+# file and not one of them swept a width. A rule nobody can mutate is a rule nobody can accept.
+#
+# The SUBJECT is the COLUMN boxes and not the band, and that is the 2026-09-02 amendment rather
+# than a pile of exceptions. DOMINATOR and BLOOD POOL were never really exceptions - they were
+# BAND - and once QUINTESSENCE and TRUE FAITH shrank to their content so EXPERIENCE could stand
+# beside them, a named list would have held four exceptions over three measured boxes per tab.
+# The partition is the one V361 already uses on both tabs and needs no second shape: a direct
+# <layout> child of the scrollBox at top=0 is BAND, every other box is COLUMN. The band has its
+# own ruler and it is V361, which freezes each of those rects by name (SPEC V361a, V328d).
+$v390Bad = @()
+$doc390 = Doc (Join-Path $dir "WoD20.7.lfm")
+$ref390 = @($doc390.SelectNodes("//layout[label/@text='PSYCHIC PHENOMENA']"))[0]
+if ($null -eq $ref390) { $v390Bad += "the PSYCHIC PHENOMENA box is gone from WoD20.7 - the one width every column is held to cannot be read, and a literal here would be its second owner (SPEC V209, B112)" }
+else {
+    $w390 = [int]$ref390.GetAttribute("width")
+    $seen390 = 0
+    foreach ($fn390 in @("WoD20.7.lfm", "WoD20.11.lfm")) {
+        $d390 = Doc (Join-Path $dir $fn390)
+        # the BAND: direct children of the scrollBox at top=0. Read once per file, by identity.
+        $sb390 = $d390.SelectSingleNode("//scrollBox")
+        $bandTop390 = BandTop $sb390
+        $band390 = @{}
+        foreach ($n390 in $d390.SelectNodes("//scrollBox/layout")) {
+            $bt390 = -1
+            if (-not [int]::TryParse($n390.GetAttribute("top"), [ref]$bt390)) { continue }
+            if ($bt390 -eq $bandTop390) { $band390[$n390.GetHashCode()] = $true }
+        }
+        foreach ($bx390 in $d390.SelectNodes("//layout[@width]")) {
+            if ($band390.ContainsKey($bx390.GetHashCode())) { continue }
+            $back390 = $false
+            foreach ($k390 in $bx390.ChildNodes) {
+                if ($k390.NodeType -eq 'Element' -and $k390.LocalName -eq 'rectangle' -and $k390.GetAttribute("align") -eq 'client' -and $k390.GetAttribute("color") -eq 'black') { $back390 = $true; break }
+            }
+            if (-not $back390) { continue }
+            $bw390 = -1
+            if (-not [int]::TryParse($bx390.GetAttribute("width"), [ref]$bw390)) { continue }
+            $seen390++
+            if ($bw390 -ne $w390) {
+                $ttl390 = '(untitled)'
+                $lb390 = $bx390.SelectSingleNode("label[@text]")
+                if ($null -ne $lb390) { $ttl390 = $lb390.GetAttribute("text") }
+                $v390Bad += "$fn390 '$ttl390' is ${bw390}px and PSYCHIC PHENOMENA sets ${w390} - every COLUMN box of these two tabs takes that one width (SPEC I134a, I139n)"
+            }
+        }
+    }
+    if ($seen390 -lt 8) { $v390Bad += "only $seen390 column box(es) were measured across the two tabs, expected at least the 8 they draw - this rule is covering less than the sheet has (SPEC V209, V20)" }
+}
+if ($v390Bad) { foreach ($b390 in $v390Bad) { Fail "V390 $b390" } }
+else { Pass "V390 every COLUMN box of Numina and Ghoul is the width PSYCHIC PHENOMENA sets - the band is V361's and carries its own rects" }
 
 # ---- V281: what a tab BUTTON is spaced by, HORIZONTALLY (SPEC I73, V281, T616) ---------
 # The same request as V280, one level out: 30 in from the end of the bar it opens, and the 4
@@ -11112,12 +12029,34 @@ foreach ($f300 in $files) {
         $v300Bad += "$($f300.Name) declares '$nn300' - note<X> paired a caption with a PANE, T830 took the last pane, and a caption named for one is named for something that does not exist (SPEC I76c, I117, B98)"
     }
 }
-# The one note there is has to be INSIDE a box and never on a bar, which is the whole of what the
-# retirement bought - and if it is nowhere, V88 is the leg that says so.
-$note300 = (Doc (Join-Path $dir 'WoD20.7.lfm')).SelectSingleNode("//layout[label/@text='HEDGE MAGIC PATHS']/label[@name='noteHedgePaths']")
-if ($null -eq $note300) { $v300Bad += "the affinity note is not a label of the HEDGE MAGIC PATHS box - T830 moved it off the strip and into the box it explains, and anywhere else is the caption standing over a list it does not describe (SPEC I76c, V88, I117)" }
+# The one note there is has to be never on a BAR and always ATTACHED to the list it captions,
+# which is the whole of what the retirement bought. WHERE it attaches moved once more in T898:
+# the user asked for it OUTSIDE the box and directly under it (SPEC I134d), because inside the
+# foot it read as a twenty-first row of a list of twenty - and the 25px of foot it was costing
+# is what made that column 586 against the 561 of PSYCHIC PHENOMENA beside it.
+#
+# So the leg stops asking WHOSE CHILD the note is and asks what that was ever a proxy for: does
+# the caption sit on the list it describes. It reads GEOMETRY now - directly under the box and
+# inside its x span - which is what a caption standing over the wrong list actually breaks.
+# Parentage only answered the question while the answer was "inside".
+$doc300  = Doc (Join-Path $dir 'WoD20.7.lfm')
+$note300 = $doc300.SelectSingleNode("//label[@name='noteHedgePaths']")
+$box300  = $doc300.SelectSingleNode("//scrollBox/layout[label/@text='HEDGE MAGIC PATHS']")
+if ($null -eq $note300) { $v300Bad += "the affinity note is gone from WoD20.7 - V88 asks for its words and this leg asks where it stands, and neither has anything to read (SPEC V209, V88)" }
+elseif ($null -eq $box300) { $v300Bad += "the HEDGE MAGIC PATHS box is gone from WoD20.7 - the caption is measured against the list it captions and there is no list (SPEC V209, I117)" }
+elseif ($null -ne $box300.SelectSingleNode("label[@name='noteHedgePaths']")) {
+    $v300Bad += "the affinity note is back INSIDE the HEDGE MAGIC PATHS box - the user asked for it under the box and outside it, and in the foot it reads as one more row of the list (SPEC I134d, T898)"
+} else {
+    $bL300 = [int]$box300.GetAttribute('left');  $bT300 = [int]$box300.GetAttribute('top')
+    $bW300 = [int]$box300.GetAttribute('width'); $bH300 = [int]$box300.GetAttribute('height')
+    $nL300 = [int]$note300.GetAttribute('left');  $nT300 = [int]$note300.GetAttribute('top')
+    $nW300 = [int]$note300.GetAttribute('width')
+    if ($nT300 -lt ($bT300 + $bH300)) { $v300Bad += "the affinity note opens at y=$nT300 and the HEDGE MAGIC PATHS box closes at $($bT300 + $bH300) - a caption that overlaps the list it captions is not under it (SPEC I134d)" }
+    elseif ($nT300 -gt ($bT300 + $bH300 + 20)) { $v300Bad += "the affinity note opens at y=$nT300, $($nT300 - $bT300 - $bH300)px under the box it explains - a caption floating that far off belongs to neither box (SPEC I134d, V298)" }
+    if ($nL300 -lt $bL300 -or ($nL300 + $nW300) -gt ($bL300 + $bW300)) { $v300Bad += "the affinity note runs $nL300..$($nL300 + $nW300) and its box runs $bL300..$($bL300 + $bW300) - a caption outside the x span of its list stands over the column beside it (SPEC I134d, V88)" }
+}
 if ($v300Bad) { foreach ($b in $v300Bad) { Fail "V300 $b" } }
-else { Pass "V300 retired with the panes in T830 - the one caption on the sheet lives inside the box it explains, and no note<X> is left pointing at a pane" }
+else { Pass "V300 retired with the panes in T830 - the one caption on the sheet stands directly under the box it explains and inside its x span, and no note<X> is left pointing at a pane" }
 
 # ---- V301: the bar wears no box, and the marker is a rule (SPEC I77a, I77b) -----------
 # The 108th round took the pill away. Eleven gold outlines side by side divided the eye evenly
@@ -11395,6 +12334,19 @@ else {
     # "simplify" it back in and undo the reason the thing is drawn per box (SPEC R113b).
     if ($ornBody2 -match '\.mode\s*=\s*"(?!original")') {
         $hbBad += "V284 the path mode is no longer 'original' - stretch scales the volutes and beads with the box, which is the shearing the per-box vector exists to avoid (SPEC R113b)"
+    }
+
+    # ... and it has to BE there. MEASURED by mutation on 2026-09-03 (T622): deleting
+    # `p.mode = "original";` outright left the leg above GREEN, because a negative leg finds
+    # nothing to object to in an ABSENCE - the same no-op door B7 is named for, on the one leg
+    # written to survive a future round's tidying. WrapMode's default is NATIVE and nobody has
+    # measured it: R113 reads the enum out of rrpgGUI.lua:1119-1120 and stops at the four values,
+    # so a deleted line leaves the motif riding on a default this repo cannot name. "Delete the
+    # redundant-looking line" IS the simplification this leg exists to refuse (SPEC V20, B7).
+    # Two independent ifs and not an elseif: "stretch" trips the first alone and an absence the
+    # second alone, so each mutation names the door it came through.
+    if ($ornBody2 -notmatch '\.mode\s*=') {
+        $hbBad += "V284 ornament() never sets the path mode at all - the leg above has nothing to object to in an absence, and the motif rides on WrapMode's native default, which no measurement in this repo names (SPEC V284d, R113b, V20)"
     }
 
     if (-not $refreshFn) {
@@ -11690,25 +12642,43 @@ else {
     }
     if ($outside312 -gt 0) { $v312Bad += "a ruler is read outside NeededPx and outside its own declaration - two owners for one sum is what B70 cost a round to find (SPEC V312d)" }
 
-    # (c) the ruler only LOOSENED. Every 12pt picker keeps the width it had, and the four of
-    # I86d are the whole of this round's narrowing - named, so a fifth cannot slip in quietly.
-    # T874 half B split the affiliation entry into a ? and a button: the ENTRY still spans the
-    # same 180..540 it always did - V297 measures that span and would redden if it moved - but the
-    # button itself now declares 335, because the ? takes 20 of the 360 and the gutter takes 5.
-    # The names change and the promise does not: no 12pt picker gave up entry width this round.
-    $WIDTH312 = @{
-        'dynhedgeAffiliation' = 335
-        'edtHedgeAffiliation' = 335
-        'cboHedgeAttr'        = 360
-    }
+    # (c) the ruler only LOOSENED, and the three entries of the HEDGE MAGIC grid are held EQUAL
+    # to each other - which is the promise - without any of them being held to a NUMBER, which
+    # is what T896 had to take out.
+    #
+    # The three carried literals (335/335/360) from the round the ? split the affiliation entry.
+    # The user then asked for every box on the Numina tab to take the width of PSYCHIC PHENOMENA
+    # and said in writing that pickers, typed fields and dropdowns are what may shrink to pay for
+    # it (SPEC I134e, I134f). A literal here charges the tab for obeying its owner - B106 - so the
+    # width is DERIVED from the box the entries live in: interior right minus where the entry
+    # column opens. Same answer V390 gives the box widths one door over, and the grid promise is
+    # stronger for it: three controls equal to a computed number cannot drift into a staircase,
+    # while three equal literals only cannot drift until somebody edits one.
     $doc312 = Doc (Join-Path $dir "WoD20.7.lfm")
+    $hm312  = @($doc312.SelectNodes("//scrollBox/layout[label/@text='HEDGE MAGIC']"))[0]
+    if ($null -eq $hm312) { $v312Bad += "the HEDGE MAGIC box is gone from WoD20.7 - the entry width is derived from it and this leg has nothing to derive from (SPEC V209, I134f)" }
+    $entryL312 = 0
+    $aff312 = if ($null -ne $hm312) { @($hm312.SelectNodes("button[@name='dynhedgeAffiliation']"))[0] } else { $null }
+    if ($null -ne $aff312) { $entryL312 = [int]$aff312.GetAttribute("left") }
+    # 20 is the box margin V280(a) floors, and it is read off the TITLE rather than assumed: the
+    # title label opens on the margin in every box on this sheet.
+    $marg312 = 20
+    $ttl312 = if ($null -ne $hm312) { $hm312.SelectSingleNode("label[@text='HEDGE MAGIC']") } else { $null }
+    if ($null -ne $ttl312) { $marg312 = [int]$ttl312.GetAttribute("left") }
+    $entryW312 = if ($null -ne $hm312 -and $entryL312 -gt 0) { [int]$hm312.GetAttribute("width") - $marg312 - $entryL312 } else { 0 }
+    if ($entryW312 -le 0) { $v312Bad += "the entry column of HEDGE MAGIC derived to $entryW312 px - this leg would certify any width at all (SPEC V209, V20)" }
+    $WIDTH312 = @{
+        'dynhedgeAffiliation' = $entryW312
+        'edtHedgeAffiliation' = $entryW312
+        'cboHedgeAttr'        = $entryW312
+    }
     $seen312 = 0
     foreach ($nm312 in $WIDTH312.Keys) {
         $node312 = @($doc312.SelectNodes("//*[@name='$nm312']"))[0]
         if ($null -eq $node312) { $v312Bad += "'$nm312' is not on WoD20.7 - one of the controls I86d narrows cannot be found, so this leg measured less than it claims (SPEC V209)"; continue }
         $seen312++
         $w312 = [int]$node312.GetAttribute("width")
-        if ($w312 -ne $WIDTH312[$nm312]) { $v312Bad += "'$nm312' is ${w312}px, not the $($WIDTH312[$nm312]) I86d sets - the entry column is a GRID and one control leaving it reopens the ladder the user had removed (SPEC I86d, V297b)" }
+        if ($entryW312 -gt 0 -and $w312 -ne $WIDTH312[$nm312]) { $v312Bad += "'$nm312' is ${w312}px and the HEDGE MAGIC box derives $($WIDTH312[$nm312]) for its entry column - the column is a GRID and one control leaving it reopens the ladder the user had removed (SPEC I86d, V297b, I134f)" }
     }
     if ($seen312 -ne 3) { $v312Bad += "only $seen312 of the 3 named entry controls were measured (SPEC V209)" }
 
@@ -11716,7 +12686,7 @@ else {
     # the same width as its two neighbours or V297b is the only thing left holding the grid.
     $ess312 = @($doc312.SelectNodes("//edit[@field='hedgeEssence']"))[0]
     if ($null -eq $ess312) { $v312Bad += "the hedgeEssence entry is gone from WoD20.7 - the middle row of the HEDGE MAGIC grid is unmeasured (SPEC V209, I86d)" }
-    elseif ([int]$ess312.GetAttribute("width") -ne 360) { $v312Bad += "the hedgeEssence entry is $([int]$ess312.GetAttribute('width'))px, not 360 - it is a free-text field with no list to price it, so nothing but this leg keeps it on the grid (SPEC I86d)" }
+    elseif ($entryW312 -gt 0 -and [int]$ess312.GetAttribute("width") -ne $entryW312) { $v312Bad += "the hedgeEssence entry is $([int]$ess312.GetAttribute('width'))px against the $entryW312 its box derives - it is a free-text field with no list to price it, so nothing but this leg keeps it on the grid (SPEC I86d, I134f)" }
 
     # No OTHER 12pt picker SPENT the slack, and the test says exactly that rather than guessing
     # at a width: every one of them still clears the OLD 6.5 ruler, which each of them cleared
@@ -11746,7 +12716,7 @@ else {
 }
 
 if ($v312Bad) { foreach ($b in $v312Bad) { Fail "V312 $b" } }
-else { Pass "V312 the ruler is a pair - 6.5 for the body and $($s12312.Groups[1].Value) for 12pt, chosen by the attribute in the one place that multiplies - and only the 3 named entries plus hedgeEssence spent the slack" }
+else { Pass "V312 the ruler is a pair - 6.5 for the body and $($s12312.Groups[1].Value) for 12pt, chosen by the attribute in the one place that multiplies - and the 3 named entries plus hedgeEssence all sit on the ${entryW312}px their own box derives, spent by nobody else" }
 
 # ---- V338: defaultValue lives on <dataLink>, and nowhere else ----------------------------
 # SPEC I99b, V338, B80. This one exists because the XML parser ACCEPTS the attribute anywhere
@@ -11771,8 +12741,8 @@ else {
     # (b) the road default is the pair of the cboRoad that no longer carries it (SPEC I99b).
     $road338 = @($dv338 | Where-Object { $_.Field -eq 'road' })
     if ($road338.Count -ne 1) { $v338Bad += "the road default sits on $($road338.Count) dataLink(s), not the one I99b declares - without it a sheet saved before the 125th round opens with no road at all" }
-    $cbo338 = @((Doc (Join-Path $dir "WoD20.1.lfm")).SelectNodes("//comboBox[@name='cboRoad'][@defaultValue]"))
-    if ($cbo338.Count -ne 0) { $v338Bad += "cboRoad carries defaultValue again - this is the exact authoring that killed the build in the 125th round (SPEC B80)" }
+    $cbo338 = @((Doc (Join-Path $dir "WoD20.1.lfm")).SelectNodes("//*[@name='dynroad'][@defaultValue] | //*[@name='edtRoad'][@defaultValue]"))
+    if ($cbo338.Count -ne 0) { $v338Bad += "the road control carries defaultValue again - this is the exact authoring that killed the build in the 125th round (SPEC B80)" }
 }
 
 if ($v338Bad) { foreach ($b in $v338Bad) { Fail "V338 $b" } }
@@ -11808,12 +12778,29 @@ $bt329 = [regex]::Match($rootLua, '(?s)\n\t{4}BEARING = \{(.*?)\n\t{4}\};')
 if (-not $bt329.Success) { $v329Bad += "BEARING could not be read - the name half of the line has no table (SPEC V209)" }
 else { foreach ($m in [regex]::Matches($bt329.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"([^"]*)"')) { $bearKeys329[$m.Groups[1].Value] = $m.Groups[2].Value } }
 
+# The DEFAULT road, and it has ONE owner in this file since T906. It was spelled out three times
+# - in the BEARING leg, in the era-filter leg and in the dataLink leg - and T906 renamed the value
+# (Humanity -> Path of Humanity, SPEC I135b). Three copies of one fact is three chances for the
+# next rename to leave one of them behind, green, describing a road nobody is on (SPEC B70, B112).
+#
+# It stays a LITERAL here rather than being read off the sheet: the dataLink leg below EXISTS to
+# catch the value drifting, so deriving it from the dataLink would make that leg agree with
+# whatever it found. One literal, three readers, and the drift check keeps its teeth.
+$ROAD_DEFAULT = 'Path of Humanity'
+# The names a saved sheet may still be holding that the road list no longer offers. They are the
+# subject of V395 and each one goes the day nobody can be holding it any more - a decision with a
+# date on it, not a tidy-up (SPEC I135d, V2). 'Humanity' is the pre-T906 default; 'Road of Heaven'
+# left in T932 because it is not a Road at all, it is the umbrella over three Abrahamic paths and
+# what the player picks is the path (SPEC Q58, I141d). It is a ROSTER and not one name because the
+# second retirement landed one round after the first: a second scalar would have been a second
+# copy of every leg below, which is the shape B70 cured on the default itself.
+$ROAD_RETIRED = @('Humanity', 'Road of Heaven')
 if ($roadItems329.Count -eq 0 -or $bearKeys329.Count -eq 0) { $v329Bad += "the road roster or BEARING came back EMPTY - both legs below would pass on nothing (SPEC V20)" }
 else {
     foreach ($r329 in $roadItems329) { if (-not $bearKeys329.ContainsKey($r329)) { $v329Bad += "'$r329' is offered by the picker and has no BEARING row - the line would open blank, which is the failure only an eye catches (SPEC V329c)" } }
     foreach ($k329 in $bearKeys329.Keys) { if ($roadItems329 -notcontains $k329) { $v329Bad += "BEARING carries '$k329', which the picker never offers - a name nobody can reach (SPEC V329d)" } }
     foreach ($k329 in $bearKeys329.Keys) { if ($bearKeys329[$k329] -eq '') { $v329Bad += "BEARING['$k329'] is EMPTY - the five the book leaves unnamed were given names by the user on 2026-08-28, so a blank one is a row that got lost (SPEC I99c5)" } }
-    if ($bearKeys329['Humanity'] -ne 'Normalcy') { $v329Bad += "BEARING['Humanity'] is '$($bearKeys329['Humanity'])', not the Normalcy core p.310 prints - it is the default road, so this is the row every new sheet shows (SPEC V329e, R121)" }
+    if ($bearKeys329[$ROAD_DEFAULT] -ne 'Normalcy') { $v329Bad += "BEARING['$ROAD_DEFAULT'] is '$($bearKeys329[$ROAD_DEFAULT])', not the Normalcy core p.310 prints - it is the default road, so this is the row every new sheet shows (SPEC V329e, R121)" }
 }
 
 # (e) ROAD_ERA answers for the same 55 and nothing else, and Humanity is the one row that is
@@ -11833,7 +12820,7 @@ else {
 $pi329 = [System.IO.File]::ReadAllText((Join-Path $dir "WoD20.6.lfm"))
 if ($pi329 -notmatch 'root == "road" and raw ~= current') { $v329Bad += "pickerItems has no road branch - ROAD_ERA is declared and never read, so every era offers all 55 roads (SPEC I99c2, B75)" }
 if ($pi329 -notmatch 'local roadEra = \(era == "Dark Ages" or era == "Classical Age"\)') { $v329Bad += "the two medieval themes are not named where the road list is filtered - a fifth theme would fall into one era by default instead of being decided (SPEC I99c2)" }
-if ($pi329 -notmatch 'raw == "Humanity"') { $v329Bad += "Humanity is not exempted from the era filter - an era whose list drops it leaves the field holding a value its own list does not offer (SPEC I99c3)" }
+if ($pi329 -notmatch "raw == ""$ROAD_DEFAULT""") { $v329Bad += "$ROAD_DEFAULT is not exempted from the era filter - an era whose list drops it leaves the field holding a value its own list does not offer (SPEC I99c3)" }
 # V330: ONE writer for the three states, and the predicate is `clanFamily` FILLED - not the
 # revenant set, which Q1 retired. A leg that still looked for REVENANT would be measuring code
 # that no longer exists, which is B7 wearing a green tick.
@@ -11841,7 +12828,7 @@ $rb330 = [regex]::Match($rootLua, '(?s)function renderBearing\(from\)(.*?)\n\t{3
 if (-not $rb330.Success) { $v329Bad += "renderBearing is gone - nothing writes the bearing line and the two labels are born dead, which is exactly B75 (SPEC V330a)" }
 else {
     $body330 = $rb330.Groups[1].Value
-    foreach ($c330 in @('cboRoad','dynBearingName')) {
+    foreach ($c330 in @('dynroad','dynBearingName')) {
         if (-not $body330.Contains($c330)) { $v329Bad += "renderBearing never touches '$c330' - one of the three states it is supposed to own has another writer or none (SPEC V330a)" }
     }
     if ($body330 -notmatch 'fam ~= nil and fam ~= ""') { $v329Bad += "renderBearing does not gate on clanFamily being FILLED - Q1 opened the road to clans, and a leg testing anything else is measuring the retired rule (SPEC I99d, V330b)" }
@@ -11868,7 +12855,7 @@ $rpCode330   = [regex]::Match($rootCode330, '(?s)function renderRoadPair\(from\)
 $reach330    = 0
 $own330      = 0
 $where330    = @()
-foreach ($nm330 in @('cboRoad','dynBearingName')) {
+foreach ($nm330 in @('dynroad','dynBearingName')) {
     foreach ($lf330 in $files) {
         # the pattern goes to a VARIABLE first: `-replace 'a' + $x, ''` binds as one argument
         # and the replacement silently does not happen, with no error to show for it.
@@ -11890,7 +12877,7 @@ if ($cnt330 -lt 2) { $v329Bad += "renderBearing is called from $cnt330 dataLink(
 # that had not happened (SPEC I99b, V328b).
 $dl328 = [regex]::Match($rootLua, 'dataLink field="road" defaultValue="([^"]*)"')
 if (-not $dl328.Success) { $v329Bad += "the road default is not on a dataLink - authored on the comboBox it is accepted by the XML and REJECTED by rdk, silently, with the .rpk deleted (SPEC I99b, B80)" }
-elseif ($dl328.Groups[1].Value -ne 'Humanity') { $v329Bad += "the road dataLink defaults to '$($dl328.Groups[1].Value)', not the Humanity I99b declares - a character with no road IS on Humanity, and a sheet saved before the 125th round would open on a road it never walked (SPEC V328b)" }
+elseif ($dl328.Groups[1].Value -ne $ROAD_DEFAULT) { $v329Bad += "the road dataLink defaults to '$($dl328.Groups[1].Value)', not the $ROAD_DEFAULT I99b declares - a character with no road IS on Humanity, and a sheet saved before the 125th round would open on a road it never walked (SPEC V328b)" }
 
 if ($v329Bad) { foreach ($b in $v329Bad) { Fail "V329/V330 $b" } }
 else { Pass "V329/V330 the ladder cuts at 10,8,4,2 with a bare last rung; BEARING and ROAD_ERA both answer for all $($roadItems329.Count) roads and nothing else; renderBearing owns all three states off one clanFamily test, is the only place on the sheet that names the three, and the road default sits on its dataLink at Humanity" }
@@ -11909,7 +12896,12 @@ else { Pass "V329/V330 the ladder cuts at 10,8,4,2 with a bare last rung; BEARIN
 # and not a note.
 $eolBad = @()
 $eolSeen = 0
-foreach ($f318 in @($files.FullName) + @((Join-Path $PSScriptRoot 'verify-hunters-hunted.ps1'), (Join-Path $PSScriptRoot 'SPEC.md'))) {
+# HANDOFF.md joined the roster on 2026-09-02, and it joined because it BROKE: the head of it was
+# rewritten from a here-string in LF while the tail stayed CRLF, and the file came out 6138 CR
+# against 6214 LF with the gate green - B74 happening again in the one CRLF file at the root this
+# check did not look at. It is read at the start of every round, so a diff that lies about it is
+# the same cost as one lying about the spec (SPEC B74, I133).
+foreach ($f318 in @($files.FullName) + @((Join-Path $PSScriptRoot 'verify-hunters-hunted.ps1'), (Join-Path $PSScriptRoot 'SPEC.md'), (Join-Path $PSScriptRoot 'HANDOFF.md'))) {
     if (-not (Test-Path $f318)) { $eolBad += "$(Split-Path $f318 -Leaf) is not where this check looks for it - it cannot be measured (SPEC V209)"; continue }
     $t318 = [IO.File]::ReadAllText($f318)
     $cr318 = ([regex]::Matches($t318, "`r")).Count
@@ -11918,7 +12910,7 @@ foreach ($f318 in @($files.FullName) + @((Join-Path $PSScriptRoot 'verify-hunter
     if ($lf318 -eq 0) { $eolBad += "$(Split-Path $f318 -Leaf) has no line break at all - it is not the file this check was written for" }
     elseif ($cr318 -ne $lf318) { $eolBad += "$(Split-Path $f318 -Leaf) carries $cr318 CR against $lf318 LF - a text tool rewrote it and ate the carriage returns, which git diff hides under autocrlf and rdk -l compiles without a word (SPEC B74)" }
 }
-if ($eolSeen -lt 17) { Fail "V318 only $eolSeen file(s) were measured, expected the 15 .lfm plus the gate and the spec - this check is covering less than the repo has (SPEC V209)" }
+if ($eolSeen -lt 15) { Fail "V318 only $eolSeen file(s) were measured, expected the 12 .lfm plus the gate, the spec and the handoff - this check is covering less than the repo has (SPEC V209). The .lfm were 15 until T909 (SPEC I136i)" }
 elseif ($eolBad) { foreach ($b in $eolBad) { Fail "V318 $b" } }
 else { Pass "V318 all $eolSeen source files are CRLF end to end - no text tool has eaten a carriage return" }
 
@@ -12292,14 +13284,37 @@ elseif ($famNC322 -notmatch "if n < 1 then return; end;") {
 else {
     $ftM322 = [Math]::Sqrt([Math]::Pow([double]$boxrM322.Groups[1].Value + $c322["ORN_MUR_OUT"], 2) - [Math]::Pow($c322["ORN_MUR_OUT"], 2))
     $flr322 = 2 * $ftM322 + $c322["ORN_MUR_STEP"]
+    # The dimensions are the BOXES' own, read the way V239 and V400 read a box - a layout with a
+    # backdrop - and no longer the backdrop RECTANGLE's width and height. Those were the same
+    # number only while nine boxes authored a SIZED backdrop instead of align=client, and T917
+    # gave the last of them align=client: this leg then read ZERO (SPEC B135, B132, V400).
+    #
+    # It was never measuring what its own message claims. Nine boxes out of sixty-seven carried a
+    # sized backdrop, and the sentence says "the smallest box side the XML authors" - the other
+    # fifty-eight were never in the minimum, so the merlon floor was cleared by a sample nobody
+    # chose. Reading the boxes is what the rule always meant (SPEC V209).
     $dim322 = @()
     foreach ($f in $files) {
-        foreach ($r322 in (Doc $f.FullName).SelectNodes("//rectangle[@color='black'][@xradius][@width][@height]")) {
-            $dim322 += [double]$r322.GetAttribute("width")
-            $dim322 += [double]$r322.GetAttribute("height")
+        foreach ($bx322 in (Doc $f.FullName).SelectNodes("//layout[@width][@height]")) {
+            $bw322 = -1; $bh322 = -1
+            if (-not [int]::TryParse($bx322.GetAttribute("width"), [ref]$bw322)) { continue }
+            if (-not [int]::TryParse($bx322.GetAttribute("height"), [ref]$bh322)) { continue }
+            if ($bw322 -le 0 -or $bh322 -le 0) { continue }
+            $back322 = $false
+            foreach ($k322 in $bx322.ChildNodes) {
+                if ($k322.NodeType -ne 'Element' -or $k322.LocalName -ne 'rectangle') { continue }
+                if ($k322.GetAttribute("color") -ne 'black' -or -not $k322.HasAttribute("xradius")) { continue }
+                $kl322 = -1; $kt322 = -1
+                [void][int]::TryParse($k322.GetAttribute("left"), [ref]$kl322)
+                [void][int]::TryParse($k322.GetAttribute("top"), [ref]$kt322)
+                if ($k322.GetAttribute("align") -eq 'client' -or ($kl322 -eq 0 -and $kt322 -eq 0)) { $back322 = $true; break }
+            }
+            if (-not $back322) { continue }
+            $dim322 += [double]$bw322
+            $dim322 += [double]$bh322
         }
     }
-    if ($dim322.Count -lt 10) { $v322Bad += "only $($dim322.Count) box dimension(s) were read for leg (c), expected at least 10 - it is measuring less than the sheet has (SPEC V209, V20)" }
+    if ($dim322.Count -lt 100) { $v322Bad += "only $($dim322.Count) box dimension(s) were read for leg (c), expected at least the 100 the boxes of the sheet carry - it is measuring less than the sheet has (SPEC V209, V20)" }
     else {
         $minD322 = ($dim322 | Measure-Object -Minimum).Minimum
         if ($minD322 -le $flr322) {
@@ -12802,7 +13817,7 @@ else {
 # The three Numina ones joined in T874 (wave 4): 12 hedge paths, 19 psychic phenomena and 12
 # picked hedge rituals, the PICKER rows of each box and never the typed ones under them - a ? on
 # a typed row is what I102f refuses and V365(b) charges by form.
-$V333_SRC   = @{ MeritPicked = 22; OpenAbility = 21; HeaderPicker = 2; DiscRow = 19; MainPathRow = 4; SecPathRow = 15; RitualRow = 22; HedgePicker = 20; PsychicPicker = 20; HedgeRitualPicker = 12 }
+$V333_SRC   = @{ MeritPicked = 22; OpenAbility = 21; HeaderPicker = 2; DiscRow = 19; MainPathRow = 4; SecPathRow = 15; RitualRow = 22; HedgePicker = 20; PsychicPicker = 20; HedgeRitualPicker = 20 }
 $q333       = @{}
 $qCalls333  = 0
 $qOpen333   = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
@@ -12841,7 +13856,7 @@ else {
     foreach ($k333 in $V333_SRC.Keys) {
         if (-not $q333.ContainsKey($k333)) { $v333Bad += "'$k333' carries no ? button - the $($V333_SRC[$k333]) rows it draws lost their description door (SPEC I102b, V333g)" }
     }
-    if ($qCalls333 -ne 157) { $v333Bad += "$qCalls333 ? button(s) in a TEMPLATE on the sheet, expected the 157 of I102b/I102h - 22 on the merit/flaw rows, 21 on the background rows, 2 on the nature/demeanor headers, the 60 the Ghoul tab carries after T879 and T880 (19 discipline, 4 main path, 15 secondary path, 22 ritual) and the 52 the Numina tab carries after T875 (20 hedge path, 20 psychic, and 12 hedge ritual - twelve because HedgeRitualFree did not convert, SPEC V269a, B122) (SPEC V333g, T846, T872, T873, T874, T830, T875)" }
+    if ($qCalls333 -ne 165) { $v333Bad += "$qCalls333 ? button(s) in a TEMPLATE on the sheet, expected the 165 of I102b/I102h - 22 on the merit/flaw rows, 21 on the background rows, 2 on the nature/demeanor headers, the 60 the Ghoul tab carries after T879 and T880 (19 discipline, 4 main path, 15 secondary path, 22 ritual) and the 52 the Numina tab carries after T875 (20 hedge path, 20 psychic, and 12 hedge ritual - seventeen after T892 converted the last five and TWENTY since T912 squared the box with HEDGE MAGIC PATHS, SPEC V269b, I136m) (SPEC V333g, T846, T872, T873, T874, T830, T875)" }
     # The ? buttons authored OUTSIDE a template, which the walk above cannot see: it reads
     # templates because that is where 148 buttons come from two dozen <button> elements. T874 made
     # this a real category for the first time - btnQFaith is a ? on a row that is not drawn by a
@@ -12852,7 +13867,7 @@ else {
     # btnQhedgeAffiliation joined in T874 half B: the affiliation row is a label+entry GRID row
     # and not a template-drawn list row, so its ? is authored inline like the True Faith one
     # (SPEC I107a1, V297).
-    $BARE_Q333 = @('btnQFaith', 'btnQhedgeAffiliation')
+    $BARE_Q333 = @('btnQFaith', 'btnQroad')   # btnQclanFamily left in T925 - clanFamily is V407's named exception
     $bareSeen333 = @()
     foreach ($f333c in $files) {
         foreach ($b333c in (Doc $f333c.FullName).SelectNodes("//button[@text='?']")) {
@@ -13112,7 +14127,7 @@ if ($fam341.Count -eq 0) { $v341Bad += "PICKER_LIST['family'] parsed to nothing 
 else {
     # (a) 23 entries, both era names present, and the bare name GONE. A bare Grimaldi surviving
     # beside the two would be a third family nobody decided on, and CLANS would answer for it.
-    if ($fam341.Count -ne 24) { $v341Bad += "PICKER_LIST['family'] holds $($fam341.Count) entries, expected 24 - the 22 R93 froze, with Grimaldi split by era and Obertus by line (SPEC I108b, V341a, V342a)" }
+    if ($fam341.Count -ne 23) { $v341Bad += "PICKER_LIST['family'] holds $($fam341.Count) entries, expected 23 - the 22 R93 froze, with Grimaldi split by era and Obertus by line (SPEC I108b, V341a, V342a)" }
     foreach ($want341 in @('Grimaldi (Dark Ages)', 'Grimaldi (Modern)')) {
         if ($fam341 -notcontains $want341) { $v341Bad += "'$want341' is not in the family list - the split R129 measured is not on the sheet (SPEC V341a)" }
     }
@@ -13131,7 +14146,7 @@ else {
     # (d) the union grows with the list, and the union is what the ghoul dropdown shows.
     $union341 = 0
     if ($PICKER.ContainsKey('clanFamily')) { $union341 = @($PICKER['clanFamily']).Count }
-    if ($union341 -ne 86) { $v341Bad += "the clan+family union counts $union341, expected 86 - 62 clans counting the empty item, and 24 families (SPEC I29b, V341d)" }
+    if ($union341 -ne 85) { $v341Bad += "the clan+family union counts $union341, expected 85 - 62 clans counting the empty item, and 23 families (SPEC I29b, V341d)" }
 }
 
 # (c) the medieval family is capped at eight blood points and the modern one is NOT. The user
@@ -13146,7 +14161,7 @@ if ($cap337.Count -gt 0) {
 }
 
 if ($v341Bad) { foreach ($b in $v341Bad) { Fail "V341 $b" } }
-else { Pass "V341 Grimaldi stands as two families on the 24-entry list, the bare name gone, both carrying the one trio that did not diverge, and the ghoul union grown to 86" }
+else { Pass "V341 Grimaldi stands as two families on the 23-entry list, the bare name gone, both carrying the one trio that did not diverge, and the ghoul union grown to 86" }
 # ---- V342: the Obertus Narov LINE is its own entry, not a choice slot (SPEC T786, Q21) ----
 # The number V342 is RESERVED here and /ck:spec still owes its SPEC text - the check is written
 # first so the decision cannot regress while the spec catches up (the same order V333's deferred
@@ -13783,9 +14798,14 @@ $v351Bad = @()
 $m351 = Doc (Join-Path $dir "WoD20.1.lfm")
 $lbl351 = $null
 foreach ($n351 in $m351.SelectNodes("//label[@text='ROAD']")) { $lbl351 = $n351; break }
-$cbo351 = $m351.SelectSingleNode("//comboBox[@name='cboRoad']")
+# The road is a picker BUTTON since T876 (SPEC I131d, I113e wave 5), and its ? leads the entry
+# the way the affiliation's does. So the pair this leg measures is three controls, and the one
+# the LABEL must not run into is the ?, not the button behind it.
+$cbo351 = $m351.SelectSingleNode("//button[@name='dynroad']")
+$q351   = $m351.SelectSingleNode("//button[@name='btnQroad']")
 if ($null -eq $lbl351) { $v351Bad += "(e) the ROAD label is gone from WoD20.1 - every leg here measured nothing (SPEC V209, V20)" }
-if ($null -eq $cbo351) { $v351Bad += "(e) cboRoad is gone from WoD20.1 (SPEC V209)" }
+if ($null -eq $cbo351) { $v351Bad += "(e) dynroad is gone from WoD20.1 (SPEC V209)" }
+elseif ($null -eq $q351) { $v351Bad += "(e) btnQroad is gone from WoD20.1 - the picker family that got a ? in T876 lost it, and V365(a) asks every picker for one (SPEC V365a, V209)" }
 if ($null -ne $lbl351 -and $null -ne $cbo351) {
     $lt351 = 0; $ll351 = 0; $lw351 = 0; $ct351 = 0; $cl351 = 0
     [void][int]::TryParse($lbl351.GetAttribute("top"), [ref]$lt351)
@@ -13797,7 +14817,7 @@ if ($null -ne $lbl351 -and $null -ne $cbo351) {
     # (a) ONE line, and the two do not sit on top of each other. Same top is the request; the
     # non-overlap is what keeps "same line" from meaning "same pixels" (SPEC I99k).
     if ($lt351 -ne $ct351) { $v351Bad += "(a) the ROAD label is at top=$lt351 and cboRoad at top=$ct351 - Q27 asked for the two on ONE line, and a label back on its own row puts the 25px back into the box (SPEC I99k)" }
-    if (($ll351 + $lw351) -gt $cl351) { $v351Bad += "(a) the ROAD label runs to x=$($ll351 + $lw351) and cboRoad opens at x=$cl351 - they would draw over each other (SPEC I99k, V37)" }
+    if (($ll351 + $lw351) -gt [int]$q351.GetAttribute("left")) { $v351Bad += "(a) the ROAD label runs to x=$($ll351 + $lw351) and the ? opens at x=$([int]$q351.GetAttribute('left')) - they would draw over each other (SPEC I99k, V37)" }
 
     # (c) the label still has to hold its own word. `CAMINHO` is the long half.
     $need351 = NeededPx 'ROAD'
@@ -13808,20 +14828,23 @@ if ($null -ne $lbl351 -and $null -ne $cbo351) {
 # ruler is fitSize, the same one mfLabel uses, so the sheet and this gate measure text alike.
 $rb351 = LuaFn $rootTxt 'renderBearing'
 if (-not $rb351) { $v351Bad += "(e) renderBearing is gone - nothing sizes the road name to the picker it has to fit (SPEC V209, V330)" }
-elseif ((NoComments $rb351) -notmatch 'cbo\.fontSize = fitSize\(') { $v351Bad += "(e) renderBearing does not size cboRoad through fitSize - the picker gave 14px to the label and a long road name would simply be cut off, which is the clip leg (c) refuses on the other side (SPEC V196, V312)" }
+elseif ((NoComments $rb351) -notmatch 'mfLabel\(found\["dynroad"\]') { $v351Bad += "(e) renderBearing does not paint dynroad through mfLabel - mfLabel is what translates the road, writes it and FITS it to the button, and the fifteen lines that did it by hand went with the combo in T876 (SPEC V196, V312, I131d)" }
 if (-not (LuaFn $rootTxt 'fitSize')) { $v351Bad += "(e) fitSize is gone - it is the ruler leg (e) and mfLabel both size text with (SPEC V16, V312a)" }
 # (d) the width exception is a LIST OF ONE, and it is read by V196 and V312c both. A second
 # name is how a named exception becomes a general loosening one line at a time - the door B7
 # describes, and the reason V15's own exception is spelled out combo by combo.
-if ($null -eq $NARROW_OK) { $v351Bad += "(d) NARROW_OK is gone - V196 and V312c would go back to failing cboRoad, or worse, someone would widen the rule instead (SPEC I99m)" }
-else {
-    $got351 = @($NARROW_OK | Sort-Object)
-    if (($got351 -join ',') -ne 'cboRoad') {
-        $v351Bad += "(d) the width exception names [$($got351 -join ', ')], expected cboRoad and nothing else - one measured cost was accepted, not a category (SPEC I99m, B7)"
-    }
+# (d) the width exception is EMPTY since T876, and empty is the answer rather than the leg
+# retiring: NARROW_OK existed for cboRoad alone, cboRoad stopped being a comboBox, and V196 and
+# V312c walk comboBoxes. So no picker on the sheet needs the exception any more - which is the
+# STRONGER state, because a narrow combo appearing tomorrow now reddens those two directly with
+# no door to go through. What is guarded is the door staying shut: a name added here has to be
+# argued for the way the one that was here was (SPEC I99m, B7).
+if ($null -eq $NARROW_OK) { $v351Bad += "(d) NARROW_OK is gone as a variable - V196 and V312c read it, and a missing roster is not the same as an empty one (SPEC I99m, V209)" }
+elseif (@($NARROW_OK).Count -ne 0) {
+    $v351Bad += "(d) the width exception names [$(@($NARROW_OK) -join ', ')] - it emptied in T876 when its one name stopped being a comboBox, and a picker narrower than its longest item is a CLIP, not an exemption (SPEC I99m, B7, V196)"
 }
 if ($v351Bad) { foreach ($b in $v351Bad) { Fail "V351 $b" } }
-else { Pass "V351 the ROAD label and cboRoad share one line without overlapping, the label still holds 'CAMINHO', cboRoad is the only picker allowed to be narrow, and its name is sized to fit what is left" }
+else { Pass "V351 the ROAD label, the ? and dynroad share one line without overlapping, the label still holds 'CAMINHO', cboRoad is the only picker allowed to be narrow, and its name is sized to fit what is left" }
 
 # ---- V378: a family that has a picker has no TYPED row left ---------------------------
 # SPEC V378, I130, T870/T871, user 2026-08-31 asks 7-11. Every background, merit, flaw and
@@ -14090,12 +15113,17 @@ $lbl380   = @($mainDoc.SelectNodes("//label[@name='lblRoad']"))[0]
 # (e) the CONTROL's type comes from the SOURCE and is not assumed to be a comboBox: wave 5 of
 # I113e turns this into a picker button, and B94 is exactly a width promise that lost its
 # guard when the widget under it changed type.
-$ctl380   = @($mainDoc.SelectNodes("//*[@name='cboRoad']"))[0]
+$ctl380   = @($mainDoc.SelectNodes("//*[@name='dynroad']"))[0]
+# The ? is part of the GROUP being centred since T876, so its width is a term in the arithmetic
+# below and it is READ, never assumed: a ? that changed size would slide the pair off centre and
+# nothing else would say so (SPEC I131d, V380b).
+$q380     = @($mainDoc.SelectNodes("//*[@name='btnQroad']"))[0]
 
 if (-not $rpSrc380.Success) { $v380Bad += "renderRoadPair is gone - the pair would sit wherever the XML pinned it and the pt case would go unmeasured (SPEC V20)" }
 elseif (-not $tbl380.Success) { $v380Bad += "ROAD_LABEL_W is gone - the label width per language is the ONE number the two lefts derive from (SPEC I128d)" }
 elseif ($null -eq $lbl380) { $v380Bad += "lblRoad is not on WoD20.1 - the check measured nothing (SPEC V20)" }
-elseif ($null -eq $ctl380) { $v380Bad += "cboRoad is not on WoD20.1 - the check measured nothing (SPEC V20)" }
+elseif ($null -eq $ctl380) { $v380Bad += "dynroad is not on WoD20.1 - the check measured nothing (SPEC V20)" }
+elseif ($null -eq $q380) { $v380Bad += "btnQroad is not on WoD20.1 - the ? is a term in the centring and this check would measure a group that is not the one on screen (SPEC V20)" }
 else {
     $ctlType380 = $ctl380.Name
     $cw380 = [int]$ctl380.GetAttribute("width")
@@ -14121,16 +15149,18 @@ else {
     $cwLua380 = [regex]::Match($rpSrc380.Groups[1].Value, 'local\s+cw\s*=\s*(\d+)')
     if (-not $cwLua380.Success) { $v380Bad += "(e) renderRoadPair no longer states the control width it centres around (SPEC I128g)" }
     elseif ([int]$cwLua380.Groups[1].Value -ne $cw380) {
-        $v380Bad += "(e) renderRoadPair centres around a ${$cwLua380.Groups[1].Value}px control and <$ctlType380 name='cboRoad'> is ${cw380}px - the pair would sit off centre by the difference (SPEC I128g, B94)"
+        $v380Bad += "(e) renderRoadPair centres around a ${$cwLua380.Groups[1].Value}px control and <$ctlType380 name='dynroad'> is ${cw380}px - the pair would sit off centre by the difference (SPEC I128g, B94)"
     }
 
     # (a)+(b)+(c): run the Lua's own arithmetic for EVERY language and check the two relations.
     $widest380 = -1; $widestL380 = 0; $widestC380 = 0
     foreach ($m380 in [regex]::Matches($tbl380.Groups[1].Value, '(\w+)\s*=\s*(\d+)')) {
         $lg = $m380.Groups[1].Value; $w = [int]$m380.Groups[2].Value
-        $left = 20 + [math]::Floor((290 - ($w + 5 + $cw380)) / 2)
-        $ctlLeft = $left + $w + 5
-        if ($ctlLeft -ne $left + $w + 5) { $v380Bad += "(a) [$lg] the gap between label and control is not 5" }
+        $qw380 = [int]$q380.GetAttribute("width")
+        $left = 20 + [math]::Floor((290 - ($w + 5 + $qw380 + 5 + $cw380)) / 2)
+        $qLeft = $left + $w + 5
+        $ctlLeft = $qLeft + $qw380 + 5
+        if ($qLeft -ne $left + $w + 5) { $v380Bad += "(a) [$lg] the gap between label and ? is not 5" }
         $slackL = $left - 20
         $slackR = 310 - ($ctlLeft + $cw380)
         if ([math]::Abs($slackL - $slackR) -gt 1) {
@@ -14225,11 +15255,18 @@ if ($boxes332.Count -ne 14) {
 } else {
     # (a) the map of I101h, LITERAL. Measured off the XML on 2026-08-29 and written down there
     # so the next round reads a number instead of re-deriving one (SPEC B73).
+    # REMEASURED 2026-09-02 off the XML that T901 and T902 left (SPEC I134j, I134k). Every box
+    # on the tab now closes on ONE of three lines - 345, 520 and 695 - and 695 is where
+    # BACKGROUNDS closes, which is what the user asked FLAWS and the bottom row to meet.
+    #
+    # The tab floor went 693 -> 695 and that is arithmetic, not taste: MERITS = FLAWS closing on
+    # BACKGROUNDS wants 2h+5 = floor, and the ten right-hand boxes on one height want 4h+15 =
+    # floor. At 693 the second gives 169.5. 695 gives 345 and 170, both whole (SPEC I134j).
     $want332 = @(
-        '0;0;364;693', '369;0;536;336', '369;341;536;336', '1370;0;225;311',
-        '910;0;225;153', '1140;0;225;153', '910;158;225;153', '1140;158;225;153',
-        '910;316;225;186', '1140;316;225;186', '1370;316;225;186',
-        '910;507;225;186', '1140;507;225;186', '1370;507;225;186'
+        '0;0;364;679', '369;0;536;337', '369;342;536;337', '1370;0;225;337',
+        '910;0;225;166', '1140;0;225;166', '910;171;225;166', '1140;171;225;166',
+        '910;342;225;166', '1140;342;225;166', '1370;342;225;166',
+        '910;513;225;166', '1140;513;225;166', '1370;513;225;166'
     )
     $got332 = @($boxes332 | ForEach-Object { "$($_.L);$($_.T);$($_.W);$($_.H)" } | Sort-Object)
     $extra332 = @($got332 | Where-Object { $want332 -notcontains $_ })
@@ -14259,13 +15296,14 @@ if ($boxes332.Count -ne 14) {
         if ($prev332.Count -eq 0) { $v332Bad += "(c) the column at x=$cl332 does not open 5px after any box's right edge - the gutters on this tab are all 5 (SPEC V298)" }
     }
 
-    # (d) the ten background boxes are one width; only the HEIGHT tells the two bands apart.
-    $small332 = @($boxes332 | Where-Object { $_.W -eq 225 -and $_.H -ne 311 })
-    if ($small332.Count -ne 10) { $v332Bad += "(d) $($small332.Count) background box(es) are 225 wide, expected 10 (SPEC I101h)" }
-    else {
-        $hh332 = @($small332 | ForEach-Object { $_.H } | Sort-Object -Unique)
-        if (($hh332 -join ',') -ne '153,186') { $v332Bad += "(d) the ten background boxes come in heights [$($hh332 -join ', ')], expected 153 on the top band and 186 on the bottom (SPEC I101h)" }
-    }
+    # (d) RETIRED into V392 on 2026-09-02. It said the ten background boxes come in two bands,
+    # 153 and 186, with DERANGEMENTS told apart by its 311 - three literals for a shape the user
+    # has now replaced: one height for all ten, DERANGEMENTS the single named exception, and the
+    # bottom row closing with BACKGROUNDS (SPEC I134k). Rewriting the three numbers here would
+    # have made this the SECOND owner of that rule beside V392, which is B70 (SPEC V135).
+    #
+    # What survives here is (a), which pins every rect including these ten, and it is a snapshot:
+    # it catches drift, while V392 states the RULE the drift would break.
 }
 # (e) the rename was TEXT only: the field kept its old spelling, because renaming it drops what
 # saved sheets already hold (SPEC V2, I101g).
@@ -14275,7 +15313,7 @@ if ($sta332.Count -ne 0) { $v332Bad += "(e) the label STATUS is back on the Trai
 if ($art332.Count -ne 1) { $v332Bad += "(e) the ARTIFACTS label appears $($art332.Count) time(s), expected 1 (SPEC I101g)" }
 if (@($doc331.SelectNodes("//*[@field='status']")).Count -ne 1) { $v332Bad += "(e) the field 'status' is no longer owned exactly once on this tab - renaming it drops what saved sheets hold (SPEC V2)" }
 if ($v332Bad) { foreach ($b in $v332Bad) { Fail "V332 $b" } }
-else { Pass "V332 the Traits tab draws the 14 boxes of I101h with no overlap, closes on 1595 with 5px gutters, keeps its ten background boxes 225 wide in two bands, and still owns 'status' once under the ARTIFACTS label" }
+else { Pass "V332 the Traits tab draws the 14 boxes of I101h with no overlap, closes on 1595 with 5px gutters, and still owns 'status' once under the ARTIFACTS label - its ten background boxes are V392's now" }
 
 # ---- V345: every description module breaks lines the SAME way, and that way is LF ---------
 # (SPEC V345, B87) The ten modules are written by script, and a module coming out with the
@@ -14336,7 +15374,7 @@ if ($pane352.Count -ne 1) {
 $box352 = $doc352.SelectSingleNode("//layout[@name='mfSearch']")
 if ($null -eq $box352) { $v352Bad += "(c) mfSearch is gone - there is no box for the pane to live in (SPEC I107c, V209)" }
 else {
-    foreach ($want352 in @(@('left','300'), @('top','80'), @('width','1000'), @('height','645'))) {
+    foreach ($want352 in @(@('left','300'), @('top','80'), @('width','1000'), @('height','635'))) {
         $got352 = $box352.GetAttribute($want352[0])
         if ($got352 -ne $want352[1]) { $v352Bad += "(c) mfSearch $($want352[0])='$got352', expected $($want352[1]) - the box closes at 1300 of 1595 and at 700 of 733, and it grew to the RIGHT (SPEC I112a, V367)" }
     }
@@ -14440,15 +15478,15 @@ $V354_WAVE = @(
     # FOR BYTE identical. A textual replace converts both and leaves the second opening the
     # FIRST one's list - it happened in the 157th - so leg (b) reading RootArg per template is
     # what catches that, and it is why they are two entries and not one.
-    @{ Tpl = 'DiscRow'; File = 'WoD20.12.lfm'; Mod = 'Disc'; FieldAttr = '$(field)'; RootArg = 'disc';
+    @{ Tpl = 'DiscRow'; File = 'WoD20.11.lfm'; Mod = 'Disc'; FieldAttr = '$(field)'; RootArg = 'disc';
     # Row counts went 12/12/15 -> 15/15/20 in T873, when the eleven typed rows of these three
     # boxes became pickers too and their three templates were deleted (SPEC I130b, V378).
        Roots = @( @{ Root = 'disc'; Form = 'numbered'; Rows = 15 }, @{ Root = 'clanDisc'; Form = 'numbered'; Rows = 4 } ) },
-    @{ Tpl = 'MainPathRow'; File = 'WoD20.13.lfm'; Mod = 'Path'; FieldAttr = '$(field)'; RootArg = 'mainPath';
+    @{ Tpl = 'MainPathRow'; File = 'WoD20.11.lfm'; Mod = 'Path'; FieldAttr = '$(field)'; RootArg = 'mainPath';
        Roots = @( @{ Root = 'mainPath'; Form = 'numbered'; Rows = 4 } ) },
-    @{ Tpl = 'SecPathRow'; File = 'WoD20.13.lfm'; Mod = 'Path'; FieldAttr = '$(field)'; RootArg = 'secPath';
+    @{ Tpl = 'SecPathRow'; File = 'WoD20.11.lfm'; Mod = 'Path'; FieldAttr = '$(field)'; RootArg = 'secPath';
        Roots = @( @{ Root = 'secPath'; Form = 'numbered'; Rows = 15 } ) },
-    @{ Tpl = 'RitualRow'; File = 'WoD20.14.lfm'; Mod = 'Ritual'; FieldAttr = '$(field)'; RootArg = 'ritual';
+    @{ Tpl = 'RitualRow'; File = 'WoD20.11.lfm'; Mod = 'Ritual'; FieldAttr = '$(field)'; RootArg = 'ritual';
     # Rows is what the box DRAWS (22 since T880), never RITUAL_ROWS - that constant is the highest
     # index (27) and carries the five burned vacancies inside it (SPEC V204 amended, V251).
        Roots = @( @{ Root = 'ritual'; Form = 'numbered'; Rows = 22 } ) },
@@ -14478,7 +15516,14 @@ $V354_WAVE = @(
     # over a span of 24 indices with four burned inside it (SPEC V263a, V204).
        Roots = @( @{ Root = 'psychic'; Form = 'numbered'; Rows = 20 } ) },
     @{ Tpl = 'HedgeRitualPicker'; File = 'WoD20.7.lfm'; Mod = 'Numina'; FieldAttr = '$(field)'; RootArg = 'hedgeRitual';
-       Roots = @( @{ Root = 'hedgeRitual'; Form = 'numbered'; Rows = 12 } ) }
+    # 12 -> 17 in T892: the last five typed rows converted, HEDGE_RITUAL_FREE_ROWS went to zero and
+    # 'picker = total - typed' resolves to the whole box, the way numina and psychic already did.
+    # 17 -> 20 in T912 (SPEC I136m, user 2026-09-02 item 7): three slots more, so the rituals hold
+    # as many as HEDGE MAGIC PATHS beside them. FREE_ROWS was already zero, so the three were born
+    # pickers and their fields came off the declareTrait loop that was already there.
+    # What held it back was the level - the typed rows kept it in BOUND dots, so converting ate 25
+    # fields with data (SPEC B122) - and the Ritual Level row of the picker pane is where it went.
+       Roots = @( @{ Root = 'hedgeRitual'; Form = 'numbered'; Rows = 20 } ) }
 )
 
 # Templates allowed to open the box WITHOUT being a wave of I113e. NAMED, never a generic skip:
@@ -15644,7 +16689,27 @@ $rmFn369 = [regex]::Match($rootTxt, '(?s)function mfRemove\(from\)(.*?)\n\t{3}en
 if (-not $rmFn369.Success) { $v369Bad += "(a) mfRemove was not found - the remove line would have to borrow mfSelect, which indexes MF.hits by page and has no entry for it (SPEC V369a, I121d, V209)" }
 else {
     $rb369 = NoComments $rmFn369.Groups[1].Value
-    if ($rb369 -notmatch 'MF\.picked = ""') { $v369Bad += "(a) mfRemove does not mark the blank - mfConfirm reads `"`" as 'clear the row', and without the mark OK would write whatever was marked before (SPEC V369a, I121d)" }
+        # (a) mfRemove MARKS what removal means, and for every field but one that mark is the blank.
+    # `road` is the named exception since T876: it has no empty state at all, so removing it
+    # RETURNS it to the default rather than clearing it (SPEC V328c, I135d). The exception is
+    # matched BY NAME and the general case is still required beside it - a mfRemove that stopped
+    # writing "" for everything else would slip through a test that only looked for the branch.
+    if ($rb369 -notmatch 'MF\.picked = ') { $v369Bad += "(a) mfRemove does not mark anything - mfConfirm writes MF.picked, so without the mark OK would write whatever was marked before (SPEC V369a, I121d)" }
+    elseif ($rb369 -notmatch '""') { $v369Bad += "(a) mfRemove never marks the blank - `"`" is what mfConfirm reads as 'clear the row', and it is what removal means for every field but the road (SPEC V369a, I121d)" }
+    else {
+        # REQUIRED, not merely validated when present. Written the other way it passed a mfRemove
+        # that had dropped the branch entirely, which is the road being CLEARED to a value its own
+        # list does not offer - the exact state V328(c) and the user's rule both refuse, with
+        # nothing on screen to show for it (MEASURED by mutation 2026-09-02).
+        $rmRoad369 = [regex]::Match($rb369, 'MF\.picked = \(MF\.field == "([^"]+)"\) and ([^\s]+|"[^"]*") or ""')
+        if (-not $rmRoad369.Success) {
+            $v369Bad += "(a) mfRemove has no road branch - `road` is the one field with no empty state, so removing it has to RETURN it to the default and not clear it to a value the list never offers (SPEC V328c, I135d, V15)"
+        }
+        else {
+            if ($rmRoad369.Groups[1].Value -ne 'road') { $v369Bad += "(a) mfRemove gives '$($rmRoad369.Groups[1].Value)' its own meaning of removal - only the road has one, because only the road has no empty state (SPEC V328c, V15)" }
+            if ($rmRoad369.Groups[2].Value -ne 'ROAD_DEFAULT') { $v369Bad += "(a) mfRemove returns the road to $($rmRoad369.Groups[2].Value) and not ROAD_DEFAULT - the migration of T906 and this line are ONE rule and read the same constant (SPEC I135d, B70)" }
+        }
+    }
     if ($rb369 -match 'MF\.hits') { $v369Bad += "(a) mfRemove reads MF.hits - the remove line was never in the pool, so any index into the hits is a name that belongs to some other row (SPEC V369a, I121b)" }
 }
 
@@ -15840,9 +16905,16 @@ foreach ($kn383 in @('MERIT_ROWS','BACKGROUND_ROWS','BACKGROUND_FREE_ROWS','SPEC
     if ($km383.Success) { $K383[$kn383] = [int]$km383.Groups[1].Value }
 }
 
-# $txt is the source the LOOP lives in, because the one-hop alias below is a `local` inside the
-# painter: renderRitualButtons writes `local last = RITUAL_ROWS - RITUAL_FREE_ROWS` in WoD20.14,
-# and hunting for it in the root form would find nothing and report a derived bound as unresolvable.
+# $txt is the source ABOVE the loop, because the one-hop alias below is a `local` inside the
+# painter: renderRitualButtons writes `local last = RITUAL_ROWS - RITUAL_FREE_ROWS`, and hunting
+# for it in the root form would find nothing and report a derived bound as unresolvable.
+#
+# ABOVE the loop and not the whole file, and the alias search below takes the LAST hit rather
+# than the first: since T909 one file holds THREE painters and all three name their bound `last`
+# (SPEC I136j). Reading the file top-down resolved every one of them to the first - the ritual
+# painter answered DISC_ROWS - DISC_FREE_ROWS = 15 and 7 authored rows read as unpainted, which
+# is the merge hazard B117 named wearing a new hat: a per-FILE regex stops being unique the day
+# two things that were in two files land in one.
 function Resolve383($expr, $txt) {
     $e = $expr.Trim()
     if ($e -match '^\d+$') { return @{ Ok = $true; Lit = $true; Val = [int]$e } }
@@ -15855,8 +16927,9 @@ function Resolve383($expr, $txt) {
     # BACKGROUND_FREE_ROWS` and bounds on `last`. That IS derived - naming the difference
     # before using it is not a literal, and a rule that could not see through the alias would
     # report correct code as broken, which is B106 (SPEC V383b).
-    $al = [regex]::Match($txt, '(?m)^\s*local\s+' + [regex]::Escape($e) + '\s*=\s*([^;]+);')
-    if ($al.Success) {
+    $als = [regex]::Matches($txt, '(?m)^\s*local\s+' + [regex]::Escape($e) + '\s*=\s*([^;]+);')
+    if ($als.Count -gt 0) {
+        $al = $als[$als.Count - 1]
         $inner = $al.Groups[1].Value.Trim()
         if ($inner -ne $e) {
             $r = Resolve383 $inner $txt
@@ -15909,7 +16982,7 @@ foreach ($f383 in $files) {
     foreach ($lp383 in [regex]::Matches($txt383, '(?s)for\s+i\s*=\s*([^,]+?)\s*,\s*(.+?)\s*,\s*1\s+do(.*?)\bend;')) {
         if ($lp383.Groups[3].Value -notmatch 'mfLabel\(') { continue }
         foreach ($pm383 in [regex]::Matches($lp383.Groups[3].Value, 'mfLabel\(\s*found\[\s*"([A-Za-z_]+)"\s*\.\.')) {
-            $paint383 += [pscustomobject]@{ Pre = $pm383.Groups[1].Value; Lo = $lp383.Groups[1].Value; Hi = $lp383.Groups[2].Value; File = $f383.Name; Txt = $txt383 }
+            $paint383 += [pscustomobject]@{ Pre = $pm383.Groups[1].Value; Lo = $lp383.Groups[1].Value; Hi = $lp383.Groups[2].Value; File = $f383.Name; Txt = $txt383.Substring(0, $lp383.Index) }
         }
     }
 }
@@ -15942,6 +17015,108 @@ if ($v383Bad.Count -eq 0) {
     }
 }
 
+# ---- (a)(b) for the picker button authored OUTSIDE any template ------------------------
+# SPEC T893, B123, V354i, V333g. The collector above expands TEMPLATES, because that is where
+# all but one of the picker buttons on this sheet come from. A button authored INLINE escapes
+# the whole rule - it is not a template instance, so nothing above ever adds it to a family and
+# nothing ever asks whether a painter reaches it. Same vacancy V333 closed one door over for
+# the ?, with $BARE_Q333, and the one V354(i) names from the code side.
+#
+# MEASURED 2026-09-01 (T874 half B): dropping 'hedgeAffiliation' out of the fields= of the
+# dataLink that drives renderNuminaButtons left the whole gate GREEN. The damage is real and
+# silent - the button would stop being repainted and sit there reading "Select Affiliation"
+# with a value inside it, because picking only does setField(MF.field, MF.picked) and there is
+# no direct repaint: the dataLink IS the path back to the screen (SPEC B123).
+#
+# NAMED and closed, never a skip: a second bare picker button has to redden here rather than be
+# absorbed by a wildcard, which is the whole difference between a roster and a hole (SPEC V328d).
+$BARE_DYN = @('dynhedgeAffiliation', 'dynroad', 'dynclanFamily')
+$bareSeen383 = @()
+foreach ($f383b in $files) {
+    foreach ($b383b in (Doc $f383b.FullName).SelectNodes("//button")) {
+        if ($b383b.GetAttribute("onClick") -notmatch 'mfOpen\(') { continue }
+        if ($null -ne (TplOf $b383b)) { continue }
+        $bn383b = $b383b.GetAttribute("name")
+        $bareSeen383 += $bn383b
+        if ($BARE_DYN -notcontains $bn383b) {
+            $v383Bad += "(a) $($f383b.Name) draws a picker button named '$bn383b' outside any template and it is on no roster - the template walk above cannot see it, so neither leg ever asks who paints it or what watches it (SPEC B123, V354i, V328d)"
+        }
+    }
+}
+# Ghost guard, and it is the zero-guard for this half: a roster name authored nowhere is a name
+# that excuses the next bare button to appear under it (SPEC V20, B7).
+foreach ($bd383 in $BARE_DYN) {
+    if ($bareSeen383 -notcontains $bd383) {
+        $v383Bad += "(e) '$bd383' is on the bare-picker roster and is authored nowhere - a stale name here is a hole the next bare button walks through (SPEC V20, B7)"
+    }
+}
+
+foreach ($bd383 in @($BARE_DYN | Where-Object { $bareSeen383 -contains $_ })) {
+    # (a) SOME mfLabel reaches it. Which FILE the painter sits in stopped being part of the
+    # question in T883 and it is not part of this one either - a painter is told by the call.
+    $pf383 = $null
+    foreach ($f383c in $files) {
+        $t383c = CodeOf $f383c.FullName
+        $mm383 = [regex]::Match($t383c, 'mfLabel\(\s*found\[\s*"' + [regex]::Escape($bd383) + '"\s*\]\s*,\s*([^,]+?)\s*,')
+        if (-not $mm383.Success) { continue }
+        # The FIELD it paints is the second argument, and the FUNCTION it paints from is the last
+        # one opened before the call - which is the name a dataLink has to carry to fire it again.
+        $fn383 = [regex]::Matches($t383c.Substring(0, $mm383.Index), '(?m)^\s*function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(')
+        $pf383 = [pscustomobject]@{
+            File = $f383c.Name
+            Arg  = $mm383.Groups[1].Value.Trim()
+            Fn   = $(if ($fn383.Count -gt 0) { $fn383[$fn383.Count - 1].Groups[1].Value } else { '' })
+        }
+        break
+    }
+    if ($null -eq $pf383) {
+        $v383Bad += "(a) '$bd383' is authored outside a template and no mfLabel call reaches it - a button nothing paints keeps its AUTHORED label forever, so a filled row reads as empty on every open (SPEC I107a2, V383a, B123)"
+        continue
+    }
+
+    $fld383 = ''
+    if     ($pf383.Arg -match '^sheet\.([A-Za-z_][A-Za-z0-9_]*)$')          { $fld383 = $matches[1] }
+    elseif ($pf383.Arg -match '^sheet\[\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*\]$') { $fld383 = $matches[1] }
+    if ($fld383 -eq '') {
+        $v383Bad += "(b) the mfLabel painting '$bd383' reads '$($pf383.Arg)', which names no single sheet field - leg (b) cannot ask whether the link watches a field it cannot name (SPEC V383b, B123)"
+        continue
+    }
+    if ($pf383.Fn -eq '') {
+        $v383Bad += "(b) the mfLabel painting '$bd383' sits inside no named function - there is nothing for a dataLink to call, so the button is painted once on load and never again (SPEC B123, V123)"
+        continue
+    }
+
+    # (b) the dataLink driving that painter OBSERVES the field the painter writes. This is the
+    # leg the mutation proved missing: everything else about the button can be perfect and the
+    # value still never reaches the screen after the pick (SPEC B123, V123).
+    $seen383 = $false
+    $watch383 = $false
+    foreach ($f383d in $files) {
+        foreach ($dl383 in (Doc $f383d.FullName).SelectNodes("//dataLink")) {
+            # A dataLink writes its handler in TWO shapes and this leg only knew one of them: the
+            # onChange ATTRIBUTE, and the <event name="onChange"> CHILD. The road link uses the
+            # child form, so T876 arrived with a correct painter, a correct watcher and a red
+            # check - the same scope-short-of-the-promise shape as B122 and B123, which is what
+            # this leg was written for in the first place. It can only over-report, never let a
+            # defect through, which is why it stayed unnoticed until a picker used the other form.
+            $h383 = $dl383.GetAttribute("onChange")
+            foreach ($ev383 in $dl383.SelectNodes("event[@name='onChange']")) { $h383 += "`n" + $ev383.InnerText }
+            if ($h383 -notmatch ('\b' + [regex]::Escape($pf383.Fn) + '\s*\(')) { continue }
+            $seen383 = $true
+            if ($dl383.GetAttribute("fields") -match ("'" + [regex]::Escape($fld383) + "'")) { $watch383 = $true }
+            # A dataLink names what it watches in TWO attributes and this leg knew only the plural:
+            # `fields="{'a','b'}"` and `field="a"`. The clanFamily link uses the singular, so the same
+            # blind spot that hid the <event> form one line up hid this one too (SPEC B122, B123).
+            if ($dl383.GetAttribute("field") -eq $fld383) { $watch383 = $true }
+        }
+    }
+    if (-not $seen383) {
+        $v383Bad += "(b) '$bd383' is painted by $($pf383.Fn) in $($pf383.File) and no dataLink anywhere calls that function - the paint runs on load and nothing ever runs it again (SPEC B123, V123)"
+    }
+    elseif (-not $watch383) {
+        $v383Bad += "(b) '$bd383' is painted by $($pf383.Fn) out of sheet.$fld383, and no dataLink driving $($pf383.Fn) watches '$fld383' - picking only does setField(MF.field, MF.picked), so the button would keep showing its empty label with a value sitting inside the field (SPEC B123, V123, V383b)"
+    }
+}
 # (c) ONE mfLabel and the shape lives inside it. (d) the empty label goes through the
 # translator, so no PT string is ever authored into the painter (SPEC V9, V24).
 $ml383 = [regex]::Matches($lua383, '(?s)function mfLabel\([^)]*\)(.*?)\n\t{3}end;')
@@ -15956,7 +17131,7 @@ else {
 }
 
 if ($v383Bad) { foreach ($b in $v383Bad) { Fail "V383 $b" } }
-else { Pass "V383 all $((($authored383.Values | ForEach-Object { $_.Count }) | Measure-Object -Sum).Sum) authored picker button(s) fall inside a painted range, each of the $($paint383.Count) painting loop(s) across $(@($paint383 | ForEach-Object { $_.File } | Sort-Object -Unique).Count) file(s) bounds on a constant read from the source, and mfLabel alone owns the empty/filled shape" }
+else { Pass "V383 all $((($authored383.Values | ForEach-Object { $_.Count }) | Measure-Object -Sum).Sum) authored picker button(s) fall inside a painted range, each of the $($paint383.Count) painting loop(s) across $(@($paint383 | ForEach-Object { $_.File } | Sort-Object -Unique).Count) file(s) bounds on a constant read from the source, the $($bareSeen383.Count) button(s) authored outside a template are each painted by a named function whose dataLink watches the field it paints, and mfLabel alone owns the empty/filled shape" }
 
 # ---- V353: the opening focus, now that the screen has answered ---------------------------
 # SPEC V353, I111, Q28, T804/T805. This id was RESERVED, not written: I111a measured fifteen
@@ -15966,7 +17141,6 @@ else { Pass "V383 all $((($authored383.Values | ForEach-Object { $_.Count }) | M
 # the three candidates of I111c collapsed to one and the rule can finally measure something.
 $v353Bad = @()
 $lua353 = CodeOf (Join-Path $dir "WoD20th.lfm")
-$mfOpen353 = [regex]::Match($lua353, '(?s)function mfOpen\([^)]*\)(.*?)\n\t{3}end;')
 
 # Comments are already stripped by CodeOf, and they matter here: the block above the call
 # spells `setFocus` four times over, so counting the raw file would find focus calls that are
@@ -15984,25 +17158,109 @@ if ($calls353.Count -eq 0) {
         $v353Bad += "$($calls353.Count) setFocus call(s) in the sheet, expected 1 - focus is asked in one place or it is asked once per opening path, and the paths do not agree for long (SPEC V353b, V135)"
     }
 
-    if (-not $mfOpen353.Success) {
-        $v353Bad += "(a) mfOpen is gone - the focus request has no opening to sit at the end of (SPEC V209)"
-    } else {
-        $body353 = $mfOpen353.Groups[1].Value
-        $show353 = [regex]::Match($body353, 'found\[\s*"mfSearch"\s*\]\s*\.visible\s*=\s*true')
-        $foc353  = [regex]::Match($body353, 'setFocus\s*\(')
-
-        if (-not $foc353.Success) {
-            $v353Bad += "(a) the setFocus call is not inside mfOpen - it is the opening that has to hand over the cursor, and a call anywhere else fires on a box that may not be open (SPEC I111c, V353a)"
-        } elseif (-not $show353.Success) {
-            $v353Bad += "(a) mfOpen never sets mfSearch.visible = true - the ordering leg has no landmark to measure against, so it would pass whatever the order actually is (SPEC V20, B7)"
-        } elseif ($foc353.Index -lt $show353.Index) {
-            $v353Bad += "(a) focus is asked BEFORE mfSearch is shown - asking a widget that is not on screen yet is the one way this cannot work, and it fails silently: no error, no cursor (SPEC I111c, V353a)"
-        }
+    # (a) AMENDED in T923 (SPEC V353 amended, I140u, B138). The prose of leg (a) has always read
+    # "o pedido de foco esta DEPOIS de mfSearch.visible = true - foco em widget invisivel ⊥ pega":
+    # the requirement is ORDER, and "inside mfOpen" was a PROXY for it that held only while mfOpen
+    # was the one opening path. The owner asked for Esc to close the ? as well, popOpen became a
+    # second opening path, and a click inside either overlay has to hand the cursor back - so the
+    # proxy started refusing the very shape it was written to protect (SPEC B138, B125).
+    #
+    # What replaces it is what the prose says, and it is STRONGER than the proxy was: the one
+    # asker gates on .visible itself, and EVERY opening path calls it after showing its box. The
+    # proxy checked one path; this checks both, and it checks the guarantee rather than a place.
+    $FOCUS_PATHS = @(
+        [pscustomobject]@{ Fn = 'mfOpen';  Box = 'mfSearch' }
+        [pscustomobject]@{ Fn = 'popOpen'; Box = 'popDesc' }
+    )
+    $refoc353 = [regex]::Match($lua353, '(?s)function kbRefocus\([^)]*\)(.*?)\n\t{3}end;')
+    if (-not $refoc353.Success) {
+        $v353Bad += "(a) kbRefocus is gone - the one asker is where the .visible guard lives, and without it focus is asked positionally again (SPEC V353a, I140u)"
+    } elseif ($refoc353.Groups[1].Value -notmatch '\.visible') {
+        $v353Bad += "(a) kbRefocus asks for focus without reading .visible - asking a widget that is not on screen is the one way this cannot work, and it fails SILENTLY (SPEC V353a, I111c)"
+    } elseif ($refoc353.Groups[1].Value -notmatch 'setFocus\s*\(') {
+        $v353Bad += "(a) the setFocus call is not inside kbRefocus - the ask and the .visible guard are one function, or the guard is optional (SPEC V353a, V135)"
+    }
+    foreach ($path353 in $FOCUS_PATHS) {
+        $fn353 = [regex]::Match($lua353, '(?s)function ' + $path353.Fn + '\([^)]*\)(.*?)\n\t{3}end;')
+        if (-not $fn353.Success) { $v353Bad += "(a) $($path353.Fn) is gone - an opening path that cannot be read is one this leg stops measuring (SPEC V209)"; continue }
+        $body353 = $fn353.Groups[1].Value
+        $show353 = [regex]::Match($body353, 'found\[\s*"' + $path353.Box + '"\s*\]\s*\.visible\s*=\s*true')
+        $ask353  = [regex]::Match($body353, 'kbRefocus\s*\(')
+        if (-not $ask353.Success) { $v353Bad += "(a) $($path353.Fn) opens $($path353.Box) and never hands the cursor over - that is Q28 again, on the overlay that got it second (SPEC I111, V353a)" }
+        elseif (-not $show353.Success) { $v353Bad += "(a) $($path353.Fn) never sets $($path353.Box).visible = true - the ordering leg has no landmark, so it would pass whatever the order actually is (SPEC V209, V20)" }
+        elseif ($ask353.Index -lt $show353.Index) { $v353Bad += "(a) $($path353.Fn) asks for focus BEFORE $($path353.Box) is shown - a widget that is not on screen yet takes no focus, and it fails silently: no error, no cursor (SPEC I111c, V353a)" }
     }
 }
 
 if ($v353Bad) { foreach ($b in $v353Bad) { Fail "V353 $b" } }
-else { Pass "V353 the cursor is handed to the filter field from exactly one place, inside mfOpen and after mfSearch is shown" }
+else { Pass "V353 the cursor is handed over from exactly one place - kbRefocus, which gates on .visible - and both opening paths call it after showing their box" }
+
+# ---- V405: Esc closes both overlays -----------------------------------------------------
+# SPEC V405, I140c, I140u, R138, T922/T923, user 2026-09-02 item 2.
+#
+# T922 measured the thing the SDK source does not say: a key event reaches ONLY the control that
+# has FOCUS, and only a TEXT control takes focus - edtPopDesc is readOnly and still takes it. The
+# probe hung onKeyDown on the popDesc layout and on popScrim as well and neither EVER fired, so
+# those two came straight back out: a listener on a control that cannot hold focus is a line that
+# never runs, which is B111 wearing different clothes.
+#
+# That leaves exactly one keyboard-capable control per overlay, and this rule is those two plus
+# the two rules that fall out of the measurement.
+# (a) DERIVED, and no longer a roster of two (SPEC B139, I140x). The first shape of this rule
+# NAMED edtMfQuery and edtPopDesc and said "exactly one keyboard-capable control per overlay" -
+# and the picker has THREE: the filter, the `-- Custom --` name field and the read-only
+# description pane. The user clicked the description, pressed Esc, and nothing happened; the
+# gate was green over it, because a roster only ever measures what somebody remembered.
+#
+# So the subject is SWEPT: every <edit> and <textEditor> inside either overlay takes focus when
+# it is clicked, therefore every one of them has to answer Esc. A control added to either box
+# tomorrow enters this set by construction (SPEC V209, B7).
+$V405_OVERLAYS = @('mfSearch', 'popDesc')
+$v405Bad = @()
+$doc405 = Doc $rootPath
+$lua405 = CodeOf $rootPath
+$seen405 = 0
+foreach ($ov405 in $V405_OVERLAYS) {
+    $box405 = $doc405.SelectSingleNode("//layout[@name='$ov405']")
+    if ($null -eq $box405) { $v405Bad += "the overlay '$ov405' is gone from the root form - every leg below would sweep an empty set (SPEC V20, V209)"; continue }
+    $keys405 = @($box405.SelectNodes(".//edit|.//textEditor"))
+    if ($keys405.Count -eq 0) { $v405Bad += "'$ov405' holds no text control at all - it would open with nothing that can hear a key, which is Q28 by the other door (SPEC V209)"; continue }
+    foreach ($k405 in $keys405) {
+        $seen405++
+        $nm405 = $k405.GetAttribute("name")
+        $kd405 = $k405.GetAttribute("onKeyDown")
+        if (-not $kd405) { $v405Bad += "'$nm405' is a text control inside $ov405 and carries no onKeyDown - click it and Esc falls on the floor, which is exactly what the owner reported about the description pane (SPEC B139, I140c)"; continue }
+        if ($kd405 -notmatch 'escClose\(') { $v405Bad += "'$nm405' answers keys with '$kd405' and not escClose - one closer for both overlays, or the second one drifts (SPEC V333e, V135)"; continue }
+        # the diagnostic argument is DERIVED from readOnly and never chosen: a box nobody types
+        # in is a free channel for the one thing still unmeasured, and a box people type in is
+        # not (SPEC V405, I140c). Reading it off readOnly is what keeps that from being taste.
+        $want405 = if ($k405.GetAttribute("readOnly") -eq 'true') { 'true' } else { 'false' }
+        if ($kd405 -notmatch (',\s*' + $want405 + '\s*\)')) {
+            $v405Bad += "'$nm405' is readOnly=$($k405.GetAttribute('readOnly')) and asks escClose with the wrong diagnostic flag - the box that reports an unrecognised key is the one nobody types in, or the report lands on the filter mid-word (SPEC V405)"
+        }
+    }
+}
+if ($seen405 -lt 4) { $v405Bad += "only $seen405 text control(s) were swept across the two overlays, expected at least the 4 they draw - this leg is covering less than the sheet has (SPEC V209)" }
+# (b) the closing goes through the SAME doors the X and the scrim use. A second closer is what
+# V333(e) refuses, and it is how one of the two overlays ends up half-shut - box hidden, scrim up.
+$esc405 = [regex]::Match($lua405, '(?s)function escClose\([^)]*\)(.*?)\n\t{3}end;')
+if (-not $esc405.Success) { $v405Bad += "escClose is gone - the two listeners above would be calling nothing (SPEC V209)" }
+else {
+    foreach ($closer405 in @('mfClose', 'popClose')) {
+        if ($esc405.Groups[1].Value -notmatch ($closer405 + '\s*\(')) { $v405Bad += "escClose never calls $closer405 - Esc would shut one overlay and leave the other, and the scrim belongs to both (SPEC V333e)" }
+    }
+    if ($esc405.Groups[1].Value -notmatch 'isEscKey\s*\(') { $v405Bad += "escClose does not ask isEscKey - closing on ANY key is not what Esc means, and typing in the filter would shut the box (SPEC I140c)" }
+}
+# (c) and the measurement itself, kept as a rule: onKeyDown belongs on a control that can hold
+# focus. MEASURED 2026-09-02 - the layout and the rectangle the probe wore never fired once.
+foreach ($f in $files) {
+    foreach ($kn405 in (Doc $f.FullName).SelectNodes("//*[@onKeyDown]")) {
+        if ($kn405.LocalName -in @('edit', 'textEditor')) { continue }
+        $v405Bad += "$($f.Name) <$($kn405.LocalName) name='$($kn405.GetAttribute('name'))'> listens for onKeyDown and cannot hold focus - T922 hung exactly that on a layout and on a rectangle and neither ever fired (SPEC R138, B111)"
+    }
+}
+if ($v405Bad) { foreach ($b405 in $v405Bad) { Fail "V405 $b405" } }
+else { Pass "V405 Esc reaches the one focusable control of each overlay and closes it through the door the X already uses" }
 
 # ---- V359: the box has TWO sizes and the CALL picks -------------------------------------
 # SPEC V359, I115, T826, ask 2. Specialties asked for a shorter box: its pane holds no book
@@ -16187,5 +17445,1071 @@ foreach ($needle387 in @('grep -C', '-Quiet', 'Edit` em vez de `Write', 'desc*.l
 if ($v387Bad) { foreach ($b in $v387Bad) { Fail "V387 $b" } }
 else { Pass "V387 all four reading rules are in CLAUDE.md" }
 
+# ---- V388: clearing a picker row clears what HUNG on it ---------------------------------
+# SPEC V388, I121, I122c, user 2026-09-02. mfConfirm wrote setField(MF.field, "") and stopped,
+# so the dots stayed lit on a row with no name and the ledger went on charging for them. It is
+# V383 turned inside out - there the data exists and vanishes off the screen, here the screen
+# shows points for a trait that is gone - and V2 stays green through both, because the name
+# field is right there, empty and legal.
+$v388Bad = @()
+
+# (a) WHICH roots carry dots, read off the TEMPLATES and never typed here: a roster of roots
+# written into the gate goes stale the day a family gains or drops its dot column.
+$dotRoots388 = @{}
+foreach ($f388 in $files) {
+    $d388 = Doc $f388.FullName
+    foreach ($tpl388 in $d388.SelectNodes("//template")) {
+        $tn388 = $tpl388.GetAttribute("name")
+        $opens388 = @($tpl388.SelectNodes(".//button[@onClick]") | Where-Object { $_.GetAttribute("onClick") -match 'mfOpen\(' })
+        if ($opens388.Count -eq 0) { continue }
+        $dots388 = @($tpl388.SelectNodes(".//imageCheckBox[@field]") | ForEach-Object { $_.GetAttribute("field") })
+        if ($dots388.Count -eq 0) { continue }
+        # Two shapes of dot field, and the root is in a different place in each: SpecialityRow
+        # builds speciality_$(num)_1 INSIDE the template, while the rest wear $(field)_N and take
+        # their root from the call site - the same split V354(e) reads as INDIRECT vs NUMBERED.
+        $m388 = [regex]::Match($dots388[0], '^([A-Za-z]+)_\$\(num\)')
+        if ($m388.Success) { $dotRoots388[$m388.Groups[1].Value] = $tn388; continue }
+        foreach ($cs388 in $d388.SelectNodes("//$tn388")) {
+            $cm388 = [regex]::Match($cs388.GetAttribute("field"), '^([A-Za-z]+)_\d+$')
+            if ($cm388.Success) { $dotRoots388[$cm388.Groups[1].Value] = $tn388 }
+        }
+    }
+}
+
+# hedgeRitual carries no dot WIDGET since T892 and still keeps its level in the same five field
+# names, which hedgeRitualLevel reads whenever the name has no prefix (SPEC V269b). A sweep over
+# widgets finds six roots and loses this one entirely, so it is NAMED - never a catch-all, or the
+# next unrated family is absorbed instead of reddening (SPEC V388c, V328d).
+$V388_FIELD_ONLY = @('hedgeRitual')
+foreach ($fo388 in $V388_FIELD_ONLY) { $dotRoots388[$fo388] = '(field-only, no widget)' }
+
+# (g) zero-guard FIRST: a rule clearing dots over an empty set of roots passes vacuously.
+if ($dotRoots388.Count -eq 0) { $v388Bad += "(g) not one picker root with dots was read off the templates - the sweep broke and every leg below would pass on the empty set (SPEC V20, B7)" }
+
+$clear388 = LuaFn $rootTxt 'clearRowDots'
+if (-not $clear388) { $v388Bad += "(a) clearRowDots is gone - nothing gives up the dots when a row is cleared, so a removed trait keeps its points on screen and in the log (SPEC V388a)" }
+else {
+    # (f) the RANGE is derived from XP_TRAIT, the registry xpClick already prices with. A literal
+    # range here would not follow a family that changes its dot count, which is how B112 was born.
+    if ($clear388 -notmatch 'XP_TRAIT\[') { $v388Bad += "(f) clearRowDots does not read XP_TRAIT - the dot count would be written a second time, free to disagree with the one xpClick prices from (SPEC V388f, B70, B112)" }
+    if ($clear388 -notmatch 'tr\.first, tr\.last') { $v388Bad += "(f) clearRowDots does not walk first..last out of the trait - starting at 1 writes an attribute's fixed opening dot, which owns no field at all (SPEC V388f, I3)" }
+    if ($clear388 -notmatch 'setField\(') { $v388Bad += "(e) clearRowDots does not write through setField - a second accounting beside the baseline diff is exactly what V136 and V269c keep off this sheet (SPEC V388e)" }
+    # (c) the one root the registry does not answer for
+    foreach ($fo388 in $V388_FIELD_ONLY) {
+        if ($clear388 -notmatch [regex]::Escape($fo388)) { $v388Bad += "(c) clearRowDots never names '$fo388' - XP_TRAIT does not declare it, so the level would survive the remove and the painter would light it on an empty row (SPEC V388c, V269b, T892)" }
+    }
+}
+
+# (d) ONE writer, and it is mfConfirm. mfRemove only MARKS - a clear there would be the second
+# door, and the empty item of V15 would go on leaving a dirty row behind it.
+$conf388 = LuaFn $rootTxt 'mfConfirm'
+$rem388  = LuaFn $rootTxt 'mfRemove'
+if (-not $conf388) { $v388Bad += "(d) mfConfirm is gone - this rule has no subject (SPEC V209)" }
+elseif ($conf388 -notmatch 'if MF\.picked == "" then clearRowDots\(MF\.field\); end;') {
+    $v388Bad += "(d) mfConfirm does not clear the dots when the pick is the empty one - '' arrives by TWO doors, the Remove line and the empty first item of V15, and this is the single write both land on (SPEC V388d, V15, I121, B94)"
+}
+if ($rem388 -and $rem388 -match 'setField\(') { $v388Bad += "(d) mfRemove writes with setField - it MARKS and confirms later, and a write here is the second owner of one gesture (SPEC I122b, V333e, V135)" }
+
+# (a)/(b) every root the templates carry is REACHABLE by clearRowDots: declared as a trait, or
+# on the named field-only roster. speciality rides in through XP_TRAIT with first=last=1 - its
+# single dot is the storyteller's FREE stamp, and the user asked for it to go with the row
+# (2026-09-02): a stamp outliving its line makes the next specialty typed there born free.
+foreach ($root388 in ($dotRoots388.Keys | Sort-Object)) {
+    if ($V388_FIELD_ONLY -contains $root388) { continue }
+    # Declared EITHER by name or through XP_NUMINA, whose two groups hand declareTrait their
+    # base at runtime - matching only the literal call reported numina and psychic, both
+    # declared, as uncovered (SPEC V209).
+    $decl388 = ($rootTxt -match ('declareTrait\("' + [regex]::Escape($root388) + '_"')) -or ($rootTxt -match ('base = "' + [regex]::Escape($root388) + '"'))
+    if (-not $decl388) {
+        $v388Bad += "(a) root '$root388' (drawn by $($dotRoots388[$root388])) carries dots and is declared to no trait - clearRowDots reaches a row through XP_TRAIT, so this family's dots would survive every remove (SPEC V388a, V388g)"
+    }
+}
+
+if ($v388Bad) { foreach ($b in $v388Bad) { Fail "V388 $b" } }
+else { Pass "V388 all $($dotRoots388.Count) picker root(s) carrying dots are reachable by clearRowDots, whose range comes from XP_TRAIT, and mfConfirm alone clears a row" }
+
+# ---- V392: the Traits tab is three closing lines, and one exception ---------------------
+# SPEC V392, I134j, I134k, T901, T902. V332(a) is a SNAPSHOT of this tab - it catches any drift
+# at all, which is what it is for - and this is the RULE that says which of those rects would be
+# right. The two are not the same job: a snapshot re-measured after a careless edit certifies the
+# careless edit, and this leg is what would refuse it.
+#
+# The user asked for three things on 2026-09-02 and they are (a), (b) and (c): MERITS and FLAWS
+# the same height with FLAWS closing where BACKGROUNDS closes; every box right of them one size,
+# with the bottom row closing on that same line; and DERANGEMENTS out of that count, because it
+# is the one box on the tab holding a long list rather than a note.
+$v392Bad = @()
+$doc392   = Doc (Join-Path $dir "WoD20.2.lfm")
+$byTitle392 = @{}
+foreach ($b392 in $doc392.SelectNodes("//scrollBox/layout")) {
+    if ($b392.HasAttribute("name")) { continue }
+    $ttl392 = $b392.SelectSingleNode("label")
+    if ($null -eq $ttl392) { continue }
+    $t392 = $ttl392.GetAttribute("text")
+    if ($t392 -eq '') { continue }
+    $byTitle392[$t392] = [pscustomobject]@{
+        L = [int]$b392.GetAttribute("left");  T = [int]$b392.GetAttribute("top")
+        W = [int]$b392.GetAttribute("width"); H = [int]$b392.GetAttribute("height")
+    }
+}
+# MERITS and FLAWS are titled by their COLUMN header, `Merit` and `Flaw`, not by a box title -
+# they are tables, and the header is the first label in the box. Named here rather than derived
+# because getting the wrong two boxes would make every leg below measure the wrong thing.
+$merit392 = $byTitle392['Merit']
+$flaw392  = $byTitle392['Flaw']
+$bg392    = $byTitle392['BACKGROUNDS']
+$der392   = $byTitle392['DERANGEMENTS']
+if ($null -eq $merit392 -or $null -eq $flaw392 -or $null -eq $bg392 -or $null -eq $der392) {
+    $v392Bad += "one of MERITS / FLAWS / BACKGROUNDS / DERANGEMENTS was not found on the Traits tab by its title - every leg here is measured against those four and this run found none of them (SPEC V209, B7)"
+} else {
+    $floor392 = $bg392.T + $bg392.H
+
+    # (a) MERITS and FLAWS are one height.
+    if ($merit392.H -ne $flaw392.H) {
+        $v392Bad += "(a) MERITS is $($merit392.H)px tall and FLAWS $($flaw392.H) - the user asked for the two tables to be the same size vertically (SPEC I134j)"
+    }
+    # (c) FLAWS closes where BACKGROUNDS closes.
+    if (($flaw392.T + $flaw392.H) -ne $floor392) {
+        $v392Bad += "(c) FLAWS closes at $($flaw392.T + $flaw392.H) and BACKGROUNDS at $floor392 - the two ends were asked to coincide, and they are what makes the left of this tab read as one block (SPEC I134j)"
+    }
+
+    # (b) every 225-wide box but DERANGEMENTS is ONE height. Derived: the ten are whichever
+    # height the column agrees on, and the odd one out has to be DERANGEMENTS BY NAME - an
+    # exception found by arithmetic would absorb the next box that drifted (SPEC V328d).
+    $col392 = @($doc392.SelectNodes("//scrollBox/layout") | Where-Object {
+        -not $_.HasAttribute("name") -and [int]$_.GetAttribute("width") -eq 225
+    } | ForEach-Object {
+        $tt = $_.SelectSingleNode("label")
+        [pscustomobject]@{
+            N = if ($null -ne $tt) { $tt.GetAttribute("text") } else { '' }
+            T = [int]$_.GetAttribute("top"); H = [int]$_.GetAttribute("height")
+        }
+    })
+    if ($col392.Count -lt 4) {
+        $v392Bad += "(b) only $($col392.Count) box(es) stand right of MERITS and FLAWS - this leg is reading a column that is not there (SPEC V209, V20)"
+    } else {
+        $ten392 = @($col392 | Where-Object { $_.N -ne 'DERANGEMENTS' })
+        $h392   = @($ten392 | ForEach-Object { $_.H } | Sort-Object -Unique)
+        if ($h392.Count -ne 1) {
+            $bad392 = @($ten392 | Group-Object H | Sort-Object Count | ForEach-Object { "$($_.Name)px: $(($_.Group | ForEach-Object { $_.N }) -join ', ')" })
+            $v392Bad += "(b) the boxes right of MERITS and FLAWS come in $($h392.Count) heights - $($bad392 -join ' | ') - and the user asked every one of them (DERANGEMENTS excepted) to be the same size (SPEC I134k)"
+        }
+        # (d) DERANGEMENTS is the exception and has to BE one - a DERANGEMENTS that quietly took
+        # the common height would leave this leg true and the exception meaningless (SPEC V209).
+        if ($h392.Count -eq 1 -and $der392.H -eq $h392[0]) {
+            $v392Bad += "(d) DERANGEMENTS is $($der392.H)px, the same as the ten it is excepted from - either it stopped needing the exception, in which case the exception goes, or the ten drifted onto it (SPEC I134k, V209)"
+        }
+        # (c) again, for the column: the LAST box of each of the three stacks closes on the floor.
+        foreach ($cl392 in @(910, 1140, 1370)) {
+            $stack392 = @($doc392.SelectNodes("//scrollBox/layout") | Where-Object {
+                -not $_.HasAttribute("name") -and [int]$_.GetAttribute("left") -eq $cl392
+            } | ForEach-Object { [int]$_.GetAttribute("top") + [int]$_.GetAttribute("height") })
+            if ($stack392.Count -eq 0) { $v392Bad += "(c) no box opens at x=$cl392 - the three right-hand columns of I134k are not all there (SPEC V209)"; continue }
+            $low392 = ($stack392 | Measure-Object -Maximum).Maximum
+            if ($low392 -ne $floor392) {
+                $v392Bad += "(c) the column at x=$cl392 ends at $low392 and BACKGROUNDS closes at $floor392 - the user asked the bottom boxes to line up with the end of BACKGROUNDS (SPEC I134k)"
+            }
+        }
+    }
+}
+if ($v392Bad) { foreach ($b392 in $v392Bad) { Fail "V392 $b392" } }
+else { Pass "V392 the Traits tab keeps MERITS and FLAWS one height closing with BACKGROUNDS, its ten right-hand boxes one height with DERANGEMENTS the named exception, and all three right columns ending on the same line" }
+
+# ---- V395: a renamed road value has a MIGRATION, and it is a WRITE ---------------------
+# SPEC V395, I135b, I135d, T906. T906 renamed the default road, and a rename of a canonical VALUE
+# is the one edit on this sheet that can strand DATA: V2 protects field NAMES, and nothing before
+# this protected the strings saved inside them. A sheet where the player picked the old name opens
+# holding a road the list no longer offers, BEARING has no row for it and ROAD_ERA filters it out
+# of every era - the line goes blank and the field quietly holds a value nothing can reach.
+#
+# MEASURED 2026-09-02: deleting the migration branch left the gate GREEN. Every other leg of T906
+# reddened under mutation and this one had nothing behind it, which is exactly the vacancy V20
+# exists to refuse.
+#
+# (a) the migration is a WRITE. A read-side fallback would paint the line right and leave the
+# stale value in the NDB for the next reader to trip on, and there is more than one reader
+# (BEARING, ROAD_ERA, the era filter, the label) - which is the many-owners shape V135 refuses.
+# (b) the old name is offered NOWHERE as a road any more, so the migration is the only thing that
+# can resolve it. If it were still in the list, a stranded sheet would look fine and the rename
+# would be half done in a way nobody sees.
+$v395Bad = @()
+# The write goes through ROAD_DEFAULT and not a literal since T876: Lua had the value spelled
+# in three places too (the migration, the fallback, and what Remove means), so the constant is
+# the same B70 fix this file made on its own side one task earlier.
+$mig395 = [regex]::Match($rootLua, 'if\s+ROAD_RETIRED\[road\]\s+then\s*\r?\n\s*setField\("road",\s*(\S+)\)')
+# V328(c) moved here in T876 (SPEC I135a). It used to read cboRoad's own items, and cboRoad is a
+# picker button now - a widget with no items to read. The list it offers is PICKER_LIST["road"],
+# which is what $roadItems329 already holds, so the leg reads the SOURCE instead of one widget's
+# view of it and is stronger for the move: it would catch the same drift with no combo on the
+# sheet at all. The rule itself is untouched and the user re-confirmed it on 2026-09-02 while
+# the conversion was being planned: a character with no road IS on the default, so the road list
+# carries no empty item and Remove RETURNS it rather than clearing it (SPEC I135a, I135d, V15).
+if ($roadItems329.Count -eq 0) { $v329Bad += "PICKER_LIST['road'] parsed to zero items - V328(c) would certify any list at all (SPEC V209, V20)" }
+else {
+    if ($roadItems329[0] -ne $ROAD_DEFAULT) { $v329Bad += "the road list leads on '$($roadItems329[0])', not the $ROAD_DEFAULT I99b declares - it is the V15 exception, and the first item is what a sheet with no pick shows (SPEC V328c)" }
+    if ($roadItems329 -contains '') { $v329Bad += "the road list carries the empty item - road is the ONE picker on the sheet that has no empty state, because a character with no road is on the default (SPEC V15, V328c, I135a)" }
+}
+
+if (-not $mig395.Success) {
+    $v395Bad += "(a) renderBearing carries no migration branch - a sheet that picked one of the retired roads ($($ROAD_RETIRED -join ', ')) opens holding a road the list no longer offers, with no BEARING row and filtered out of every era, and NOTHING on screen says so (SPEC I135d, V2)"
+} else {
+    if ($mig395.Groups[1].Value -notin @("ROAD_DEFAULT", ("""" + $ROAD_DEFAULT + """"))) { $v395Bad += "(a) the migration writes '$($mig395.Groups[1].Value)', not the default '$ROAD_DEFAULT' (or the ROAD_DEFAULT that holds it) - the user's rule is that a road with no usable value BECOMES the default, and Remove says the same sentence (SPEC I135d, V135)" }
+}
+# The branch tests a TABLE and not a name since T932, because the second retirement arrived: two
+# `if`s spelling the same setField would be one rule in two places, which is what B70 cured on the
+# default itself. So the table has to be measured too - a name that left the list and never reached
+# it migrates for NOBODY, and the branch above would go on matching while that sheet stayed broken.
+$ret395 = [regex]::Match($rootLua, '(?s)\n\t{4}ROAD_RETIRED = \{(.*?)\n\t{4}\};')
+$retKeys395 = @()
+if ($ret395.Success) { foreach ($m395 in [regex]::Matches($ret395.Groups[1].Value, '\["([^"]+)"\]\s*=\s*true')) { $retKeys395 += $m395.Groups[1].Value } }
+if (-not $ret395.Success -or $retKeys395.Count -eq 0) {
+    $v395Bad += "(a) ROAD_RETIRED is not declared in Lua, or parsed to zero names - the migration branch reads it, so an empty table fires for nobody and this rule would certify a retirement that migrates nothing (SPEC I135d, V20, B70)"
+} else {
+    foreach ($r395 in $ROAD_RETIRED) { if ($retKeys395 -notcontains $r395) { $v395Bad += "(a) '$r395' was retired from the road list and ROAD_RETIRED does not carry it - a sheet holding it opens on a road nothing offers, with no BEARING row and filtered out of every era (SPEC I135d, V2)" } }
+    foreach ($k395 in $retKeys395) { if ($ROAD_RETIRED -notcontains $k395) { $v395Bad += "(a) ROAD_RETIRED carries '$k395' and the roster here does not - either a retirement nobody wrote down, or a line left standing after the value came back to the list (SPEC V20, B70)" } }
+}
+$live395 = @()
+foreach ($r395 in $ROAD_RETIRED) {
+    if ($roadItems329 -contains $r395) { $live395 += "'$r395' in the picker list" }
+    if ($bearKeys329.ContainsKey($r395)) { $live395 += "'$r395' in BEARING" }
+    if ($eraKeys329.ContainsKey($r395)) { $live395 += "'$r395' in ROAD_ERA" }
+}
+# Lua's own single owner for the value, and it has to BE the default: three readers hang off it
+# (the migration, the fallback, Remove) and a constant that drifted would move all three at once
+# in a direction nobody asked for (SPEC I135d, B70).
+$rd876 = [regex]::Match($rootLua, 'ROAD_DEFAULT\s*=\s*"([^"]*)"')
+if (-not $rd876.Success) { $v395Bad += "(a) ROAD_DEFAULT is not declared in Lua - the migration, the fallback and what Remove means would each carry the literal again (SPEC B70, I135d)" }
+elseif ($rd876.Groups[1].Value -ne $ROAD_DEFAULT) { $v395Bad += "(a) Lua declares ROAD_DEFAULT as '$($rd876.Groups[1].Value)' and the gate expects '$ROAD_DEFAULT' - the sheet and the ruler disagree about which road a character with no pick is on (SPEC I135b)" }
+if ($live395.Count -gt 0) {
+    $v395Bad += "(b) a retired name is still live - $($live395 -join ', ') - the retirement is half done, and a sheet stranded on that name would look correct while holding a value the list stopped meaning (SPEC I135b, T906, T932)"
+}
+if ($v395Bad) { foreach ($b395 in $v395Bad) { Fail "V395 $b395" } }
+else { Pass "V395 the road retirements carry their migration - the $($ROAD_RETIRED.Count) retired name(s) ($($ROAD_RETIRED -join ', ')) are live nowhere, ROAD_RETIRED lists exactly those, and renderBearing WRITES '$ROAD_DEFAULT' over them once, on load" }
+# ---- V409: descRoad is FOUR blocks, a FUSED table, and ONE aura name ---------------------
+# SPEC V409, I141, I141a, I141b, I141e, I141g, T931. This is V192/V273 on the new module plus
+# two legs neither of them has, because no other list on the sheet INHERITS: a Path shows the
+# Road's hierarchy of sins with its OWN levels substituted in (I141e), and the aura it prints
+# is the mother's (I141g).
+#
+# COVERAGE IS DELIBERATELY NOT HERE, and SPEC V409 says so in its own text: V408 already asks
+# "does every picker name have an entry" for every (list, kind) with a module on disk, and Road
+# stopped being exempt the moment descRoad_en.lua landed. A second coverage rule here would be
+# exactly the duplicate B137 cost.
+#
+# Everything below is authored in ASCII on purpose: this file is patched byte for byte through
+# Latin-1 to keep the fourteen UTF-8 bytes already in it, so the em dash of a level line and the
+# accented "pag." come in through [char] rather than as literals.
+$v409Bad = @()
+$EMDASH409 = [char]0x2014
+$mod409 = @{ en = (Join-Path $plugin 'descRoad_en.lua'); pt = (Join-Path $plugin 'descRoad_pt.lua') }
+if (-not (Test-Path -LiteralPath $mod409['en'])) {
+    Pass 'V409 descRoad_en.lua is not on disk yet - the form of I141 has nothing to measure (SPEC T931)'
+} else {
+    # (b) reads the =<mother> column of research/road_bearing.tsv, which is where the inheritance
+    # of I141d is written down. No file, no leg - and saying so beats certifying nothing.
+    $mother409 = @{}
+    $bearTsv409 = Join-Path $PSScriptRoot 'research\road_bearing.tsv'
+    if (-not (Test-Path -LiteralPath $bearTsv409)) {
+        $v409Bad += "(b) research/road_bearing.tsv is gone - the =<mother> column is the ONLY place the aura inheritance is written down, and without it the fusion leg would certify a child with any number of levels at all (SPEC I141d, V20)"
+    } else {
+        foreach ($l409 in ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($bearTsv409)) -split "`r?`n")) {
+            if ($l409.Trim() -eq '' -or $l409.StartsWith('#')) { continue }
+            $c409 = $l409 -split "`t"
+            if ($c409.Count -ge 2 -and $c409[1].StartsWith('=')) { $mother409[$c409[0]] = $c409[1].Substring(1) }
+        }
+        if ($mother409.Count -eq 0) { $v409Bad += "(b) road_bearing.tsv carries no =<mother> row - the fusion leg would measure nothing, and the fusion of I141e is the most likely way this whole list breaks (SPEC V20)" }
+    }
+
+    foreach ($lang409 in @('en', 'pt')) {
+        $path409 = $mod409[$lang409]
+        if (-not (Test-Path -LiteralPath $path409)) { $v409Bad += "descRoad_$lang409.lua is missing while its twin is on disk - one module PER LANGUAGE, both halves or neither (SPEC V210, I141i)"; continue }
+        $ent409 = DescEntries $path409 'ROAD_DESC' $lang409
+        if ($null -eq $ent409 -or @($ent409).Count -eq 0) { $v409Bad += "descRoad_$lang409.lua parsed to ZERO entries - every leg below would pass on nothing (SPEC V209, V20)"; continue }
+        $pfx409 = 'p. '
+        if ($lang409 -eq 'pt') { $pfx409 = 'p' + [char]0x00E1 + 'g. ' }
+        $lvl409 = @{}
+        $aura409 = @{}
+        foreach ($e409 in $ent409) {
+            $b409 = $e409.Body -split "`n`n`n"
+            # (a) FORM. Four blocks, not three: I141a splits the third block of I21 into the aura
+            # and the sins table, and the separator is the same two blank lines (Q56).
+            if ($b409.Count -ne 4) {
+                $v409Bad += "(a) [$lang409] '$($e409.Key)' holds $($b409.Count) block(s), not the FOUR I141a asks for - the third block of I21 splits into the aura and the hierarchy of sins, separated by the same two blank lines (SPEC I141a, I21, Q56)"
+                continue
+            }
+            if ($b409[0] -notmatch (',\s*' + [regex]::Escape($pfx409) + '\d')) { $v409Bad += "(a) [$lang409] '$($e409.Key)' opens on '$($b409[0])' and not '<Book>, $pfx409<n>' - the citation is the one thing a player can carry back to the book, and only the p./pag. translates (SPEC I141a, I21, I100e)" }
+            if ($b409[1] -cne $e409.Key) { $v409Bad += "(a) [$lang409] '$($e409.Key)' has '$($b409[1])' as block 2 - block 2 is the KEY verbatim, which is the value the sheet SAVES, and it does not translate (SPEC V24, I141a, I142e)" }
+            if ($b409[2] -notmatch '^Aura: \S') { $v409Bad += "(a) [$lang409] '$($e409.Key)' block 3 does not open on 'Aura: ' - it is the block I141b defines, and the label is what tells the player which number the road drives (SPEC I141b)" }
+            $lv409 = @([regex]::Matches($b409[3], '(?m)^(10|[1-9]) ' + $EMDASH409 + ' '))
+            if ($lv409.Count -eq 0) { $v409Bad += "(a) [$lang409] '$($e409.Key)' block 4 carries no level line - the hierarchy of sins IS the block, and a heading over nothing is worse than no block (SPEC I141c)" }
+            $lvl409[$e409.Key] = $lv409.Count
+            $am409 = [regex]::Match($b409[2], '^Aura: (.+?)\.\s')
+            if ($am409.Success) { $aura409[$e409.Key] = $am409.Groups[1].Value }
+        }
+
+        # (c) ONE identity for the aura. The name block 3 prints is the string BEARING already
+        # shows on the ROAD line of the Main tab - two spellings for the same aura two fingers
+        # apart is the box contradicting the sheet (SPEC I141b). On the pt half the comparison
+        # goes through the sheet's OWN PT map, because that is what the ROAD line renders there:
+        # translating it anywhere else would be the second identity this leg exists to refuse.
+        foreach ($k409 in ($aura409.Keys | Sort-Object)) {
+            if (-not $bearKeys329.ContainsKey($k409)) { continue }
+            $want409 = $bearKeys329[$k409]
+            if ($lang409 -eq 'pt' -and $ptVal.ContainsKey($want409)) { $want409 = $ptVal[$want409] }
+            if ($aura409[$k409] -cne $want409) { $v409Bad += "(c) [$lang409] '$($k409)' prints the aura as '$($aura409[$k409])' and BEARING says '$want409' - the box would contradict the ROAD line of the Main tab two fingers away (SPEC I141b, I141g, V329c)" }
+        }
+
+        # (b) FUSION. A child carries the mother's table with its own levels substituted, BAKED
+        # into the string (I141e, I141f), so it shows the SAME number of levels she does. A child
+        # with fewer is the fusion that did not run, and it is the likeliest failure of this list.
+        foreach ($k409 in ($mother409.Keys | Sort-Object)) {
+            if (-not $lvl409.ContainsKey($k409)) { continue }
+            $mk409 = $mother409[$k409]
+            if (-not $lvl409.ContainsKey($mk409)) { $v409Bad += "(b) [$lang409] '$k409' inherits from '$mk409' and descRoad has no entry for the mother - the fusion had nothing to fuse onto (SPEC I141d, I141e)"; continue }
+            if ($lvl409[$k409] -ne $lvl409[$mk409]) { $v409Bad += "(b) [$lang409] '$k409' shows $($lvl409[$k409]) level(s) and its mother '$mk409' shows $($lvl409[$mk409]) - a Path takes the Road's table with its OWN levels substituted, so it shows every level she does (SPEC I141e, I141f)" }
+        }
+    }
+    if ($v409Bad) { foreach ($b409x in $v409Bad) { Fail "V409 $b409x" } }
+    else { Pass "V409 descRoad carries four blocks per entry in both halves, every child shows its mother's full table, and every aura name is the one BEARING prints" }
+}
+# ---- V389: popScrim covers the TALLEST tab, not just the widest ------------------------
+# SPEC V389, B124, I102a. The scrim is the one way a click outside the ? box closes it, and it
+# only closes what it covers. I102a wrote the risk down on 2026-08-31 naming TWO axes - "a strip
+# of the tab that does not close the overlay" - and the check that came out of it (V375) measured
+# the WIDTH. Nothing ever measured the height, and the height was wrong the whole time: the scrim
+# is authored 733 tall, which is the 40px strip plus the 693 the Traits grid covers, while the
+# MAIN tab closes at 888. A click in the bottom 195px of Main did not close the box, and the gate
+# was green (SPEC B124).
+#
+# DERIVED on both terms, because a literal here would be the THIRD owner of a tab's floor - the
+# boxes own it, V376/V69 read it, and this would copy it (SPEC B70). The floor is swept off every
+# content form the same way V286 sweeps them, and the strip's own height comes off the strip.
+$v389Bad = @()
+$rootDoc389 = Doc (Join-Path $dir 'WoD20th.lfm')
+$scrim389 = @($rootDoc389.SelectNodes("//rectangle[@name='popScrim']"))[0]
+$strip389 = $rootDoc389.SelectSingleNode("//layout[@name='tabStrip']")
+
+if ($null -eq $scrim389) { $v389Bad += "popScrim is gone from WoD20th.lfm - there is no scrim to measure and no second closer either (SPEC I102a, V333e, V209)" }
+elseif ($null -eq $strip389) { $v389Bad += "tabStrip is gone from WoD20th.lfm - the scrim's origin sits above it and this leg has no offset to add (SPEC V209, I102a)" }
+else {
+    $stripH389 = 0
+    if (-not [int]::TryParse($strip389.GetAttribute("height"), [ref]$stripH389) -or $stripH389 -le 0) {
+        $v389Bad += "tabStrip declares no usable height - the scrim's offset would be guessed (SPEC V209)"
+    }
+    # The deepest y any tab reaches, over every content form, read off the top-level boxes the
+    # same way V286 reads them. ContentRoot is what makes this survive T895: three of the forms
+    # stopped being scrollBoxes and not one of their boxes moved.
+    $deep389 = 0; $deepFile389 = ''
+    $forms389 = 0
+    foreach ($f389 in $files) {
+        if ($f389.Name -eq 'WoD20th.lfm') { continue }
+        $cr389 = ContentRoot (Doc $f389.FullName)
+        if ($null -eq $cr389) { continue }
+        $forms389++
+        foreach ($b389 in $cr389.SelectNodes("layout")) {
+            $bt389 = 0; $bh389 = 0
+            if (-not [int]::TryParse($b389.GetAttribute("top"), [ref]$bt389)) { continue }
+            [void][int]::TryParse($b389.GetAttribute("height"), [ref]$bh389)
+            if (($bt389 + $bh389) -gt $deep389) { $deep389 = $bt389 + $bh389; $deepFile389 = $f389.Name }
+        }
+    }
+    if ($forms389 -eq 0 -or $deep389 -eq 0) {
+        $v389Bad += "no content form was swept for its floor - this leg would certify a scrim of any height at all (SPEC V209, V20)"
+    } else {
+        $needH389 = $deep389 + $stripH389
+        $haveH389 = 0
+        [void][int]::TryParse($scrim389.GetAttribute("height"), [ref]$haveH389)
+        if ($haveH389 -lt $needH389) {
+            $v389Bad += "popScrim is ${haveH389}px tall against a sheet whose deepest tab closes at $deep389 ($deepFile389) under a ${stripH389}px strip - the bottom $($needH389 - $haveH389)px of that tab do not close the overlay, and a click that only fails in one band of one tab has no symptom anybody reports (SPEC I102a, B124)"
+        }
+    }
+}
+if ($v389Bad) { foreach ($b389 in $v389Bad) { Fail "V389 $b389" } }
+else { Pass "V389 popScrim reaches the floor of the deepest tab plus the strip above it - every click outside the box closes it, on every tab" }
+
+# ---- V396: popScrim covers the WIDEST tab, and not one tab named in the gate ----------
+# SPEC V396, B127, B129, I136g. V375 leg (d) measured the scrim against the right edge of the
+# MAIN tab's EXPERIENCE box. That is a ruler of MAXIMUM written as an equality against ONE
+# member, and it never measured what it claimed: MEASURED while building T908, Traits closes at
+# 1595 and Main carried 1680, so the leg certified 85px of slack as exact. It was green because
+# Main happened to be WIDER than the widest, which is a different sentence. T908 takes Main to
+# 1345, at which point the same leg would DEMAND a scrim 250px too narrow for Traits - B124 on
+# the other axis, and with the same silence. Same sweep as V389 and for the same reason: a
+# literal here would be a third owner of the sheet's own width (SPEC B70).
+$v396Bad = @()
+if ($null -eq $scrim389) { $v396Bad += "popScrim is gone from WoD20th.lfm - there is no scrim to measure (SPEC I102a, V209)" }
+else {
+    $wide396 = 0; $wideFile396 = ''
+    $forms396 = 0
+    foreach ($f396 in $files) {
+        if ($f396.Name -eq 'WoD20th.lfm') { continue }
+        $cr396 = ContentRoot (Doc $f396.FullName)
+        if ($null -eq $cr396) { continue }
+        $forms396++
+        foreach ($b396 in $cr396.SelectNodes("layout")) {
+            $bl396 = 0; $bw396 = 0
+            if (-not [int]::TryParse($b396.GetAttribute("left"), [ref]$bl396)) { continue }
+            [void][int]::TryParse($b396.GetAttribute("width"), [ref]$bw396)
+            if (($bl396 + $bw396) -gt $wide396) { $wide396 = $bl396 + $bw396; $wideFile396 = $f396.Name }
+        }
+    }
+    if ($forms396 -eq 0 -or $wide396 -eq 0) {
+        $v396Bad += "no content form was swept for its right edge - this leg would certify a scrim of any width at all (SPEC V209, V20)"
+    } else {
+        $haveW396 = 0
+        [void][int]::TryParse($scrim389.GetAttribute("width"), [ref]$haveW396)
+        if ($haveW396 -lt $wide396) {
+            $v396Bad += "popScrim is ${haveW396}px wide against a sheet whose widest tab closes at $wide396 ($wideFile396) - the right $($wide396 - $haveW396)px of that tab do not close the overlay, and nothing outside that corner would ever show it (SPEC I102a, B127)"
+        }
+    }
+}
+if ($v396Bad) { foreach ($b396 in $v396Bad) { Fail "V396 $b396" } }
+else { Pass "V396 popScrim is as wide as the widest tab, swept off every content form - the width is tied to no tab by name" }
+# ---- V397: an imported form paints its OWN client rect, or it is not imported ----------
+# SPEC V397, R136, R137, B128, I136h. <import> compiles to _obj_newObject("form") plus
+# setAlign("client") and setTheme("dark"), so an imported form is a REAL form at runtime and
+# paints the theme's own ground over the rect that holds it. gui.Form carries ten properties and
+# not one of them is a colour, a background or a transparency - there is no attribute that turns
+# that off. The only thing that hides it is the form painting its own client rect, which on this
+# sheet means a <scrollBox> with a themePaper on it (SPEC V56).
+#
+# So the rule is WHERE a form may be imported, and the answer is only ONE place: the root. A tab
+# form fills the whole tab, so its panel edge lands exactly on the tab edge and nobody can see
+# it. A form dropped into a REGION of another form - a 466x700 column inside a 1408 tab - draws
+# that same edge in the middle of the page, and THAT is the box the user kept reporting.
+#
+# ⚠ the first draft of this rule also demanded a scrollBox and a themePaper of every imported
+# form, and it was born RED against correct code: WoD20.6 carries no paper and never needed one
+# (SPEC B106). Whether a form paints the Victorian texture is V56's question; this one is only
+# about where a form may be dropped.
+$v397Bad = @()
+$v397Seen = 0
+foreach ($f397 in $files) {
+    $imps397 = @((Doc $f397.FullName).SelectNodes("//import"))
+    if ($f397.Name -eq 'WoD20th.lfm') {
+        $v397Seen = $imps397.Count
+        foreach ($imp397 in $imps397) {
+            $sub397 = $imp397.GetAttribute("file")
+            if (-not (Test-Path (Join-Path $dir $sub397))) { $v397Bad += "the root form imports $sub397 and it is not on disk (SPEC V209)" }
+        }
+        continue
+    }
+    foreach ($imp397 in $imps397) {
+        $v397Bad += "$($f397.Name) imports $($imp397.GetAttribute('file')) - only the root form may import. A form dropped inside another form draws its own panel over the rect that holds it, gui.Form has no property that turns it off, and the sheet has no symptom for it but the box itself (SPEC R136, R137, B128, I136h)"
+    }
+}
+if ($v397Seen -ne 11) { $v397Bad += "the root form carries $v397Seen <import>, expected the 11 tabs - with none read this rule would certify a sheet that imports nothing (SPEC V209, V20)" }
+if ($v397Bad) { foreach ($b397 in $v397Bad) { Fail "V397 $b397" } }
+else { Pass "V397 the 11 <import> of the sheet are all on the root form and all on disk - no form is dropped inside another, where its own panel would draw a box in the middle of the page" }
+# ---- V398: the two hedge boxes are one box drawn twice --------------------------------
+# SPEC V398, I136m, user 2026-09-02 item 7. HEDGE MAGIC RITUALS and HEDGE MAGIC PATHS stand side
+# by side on the Numina tab and held DIFFERENT numbers of slots - 17 against 20 - which reads as
+# a bug in the data rather than as a choice anybody made. Both terms are READ and neither is
+# typed here: the row count off each box's own XML, and the height of one box against the other.
+# A literal would be the third owner of 561 and would not follow the pair the day a row is added
+# (SPEC V390, B112).
+#
+# The count against the LUA constant is V204's pair and is not repeated here - one owner (B70).
+# What this rule adds is the relation BETWEEN the two boxes, which nothing measured before.
+$v398Bad = @()
+$numDoc398 = Doc (Join-Path $dir "WoD20.7.lfm")
+$b398 = @{}
+foreach ($ttl398 in @('HEDGE MAGIC PATHS', 'HEDGE MAGIC RITUALS')) {
+    $bx398 = BoxOf $numDoc398 $ttl398
+    if ($null -eq $bx398) { $v398Bad += "the box '$ttl398' is gone from WoD20.7 - this rule measured nothing (SPEC V20, V209)"; continue }
+    $b398[$ttl398] = [pscustomobject]@{
+        H = [int]$bx398.GetAttribute("height")
+        R = @($bx398.SelectNodes("layout")).Count
+    }
+}
+if ($b398.Count -ne 2) { $v398Bad += "only $($b398.Count) of the two hedge boxes were read - an equality over one box is true of every box ever drawn (SPEC V20, B7)" }
+else {
+    $pr398 = $b398['HEDGE MAGIC PATHS']
+    $ri398 = $b398['HEDGE MAGIC RITUALS']
+    if ($pr398.R -lt 2) { $v398Bad += "HEDGE MAGIC PATHS reads $($pr398.R) row(s) - the sweep broke and the equality below would be struck over nothing (SPEC V209, V20)" }
+    elseif ($pr398.R -ne $ri398.R) { $v398Bad += "HEDGE MAGIC PATHS draws $($pr398.R) row(s) and HEDGE MAGIC RITUALS $($ri398.R) - two columns side by side with different counts read as a list that lost entries, not as a choice (SPEC I136m)" }
+    elseif ($pr398.H -ne $ri398.H) { $v398Bad += "HEDGE MAGIC PATHS is $($pr398.H)px tall and HEDGE MAGIC RITUALS $($ri398.H) - same rows, same pitch, same foot, so the heights are the same number or one of the three moved on its own (SPEC I136m, V280a)" }
+}
+if ($v398Bad) { foreach ($b398m in $v398Bad) { Fail "V398 $b398m" } }
+else { Pass "V398 HEDGE MAGIC PATHS and HEDGE MAGIC RITUALS both draw $($b398['HEDGE MAGIC PATHS'].R) rows in $($b398['HEDGE MAGIC PATHS'].H)px - the same box twice, read off the boxes and never typed here" }
+
+# ---- V394: the TRUE FAITH row is centred as a GROUP -----------------------------------
+# SPEC V394, I134g, T899. The box holds ONE row - the ?, the Religion label, the field and five
+# dots - and the user asked for it centred. The word that matters is GROUP: centring each control
+# on its own is what leaves a row reading crooked, because the eye reads the whole line and the
+# air it sits in, not each widget's own middle. So the measurement is the SPAN: leftmost edge of
+# anything in the box against the box's own left, and the rightmost against its right.
+#
+# The title is excluded because it is already centred by horzTextAlign over the FULL width and
+# would drag the span out to the margins, making any arrangement pass. The client rectangle is
+# excluded because it IS the box. What is left is exactly the row (SPEC V27 owns the title).
+$v394Bad = @()
+$doc394 = Doc (Join-Path $dir "WoD20.7.lfm")
+$box394 = $doc394.SelectSingleNode("//scrollBox/layout[label/@text='TRUE FAITH']")
+if ($null -eq $box394) {
+    $v394Bad += "the TRUE FAITH box was not found by title on WoD20.7 - this check measured nothing (SPEC V209, B7)"
+} else {
+    $bw394 = [int]$box394.GetAttribute("width")
+    $lo394 = [int]::MaxValue; $hi394 = [int]::MinValue; $seen394 = 0
+    foreach ($c394 in $box394.ChildNodes) {
+        if ($c394.NodeType -ne 'Element') { continue }
+        if ($c394.LocalName -eq 'rectangle') { continue }
+        if ($c394.LocalName -eq 'label' -and $c394.GetAttribute("text") -eq 'TRUE FAITH') { continue }
+        $cl394 = 0
+        if (-not [int]::TryParse($c394.GetAttribute("left"), [ref]$cl394)) { continue }
+        $cw394 = 0
+        [void][int]::TryParse($c394.GetAttribute("width"), [ref]$cw394)
+        $seen394++
+        if ($cl394 -lt $lo394) { $lo394 = $cl394 }
+        if (($cl394 + $cw394) -gt $hi394) { $hi394 = $cl394 + $cw394 }
+    }
+    # The row is eight widgets. A count that collapses is a check certifying an empty box, which
+    # is the shape B7 keeps coming back as (SPEC V209, V20).
+    if ($seen394 -lt 4) {
+        $v394Bad += "only $seen394 widget(s) of the TRUE FAITH row were measured - the row is the ?, the label, the field and five dots, and a span read off fewer than four of them is not the group the user asked to centre (SPEC V209)"
+    } else {
+        $left394  = $lo394
+        $right394 = $bw394 - $hi394
+        if ([Math]::Abs($left394 - $right394) -gt 1) {
+            $v394Bad += "the TRUE FAITH row spans $lo394..$hi394 in a box of $bw394 - $left394 px of air on the left against $right394 on the right. The user asked for the row centred as a GROUP, and centring the controls one at a time is exactly what leaves this gap (SPEC I134g, V394)"
+        }
+    }
+}
+if ($v394Bad) { foreach ($b394 in $v394Bad) { Fail "V394 $b394" } }
+else { Pass "V394 the TRUE FAITH row is centred as one group in its box, to the pixel" }
+
+# ---- V391: no scrollBox inside a scrollBox, one theme backdrop per TAB ----------------
+# SPEC V391, I134c, T895, B41. BOTH legs measure the ASSEMBLED tree, and that is the whole
+# point: neither defect is visible in any single file. WoD20.12/.13/.14 each opened a
+# scrollBox with a themePaper in it and each was correct ALONE - it was WoD20.11 importing
+# the three INTO its own scrollBox that made the tab draw four boxes and four papers, three
+# of them stretched over one column each. The user named it without opening a file ("parecem
+# heranca de quando eles eram sub-abas") and no file-at-a-time check could have seen it.
+#
+# V56 stays where it is and is NOT widened: it asks whether a form that carries content has a
+# backdrop, one form at a time, and it is derived off "does this form have a scrollBox" - so
+# dropping the scrollBox in the three took them off both sides of that count on its own. This
+# is the question V56 does not ask: how many land on ONE TAB once the imports are resolved.
+$v391Bad = @()
+
+# (a) an <import> whose target opens a scrollBox may not itself sit under one.
+foreach ($f391 in $files) {
+    foreach ($imp391 in (Doc $f391.FullName).SelectNodes("//import")) {
+        $tgt391 = $imp391.GetAttribute("file")
+        $tp391  = Join-Path $dir $tgt391
+        if (-not (Test-Path $tp391)) { continue }
+        if ($null -eq (Doc $tp391).SelectSingleNode("//scrollBox")) { continue }
+        $anc391 = $imp391.ParentNode
+        while ($null -ne $anc391) {
+            if ($anc391.LocalName -eq 'scrollBox') {
+                $v391Bad += "$($f391.Name) imports $tgt391 from inside a <scrollBox> and $tgt391 opens one of its own - the assembled tab draws a box inside a box, which is what the Ghoul tab looked like until T895 (SPEC I134c)"
+                break
+            }
+            $anc391 = $anc391.ParentNode
+        }
+    }
+}
+
+# (b) at most ONE themePaper per tab, counted over the tab's transitive import closure.
+function Closure391($start391) {
+    $seen391 = New-Object System.Collections.Generic.List[string]
+    $todo391 = New-Object System.Collections.Generic.Queue[string]
+    $todo391.Enqueue($start391)
+    while ($todo391.Count -gt 0) {
+        $cur391 = $todo391.Dequeue()
+        if ($seen391.Contains($cur391)) { continue }
+        $p391 = Join-Path $dir $cur391
+        if (-not (Test-Path $p391)) { continue }
+        [void]$seen391.Add($cur391)
+        foreach ($i391 in (Doc $p391).SelectNodes("//import")) { $todo391.Enqueue($i391.GetAttribute("file")) }
+    }
+    return ,$seen391.ToArray()
+}
+
+$rootDoc391 = Doc (Join-Path $dir 'WoD20th.lfm')
+$tabsSeen391 = 0
+foreach ($tab391 in $rootDoc391.SelectNodes("//layout[starts-with(@name,'tab')]")) {
+    $imps391 = @($tab391.SelectNodes(".//import"))
+    if ($imps391.Count -eq 0) { continue }
+    $tabsSeen391++
+    $set391 = @()
+    foreach ($i391 in $imps391) { $set391 += Closure391 $i391.GetAttribute("file") }
+    $papers391 = @()
+    foreach ($ff391 in @($set391 | Sort-Object -Unique)) {
+        foreach ($img391 in (Doc (Join-Path $dir $ff391)).SelectNodes("//image[starts-with(@name,'themePaper')]")) {
+            $papers391 += "$ff391/$($img391.GetAttribute('name'))"
+        }
+    }
+    if ($papers391.Count -gt 1) {
+        $v391Bad += "tab $($tab391.GetAttribute('name')) stacks $($papers391.Count) theme backdrops ($($papers391 -join ', ')) - applyTheme lights every one of them, so the extras paint a lid over the columns they cover and read as a frame drawn around those boxes (SPEC I134c, B41)"
+    }
+}
+# A roster that resolves to nothing is a check that cannot fail (SPEC V20, V209).
+if ($tabsSeen391 -eq 0) { $v391Bad += "no tab layout in WoD20th.lfm holds an <import> - this check is reading nothing (SPEC V209)" }
+
+if ($v391Bad) { foreach ($b391 in $v391Bad) { Fail "V391 $b391" } }
+else { Pass "V391 no imported form opens a scrollBox inside one, and each of the $tabsSeen391 imported tab(s) carries at most one theme backdrop across its whole import closure" }
+
+# ---- V410: an OPEN task does not claim a file that EXISTS -----------------------------
+# SPEC V410, B140, V20, B7, T690. T690 sat at `~` with its work already finished, because the
+# half it still owed had become a task under ANOTHER id: T928 delivered the fifty-two hedge
+# ritual descriptions, descNumina_en.lua and descNumina_pt.lua reached the disk, and nothing
+# noticed that the older row had gone stale. V408 measures list -> module, never task -> task,
+# so "two rows describe one delivery" has no owner here - and it cannot get one, because that
+# is a statement about MEANING and no check reads meaning.
+#
+# What T690 DID leave behind is checkable. It said, in writing, that there was no
+# descNumina_en.lua file on the sheet. That is a claim about an ARTEFACT, it is cheap to test,
+# and it went false the day the file appeared. So this rule measures the CLAIM, not the
+# identity, and that is the only leg of B140 an artefact can carry.
+#
+# A CLOSED row is skipped on purpose: an `x` line is HISTORY and is allowed to record the world
+# as it stood when it was written. Only `.` and `~` - rows that still describe work to be done -
+# are read as claims about TODAY.
+#
+# The gate carries no BOM, so PowerShell 5.1 reads this file as ANSI and a UTF-8 literal would
+# arrive mangled and MATCH NOTHING, in silence. The needle is built from codepoints for that
+# reason, the same way $sect384 is (SPEC I142g).
+$perp410  = [string][char]0x22A5
+$ex410    = [string][char]0x2203
+$head410  = $perp410 + ' ' + $ex410 + ' '
+$words410 = @('arquivo', 'm' + [string][char]0x00F3 + 'dulo')
+# where a sheet file can live: plugin root, the sheet folder, the repo root
+$roots410 = @($plugin, $dir, $PSScriptRoot)
+
+$specPath410  = Join-Path $PSScriptRoot 'SPEC.md'
+$specLines410 = @()
+if (Test-Path $specPath410) { $specLines410 = [IO.File]::ReadAllLines($specPath410, [Text.Encoding]::UTF8) }
+
+$v410Bad    = @()
+$v410Rows   = 0
+$v410Claims = 0
+foreach ($l410 in $specLines410) {
+    if ($l410 -notmatch '^(T[0-9]+)\|[.~]\|') { continue }
+    $row410 = $Matches[1]
+    $v410Rows++
+    foreach ($w410 in $words410) {
+        $needle410 = $head410 + $w410
+        $at410 = 0
+        while ($true) {
+            $at410 = $l410.IndexOf($needle410, $at410)
+            if ($at410 -lt 0) { break }
+            $p410 = $at410 + $needle410.Length
+            # Only the names the phrase actually NAMES: the run of backticked tokens that
+            # follows it, stopping at the first thing that is not one. A task row is long and
+            # mentions other files further down; reading to end of line would flag those too.
+            while ($p410 -lt $l410.Length) {
+                $m410 = [regex]::Match($l410.Substring($p410), '^[\s/,&]*`([^`]+)`')
+                if (-not $m410.Success) { break }
+                $nm410 = $m410.Groups[1].Value
+                $p410 += $m410.Length
+                if ($nm410 -notmatch '^\w+\.(lua|lfm|ps1)$') { continue }
+                $v410Claims++
+                foreach ($r410 in $roots410) {
+                    if (Test-Path -LiteralPath (Join-Path $r410 $nm410)) {
+                        $v410Bad += "$row410 is OPEN and says the file '$nm410' does not exist, and it is on disk at $r410 - the row describes work that is already delivered, so its status is a lie the way T690's was (SPEC B140)"
+                        break
+                    }
+                }
+            }
+            $at410 = $p410
+        }
+    }
+}
+if ($v410Rows -lt 1) { Fail "V410 not one open task row (T<n> with status . or ~) was found in SPEC.md - the parser drifted and this rule would certify a spec whose every open row lies (SPEC V20, B7)" }
+elseif ($v410Bad) { foreach ($b410 in ($v410Bad | Select-Object -First 8)) { Fail "V410 $b410" } }
+else { Pass "V410 none of the $v410Rows open task row(s) claims a file that is on disk ($v410Claims file claim(s) tested against 3 roots)" }
+
+# ---- V411: the [pt] half carries ACCENTS, or the translation never happened ------------
+# T931 wrote the first 120 lines of road_sins_pt.tsv in plain ASCII - "egoistas", "acao",
+# "proposito" with no tilde - and this gate stayed GREEN through it. Nothing here had ever
+# looked at the BODY of a [pt] module: V9 measures the opposite (authored text must be
+# ENGLISH), V210 measures key PARITY between the halves, V335 measures block SHAPE. Portuguese
+# with no accent in it is a translation that did not happen, and it ships looking exactly like
+# one that did (SPEC V411, V411b).
+#
+# The roster is a GLOB and not a literal list, on purpose. V210 keeps a literal one and says in
+# its own comment that a literal list is how descMerit nearly shipped unchecked - and that list
+# is short TWO areas today (descNature and descRoad are on disk with their markers and are not
+# in it). A rule about GENERATED files has to read what is on disk (SPEC V20).
+#
+# N, the ceiling of leg (a), is MEASURED and not guessed (SPEC T933, B106). Accent characters
+# per entry in the eight [pt] modules on disk, 2026-09-03:
+#   descNature 24.0 | descMerit 27.9 | descRoad 34.4 | descRitual 38.0
+#   descNumina 55.4 | descBackground 77.5 | descPath 78.7 | descDisc 100.3
+# and not ONE of the 1533 entries carries a body with zero accents. So N = 1 - at least one
+# accent per entry, counted over the whole module - is the tightest value the spec's wording
+# ("one accent every N entries") allows, and the worst module on disk still clears it by 24x.
+# A bigger N is a weaker rule: one that passes a module 96% de-accented is the vacuous pass B7
+# is named for. What this rule reaches is a module de-accented WHOLESALE, which is the defect
+# that shipped; a partially de-accented one needs a per-module baseline nobody has asked for.
+#
+# Mutation (SPEC V20, V222): run one [pt] module through a de-accenter -> RED on (a); swap one
+# accented word for an accented synonym -> GREEN, because density is not the subject.
+$v411Bad = @()
+$v411N = 1
+$v411Acc = [regex]"[\u00E0\u00E1\u00E2\u00E3\u00E9\u00EA\u00ED\u00F3\u00F4\u00F5\u00FA\u00E7]"
+$v411Mods = 0
+$v411Entries = 0
+$v411Worst = ""
+$v411WorstRatio = [double]::MaxValue
+foreach ($f411 in (Get-ChildItem -LiteralPath $plugin -Filter "desc*_pt.lua" | Sort-Object Name)) {
+    $area411 = $f411.BaseName -replace "_pt$", ""
+    $kind411 = $area411 -replace "^desc", ""
+    if (-not $DESC_MARKER.ContainsKey($kind411)) {
+        $v411Bad += "(a) $($f411.Name) is on disk and DESC_MARKER names no marker for '$kind411' - this rule cannot read a module it cannot find the region of, and skipping it silently is how a half ships unmeasured (SPEC V408, V209)"
+        continue
+    }
+    $ent411 = DescEntries $f411.FullName $DESC_MARKER[$kind411] "pt"
+    if ($null -eq $ent411) {
+        $v411Bad += "(a) $($f411.Name) has no $($DESC_MARKER[$kind411]) region - half the book has nowhere to live and every count below would read zero (SPEC V209, V210)"
+        continue
+    }
+    if ($ent411.Count -eq 0) {
+        $v411Bad += "(c) $($f411.Name) parsed to zero entries - a module with nothing in it makes leg (a) true by default (SPEC V20, B7)"
+        continue
+    }
+    $v411Mods++
+    $v411Entries += $ent411.Count
+    $acc411 = 0
+    foreach ($e411 in $ent411) { $acc411 += $v411Acc.Matches($e411.Body).Count }
+    $need411 = [math]::Ceiling($ent411.Count / $v411N)
+    if ($acc411 -lt $need411) {
+        $v411Bad += "(a) $($f411.Name) holds $($ent411.Count) entries and only $acc411 accented character(s), and one accent every $v411N entry/entries asks for $need411 - Portuguese this bare is a translation that never happened, and V9, V210 and V335 all stay green on it (SPEC V411a)"
+    }
+    $r411 = $acc411 / $ent411.Count
+    if ($r411 -lt $v411WorstRatio) { $v411WorstRatio = $r411; $v411Worst = $f411.Name }
+}
+# (c) zero-guard on the ROSTER itself: a glob that matched nothing would make the loop above run
+# over an empty set and this rule would certify a plugin with no translated half at all. The
+# count is a FLOOR and not an equality - a ninth area is welcome and costs nothing here.
+if ($v411Mods -lt 8) { $v411Bad += "(c) only $v411Mods [pt] description module(s) were read at the plugin root and eight were measured there on 2026-09-03 - a roster that shrank is either a deleted half or a glob that stopped matching, and both make this rule pass over nothing (SPEC V411c, V20, B7)" }
+if ($v411Bad) { foreach ($b411 in $v411Bad) { Fail "V411 $b411" } }
+else { Pass "V411 all $v411Mods [pt] description modules carry accented Portuguese across $v411Entries entries - thinnest is $v411Worst at $([math]::Round($v411WorstRatio,1)) accent(s) per entry against a floor of $v411N" }
+
+# ---- V413: the Revenant row belongs to clanFamily and to no other list -----------------
+# SPEC I143d, the owner's ask of 2026-09-03. The picker asks ONE list a question of its own -
+# "is this custom entry a revenant, and what is its weakness" - and the row that asks it has
+# the same failure modes the Ritual Level row of I129i was built around: shown for every list
+# it repaints a question nobody asked, and given a field it saves an answer the player never
+# confirmed. Neither leaves a mark to grep for.
+#
+# Mutation (SPEC V20, V222): drop the list test from mfRevenantShown -> red on (a); give the
+# combo a field -> red on (b); author the combo on `Yes` -> red on (c); swap the weakness
+# pair's hide for enabled="false" -> red on (d); pin edtMfDesc.top back to a constant -> red
+# on (e). Probe: rename the weakness label's text -> GREEN, the wording is not the subject.
+$v413Bad = @()
+$revFn   = LuaFn $root 'mfRevenantShown'
+$revPane = LuaFn $root 'mfRevenantPane'
+$revChg  = LuaFn $root 'mfRevenantChange'
+$custPn  = LuaFn $root 'mfCustomPane'
+$rootDoc = Doc (Join-Path $dir "WoD20th.lfm")
+$revCmb  = @($rootDoc.SelectNodes("//comboBox[@name='cmbMfRevenant']"))
+$revLbls = @($rootDoc.SelectNodes("//label[@name='lblMfRevenant']")) + @($rootDoc.SelectNodes("//label[@name='lblMfWeak']"))
+$revEdt  = @($rootDoc.SelectNodes("//edit[@name='edtMfWeak']"))
+
+if (-not $revFn)  { $v413Bad += "mfRevenantShown() is gone from the root form - the ONE question the pane and the confirm both ask has no owner, and this check measured nothing (SPEC V209, V135)" }
+if (-not $revPane) { $v413Bad += "mfRevenantPane() is gone - the row has no painter (SPEC V209)" }
+if (-not $revChg)  { $v413Bad += "mfRevenantChange() is gone - nothing writes MF.revenant and the combo answers to no one (SPEC V209)" }
+if ($revCmb.Count -ne 1) { $v413Bad += "the Revenant combo is authored $($revCmb.Count) time(s) as cmbMfRevenant and it has to be exactly once - two would be two owners of one answer (SPEC V135, V209)" }
+if ($revLbls.Count -ne 2) { $v413Bad += "the Revenant row's two labels (lblMfRevenant, lblMfWeak) are $($revLbls.Count) on the root form and there have to be two (SPEC V209)" }
+if ($revEdt.Count -ne 1) { $v413Bad += "edtMfWeak is authored $($revEdt.Count) time(s) and it has to be exactly once (SPEC V209)" }
+
+if (-not $v413Bad) {
+    $revBody  = NoComments $revFn
+    $paneBody = NoComments $revPane
+    $custBody = NoComments $custPn
+    $cmb413   = $revCmb[0]
+
+    # (a) the test is on the LIST as well as on the custom state. Gated on custom alone the row
+    # shows up in all nine lists; gated on the list alone it shows over a book entry, which has
+    # nothing to be asked. The pair IS the rule, and mfLevelShown next door reads the same way.
+    if ($revBody -notmatch 'MF\.list\s*==\s*"clanFamily"') {
+        $v413Bad += "(a) mfRevenantShown does not test MF.list against clanFamily - the row would ask its question of every list on the sheet (SPEC V413a, I143d)"
+    }
+    if ($revBody -notmatch 'MF\.custom') {
+        $v413Bad += "(a) mfRevenantShown does not test the custom state - the row would paint over a book entry, which carries its own weakness (SPEC V413a, I129i)"
+    }
+
+    # (b) no field on either control. A field here saves an answer the player never confirmed,
+    # which is the door V333e keeps shut for every other control in this box.
+    foreach ($n413 in (@($cmb413) + $revEdt + $revLbls)) {
+        if ($n413.HasAttribute("field")) {
+            $v413Bad += "(b) '$($n413.GetAttribute('name'))' owns a field - the Revenant row is a question the open box asks and its answer rides out through MF, so a field here writes without an OK (SPEC V413b, V269a, V333e)"
+        }
+    }
+
+    # (c) the default is AUTHORED. Written by Lua on open it goes missing the day the open path
+    # changes, and the row would come up on Yes for a player who never said so.
+    $vals413 = @([regex]::Matches($cmb413.GetAttribute("values"), "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
+    if ($vals413.Count -ne 2 -or $vals413[0] -cne 'No' -or $vals413[1] -cne 'Yes') {
+        $v413Bad += "(c) cmbMfRevenant offers [$($vals413 -join ', ')] and the ask names exactly No then Yes, in that order - the FIRST is what an unset combo shows, so the order is the default (SPEC V413c, V15)"
+    }
+
+    # (d) the weakness pair is HIDDEN, never disabled: invisible-and-enabled still takes Tab,
+    # and that is the bug no screenshot shows.
+    foreach ($n413 in ($revEdt + @($rootDoc.SelectNodes("//label[@name='lblMfWeak']")))) {
+        if ($n413.GetAttribute("visible") -ne "false") {
+            $v413Bad += "(d) '$($n413.GetAttribute('name'))' is not authored hidden - the box opens on a book entry far more often than on a custom one, and what is authored has to be the common case (SPEC V413d, V274c)"
+        }
+    }
+    if ($paneBody -match 'lblMfWeak"\]\.enabled' -or $paneBody -match 'edtMfWeak"\]\.enabled') {
+        $v413Bad += "(d) the weakness pair is turned off with enabled= instead of visible= - a control that is invisible and still enabled takes Tab focus, which is the bug no screenshot shows (SPEC V413d, V274c, V274d)"
+    }
+
+    # (e) edtMfDesc.top is CHOSEN per lit row and the floor does not move. A single constant is
+    # a pane that ignores the rows above it; a moved floor is a pane that leaves the box.
+    $tops413 = @([regex]::Matches($custBody, 'top\s*=\s*(\d+)') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+    if ($tops413.Count -lt 4) {
+        $v413Bad += "(e) mfCustomPane chooses edtMfDesc's top from $($tops413.Count) value(s) and the pane now has four lit states - no custom, custom, custom with a row, custom with the weakness (SPEC V413e, I143f)"
+    }
+    if ($custBody -notmatch '625\s*-\s*top') {
+        $v413Bad += "(e) edtMfDesc's height is no longer derived from the 625 floor - the floor is the bottom of the pane and writing the height out beside the top is the same rule in two places (SPEC V413e, B70)"
+    }
+    if ($custBody -notmatch 'mfRevenantPane') {
+        $v413Bad += "(e) mfCustomPane never calls mfRevenantPane - the row would never light, and the pane would leave its space blank (SPEC V413e, V209)"
+    }
+
+    # (f) the row's own strings carry a [pt] key. `Revenant Weakness` is NOT checked here: the
+    # sheet already ships a FLAW of that name with a translation of its own, so the label reads
+    # the flaw's, and forcing a second key would be two owners of one string (SPEC I102g, V135).
+    if ($embedded -ne $null -and -not $embedded.ContainsKey('Revenant')) {
+        $v413Bad += "(f) the label 'Revenant' has no key in the PT map - it would show in English on a sheet set to Portuguese, which is B57 exactly (SPEC V413f, V28)"
+    }
+}
+
+if ($v413Bad) { foreach ($b413 in $v413Bad) { Fail "V413 $b413" } }
+else { Pass "V413 the Revenant row asks clanFamily alone, owns no field, is authored on No, hides rather than disables, and the desc pane starts under the last lit row" }
+
+# ---- V412: the box shows the FAMILY's weakness, and never the clan's --------------------
+# SPEC I143, V412, T936, the owner's ask of 2026-09-03. `clanFamily` is ONE list with two
+# species inside it (SPEC I143b): sixty-one clans and twenty-three revenant families, and the
+# two share no name. The box has to ask which species a value came from, and every other way
+# of asking is a SECOND owner of a fact the value already carries - a second list, a prefix on
+# the name, a saved isRevenant flag (SPEC V135, V29).
+#
+# Mutation (SPEC V20, V222): put a CLAN name in FAMILY_WEAKNESS -> red on (b); swap the
+# pertinence loop for string.find on the name -> red on (b); let the painter hide the box when
+# there is nothing to show -> red on (d); drop one family from the table -> red on (f);
+# reword a sentence without moving its key -> red on (f) half two. Probe: rename the box
+# TITLE -> GREEN, the wording of the heading is not what this rule is about.
+$v412Bad  = @()
+$doc412   = Doc (Join-Path $dir "WoD20.11.lfm")
+$src412   = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.11.lfm")))
+$box412   = @($doc412.SelectNodes("//layout[textEditor/@name='edtRevWeakness']"))
+$fam412   = @(@($PICKER['family']) | Where-Object { $_ -ne '' })
+$clan412  = @(@($PICKER['clan'])   | Where-Object { $_ -ne '' })
+$fw412    = [regex]::Match($rootTxt, '(?s)\n\t{3}FAMILY_WEAKNESS = \{(.*?)\n\t{3}\};')
+$read412  = LuaFn $rootTxt 'familyWeakness'
+$paint412 = LuaFn $src412 'renderRevWeakness'
+
+# (e) the zero-guard runs FIRST, because every leg below reads one of these five and a set
+# that comes back empty makes all of them pass over nothing (SPEC V412e, B94, B7).
+if ($box412.Count -ne 1) { $v412Bad += "(e) the weakness box is authored $($box412.Count) time(s) in WoD20.11 and there has to be exactly one - two of them would be two owners of one sentence (SPEC V412e, V135, V209)" }
+if ($fam412.Count -eq 0) { $v412Bad += "(e) PICKER_LIST[family] read back empty - the pertinence question, the completeness leg and the clan test below would every one of them pass over nothing (SPEC V412e, B94)" }
+if ($clan412.Count -eq 0) { $v412Bad += "(e) PICKER_LIST[clan] read back empty - the leg that refuses a clan row in the weakness table would certify any table at all (SPEC V412e, B94)" }
+if (-not $fw412.Success) { $v412Bad += "(e) FAMILY_WEAKNESS is not on the root form - the box has no book text to paint and every leg below reads an empty table (SPEC V412e, V209)" }
+if (-not $read412) { $v412Bad += "(e) familyWeakness() is gone from the root form - the ONE reader of both the book table and the typed slot has no owner left (SPEC V412e, V135, V337c)" }
+if (-not $paint412) { $v412Bad += "(e) renderRevWeakness() is gone from WoD20.11 - the box would keep the text it was authored with for ever, which is V383(a) one control over (SPEC V412e, V383a)" }
+
+if (-not $v412Bad) {
+    $keys412 = @()
+    $vals412 = @{}
+    foreach ($m412 in [regex]::Matches($fw412.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"([^"]*)"')) {
+        $keys412 += $m412.Groups[1].Value
+        $vals412[$m412.Groups[1].Value] = $m412.Groups[2].Value
+    }
+    $body412  = NoComments $read412
+    $pbody412 = NoComments $paint412
+
+    if ($keys412.Count -eq 0) { $v412Bad += "(e) FAMILY_WEAKNESS parsed to zero rows - a table read empty passes completeness by vacuity, which is B7 arriving through the parser (SPEC V412e, B7)" }
+
+    # (a) the box is IN the band. One that slid below it would still paint, still read right in
+    # every grep, and simply not be where the ask put it. What the band CLOSES on is V414's and
+    # is not restated here: one number, one owner (SPEC B70).
+    $sb412  = $doc412.SelectSingleNode("//scrollBox")
+    $bt412  = BandTop $sb412
+    $par412 = $box412[0].ParentNode
+    $top412 = -1
+    [void][int]::TryParse($box412[0].GetAttribute("top"), [ref]$top412)
+    if ($bt412 -lt 0) { $v412Bad += "(a) WoD20.11 has no band for the box to sit in - leg (a) measured nothing (SPEC V412e, V209)" }
+    elseif ($par412.LocalName -ne 'scrollBox' -or $top412 -ne $bt412) {
+        $v412Bad += "(a) the weakness box opens at top=$top412 under <$($par412.LocalName)> and this tab's band opens at $bt412 - the ask put it BETWEEN two boxes OF THE BAND, and a box that left it is not the thing that was asked for (SPEC I143a, V412a)"
+    }
+
+    # (b) pertinence, and nothing but pertinence. The list is what answers "is this a Family?",
+    # and the parenthesis in `Bratovich (Dark Ages)` is SPELLING and not species - four clans
+    # carry one too, which is why picking the name apart is the mutation this leg exists for.
+    if ($body412 -notmatch 'PICKER_LIST\["family"\]') {
+        $v412Bad += "(b) familyWeakness never reads PICKER_LIST[family] - whatever it asks instead is a second owner of which species a name came from (SPEC V412b, I143b, V135)"
+    }
+    if ($body412 -match 'string\.(find|match|sub)\s*\(') {
+        $v412Bad += "(b) familyWeakness tells a family from a clan by picking the NAME apart - the value already carries which list it came from, and reading it out of the spelling is the door I143b was written to shut (SPEC V412b, I143b)"
+    }
+    $clanRows412 = @($keys412 | Where-Object { $clan412 -contains $_ })
+    if ($clanRows412.Count) {
+        $v412Bad += "(b) FAMILY_WEAKNESS carries $($clanRows412.Count) row(s) for a CLAN [$($clanRows412 -join ', ')] - a clan has no revenant weakness, and a row here is how the box would come to paint one over it (SPEC V412b, I143)"
+    }
+
+    # (c) the typed slot is READ where the picker wrote it, and there is no second copy of it
+    # anywhere. The field name is DERIVED through customFieldOf, which already owns that
+    # convention - a name typed out again here is its second spelling (SPEC I143g, V135).
+    if ($body412 -notmatch 'clanFamilyCustomWeak') {
+        $v412Bad += "(c) familyWeakness never reads clanFamilyCustomWeak - the weakness a player typed into the custom slot would be written by the picker and read by nobody (SPEC V412c, I143g)"
+    }
+    if ($body412 -notmatch 'customFieldOf\(') {
+        $v412Bad += "(c) familyWeakness does not derive the custom field through customFieldOf - the convention has one owner and a name spelled out here is its second (SPEC V412c, V135, I143g)"
+    }
+    $wr412 = @([regex]::Matches((NoComments $rootTxt), 'setField\("clanFamilyCustomWeak"'))
+    if ($wr412.Count -ne 1) {
+        $v412Bad += "(c) clanFamilyCustomWeak is written in $($wr412.Count) place(s) and there is exactly one - the picker's OK. A second writer is the second copy the box is forbidden to read from (SPEC V412c, V135, I143g)"
+    }
+
+    # (d) the box FICA. Nothing to show is a SENTENCE, and it is the same sentence for a clan
+    # and for a custom entry answered No, because the owner decided the two say the same thing
+    # (SPEC Q60). A box that came and went would move the band at runtime, which is the one
+    # thing V57 says this sheet's geometry never does.
+    if ($pbody412 -match '\.visible\s*=') {
+        $v412Bad += "(d) renderRevWeakness writes .visible - a box that comes and goes moves the band while the sheet is open, and every geometry check on this tab reads the static XML (SPEC V412d, V57, V375)"
+    }
+    if ($pbody412 -notmatch '-- no weakness --') {
+        $v412Bad += "(d) renderRevWeakness does not fall back to the authored '-- no weakness --' sentence - a clan and a custom entry answered No would leave the box BLANK, and blank says nothing at all (SPEC V412d, Q60, V360c)"
+    }
+    if (-not $ptK.Contains('-- no weakness --')) { $v412Bad += "(d) '-- no weakness --' has no [pt] key in localization.lang - the Portuguese sheet would read the absence in English (SPEC V412d, V9, V10)" }
+    if (-not $enK.Contains('-- no weakness --')) { $v412Bad += "(d) '-- no weakness --' has no [en] key in localization.lang (SPEC V412d, V10)" }
+
+    # (f) COMPLETENESS, and it is asked TWICE - of the table and of the language file. The
+    # owner ruled on 2026-09-03 that a family with no weakness is a QUESTION and not a state of
+    # the screen: it ends with the text arriving or with the family leaving the list, which is
+    # exactly how Katayama left it in T938 (SPEC Q60, V412f). The number is READ off the list
+    # and never typed, so a family added tomorrow reddens here the same day.
+    $missing412 = @($fam412 | Where-Object { -not $vals412.ContainsKey($_) })
+    if ($missing412.Count) {
+        $v412Bad += "(f) $($missing412.Count) of the $($fam412.Count) names of PICKER_LIST[family] have no line in FAMILY_WEAKNESS [$($missing412 -join ', ')] - a family on the list with no weakness behind it is the question this rule refuses to let go quiet (SPEC V412f, Q60, T938)"
+    }
+    $extra412 = @($keys412 | Where-Object { $fam412 -notcontains $_ })
+    if ($extra412.Count) {
+        $v412Bad += "(f) FAMILY_WEAKNESS carries $($extra412.Count) row(s) no family answers to [$($extra412 -join ', ')] - a weakness keyed to a name that is not on the list can never fire and is worse than absent, which is the reading V337(a) already makes of the ceiling (SPEC V412f, V337a)"
+    }
+    $noKey412 = @()
+    foreach ($k412 in $keys412) {
+        $t412 = $vals412[$k412]
+        if (-not $ptK.Contains($t412) -or -not $enK.Contains($t412)) { $noKey412 += $k412 }
+    }
+    if ($noKey412.Count) {
+        $v412Bad += "(f) $($noKey412.Count) weakness sentence(s) have no key in BOTH halves of localization.lang [$($noKey412 -join ', ')] - the table is authored in English and translateSheetText is the only thing that turns it into Portuguese, so a sentence without a key ships in one language and nothing says so (SPEC V412f, V9, V10, V24)"
+    }
+}
+
+if ($v412Bad) { foreach ($b412 in $v412Bad) { Fail "V412 $b412" } }
+else { Pass "V412 the weakness box sits in the band, asks pertinence in PICKER_LIST[family] alone, reads the typed slot where the picker wrote it, never hides, and every one of the $(@(@($PICKER['family']) | Where-Object { $_ -ne '' }).Count) families has a sentence with a key in both languages" }
+
+# ---- V414: the two strips of the Ghoul tab close on the SAME number ---------------------
+# SPEC V414, I143j, the owner's ask of 2026-09-03. This tab is a BAND of boxes over three
+# COLUMNS, and the two are widths nobody obliges to agree: both close on the same number today
+# by construction, and until this round nothing measured it. A band wider than the columns
+# leaves a box hanging off the paper and a narrower one leaves a strip of nothing to the right,
+# and both of them exit 0 through every other check on the sheet.
+#
+# It does NOT freeze the number (SPEC V414b). A literal here would be a rule born red the day
+# the weakness box grows, which is the very thing I143j exists to allow - B106 by the front
+# door. What is measured is the EQUALITY, read off the boxes themselves: each strip closes on
+# the widest left+width it holds, so the 5px gutter needs no second owner here either - V298
+# owns that number and V221 charges these columns theirs (SPEC B70).
+#
+# Mutation (SPEC V20, V222): widen one band box without paying it back below -> red on (a);
+# take the backdrop off a Ghoul box so it drops out of the V280 census -> red on (c). Probe:
+# swap the ORDER of two band boxes keeping the total -> GREEN, this is about where the strip
+# closes and not about who sits where inside it.
+$v414Bad = @()
+$doc414  = Doc (Join-Path $dir "WoD20.11.lfm")
+$sb414   = $doc414.SelectSingleNode("//scrollBox")
+$bt414   = BandTop $sb414
+$band414 = @()
+$cols414 = @()
+if ($null -eq $sb414 -or $bt414 -lt 0) {
+    $v414Bad += "(d) WoD20.11 has no band - the equality would be struck between two sets this run never found (SPEC V414d, V209)"
+} else {
+    foreach ($l414 in $sb414.SelectNodes("layout")) {
+        $t414 = 0
+        if (-not [int]::TryParse($l414.GetAttribute("top"), [ref]$t414)) { continue }
+        if ($t414 -eq $bt414) { $band414 += $l414 } else { $cols414 += $l414 }
+    }
+}
+# (d) zero-guard, and it is TWO questions: an equality struck over an empty side is true of
+# every drawing ever made, and 0 == 0 is the way this rule would pass having read nothing.
+if ($band414.Count -eq 0) { $v414Bad += "(d) not one box was read in the band of WoD20.11 - the left side of the equality is empty and 0 would equal 0 (SPEC V414d, B7, B94)" }
+if ($cols414.Count -eq 0) { $v414Bad += "(d) not one column was read below the band of WoD20.11 - the right side of the equality is empty (SPEC V414d, B7, B94)" }
+
+if (-not $v414Bad) {
+    # The gutter, DERIVED and never typed: it is what the columns actually leave between them,
+    # and V221 and V298 are what hold that at the house 5 (SPEC B70). Read here so this rule
+    # owns no copy of the number it depends on.
+    $cs414 = @($cols414 | Sort-Object { [int]$_.GetAttribute("left") })
+    $gut414 = -1
+    if ($cs414.Count -ge 2) { $gut414 = [int]$cs414[1].GetAttribute("left") - ([int]$cs414[0].GetAttribute("left") + [int]$cs414[0].GetAttribute("width")) }
+    if ($gut414 -lt 0) { $v414Bad += "(d) the gutter between the Ghoul columns read back $gut414 - the sum on both sides of the equality is struck with it, and a negative one would make the two sides agree by arithmetic (SPEC V414d, V298, V209)" }
+
+    $bandSum414 = 0
+    $bandLst414 = @()
+    foreach ($l414 in $band414) {
+        $w414 = [int]$l414.GetAttribute("width")
+        $n414 = ColId361 $l414
+        if (-not $n414) { $n414 = "the box at x=$($l414.GetAttribute('left'))" }
+        $bandLst414 += "$n414 $w414"
+        $bandSum414 += $w414
+    }
+    $colSum414 = 0
+    $colLst414 = @()
+    foreach ($l414 in $cols414) {
+        $w414 = [int]$l414.GetAttribute("width")
+        $n414 = ColId361 $l414
+        if (-not $n414) { $n414 = "the column at x=$($l414.GetAttribute('left'))" }
+        $colLst414 += "$n414 $w414"
+        $colSum414 += $w414
+    }
+    $bandSum414 += ($band414.Count - 1) * $gut414
+    $colSum414  += ($cols414.Count - 1) * $gut414
+
+    # (a) the equality itself, and it is struck on the WIDTHS and not on where the last box
+    # happens to close. A box that grows INTO its neighbour moves no closing edge at all - the
+    # overlap is V40's and V298's to name - and this leg would have read 1408 on both sides and
+    # passed, which is the version of it MEASURED red in T936's mutation round.
+    if ($bandSum414 -ne $colSum414) {
+        $v414Bad += "(a) the band wants $bandSum414 px and the columns $colSum414 - the $($band414.Count) band box(es) ($($bandLst414 -join ', ')) and the $($cols414.Count) column(s) ($($colLst414 -join ', ')) are one tab laid out with one ${gut414}px gutter, so the two sums are one number. A band that grew without being paid for below leaves a box off the paper, one that shrank leaves a strip of nothing, and neither of them raises an error (SPEC V414a, I143j)"
+    }
+
+    # (c) the squeeze goes down to the margin and NOT past it. The 20 has exactly one owner and
+    # it is V280(a) - restating it here would be B70 - so what this leg guarantees is that
+    # V280's census is actually LOOKING at these boxes. A Ghoul box that fell out of it would
+    # take its floor with it in silence, which is B94: the case that got away is the one nobody
+    # names. Matched by rect inside the file, because Doc() reparses and node identity does not
+    # survive the second call.
+    $seen414 = 0
+    $out414  = @()
+    $sect414 = @()
+    foreach ($l414 in $band414) { $sect414 += $l414 }
+    foreach ($c414 in $cols414) { foreach ($l414 in $c414.SelectNodes("layout")) { $sect414 += $l414 } }
+    foreach ($l414 in $sect414) {
+        $hit414 = @($v280Boxes | Where-Object {
+            $_.F -eq 'WoD20.11.lfm' -and
+            $_.L -eq [int]$l414.GetAttribute("left")  -and $_.T -eq [int]$l414.GetAttribute("top") -and
+            $_.W -eq [int]$l414.GetAttribute("width") -and $_.H -eq [int]$l414.GetAttribute("height") })
+        if ($hit414.Count -eq 0) {
+            $n414 = ColId361 $l414
+            if (-not $n414) { $n414 = "the box at $($l414.GetAttribute('left')),$($l414.GetAttribute('top'))" }
+            $out414 += $n414
+        } else { $seen414++ }
+    }
+    if ($out414.Count) {
+        $v414Bad += "(c) $($out414.Count) box(es) of the two Ghoul strips [$($out414 -join ', ')] are not in the census V280 measures the 20px margin with - a box outside it keeps no floor at all, and the squeeze I143j asked for is allowed to go TO the margin and not past it (SPEC V414c, V280a, B94)"
+    }
+    if ($seen414 -eq 0) {
+        $v414Bad += "(c) not one box of the two strips was matched against the V280 census - this leg passed over nothing (SPEC V414d, V20, B7)"
+    }
+}
+
+if ($v414Bad) { foreach ($b414 in $v414Bad) { Fail "V414 $b414" } }
+else { Pass "V414 the $($band414.Count) boxes of the Ghoul band and its $($cols414.Count) columns want the same $bandSum414 px over one ${gut414}px gutter, and every box of both strips is inside the census V280 holds to the 20px margin" }
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

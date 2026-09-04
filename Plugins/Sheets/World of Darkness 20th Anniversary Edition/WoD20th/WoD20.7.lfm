@@ -87,8 +87,10 @@
 			-- off hedgeRitualLevel, the same reader the log prices with, so the art and the price
 			-- cannot tell two stories (SPEC V269d).
 			--
-			-- It stops at the picked rows. The typed ones own their dots, the host draws them and
-			-- painting them here would fight the player for the widget.
+			-- It covers EVERY row since T892: HEDGE_RITUAL_FREE_ROWS is zero, so the bound below is
+			-- the whole family. The five that used to be typed lost their editable dots with the
+			-- template, and they are painted from the same five fields they always held - the level
+			-- of a homebrew ritual is chosen in the picker pane now and nowhere else (SPEC V269b).
 			function paintHedgeRitualDots(form)
 				if sheet == nil then return; end;
 
@@ -173,15 +175,6 @@
 			<imageCheckBox name="roHR$(field)_5" left="401" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</template>
 
-		<template name="HedgeRitualFree">
-			<edit left="25" top="2" width="271" height="21" field="$(field)" fontSize="12"/>
-			<imageCheckBox left="301" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="326" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="351" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="376" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="401" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
-		</template>
-
 		<!--
 			Numina tab, NO sub-tabs since T830 (SPEC I117, pedido 4). The strip and the two panes
 			behind it are gone and the three lists stand side by side, all three visible at once -
@@ -202,9 +195,9 @@
 			one changes what is inside it. Willpower left the tab and TRUE FAITH took its place
 			(SPEC I117d), which is the one named exception V361(c) carries.
 		-->
-		<layout left="0" top="0" width="586" height="146">
+		<layout left="0" top="10" width="466" height="131">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="546" height="20" text="HEDGE MAGIC" horzTextAlign="center"/>
+			<label left="20" top="15" width="426" height="20" text="HEDGE MAGIC" horzTextAlign="center"/>
 
 			<!-- Affiliation FIRST, and on a line of its own (SPEC I66, V196). It became a
 			     picker in the 92nd round, and the widest name it offers - `The Society of
@@ -245,9 +238,8 @@
 			     the picker is dyn*, and fieldRoot's "drop the cbo" has nothing left to drop
 			     (SPEC V270d amended).
 			-->
-			<label left="20" top="41" width="150" height="24" text="Affiliation"/>
-			<button name="btnQhedgeAffiliation" left="180" top="41" width="20" height="24" text="?" onClick="popOpen(self, 'Numina', sheet['hedgeAffiliation'], nil, 'hedgeAffiliation');"/>
-			<button name="dynhedgeAffiliation" left="205" top="41" width="335" height="24" fontSize="12" text="Select Affiliation" onClick="mfOpen(self, 'hedgeAffiliation', 'hedgeAffiliation', 'Numina');"/>
+			<label left="20" top="36" width="150" height="24" text="Affiliation"/>
+			<button name="dynhedgeAffiliation" left="180" top="36" width="266" height="24" fontSize="12" text="Select Affiliation" onClick="mfOpen(self, 'hedgeAffiliation', 'hedgeAffiliation', 'Numina');"/>
 
 			<!-- The typed twin of the picker above, one field and two widgets with exactly one
 			     of them visible (SPEC I71, V274, user 2026-08-23). A DECLARED mirror in SPEC I3
@@ -261,20 +253,20 @@
 			     ⚠ what is typed here is FREE text while the picker stores the canonical EN
 			     (SPEC V24), so the filters of I67/I68 read an affiliation they do not know and
 			     prune nothing - which is the right answer for homebrew, not an accident. -->
-			<edit name="edtHedgeAffiliation" left="205" top="41" width="335" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
+			<edit name="edtHedgeAffiliation" left="180" top="36" width="266" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
 
 			<!-- The label column is 150 because SPEC V16 prices it there and not by eye:
 			     `Atributo de Conjuracao` is 22 characters, which the house ruler puts at
 			     143px. These two rows share one label x and one entry x, so they are a GRID
 			     and not two controls that happen to line up (SPEC V224, B12, B13). -->
-			<label left="20" top="69" width="150" height="24" text="Essence"/>
-			<edit left="180" top="69" width="360" height="24" field="hedgeEssence"/>
+			<label left="20" top="64" width="150" height="24" text="Essence"/>
+			<edit left="180" top="64" width="266" height="24" field="hedgeEssence"/>
 
 			<!-- cbo, not cmb: this is a picker of PROSE, so its list lives in PICKER_LIST and
 			     translates with the sheet (SPEC I27, V208 scope, B57). The nine names are the
 			     nine of XP_ATTRS, `Inteligence` in the sheet's own spelling (SPEC I3). -->
-			<label left="20" top="97" width="150" height="24" text="Casting Attribute"/>
-			<comboBox left="180" top="97" width="360" height="24" fontSize="12" name="cboHedgeAttr" field="hedgeAttr">
+			<label left="20" top="92" width="150" height="24" text="Casting Attribute"/>
+			<comboBox left="180" top="92" width="266" height="24" fontSize="12" name="cboHedgeAttr" field="hedgeAttr">
 			</comboBox>
 		</layout>
 
@@ -288,20 +280,20 @@
 		     Pitch 29 and not 28: the row spans 9*pitch + 25, and 286 leaves an integer gap on
 		     both sides of the 460-wide box I73 left it in - 87 and 87 (SPEC V239).
 		     At 28 the span is 277 and the two gaps come out 71 and 72. -->
-		<layout left="591" top="0" width="407" height="146">
+		<layout left="471" top="10" width="326" height="131">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="367" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
+			<label left="20" top="15" width="286" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
 
-			<imageCheckBox left="60" top="70" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="89" top="70" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="118" top="70" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="147" top="70" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="176" top="70" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="205" top="70" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="234" top="70" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="263" top="70" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="292" top="70" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="321" top="70" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="20" top="63" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="49" top="63" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="78" top="63" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="107" top="63" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="136" top="63" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="165" top="63" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="194" top="63" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="223" top="63" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="252" top="63" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="281" top="63" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 		</layout>
 
 		<!--
@@ -326,18 +318,36 @@
 			five are CENTRED in the body - 113 of air on each side - which is the same answer V239
 			asks of the quintessence row beside it.
 		-->
-		<layout left="1003" top="0" width="407" height="146">
+		<layout left="802" top="10" width="358" height="131">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="367" height="20" text="TRUE FAITH" horzTextAlign="center"/>
+			<label left="20" top="15" width="318" height="20" text="TRUE FAITH" horzTextAlign="center"/>
 
-			<button name="btnQFaith" left="20" top="72" width="20" height="20" text="?" onClick="popOpen(self, 'Numina', 'True Faith', nil, nil);"/>
-			<label left="45" top="70" width="95" height="24" text="Religion"/>
-			<edit left="145" top="70" width="90" height="24" field="faith" fontSize="12"/>
-			<imageCheckBox left="245" top="70" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_1', self);"/>
-			<imageCheckBox left="274" top="70" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_2', self);"/>
-			<imageCheckBox left="303" top="70" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_3', self);"/>
-			<imageCheckBox left="332" top="70" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_4', self);"/>
-			<imageCheckBox left="361" top="70" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_5', self);"/>
+			<button name="btnQFaith" left="20" top="65" width="20" height="20" text="?" onClick="popOpen(self, 'Numina', 'True Faith', nil, nil);"/>
+			<label left="45" top="63" width="52" height="24" text="Religion"/>
+			<edit left="102" top="63" width="90" height="24" field="faith" fontSize="12"/>
+			<imageCheckBox left="197" top="63" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_1', self);"/>
+			<imageCheckBox left="226" top="63" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_2', self);"/>
+			<imageCheckBox left="255" top="63" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_3', self);"/>
+			<imageCheckBox left="284" top="63" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_4', self);"/>
+			<imageCheckBox left="313" top="63" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_5', self);"/>
+		</layout>
+
+		<!--
+			EXPERIENCE, the fourth box of the band and a REPLICA of the Ghoul one (SPEC I139g, I139h,
+			V399, user 2026-09-02 item 7). It carries no field: xpPaint on the root works the balance
+			out and writes every box that is loaded, so this is a VIEW and never a second owner of the
+			number (SPEC I11, V100, V1).
+
+			The box is what is LEFT of the band once QUINTESSENCE and TRUE FAITH shrank to their own
+			content, and it closes on 1408 with HEDGE MAGIC RITUALS under it - the width is derived
+			from the row and not chosen. 91 and not 90 for the edit: 243 is ODD and V239 compares the
+			two side gaps with no tolerance (SPEC I139i).
+		-->
+		<layout left="1165" top="10" width="243" height="131">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="203" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+
+			<edit name="edtCurrentXPNumina" left="76" top="70" width="91" height="25" horzTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPNumina.text);"/>
 		</layout>
 
 		<!--
@@ -347,212 +357,240 @@
 			VISIBLE: there is no strip left to hide any of them behind, which is the whole of the
 			request (SPEC I117, V221 for the Ghoul's half of the same design).
 
-			Widths 466/467/467 and gaps 5 close the row on 1410, where the top band closes - the
+			Widths 466/466/466 and gaps 5 close the row on 1408, where the top band closes - the
 			ruler V262(c) reads off the widest row of the tab. The row INSIDE each column is 426
 			wide in all three, so the ? column, the entry column and the five dots sit on the same
-			x in every box on the tab (SPEC V26): the two extra pixels of columns 2 and 3 go to the
-			margin, which V280(a) prices at 20 or more and never at exactly 20.
+			x in every box on the tab (SPEC V26).
+
+			The TOP band no longer matches this row box for box, and since T920 that is the design
+			rather than drift: QUINTESSENCE and TRUE FAITH shrank to their own content so a fourth
+			box - EXPERIENCE - could stand beside them and close on 1408 with RITUALS. V390 reads
+			COLUMN boxes only for that reason, and the band is V361 (SPEC I139g, I139n, B134).
 
 			Every foot is 20 - the minimum V280(a) allows - so no column's foot is a number anybody
 			chose. The Ghoul pays for its feet differently (SPEC V280d): its three columns are
 			imported forms that have to land on one line, and these are inline lists whose row
 			counts differ by three.
 		-->
-		<layout left="0" top="151" width="466" height="561">
+		<layout left="0" top="146" width="466" height="551">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="426" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
+			<label left="20" top="15" width="426" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
 
-			<layout left="20" top="41" width="426" height="25">
+			<layout left="20" top="36" width="426" height="25">
 				<PsychicPicker field="psychic_1"/>
 			</layout>
-			<layout left="20" top="66" width="426" height="25">
+			<layout left="20" top="61" width="426" height="25">
 				<PsychicPicker field="psychic_2"/>
 			</layout>
-			<layout left="20" top="91" width="426" height="25">
+			<layout left="20" top="86" width="426" height="25">
 				<PsychicPicker field="psychic_3"/>
 			</layout>
-			<layout left="20" top="116" width="426" height="25">
+			<layout left="20" top="111" width="426" height="25">
 				<PsychicPicker field="psychic_4"/>
 			</layout>
-			<layout left="20" top="141" width="426" height="25">
+			<layout left="20" top="136" width="426" height="25">
 				<PsychicPicker field="psychic_5"/>
 			</layout>
-			<layout left="20" top="166" width="426" height="25">
+			<layout left="20" top="161" width="426" height="25">
 				<PsychicPicker field="psychic_6"/>
 			</layout>
-			<layout left="20" top="191" width="426" height="25">
+			<layout left="20" top="186" width="426" height="25">
 				<PsychicPicker field="psychic_7"/>
 			</layout>
-			<layout left="20" top="216" width="426" height="25">
+			<layout left="20" top="211" width="426" height="25">
 				<PsychicPicker field="psychic_8"/>
 			</layout>
-			<layout left="20" top="241" width="426" height="25">
+			<layout left="20" top="236" width="426" height="25">
 				<PsychicPicker field="psychic_9"/>
 			</layout>
-			<layout left="20" top="266" width="426" height="25">
+			<layout left="20" top="261" width="426" height="25">
 				<PsychicPicker field="psychic_10"/>
 			</layout>
-			<layout left="20" top="291" width="426" height="25">
+			<layout left="20" top="286" width="426" height="25">
 				<PsychicPicker field="psychic_11"/>
 			</layout>
-			<layout left="20" top="316" width="426" height="25">
+			<layout left="20" top="311" width="426" height="25">
 				<PsychicPicker field="psychic_12"/>
 			</layout>
-			<layout left="20" top="341" width="426" height="25">
+			<layout left="20" top="336" width="426" height="25">
 				<PsychicPicker field="psychic_13"/>
 			</layout>
-			<layout left="20" top="366" width="426" height="25">
+			<layout left="20" top="361" width="426" height="25">
 				<PsychicPicker field="psychic_14"/>
 			</layout>
-			<layout left="20" top="391" width="426" height="25">
+			<layout left="20" top="386" width="426" height="25">
 				<PsychicPicker field="psychic_15"/>
 			</layout>
-			<layout left="20" top="416" width="426" height="25">
+			<layout left="20" top="411" width="426" height="25">
 				<PsychicPicker field="psychic_20"/>
 			</layout>
-			<layout left="20" top="441" width="426" height="25">
+			<layout left="20" top="436" width="426" height="25">
 				<PsychicPicker field="psychic_21"/>
 			</layout>
-			<layout left="20" top="466" width="426" height="25">
+			<layout left="20" top="461" width="426" height="25">
 				<PsychicPicker field="psychic_22"/>
 			</layout>
-			<layout left="20" top="491" width="426" height="25">
+			<layout left="20" top="486" width="426" height="25">
 				<PsychicPicker field="psychic_23"/>
 			</layout>
-			<layout left="20" top="516" width="426" height="25">
+			<layout left="20" top="511" width="426" height="25">
 				<PsychicPicker field="psychic_24"/>
 			</layout>
 		</layout>
 
-		<layout left="471" top="151" width="467" height="586">
+		<layout left="471" top="146" width="466" height="551">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="427" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
+			<label left="20" top="15" width="426" height="20" text="HEDGE MAGIC PATHS" horzTextAlign="center"/>
 
-			<layout left="20" top="41" width="426" height="25">
+			<layout left="20" top="36" width="426" height="25">
 				<HedgePicker field="numina_1" style="bold"/>
 			</layout>
-			<layout left="20" top="66" width="426" height="25">
+			<layout left="20" top="61" width="426" height="25">
 				<HedgePicker field="numina_2" style=""/>
 			</layout>
-			<layout left="20" top="91" width="426" height="25">
+			<layout left="20" top="86" width="426" height="25">
 				<HedgePicker field="numina_3" style=""/>
 			</layout>
-			<layout left="20" top="116" width="426" height="25">
+			<layout left="20" top="111" width="426" height="25">
 				<HedgePicker field="numina_4" style=""/>
 			</layout>
-			<layout left="20" top="141" width="426" height="25">
+			<layout left="20" top="136" width="426" height="25">
 				<HedgePicker field="numina_5" style=""/>
 			</layout>
-			<layout left="20" top="166" width="426" height="25">
+			<layout left="20" top="161" width="426" height="25">
 				<HedgePicker field="numina_6" style=""/>
 			</layout>
-			<layout left="20" top="191" width="426" height="25">
+			<layout left="20" top="186" width="426" height="25">
 				<HedgePicker field="numina_7" style=""/>
 			</layout>
-			<layout left="20" top="216" width="426" height="25">
+			<layout left="20" top="211" width="426" height="25">
 				<HedgePicker field="numina_8" style=""/>
 			</layout>
-			<layout left="20" top="241" width="426" height="25">
+			<layout left="20" top="236" width="426" height="25">
 				<HedgePicker field="numina_9" style=""/>
 			</layout>
-			<layout left="20" top="266" width="426" height="25">
+			<layout left="20" top="261" width="426" height="25">
 				<HedgePicker field="numina_10" style=""/>
 			</layout>
-			<layout left="20" top="291" width="426" height="25">
+			<layout left="20" top="286" width="426" height="25">
 				<HedgePicker field="numina_11" style=""/>
 			</layout>
-			<layout left="20" top="316" width="426" height="25">
+			<layout left="20" top="311" width="426" height="25">
 				<HedgePicker field="numina_12" style=""/>
 			</layout>
-			<layout left="20" top="341" width="426" height="25">
+			<layout left="20" top="336" width="426" height="25">
 				<HedgePicker field="numina_13" style=""/>
 			</layout>
-			<layout left="20" top="366" width="426" height="25">
+			<layout left="20" top="361" width="426" height="25">
 				<HedgePicker field="numina_14" style=""/>
 			</layout>
-			<layout left="20" top="391" width="426" height="25">
+			<layout left="20" top="386" width="426" height="25">
 				<HedgePicker field="numina_15" style=""/>
 			</layout>
-			<layout left="20" top="416" width="426" height="25">
+			<layout left="20" top="411" width="426" height="25">
 				<HedgePicker field="numina_16" style=""/>
 			</layout>
-			<layout left="20" top="441" width="426" height="25">
+			<layout left="20" top="436" width="426" height="25">
 				<HedgePicker field="numina_17" style=""/>
 			</layout>
-			<layout left="20" top="466" width="426" height="25">
+			<layout left="20" top="461" width="426" height="25">
 				<HedgePicker field="numina_18" style=""/>
 			</layout>
-			<layout left="20" top="491" width="426" height="25">
+			<layout left="20" top="486" width="426" height="25">
 				<HedgePicker field="numina_19" style=""/>
 			</layout>
-			<layout left="20" top="516" width="426" height="25">
+			<layout left="20" top="511" width="426" height="25">
 				<HedgePicker field="numina_20" style=""/>
 			</layout>
 
-			<!-- The affinity note, and it lives INSIDE the box it explains now (SPEC V88, I64). It
-			     rode at the right end of hedgeStrip from the 91st round because the pane had no free
-			     band for it; T830 took the strip and gave the column a foot, which is where a caption
-			     about the first row of THIS list belongs. It is a bare label, so V40 and V48 - which
-			     measure boxes - have nothing to say about it, and it carries no field. -->
-			<label name="noteHedgePaths" left="20" top="546" width="426" height="20" text="* The first path is the Affinity Path" fontSize="12" vertTextAlign="center"/>
 		</layout>
 
-		<layout left="943" top="151" width="467" height="486">
+		<layout left="942" top="146" width="466" height="551">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="20" width="427" height="20" text="HEDGE MAGIC RITUALS" horzTextAlign="center"/>
+			<label left="20" top="15" width="426" height="20" text="HEDGE MAGIC RITUALS" horzTextAlign="center"/>
 
-			<layout left="20" top="41" width="426" height="25">
+			<layout left="20" top="36" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_1"/>
 			</layout>
-			<layout left="20" top="66" width="426" height="25">
+			<layout left="20" top="61" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_2"/>
 			</layout>
-			<layout left="20" top="91" width="426" height="25">
+			<layout left="20" top="86" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_3"/>
 			</layout>
-			<layout left="20" top="116" width="426" height="25">
+			<layout left="20" top="111" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_4"/>
 			</layout>
-			<layout left="20" top="141" width="426" height="25">
+			<layout left="20" top="136" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_5"/>
 			</layout>
-			<layout left="20" top="166" width="426" height="25">
+			<layout left="20" top="161" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_6"/>
 			</layout>
-			<layout left="20" top="191" width="426" height="25">
+			<layout left="20" top="186" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_7"/>
 			</layout>
-			<layout left="20" top="216" width="426" height="25">
+			<layout left="20" top="211" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_8"/>
 			</layout>
-			<layout left="20" top="241" width="426" height="25">
+			<layout left="20" top="236" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_9"/>
 			</layout>
-			<layout left="20" top="266" width="426" height="25">
+			<layout left="20" top="261" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_10"/>
 			</layout>
-			<layout left="20" top="291" width="426" height="25">
+			<layout left="20" top="286" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_11"/>
 			</layout>
-			<layout left="20" top="316" width="426" height="25">
+			<layout left="20" top="311" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_12"/>
 			</layout>
-			<layout left="20" top="341" width="426" height="25">
-				<HedgeRitualFree field="hedgeRitual_13"/>
+			<layout left="20" top="336" width="426" height="25">
+				<HedgeRitualPicker field="hedgeRitual_13"/>
 			</layout>
-			<layout left="20" top="366" width="426" height="25">
-				<HedgeRitualFree field="hedgeRitual_14"/>
+			<layout left="20" top="361" width="426" height="25">
+				<HedgeRitualPicker field="hedgeRitual_14"/>
 			</layout>
-			<layout left="20" top="391" width="426" height="25">
-				<HedgeRitualFree field="hedgeRitual_15"/>
+			<layout left="20" top="386" width="426" height="25">
+				<HedgeRitualPicker field="hedgeRitual_15"/>
 			</layout>
-			<layout left="20" top="416" width="426" height="25">
-				<HedgeRitualFree field="hedgeRitual_16"/>
+			<layout left="20" top="411" width="426" height="25">
+				<HedgeRitualPicker field="hedgeRitual_16"/>
 			</layout>
-			<layout left="20" top="441" width="426" height="25">
-				<HedgeRitualFree field="hedgeRitual_17"/>
+			<layout left="20" top="436" width="426" height="25">
+				<HedgeRitualPicker field="hedgeRitual_17"/>
+			</layout>
+			<layout left="20" top="461" width="426" height="25">
+				<HedgeRitualPicker field="hedgeRitual_18"/>
+			</layout>
+			<layout left="20" top="486" width="426" height="25">
+				<HedgeRitualPicker field="hedgeRitual_19"/>
+			</layout>
+			<layout left="20" top="511" width="426" height="25">
+				<HedgeRitualPicker field="hedgeRitual_20"/>
 			</layout>
 		</layout>
+		<!--
+			The affinity note, OUTSIDE the box it explains and directly under it (SPEC I134d, T898,
+			user 2026-09-02: "deve ficar fora do box, em baixo do box").
+
+			It has moved twice for the same reason and this is the third address. It rode the right
+			end of hedgeStrip until T830 took the strip; T830 put it INSIDE the box, in the foot the
+			column had just gained. Inside, it read as a twenty-first ROW of a list of twenty - which
+			is what the user is asking to undo, and the 25px of foot the box carried for it is what
+			made the column 586 against the 561 of PSYCHIC PHENOMENA beside it. Out here the two
+			columns close on ONE y, which is the shape they always should have had.
+
+			left=491 and not 471: it lines up with the ROWS of the box above, not with the box edge,
+			so the caption and the list it captions share one left. width 426 is the row width, and
+			top is derived - the box opens at 151 and is 561 tall, and 5 is the gutter V298 rules
+			between two things stacked on this sheet.
+
+			Still a bare label: it carries no field and no rectangle, so V40 and V48 - which measure
+			BOXES - have nothing to say about it out here either, and the V280/V298 collectors walk
+			<layout> nodes carrying a <rectangle> and never see it (MEASURED, not assumed).
+		-->
+		<label name="noteHedgePaths" left="491" top="702" width="426" height="20" text="* The first path is the Affinity Path" fontSize="12" vertTextAlign="center"/>
 	</scrollBox>
 
 	<!--
@@ -570,7 +608,7 @@
 	<!-- The picked rituals wear their level in art, so the art follows the row (SPEC I65). It
 	     is a link of its own and not more handlers on the one above: that one repaints three
 	     description blocks and a level is not a description. -->
-	<dataLink fields="{'hedgeRitual_1', 'hedgeRitual_2', 'hedgeRitual_3', 'hedgeRitual_4', 'hedgeRitual_5', 'hedgeRitual_6', 'hedgeRitual_7', 'hedgeRitual_8', 'hedgeRitual_9', 'hedgeRitual_10', 'hedgeRitual_11', 'hedgeRitual_12', 'hedgeRitual_13', 'hedgeRitual_14', 'hedgeRitual_15', 'hedgeRitual_16', 'hedgeRitual_17'}" onChange="paintHedgeRitualDots(self);"/>
+	<dataLink fields="{'hedgeRitual_1', 'hedgeRitual_2', 'hedgeRitual_3', 'hedgeRitual_4', 'hedgeRitual_5', 'hedgeRitual_6', 'hedgeRitual_7', 'hedgeRitual_8', 'hedgeRitual_9', 'hedgeRitual_10', 'hedgeRitual_11', 'hedgeRitual_12', 'hedgeRitual_13', 'hedgeRitual_14', 'hedgeRitual_15', 'hedgeRitual_16', 'hedgeRitual_17', 'hedgeRitual_1_1', 'hedgeRitual_1_2', 'hedgeRitual_1_3', 'hedgeRitual_1_4', 'hedgeRitual_1_5', 'hedgeRitual_2_1', 'hedgeRitual_2_2', 'hedgeRitual_2_3', 'hedgeRitual_2_4', 'hedgeRitual_2_5', 'hedgeRitual_3_1', 'hedgeRitual_3_2', 'hedgeRitual_3_3', 'hedgeRitual_3_4', 'hedgeRitual_3_5', 'hedgeRitual_4_1', 'hedgeRitual_4_2', 'hedgeRitual_4_3', 'hedgeRitual_4_4', 'hedgeRitual_4_5', 'hedgeRitual_5_1', 'hedgeRitual_5_2', 'hedgeRitual_5_3', 'hedgeRitual_5_4', 'hedgeRitual_5_5', 'hedgeRitual_6_1', 'hedgeRitual_6_2', 'hedgeRitual_6_3', 'hedgeRitual_6_4', 'hedgeRitual_6_5', 'hedgeRitual_7_1', 'hedgeRitual_7_2', 'hedgeRitual_7_3', 'hedgeRitual_7_4', 'hedgeRitual_7_5', 'hedgeRitual_8_1', 'hedgeRitual_8_2', 'hedgeRitual_8_3', 'hedgeRitual_8_4', 'hedgeRitual_8_5', 'hedgeRitual_9_1', 'hedgeRitual_9_2', 'hedgeRitual_9_3', 'hedgeRitual_9_4', 'hedgeRitual_9_5', 'hedgeRitual_10_1', 'hedgeRitual_10_2', 'hedgeRitual_10_3', 'hedgeRitual_10_4', 'hedgeRitual_10_5', 'hedgeRitual_11_1', 'hedgeRitual_11_2', 'hedgeRitual_11_3', 'hedgeRitual_11_4', 'hedgeRitual_11_5', 'hedgeRitual_12_1', 'hedgeRitual_12_2', 'hedgeRitual_12_3', 'hedgeRitual_12_4', 'hedgeRitual_12_5', 'hedgeRitual_13_1', 'hedgeRitual_13_2', 'hedgeRitual_13_3', 'hedgeRitual_13_4', 'hedgeRitual_13_5', 'hedgeRitual_14_1', 'hedgeRitual_14_2', 'hedgeRitual_14_3', 'hedgeRitual_14_4', 'hedgeRitual_14_5', 'hedgeRitual_15_1', 'hedgeRitual_15_2', 'hedgeRitual_15_3', 'hedgeRitual_15_4', 'hedgeRitual_15_5', 'hedgeRitual_16_1', 'hedgeRitual_16_2', 'hedgeRitual_16_3', 'hedgeRitual_16_4', 'hedgeRitual_16_5', 'hedgeRitual_17_1', 'hedgeRitual_17_2', 'hedgeRitual_17_3', 'hedgeRitual_17_4', 'hedgeRitual_17_5'}" onChange="paintHedgeRitualDots(self);"/>
 
 
 	<!-- The affiliation decides what the Affinity Path row and the casting attribute may offer,
@@ -581,6 +619,8 @@
 	     At form level like every other dataLink on this sheet, not inside the HEDGE MAGIC box:
 	     there are twenty-odd links across the fifteen forms and not one of them is nested, and
 	     the handler walks up from `self` anyway (SPEC V143). -->
+	<!-- The EXPERIENCE box of this tab follows a purchase made on ANY tab (SPEC I11, V133). -->
+	<dataLink field="xpTotal" onChange="renderXPBoxes(self);"/>
 	<dataLink field="hedgeAffiliation" onChange="renderHedgePickers(self);"/>
 
 	<!-- The storyteller flag that swaps this tab's Affiliation picker for a typed field
@@ -600,6 +640,7 @@
 -->
 	<event name="onShow">
 		wodTrace("WoD20.7.onShow");
+		renderXPBoxes(self);
 		renderManualEntry(self);
 		renderNuminaButtons(self);
 		paintHedgeRitualDots(self);

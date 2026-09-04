@@ -71,7 +71,7 @@
 				["family"] = {
 					"Basarab", "Bratovich (Dark Ages)", "Bratovitch (Modern)", "D'Habi", "Danislav",
 					"Ducheski", "Enrathi", "Grimaldi (Dark Ages)", "Grimaldi (Modern)",
-					"Kairouan Brotherhood", "Katayama", "Keskinen",
+					"Kairouan Brotherhood", "Keskinen",
 					"Khavi", "Krevcheski", "Marijava", "Obertus", "Obertus (Narov)", "Oprichniki",
 					"Rafastio", "Rossellini",
 					"Servants of Anushin-Rawan", "Szantovich", "Vlaszy", "Zantosa",
@@ -88,17 +88,17 @@
 				-- which is trap 5 of research/README.md. Separate lists in separate places, and the one
 				-- .lang key serves both because both read `A Trilha do Sangue`.
 				["road"] = {
-					"Humanity", "The Path of Blood", "The Path of the Bones", "The Path of Caine", "The Path of Cathari",
+					"Path of Humanity", "The Path of Blood", "The Path of the Bones", "The Path of Caine", "The Path of Cathari",
 					"The Path of the Feral Heart", "The Path of Honorable Accord", "The Path of Lilith",
 					"The Path of Metamorphosis", "The Path of Night", "The Path of Paradox",
 					"The Path of Power and the Inner Voice", "The Path of Typhon", "The Path of the Hive",
 					"The Path of the Scorched Heart", "The Path of Self-Focus", "The Path of Asakku",
 					"The Path of Entelechy", "The Path of Ecstasy", "The Path of the Warrior", "Road of the Beast",
-					"Road of Heaven", "Road of Humanity", "Road of Kings", "Road of Lilith", "Road of Metamorphosis",
+					"Road of Humanity", "Road of Kings", "Road of Lilith", "Road of Metamorphosis",
 					"Road of Sin", "Road of Bones", "Road of Yasa", "Road of Blood", "Road of Paradox",
 					"The Code of Samiel", "Road of the Abyss", "Road of Set", "Path of the Archangel",
 					"Road of Angra Mainyu", "Road of Ahura Mazda", "Path of the Hunter", "Path of Journeys",
-					"Path of Liberation", "Path of Christianity", "Path of Life/Judaism", "Path of Breath",
+					"Path of Liberation", "Path of Christianity", "Path of Life/Judaism", "Path of the Prophet/Islam", "Path of Breath",
 					"Path of Community", "Path of Illumination", "Path of Chivalry", "Path of Devaraja", "Path of Daena",
 					"Path of Thorns", "Path of Veils", "Path of Making", "Path of Pleasure", "Path of the Devil",
 					"Path of Screams", "Path of Watchful Gods",
@@ -950,8 +950,14 @@
 				["Caitiff"]            = { open = 3 },
 				["Children of Osiris"] = { open = 3 },
 				-- The revenant families (SPEC R93, T640). Eighteen trios come from the books; the
-				-- four the books NAME without statting - Katayama, Keskinen, Krevcheski, Marijava -
-				-- were answered by the user on 2026-08-25 and are his call, not the book's.
+				-- ones the books NAME without statting were answered by the user on 2026-08-25 and
+				-- are his call, not the book's. They were FOUR and are THREE - Keskinen, Krevcheski
+				-- and Marijava - since T938 took Katayama out of the list (SPEC I143k): it is the
+				-- only one of the four the book gives no weakness for, in prose or otherwise, and
+				-- its trio went with it because a trio for a name nobody can pick is dead data.
+				-- Keskinen and Marijava DO carry a weakness, written as prose in the "Other
+				-- Families" page rather than under a Weakness: label, and Krevcheski is the
+				-- Ducheski under the surname they abandoned - all three stay.
 				["Basarab"]                   = { fixed = {"Animalism", "Dominate", "Presence"} },
 				["Bratovich (Dark Ages)"]     = { fixed = {"Animalism", "Potence", "Vicissitude"} },
 				["Bratovitch (Modern)"]       = { fixed = {"Animalism", "Fortitude", "Vicissitude"} },
@@ -962,7 +968,6 @@
 				["Grimaldi (Dark Ages)"]      = { fixed = {"Celerity", "Dominate", "Fortitude"} },
 				["Grimaldi (Modern)"]         = { fixed = {"Celerity", "Dominate", "Fortitude"} },
 				["Kairouan Brotherhood"]      = { fixed = {"Auspex", "Celerity", "Obfuscate"} },
-				["Katayama"]                  = { fixed = {"Auspex", "Dominate", "Obfuscate"} },
 				-- One fixed and TWO picked from the same short list, which is the only entry in the
 				-- table that needs `choiceN` (SPEC I17): `choice` alone would leave all three empty
 				-- slots open and hand the player a third pick the family does not have.
@@ -1596,7 +1601,7 @@
 			-- measured, not opinion. Humanity is the one row in BOTH: it is the default, and an era
 			-- whose list omitted it would leave the field holding no legal value (SPEC I99c3).
 				BEARING = {
-					["Humanity"] = "Normalcy",
+					["Path of Humanity"] = "Normalcy",
 					["The Path of Blood"] = "Resolve",
 					["The Path of the Bones"] = "Silence",
 					["The Path of Caine"] = "Faith",
@@ -1617,7 +1622,6 @@
 					["The Path of Ecstasy"] = "Rapture",
 					["The Path of the Warrior"] = "Fury",
 					["Road of the Beast"] = "Menace",
-					["Road of Heaven"] = "Holiness",
 					["Road of Humanity"] = "Normalcy",
 					["Road of Kings"] = "Command",
 					["Road of Lilith"] = "Carved and bleeding",
@@ -1638,6 +1642,7 @@
 					["Path of Liberation"] = "Menace",
 					["Path of Christianity"] = "Holiness",
 					["Path of Life/Judaism"] = "Holiness",
+					["Path of the Prophet/Islam"] = "Holiness",
 					["Path of Breath"] = "Normalcy",
 					["Path of Community"] = "Normalcy",
 					["Path of Illumination"] = "Normalcy",
@@ -1653,8 +1658,27 @@
 					["Path of Watchful Gods"] = "Temptation",
 				};
 
+				-- The default road, and the ONE place Lua spells it. It is read by three things that
+				-- would otherwise each carry the literal: the migration off the old name, the fallback
+				-- for a sheet that never picked, and what REMOVING the road means (SPEC I135d, V395).
+				-- T906 renamed the value and found it copied into three legs of the gate; this keeps
+				-- the same mistake from being made on this side (SPEC B70).
+				ROAD_DEFAULT = "Path of Humanity";
+
+				-- Values a saved sheet can still be holding that the list no longer offers. One line per
+				-- retirement, and the branch in renderBearing reads THIS table: a second `if` per name
+				-- would put one rule in two places, the shape B70 already cured on the default itself.
+				-- Road of Heaven left the list in T932 - it is not a Road, it is the umbrella over the
+				-- three Abrahamic paths, and what the player picks is the path (SPEC Q58, I141d). It
+				-- migrates to the DEFAULT and not to one of the three, because choosing a faith for the
+				-- player is the same error Q58 refused (SPEC V395, I135d).
+				ROAD_RETIRED = {
+					["Humanity"] = true,
+					["Road of Heaven"] = true,
+				};
+
 				ROAD_ERA = {
-					["Humanity"] = "modern",
+					["Path of Humanity"] = "modern",
 					["The Path of Blood"] = "modern",
 					["The Path of the Bones"] = "modern",
 					["The Path of Caine"] = "modern",
@@ -1675,7 +1699,6 @@
 					["The Path of Ecstasy"] = "modern",
 					["The Path of the Warrior"] = "modern",
 					["Road of the Beast"] = "medieval",
-					["Road of Heaven"] = "medieval",
 					["Road of Humanity"] = "medieval",
 					["Road of Kings"] = "medieval",
 					["Road of Lilith"] = "medieval",
@@ -1696,6 +1719,7 @@
 					["Path of Liberation"] = "medieval",
 					["Path of Christianity"] = "medieval",
 					["Path of Life/Judaism"] = "medieval",
+					["Path of the Prophet/Islam"] = "medieval",
 					["Path of Breath"] = "medieval",
 					["Path of Community"] = "medieval",
 					["Path of Illumination"] = "medieval",
@@ -1717,7 +1741,7 @@
 			-- and fails if it stops matching PITCH (SPEC V49) - the same Lua-vs-XML drift that
 			-- produced B12 and B16.
 			HEALTH_ROW_PITCH = 27;
-			HEALTH_BOX_PAD   = 57;
+			HEALTH_BOX_PAD   = 55;
 
 			local function markIndex(v)
 				for i = 1, #HEALTH_MARKS, 1 do
@@ -2483,8 +2507,14 @@
 			--
 			-- A ritual is KNOWN, not rated: only the five TYPED rows carry dots of their own, and
 			-- only they are declared as traits below (SPEC V269b).
-			HEDGE_RITUAL_ROWS      = 17;
-			HEDGE_RITUAL_FREE_ROWS = 5;
+			HEDGE_RITUAL_ROWS      = 20;
+			-- How many dots a ritual level runs over (SPEC I65, V269). It is NOT a declared trait -
+			-- the level is not bought, it comes off the book's prefix or out of the picker pane
+			-- (SPEC V269b) - so XP_TRAIT does not answer for it and the number would otherwise be
+			-- written twice: once where the pane's confirm stores it, once where a remove clears
+			-- it. Two copies of one number is B70, and this is the cheaper half of that trade.
+			HEDGE_RITUAL_LEVELS    = 5;
+			HEDGE_RITUAL_FREE_ROWS = 0;
 
 			-- `count` is the HIGHEST INDEX of the family and `vacant` is the hole inside it, so the
 			-- three loops that walk a numina by index read one table instead of each carrying its
@@ -2867,14 +2897,25 @@
 			-- GLOBAL, and for the reason V223 gives: the dot painter on WoD20.7 reads it too, so
 			-- the "<n>. " grammar is written ONCE and the art on screen cannot drift from the price
 			-- in the log (SPEC V269d).
+			-- T892 piece 5 (user 2026-09-02): the PREFIX first, the dots second.
+			--
+			-- It used to ask isTypedRow, and that question stopped having an answer the moment
+			-- HEDGE_RITUAL_FREE_ROWS went to zero: every row is a picker now, so "which half of
+			-- the family is this row in" no longer separates a book ritual from a homebrew one.
+			-- What separates them is whether the NAME carries a level - the book writes "3. Name"
+			-- and homebrew has no prefix to write - so that is what is asked.
+			--
+			-- The dots are the fallback and not the first answer, which is the order the user
+			-- fixed: a ritual that came off the list is priced by the book, always, even if the
+			-- five fields behind it still hold what some earlier pick left there.
 			function hedgeRitualLevel(field, value, node)
-				if isTypedRow(field) then
-					if node == nil then return liveLevel(field, 1, 5, 0); end;
+				local pre = tonumber(string.match(value or "", "^(%d+)%. "));
 
-					return traitLevel(node, field, 1, 5, 0);
-				end;
+				if pre ~= nil then return pre; end;
 
-				return tonumber(string.match(value or "", "^(%d+)%. ")) or 0;
+				if node == nil then return liveLevel(field, 1, 5, 0); end;
+
+				return traitLevel(node, field, 1, 5, 0);
 			end;
 
 			-- Returns the rows, or nil when no initial character has been saved yet - the
@@ -3198,7 +3239,12 @@
 			-- The three numbers, wherever they are drawn (SPEC I11): the Progress tab has all
 			-- three, the Main tab has the balance only. One is stored and two are worked out,
 			-- which is what stops any of them from disagreeing with the log (SPEC V100).
-			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true, edtTotalXPMain = true, edtSpentXPMain = true };
+			--
+			-- The Main tab is back to ONE box (SPEC I136e, T908, user 2026-09-02 item 6), so
+			-- edtTotalXPMain and edtSpentXPMain left this roster in the same commit as the XML.
+			-- Both writes were nil-guarded and would have stayed silent forever; a name here with
+			-- no widget there is the orphan of V2 one floor up (SPEC I136f, B111, B123).
+			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true, edtCurrentXPGhoul = true, edtCurrentXPNumina = true };
 
 			-- The painting itself. No xpQuiet here (SPEC V142): the flag exists to keep the
 			-- sheet's OWN writes from dragging a repaint along (SPEC V107), and a flag left
@@ -3229,7 +3275,6 @@
 				local box   = xpFind(node, XP_BOXES, {});
 
 				if box.edtTotalXP       ~= nil then box.edtTotalXP.text       = tostring(total); end;
-				if box.edtTotalXPMain   ~= nil then box.edtTotalXPMain.text   = tostring(total); end;
 
 				-- Spent is the one box whose lock moves (SPEC I44, V245). `== true` and not
 				-- truthiness: a sheet saved before this round answers nil and has to read as
@@ -3241,22 +3286,19 @@
 				-- key is the lie those two exist to stop. 0.75 because an edit is TEXT
 				-- (SPEC V244).
 				--
-				-- The Main copy of Spent takes the SAME dance and not a shortened one (SPEC I127c):
-				-- two views of one number that disagree about whether it is locked is the lie the
-				-- pair above exists to stop, and it would be the Main - the tab the player lives
-				-- on - that showed it unlocked.
+				-- There is ONE Spent box again since T908 (SPEC I136e): the Main tab shows the
+				-- balance alone, so the paired dance I127c asked for - two views of one number
+				-- that must agree about being locked - has only one dancer left.
 				local stEdit = (sheet.stEditSpentXP == true);
 
 				if box.edtSpentXP ~= nil then
 					box.edtSpentXP.text = tostring(spent);
 					box.edtSpentXP.readOnly = not stEdit; box.edtSpentXP.opacity = stEdit and 1 or 0.75;
 				end;
-				if box.edtSpentXPMain ~= nil then
-					box.edtSpentXPMain.text = tostring(spent);
-					box.edtSpentXPMain.readOnly = not stEdit; box.edtSpentXPMain.opacity = stEdit and 1 or 0.75;
-				end;
 				if box.edtCurrentXP     ~= nil then box.edtCurrentXP.text     = tostring(total - spent); end;
-				if box.edtCurrentXPMain ~= nil then box.edtCurrentXPMain.text = tostring(total - spent); end;
+				if box.edtCurrentXPMain   ~= nil then box.edtCurrentXPMain.text   = tostring(total - spent); end;
+				if box.edtCurrentXPGhoul  ~= nil then box.edtCurrentXPGhoul.text  = tostring(total - spent); end;
+				if box.edtCurrentXPNumina ~= nil then box.edtCurrentXPNumina.text = tostring(total - spent); end;
 			end;
 
 			-- What a dataLink, an onShow or an onNodeReady calls: it paints its own tab, and
@@ -3950,7 +3992,7 @@
 			function renderBearing(from)
 				if sheet == nil or from == nil then return; end;
 
-				local names = { cboRoad = true, dynBearingName = true };
+				local names = { dynroad = true, dynBearingName = true };
 				local found = {};
 
 				xpFind(tabRootOf(from), names, found);
@@ -3968,11 +4010,33 @@
 					if sheet["humanity_" .. i] == true then dots = dots + 1; end;
 				end;
 
-				-- A sheet saved before this round has no `road` at all. It falls to Humanity, which is
-				-- what such a character always was (SPEC I99b), rather than to a blank line.
+				-- A sheet saved before this round has no `road` at all. It falls to the default, which
+				-- is what such a character always was (SPEC I99b), rather than to a blank line.
+				--
+				-- T906 renamed the default `Humanity` -> `Path of Humanity` (SPEC I135b): the two were
+				-- always the same road under two spellings, and the user asked for the one the rest of
+				-- the list uses. So there are now TWO ways to arrive with no usable value - never
+				-- picked (nil) and picked the OLD name - and only the second is stale DATA.
+				--
+				-- The stale one is WRITTEN back rather than read around, and that is the whole of the
+				-- migration (SPEC I135d). A read-side alias would have to live in every reader -
+				-- BEARING, ROAD_ERA, the era filter, the label - which is the many-owners shape V135
+				-- refuses. It cannot loop: after the write sheet.road is no longer the old name, so the
+				-- dataLink fires once more and falls straight through. Same standing as renderClanDisc,
+				-- which also writes from inside the link that called it (SPEC V122).
+				--
+				-- The user's own rule for REMOVAL is the same sentence as this one - "removing the road
+				-- results in Path of Humanity" - so the picker's Remove and this migration are one rule
+				-- with one owner, not two that happen to agree (SPEC I135d, V135).
 				local road = sheet.road;
 
-				if road == nil or road == "" then road = "Humanity"; end;
+				if ROAD_RETIRED[road] then
+					setField("road", ROAD_DEFAULT);
+
+					return;
+				end;
+
+				if road == nil or road == "" then road = ROAD_DEFAULT; end;
 
 				local lang = (sheet.language == "pt") and "pt" or "en";
 				local bear = BEARING[road] or "";
@@ -3981,22 +4045,16 @@
 				-- xpWarn guards it further up this file.
 				if translateSheetText ~= nil then bear = translateSheetText(bear, lang); end;
 
-				-- The road NAME has to fit the picker the 143rd narrowed to make room for the label
-				-- (user 2026-08-29). Same ruler mfLabel uses - the gate's own - and the 24 is the arrow
-				-- the combo draws over its own right edge, which V312 has priced in since it was
-				-- written. A row with nothing chosen keeps the authored size: fitSize answers 12 for an
-				-- empty string, and for a width it cannot read.
-				local cbo = found["cboRoad"];
-
-				if cbo ~= nil then
-					local shownRoad = sheet.road;
-
-					if shownRoad ~= nil and shownRoad ~= "" and translateSheetText ~= nil then
-						shownRoad = translateSheetText(shownRoad, lang) or shownRoad;
-					end;
-
-					cbo.fontSize = fitSize(shownRoad, (cbo.width or 0) - 24);
-				end;
+				-- The road became a PICKER in T876 (SPEC I131d, I113e wave 5), so the fifteen lines
+				-- that stood here are one call: mfLabel translates, writes and FITS, which is exactly
+				-- what this block did by hand. The 24px subtracted here was the combo's arrow, and a
+				-- button does not draw one - so the name gets 24px more room at the same width, which
+				-- is the trade I134o priced when it took the pair to 195.
+				--
+				-- `road` never shows the empty style: it has no empty value at all (SPEC V328c), so
+				-- the fallback text is dead weight the day the migration lands and is kept only
+				-- because mfLabel takes it (SPEC I135a).
+				mfLabel(found["dynroad"], sheet.road, "Select Road", lang);
 
 				-- ONE line, centred, name and modifier joined (user 2026-08-29). Two labels each
 				-- centred in their own half never read as one sentence, which is what was asked.
@@ -4113,6 +4171,101 @@
 			-- spends a slot the root does not have - it declares 50 against the 50 V347 allows,
 			-- and over the real 53 rdk -l exits 1, prints nothing and deletes the .rpk (SPEC
 			-- B93, B19, V347).
+			-- ===== Esc fecha os 2 overlays (SPEC V405, I140c, T922/T923) =====
+			--
+			-- MEDIDO no Firecast pelo user 2026-09-02, & é a §T922 inteira: o evento de teclado
+			-- chega SÓ em quem tem FOCO, & só controle de TEXTO toma foco - `edtPopDesc` é
+			-- `readOnly` & mesmo assim recebe. Nos 2 overlays isso dá EXATAMENTE 1 controle:
+			-- `edtMfQuery` no picker & `edtPopDesc` no `?`. Os handlers que a sonda pendurou no
+			-- `<layout popDesc>` & no `popScrim` NUNCA dispararam ∴ saíram: `onKeyDown` em quem
+			-- ⊥ pode ter foco é linha que ⊥ roda, & isso é §B111 com outra roupa.
+			--
+			-- ∴ o desenho tem 2 metades & a 2ª é a que o user descreve ("se não estiver no bloco
+			-- de texto, nada acontece"):
+			--   (1) ABRIR dá foco - `mfOpen` já dava, `popOpen` ⊥ dava a ninguém;
+			--   (2) CLICAR dentro devolve o foco, senão o 1º clique numa linha mata o Esc.
+			kbEscArmed = false;
+
+			-- Devolve o foco ao ÚNICO controle de teclado do overlay que estiver aberto. Chamada
+			-- do fim de todo handler de clique de dentro dos 2 (SPEC V405).
+			function kbRefocus(from)
+				if from == nil then return; end;
+
+				local f = {};
+
+				xpFind(tabRootOf(from), { mfSearch = true, edtMfQuery = true, popDesc = true, edtPopDesc = true }, f);
+
+				-- ONE setFocus in the whole sheet, and this is it (SPEC V353b): the two overlays
+				-- pick WHICH control, never whether to ask. mfOpen and popOpen route through here
+				-- for the same reason - two opening paths asking on their own do not agree for long.
+				local ctrl = nil;
+
+				if f["mfSearch"] ~= nil and f["mfSearch"].visible then ctrl = f["edtMfQuery"];
+				elseif f["popDesc"] ~= nil and f["popDesc"].visible then ctrl = f["edtPopDesc"]; end;
+
+				if ctrl ~= nil then ctrl:setFocus(); end;
+			end;
+
+			-- O QUE o `event` carrega ⊥ está medido (§R138 segue `?` nessa metade): a sonda de
+			-- §T922 provou que o handler DISPARA, & o user relatou o comportamento em vez do
+			-- conteúdo da caixa. ∴ as 4 formas que um SDK usa são aceitas de uma vez, & ⊥ é
+			-- chute solto: `27` é VK_ESCAPE em toda a família Windows & os 2 nomes são o que
+			-- DOM & Delphi escrevem. Se NENHUMA casar, o `?` DENUNCIA (ver escClose).
+			function isEscKey(ev)
+				if ev == nil then return false; end;
+
+				for _, k in ipairs({"keyCode", "key", "code", "char"}) do
+					local ok, v = pcall(function() return ev[k]; end);
+
+					if ok and v ~= nil then
+						if v == 27 or v == "27" or v == "Escape" or v == "Esc" then return true; end;
+					end;
+				end;
+
+				return false;
+			end;
+
+			-- Fecha pelo MESMO fechador que o X & o scrim chamam - ⊥ nasce 2º fechador (§V333e).
+			--
+			-- `diag` é `true` só no `?`, & isso ⊥ é assimetria por gosto: `edtPopDesc` é READ-ONLY
+			-- ∴ a única tecla que alguém aperta lá é o próprio Esc, & uma caixa de diagnóstico ali
+			-- ⊥ atrapalha ninguém. No `edtMfQuery` a MESMA caixa apareceria na 1ª letra digitada,
+			-- que é a própria feature da busca. ∴ o canal de medida é o painel onde ⊥ se digita.
+			function escClose(from, ev, diag)
+				if from == nil then return; end;
+
+				if isEscKey(ev) then
+					local f = {};
+
+					xpFind(tabRootOf(from), { mfSearch = true, popDesc = true }, f);
+
+					if f["mfSearch"] ~= nil and f["mfSearch"].visible then mfClose(from); return; end;
+					if f["popDesc"] ~= nil and f["popDesc"].visible then popClose(from); end;
+
+					return;
+				end;
+
+				-- ⊥ reconhecida, & só no `?`: 1 caixa por abertura, dizendo o que o `event` TEM.
+				-- É a §T922 se auto-respondendo se o palpite de `isEscKey` estiver errado.
+				if diag ~= true or not kbEscArmed then return; end;
+
+				kbEscArmed = false;
+
+				local msg = "Esc ⊥ reconhecido. type(event) = " .. type(ev);
+
+				if type(ev) == "table" then
+					for k, v in pairs(ev) do msg = msg .. "\n  [" .. tostring(k) .. "] = " .. tostring(v); end;
+				end;
+
+				for _, k in ipairs({"keyCode", "key", "code", "char", "keyChar", "shift", "ctrl", "alt"}) do
+					local ok, v = pcall(function() return ev[k]; end);
+
+					if ok and v ~= nil then msg = msg .. "\n  ." .. k .. " = " .. tostring(v); end;
+				end;
+
+				Dialogs.showMessage(msg);
+			end;
+
 			popRow = nil;
 
 			-- popOpen paints the ? box - title, text, scrim, box - and reads the text through descText.
@@ -4184,6 +4337,8 @@
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
 
 				found["popDesc"].visible = true;
+				kbEscArmed = true;
+				kbRefocus(from);
 			end;
 
 			function popClose(from)
@@ -4254,9 +4409,15 @@
 					lblMfLoading = true, btnMfOk = true, btnMfPrev = true, btnMfNext = true, btnMfRemove = true,
 					lblMfPage = true, edtMfDesc = true, btnMfCustom = true, lblMfCustomName = true,
 					edtMfCustomName = true, lblMfDescTitle = true, btnFontDownMf = true,
+					lblMfLevel = true,
+					lblMfRevenant = true, cmbMfRevenant = true, lblMfWeak = true, edtMfWeak = true,
 					btnFontUpMf = true, btnMfClose = true };
 
 				for i = 1, MF.rows, 1 do n["dynMfRow_" .. i] = true; end;
+
+				-- T892 piece 2: without these xpFind never reaches the level dots and every write
+				-- below lands on nil - the pane would stay blank and the refusal would never fire.
+				for d = 1, 5, 1 do n["chkMfLvl_" .. d] = true; end;
 
 				MF.names = n;
 
@@ -4423,6 +4584,7 @@
 				MF.page = 1;
 
 				mfPaint(from);
+				kbRefocus(from);
 			end;
 
 			-- DEBOUNCE by generation, because there is no clearTimeout to cancel with: every event
@@ -4460,6 +4622,7 @@
 				if found["edtMfDesc"] ~= nil then found["edtMfDesc"].text = ""; end;
 
 				mfPaint(from);
+				kbRefocus(from);
 			end;
 
 			-- I107f: require is SYNCHRONOUS. Painting the loading text and requiring in the same
@@ -4542,6 +4705,9 @@
 				-- of the open box and not of the row, so leaving it set would open the next row
 				-- with the previous row's Name showing.
 				MF.custom = false;
+				-- Cleared with the rest of the per-opening state (SPEC I129d): custom is a state of
+				-- the OPEN BOX and the level rides with it, so nothing here survives to the next row.
+				MF.level = 0;
 				MF.gen = MF.gen + 1;
 
 				-- SPEC I113a: the title is DERIVED from the list and not looked up in a roster that
@@ -4583,6 +4749,7 @@
 				mfSize(found, size);
 
 				found["mfSearch"].visible = true;
+				kbEscArmed = true;
 
 				setTimeout(function()
 					-- SPEC I112e: the description module is parsed HERE, in the same turn the list is, and
@@ -4711,7 +4878,7 @@
 					-- layout that was hidden a tick ago - and that is the screen half of T804, which
 					-- no gate can run. The fall is free: no focus and the box is exactly what it is
 					-- today (I111d).
-					if f2["edtMfQuery"] ~= nil then f2["edtMfQuery"]:setFocus(); end;
+					kbRefocus(from);
 				end, 1);
 			end;
 
@@ -4731,15 +4898,122 @@
 			-- The pane is writable only while custom is marked, and then for ANY player - the
 			-- custom is HIS. That is the one place this parts company with I102i, where the ?
 			-- opens for the storyteller alone because the text there describes the BOOK.
+			-- T892: the ONE question "is the level row showing right now". Both the pane and the
+			-- refusal in mfConfirm ask it, and they have to agree - a box that shows five dots and
+			-- confirms without them, or refuses over a row nobody can see, is the same bug twice
+			-- (SPEC V135). Custom AND hedgeRitual, both: the other eight lists have no level.
+			function mfLevelShown()
+				return MF.custom == true and MF.list == "hedgeRitual";
+			end;
+
+			-- Paints the five from MF.level. It never READS the widgets: MF.level is the level, the
+			-- dots are its picture, and asking the picture what it says is the second source V269d
+			-- already closed one door over (SPEC V135, V269d).
+			function mfLevelPane(found, on)
+				if found == nil then return; end;
+
+				if found["lblMfLevel"] ~= nil then found["lblMfLevel"].visible = on; end;
+
+				for d = 1, 5, 1 do
+					local dot = found["chkMfLvl_" .. d];
+
+					if dot ~= nil then
+						dot.visible = on;
+						dot.checked = on and d <= (MF.level or 0);
+					end;
+				end;
+			end;
+
+			-- T892 piece 4 half one: marking a level. The ONE writer of MF.level, so the art on
+			-- screen and the refusal below cannot tell two stories (SPEC V135). autoChange is false
+			-- on all five, so the click does not toggle the widget behind this - the repaint does.
+			function mfLevelClick(from, n)
+				if from == nil or not mfLevelShown() then return; end;
+
+				local found = {};
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				MF.level = n;
+
+				mfLevelPane(found, true);
+			end;
+
+			-- The ONE question "is the Revenant row showing right now" (SPEC I143d, V413a). The pane
+			-- and the write in mfConfirm both ask it and they have to agree - a box that shows the
+			-- row and confirms without it, or writes over a row nobody can see, is the same bug
+			-- twice (SPEC V135). Custom AND clanFamily, both: the other eight lists have no
+			-- revenants in them, and a book entry carries a weakness of its own.
+			function mfRevenantShown()
+				return MF.custom == true and MF.list == "clanFamily";
+			end;
+
+			-- Paints the pair from MF.revenant. It never READS the widgets: MF.revenant is the
+			-- answer, the combo is its picture, and asking the picture what it says is the second
+			-- source V269d already closed one door over (SPEC V135, V269d).
+			function mfRevenantPane(found, on)
+				if found == nil then return; end;
+
+				local yes = on and MF.revenant == true;
+
+				if found["lblMfRevenant"] ~= nil then found["lblMfRevenant"].visible = on; end;
+
+				if found["cmbMfRevenant"] ~= nil then
+					local want = yes and "Yes" or "No";
+
+					found["cmbMfRevenant"].visible = on;
+
+					-- Written only when it DIFFERS. Assigning the value fires onChange again, and
+					-- the handler repaints through here - the two would call each other until the
+					-- stack gave out. One writer, and it may not answer its own echo (SPEC V135).
+					if found["cmbMfRevenant"].value ~= want then found["cmbMfRevenant"].value = want; end;
+				end;
+
+				if found["lblMfWeak"] ~= nil then found["lblMfWeak"].visible = yes; end;
+				if found["edtMfWeak"] ~= nil then found["edtMfWeak"].visible = yes; end;
+			end;
+
+			-- The ONE writer of MF.revenant. The combo carries no field, so nothing is saved here:
+			-- the answer rides out through MF and lands only on OK (SPEC V269a, V333e).
+			function mfRevenantChange(from)
+				if from == nil or not mfRevenantShown() then return; end;
+
+				local found = {};
+				xpFind(tabRootOf(from), mfNames(), found);
+
+				MF.revenant = (from.value == "Yes");
+
+				mfCustomPane(found, true);
+			end;
 			function mfCustomPane(found, on)
 				if found == nil then return; end;
 
 				if found["lblMfCustomName"] ~= nil then found["lblMfCustomName"].visible = on; end;
 				if found["edtMfCustomName"] ~= nil then found["edtMfCustomName"].visible = on; end;
 
+				-- The level row only exists for ONE list, so the pane closes over THREE heights and
+				-- no longer two: no custom (76), custom without a level (130), custom with one (185).
+				-- The bottom is 625 in all three - it is the pane floor and it does not move, so the
+				-- height is DERIVED from the top rather than written out three times (SPEC B70).
+				local lvl = on and mfLevelShown();
+				local rev = on and mfRevenantShown();
+
+				mfLevelPane(found, lvl);
+				mfRevenantPane(found, rev);
+
 				if found["edtMfDesc"] ~= nil then
-					found["edtMfDesc"].top = on and 130 or 76;
-					found["edtMfDesc"].height = on and 495 or 549;
+					-- A CASCADE in row order and not a sum: the authored gaps are NOT uniform - 11px
+					-- under the Name row and 13 under the level dots, MEASURED 2026-09-03 - so a
+					-- computed stack would move a pane that already ships. Each row names its own
+					-- number ONCE, which is what B70 is about; five copies of one rule would not be
+					-- (SPEC I143f). The floor stays 625 and the height is still derived from it.
+					local top = 76;
+
+					if on then top = 130; end;
+					if lvl or rev then top = 185; end;
+					if rev and MF.revenant == true then top = 237; end;
+
+					found["edtMfDesc"].top = top;
+					found["edtMfDesc"].height = 625 - top;
 					-- readOnly and opacity on the SAME line, like every other runtime lock on the
 					-- sheet (SPEC V112, V162, B104): a pane that looks writable and refuses the key
 					-- is the lie those two exist to stop.
@@ -4761,14 +5035,33 @@
 				MF.custom = true;
 				MF.picked = nil;
 				MF.mark = 0;
+				-- T892 piece 3: the first dot comes up marked on EVERY custom open, and the number
+				-- is written here rather than left over - a level marked on the last row would
+				-- otherwise ride into the next one, which is the leak I129d refuses for the name.
+				MF.level = 1;
+
+				-- The Revenant answer comes back from what the slot HOLDS and is not a second flag:
+				-- a saved yes/no could disagree with the text beside it and a DERIVED one cannot
+				-- (SPEC V29, I143g). An empty weakness IS "No" - "revenant with nothing typed" and
+				-- "not a revenant" paint the same empty box, so it is not a state worth storing.
+				MF.revenant = false;
 
 				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
 				local nm = "";
 				local tx = "";
 
+				local wk = "";
+
 				if sheet ~= nil and MF.field ~= nil then
 					nm = sheet[customFieldOf(MF.field)] or "";
 					tx = sheet[customDescFieldOf(MF.field)] or "";
+				end;
+
+				-- BEFORE mfCustomPane below, because the pane reads MF.revenant to decide how far
+				-- down edtMfDesc starts: read after the paint and the box opens one repaint late.
+				if sheet ~= nil and mfRevenantShown() then
+					wk = sheet.clanFamilyCustomWeak or "";
+					MF.revenant = wk ~= "";
 				end;
 
 				-- The starting text is EDITABLE prose and not the sentence of V360c: that one is a
@@ -4778,9 +5071,11 @@
 				mfCustomPane(found, true);
 
 				if found["edtMfCustomName"] ~= nil then found["edtMfCustomName"].text = nm; end;
+				if found["edtMfWeak"] ~= nil then found["edtMfWeak"].text = wk; end;
 
 				mfDesc(found, nil, tx);
 				mfArm(found, true);
+				kbRefocus(from);
 			end;
 
 			-- STILL the one writer of the pane (SPEC V372a). `own` is the custom prose, which does
@@ -4838,6 +5133,7 @@
 				mfDesc(found, name);
 
 				mfArm(found, true);
+				kbRefocus(from);
 			end;
 
 			-- SPEC I121d/V369. Marking the way out. The blank is a real CHOICE - mfConfirm reads ""
@@ -4851,7 +5147,19 @@
 
 				xpFind(tabRootOf(from), mfNames(), found);
 
-				MF.picked = "";
+				-- `road` has no empty state, and removing it RETURNS it to the default instead of
+				-- clearing it (SPEC V328c, I135d, user 2026-09-02: "ao se remover road o que resulta
+				-- e mudar para Trilha da Humanidade"). It is the ONE field on the sheet that works
+				-- this way, because a character with no road IS on the default road (SPEC I99b) -
+				-- which is also why its list carries no empty item while every other picker's does
+				-- (SPEC V15).
+				--
+				-- The branch sits HERE, in the one place that decides what removal MEANS, and not in
+				-- mfConfirm beside the write: the write is shared by the pick and the removal, and a
+				-- test there would ask "is this the road?" on every confirm the sheet ever does
+				-- (SPEC V135). This is also the same sentence the migration of T906 obeys, through
+				-- the same constant - one rule, one owner, two readers.
+				MF.picked = (MF.field == "road") and ROAD_DEFAULT or "";
 				MF.mark = 0;
 
 				-- SPEC I122c. The remove line has no description of its OWN, and falling to V360c's
@@ -4862,6 +5170,40 @@
 				mfDesc(found, (sheet ~= nil) and sheet[MF.field] or nil);
 
 				mfArm(found, true);
+				kbRefocus(from);
+			end;
+
+			-- SPEC V388, user 2026-09-02: clearing a row gives up what HUNG on it, not just the
+			-- name. Until now mfConfirm wrote setField(MF.field, "") and stopped, so the dots stayed
+			-- lit on a row with no name and the ledger went on charging for them - V383 turned
+			-- inside out, and V2 green through both.
+			--
+			-- The RANGE is derived and never written here: XP_TRAIT already holds first/last for
+			-- every rated row and it is the same registry xpClick prices with, so a family that
+			-- changes its dot count changes it in ONE place (SPEC V388f, B112). `first` and not 1 -
+			-- an attribute's opening dot is fixed art with no field behind it, and walking from 1
+			-- would write a field nothing owns.
+			--
+			-- hedgeRitual is the one root XP_TRAIT does not answer for, and that is deliberate: its
+			-- dots are not bought, so declareTrait skips them (SPEC V269b). It still keeps the level
+			-- in those same five names and hedgeRitualLevel reads them whenever the name carries no
+			-- prefix, so a remove that skipped this root would leave a level burning on an empty row
+			-- and the painter would light it (SPEC V388c, T892). NAMED, never a catch-all: a second
+			-- unrated family has to redden the gate rather than be absorbed (SPEC V328d).
+			function clearRowDots(field)
+				if field == nil then return; end;
+
+				local tr = XP_TRAIT[field];
+
+				if tr ~= nil then
+					for d = tr.first, tr.last, 1 do setField(field .. "_" .. d, false); end;
+
+					return;
+				end;
+
+				if string.match(field, "^hedgeRitual_%d+$") ~= nil then
+					for d = 1, HEDGE_RITUAL_LEVELS, 1 do setField(field .. "_" .. d, false); end;
+				end;
 			end;
 
 			-- I107i: the ONE point of WRITE. Three roads reach it - btnMfOk, the double click and
@@ -4894,8 +5236,39 @@
 
 					if nm == "" then return; end;
 
+					-- T892 piece 4: and a level is required in the same breath, at the SAME door.
+					-- A homebrew ritual has no prefix to read a level from, so confirming with no
+					-- dot marked writes a ritual the log prices at zero and the row draws blank -
+					-- the same silent nothing an empty name writes (SPEC V369c, V135).
+					if mfLevelShown() and (MF.level or 0) < 1 then return; end;
+
 					setField(customFieldOf(MF.field), nm);
 					setField(customDescFieldOf(MF.field), tx);
+
+					-- T892 piece 5: the level rides out to the row's own five fields, which is where
+					-- hedgeRitualLevel looks when the name carries no "<n>. " prefix - and homebrew
+					-- never does. They are the SAME five names HedgeRitualFree bound before the row
+					-- became a picker, so a sheet saved under the old shape opens with its level
+					-- intact and nothing has to be migrated (SPEC V269b, B122).
+					--
+					-- BEFORE the name, and the order is load-bearing: writing the name is what wakes
+					-- the dot painter, so a level written after it would be one repaint late.
+					if mfLevelShown() then
+						for d = 1, HEDGE_RITUAL_LEVELS, 1 do setField(MF.field .. "_" .. d, d <= (MF.level or 0)); end;
+					end;
+
+					-- The weakness rides out on the SAME door as the name (SPEC I143g). "No" writes
+					-- the EMPTY string instead of leaving the old text where it was: the answer is
+					-- DERIVED from this field, so a stale value here would come back as "Yes" the
+					-- next time the box opens (SPEC V29).
+					if mfRevenantShown() then
+						local wk = "";
+
+						if MF.revenant == true and found["edtMfWeak"] ~= nil then wk = found["edtMfWeak"].text or ""; end;
+
+						setField("clanFamilyCustomWeak", wk);
+					end;
+
 					setField(MF.field, nm);
 					mfClose(from);
 
@@ -4903,6 +5276,12 @@
 				end;
 
 				if MF.picked == nil or MF.field == nil then return; end;
+
+				-- SPEC V388d: "" arrives by TWO doors - the Remove line (I121) and the empty first
+				-- item every prose list opens with (V15) - and both land here, on one write. Curing
+				-- only the Remove door would leave the other one dirty, which is B94: the case that
+				-- got away is the one nobody names.
+				if MF.picked == "" then clearRowDots(MF.field); end;
 
 				setField(MF.field, MF.picked);
 
@@ -5100,6 +5479,7 @@
 
 				setField("descFontSize", s);
 				applyDescFont(from);
+				kbRefocus(from);
 			end;
 
 			-- The way back (SPEC V334e, the pair V316c asks of theme): the field is read on open, so
@@ -5141,6 +5521,93 @@
 				if row == nil then return nil; end;
 
 				return row[trait];
+			end;
+
+			-- ---- The revenant weakness (SPEC I143, I143c, V412, T936, T937) -------------------
+			--
+			-- SISTER of FAMILY_CAP above, and for its reason: the family is what a book LIMITS and
+			-- what a book CURSES, both are keyed by the picker's own name VERBATIM, and both have
+			-- exactly one reader (SPEC I143c, V337c, V135). It is NOT a desc module - a desc module
+			-- is book PROSE in the shape of I21, and this is one sentence the box paints whole.
+			--
+			-- COMPLETE where FAMILY_CAP is sparse, and that is a DECISION and not an accident: every
+			-- one of the 23 names of PICKER_LIST["family"] has a line here and V412(f) says so. The
+			-- owner ruled on 2026-09-03 that a family with no weakness is a QUESTION, not a state of
+			-- the screen - it ends with the text arriving or with the family leaving the list, which
+			-- is exactly how Katayama left it in T938 (SPEC Q60, V412f).
+			--
+			-- ENGLISH only. The [pt] half lives in localization.lang like every other sentence this
+			-- sheet shows, and translateSheetText is the one thing that reads it (SPEC V9, V10, V24).
+			--
+			-- MEASURED, never remembered: research/family_weakness.tsv carries the book and the page
+			-- behind every line - 16 out of Ghouls & Revenants, 7 out of V20 Dark Ages.
+			FAMILY_WEAKNESS = {
+				["Basarab"]                     = "Repelled by garlic and holy symbols: presented with either, a Willpower roll or they must remove themselves from its presence.",
+				["Bratovich (Dark Ages)"]       = "Given over to their own savagery, they suffer the same frenzy effects as the Brujah.",
+				["Bratovitch (Modern)"]         = "+2 difficulty on every roll to resist frenzy. They may not spend Willpower to avoid a frenzy, only to end one.",
+				["D'Habi"]                      = "Broken by centuries of infernal servitude, they are extraordinarily suggestible: +2 difficulty on all Willpower rolls.",
+				["Danislav"]                    = "They take aggravated damage from silver.",
+				["Ducheski"]                    = "Centuries under the Tremere left them far from their human side: no Ducheski may ever have a Social Attribute above 2.",
+				["Enrathi"]                     = "Centuries of moral decay: they may not have Humanity higher than 3, nor Conscience higher than 2.",
+				["Grimaldi (Dark Ages)"]        = "Tzimisce blood runs thin in this family, which has no native ties to the Voivodate: they have only eight blood points.",
+				["Grimaldi (Modern)"]           = "Family arrogance: whenever there is a chance to boast of the family, a Willpower roll at difficulty 7 to hold back their scorn.",
+				["Kairouan Brotherhood"]        = "Years of genetic manipulation: every member suffers the Slow Healing Flaw (V20 p. 483).",
+				["Keskinen"]                    = "All Keskinen share their patron's obsession with blotting out the sun, which manifests as a Derangement.",
+				["Khavi"]                       = "Vulnerable to sunlight: they take sunlight damage as a Cainite would, but bashing rather than aggravated, and may soak it with Stamina and Fortitude.",
+				["Krevcheski"]                  = "Krevcheski are distrusted by the Tzimisce, and thus have only learned two family Disciplines instead of the normal three.",
+				["Marijava"]                    = "Quite susceptible to the blood bond: they become Bound to a vampire after a single drink.",
+				["Obertus"]                     = "Bred for intellect and prone to psychological disorders: the vast majority suffer the Obsessive-Compulsive Derangement (V20 pp. 291-292).",
+				["Obertus (Narov)"]             = "Members of the resurging Narov line are afflicted with the Megalomania Derangement instead (V20 pp. 291-292).",
+				["Oprichniki"]                  = "Cursed for their founders' crimes: they suffer the Haunted Flaw (V20 p. 495) permanently, and banishing one ghost only brings another.",
+				["Rafastio"]                    = "Cursed by the moon: +2 difficulty to use Disciplines at the new moon, +1 waxing and waning, -1 at the full moon. Their blood rejects the Embrace, which has always killed them.",
+				["Rossellini"]                  = "All of them suffer the Deathsight Flaw (V20 p. 494): -2 difficulty to resist Appearance-based rolls, +2 difficulty on Perception rolls and +1 on Social rolls.",
+				["Servants of Anushin-Rawan"]   = "In the presence of a vampire descended from Anushin-Rawan they are compelled to protect that Ventrue as if blood bound, for 10 nights minus their Willpower.",
+				["Szantovich"]                  = "Addictive personalities: exposed to a sensual experience that has weakened them, a Willpower roll to do anything but pursue it, and Willpower may not be spent to resist the addiction.",
+				["Vlaszy"]                      = "Every Vlaszy swears a Blood Oath to a Fiend upon reaching the age of majority.",
+				["Zantosa"]                     = "Exposed to a particularly pleasurable experience, a Willpower roll or they become obsessed with it. They may not spend Willpower to resist a supernatural power that entices them to a new pleasure.",
+			};
+
+			-- ONE reader, exactly as familyCap is the one reader of the ceiling (SPEC V337c, V135,
+			-- V412c). It answers in ENGLISH and never translates: the caller owns the language, the
+			-- way every other painter on this sheet does.
+			--
+			-- The CUSTOM slot is asked FIRST, and it is asked of the slot itself and never of a saved
+			-- flag: the picker writes the typed name into BOTH clanFamily and clanFamilyCustom, so a
+			-- value equal to the second IS the custom entry, and an empty weakness beside it is the
+			-- answer "No" - the same derivation mfCustomOpen makes, and for V29's reason (SPEC I143g,
+			-- V412c). The field name is DERIVED through customFieldOf and not typed, because that
+			-- function is already the one owner of the convention (SPEC V135).
+			--
+			-- Then PERTINENCE, which is the whole of "is this a Family?": the two lists inside
+			-- clanFamily share no name (SPEC I143b, MEASURED), so the value decides by itself which
+			-- one it came from. A second list, a prefix on the name or an `isRevenant` field would
+			-- each be a second owner of a fact the value already carries (SPEC V412b, V135).
+			function familyWeakness()
+				if sheet == nil then return nil; end;
+
+				local name = sheet.clanFamily;
+
+				if name == nil or name == "" then return nil; end;
+
+				local custom = customFieldOf("clanFamily");
+
+				if custom ~= nil and name == (sheet[custom] or "") then
+					local wk = sheet.clanFamilyCustomWeak or "";
+
+					if wk == "" then return nil; end;
+
+					return wk;
+				end;
+
+				local fam = PICKER_LIST["family"];
+
+				if fam == nil then return nil; end;
+
+				for i = 1, #fam, 1 do
+					if fam[i] == name then return FAMILY_WEAKNESS[name]; end;
+				end;
+
+				return nil;
 			end;
 
 			-- The blood pool toggle, and the refusal that comes with it (SPEC I108c, Q20). Nothing
@@ -5201,6 +5668,23 @@
 			-- `clan` - the dormant combo on the Main tab - is NOT written here and stays asleep
 			-- (SPEC V173). What plays the part of the clan today is `clanFamily` (SPEC B50): one
 			-- field, not two mirroring each other into disagreement.
+			-- The Clan/Family entry became a picker in T876 (SPEC I131d, I113e wave 5), so something
+			-- has to write what it SHOWS. It rides renderClanDisc rather than arriving with a dataLink
+			-- of its own: the link watching clanFamily already exists and already calls this, and a
+			-- second link on one field would be a second thing to keep in step (SPEC V123, V135).
+			--
+			-- It lives on the ROOT form for the reason the rest of renderClanDisc does: the button is
+			-- drawn in WoD20.11, inside a tab a table with Show Ghoul off never opens, and a painter
+			-- that may not be there cannot be what keeps the sheet right (SPEC V95, B26).
+			function renderClanFamilyButton(from)
+				if sheet == nil or from == nil then return; end;
+
+				local found = xpFind(tabRootOf(from), { dynclanFamily = true }, {});
+				local lang  = (sheet.language == "pt") and "pt" or "en";
+
+				mfLabel(found["dynclanFamily"], sheet.clanFamily, "Select Clan/Family", lang);
+			end;
+
 			function renderClanDisc(from)
 				if sheet == nil or from == nil then return; end;
 
@@ -5274,7 +5758,7 @@
 			-- There is no text-measuring API on this sheet and I114i already found that reading
 			-- ctrl.width from Lua is unmeasured - so measuring at runtime would be a new mechanism
 			-- bought for precision the screen gives away.
-			ROAD_LABEL_W = { en = 26, pt = 46 };
+			ROAD_LABEL_W = { en = 26, pt = 65 };
 
 			-- The interior of the ROAD box is 20..310, so 290 wide, and the control is 205 with a
 			-- 5px gap to the label - the gap every other pair on the sheet uses.
@@ -5295,19 +5779,28 @@
 			function renderRoadPair(from)
 				if sheet == nil or from == nil then return; end;
 
-				local found = xpFind(tabRootOf(from), { lblRoad = true, cboRoad = true }, {});
+				local found = xpFind(tabRootOf(from), { lblRoad = true, btnQroad = true, dynroad = true }, {});
 				local lbl   = found["lblRoad"];
-				local ctrl  = found["cboRoad"];
+				local q     = found["btnQroad"];
+				local ctrl  = found["dynroad"];
 
-				if lbl == nil or ctrl == nil then return; end;
+				if lbl == nil or q == nil or ctrl == nil then return; end;
 
-				local w = ROAD_LABEL_W[sheet.language or "en"] or ROAD_LABEL_W["en"];
-				local cw = 205;
-				local left = 20 + math.floor((290 - (w + 5 + cw)) / 2);
+				-- THREE now, not two: T876 made the road a picker and a picker carries its ?. The ?
+				-- leads the ENTRY and not the row, which is the shape the affiliation already wears
+				-- (label - ? - button, SPEC I107a1) and the one BACKGROUNDS wore first.
+				--
+				-- The group grew 25 - the ? plus its gutter - and it still centres: 65 + 5 + 20 + 5 +
+				-- 176 is 271 inside 290, so the WIDEST language leaves 9px of air on the left and 10 on
+				local w  = ROAD_LABEL_W[sheet.language or "en"] or ROAD_LABEL_W["en"];
+				local qw = 20;
+				local cw = 176;
+				local left = 20 + math.floor((290 - (w + 5 + qw + 5 + cw)) / 2);
 
 				lbl.width = w;
 				lbl.left  = left;
-				ctrl.left = left + w + 5;
+				q.left    = left + w + 5;
+				ctrl.left = left + w + 5 + qw + 5;
 			end;
 
 			function renderSpecialities(from)
@@ -5800,9 +6293,33 @@
 			lands on the scrim and on nothing else (SPEC I102a, V333b).
 
 			The tops are 40 higher than they were: sheetBody's origin sits above the 40px tabStrip,
-			while a tab layout's origin sits below it. The scrim is 1595x733 - the strip plus the
-			693 the grid covers - so a click anywhere outside the box closes it, the tab strip
-			included. It is sized rather than align=client because a second child claiming the
+			while a tab layout's origin sits below it. The scrim is 1595x936 - as wide as the
+			WIDEST tab, which is TRAITS, and as deep as the strip plus the 896 the DEEPEST tab
+			reaches, which is Main - so a click anywhere outside the box closes it, the tab strip
+			included. Two different tabs own the two axes, which is the whole reason neither is
+			written as a literal.
+
+			⚠ it was 1680x733 until T905, and 733 was the strip plus the 693 the TRAITS grid covers. Main
+			closes at 896, so the bottom 203px of it did not close the overlay and NOTHING said so - the
+			gate was green, because I102a named two axes and only the WIDTH ever became a check (SPEC
+			B124). V389 owns the height now, derived off the deepest tab and the strip's own height, so a
+			tab that grows takes the scrim with it instead of leaving a dead band behind.
+
+			⚠ and the WIDTH had the SAME disease one level down, which is why it is 1408 and not
+			1345: the check compared the scrim to the right edge of Main's EXPERIENCE box - ONE
+			named tab - and was green only while Main happened to be WIDER than the widest, which
+			is not the same thing (SPEC B127). MEASURED while building T908: Traits closes at 1595
+			and has all along, so the 1680 this rectangle carried was 85px of slack the rule read
+			as correct, and taking Main to 1345 would have had the same rule DEMAND 250px less
+			than Traits needs. V396 owns the width now and derives it off the same sweep V389 uses
+			for the height, so NEITHER axis is tied to a tab by name any more.
+
+			strokeColor is AUTHORED and it is not decoration: applyTheme writes the era's rule onto
+			every THEME_SHAPES rectangle that authors nothing, and on a transparent FILL that rule
+			is a contour with no box - here, a 1595x936 frame over the whole sheet, lit every time
+			the picker or the ? opened, because both raise this one scrim (SPEC B136, V404, V287).
+
+			It is sized rather than align=client because a second child claiming the
 			client rect is what V190 refuses. Fully transparent: a hit target, not a tint, and the
 			ONE way a click outside closes the box. There is no second closer - the X and the
 			scrim both call popClose (SPEC V333e).
@@ -5811,23 +6328,23 @@
 			V280/V298 collector would sweep it up, and a floating overlay has no neighbour to be 5px
 			from - it is excluded there BY NAME, the way cboRoad is named in V328c (SPEC I73, I76a).
 		-->
-		<rectangle name="popScrim" left="0" top="0" width="1680" height="733" color="#00000000" visible="false" onClick="popClose(self);"/>
+		<rectangle name="popScrim" left="0" top="0" width="1595" height="936" color="#00000000" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
 
-		<layout name="popDesc" left="440" top="150" width="500" height="500" visible="false">
+		<layout name="popDesc" left="440" top="150" width="500" height="490" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<!-- Named dyn* so the language traversal in WoD20.6 leaves it alone: the title is the
 			     canonical EN name Lua writes, and a traversal that snapshots authored text would
 			     restore a stale one over it (SPEC I108a, V31). -->
-			<label name="dynPopDescTitle" left="20" top="20" width="380" height="20" horzTextAlign="center"/>
-			<button name="btnFontDownPop" left="410" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
-			<button name="btnFontUpPop" left="435" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
-			<button name="btnPopClose" left="460" top="20" width="20" height="20" text="X" onClick="popClose(self);"/>
+			<label name="dynPopDescTitle" left="20" top="15" width="380" height="20" horzTextAlign="center"/>
+			<button name="btnFontDownPop" left="410" top="15" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+			<button name="btnFontUpPop" left="435" top="15" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
+			<button name="btnPopClose" left="460" top="15" width="20" height="20" text="X" onClick="popClose(self);"/>
 
 			<!-- wordWrap is what kills the horizontal scrollbar the user asked not to see: there is
 			     no scroll property on this control in SDK3, so the only way to have no horizontal
 			     bar is to give it nothing to scroll (SPEC I102c, V333f). -->
-			<textEditor name="edtPopDesc" left="20" top="45" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePopDesc(self);"/>
+			<textEditor name="edtPopDesc" left="20" top="40" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePopDesc(self);" onKeyDown="escClose(self, event, true);"/>
 		</layout>
 
 		<!--
@@ -5850,19 +6367,19 @@
 		-->
 
 
-		<layout name="mfSearch" left="300" top="80" width="1000" height="645" visible="false">
+		<layout name="mfSearch" left="300" top="80" width="1000" height="635" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label name="dynMfTitle" left="60" top="20" width="400" height="20" horzTextAlign="center"/>
+			<label name="dynMfTitle" left="60" top="15" width="400" height="20" horzTextAlign="center"/>
 			<!-- SPEC I112c, T806 - edtMfDesc is the NINTH pane of I103c, so it carries its own zoom
 			     pair and obeys descFontSize like the other eight. The pair is named off the pane's
 			     own name with edt/ and /Desc stripped, which is the suffix V334b derives. -->
-			<button name="btnFontDownMf" left="890" top="20" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
-			<button name="btnFontUpMf" left="915" top="20" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
-			<button name="btnMfClose" left="960" top="20" width="20" height="20" text="X" onClick="mfClose(self);"/>
+			<button name="btnFontDownMf" left="890" top="15" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+			<button name="btnFontUpMf" left="915" top="15" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
+			<button name="btnMfClose" left="960" top="15" width="20" height="20" text="X" onClick="mfClose(self);"/>
 
-			<edit name="edtMfQuery" left="20" top="50" width="480" height="24" onChange="mfConfirm(self);" onKeyUp="mfKey(self);"/>
-			<label name="lblMfLoading" left="20" top="82" width="480" height="20"/>
+			<edit name="edtMfQuery" left="20" top="45" width="480" height="24" onChange="mfConfirm(self);" onKeyUp="mfKey(self);" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfLoading" left="20" top="77" width="480" height="20"/>
 
 			<!-- SPEC I121/V369, pedido 1 do user 2026-08-30. The way OUT of the row, and it is NOT
 			     one of the paged results. It never enters MF.pool or MF.hits, so it does not spend
@@ -5873,7 +6390,7 @@
 			     VISIBLE: flush against the list it reads as one more option, and emptying a row by
 			     accident is the mistake with no undo (V369c). Text comes from mfShown("") in both
 			     languages, so no new string is born (V369e). -->
-			<button name="btnMfRemove" left="20" top="106" width="480" height="20" visible="false" onClick="mfRemove(self);" onDblClick="mfConfirm(self);"/>
+			<button name="btnMfRemove" left="20" top="101" width="480" height="20" visible="false" onClick="mfRemove(self);" onDblClick="mfConfirm(self);"/>
 			<!-- SPEC I129a/I129b/V379, user 2026-08-31 asks 12 and 13. The SECOND fixed line, and
 			     the reason the typed rows could go: it is the only way to put a name of your own
 			     in a slot now that every family is a picker (SPEC I130).
@@ -5890,34 +6407,34 @@
 			     The label is a string of its OWN and not mfShown("") - remove could borrow the
 			     empty value's label because V15 already gave it one in both languages, and there
 			     is no empty value here to borrow from (SPEC I129c, V369e). -->
-			<button name="btnMfCustom" left="20" top="131" width="480" height="20" onClick="mfCustom(self);" onDblClick="mfConfirm(self);"/>
+			<button name="btnMfCustom" left="20" top="126" width="480" height="20" onClick="mfCustom(self);" onDblClick="mfConfirm(self);"/>
 
-			<button name="dynMfRow_1" left="20" top="156" width="480" height="20" visible="false" onClick="mfSelect(self, 1);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_2" left="20" top="176" width="480" height="20" visible="false" onClick="mfSelect(self, 2);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_3" left="20" top="196" width="480" height="20" visible="false" onClick="mfSelect(self, 3);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_4" left="20" top="216" width="480" height="20" visible="false" onClick="mfSelect(self, 4);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_5" left="20" top="236" width="480" height="20" visible="false" onClick="mfSelect(self, 5);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_6" left="20" top="256" width="480" height="20" visible="false" onClick="mfSelect(self, 6);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_7" left="20" top="276" width="480" height="20" visible="false" onClick="mfSelect(self, 7);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_8" left="20" top="296" width="480" height="20" visible="false" onClick="mfSelect(self, 8);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_9" left="20" top="316" width="480" height="20" visible="false" onClick="mfSelect(self, 9);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_10" left="20" top="336" width="480" height="20" visible="false" onClick="mfSelect(self, 10);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_11" left="20" top="356" width="480" height="20" visible="false" onClick="mfSelect(self, 11);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_12" left="20" top="376" width="480" height="20" visible="false" onClick="mfSelect(self, 12);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_13" left="20" top="396" width="480" height="20" visible="false" onClick="mfSelect(self, 13);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_14" left="20" top="416" width="480" height="20" visible="false" onClick="mfSelect(self, 14);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_15" left="20" top="436" width="480" height="20" visible="false" onClick="mfSelect(self, 15);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_16" left="20" top="456" width="480" height="20" visible="false" onClick="mfSelect(self, 16);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_17" left="20" top="476" width="480" height="20" visible="false" onClick="mfSelect(self, 17);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_18" left="20" top="496" width="480" height="20" visible="false" onClick="mfSelect(self, 18);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_19" left="20" top="516" width="480" height="20" visible="false" onClick="mfSelect(self, 19);" onDblClick="mfConfirm(self);"/>
-			<button name="dynMfRow_20" left="20" top="536" width="480" height="20" visible="false" onClick="mfSelect(self, 20);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_1" left="20" top="151" width="480" height="20" visible="false" onClick="mfSelect(self, 1);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_2" left="20" top="171" width="480" height="20" visible="false" onClick="mfSelect(self, 2);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_3" left="20" top="191" width="480" height="20" visible="false" onClick="mfSelect(self, 3);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_4" left="20" top="211" width="480" height="20" visible="false" onClick="mfSelect(self, 4);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_5" left="20" top="231" width="480" height="20" visible="false" onClick="mfSelect(self, 5);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_6" left="20" top="251" width="480" height="20" visible="false" onClick="mfSelect(self, 6);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_7" left="20" top="271" width="480" height="20" visible="false" onClick="mfSelect(self, 7);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_8" left="20" top="291" width="480" height="20" visible="false" onClick="mfSelect(self, 8);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_9" left="20" top="311" width="480" height="20" visible="false" onClick="mfSelect(self, 9);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_10" left="20" top="331" width="480" height="20" visible="false" onClick="mfSelect(self, 10);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_11" left="20" top="351" width="480" height="20" visible="false" onClick="mfSelect(self, 11);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_12" left="20" top="371" width="480" height="20" visible="false" onClick="mfSelect(self, 12);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_13" left="20" top="391" width="480" height="20" visible="false" onClick="mfSelect(self, 13);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_14" left="20" top="411" width="480" height="20" visible="false" onClick="mfSelect(self, 14);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_15" left="20" top="431" width="480" height="20" visible="false" onClick="mfSelect(self, 15);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_16" left="20" top="451" width="480" height="20" visible="false" onClick="mfSelect(self, 16);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_17" left="20" top="471" width="480" height="20" visible="false" onClick="mfSelect(self, 17);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_18" left="20" top="491" width="480" height="20" visible="false" onClick="mfSelect(self, 18);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_19" left="20" top="511" width="480" height="20" visible="false" onClick="mfSelect(self, 19);" onDblClick="mfConfirm(self);"/>
+			<button name="dynMfRow_20" left="20" top="531" width="480" height="20" visible="false" onClick="mfSelect(self, 20);" onDblClick="mfConfirm(self);"/>
 
-			<button name="btnMfPrev" left="20" top="564" width="80" height="24" text="&lt;" onClick="mfPage(self, -1);"/>
-			<label name="lblMfPage" left="110" top="564" width="300" height="24" horzTextAlign="center"/>
-			<button name="btnMfNext" left="420" top="564" width="80" height="24" text="&gt;" onClick="mfPage(self, 1);"/>
+			<button name="btnMfPrev" left="20" top="559" width="80" height="24" text="&lt;" onClick="mfPage(self, -1);"/>
+			<label name="lblMfPage" left="110" top="559" width="300" height="24" horzTextAlign="center"/>
+			<button name="btnMfNext" left="420" top="559" width="80" height="24" text="&gt;" onClick="mfPage(self, 1);"/>
 
-			<button name="btnMfOk" left="390" top="601" width="110" height="24" text="OK" enabled="false" onClick="mfConfirm(self);"/>
+			<button name="btnMfOk" left="390" top="596" width="110" height="24" text="OK" enabled="false" onClick="mfConfirm(self);"/>
 
 			<!-- SPEC I112a/I112b/I112g, Q29 - the description pane. CHILD of mfSearch and not a
 			     sibling: a sibling would be a second closing point and the text would outlive the
@@ -5935,17 +6452,62 @@
 			     The heading is a <label> like every other visible string, so V10 reaches it and the
 			     .lang carries `Description` / `Descricao` in both languages. Spelling it in the XML
 			     without the [pt] pair is the half-translated sheet V10 refuses. -->
-			<rectangle name="mfDescRule" left="510" top="50" width="1" height="575" color="#00000000" strokeColor="white" hitTest="false"/>
-			<label name="lblMfDescTitle" left="520" top="50" width="460" height="20" text="Description" horzTextAlign="center"/>
+			<rectangle name="mfDescRule" left="510" top="45" width="1" height="575" color="#00000000" strokeColor="white" hitTest="false"/>
+			<label name="lblMfDescTitle" left="520" top="45" width="460" height="20" text="Description" horzTextAlign="center"/>
 			<!-- SPEC I129d, asks 12 and 13. The pane has TWO states and stays ONE pane: with
 			     the Custom line marked these two light up and edtMfDesc drops to top=130; with it
 			     unmarked they go dark and the pane goes back to 76/549. Two panes would be two
 			     owners of the same text (SPEC V135).
 			     Both are born hidden: the box opens on a book entry far more often than on a
 			     custom one, and what is authored is the common case. -->
-			<label name="lblMfCustomName" left="520" top="76" width="460" height="20" text="Name" visible="false"/>
-			<edit name="edtMfCustomName" left="520" top="100" width="460" height="24" visible="false"/>
-			<textEditor name="edtMfDesc" left="520" top="76" width="460" height="549" readOnly="true" wordWrap="true" transparent="true" fontSize="12"/>
+			<label name="lblMfCustomName" left="520" top="71" width="460" height="20" text="Name" visible="false"/>
+			<edit name="edtMfCustomName" left="520" top="95" width="460" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<!-- The Revenant row, and it belongs to clanFamily ALONE (SPEC I143d, V413, user
+			     2026-09-03). Same shape as the Ritual Level row below and for the same reason: a
+			     question the open box asks for ONE list, so the test is on the LIST as well as on
+			     the custom state, and neither control owns a field - the answer rides out through
+			     MF and nothing here survives the box closing (SPEC V269a, V333e, I129i).
+			     It shares the level row's y ON PURPOSE: hedgeRitual and clanFamily are different
+			     lists, so the two can never be lit at once, and a second pair of coordinates for
+			     the same slot would be two owners of one place (SPEC V135).
+			     `values` REPEATS `items` and that is the contract, not laziness: V257c makes the item
+			     rebuildable from the value, so the stored token IS the English text and applyLanguage
+			     rewrites `items` alone - switching language can never touch what the NDB keeps
+			     (SPEC V257b, V257c, V22). `No`/`Yes` already carry PT keys. Authored on `No`: the default is in the FILE and is not
+			     written by Lua on open, or it goes missing the day the open path changes (V413c). -->
+			<label name="lblMfRevenant" left="520" top="125" width="460" height="20" text="Revenant" visible="false"/>
+			<!-- `cmb` and NOT `cbo`: the gate enrols a combo into the PICKER rules (V13, V15, V208,
+			     V211) by that three-letter prefix, and a picker's list has to live in PICKER_LIST.
+			     Two values is an ENUM, and the sheet already spells those cmb - cmbHealthLevels,
+			     cmbSpecCost, cmbBgCost, cmbDominatorGen (MEASURED 2026-09-03, T935). -->			<comboBox name="cmbMfRevenant" left="520" top="147" width="460" height="24" fontSize="12" visible="false" items="{'No','Yes'}" values="{'No','Yes'}" onChange="mfRevenantChange(self);"/>
+			<!-- The weakness itself, and it exists only on `Yes`. HIDDEN and not disabled: a control
+			     that is invisible and still enabled takes Tab focus, which is the bug no screenshot
+			     shows (SPEC V274c, V274d) - the same reason edtClanFamily is authored the way it is.
+			     ⚠ the authored text is SHARED with a FLAW of the same name: `Revenant Weakness` is
+			     also an entry in PICKER_LIST's flaw list, so this label and that flaw read ONE key
+			     in localization.lang and cannot drift apart (SPEC I102g is the same collision one
+			     level down, where the cure had to be a composite key because the two meant
+			     different things - here they mean the same one).
+			     The owner ruled on 2026-09-03: that key goes to `Fraqueza de Revenante`, and its
+			     sibling `Revenant Disciplines` with it. `Revenant` alone was the untranslated
+			     English, and leaving one of the pair behind would print the same word two ways in
+			     one picker list. -->
+			<label name="lblMfWeak" left="520" top="177" width="460" height="20" text="Revenant Weakness" visible="false"/>
+			<edit name="edtMfWeak" left="520" top="199" width="460" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<!-- T892 piece 1, user 2026-09-01: the Ritual Level row, and it belongs to hedgeRitual
+			     ALONE. A homebrew ritual carries no "<n>. " prefix to read a level off, so the level
+			     has to be ASKED for; the other eight lists have no level at all, which is why the
+			     test is on the LIST as well as on the custom state (SPEC V269b, I129i).
+			     Same 25px pitch as the row dots on WoD20.7, so the two read as one widget. They own
+			     NO field: they are a question the open box is asking, not data - the answer rides
+			     out through MF.level and nothing here survives the box closing (SPEC V269a). -->
+			<label name="lblMfLevel" left="520" top="125" width="460" height="20" text="Ritual Level" visible="false"/>
+			<imageCheckBox name="chkMfLvl_1" left="520" top="147" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false" onClick="mfLevelClick(self, 1);"/>
+			<imageCheckBox name="chkMfLvl_2" left="545" top="147" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false" onClick="mfLevelClick(self, 2);"/>
+			<imageCheckBox name="chkMfLvl_3" left="570" top="147" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false" onClick="mfLevelClick(self, 3);"/>
+			<imageCheckBox name="chkMfLvl_4" left="595" top="147" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false" onClick="mfLevelClick(self, 4);"/>
+			<imageCheckBox name="chkMfLvl_5" left="620" top="147" width="25" height="25" autoChange="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false" onClick="mfLevelClick(self, 5);"/>
+			<textEditor name="edtMfDesc" left="520" top="71" width="460" height="549" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onKeyDown="escClose(self, event, true);"/>
 		</layout>
 	</layout>
 
@@ -5964,6 +6526,7 @@
 	<dataLink field="clanFamily">
 		<event name="onChange">
 			renderClanDisc(self);
+			renderClanFamilyButton(self);
 			renderBearing(self);
 		</event>
 	</dataLink>
@@ -5977,7 +6540,7 @@
 		It does not WRITE the field (SPEC I51, V12), so a sheet saved before this round still
 		arrives with road = nil - renderBearing falls back to Humanity for exactly that reason.
 	-->
-	<dataLink field="road" defaultValue="Humanity"/>
+	<dataLink field="road" defaultValue="Path of Humanity"/>
 	<!--
 		The road line, watched from HERE for the same reason clanFamily is: the labels are drawn
 		on WoD20.1, but what moves them lives in three different places - the family on the

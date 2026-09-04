@@ -1,0 +1,40 @@
+# road_aura_overrides.tsv - os 9 blocos que road_aura_parse.ps1 NAO alcanca por CONSTRUCAO (T849,
+# I141b, I142). A MAO, conferido contra o livro. Aplicado DEPOIS do parser, casando por bid:
+# bid que ja existe no raw e SUBSTITUIDO; bid que nao existe e INSERIDO.
+#
+# bid<TAB>nome<TAB>prosa<TAB>motivo
+#
+# ⚠ A PROSA AQUI COPIA O LIVRO BYTE A BYTE, apostrofo CURVO (U+2019) e aspas curvas incluidos -
+#   e o que o raw cospe, e misturar reto com curvo faria 2 grafias na mesma lista. Isso implica
+#   que este arquivo NAO pode ser lido por literal de .ps1 (I142h: `'` fecha string no 5.1) -
+#   leia por ReadAllBytes/UTF8, que e o que road_sins_parse.ps1 ja faz.
+#
+# Nao e preguica de regua, e limite de forma, e os motivos sao 4 e nao 1:
+#
+#   1. SIDEBAR ENCAIXADO NO MEIO DA FRASE. O pdftotext le por ordem de content stream e a caixa
+#      lateral entra entre o sujeito e o predicado: "rolls to excite extreme <TODO O SIDEBAR> and
+#      transformative emotional responses". Regua de forma NAO acha, porque o sidebar e prosa
+#      valida e nao tem rotulo. lotc:70:1 e dac:70:1.
+#   2. TABELA DE PECADOS ENTRE A FRASE E O RESTO DELA. A prosa vira a pagina e o que vem primeiro
+#      na pagina seguinte e a HIERARCHY OF SINS inteira; a cauda da frase vem DEPOIS da tabela.
+#      da:129:1 e da:122:1. Foi lido no cache -layout, que e onde as 2 colunas ficam separadas.
+#   3. O LIVRO NAO ROTULA. Nao existe linha `Aura:` nem `Bearing:` - a aura mora dentro de
+#      "Playing the Road:" (da:442:1, da:449:1) ou na barra lateral geral de Bearing (core:310:1).
+#      Sao 3 das 5 que o user batizou em 2026-08-28 (rodape do road_bearing.tsv): o NOME e
+#      decisao dele, a PROSA e do livro.
+#   4. UM ROTULO, DUAS ESTRADAS. O `Aura:` do dac p.84 cobre Angra Mainyu E Ahura Mazda numa
+#      frase cada: o parser devolve o par colado como dac:84:1. O 1o e substituido e o 2o e
+#      inserido como dac:84:2.
+#
+# ⚠ da:129:1 tinha 1690 caracteres no raw com a tabela de pecados dentro, e da:122:1 tinha 980
+#   pelo mesmo motivo. Contar caractere e o jeito barato de achar bloco poluido: os limpos ficam
+#   entre 90 e 390.
+lotc:70:1	Rapture	Ecstatics know how to use earthly sensations and passions to transcend the mundane. Their bearing modifier affects rolls to excite extreme and transformative emotional responses in themselves and others.	sidebar "Alternative Children of Damballah" (446 ch) entra entre "extreme" e "and transformative"
+dac:70:1	Melancholia	A Childe of the Archangel applies modifiers whenever her great loss and longing would engender a reaction, or when being seen as a martyr is relevant.	sidebar "Constantine Reverie" + SINS AGAINST THE ARCHANGEL + TOREADOR APOCRYPHA colam 3.5 KB no fim
+da:129:1	Carved and bleeding	A Bahari’s aura manifests as any other vampire’s might, though chunks and swirls may appear carved out of the whole. If one concentrates, they might think they see symbols in these shifting carvings, but can catch none of them. Further, the aura seems to bleed or drip, making the “carvings” appear more like wounds. Acts of creation and mentorship receive the character’s aura modifier.	a frase quebra em "swirls may" no fim da p.129 e a cauda so aparece na p.130 DEPOIS da HIERARCHY OF SINS AGAINST WHO YOU ARE inteira
+da:122:1		The Cainite walking the Road of Humanity strives to emulate her past state wherever possible. In matters of empathy and mutual understanding with mortals, her Aura will influence the outcome.	sem nome no livro (user: Normalcy); a HIERARCHY OF SINS AGAINST THE SOUL cola logo depois
+core:310:1		Vampires on Humanity have a bearing of normalcy; the humane connection that such vampires hold keeps them from seeming strange and terrifying to mortals. The bearing modifier affects Social rolls for appearing normal and winning sympathy.	o core nao da bloco por trilha para Humanity - a aura dela esta na barra lateral GERAL de Bearing, misturada com a escada de modificador. Nome Normalcy: o livro escreve "a bearing of normalcy" em minuscula, e e a unica das 5 do user com apoio de livro
+da:442:1		Their Aura affects any attempt to chase the darkness, and to pursue forbidden truths.	sem rotulo: a frase esta dentro de "Playing the Road:". Nome Darkness = user 2026-08-28
+da:449:1		Their Aura benefits attempts to proselytize for their god.	sem rotulo: dentro de "Playing the Road:" dos Setites. ⚠ a MESMA p.449 tem outro "Their Aura" logo abaixo, o do Path of Apep ("affects any attempts to pursue instant, sinful gratification"), e Apep NAO esta no picker - casar por pagina sem ler pega o errado (I142b). Nome Devotion = user 2026-08-28
+dac:84:1	Corruption	Vampires on the Road of Angra Mainyu carry an aura of corruption. Their voices are honeyed and they gain a +2 dice bonus to persuade people to evil.	o unico dos 55 cujo NOME saiu de prosa e nao de linha "Aura: <Nome>." (rodape do road_bearing.tsv)
+dac:84:2	Holiness	Vampires on the Road of Ahura Mazda gain an aura of goodness. They can spend two Willpower during frenzy to name something they absolutely won’t do, i.e. “I won’t harm that child.” (“I won’t harm any children” is too broad, and the child of the first example is still fair game in a later frenzy.)	2a metade do MESMO rotulo do dac p.84. Nome Holiness = user 2026-08-28

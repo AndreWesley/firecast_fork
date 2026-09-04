@@ -1,0 +1,51 @@
+# road_aura_pt.tsv - a metade PT do bloco 3 de I141b (T931, V210). TRADUCAO A MAO, como
+# bg_body_pt.tsv de T765 e road_sins_pt.tsv ao lado.
+#
+# bid<TAB>prosa_pt
+#
+# O NOME da aura NAO esta aqui: ele sai de BEARING (WoD20th.lfm) passado pelo mapa PT do
+# WoD20.6.lfm, que e o MESMO string que a linha de ROAD da aba Main mostra. Duas grafias para
+# a mesma aura a dois dedos de distancia e exatamente o que I141b proibe, e o que V409(c) mede.
+#
+# ⚠ O cabecalho e ASCII e o DADO NAO E: a prosa leva acento de verdade.
+# ⚠ "bearing modifier" e "aura modifier" sao o MESMO conceito com 2 nomes no livro (o rotulo muda
+#   por livro, I141b) - em pt os dois viram "modificador de aura", que e o termo que a ficha usa
+#   na linha de ROAD. Manter as 2 grafias so propagaria a inconsistencia do livro para dentro da
+#   ficha, onde ela nao existe.
+bh:115:1	Os seguidores adotam um comportamento alienígena. A maioria usa Vicissitude constantemente. Mesmo quando tentam se misturar, todos exceto os mais espertos cometem erros incomuns, marcando-se como seres pouco familiarizados com o mundo humano. Ignoram convenções sociais e encaram direções estranhas. O modificador de aura de um Asakku se aplica a testes de Prontidão e Ocultismo para sentir energias sobrenaturais.
+bh:53:1	Os Abelenos carregam uma atmosfera de retribuição divina. O modificador de aura deles afeta testes para convencer os outros da retidão de seus atos.
+bh:55:1	Os Implacáveis não se deixam abalar facilmente por apelos à emoção. O modificador de aura deles afeta testes que pretendam influenciá-los por Atributos Sociais.
+bh:58:1	Quem está perto de um Internalista se acalma com sua presença pacífica. O modificador de aura deles afeta testes para evitar confronto ou acalmar os outros.
+core:310:1	Vampiros em Humanidade têm uma aura de normalidade; a conexão humana que esses vampiros mantêm impede que pareçam estranhos e aterrorizantes aos mortais. O modificador de aura afeta testes Sociais para parecer normal e conquistar simpatia.
+core:316:1	Os seguidores da Trilha do Sangue conhecem a seriedade de sua tarefa e são incrivelmente dedicados a ela. O modificador de aura deles afeta testes de Força de Vontade.
+core:318:1	Os Coveiros, acostumados como são a longas horas de estudo silencioso e contemplação do túmulo, irradiam a quietude da morte. O modificador de aura se aplica a testes que envolvam Furtividade e tentativas de passar despercebido.
+core:320:1	A retidão do Cainita é evidente a todos. O modificador de aura afeta todos os testes que dependam da imagem do vampiro como Membro devoto e estudioso dos ensinamentos de Caim.
+core:323:1	Os Cátaros são a tentação encarnada, e têm um dom estranho para conhecer os desejos alheios. O modificador de aura afeta testes para tentar e seduzir os outros.
+core:324:1	Quem está diante de uma Besta sabe que ela é uma verdadeira caçadora, do mesmo modo que o cervo sabe ao encarar o lobo. O modificador de aura se aplica a testes voltados a aterrorizar ou intimidar um oponente.
+core:326:1	Os Cavaleiros mantêm sua palavra e são muito difíceis de desviar de seu dever. O modificador de aura afeta testes para resistir a tentativas de manipulá-los ou forçá-los a agir contra o propósito que assumiram.
+core:329:1	Os Bahari veem a iluminação pela dor e pelo conflito, e aprendem a transformar a dor em vantagem. O modificador de aura afeta testes atingidos por suas próprias penalidades de ferimento.
+core:331:1	Os Metamorfistas trabalham sem descanso para se tornar algo que não seja humano. Modificadores de aura se aplicam a Intimidação, bem como a qualquer teste de Manipulação que possa ser favorecido por assustar o alvo.
+core:332:1	Os Niilistas exalam um leve ar de escuridão interior, levando quem está por perto a remoer seus medos e pensamentos mais sombrios. O modificador de aura deles se aplica a qualquer tentativa de trazer à tona a escuridão interior de uma vítima, como arrancar segredos sujos de um político respeitado ou convencer uma santa a romper seu voto de castidade.
+core:335:1	Os Shilmulo acreditam estar exatamente no lugar e no tempo em que deveriam estar, fazendo o que deveriam fazer — e isso transparece. O modificador de aura se aplica a tentativas de manipular ou liderar os outros.
+core:336:1	Os Unificadores estão destinados ao poder, e sabem disso. Quem está por perto sente sua presença imperiosa. O modificador de aura deles afeta testes para comandar ou liderar os outros.
+core:338:1	Os Teofidianos fazem tudo de olho em como podem servir melhor a Set. O modificador de aura ajuda em tentativas de ganhar convertidos e em testes para resistir a poderes baseados em outras fés (como a Fé Verdadeira — veja p. 372).
+da:117:1	A Besta é bem-vinda na pele do Apóstata, e isso aparece não só na penetração de seu olhar, mas no reflexo trêmulo de sua alma. A Besta é, de muitas maneiras, o espírito dela, e a perigosa sede de sobreviver a qualquer custo pinta sombras selvagens e sangue por toda a sua aura.
+da:120:1	Os Fiéis recebem bônus sempre que estiverem em situações nas quais ser visto como sagrado lhes dê vantagem social.
+da:122:1	O Cainita que trilha o Caminho da Humanidade se esforça para emular seu estado passado sempre que possível. Em questões de empatia e entendimento mútuo com mortais, sua Aura influenciará o resultado.
+da:126:1	Os Luminares são senhores de si e confiantes em seu direito de governar. Os outros sentem sua presença imperiosa como uma corrente posta em volta do pescoço.
+da:129:1	A aura de um Bahari se manifesta como a de qualquer outro vampiro, embora possam surgir pedaços e espirais como que talhados no conjunto. Se alguém se concentra, pode julgar ver símbolos nesses entalhes movediços, mas não consegue apreender nenhum deles. Além disso, a aura parece sangrar ou gotejar, fazendo os "entalhes" parecerem mais feridas. Atos de criação e de ensino recebem o modificador de aura do personagem.
+da:133:1	Os Buscadores são decididamente alienígenas, tendo trabalhado tanto para lançar fora a própria humanidade. Os modificadores se aplicam sempre que o medo, a ansiedade ou o desconforto de outra pessoa possam afetar um teste.
+da:135:1	Os Pecadores são livres e seu Caminho é cheio de promessas, e eles são hábeis em reconhecer os desejos alheios. O modificador de aura deles afeta testes para persuadir e atrair.
+da:140:1	A quietude do túmulo e o silêncio do estudo cercam os seguidores deste Caminho. O modificador de aura deles se aplica a todos os testes de Furtividade.
+da:141:1	Quem está acima de você confia que você cumprirá seu dever com obediência. Quem está abaixo confia que você os tratará com justiça. Os inimigos confiam que você os respeitará fazendo tudo ao seu alcance para derrotá-los. O modificador de aura afeta testes de Liderança aplicados contra subordinados e testes de Intimidação contra inimigos.
+da:432:1	Um seguidor do Caminho do Sangue leva sua tarefa a sério e é dedicado a levá-la até o fim. O modificador de aura afeta testes de Força de Vontade.
+da:442:1	A Aura deles afeta qualquer tentativa de perseguir a escuridão e de buscar verdades proibidas.
+da:445:1	Os Asura têm certeza de estar sempre onde deveriam estar, fazendo o que deveriam fazer. A confiança deles se derrama sobre os outros, inspirando-os a grandes feitos.
+da:448:1	A Aura dos escolhidos de Samiel ajuda em qualquer tentativa de se colocar em perigo por outra pessoa.
+da:449:1	A Aura deles favorece tentativas de fazer proselitismo em nome de seu deus.
+dac:70:1	Um Filho do Arcanjo aplica modificadores sempre que sua grande perda e seu anseio provoquem uma reação, ou quando ser visto como mártir for relevante.
+dac:84:1	Vampiros do Caminho de Angra Mainyu carregam uma aura de corrupção. Suas vozes são melífluas e eles ganham um bônus de +2 dados para persuadir as pessoas ao mal.
+dac:84:2	Vampiros do Caminho de Ahura Mazda ganham uma aura de bondade. Eles podem gastar dois pontos de Força de Vontade durante o frenesi para nomear algo que absolutamente não farão, por exemplo: "Não farei mal àquela criança." ("Não farei mal a criança alguma" é amplo demais, e a criança do primeiro exemplo continua sendo presa legítima num frenesi posterior.)
+lotc:51:1	Os Filósofos trazem à morte-viva um pragmatismo que lhes permite manter a equanimidade diante das provocações infantis e das farpas cruéis de Membros menos iluminados. O modificador de aura soma em todos os testes para resistir ao frenesi quando provocado por insultos ou por outras ações deliberadamente provocativas. Ele não afeta testes de frenesi disparados por outras formas de estímulo indutor de fúria.
+lotc:70:1	Os Extáticos sabem usar sensações e paixões terrenas para transcender o mundano. O modificador de aura deles afeta testes para excitar respostas emocionais extremas e transformadoras em si mesmos e nos outros.
+lotc:72:1	Os Iracundos ardem em fúria divina. O modificador de aura deles se aplica a intimidar os outros (testes de Intimidação) e até as próprias Bestas (testes para resistir tanto ao frenesi quanto ao Rötschreck).

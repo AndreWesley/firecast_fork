@@ -1156,5 +1156,892 @@ Milagres são impossíveis de definir mecanicamente, pois devem ser especificame
 • Ajudar alguém preso sob um prédio desabado
 
 • Encontrar-se ao lado de um amigo em necessidade desesperada]==] },
+				-- The fifty-two SAMPLE RITUALS of the hedge Paths, "HEDGE MAGIC RITUALS" on the
+				-- Numina tab (SPEC T928, I140i, I140l). They are keyed by the picker value, level
+				-- prefix and all, because that is what the sheet saves and what mfOpen hands to
+				-- descText - the box already passes the 'Numina' kind, so no code names them.
+				-- The book prints these as prose with no System block, which is why every one of
+				-- them is on the named V335c list (SPEC I104c).
+				["1. Death Curse"] = { pt = [==[M20 Sorcerer, pág. 31
+
+
+1. Death Curse
+
+
+Um dos rituais mais extremos que um mago pode realizar, a Death Curse sempre resulta na morte dele e, normalmente, na destruição de seus inimigos. O mago gasta toda a sua Força-de-Vontade permanente, ganhando uma reserva de sucessos igual a esse valor para a magia final. Este ritual permite que ele eleve o nível dos Aspectos a 2 acima do seu nível de Caminho, permitindo que magos relativamente poderosos se sacrifiquem por maldições lendárias (ou, mais raramente, bênçãos). Maldições que ressoam por gerações, com destinos piores que a morte para cidades inteiras, não são inéditas entre os magos mais poderosos que se dispõem a fazer o sacrifício. Ele faz o teste de Caminho com a dificuldade determinada pelos Aspectos, como de costume, mas com essa reserva adicional de sucessos automáticos. Ao concluir o ritual, o mago desaba, tendo gasto a própria vida na conjuração; muitas vezes já está morto antes mesmo de atingir o chão.]==] },
+				["1. Deathsight"] = { pt = [==[M20 Sorcerer, pág. 40
+
+
+1. Deathsight
+
+
+Normalmente, um necromante só consegue ver os fantasmas ao seu redor. Ele não vê o ambiente que os fantasmas chamam de lar. Este ritual muda isso. Com ele, o mago não apenas vê os Mortos Inquietos, como consegue de fato enxergar dentro das Terras das Sombras. O efeito dura um minuto por sucesso no ritual. Enquanto está sob a influência deste ritual, o necromante não consegue perceber o mundo normal; apenas as Terras das Sombras são visíveis para ele.]==] },
+				["1. Eldritch Mark"] = { pt = [==[M20 Sorcerer, pág. 29
+
+
+1. Eldritch Mark
+
+
+Ao inscrever um símbolo ou marca em um objeto ou na testa de uma pessoa, o mago a marca como sua. A marca é invisível a olho nu, mas evidente para qualquer um com percepções magicamente ampliadas de qualquer tipo. A marca informa a quem a observa o nome do mago que a criou. Este ritual leva cinco minutos para ser conjurado e não custa Força-de-Vontade. A marca dura até a próxima lua nova.]==] },
+				["1. Face Theft"] = { pt = [==[M20 Sorcerer, pág. 47
+
+
+1. Face Theft
+
+
+O ritual central da espionagem baseada no Caminho da Metamorfose, Face Theft permite que o mago assuma a forma exata de outro ser humano. Ele precisa ter alguma parte da pessoa, como fios de cabelo ou aparas de unha. O ritual exige um sucesso para uma pessoa de aparência amplamente semelhante à do conjurador, e um sucesso adicional para cada diferença de etnia, sexo ou mais de 20 anos de idade.]==] },
+				["1. Healing Slumber"] = { pt = [==[M20 Sorcerer, pág. 33
+
+
+1. Healing Slumber
+
+
+O curandeiro trata um paciente voluntário (ou inconsciente) e o envia a um sono profundo e revigorante. Com sucesso, o paciente permanece adormecido por 9 horas; ao despertar, todo o dano contundente está curado e ele recupera um ponto de Força-de-Vontade. Para cada sucesso acima do primeiro, subtraia uma hora do tempo de sono exigido. O curandeiro não pode tratar ferimentos letais ou agravados desta forma.]==] },
+				["1. Lifting Shadows"] = { pt = [==[M20 Sorcerer, pág. 46
+
+
+1. Lifting Shadows
+
+
+Sombras e penumbras escondem segredos para quem deseja escondê-los, mas o feiticeiro instruído pode revelar esses segredos a quem confia. Untando tinta em um par de lentes de contato ou canalizando fumaça para dentro de óculos de natação justos, o feiticeiro leva a visão do beneficiado ao reino das sombras. Pelas oito horas seguintes, a noite pode ser tão clara quanto o dia. Uma vez abençoados, o feiticeiro ou seu aliado podem tratar toda escuridão como luz do dia ao fazer testes de Prontidão baseados na visão.]==] },
+				["1. Sprint"] = { pt = [==[M20 Sorcerer, pág. 22
+
+
+1. Sprint
+
+
+Às vezes, um mago precisa percorrer uma distância curta rapidamente. Embora os preparativos variem, principalmente conforme a Prática e a Habilidade, este ritual sempre termina com o amarrar de um par de tênis azuis. Uma vez calçados, o mago pode correr mais rápido que qualquer humano mundano, desde que ninguém o veja fazê-lo. Cada sucesso no ritual dobra a velocidade de corrida e concede um minuto de corrida. Ao final, o ritual deixa o mago exausto, e ele precisa descansar por cinco minutos.]==] },
+				["1. Symbol Interpretation"] = { pt = [==[M20 Sorcerer, pág. 43
+
+
+1. Symbol Interpretation
+
+
+Na pressa de controlar os sonhos alheios, muitos oniromantes esquecem até o significado do nome de seu Caminho. Embora nenhum esqueça que oneiros significa sonho, eles acham que “mancia” se refere simplesmente a magia, em vez de derivar de manteia, ou adivinhação. Um movimento crescente entre os oniromantes de várias Confrarias — encabeçado pelo Prof. Jeremiah Marquette, especializado em usar sonhos para acessar memórias bloqueadas ou esquecidas — vem resgatando informações perdidas ao reunir aspectos do Caminho esquecidos por muitos praticantes. Ele popularizou um novo ritual que permite ao oniromante encontrar a resposta de qualquer pergunta de sim ou não cuja resposta o sonhador já tenha conhecido, lendo os símbolos de seus sonhos. O mago precisa ter em sua posse algo pertencente ao alvo. Em seguida, precisa obter sucesso em um teste de Caminho e passar a noite observando os sonhos do alvo com uma pergunta específica de sim ou não em mente. Ao final, deve fazer um teste de Inteligência + Enigmas ou Inteligência + Esotérica (Interpretação de Sonhos). Se tiver sucesso, encontra a resposta à sua pergunta nos sonhos do alvo.]==] },
+				["2. Bedtime Story"] = { pt = [==[M20 Sorcerer, pág. 43
+
+
+2. Bedtime Story
+
+
+O momento mais perigoso para um oniromante é aquele primeiro passo dentro de um sonho. A narrativa do sonho está em vigor, e ele é adaptado à força a ela, às vezes se perdendo nela. Oniromantes empreendedores desenvolveram um ritual para tomar o controle do sonho enquanto ele se forma, mitigando o risco de perdê-lo. Este ritual precisa ser concluído no momento em que o sujeito adormece e exige que o oniromante esteja no mesmo aposento que ele. Em compensação, um único sucesso permite que o oniromante dirija o sonho em formação, guiando amplamente sua narrativa e seus temas.]==] },
+				["2. Cruel Whispers"] = { pt = [==[M20 Sorcerer, pág. 36
+
+
+2. Cruel Whispers
+
+
+Ilusionistas precisam ser, com frequência, mestres da guerra psicológica. Eles não conseguem criar nada verdadeiramente real, então jogam com os medos e as ansiedades de seus alvos para controlá-los. Um dos rituais centrais para isso é Cruel Whispers. Uma ilusão puramente auditiva, Cruel Whispers segue seu alvo por vinte e quatro horas. Embora o mago talvez nunca saiba o que os sussurros dizem, a vítima ouve vozes, quase inaudíveis, apontando cada defeito, cada insegurança e cada passo em falso que ela dá ao longo do dia. Isso a distrai, dando +1 de dificuldade a todos os seus testes durante o dia, e sempre que ela obtiver um desastre precisa fazer um teste de Força-de-Vontade (dificuldade 6) ou sofrer os efeitos do Defeito Depressão Crônica (BoS p. 51) por uma semana.]==] },
+				["2. Enhance Craftsmanship"] = { pt = [==[M20 Sorcerer, pág. 29
+
+
+2. Enhance Craftsmanship
+
+
+Às vezes, em vez de um item mágico, o que um mago precisa é de um objeto comum, mas perfeitamente confeccionado. Este ritual cria lâminas inquebráveis, suéteres que não desfiam e objetos semelhantes cujo único aprimoramento está na qualidade extrema de sua confecção. Esses objetos não podem, contudo, receber encantamentos adicionais. Itens aprimorados não são mágicos, mas um Encantador ou Alquimista pode fazer um teste de Percepção + Ocultismo (dificuldade 6) para reconhecer que foram criados desta maneira. Este ritual precisa ser conjurado durante a criação do objeto, ou leva de 15 a 20 minutos depois do fato, e não custa Força-de-Vontade.]==] },
+				["2. Fire's Weal"] = { pt = [==[M20 Sorcerer, pág. 34
+
+
+2. Fire's Weal
+
+
+O fogo é um dos perigos mais graves do Mundo das Trevas; mesmo chamas naturais podem facilmente causar dano permanente a seres sobrenaturais poderosos. Com este ritual, o mago pode conceder proteção contra fogo de todo tipo. Com dois sucessos, o ritual permite que o alvo absorva dano de fogo, mesmo de chamas sobrenaturais, como se fosse contundente, independentemente do dano que ele cause. Sucessos além de dois reduzem a dificuldade dos testes de absorção contra fogo (até um modificador máximo de –3), de modo que quatro sucessos no total resultam em absorver dano de fogo com –2 de dificuldade.]==] },
+				["2. Hellblade"] = { pt = [==[M20 Sorcerer, pág. 34
+
+
+2. Hellblade
+
+
+Um ritual espalhafatoso, Hellblade sintoniza uma arma, tradicionalmente uma espada, ao Caminho do Fogo do Inferno. Uma vez sintonizada, o mago pode gastar um ponto de Força-de-Vontade para envolver a arma em chamas. As chamas fazem a arma infligir dois dados adicionais de dano e convertem seu dano em agravado. Isso dura uma cena, embora o ritual termine se a arma deixar a mão do conjurador. Este ritual exige um mínimo de dois sucessos.]==] },
+				["2. Jolt"] = { pt = [==[M20 Sorcerer, pág. 33
+
+
+2. Jolt
+
+
+O feiticeiro gasta um ponto de Força-de-Vontade e desperta magicamente uma pessoa que esteja dormindo, inconsciente ou em coma. Isso normalmente exige um sucesso, mas exige o Índice de Toxina em sucessos para despertar alguém drogado, e quatro sucessos para despertar quem está em coma.
+
+Reverter um efeito mágico exige sucessos iguais aos do efeito original +1. Este poder não cura a doença, o ferimento ou o envenenamento subjacente, e o paciente cai inconsciente de novo ao final da cena se o curandeiro não resolver a causa. Isso pode ser usado para ajudar a identificar o paciente e reunir informações sobre quem ou o que o deixou naquele estado.]==] },
+				["2. Object Permanence"] = { pt = [==[M20 Sorcerer, pág. 21
+
+
+2. Object Permanence
+
+
+Magos estáticos naturalmente têm mais facilidade em invocar alvos com os quais têm uma ligação forte, como um animal de estimação querido ou a faca ritual que o mentor lhes deu. Com Object Permanence, o mago estático força uma conexão sobrenatural com objetos para invocá-los no futuro. Isso trata o alvo como “bem conhecido do feiticeiro”, mesmo que o feiticeiro o tenha achado numa lixeira uma hora atrás. O feiticeiro medita a até 10 pés do alvo e gasta um ponto de Força-de-Vontade. Cada sucesso representa um dia em que o alvo mantém a conexão sobrenatural com o feiticeiro. Um mago estático pode manter, ao mesmo tempo, no máximo tantos alvos vinculados desta forma quantos forem seus pontos em Conjuration.]==] },
+				["2. Quintessence Infusion"] = { pt = [==[M20 Sorcerer, pág. 45
+
+
+2. Quintessence Infusion
+
+
+A capacidade de armazenar e redirecionar Quintessência é útil quase diariamente para o feiticeiro que vive em movimento. Pensando à frente, o feiticeiro se prepara para situações em que pode começar a ficar sem Quintessência disponível infundindo bebidas ou lanches com as próprias reservas para uso posterior. Classicamente, isso era uma poção de grande poder. Nas noites modernas, o feiticeiro esperto pode achar que o espresso enlatado ou a barra de proteína são igualmente práticos, servindo como o consumível discreto perfeito. A única desvantagem desta tarefa é o combustível e o recurso do ritual. Para cada ponto de Quintessência armazenado, outro ponto de Quintessência precisa ser canalizado para infundir o receptáculo.]==] },
+				["2. Rest in Peace"] = { pt = [==[M20 Sorcerer, pág. 38
+
+
+2. Rest in Peace
+
+
+Ao invocar uma tempestade vinda do submundo, o mago pode colocar os fantasmas próximos em estado de Slumber (Sono). O Slumber é semelhante, em muitos aspectos, ao sono dos vivos. É restaurador para a forma efêmera do fantasma e repousante para sua mente e sua personalidade. Durante o Slumber, o fantasma perde a consciência do que o cerca e passa a ter sonhos vívidos. Normalmente esses sonhos são vibrantes e coloridos, centrados nas Paixões do fantasma, mas com uma escuridão sobreposta a eles por causa da Sombra. O Slumber criado por este ritual traz sonhos melhores e mais tranquilos. A influência da Sombra sobre eles é reduzida a nada, e até Espectros se veem tendo sonhos positivos pela primeira vez desde que sucumbiram às suas Sombras. Um único sucesso sempre coloca um alvo voluntário em Slumber, mas alvos involuntários (como a maioria dos Espectros) testam Força-de-Vontade (dificuldade 6) e precisam obter mais sucessos que o ritual para permanecerem acordados.]==] },
+				["2. Step on a Crack"] = { pt = [==[M20 Sorcerer, pág. 31
+
+
+2. Step on a Crack
+
+
+Uma cantiga comum entre crianças diz: “Se você pisar numa rachadura, quebra as costas da sua mãe”. É apenas a versão infantil de uma crença antiga de que tocar rachaduras traz infortúnio. Essa crença se torna manifesta neste ritual. Ao contrário da maioria das maldições, o mago precisa informar o alvo da maldição para que ela tenha efeito, e a maldição não ocorre automaticamente. Em vez disso, a vítima pode tentar escapar dela não tocando em rachaduras. Isso, é claro, acaba se provando impossível, disparando uma maldição que traz algum dano não fatal, mas potencialmente permanente, à vítima ou a seus entes queridos. Se ela conseguir desfazer (ver p. 15) essa maldição antes de pisar numa rachadura, faz isso com –2 de dificuldade. Porém, uma vez disparada a maldição, qualquer tentativa de livrar a vítima dela é feita com +2 de dificuldade, já que as ações dela foram a causa direta de seu infortúnio, por mais injusto que isso seja.]==] },
+				["2. Teleport Ward"] = { pt = [==[M20 Sorcerer, pág. 22
+
+
+2. Teleport Ward
+
+
+Magos estáticos que estudam o Caminho do Transporte rapidamente aprendem a se defender dele. Ao demarcar um cômodo ou edifício de maneira apropriada — um círculo de giz, sigilos nas paredes ou projetores de campo antiteletransporte, etc. — eles podem dificultar que outros magos estáticos usem o Caminho para entrar na área. Depois que o ritual é fixado, cada sucesso precisa ser superado por um conjurador que tente entrar na área delimitada. Essa proteção se degrada a uma taxa de um sucesso por mês, mas um único sucesso em outro teste de ritual a restaura.]==] },
+				["3. Always Armed"] = { pt = [==[M20 Sorcerer, pág. 21
+
+
+3. Always Armed
+
+
+O feiticeiro não precisa parecer armado para ter uma arma à mão. Pela natureza deste ritual, ele quase sempre é deixado pendurado antes de o feiticeiro entrar numa situação potencialmente perigosa. Se precisar acessar a arma, o feiticeiro completa o ritual enfiando a mão no sobretudo ou em uma sombra conveniente para invocá-la. Tradicionalmente, feiticeiros usavam este ritual para conjurar espadas, mas nos tempos modernos é mais comum que invoquem uma espingarda ou um rifle. A arma invocada não pode ser maior que uma espingarda ou uma espada longa.]==] },
+				["3. Bashert"] = { pt = [==[M20 Sorcerer, pág. 32
+
+
+3. Bashert
+
+
+Embora este ritual existisse na Antiguidade de uma forma ou de outra, foi popularizado em sua forma atual por Anne Richard e Judith Marquette. O destino pode ser volúvel, mas alguns pares são quase impossíveis de manter separados. Com um único sucesso, o alvo deste ritual está praticamente garantido a encontrar um par perfeito, alguém com potencial para ser seu Amor Verdadeiro (conforme a Qualidade em Book of Secrets p. 59), dentro de um ano. Cada sucesso adicional divide o tempo: dois sucessos os aproximam em seis meses, três reduzem a espera para quatro meses, e assim por diante.]==] },
+				["3. Belle/Beau/Bright of the Ball"] = { pt = [==[M20 Sorcerer, pág. 30
+
+
+3. Belle/Beau/Bright of the Ball
+
+
+Sabendo de um evento social próximo e com o preparo adequado, um feiticeiro pode se tornar a grande sensação. Com um convite em mãos, destinado a ele ou não, o mago infunde sua presença no encontro que se aproxima. Durante toda a festa especificada, ele recebe tratamento VIP de todos os presentes e de toda a equipe contratada. Os organizadores dão sua bênção e oferecem um caloroso “tenha uma ótima noite” sem questionar a lista de convidados.]==] },
+				["3. Calm Above, Hell Below"] = { pt = [==[M20 Sorcerer, pág. 39
+
+
+3. Calm Above, Hell Below
+
+
+As magias do Caminho dos Maelstroms geralmente trazem a energia da Tempestade do Submundo para o mundo físico. Isso cria as tormentas acima e acalma o que está abaixo. Este ritual inverte isso. Só pode ser realizado durante uma tempestade e, ao ser concluído, qualquer tempestade normal na área se dissipa. Eventos climáticos extremos são em grande parte inalterados e podem ser usados para realizar este ritual várias vezes, chegando a reduzir a dificuldade em um. Ainda assim, raramente é boa ideia ficar do lado de fora num furacão por várias horas. A energia da tempestade enfurece os fantasmas da área. Com um único sucesso, eles precisam fazer testes de Força-de-Vontade (dificuldade 6), ou começam a atacar uns aos outros e até os vivos, se tiverem poder para tanto. Se o conjurador obtiver cinco ou mais sucessos, isso cria adicionalmente um Maelstrom, fazendo com que a maioria dos fantasmas tente fugir da área, antes de serem atacados pelos espectros que tais perturbações inevitavelmente atraem.]==] },
+				["3. Get Me the Heck Outta Here!"] = { pt = [==[M20 Sorcerer, pág. 22
+
+
+3. Get Me the Heck Outta Here!
+
+
+Uma das ferramentas mais úteis que um mago pode ter no bolso é uma rota de fuga para quando as coisas dão errado. Este ritual traz o mago instantaneamente de volta a um local de origem preparado de antemão, dentro de um raio de 50 milhas dele. Exige ao menos quatro sucessos para ser conjurado, embora sucessos adicionais acrescentem 20 milhas cada ao alcance do ritual. Um teste adicional ao conjurar o ritual permite que o mago retorne a um local secundário, caso sua origem dedicada esteja longe demais. Este ritual é quase sempre conjurado como um ritual pendurado.]==] },
+				["3. Grip of Shades"] = { pt = [==[M20 Sorcerer, pág. 47
+
+
+3. Grip of Shades
+
+
+Dentro de cada fenda esconde-se uma pequena sombra. Dentro de cada sombra esconde-se um aliado do feiticeiro do Caminho das Sombras. É o acesso a esses aliados que dá ao feiticeiro uma vantagem que poucos conseguiriam antecipar. Ao endurecer a substância sombria contida nas sombras sobre seu corpo, o feiticeiro garante a si mesmo uma medida de proteção contra impactos e vantagem no combate corpo a corpo. Por 24 horas após banhar-se em óleos infundidos com carvão, o feiticeiro tem armadura de índice 2 ao absorver dano contundente ou letal e soma dois a todas as reservas de dados de Briga e Artes Marciais que envolvam agarrões.]==] },
+				["3. Hard-Light Constructs"] = { pt = [==[M20 Sorcerer, pág. 37
+
+
+3. Hard-Light Constructs
+
+
+Um ritual popular entre os tecnofeiticeiros, os Hard-Light Constructs são ilusões que todos os envolvidos sabem serem falsas. Isso cria cenários, mobília, etc., que parecem e são sentidos como reais, embora colocar seu peso sobre eles não seja a melhor das ideias. É frequentemente usado para simular imagens em que nem todo detalhe é necessário, mas que tenham partes móveis. Cria a ilusão para todos os observadores, em vez de para um conjunto fixo de alvos. Ao menos um Cidadão Extraordinário já foi repreendido por usar Hard-Light Constructs para conduzir sua mesa de World of Shadows.]==] },
+				["3. Invade Demesne"] = { pt = [==[M20 Sorcerer, pág. 43
+
+
+3. Invade Demesne
+
+
+Normalmente, o espaço criado pelo Antecedente Demesne é inviolável. Apenas magos poderosos, capazes de encontrá-lo por viagem astral, conseguem alcançá-lo. Oniromantes, porém, têm truques que poucos conseguem reproduzir. Este ritual permite que o oniromante entre no Demesne de seu alvo. Uma vez lá, ele pode tentar tomar o controle, embora isso exija um teste de Caminho com dificuldade 9, resistido pelo dono do Demesne com um teste de Raciocínio + Demesne (dificuldade 6). Isso é altamente arriscado, e apenas os oniromantes mais bem preparados deveriam tentar.]==] },
+				["3. Mike's Cure-All"] = { pt = [==[M20 Sorcerer, pág. 33
+
+
+3. Mike's Cure-All
+
+
+Embora rituais semelhantes fossem realizados havia séculos, ou mais, esta versão foi registrada pela primeira vez em Chicago durante a Lei Seca e foi baseada nos Cure-Alls da era vitoriana. O curandeiro pode forçar o corpo do paciente a expelir todas as drogas e toxinas por qualquer, e às vezes por todas, as saídas possíveis. Isso inclui vômito, suor, lágrimas, diarreia, etc. O processo é incrivelmente desagradável, mas pode salvar uma vítima de envenenamento ou alguém em overdose. O feiticeiro precisa obter ao menos tantos sucessos quanto o Índice de Toxina da toxina mais potente no organismo do paciente. Nenhum dano é curado, mas o paciente não sofre mais nenhum efeito nocivo. Isso também pode expelir poções mágicas.]==] },
+				["3. Purification of the Inferno"] = { pt = [==[M20 Sorcerer, pág. 35
+
+
+3. Purification of the Inferno
+
+
+Depois de um encontro infeliz com um vampiro, Charles Moran desenvolveu este ritual para se proteger no futuro. Infelizmente, este ritual não distingue amigo de inimigo, o que o torna extremamente arriscado de conjurar quando o mago pode estar em espaço apertado com outras pessoas, como num elevador. Purification of the Inferno funciona como um dispositivo defensivo de segurança. A primeira pessoa a tocar o mago depois do ritual imediatamente irrompe em chamas, sofrendo quatro dados de dano agravado. As chamas então se tornam inteiramente mundanas, causando três de dano letal por turno, que pode ser absorvido com dificuldade 8 até que sejam apagadas. O ritual exige três sucessos na conjuração.]==] },
+				["3. Shape Quintessence"] = { pt = [==[M20 Sorcerer, pág. 45
+
+
+3. Shape Quintessence
+
+
+Seguindo diagramas elaborados ou práticas alinhadas ao seu estilo, o feiticeiro pode manipular o fluxo de Quintessência dentro de uma área. Uma casa de jogos poderia ficar mais sortuda para a banca, ou um pronto-socorro particularmente respeitado poderia sofrer taxas de mortalidade mais altas apesar dos melhores esforços da equipe, simplesmente pela manipulação das linhas de força sob a superfície. As energias acabam retornando ao seu padrão original, pois o ritual as mantém em estado elástico apenas por certo tempo. Com manutenção adequada e observação contínua, um local pode assumir os novos aspectos permanentemente.]==] },
+				["3. Shitstorm"] = { pt = [==[M20 Sorcerer, pág. 21
+
+
+3. Shitstorm
+
+
+O mago estático envolve a si mesmo e aos companheiros a até 25 pés dele com uma casca giratória de pequenos objetos inanimados. Isso adiciona +1 de dificuldade para acertar qualquer um coberto pelo efeito com um ataque à distância a cada 2 sucessos de ativação. Além disso, qualquer um que tente combate corpo a corpo contra os afetados pelo ritual precisa absorver [sucessos de ativação] de dano. Isso normalmente é contundente, a menos que o feiticeiro estivesse num cômodo cheio de cacos de vidro, facas pequenas ou outros objetos cortantes, caso em que o dano é letal. O feiticeiro não precisa mirar em nenhum inimigo em particular para que isso ocorra. Qualquer um, amigo ou inimigo, que chegue perto demais dos destroços voadores é atingido e precisa absorver o dano.]==] },
+				["3. Shroud Bubble"] = { pt = [==[M20 Sorcerer, pág. 41
+
+
+3. Shroud Bubble
+
+
+Às vezes, quando tudo o mais falha, a melhor coisa que um mago pode fazer diante de uma assombração problemática é se esconder e esperar passar. O problema é que fantasmas têm a péssima tendência de atravessar paredes e a maioria das outras barreiras protetoras. Também costumam ser implacáveis, muitas vezes obcecados quando fixam a mente numa tarefa. Magos desesperados, perseguidos por fantasmas perseverantes, inventaram o conceito do Shroud Bubble para se protegerem, especialmente enquanto esperam reforços chegarem para lidar com o fantasma de forma mais direta. O ritual exige três sucessos e eleva a Mortalha (Shroud) para 10 nas proximidades do mago. Na verdade, o índice da Mortalha aumenta numa esfera grande o bastante apenas para contê-lo. O efeito permanece estacionário, de modo que o mago não pode deixar a área sem aumentar seu risco diante dos fantasmas, e dura 8 horas.]==] },
+				["3. Shut It Down"] = { pt = [==[M20 Sorcerer, pág. 41
+
+
+3. Shut It Down
+
+
+Assombrações variam em escala. Para as confinadas a um ou dois cômodos, é bem simples desligar os poderes que os fantasmas usam para interagir com o mundo físico. Mais frequentemente, porém, há um edifício inteiro ou uma área maior sendo assombrada e, se o fantasma for barrado em um cômodo, ele simplesmente vai para outro. Com Shut It Down, uma área muito maior que o normal pode ser silenciada, de modo que poderes fantasmagóricos se tornem impossíveis de usar. O mago precisa marcar os cantos do edifício ou da área, que pode ser tão grande quanto um quarteirão inteiro de terreno vazio ou um único edifício. O ritual exige ao menos 3 sucessos, e os fantasmas dentro dela só podem usar seus poderes se tiverem sucesso num teste de Força-de-Vontade com dificuldade 8.]==] },
+				["3. Wrapped in a Shroud"] = { pt = [==[M20 Sorcerer, pág. 40
+
+
+3. Wrapped in a Shroud
+
+
+A Mortalha (Shroud) separa o mundo dos vivos do mundo dos mortos. Pode ser difícil cruzar essa barreira, fato que protege tanto os vivos quanto os mortos uns dos outros. Normalmente, ou um necromante precisa alcançar a terra dos mortos a partir da terra dos vivos, ou um fantasma precisa ter cruzado para realizar algo entre os vivos, para que possam interagir. Por um minuto para cada sucesso neste ritual, o necromante consegue de fato ficar entre os mundos, capaz de interagir diretamente com ambos sem mais nenhuma magia. Tanto seres humanos quanto fantasmas podem interagir livremente com o mago, para o bem ou para o mal.]==] },
+				["4. Doxxing"] = { pt = [==[M20 Sorcerer, pág. 42
+
+
+4. Doxxing
+
+
+Ao ler as correntes geradas por um fantasma e por seus movimentos, o mago pode extrair informações dele. Cada informação tem um custo e precisa ser declarada e paga antes da conjuração. Quaisquer recursos gastos desta forma não são devolvidos se o ritual falhar. Nenhuma informação é obtida se o ritual não alcançar o número de sucessos exigido pela informação buscada:
+
+• Identificar uma Paixão — Um sucesso cada. Isso identifica tanto a Paixão quanto a emoção à qual ela está ligada.
+
+• Natureza, Comportamento e Arquétipo da Sombra — Um sucesso e um ponto de Força-de-Vontade cada.
+
+• Identificar um Grilhão — Bem mais difícil, isso exige dois sucessos e um ponto de Força-de-Vontade.
+
+• O Nome Verdadeiro do fantasma — Isso exige cinco sucessos e dois pontos de Força-de-Vontade.]==] },
+				["4. Dream Scream"] = { pt = [==[M20 Sorcerer, pág. 43
+
+
+4. Dream Scream
+
+
+Embora oniromantes poderosos possam simplesmente enviar sonhos às pessoas como magias, com este ritual eles podem enviar uma mensagem a várias pessoas de uma só vez através dos sonhos delas. O mago escolhe uma mensagem composta por uma única frase, fixa-a na mente e realiza o ritual. Ao concluí-lo, pode enviar a mensagem a uma pessoa por sucesso dentro de um raio de 10 milhas.]==] },
+				["4. Extraction"] = { pt = [==[M20 Sorcerer, pág. 22
+
+
+4. Extraction
+
+
+Outro ritual comumente deixado pendurado “por precaução”, Extraction permite que o feiticeiro retire do combate companheiros caídos ou encurralados e os leve para um lugar seguro. O feiticeiro primeiro sai do alcance do combate, tipicamente para trás de uma cobertura, e puxa seus companheiros para fora de uma sombra. Não há aumento de dificuldade nem penalidade de sucessos se os companheiros não estiverem resistindo e não forem alvo imediato — o caos do combate pode disfarçar o uso deste ritual. Uma vez que o feiticeiro e seus companheiros estejam fora de alcance, eles não são mais considerados em combate, a menos que um combatente os encontre e ataque. Este ritual poderoso pode funcionar com até 10 companheiros, que o feiticeiro precisa definir ao realizar o ritual pela primeira vez.]==] },
+				["4. Fix the True Form"] = { pt = [==[M20 Sorcerer, pág. 47
+
+
+4. Fix the True Form
+
+
+Metamorfos frequentemente se veem em conflito uns com os outros. Também esbarram em coisas mais estranhas, com múltiplas formas. Fix the True Form foi desenvolvido por alguém que alegava descender de lobisomens. Ele força qualquer um que seja seu alvo a assumir sua “verdadeira” forma, caso falhe num teste de Força-de-Vontade (dificuldade 8). Magos simplesmente revertem à sua forma natural, assim como a maioria dos outros metamorfos. Ironicamente, apesar de ter sido criado em parte para forçar lobisomens a assumir sua forma humana ou lupina, este ritual força Garou e Fera a assumirem suas formas intermediárias, muitas vezes com consequências terríveis para um mago estático excessivamente confiante.]==] },
+				["4. Forced Medium"] = { pt = [==[M20 Sorcerer, pág. 40
+
+
+4. Forced Medium
+
+
+Algumas pessoas são naturalmente mais fáceis de serem possuídas por fantasmas. Esses médiuns podem ver isso como um dom ou uma maldição, mas isso os distingue. São as pessoas que lidam com os mundos espirituais, e a quem os fantasmas procuram para pedir a solução de um problema ou para tomar seu corpo e obrigá-las a resolvê-lo. Este ritual concede ao alvo a Qualidade Medium (BoS p. 69) por uma semana, junto de –2 de dificuldade nas tentativas de fantasmas de possuí-lo.]==] },
+				["4. Freudian Slip"] = { pt = [==[M20 Sorcerer, pág. 32
+
+
+4. Freudian Slip
+
+
+Dizer o que se pensa na hora errada pode ser um suicídio social. Pode acabar com amizades, destruir carreiras e criar ódios para a vida toda, com outras consequências mais adiante. Magos que estudam o Caminho da Fortuna refinaram este ritual para tirar proveito desse conhecimento. Freudian Slip amaldiçoa a vítima a dizer a pior coisa possível em que ela realmente acredita, em seu próximo evento ou encontro social importante. Isso pode incluir discursos políticos, entrevistas de emprego, encontros amorosos, eventos de família e mais. Seja qual for o contexto, na próxima vez em que ela estiver tentando ocultar seus verdadeiros sentimentos numa situação em que revelá-los causaria dano significativo e duradouro, precisa fazer um teste de Força-de-Vontade (dificuldade 8) para não simplesmente deixá-los escapar. Se ela evitar eventos sociais importantes por um ano e um dia, a maldição se esvai e a deixa em paz.]==] },
+				["4. Humor Alignment"] = { pt = [==[M20 Sorcerer, pág. 33
+
+
+4. Humor Alignment
+
+
+Este é um ritual antigo para curar condições crônicas e congênitas. Remonta à Idade Média, quando a teoria dos humores estava em voga. O curandeiro sangra o paciente com sanguessugas, uma faca ritual ou outro instrumento adequado à sua Prática, o que causa um nível de dano letal. O curandeiro gasta um ponto de Força-de-Vontade e precisa obter ao menos 5 sucessos. Ele pode realizar este ritual como uma ação estendida. O paciente descansa por três dias, ao fim dos quais o dano letal e a condição estão curados. Esse repouso não precisa ser apenas sono. O paciente pode se mover minimamente para realizar funções corporais básicas, mas fora isso deve permanecer deitado. Se o paciente for ativo demais durante os três dias, o ritual falha automaticamente. O ritual também falha se o paciente sofrer estresse mental ou emocional significativo, como tentar trabalhar da cama ou ter uma discussão acalorada.]==] },
+				["4. Information Superhighway"] = { pt = [==[M20 Sorcerer, pág. 23
+
+
+4. Information Superhighway
+
+
+Para magos de base tecnológica, existe um meio de transporte incomum, muitas vezes ignorado pelos místicos. É mais difícil de acessar que os outros, mas às vezes alcança lugares que o Caminho do Transporte normalmente não alcança. Este ritual permite que o conjurador viaje de qualquer tomada elétrica para qualquer outra, convertendo o mago em eletricidade. O alcance é limitado a 5 milhas por sucesso. A viagem leva um minuto a cada 5 milhas. Contudo, o arquetípico cômodo lacrado que o Caminho do Transporte não acessa normalmente não está isolado da eletricidade: se existe uma tomada, o mago consegue chegar até ela.]==] },
+				["4. Instant Feast"] = { pt = [==[M20 Sorcerer, pág. 37
+
+
+4. Instant Feast
+
+
+Comida ilusória é enganosamente difícil de criar. Sabor, cheiro, imagem e textura precisam estar exatamente certos para enganar alguém e fazê-lo pensar que está comendo uma refeição de verdade. O alvo faz um teste de Percepção + Prontidão (dificuldade 7). Se falhar, acredita estar comendo comida de verdade durante toda a refeição — qualquer comida que o mago consiga imaginar. Ainda assim, continua com fome. Isso não fornece nenhum sustento (a menos que a ilusão esteja encobrindo alguma outra comida), embora, se seis ou mais sucessos forem obtidos na conjuração, os sinais de fome sejam suprimidos por um número de horas igual ao Vigor do alvo, antes que ele volte a sentir fome. Isso não pode aliviar os efeitos da inanição.]==] },
+				["4. Love Potion Number 9"] = { pt = [==[M20 Sorcerer, pág. 30
+
+
+4. Love Potion Number 9
+
+
+Apesar de sua natureza clássica e icônica, o uso da “poção do amor” caiu em desuso por razões óbvias. À medida que as sociedades passaram a insistir mais na importância do consentimento, os feiticeiros tiveram menos motivos para gastar o tempo e os recursos exigidos por este ritual. Os que ainda se dispõem a preparar a potente mistura de amor e lealdade o fazem com hesitação e cobram um preço alto.
+
+Uma mecha de cabelo, uma dracma de sangue ou um objeto pessoal de valor sentimental é necessário para criar a conexão certa com o coração em questão. Quando realizado para outra pessoa que não o próprio feiticeiro, normalmente também se exige alguma parte do cliente. Em algumas Práticas, o ritual assume a forma da poção tradicional; em outras, é uma espécie de vínculo ritualizado feito com um cordão de nós. Em todos os casos, a vítima é atada ao ponto de ancoragem do feiticeiro ou de seu cliente.
+
+Uma vez realizado, a vítima se vê inquieta e enjoada. A náusea persistente desaparece quando a âncora está por perto, ou quando ela realiza uma tarefa que sabe que agradaria à âncora.]==] },
+				["5. Generational Wealth"] = { pt = [==[M20 Sorcerer, pág. 32
+
+
+5. Generational Wealth
+
+
+Só existem tantas maneiras de ficar rico o bastante para que a riqueza dure gerações. Fora a sorte pura, todas elas exigem um sacrifício substancial. Para a maioria, esse sacrifício é suportado por outros, por meio de práticas trabalhistas exploratórias ou de empreendimentos criminosos. De fato, dada a natureza volúvel da sorte, a exploração sempre foi o caminho mais fácil e mais confiável para a riqueza. Este ritual permite que a sorte seja domada e garantida. Ele ainda exige um sacrifício; afinal, nada vem de graça. Mas, em vez de sacrificar outros, aproveitando-se do desespero alheio, o pai ou a mãe que busca segurança para a família sacrifica voluntariamente a si mesmo. Embora o sacrifício precise ser voluntário, poucos magos se dispõem a realizar este ritual. Os que se dispõem precisam realizar o sacrifício de alguma forma apropriada à sua Prática. Os beneficiários do sacrifício se veem subitamente com sorte extrema, capazes de ganhar dinheiro suficiente no jogo para que eles, seus filhos e os filhos de seus filhos nunca mais precisem trabalhar um único dia na vida. Mesmo que de algum modo consigam esbanjar essa vasta fortuna, a geração seguinte será igualmente sortuda e a recuperará. A bênção dura sete gerações, após as quais os descendentes ficam por conta própria.]==] },
+				["5. Megafauna Transformation"] = { pt = [==[M20 Sorcerer, pág. 48
+
+
+5. Megafauna Transformation
+
+
+O Caminho da Metamorfose permite que o conjurador assuma formas animais, incluindo transformações parciais. Mas, no fim das contas, o conjurador normalmente só consegue se transformar por completo em um animal normal. Este ritual permite que ele se torne uma versão gigantesca do animal em que quiser se transformar. Na maioria dos casos, isso é um retorno completo a uma versão extinta do animal, como o megatério (preguiça-gigante) das Américas. Isso exige ao menos cinco sucessos.]==] },
+				["5. Oubliette"] = { pt = [==[M20 Sorcerer, pág. 37
+
+
+5. Oubliette
+
+
+Um dos rituais mais aterrorizantes do Caminho da Ilusão, Oubliette já quebrou algumas das pessoas mais fortes do mundo. O mago precisa permanecer a poucos passos de seu alvo durante todo um ritual de três horas, que exige ao menos 5 sucessos. Se conseguir, o ritual retira todos os cinco sentidos da vítima. Ela fica presa num mundo sem qualquer sensação até que o mago a liberte ou até que ela acumule 5 sucessos em testes de Percepção com dificuldade 9, fazendo um a cada hora. A vítima precisa recomeçar do zero em caso de desastre. Muitas vezes, as vítimas deste ritual estão sendo punidas por crimes hediondos e o recebem antes de serem lançadas num buraco e esquecidas, deixadas para morrer de fome sem sequer saber que estão morrendo de fome.]==] },
+				["5. Overwrite"] = { pt = [==[M20 Sorcerer, pág. 42
+
+
+5. Overwrite
+
+
+A expressão máxima do Caminho da Necrônica: o praticante conclui que todos os fantasmas são sinais eletromagnéticos presos na matriz da personalidade de uma pessoa que já foi viva. Isso explica por que são tão maleáveis, para o bem ou para o mal. Com este ritual, o mago pode reescrever a natureza do fantasma em nível fundamental. Para isso, precisa saber o Nome Verdadeiro do fantasma e possuir um de seus Grilhões. O ritual leva 12 horas e exige dois testes de Vigor (dificuldade 6) para ser concluído. Durante todo esse tempo, o fantasma precisa ser mantido no mesmo cômodo que o conjurador, um espaço de mais ou menos 10 por 10 pés. Ao concluir o ritual, mudanças significativas podem ser feitas no fantasma, mas cada uma tem um custo. Por padrão elas duram um ciclo lunar, mas se tornam permanentes se os custos forem dobrados. Algumas das mudanças possíveis são:
+
+• 1 sucesso e 1 ponto de Força-de-Vontade por nível para mudar Paixões, e um ponto adicional de Força-de-Vontade para mudar para uma emoção diferente.
+
+• 2 sucessos e 1 nível de Vitalidade — não é dano, o próprio nível de Vitalidade desaparece pela duração — para adicionar ou remover um ponto de Angústia.
+
+• 5 sucessos e 5 pontos de Força-de-Vontade para sobrescrever o fantasma por completo com outra personalidade específica.]==] },
+				["5. Shelter for the Dead"] = { pt = [==[M20 Sorcerer, pág. 39
+
+
+5. Shelter for the Dead
+
+
+Um ritual poderoso, mas útil apenas em situações específicas, Shelter for the Dead só pode ser realizado com as maiores tempestades do Submundo: os Grandes Maelstroms. Ninguém sabe como ou quando ele foi desenvolvido, mas foi usado pela primeira vez para proteger os fantasmas de Constantinopla durante o Grande Maelstrom causado pela Peste Negra. O ritual é transmitido pelos poucos que o conhecem a seus alunos, na esperança de que nunca seja necessário, mas sabendo o quanto pode ser valioso se o pior acontecer. Ao custo de arriscar uma tempestade extrema castigando as terras dos vivos, Shelter for the Dead cria uma região, não maior que um quarteirão moderno, onde o Maelstrom não pode entrar. Ou melhor: se pedaços do Grande Maelstrom entrarem, eles são imediatamente transformados em tempestades brutais, com vento extremo, granizo do tamanho de punhos e outras coisas estranhas, independentemente do clima habitual da área. O ritual exige dez sucessos, quase sempre exigindo um grupo, e dura um dia, mais um dia para cada sucesso adicional além dos dez mínimos.]==] },
+				["5. Smoldering Ruin"] = { pt = [==[M20 Sorcerer, pág. 35
+
+
+5. Smoldering Ruin
+
+
+O alvo mais comum do Caminho do Fogo do Inferno é um inimigo individual. É magia diretamente ofensiva, e os magos sabem disso e a usam como tal. Às vezes, mirar em indivíduos, e mesmo em grupos, é pequeno demais. Às vezes o mago quer mesmo é se soltar de vez, e a magia estática não oferece muitas válvulas de escape para isso. Os mestres do Fogo do Inferno, porém, desenvolveram este ritual justamente para isso: se soltar e causar dano a todos os seus inimigos de uma vez. Smoldering Ruin exige três horas inteiras de conjuração e, em todas as suas formas, um teste de Vigor (dificuldade 6) apenas para concluir o ritual exaustivo. Uma vez concluído, o mago gasta 3 pontos de Força-de-Vontade e precisa obter ao menos 5 sucessos. Apesar da dificuldade, o sucesso vale o esforço: o ritual põe fogo em um edifício, reduzindo-o a cinzas. Nenhum esforço mundano extingue esse fogo, alimentado pelo desejo de destruição do conjurador, embora meios sobrenaturais sejam capazes de fazê-lo. Ele consegue até queimar edifícios feitos de materiais normalmente resistentes ao fogo e à prova de fogo. Vale notar que o conjurador precisa realizar o ritual dentro do edifício e depois torcer para conseguir escapar antes de ficar preso lá dentro.]==] },
+				["5. Steal Life"] = { pt = [==[M20 Sorcerer, pág. 40
+
+
+5. Steal Life
+
+
+Uma das artes mais sombrias da Necromancia: os mestres do Caminho conseguem roubar a energia vital de outra pessoa viva. O conjurador primeiro se enche de energia mortuária, mas não a molda diretamente numa magia. Em vez disso, antes que ela absorva sua própria força vital, ele a empurra para dentro da vítima. Essa transferência leva consigo os cinco níveis de dano mais recentes que o conjurador está sofrendo. O conjurador cura esses ferimentos. A maioria das versões deste ritual envolve entalhar sigilos na vítima (ou perfurá-la com fios elétricos, ou qualquer outra técnica), causando dano adicional. Nem é preciso dizer que pouquíssimos sobrevivem a esse processo, e os que sobrevivem muitas vezes caçam o necromante até o fim de seus dias.]==] },
+				["5. Teleportal"] = { pt = [==[M20 Sorcerer, pág. 23
+
+
+5. Teleportal
+
+
+Os mestres do Caminho do Transporte podem fazer mais do que simplesmente transportar a si mesmos e a outros de um lugar a outro. Eles podem criar portais estáveis entre dois locais. Primeiro, o mago precisa preparar os dois sítios para que o portal seja criado. Isso leva três dias de preparação em cada sítio, usando parafernália e materiais apropriados à Habilidade de Caminho do conjurador. Concluídos os preparativos apropriados, o mago faz um teste estendido, com um teste por hora. Exige ao menos um sucesso a cada 10 milhas entre os portais. Cada sucesso extra acrescenta cinco usos do portal ou uma condição em uma ou nas duas pontas, como uma restrição de quem pode usá-lo ou torná-lo de mão única. Criar este portal custa um ponto permanente de Força-de-Vontade, que não é devolvido se o portal se dissipar. Teleportal é um ritual complexo, mais bem realizado com assistentes.]==] },
+				-- The twenty-six AFFILIATIONS of the Affiliation picker on the Numina tab (SPEC
+				-- T929, I140i, I140m). Same reason the hedge rituals above are here and not in a
+				-- module of their own: the picker hands mfOpen the 'Numina' kind, so descText
+				-- already requires THIS module for them. Twenty come out of M20 Sorcerer chapter
+				-- three, Lone Practitioner off the page before it, four out of Sorcerer's
+				-- Companion chapter two and the Society of Leopold out of The Hunters Hunted II.
+				-- Prose with no System block, like the rituals - all twenty-six are on V335c.
+				["Balamo’ob"] = { pt = [==[M20 Sorcerer, pág. 81
+
+
+Balamo’ob
+
+
+Atributos Favorecidos: Vigor, Raciocínio
+
+Caminhos Favorecidos: Alchemy, Healing, Shapeshifting, Summoning, Binding, and Warding
+
+Nas selvas da Mesoamérica, os sacerdotes-guerreiros dos maias, os Balamo’ob, ainda velam por seu povo. Eles transmitem ensinamentos que já eram antigos no auge do império maia, vinculando-se ao seu wayob, um animal familiar e guia espiritual, e, por sua vez, guiando seu povo para protegê-lo dos espíritos sombrios que sobem de Xibalba, o Outro Mundo, ou, simplesmente, a Umbra. Transes visionários levam os Balamo’ob a Xibalba, onde o primeiro espírito que contatam se torna seu wayob. A Wakah-Chan, a Árvore do Mundo, separa a terra e o céu, mas também liga nosso mundo a Xibalba, venerada em símbolos e efígies feitos de corda e madeira. A seiva mágica da Árvore do Mundo é encontrada na seiva de árvores sagradas do mundo mundano, assim como em várias secreções líquidas naturais do corpo humano. O derramamento de sangue é em si um ato sagrado, especialmente quando se oferece o próprio sangue, e, embora algumas gotas bastem para as magias mais simples, as magias mais espetaculares ou urgentes exigem muito mais. Esse derramamento maior é feito perfurando o corpo com espirais de corda e dançando, lançando sangue pelo ar em sacrifício. A dança é parte inseparável da arte Balamo’ob. Em alguns festivais, os Balamo’ob assumem a aparência do wayob, vestindo mantos, peles ou trajes para emulá-los em reencenações da criação do mundo. Os talentosos o bastante assumem a forma do patrono ao fim do festival, disparando noite adentro, representação física de seu wayob e também da Árvore do Mundo, unindo carne e espírito, o celeste e o mundano.
+
+Os Balamo’ob vêm da população local da Mesoamérica, em particular do povo maia hoje espalhado pela região. Poucos de fora — arqueólogos, antropólogos ou buscadores do oculto — foram iniciados em seus mistérios. Os Balamo’ob tiveram de manter seu conhecimento em segredo diante da opressão ao longo dos séculos. Os ensinamentos são transmitidos oralmente em mestizo, um dialeto de espanhol e maia. Embora a língua em si não seja sagrada, algumas coisas podem se perder na tradução. Junto dos estudos linguísticos, o iniciado precisa aprender a cosmologia e a simbologia maias para compreender a magia Balamo’ob. Depois disso, quando o ancião o julga pronto, o iniciado realiza seu primeiro transe visionário. Esse transe permite que o aspirante viaje até Xibalba em forma onírica. A grande Serpente da Visão o guia pelos ritos secretos finais, quando o Balamo’ob encontra seu wayob, um espírito animal em forma de jaguar, cobra, águia ou outro animal, mesmo mítico. Desse dia em diante, seu estudo é só seu. O Balamo’ob ganha sabedoria pela experiência, aprendendo com outros anciãos e viajando a Xibalba com seu wayob.
+
+Os xamãs, itzamna, dos Balamo’ob não adotam nenhuma organização formal, mas se estabelecem em territórios pessoais por toda a Mesoamérica, pois os espíritos preferem permanecer nos lugares que melhor conhecem. As relações entre os xamãs são sempre pessoais, fundando alianças para resolver problemas e rivalidades onde surgem conflitos. Não há politicagem entre eles. Como cada xamã tem suas próprias crenças e interpretações, não cabe a um julgar o outro, desde que continuem com seu trabalho. Essa abertura permite que alguns Balamo’ob se vinculem a espíritos de natureza mais sombria, o que pode levar o xamã a incursões movidas pela fúria contra forasteiros, exploradores e profanadores. Outros são atraídos por revoluções políticas ou buscam o ressurgimento do império maia.]==] },
+				["Followers of Set"] = { pt = [==[Sorcerer’s Companion, pág. 14
+
+
+Followers of Set
+
+
+Iniciação
+
+Os Followers of Set são conhecidos por se tratarem mais como uma seita religiosa do que como um clã e, por isso, frequentemente acolhem convertidos de outros clãs, mortais e até outros seres sobrenaturais, desde que estejam dispostos a aceitar e seguir os ensinamentos de Set. Feiticeiros, sendo mais poderosos que a maioria dos mortais e ainda mais propensos a se sentirem forasteiros num mundo incerto, são portanto tão ou mais propensos que qualquer outro a encontrar o caminho até um dos Cultos que compõem os Followers of Set, e os setitas ficam mais que felizes em atraí-los.
+
+Há uma diferença, é claro, entre um joguete e alguém que sabe o que há por trás da cortina, tendo sido plenamente introduzido à filosofia setita e feito parte do Clã. Os primeiros são abundantes, os segundos bem mais raros, mesmo entre feiticeiros — ainda que alguns dos primeiros possam estar se aproveitando dos demais adoradores do mesmo modo que os próprios setitas fazem, ou talvez estejam apenas envolvidos no turbilhão de vícios e experiências que lhes é oferecido.
+
+De um jeito ou de outro, os próprios Kindred setitas costumam ficar mais que satisfeitos em aproveitar os talentos únicos desses usuários de magia, pondo suas magias e rituais a serviço da coleta dos recursos e segredos que pretendem oferecer às massas doutrinadas. Os feiticeiros, por sua vez, tendem a pôr seus novos aliados para trabalhar e, de fato, mais de um Filho de Osíris (inimigo comum desses feiticeiros, como descrito em Sorcerer Revised, pág. 34) já descobriu que um feiticeiro setita rival tem alguns aliados mortos-vivos dispostos a ajudá-lo.
+
+Organização e Estilo
+
+Os diletantes que apenas fazem média com os Cultos setitas raramente vão longe e raramente seguem qualquer padrão reconhecível em sua magia além de uma inclinação genericamente mítica e religiosa. Já os que se veem plenamente doutrinados entre os setitas descobrem que seus focos e seu estilo passam a espelhar os ensinamentos de seu culto e do Clã como um todo. Embora as especificidades variem entre Cultos e mesmo entre indivíduos, isso normalmente significa santuários “blasfemos”, sangue, sacrifícios, orações a Set e/ou a suas máscaras (ou símbolos e representações deles), profanação de símbolos de deuses opostos a Set e, claro, serpentes, sejam representações delas ou espécimes físicos de verdade.
+
+Embora os “diletantes” possam acabar servindo como carniçais dos setitas, é na verdade muito raro que iniciados adotados sejam alimentados com Vitae, ou pelo menos não é mais comum do que seria um setita tentar criar um Vínculo de Sangue com outro.
+
+Caminhos
+
+Fascination, Illusion (pág. 31) e Shapeshifting, com outros dependendo do Culto de que o feiticeiro faz parte. Com permissão do Narrador, feiticeiros que tenham comprado a Qualidade Setite Initiate (Lore of the Clans, pág. 67) podem, em vez de comprar Disciplinas setitas diretamente, espelhar a Setite Sorcery apropriada ao estilo de feitiçaria de seu Culto (Akhu, Sadhana, etc.) como Caminhos de feitiçaria, substituindo os custos em Vitae por Força-de-Vontade, mas comprando-os como se fossem um nível acima do normal (assim, o primeiro ponto daquela feitiçaria é inútil, e o segundo ponto fornece o primeiro ponto do Caminho).]==] },
+				["Forn Jafnaðr"] = { pt = [==[M20 Sorcerer, pág. 85
+
+
+Forn Jafnaðr
+
+
+Atributos Favorecidos: Destreza, Raciocínio
+
+Caminhos Favorecidos: Divination, Enchantment, Hellfire e Summoning, Binding and Warding
+
+Desde tempos antigos, povos da Escandinávia praticaram, principalmente mas nem sempre, uma bruxaria feminina derivada do forn seiðr, os “antigos costumes” dos nórdicos. Eles cultuam divindades de uma ou de ambas as famílias dos Æsir e dos Vanir.
+
+Digna de nota é Freyja, a deusa Vanir da fertilidade, do amor, da guerra e da magia, que ensinou feitiçaria aos Æsir. Odin também se destaca como chefe masculino dos Æsir, associado à feitiçaria, à guerra, à sabedoria e ao alfabeto rúnico, entre outras coisas. Historicamente, os praticantes eram muito valorizados por seus poderes, mas sofreram estigma e perseguição após a cristianização da região.
+
+Apesar da oposição, a prática nunca morreu por completo. Muitos se esconderam sob o disfarce da religião dominante para manter sua fé em segredo. Hoje em dia, é mais aceitável praticar abertamente religiões e magias pagãs, mas eles ainda sofrem retaliação preconceituosa em alguns lugares. Os praticantes são nominalmente atraídos pelos Verbena quando se envolvem na política da Guerra da Ascensão, embora muitos covens se contentem em cuidar de si mesmos e de suas comunidades. Forn Jafnaðr é uma Afiliação nova e em rápido crescimento que não escolheu nenhuma dessas opções.
+
+Nas últimas décadas, grupos neonazistas (sob quaisquer nomes que lhes deem negação plausível suficiente para suas intenções) apropriaram-se de simbologia e de outros aspectos do forn seiðr para justificar sua intolerância. Um desses grupos, o Asatru Futhark, era um bando de perdedores nazistas que não se deram ao trabalho de checar os fatos, nomeando-se preguiçosamente a partir dos seguidores dos Æsir e do nome do alfabeto rúnico. O Asatru Futhark era um grupo de criminosos que se julgavam racialmente superiores aos outros e que, embora fossem um bando de aspirantes a feiticeiros, falharam completamente em entender que a prática de que roubaram era historicamente, e sobretudo, um ofício de mulheres, e não teria nada a ver com a merda patriarcal do Asatru Futhark. O Asatru Futhark causou destruição e morte sob o pretexto de crença religiosa até que um grupo de feiticeiros da Ordem Aeon pôs fim a eles. Isso levou os feiticeiros locais do forn seiðr a se erguerem em oposição direta àqueles que se apropriam de suas crenças para promover crimes de ódio e retórica indesculpáveis.
+
+Membros remanescentes do Asatru Futhark tentaram ressuscitar a facção extinta várias vezes, e todas as vezes foram definitivamente esmagados pelo Forn Jafnaðr. O Forn Jafnaðr tem as mãos cheias em sua luta contra grupos neonazistas que se apropriam do nórdico, mas felizmente não estão sem aliados nem sem gente disposta a se juntar a eles. Embora façam questão pessoal de destruir os grupos neonazistas apropriadores, também não recusam ajuda oferecida, especialmente de outros feiticeiros. O Forn Jafnaðr é hoje uma Afiliação descentralizada, composta de vários covens que praticam alguma variação do forn seiðr. Estão baseados sobretudo na Escandinávia, mas vêm se espalhando por outras áreas da Europa à medida que o sentimento ganha força. Em 2019, fundaram o primeiro coven Forn Jafnaðr nos Estados Unidos.
+
+Feiticeiros mais experientes costumam orientar individualmente membros promissores e interessados de sua fé para que aprendam sua prática mágica. O aprendiz aprende ao lado de seu mestre e auxilia no trabalho ritual do mestre e do coven, oferecendo um par extra de mãos. A aptidão para a magia é secundária à paixão e à devoção pela causa na hora de escolher iniciados. A filosofia é que a magia sempre pode ser ensinada a quem deseja aprender, mas a paixão pelos ideais é imperativa.
+
+Na medida em que o Forn Jafnaðr se envolve na política da Guerra da Ascensão, é mais provável que formem relações de trabalho temporárias com a Aliança Díspar ou com os Verbena. Normalmente, estão ocupados demais com seu objetivo principal para se importar em combater a Tecnocracia, mas, sendo místicos, às vezes são arrastados para o conflito assim mesmo. Além de combater o fascismo direta e indiretamente, covens individuais são livres para agir de forma autônoma e adaptar melhor suas respostas às comunidades locais. Alguns covens se esforçam para viver fora da rede, como seus antepassados, mas outros acolhem a tecnologia moderna em suas vidas, se não em suas práticas mágicas. É bem mais fácil, afinal, se organizar com aliados pela internet do que por cartas manuscritas.]==] },
+				["Giovanni"] = { pt = [==[Sorcerer’s Companion, pág. 15
+
+
+Giovanni
+
+
+Iniciação
+
+Os Giovanni já foram Necromantes mortais, dizem muitos, e de fato a Necromancia (a versão “Magia de Sangue”) foi ela própria baseada nos preceitos da antiga feitiçaria mortal. Embora o conhecimento dessa magia costume ser mantido longe dos membros mortais das várias famílias do Clã, alguns dos que ganham uma espiada por trás da cortina encontram meios de imitar seus poderes de qualquer forma, seja por uma aproximação da Feitiçaria de Sangue que testemunham, por um vislumbre de recursos necrománticos de eras passadas ou, talvez, pela ajuda dos spiriti presos pela família, no caso dos que têm sensibilidade natural a eles.
+
+Ainda assim, os Giovanni raramente confiam muito em magos mortais, e são ainda mais hesitantes quanto aos membros vivos de sua própria família assumirem tais poderes, a menos que sejam alguém que já vinham observando como protegido por um motivo ou outro. De modo geral, quando os anziani descobrem que há um feiticeiro na família, há duas possibilidades: o Beijo por Procuração, se você for visto como digno, ou dois metros abaixo da terra, se não for.
+
+Organização e Estilo
+
+Mesmo que lhe permitam continuar sua prática, o melhor que um feiticeiro entre os Giovanni pode esperar é o já mencionado Vínculo de Sangue, tornando-se carniçal de um membro talvez poderoso da Família, mas carniçal ainda assim. Mortais simplesmente não têm permissão para progredir nas fileiras; no que diz respeito à família, não passam de uma ferramenta muito útil. Ao menos até que comecem a ser considerados para o Abraço.
+
+Dependendo da forma de Necromancia com que estão mais familiarizados, bem como da tradição do ramo exato da família de que vêm, as ferramentas e a prática podem variar. Alguns podem usar práticas vodun, outros podem seguir a parafernália do Alto Ritual, e outros que juntaram as peças por conta própria talvez precisem depender do que muitos Magos chamariam de “magia de sarjeta”.
+
+De todo modo, todas as suas magias e rituais costumam seguir os mesmos preceitos dos Necromantes mortos-vivos: precisam incorporar um aspecto da autoridade do usuário de magia sobre os mortos (ou sobre o mundo mais amplo), o aprisionamento que é a própria morte (para que os espíritos e os mortos saibam seu lugar) e um item que identifique o alvo ou o efeito (no caso dos Wraiths, isso normalmente significa incorporar um Grilhão). Os instrumentos e focos que representam essas coisas variam tanto quanto a própria prática, e podem envolver língua e invocação, círculos e símbolos, representações de outros mundos, retratos da morte, elementos concretos da morte (como cadáveres), estados emocionais, sacrifícios ou oferendas, entre outras possibilidades.
+
+Caminhos
+
+Divination, Shadowcasting e Summoning/Binding/Warding (necromântico ou material). Muitos rituais de Necromancia podem ser duplicados como rituais de um dos Caminhos citados, com permissão do Narrador (por exemplo, Puppet pode virar um ritual de Summoning/Binding/Warding de nível 2).]==] },
+				["Lone Practitioner"] = { pt = [==[M20 Sorcerer, pág. 79
+
+
+Lone Practitioner
+
+
+Embora muitos magos estáticos aprendam suas artes pela estrutura de uma Afiliação, é quase tão comum que cheguem à prática por conta própria, já que inúmeras avenidas de estudo podem levar à magia estática. Muitos dos que aprendem magia estática sozinhos preferem permanecer livres de enredamentos com outros magos. Podem formar alianças temporárias, amizades e laços românticos com outros magos, mas, quando se trata de reunir conhecimento e poder, o praticante solitário prefere a autossuficiência. Alguns praticantes solitários não se juntam a covens ou Afiliações pelo simples fato de não saberem que existem. Muitos magos estáticos, ao longo dos séculos, viveram e morreram sem nunca ter conhecido outro praticante.
+
+Os psíquicos são ainda mais propensos à prática solitária. Muitos psíquicos não sabem que existem outros com habilidades semelhantes pelo mundo. Eles simplesmente tentam sobreviver e ganhar controle sobre o próprio poder, para não se tornarem um perigo para todos ao seu redor. Boa parte dos psíquicos evita usar seus poderes, manifestando fenômenos apenas quando o instinto ou a sobrevivência exigem. A ideia de procurar outros como eles e se juntar a um time de aberrações iguais a si tem apelo mínimo para esses psíquicos.]==] },
+				["Maison Liban"] = { pt = [==[M20 Sorcerer, pág. 87
+
+
+Maison Liban
+
+
+Atributos Favorecidos: Inteligência, Manipulação
+
+Caminhos Favorecidos: Fortune, Shadow, Summoning, Binding, and Warding, Quintessence Manipulation
+
+Durante o Cisma Hermético do século XI, que resultou no nascimento do clã vampírico Tremere, Mathieu de Calice concentrou seus estudos em proteção e contramagia, decidido a se manter em segurança enquanto a Ordem começava a se despedaçar. Fugindo para território mais seguro no norte da França, de Calice e seus aprendizes se esconderam sob sua ofuscação arcana enquanto os Tremere se ocupavam com os vampiros locais. Separado da Ordem de Hermes, temendo por sua vida diante de seu antigo mentor e dos vampiros-magos recém-empoderados, o Magus de Calice trabalhou para ocultar a Casa Hermética. Ele rebatizou o grupo de “Liban” na língua visigoda, significando “viver, partir, sobreviver”. Começando apenas com os aprendizes de de Calice, depois com refugiados franceses e espanhóis, o grupo se esforçou para manter o segredo e uma aparência de normalidade. Levaria 250 anos até o fim do expurgo da Casa Tremere pela Ordem de Hermes, época em que a Maison Liban já se tornara uma sociedade própria.
+
+Depois dos anos formativos vivendo em segredo, todos os estudantes da Maison Liban são orientados a manter uma vida dupla, para separar sua prática mágica de vidas normais e respeitáveis. Não devem revelar sua Arte a ninguém que conheçam, a menos que julguem a pessoa responsável o bastante para aprender os caminhos da Maison Liban. Isso não impede que os Liban usem magias protetoras em entes queridos e amigos. Não há grandes feitos, nenhuma exibição de poder para a Maison Liban, que segue seus estudos sob sua máscara mundana. Os estudantes aprendem como iniciados de um mestre até saberem o bastante para ensinar outros, ponto em que também são nomeados mestres, um pater ou mater. Os mais venerados da Maison Liban, em deferência à fundação, usam o honorífico Pontifex.
+
+A Maison Liban nasceu como uma Casa Hermética. Eles mantêm o uso de selos, anéis e círculos em sua magia. Embora o latim seja usado predominantemente, ele é combinado com a língua gótica do tempo em que a sociedade viveu escondida. Essa mistura das origens herméticas com a necessidade de se esconder entre os visigodos durante o expurgo da Ordem de Hermes deu à Maison Liban um estilo de magia único, que não é facilmente copiado por outras sociedades herméticas.]==] },
+				["Mogen HaLev"] = { pt = [==[M20 Sorcerer, pág. 87
+
+
+Mogen HaLev
+
+
+Atributos Favorecidos: Inteligência, Percepção
+
+Caminhos Favorecidos: Divination, Ephemera (Fantasmas) e Summoning, Binding and Warding (Anjos). Caminhos Favorecidos do Auxiliar Feminino: Fortune, Healing e Weather Control
+
+Em algumas formas do misticismo judaico, existe a crença de que há 36 justos em cada geração. Essas pessoas estão dispersas e podem vir de qualquer origem, mas, sem ao menos 36 delas vivas a qualquer momento, o mundo acabaria. É apenas pela bondade essencial desses 36 que o mundo é poupado da ruína certa. Complicando a questão, os 36 são tão humildes que não saberiam que são de fato um dos 36 justos, quanto mais contariam a alguém.
+
+A Mogen HaLev, hebraico para “Escudo dos 36”, é uma afiliação frouxa de covens místicos judaicos ortodoxos com um propósito único: encontrar e proteger esses 36 indivíduos justos. São um grupo de eruditos homens com idades entre 45 e quase 100 anos, embora permitam que iniciados comecem o estudo já aos 40. Acreditam que estudar a magia necessária antes da maturidade convida ao desastre. A maioria dos membros está na casa dos 60. O mais velho da Mogen HaLev, chamado Baal Shem Tov (“Mestre do Bom Nome”), é reconhecido como uma espécie de líder em toda a Afiliação, embora sobretudo no sentido de buscar orientação e desempatar decisões. Uma vez que o iniciado começa o estudo, é um processo intensivo que envolve não só a magia em si, mas também filosofia e habilidades mundanas de contato com pessoas úteis, como médicos e assistentes sociais. Cada vez mais, nos últimos anos, a Mogen HaLev trabalha com covens irmãos de místicas judias que usam outros conjuntos de habilidades e Caminhos para alcançar o objetivo comum. Embora não sejam membros oficiais da facção, esses covens irmãos se concentram em magias práticas de proteção dos 36, em vez da adivinhação e dos assuntos espirituais em que os homens da Mogen HaLev se especializam.
+
+O coven principal (embora eles não se chamassem assim) da Mogen HaLev se reúne num sobrado no Brooklyn, em Nova York, ao lado de uma yeshiva. Eles mantêm uma biblioteca ocultista e religiosa grande o bastante para emprestar textos aos outros covens da Afiliação conforme necessário. Concentram-se sobretudo em magia de adivinhação e proteção, embora também aprendam a falar com espíritos para coletar informações. Todos os membros seguem estritamente as tradições judaicas ortodoxas, incluindo restrições alimentares, cuidados com barba e cabelo e o uso da kipá, além de trabalho e doações de caridade somados ao trabalho dentro da Mogen HaLev. Cada coven cultiva conexões que ajudem a identificar e proteger os 36, de abrigos para desabrigados a profissionais de medicina.
+
+Os motivos do grupo Mogen HaLev começam e terminam em encontrar e proteger os 36. Não têm tempo para nenhuma dessa bobagem de Guerra da Ascensão, exceto quando ela ameaça um dos 36. Não são conhecidos por guardar rancores duradouros e prefeririam cuidar de si mesmos e de seu propósito. São igualmente improváveis de formar até alianças temporárias com outras facções mágicas, a não ser num esforço para proteger os 36. Se um dos que protegem estiver em perigo, chegarão a extremos para resolver a ameaça. A exceção notável ao hábito de evitar rancores mágicos são grupos como os Nebuu-Afef e outros que tentam explicitamente o genocídio de populações judaicas. A Mogen HaLev não hesitará em defender a si mesma e suas comunidades se um desses grupos aparecer na cidade.]==] },
+				["Nebuu-Afef, The Order of The Golden Fly"] = { pt = [==[M20 Sorcerer, pág. 88
+
+
+Nebuu-Afef, The Order of The Golden Fly
+
+
+Atributos Favorecidos: Força, Vigor
+
+Caminhos Favorecidos: Conjuration, Hellfire, Shadowcasting, Shapeshifting
+
+Depois do Êxodo dos israelitas do Egito, nos dias de Ramsés, o Grande, a Nebuu-Afef foi forjada nas chamas do ódio, da fúria e da dor. Após a perda de seus primogênitos e o sofrimento das pragas lançadas sobre eles pela escravização do povo hebreu pelo Egito, um grupo de soldados egípcios condecorados iniciou sua busca por vingança contra os refugiados em fuga. Agraciados com uma medalha em forma de mosca dourada como insígnia de honra, esses guerreiros já eram habilidosos com magia, mas desejavam mais: concentrar sua fúria em força destrutiva. Nomeando-se a partir dessa marca de distinção, a Ordem da Mosca Dourada passou anos em pesquisa e acúmulo de recursos. Sua devoção finalmente deu frutos com a descoberta dos nomes secretos do anjo da morte que trouxera as pragas sobre o Egito — o mesmo anjo que lhes tomara os primogênitos — e dos meios de invocar e controlar esse anjo. Por meio de ritual profano, os místicos invocaram esse anjo, Mastema, e o prenderam ao seu controle, exigindo mais conhecimento e amuletos para trazer pragas ou fazer chover fogo. A Ordem queria essas ferramentas para punir os israelitas.
+
+O que a Ordem não percebeu em sua arrogância é que Mastema nunca esteve preso a eles; não foi contido nem controlado. Mastema havia caído, corrompido por sua destruição do Egito, descobrindo uma volúpia pela morte e pelo medo que espalhara por todo o país. Enquanto a Ordem exigia poder do anjo, Mastema lhes alimentava apenas as magias mais sombrias e destrutivas. Por mais que a Ordem se julgasse no comando, Mastema só lhes dava o que ele mesmo desejava, convertendo sua raiva e seu ódio em propósito destrutivo. Os membros originais da Nebuu-Afef nunca realizaram seus planos contra os israelitas, mas a Ordem foi fundada e continuou a atormentar o Egito por séculos. No período copta, o faraó Ikhnaton expulsou o pequeno grupo do Egito. A Ordem se mudou de região em região, mantida pequena por compartilhar o poder de um único anjo ‘preso’ para servir a todos.
+
+Foi na Áustria, na Segunda Guerra Mundial, que a Ordem saiu da obscuridade para buscar a carnificina de seu propósito inicial. Eles procuraram membros do partido nazista, oferecendo sua assistência ao já ocultista Hitler. Isso acabou sendo a ruína da Ordem, pois, pouco depois desse contato, a casa de reuniões da Ordem explodiu, destruindo a maior parte de seus registros e matando os membros seniores da seita. O aprendiz do sacerdote da Ordem e alguns iniciados fugiram, escapando no caos.
+
+Os remanescentes da Ordem hoje existem espalhados pelo globo em pequenas células, ligadas por comunicação pela internet. Os que restam estão inteiramente sob o controle de Mastema, embora a criatura cativa ainda se disfarce de tutor submisso. O anjo guia habilmente a Ordem a recrutar gente como os fundadores originais — guerreiros fortes, rápidos e taticamente talentosos. Soldados, policiais, seguranças de casas noturnas e assassinos em série suficientemente cautelosos são perseguidos e recrutados para as fileiras da Ordem. Mastema ensina aos novos alunos a morte, o ódio e o medo; a Ordem ensina a seus recrutas que a autoridade vem do poder. O novato é torturado e humilhado, desmontado e remontado como um matador.
+
+Interpretando os Nebuu-Afef
+
+Os Nebuu-Afef são uma Ordem antagonista e não foram feitos para serem personagens de jogador. São ‘feiticeiros’ apenas no nome, enganados a acreditar que controlam um anjo. Se os jogadores tiverem interesse em interpretar vilões como esses, converse com o grupo sobre o propósito de interpretá-los. É uma tentativa de retratar reforma, reabilitação e reparação daqueles perdidos para o próprio ódio e raiva, ou apenas uma tentativa de ser transgressor? Essa deve ser uma conversa séria para todos na sua mesa. Se todos concordarem, consulte Book of the Fallen para mais orientações sobre ferramentas e cuidados ao incorporar o mal puro ao seu jogo.
+
+Para representar mecanicamente a dependência dos Nebuu-Afef e a natureza pouco confiável da ajuda de Mastema, o Narrador deve fazer todos os testes do Caminho Summoning, Binding, and Warding em segredo e, mesmo que o teste seja bem-sucedido, Mastema apenas foi contatado e pode não aparecer.
+
+Embora a Ordem tenha sido fundada por místicos que haviam desenvolvido rituais e práticas próprias antes de invocar Mastema, a magia da Ordem atual depende dos ensinamentos do anjo. Todo estudante aprende magias de aprisionamento destinadas a chamar e controlar Mastema, mas essas magias são inúteis contra o anjo. Se o anjo se dignar a ensinar um Caminho a um estudante, será um focado em destruição e sofrimento. Ele não ensina nada de Aprisionamento ou Comando, pois jamais revelará que todo membro da Ordem é brinquedo e ferramenta do anjo.]==] },
+				["Path-Dancers"] = { pt = [==[Sorcerer’s Companion, pág. 16
+
+
+Path-Dancers
+
+
+Iniciação
+
+A tribo Uktena conta com mais xamãs e praticantes menores de magia entre seus parentes do que a maioria imagina, incluindo a maior parte da própria Tribo, mas muitos desses magos estáticos são obrigados a manter sua prática em segredo, agindo como parentes comuns quando estão entre a Nação em geral, já que tantas outras Tribos não sabem distinguir um xamã respeitoso de uma Bruxa Quebra-Nomes. Na maioria das vezes, os Garou do camp dos Path Dancers se interessam por eles, organizando-os para que possam desenvolver seus talentos em prol da Nação e para transmitir parte de seu conhecimento aos Uktena julgados dignos de controlar tal magia.
+
+Na maioria das vezes, os feiticeiros dos Path Dancers descobrem sua propensão à magia muito antes de entrar na sociedade secreta de feiticeiros do Camp. Muitos simplesmente começam como médiuns simples e outros falantes de espíritos, aprendendo rituais mundanos para aplacar e honrar os espíritos, que com o tempo assumem certo grau de poder. Outros aprendem seus dons com outros feiticeiros (longe dos olhos curiosos dos Garou), mas em todos os casos os Uktena conhecidos por magias semelhantes estão sempre de olho em possíveis alunos (e professores).
+
+Organização e Estilo
+
+Os Path Dancers são um grupo pequeno, então seus parentes feiticeiros são geralmente organizados de forma bem simples. Eles seguem a direção de quaisquer membros do Camp alinhados ao Caern local e frequentemente são reivindicados por alguém da Tribo, para que lhes seja mais fácil cumprir seu propósito, em vez de serem postos nas tarefas mais típicas atribuídas aos parentes. Um Garou desse Camp pode acabar responsável por algo entre um e meia dúzia de feiticeiros talentosos, dependendo da região e de quantos desses Uktena estão envolvidos com o Caern.
+
+As metodologias dos xamãs Path Dancer são frequentemente muito coloridas por seus tutores Garou, e isso lhes dá uma visão única da cosmologia do universo, mesmo em comparação com outros xamãs; de fato, os Path Dancers muitas vezes discordam bastante das visões dos Dreamspeakers de todos os matizes, ainda que ambos compartilhem uma visão animista básica do mundo e sigam os caminhos mais frequentemente atribuídos aos xamãs.
+
+Seguindo os ensinamentos dos Uktena especificamente, isso faz com que a maioria dos Path Dancers adote formas de xamanismo ou de trabalho de cura, e a relação entre o material e o imaterial; seus focos tendem a incluir fetiches (em minúsculas, normalmente), representações de espíritos, fumaça, drogas, práticas espelhadas dos ritos Garou, totens e vários usos dos elementos. Eles chamam mais frequentemente pelos espíritos conhecidos da Nação, buscando as bênçãos de Gaia e da Wyld mais do que os totens “menores” procurados pelos Dreamspeakers.
+
+Caminhos
+
+Spirit Chasing (pág. 23) é o mais comum, seguido de Summoning/Binding/Warding (particularmente para Espíritos), Alchemy (Herbalismo) e Healing. Uns poucos praticam Shapeshifting para espelhar sua família Trueborn, embora poucos Garou tolerem que seus Parentes roubem o que veem como um dom que cabe a Gaia conceder, mesmo entre os Path Dancers.]==] },
+				["Thal’hun"] = { pt = [==[M20 Sorcerer, pág. 92
+
+
+Thal’hun
+
+
+Atributos Favorecidos: Inteligência, Raciocínio
+
+Caminhos Favorecidos: Conjuration, Fortune, Hellfire, Quintessence Manipulation
+
+Os Thal’hun professam que a ideia de magia tal como apresentada pelos feiticeiros é ridícula, mas há um grão de verdade escondido em meio a toda a fanfarronice e superstição. Os Thal’hun são uma ordem de cientistas, engenheiros e metafísicos que encontraram a verdade: toda “magia” consiste meramente em acessar o maior poder do cosmos, chamado thal. Thal é a ciência dos harmônicos, e um Thal’hun é um engenheiro desses harmônicos. A ordem afirma ter sido ensinada por uma raça antiga de alienígenas vindos das estrelas, os Hui:xa.
+
+Como os Thal’hun explicam, os Hui:xa tiveram milhares de anos de cultura para desenvolver ciências além da compreensão humana, mas thal é a joia da coroa de suas descobertas. Exige intelecto e vontade supremos dominar esse poder sem ferir os que estão ao redor do Thal’hun. Embora alguns dos Hui:xa tivessem dominado o thal, havia outras ciências que ainda não compreendiam plenamente, e um desastre biológico levou à destruição de seu mundo natal, ameaçando extingui-los. Para evitar a perda total de seu povo, seus mais eruditos sacerdotes-cientistas deslocaram uma parte de sua grande cidade, Zoraster, para outro plano além do tempo e do espaço. Trezentos dos Hui:xa foram selecionados para ser Jeva, ou Portadores da Luz, transformados em criaturas de pura energia e enviados a encontrar um novo lar para o que resta de seu povo.
+
+Um Jeva chamado Khuvon veio ao nosso mundo quando a Mesopotâmia estava em ascensão. Intrigado com a humanidade, assumiu forma mortal e viveu entre as pessoas por um tempo, mas havia um limite para o que podia fazer. Ocasionalmente, ele se erguia e ensinava as artes do thal, criando uma nova geração de Thal’hun. Essas primeiras lições não eram de ciência, pois tal ideia estava além da compreensão humana daqueles dias, então o thal era ensinado envolto nas histórias e mitos da época. Finalmente, em 1961, quando a humanidade alcançou pela primeira vez o espaço além da Terra, Khuvon voltou a ensinar. Desta vez, a cientistas, não a místicos e filósofos. Nada de mitos e lendas, mas ciência pura do Thal. Ele passou 5 anos com seus 7 alunos, ensinando-lhes tudo o que podia, e então os enviou entre a humanidade para ensinarem em seu lugar. Satisfeito de que a Terra seria um novo lar para os Hui:xa, lançou o chamado ao espaço, chamando os outros Jeva, chamando-os a si para trazer Zoraster de volta a este plano. Agora Khuvon repousa no núcleo da Terra, os Thal’hun instruem a próxima geração e todos aguardam a chegada dos Jeva, espalhados pelas estrelas por milhares de anos.
+
+Novos iniciados dos Thal’hun vêm de várias sociedades marginais: questionadores do status quo de mente científica, gente que mergulha em pseudociência, curandeiros de cristais da Nova Era, observadores de OVNIs ou tipos ‘inventor genial’. Os mais inclinados ao místico, ocultistas e filósofos, estão simplesmente arraigados demais em suas crenças para considerar a verdade do thal. Esses novos iniciados passam anos aprendendo a escrever e pronunciar os caracteres Luz’at, a meditação apropriada e a história da atividade de Khuvon na Terra, antes que sua mente esteja pronta para entender a língua em si. Depois disso, o novo iniciado começa a usar diademas, dispositivos de metal e cristal como varas, bastões, tripés e outras antenas, para amplificar seus harmônicos e sua sintonia mental e assim manipular o próprio thal ‘estabelecendo uma ressonância’ com aqueles sons específicos. Eles ajudam outros a construir diademas e em seus experimentos com o Thal, e estudam a cultura, a tradição, a astronomia e os poemas e histórias Hui:xa deixados por Khuvon para seus “filhos” humanos.
+
+Por fim, o recruta repousa num tanque de privação sensorial por até uma semana, começando com silêncio e depois passando a uma série de frequências geradas por cientistas mais velhos para abrir a mente do iniciado. Dentro de um estado de transe, o iniciado encontra Khuvon em sua forma espiritual, que o inicia e o aceita como novo discípulo. Após mais uma hora de silêncio para assimilar a experiência, o iniciado emerge como um novo Thal’hun.]==] },
+				["The Ancient Order of The Aeon Rites"] = { pt = [==[M20 Sorcerer, pág. 80
+
+
+The Ancient Order of The Aeon Rites
+
+
+Atributos Favorecidos: Inteligência, Raciocínio
+
+Caminhos Favorecidos: Conjuration, Divination, Enchantment, Summon, Binding, and Warding
+
+Dentro dos tabernáculos sagrados da Ancient Order of the Aeon Rites, feiticeiros estudam os diários e ensinamentos do Mestre Johannes Agrippa, que fundou a Ordem em 1873. Baseados em obras ainda mais antigas, milenares e vindas de culturas e sociedades de todo o globo, os Vigias Secretos da Ordem haviam escondido fragmentos da Verdade dentro da estrutura de todo o ocultismo e misticismo, para quando a humanidade estivesse pronta para essa Verdade. As visões do Mestre Agrippa vindas dos Vigias Secretos e seu estudo dessas culturas antigas levaram à formação dos Ritos do Éon, escritos em enochiano, a língua dos anjos. Os feiticeiros da Ancient Order operam sua magia por meio de estudo cuidadoso e rituais precisos, envoltos em simbolismo e correspondência que podem ser familiares a magos de qualquer outra Prática. Com túnicas cerimoniais, movimentos prescritos e a colocação calculada de instrumentos meticulosamente confeccionados, os feiticeiros da AOAR adotam uma abordagem hermética da magia, exigindo estudo e execução acima de práticas mais emocionais.
+
+Os mestres da Ordem agem como professores benevolentes, vendo outras sociedades como recrutas em potencial que apenas precisam ser postos no caminho apropriado para a iluminação. É crença da Ordem que todos os feiticeiros deveriam usar suas habilidades para guiar a humanidade a uma nova era dourada de prosperidade. Isso poderia soar autoglorificante se a AOAR não acompanhasse as palavras com atos, auxiliando outros magos em sua busca pela iluminação, fundando organizações de caridade e realizando outras boas obras. A Ordem dedica os três primeiros graus de iniciação a esses deveres mundanos. Os egoístas e centrados em si mesmos não têm permissão para avançar aos círculos internos da Ordem. No círculo seguinte, outros 3 graus da Ordem supervisionam o trabalho mais amplo da sociedade, desenvolvendo conexões políticas, mantendo seus consideráveis cofres e treinando os recém-iniciados, tudo isso enquanto perseguem verdades maiores e o domínio dos Caminhos da magia. Os 3 graus finais da Ordem são os daqueles que verdadeiramente se dedicam ao estudo dos Ritos do Éon, mergulhando nos mistérios mais esotéricos.
+
+Diz-se que, na morte, os da AOAR que se provaram dignos são aceitos pelos Vigias Secretos em suas fileiras. Esses Vigias Secretos guiam e aconselham a Ordem, mas raramente são vistos. O Mestre Agrippa já apareceu em forma fantasmagórica para orientar iniciados e magisters, embora tais manifestações sejam raras. Corre o boato de que a Ordem é meramente uma ferramenta do Mestre Agrippa, que ainda vive e puxa os cordões da Ordem de longe. A maioria dos membros descarta tal especulação, pois não parece haver propósito para semelhante engodo. À medida que uma nova geração de magisters começa a tomar seu lugar nas fileiras superiores da Ordem, eles começaram a questionar esse passo final. Uma vida após a morte continuando seu trabalho no reino espiritual é realidade, ou é meramente um ardil para impedir que magisters plenamente treinados criem suas próprias facções?]==] },
+				["The Arcanum"] = { pt = [==[M20 Sorcerer, pág. 80
+
+
+The Arcanum
+
+
+Atributos Favorecidos: Inteligência, Raciocínio
+
+Caminhos Favorecidos: Alchemy, Conveyance, Enchantment, Summoning, Binding, and Warding
+
+O Arcanum nasceu do auge ocultista do fim do século XIX, quando a alta sociedade vitoriana prestava reverência da boca para fora a rituais e esoterismo. Frustrada com a Ordem Hermética do Dia Nascente, uma nova sociedade nasceu não para cumprir o protocolo, mas para buscar conhecimento e verdade. Independentemente de cultura e fonte, o Arcanum investiga superstição, mito, pseudociência e ocorrências estranhas. O Arcanum acredita que há outro mundo que faz fronteira com o nosso, um lugar onde as histórias contadas pelos antigos são reais. Pelo estudo dos contos e lendas desses antigos, acreditam poder encontrar o cerne de verdade do qual essas histórias brotam. Eles não julgam esse conhecimento; não atribuem moralidade ao sobrenatural, servindo apenas como bibliotecários e observadores. Embora o Arcanum seja voraz por conhecimento e use outros contatos para ajudar a reuni-lo, guarda seus segredos com ciúme. O Arcanum só revela informação a estranhos sob determinação do Comitê Executivo.
+
+O Arcanum opera numa série de camadas, começando pela comunidade acadêmica em geral, onde também faz seu recrutamento. Nesses círculos, o Arcanum é conhecido simplesmente como uma sociedade erudita que apoia investigações em pesquisas marginais. O Arcanum é ativo em muitas publicações, incluindo mídias tradicionais como livros e periódicos. Recentemente, começaram a avaliar e apoiar os trabalhos de indivíduos e grupos pela internet que investigam e relatam por mídias mais novas, como vídeos ou podcasts. A filiação ao Arcanum não é secreta, e eles são frequentemente procurados diretamente por acadêmicos curiosos interessados em entrar na Confraria. A primeira camada do Arcanum são esses Associados, os jovens estudiosos, pesquisadores ou outros investigadores que trabalham com o Arcanum mas não estão de fato sujeitos às regras nem gozam dos privilégios de um membro pleno. Os Associados que começam a fazer perguntas ao Arcanum, examinando o propósito da sociedade e buscando iluminação além de seu foco pessoal, são convidados a entrar como Neófitos. Esses Neófitos estudam sob um mentor, muitas vezes um Irmão Ancião que lhes dá acesso à literatura e aos recursos do Arcanum conforme necessário. Os Neófitos são as “crianças” do Arcanum, ali para aprender e estudar, mas não contribuem para a conversa maior da sociedade. Com exame e ritual, um Neófito se gradua como membro pleno do Arcanum, um Arcanista, às vezes chamado de Irmão, Irmã ou Irmão-em-geral. Embora não seja um posto acima dos demais, os membros que demonstraram ser sábios e eruditos recebem o honorífico de “Ancião”, ainda que isso não tenha relação com idade ou senioridade dentro do Arcanum.
+
+Em termos de organização, a sociedade do Arcanum se reporta ao Comitê Executivo na Casa Fundação, sob direção do Grão-Chanceler. A própria Casa Fundação é uma propriedade enorme e ostenta o “Axis Mundi”, que eles alegam ser a mais completa biblioteca de tudo que é arcano e sobrenatural. Casas Capitulares pelo globo coordenam e apoiam os Arcanistas locais. Cada Casa Capitular tem liberdade para se organizar conforme a necessidade de seus membros, assumindo funções abaixo do Chanceler local, como Diretor Financeiro, Bibliotecário-Chefe ou Sargento de Armas. Essas Casas Capitulares podem oferecer hospedagem aos Arcanistas, nas próprias instalações ou nas proximidades. Servem também como locais seguros para onde um Arcanista pode se recolher em caso de problemas que apareçam durante investigações. Dentro das Casas Capitulares, os membros também se ligam como uma “loja” de vários Arcanistas, muitas vezes uma turma graduada de Neófitos, que trabalham juntos para perseguir seus interesses variados, reunindo especialistas de campos diferentes para trabalhar num único problema. Esses interesses são apoiados por um Colégio, que ajuda a organizar a pesquisa de diferentes campos, como o Colégio de Taumatologia, o Programa de Estudos Herméticos e a Escola de Mitoarqueologia.]==] },
+				["The Children of Osiris"] = { pt = [==[M20 Sorcerer, pág. 82
+
+
+The Children of Osiris
+
+
+Atributos Favorecidos: Inteligência, Raciocínio
+
+Caminhos Favorecidos: Ephemera, Healing, Herbalism e Oneiromancy
+
+No antigo Egito, muito antes de as pirâmides se erguerem, antes de o faraó Narmer unir os reinos alto e baixo, vivia um rei mortal, sábio e estudioso, do oeste do Egito, chamado Osíris. Osíris tinha um irmão mais novo e invejoso chamado Set, que queria governar a qualquer custo. Depois de uma tentativa de assassinato dramática mas malsucedida, a esposa de Osíris, Ísis, o salvou com sua magia. Set ficou enfurecido por Ísis tê-lo frustrado e buscou meios mais astutos de contrariar o poder dela. Encontrou exatamente a vantagem que procurava quando foi abraçado como vampiro.
+
+Encorajado por seu novo poder, Set exigiu que Osíris lhe entregasse o trono. Quando Osíris recusou, Set entrou em frenesi e despedaçou o irmão em 14 pedaços. Set espalhou os pedaços pela terra para impedir que Ísis o revivesse.
+
+Isso não bastou para deter a determinada feiticeira de reunir os pedaços do cadáver do marido. Depois de recolher tantos fragmentos quantos pôde, toda a magia empunhada por Ísis e pelo coven de Osíris trouxe Osíris de volta milagrosamente, mas de forma imperfeita. Ele estava fraco. Sua pele estava irreparavelmente danificada pelo tempo em decomposição. Foram necessários esforços contínuos do coven apenas para manter Osíris vivo.
+
+Angustiada, Ísis não suportava ver o marido morto ou em agonia constante. Ela procurou freneticamente uma solução melhor e topou com uma figura misteriosa que prometeu restaurar seu marido. Estava desesperada demais para discutir o que o processo envolveria, ou qual seria o custo, e aceitou. A figura misteriosa abraçou Osíris como vampiro.
+
+Osíris massacrou seu amigo mais próximo no coven imediatamente após o abraço. Quando percebeu que não apenas matara seu querido amigo mas consumira seu sangue num frenesi de fome, ficou horrorizado. Tomado pelo luto, culpou Ísis e jurou encontrar um meio de banir seus impulsos monstruosos. O coven se partiu em dois: os que simpatizavam com Osíris e os que o achavam um monstro irredimível. Aqueles poucos simpatizantes foram os primeiros Filhos de Osíris mortais.
+
+A Afiliação cresceu, unindo-se a vampiros que também buscavam a liberdade de suas Bestas e a feiticeiros que buscavam reconciliar vida e morte para se tornarem imortais sem as falhas do vampirismo. A princípio, os Filhos feiticeiros e vampiros eram tratados como iguais. Contudo, depois que Set finalmente matou Osíris, os vampiros da facção tomaram o controle. Os feiticeiros se tornaram servos de seus mestres vampíricos, embora os Filhos mortos-vivos supostamente seguissem a ordem de Osíris de que jamais abraçassem seus equivalentes feiticeiros. Há algum tempo, os Filhos vampiros desapareceram, deixando os feiticeiros por conta própria.
+
+Os Filhos de Osíris são poucos, mas crescem lentamente devido ao interesse mundial crescente pela tradição do antigo Egito e à recente descoberta de algumas tumbas de Osíris. Estão concentrados sobretudo no Egito e arredores, mas os que não vivem no Egito fazem questão de visitá-lo com a maior frequência possível. Organizam-se em templos ocultos projetados à maneira de tumbas. Os Filhos de Osíris são liderados pelo membro mais experiente, de qualquer gênero, seja ele o mais velho ou não. A iniciação leva anos para ser concluída e consiste em rituais solenes modelados a partir de práticas funerárias do antigo Egito, seguidos de estudo guiado de línguas antigas e textos mágicos.
+
+Eles normalmente praticam uma vida saudável, com dietas simples e exercício regular incentivados. Todos os Filhos, independentemente do gênero, mantêm a cabeça raspada, embora muitos usem perucas fora de seus templos. Isso é tanto uma prática ritual quanto uma questão de saúde — quando os Filhos de Osíris estavam em sua infância, o único modo confiável de evitar piolhos e as infecções de pele potencialmente fatais que deles resultavam era raspar a cabeça.
+
+Os Filhos ainda veneram Osíris como um deus, alegando que ele não se foi para sempre, mas assumiu seu lugar de direito como rei do submundo. A maioria dedica seu tempo ao estudo meticuloso de seus Caminhos. Alguns arranjam tempo para manter uma rivalidade unilateral com o mais poderoso Cult of Isis, embora isso geralmente não seja incentivado e seja considerado uma distração da verdade em seus estudos. A progênie de Set em grande parte deixou os seguidores mortais de Osíris em paz desde o desaparecimento dos Filhos vampiros, mas, se seus descendentes encontrassem um templo feiticeiro dos Filhos de Osíris, as coisas ficariam feias rapidamente.]==] },
+				["The Crystal Circle"] = { pt = [==[Sorcerer’s Companion, pág. 19
+
+
+The Crystal Circle
+
+
+Iniciação
+
+Os poderosos manipuladores de magia do secreto Crystal Circle estão envoltos em rumor e mistério, uma organização Changeling que está na boca de muitos, mas sobre a qual a maioria pouco sabe. Amplamente conhecidos como heróis e magos poderosos, poucos sabem como aprenderam a dominar a magia com tanta facilidade, ou como conseguiram sobreviver a suas incursões no Sonhar. Praticamente nenhum deles sabe que um coven de magos estáticos vem trabalhando lado a lado com a cabala do Crystal Circle, uma aliança de certo tipo entre Conjurador e Fae que não se via desde antes do Despedaçamento. Embora os grupos não sejam tecnicamente o mesmo, já que os feiticeiros e os Changelings de seus respectivos Círculos mantêm organização própria, eles estão tão incrivelmente entrelaçados que bem poderiam ser parte do mesmo grupo.
+
+Um feiticeiro precisa ser bem renomado e bem versado em seus talentos mágicos para entrar no Crystal Circle, e muitos deles primeiro praticam de forma independente ou em outro grupo (mecanicamente, isso significa que precisam de ao menos 10 pontos em Caminhos para entrar). Aqueles que têm a aptidão certa e que são vistos pelo coven como tendo a pureza de intenção certa, e o espírito certo de curiosidade e exploração, são abordados e recebem a chance de entrar. Essa iniciação geralmente envolve uma viagem ao Sonhar por conta própria do usuário de magia, uma jornada perigosa para quem não tem o senso Kithain das leis daquele reino. Essa jornada normalmente é feita com um objetivo bem simples: recolher um objeto do Sonhar Próximo que não possa ser visto de um Rath ou Feudo, ou aprender um segredo com uma Quimera da região; mas, para quem não tem experiência com o Reino, isso já é tarefa difícil o bastante.
+
+Organização e Estilo
+
+Em geral, o Crystal Circle trabalha em estreita colaboração com seus equivalentes Changeling, os dois compartilhando seu conhecimento mágico e ajudando o outro a desenvolver seus talentos de um modo que se entrelaça de forma bastante única em comparação com alianças semelhantes. Alguns do coven diriam que a Nomeação foi desenvolvida com a ajuda de usuários de magia mortais, afinal, e muitos rituais conjurados pelos feiticeiros do Crystal Circle espelham por sua vez os Cantrips Changeling.
+
+Internamente falando, o grupo é pequeno demais para ter uma organização de verdade, e é difícil dizer se estão em pé de igualdade com os Sidhe do Crystal Circle que lideram os seus, ou abaixo deles. De modo geral, ou se está no comando ou não, embora os mais adeptos na magia recebam mais respeito que os de habilidade menos aparente.
+
+Boa parte da feitiçaria realizada pelo Crystal Circle é feita de maneira semelhante aos bunks e trabalhos de glamour dos Fae. Para produzir seus efeitos, a Energia (especialmente Glamour) é o instrumento mais usado, assim como os já mencionados bunks espelhados, línguas e nomes verdadeiros, e escritos ou inscrições; a ideia básica por trás de tudo isso é que a pura energia criativa do Glamour e da Mana apenas precisa ser guiada e moldada apropriadamente para ter efeito sobre o mundo mais amplo.
+
+Caminhos
+
+Mana Manipulation, Oneiromancy, Dowsing (pág. 21) e Enchantment são os mais usados entre os feiticeiros do Círculo, mas eles se orgulham de ter um amplo leque de capacidades e, portanto, podem potencialmente desenvolver qualquer Caminho.]==] },
+				["The Cult of Isis"] = { pt = [==[M20 Sorcerer, pág. 83
+
+
+The Cult of Isis
+
+
+Atributos Favorecidos: Carisma, Manipulação
+
+Caminhos Favorecidos: Divination, Fascination, Fortune, Healing
+
+O Cult of Isis é um grupo fraturado e disperso, distante no tempo e no espaço de suas origens no Egito, aos pés da deusa da cura, Ísis. Ramos do Culto já foram de magos pacíficos buscando nutrir a humanidade a feiticeiros da natureza que abençoavam tanto o campo quanto o ventre. Depois da destruição da deusa-mãe, seu filho, Hórus, tomou o controle do Culto para lutar contra o assassino, Set, e seus filhos amaldiçoados. Na época de Cleópatra, o Culto havia caído em desgraça, uma casca partida de sua antiga glória, mas, à medida que Roma conquistava o Egito, o Culto se uniu ao culto de outras deusas, e o nome de Ísis passou a ser pronunciado ao lado dos de Juno, Ceres e Vesta. Cultos de fertilidade se espalharam pela região em nome dela, e mais cultos de mistério diluíram o Culto numa miríade de seitas e ramos, alguns com crenças e propósitos radicalmente diferentes.
+
+Nos tempos modernos, a influência do Culto pode ser vista nos ensinamentos de Tradições como os Extáticos e os Verbena, ou entre Kindred corrompidos que hoje seguem os ensinamentos de Set, mas há um novo Cult of Isis que floresceu na esteira da Primavera Árabe de 2010. Liderado por uma maga que se chama Semet, este ramo do Culto é dedicado a uma nova era de cura e paz. Isso começou como a tentativa de uma pequena seita de cuidar das relíquias e maravilhas ocultas do passado, em meio a agitação e sofrimento. A sacerdotisa Semet organizou o Culto como socorristas de rua, enfermeiros, cuidadores e mediadores. O Culto não assume postos de liderança nem toma partido em política, apenas cuidando dos feridos ou dos que ficam no meio do fogo cruzado, na esperança de impedir que qualquer conflito escale além do reparável. Os símbolos do disco lunar com chifres de Ísis ou de suas asas abertas são colocados como marcos de refúgio e segurança. Esta seita do Culto não abandonou os ensinamentos místicos de Ísis. Em meio a uma organização de socorristas amadores pelas redes sociais, o Culto opera sua magia, tratando dos piores ferimentos, que eles prometem “não serem tão graves quanto parecem”. A portas fechadas, o sacerdócio moderno de Ísis realiza rituais para abençoar as mãos dos trabalhadores, e amuletos sagrados são encantados para a proteção de seus membros.
+
+Enquanto o ramo de Semet cresce e se espalha pela região, outros Cultos seguiram em moldes mais tradicionais. Cultos de fertilidade ligados à sensualidade e ao sexo se valem de impulsos naturais da humanidade — experiências extáticas que aproximam da deusa e alimentam sua magia. Hieróglifos egípcios, cânticos demóticos e arquitetura geomântica precisa dão poder a rituais transmitidos por mais de sete milênios. Esses Cultos cresceram e viajaram longe, primeiro do Egito a Roma, depois por todo o Império Romano, e agora a cada canto do globo, com dezenas de faces para a deusa. Seitas secretas que operam manipulação e controle sociais, irmandades zelosas que reverenciam todas as deusas sagradas, ou alguns dos poucos que ainda apoiam Hórus, o filho imortal de Ísis, em sua busca por vingança — todos reverenciam o nome da deusa e se contam como um Cult of Isis.]==] },
+				["The Cult of Mercury"] = { pt = [==[M20 Sorcerer, pág. 83
+
+
+The Cult of Mercury
+
+
+Atributos Favorecidos: Carisma, Vigor
+
+Caminhos Favorecidos: Conjuration, Conveyance, Divination, Fortune, para o templo romano. Substitua um deles por um Caminho aplicável à interpretação local de Mercúrio, a critério do Narrador.
+
+O Cult of Mercury foi fundado na Roma antiga entre muitos cultos semelhantes devotados a divindades específicas dos panteões locais e vizinhos. Seu primeiro templo ficava no Circo Máximo, perto de uma pista de corrida de cavalos e de um popular ponto de mercadores, local apropriado para um deus da fortuna financeira e das viagens rápidas.
+
+Mercadores locais, e depois até senadores, afluíram ao culto para dar apoio às suas elevadas aspirações de poder. Apesar de atrair populações que de outro modo seriam propensas a ambições implacáveis, o Cult of Mercury exige imenso trabalho em equipe. O culto realiza exclusivamente magia ritual, organizando até centenas de seguidores numa prática cooperativa intrincada para criar seus efeitos. O simples número de feiticeiros realizando rituais juntos exige várias camadas de liderança para organizar todas as engrenagens. Durante os rituais, todos os feiticeiros vestem túnicas, togas ou outras roupas brancas limpas, mais apropriadas à região nos templos fora de Roma. Os rituais incluem incenso, movimento coordenado, velas acesas, o segurar de objetos associados à intenção do ritual e toda a assembleia entoando em latim e grego antigo.
+
+Devotos de um deus das viagens, os membros do Cult of Mercury sem aspirações políticas locais viajavam e formavam novas congregações como forma de subir rapidamente de posto no culto. À medida que o Cult of Mercury se espalhou por outras regiões, tanto por conquistas romanas quanto pelo comércio, os cultistas assemelharam Mercúrio às divindades locais, alegando que essas outras divindades eram simplesmente aspectos e compreensões diferentes de Mercúrio. Assim, os templos podem focar Caminhos mais aplicáveis à sua interpretação local de Mercúrio, como Shapeshifting para o aspecto Mercurius Artaios, um deus dos ursos e da caça no sudeste da França. As práticas são igualmente localizadas, com elementos rituais tradicionais dos primeiros congregantes da região.
+
+O Cult of Mercury sofreu um duro golpe em liderança e retenção de membros quando Constantino converteu o Império Romano ao cristianismo. Muitos dos que entraram em busca de boa sorte concluíram que não estariam desafiando tanto o destino ao aderir à nova religião majoritária e patrocinada pelo Estado, em vez de ficar com o que conheciam. Os templos que continuaram a praticar esconderam sua religião disfarçando-se de igrejas cristãs. Os efeitos dessa mudança persistem até hoje, com os postos de liderança do Cult of Mercury compartilhando nomes com cargos da igreja católica.
+
+O Cult of Mercury procura tirar proveito da recente onda de popularidade das religiões antigas. Sem conversões suficientes, templos inteiros ruem quando os membros mais velhos morrem e o número já não sustenta o elaborado trabalho ritual. O culto prefere os ambiciosos e aventureiros, mas no fim a liderança não é exigente, desde que haja subordinados suficientes para que os rituais funcionem. Pais são incentivados a trazer os filhos para o culto assim que tiverem idade para executar tarefas rituais auxiliares simples — e para guardar segredos nas regiões em que a prática é estigmatizada.
+
+O Cult of Mercury pode realizar feitos impressionantes quando em plena força, mas está limitado a magia ritual com não menos de 50 participantes. Embora um cultista não possa usar magias conjuradas de improviso, é costume que os templos preparem rituais de antemão, que membros habilidosos possam terminar de conjurar numa emergência. Personagens do Cult of Mercury podem aprender 2 rituais gratuitos adicionais para cada ponto num Caminho. Pastorear uma grande congregação não é tarefa fácil e exige liderança com Atributos sociais fortes. Carisma costuma ser o Atributo favorecido para cultistas com papéis ou aspirações de liderança, enquanto o cultista médio de uma congregação pode preferir Vigor, pela paciência e dedicação de ser uma engrenagem em rituais imensos.]==] },
+				["The Dozen Priests of the Pythian Order"] = { pt = [==[M20 Sorcerer, pág. 84
+
+
+The Dozen Priests of the Pythian Order
+
+
+Atributos Favorecidos: Carisma, Inteligência
+
+Caminhos Favorecidos: Divination, Healing, Shapeshifting, Weather Control
+
+A própria Ordem Pítia já atravessou o mundo helênico e grego. Seus membros eram especialistas em adivinhação, que transmitiam as palavras dos deuses e encontravam sua magia no ritmo e na rima da poesia. Não meramente uma forma de arte, mas uma expressão de numerologia, a prática pítia unia música, astrologia e matemática, ressoando com a música das esferas. Eles se esforçavam para encontrar exatamente a métrica poética certa para encapsular essa magia, prendendo-a a textos para armazenar esse poder. Magia delicada e minuciosa, era raro dominá-la. O número de sacerdotes da Ordem Pítia diminuiu com o tempo. Quando a ciência e o saber declinaram na Europa, a Ordem Pítia já havia caído em desgraça. Seus números minguaram àqueles poucos que haviam estendido a própria vida além dos limites naturais da humanidade.
+
+Na época do Renascimento e do interesse renovado pelos clássicos, os Doze Sacerdotes da Ordem Pítia que ainda viviam foram procurados. Os poucos textos pítios que haviam chegado aos eruditos da época eram uma maravilha, e a Ordem Pítia ganhou um punhado de novos convertidos. No período romântico, o interesse cresceu ainda mais, especialmente entre os poetas da época. Esses artistas descobriram que o sentido de sua poesia alcançava novas alturas quando inspirado pelo saber esotérico dos pítios. Contudo, surtos de popularidade nunca revitalizaram a Ordem Pítia além dos poucos eruditos antigos que restam, mesmo com novos magos se dedicando ao ofício.
+
+O que resta da Ordem — os Doze Sacerdotes hoje reduzidos a quatro — habita um templo em Milos, uma ilha ao largo da costa da Grécia. Ali, os versos sagrados são preservados, e os Sacerdotes começaram a questionar se devem lutar contra a inevitável erosão do tempo e deixar a Ordem Pítia finalmente cair, ou buscar novos alunos, dignos e dedicados, para transmitir seu conhecimento. Não é meramente uma questão de perda de conhecimento, pois sua poesia está guardada, e outras obras pítias estão em arquivos e museus. Há mais a considerar, pois os sacerdotes remanescentes acumularam poder imenso ao longo de séculos de estudo. Deixá-lo morrer com eles parece uma afronta aos deuses por quem um dia falaram. Eles trabalham agora nesse sentido, adivinhando o futuro e o próprio fim dos seus dias, para ver se chegarão alunos para aprender com eles ou se seguem agarrados à tradição por teimosia fútil.]==] },
+				["The Fenian"] = { pt = [==[M20 Sorcerer, pág. 85
+
+
+The Fenian
+
+
+Atributos Favorecidos: Manipulação, Aparência
+
+Caminhos Favorecidos: Fascination, Shapeshifting, Weather Control
+
+Muitos feiticeiros que compartilham ancestralidade com os celtas alegam ter sangue e poder feéricos em sua linhagem. Na maior parte das vezes, isso é ou patentemente falso ou remoto demais para importar. Os Fenian são diferentes. São uma família ininterrupta de metamorfos de sangue feérico que podem, se acreditarmos neles, traçar sua linhagem até os Tuatha Dé Danann. Seu domínio da mudança para formas animais é prova adicional dessa alegação.
+
+Nos primeiros dias da família, eles eram um grupo de aventureiros meio-feéricos que encontraram mais aventura do que esperavam. A faísca da exploração os atingiu, e eles deixaram para trás suas conexões humanas para encontrar a verdade de sua linhagem. Ao descobrirem sua ligação com os fae, alguns abandonaram a humanidade por completo para se juntar ao Sonhar. Os outros fizeram acordos com os Tuatha Dé Danann para aprender a controlar a magia em seu sangue. Adotaram formas animais conforme suas personalidades: os guerreiros comumente mudavam para ursos ou grandes felinos, enquanto os trapaceiros de espírito livre viravam raposas ou corvídeos. Todos os Fenian aprenderam a influenciar as opiniões dos mortais, e alguns poucos ganharam verdadeiro domínio sobre o clima. A família não é tanto uma família normal de feiticeiros, mas uma família de seres inatamente mágicos. Os contratos mágicos, ou geasa, eram talhados para cada Fenian conforme a tradição e as tendências pessoais. Um Fenian que aprecia muito os prazeres da vida pode ser proibido de comer certos tipos de comida, enquanto um Fenian que resiste à autoridade pode ser obrigado a sempre aceitar orientação — mesmo que a orientação seja prejudicial. Um Fenian pode assumir um geas por poderes ao aprender um novo Caminho ou ritual, e ele também pode se aplicar a seus descendentes.
+
+Hoje em dia, os Fenian estão à beira da extinção. Alguns especulam que seu sangue feérico está ficando ralo demais; outros suspeitam que alguém quebrou os geasa com os Tuatha Dé Danann. Ainda há esperança: uma criança da família chamada Niamh desenvolveu a habilidade de falar com animais depois de uma geração inteira sem qualquer aptidão ou predileção mágica. Há apenas algumas dezenas de feiticeiros Fenian vivos e ativos atualmente.
+
+Dada sua herança mágica, os Fenian tratam todos os Caminhos favorecidos Fenian como seus Caminhos de Afinidade, mas aprendem toda a outra magia estática a um custo maior. Pagam 10 de experiência para aprender um novo Caminho não-Fenian, novo nível x8 para aumentar um Caminho não-Fenian e nível x2 para rituais não-Fenian. Qualquer Fenian sob o efeito de geasa quebrados recebe uma penalidade adicional de experiência para toda a magia estática, aumentando o multiplicador de nível em 1, e +1 de dificuldade a toda magia estática e fenômeno psíquico. É portanto mais difícil para gerações inteiras aprender e usar magia estática do que para a pessoa comum, se quebrarem os geasa. Esta é a única linhagem feiticeira remanescente conhecida com mais probabilidade de passar por uma Crisálida Changeling do que de Despertar como Mago.]==] },
+				["The Nephite Priesthood"] = { pt = [==[M20 Sorcerer, pág. 89
+
+
+The Nephite Priesthood
+
+
+Atributos Favorecidos: Vigor, Raciocínio
+
+Caminhos Favorecidos: Divination, Enchantment, Hellfire, Summoning, Binding, and Warding e Weather Control
+
+O Nephite Priesthood, também conhecido como “Os Profetas da Poeira”, é uma Afiliação exclusiva de místicos da Igreja de Jesus Cristo dos Santos dos Últimos Dias. Eles acreditam que Joseph Smith não revelou publicamente os segredos de um sacerdote chamado Néfi, a quem Deus ensinou por meio de sonhos a realizar milagres. Néfi manteve um grupo de discípulos para transmitir o conhecimento divino e servir seu povo. Néfi e seus discípulos foram mortos na batalha de Cumorah, e o conhecimento se perdeu por mais de um milênio. Em 1849, Néfi se revelou como ser celestial a um piedoso colono do deserto chamado Uriah Spence, para que Uriah restaurasse o Sacerdócio e protegesse a Igreja de um governo opressor e de outros forasteiros hostis. Eles também se preparam para um confronto final vindouro, quando chegar o apocalipse. Todos os Profetas da Poeira juram votos de segredo. Não lhes é permitido deixar que membros da Igreja saibam de suas habilidades milagrosas.
+
+Para entrar no Sacerdócio, é preciso ser um homem em boa situação dentro da Igreja. A maioria dos Sacerdotes Nefitas nasceu na Igreja, mas convertidos não são inéditos. Se um homem não é Santo dos Últimos Dias, precisa primeiro se converter à Igreja e estudar por ao menos vários anos antes que um sacerdote nefita o aborde. Eles acreditam que qualquer um que se desviasse de um código de conduta estrito seria rapidamente corrompido pelo poder e arriscaria a danação. Os ritos de iniciação são realizados em templos secretos. O iniciado, conhecido como Diácono, jejua primeiro por três dias. Ao nascer do sol do quarto dia, ele entra no templo, se despe e é ungido com óleo. Passa a manhã em oração. Ao meio-dia, o Diácono se veste com um manto branco puro. Um Sacerdote assiste ao altar, separado do Diácono por um véu, e ora com o iniciado. Ao término da cerimônia, o Diácono “renasce” no reino celestial, atravessando o véu e aproximando-se do altar para uma oração final.
+
+Depois do ritual, o Diácono passa dois anos estudando os milagres e a história nefita, incluindo os nomes sagrados dos Sacerdotes Nefitas originais que se deve invocar para realizar os milagres. Para progredir ao sacerdócio e além, o Profeta da Poeira passa por rituais cada vez mais longos e solenes. Sacerdotes podem agir por sua própria conta na ausência de Anciãos e, após a ordenação, precisam passar ao menos dois anos peregrinando fora do deserto, tipicamente pela América Central e do Sul, para espalhar a fé e conhecer o mundo exterior. Anciãos são sacerdotes mais velhos e experientes, que tipicamente passam ao menos uma década peregrinando e aprendendo após a ordenação. O Sumo Sacerdote-Profeta é o ancião de posto mais alto, escolhido por voto popular entre os Anciãos. A maioria dos Sacerdotes Nefitas faz uma jornada anual, peregrinando por 40 dias e 40 noites pelo ermo que se estende de Utah à América do Sul, viajando o mais longe possível da civilização.
+
+Em 4 de janeiro de 2000, no 104º aniversário da criação do estado de Utah, todo o Nephite Priesthood se reuniu em Salt Lake City com um propósito desconhecido. O que restou dos relatos se contradiz enormemente, mas uma coisa é certa: ocorreu um evento de proporções apocalípticas. Apenas um Ancião Nefita, Porter Larsen, restou para transmitir o conhecimento e reconstruir a facção. Alguns sussurram que um ritual em massa deu terrivelmente errado, outros especulam que houve o arrebatamento, levando todos menos um Ancião e deixando o resto do mundo à sua ruína. Ninguém reivindica abertamente o crédito pelo que quer que tenha acontecido, e o Ancião Larsen nada acrescentou à discussão. Sua missão é reconstruir o Sacerdócio, diz ele, não perder tempo se preocupando com o que não pode mudar. Ele não foi visto muito em público desde então, e o novo Nephite Priesthood não chamou atenção para si.
+
+A possibilidade de um ataque externo não é implausível. O Nephite Priesthood tinha muitos inimigos. Agências de inteligência dos EUA acumularam arquivos imensos sobre a organização, atribuindo-lhe ações antigovernamentais (merecidas e imerecidas); consequentemente, o Project Twilight vigiava o Sacerdócio. O Nephite Priesthood acredita que seus poderes são dons divinos e considerava todos os outros feiticeiros místicos adoradores do diabo. Na melhor das hipóteses, os Profetas da Poeira os evitavam, mesmo quando invadiam terras alheias durante suas peregrinações. Consideravam interações amistosas com outras sociedades místicas potencialmente traiçoeiras. Alguns permanecem esperançosos de que a Afiliação, se e quando ressurgir, não seja tão beligerante quanto foi sob a liderança anterior.]==] },
+				["The Seven Thunders"] = { pt = [==[M20 Sorcerer, pág. 90
+
+
+The Seven Thunders
+
+
+Atributos Favorecidos: Carisma, Manipulação
+
+Caminhos Favorecidos: Divination, Fortune, Healing, Hellfire
+
+O Armagedom estava previsto para a virada do milênio, mas os anos continuaram a se acumular, e os Seven Thunders, os profetas desse apocalipse, descobriram que seu exército de fiéis perdeu a fé. A Fé Verdadeira dos sete profetas não vacilou nas décadas que se passaram. Eles continuam sua missão, ainda que mudada e ajustada à medida que percebem que sua compreensão mortal das visões divinas era falha. Os Seven Thunders se espalharam pelo globo, apoiados por seus poucos seguidores fiéis remanescentes, enquanto trabalham para trazer o julgamento sobre os ímpios. Os Seven Thunders não olham mais para o relógio, esperando uma data específica para a chegada do Armagedom. Acreditam que ele virá no tempo determinado, e não antes. Pode ser que o Armagedom não chegue antes que eles tenham preparado plenamente a terra para ele.
+
+Com essa nova visão de sua missão, os Seven Thunders buscam os ímpios, os falsos deuses e os desencaminhados. Vão rebaixar os altos e poderosos; trazê-los à luz de sua fé. Se necessário, vão destruí-los. Eles são o Julgamento na Terra e, enquanto os profetas erguem a espada da fé contra as maiores ameaças, seus seguidores procuram os inimigos que puderem encontrar. Os Thunders pregam o fim do mundo, exibindo sinais de sua fé, curando os enfermos e expulsando espíritos imundos. Enquanto isso, comandam pessoas comuns armadas de rosários e rifles para combater vampiros, lobisomens e místicos.
+
+Com o passar do tempo, os Seven Thunders descobrem que não estão em completo acordo. Embora acreditem ter a mesma missão, o caminho que trilham mudou. Agora fisicamente separados para cobrir mais território e apressar a chegada do Armagedom, os métodos e focos dos Seven Thunders se diversificaram conforme o que cada profeta considera mais importante. Os profetas não são dedicados a territórios específicos, mas viajam pelos continentes conforme suas visões os conduzem, buscando redes de apoio locais para suas missões. Isso significa que alguns apoiadores se veem passando de pastores de sua comunidade local a caçadores de licantropos na mata no espaço de uma semana. Essa mudança contínua de prioridades e de liderança afastou alguns seguidores, mas os que permanecem são dedicados à causa, arriscando suas relações e suas vidas.]==] },
+				["The Silver Portal"] = { pt = [==[M20 Sorcerer, pág. 90
+
+
+The Silver Portal
+
+
+Atributos Favorecidos: Carisma, Percepção
+
+Caminhos Favorecidos: Ephemera (Umbrood), Fascination, Oneiromancy, Shadows
+
+A mente é uma coisa poderosa. Quando dormimos, até os não iniciados podem provar o potencial dos indomados mundos oníricos. O caos é apenas potencial esperando para ser explorado. O Silver Portal é único nessa compreensão da habilidade mágica entre as Afiliações de feiticeiros. Seu texto sagrado é uma obra eldritch que foi repassada como um telefone sem fio ao longo de séculos, línguas, múltiplas revisões massivas e culturas, virando algo inteiramente alheio ao pergaminho persa do século V (ou ainda mais antigo, como alega) chamado Zolondrodere, do qual deriva. Ele ensina que todo pensamento e toda ideia possíveis existem à deriva em Maya, os Reinos do Sonho, esperando alguém com poder para arrancá-los desse reino subliminar e trazê-los à realidade.
+
+Os segredos do Zolondrodere desafiam o pensamento racional, mesmo para padrões místicos. A mente sã costuma rejeitar os ensinamentos do tomo, então os iniciados do Silver Portal muitas vezes precisam começar seu estudo por hipnose, indulgência em substâncias alteradoras da mente e privação ritual de sentidos e de sono. Assim que o feiticeiro começa a sentir que compreende, ele entra num transe onírico, com frequência diante de um espelho inscrito com símbolos místicos tidos como promotores de abertura. Uma vez cruzado o portal de prata rumo a Maya, encontram Umbrood estranhos e imagens desorientadoras e potentes — fantásticas e horríveis em igual medida. Ali, encontram poder para trazer ao mundo desperto.
+
+Eruditos Despertos compararam as práticas do Silver Portal à natureza caótica dos Marauders, o que é um pensamento bastante horrível para a maioria. Os feiticeiros permitem que os reinos oníricos lhes confiram magia que se derrama no mundo desperto. Para um feiticeiro do Silver Portal, sonho e realidade não são dois conceitos distintos e se sobrepõem bastante. São os mais flexíveis de todos os feiticeiros, capazes de dobrar as regras da magia linear com suas práticas sem levar um tapa da Realidade por isso.
+
+O feiticeiro do Silver Portal mantém registro do número total de pontos gastos em Caminhos e rituais a todo momento. Sempre que o feiticeiro entra no Reino do Sonho de propósito por um transe, o jogador do feiticeiro pode redistribuir esses pontos entre Caminhos e rituais como quiser, mesmo para Caminhos que o feiticeiro ainda não conhece. Para cada Caminho pretendido, o feiticeiro testa seu Atributo Favorecido mais Meditação com dificuldade 6 ou Sonho Lúcido com dificuldade 5. O número de sucessos é o número de pontos que o feiticeiro pode possuir naquele Caminho, até o número de pontos alocados. Todos os pontos alocados que não forem obtidos com sucessos ficam inacessíveis até o efeito terminar. O feiticeiro viaja pelo Reino do Sonho para encontrar esses poderes e rituais, e o narrador é incentivado a usar imagens oníricas surreais para a jornada. Ele pode usar esses poderes temporários no Reino do Sonho e na realidade desperta até ter um sono reparador. O feiticeiro precisa ter um sono reparador antes de poder entrar em transe para redistribuir os pontos de Caminho de novo. Como o feiticeiro não aprende Caminhos diretamente por meios normais, ele precisa primeiro redistribuir pontos para um Caminho ou ritual e gastar a Experiência para torná-lo um de seus poderes básicos.
+
+Não há hierarquia formal no Silver Portal, dada a natureza dos próprios feiticeiros. Novos membros conquistam a iniciação fascinando um feiticeiro do Silver Portal tanto no mundo desperto e sem graça quanto por seus sonhos.]==] },
+				["The Society of Enlightened Altruistic Ideologies (SEAI)"] = { pt = [==[M20 Sorcerer, pág. 91
+
+
+The Society of Enlightened Altruistic Ideologies (SEAI)
+
+
+Atributos Favorecidos: Inteligência, Manipulação
+
+Caminhos Favorecidos: Alchemy, Conjuration, Conveyance, Enchantment
+
+Os membros Iluminados da União Tecnocrata são alguns dos maiores opositores dos feiticeiros pelo mundo, quer reconheçam ou não que seu Gênio interior é um Avatar Desperto. Contudo, nem todos os membros da Tecnocracia são Iluminados, e a Society of Enlightened Altruistic Ideologies (SEAI, pronunciado si-á, para encurtar) trabalha para tratar das preocupações dos associados não Iluminados, garantindo que suas necessidades sejam atendidas. A SEAI tem um certo ar de clube social, com encontros cheios de fofoca em torno de café e bolo, mas os tópicos de conversa são mais esotéricos e profundos do que os do cafezinho comum. Como a SEAI cavalga os mundos da Ciência Iluminada e da sociedade mundana, eles adquirem conhecimento de muita coisa fora de seu alcance. Veem o poder de feiticeiros e magos, mas são obrigados a levar vidas monótonas e sem graça. Sentem ressentimento crescente pelos Desviantes da Realidade que acessaram as energias cósmicas do universo apenas para desperdiçá-las; afinal, os cidadãos extraordinários da SEAI são bem mais merecedores desses poderes.
+
+Entre empurrar papel, buscar café e reportar estatísticas, a SEAI ouviu coisas, acompanhou eventos, calculou despesas e tomou notas cuidadosas, com uma única ideia em mente: capturar um mago das Tradições, apagar-lhe a mente e tomar seu Avatar para si. Os Progenitores da Tecnocracia já trabalham na tecnologia de apagamento de mente, então, combinando essa tecnologia com algumas magias de invenção própria da SEAI, eles começaram a avançar rumo ao seu objetivo. A ideia de Avatares Nephandi é ignorada como mera propaganda ou conto de fadas e não foi verdadeiramente considerada pela SEAI. Operativos Iluminados que zombam ou riem da SEAI podem descobrir que se juntaram aos Desviantes da Realidade na lista dos que deveriam ter seu Avatar removido e entregue aos membros mais dignos e trabalhadores da SEAI. Embora ainda não tenham capturado um mago vivo, as discussões sobre como proceder foram feitas a sério, e eles estão prontos para atacar assim que surgir a oportunidade. Ocasionalmente, notícias desses planos e avanços chegam aos membros Iluminados da União Tecnocrata, causando certa preocupação, já que os membros da SEAI se agrupam conforme a Tradição a que se juntariam, fossem eles Despertos. Quando esses rumores chegam à alta gerência, os membros da SEAI que falaram demais ou foram vistos desviando do protocolo são normalmente levados para recondicionamento.
+
+Feiticeiros de todos os tipos podem topar com a Sociedade, já que a SEAI usa magias para guardar seu trabalho e experimenta outros usos na busca de capturar um mago das Tradições. Alguns da SEAI flertam com a linha da coleta de informação e vão ‘disfarçados’ para dentro de grupos feiticeiros a fim de extrair conhecimento ou descobrir quando um mago pode estar vulnerável. Esses cidadãos correm o risco de ser pegos pela União Tecnocrata ou pelas sociedades que infiltram, caminhando no fio da navalha para tomar poder dos indignos. Outros da SEAI perdem a ‘perspectiva’ e escorregam para fora da Tecnocracia quando provam a magia por ritual e estudo, muitas vezes ao começarem a reconhecer que a hiperciência que estudaram parece tão semelhante às fórmulas herméticas.]==] },
+				["The Society of Leopold"] = { pt = [==[The Hunters Hunted II, pág. 117
+
+
+The Society of Leopold
+
+
+E o anjo falou comigo, em voz forte, clamando: “Muitos são os filhos do Dragão, a Serpente, o grande Satã, e eles estão entre vós agora. Digo-vos, Servos de Cristo, que a Parusia está próxima, que a Segunda Vinda logo chegará. Cada vez mais fortes se tornam os filhos do Dragão, e eles se multiplicam, e são uma ferida sobre a terra. E nós somos o bálsamo para essa ferida, precisamos limpá-la com fogo e purificá-la, e então a terra estará pronta para a Parusia, e seremos julgados dignos.”
+
+— Leopold de Murnau, O Testamento de Leopold
+
+Chame-os de velas no escuro. Chame-os de anjos feridos. Chame-os de zelotes sádicos. Mas não os chame de apáticos. Antes que a ciência acendesse sua luz noturna para dar coragem aos homens, essas ovelhas ousaram desafiar os senhores predadores. Não são cruzados antiquados enclausurados em mosteiros. Esta noite, eles empunham lâmina e arma em becos sórdidos pintados com sangue de monstro e o brilho trêmulo de uma cruz de neon. Eles recrutam e coordenam ataques pela internet. Tocam música coral digital em fones de ouvido para abafar as palavras venenosas dos demônios que exorcizam. Estas são as histórias da Inquisição moderna. Não há mortais que os Filhos de Caim temam mais.
+
+Tema e Clima
+
+O tema da Inquisição é o cruzado moderno. O mundo inteiro é sua Terra Santa. Quando um Inquisidor olha para a rua mais banal, não consegue deixar de ver a guerra secreta. Não há como voltar atrás. As apostas não poderiam ser mais altas. O Inimigo é o próprio Diabo, e as almas de toda a humanidade estão em jogo. Nos momentos mais sombrios, o Inquisidor sabe que esta nem sequer é a guerra verdadeira. Quando o mundo se rachar e o Inferno se soltar sobre a terra, então a verdadeira batalha começará. E a Inquisição estará pronta.
+
+O clima da Inquisição é fé e dúvida. Um pêndulo afiado balança entre as duas. O frenesi apocalíptico faz a lâmina tremer. O que é cortado? O que sangra? Pode um caçador de bruxas fazer as coisas terríveis que se exigem dele e ainda manter a fé? A paixão extática e o ímpeto, e as coisas maravilhosas e terríveis que eles nos permitem fazer, estão no coração da história do caçador fiel.]==] },
+				["The Star Council"] = { pt = [==[M20 Sorcerer, pág. 92
+
+
+The Star Council
+
+
+Atributos Favorecidos: Percepção, Inteligência
+
+Caminhos Favorecidos: A maioria dos Star Council modernos são psíquicos, mas alguns conhecem Enchantment, Healing, Shadow e Quintessence Manipulation
+
+Em julho de 1947, a notícia de uma possível queda extraterrestre em Roswell, Novo México, varreu o país. Pessoas de todas as origens ficaram encantadas e inspiradas pela possibilidade de vida além da Terra. O Star Council se formou originalmente como um punhado de entusiastas de OVNIs e pesquisadores do paranormal com ideias afins. Embora viessem de origens diferentes, de professores excêntricos a adolescentes delinquentes, encontraram comunidade e prontamente compartilharam suas teorias e descobertas sobre o espaço, extraterrestres e conspirações relacionadas.
+
+O Star Council acolheu outro grupo menor, os Thal’hun, em suas fileiras no fim dos anos 1960. Os Thal’hun eram mais fechados que o resto do Star Council e permaneceram em grande parte como facção própria, embora participassem do compartilhamento de suas crenças e descobertas. Foram os primeiros a apresentar ao Star Council provas do sobrenatural e ganharam credibilidade quando a suposta tecnologia extraterrestre que roubaram do Governo dos EUA funcionou exatamente como previram.
+
+Com o passar das décadas, o Star Council fez o possível para continuar sendo baixa prioridade para o governo. Seus esforços foram muitas vezes complicados pelas ações da facção Thal’hun, e o Star Council teve de contar com membros mais jovens e habilidosos em tecnologia e com advogados desacreditados em suas fileiras para não chamar atenção. Os objetivos divergentes e as práticas rigorosas de estudo dos Thal’hun se tornaram pontos de atrito supurantes.
+
+Sem que o grupo soubesse, o Star Council não-Thal’hun era composto em sua maioria de psíquicos no fim dos anos 1990. Esses membros normalmente acreditam ser vítimas de experimentação extraterrestre ou descendentes reais de extraterrestres. Acreditam que diferenças genéticas, naturais ou não, causaram seus poderes sobrenaturais, enquanto os Thal’hun insistiam que jamais alcançariam seu pleno potencial sem a educação Thal’hun.
+
+Quando os Thal’hun deixaram a polícia no encalço do grupo após um experimento que deu terrivelmente errado em 2002, o Star Council finalmente os expulsou. A discussão explosiva que se seguiu deixou mágoas dos dois lados, e foi preciso o esforço de todo o Star Council para limpar a bagunça tanto do experimento fracassado quanto do conflito resultante. Desde então, o Star Council voltou às suas raízes de exploradores de olhos arregalados com todo o universo a descobrir. O Star Council mantém suas práticas de estudo individualizado e de apresentação e discussão em grupo. Alguns usam “ciência alienígena” derivada das práticas Thal’hun, mas também aceitam outros paradigmas adjacentes de hiperciência e tecnomagia. O Star Council não apoia oficialmente ações para expor segredos governamentais sobre extraterrestres, mas frequentemente procuram onde não deveriam. Normalmente tentam ser discretos, mas, se algo dá errado, um colega está sempre pronto a ajudar a dar cobertura. Recentemente, alguns jovens membros audaciosos inspiraram uma multidão a invadir a Área 51 por meio de um meme viral. Não foi tão útil para reunir informações secretas quanto esperavam, mas o Star Council iniciou vários membros novos após o evento.
+
+A iniciação é uma convenção social importante no Star Council. O iniciado precisa se encontrar com os membros para estabelecer química social e apresentar uma tese informal de suas crenças sobre o extraterrestre e o futuro do universo ao resto do Star Council. Se o Star Council julgar que o iniciado está pronto e se encaixa bem, dão uma festa celebrando a nova adição ao conhecimento e à criatividade coletivos. O Star Council moderno aprendeu com seus erros com os Thal’hun e quer ter certeza de que novos iniciados contribuam sem desviar a missão da Afiliação para um rumo radicalmente diferente.
+
+O Star Council de hoje é um bando de esquisitos frequentemente desprezados que atravessa gerações. Muitos deles enfrentam ou enfrentaram dificuldades de exclusão social e, por isso, construíram a sua própria. São rápidos em ajudar uns aos outros quando é preciso, e membros que passam por maus bocados costumam ser bem-vindos a ficar na casinha que o Star Council mantém para eventos sociais do grupo.
+
+Nem todos começaram como entusiastas de OVNIs. Alguns só se interessaram pelo fenômeno depois de encontrar no Star Council uma comunidade que os aceitou. Um dos efeitos colaterais da filosofia do Star Council sobre extraterrestres é que, por pior que fique o mundo à sua volta, eles acreditam firmemente que a humanidade como um todo pode melhorar. Acreditam que há algo naquele pontinho azul de planeta chamado Terra que vale a pena atravessar galáxias para encontrar. Sua esperança persistente, ainda que devastadoramente ingênua às vezes, costuma ser sua maior força.]==] },
+				["U.S. Government (Project Twilight)"] = { pt = [==[M20 Sorcerer, pág. 93
+
+
+U.S. Government (Project Twilight)
+
+
+Atributos Favorecidos: Destreza, Raciocínio
+
+Caminhos Favorecidos: A maioria são psíquicos, mas magos estáticos comumente aprendem Divination, Fortune e Hellfire
+
+Não existe nenhuma subdivisão de inteligência dos EUA, nem mesmo classificada, oficialmente conhecida como “Project Twilight” — esse é apenas o apelido que pegou. “Project Twilight” inclui departamentos de parainteligência de várias agências, como o Departamento de Defesa, a Agência de Segurança Nacional (NSA), a Agência Central de Inteligência (CIA), o Departamento de Assuntos Especiais do FBI e até projetos secretos dentro do Centro de Controle de Doenças e do Departamento do Interior. O apelido vem de agentes brincando sombriamente que sair em missão era como viver na “Twilight Zone” (Além da Imaginação), embora o apelido traga conotações diferentes para os agentes mais jovens.
+
+Todos os projetos que caem sob o rótulo de Project Twilight são financiados por uma verba única chamada de despesas de “livro negro”, que o Congresso autoriza para operações de inteligência classificadas. Assim, a maioria dos indivíduos, mesmo em alguns dos mais altos níveis do governo, permanece sem saber da existência do projeto. As agências prefeririam que as coisas continuassem assim, já que extirpar a interferência sobrenatural intrometida no governo e manter isso em segredo do público é o trabalho dos agentes. Todos os agentes têm níveis chocantes de discricionariedade em suas funções. Nenhum jamais seria indiciado pelo que normalmente seria considerado grave abuso de poder, desde que justificado por impedir que vampiros e lobisomens corram soltos, ou por preservar a “segurança nacional”, como codificam os documentos oficiais. Mesmo que um superior achasse que o agente cruzou uma linha, ou várias, o agente simplesmente seria terminado, e nunca mais se ouviria falar dele. Isso é duplamente verdadeiro para os magos estáticos e psíquicos que trabalham para o governo.
+
+Nem todos os agentes do Project Twilight são feiticeiros, mas muitos agentes de campo são. É bem mais fácil combater sobrenaturais barulhentos com uma variedade maior de ferramentas à disposição do governo. E é assim que muitos feiticeiros do Project Twilight são vistos: descartáveis. Agentes são enviados para lidar com tudo, de ataques Sabá a magos egocêntricos numa viagem de poder (o que quer dizer, a maioria deles). No mínimo, o salário é melhor que a maioria das outras formas de um feiticeiro ganhar a vida legalmente, ainda que não honestamente.
+
+Muitos dos figurões respondem a mestres inteiramente diferentes. A Camarilla, a Tecnocracia, a Pentex e outros têm os dedos nas divisões de parainteligência para servir aos próprios objetivos, que muitas vezes coincidem com manter o público alheio ao sobrenatural. Por outro lado, os agentes nunca podem ficar bons demais em desenterrar o sobrenatural dentro das próprias organizações; os sobrenaturais envolvidos nas agências não permitem. Embora muitos agentes possam ser rigorosamente eficazes em campo, os conflitos de interesse inerentes aos níveis superiores servem para manter os agentes focados em assuntos fora de sua agência, e não em seus superiores.
+
+Psíquicos são de interesse particular para o governo por vários motivos. Tendem a ter Força-de-Vontade bem acima da média, e suas habilidades tendem a funcionar sem necessidade de rituais longos ou equipamento especializado. Além disso, tendem a ser mais fáceis de aceitar como legítimos pelos não feiticeiros, por causa da quantidade imensa de mídia que retrata psíquicos trabalhando nas agências de três letras. Por causa da influência tecnocrata no governo e na cultura dos EUA, os magos estáticos nos projetos de parainteligência são majoritariamente tecnofeiticeiros.
+
+Feiticeiros não afiliados à Tecnocracia dificilmente confiam em feiticeiros envolvidos com o Project Twilight, se o empregador deles (mesmo apenas o mundano) for conhecido. Nem mesmo outros feiticeiros do Project Twilight tendem a confiar uns nos outros, dada a frequência com que acabam espionando uns aos outros. O governo tem uma história longa e sangrenta de opressão de grupos de etnias, religiões e outras identidades minoritárias — que compõem a maioria dos covens de feiticeiros. Historicamente, a magia foi uma válvula para grupos oprimidos corrigirem injustiças e se protegerem quando os sistemas lhes falharam ou nunca foram desenhados para protegê-los em primeiro lugar.]==] },
+				["Uzoma"] = { pt = [==[M20 Sorcerer, pág. 95
+
+
+Uzoma
+
+
+Atributos Favorecidos: Carisma, Raciocínio
+
+Caminhos Favorecidos: Alchemy, Healing, Summoning, Binding, and Warding, Quintessence Manipulation
+
+Originários das regiões iorubás da África, os Uzoma são os guardiões do mundo espiritual, intercedendo entre os orixás, os deuses de toda a criação, e a humanidade. Por anos serviram como sacerdotes e feiticeiros, chamados babalawos, dentro da cidade-estado sagrada de Ifé, mas, à medida que outras civilizações oprimiram e escravizaram seu povo, os Uzoma começaram a perder influência. Os Uzoma ganham poder dos orixás, os orixás ganham poder dos crentes e, à medida que seu povo era levado à escravidão, sua crença vacilou. Para onde quer que seu povo fosse levado, os Uzoma iam junto. No Novo Mundo, essa fé se fundiu a outras crenças, criando novas religiões: candomblé, vodum, macumba e outras. A fé Uzoma continuou, porém, oculta ao lado dessas novas fés, tanto em sua terra natal quanto na África. Com o passar do tempo, o peso da colonização diminuiu um pouco, e os velhos costumes ressurgiram entre as diásporas africanas.
+
+Os Uzoma se organizam em grupos “familiares” chamados ilê, adotando uma abordagem discreta enquanto velam por seu povo e seu território. Depois de centenas de anos de influência externa, os Uzoma não permitem nenhuma interferência com seu povo. Quando os Uzoma intervêm, não há contenção, e eles golpeiam sem reservas. Enquanto seu mundo permanecer em paz, os Uzoma se contentam em observar e permanecer em segundo plano. Veem sua tarefa como a de servir de portais para os espíritos, não como a de magos. Os verdadeiros feiticeiros são os Nhanga, que servem a outros orixás de origem mais sombria. Os Uzoma se dedicam aos outros e ao seu povo, enquanto os Nhanga se põem acima dos demais. Frequentemente, feiticeiros e magos estrangeiros também são rotulados de Nhanga, devido às experiências passadas dos Uzoma com eles.
+
+Cada orixá é único, e há mais de 400 deles, embora os Uzoma nem sempre concordem sobre os nomes e papéis de cada um. Cada orixá tem um número, uma cor, uma comida e uma dança que lhe são específicos; conhecer essas características é necessário para se comunicar apropriadamente com eles e conquistá-los. Cada indivíduo tem um orixá guia que influencia sua personalidade e comportamento, as aldeias adotam um orixá patrono, e os Uzoma escolhem orixás específicos a quem servem.
+
+A magia que os Uzoma realizam se dá por ritual religioso, começando por louvar e agradecer a Olorun, o Dono do Céu. Os sacerdotes então apelam a orixás específicos, pedindo sua assistência mágica em troca do serviço passado dos Uzoma e para capacitá-los a mais serviço no futuro. Os rituais giram em torno de dança, tambores e canto como formas de alcançar o orixá. Formas diferentes de toque de tambor e de dança estão ligadas a certos rituais, e nunca são executadas fora deles. A performance é oferecida para chamar o orixá e convidá-lo a se juntar à comunidade dos Uzoma; o ritual inteiro é rito mágico, serviço religioso e celebração, tudo junto. Ao término do rito, o sacerdote é “montado” pelo orixá, que fala através dele como uma espécie de possessão, embora às vezes o orixá escolha não falar e apenas se una ao babalawo por um tempo.
+
+O início da iniciação de um Uzoma começa com uma leitura do Ifá, uma coleção de patakis (ditos, mitos e histórias) consultada por meio de uma adivinhação com búzios. Os anciãos discernem o orixá guia pessoal do iniciado, o que ajuda a determinar a qual ilê ele pertence. O iniciado recebe seus elekes, colares abençoados pelo babalawo do ilê e que indicam sua casa. Isso dá início a um ano de serviço como ‘filho’. Eles se vestem de branco, seguem uma dieta estrita e não podem ser tocados durante seu tempo de serviço. Os dias são passados aprendendo os patakis com os sacerdotes da casa e aprendendo a lançar o Ifá. Depois de seu ano de serviço ao ilê, o ‘filho’ se torna um babalawo e inicia seu serviço ao seu povo e aos orixás. Embora todos os iniciados vão às terras iorubás da Nigéria, do Benim e do Togo para começar seu aprendizado, muitos retornaram para casa nas Américas e na Europa, dando continuidade ao retorno dos velhos costumes em novos lugares.]==] },
 				-- <<< DESC_END
 };

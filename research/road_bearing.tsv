@@ -1,3 +1,15 @@
+#
+# EMENDA 2026-09-02 (T932, Q58, I141d), CONSTRUIDA 2026-09-03 - a ficha ALCANCOU este arquivo:
+# PICKER_LIST["road"], BEARING e ROAD_ERA do WoD20th.lfm ja perderam Road of Heaven e ja tem o
+# Islam, e contar linha aqui da o MESMO que contar o picker. Nao lidera mais nada.
+#   - Road of Heaven SAIU: e guarda-chuva das 3 vias abraamicas, nao uma Estrada. E o unico dos
+#     55 sem tabela de pecados em livro nenhum (da pp.119-120 dao Aura + Virtues e vao direto
+#     aos Paths), e cada um dos 3 Paths tem os 10 niveis proprios.
+#   - Path of Christianity e Path of Life/Judaism perderam o =Road of Heaven e viram MAES.
+#   - Path of the Prophet/Islam ENTROU (da p.121, 10 niveis). O picker omitia a 3a fe.
+#   - A aura dos 3 e Holiness: o livro imprime UMA Aura: Holiness na p.120, no nivel do
+#     guarda-chuva, e nenhuma propria por Path (CONFERIDO em da pp.120-122).
+#
 # road_bearing.tsv — §T748, 125ª rodada 2026-08-28
 # nome_EN <TAB> bearing_EN <TAB> livro <TAB> pag_impressa <TAB> epoca
 #
@@ -14,7 +26,7 @@
 # bearing "=X" = Path que herda a aura do Road dono; pagina vem do SUMARIO do
 #   livro, NAO de leitura da pagina -> conferir antes de virar citacao.
 #
-Humanity	Normalcy	core	310	modern
+Path of Humanity	Normalcy	core	310	modern
 The Path of Blood	Resolve	core	316	modern
 The Path of the Bones	Silence	core	318	modern
 The Path of Caine	Faith	core	320	modern
@@ -35,7 +47,6 @@ The Path of Entelechy	Stoicism	lotc	51	modern
 The Path of Ecstasy	Rapture	lotc	70	modern
 The Path of the Warrior	Fury	lotc	72	modern
 Road of the Beast	Menace	da	117	medieval
-Road of Heaven	Holiness	da	120	medieval
 Road of Humanity	Normalcy	da	122	medieval
 Road of Kings	Command	da	126	medieval
 Road of Lilith	Carved and bleeding	da	129	medieval
@@ -54,8 +65,9 @@ Road of Ahura Mazda	Holiness	dac	84	medieval
 Path of the Hunter	=Road of the Beast	da	117	medieval
 Path of Journeys	=Road of the Beast	da	118	medieval
 Path of Liberation	=Road of the Beast	da	118	medieval
-Path of Christianity	=Road of Heaven	da	120	medieval
-Path of Life/Judaism	=Road of Heaven	da	120	medieval
+Path of Christianity	Holiness	da	120	medieval
+Path of Life/Judaism	Holiness	da	120	medieval
+Path of the Prophet/Islam	Holiness	da	121	medieval
 Path of Breath	=Road of Humanity	da	123	medieval
 Path of Community	=Road of Humanity	da	124	medieval
 Path of Illumination	=Road of Humanity	da	124	medieval

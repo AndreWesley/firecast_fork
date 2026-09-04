@@ -1,0 +1,30 @@
+# road_sins_overrides.tsv - linhas conferidas A MAO contra a pagina (T849, I142d, I142j)
+# Aplicado DEPOIS do parser, casando por (tid, score). Score que nao existe no raw = INSERIR.
+# So entra aqui o que o parser nao acerta por CONSTRUCAO:
+#   da p.131   - imprime DUAS tabelas LADO A LADO, e o corte por linha mistura as colunas
+#   core p.312 - o cabecalho e prosa, entao a coluna do wrongdoing nao tem x confiavel
+#   core p.317/319 - o rodape da pagina cai na ultima linha da tabela
+# tid<TAB>score<TAB>minimum_wrongdoing<TAB>rationale<TAB>fonte
+core:312:1	8	Injury to another (accidental or otherwise)		sobra da coluna de prosa vizinha (individuals.) na linha em que a celula quebra
+core:312:1	4	Impassioned violation (manslaughter, killing a vessel in frenzy)		idem: rather than taboos, for a vampire with Humanity 4.
+core:312:1	1	Utter perversion or heinous acts		idem: twisted pleasures and aberrant whims, which may in-
+core:317:1	1	Acting against another Assamite	This is treason to the Path and the Clan.	rodape da pagina caindo na ultima linha
+core:319:1	1	Actively preventing a death	Such emotional ties befit humans, not Kindred.	rodape da pagina caindo na ultima linha
+da:131:2	10	Rejecting the advances of demons with seed in hand.		p.131 lado a lado com Veils; lido por fatia de coluna em x=62
+da:131:2	7	Abandoning a thing because it is ugly or frightening.		INSERIR - o parser so achou 1 dos 4 niveis
+da:131:2	5	Not taking a secret of making and creating from savages who don’t know the divine purpose behind it.		INSERIR; pur- pose juntado
+da:131:2	1	Rejecting the advances of angels with seed in hand.		INSERIR
+# --- 4 linhas achadas em 2026-09-03 ao construir T931, por varredura e nao por leitura: a busca
+#     foi (a) minuscula colada em MAIUSCULA dentro da celula e (b) sobra de prosa depois do ponto
+#     final. As 4 sao a MESMA familia das de cima - coluna vizinha invadindo a celula.
+bh:59:1	5	Failure to treat others as you would be treated	Even a teacher must be questioned.	o pdf cola 'Act as your own master.' no fim da celula do wrongdoing (bh p.59, coluna esquerda) - texto solto de outro elemento
+da:123:2	1	Spending a night without human contact		o rodape 'the road of humanity 123' cai na ultima linha da tabela. Tabela de FILHA no da e de 2 COLUNAS: rationale vazia e o livro, nao buraco
+da:125:1	7	Any act that will prevent a Cainite from following the journey you have begun.		sobra 'expected to' da coluna de prosa vizinha (da p.125, a tabela ocupa so a coluna esquerda)
+da:125:1	1	Letting true darkness in, to squelch the light. Accepting Evil.		sobra 'and respect. Luminaries kn...' da coluna de prosa vizinha
+# --- 4 linhas achadas na LEITURA das 483 (a varredura de forma nao pega estas 3 ultimas: o
+#     lixo entra DEPOIS do ponto final e parece frase). Familia: titulo da tabela vizinha ou
+#     rodape da pagina caindo dentro da celula.
+da:120:2	1	Failing to spread the Gospel of Christ	It is the duty of all Christians to spread the good news of our Lord	o titulo da tabela VIZINHA (DERECH CHAIM - THE PATH OF LIFE (JUDAISM)) entra no fim da celula - as 2 tabelas dividem a da p.120
+da:127:2	1	Giving into your Beast, such as frenzy	If you cannot control yourself, how can you control others?	rodape 'The road of kings 127' no fim da rationale
+da:135:1	1	Refusing to act in your own best interests	Your desires are all that truly matters.	rodape 'the road of sin 135' no fim da rationale
+dac:84:2	1	Fearing frenzy	Rage and Hunger are gifts from Angra Mainyu, and the vampire must embrace them.	a linha do TITULO da tabela irma (THE ROAD OF AHURA MAZDA ... but with these additions:) atravessa as 2 celulas - as 2 variantes do dac p.84 saem GRUDADAS (I141d)

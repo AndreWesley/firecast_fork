@@ -1,0 +1,37 @@
+# family_source.tsv - de que livro sai o texto de cada uma das 24 familias do picker.
+# MEDIDO 2026-09-03 (173a rodada) varrendo o cache de %TEMP%\wod_books_txt, 15 livros.
+# EMENDADO no mesmo dia por T938: 24 -> 23 linhas.
+# Cabecalho em ASCII por convencao; o DADO nao e (V411b).
+#
+# gr = Ghouls & Revenants (offset 1)   da = V20 Dark Ages (offset 1)
+# Reparticao CONTADA do proprio arquivo: gr 16, da 7. Nenhuma das 23 fica sem fonte.
+#
+# A linha 'Weakness:' e LITERAL nos dois livros e e o que T937 extrai. 20 das 24 tem uma;
+# as 3 sem ela sao Keskinen e Marijava (fraqueza em PROSA, Other Families gr p.114) e
+# Krevcheski (e o nome ANTIGO dos Ducheski: gr p.94 diz que abandonaram o sobrenome).
+# Katayama SAIU da lista em T938 - era a unica sem fraqueza em lugar nenhum.
+#
+# nome_picker<TAB>livro<TAB>pag_verbete<TAB>pag_weakness<TAB>nota
+Basarab	da	454	454	
+Bratovich (Dark Ages)	da	454	454	par de epoca: o Moderno esta no gr p.90-91
+Bratovitch (Modern)	gr	90-91	91	par de epoca; GRAFIA muda (tch) e a chave e verbatim
+D'Habi	gr	92-93	93	o livro escreve com apostrofo CURVO (U+2019); o picker usa o reto
+Danislav	da	455	455	
+Ducheski	gr	94-95	95	
+Enrathi	gr	96-97	97	ja tem dado mecanico em FAMILY_CAP (humanity 3, conscience 2)
+Grimaldi (Dark Ages)	da	455	455	par de epoca; ja tem FAMILY_CAP (bloodPool 8, da p.454)
+Grimaldi (Modern)	gr	98-99	99	par de epoca
+Kairouan Brotherhood	gr	100-101	101	
+Keskinen	gr	114	?	Other Families: 1 paragrafo, SEM linha Weakness rotulada
+Khavi	da	455	455	
+Krevcheski	gr	94	?	SEM verbete proprio: e o fundador, dentro do verbete Ducheski
+Marijava	gr	114	?	Other Families: 1 paragrafo, SEM linha Weakness rotulada
+Obertus	gr	102-103	103	
+Obertus (Narov)	gr	102-103	103	NAO herda: gr p.103 da Megalomania a Narov e Obsessive a Obertus
+Oprichniki	gr	104-105	105	
+Rafastio	gr	106-107	107	
+Rossellini	gr	108-109	109	
+Servants of Anushin-Rawan	gr	110-111	111	
+Szantovich	da	455	455	
+Vlaszy	da	455	455	
+Zantosa	gr	112-113	113	

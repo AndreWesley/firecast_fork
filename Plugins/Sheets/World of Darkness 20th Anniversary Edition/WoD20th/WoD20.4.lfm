@@ -26,36 +26,36 @@
 			order INSIDE each one is untouched, as is every field name (SPEC V2) - only the
 			field=/nome= pair on each <Descricao> call moved.
 		-->
-		<layout left="0" top="0" width="1180" height="125">
+		<layout left="0" top="0" width="1180" height="115">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<layout left="20" top="20" width="350" height="25" >
+			<layout left="20" top="15" width="350" height="25" >
 				<Descricao field="altura" nome="Height"/>
 			</layout>
-			<layout left="415" top="20" width="350" height="25" >
+			<layout left="415" top="15" width="350" height="25" >
 				<Descricao field="olhos" nome="Eyes"/>
 			</layout>
-			<layout left="810" top="20" width="350" height="25" >
+			<layout left="810" top="15" width="350" height="25" >
 				<Descricao field="sexo" nome="Sex"/>
 			</layout>
 
-			<layout left="20" top="50" width="350" height="25" >
+			<layout left="20" top="45" width="350" height="25" >
 				<Descricao field="peso" nome="Weight"/>
 			</layout>
-			<layout left="415" top="50" width="350" height="25" >
+			<layout left="415" top="45" width="350" height="25" >
 				<Descricao field="cabelo" nome="Hair"/>
 			</layout>
-			<layout left="810" top="50" width="350" height="25" >
+			<layout left="810" top="45" width="350" height="25" >
 				<Descricao field="idade" nome="Age"/>
 			</layout>
 
-			<layout left="20" top="80" width="350" height="25" >
+			<layout left="20" top="75" width="350" height="25" >
 				<Descricao field="nacionalidade" nome="Nationality"/>
 			</layout>
-			<layout left="415" top="80" width="350" height="25" >
+			<layout left="415" top="75" width="350" height="25" >
 				<Descricao field="etinicidade" nome="Ethnicity"/>
 			</layout>
-			<layout left="810" top="80" width="350" height="25" >
+			<layout left="810" top="75" width="350" height="25" >
 				<Descricao field="idadeAparente" nome="Apparent Age"/>
 			</layout>
 		</layout>
@@ -67,10 +67,10 @@
 			contents - `aparencia` holds languages and `idiomas` holds goals. Recorded in SPEC C
 			so nobody "fixes" the names later and silently drops player text.
 		-->
-		<layout left="0" top="130" width="490" height="196">
-			<rectangle left="0" top="0" width="490" height="196" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="20" top="20" width="450" height="20" text="Languages" horzTextAlign="center"/>
-			<textEditor left="35" top="41" width="420" height="135" field="aparencia"/>
+		<layout left="0" top="120" width="490" height="186">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+	        <label left="20" top="15" width="450" height="20" text="Languages" horzTextAlign="center"/>
+			<textEditor left="35" top="36" width="420" height="135" field="aparencia"/>
         </layout>
 
 		<!-- New boxes, not renames: the tab never had a Goals box to rename onward from, so
@@ -81,27 +81,27 @@
 		     in them but own no widget any more - SPEC I3 lists them as declared orphans, and the
 		     gate fails if either name is ever reused for something else. The `Concept` and
 		     `Nature` .lang keys stay: the Main tab still renders both. -->
-		<layout left="0" top="331" width="235" height="196">
-			<rectangle left="0" top="0" width="235" height="196" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="20" top="20" width="195" height="20" text="Moral Flaws" horzTextAlign="center"/>
-			<textEditor left="35" top="41" width="165" height="135" field="moralFlaws"/>
-        </layout>
-        <layout left="240" top="331" width="250" height="196">
-			<rectangle left="0" top="0" width="250" height="196" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="20" top="20" width="210" height="20" text="Fears" horzTextAlign="center"/>
-			<textEditor left="35" top="41" width="180" height="135" field="fears"/>
-        </layout>
-
-		<layout left="0" top="532" width="490" height="196">
-			<rectangle left="0" top="0" width="490" height="196" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="20" top="20" width="450" height="20" text="Goals" horzTextAlign="center"/>
-			<textEditor left="35" top="41" width="420" height="135" field="idiomas"/>
-        </layout>
-
-		<layout left="495" top="130" width="685" height="598">
+		<layout left="0" top="311" width="235" height="186">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-	        <label left="20" top="20" width="645" height="20" text="Prelude" horzTextAlign="center"/>
-			<richEdit left="35" top="41" width="615" height="537" field="background" backgroundColor="#333333" defaultFontSize="12" defaultFontColor="white"/>
+	        <label left="20" top="15" width="195" height="20" text="Moral Flaws" horzTextAlign="center"/>
+			<textEditor left="35" top="36" width="165" height="135" field="moralFlaws"/>
+        </layout>
+        <layout left="240" top="311" width="250" height="186">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+	        <label left="20" top="15" width="210" height="20" text="Fears" horzTextAlign="center"/>
+			<textEditor left="35" top="36" width="180" height="135" field="fears"/>
+        </layout>
+
+		<layout left="0" top="502" width="490" height="206">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+	        <label left="20" top="15" width="450" height="20" text="Goals" horzTextAlign="center"/>
+			<textEditor left="35" top="36" width="420" height="135" field="idiomas"/>
+        </layout>
+
+		<layout left="495" top="120" width="685" height="588">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+	        <label left="20" top="15" width="645" height="20" text="Prelude" horzTextAlign="center"/>
+			<richEdit left="35" top="36" width="615" height="537" field="background" backgroundColor="#333333" defaultFontSize="12" defaultFontColor="white"/>
         </layout>
 	</scrollBox>
 </form>

@@ -1,0 +1,39 @@
+# family_weakness.tsv - a FRAQUEZA de cada uma das 23 familias de PICKER_LIST[family].
+# T937, 173a rodada 2026-09-03. Cabecalho ASCII por convencao; o DADO nao e (V411b).
+#
+# nome_picker<TAB>fonte<TAB>pag<TAB>en<TAB>pt
+#
+# fonte: gr = Ghouls & Revenants | da = V20 Dark Ages | USER = resposta do dono
+#
+# FORMA: UMA FRASE MECANICA, nao o bloco do livro (decisao do user 2026-09-03). Os blocos
+# vao de 49 a 833 chars e sao ate 3 paragrafos; o box da aba Ghoul tem 128px de altura, o
+# que da ~4 linhas. A pagina fica na linha para conferir de onde a frase foi destilada.
+#
+# Termos em pt seguem os que a ficha JA usa (medidos nos desc*_pt.lua): laco de sangue,
+# frenesi, agravado, contundente, Abraco, Perturbacao, Qualidade, Defeito, Vigor.
+#
+# COMPLETUDE e cobrada por V412f: nome na lista sem linha aqui e FAIL, nao 'ainda nao
+# extrai' - decisao do user em Q60, e foi o que tirou Katayama da lista em T938.
+Basarab	da	454	Repelled by garlic and holy symbols: presented with either, a Willpower roll or they must remove themselves from its presence.	Repelidos por alho e por símbolos sagrados: diante de qualquer um dos dois, um teste de Força de Vontade ou têm de se afastar.
+Bratovich (Dark Ages)	da	454	Given over to their own savagery, they suffer the same frenzy effects as the Brujah.	Entregues à própria selvageria, sofrem os mesmos efeitos de frenesi que os Brujah.
+Bratovitch (Modern)	gr	91	+2 difficulty on every roll to resist frenzy. They may not spend Willpower to avoid a frenzy, only to end one.	+2 de dificuldade em todo teste para resistir ao frenesi. Não podem gastar Força de Vontade para evitar um frenesi, apenas para encerrá-lo.
+D'Habi	gr	93	Broken by centuries of infernal servitude, they are extraordinarily suggestible: +2 difficulty on all Willpower rolls.	Quebrados por séculos de servidão infernal, são extraordinariamente sugestionáveis: +2 de dificuldade em todo teste de Força de Vontade.
+Danislav	da	455	They take aggravated damage from silver.	Sofrem dano agravado por prata.
+Ducheski	gr	95	Centuries under the Tremere left them far from their human side: no Ducheski may ever have a Social Attribute above 2.	Séculos sob os Tremere os afastaram do lado humano: nenhum Ducheski pode ter um Atributo Social acima de 2.
+Enrathi	gr	97	Centuries of moral decay: they may not have Humanity higher than 3, nor Conscience higher than 2.	Séculos de decadência moral: não podem ter Humanidade acima de 3, nem Consciência acima de 2.
+Grimaldi (Dark Ages)	da	455	Tzimisce blood runs thin in this family, which has no native ties to the Voivodate: they have only eight blood points.	O sangue Tzimisce é fraco nesta família, que não tem laços nativos com o Voivodato: têm apenas oito pontos de sangue.
+Grimaldi (Modern)	gr	99	Family arrogance: whenever there is a chance to boast of the family, a Willpower roll at difficulty 7 to hold back their scorn.	Arrogância de família: sempre que houver ocasião de gabar-se da família, um teste de Força de Vontade a dificuldade 7 para conter o desprezo.
+Kairouan Brotherhood	gr	101	Years of genetic manipulation: every member suffers the Slow Healing Flaw (V20 p. 483).	Anos de manipulação genética: todo membro sofre o Defeito Cura Lenta (V20 p. 483).
+Keskinen	gr	114	All Keskinen share their patron's obsession with blotting out the sun, which manifests as a Derangement.	Todos os Keskinen compartilham a obsessão de sua patrona por apagar o sol, que se manifesta como uma Perturbação.
+Khavi	da	455	Vulnerable to sunlight: they take sunlight damage as a Cainite would, but bashing rather than aggravated, and may soak it with Stamina and Fortitude.	Vulneráveis à luz do sol: sofrem dano solar como um Cainita, mas contundente em vez de agravado, e podem absorvê-lo com Vigor e Fortitude.
+Krevcheski	USER	-	Krevcheski are distrusted by the Tzimisce, and thus have only learned two family Disciplines instead of the normal three.	Os Krevcheski são vistos com desconfiança pelos Tzimisce e, por isso, aprenderam apenas duas Disciplinas de família em vez das três normais.
+Marijava	gr	114	Quite susceptible to the blood bond: they become Bound to a vampire after a single drink.	Bastante suscetíveis ao laço de sangue: ficam presos a um vampiro após um único gole.
+Obertus	gr	103	Bred for intellect and prone to psychological disorders: the vast majority suffer the Obsessive-Compulsive Derangement (V20 pp. 291-292).	Criados para o intelecto e propensos a distúrbios psicológicos: a grande maioria sofre da Perturbação Obsessivo-Compulsiva (V20 p. 291-292).
+Obertus (Narov)	gr	103	Members of the resurging Narov line are afflicted with the Megalomania Derangement instead (V20 pp. 291-292).	Os membros da linhagem Narov ressurgente são afligidos pela Perturbação Megalomania (V20 p. 291-292).
+Oprichniki	gr	105	Cursed for their founders' crimes: they suffer the Haunted Flaw (V20 p. 495) permanently, and banishing one ghost only brings another.	Amaldiçoados pelos crimes dos fundadores: sofrem o Defeito Assombrado (V20 p. 495) em definitivo, e banir um fantasma só traz outro.
+Rafastio	gr	107	Cursed by the moon: +2 difficulty to use Disciplines at the new moon, +1 waxing and waning, -1 at the full moon. Their blood rejects the Embrace, which has always killed them.	Amaldiçoados pela lua: +2 de dificuldade para usar Disciplinas na lua nova, +1 na crescente e na minguante, -1 na cheia. O sangue deles rejeita o Abraço, que sempre os matou.
+Rossellini	gr	109	All of them suffer the Deathsight Flaw (V20 p. 494): -2 difficulty to resist Appearance-based rolls, +2 difficulty on Perception rolls and +1 on Social rolls.	Todos sofrem o Defeito Visão da Morte (V20 p. 494): -2 de dificuldade para resistir a testes de Aparência, +2 de dificuldade em testes de Percepção e +1 em testes Sociais.
+Servants of Anushin-Rawan	gr	111	In the presence of a vampire descended from Anushin-Rawan they are compelled to protect that Ventrue as if blood bound, for 10 nights minus their Willpower.	Na presença de um vampiro descendente de Anushin-Rawan, são compelidos a proteger aquele Ventrue como se estivessem sob laço de sangue, por 10 noites menos a Força de Vontade.
+Szantovich	da	455	Addictive personalities: exposed to a sensual experience that has weakened them, a Willpower roll to do anything but pursue it, and Willpower may not be spent to resist the addiction.	Personalidades viciantes: expostos a uma experiência sensual que os enfraqueceu, um teste de Força de Vontade para fazer qualquer coisa que não seja persegui-la, e não podem gastar Força de Vontade para resistir ao vício.
+Vlaszy	da	455	Every Vlaszy swears a Blood Oath to a Fiend upon reaching the age of majority.	Todo Vlaszy jura um Juramento de Sangue a um Demônio ao atingir a maioridade.
+Zantosa	gr	113	Exposed to a particularly pleasurable experience, a Willpower roll or they become obsessed with it. They may not spend Willpower to resist a supernatural power that entices them to a new pleasure.	Diante de uma experiência particularmente prazerosa, um teste de Força de Vontade ou ficam obcecados por ela. Não podem gastar Força de Vontade para resistir a um poder sobrenatural que os atraia a um novo prazer.

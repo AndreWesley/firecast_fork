@@ -1,0 +1,74 @@
+# road_sins_titles.tsv - o CABECALHO do bloco 4 de I141a, nos 2 idiomas (T931, I141c, Q57).
+# A MAO. 57 tids, os mesmos que road_sins_map.tsv aponta.
+#
+# tid<TAB>titulo_en<TAB>titulo_pt<TAB>nota
+#
+# POR QUE ESTE ARQUIVO EXISTE E NAO E COLUNA DO raw: em 9 dos 57 o titulo que o parser colhe e
+# PROSA COLADA, nao titulo - a caixa do titulo flutua e o pdftotext entrega a linha de texto que
+# ficou na mesma altura. Os 9 estao marcados na coluna nota com o lixo que o raw traz. Corrigir
+# no raw seria editar saida de maquina a mao, que e o que road_sins_parse.ps1 proibe no cabecalho.
+#
+# O titulo do FILHO e o que o LIVRO da ao filho, nao o da mae (Q57): "HIERARCHY OF SINS AGAINST
+# THE HUNT" ja diz de que trilha a tabela fala, e quem quer a mae abre a mae no picker. Os 2 do
+# dac p.84 sao a excecao e por isso saem VAZIOS: o livro nao da titulo nenhum a eles, so a frase
+# "mechanically similar to X, but with these additions/replacements" - o gerador cai no titulo da
+# MAE nesses 2, que e a unica saida que nao inventa nome.
+#
+# ⚠ O TITULO NAO E CHAVE. 2 pares repetem: da:116:1 e da:130:1 sao os dois "AGAINST WHO YOU ARE"
+#   (Road of the Beast p.116 E Road of Lilith p.130) - e o motivo de o mapa casar por tid.
+bh:54:1	Via Hyron: Path of the Hive Hierarchy of Sins	Via Hyron: Hierarquia de Pecados da Trilha da Colmeia
+bh:57:1	Path of the Scorched Heart Hierarchy of Sins	Hierarquia de Pecados da Trilha do Coração Chamuscado
+bh:59:1	Path of Self-Focus Hierarchy of Sins	Hierarquia de Pecados da Trilha do Foco Interior
+bh:117:1	Hierarchy of Sins against the Asakku	Hierarquia de Pecados contra os Asakku
+core:312:1	Hierarchy of Sin — Humanity	Hierarquia do Pecado — Humanidade	raw traz "to be done to get it. Though she won’t necessarily go" - a tabela do core p.312 tem cabecalho de PROSA (I141h a)
+core:317:1	Path of Blood Hierarchy of Sins	Hierarquia de Pecados da Trilha do Sangue
+core:319:1	Path of the Bones Hierarchy of Sins	Hierarquia de Pecados da Trilha dos Ossos
+core:322:1	Path of Caine Hierarchy of Sins	Hierarquia de Pecados da Trilha de Caim
+core:324:1	Path of Cathari Hierarchy of Sins	Hierarquia de Pecados da Trilha dos Cátaros
+core:326:1	Path of the Feral Heart Hierarchy of Sins	Hierarquia de Pecados da Trilha do Coração Selvagem
+core:328:1	Path of Honorable Accord Hierarchy of Sins	Hierarquia de Pecados da Trilha do Acordo Honrado
+core:330:1	Path of Lilith Hierarchy of Sins	Hierarquia de Pecados da Trilha de Lilith
+core:332:1	Path of Metamorphosis Hierarchy of Sins	Hierarquia de Pecados da Trilha da Metamorfose
+core:334:1	Path of Night Hierarchy of Sins	Hierarquia de Pecados da Trilha da Noite
+core:336:1	Path of Paradox Hierarchy of Sins	Hierarquia de Pecados da Trilha do Paradoxo
+core:338:1	Path of Power and the Inner Voice Hierarchy of Sins	Hierarquia de Pecados da Trilha do Poder e da Voz Interior
+core:340:1	Path of Typhon Hierarchy of Sins	Hierarquia de Pecados da Trilha de Tífon
+da:116:1	HIERARCHY OF SINS AGAINST WHO YOU ARE	HIERARQUIA DE PECADOS CONTRA QUEM VOCÊ É
+da:118:1	HIERARCHY OF SINS AGAINST JOURNEYS	HIERARQUIA DE PECADOS CONTRA AS JORNADAS
+da:118:2	HIERARCHY OF SINS AGAINST LIBERATION	HIERARQUIA DE PECADOS CONTRA A LIBERTAÇÃO
+da:118:3	HIERARCHY OF SINS AGAINST THE HUNT	HIERARQUIA DE PECADOS CONTRA A CAÇADA	raw traz "HIERARCHYOFSINS AGAINSTTHEHUNT" - o livro imprime o titulo sem espaco entre as palavras
+da:120:1	DERECH CHAIM — THE PATH OF LIFE (JUDAISM)	DERECH CHAIM — A TRILHA DA VIDA (JUDAÍSMO)
+da:120:2	THE PATH OF CHRIST (CHRISTIANITY)	A TRILHA DE CRISTO (CRISTIANISMO)
+da:121:1	THE PATH OF THE PROPHET (ISLAM)	A TRILHA DO PROFETA (ISLAMISMO)
+da:123:1	HIERARCHY OF SINS AGAINST THE SOUL	HIERARQUIA DE PECADOS CONTRA A ALMA
+da:123:2	HIERARCHY OF SINS AGAINST BREATH	HIERARQUIA DE PECADOS CONTRA O SOPRO	raw traz "you must enrich a downtrodden child’s life to give your" - o titulo quebra em 2 linhas e a caixa flutua
+da:124:1	HIERARCHY OF SINS AGAINST COMMUNITY	HIERARQUIA DE PECADOS CONTRA A COMUNIDADE	raw traz "would squander the herd, or treat their keep like animals"
+da:125:1	HIERARCHY OF SINS AGAINST ILLUMINATION	HIERARQUIA DE PECADOS CONTRA A ILUMINAÇÃO	raw traz "enemies and defend his lands. As such, Luminaries strive to"
+da:126:1	HIERARCHY OF SINS AGAINST KINGSHIP	HIERARQUIA DE PECADOS CONTRA A REALEZA
+da:127:1	HIERARCHY OF SINS AGAINST CHIVALRY	HIERARQUIA DE PECADOS CONTRA A CAVALARIA
+da:127:2	HIERARCHY OF SINS AGAINST DAENA	HIERARQUIA DE PECADOS CONTRA DAENA
+da:127:3	HIERARCHY OF SINS AGAINST DEVARAJA	HIERARQUIA DE PECADOS CONTRA DEVARAJA
+da:130:1	HIERARCHY OF SINS AGAINST WHO YOU ARE	HIERARQUIA DE PECADOS CONTRA QUEM VOCÊ É
+da:130:2	HIERARCHY OF SINS AGAINST THORNS	HIERARQUIA DE PECADOS CONTRA OS ESPINHOS	raw traz "Wisdom can be written down and taught as well as it can"
+da:131:1	HIERARCHY OF SINS AGAINST VEILS	HIERARQUIA DE PECADOS CONTRA OS VÉUS	raw traz "frightening."
+da:131:2	HIERARCHY OF SINS AGAINST MAKING	HIERARQUIA DE PECADOS CONTRA A CRIAÇÃO	raw traz "of Lilith’s murdered children, as she forgives them." - e a p.131 imprime as 2 tabelas LADO A LADO (o motivo dos 3 INSERIR do overrides)
+da:132:1	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	HIERARQUIA DE PECADOS CONTRA A TRANSMOGRIFICAÇÃO
+da:134:1	HIERARCHY OF SINS AGAINST YOURSELF	HIERARQUIA DE PECADOS CONTRA VOCÊ MESMO
+da:135:1	HIERARCHY OF SINS AGAINST PLEASURE	HIERARQUIA DE PECADOS CONTRA O PRAZER
+da:136:1	HIERARCHY OF SINS AGAINST DAMNATION	HIERARQUIA DE PECADOS CONTRA A CONDENAÇÃO
+da:136:2	HIERARCHY OF SINS AGAINST REBELLION	HIERARQUIA DE PECADOS CONTRA A REBELIÃO
+da:138:1	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	HIERARQUIA DE PECADOS CONTRA OS DEUSES VIGILANTES
+da:140:1	HIERARCHY OF SINS AGAINST KNOWLEDGE	HIERARQUIA DE PECADOS CONTRA O CONHECIMENTO
+da:141:1	HIERARCHY OF SINS AGAINST THE YASA	HIERARQUIA DE PECADOS CONTRA A YASA
+da:432:1	Sins Against the Blood	Pecados Contra o Sangue	raw traz "to the nomadic warrior sect, taking up the mantle of Minimum" - uma das 4 tabelas SEM titulo proprio da faixa do apendice
+da:442:1	The Road of the Abyss	O Caminho do Abismo
+da:445:1	SINS AGAINST PARADOX	PECADOS CONTRA O PARADOXO
+da:447:1	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	HIERARQUIA DE PECADOS CONTRA A RETIDÃO
+da:449:1	HIERARCHY OF SINS AGAINST APEP	HIERARQUIA DE PECADOS CONTRA APEP
+da:449:2	HIERARCHY OF SINS AGAINST SET	HIERARQUIA DE PECADOS CONTRA SET
+dac:71:1	SINS AGAINST THE ARCHANGEL	PECADOS CONTRA O ARCANJO
+dac:84:1			VAZIO DE PROPOSITO: Road of Ahura Mazda, "additions" a Via Humanitas (da p.123). O livro nao da titulo - o gerador usa o da MAE
+dac:84:2			VAZIO DE PROPOSITO: Road of Angra Mainyu, "replacements" a Via Apophis (da p.449). O livro nao da titulo - o gerador usa o da MAE
+lotc:52:1	PATH OF ENTELECHY HIERARCHY OF SINS	HIERARQUIA DE PECADOS DA TRILHA DA ENTELEQUIA
+lotc:71:1	Path of Ecstasy Hierarchy of Sins	Hierarquia de Pecados da Trilha do Êxtase
+lotc:73:1	Path of the Warrior Hierarchy of Sins	Hierarquia de Pecados da Trilha do Guerreiro

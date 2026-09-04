@@ -36,6 +36,17 @@ o `.lfm` precisar ser regerado, e para §T444–446 saberem o que procurar em qu
 | `adv_all.tsv` | a união dedupada, níveis 6–9 | 192 |
 | `d36.list` | as 36 disciplinas canônicas de §I20 | 36 |
 | `advext.awk` | extrator dos poderes 6–9 | — |
+| `hedge_ritual_pages.tsv` | `<nível>\t<ritual hedge>\t<Caminho dono>\t<livro>\t<pág IMPRESSA>` — §T928 | 52 |
+| `hedge_affiliation_pages.tsv` | `<afiliação>\t<livro>\t<pág IMPRESSA>` — §T929, 3 livros | 26 |
+| `road_bearing.tsv` | `<nome>\t<aura|=mãe>\t<livro>\t<pág>\t<época>` — §T748 | 55 |
+| `road_sins_raw.tsv` | `<tid>\t<livro>\t<pág>\t<título>\t<score>\t<wrongdoing>\t<rationale>` — MÁQUINA | 57 tabelas |
+| `road_sins_map.tsv` · `road_sins_overrides.tsv` | nome do picker → `tid`, & o que o parser ⊥ acerta | 55 · 9 |
+| `road_aura_raw.tsv` | `<bid>\t<rótulo>\t<nome>\t<prosa>` — MÁQUINA | 33 |
+| `road_aura_map.tsv` · `road_aura_overrides.tsv` | nome do picker → `bid`, & os 9 que o parser ⊥ alcança | 55 · 9 |
+| `road_sins_titles.tsv` | `<tid>\t<título EN>\t<título PT>` — o cabeçalho do bloco 4 | 56 |
+| `road_sins_pt.tsv` | `<tid>\t<score>\t<wrongdoing PT>\t<rationale PT>` — À MÃO | 483 |
+| `road_aura_pt.tsv` | `<bid>\t<prosa PT>` — À MÃO | 37 |
+| `gen_road_desc.ps1` | escreve `descRoad_{en,pt}.lua` a partir dos 8 acima + os 2 `.lfm` | — |
 
 Os 5 `rd_*.tsv` de livro já vêm **dedupados entre si**, na precedência
 core > RoB > (LotC/LoB/DAC/BH) > TOS > DA. Somados dão 284 sem repetir nome.
@@ -488,3 +499,262 @@ perl research/gen_nature.pl research/arch_body_en.tsv en "<plugin>/descNature_en
 **As 18 emendas de costura** ficam em `%FIX` dentro de `arch_extract.pl`, cada uma conferida
 contra a página pelo user em 2026-08-30. São coisas que régua nenhuma acha: palavra partida pela
 virada de página, letra carregada da coluna vizinha.
+
+## `descRoad` — a tabela de pecados das 55 Estradas (§T849, §I141, §R139)
+
+**Estado 2026-09-02: extração MECÂNICA pronta, mapeamento nome↔tabela PARCIAL.** `.lua` NENHUM
+foi escrito ainda — & isso é de propósito: no minuto em que `descRoad_en.lua` tocar o disco,
+**§V408 cobra as 55 sozinha** (a isenção "kind sem módulo em disco" cai sem ninguém editar régua)
+∴ ⊥ ∃ entrega parcial que deixe o gate verde.
+
+| arquivo | o que é |
+|---|---|
+| `road_table_cache.ps1` | roda `pdftotext -table` nos **5** livros & guarda em `%TEMP%\wod_books_table\`. Idempotente |
+| `road_sins_parse.ps1` | lê esse cache & cospe `road_sins_raw.tsv`. **MÁQUINA — ⊥ editar à mão** |
+| `road_sins_raw.tsv` | **53** tabelas · **44** com os 10 níveis · 138 KB. `livro⇥pág⇥título⇥score⇥wrongdoing⇥rationale` |
+| `road_bearing.tsv` | (já existia, §T748) os **55** nomes + aura + livro + pág de SEÇÃO + época |
+
+### ⚑ `-table` é a descoberta desta rodada, & ela vale p/ §T848/§T850 também
+
+O `pdftotext` daqui é **Xpdf 4.00** (`C:\Program Files\Git\mingw64\bin\`), ⊥ Poppler: ⊥ tem
+`-bbox-layout`, **mas tem `-table`**. Os 3 caches que já ∃ (`wod_books_txt` · `wod_books_layout` ·
+`wod_books_noenc`, §I142a) **⊥ servem p/ TABELA**: o `_txt` derrete a tabela em parágrafo (a coluna
+`Rationale` vira 1 bloco colado no fim) & o `_layout` desalinha a linha do score da linha do texto
+em `bh`/`lotc`/`da` p.118. `-table -enc UTF-8` alinha as 3 formas de §I141h **de uma vez**.
+
+**⊥ ler o `-table` sem expandir TAB antes.** As tabelas do `core` vêm com `\t` no meio ∴ a posição
+VISUAL da coluna ⊥ é o índice na string, & fatiar por índice devolve célula vazia calada. Expandir
+p/ paradas de 8 resolve — foi `10` de `10` tabelas do core recuperadas nessa 1 linha.
+
+**A régua é a linha de CABEÇALHO DE COLUNA, ⊥ o título.** Formas MEDIDAS, **4** & ⊥ 1:
+`Rating` · `Score` · `Path Rating` · `Dots`. E **⊥ ∃ título** em 4 tabelas (`Sins Against the
+Blood` da p.432 · `The Road of the Abyss` da p.442 · as 2 variantes do `dac` p.84). Ancorar a
+coluna do score em **x=0** (⊥ no índice da palavra `Rating`) é o que faz `Path Rating` funcionar.
+
+### ⚠ 3 achados que a SPEC ⊥ tem, & os 3 são FUSÃO onde o tsv diz MÃE
+
+`road_bearing.tsv` marca filho só com `=<mãe>` na coluna do bearing (§I141d). Estes **3** ⊥ têm `=`
+& mesmo assim herdam tabela — o livro DIZ isso em prosa, ⊥ em estrutura:
+
+- **`Road of Angra Mainyu`** (dac p.84): *"mechanically similar to the **Via Apophis** (V20 Dark
+  Ages, p.449), but with these **replacements**"* ∴ mãe = `HIERARCHY OF SINS AGAINST APEP`, da
+  p.449, & ela tem **3** níveis próprios (10·2·1)
+- **`Road of Ahura Mazda`** (dac p.84): *"mechanically similar to the **Via Humanitas** (V20 Dark
+  Ages, 123), but with these **additions**"* ∴ mãe = `AGAINST THE SOUL`, da p.123 (= `Road of
+  Humanity`), **3** níveis próprios (10·8·1)
+- **`Path of the Archangel`** (dac): a tabela ⊥ está na p.70 da seção, está na **p.71**, & é
+  PRÓPRIA (`SINS AGAINST THE ARCHANGEL`, 10 níveis) ∴ esta é mãe DE VERDADE — o susto foi a página
+
+⚠ **`Via Apophis` ≠ `Road of Set`.** As 2 estão na MESMA página (da p.449) & são tabelas
+DIFERENTES: `AGAINST SET` & `AGAINST APEP`. Casar pela página dá a errada.
+
+### ⚑ O MAPA está PRONTO — `road_sins_map.tsv`, **55**/55, conferido contra o livro
+
+O título da tabela no livro é **TEMÁTICO**, ⊥ o nome da Estrada: `AGAINST WHO YOU ARE` é
+`Road of the Beast` na p.116 **&** `Road of Lilith` na p.130 ∴ casar por string ⊥ funciona. Casar
+por proximidade de página tb ⊥: a tabela **FLUTUA p/ o topo da página** & cai ANTES ou DEPOIS da
+seção sem regra (`Road of the Beast` seção p.117 → tabela p.**116**; `Path of the Hunter` seção
+p.117 → tabela p.**118**). O que resolveu foram **2** âncoras de CONTEÚDO: os blocos
+`Additional Ethics of <nome>:` (25 deles, cada um nomeia o Path) & ler os níveis quando ainda
+sobrava dúvida — foi assim que saíram `Path of Community` (p.124: propriedade pública · roubo ·
+genocídio) contra `Path of Illumination` (p.125: luz · Luminaries), & `Path of the Devil`
+(`AGAINST REBELLION`: rejeitar a lei de Deus & do Homem = o Adversário) contra `Path of Screams`
+(`AGAINST DAMNATION`: servir o Inferno).
+
+`tid` = `<livro>:<pág>:<ordinal na página>`, & é o que liga o mapa ao `road_sins_raw.tsv` — o
+TÍTULO ⊥ serve de chave porque **8** tabelas saem c/ título de prosa colada. **Conferido:** os 55
+nomes batem 1:1 c/ `PICKER_LIST["road"]` & ∀ `tid` do mapa ∃ no raw.
+
+### ⚠ `Road of Heaven` ⊥ TEM TABELA em livro NENHUM — & é a única das 55
+
+MEDIDO: `da` pp.119-120 dão `Aura: Holiness` & `Virtues: Conscience and Self-Control` & vão
+DIRETO p/ os 3 Paths (`Christ` p.120 · `Derech Chaim` p.120 · `The Prophet` p.121), cada um c/ os
+**10** níveis PRÓPRIOS. A Estrada mãe ⊥ ganha hierarquia. Isso BATE de frente c/ §I141c
+("**10** níveis p/ Estrada, SEMPRE — palavra do user") ∴ é **decisão do dono**, ⊥ escolha minha,
+& está marcada `!SEM-TABELA` no mapa. As 2 filhas dela ⊥ sofrem: têm os 10 próprios (`!SEM-MAE`).
+
+⚠ o livro tb tem **2** Paths que o picker ⊥ oferece — `THE PATH OF THE PROPHET (ISLAM)` (da p.121,
+a 3ª via abraâmica do `Road of Heaven`) & `AGAINST THE EIGHTFOLD WHEEL` (da p.137) — ∴ as 2
+tabelas ficam no raw sem dono no mapa, & isso é CERTO.
+
+### `road_sins_overrides.tsv` — **9** linhas que o parser ⊥ acerta por CONSTRUÇÃO
+
+Aplicado DEPOIS do parser, casando por `(tid, score)`; score que ⊥ ∃ no raw é **INSERIR**.
+⊥ é preguiça de régua, é limite de forma, & ∀ um dos 3 motivos é diferente:
+- **`da` p.131 imprime DUAS tabelas LADO A LADO** (`Path of Veils` à esquerda, `Path of Making` à
+  direita) ∴ corte por LINHA mistura as 2 colunas. As 4 de `Making` saíram de fatiar em `x=62`, &
+  **3** delas o gerador ! INSERIR — o parser só achou 1 dos 4 níveis. (As 3 de `Veils` o parser
+  passou a acertar sozinho & SAÍRAM daqui — override obsoleto é a mesma podridão de roster que
+  §V408 nasceu p/ impedir)
+- **`core` p.312** — o cabeçalho da tabela é PROSA ∴ a coluna do wrongdoing ⊥ tem `x` confiável &
+  as 3 linhas cuja célula quebra colhem a coluna vizinha
+- **`core` p.317 & p.319** — o rodapé da página cai na última linha (score 1)
+
+### ⚑ O PARSER, 9 defeitos corridos & 1 tentativa REVERTIDA
+
+`46` de `57` tabelas c/ os 10 níveis (as 11 restantes são as filhas ESPARSAS, & isso é o livro).
+Sobra de rodapé/cabeçalho: **2** linhas, as 2 no override. Os 9 defeitos, ∀ um MEDIDO:
+`Wrongdoing` sozinho é cabeçalho (`da` p.432 põe `Minimum` na linha de cima) · a coluna do score
+começa no GRUPO do cabeçalho, ⊥ em `x=0` (senão `Path Rating` some & a prosa entra) · 2º
+cabeçalho encerra a tabela (`da` p.120 & `dac` p.84 vinham GRUDADAS) · tabela de 2 colunas corta
+na goteira de 5 espaços · de-hifenização `diabler- ize` (§I142d) · **continuação ! ter a célula
+do score VAZIA** — sem isso a linha de score 1 engolia o resto da página em **31** de 57 tabelas,
+& o arquivo tinha **137 KB** de prosa colada contra os **74 KB** de agora · & nas linhas c/ TAB
+(as do `core`) a atribuição é por BLOCO, ⊥ por fatia de `x`, porque o tab faz a fronteira
+derivar & CORTAR PALAVRA (`non-Assami` `pay` `emotio`).
+
+⚠ **REVERTIDA — "só aceita o bloco se ele começar a ≤6 da coluna".** Parecia a generalização
+certa das 2 últimas & DERRUBOU `core` p.312 de 7 linhas boas p/ **0**: naquela tabela o `x` da
+coluna vem de um cabeçalho que é prosa ∴ a régua de distância mede contra a coluna ERRADA. Fica
+registrado porque a ideia vai voltar: a cura ⊥ é medir melhor a distância, é ⊥ confiar no `x`
+quando o cabeçalho ⊥ é cabeçalho.
+### âš‘ A AURA â€” bloco 3 de Â§I141b, & ela Ã© o 2Âº pipeline, âŠ¥ uma coluna do 1Âº
+
+**FECHADO 2026-09-03 (Â§T849).** A aura Ã© PROSA & mora na SEÃ‡ÃƒO; a tabela de pecados Ã© TABELA &
+mora na pÃ¡gina vizinha. SÃ£o fontes diferentes âˆ´ sÃ£o 2 pipelines de 4 peÃ§as, & tentar tirar a
+aura do cache `-table` custa o mesmo que tirar a tabela do cache de prosa: âŠ¥ dÃ¡.
+
+| arquivo | o que Ã© |
+|---|---|
+| `road_aura_parse.ps1` | lÃª `%TEMP%\wod_books_txt\` (o cache de PROSA de Â§I142a) â†’ `road_aura_raw.tsv`. **MÃQUINA, âŠ¥ editar Ã  mÃ£o** |
+| `road_aura_raw.tsv` | **33** blocos rotulados nos 5 livros |
+| `road_aura_overrides.tsv` | **9** blocos que o parser âŠ¥ alcanÃ§a por CONSTRUÃ‡ÃƒO, Ã  mÃ£o |
+| `road_aura_map.tsv` | **55**/55 nome do picker â†’ `bid`, Ã  mÃ£o. âˆ€ `bid` resolve, & as 16 filhas apontam p/ a mÃ£e (Â§I141g) |
+
+`bid` = `<livro>:<pÃ¡g impressa>:<ordinal>` â€” o MESMO formato do `tid` do `road_sins_map.tsv`, de
+propÃ³sito: quem escrever Â§T931 lÃª os 2 mapas do mesmo jeito.
+
+**CONFERIDO por varredura, âŠ¥ por amostra:** os 55 nomes batem 1:1 c/ `PICKER_LIST["road"]`, âˆ€
+`bid` do mapa âˆƒ no raw ou no overrides, **0** bloco extraÃ­do fica sem dono, & o `<Nome>` de âˆ€
+bloco bate c/ `BEARING` da ficha nas 39 mÃ£es â€” que Ã© Â§I141g valendo em disco & âŠ¥ sÃ³ no papel.
+
+#### As 5 armadilhas, & as 5 produziram texto ERRADO que passava por certo
+
+1. **O rÃ³tulo tem 2 grafias & elas se dividem por LIVRO, âŠ¥ por trilha.** `da` & `dac` escrevem
+   `Aura:`; core/bh/lotc escrevem `Bearing:`. Procurar sÃ³ um perde **21** dos 33.
+2. **O terminador âŠ¥ pode ser `Road of ` nem `Path of `.** As 2 frases aparecem DENTRO da prosa
+   (*"A follower of the Road of Blood takes his task seriously"*) & cortar nelas decepou **4**
+   blocos, deixando `A follower of the` como texto final. O terminador Ã© o rÃ³tulo IRMÃƒO que vem
+   depois: `Virtues:` no `da`, `Basic Beliefs:` no core/bh/lotc.
+3. **`-match` Ã© case-INSENSITIVE & `[regex]::Match` Ã© case-SENSITIVE.** Usar os 2 no mesmo padrÃ£o
+   faz o teste "o bloco fechou nesta pÃ¡gina?" discordar do corte: o rodapÃ© `the road of lilith`
+   casava minÃºsculo no teste & âŠ¥ casava no corte âˆ´ o bloco saÃ­a c/ o rodapÃ© colado dentro & sem
+   a cauda que estava na pÃ¡gina seguinte. **A pior das 5, porque o texto sai plausÃ­vel.**
+4. **O sidebar entra ENTRE o sujeito & o predicado.** O `pdftotext` lÃª por ordem do content
+   stream: `lotc` p.70 pÃµe 446 caracteres de *"Alternative Children of Damballah"* entre
+   `rolls to excite extreme` & `and transformative emotional responses`. RÃ©gua de forma âŠ¥ acha â€”
+   o sidebar Ã© prosa vÃ¡lida & âŠ¥ tem rÃ³tulo. Mesma coisa no `dac` p.70 (3,5 KB).
+5. **A tabela de pecados entra no MEIO da frase que vira a pÃ¡gina.** `da` p.129 (Lilith) corta em
+   `chunks and swirls may` & a cauda sÃ³ aparece na p.130 **depois** da `HIERARCHY OF SINS` inteira.
+   No cache de prosa a cauda parece âŠ¥ existir (busca por `swirl` no livro todo: **1** ocorrÃªncia);
+   ela estÃ¡ no cache `-layout`, que Ã© onde as 2 colunas ficam separadas. Idem `da` p.122.
+
+âš  **`da` p.449 tem DOIS `Their Aura` & o 2Âº Ã© do `Path of Apep`,** que o picker âŠ¥ oferece. Casar
+por pÃ¡gina sem ler pega o errado â€” Ã© Â§I142b outra vez, na mesma pÃ¡gina em que ele jÃ¡ mordeu a
+tabela (`AGAINST SET` â‰  `AGAINST APEP`).
+
+âš  **`String.StartsWith(string)` Ã© CULTURE-SENSITIVE & `U+FEFF` tem peso ZERO** âˆ´
+`"#x".StartsWith([char]0xFEFF)` devolve **TRUE** & o `Substring(1)` come o `#` do cabeÃ§alho â€”
+aconteceu nos 2 `.tsv` escritos Ã  mÃ£o, calado. Comparar o CHAR (`$s[0] -eq [char]0xFEFF`).
+
+#### As 3 contas de mÃ£e/filha âŠ¥ sÃ£o a mesma, & as 3 sÃ£o MEDIDAS
+
+| eixo | mÃ£es | filhas | onde |
+|---|---|---|---|
+| bearing / aura | **39** | **16** | `road_bearing.tsv`, `road_aura_map.tsv` |
+| tabela de pecados | **37** | **18** | `road_sins_map.tsv` |
+
+A diferenÃ§a sÃ£o `Road of Angra Mainyu` & `Road of Ahura Mazda`: as 2 herdam **tabela** por prosa
+do `dac` p.84 (Â§I141d) & mesmo assim tÃªm **aura prÃ³pria**, no mesmo parÃ¡grafo. âŠ¥ âˆƒ 1 nÃºmero que
+sirva p/ as duas â€” sondar o artefato, âŠ¥ deduzir (Â§B141).
+
+âš  `Path of Christianity`, `Path of Life/Judaism` & `Path of the Prophet/Islam` sÃ£o **mÃ£es de
+tabela** (10 nÃ­veis prÃ³prios cada) & dividem **1** bloco de aura, `da:120:1`: o livro imprime a
+Aura no nÃ­vel do guarda-chuva que Â§Q58 tirou da lista. O IslÃ£ abre a seÃ§Ã£o na p.121 & a aura dele
+mora na p.120.
+
+### ⚑ A ENTREGA — `gen_road_desc.ps1` escreve os 2 `.lua`, & **⊥ editar `.lua` à mão**
+
+**FECHADO 2026-09-03 (§T931).** `descRoad_en.lua` (**79.833** B) & `descRoad_pt.lua` (**83.814** B),
+**55** chaves idênticas nos 2, **4** blocos por entrada. O gerador é DETERMINÍSTICO & lê 8 `.tsv`
++ os **2** `.lfm`: se o texto está errado, o errado está num `.tsv` — conserta lá & roda de novo.
+
+```powershell
+cd research
+.\road_table_cache.ps1   # pdftotext -table nos 5 livros -> %TEMP%\wod_books_table\  (idempotente)
+.\road_sins_parse.ps1    # o cache -table -> road_sins_raw.tsv                       (MÁQUINA)
+.\road_aura_parse.ps1    # o cache de PROSA -> road_aura_raw.tsv                      (MÁQUINA)
+.\gen_road_desc.ps1      # os 8 .tsv + os 2 .lfm -> descRoad_{en,pt}.lua
+```
+
+O gerador **conta os buracos & fala**: chave sem prosa PT sai como `((FALTA pt <tid>|<score>))`
+& o rodapé lista os que faltam. Foi assim que as 483 linhas & as 37 auras fecharam sem metade
+calada — `COMPLETO - nenhum buraco de dado` é a única saída que serve.
+
+**Os 2 `.lfm` são AUTORIDADE & ⊥ cópia**, & isso é §I141b valendo em disco: a lista & a ORDEM das
+chaves saem de `PICKER_LIST["road"]`, o nome da aura sai de `BEARING`, & o nome PT sai do mapa PT
+do `WoD20.6.lfm` — o MESMO string que a linha de `ROAD` da Main mostra. §V409(c) mede exatamente
+essa igualdade nos 2 idiomas.
+
+#### 5 armadilhas, & 3 delas fizeram texto ERRADO passar por certo
+
+1. **`$bearing` & `$BEARING` são a MESMA variável** (PowerShell ⊥ distingue caixa em nome de
+   variável). O mapa do tsv comeu a tabela lida do `.lfm` & as **55** entradas saíram com
+   `Aura: System.Collections.Hashtable.` — gerador exit 0, log limpo. É §I142k outra vez.
+2. **`’` (U+2019) fecha string no PS 5.1** (§I142h) & morde no `.ps1` do GERADOR, ⊥ no dado:
+   `'The Black Hand: A Guide to the Tal’Mahe’Ra'` derruba o parse. O título entra por `[char]`.
+   & o `.ps1` **precisa de BOM** (§B84) porque tem `—` & `pág.` — são 2 defeitos DISTINTOS.
+3. **`String.StartsWith(string)` é CULTURE-SENSITIVE & `U+FEFF` tem peso ZERO** ∴
+   `"#x".StartsWith([char]0xFEFF)` devolve TRUE & o `Substring(1)` come o `#` do cabeçalho —
+   virou linha de DADO em 2 `.tsv`, calada. Comparar o CHAR: `$s[0] -eq [char]0xFEFF`.
+4. **Os `desc*.lua` são LF de ponta a ponta & o resto do repo é CRLF** (§V345, §B87). Juntar as
+   linhas com CRLF deixa o arquivo MISTO (o corpo das entradas já é LF) & o gate conta os 2 —
+   foram **192** CRLF entre 2.308 quebras na 1ª escrita.
+5. **A metade PT ⊥ pode ser escrita sem acento.** O CABEÇALHO dos `.tsv` de `research/` é ASCII
+   por convenção & o DADO ⊥ é: `bg_body_pt.tsv` já carrega acento. A 1ª escrita das 483 linhas
+   saiu sem, & régua nenhuma pega — é texto que o jogador lê.
+
+#### ⚠ 8 defeitos de EXTRAÇÃO achados na hora de entregar, & a busca que os achou
+
+O `road_sins_raw.tsv` estava VERDE no gate & tinha **8** células com lixo dentro. **4** saíram de
+varredura de FORMA & **4** só de LER as 483 linhas:
+
+| como se acha | o que era |
+|---|---|
+| minúscula colada em MAIÚSCULA na célula | `treatedAct as your own master.` (`bh:59:1`) |
+| sobra depois do ponto final | `...you have begun. expected to` (`da:125:1`) |
+| rodapé da página na última linha | `the road of sin 135` · `The road of kings 127` · `the 123` |
+| título da tabela VIZINHA na célula | `...Gospel of Christ DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)` |
+| as 2 variantes do `dac` p.84 GRUDADAS | `Fearing Frenzy THE ROAD OF AHUR The Road of Ahura Mazda is m (V20 Dark Ages,` |
+
+Os 8 estão em `road_sins_overrides.tsv` com o motivo. **A lição: contar caractere acha bloco
+poluído barato** — os limpos ficam entre 90 e 390, & `da:129:1` tinha **1.690** com a tabela de
+pecados dentro.
+
+⚠ **Tabela de FILHA no `da` é de 2 COLUNAS** (`Score` + `Minimum Wrongdoing`, sem `Rationale`) ∴
+`rationale` vazia nas 6 filhas do `da` é o LIVRO, ⊥ buraco de tradução. Idem o `core` p.312, que
+é a forma (a) de §I141h. Encher isso "por simetria" inventaria texto.
+
+### O que FALTA p/ fechar
+
+⊥ ∃ mais nada em §T849 nem em §T931 — as 2 estão `x`, o gate está VERDE com §V409 nova & as 3
+pernas dela passaram por MUTAÇÃO (tirar 1 nível de filha avermelha (b); trocar 1 nome de aura
+avermelha (c); colar os 4 blocos com 1 quebra avermelha (a)).
+
+As **3** §Q que a lista `road` carrega seguem ABERTAS, & nenhuma delas bloqueou a entrega — as 3
+foram construídas pela RECOMENDAÇÃO registrada na própria §Q, & trocar de decisão custa **1**
+`gen_road_desc.ps1`, ⊥ 110 entradas à mão (é para isso que o gerador existe):
+
+1. **§Q55** — qual das 3 páginas candidatas vai no bloco 1. Construído: a que **ABRE a seção**,
+   que é a que `road_bearing.tsv` carrega. ⚠ as **16** páginas de filha do tsv saíram do SUMÁRIO
+   & o próprio arquivo manda conferir antes de virar citação — o bloco 3 ⊥ herda esse problema
+   (a filha aponta p/ o `bid` da MÃE, lido na página), mas o bloco **1** herda.
+2. **§Q56** — o separador do par novo. Construído: o MESMO `\n\n\n`, & §V409(a) já o cobra.
+3. **§Q57** — marcar ou ⊥ as linhas herdadas. Construído: **⊥ marcar**, & o cabeçalho é o que o
+   LIVRO dá ao filho (`HIERARCHY OF SINS AGAINST THE HUNT`), ⊥ o da mãe. Os **2** do `dac` p.84
+   são a exceção & saem com o cabeçalho da MÃE: o livro ⊥ dá título nenhum a eles.
+
+⚠ **A decisão que ⊥ estava em §Q nenhuma & é minha: a FORMA do bloco 4.** `<cabeçalho>` + linha
+em branco + `<score> — <wrongdoing>` + `      <rationale>` indentada, 1 nível em branco entre
+níveis. O `textEditor` das panes ⊥ estiliza linha (§V29, §V31) ∴ tabela de verdade ⊥ ∃; isto é o
+mais próximo que lê como tabela sem virar caractere de decoração. Trocar = 1 função no gerador.

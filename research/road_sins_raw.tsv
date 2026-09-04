@@ -1,0 +1,494 @@
+# road_sins_raw.tsv - MACHINE OUTPUT of research\road_sins_parse.ps1 (T849, I141, R139)
+# Regenerate: road_table_cache.ps1 then road_sins_parse.ps1. Do NOT hand-edit.
+# tid<TAB>book<TAB>pag_impressa<TAB>titulo_da_tabela<TAB>score<TAB>minimum_wrongdoing<TAB>rationale
+# UNMAPPED to a picker name on purpose: the name<->table map is road_sins_map.tsv, by hand (I142b).
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	10	Failing to ride the wave in frenzy	The heart of Abel’s prized Beast was to him by the One Above. Its voice is sacred and unleashing its divinity protects his angels from assault.
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	9	Failing to staunch the influence of institutionalized religion	Throughout history, the deceiver, Lucifer, has twisted faith and clothed the spread of ignorance, bigotry, delusion, greed, and mayhem in the hypocrisy of religion. It is the duty of the Molochim to shepherd Caine’s flock.
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	8	Feeding on the children of Seth	Reclaim Abel’s blood in vengeance from the builders, Caine’s children. Those living in harmony with Creation in the wild are not subject to retribution from the One Above.
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	7	Not actively pursuing safe knowledge of sorcery and the demonic	Know thy enemy. Ignorance is darkness, and darkness is where the infernal hides. Blood sorcery is the sacrament in the arsenal against atrocity.
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	6	Refusing an opportunity to convert those seeking redemption	The larger the hive, the greater the swarm. Those who have faced the infernal are hornets without a Nest waiting to be saved. Bind them through the blood and release them when they find shelter
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	5	Refusing to sing a lullaby to the sleepers	The sleepers’ dreams are fueled by havoc and devastation visited upon Creation. Without fuel, the sleepers turn their attentions away from dreaming and seek to awaken.
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	4	Not being selective in a lullaby	Undirected destruction that does not serve as fertilizer for new Creation to emerge is no better than an awoken sleeper. Shepherd Creation by strategic application of violence and suffering.
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	3	Failing to enslave or extinguish the demonic	The One Above damned Lucifer and his children; their existence is forfeit.
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	2	Failing to cleanse the infernal	Each utterance of a sleeper’s name and soul lost to the demonic stirs the sleepers from dream.
+bh:54:1	bh	54	Via Hyron: Path of the Hive Hierarchy of Sins	1	Failing to Nest	Independence is the gateway to the infernal; Lucifer preys first upon individuals alone. Unity is the of the hive, isolation weakens the swarm. If leaving a Nest, find another.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	10	Failing to acquire knowledge that is safely and readily available	Knowledge is the wellspring of truth; you can never know enough.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	9	Committing to any action without purpose	Do not waste effort on what does not enhance you.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	8	Sacrificing when you gain less	A victory that costs you more than you earn garners no benefit.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	7	Relying on others	Your actions are the only ones you can predict with absolute certainty.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	6	Making assumptions	Without clarity, error hides in the fog of unconsidered data.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	5	Acting rashly	You cannot learn from indiscriminate action. Observe, think, calculate, consider, then act.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	4	Speaking falsely	Truth is a bullet. Without trust, truth has no gun.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	3	Falling to frenzy or Rötschreck	Carelessness is dangerous. You cannot control the threats you fail to see when not objective. If you cannot master yourself, you have no defense against others mastering you.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	2	Making decisions based on emotion	The urges of emotion are the words of the Beast, not your own. Purge them.
+bh:57:1	bh	57	Path of the Scorched Heart Hierarchy of Sins	1	Acknowledging your emotions	The Beast feels. You do not. Deny the Beast and it withers.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	10	Accepting everything	A bowl filled to the brim will spill.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	9	Accepting nothing	Oversharpen your knife and it will break.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	8	Laziness	An ant on the move does more than a sleeping elephant.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	7	Interfering in the universe	In order to lead, walk behind.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	6	Restraining the Beast	Struggle creates conflict and moves you out of line with yourself.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	5	Failure to treat others as you would be treatedAct as your own master.	Even a teacher must be questioned.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	4	Allowing the universe to interfere with you	You alone control your actions.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	3	Overconfidence	To know strength, harness weakness.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	2	Rejecting nothing	Water is gentler and more flexible than anything, and yet nothing can resist it.
+bh:59:1	bh	59	Path of Self-Focus Hierarchy of Sins	1	Rejecting everything	By not changing direction, you always arrive where you are headed.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	10	Using or answering to your former name	You are not a vampire. You are one strand in a web of power.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	9	Refusing to use Vicissitude at every opportunity	Become your power.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	8	Failing to increase your command of Vicissitude to the greatest extent possible	You must apply all your efforts to identifying with the Watcher within.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	7	Failing to commit Amaranth or convert a member of the Clan that practices Vicissitude	Take back the power they have stolen.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	6	Refusing to teach Vicissitude	Let the Watcher see through a thousand eyes.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	5	Allowing enemies to discover your true haven	Your lair belongs to the Watcher.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	4	Betraying another of the Corrupted	We emanate from the same darkness and must claw our way into the world together.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	3	Allowing enemies to discover your true nature	Let Caine’s bastards forget the origins of their gifts until we are ready to reclaim them openly.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	2	Refusing to convert those under the blood bond to the Path	The Watcher requires followers to manifest more powerfully.
+bh:117:1	bh	117	Hierarchy of Sins against the Asakku	1	Failing to use Vicissitude nightly, unless in torpor	The murmuring shadow within must speak
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	10	Selfish thoughts	
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	9	Minor selfish acts	
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	8	Injury to another (accidental or otherwise) individuals.	
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	7	Theft	
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	6	Accidental violation (drinking a vessel dry out of starvation)	
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	5	Intentional property damage	
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	4	Impassioned violation (manslaughter, killing a vessel in frenzy) rather than taboos, for a vampire with Humanity 4.	
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	3	Planned violation (outright murder, savored exsanguination)	
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	2	Casual violation (thoughtless killing, feeding past satiation)	
+core:312:1	core	312	to be done to get it. Though she won’t necessarily go	1	Utter perversion or heinous acts twisted pleasures and aberrant whims, which may in-	
+core:317:1	core	317	Path of Blood Hierarchy of Sins	10	Killing a mortal for sustenance	Human blood is nourishing to the body, but the murder of lessers is poison to the soul.
+core:317:1	core	317	Path of Blood Hierarchy of Sins	9	Breaking a word of honor to a Clanmate	Solidarity is important to the Assamites’ holy cause.
+core:317:1	core	317	Path of Blood Hierarchy of Sins	8	Refusing to offer a non-Assamite an opportunity to convert	The childer of Khayyin are accursed and must be saved.
+core:317:1	core	317	Path of Blood Hierarchy of Sins	7	Failing to destroy an unrepentant Kindred outside the Clan	Those who do not accept Haqim’s teachings forfeit their unlives.
+core:317:1	core	317	Path of Blood Hierarchy of Sins	6	Succumbing to frenzy	Haqim teaches ascendance, not indulgence.
+core:317:1	core	317	Path of Blood Hierarchy of Sins	5	Failing to pursue the lore of Khayyin	To oppose one’s enemies successfully, one must learn all about them.
+core:317:1	core	317	Path of Blood Hierarchy of Sins	4	Failing to demand blood as payment	Other members of the Clan may benefit from such vitae, no matter how diluted.
+core:317:1	core	317	Path of Blood Hierarchy of Sins	3	Refusal to aid a more advanced member of the Path	To act selfishly is to fall into the snares of Khayyin’s pawn.
+core:317:1	core	317	Path of Blood Hierarchy of Sins	2	Failing to tithe blood	Haqim has decreed this as paramount to his childer’s cause.
+core:317:1	core	317	Path of Blood Hierarchy of Sins	1	Acting against another Assamite VAMPIRE THE MASQUERADE 20th ANN	This is treason to the Path and the Clan. IVERSARY EDITION 317
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	10	Showing a fear of death	Fear inhibits learning.
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	9	Failing to study an occurrence of death	Refusal to learn indicates refusal to understand.
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	8	Accidental killing	There is no opportunity to gain insight.
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	7	Postponing feeding when hungry	Denial of the self serves no greater purpose.
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	6	Succumbing to frenzy	The Beast is irrational, and emotion serves little to advance understanding.
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	5	Refusing to kill when an opportunity presents itself	Experimentation proves theory, and without proof, there is no conclusion.
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	4	Making a decision based on emotion rather than logic	Vampires are dead; so, too, are their emotions.
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	3	Inconveniencing oneself for another’s benefit	Death is inevitable; what meaning does easing another’s doomed discomfort have?
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	2	Needlessly preventing a death	One must not prevent the cycle, but should learn from it.
+core:319:1	core	319	Path of the Bones Hierarchy of Sins	1	Actively preventing a death VAMPIRE THE MASQUERADE 20th ANNIVERSARY	Such emotional ties befit humans, not Kindred. EDITION 319
+core:322:1	core	322	Path of Caine Hierarchy of Sins	10	Failing to engage in research or study each night, regardless of circumstances	The search for truth requires dedication.
+core:322:1	core	322	Path of Caine Hierarchy of Sins	9	Failing to instruct other vampires in the Path of Caine	All vampires must have the opportunity to explore their potential.
+core:322:1	core	322	Path of Caine Hierarchy of Sins	8	Befriending or co-existing with mortals	Caine was separated from mortals, as all vampires should be.
+core:322:1	core	322	Path of Caine Hierarchy of Sins	7	Showing disrespect to other students of Caine	All of the Children of Caine deserve the respect due their heritage, as long as they strive to understand themselves.
+core:322:1	core	322	Path of Caine Hierarchy of Sins	6	Failing to ride the wave in frenzy	Direct the Beast; do not be directed by it.
+core:322:1	core	322	Path of Caine Hierarchy of Sins	5	Succumbing to Rötschreck	Master your fear. Terror is for lesser beings.
+core:322:1	core	322	Path of Caine Hierarchy of Sins	4	Failing to diablerize a “humane” vampire	Those who do not explore their potential forfeit that potential.
+core:322:1	core	322	Path of Caine Hierarchy of Sins	3	Failing to regularly test the limits of abilities and Disciplines	Develop your capabilities to their limits in order to discern your true nature.
+core:322:1	core	322	Path of Caine Hierarchy of Sins	2	Failing to pursue lore about vampirism when the opportunity arises	Every scrap of knowledge adds a piece to the puzzle of undead existence.
+core:322:1	core	322	Path of Caine Hierarchy of Sins	1	Denying vampiric needs (by refusing to feed, showing compassion, or failing to learn about one’s vampiric abilities)	To be a vampire, one must satisfy a vampire’s needs.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	10	Exercising restraint	One’s purpose is excess, not moderation.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	9	Showing trust	Use or be used.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	8	Failing to pass on the Curse to the passionately wicked or virtuous	The depraved can serve evil better as vampires; the virtuous can be overcome by the Curse.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	7	Failing to ride the wave in frenzy	The Beast, as well as the higher self, must be indulged.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	6	Acting against another Albigensian	Those of like purpose should fulfill that purpose, not quarrel among themselves.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	5	Impassioned killing	Murder achieves no greater end; dead men cannot sully their souls.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	4	Sacrificing gratification for someone else’s convenience	Promote physical pleasures, not altruistic achievements.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	3	Refraining from indulgence	The material world is a place for the gratification of the flesh.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	2	Arbitrary killing	Killing a mortal prevents his bringing about his own damnation.
+core:324:1	core	324	Path of Cathari Hierarchy of Sins	1	Encouraging others to exercise restraint	Vampires are creatures of evil; the vampire’s purpose is to corrupt, not save.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	10	Hunting with means other than your own vampiric powers	The perfect hunter needs no tools.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	9	Engaging in politics	Political struggles do not yield sustenance.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	8	Remaining in the presence of fire or sunlight, except to kill an enemy	There is no sense in courting Final Death.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	7	Acting in an overly cruel manner	Death is natural; feeding is natural. Torture and cruelty are not.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	6	Failing to hunt when hungry	The vampire’s purpose is to feed.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	5	Failing to support your pack or allies	Support your family, and it will support you.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	4	Killing without need	A dead vessel may not be fed from in the future.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	3	Failing to follow one’s instincts	Instinct is the basis of predatory nature.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	2	Killing a creature other than for survival	A kill’s purpose is sustenance.
+core:326:1	core	326	Path of the Feral Heart Hierarchy of Sins	1	Refusing to kill to survive	Vampires are hunters; everyone else is the hunted.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	10	Failing to uphold all the precepts of your group	True duty to a cause requires sterling character.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	9	Failing to show hospitality to your allies	Hospitality and generosity are the wealth of the soul.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	8	Associating with the dishonorable	Serve as an example, but do not be dragged into pettiness.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	7	Failing to participate in your group’s rituals	Tradition and ritual are important parts of heritage.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	6	Disobeying your leader	Loyalty is the keystone of hierarchy.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	5	Failing to protect your allies	Defend those who are worthy of your esteem.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	4	Placing personal concerns over duty	Duty is the vampire’s purpose.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	3	Showing cowardice	Honor lies in fighting for a cause, not in fleeing it.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	2	Killing without reason	Life and death are God’s to decree.
+core:328:1	core	328	Path of Honorable Accord Hierarchy of Sins	1	Breaking your word or oath; failing to honor an agreement	To break one’s oath is to be without the honor that defines existence.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	10	Feeding immediately when hungry	Deprivation and hunger taught Lilith to survive.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	9	Pursuing temporal wealth or power	True wealth comes from inside, not from money or influence.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	8	Not correcting the errors of others regarding Caine and Lilith	Caine was a murderer, traitor, and fool who deserves no reverence.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	7	Feeling remorse for bringing pain to someone	Pain and suffering help others to learn and grow.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	6	Failing to participate in a Bahari ritual	The rituals handed down through time contain clues to awakening.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	5	Fearing death	Death is simply an inevitable change to a new form of existence.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	4	Killing a living or unliving being	Death denies one the chance to transcend.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	3	Not seeking out the teachings of Lilith	Lilith hid her works in many places; they must be found.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	2	Failing to dispense pain and anguish	Be a teacher through the pain.
+core:330:1	core	330	Path of Lilith Hierarchy of Sins	1	Shunning pain	Only through pain are we reborn.To shun pain is to embrace ignorance.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	10	Postponing feeding when hungry	Hunger causes distraction.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	9	Indulging in pleasure	Hedonism deters one from greater ends.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	8	Asking another for knowledge	The lessons of Metamorphosis are secrets that must be uncovered, not copied.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	7	Sharing knowledge with another	Knowledge must be learned, not simply illustrated.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	6	Refusing to kill when knowledge may be gained from it	Before transcending death, the Metamorphosist must understand it.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	5	Failing to ride out a frenzy	A Kindred must know the Beast to transcend it.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	4	Considering the needs of others	Those who cannot be bothered to attain Metamorphosis are beneath one’s attention.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	3	Failure to experiment, even at risk to oneself	The Path can be understood only through empirical research.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	2	Neglecting to alter one’s own body	Physical change must be attained before any more significant metamorphosis.
+core:332:1	core	332	Path of Metamorphosis Hierarchy of Sins	1	Exhibiting compassion for others	The fates of others drag one into devolution, not transcendence.
+core:334:1	core	334	Path of Night Hierarchy of Sins	10	Killing a mortal for food	Dead mortals feel no dread.
+core:334:1	core	334	Path of Night Hierarchy of Sins	9	Acting in the interests of another	There is no time to fulfill petty agendas.
+core:334:1	core	334	Path of Night Hierarchy of Sins	8	Failing to be innovative in one’s depredations	Familiarity for one’s vile acts breeds contempt for them in others, and they may soon fail to shock.
+core:334:1	core	334	Path of Night Hierarchy of Sins	7	Asking aid of another	Those who cannot provide for themselves fulfill their ends poorly.
+core:334:1	core	334	Path of Night Hierarchy of Sins	6	Accidental killing	God has made Kindred horrors, not murderers.
+core:334:1	core	334	Path of Night Hierarchy of Sins	5	Bowing to another Kindred’s will	The games of the Jyhad are diversions from the Damned’s true purpose.
+core:334:1	core	334	Path of Night Hierarchy of Sins	4	Intentional or impassioned killing	Death serves no one; it merely deprives one of a victim.
+core:334:1	core	334	Path of Night Hierarchy of Sins	3	Aiding another	Compassion has no place in a vampire’s undead heart.
+core:334:1	core	334	Path of Night Hierarchy of Sins	2	Accepting another’s claim to superiority	All Kindred are equal under God’s plan.
+core:334:1	core	334	Path of Night Hierarchy of Sins	1	Repenting one’s behavior	The Kindred’s purpose is to cause repentance, not to practice it.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	10	Embracing a woman	Women should be bearers of life, not death.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	9	Embracing outside the jati	Most others fail to comprehend the depth of the Paradox philosophy.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	8	Destroying another Shilmulo	Charity does not, as is widely believed, begin at home.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	7	Killing a mortal for sustenance	Death robs a person of the ability to fulfill their svadharma.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	6	Failing to destroy a vampire on another Path	Those who cannot see the true way should be returned to a productive role in the cycle.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	5	Killing a mortal for reasons other than survival	A person may not have achieved her svadharma, and preventing such is anathema.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	4	Failure to aid another’s svadharma	The gods have set this as the Shilmulo’s purpose.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	3	Allowing one’s Sect affairs to take precedence over one’s dharma	One’s allegiance should be to the gods, not one’s companions.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	2	Becoming blood bound	One may never destroy one’s regnant, which is the whole purpose of this Path.
+core:336:1	core	336	Path of Paradox Hierarchy of Sins	1	Embracing needlessly or out of personal desire	One must return others to the cycle, not extract them from it.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	10	Denying responsibility for your actions	Dereliction of responsibility is a failure to lead properly.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	9	Treating your underlings poorly	Reward competence as an incentive, but do so sparingly.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	8	Failing to respect your superiors	Give the respect that is due, that you might learn something in turn.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	7	Helping others when it is not to your advantage	Always gain something from your actions.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	6	Accepting defeat	Succeed, or die.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	5	Failing to kill when it’s in your interests	Do not hesitate to eliminate those who would stand against you.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	4	Submitting to the error of others	Be right and you will be vindicated. Follow a fool and you will suffer for it.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	3	Not using the most effective tools for control	Power must be seized. Be iron-fisted and resolute.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	2	Not punishing failure	Failure is instructive only when used as a negative example.
+core:338:1	core	338	Path of Power and the Inner Voice Hierarchy of Sins	1	Turning down the opportunity for power	Personal power is the means to all ends.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	10	Pursuing one’s own indulgences instead of another’s	The slide into vice is a tool, not a recreation.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	9	Refusing to aid another follower of the Path	Teams work more efficiently than individuals to raise Set.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	8	Failing to destroy a vampire in Golconda	Those who have transcended their desires cannot brought under sway.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	7	Failing to observe Setite religious ritual	You must not deny Set his due.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	6	Failing to undermine the current social order in favor of the Setites	Other Kindred are purposeless or misled, and this indolence delays Set’s revival.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	5	Failing to do whatever is necessary to corrupt another	The more individuals in the Setites’ debt, the better.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	4	Failing to pursue arcane knowledge	The mysteries of Set’s resurrection may be hidden anywhere.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	3	Obstructing another Setite’s efforts	The ranks of the righteous are no place for petty power plays.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	2	Failing to take advantage of another’s weakness	Compassion has no place in Set’s greater plans.
+core:340:1	core	340	Path of Typhon Hierarchy of Sins	1	Refusing to aid in Set’s resurrection	This is the purview of unbelievers.
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	10	Risking your own life	Survival is paramount.
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	9	Acknowledging a leader	There is no “us”, only “me.”
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	8	Killing for pleasure	Never waste.
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	7	Choosing to live in order over chaos	Civilization softens you.
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	6	Cruelty for pleasure	Cruelty is wasted energy.
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	5	Doing something for nothing	Charity doesn’t feed the Beast.
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	4	Failing to kill when survival is on the line	If it comes down to you or them, it must be you.
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	3	Not protecting what is yours	Make it yours, keep it yours.
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	2	Having no things that are yours	Mark your territory, mark your people, mark your herd.
+da:116:1	da	116	HIERARCHY OF SINS AGAINST WHO YOU ARE	1	Refusing to feed when hungry	There is no balance when the Beast is denied.
+da:118:1	da	118	HIERARCHY OF SINS AGAINST JOURNEYS	3	Failing to explore	You cannot know what lies around the corner if you don’t go looking.
+da:118:1	da	118	HIERARCHY OF SINS AGAINST JOURNEYS	2	Acknowledging ties to a land or people	Reject their titles and their attempts to domesticate you.
+da:118:2	da	118	HIERARCHY OF SINS AGAINST LIBERATION	8	Failing to expose someone to a hard truth	Liberation belongs to everyone.
+da:118:2	da	118	HIERARCHY OF SINS AGAINST LIBERATION	6	Taking comfort in the city instead of dismantling it	If it makes your life easier, it makes you weaker. Destroy it.
+da:118:2	da	118	HIERARCHY OF SINS AGAINST LIBERATION	1	Empowering tyranny	You create liberation, if they want it or not.
+da:118:3	da	118	HIERARCHYOFSINS AGAINSTTHEHUNT	8	Ignoring potential threats to your hunt.	Others will try to limit your hunting rights. Do not let them.
+da:118:3	da	118	HIERARCHYOFSINS AGAINSTTHEHUNT	7	Acting without a plan	A careless Hunter is a failure before she starts.
+da:118:3	da	118	HIERARCHYOFSINS AGAINSTTHEHUNT	2	Hunting without ritual preparation	The Hunt is the only sacred thing.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	10	Failing to maintain a state of ritual purity	And ye shall be holy men unto me.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	9	Unnecessary contact with non-Jews	The people must be protected.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	8	Failing to find a rabbinical authority to make rulings for you, and obey those rulings	In whatever place there is a profanation of God’s name, they do not show respect to their rabbi.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	7	Failing to obey the laws and customs of the local Jewish community	The spiritual needs of the individual can only be met through community.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	6	Failing to maintain a connection to a local Jewish community	Jews cannot exist in isolation.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	5	Drinking impermissible blood	For the life of the flesh is in the blood.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	4	Worshipping idols	Hear, O Israel, God is One.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	3	Committing sexual violence	It is worse to wrong a fellow person than it is to wrong God.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	2	Murder	Whoever sheds the blood of man, by man shall his blood be shed.
+da:120:1	da	120	DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	1	Endangering the Jewish community	You shall not stand by the blood of your fellow.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	10	Failing to denounce corruption and sin	All that evil needs to triumph is the inaction of the righteous.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	9	Acting out of pride, avarice, lust, or other sinful impulse	The road to the Beast is paved in sin.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	8	Bearing false witness	A lying tongue is hateful in the eyes of the Lord.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	7	Causing harm to a pious person	God protects the innocent.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	6	Feeding from an innocent without permission	Corruption of the innocent is a grave sin.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	5	Blasphemy or heresy in word or act	Blasphemy is a sin against God.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	4	Murder of innocents	Thou shalt not kill, sayeth the Lord.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	3	Worshiping false idols	Thou shalt not have any other god before me.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	2	Aiding demons or supernatural evil	It is the duty of the righteous to smite the wicked.
+da:120:2	da	120	THE PATH OF CHRIST (CHRISTIANITY)	1	Failing to spread the Gospel of Christ DERECH CHAIM - THE PATH OF LIFE ( JUDAISM)	It is the duty of all Christians to spread the good news of our Lord
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	10	Failing to honor your elders	Say not to them a word of contempt but address them in terms of honor.
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	9	Failing to care for the defenseless	All power is a gift from God.
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	8	Being dishonest or unfair in your dealings with others	Give full measure for measure and weigh with a balance that is straight.
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	7	Breaking a promise	Every covenant will be inquired into on the Day of Reckoning.
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	6	Boastfulness or arrogance	Successful are those who humble themselves in prayers.
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	5	Feeding from a non-Muslim	He hath forbidden that which has been immolated to any other god.
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	4	Killing unjustly	Nor take life — which Allah has made sacred — for unjust cause.
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	3	Acknowledging any god but Allah (and Muhammad is His Prophet)	Take not with Allah another object of worship.
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	2	Breaking the unity of Islam	You Muslims are the best nation brought out for Mankind.
+da:121:1	da	121	THE PATH OF THE PROPHET (ISLAM)	1	Failing to submit to the will of Allah as revealed through his Prophet and revelation	God alone possesses all power and glory.
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	10	Selfish thoughts	If it can be thought, it can be done.
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	9	Minor selfish acts	Putting oneself first lets the Beast in.
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	8	Injury to another	Accidental or not, there is still blood on your hands.
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	7	Theft	Only an animal takes without thought of consequence
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	6	Accidental violation of another	Humanity is a shared condition, his suffering is your own.
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	5	Wanton destruction	Are you a person or an animal?
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	4	Impassioned violation of another	Passion behind violence is the whispering of the Beast.
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	3	Planned violation of another	To be so cold is to reject the warmth of humanity.
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	2	Casual violation of another	Even wild animals know better.
+da:123:1	da	123	HIERARCHY OF SINS AGAINST THE SOUL	1	The most monstrous, vile acts	Are you a person or a monster?
+da:123:2	da	123	you must enrich a downtrodden child’s life to give your	10	Allowing yourself to think or act as a vampire	
+da:123:2	da	123	you must enrich a downtrodden child’s life to give your	7	Knowingly letting a human suffer	
+da:123:2	da	123	you must enrich a downtrodden child’s life to give your	1	Spending a night without human contact the 123	
+da:124:1	da	124	would squander the herd, or treat their keep like animals	7	Accidental destruction of public property	
+da:124:1	da	124	would squander the herd, or treat their keep like animals	4	Theft	
+da:124:1	da	124	would squander the herd, or treat their keep like animals	1	Genocide or any action that ends a community’s ability to grow and thrive	
+da:125:1	da	125	enemies and defend his lands. As such, Luminaries strive to	10	Staying any place that is not furthering you along your journey	
+da:125:1	da	125	enemies and defend his lands. As such, Luminaries strive to	7	Any act that will prevent a Cainite from following the journey you have begun. expected to defer to those of higher station while aspiring	
+da:125:1	da	125	enemies and defend his lands. As such, Luminaries strive to	1	Letting true darkness in, to squelch the light. Accepting Evil. and respect. Luminaries know that a leader is only as	
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	10	Forgoing your duty	Those who do not maintain responsibilities often lose them.
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	9	Treating a peer with disrespect	Respect must be given to earn it from others.
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	8	Placing personal desires over duty	A leader must do what is best for the many, not the one.
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	7	Treating an inferior as an equal	Everyone should know their place, including you.
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	6	Killing without purpose	Displays of power should inspire fear or respect.
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	5	Showing weakness in front of inferiors	A leader must be strong at all times.
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	4	Failing to answer a challenge to your honor	Honor and reputation are everything.
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	3	Treating your superior with disrespect	Superiors must be given the respect they are due.
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	2	Breaking your word or oath	Your word is your honor. If you have no honor, you have no worth.
+da:126:1	da	126	HIERARCHY OF SINS AGAINST KINGSHIP	1	Giving in to your Beast, such as frenzy	If you cannot control yourself, how can you control others?
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	10	Neglecting your duty for any reason	Duty must come first.
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	9	Dishonorable acts (deceit, murder, etc.)	Your honor is the most important thing.
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	8	Treating another with disrespect	Respect must be given to earn it from others.
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	7	Behaving in an unjust manner	It is your duty to uphold justice.
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	6	Failing to come to the aid of another	It is your duty to protect the weak.
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	5	Treating your superior with disrespect	Superiors must be given the respect they are due.
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	4	Placing personal desires over duty	Selfish thoughts have no place in a Paladin’s heart.
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	3	Failing to answer a challenge to your honor	Honor and reputation are everything.
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	2	Breaking your word	Your word is your honor. If you have no honor, you have no worth.
+da:127:1	da	127	HIERARCHY OF SINS AGAINST CHIVALRY	1	Breaking a sworn oath	Oaths of fealty are what make civilized society.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	10	Neglecting your duty for any reason	Duty must come first.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	9	Breaking the law	You must uphold the law at all costs.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	8	Treating another with disrespect	Respect must be given to earn it from others.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	7	Behaving in an unjust manner	It is your duty to uphold justice.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	6	Killing without purpose	Displays of power should inspire fear or respect.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	5	Failing to come to the aid of another	To gain power, you must first gather goodwill.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	4	Treating your superior with disrespect	Superiors must be given the respect they are due.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	3	Failing to uphold the law	It is your duty to uphold the law not matter the price.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	2	Breaking your word or oath	Your word is your honor. If you have no honor, you have no worth.
+da:127:2	da	127	HIERARCHY OF SINS AGAINST DAENA	1	Giving into your Beast, such as frenzy	If you cannot control yourself, how can you control others? The road of kings 127
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	10	Failing to recognize the divine	Your power comes from the divine will.
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	9	Forgoing your duty	Those who do not maintain responsibilities often lose them.
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	8	Treating another with disrespect	Respect must be given to earn it from others.
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	7	Treating an inferior as an equal	You are a god; you must not forget this.
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	6	Placing personal desires over duty	A leader must do what is best for the many, not the one.
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	5	Failing to seize power when the chance arises	You must prove to the divine that you deserve its blessing.
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	4	Failing to answer a challenge to your honor.	True gods smite their detractors.
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	3	Killing without purpose	It is your divine duty to protect your worshippers, not kill them.
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	2	Breaking your word or oath	Your word is your honor. If you have no honor, you have no worth.
+da:127:3	da	127	HIERARCHY OF SINS AGAINST DEVARAJA	1	Giving into your Beast, such as frenzy	If you cannot control yourself, how can you accept the divine?
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	10	Feeding immediately when hungry	There is a lesson in every denial, and there is control in self-denial.
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	9	Joining a system created by those with no wisdom	Live outside their lies.
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	8	Ignoring one of Lilith’s faces	Wherever you go, the Dark Mother has left messages for you. Read their myths and show them where Lilith lives.
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	7	Rejecting the suffering of others or dismissing it	Teach whenever the opportunity presents itself, even if you think the lessons learned would be beneath you.
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	6	Cruelty for its own sake	As a teacher, you must craft your lessons. Petty abuses are beneath you. The pain you inflict must be divine.
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	5	Stealing great learning and claiming it as your own	If you did not discover the wisdom yourself, you have no rights claiming it or authority based on it.
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	4	Destroying a thinking being	They can neither learn from you nor teach you if they have been destroyed.
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	3	Not seeking out the teachings of Lilith	Turn over the leaf, split the wood, and find her secrets wherever they hide.
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	2	Getting between someone and a valuable lesson	Better to pull the stars from the heavens than to rob someone of moments of true gnosis.
+da:130:1	da	130	HIERARCHY OF SINS AGAINST WHO YOU ARE	1	Shunning pain	The harder it is, the more rewarding the growth.
+da:130:2	da	130	Wisdom can be written down and taught as well as it can	9	Joining any community of fools.	
+da:130:2	da	130	Wisdom can be written down and taught as well as it can	5	Accepting a student (formal or informal) the first time they come to you.	
+da:130:2	da	130	Wisdom can be written down and taught as well as it can	2	Putting the learning of another before your own.	
+da:131:1	da	131	frightening.	9	Accepting and abiding any law of Caine or God.	
+da:131:1	da	131	frightening.	8	Failing to destroy the works of Noddist-liars.	
+da:131:1	da	131	frightening.	4	Snuffing the spark of a candle that desires to burn brighter.	
+da:131:2	da	131	of Lilith’s murdered children, as she forgives them.	10	Rejecting the advances of demons with seed in	
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	10	Failing to ride out a frenzy	While you can glean knowledge from the Beast, you must not allow your baser impulses to control you.
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	9	Offering unsolicited knowledge to another	Most are not on your path, but do not presume to take away their choice.
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	8	Allowing pleasure or emotion to distract you	Hedonism deters greater ends.
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	7	Asking another for knowledge	No one can teach you apotheosis. You must discover its secrets yourself.
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	6	Denying yourself sustenance	Hunger is the most basic distraction.
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	5	Succumbing to conventional morality when knowledge could be gained	Without transgressing, you will never find what is hidden from sight.
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	4	Placing others above your quest for knowledge	Those who wish to chain themselves to this world will hold you back as well.
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	3	Failure to experiment due to compassion, discomfort, or personal risk	We may flounder in the dark, and it may be unpleasant, but it is our only way forward.
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	2	Loving another	Love puts itself above all things, even Metamorphosis. Do not allow this.
+da:132:1	da	132	HIERARCHY OF SINS AGAINST TRANSMOGRIFICATION	1	Neglecting to alter one’s own body	If the forms we have were suited for ascension, we would already have ascended.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	10	Acknowledging any authority over your own	You are beyond submission.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	9	Failing to indulge a new desire	No pleasure should be denied you.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	8	Failing to ride the wave of frenzy	The Beast tires with exercise, strengthens with denial.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	7	Forfeiting long-term pleasures for short-term ones	Do not exchange floods of desire for a draught.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	6	Putting the needs of others ahead of your own pleasure	Your need outweighs everything else.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	5	Swearing an oath	Be bound by none, least of all yourself.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	4	Refusing to act against those who attempt to bind you	The truest chains are self-imposed, but false ones can bind just as well.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	3	Refusing to feed or kill when necessary	No life is worth more than your own.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	2	Encouraging the tenets or virtues of another Road	All other Roads lead to gilded cages and liberated Beasts.
+da:134:1	da	134	HIERARCHY OF SINS AGAINST YOURSELF	1	Refusing to act in your own best interests	Only fools sacrifice themselves.
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	10	Being shamed by your actions	Shame is disapproval in the eyes of others; your actions can only please yourself.
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	9	Failing to indulge your desires	Satiation keeps the Beast at bay.
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	8	Failing to ride the wave of frenzy	The red rages are but another pleasure to experience.
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	7	Any display of modesty	Modesty is morality imposed from without. Never submit to it.
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	6	Putting the needs of others ahead of your own interests	Your desires come before their need.
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	5	Swearing an oath	A wild heart must never be chained.
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	4	Associating with those who bring you no pleasure	The Beast rages when denied; never give license to its fury.
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	3	Refusing to feed or kill when necessary	These are your greatest and purest joys.
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	2	Encouraging virtue or agents of virtue	Why exert effort to aid those who would chain you?
+da:135:1	da	135	HIERARCHY OF SINS AGAINST PLEASURE	1	Refusing to act in your own best interests	Your desires are all that truly matters. the road of sin 135
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	10	Acknowledging any laws but that of Hell	Divinity and mundanity have no meaning for the Damned.
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	9	Failing to indulge your desires	Pleasure strengthens you, which strengthens your masters.
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	8	Failing to ride the wave of frenzy	The Beast is the clarion call of your soul.
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	7	Refusing to feed or kill when necessary	Beautiful is the blood that darkens the soil.
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	6	Avoiding injury to others for any reason	Blood spilled is your gift to the world, your greatest pleasure.
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	5	Any display of mercy or pity	Mercy is for the weak, and Damnation makes you strong.
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	4	Failing to act on behalf of Hell	You serve Hell, even when it does not serve you.
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	3	Any altruistic behavior	You owe others nothing.
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	2	Acting against the minions of Hell	We are all as drones in the hive of the Pit.
+da:136:1	da	136	HIERARCHY OF SINS AGAINST DAMNATION	1	Encouraging virtue or agents of virtue	Nothing pure may withstand you, even the purity of Sin.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	10	Acknowledging the laws of God or Man	Never give credence to those who would enslave others.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	9	Failing to indulge a new desire	Passion is the fire of the soul.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	8	Failing to ride the wave of frenzy	The Beast may only be understood after struggle.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	7	Refusing to aid a lost soul in need	The weak cannot understand their nature, and must be taught by the strong.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	6	Refusing a pleasure that injures none	Seeking to pleasure yourself is the fondest pursuit.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	5	Swearing an oath	Forced servitude cannot be helped, and is to be pitied; self-enforced servitude is hideous, and is to be resisted.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	4	Refusing to act against those who choose to bind you	Punish those who attempt to control you.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	3	Refusing to feed or kill when necessary	Never feel shame for doing what must be done.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	2	Pursuing material gain at the expense of higher concerns	Enrich your soul before you fill your coffers.
+da:136:2	da	136	HIERARCHY OF SINS AGAINST REBELLION	1	Encouraging false virtue or agents of false virtue	Constrictions of laws enslave the mind and strangle the soul.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	10	Failing to spend time alone in the silence of nature	It is through nature that the gods are revealed to us.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	9	Betraying a secret	The Druids teach us that we must be blind where secrets are concerned.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	8	Failing to care for the sick and the weak	One cannot be strong without concern for others.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	7	Letting pride come before justice	One must be strong toward the strong and weak toward the strengthless.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	6	Failing to honor the spirits of nature	The spirits aid and guide us.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	5	Failing to honor the gods	The gods created the world that sustains us.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	4	Breaking a promise	A promise is a sacred bond.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	3	Acting to upset the balance of nature	For the righteous must seek balance in all things.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	2	Failure to conduct yourself with honor	The gods honor those who live with honor.
+da:137:1	da	137	HIERARCHY OF SINS AGAINST THE EIGHTFOLD WHEEL	1	Failure to seek self-knowledge	Never permit self-deception to obscure knowledge of the self. the road of sin 137
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	10	Failing to make regular sacrifices	Regular sacrifices give the gods strength.
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	9	Lying	Do not dishonor yourself in the eyes of the gods with false words.
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	8	Offending the gods or spirits with violence	Do not disrespect the spirits with violence, for they are quick to take offense and their memory is long.
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	7	Failing to act honorably	The gods reward honor and punish dishonor.
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	6	Stealing from offerings or sacrifices	Give the gods the first fruits of your labor and do not grudge them their portion.
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	5	Not honoring priests	Priests are the servants of order and balance favored by the gods.
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	4	Killing a sacred animal	Honor that which the gods have decreed sacred.
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	3	Defiling sacred places	Defiling a temple is like cursing the gods themselves.
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	2	Damaging the image of the gods	One should strive always to honor the gods in thought and deed.
+da:138:1	da	138	HIERARCHY OF SINS AGAINST THE WATCHFUL GODS	1	Reviling a god or the gods	The gods are the source of all life and goodness.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	10	Refusing to share knowledge with a worthy recipient	Scholarship is improved with informed review.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	9	Wanton destruction and cruelty	Beasts and idiots will discover nothing but the stake.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	8	Refusing to kill when useful or necessary	Let no mortal squeamishness impede your quest.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	7	Being swayed by emotion	Study emotion as an expression of the soul, but do not let it guide your hand.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	6	Succumbing to frenzy	A raging Beast is a poor observer.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	5	Pursuing power, prestige, or mortal attachments instead of knowledge	These things are means to an end and nothing more.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	4	Allowing compassion or pity to influence you	Affecting compassion may be useful to manipulate your enemies, but don’t let it enter your heart.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	3	Needlessly preventing a death	All flesh is dust.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	2	Showing fear of death	Be not afraid of the truth.
+da:140:1	da	140	HIERARCHY OF SINS AGAINST KNOWLEDGE	1	Destroying irreplaceable sources of knowledge	Destroying an artifact destroys an entire world.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	10	Ignoring an insult	You have earned the respect of others.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	9	Insulting another undeservedly	You must show respect to those who have earned it.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	8	Lying to one who has proved themselves honest	Honesty demands honesty.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	7	Abusing your herd	The herd is not just for one.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	6	Showing mercy to one who has not submitted	The weak must accept you as their master.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	5	Losing a battle due to pride	Defeat your enemy now. Assuage your ego later.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	4	Harming family, anda, herd, or allies while in frenzy	A warrior’s essential quality is discipline.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	3	Disobeying the order of your noyan	Obedience is the foundation of honor.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	2	Betraying your family	You will never know a stronger bond than that of blood.
+da:141:1	da	141	HIERARCHY OF SINS AGAINST THE YASA	1	Betraying your Bloodbrothers	The family of choice is the strongest.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	10	Acting impulsively in any situation	Discipline is strength.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	9	Allowing actions to be dictated by emotion	Passion is the first stirring of the Beast.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	8	Succumbing to frenzy	Our will must be unshakable.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	7	Failing to diablerize an unworthy vampire	Return the blood of the unworthy to Haqim.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	6	Acting cowardly or dishonorably	Our actions reflect on our father, Haqim.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	5	Allowing the unworthy to go unpunished	We are the judges of the unliving.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	4	Showing weakness before the unworthy	We represent Haqim in all things.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	3	Failing to honor an oath	Our honor is what sets us apart.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	2	Submitting to the will of an unworthy prince or elder	Nothing in this world may sway us from our sacred purpose.
+da:432:1	da	432	to the nomadic warrior sect, taking up the mantle of Minimum	1	Becoming oathbound to another Cainite	We serve Haqim and no other.
+da:442:1	da	442	The Road of the Abyss	10	Showing fear of the dark	Darkness has much to teach us about the Abyss.
+da:442:1	da	442	The Road of the Abyss	9	Failing to observe a manifestation of darkness	Only through observation can one increase knowledge.
+da:442:1	da	442	The Road of the Abyss	8	Expressing reverence for creation	Creation is a blight, a taint of the purity of the Abyss.
+da:442:1	da	442	The Road of the Abyss	7	Refusing to feed when hungry	Hunger is a manifestation of the void.
+da:442:1	da	442	The Road of the Abyss	6	Refusing to kill when it is the most expedient path	Everything returns to the Abyss in time.
+da:442:1	da	442	The Road of the Abyss	5	Giving in to frenzy	In order to master the darkness, you must first master yourself.
+da:442:1	da	442	The Road of the Abyss	4	Refusing to share knowledge with another Abyss mystic	Full understanding of the Abyss cannot be attained without the insight of others.
+da:442:1	da	442	The Road of the Abyss	3	Letting morality hinder study of the Abyss	Morals are a light-born weakness. We are creatures of darkness.
+da:442:1	da	442	The Road of the Abyss	2	Needlessly avoiding the darkness	We are creatures of darkness. To reject it is to reject yourself.
+da:442:1	da	442	The Road of the Abyss	1	Showing aversion to the Abyss	You cannot master that which you fear.
+da:445:1	da	445	SINS AGAINST PARADOX	10	Failing to accept death	Your svadharma is only temporary, you must eventually return to the samsara.
+da:445:1	da	445	SINS AGAINST PARADOX	9	Embracing outside the jati	Only Embrace those that will follow the Road of Paradox.
+da:445:1	da	445	SINS AGAINST PARADOX	8	Destroying another Asura	Your fellows on this Road have a svadharma, do not stop them.
+da:445:1	da	445	SINS AGAINST PARADOX	7	Killing a mortal for sustenance	Death prevents a person from fulfilling their svadharma in this part of the cycle.
+da:445:1	da	445	SINS AGAINST PARADOX	6	Failing to kill vampires on another Road	Only by accepting the true path to moksha can a vampire atone. Otherwise, they are useless.
+da:445:1	da	445	SINS AGAINST PARADOX	5	Allowing personal affairs to interfere in your svadharma	You must follow your sacred duty at all times.
+da:445:1	da	445	SINS AGAINST PARADOX	4	Failure to aid another’s svadharma	This is your only purpose before returning to the cycle.
+da:445:1	da	445	SINS AGAINST PARADOX	3	Killing a mortal for any reason other than survival	Preventing others from achieving their svadharma is anathema.
+da:445:1	da	445	SINS AGAINST PARADOX	2	Becoming blood bound	You cannot destroy your regnant, which could prevent you from following your svadharma.
+da:445:1	da	445	SINS AGAINST PARADOX	1	Embracing needlessly out of personal desire	You must allow others to continue their cycle, not remove them from it.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	10	Failing to punish corruption and sin	Evil prospers in the unchallenged heart.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	9	Acting out of avarice or lust	Honor must be stronger than steel.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	8	Bearing false witness	Your sword is that of truth.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	7	Feeding from the innocent without permission	As the Healers are bound, so shall we be.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	6	Failing to defend or aid a person in need	A dead heart finds life in service to others.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	5	Failing to defend or aid a Healer in need	The red right hand defends the left.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	4	Letting a worthy challenge go unanswered	Be as the lion, not as the lamb.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	3	Failing to challenge a vampire with a low Road	Their souls endanger Cainite and kine.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	2	Neglecting an opportunity to exact vengeance	Let retribution be your pride and purview.
+da:447:1	da	447	HIERARCHY OF SINS AGAINST RIGHTEOUSNESS	1	Aiding demons, Baali, Setites, or other evils	Offer the wicked no succor but salt and fire.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	10	Failing to indulge in pleasurable acts	Chaos is the gift of Apep, our source of strength.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	9	Delaying carnal gratification	Denial of one’s desires is a denial of one’s true self.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	8	Refusing an opportunity to corrupt a mortal	Order prevents us from being who we truly are.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	7	Refusing an opportunity to corrupt a vampire	We are the children of Apep. His gift must not be rejected.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	6	Refusing an opportunity to corrupt a holy figure	Weakness must be cast aside.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	5	Failing to undermine the prevailing mortal environment	Stagnation promotes weakness.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	4	Failing to undermine Cainite structures of power	Times of strife help us discover our true strength.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	3	Placing another’s wishes above your own	Civilization is a lie.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	2	Punishing an individual for indecent behavior	Freedom is strength.
+da:449:1	da	449	HIERARCHY OF SINS AGAINST APEP	1	Actively enforcing the rule of law	Order and chaos are natural opposites.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	10	Pursuing personal indulgence over the interests of the Path	Dissolution is the pastime of the weak.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	9	Refusing to aid another follower of the Path	We must work together if we are to eliminate our enemies.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	8	Failing to acquire leverage against enemies of the Road	The unrighteous shall be destroyed and the weak converted.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	7	Refusing to spread the worship of Set	Those who bear the blood of Set bear a sacred duty to spread his word.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	6	Failing to observe Setite rituals	Only through our devotion do we earn Set’s favor.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	5	Failing to sow chaos among the enemies of the Road	Let the ungodly be cast down.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	4	Failing to do whatever is needed to convert the pious of other faiths	Where they lead, others will follow.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	3	Obstructing another Setite’s efforts	We all work toward a common purpose.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	2	Refusing to aid in Set’s resurrection	It is our sacred duty to restore our lord’s place in the world.
+da:449:2	da	449	HIERARCHY OF SINS AGAINST SET	1	Worshipping any god but Set	Set is our progenitor and protector. There is no true god but Set.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	10	Indulging in any temptation	True katharsis purges all passions.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	9	Going one night without performing any creative work	In art, we illuminate truth.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	8	Turning away from those who need inspiration	An angel’s work is in guiding the lost.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	7	Refusing to make a minor sacrifice	Shedding earthly things brings us closer to divinity.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	6	Leaving fellow Toreador to languish unbaptized	We are all Michael’s chosen.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	5	Going one week without performing any creative work	Art is how the soul worships.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	4	Indulging in temptations of the flesh	In katharsis we renounce carnal passions.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	3	Abandoning any in your charge	We must earn the worship of the flock.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	2	Giving in to your Beast, such as frenzy	Katharsis purges our basest urges first and foremost.
+dac:71:1	dac	71	SINS AGAINST THE ARCHANGEL	1	Refusing to make a major sacrifice	We follow Michael’s example in all things.
+dac:84:1	dac	84	(V20 Dark Ages, 123), but with these additions:	10	Fearing Final Death	The vampire has worked her way back to Ahura Mazda. Heaven awaits when she dies.
+dac:84:1	dac	84	(V20 Dark Ages, 123), but with these additions:	8	Speaking evil words, speaking ill of others	Words carry to the ear of Ahura Mazda.
+dac:84:1	dac	84	(V20 Dark Ages, 123), but with these additions:	1	Feeding on good men	The vampire has chosen Ahura Mazda, and must protect the good and righteous.
+dac:84:2	dac	84	(V20 Dark Ages, p.449), but with these replacements:	10	Committing any act of kindness	The vampire is a servant of Angra Mainyu, the bringer of evil.
+dac:84:2	dac	84	(V20 Dark Ages, p.449), but with these replacements:	2	Feeding on evil men	The vampire must not harm other servants of Angra Mainyu.
+dac:84:2	dac	84	(V20 Dark Ages, p.449), but with these replacements:	1	Fearing Frenzy THE ROAD OF AHUR The Road of Ahura Mazda is m (V20 Dark Ages,	Rage and Hunger are gifts from Angra Mainyu, and the vampire must embrace them. A MAZDA echanically similar to the Via Humanitas 123), but with these additions:
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	10	Ill-defined or idle thinking	Only rigidity of thought can allow for mastery over the Beast.
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	9	Refusing to intervene when another vampire is at risk for degeneration	In helping others to control their impulses, you learn more on how to control your own.
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	8	Acting on impulse	Acting without careful thought leads to a loss of control.
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	7	Theft, robbery, or vandalism	Acting against others is the path away from Humanity.
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	6	Refusing to stand up for a moral principle out of fear or cowardice	It is only through the defense of morality that you can understand it.
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	5	Causing deliberate harm to a mortal, including violent nonconsensual feeding	If you harm a mortal’s body, you also harm your own spirituality.
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	4	Aiding a follower of another Path that does not respect humanity	Aiding those who reject humanity (and Humanity) is as bad as rejecting it yourself.
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	3	Succumbing to frenzy when wise conduct could have avoided it	Do not give the Beast a chance to flourish.
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	2	Allowing any violent crime against an innocent to go unpunished	If you allow others to come to harm without punishment, it is as if you committed the harm yourself.
+lotc:52:1	lotc	52	PATH OF ENTELECHY HIERARCHY OF SINS	1	The murder of innocents	Taking a life is the worst loss of control one can commit.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	10	Suffering an innocent to live	A soul unwilling to touch the beyond, via sensation, should be sent by a more direct route.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	9	Not wallowing in absolute decadence	Always, always drown the Beast.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	8	Refusing to break a taboo	Transgressing any sacred border deteriorates the paradigm of the Aeons.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	7	Allowing an infector of impurity (i.e. priest, nun, etc.) to live without good reason	Unless they can be compromised, the hypocrites will continue serving the purpose of the Aeons.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	6	Failing to create a beautiful moment	In a world choked in nihilism, it is a sin to not open a window to the divine when inspiration strikes.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	5	Not attempting to corrupt an innocent	Free the shackled sheep when you can.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	4	Not taking at least one drug regularly	A malleable mind is more open to the supernal.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	3	Restraining your natural impulses unnecessarily	The compulsion of repression is a useless artifact, implanted by the Aeons, and must be cut out.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	2	Refusing to subvert the chains of the Aeons	Without our glorious purpose, we are naught but shabby hedonists.
+lotc:71:1	lotc	71	Path of Ecstasy Hierarchy of Sins	1	Destroying something of beauty, even an innocent	We refuse to make the world any less interesting.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	10	Not subjecting yourself to the most painful tortures	Your flesh must be purified for its holy purpose.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	9	Failing any test set before you, physical or mental	Failure is unworthy of the Dark God.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	8	Not developing your body to its fullest potential	You are a weapon wielded by Set, and you must be sharp.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	7	Spending blood points to heal your wounds the same night they are inflicted	Pain is a teacher. Do not skirt your lessons.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	6	Not developing your Disciplines to their fullest potential	Divinity is wasted on those who do not unlock its gifts.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	5	Killing swiftly and mercifully	A dying enemy must know despair if Set is to hear your offering.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	4	Showing any sign of pain	Your pain belongs to you and to no one else whom you do not give it to.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	3	Succumbing to frenzy or Rötschreck	If you have all the power in the world, and the Beast controls you, you have nothing.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	2	Thinking too long before acting	Hesitation is a mortal failing and unworthy of you.
+lotc:73:1	lotc	73	Path of the Warrior Hierarchy of Sins	1	Refusing to aid in Set’s resurrection	The final battle cannot begin until the God of Storm and Sky returns.
