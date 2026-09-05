@@ -49,6 +49,8 @@ o `.lfm` precisar ser regerado, e para §T444–446 saberem o que procurar em qu
 | `gen_road_desc.ps1` | escreve `descRoad_{en,pt}.lua` a partir dos 8 acima + os 2 `.lfm` | — |
 | `clan_body_en.tsv` | `<nome do picker>\t<livro>\t<pág impressa>\t<corpo EN>` — §T848 metade EN | 61 |
 | `clan_extract.ps1` | o extrator que escreve o de cima a partir do cache de texto dos livros | — |
+| `clan_disc_open.tsv` | `<nome do picker>\t<en>\t<pt>` — a linha `Disciplines:` de trio ABERTO, em palavras (§I148d, §V432b); 1 família (§T850) + 6 clãs (§T970) | 1 |
+| `gen_traits_desc.ps1` | escreve `descFamily_{en,pt}.lua` (§T850; §T971 põe o par `Clan`) a partir de `CLANS` + `FAMILY_WEAKNESS` do `WoD20th.lfm`, do `.lang`, de `family_source.tsv` & de `clan_disc_open.tsv` — bloco 3 = `Disciplines:` ↵↵ `Weakness:`, mais nada | — |
 
 Os 5 `rd_*.tsv` de livro já vêm **dedupados entre si**, na precedência
 core > RoB > (LotC/LoB/DAC/BH) > TOS > DA. Somados dão 284 sem repetir nome.

@@ -130,7 +130,7 @@ function DescMap($entries) {
 # hashtable named below its use is $null with no error to show for it.
 $DESC_MARKER = @{ 'Background' = 'BACKGROUND_DESC'; 'Disc' = 'DISC_DESC'; 'Merit' = 'MERIT_DESC'; 'Road' = 'ROAD_DESC';
                   'Nature' = 'NATURE_DESC'; 'Numina' = 'DESC'; 'Path' = 'PATH_DESC'; 'Ritual' = 'RITUAL_DESC';
-                  'Clan' = 'CLAN_DESC' }
+                  'Clan' = 'CLAN_DESC'; 'Family' = 'FAMILY_DESC' }
 
 
 # ---- the BAND of a tab, ONE owner (SPEC V406, I140q, Q53) ------------------------------
@@ -8479,7 +8479,7 @@ else {
     }
 }
 # the trigger cannot live on the tab that draws the slots: it is managed, and may never open
-if ($rootTxt -notmatch '<dataLink field="clanFamily">') { $orphanBad += "the root form does not watch clanFamily - a tab that is never opened cannot be the thing that keeps the slots correct (SPEC V95, B26)" }
+if ($rootTxt -notmatch '<dataLink fields="\{''language'', ''clanFamily''\}">') { $orphanBad += "the root form does not watch clanFamily - a tab that is never opened cannot be the thing that keeps the slots correct (SPEC V95, B26)" }
 foreach ($nf in @('WoD20.11.lfm')) {
     if ((CodeOf (Join-Path $dir $nf)) -match 'renderClanDisc\(') { $orphanBad += "$nf calls renderClanDisc - it is a managed tab, and the sheet must be correct whether or not it is ever opened (SPEC V95)" }
 }
@@ -19368,5 +19368,194 @@ foreach ($p426 in @('Clan/Family', 'Select Clan/Family')) {
 
 if ($v426Bad) { foreach ($b426 in ($v426Bad | Select-Object -First 12)) { Fail "V426 $b426" } }
 else { Pass "V426 the Clan/Family line is dynclan and dynfamily over the one field clanFamily, each with its own list and kind, the value shown by pertinence in the family list, the union gone, the Revenant row on the family list, and the four phrases keyed in both halves" }
+# ---- V431: the two FIXED lines of the picker wear the empty invitation - italic at 0.80 ----
+# SPEC V431, I148a, T967, user 2026-09-05 (4th batch). `-- Remove --` and `-- Custom --` are
+# not names and not values: they are the way OUT of a row and the way to a name of your own,
+# and the owner asked that the eye read them the way it reads the empty invitation mfLabel
+# paints - italic, dimmed to 0.80. Authored in the XML and not written from Lua, on purpose:
+# V355(b)/(c) count the Lua writers of fontStyle and of 0.80 on the root form and want every
+# one of them inside mfLabel, and routing the two buttons through mfLabel trips V383(b) (the
+# second argument is a sheet.X literal) and V369(e) (the remove text comes from mfShown("")).
+# The host has taken both properties on a <button> before (fontStyle in HedgePicker, opacity
+# in five other sheets of the repo), so B155 asks for no probe. The NUMBER is mfLabel's and is
+# read off it here - a third owner of 0.80 is B70 (SPEC V244, V429c).
+#
+# Mutation (SPEC V20, V222): drop fontStyle from one button -> red on (a); opacity="0.75" on
+# one -> red on (b); write .opacity on btnMfRemove inside mfPaint -> red on (c) and on V355(b).
+$v431Bad = @()
+$doc431 = Doc (Join-Path $dir "WoD20th.lfm")
+$lua431 = CodeOf (Join-Path $dir "WoD20th.lfm")
+$lbl431 = LuaFn $rootTxt 'mfLabel'
+$want431 = $null
+$btns431 = @{}
+foreach ($n431 in @('btnMfRemove', 'btnMfCustom')) { $btns431[$n431] = @($doc431.SelectNodes("//layout[@name='mfSearch']/button[@name='$n431']"))[0] }
+# (d) zero-guard FIRST: a button not found, or mfLabel gone, and every leg below reads nothing
+foreach ($n431 in @('btnMfRemove', 'btnMfCustom')) {
+    if ($null -eq $btns431[$n431]) { $v431Bad += "(d) $n431 is not authored inside mfSearch - the fixed line is gone and legs (a)-(c) would measure nothing (SPEC V431d, V369a, V379a, V209)" }
+}
+if (-not $lbl431) { $v431Bad += "(d) mfLabel is gone from the root form - the number the two buttons have to match has no owner (SPEC V431d, V209)" }
+if (-not $v431Bad) {
+    # (b) the number is mfLabel's: the opacity it writes right after the italic of the EMPTY state
+    $want431 = [regex]::Match((NoComments $lbl431), '(?s)\.fontStyle\s*=\s*"italic";\s*\w+\.opacity\s*=\s*([0-9.]+)')
+    if (-not $want431.Success) { $v431Bad += "(b) mfLabel no longer writes opacity right after the italic of the empty state - the number this rule reads off it is gone (SPEC V431b, V355b, I114e)" }
+    foreach ($n431 in @('btnMfRemove', 'btnMfCustom')) {
+        $b431 = $btns431[$n431]
+        # (a) both properties, AUTHORED
+        if ($b431.GetAttribute('fontStyle') -ne 'italic') { $v431Bad += "(a) $n431 authors fontStyle='$($b431.GetAttribute('fontStyle'))' and the fixed line reads italic like the empty invitation (SPEC V431a, I148a)" }
+        if (-not $b431.HasAttribute('opacity')) { $v431Bad += "(a) $n431 authors no opacity - the fixed line reads at full weight beside an invitation that is dimmed (SPEC V431a, I148a)" }
+        elseif ($want431.Success -and $b431.GetAttribute('opacity') -ne $want431.Groups[1].Value) { $v431Bad += "(b) $n431 authors opacity='$($b431.GetAttribute('opacity'))' and mfLabel dims the empty state to $($want431.Groups[1].Value) - the two cues drifted apart, and the number has one owner (SPEC V431b, B70, V244)" }
+        # (c) no Lua writer of either property on the two: mfLabel stays the one writer V355 counts
+        if ($lua431 -match ('"' + $n431 + '"\]\s*\.(opacity|fontStyle)\s*=')) { $v431Bad += "(c) the root form writes opacity or fontStyle on $n431 from Lua - the XML is the one owner of the dress, and a Lua writer outside mfLabel is the second voice V355(b)/(c) refuse (SPEC V431c, V355)" }
+    }
+}
+if ($v431Bad) { foreach ($b in $v431Bad) { Fail "V431 $b" } }
+else { Pass "V431 btnMfRemove and btnMfCustom author italic at opacity $($want431.Groups[1].Value), the number read off mfLabel, and no Lua writes either property on them" }
+
+# ---- V430: a painter that TRANSLATES follows the language switch, the moment it happens ----
+# SPEC V430, I148b, B156, T968, user 2026-09-05 (4th batch). The language traversal of WoD20.6
+# skips every dyn* control on purpose (SPEC V31): whoever writes such a text owns both
+# languages for it. So a picker button changes language only when ITS painter runs, and the
+# painter runs when ITS dataLink fires. Twelve painters on this sheet translate what they
+# write - they call mfLabel or translateSheetText - and six of them hung off links that
+# watched the row's fields and not the language: the backgrounds stayed in English after the
+# switch until one background was touched, and then all sixteen followed (SPEC B156). The tabs
+# had put 'language' on their links already; the root form had not.
+#
+# The rule is per PAINTER and not per link: a painter reached by two links needs ONE of them
+# to observe the language (renderXPLedger has a language link and an xpManual link). A
+# painter reached by NO link is a FAIL and not an exemption - a painter nothing calls is
+# either dead or wired to an event this sweep cannot see, and both are worth a look.
+# Exceptions are NAMED, and the roster is empty today: a painter that must not follow the
+# language enters here by name and with a reason, never by vacuity (SPEC V430b, V366c).
+#
+# Mutation (SPEC V20, V222): drop 'language' from the background_* link on the root form ->
+# red on (a). Probe: move 'language' to the END of a fields list -> green, position is not
+# the subject.
+$V430_EXEMPT = @()
+$v430Bad = @()
+$v430Painters = @{}
+$v430Links = New-Object System.Collections.ArrayList
+foreach ($f430 in $files) {
+    $raw430 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f430.FullName))
+    $raw430 = [regex]::Replace($raw430, '(?s)<!--.*?-->', '')
+    $code430 = CodeOf $f430.FullName
+    foreach ($m430 in [regex]::Matches($code430, 'function\s+(render\w+)\s*\(')) {
+        $nm430 = $m430.Groups[1].Value
+        $body430 = NoComments (LuaFn $code430 $nm430)
+        if ($body430 -match 'mfLabel\(|translateSheetText\(') { $v430Painters[$nm430] = $f430.Name }
+    }
+    foreach ($m430 in [regex]::Matches($raw430, '(?s)<dataLink\b([^>]*?)(/>|>(.*?)</dataLink>)')) {
+        $attrs430 = $m430.Groups[1].Value
+        $handler430 = ''
+        $am430 = [regex]::Match($attrs430, 'onChange="([^"]*)"')
+        if ($am430.Success) { $handler430 = $am430.Groups[1].Value }
+        $em430 = [regex]::Match($m430.Groups[3].Value, '(?s)<event name="onChange">(.*?)</event>')
+        if ($em430.Success) { $handler430 += ' ' + $em430.Groups[1].Value }
+        $obs430 = ($attrs430 -match 'field="language"') -or ($attrs430 -match "fields=`"\{[^}]*'language'")
+        [void]$v430Links.Add(@{ File = $f430.Name; Observes = $obs430; Handler = $handler430 })
+    }
+}
+# (c) zero-guard: twelve painters were measured on 2026-09-05, and a sweep that finds fewer
+# is a broken regex, not a tidier sheet (SPEC V209, B7)
+if ($v430Painters.Count -lt 12) { $v430Bad += "(c) only $($v430Painters.Count) translating painter(s) were found across the sheet and twelve were measured on 2026-09-05 - the sweep shrank, not the sheet (SPEC V430c, V209, B7)" }
+if ($v430Links.Count -eq 0) { $v430Bad += "(c) no dataLink was read on any form - every painter below would fail for the wrong reason (SPEC V430c, V209)" }
+foreach ($p430 in ($v430Painters.Keys | Sort-Object)) {
+    if ($V430_EXEMPT -contains $p430) { continue }
+    $calls430 = @($v430Links | Where-Object { $_.Handler -match ('\b' + $p430 + '\s*\(') })
+    if ($calls430.Count -eq 0) { $v430Bad += "(a) $p430 [$($v430Painters[$p430])] translates and no dataLink calls it - a painter nothing triggers keeps the old language for ever, or is wired somewhere this sweep cannot see (SPEC V430a, V430c)" }
+    elseif (@($calls430 | Where-Object { $_.Observes }).Count -eq 0) { $v430Bad += "(a) $p430 [$($v430Painters[$p430])] translates and none of its $($calls430.Count) dataLink(s) observes 'language' - its text stays in the old language until someone touches the row (SPEC V430a, B156, V31)" }
+}
+foreach ($x430 in $V430_EXEMPT) { if (-not $v430Painters.ContainsKey($x430)) { $v430Bad += "(b) '$x430' is on the exemption roster and is not a translating painter - a stale name excuses nothing and hides the next gap (SPEC V430b, V20)" } }
+if ($v430Bad) { foreach ($b in $v430Bad) { Fail "V430 $b" } }
+else { Pass "V430 all $($v430Painters.Count) translating painters ($(($v430Painters.Keys | Sort-Object) -join ', ')) are reached by a dataLink that observes 'language', with $($V430_EXEMPT.Count) named exemption(s)" }
+
+# ---- V432: descClan and descFamily are MECHANICS derived from the sheet's own tables ------
+# SPEC V432, I148d, T850 (Family here; T971 extends the roster to Clan), user 2026-09-05. The
+# owner asked the ? of a clan or a family to say what the book STATS - the Disciplines and the
+# Weakness - and nothing else. Both facts already have an owner on the root form: CLANS holds
+# every trio (SPEC I17) and FAMILY_WEAKNESS every family sentence (SPEC V412f), so the module is
+# DERIVED from them by research/gen_traits_desc.ps1 and this rule reads the two back against each
+# other. A module that drifted from its table would show one trio in the pane and fill another
+# into the slots (V135 with the player watching). An OPEN trio (choice/open in CLANS) carries the
+# book's phrase from research/clan_disc_open.tsv instead of three names.
+#
+# Mutation (SPEC V20, V222): swap one discipline in descFamily_en.lua -> red on (b); reword one
+# weakness in the module without touching FAMILY_WEAKNESS -> red on (c); add a third line of
+# prose to block 3 -> red on (a). Probe: reorder two ENTRIES -> green, order is not the subject.
+$V432_KINDS = @(
+    [pscustomobject]@{ Kind = 'Family'; List = 'family'; Marker = 'FAMILY_DESC'; Weak = 'table' }
+)
+$v432Bad = @()
+$v432Seen = 0
+$v432Open = @{}
+$open432 = Join-Path $PSScriptRoot 'research\clan_disc_open.tsv'
+if (Test-Path -LiteralPath $open432) {
+    foreach ($l432 in [System.IO.File]::ReadAllLines($open432, [System.Text.Encoding]::UTF8)) {
+        if ($l432 -eq '' -or $l432.StartsWith('#')) { continue }
+        $c432 = $l432 -split "`t"
+        if ($c432.Count -ge 3) { $v432Open[$c432[0]] = @{ en = $c432[1]; pt = $c432[2] } }
+    }
+}
+# (e) zero-guard FIRST: the two tables every entry is read against
+if ($null -eq $clanEntries -or $clanEntries.Count -lt 84) { $v432Bad += "(e) CLANS parsed to $(@($clanEntries).Count) entries and it holds 61 clans + 23 families - the trio every module line is read against is missing (SPEC V432e, V209, B7)" }
+if ($null -eq $vals412 -or $vals412.Count -eq 0) { $v432Bad += "(e) FAMILY_WEAKNESS read back empty - leg (c) would compare every family sentence against nothing (SPEC V432e, V412f, B7)" }
+foreach ($k432 in $V432_KINDS) {
+    $names432 = @(@($PICKER[$k432.List]) | Where-Object { $_ -ne '' })
+    $en432 = DescEntries (Join-Path $plugin "desc$($k432.Kind)_en.lua") $k432.Marker 'en'
+    $pt432 = DescEntries (Join-Path $plugin "desc$($k432.Kind)_pt.lua") $k432.Marker 'pt'
+    if ($names432.Count -eq 0) { $v432Bad += "(e) PICKER_LIST[$($k432.List)] read back empty (SPEC V432e, B7)"; continue }
+    if ($null -eq $en432 -or @($en432).Count -eq 0) { $v432Bad += "(e) desc$($k432.Kind)_en.lua is missing or its $($k432.Marker) markers are gone - the ? on a $($k432.List) falls to V360c's sentence (SPEC V432e, V209)"; continue }
+    if ($null -eq $pt432 -or @($pt432).Count -eq 0) { $v432Bad += "(e) desc$($k432.Kind)_pt.lua is missing or its $($k432.Marker) markers are gone (SPEC V432e, V209)"; continue }
+    $enMap432 = DescMap $en432
+    $ptMap432 = DescMap $pt432
+    # (d) keys = the list, in both halves
+    foreach ($n432 in $names432) {
+        if (-not $enMap432.ContainsKey($n432)) { $v432Bad += "(d) '$n432' is offered by PICKER_LIST[$($k432.List)] and desc$($k432.Kind)_en holds no entry for it (SPEC V432d, V408)" }
+        if (-not $ptMap432.ContainsKey($n432)) { $v432Bad += "(d) '$n432' has no entry in desc$($k432.Kind)_pt (SPEC V432d, V210a)" }
+    }
+    foreach ($key432 in $enMap432.Keys) { if ($names432 -notcontains $key432) { $v432Bad += "(d) desc$($k432.Kind)_en holds '$key432' and the list does not offer it - text nobody can reach (SPEC V432d, V366b)" } }
+    foreach ($n432 in $names432) {
+        if (-not $enMap432.ContainsKey($n432) -or -not $ptMap432.ContainsKey($n432)) { continue }
+        $v432Seen++
+        foreach ($half432 in @(@('en', $enMap432[$n432], 'Disciplines: ', 'Weakness: '), @('pt', $ptMap432[$n432], 'Disciplinas: ', 'Fraqueza: '))) {
+            $lang432 = $half432[0]
+            $body432 = $half432[1] -replace "`r`n", "`n"
+            $blocks432 = @($body432 -split "`n`n`n")
+            if ($blocks432.Count -ne 3) { $v432Bad += "(a) [$lang432] '$n432' has $($blocks432.Count) block(s) and I21 gives three - the mechanics block is not where the reader looks for it (SPEC V432a, I21)"; continue }
+            $lines432 = @($blocks432[2] -split "`n")
+            if ($lines432.Count -ne 3 -or $lines432[1] -ne '' -or -not $lines432[0].StartsWith($half432[2]) -or -not $lines432[2].StartsWith($half432[3])) {
+                $v432Bad += "(a) [$lang432] '$n432' block 3 is not exactly '$($half432[2].Trim())' + blank + '$($half432[3].Trim())' - the owner asked for the mechanics and nothing else (SPEC V432a, I148d)"
+                continue
+            }
+            $disc432 = $lines432[0].Substring($half432[2].Length)
+            $weak432 = $lines432[2].Substring($half432[3].Length)
+            # (b) the trio is CLANS's, in CLANS's order; an open trio carries the book phrase
+            $ce432 = $clanEntries[$n432]
+            if ($null -eq $ce432) { $v432Bad += "(b) '$n432' has no CLANS entry to read its trio against (SPEC V432b, V212)" }
+            elseif (@($ce432.choice).Count -eq 0 -and $ce432.open -eq 0) {
+                $want432 = @()
+                foreach ($d432 in $ce432.fixed) { if ($lang432 -eq 'en') { $want432 += $d432 } elseif ($ptVal.ContainsKey($d432)) { $want432 += $ptVal[$d432] } else { $want432 += $d432 } }
+                if ($disc432 -ne ($want432 -join ', ')) { $v432Bad += "(b) [$lang432] '$n432' lists '$disc432' and CLANS fixes '$($want432 -join ', ')' - the pane and the slots would disagree (SPEC V432b, I17, V135)" }
+            } else {
+                if (-not $v432Open.ContainsKey($n432)) { $v432Bad += "(b) '$n432' has an open trio and research/clan_disc_open.tsv carries no phrase for it (SPEC V432b, I148d)" }
+                elseif ($disc432 -ne $v432Open[$n432][$lang432]) { $v432Bad += "(b) [$lang432] '$n432' lists '$disc432' and clan_disc_open.tsv says '$($v432Open[$n432][$lang432])' (SPEC V432b)" }
+            }
+            # (c) the family sentence is FAMILY_WEAKNESS's byte for byte, and its [pt] line in the other half
+            if ($k432.Weak -eq 'table' -and $null -ne $vals412) {
+                if (-not $vals412.ContainsKey($n432)) { $v432Bad += "(c) '$n432' has no FAMILY_WEAKNESS row to read against (SPEC V432c, V412f)" }
+                else {
+                    $sent432 = $vals412[$n432]
+                    $wantW432 = ''
+                    if ($lang432 -eq 'en') { $wantW432 = $sent432 } elseif ($ptVal.ContainsKey($sent432)) { $wantW432 = $ptVal[$sent432] }
+                    if ($weak432 -ne $wantW432) { $v432Bad += "(c) [$lang432] '$n432' says '$($weak432.Substring(0, [Math]::Min(40, $weak432.Length)))...' and the box says '$($wantW432.Substring(0, [Math]::Min(40, $wantW432.Length)))...' - one weakness, two voices (SPEC V432c, V412f, V135)" }
+                }
+            }
+        }
+    }
+}
+if ($v432Seen -eq 0) { $v432Bad += "(e) not one entry was read against its table - every leg passed by vacancy (SPEC V432e, B7)" }
+if ($v432Bad) { foreach ($b in ($v432Bad | Select-Object -First 12)) { Fail "V432 $b" } }
+else { Pass "V432 $v432Seen entries of $($V432_KINDS.Count) traits module(s) carry exactly Disciplines + Weakness, the trio read off CLANS and the family sentence off FAMILY_WEAKNESS, in both halves" }
+
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

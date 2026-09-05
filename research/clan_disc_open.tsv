@@ -1,0 +1,9 @@
+# clan_disc_open.tsv - the `Disciplines:` line of an OPEN trio, in words (SPEC I148d, V432b).
+# An entry of CLANS with `choice` or `open` settles no trio, so the traits module cannot list
+# three names for it: it carries the book's sentence instead, in both languages. T850 wrote
+# Keskinen (one fixed, two picked - the trio the owner settled on 2026-08-25, not the book's);
+# T970 adds the six clans (Ventrue Antitribu, Wu Zao, Angellis Ater, Maeghar, Panders, Caitiff).
+# Header ASCII by convention; the DATA is not (V411b).
+#
+# nome_picker<TAB>en<TAB>pt
+Keskinen	Thaumaturgy, plus two of Auspex, Dominate or Obfuscate	Taumaturgia, mais duas entre Auspícios, Dominação ou Ofuscação

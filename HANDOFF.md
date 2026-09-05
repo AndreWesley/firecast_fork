@@ -1,5 +1,34 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## ⚑ COMECE AQUI — 183ª rodada (2026-09-05, manhã). **`/ck:spec` do 4º lote + `/ck:build`: §T967 §T968 §T969 §T850 CONSTRUÍDAS & FECHADAS (gate `-Build` VERDE, 7 mutações + 1 sonda RODADAS, 0 sonda de host); ficam §T970 (research) & §T971 (depende dela)**
+
+### ✔ INSTALADO 2026-09-05 11:49 c/ o Firecast fechado (`rdk -i`): instalado & `output/` em **2.839.752 B**, mesmo tamanho
+### ▶ 1º ATO: **`/ck:research T970`** — a fraqueza dos 61 clãs p/ `research/clan_weakness.tsv` + as 6 linhas de clã em `clan_disc_open.tsv` (a de `Keskinen` já ∃). O cache `%TEMP%\wod_books_txt` SUMIU (só `wod_books_layout`, 4 arquivos) — reconstruir por §I142a ANTES de extrair. Depois **`/ck:build T971`**: `gen_traits_desc.ps1` ganha o par `Clan` em `$KINDS` (fraqueza do tsv, livro/página de `clan_body_en.tsv`), regera `descClan_*`, `gen_clan_desc.ps1` sai, §V432 ganha a linha `Clan` em `$V432_KINDS` (`Weak = 'tsv'` — a perna (c) hoje só compara `table`)
+### ⚠ 2 perguntas ABERTAS em §C, nenhuma bloqueou: §Q68 (`Era`/`Época` — construído pela saída (a); se o user quiser EN `Age`, refazer §T969 pela (b)) · §Q69 (renomear `descClan`→`clanTraits`? construído por (c), nada renomeado)
+### ⊥ pedir `--all`: as ~82 §T abertas seguem sendo TESTE/PROBE em Firecast [USER] + T970/T971
+### ▶ TESTES DE TELA que o user pode fazer c/ este build: picker → `-- Custom --` & `-- Remove --` itálicos a 0,80 · trocar idioma na Settings & voltar à Main SEM tocar em linha → backgrounds, merits, `Nature`/`Demeanor`, specialities & `ROAD` já na outra língua (Ghoul idem c/ `Clan`/`Family`) · Settings mostra `Era`/`Época` · `?` de `Basarab` na Ghoul → `Disciplines: Animalism, Dominate, Presence` ↵↵ `Weakness: Repelled by garlic…` & nada mais
+
+**Estado:** gate **VERDE** (`-Build` também, 11:48) · `rdk -l` OK · `output/` **2.839.752 B** · **INSTALADO** 11:49 (2.839.752 B, ≡ `output/`) · **⊥ commitado** — working tree: `SPEC.md` `HANDOFF.md` `WoD20th.lfm` `WoD20.6.lfm` `localization.lang` gate `research/README.md` + NOVOS `descFamily_en.lua` `descFamily_pt.lua` `research/gen_traits_desc.ps1` `research/clan_disc_open.tsv` + o `.rpk` de `output/`.
+
+### ⚑ O QUE A 183ª FECHOU
+
+| §T | o quê |
+|---|---|
+| T967 | `btnMfRemove`/`btnMfCustom` c/ `fontStyle="italic" opacity="0.80"` no XML, 0 Lua; **§V431 nasce** (lê o 0,80 de `mfLabel`, ⊥ redigita) |
+| T968 | `'language'` nos 6 links da raiz (`road`+`humanity`, `merit_*`, `background_*`, `nature`/`demeanor`, `speciality_*`, `clanFamily`); literal de §V95 no gate segue; **§V430 nasce** (12 pintores nomeados, roster de exceção `@()`); §B156 |
+| T969 | Settings `Age` → `Era` / `Época`: rótulo, `PT`, 2 chaves `.lang` (LF); `Age`/`Idade` da WoD20.4 intacta |
+| T850 | `research/gen_traits_desc.ps1` + `clan_disc_open.tsv` (Keskinen) → `descFamily_{en,pt}.lua` (23, marcador `FAMILY_DESC`); `$DESC_MARKER` ganha `Family`; **§V432 nasce** (5 pernas); V210 passa a 10 áreas, V408 a 12 pares, V411 mede o pt novo (6,8 acentos/entrada) |
+
+**Bateria (tudo como escrito):** V431 (a) (b) (c)+V355b · V430 (a) + sonda `'language'` no FIM da lista = VERDE · V432 (b) (c) (a). Gate limpo depois de cada uma.
+
+### ⚠ LIÇÕES DA 183ª
+- **PowerShell: `$weak` & `$WEAK` são a MESMA variável** — o gerador trocou a tabela pela string na 1ª iteração & morreu em `[String] não contém ContainsKey` na 2ª. Sufixo na tabela (`$WEAKNESS`, `$OPEN_TRIO`).
+- **Filtro de processo por `MainWindowTitle -match 'Firecast'` pega o VS CODE** (o título carrega `firecast_fork`) — filtrar por `ProcessName`/`Path`, nunca por título.
+- `research/README.md` tem linhas em mojibake mas **0** LF solto — a régua `CrlfOk` estrita nele acendeu por um `(?<!\r)\n` que… ⊥ ∃; conferir a contagem antes de culpar o arquivo.
+- O `&&` do Bash morre no 1º `powershell.exe` que sai ≠ 0 & o resto da linha roda no cwd ERRADO sem avisar ("No such file") — 1 chamada por etapa que pode falhar.
+
+---
+
 ## ⚑ COMECE AQUI — 182ª rodada (2026-09-04, noite). **Construiu §T956..§T965 (10 §T, `--all` do user); §T963 SONDA fechada (§B155); §T966 construída & FECHADA pelo user ("tudo testado, tudo ok"); INSTALADO 10:12 (2.833.520 B)**
 
 ### ✔ INSTALADO 2026-09-05 09:59 c/ o Firecast fechado (`rdk -i` offline): instalado & `output/` em **2.833.630 B**, mesmo tamanho

@@ -198,6 +198,7 @@
 				["Enigmas"] = "Enigmas",
 				["Ephemera"] = "Efêmera",
 				["EQUIPMENT (OWNED)"] = "EQUIPAMENTO (POSSUÍDO)",
+				["Era"] = "Época",
 				["Esoterica"] = "Esotérica",
 				["Ethnicity"] = "Etnia",
 				["Etiquette"] = "Etiqueta",
@@ -4973,7 +4974,7 @@
 				and gave the name to the contemporary palette. Every value paints now, so there
 				is no way back to the sheet as the XML authors it (SPEC C, 16th round).
 			-->
-			<label left="20" top="95" width="80" height="20" text="Age" horzTextAlign="center"/>
+			<label left="20" top="95" width="80" height="20" text="Era" horzTextAlign="center"/>
 			<comboBox name="cboSheetTheme" left="100" top="95" width="300" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}"/>
 			<dataLink field="sheetTheme" defaultValue="Modern Nights">
 				<event name="onChange">

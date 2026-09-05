@@ -6381,8 +6381,12 @@
 			     was. Its top is 25 above the first result against a 20px row pitch, so the gap is
 			     VISIBLE: flush against the list it reads as one more option, and emptying a row by
 			     accident is the mistake with no undo (V369c). Text comes from mfShown("") in both
-			     languages, so no new string is born (V369e). -->
-			<button name="btnMfRemove" left="20" top="101" width="480" height="20" visible="false" onClick="mfRemove(self);" onDblClick="mfConfirm(self);"/>
+			     languages, so no new string is born (V369e).
+			     Italic at 0.80 since T967 (SPEC I148a, V431): the way out of a row wears the dress of the
+			     empty invitation mfLabel paints, and wears it in the XML - mfLabel stays the ONE Lua
+			     writer of fontStyle and of 0.80 (V355b, V355c), and the gate reads the number off it
+			     rather than carrying a third copy (B70). -->
+			<button name="btnMfRemove" left="20" top="101" width="480" height="20" visible="false" fontStyle="italic" opacity="0.80" onClick="mfRemove(self);" onDblClick="mfConfirm(self);"/>
 			<!-- SPEC I129a/I129b/V379, user 2026-08-31 asks 12 and 13. The SECOND fixed line, and
 			     the reason the typed rows could go: it is the only way to put a name of your own
 			     in a slot now that every family is a picker (SPEC I130).
@@ -6398,8 +6402,11 @@
 
 			     The label is a string of its OWN and not mfShown("") - remove could borrow the
 			     empty value's label because V15 already gave it one in both languages, and there
-			     is no empty value here to borrow from (SPEC I129c, V369e). -->
-			<button name="btnMfCustom" left="20" top="126" width="480" height="20" onClick="mfCustom(self);" onDblClick="mfConfirm(self);"/>
+			     is no empty value here to borrow from (SPEC I129c, V369e).
+
+			     Italic at 0.80 like btnMfRemove, authored in the XML for the same reason (SPEC I148a,
+			     V431, T967). -->
+			<button name="btnMfCustom" left="20" top="126" width="480" height="20" fontStyle="italic" opacity="0.80" onClick="mfCustom(self);" onDblClick="mfConfirm(self);"/>
 
 			<button name="dynMfRow_1" left="20" top="151" width="480" height="20" visible="false" onClick="mfSelect(self, 1);" onDblClick="mfConfirm(self);"/>
 			<button name="dynMfRow_2" left="20" top="171" width="480" height="20" visible="false" onClick="mfSelect(self, 2);" onDblClick="mfConfirm(self);"/>
@@ -6514,8 +6521,12 @@
 		and not from WoD20.12, where the slots are drawn: that file is inside a managed tab,
 		and a sheet whose table never turned Show Ghoul on would keep whatever the last clan
 		left behind (SPEC V95, B26).
+
+		'language' too, since T968 (SPEC V430, I148b): renderClanFamilyButton and renderBearing
+		translate what they paint. renderClanDisc reads no language and writes nothing when
+		nothing changed, so riding along costs it nothing.
 	-->
-	<dataLink field="clanFamily">
+	<dataLink fields="{'language', 'clanFamily'}">
 		<event name="onChange">
 			renderClanDisc(self);
 			renderClanFamilyButton(self);
@@ -6542,8 +6553,13 @@
 		
 		The ten humanity fields are listed one by one and not by prefix: `fields` takes a literal
 		table, and a dot that fell out of the list would go unwatched in silence.
+
+		'language' rides on this link and on the five below it since T968 (SPEC V430, I148b, B156):
+		the painters translate what they write and the traversal of WoD20.6 skips dyn* controls
+		(SPEC V31), so the link is the only thing that repaints them the moment the language is
+		switched. The tabs already had it on their links; the root form had not.
 	-->
-	<dataLink fields="{'road', 'humanity_1', 'humanity_2', 'humanity_3', 'humanity_4', 'humanity_5', 'humanity_6', 'humanity_7', 'humanity_8', 'humanity_9', 'humanity_10'}">
+	<dataLink fields="{'language', 'road', 'humanity_1', 'humanity_2', 'humanity_3', 'humanity_4', 'humanity_5', 'humanity_6', 'humanity_7', 'humanity_8', 'humanity_9', 'humanity_10'}">
 		<event name="onChange">
 			renderBearing(self);
 		</event>
@@ -6555,7 +6571,7 @@
 		by one and not by prefix, for the reason the ten humanity fields are: `fields` takes a
 		literal table and a row that fell out of it would go unwatched in silence.
 	-->
-	<dataLink fields="{'merit_m0', 'merit_m1', 'merit_m2', 'merit_m3', 'merit_m4', 'merit_m5', 'merit_m6', 'merit_f0', 'merit_f1', 'merit_f2', 'merit_f3', 'merit_f4', 'merit_f5', 'merit_f6'}">
+	<dataLink fields="{'language', 'merit_m0', 'merit_m1', 'merit_m2', 'merit_m3', 'merit_m4', 'merit_m5', 'merit_m6', 'merit_f0', 'merit_f1', 'merit_f2', 'merit_f3', 'merit_f4', 'merit_f5', 'merit_f6'}">
 		<event name="onChange">
 			renderMeritButtons(self);
 		</event>
@@ -6566,7 +6582,7 @@
 		I113, T808). The last five background rows are TYPED and carry no button, so they are
 		not in this list - "picker = total - typed" (SPEC I50, V255).
 	-->
-	<dataLink fields="{'background_1', 'background_2', 'background_3', 'background_4', 'background_5', 'background_6', 'background_7', 'background_8', 'background_9', 'background_10', 'background_11', 'background_12', 'background_13', 'background_14', 'background_15', 'background_16'}">
+	<dataLink fields="{'language', 'background_1', 'background_2', 'background_3', 'background_4', 'background_5', 'background_6', 'background_7', 'background_8', 'background_9', 'background_10', 'background_11', 'background_12', 'background_13', 'background_14', 'background_15', 'background_16'}">
 		<event name="onChange">
 			renderBgButtons(self);
 		</event>
@@ -6577,13 +6593,13 @@
 			Speciality rows 8-10 are TYPED and carry no button, so they are not in this list -
 			"picker = total - typed" (SPEC I50, V255).
 		-->
-		<dataLink fields="{'nature', 'demeanor'}">
+		<dataLink fields="{'language', 'nature', 'demeanor'}">
 			<event name="onChange">
 				renderHeaderButtons(self);
 			</event>
 		</dataLink>
 
-		<dataLink fields="{'speciality_1', 'speciality_2', 'speciality_3', 'speciality_4', 'speciality_5', 'speciality_6', 'speciality_7'}">
+		<dataLink fields="{'language', 'speciality_1', 'speciality_2', 'speciality_3', 'speciality_4', 'speciality_5', 'speciality_6', 'speciality_7'}">
 			<event name="onChange">
 				renderSpecialities(self);
 			</event>
