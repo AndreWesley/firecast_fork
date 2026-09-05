@@ -4223,7 +4223,9 @@
 
 				-- ⊥ reconhecida, & só no `?`: 1 caixa por abertura, dizendo o que o `event` TEM.
 				-- É a §T922 se auto-respondendo se o palpite de `isEscKey` estiver errado.
-				if diag ~= true or not kbEscArmed then return; end;
+				-- `from.readOnly` em RUNTIME & ⊥ o atributo: `edtPopDesc` vira editável em item
+				-- CUSTOM (& `edtMfDesc` p/ o narrador), & aí a 1ª letra digitada abria esta caixa.
+				if diag ~= true or not kbEscArmed or from.readOnly ~= true then return; end;
 
 				kbEscArmed = false;
 
