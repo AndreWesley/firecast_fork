@@ -363,13 +363,12 @@
 		     not change: `dominator` and `dominatorGen` still own the data (SPEC V2 - a rename here
 		     would drop what is already saved on the sheet the user is testing with).
 
-		     THREE rows since T954, and the box did not grow for it (SPEC I145b, Q65). The two rows
-		     sat at 51 and 83, a step of 32 this box had made up for itself; on the 25 ruler every
-		     other box already keeps (SPEC I124, V370) three rows land at 39/64/89, the content
-		     closes at 113 and the foot is V280a's 15 exactly - so the 128 stays, the band closes
-		     where it closed and the three columns under it never hear about it (SPEC V414). The
-		     third row uses the LEFT pair only: `342..558` is 206 wide and the family with its
-		     `Familia: ` prefix prices at 222, so on the right it would clip (SPEC I143i). -->
+		     TWO rows on the 25 ruler since T972 (SPEC I149b, V433). T954 had split the line into
+		     three rows (Clan, Family); the 5th batch of 2026-09-05 put the ONE line `Clan/Family`
+		     back over the union, so the rows are 39 (Name, Generation) and 64 (Clan/Family, Max
+		     Discipline Level). The content closes at 88 and the box stays 590x128 on purpose: the
+		     BAND is the master (SPEC V414) and the foot is what pays for it (SPEC V280d) - the
+		     three columns under it never hear about any of this. -->
 		<layout left="0" top="10" width="590" height="128">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="550" height="20" text="DOMINATOR" horzTextAlign="center"/>
@@ -395,35 +394,29 @@
 			     The label opposite is `Nivel Max. de Disciplina` in pt, 24 chars, which V16 prices at
 			     exactly the 156px it now gets - the squeeze took the 9px of slack it used to carry.
 
-			     ONE field, TWO buttons (SPEC I145a, I145c, V426, user 2026-09-04). `Clan/Family` was
-			     one picker over the union of two lists and one kind, `Clan`, which is why the family
-			     module of T850 had no button that could open it (SPEC Q65). The split is two calls to
-			     the SAME mfOpen with the same FIELD and a different list and kind each - no new
-			     mechanism, no new field, no migration. Neither button carries field=: the typed twin
-			     below is the one widget bound to `clanFamily`, so V1 and V2 see exactly what they saw
-			     before, and because the field is ONE, picking a clan clears the family and the other
-			     way round without a line of code - a ghoul serves a domitor WITH a clan or is a
-			     revenant OF a family, never both (SPEC I145c). Which of the two SHOWS the value is
-			     pertinence in PICKER_LIST["family"], asked by renderClanFamilyButton on the root
-			     (SPEC I145d, V426c). The names are derived, not chosen: `dyn` + the list mfOpen is
-			     handed, the way dynroad and dynhedgeAffiliation are (SPEC I145g, V270d). -->
-			<label left="20" top="64" width="72" height="24" text="Clan"/>
-			<!-- NO ? here, on either button, and they are the pickers on the sheet without one (SPEC
-			     V407, I140g, user 2026-09-02 item 5 - his word, `e uma excecao`, said of the LINE, and
-			     the line is two now). V365(a) asks every picker for its ?; this is the named exception,
-			     and it cuts both ways - a ? coming back on either reddens V407.
-			     What it pays for: with nothing leading it, the entry opens at 97 and closes at 322, the
-			     same span as <edit field="dominator" /> above, so the rows of this box are the ONE
-			     grid V224 asks for. The ? was the only reason they were not (SPEC V224, T910). -->
-			<button name="dynclan" left="97" top="64" width="237" height="24" fontSize="12" text="Select Clan" onClick="mfOpen(self, 'clanFamily', 'clan', 'Clan');"/>
+			     ONE field, ONE button, ONE list - the UNION (SPEC I149a, V433, user 2026-09-05).
+			     T954 split this into two buttons with a kind each so descFamily_* had an opener;
+			     the 5th batch undid it: the player sees ONE picker, `Clan/Family`, offering both
+			     lists, and the KIND is resolved by the NAME picked - mfKind on the root form
+			     answers `Family` for a name that stands in PICKER_LIST["family"] and the authored
+			     kind otherwise (SPEC V433c). Same pertinence test V412(b) and the weakness box
+			     already ask, one body (isFamilyName), no second owner of the species (SPEC V135).
+			     The button carries no field=: the typed twin below is the one widget bound to
+			     `clanFamily`, so V1 and V2 see exactly what they saw before (SPEC V426b, kept). -->
+			<label left="20" top="64" width="72" height="24" text="Clan/Family"/>
+			<!-- NO ? here, and it is the picker on the sheet without one (SPEC V407, I140g, user
+			     2026-09-02 item 5 - his word, `e uma excecao`). V365(a) asks every picker for its
+			     ?; this is the named exception, and it cuts both ways - a ? coming back reddens V407.
+			     What it pays for: with nothing leading it, the entry opens at 97 and closes at 334,
+			     the same span as <edit field="dominator" /> above, so the rows of this box are the
+			     ONE grid V224 asks for. The ? was the only reason they were not (SPEC V224, T910). -->
+			<button name="dynclanFamily" left="97" top="64" width="237" height="24" fontSize="12" text="Select Clan/Family" onClick="mfOpen(self, 'clanFamily', 'clanFamily', 'Clan');"/>
 
-			<!-- The typed twin of the two pickers, one field and three widgets with exactly one of
+			<!-- The typed twin of the two pickers, one field and two widgets with exactly one of
 			     them visible (SPEC I71, V274, user 2026-08-23). It is a DECLARED mirror in SPEC I3
 			     ESPELHOS, not the accidental duplicate V1 refuses.
 
-			     SAME rectangle as the clan button on purpose: the flag swaps BOTH buttons for this
-			     one edit (SPEC V274d, the trio), and it has to land on one of the two rows - the
-			     first, so a second geometry does not move the row.
+			     SAME rectangle as the picker button on purpose: the flag swaps the button for this one edit (SPEC V274d), and a second geometry would move the row.
 
 			     Authored state IS the flag off - `visible="false" enabled="false"`, both of them,
 			     for the reason cboClan is authored the same way: a control that is invisible and
@@ -436,15 +429,6 @@
 			     recomputed must not be able to disagree with what it was computed from. -->
 			<label left="354" top="64" width="156" height="24" text="Max Discipline Level"/>
 			<label name="lblMaxDisc" left="520" top="64" width="50" height="24" text="-"/>
-
-			<!-- The family half of the split (SPEC V426a). Kind `Family` is what makes descFamily_*
-			     reachable at all - T850 delivers the module, this is the button that opens it. Until
-			     then the box shows V360c's sentence, which is V364a doing what it is for. The saved
-			     FAMILY hangs at the end of the CLAN pool when this sheet opens the other button, and
-			     vice versa: that is V200/V346b appending the row's own value, and it is not a defect
-			     to code around (SPEC I145f). -->
-			<label left="20" top="89" width="72" height="24" text="Family"/>
-			<button name="dynfamily" left="97" top="89" width="237" height="24" fontSize="12" text="Select Family" onClick="mfOpen(self, 'clanFamily', 'family', 'Family');"/>
 		</layout>
 
 		<!-- 405 -> 299 in T936, and the number came off the DOTS and not off the box: the step

@@ -40,9 +40,9 @@
 					"Brujah Antitribu", "City Gangrel", "Country Gangrel", "Malkavian Antitribu", "Nosferatu Antitribu",
 					"Ravnos Antitribu", "Salubri Antitribu", "Serpents of the Light", "Toreador Antitribu",
 					"Tremere Antitribu", "Assamite Sorcerers", "Assamite Viziers", "Daitya", "Tlacique", "Warrior Setites",
-					"Mariners", "Lasombra Antitribu", "Dominate Malkavians", "Brahman", "Telyavelic Tremere",
+					"Gangrel (Marine)", "Lasombra Antitribu", "Dominate Malkavians", "Brahman", "Telyavelic Tremere",
 					"Old Clan Tzimisce", "Gargoyles (Modern)", "Gargoyles (Scout)", "Gargoyles (Sentinel)",
-					"Gargoyles (Warrior)", "Ventrue Antitribu", "Wu Zao", "Angellis Ater", "Maeghar", "Panders", "Caitiff",
+					"Gargoyles (Warrior)", "Ventrue Antitribu", "Salubri (Wu Zao / Watchers)", "Angellis Ater", "Maeghar", "Panders", "Caitiff",
 					"Children of Osiris",
 				},
 				-- The revenant families (SPEC R93, I29b). A list of its OWN, not an alias and not an
@@ -551,13 +551,37 @@
 			PICKER_LIST["clanDisc"] = PICKER_LIST["disc"];
 			PICKER_LIST["secPath"]  = PICKER_LIST["mainPath"];
 
-			-- There is NO fourth key. `clanFamily` was a UNION of clan + family built here from the
-			-- 107th round to T954 (SPEC I29b, T510, V294a), because one dropdown offered both; the
-			-- Ghoul tab has one button per list since T954 (SPEC I145a, V426d) and the union lost its
-			-- only reader - mfOpen. A list nobody reads is the dead data B55 cost a round to find, so
-			-- it left in the same commit. The families are still NOT appended to `clan`: a push there
+			-- The fourth key stopped being an alias in the 107th round (SPEC I29b, T510). Clan and
+			-- family are two AUTHORED lists now - the clan picker is going to be shown somewhere
+			-- else without the families - and only this dropdown offers both, so what it gets is
+			-- their UNION, built once here and never written again.
+			--
+			-- Three invariants all say the same thing about the shape. V201 wants PICKER_LIST
+			-- constant: this is born in the constructor and nothing writes it afterwards, which is
+			-- exactly as constant as the two lists standing behind it. V208 forbids two tables with
+			-- the same content: the union holds neither list's content. V211c calls an alias
+			-- identity, and that is why the families are NOT appended to `clan` - a push there
 			-- would grow the Main tab's clan picker with them, which is what B50 already paid for
-			-- once (SPEC V211c, V294c).
+			-- once.
+			--
+			-- The local is the point: writing straight into PICKER_LIST["clanFamily"][n] would be a
+			-- table growing inside the map, and V294c reads the source for exactly that shape.
+			-- >>> CLANFAMILY_UNION_BEGIN (SPEC V294 - the gate finds this region by MARKER)
+			local clanFamilyUnion = {};
+			local clanFamilyCount = 0;
+
+			for i = 1, #PICKER_LIST["clan"], 1 do
+				clanFamilyCount = clanFamilyCount + 1;
+				clanFamilyUnion[clanFamilyCount] = PICKER_LIST["clan"][i];
+			end;
+
+			for i = 1, #PICKER_LIST["family"], 1 do
+				clanFamilyCount = clanFamilyCount + 1;
+				clanFamilyUnion[clanFamilyCount] = PICKER_LIST["family"][i];
+			end;
+
+			PICKER_LIST["clanFamily"] = clanFamilyUnion;
+			-- <<< CLANFAMILY_UNION_END
 
 			-- Which hedge paths an affiliation FAVOURS, and it is the same block of the book the
 			-- casting attribute comes from - `Favored Attributes:` and `Favored Paths:` are two
@@ -908,7 +932,7 @@
 				["Daitya"] = { fixed = {"Presence", "Obfuscate", "Serpentis"} },
 				["Tlacique"] = { fixed = {"Obfuscate", "Presence", "Protean"} },
 				["Warrior Setites"] = { fixed = {"Potence", "Presence", "Serpentis"} },
-				["Mariners"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
+				["Gangrel (Marine)"] = { fixed = {"Animalism", "Fortitude", "Protean"} },
 				["Lasombra Antitribu"] = { fixed = {"Dominate", "Obtenebration", "Potence"} },
 				["Dominate Malkavians"] = { fixed = {"Auspex", "Dominate", "Obfuscate"} },
 				["Brahman"] = { fixed = {"Animalism", "Auspex", "Chimerstry"} },
@@ -919,7 +943,7 @@
 				["Gargoyles (Sentinel)"] = { fixed = {"Flight", "Potence", "Fortitude"} },
 				["Gargoyles (Warrior)"]  = { fixed = {"Flight", "Fortitude", "Protean"} },
 				["Ventrue Antitribu"] = { fixed = {"Dominate", "Fortitude"}, choice = {"Auspex", "Presence"} },
-				["Wu Zao"]            = { fixed = {"Auspex", "Fortitude"}, choice = {"Obeah", "Valeren"} },
+				["Salubri (Wu Zao / Watchers)"] = { fixed = {"Auspex", "Fortitude"}, choice = {"Obeah", "Valeren"} },
 				["Angellis Ater"]     = { fixed = {"Daimonion", "Dominate"}, choice = {"Potence", "Presence", "Obfuscate"} },
 				["Maeghar"]            = { choice = {"Mytherceria", "Necromancy"}, open = 2 },
 				["Panders"]            = { open = 3 },
@@ -1651,6 +1675,17 @@
 				ROAD_RETIRED = {
 					["Humanity"] = true,
 					["Road of Heaven"] = true,
+				};
+
+				-- Clan names a saved sheet can still be holding under the spelling the list stopped
+				-- using. The 5th batch of 2026-09-05 renamed two VALUES of PICKER_LIST["clan"], and
+				-- `clanFamily` stores the string, so this is V395 again for the clan list: one line
+				-- per rename, and ONE branch at the top of renderClanFamilyButton reads this table
+				-- and WRITES the new name (SPEC V434, I149c, T973). A read-side alias would have to
+				-- live in every reader - CLANS, the PT map, descClan, the weakness box (SPEC V135).
+				CLAN_RENAMED = {
+					["Wu Zao"] = "Salubri (Wu Zao / Watchers)",
+					["Mariners"] = "Gangrel (Marine)",
 				};
 
 				ROAD_ERA = {
@@ -4916,13 +4951,24 @@
 				mfLevelPane(found, true);
 			end;
 
+			-- The KIND the desc pane reads for a name, and the one place it is decided (SPEC V433c,
+			-- I149a). Every list carries its kind in the mfOpen call, and ONE list carries two
+			-- modules: `clanFamily` is the union of clan + family, so a family name answers
+			-- `Family` and everything else the authored kind. MF.mod itself is not rewritten -
+			-- the pane asks per NAME, and the box stays open on the list it opened on.
+			function mfKind(name)
+				if MF.list == "clanFamily" and isFamilyName(name) then return "Family"; end;
+
+				return MF.mod;
+			end;
+
 			-- The ONE question "is the Revenant row showing right now" (SPEC I143d, V413a). The pane
 			-- and the write in mfConfirm both ask it and they have to agree - a box that shows the
 			-- row and confirms without it, or writes over a row nobody can see, is the same bug
 			-- twice (SPEC V135). Custom AND clanFamily, both: the other eight lists have no
 			-- revenants in them, and a book entry carries a weakness of its own.
 			function mfRevenantShown()
-				return MF.custom == true and MF.list == "family";
+				return MF.custom == true and MF.list == "clanFamily";
 			end;
 
 			-- Paints the pair from MF.revenant. It never READS the widgets: MF.revenant is the
@@ -5083,7 +5129,7 @@
 				-- sheet broke", which is the lie I107m exists to stop. `speciality` will never have
 				-- a module (Q33) - a permanent state, not a gap waiting to close.
 				if own ~= nil then txt = own;
-				elseif name ~= nil and name ~= "" then txt = descFor(MF.field, MF.mod, name, MF.list, lang); end;
+				elseif name ~= nil and name ~= "" then txt = descFor(MF.field, mfKind(name), name, MF.list, lang); end;
 				if txt == nil or txt == "" then txt = translateSheetText("No description available", lang); end;
 
 				found["edtMfDesc"].text = txt;
@@ -5560,6 +5606,23 @@
 			-- clanFamily share no name (SPEC I143b, MEASURED), so the value decides by itself which
 			-- one it came from. A second list, a prefix on the name or an `isRevenant` field would
 			-- each be a second owner of a fact the value already carries (SPEC V412b, V135).
+			-- The ONE body of the question "is this name a revenant FAMILY?" (SPEC V433c, V412b,
+			-- V135): pertinence in PICKER_LIST["family"], and nothing else - the two lists share no
+			-- name (V294b), so the value says by itself which list it came from. Three readers ask
+			-- it (the weakness box, the kind of the desc pane, whoever comes next) and a second loop
+			-- anywhere is a second owner of the species.
+			function isFamilyName(name)
+				local fam = PICKER_LIST["family"];
+
+				if name == nil or name == "" or fam == nil then return false; end;
+
+				for i = 1, #fam, 1 do
+					if fam[i] == name then return true; end;
+				end;
+
+				return false;
+			end;
+
 			function familyWeakness()
 				if sheet == nil then return nil; end;
 
@@ -5577,15 +5640,9 @@
 					return wk;
 				end;
 
-				local fam = PICKER_LIST["family"];
+				if not isFamilyName(name) then return nil; end;
 
-				if fam == nil then return nil; end;
-
-				for i = 1, #fam, 1 do
-					if fam[i] == name then return FAMILY_WEAKNESS[name]; end;
-				end;
-
-				return nil;
+				return FAMILY_WEAKNESS[name];
 			end;
 
 			-- The blood pool toggle, and the refusal that comes with it (SPEC I108c, Q20). Nothing
@@ -5655,28 +5712,28 @@
 			-- drawn in WoD20.11, inside a tab a table with Show Ghoul off never opens, and a painter
 			-- that may not be there cannot be what keeps the sheet right (SPEC V95, B26).
 			--
-			-- TWO buttons over ONE field since T954 (SPEC I145d, V426c). Which of them shows the
-			-- value is PERTINENCE in PICKER_LIST["family"] - the same question familyWeakness asks
-			-- and for the same reason: the two lists share no name (SPEC I143b, MEASURED), so the
-			-- value says by itself which list it came from, and a prefix, a flag or a second list
-			-- would each be a second owner of that fact (SPEC V412b, V135). The other button goes
-			-- back to its invitation, which is what mfLabel does with nil.
+			-- ONE button over ONE field again since T972 (SPEC I149a, V433a): the 5th batch of
+			-- 2026-09-05 undid the split of T954. The value paints as it is - the box REVENANT
+			-- WEAKNESS is what says which species the name is (SPEC V412d, Q70 exit b).
 			function renderClanFamilyButton(from)
 				if sheet == nil or from == nil then return; end;
 
-				local found = xpFind(tabRootOf(from), { dynclan = true, dynfamily = true }, {});
-				local lang  = (sheet.language == "pt") and "pt" or "en";
-				local fam   = PICKER_LIST["family"];
-				local isFam = false;
+				-- The migration off a renamed clan value (SPEC V434a, the same shape as the
+				-- ROAD_RETIRED branch of renderBearing): written back, not read around, so every
+				-- reader downstream sees the new name. It cannot loop - after the write the value
+				-- is no longer a key, the link fires once more and falls straight through.
+				local v = sheet.clanFamily;
 
-				if fam ~= nil then
-					for i = 1, #fam, 1 do
-						if fam[i] == sheet.clanFamily then isFam = true; break; end;
-					end;
+				if v ~= nil and CLAN_RENAMED[v] ~= nil then
+					setField("clanFamily", CLAN_RENAMED[v]);
+
+					return;
 				end;
 
-				mfLabel(found["dynclan"],   (not isFam) and sheet.clanFamily or nil, "Select Clan",   lang);
-				mfLabel(found["dynfamily"], isFam and sheet.clanFamily or nil,       "Select Family", lang);
+				local found = xpFind(tabRootOf(from), { dynclanFamily = true }, {});
+				local lang  = (sheet.language == "pt") and "pt" or "en";
+
+				mfLabel(found["dynclanFamily"], sheet.clanFamily, "Select Clan/Family", lang);
 			end;
 
 			function renderClanDisc(from)

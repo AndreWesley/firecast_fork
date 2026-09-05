@@ -2,8 +2,15 @@
 # An entry of CLANS with `choice` or `open` settles no trio, so the traits module cannot list
 # three names for it: it carries the book's sentence instead, in both languages. T850 wrote
 # Keskinen (one fixed, two picked - the trio the owner settled on 2026-08-25, not the book's);
-# T970 adds the six clans (Ventrue Antitribu, Wu Zao, Angellis Ater, Maeghar, Panders, Caitiff).
+# T970 added the seven clans (Ventrue Antitribu, Salubri (Wu Zao / Watchers), Angellis Ater, Maeghar, Panders, Caitiff, Children of Osiris).
 # Header ASCII by convention; the DATA is not (V411b).
 #
 # nome_picker<TAB>en<TAB>pt
 Keskinen	Thaumaturgy, plus two of Auspex, Dominate or Obfuscate	Taumaturgia, mais duas entre Auspícios, Dominação ou Ofuscação
+Ventrue Antitribu	Dominate, Fortitude, plus Auspex or Presence	Dominação, Fortitude, mais Auspícios ou Presença
+Salubri (Wu Zao / Watchers)	Auspex, Fortitude, plus Obeah or Valeren (chosen at creation)	Auspícios, Fortitude, mais Obeah ou Valeren (escolhida na criação)
+Angellis Ater	Daimoinon, Dominate, plus one of Potence, Presence or Obfuscate	Daimoinon, Dominação, mais uma entre Potência, Presença ou Ofuscação
+Maeghar	Mytherceria or Necromancy (chosen at creation), plus two from the sire's Clan	Mytherceria ou Necromancia (escolhida na criação), mais duas do Clã do senhor
+Panders	No Clan Disciplines: any three, chosen at creation with Storyteller approval	Sem Disciplinas de Clã: três quaisquer, escolhidas na criação com aprovação do Narrador
+Caitiff	No Clan Disciplines: any three, chosen at creation; raising any Discipline costs the current rating x 6	Sem Disciplinas de Clã: três quaisquer, escolhidas na criação; aumentar qualquer Disciplina custa o valor atual x 6
+Children of Osiris	As appropriate for the character's original Clan; Bardo is also an in-Clan Discipline	Conforme o Clã original do personagem; Bardo também conta como Disciplina de Clã

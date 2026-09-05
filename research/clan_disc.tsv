@@ -47,7 +47,7 @@ Assamite Viziers	Auspex	Celerity	Quietus		core
 Daitya	Presence	Obfuscate	Serpentis		core
 Tlacique	Obfuscate	Presence	Protean		core
 Warrior Setites	Potence	Presence	Serpentis		core
-Mariners	Animalism	Fortitude	Protean		core
+Gangrel (Marine)	Animalism	Fortitude	Protean		core
 Lasombra Antitribu	Dominate	Obtenebration	Potence		core
 Dominate Malkavians	Auspex	Dominate	Obfuscate		core
 Brahman	Animalism	Auspex	Chimerstry		core
@@ -58,7 +58,7 @@ Gargoyles (Scout)	Auspex	Obfuscate	Flight		lob
 Gargoyles (Sentinel)	Flight	Potence	Fortitude		lob
 Gargoyles (Warrior)	Flight	Fortitude	Protean		lob
 Ventrue Antitribu					core: "Dominate, Fortitude, Auspex OR Presence" - the third is a choice
-Wu Zao					core: "Auspex, Fortitude, Obeah OR Valeren (choice at creation)"
+Salubri (Wu Zao / Watchers)					core: "Auspex, Fortitude, Obeah OR Valeren (choice at creation)"
 Angellis Ater					core: "Daimoinon, Dominate, and one of Potence, Presence or Obfuscate"
 Maeghar					bh: "Mytherceria or Necromancy (choice), plus two from the sire's Clan"
 Panders					core: "Panders do not have Clan Disciplines" - pick any at creation

@@ -186,12 +186,15 @@ foreach ($a in [regex]::Matches($rootLfmTxt, 'PICKER_LIST\["(\w+)"\]\s*=\s*PICKE
     if ($PICKER.ContainsKey($a.Groups[2].Value)) { $PICKER[$a.Groups[1].Value] = $PICKER[$a.Groups[2].Value] }
 }
 
-# `clanFamily` is a FIELD and no list at all since T954. From the 107th round to T954 it was the
-# UNION of clan + family, built in the constructor and mirrored here (SPEC I29b, T510, V294a);
-# the Ghoul tab has one button per list now - `dynclan` over `clan`, `dynfamily` over `family`
-# - and the union left with its only reader (SPEC I145a, V426d). Nothing is mirrored here on
-# purpose: a picker naming the list `clanFamily` again reddens V408 as "the map has no such
-# list", which is the right answer for a list that does not exist.
+# clanFamily stopped being an alias in the 107th round. Clan and family are two authored
+# lists and the ghoul picker offers their UNION, built once in the constructor (SPEC I29b,
+# T510, V433b - back since T972, after the T954 interlude of one button per list). Mirror it
+# here exactly the way the aliases are mirrored above, so every check downstream measures the
+# list the picker really shows and not the clan list alone.
+$UNION_REGION = [regex]::Match($rootLfmTxt, '(?s)>>> CLANFAMILY_UNION_BEGIN(.*?)<<< CLANFAMILY_UNION_END')
+if ($UNION_REGION.Success -and $PICKER.ContainsKey('clan') -and $PICKER.ContainsKey('family')) {
+    $PICKER['clanFamily'] = @(@($PICKER['clan']) + @($PICKER['family']))
+}
 
 # Which key a comboBox reads. Mirrors fieldRoot() in WoD20.6: drop "cbo", drop the row number,
 # lowercase the first letter. Template combos are named cbo$(field) in the SOURCE, so their
@@ -6227,9 +6230,13 @@ if (-not $pickerFn.Success) {
     $plWrites = [regex]::Matches((NoComments $rootLfmTxt), '(?m)^\s*PICKER_LIST\["(\w+)"\]\s*=\s*(.+)$')
     foreach ($w in $plWrites) {
         if ($w.Groups[2].Value -match '^PICKER_LIST\["\w+"\];') { continue }
-        # No exception any more. The clan+family union used to be the one legal non-alias write,
-        # accepted from inside its markers; it left in T954 with its only reader (SPEC V426d), so
-        # every non-alias write fails here again - including that one coming back.
+        # One write is not an alias and is still legal: the clan+family union, assembled into
+        # a LOCAL inside its marked region and handed over whole (SPEC I29b, V294, V433b). It is
+        # as constant as the two lists behind it - born in the constructor, never written again -
+        # and it is accepted only from INSIDE the markers, so a stray assignment anywhere else
+        # still fails right here.
+        if ($w.Groups[1].Value -eq 'clanFamily' -and $UNION_REGION.Success -and
+            $UNION_REGION.Groups[1].Value -match [regex]::Escape($w.Value.Trim())) { continue }
         $filterBad += "V201 PICKER_LIST[$($w.Groups[1].Value)] is assigned something that is not an alias - the map is authored once and never written (SPEC V201)"
     }
 
@@ -6644,8 +6651,8 @@ else { Pass "V212 the picker and CLANS name the same $(@(@($PICKER['clan']) + @(
 # ---- V294: clan and family are TWO authored lists - disjoint, constant, translated ------
 # clanFamily stopped being an alias when clan and family became two lists (SPEC I29b), and
 # from then until T954 the ghoul dropdown offered their UNION, which leg (a) measured loop by
-# loop. The union left in T954 with its only reader - the Ghoul tab has one button per list
-# now (SPEC I145a, V426d) - so leg (a) is RETIRED and V426(d) is what refuses it coming back.
+# loop. It left in T954 (one button per list) and came BACK in T972 with the one-button line
+# (SPEC I149a, V433b) - so leg (a) measures the union again.
 # Legs (b), (c) and (d) outlive it, because they were never about the union: two lists that
 # share a name make `CLANS[sheet.clanFamily]` ambiguous whichever button wrote the field, a
 # push onto either list grows the Main tab's clan picker (SPEC B50), and a family with no
@@ -6657,6 +6664,30 @@ if ($famList.Count -eq 0) {
     $v294Bad += "PICKER_LIST['family'] is not declared - the family picker would offer nothing (SPEC I29b)"
 } else {
     $uClan = @($PICKER['clan'])
+    # (a) the union really walks BOTH lists. This has to read the SOURCE, not the mirror the
+    # parser builds: the mirror is clan+family by construction, so comparing it against
+    # clan+family would be a check that cannot fail - B7 in a new costume. What can rot is the
+    # code, so the code is what gets measured: one loop per authored list, both copying into
+    # the same local, and that local handed to the map (SPEC V294a, V433b).
+    if (-not $UNION_REGION.Success) {
+        $v294Bad += "the CLANFAMILY_UNION markers are gone from the root form - the union is unreadable and the one picker of the Ghoul line offers nothing (SPEC V20, B7, V433b)"
+    } else {
+        $uSrc = $UNION_REGION.Groups[1].Value
+        $uLocal = ''
+        if ($uSrc -match 'PICKER_LIST\["clanFamily"\]\s*=\s*(\w+);') { $uLocal = $Matches[1] }
+        if (-not $uLocal) {
+            $v294Bad += "nothing inside the markers is handed to PICKER_LIST['clanFamily'] - the picker would resolve to nothing at all (SPEC V294a, B6)"
+        } else {
+            foreach ($src in @('clan', 'family')) {
+                if ($uSrc -notmatch ('#PICKER_LIST\["' + $src + '"\]')) {
+                    $v294Bad += "the union never walks PICKER_LIST['$src'] - the picker would offer only what the other loop copies (SPEC V294a)"
+                }
+                if ($uSrc -notmatch ([regex]::Escape($uLocal) + '\[[^\]\r\n]*\]\s*=\s*PICKER_LIST\["' + $src + '"\]')) {
+                    $v294Bad += "PICKER_LIST['$src'] is walked but never copied into $uLocal - the entries counted are not the entries offered (SPEC V294a)"
+                }
+            }
+        }
+    }
     # (b) the two lists are disjoint
     $clanSet = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
     foreach ($x in $uClan) { if ($x -ne '') { [void]$clanSet.Add($x) } }
@@ -6666,7 +6697,7 @@ if ($famList.Count -eq 0) {
     }
     # (c) neither authored list is grown, anywhere
     $rootNoC294 = NoComments $rootLfmTxt
-    foreach ($k in @('clan', 'family')) {
+    foreach ($k in @('clan', 'family', 'clanFamily')) {
         # WRITING is the verb, so the pattern demands the assignment: a reader indexes
         # PICKER_LIST["clan"][i] too, and a check that could not tell the two apart would fail
         # on the very code it exists to protect.
@@ -7282,15 +7313,13 @@ else {
         $cells += [pscustomobject]@{ L = [int]$c.GetAttribute("left"); R = $rr224 }
     }
     $cols = $cells | Group-Object L | Sort-Object { [int]$_.Name }
-    # THREE rows since T954 and still one grid (SPEC I145b, V224 amended): the LEFT pair -
-    # label at 20, entry at 97 - carries all three rows, the RIGHT pair the first two, because
-    # the third row does not fit on the right: 342..558 is 206 and the family with its prefix
-    # prices at 222 (SPEC I143i). So the count a column has to show is its PAIR's - 3 and 3 on
-    # the left, 2 and 2 on the right - and a column off its partner's count is one row that left
-    # the column, which is B12 again with a third row to hide in.
+    # TWO rows again since T972 and still one grid (SPEC I149b, V433): the LEFT pair - label at
+    # 20, entry at 97 - and the RIGHT pair - 354, 520 - carry two rows each. So the count a
+    # column has to show is its PAIR's - 2 and 2 on both sides - and a column off its partner's
+    # count is one row that left the column, which is B12 again (the third row of T954 left in T972).
     $offGrid = @()
     if ($cols.Count -eq 4) {
-        if ($cols[0].Count -ne 3 -or $cols[1].Count -ne 3) { $offGrid += "the left pair x=$($cols[0].Name)/$($cols[1].Name) is used by $($cols[0].Count)/$($cols[1].Count) control(s), not 3/3" }
+        if ($cols[0].Count -ne 2 -or $cols[1].Count -ne 2) { $offGrid += "the left pair x=$($cols[0].Name)/$($cols[1].Name) is used by $($cols[0].Count)/$($cols[1].Count) control(s), not 2/2" }
         if ($cols[2].Count -ne 2 -or $cols[3].Count -ne 2) { $offGrid += "the right pair x=$($cols[2].Name)/$($cols[3].Name) is used by $($cols[2].Count)/$($cols[3].Count) control(s), not 2/2" }
     }
     # The right edge, asked of the SAME columns (SPEC I136k, user 2026-09-02 item 4). V224 has
@@ -7298,7 +7327,7 @@ else {
     # share an x and end 18px apart - which is what Name and the Clan/Family picker did, and what
     # the owner asked to be rid of. It is one grid: both edges or neither.
     $offRight = @($cols | Where-Object { (@($_.Group | ForEach-Object { $_.R } | Sort-Object -Unique)).Count -ne 1 })
-    if ($cells.Count -ne 10) { Fail "V224 the DOMINATOR box holds $($cells.Count) placed controls, expected 10 - three label/input pairs on the left and two on the right (SPEC I30, I145b)" }
+    if ($cells.Count -ne 8) { Fail "V224 the DOMINATOR box holds $($cells.Count) placed controls, expected 8 - two label/input pairs on each side (SPEC I30, I149b)" }
     elseif ($cols.Count -ne 4) { Fail "V224 the DOMINATOR box uses $($cols.Count) x positions, expected 4 - two label columns and two input columns (SPEC I30)" }
     elseif ($offGrid.Count) { Fail "V224 $($offGrid[0]) - a row left its column (SPEC B12, I145b)" }
     elseif ($offRight.Count) { Fail "V224 the column opening at x=$($offRight[0].Name) closes at $(@($offRight[0].Group | ForEach-Object { $_.R } | Sort-Object -Unique) -join ' and ') - one column, one right edge, or the rows only look aligned from the left (SPEC I136k, B12)" }
@@ -8401,7 +8430,7 @@ else { Pass "V236 CLANS answers all 84 clans and families in the picker's own sp
 
 # ---- V295: an entry PROMISES a number of slots, and that number has to fit ------------
 # B65: `choice` never said how MANY slots it opens, so renderClanDisc treated every slot
-# without a `fixed` name as a slot to pick in - and Ventrue Antitribu, Wu Zao and Angellis
+# without a `fixed` name as a slot to pick in - and Ventrue Antitribu, Salubri (Wu Zao / Watchers) and Angellis
 # Ater handed out four clan Disciplines where the book gives three. The fourth slot exists
 # for the Gargoyles, who fix four; the other three inherited it for free. V236 could not
 # see it: it measures coverage, spelling, and the `fixed` ceiling ON ITS OWN - never the
@@ -10732,9 +10761,9 @@ foreach ($fld274 in @('hedgeAffiliation', 'clanFamily')) {
 # The visible half is a picker BUTTON on both sides since T874 half B and T876, so the roster
 # carries the element name too - one reader, two shapes, because the shape is what the I113e
 # wave changes and the RULE is not about the shape (SPEC V274c amended).
-# The clanFamily side is a TRIO since T954 (SPEC V274 amended, I145e, V426): the twin sits on
-# dynclan's rectangle - the first of the two rows - and dynfamily is measured just below.
-foreach ($pair274 in @(@('WoD20.7.lfm', 'dynhedgeAffiliation', 'edtHedgeAffiliation', 'button'), @('WoD20.11.lfm', 'dynclan', 'edtClanFamily', 'button'))) {
+# The clanFamily side is a PAIR again since T972 (SPEC V274 amended, I149b, V433): the twin sits
+# on dynclanFamily's rectangle, the second row of the DOMINATOR box.
+foreach ($pair274 in @(@('WoD20.7.lfm', 'dynhedgeAffiliation', 'edtHedgeAffiliation', 'button'), @('WoD20.11.lfm', 'dynclanFamily', 'edtClanFamily', 'button'))) {
     $doc274 = Doc (Join-Path $dir $pair274[0])
     $cbo274 = $doc274.SelectSingleNode("//$($pair274[3])[@name='$($pair274[1])']")
     $edt274 = $doc274.SelectSingleNode("//edit[@name='$($pair274[2])']")
@@ -10746,26 +10775,12 @@ foreach ($pair274 in @(@('WoD20.7.lfm', 'dynhedgeAffiliation', 'edtHedgeAffiliat
         if ($cbo274.GetAttribute($att274) -ne $edt274.GetAttribute($att274)) { $v274Bad += "$($pair274[2]) sits at $att274=$($edt274.GetAttribute($att274)) and $($pair274[1]) at $($cbo274.GetAttribute($att274)) - one field, one rectangle, or the swap moves the row (SPEC V274c, I71)" }
     }
 }
-# The third of the trio. Authored the picker's way - no visible= - and on the twin's column: same
-# left, width and height, the row below. Only `top` may differ, and it is the one attribute this
-# leg does not compare (SPEC V274c amended, I145b, V426b).
-$doc274f = Doc (Join-Path $dir 'WoD20.11.lfm')
-$fam274  = $doc274f.SelectSingleNode("//button[@name='dynfamily']")
-$edtF274 = $doc274f.SelectSingleNode("//edit[@name='edtClanFamily']")
-if ($null -eq $fam274) { $v274Bad += "dynfamily is gone from WoD20.11 - the trio the flag swaps is a pair again, and the family module has no button to open it (SPEC V274c, V426a)" }
-elseif ($null -ne $edtF274) {
-    if ($fam274.GetAttribute("visible") -ne '') { $v274Bad += "dynfamily authors visible='$($fam274.GetAttribute('visible'))' - the picker is the DEFAULT side and default is not written down (SPEC V274c, V56)" }
-    foreach ($att274 in @('left', 'width', 'height')) {
-        if ($fam274.GetAttribute($att274) -ne $edtF274.GetAttribute($att274)) { $v274Bad += "dynfamily has $att274=$($fam274.GetAttribute($att274)) and edtClanFamily $att274=$($edtF274.GetAttribute($att274)) - the two buttons and the twin are one column of the grid (SPEC V274c, V224)" }
-    }
-}
-
-# (d) BOTH properties for ALL FIVE controls, and the five are named in one place.
+# (d) BOTH properties for ALL FOUR controls, and the four are named in one place.
 $manFn274 = LuaFn $hh6 'renderManualEntry'
 if (-not $manFn274) { $v274Bad += "renderManualEntry is not declared in WoD20.6 - the two dataLinks call a global that finds nil, and rdk exits 0 on that (SPEC V274d, V223, B51)" }
 else {
     $mb274 = NoComments $manFn274
-    foreach ($nm274 in @('dynhedgeAffiliation', 'edtHedgeAffiliation', 'dynclan', 'dynfamily', 'edtClanFamily')) {
+    foreach ($nm274 in @('dynhedgeAffiliation', 'edtHedgeAffiliation', 'dynclanFamily', 'edtClanFamily')) {
         # WORD BOUNDARY and case-SENSITIVE, both, and a mutation is what asked for them: renaming
         # the entry to `dynhedgeAffiliationX` left this leg GREEN, because a bare -notmatch is a
         # SUBSTRING test and the longer name contains the shorter one. That is the anchor V222
@@ -12145,13 +12160,13 @@ else { Pass "V403 the 20 BLOOD POOL dots are two rows on one pitch, centred betw
 # exception that only forbids is a door (SPEC V328d).
 #
 # What the exception PAYS is the second leg, and it is why this one is cheap: with no ? leading
-# them, dynclan, dynfamily and edtClanFamily open where <edit field="dominator"> opens and close
+# it, dynclanFamily and edtClanFamily open where <edit field="dominator"> opens and close
 # where it closes, so the rows of the DOMINATOR box share ONE left and ONE right and are the grid
 # V224 asks for. The ? was the only reason they were not (SPEC I140g).
 #
-# TWO buttons since T954 (SPEC V407 amended, V426): the user's word was said of the LINE, and the
-# line is two now. The exception names both, and a ? back on EITHER reddens - the old name is on
-# the roster too, so the button of before cannot come back under it.
+# ONE button again since T972 (SPEC V407 amended twice, V433a): T954 had split the line in two
+# and the user undid it on 2026-09-05. The exception names the one button, and the two names of
+# the split stay on the refusal roster so a ? cannot come back under them either.
 $v407Bad = @()
 $doc407 = Doc (Join-Path $dir "WoD20.11.lfm")
 foreach ($q407 in @('btnQclanFamily', 'btnQclan', 'btnQfamily')) {
@@ -12160,14 +12175,13 @@ foreach ($q407 in @('btnQclanFamily', 'btnQclan', 'btnQfamily')) {
     }
 }
 $dom407 = @($doc407.SelectNodes("//edit[@field='dominator']"))[0]
-$pick407 = @($doc407.SelectNodes("//button[@name='dynclan']"))[0]
-$fam407  = @($doc407.SelectNodes("//button[@name='dynfamily']"))[0]
+$pick407 = @($doc407.SelectNodes("//button[@name='dynclanFamily']"))[0]
 $twin407 = @($doc407.SelectNodes("//edit[@name='edtClanFamily']"))[0]
-if ($null -eq $dom407 -or $null -eq $pick407 -or $null -eq $fam407 -or $null -eq $twin407) {
-    $v407Bad += "one of dominator / dynclan / dynfamily / edtClanFamily is gone from WoD20.11 - the grid this exception pays for cannot be measured (SPEC V20, V209)"
+if ($null -eq $dom407 -or $null -eq $pick407 -or $null -eq $twin407) {
+    $v407Bad += "one of dominator / dynclanFamily / edtClanFamily is gone from WoD20.11 - the grid this exception pays for cannot be measured (SPEC V20, V209)"
 } else {
     $dl407 = [int]$dom407.GetAttribute("left"); $dr407 = $dl407 + [int]$dom407.GetAttribute("width")
-    foreach ($n407 in @($pick407, $fam407, $twin407)) {
+    foreach ($n407 in @($pick407, $twin407)) {
         $l407 = [int]$n407.GetAttribute("left"); $r407 = $l407 + [int]$n407.GetAttribute("width")
         if ($l407 -ne $dl407 -or $r407 -ne $dr407) {
             $v407Bad += "'$($n407.GetAttribute('name'))' spans $l407..$r407 and the dominator entry spans $dl407..$dr407 - with the ? gone the rows of DOMINATOR are one grid, which is what the exception buys (SPEC V224, I140g)"
@@ -12175,7 +12189,7 @@ if ($null -eq $dom407 -or $null -eq $pick407 -or $null -eq $fam407 -or $null -eq
     }
 }
 if ($v407Bad) { foreach ($b407 in $v407Bad) { Fail "V407 $b407" } }
-else { Pass "V407 dynclan and dynfamily carry no ? and both entries share both x edges with the dominator row - the exception cuts both ways and pays for itself in the V224 grid" }
+else { Pass "V407 dynclanFamily carries no ? and its entry shares both x edges with the dominator row - the exception cuts both ways and pays for itself in the V224 grid" }
 
 # ---- V408: a list is covered by the module its picker names ---------------------------
 # SPEC V408, B137, I140i, I140j, I140k, I140m, user 2026-09-02 item 6. Every picker on the sheet
@@ -12264,6 +12278,16 @@ foreach ($k408 in ($v408Pairs.Keys | Sort-Object)) {
     $have408 = @{}
     foreach ($e408 in $ent408) { $have408[$e408.Key] = $true }
     $miss408 = @(@($PICKER[$list408]) | Where-Object { $_ -ne '' -and -not $have408.ContainsKey($_) })
+    # V433(e): the union is ONE list read by TWO modules, by pertinence - a family name is owed
+    # to descFamily and everything else to the kind the button names (SPEC V433c, I149a).
+    if ($list408 -eq 'clanFamily' -and $PICKER.ContainsKey('family')) {
+        $famMod408 = Join-Path $plugin 'descFamily_en.lua'
+        $haveF408 = @{}
+        if ((Test-Path -LiteralPath $famMod408) -and $DESC_MARKER.ContainsKey('Family')) { $famEnt408 = DescEntries $famMod408 $DESC_MARKER['Family'] 'en'; foreach ($e408 in $famEnt408) { $haveF408[$e408.Key] = $true } }
+        $famSet408 = @{}
+        foreach ($n408 in @($PICKER['family'])) { $famSet408[$n408] = $true }
+        $miss408 = @(@($PICKER[$list408]) | Where-Object { $_ -ne '' -and -not $(if ($famSet408.ContainsKey($_)) { $haveF408.ContainsKey($_) } else { $have408.ContainsKey($_) }) })
+    }
     $v408Seen++
     # the excuse is by NAME: a name on the roster that the module now HOLDS is a line lying about
     # text that exists, and striking it is what retires the line the round the debt gets paid
@@ -16778,7 +16802,8 @@ if ($sel360) {
 # passes in silence - the ageing roster I114f forbids.
 if ($sel360) {
     if ((NoComments $sel360) -match '(?m)\{[^}]*\bmerit\b[^}]*=\s*"[Dd]esc') { $v360Bad += "(d) mfSelect carries a list-to-module roster - MF.mod already answers this and a roster ages one row per wave (SPEC I116d, I114f, V208)" }
-    if ((NoComments $sel360) -notmatch 'descFor\(\s*MF\.field,\s*MF\.mod') { $v360Bad += "(d) mfDesc does not resolve the module from MF.mod - the parameter I113a added is being ignored and something else decides (SPEC I116d)" }
+    # mfKind(name) IS MF.mod, resolved per NAME for the one list that reads two modules (SPEC V433c).
+    if ((NoComments $sel360) -notmatch 'descFor\(\s*MF\.field,\s*(MF\.mod|mfKind\(name\))') { $v360Bad += "(d) mfDesc does not resolve the module from MF.mod - the parameter I113a added is being ignored and something else decides (SPEC I116d)" }
 }
 
 # (e) ONE function resolves the text and every reader goes through it. A second place building
@@ -17592,7 +17617,7 @@ if ($v383Bad.Count -eq 0) {
 #
 # NAMED and closed, never a skip: a second bare picker button has to redden here rather than be
 # absorbed by a wildcard, which is the whole difference between a roster and a hole (SPEC V328d).
-$BARE_DYN = @('dynhedgeAffiliation', 'dynroad', 'dynclan', 'dynfamily')
+$BARE_DYN = @('dynhedgeAffiliation', 'dynroad', 'dynclanFamily')
 $bareSeen383 = @()
 foreach ($f383b in $files) {
     foreach ($b383b in (Doc $f383b.FullName).SelectNodes("//button")) {
@@ -18251,6 +18276,73 @@ if ($live395.Count -gt 0) {
 }
 if ($v395Bad) { foreach ($b395 in $v395Bad) { Fail "V395 $b395" } }
 else { Pass "V395 the road retirements carry their migration - the $($ROAD_RETIRED.Count) retired name(s) ($($ROAD_RETIRED -join ', ')) are live nowhere, ROAD_RETIRED lists exactly those, and renderBearing WRITES '$ROAD_DEFAULT' over them once, on load" }
+# ---- V434: a renamed clan VALUE carries its migration, and the old name lives nowhere -----
+# SPEC V434, I149c, T973. V395 again, for the clan list: `clanFamily` stores the STRING the
+# picker wrote, so renaming a value of PICKER_LIST["clan"] strands every sheet holding it
+# unless ONE branch writes the new name back. (a) the branch is a WRITE (setField) at the top
+# of renderClanFamilyButton, never a read-side alias - CLANS, the PT map, descClan and the
+# weakness box all read the field, and an alias would have to live in each of them (V135).
+# (b) the old name is offered NOWHERE: the list, CLANS, the PT map, both halves of the .lang,
+# the keys of descClan_en/pt and column 1 of the research tsv - a stranded sheet would look
+# right while holding a value nothing else means. (c) the new name lives in ALL of those, with
+# exactly one .lang line per half. (d) the roster here and the Lua table agree key by key,
+# both ways (the shape of $ROAD_RETIRED). (e) zero-guard. (f) the field `clan` of the Main
+# tab (cboClan, dormant since T432, V173) is NOT migrated - it has no reader; the day it
+# wakes, the branch gains a sibling on its link.
+$CLAN_RENAMED = @{ 'Wu Zao' = 'Salubri (Wu Zao / Watchers)'; 'Mariners' = 'Gangrel (Marine)' }
+$v434Bad = @()
+$ren434 = [regex]::Match($rootLua, '(?s)\n\t{4}CLAN_RENAMED = \{(.*?)\n\t{4}\};')
+$renLua434 = @{}
+if ($ren434.Success) { foreach ($m434 in [regex]::Matches($ren434.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"([^"]+)"')) { $renLua434[$m434.Groups[1].Value] = $m434.Groups[2].Value } }
+if (-not $ren434.Success -or $renLua434.Count -eq 0) {
+    $v434Bad += "(e) CLAN_RENAMED is not declared in Lua, or parsed to zero pairs - the branch reads it, so an empty table migrates nobody and this rule would certify a rename that strands every saved sheet (SPEC V434a, V20, V209)"
+} else {
+    foreach ($k434 in $CLAN_RENAMED.Keys) {
+        if (-not $renLua434.ContainsKey($k434)) { $v434Bad += "(d) '$k434' was renamed in the clan list and CLAN_RENAMED does not carry it - a sheet holding it opens on a name nothing offers (SPEC V434a, V434d)" }
+        elseif ($renLua434[$k434] -ne $CLAN_RENAMED[$k434]) { $v434Bad += "(d) CLAN_RENAMED maps '$k434' to '$($renLua434[$k434])' and the roster here says '$($CLAN_RENAMED[$k434])' - the sheet and the ruler disagree about where that sheet goes (SPEC V434d)" }
+    }
+    foreach ($k434 in $renLua434.Keys) { if (-not $CLAN_RENAMED.ContainsKey($k434)) { $v434Bad += "(d) CLAN_RENAMED carries '$k434' and the roster here does not - either a rename nobody wrote down, or a line left standing after the value came back (SPEC V434d)" } }
+}
+$fn434 = [regex]::Match($rootLua, '(?s)function renderClanFamilyButton\(from\)(.*?)\n\t{3}end;')
+if (-not $fn434.Success) { $v434Bad += "(e) renderClanFamilyButton was not found in the root Lua - the migration branch has nowhere to live (SPEC V434a, V209)" }
+elseif ($fn434.Groups[1].Value -notmatch 'if\s+v\s*~=\s*nil\s+and\s+CLAN_RENAMED\[v\]\s*~=\s*nil\s+then\s*\r?\n\s*setField\("clanFamily",\s*CLAN_RENAMED\[v\]\)') {
+    $v434Bad += "(a) renderClanFamilyButton carries no migration branch - a sheet that saved one of the renamed clans ($($CLAN_RENAMED.Keys -join ', ')) opens holding a name the list no longer offers, with no CLANS row, no translation and no description (SPEC V434a, V395a)"
+}
+$w6txt434  = [System.IO.File]::ReadAllText((Join-Path $dir "WoD20.6.lfm"))
+$lang434   = [System.IO.File]::ReadAllText($langFile)
+$descEn434 = [System.IO.File]::ReadAllText((Join-Path $plugin "descClan_en.lua"))
+$descPt434 = [System.IO.File]::ReadAllText((Join-Path $plugin "descClan_pt.lua"))
+$tsv434 = @(@('clan_body_en.tsv', 'clan_body_pt.tsv', 'clan_disc.tsv', 'clan_weakness.tsv') | ForEach-Object { Join-Path $PSScriptRoot "research\$_" } | Where-Object { Test-Path $_ })
+$clanOnly434 = @(); if ($PICKER.ContainsKey('clan')) { $clanOnly434 = @($PICKER['clan']) }
+$clansKeys434 = @{}
+$clansBody434 = [regex]::Match($rootLua, '(?s)\n\t{3}local CLANS = \{(.*?)\n\t{3}\};')
+if ($clansBody434.Success) { foreach ($m434 in [regex]::Matches($clansBody434.Groups[1].Value, '(?m)^\s*\["([^"]+)"\]\s*=')) { $clansKeys434[$m434.Groups[1].Value] = $true } }
+if ($clanOnly434.Count -eq 0 -or $clansKeys434.Count -eq 0) { $v434Bad += "(e) PICKER_LIST['clan'] or CLANS parsed to zero names - legs (b) and (c) would pass on nothing (SPEC V20, V209)" }
+function Sites434($name) {
+    $hits = @()
+    $rx = [regex]::Escape($name)
+    if ($clanOnly434 -contains $name) { $hits += 'PICKER_LIST[clan]' }
+    if ($clansKeys434.ContainsKey($name)) { $hits += 'CLANS' }
+    if ($w6txt434 -match ('\["' + $rx + '"\]\s*=')) { $hits += 'the PT map' }
+    $n = ([regex]::Matches($lang434, '(?m)^wod\.' + $rx + '=')).Count
+    if ($n -ge 1) { $hits += "the .lang x$n" }
+    if ($descEn434 -match ('(?m)^\s*\["' + $rx + '"\]\s*=')) { $hits += 'descClan_en' }
+    if ($descPt434 -match ('(?m)^\s*\["' + $rx + '"\]\s*=')) { $hits += 'descClan_pt' }
+    foreach ($t434 in $tsv434) { if ([System.IO.File]::ReadAllText($t434) -match ('(?m)^' + $rx + "`t")) { $hits += (Split-Path $t434 -Leaf) } }
+    return $hits
+}
+$want434 = 6 + $tsv434.Count
+foreach ($old434 in @($CLAN_RENAMED.Keys)) {
+    $live434 = @(Sites434 $old434)
+    if ($live434.Count -gt 0) { $v434Bad += "(b) the old name '$old434' is still live in $($live434 -join ', ') - the rename is half done, and a sheet stranded on it would look correct while holding a value the list stopped meaning (SPEC V434b)" }
+    $new434 = $CLAN_RENAMED[$old434]
+    $has434 = @(Sites434 $new434)
+    $langN434 = ([regex]::Matches($lang434, '(?m)^wod\.' + [regex]::Escape($new434) + '=')).Count
+    if ($has434.Count -lt $want434) { $v434Bad += "(c) the new name '$new434' lives in $($has434.Count) of $want434 sites ($($has434 -join ', ')) - a reader that misses it shows the raw key, or nothing (SPEC V434c)" }
+    elseif ($langN434 -ne 2) { $v434Bad += "(c) the new name '$new434' has $langN434 line(s) in the .lang and needs exactly 2, one per half (SPEC V434c, V9, V22)" }
+}
+if ($v434Bad) { foreach ($b434 in $v434Bad) { Fail "V434 $b434" } }
+else { Pass "V434 the $($CLAN_RENAMED.Count) renamed clan value(s) carry their migration - CLAN_RENAMED and the roster agree, renderClanFamilyButton WRITES the new name, the old names are live nowhere and the new ones live in all $want434 sites" }
 # ---- V409: descRoad is FOUR blocks, a FUSED table, and ONE aura name ---------------------
 # SPEC V409, I141, I141a, I141b, I141e, I141g, T931. This is V192/V273 on the new module plus
 # two legs neither of them has, because no other list on the sheet INHERITS: a Path shows the
@@ -18790,11 +18882,10 @@ if (-not $v413Bad) {
     # (a) the test is on the LIST as well as on the custom state. Gated on custom alone the row
     # shows up in all nine lists; gated on the list alone it shows over a book entry, which has
     # nothing to be asked. The pair IS the rule, and mfLevelShown next door reads the same way.
-    # The list is `family` since T954 (SPEC V413 amended, V426e): the row always belonged to the
-    # family, and it read `clanFamily` only because the list was one - which put a Revenant row
-    # in the CLAN picker's custom pane, where it has no meaning.
-    if ($revBody -notmatch 'MF\.list\s*==\s*"family"') {
-        $v413Bad += "(a) mfRevenantShown does not test MF.list against family - the row would ask its question of every list on the sheet, or of the clan list where it has no meaning (SPEC V413a, I143d, V426e)"
+    # The list is `clanFamily` again since T972 (SPEC V433d): the line is one picker over the
+    # union, and a custom entry of that picker is the one place a revenant can be declared.
+    if ($revBody -notmatch 'MF\.list\s*==\s*"clanFamily"') {
+        $v413Bad += "(a) mfRevenantShown does not test MF.list against clanFamily - the row would ask its question of every list on the sheet (SPEC V413a, I143d, V433d)"
     }
     if ($revBody -notmatch 'MF\.custom') {
         $v413Bad += "(a) mfRevenantShown does not test the custom state - the row would paint over a book entry, which carries its own weakness (SPEC V413a, I129i)"
@@ -18848,7 +18939,7 @@ if (-not $v413Bad) {
 }
 
 if ($v413Bad) { foreach ($b413 in $v413Bad) { Fail "V413 $b413" } }
-else { Pass "V413 the Revenant row asks the family list alone, owns no field, is authored on No, hides rather than disables, and the desc pane starts under the last lit row" }
+else { Pass "V413 the Revenant row asks the clanFamily list alone, owns no field, is authored on No, hides rather than disables, and the desc pane starts under the last lit row" }
 
 # ---- V412: the box shows the FAMILY's weakness, and never the clan's --------------------
 # SPEC I143, V412, T936, the owner's ask of 2026-09-03. `clanFamily` is ONE list with two
@@ -18909,8 +19000,9 @@ if (-not $v412Bad) {
     # (b) pertinence, and nothing but pertinence. The list is what answers "is this a Family?",
     # and the parenthesis in `Bratovich (Dark Ages)` is SPELLING and not species - four clans
     # carry one too, which is why picking the name apart is the mutation this leg exists for.
-    if ($body412 -notmatch 'PICKER_LIST\["family"\]') {
-        $v412Bad += "(b) familyWeakness never reads PICKER_LIST[family] - whatever it asks instead is a second owner of which species a name came from (SPEC V412b, I143b, V135)"
+    # Since T972 the loop lives in isFamilyName, the ONE body, and familyWeakness CALLS it (SPEC V433c).
+    if ($body412 -notmatch 'isFamilyName\(') {
+        $v412Bad += "(b) familyWeakness does not ask isFamilyName - whatever it asks instead is a second owner of which species a name came from (SPEC V412b, V433c, I143b, V135)"
     }
     if ($body412 -match 'string\.(find|match|sub)\s*\(') {
         $v412Bad += "(b) familyWeakness tells a family from a clan by picking the NAME apart - the value already carries which list it came from, and reading it out of the spelling is the door I143b was written to shut (SPEC V412b, I143b)"
@@ -19293,81 +19385,98 @@ if ($anch419 -ne '') {
 if ($v419Bad) { foreach ($b419 in $v419Bad) { Fail "V419 $b419" } }
 else { Pass "V419 the three Settings combos author their anchor in XML, PICKER_ANCHOR matches the $($want419.Count) anchored cbo*/cmb* combos name for name and value for value, and keepAnchor is the one Lua that writes an alignment" }
 
-# ---- V426: the Clan/Family line is TWO buttons over ONE field ---------------------------
-# SPEC V426, I145, Q65 (2nd half, exit 2), T954, the user's decision of 2026-09-04. One picker
-# over the union of two lists carried ONE kind, `Clan`, so the family module T850 delivers had
-# no button that could open it. The split is two calls to the same mfOpen with the SAME field
-# and a different list and kind each - and it is the field staying one that makes clan and
-# family mutually exclusive without a line of code (SPEC I145c).
+# ---- V433: the Clan/Family line is ONE button over the UNION, and the KIND follows the name --
+# SPEC V433, I149a, I149b, T972, the user's decision of 2026-09-05 (5th batch) - it SUPERSEDES
+# V426 (a)(c)(d)(e); V426(b) - one field, no field= on the button - is kept here as (a2).
+# T954 had split the line into two buttons with a kind each so descFamily_* had an opener; the
+# user put the ONE picker back: the player sees `Clan/Family` over clan + family, and the pane
+# resolves the module by the NAME picked - mfKind answers `Family` for a name standing in
+# PICKER_LIST["family"] and the authored kind otherwise. The pertinence test has ONE body,
+# isFamilyName, and every other reader of "is it a family?" calls it (V135, V412b).
 #
-# Mutation (SPEC V20, V222): put both mfOpen calls back on kind `Clan` -> red on (a); give one
-# button field="clanFamily" -> red on (b) AND on V1; leave mfRevenantShown on "clanFamily" ->
-# red on (e); bring the union back -> red on (d). Probe: change the WIDTH of both buttons
-# together -> GREEN here, the grid is V224's to keep.
-$v426Bad = @()
-$doc426  = Doc (Join-Path $dir 'WoD20.11.lfm')
-$box426  = $doc426.SelectSingleNode("//layout[label/@name='lblMaxDisc']")
-$btn426  = @()
-if ($null -ne $box426) { $btn426 = @($box426.SelectNodes("button[contains(@onClick, 'mfOpen(')]")) }
-$want426 = @{ dynclan = @('clan', 'Clan'); dynfamily = @('family', 'Family') }
-
-# zero-guard FIRST: fewer than two picker buttons on the line, or one without its kind, and
-# every leg below would be asking a question of nothing (SPEC V209, B7)
-if ($null -eq $box426) { $v426Bad += "the DOMINATOR box is gone from WoD20.11 - there is no line to measure (SPEC V209)" }
-elseif ($btn426.Count -lt 2) { $v426Bad += "the DOMINATOR box carries $($btn426.Count) picker button(s) and the line is two since T954 - with one, the family module has no button that opens it again (SPEC V209, V426a, Q65)" }
+# Mutation (SPEC V20, V222): dynfamily back on the line -> red on (a); the union without its
+# markers -> red on (b); descFor(MF.field, MF.mod, ...) back in the pane -> red on (c); a second
+# loop over PICKER_LIST["family"] -> red on (c); mfRevenantShown on "family" -> red on (d);
+# Basarab out of descFamily_en -> red on V408 (leg (e) lives there, by pertinence).
+$v433Bad = @()
+$doc433  = Doc (Join-Path $dir 'WoD20.11.lfm')
+$box433  = $doc433.SelectSingleNode("//layout[label/@name='lblMaxDisc']")
+$btn433  = @()
+if ($null -ne $box433) { $btn433 = @($box433.SelectNodes("button[contains(@onClick, 'mfOpen(')]")) }
+# (f) zero-guard FIRST
+if ($null -eq $box433) { $v433Bad += "(f) the DOMINATOR box is gone from WoD20.11 - there is no line to measure (SPEC V209)" }
+elseif ($btn433.Count -ne 1) { $v433Bad += "(a) the DOMINATOR box carries $($btn433.Count) picker button(s) and the line is ONE since T972 - a second button is the split of T954 the user undid (SPEC V433a, I149a)" }
 else {
-    foreach ($b426 in $btn426) {
-        $nm426 = $b426.GetAttribute('name')
-        $m426  = [regex]::Match($b426.GetAttribute('onClick'), "mfOpen\(self,\s*'([^']*)',\s*'([^']*)'(?:,\s*'([^']*)')?")
-        if (-not $m426.Success -or $m426.Groups[3].Value -eq '') { $v426Bad += "'$nm426' opens the box with no kind - a picker with no module named is V360c's sentence for ever, and the whole point of the split was a kind per list (SPEC V209, V426a)"; continue }
-        # (a) same field, the list and the kind the button's name is derived from (SPEC I145g)
-        if (-not $want426.ContainsKey($nm426)) { $v426Bad += "(a) '$nm426' is a picker button on the Clan/Family line and the line names dynclan and dynfamily - a third button here is a third opener of one field (SPEC V426a, V135)"; continue }
-        if ($m426.Groups[1].Value -ne 'clanFamily') { $v426Bad += "(a) '$nm426' opens on field '$($m426.Groups[1].Value)' - both buttons write clanFamily, the ONE field, or clan and family stop being exclusive (SPEC V426a, I145c)" }
-        if ($m426.Groups[2].Value -ne $want426[$nm426][0]) { $v426Bad += "(a) '$nm426' offers PICKER_LIST['$($m426.Groups[2].Value)'] and the button is named after '$($want426[$nm426][0])' - the name is derived from the list mfOpen is handed (SPEC V426a, I145g, V270d)" }
-        if ($m426.Groups[3].Value -ne $want426[$nm426][1]) { $v426Bad += "(a) '$nm426' names kind '$($m426.Groups[3].Value)', expected '$($want426[$nm426][1])' - the kind is what reaches desc<KIND>, and the family module is reachable through kind Family only (SPEC V426a, Q65)" }
-        # (b) no field on either button: the twin is the one widget bound to clanFamily
-        if ($b426.HasAttribute('field')) { $v426Bad += "(b) '$nm426' carries field='$($b426.GetAttribute('field'))' - a picker button binds no field; edtClanFamily is the one owner and a second one is the duplicate V1 refuses (SPEC V426b, V1, I145c)" }
+    $b433  = $btn433[0]
+    $nm433 = $b433.GetAttribute('name')
+    $m433  = [regex]::Match($b433.GetAttribute('onClick'), "mfOpen\(self,\s*'([^']*)',\s*'([^']*)'(?:,\s*'([^']*)')?")
+    if ($nm433 -ne 'dynclanFamily') { $v433Bad += "(a) the picker button on the line is named '$nm433', not dynclanFamily - the name is derived from the list mfOpen is handed (SPEC V433a, I145g)" }
+    if (-not $m433.Success) { $v433Bad += "(a) '$nm433' does not call mfOpen(self, field, list, kind) (SPEC V433a)" }
+    else {
+        if ($m433.Groups[1].Value -ne 'clanFamily') { $v433Bad += "(a) '$nm433' opens on field '$($m433.Groups[1].Value)' - the line writes clanFamily, the ONE field (SPEC V433a, V426b)" }
+        if ($m433.Groups[2].Value -ne 'clanFamily') { $v433Bad += "(a) '$nm433' offers PICKER_LIST['$($m433.Groups[2].Value)'] and the line offers the UNION clanFamily - a family or a clan alone is the split coming back (SPEC V433a, V433b)" }
+        if ($m433.Groups[3].Value -ne 'Clan') { $v433Bad += "(a) '$nm433' names kind '$($m433.Groups[3].Value)', expected 'Clan' - the authored kind is the clan's, and Family is what mfKind answers by pertinence (SPEC V433a, V433c)" }
     }
-    foreach ($k426 in $want426.Keys) { if (@($btn426 | Where-Object { $_.GetAttribute('name') -eq $k426 }).Count -ne 1) { $v426Bad += "(a) '$k426' is authored $(@($btn426 | Where-Object { $_.GetAttribute('name') -eq $k426 }).Count) time(s) on the line and it has to be exactly once (SPEC V426a, V209)" } }
-    $owners426 = @($doc426.SelectNodes("//*[@field='clanFamily']"))
-    if ($owners426.Count -ne 1 -or $owners426[0].GetAttribute('name') -ne 'edtClanFamily') { $v426Bad += "(b) clanFamily is bound by $($owners426.Count) control(s) on WoD20.11 and the one is edtClanFamily - no new field, no new owner, is what keeps V1, V2 and I3 untouched by the split (SPEC V426b, I145c)" }
+    # (a2) = V426(b), kept: no field on the button, the twin is the one owner
+    if ($b433.HasAttribute('field')) { $v433Bad += "(a) '$nm433' carries field='$($b433.GetAttribute('field'))' - a picker button binds no field; edtClanFamily is the one owner and a second one is the duplicate V1 refuses (SPEC V426b, V1)" }
+    $owners433 = @($doc433.SelectNodes("//*[@field='clanFamily']"))
+    if ($owners433.Count -ne 1 -or $owners433[0].GetAttribute('name') -ne 'edtClanFamily') { $v433Bad += "(a) clanFamily is bound by $($owners433.Count) control(s) on WoD20.11 and the one is edtClanFamily (SPEC V426b, V1, V2)" }
 }
-# the retired name: a `dynclanFamily` coming back anywhere is the one-button line under its old
-# name, and the family module losing its opener again
-foreach ($f426 in $files) {
-    if ((NoComments ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f426.FullName)))) -match "name=`"dynclanFamily`"") { $v426Bad += "(a) $($f426.Name) authors a control named dynclanFamily - the one-button line is back under its old name, and the family kind loses its opener (SPEC V426a, Q65)" }
+# the retired names: dynclan / dynfamily coming back anywhere is the split under its old names
+foreach ($f433 in $files) {
+    $c433 = NoComments ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f433.FullName)))
+    foreach ($old433 in @('dynclan', 'dynfamily')) {
+        if ($c433 -cmatch "\b$old433\b") { $v433Bad += "(a) $($f433.Name) still names $old433 - the two buttons of T954 are gone and a reader waiting for one paints nothing, or swaps nothing (SPEC V433a, V274d)" }
+    }
 }
-
-# (c) which button SHOWS the value is pertinence in PICKER_LIST["family"], and nothing else
-$paint426 = LuaFn $rootTxt 'renderClanFamilyButton'
-if (-not $paint426) { $v426Bad += "(c) renderClanFamilyButton is gone from the root form - nothing decides which of the two buttons shows the value (SPEC V209, V426c)" }
+# (b) the union is BACK, built once inside its markers, and is what the map mirrors
+if (-not $UNION_REGION.Success) { $v433Bad += "(b) the CLANFAMILY_UNION markers are gone from the root form - the one button offers a list that is built nowhere (SPEC V433b, V209)" }
+elseif (-not $PICKER.ContainsKey('clanFamily')) { $v433Bad += "(b) the map never mirrored PICKER_LIST['clanFamily'] - V408 would answer 'no such list' for the one picker of the line (SPEC V433b)" }
 else {
-    $pb426 = NoComments $paint426
-    foreach ($n426 in @('dynclan', 'dynfamily')) { if ($pb426 -cnotmatch "\b$n426\b") { $v426Bad += "(c) renderClanFamilyButton never names $n426 - a button nothing paints keeps its authored label with a value sitting in the field (SPEC V426c, V383a)" } }
-    if ($pb426 -notmatch 'PICKER_LIST\["family"\]') { $v426Bad += "(c) renderClanFamilyButton never reads PICKER_LIST[family] - whatever it asks instead is a second owner of which species a name came from (SPEC V426c, I145d, V412b, V135)" }
-    if ($pb426 -match 'string\.(find|match|sub)\s*\(') { $v426Bad += "(c) renderClanFamilyButton tells a family from a clan by picking the NAME apart - the value already carries which list it came from (SPEC V426c, I143b)" }
+    $want433 = @($PICKER['clan']).Count + @($PICKER['family']).Count
+    if (@($PICKER['clanFamily']).Count -ne $want433 -or $want433 -lt 84) { $v433Bad += "(b) the union counts $(@($PICKER['clanFamily']).Count) and clan + family count $want433 (floor 84) - the picker offers less than the two lists, or the parse broke (SPEC V433b, V209)" }
 }
-
-# (d) the union has no reader and is gone - a list nobody reads is B55's dead data
-$rootNoC426 = NoComments $rootLfmTxt
-if ($rootNoC426 -match 'PICKER_LIST\["clanFamily"\]' -or $rootLfmTxt -match 'CLANFAMILY_UNION_BEGIN') { $v426Bad += "(d) PICKER_LIST['clanFamily'] is back on the root form - the union lost its only reader in T954, and a list nobody reads is the dead data B55 cost a round to find (SPEC V426d, B55, V208)" }
-
-# (e) the Revenant row belongs to the FAMILY list
-$rev426 = LuaFn $rootTxt 'mfRevenantShown'
-if (-not $rev426) { $v426Bad += "(e) mfRevenantShown is gone from the root form (SPEC V209, V413)" }
-elseif ((NoComments $rev426) -match 'MF\.list\s*==\s*"clanFamily"') { $v426Bad += "(e) mfRevenantShown still tests MF.list against clanFamily - that list is no more, so the Revenant row would show for no picker at all (SPEC V426e, V413a)" }
-
-# (f) the four phrases of I145g are keyed in both halves, and the two they replaced are gone
-foreach ($p426 in @('Clan', 'Family', 'Select Clan', 'Select Family')) {
-    if (-not $ptK.Contains($p426)) { $v426Bad += "(f) '$p426' has no [pt] key - the line would read English to a player reading Portuguese (SPEC I145g, V9, V10)" }
-    if (-not $enK.Contains($p426)) { $v426Bad += "(f) '$p426' has no [en] key (SPEC I145g, V28)" }
+# (c) the kind follows the NAME, and the pertinence test has ONE body
+$kind433 = LuaFn $rootTxt 'mfKind'
+$isFam433 = LuaFn $rootTxt 'isFamilyName'
+if (-not $isFam433) { $v433Bad += "(f) isFamilyName is gone from the root form - the one body of the species question has no owner (SPEC V433c, V209)" }
+elseif ((NoComments $isFam433) -notmatch 'PICKER_LIST\["family"\]') { $v433Bad += "(c) isFamilyName does not read PICKER_LIST[family] - whatever it asks instead is a second owner of which species a name came from (SPEC V433c, V412b, V135)" }
+if (-not $kind433) { $v433Bad += "(c) mfKind is gone from the root form - the pane would read the authored kind for a family name and open descClan on it (SPEC V433c)" }
+else {
+    $kb433 = NoComments $kind433
+    if ($kb433 -notmatch 'MF\.list\s*==\s*"clanFamily"\s+and\s+isFamilyName\(name\)') { $v433Bad += "(c) mfKind does not ask isFamilyName on the clanFamily list - the family module is unreachable from the one button again (SPEC V433c)" }
+    if ($kb433 -notmatch 'return\s+"Family"') { $v433Bad += "(c) mfKind never answers 'Family' - the kind is what reaches desc<KIND> (SPEC V433c)" }
 }
-foreach ($p426 in @('Clan/Family', 'Select Clan/Family')) {
-    if ($ptK.Contains($p426) -or $enK.Contains($p426)) { $v426Bad += "(f) '$p426' is still keyed in localization.lang - the phrase has no reader since T954, and a key nobody reads is the same dead data as the union (SPEC I145g)" }
+$rootNoC433 = NoComments $rootTxt
+if ($rootNoC433 -match 'descFor\(MF\.field,\s*MF\.mod\b') { $v433Bad += "(c) the pane still hands descFor the authored MF.mod - a family name opens descClan, which does not hold it (SPEC V433c)" }
+if ($rootNoC433 -notmatch 'descFor\(MF\.field,\s*mfKind\(name\)') { $v433Bad += "(c) the pane does not hand descFor mfKind(name) - the ONE place the kind is decided is bypassed (SPEC V433c, V135)" }
+# one body: outside isFamilyName and the union's own loop, nothing reads PICKER_LIST["family"]
+$total433 = ([regex]::Matches($rootNoC433, 'PICKER_LIST\["family"\]')).Count
+$inFam433 = 0; if ($isFam433) { $inFam433 = ([regex]::Matches((NoComments $isFam433), 'PICKER_LIST\["family"\]')).Count }
+$inUni433 = 0; if ($UNION_REGION.Success) { $inUni433 = ([regex]::Matches((NoComments $UNION_REGION.Groups[1].Value), 'PICKER_LIST\["family"\]')).Count }
+$extra433 = $total433 - $inFam433 - $inUni433
+if ($extra433 -gt 0) { $v433Bad += "(c) PICKER_LIST[family] is read $extra433 time(s) outside isFamilyName and the union loop - a second loop over the family list is a second owner of the species question (SPEC V433c, V135)" }
+$paint433 = LuaFn $rootTxt 'renderClanFamilyButton'
+if (-not $paint433) { $v433Bad += "(f) renderClanFamilyButton is gone from the root form (SPEC V209, V429)" }
+else {
+    $pb433 = NoComments $paint433
+    if ($pb433 -cnotmatch '\bdynclanFamily\b') { $v433Bad += "(a) renderClanFamilyButton never names dynclanFamily - a button nothing paints keeps its authored label (SPEC V433a, V429)" }
+    if ($pb433 -match 'string\.(find|match|sub)\s*\(') { $v433Bad += "(c) renderClanFamilyButton tells a family from a clan by picking the NAME apart - the value already carries which list it came from (SPEC V433c, V412b)" }
 }
-
-if ($v426Bad) { foreach ($b426 in ($v426Bad | Select-Object -First 12)) { Fail "V426 $b426" } }
-else { Pass "V426 the Clan/Family line is dynclan and dynfamily over the one field clanFamily, each with its own list and kind, the value shown by pertinence in the family list, the union gone, the Revenant row on the family list, and the four phrases keyed in both halves" }
+# (d) the Revenant row belongs to the union's picker again
+$rev433 = LuaFn $rootTxt 'mfRevenantShown'
+if (-not $rev433) { $v433Bad += "(f) mfRevenantShown is gone from the root form (SPEC V209, V413)" }
+elseif ((NoComments $rev433) -notmatch 'MF\.list\s*==\s*"clanFamily"') { $v433Bad += "(d) mfRevenantShown does not test MF.list against clanFamily - the Revenant row would show for no picker on the sheet (SPEC V433d, V413a)" }
+# (g) the two phrases of the line are keyed in both halves, and the four of T954 are gone
+foreach ($p433 in @('Clan/Family', 'Select Clan/Family')) {
+    if (-not $ptK.Contains($p433)) { $v433Bad += "(g) '$p433' has no [pt] key - the line would read English to a player reading Portuguese (SPEC V9, V10)" }
+    if (-not $enK.Contains($p433)) { $v433Bad += "(g) '$p433' has no [en] key (SPEC V28)" }
+}
+foreach ($p433 in @('Clan', 'Family', 'Select Clan', 'Select Family')) {
+    if ($ptK.Contains($p433) -or $enK.Contains($p433)) { $v433Bad += "(g) '$p433' is still keyed in localization.lang - the phrase has no reader since T972, and a key nobody reads is dead data (SPEC I145g, B55)" }
+}
+if ($v433Bad) { foreach ($b433 in ($v433Bad | Select-Object -First 12)) { Fail "V433 $b433" } }
+else { Pass "V433 the Clan/Family line is dynclanFamily over the union clanFamily (kind Clan), the union is built inside its markers and mirrored, mfKind answers Family by isFamilyName - the one body of the species question - and the Revenant row asks clanFamily" }
 # ---- V431: the two FIXED lines of the picker wear the empty invitation - italic at 0.80 ----
 # SPEC V431, I148a, T967, user 2026-09-05 (4th batch). `-- Remove --` and `-- Custom --` are
 # not names and not values: they are the way OUT of a row and the way to a name of your own,
@@ -19470,12 +19579,13 @@ if ($v430Bad) { foreach ($b in $v430Bad) { Fail "V430 $b" } }
 else { Pass "V430 all $($v430Painters.Count) translating painters ($(($v430Painters.Keys | Sort-Object) -join ', ')) are reached by a dataLink that observes 'language', with $($V430_EXEMPT.Count) named exemption(s)" }
 
 # ---- V432: descClan and descFamily are MECHANICS derived from the sheet's own tables ------
-# SPEC V432, I148d, T850 (Family here; T971 extends the roster to Clan), user 2026-09-05. The
+# SPEC V432, I148d, T850 (Family) and T971 (Clan), user 2026-09-05. The
 # owner asked the ? of a clan or a family to say what the book STATS - the Disciplines and the
 # Weakness - and nothing else. Both facts already have an owner on the root form: CLANS holds
-# every trio (SPEC I17) and FAMILY_WEAKNESS every family sentence (SPEC V412f), so the module is
-# DERIVED from them by research/gen_traits_desc.ps1 and this rule reads the two back against each
-# other. A module that drifted from its table would show one trio in the pane and fill another
+# every trio (SPEC I17) and FAMILY_WEAKNESS every family sentence (SPEC V412f); the clan sentence
+# has no owner on the sheet - the box shows FAMILY only (V412d) - so research/clan_weakness.tsv
+# (T970) owns it in both languages. The module is DERIVED from them by research/gen_traits_desc.ps1
+# and this rule reads it back against each. A module that drifted from its table would show one trio in the pane and fill another
 # into the slots (V135 with the player watching). An OPEN trio (choice/open in CLANS) carries the
 # book's phrase from research/clan_disc_open.tsv instead of three names.
 #
@@ -19484,10 +19594,22 @@ else { Pass "V430 all $($v430Painters.Count) translating painters ($(($v430Paint
 # prose to block 3 -> red on (a). Probe: reorder two ENTRIES -> green, order is not the subject.
 $V432_KINDS = @(
     [pscustomobject]@{ Kind = 'Family'; List = 'family'; Marker = 'FAMILY_DESC'; Weak = 'table' }
+    [pscustomobject]@{ Kind = 'Clan';   List = 'clan';   Marker = 'CLAN_DESC';   Weak = 'tsv' }
 )
 $v432Bad = @()
 $v432Seen = 0
 $v432Open = @{}
+# the clan sentences, both halves, keyed by the picker value (T970). Zero-guarded below: a tsv that
+# parsed to nothing would let leg (c) pass on every clan by vacancy (B7).
+$v432Tsv = @{}
+$tsv432 = Join-Path $PSScriptRoot 'research\clan_weakness.tsv'
+if (Test-Path -LiteralPath $tsv432) {
+    foreach ($l432 in [System.IO.File]::ReadAllLines($tsv432, [System.Text.Encoding]::UTF8)) {
+        if ($l432 -eq '' -or $l432.StartsWith('#')) { continue }
+        $c432 = $l432 -split "`t"
+        if ($c432.Count -ge 5) { $v432Tsv[$c432[0]] = @{ en = $c432[3]; pt = $c432[4] } }
+    }
+}
 $open432 = Join-Path $PSScriptRoot 'research\clan_disc_open.tsv'
 if (Test-Path -LiteralPath $open432) {
     foreach ($l432 in [System.IO.File]::ReadAllLines($open432, [System.Text.Encoding]::UTF8)) {
@@ -19498,6 +19620,7 @@ if (Test-Path -LiteralPath $open432) {
 }
 # (e) zero-guard FIRST: the two tables every entry is read against
 if ($null -eq $clanEntries -or $clanEntries.Count -lt 84) { $v432Bad += "(e) CLANS parsed to $(@($clanEntries).Count) entries and it holds 61 clans + 23 families - the trio every module line is read against is missing (SPEC V432e, V209, B7)" }
+if ($v432Tsv.Count -lt 61) { $v432Bad += "(e) research/clan_weakness.tsv parsed to $($v432Tsv.Count) row(s) and the clan list has 61 - leg (c) would pass the clans by vacancy (SPEC V432e, T970, B7)" }
 if ($null -eq $vals412 -or $vals412.Count -eq 0) { $v432Bad += "(e) FAMILY_WEAKNESS read back empty - leg (c) would compare every family sentence against nothing (SPEC V432e, V412f, B7)" }
 foreach ($k432 in $V432_KINDS) {
     $names432 = @(@($PICKER[$k432.List]) | Where-Object { $_ -ne '' })
@@ -19549,6 +19672,11 @@ foreach ($k432 in $V432_KINDS) {
                     if ($lang432 -eq 'en') { $wantW432 = $sent432 } elseif ($ptVal.ContainsKey($sent432)) { $wantW432 = $ptVal[$sent432] }
                     if ($weak432 -ne $wantW432) { $v432Bad += "(c) [$lang432] '$n432' says '$($weak432.Substring(0, [Math]::Min(40, $weak432.Length)))...' and the box says '$($wantW432.Substring(0, [Math]::Min(40, $wantW432.Length)))...' - one weakness, two voices (SPEC V432c, V412f, V135)" }
                 }
+            }
+            elseif ($k432.Weak -eq 'tsv') {
+                # (c) for a CLAN the sentence is the tsv's, both halves, byte for byte (SPEC V432c, T970)
+                if (-not $v432Tsv.ContainsKey($n432)) { $v432Bad += "(c) '$n432' has no row in research/clan_weakness.tsv to read against (SPEC V432c, T970)" }
+                elseif ($weak432 -ne $v432Tsv[$n432][$lang432]) { $v432Bad += "(c) [$lang432] '$n432' says '$($weak432.Substring(0, [Math]::Min(40, $weak432.Length)))...' and clan_weakness.tsv says '$($v432Tsv[$n432][$lang432].Substring(0, [Math]::Min(40, $v432Tsv[$n432][$lang432].Length)))...' - the pane drifted from its owner (SPEC V432c, V135)" }
             }
         }
     }

@@ -31,7 +31,7 @@
 			chapter, with Gargoyles as four rows (SPEC I17). The empty first entry is the one
 			every picker carries (SPEC V15).
 		-->
-		<comboBox name="cboClan" left="0" top="0" width="215" height="25" visible="false" enabled="false" field="clan"/>
+		<comboBox name="cboClan" left="0" top="0" width="230" height="25" visible="false" enabled="false" field="clan"/>
 		<!--
 			Layout grid (SPEC T41, V26, V27). Everything closes on x=1345 / y=866.
 

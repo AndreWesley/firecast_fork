@@ -125,11 +125,24 @@ function Entry($name, $title, $page, $disc, $weak, $lang) {
 }
 
 # Family: name<TAB>book<TAB>pag_verbete<TAB>pag_weakness<TAB>note (research/family_source.tsv).
-$SRC = @{}
-foreach ($r in (Rows (Join-Path $PSScriptRoot 'family_source.tsv'))) { $SRC[$r[0]] = @{ book = $r[1]; page = $r[2] } }
+$SRC_FAMILY = @{}
+foreach ($r in (Rows (Join-Path $PSScriptRoot 'family_source.tsv'))) { $SRC_FAMILY[$r[0]] = @{ book = $r[1]; page = $r[2] } }
+# Clan: name<TAB>book<TAB>pag_impressa<TAB>corpo (research/clan_body_en.tsv) - book and page of the
+# write-up for block 1; the body is the prose T848 extracted and block 3 does not carry it (I148d).
+$SRC_CLAN = @{}
+foreach ($r in (Rows (Join-Path $PSScriptRoot 'clan_body_en.tsv'))) { $SRC_CLAN[$r[0]] = @{ book = $r[1]; page = $r[2] } }
+# Clan weakness: name<TAB>book<TAB>pag<TAB>en<TAB>pt (research/clan_weakness.tsv, T970). The clan
+# sentence has no owner on the root form - the box of the Ghoul tab shows FAMILY only (V412d) - so
+# the tsv IS the owner, in both languages, and V432(c) reads the module back against it.
+$WEAK_CLAN = @{}
+foreach ($r in (Rows (Join-Path $PSScriptRoot 'clan_weakness.tsv'))) {
+    if ($r.Count -ne 5) { throw "clan_weakness.tsv: '$($r[0])' has $($r.Count) fields, not 5" }
+    $WEAK_CLAN[$r[0]] = @{ en = $r[3]; pt = $r[4] }
+}
 
 $KINDS = @(
-    @{ Kind = 'Family'; List = 'family'; Marker = 'FAMILY_DESC'; Task = 'T850'; What = 'Revenant family traits' }
+    @{ Kind = 'Family'; List = 'family'; Marker = 'FAMILY_DESC'; Task = 'T850'; What = 'Revenant family traits'; Src = $SRC_FAMILY; SrcFile = 'family_source.tsv'; Weak = 'table' }
+    @{ Kind = 'Clan';   List = 'clan';   Marker = 'CLAN_DESC';   Task = 'T971'; What = 'Clan traits';            Src = $SRC_CLAN;   SrcFile = 'clan_body_en.tsv';   Weak = 'tsv' }
 )
 foreach ($k in $KINDS) {
     $list = PickerList $k.List
@@ -140,9 +153,10 @@ foreach ($k in $KINDS) {
             "-- One entry per item of PICKER_LIST[""$($k.List)""], keyed by the value the sheet SAVES, byte for"
             '-- byte (SPEC V24). Block 3 is MECHANICS and nothing else - the Disciplines and the Weakness -'
             '-- because that is what the owner asked the ? to say (SPEC I148d). The trio is read off CLANS'
-            '-- and the family sentence off FAMILY_WEAKNESS, both on the root form: the module is DERIVED'
-            '-- from them and V432 reads it back against them, so a drift shows up as a red gate and not'
-            '-- as a pane that disagrees with the slots (SPEC V135).'
+            '-- on the root form; the weakness sentence comes off FAMILY_WEAKNESS (family, root form) or'
+            '-- research/clan_weakness.tsv (clan, T970): the module is DERIVED from them and V432 reads it'
+            '-- back against them, so a drift shows up as a red gate and not as a pane that disagrees'
+            '-- with the slots (SPEC V135).'
             '--'
             '-- Three blocks separated by two blank lines (SPEC I21): source, name, body. The book title'
             '-- does not translate and neither does the name in block 2 - it is the key; only p./pag. does.'
@@ -156,12 +170,18 @@ foreach ($k in $KINDS) {
         )
         $seen = 0
         foreach ($name in $list) {
-            if (-not $SRC.ContainsKey($name)) { throw "'$name' has no row in family_source.tsv" }
-            if (-not $BOOK_TITLE.ContainsKey($SRC[$name].book)) { throw "book code '$($SRC[$name].book)' of '$name' has no title here" }
-            if (-not $WEAKNESS.ContainsKey($name)) { throw "'$name' has no FAMILY_WEAKNESS row" }
-            $weak = $WEAKNESS[$name]
-            if ($lang -eq 'pt') { $weak = Pt $weak }
-            $lines += Entry $name $BOOK_TITLE[$SRC[$name].book] $SRC[$name].page (DiscLine $name $lang) $weak $lang
+            $src = $k.Src
+            if (-not $src.ContainsKey($name)) { throw "'$name' has no row in $($k.SrcFile)" }
+            if (-not $BOOK_TITLE.ContainsKey($src[$name].book)) { throw "book code '$($src[$name].book)' of '$name' has no title here" }
+            if ($k.Weak -eq 'table') {
+                if (-not $WEAKNESS.ContainsKey($name)) { throw "'$name' has no FAMILY_WEAKNESS row" }
+                $weak = $WEAKNESS[$name]
+                if ($lang -eq 'pt') { $weak = Pt $weak }
+            } else {
+                if (-not $WEAK_CLAN.ContainsKey($name)) { throw "'$name' has no row in clan_weakness.tsv" }
+                $weak = $WEAK_CLAN[$name][$lang]
+            }
+            $lines += Entry $name $BOOK_TITLE[$src[$name].book] $src[$name].page (DiscLine $name $lang) $weak $lang
             $seen++
         }
         $lines += "`t`t`t`t-- <<< $($k.Marker)_END"

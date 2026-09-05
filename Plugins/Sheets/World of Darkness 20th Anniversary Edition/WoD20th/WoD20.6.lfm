@@ -22,8 +22,7 @@
 				["Select Affiliation"] = "Selecionar Afiliação",
 				["Select Hedge Path"] = "Selecionar Caminho de Magia Estática",
 				["Select Road"] = "Selecionar Estrada",
-				["Select Clan"] = "Selecionar Clã",
-				["Select Family"] = "Selecionar Família",
+				["Select Clan/Family"] = "Selecionar Clã/Família",
 				["Select Phenomenon"] = "Selecionar Fenômeno",
 				["Select Hedge Ritual"] = "Selecionar Ritual de Magia Estática",
 				["Select Flaw"] = "Selecionar Defeito",
@@ -142,8 +141,7 @@
 				["<"] = "<",
 				[">"] = ">",
 				["X"] = "X",
-				["Clan"] = "Clã",
-				["Family"] = "Família",
+				["Clan/Family"] = "Clã/Família",
 				["BLOOD POOL"] = "RESERVA DE SANGUE",
 				["REVENANT WEAKNESS"] = "FRAQUEZA DE REVENANTE",
 				["Courage"] = "Coragem",
@@ -1025,6 +1023,7 @@
 				["Dominate Malkavians"] = "Malkavianos de Dominação",
 				["Followers of Set"] = "Seguidores de Set",
 				["Gangrel"] = "Gangrel",
+				["Gangrel (Marine)"] = "Gangrel (Marinho)",
 				["Gargoyles (Modern)"] = "Gárgulas (Era Moderna)",
 				["Gargoyles (Scout)"] = "Gárgulas (Batedoras)",
 				["Gargoyles (Sentinel)"] = "Gárgulas (Sentinelas)",
@@ -1039,17 +1038,17 @@
 				["Maeghar"] = "Maeghar",
 				["Malkavian"] = "Malkaviano",
 				["Malkavian Antitribu"] = "Malkavianos Antitribu",
-				["Mariners"] = "Marinheiros",
 				["Nagaraja"] = "Nagaraja",
 				["Noiad"] = "Noiad",
 				["Nosferatu"] = "Nosferatu",
 				["Nosferatu Antitribu"] = "Nosferatu Antitribu",
-				["Old Clan Tzimisce"] = "Tzimisce do Clã Antigo",
+				["Old Clan Tzimisce"] = "Antigo Clã Tzimisce",
 				["Caitiff"] = "Caitiff",
 				["Panders"] = "Panders",
 				["Ravnos"] = "Ravnos",
 				["Ravnos Antitribu"] = "Ravnos Antitribu",
 				["Salubri"] = "Salubri",
+				["Salubri (Wu Zao / Watchers)"] = "Salubri (Wu Zao / Observadores)",
 				["Salubri Antitribu"] = "Salubri Antitribu",
 				["Samedi"] = "Samedi",
 				["Serpents of the Light"] = "Serpentes da Luz",
@@ -1064,7 +1063,6 @@
 				["Ventrue"] = "Ventrue",
 				["Ventrue Antitribu"] = "Ventrue Antitribu",
 				["Warrior Setites"] = "Seguidores de Set: Guerreiros",
-				["Wu Zao"] = "Wu Zao",
 				["Basarab"] = "Basarab",
 				["Bratovich (Dark Ages)"] = "Bratovich (Idade das Trevas)",
 				["Bratovitch (Modern)"] = "Bratovitch (Era Moderna)",
@@ -2651,7 +2649,7 @@
 
 				local names = {
 					dynhedgeAffiliation = true, edtHedgeAffiliation = true,
-					dynclan = true, dynfamily = true, edtClanFamily = true,
+					dynclanFamily = true, edtClanFamily = true,
 				};
 
 				local found = {};
@@ -2663,8 +2661,7 @@
 				local on = {
 					dynhedgeAffiliation = sheet.stManualAffiliation ~= true,
 					edtHedgeAffiliation = sheet.stManualAffiliation == true,
-					dynclan             = sheet.stManualClanFamily ~= true,
-					dynfamily           = sheet.stManualClanFamily ~= true,
+					dynclanFamily       = sheet.stManualClanFamily ~= true,
 					edtClanFamily       = sheet.stManualClanFamily == true,
 				};
 

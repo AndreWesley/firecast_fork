@@ -1,5 +1,35 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## ⚑ COMECE AQUI — 184ª rodada (2026-09-05, tarde). **5º lote: `/ck:spec` + `/ck:build --all`: §T973 §T974 §T972 §T970 §T971 CONSTRUÍDAS & FECHADAS (gate `-Build` VERDE 15:22; 15 mutações RODADAS, todas VERMELHAS); INSTALADO 15:33**
+
+### ✔ INSTALADO 2026-09-05 15:33 c/ o Firecast fechado (`rdk -i` offline): instalado & `output/` em **2.788.713 B**, mesmo tamanho (os `descClan_*` perderam 130 KB de prosa, por isso menor que o de 12:06)
+### ⚠ 1 pergunta ABERTA em §C, ⊥ bloqueou: §Q70 (prefixo `Family: ` no botão `Clan/Family` — construído pela saída (b), SEM prefixo; se o user quiser (a), é 1 linha em `renderClanFamilyButton`).
+### ⚠ **⊥ commitado** — working tree: `SPEC.md` `HANDOFF.md` gate `WoD20th.lfm` `WoD20.1.lfm` `WoD20.6.lfm` `WoD20.11.lfm` `localization.lang` `descClan_{en,pt}.lua` `research/{README.md, gen_traits_desc.ps1, clan_body_en.tsv, clan_body_pt.tsv, clan_disc.tsv, clan_disc_open.tsv}` + NOVO `research/clan_weakness.tsv` + APAGADO `research/gen_clan_desc.ps1` + o `.rpk` de `output/`.
+### ⊥ pedir `--all`: as ~82 §T abertas seguem sendo TESTE/PROBE em Firecast [USER].
+### ▶ TESTES DE TELA c/ o build (depois de instalar): Ghoul → 1 botão `Select Clan/Family` (Clã/Família) sobre clãs + famílias · `Basarab` → box `REVENANT WEAKNESS` c/ a fraqueza & a pane do picker c/ `Disciplines: … ↵↵ Weakness: …` de FAMÍLIA · `Assamite` → box `-- no weakness --` & pane c/ `Celerity, Obfuscate, Quietus` + a fraqueza do core p.49 · ficha salva c/ `Wu Zao`/`Mariners` abre já como `Salubri (Wu Zao / Observadores)`/`Gangrel (Marinho)` (migração §V434) · `Old Clan Tzimisce` traduz `Antigo Clã Tzimisce`.
+
+**Estado:** gate **VERDE** (`-Build` 15:22) · `rdk -l` OK · `output/` **2.788.714 B** · **⊥ instalado** · **⊥ commitado**.
+
+### ⚑ O QUE A 184ª FECHOU
+
+| §T | o quê |
+|---|---|
+| T973 | `Wu Zao` → `Salubri (Wu Zao / Watchers)` & `Mariners` → `Gangrel (Marine)` em 10 arquivos + `CLAN_RENAMED` & o ramo de migração no topo de `renderClanFamilyButton`; **§V434 nasce**; `cboClan` 215 → 230 (§B157: a conta esqueceu a seta & o 2º leitor da lista) |
+| T974 | pt `Antigo Clã Tzimisce` (`.lang` + `PT`) |
+| T972 | `DOMINATOR` volta a 2 fileiras (39/64) c/ 1 botão `dynclanFamily` sobre a UNIÃO (de volta do git, marcadores); `isFamilyName` (1 corpo) + `mfKind(name)` na pane (`descFor(MF.field, mfKind(name), …)`); `mfRevenantShown` → `"clanFamily"`; rosters/`.lang` de volta; gate: **§V433 nasce** (no lugar de V426), V294(a) volta, espelho `$PICKER['clanFamily']` + exceção V201 voltam, V407/V274/V413/`$BARE_DYN` p/ 1 botão, V408 por pertinência, + V224 (10→8), V360d, V412b (§B158) |
+| T970 | `research/clan_weakness.tsv` (61, en verbatim + pt à mão) & 7 linhas em `clan_disc_open.tsv` (8 c/ Keskinen; `Children of Osiris` é trio aberto — §I148d corrigido); cache `%TEMP%\wod_books_txt` reconstruído p/ core/lob/bh/anarch |
+| T971 | `gen_traits_desc.ps1` c/ o par `Clan` (`$KINDS` de 2, `Weak = 'tsv'`); `descClan_*` regerados (só mecânica); `gen_clan_desc.ps1` apagado; V432 c/ 2 kinds + perna (c) do tsv + zero-guard |
+
+**Bateria (15, tudo VERMELHO):** V434 (a)(b)(b)(d) · V433 (a)(b)(c)(c)(d) + V408 · V432 (b)(a)(b)(c).
+
+### ⚠ LIÇÕES DA 184ª
+- **PowerShell: função que imprime `"  rep $label"` sem `Write-Host` DEVOLVE o rótulo junto com o texto** — 2 arquivos (`WoD20th.lfm`, `research/README.md`) foram salvos c/ os rótulos na frente & tiveram de ser cortados. Rótulo = `Write-Host`, sempre.
+- **`$a + '}' + $nl + @(...) -join $nl` é `(… + @(...)) -join`** — o `+` vence & o array vira 1 linha com espaços; o `#` de um comentário engoliu as chaves do gate (ParserError). Parêntese em volta do `-join`.
+- **`@(FuncaoQueDevolve ,$lista)` embrulha a lista num elemento só** — `$x = Funcao …; foreach ($e in $x)` é a forma que o gate já usa (V408 ficou vermelho por isso).
+- **Mutação de marcador: `_M2` no fim ainda CONTÉM o marcador** — a regex casou & a mutação ficou verde à toa; apagar o marcador de verdade.
+- **O hook barra `Remove-Item` na mesma linha de um `\f` literal** (texto do spec) — separar a remoção em chamada própria.
+- **Conta de largura de item de picker: `NeededPx + ARROW(24)`, & todo leitor da lista conta** (`cboClan` dormente também) — §B157.
+
 ## ⚑ COMECE AQUI — 183ª rodada (2026-09-05, manhã). **`/ck:spec` do 4º lote + `/ck:build`: §T967 §T968 §T969 §T850 CONSTRUÍDAS & FECHADAS (gate `-Build` VERDE, 7 mutações + 1 sonda RODADAS, 0 sonda de host); ficam §T970 (research) & §T971 (depende dela)**
 
 ### ✔ INSTALADO 2026-09-05 11:49 c/ o Firecast fechado (`rdk -i`): instalado & `output/` em **2.839.752 B**, mesmo tamanho

@@ -3,9 +3,10 @@
 -- One entry per item of PICKER_LIST["family"], keyed by the value the sheet SAVES, byte for
 -- byte (SPEC V24). Block 3 is MECHANICS and nothing else - the Disciplines and the Weakness -
 -- because that is what the owner asked the ? to say (SPEC I148d). The trio is read off CLANS
--- and the family sentence off FAMILY_WEAKNESS, both on the root form: the module is DERIVED
--- from them and V432 reads it back against them, so a drift shows up as a red gate and not
--- as a pane that disagrees with the slots (SPEC V135).
+-- on the root form; the weakness sentence comes off FAMILY_WEAKNESS (family, root form) or
+-- research/clan_weakness.tsv (clan, T970): the module is DERIVED from them and V432 reads it
+-- back against them, so a drift shows up as a red gate and not as a pane that disagrees
+-- with the slots (SPEC V135).
 --
 -- Three blocks separated by two blank lines (SPEC I21): source, name, body. The book title
 -- does not translate and neither does the name in block 2 - it is the key; only p./pag. does.
