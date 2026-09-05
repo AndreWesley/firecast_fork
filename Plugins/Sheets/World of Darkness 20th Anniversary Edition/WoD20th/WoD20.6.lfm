@@ -22,7 +22,8 @@
 				["Select Affiliation"] = "Selecionar Afiliação",
 				["Select Hedge Path"] = "Selecionar Caminho de Magia Estática",
 				["Select Road"] = "Selecionar Estrada",
-				["Select Clan/Family"] = "Selecionar Clã/Família",
+				["Select Clan"] = "Selecionar Clã",
+				["Select Family"] = "Selecionar Família",
 				["Select Phenomenon"] = "Selecionar Fenômeno",
 				["Select Hedge Ritual"] = "Selecionar Ritual de Magia Estática",
 				["Select Flaw"] = "Selecionar Defeito",
@@ -88,6 +89,7 @@
 				["Blood Sorcery: Rituals"] = "Feitiçaria de Sangue: Rituais",
 				["Bon Vivant"] = "Bon Vivant",
 				["Book"] = "Livro",
+				["BOOK"] = "LIVRO",
 				["Bravo"] = "Valentão",
 				["Brawl"] = "Briga",
 				["BRAWLING CHART"] = "TABELA DE COMBATE",
@@ -132,6 +134,7 @@
 				["Contrary"] = "Contrário",
 				["Conveyance"] = "Transporte",
 				["Cost"] = "Custo",
+				["COST"] = "CUSTO",
 				["DOMINATOR"] = "DOMINADOR",
 				["Max Discipline Level"] = "Nível Máx. de Disciplina",
 				["-"] = "-",
@@ -139,7 +142,8 @@
 				["<"] = "<",
 				[">"] = ">",
 				["X"] = "X",
-				["Clan/Family"] = "Clã/Família",
+				["Clan"] = "Clã",
+				["Family"] = "Família",
 				["BLOOD POOL"] = "RESERVA DE SANGUE",
 				["REVENANT WEAKNESS"] = "FRAQUEZA DE REVENANTE",
 				["Courage"] = "Coragem",
@@ -222,11 +226,13 @@
 				["Fanatic"] = "Fanático",
 				["Fascination"] = "Fascinação",
 				["Fears"] = "Medos",
+				["FEARS"] = "MEDOS",
 				["Fetish"] = "Fetiche",
 				["FETISHES"] = "FETICHES",
 				["Finance"] = "Finanças",
 				["Firearms"] = "Armas de Fogo",
 				["Flaw"] = "Defeito",
+				["FLAWS"] = "DEFEITOS",
 				["Follower"] = "Seguidor",
 				["Font"] = "Fonte",
 				["Fortune"] = "Fortuna",
@@ -241,6 +247,7 @@
 				["Glory"] = "Glória",
 				["Gnosis"] = "Gnose",
 				["Goals"] = "Metas",
+				["GOALS"] = "METAS",
 				["Grifter"] = "Esperto",
 				["Guide"] = "Guia",
 				["GUIDES"] = "GUIAS",
@@ -283,6 +290,7 @@
 				["KNOWLEDGES"] = "CONHECIMENTOS",
 				["Language"] = "Idioma",
 				["Languages"] = "Idiomas",
+				["LANGUAGES"] = "IDIOMAS",
 				["Larceny"] = "Furto",
 				["Law"] = "Direito",
 				["Leader"] = "Líder",
@@ -313,12 +321,14 @@
 				["MENTOR"] = "MENTOR",
 				["Mercenary"] = "Mercenário",
 				["Merit"] = "Qualidade",
+				["MERITS"] = "QUALIDADES",
 				["MERITS AND FLAWS"] = "QUALIDADES E DEFEITOS",
 				["Metis Deformity"] = "Deformidade de Impuro",
 				["Mind Shields"] = "Escudos Mentais",
 				["Modern Nights"] = "Noites Modernas",
 				["Monster"] = "Monstro",
 				["Moral Flaws"] = "Falhas Morais",
+				["MORAL FLAWS"] = "FALHAS MORAIS",
 				["Motivation"] = "Motivação",
 				["Name"] = "Nome",
 				["name"] = "Nome",
@@ -332,6 +342,7 @@
 				["Nothing bought yet"] = "Nada comprado ainda",
 				["Not enough experience to buy that dot"] = "Experiência insuficiente para comprar esse ponto",
 				["Notes"] = "Anotações",
+				["NOTES"] = "ANOTAÇÕES",
 				["NUMINA"] = "NÚMINAS",
 				["NUMINA & OTHER TRAITS"] = "NUMINA E OUTROS TRAÇOS",
 				["HEDGE MAGIC PATHS"] = "CAMINHOS DE MAGIA ESTÁTICA",
@@ -379,6 +390,7 @@
 				["Pack Name"] = "Matilha",
 				["Pack Totem"] = "Totem",
 				["Page"] = "Página",
+				["PAGE"] = "PÁGINA",
 				["Past Lives"] = "Vidas Passadas",
 				["Patron"] = "Patrono",
 				["Patron (1)"] = "Patrono (1)",
@@ -405,6 +417,7 @@
 				["Pragmatist"] = "Pragmático",
 				["Precognition"] = "Precognição",
 				["Prelude"] = "Prelúdio",
+				["PRELUDE"] = "PRELÚDIO",
 				["Primal-Urge"] = "Inst. Primitivo",
 				["Programmer: Andre (Styllern)"] = "Programador: André (Styllern)",
 				["Prophet"] = "Profeta",
@@ -504,7 +517,6 @@
 				["That path needs its blood sorcery on the sheet"] = "Essa trilha precisa da feitiçaria de sangue dela na ficha",
 				["That ritual is above what its blood sorcery allows"] = "Esse ritual passa do que a feitiçaria de sangue dele permite",
 				["That ritual needs its blood sorcery on the sheet"] = "Esse ritual precisa da feitiçaria de sangue dele na ficha",
-				["Theme"] = "Tema",
 				["Theme:"] = "Tema:",
 				["Theology"] = "Teologia",
 				["There is a new version of this plugin. Install it?"] = "Há uma nova versão desse plugin. Deseja instalar?",
@@ -527,7 +539,7 @@
 				["Update"] = "Atualizar",
 				["Version"] = "Versão Atual",
 				["Version: 0.1.1"] = "Versão: 0.1.1",
-				["Victorian Era"] = "Era Vitoriana",
+				["Victorian Age"] = "Era Vitoriana",
 				-- Latin, and the book leaves it Latin inside English prose - so the entry is the SAME
 				-- string on both sides (SPEC I17). The key still has to exist: V10 collects every picker
 				-- item into the visible set, and a name with no key fails there whether it translates or
@@ -2622,11 +2634,15 @@
 			-- The flags are fail-closed: nil is not true, so a sheet saved before this round opens
 			-- with the pickers showing (SPEC V80, V89, V175).
 			--
-			-- `visible` AND `enabled`, on the same two lines, for the four of them (SPEC V274d).
+			-- `visible` AND `enabled`, on the same two lines, for the five of them (SPEC V274d).
 			-- Writing only `visible` leaves an invisible control taking Tab focus, which is the bug
 			-- that shows up in no screenshot - the same pairing cboClan is authored with.
 			--
-			-- xpFind from the ROOT and not the tab: the two pairs live in WoD20.7 and WoD20.11,
+			-- FIVE since T954, not four: the clanFamily side is a TRIO - two picker buttons over
+			-- one field and the typed twin - and the storyteller's flag swaps BOTH buttons for the
+			-- edit, never one of them (SPEC I145e, V274d amended, V426).
+			--
+			-- xpFind from the ROOT and not the tab: the two groups live in WoD20.7 and WoD20.11,
 			-- two tabs apart, and `form.<name>` does not cross an <import> (SPEC V143, B9).
 			function renderManualEntry(from)
 				wodTrace("renderManualEntry");
@@ -2634,19 +2650,20 @@
 
 				local names = {
 					dynhedgeAffiliation = true, edtHedgeAffiliation = true,
-					dynclanFamily = true, edtClanFamily = true,
+					dynclan = true, dynfamily = true, edtClanFamily = true,
 				};
 
 				local found = {};
 
 				xpFind(rootOf(from), names, found);
 
-				-- Which of the four is the one on show. The picker is the DEFAULT side of each
-				-- pair, so it reads the flag negated and the typed twin reads it straight.
+				-- Which of the five is on show. The picker is the DEFAULT side of each group, so
+				-- it reads the flag negated and the typed twin reads it straight.
 				local on = {
 					dynhedgeAffiliation = sheet.stManualAffiliation ~= true,
 					edtHedgeAffiliation = sheet.stManualAffiliation == true,
-					dynclanFamily       = sheet.stManualClanFamily ~= true,
+					dynclan             = sheet.stManualClanFamily ~= true,
+					dynfamily           = sheet.stManualClanFamily ~= true,
 					edtClanFamily       = sheet.stManualClanFamily == true,
 				};
 
@@ -3017,9 +3034,9 @@
 					boxCorner = { type = "bevel", radius = 18 },
 				},
 
-				-- Was "Victorian Era (Dark)" until the 15th round. The suffix went with the
+				-- Was "Victorian Era (Dark)" until the 15th round and "Victorian Era" until T957 (SPEC I146b): the suffix went with the
 				-- light variant it existed to distinguish; the palette itself is untouched.
-				["Victorian Era"] = {
+				["Victorian Age"] = {
 					form       = "dark",
 					fontFamily = "Georgia",
 					fill = {
@@ -3311,6 +3328,15 @@
 			local ORN_BOXR  = 14;      -- the radius V68 authors on every section box
 			local ORN_OUT   = 5;       -- outer rule, in from the box edge
 			local ORN_IN    = 9;       -- inner rule
+
+			-- The six frames under the XP numbers (SPEC V417, I144e) wear the palette's CORNER but
+			-- never its radius as declared: 18 on a 25px-high frame would eat the frame. Named, the
+			-- way sectionBox names the avatar pair, and never by fill - the frames are #0A0A0A and
+			-- not the box black, which is exactly why sectionBox passes them over (SPEC V427a, V427d).
+			local XP_FRAME = {
+				bgTotalXP = true, bgSpentXP = true, bgCurrentXP = true,
+				bgCurrentXPMain = true, bgCurrentXPNumina = true, bgCurrentXPGhoul = true,
+			};
 			local ORN_ARM   = 40;      -- corner reach along each edge
 			local ORN_FLEUR = 150;     -- an edge run shorter than this carries no centre motif
 			local ORN_KAPPA = 0.5523;  -- cubic approximation of a quarter arc
@@ -4804,6 +4830,22 @@
 							paint(c, "yradius", (bc ~= nil and bc.radius) or ry, ry);
 						end;
 
+						-- The six XP number frames, by NAME (SPEC V427, T960). The palette's cornerType and
+						-- the SMALLER of its radius and the authored one: Modern Nights bevels at the frame's
+						-- own 6, the Classical Age steps at its 1, and the two eras that declare no boxCorner
+						-- fall back to what the XML authored, exactly as the boxes above do. The `or` on each
+						-- line is the way back out (SPEC V316c, V427b, V427c).
+						if XP_FRAME[nm] then
+							local bc = t.boxCorner;
+							local ct = authored(c, "cornerType");
+							local rx = authored(c, "xradius");
+							local ry = authored(c, "yradius");
+
+							paint(c, "cornerType", (bc ~= nil and bc.type) or ct, ct);
+							paint(c, "xradius", (bc ~= nil and math.min(bc.radius, rx)) or rx, rx);
+							paint(c, "yradius", (bc ~= nil and math.min(bc.radius, ry)) or ry, ry);
+						end;
+
 						-- The filigree rides the same walk and the same authored value the fill does,
 						-- so the frame and the box can never disagree about which era is in force.
 						ornament(c, fill, t.ornament);
@@ -4931,8 +4973,8 @@
 				and gave the name to the contemporary palette. Every value paints now, so there
 				is no way back to the sheet as the XML authors it (SPEC C, 16th round).
 			-->
-			<label left="20" top="95" width="80" height="20" text="Theme" horzTextAlign="center"/>
-			<comboBox name="cboSheetTheme" left="100" top="95" width="300" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Era', 'Dark Ages', 'Classical Age'}"/>
+			<label left="20" top="95" width="80" height="20" text="Age" horzTextAlign="center"/>
+			<comboBox name="cboSheetTheme" left="100" top="95" width="300" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}"/>
 			<dataLink field="sheetTheme" defaultValue="Modern Nights">
 				<event name="onChange">
 					if sheet == nil then return end;

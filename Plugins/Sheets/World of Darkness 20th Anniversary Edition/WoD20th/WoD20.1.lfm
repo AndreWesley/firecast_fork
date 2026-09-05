@@ -364,8 +364,8 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="290" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<rectangle name="bgCurrentXPMain" left="120" top="57" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
-			<edit name="edtCurrentXPMain" type="number" decimalPlaces="0" left="120" top="57" width="90" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPMain.text);" transparent="true"/>
+			<rectangle name="bgCurrentXPMain" left="120" top="53" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtCurrentXPMain" type="number" decimalPlaces="0" left="120" top="53" width="90" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPMain.text);" transparent="true"/>
 		</layout>
 
 		<layout left="0" top="110" width="340" height="296">
@@ -713,20 +713,20 @@
 			     user 2026-08-31 ask 6). renderRoadPair writes both lefts and the label's width
 			     from ROAD_LABEL_W at every language change.
 
-			     What is AUTHORED here is the LONGER of the two - pt, 65px at left=29 - and not
+			     What is AUTHORED here is the LONGER of the two - pt, 80px at left=30 - and not
 			     the English the sheet is written in: V16/V25 and V351(c) read the XML, and a
 			     label authored at the English width would be a clipped `CAMINHO` sitting in the
 			     file waiting for someone to open the sheet in pt. Declaring the worst case and
 			     letting the renderer shrink it is what HEALTH already does with its ten-row
 			     height (SPEC V49) - the file says the biggest it can ever be, and Lua takes it
 			     down. Nothing is measured against the English case except the screen. -->
-			<label name="lblRoad" left="29" top="15" width="65" height="24" text="ROAD" horzTextAlign="trailing" vertTextAlign="center"/>
-			<button name="btnQroad" left="99" top="15" width="20" height="24" text="?" onClick="popOpen(self, 'Road', sheet['road'], nil, 'road');"/>
-			<button name="dynroad" left="124" top="15" width="176" height="24" fontSize="12" text="Select Road" onClick="mfOpen(self, 'road', 'road', 'Road');"/>
+			<label name="lblRoad" left="30" top="15" width="80" height="24" text="ROAD" horzTextAlign="trailing" vertTextAlign="center"/>
+			<button name="btnQroad" left="115" top="15" width="20" height="24" text="?" onClick="popOpen(self, 'Road', sheet['road'], nil, 'road');"/>
+			<button name="dynroad" left="140" top="15" width="160" height="24" fontSize="12" text="Select Road" onClick="mfOpen(self, 'road', 'road', 'Road');"/>
 			<!-- The typed twin, one field and two widgets with exactly one visible (SPEC I71, V274).
 			     Authored state IS the flag off - visible AND enabled - because invisible-and-enabled
 			     still takes Tab focus, which no screenshot shows (SPEC V274c, V274d). -->
-			<edit name="edtRoad" left="124" top="15" width="176" height="24" field="road" visible="false" enabled="false"/>
+			<edit name="edtRoad" left="140" top="15" width="160" height="24" field="road" visible="false" enabled="false"/>
 			<layout left="40" top="44" width="250" height="25" >
 				<Advantages field="humanity"/>
 			</layout>
@@ -855,6 +855,9 @@
 	<event name="onShow">
 		wodTrace("WoD20.1.onShow");
 		renderXPBoxes(self);
+		-- Both events, like renderXPBoxes (SPEC V429b, I146g, T962): onNodeReady alone leaves the
+		-- authored "Select Speciality" on screen whenever the sheet is not bound yet.
+		renderSpecialities(self);
 	</event>
 
 	<event name="onNodeReady">

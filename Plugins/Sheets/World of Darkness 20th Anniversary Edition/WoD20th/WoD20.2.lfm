@@ -215,12 +215,12 @@
 
 		<layout left="369" top="0" width="536" height="337">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="40" top="15" width="264" height="20" text="Merit" horzTextAlign="center"/>
-			<label left="304" top="15" width="117" height="20" text="Book" horzTextAlign="center"/>
+			<label left="40" top="15" width="264" height="20" text="MERITS" horzTextAlign="center"/>
+			<label left="304" top="15" width="117" height="20" text="BOOK" horzTextAlign="center"/>
 			<!-- Column renamed to Page on request. The field is still type_* : renaming a
 			     field drops what is already saved in existing sheets (SPEC V2). -->
-			<label left="421" top="15" width="45" height="20" text="Page" horzTextAlign="center"/>
-			<label left="466" top="15" width="50" height="20" text="Cost" horzTextAlign="center"/>
+			<label left="421" top="15" width="45" height="20" text="PAGE" horzTextAlign="center"/>
+			<label left="466" top="15" width="50" height="20" text="COST" horzTextAlign="center"/>
 
 			<layout left="20" top="36" width="496" height="25" >
 				<MeritPicked sub="merit" num="m0" lbl="Select Merit"/>
@@ -259,10 +259,10 @@
 
 		<layout left="369" top="342" width="536" height="337">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="40" top="15" width="264" height="20" text="Flaw" horzTextAlign="center"/>
-			<label left="304" top="15" width="117" height="20" text="Book" horzTextAlign="center"/>
-			<label left="421" top="15" width="45" height="20" text="Page" horzTextAlign="center"/>
-			<label left="466" top="15" width="50" height="20" text="Cost" horzTextAlign="center"/>
+			<label left="40" top="15" width="264" height="20" text="FLAWS" horzTextAlign="center"/>
+			<label left="304" top="15" width="117" height="20" text="BOOK" horzTextAlign="center"/>
+			<label left="421" top="15" width="45" height="20" text="PAGE" horzTextAlign="center"/>
+			<label left="466" top="15" width="50" height="20" text="COST" horzTextAlign="center"/>
 
 			<layout left="20" top="36" width="496" height="25" >
 				<MeritPicked sub="flaw" num="f0" lbl="Select Flaw"/>

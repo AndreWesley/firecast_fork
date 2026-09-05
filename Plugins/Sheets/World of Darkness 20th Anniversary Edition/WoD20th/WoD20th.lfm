@@ -551,37 +551,13 @@
 			PICKER_LIST["clanDisc"] = PICKER_LIST["disc"];
 			PICKER_LIST["secPath"]  = PICKER_LIST["mainPath"];
 
-			-- The fourth key stopped being an alias in the 107th round (SPEC I29b, T510). Clan and
-			-- family are two AUTHORED lists now - the clan picker is going to be shown somewhere
-			-- else without the families - and only this dropdown offers both, so what it gets is
-			-- their UNION, built once here and never written again.
-			--
-			-- Three invariants all say the same thing about the shape. V201 wants PICKER_LIST
-			-- constant: this is born in the constructor and nothing writes it afterwards, which is
-			-- exactly as constant as the two lists standing behind it. V208 forbids two tables with
-			-- the same content: the union holds neither list's content. V211c calls an alias
-			-- identity, and that is why the families are NOT appended to `clan` - a push there
+			-- There is NO fourth key. `clanFamily` was a UNION of clan + family built here from the
+			-- 107th round to T954 (SPEC I29b, T510, V294a), because one dropdown offered both; the
+			-- Ghoul tab has one button per list since T954 (SPEC I145a, V426d) and the union lost its
+			-- only reader - mfOpen. A list nobody reads is the dead data B55 cost a round to find, so
+			-- it left in the same commit. The families are still NOT appended to `clan`: a push there
 			-- would grow the Main tab's clan picker with them, which is what B50 already paid for
-			-- once.
-			--
-			-- The local is the point: writing straight into PICKER_LIST["clanFamily"][n] would be a
-			-- table growing inside the map, and V294c reads the source for exactly that shape.
-			-- >>> CLANFAMILY_UNION_BEGIN (SPEC V294 - the gate finds this region by MARKER)
-			local clanFamilyUnion = {};
-			local clanFamilyCount = 0;
-
-			for i = 1, #PICKER_LIST["clan"], 1 do
-				clanFamilyCount = clanFamilyCount + 1;
-				clanFamilyUnion[clanFamilyCount] = PICKER_LIST["clan"][i];
-			end;
-
-			for i = 1, #PICKER_LIST["family"], 1 do
-				clanFamilyCount = clanFamilyCount + 1;
-				clanFamilyUnion[clanFamilyCount] = PICKER_LIST["family"][i];
-			end;
-
-			PICKER_LIST["clanFamily"] = clanFamilyUnion;
-			-- <<< CLANFAMILY_UNION_END
+			-- once (SPEC V211c, V294c).
 
 			-- Which hedge paths an affiliation FAVOURS, and it is the same block of the book the
 			-- casting attribute comes from - `Favored Attributes:` and `Favored Paths:` are two
@@ -1997,7 +1973,7 @@
 					skills     = {"Animal Ken", "Crafts", "Drive", "Etiquette", "Firearms", "Larceny", "Martial Arts", "Meditation", "Melee", "Performance", "Research", "Stealth", "Survival"},
 					knowledges = {"Academics", "Computer", "Cosmology", "Enigmas", "Esoterica", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
 				},
-				["Victorian Era"] = {
+				["Victorian Age"] = {
 					talents    = BASE_TALENTS,
 					skills     = {"Animal Ken", "Crafts", "Etiquette", "Firearms", "Larceny", "Martial Arts", "Meditation", "Melee", "Performance", "Research", "Ride", "Stealth", "Survival"},
 					knowledges = {"Academics", "Cosmology", "Enigmas", "Esoterica", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
@@ -4944,7 +4920,7 @@
 			-- twice (SPEC V135). Custom AND clanFamily, both: the other eight lists have no
 			-- revenants in them, and a book entry carries a weakness of its own.
 			function mfRevenantShown()
-				return MF.custom == true and MF.list == "clanFamily";
+				return MF.custom == true and MF.list == "family";
 			end;
 
 			-- Paints the pair from MF.revenant. It never READS the widgets: MF.revenant is the
@@ -5363,7 +5339,7 @@
 			-- italic and dimmed, so the eye reads "nothing here" before it reads the word. A FILLED
 			-- row reads its value plain, in the language in force, at whatever size it takes to fit -
 			-- a button clips the way a comboBox does, and a name cut in half is worse than a name one
-			-- point smaller. 0.60 is neither of the two dimming numbers of I43/V244 and is not trying
+			-- point smaller. 0.80 is the second of the two Lua dimming numbers of I43/V244 (T962) and is not trying
 			-- to be: those say "read-only", this one says "not filled in".
 			function mfLabel(ctrl, value, fallback, lang)
 				if ctrl == nil then return; end;
@@ -5389,7 +5365,7 @@
 
 				ctrl.text = empty;
 				ctrl.fontStyle = "italic";
-				ctrl.opacity = 0.60;
+				ctrl.opacity = 0.80;
 				ctrl.fontSize = fitSize(empty, ctrl.width);
 			end;
 
@@ -5564,7 +5540,7 @@
 				["Servants of Anushin-Rawan"]   = "In the presence of a vampire descended from Anushin-Rawan they are compelled to protect that Ventrue as if blood bound, for 10 nights minus their Willpower.",
 				["Szantovich"]                  = "Addictive personalities: exposed to a sensual experience that has weakened them, a Willpower roll to do anything but pursue it, and Willpower may not be spent to resist the addiction.",
 				["Vlaszy"]                      = "Every Vlaszy swears a Blood Oath to a Fiend upon reaching the age of majority.",
-				["Zantosa"]                     = "Exposed to a particularly pleasurable experience, a Willpower roll or they become obsessed with it. They may not spend Willpower to resist a supernatural power that entices them to a new pleasure.",
+				["Zantosa"]                     = "Exposed to a pleasurable experience, a Willpower roll or they become obsessed with it. They may not spend Willpower to resist a supernatural power that entices them to a new pleasure.",
 			};
 
 			-- ONE reader, exactly as familyCap is the one reader of the ceiling (SPEC V337c, V135,
@@ -5676,13 +5652,29 @@
 			-- It lives on the ROOT form for the reason the rest of renderClanDisc does: the button is
 			-- drawn in WoD20.11, inside a tab a table with Show Ghoul off never opens, and a painter
 			-- that may not be there cannot be what keeps the sheet right (SPEC V95, B26).
+			--
+			-- TWO buttons over ONE field since T954 (SPEC I145d, V426c). Which of them shows the
+			-- value is PERTINENCE in PICKER_LIST["family"] - the same question familyWeakness asks
+			-- and for the same reason: the two lists share no name (SPEC I143b, MEASURED), so the
+			-- value says by itself which list it came from, and a prefix, a flag or a second list
+			-- would each be a second owner of that fact (SPEC V412b, V135). The other button goes
+			-- back to its invitation, which is what mfLabel does with nil.
 			function renderClanFamilyButton(from)
 				if sheet == nil or from == nil then return; end;
 
-				local found = xpFind(tabRootOf(from), { dynclanFamily = true }, {});
+				local found = xpFind(tabRootOf(from), { dynclan = true, dynfamily = true }, {});
 				local lang  = (sheet.language == "pt") and "pt" or "en";
+				local fam   = PICKER_LIST["family"];
+				local isFam = false;
 
-				mfLabel(found["dynclanFamily"], sheet.clanFamily, "Select Clan/Family", lang);
+				if fam ~= nil then
+					for i = 1, #fam, 1 do
+						if fam[i] == sheet.clanFamily then isFam = true; break; end;
+					end;
+				end;
+
+				mfLabel(found["dynclan"],   (not isFam) and sheet.clanFamily or nil, "Select Clan",   lang);
+				mfLabel(found["dynfamily"], isFam and sheet.clanFamily or nil,       "Select Family", lang);
 			end;
 
 			function renderClanDisc(from)
@@ -5758,7 +5750,7 @@
 			-- There is no text-measuring API on this sheet and I114i already found that reading
 			-- ctrl.width from Lua is unmeasured - so measuring at runtime would be a new mechanism
 			-- bought for precision the screen gives away.
-			ROAD_LABEL_W = { en = 26, pt = 65 };
+			ROAD_LABEL_W = { en = 45, pt = 80 };
 
 			-- The interior of the ROAD box is 20..310, so 290 wide, and the control is 205 with a
 			-- 5px gap to the label - the gap every other pair on the sheet uses.
@@ -5790,11 +5782,11 @@
 				-- leads the ENTRY and not the row, which is the shape the affiliation already wears
 				-- (label - ? - button, SPEC I107a1) and the one BACKGROUNDS wore first.
 				--
-				-- The group grew 25 - the ? plus its gutter - and it still centres: 65 + 5 + 20 + 5 +
-				-- 176 is 271 inside 290, so the WIDEST language leaves 9px of air on the left and 10 on
+				-- The group grew 25 - the ? plus its gutter - and it still centres: 80 + 5 + 20 + 5 +
+				-- 160 is 270 inside 290, so the WIDEST language leaves 10px of air on the left and 10 on
 				local w  = ROAD_LABEL_W[sheet.language or "en"] or ROAD_LABEL_W["en"];
 				local qw = 20;
-				local cw = 176;
+				local cw = 160;
 				local left = 20 + math.floor((290 - (w + 5 + qw + 5 + cw)) / 2);
 
 				lbl.width = w;
@@ -6653,6 +6645,11 @@
 		-- never chose one - renderMaxDisc gains a ceiling where it had none - and that is the
 		-- change that was asked for, not a side effect (SPEC V420).
 		if sheet ~= nil and sheet.dominatorGen == nil then setField("dominatorGen", "13"); end;
+
+		-- T957 renamed the theme's VALUE (SPEC I146b, V52e): a sheet saved on the old key would
+		-- fall to the DEFAULT palette by V52 and grow a fifth item in the combo (SPEC C). Rewritten
+		-- once, here, and this line is the one place the old spelling is still allowed to exist.
+		if sheet ~= nil and sheet.sheetTheme == "Victorian Era" then setField("sheetTheme", "Victorian Age"); end;
 
 		-- The Game box is locked (SPEC V109), so a value outside its three would sit there
 		-- with nobody able to clear it: one of the four longer names this sheet used to offer,

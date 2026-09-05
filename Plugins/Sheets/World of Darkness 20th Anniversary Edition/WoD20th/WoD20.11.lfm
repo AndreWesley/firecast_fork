@@ -15,8 +15,8 @@
 			function renderRevWeakness(form)
 				if sheet == nil or form == nil then return; end;
 
-				local found = xpFind(tabRootOf(form), { edtRevWeakness = true }, {});
-				local ctrl  = found["edtRevWeakness"];
+				local found = xpFind(tabRootOf(form), { dynRevWeakness = true }, {});
+				local ctrl  = found["dynRevWeakness"];
 
 				if ctrl == nil then return; end;
 
@@ -343,7 +343,7 @@
 		     image is the ONE child claiming the client rect, exactly as in WoD20.12. applyTheme
 		     finds it by the first ten characters of the name, so the number must stay attached. -->
 		<image name="themePaper11" align="client" style="stretch" hitTest="false" visible="false"/>
-		<!-- Two columns of LABEL (20, 342) and two of INPUT (97, 508), and both rows use the
+		<!-- Two columns of LABEL (20, 342) and two of INPUT (97, 508), and every row uses the
 		     same four (SPEC I30, V224). The four moved in the 89th round when Name and Clan/Family
 		     lost 40% and Generation 70% (SPEC I55); the label column went 12 -> 15 with them, and
 		     that 3px is V258, not taste - at 12 the entry column closed 12px from the border and
@@ -361,20 +361,28 @@
 
 		     The two labels on the left say Name and Generation now, and the FIELDS under them did
 		     not change: `dominator` and `dominatorGen` still own the data (SPEC V2 - a rename here
-		     would drop what is already saved on the sheet the user is testing with). -->
-		<layout left="0" top="10" width="578" height="128">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="538" height="20" text="DOMINATOR" horzTextAlign="center"/>
+		     would drop what is already saved on the sheet the user is testing with).
 
-			<label left="20" top="51" width="72" height="24" text="Name"/>
-			<edit left="97" top="51" width="225" height="24" field="dominator"/>
+		     THREE rows since T954, and the box did not grow for it (SPEC I145b, Q65). The two rows
+		     sat at 51 and 83, a step of 32 this box had made up for itself; on the 25 ruler every
+		     other box already keeps (SPEC I124, V370) three rows land at 39/64/89, the content
+		     closes at 113 and the foot is V280a's 15 exactly - so the 128 stays, the band closes
+		     where it closed and the three columns under it never hear about it (SPEC V414). The
+		     third row uses the LEFT pair only: `342..558` is 206 wide and the family with its
+		     `Familia: ` prefix prices at 222, so on the right it would clip (SPEC I143i). -->
+		<layout left="0" top="10" width="590" height="128">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="550" height="20" text="DOMINATOR" horzTextAlign="center"/>
+
+			<label left="20" top="39" width="72" height="24" text="Name"/>
+			<edit left="97" top="39" width="237" height="24" field="dominator"/>
 
 			<!-- cmb, not cbo: pickerItems only touches controls named cbo* (WoD20.6), which is what
 			     lets this one keep an items/values pair that DIFFERS - the ordinal is what the player
 			     reads, the number is what GEN_MAX is keyed by (SPEC I29). Same footing as
 			     cmbHealthLevels: a combo of VALUE, not a picker of prose (SPEC V208 scope). -->
-			<label left="342" top="51" width="156" height="24" text="Generation"/>
-			<comboBox name="cmbDominatorGen" left="508" top="51" width="50" height="24" field="dominatorGen"
+			<label left="354" top="39" width="156" height="24" text="Generation"/>
+			<comboBox name="cmbDominatorGen" left="520" top="39" width="50" height="24" field="dominatorGen"
 			          items="{'', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th'}"
 			          values="{'', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'}"/>
 
@@ -385,43 +393,67 @@
 			     it is why the box could only close at 578 - the prefix and the shrinking of the picker
 			     were both asked for on 2026-09-03 and the prefix wins (SPEC I143i, I143j).
 			     The label opposite is `Nivel Max. de Disciplina` in pt, 24 chars, which V16 prices at
-			     exactly the 156px it now gets - the squeeze took the 9px of slack it used to carry. -->
-			<label left="20" top="83" width="72" height="24" text="Clan/Family"/>
-			<!-- NO ? here, and it is the one picker on the sheet without one (SPEC V407, I140g, user
-			     2026-09-02 item 5 - his word, `e uma excecao`). V365(a) asks every picker for its ?; this
-			     is the named exception, and it cuts both ways - the button coming back reddens V407.
-			     What it pays for: with nothing leading it, the entry opens at 97 and closes at 322, the
-			     same span as <edit field="dominator" /> above, so the two rows of this box are the ONE
-			     grid V224 asks for. The ? was the only reason they were not (SPEC V224, T910). -->
-			<button name="dynclanFamily" left="97" top="83" width="225" height="24" fontSize="12" text="Select Clan/Family" onClick="mfOpen(self, 'clanFamily', 'clanFamily', 'Clan');"/>
+			     exactly the 156px it now gets - the squeeze took the 9px of slack it used to carry.
 
-			<!-- The typed twin of the picker above, one field and two widgets with exactly one of
+			     ONE field, TWO buttons (SPEC I145a, I145c, V426, user 2026-09-04). `Clan/Family` was
+			     one picker over the union of two lists and one kind, `Clan`, which is why the family
+			     module of T850 had no button that could open it (SPEC Q65). The split is two calls to
+			     the SAME mfOpen with the same FIELD and a different list and kind each - no new
+			     mechanism, no new field, no migration. Neither button carries field=: the typed twin
+			     below is the one widget bound to `clanFamily`, so V1 and V2 see exactly what they saw
+			     before, and because the field is ONE, picking a clan clears the family and the other
+			     way round without a line of code - a ghoul serves a domitor WITH a clan or is a
+			     revenant OF a family, never both (SPEC I145c). Which of the two SHOWS the value is
+			     pertinence in PICKER_LIST["family"], asked by renderClanFamilyButton on the root
+			     (SPEC I145d, V426c). The names are derived, not chosen: `dyn` + the list mfOpen is
+			     handed, the way dynroad and dynhedgeAffiliation are (SPEC I145g, V270d). -->
+			<label left="20" top="64" width="72" height="24" text="Clan"/>
+			<!-- NO ? here, on either button, and they are the pickers on the sheet without one (SPEC
+			     V407, I140g, user 2026-09-02 item 5 - his word, `e uma excecao`, said of the LINE, and
+			     the line is two now). V365(a) asks every picker for its ?; this is the named exception,
+			     and it cuts both ways - a ? coming back on either reddens V407.
+			     What it pays for: with nothing leading it, the entry opens at 97 and closes at 322, the
+			     same span as <edit field="dominator" /> above, so the rows of this box are the ONE
+			     grid V224 asks for. The ? was the only reason they were not (SPEC V224, T910). -->
+			<button name="dynclan" left="97" top="64" width="237" height="24" fontSize="12" text="Select Clan" onClick="mfOpen(self, 'clanFamily', 'clan', 'Clan');"/>
+
+			<!-- The typed twin of the two pickers, one field and three widgets with exactly one of
 			     them visible (SPEC I71, V274, user 2026-08-23). It is a DECLARED mirror in SPEC I3
 			     ESPELHOS, not the accidental duplicate V1 refuses.
 
-			     SAME rectangle as the combo on purpose: the flag swaps which of the two the reader
-			     sees, and a second geometry would make that swap move the row.
+			     SAME rectangle as the clan button on purpose: the flag swaps BOTH buttons for this
+			     one edit (SPEC V274d, the trio), and it has to land on one of the two rows - the
+			     first, so a second geometry does not move the row.
 
 			     Authored state IS the flag off - `visible="false" enabled="false"`, both of them,
 			     for the reason cboClan is authored the same way: a control that is invisible and
 			     still enabled takes Tab focus, which is the bug no screenshot shows (SPEC V274c,
 			     V274d). A sheet that never opened the storyteller's tab paints right with no Lua
 			     at all (SPEC V56). -->
-			<edit name="edtClanFamily" left="97" top="83" width="225" height="24" field="clanFamily" visible="false" enabled="false"/>
+			<edit name="edtClanFamily" left="97" top="64" width="237" height="24" field="clanFamily" visible="false" enabled="false"/>
 
 			<!-- Derived, so it has no `field` and is never saved (SPEC I3, V29): a number that can be
 			     recomputed must not be able to disagree with what it was computed from. -->
-			<label left="342" top="83" width="156" height="24" text="Max Discipline Level"/>
-			<label name="lblMaxDisc" left="508" top="83" width="50" height="24" text="-"/>
+			<label left="354" top="64" width="156" height="24" text="Max Discipline Level"/>
+			<label name="lblMaxDisc" left="520" top="64" width="50" height="24" text="-"/>
+
+			<!-- The family half of the split (SPEC V426a). Kind `Family` is what makes descFamily_*
+			     reachable at all - T850 delivers the module, this is the button that opens it. Until
+			     then the box shows V360c's sentence, which is V364a doing what it is for. The saved
+			     FAMILY hangs at the end of the CLAN pool when this sheet opens the other button, and
+			     vice versa: that is V200/V346b appending the row's own value, and it is not a defect
+			     to code around (SPEC I145f). -->
+			<label left="20" top="89" width="72" height="24" text="Family"/>
+			<button name="dynfamily" left="97" top="89" width="237" height="24" fontSize="12" text="Select Family" onClick="mfOpen(self, 'clanFamily', 'family', 'Family');"/>
 		</layout>
 
 		<!-- 405 -> 299 in T936, and the number came off the DOTS and not off the box: the step
 		     between two of them went 28 -> 26, which is the closest the 25px art gets to touching,
 		     and twenty of them then close 259 from the margin (SPEC I143j, Q59). The margins are
 		     V280a's 20 on both sides, so nothing here has slack left to give. -->
-		<layout left="583" top="10" width="299" height="128">
+		<layout left="595" top="10" width="307" height="128">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="259" height="20" text="BLOOD POOL" horzTextAlign="center"/>
+			<label left="20" top="15" width="267" height="20" text="BLOOD POOL" horzTextAlign="center"/>
 
 			<!-- Twenty FREE dots (SPEC V219). They wear the rating art and they are not rating dots:
 			     blood is spent and regained inside a single scene. Nothing here reaches xpClick,
@@ -439,27 +471,27 @@
 			     so it must NOT be loosened to let these through - the gate names them by field
 			     prefix instead (SPEC T509). applyTheme repaints by CLASS, so they follow the palette
 			     with nothing added (MEASURED: WoD20.6, cls == "imageCheckBox"). -->
-			<imageCheckBox left="20" top="54" width="25" height="25" field="bloodPool_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_1', self);"/>
-			<imageCheckBox left="46" top="54" width="25" height="25" field="bloodPool_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_2', self);"/>
-			<imageCheckBox left="72" top="54" width="25" height="25" field="bloodPool_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_3', self);"/>
-			<imageCheckBox left="98" top="54" width="25" height="25" field="bloodPool_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_4', self);"/>
-			<imageCheckBox left="124" top="54" width="25" height="25" field="bloodPool_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_5', self);"/>
-			<imageCheckBox left="150" top="54" width="25" height="25" field="bloodPool_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_6', self);"/>
-			<imageCheckBox left="176" top="54" width="25" height="25" field="bloodPool_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_7', self);"/>
-			<imageCheckBox left="202" top="54" width="25" height="25" field="bloodPool_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_8', self);"/>
-			<imageCheckBox left="228" top="54" width="25" height="25" field="bloodPool_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_9', self);"/>
-			<imageCheckBox left="254" top="54" width="25" height="25" field="bloodPool_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_10', self);"/>
+			<imageCheckBox left="24" top="49" width="25" height="25" field="bloodPool_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_1', self);"/>
+			<imageCheckBox left="50" top="49" width="25" height="25" field="bloodPool_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_2', self);"/>
+			<imageCheckBox left="76" top="49" width="25" height="25" field="bloodPool_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_3', self);"/>
+			<imageCheckBox left="102" top="49" width="25" height="25" field="bloodPool_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_4', self);"/>
+			<imageCheckBox left="128" top="49" width="25" height="25" field="bloodPool_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_5', self);"/>
+			<imageCheckBox left="154" top="49" width="25" height="25" field="bloodPool_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_6', self);"/>
+			<imageCheckBox left="180" top="49" width="25" height="25" field="bloodPool_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_7', self);"/>
+			<imageCheckBox left="206" top="49" width="25" height="25" field="bloodPool_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_8', self);"/>
+			<imageCheckBox left="232" top="49" width="25" height="25" field="bloodPool_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_9', self);"/>
+			<imageCheckBox left="258" top="49" width="25" height="25" field="bloodPool_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_10', self);"/>
 
-			<imageCheckBox left="20" top="84" width="25" height="25" field="bloodPool_11" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_11', self);"/>
-			<imageCheckBox left="46" top="84" width="25" height="25" field="bloodPool_12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_12', self);"/>
-			<imageCheckBox left="72" top="84" width="25" height="25" field="bloodPool_13" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_13', self);"/>
-			<imageCheckBox left="98" top="84" width="25" height="25" field="bloodPool_14" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_14', self);"/>
-			<imageCheckBox left="124" top="84" width="25" height="25" field="bloodPool_15" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_15', self);"/>
-			<imageCheckBox left="150" top="84" width="25" height="25" field="bloodPool_16" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_16', self);"/>
-			<imageCheckBox left="176" top="84" width="25" height="25" field="bloodPool_17" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_17', self);"/>
-			<imageCheckBox left="202" top="84" width="25" height="25" field="bloodPool_18" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_18', self);"/>
-			<imageCheckBox left="228" top="84" width="25" height="25" field="bloodPool_19" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_19', self);"/>
-			<imageCheckBox left="254" top="84" width="25" height="25" field="bloodPool_20" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_20', self);"/>
+			<imageCheckBox left="24" top="79" width="25" height="25" field="bloodPool_11" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_11', self);"/>
+			<imageCheckBox left="50" top="79" width="25" height="25" field="bloodPool_12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_12', self);"/>
+			<imageCheckBox left="76" top="79" width="25" height="25" field="bloodPool_13" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_13', self);"/>
+			<imageCheckBox left="102" top="79" width="25" height="25" field="bloodPool_14" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_14', self);"/>
+			<imageCheckBox left="128" top="79" width="25" height="25" field="bloodPool_15" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_15', self);"/>
+			<imageCheckBox left="154" top="79" width="25" height="25" field="bloodPool_16" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_16', self);"/>
+			<imageCheckBox left="180" top="79" width="25" height="25" field="bloodPool_17" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_17', self);"/>
+			<imageCheckBox left="206" top="79" width="25" height="25" field="bloodPool_18" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_18', self);"/>
+			<imageCheckBox left="232" top="79" width="25" height="25" field="bloodPool_19" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_19', self);"/>
+			<imageCheckBox left="258" top="79" width="25" height="25" field="bloodPool_20" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_20', self);"/>
 		</layout>
 
 		<!--
@@ -478,16 +510,16 @@
 			hides would change the band in runtime, which is the one thing V57 says the geometry
 			never does (SPEC V412d, V375).
 
-			textEditor and not a label: the longest weakness is 221 characters in pt and the widest
+			textEditor and not a label: the longest weakness is 207 characters in pt and the widest
 			this band can ever hand it is 345 of text, so it WRAPS and scrolls the way edtMfDesc
 			does. 385 is what the squeeze of the other three paid for, and the band still closes on
 			the 1408 the three columns below close on - V414 measures that equality (SPEC I143j).
 		-->
-		<layout left="887" top="10" width="385" height="128">
+		<layout left="907" top="10" width="365" height="128">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="345" height="20" text="REVENANT WEAKNESS" horzTextAlign="center"/>
+			<label left="20" top="15" width="325" height="20" text="REVENANT WEAKNESS" horzTextAlign="center"/>
 
-			<textEditor name="edtRevWeakness" left="20" top="40" width="345" height="73" readOnly="true" wordWrap="true" transparent="true" fontSize="12" opacity="0.75" horzTextAlign="center"/>
+			<label name="dynRevWeakness" left="20" top="40" width="325" height="73" wordWrap="true" fontSize="12" horzTextAlign="center" vertTextAlign="center"/>
 		</layout>
 
 		<!--
@@ -510,8 +542,8 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="91" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<rectangle name="bgCurrentXPGhoul" left="20" top="69" width="91" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
-			<edit name="edtCurrentXPGhoul" type="number" decimalPlaces="0" left="20" top="69" width="91" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPGhoul.text);" transparent="true"/>
+			<rectangle name="bgCurrentXPGhoul" left="20" top="64" width="91" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtCurrentXPGhoul" type="number" decimalPlaces="0" left="20" top="64" width="91" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPGhoul.text);" transparent="true"/>
 		</layout>
 
 		<!--
@@ -887,7 +919,7 @@
 	<dataLink field="xpTotal" onChange="renderXPBoxes(self);"/>
 	<dataLink field="dominatorGen" onChange="renderMaxDisc(self);"/>
 
-	<!-- The storyteller flag that swaps this tab's Clan/Family picker for a typed field
+	<!-- The storyteller flag that swaps this tab's Clan and Family pickers for a typed field
 	     (SPEC I71, V274), wired beside the one above and for the same reason: the flag is set
 	     on another tab and every client at the table has to follow it. -->
 	<dataLink field="stManualClanFamily" onChange="renderManualEntry(self);"/>
@@ -988,6 +1020,10 @@
 		renderPathButtons(self);
 		renderRitualButtons(self);
 		renderRevWeakness(self);
+		-- The clan/family pair paints on SHOW too (SPEC V429a, I146g, T962): the root dataLink of
+		-- clanFamily is the only other caller, an EMPTY field never fires it, and a fresh sheet
+		-- used to open on the authored "Select Clan" instead of the dashed invitation.
+		renderClanFamilyButton(self);
 	</event>
 
 	<event name="onNodeReady">

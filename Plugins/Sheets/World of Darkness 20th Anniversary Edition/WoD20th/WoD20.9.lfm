@@ -163,11 +163,11 @@
 			Stacking costs height - the box went 75 -> 95 - which is why the log below starts at 105
 			and still closes the tab on 640.
 		-->
-		<layout left="0" top="0" width="561" height="105">
+		<layout left="0" top="0" width="561" height="120">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="521" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<label left="36" top="43" width="141" height="20" text="Total Experience" horzTextAlign="center"/>
+			<label left="36" top="50" width="141" height="20" text="Total Experience" horzTextAlign="center"/>
 			<!-- All SIX experience numbers stand on a darker ground than the box (SPEC V256 as
 			     amended, V417, user 2026-09-04). It takes THREE things and any one of them alone
 			     does nothing: the rectangle declared BEFORE the edit so it paints behind it,
@@ -182,20 +182,20 @@
 			     is a FIELD frame now - "you type the number here" - and the lock cue is opacity
 			     alone (SPEC V111a): the two locked ones keep 0.75 and the four editable ones carry
 			     no opacity at all, which is what V111(b) already asked for. -->
-			<rectangle name="bgTotalXP" left="61" top="65" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
-			<edit name="edtTotalXP" type="number" decimalPlaces="0" left="61" top="65" width="90" height="25" readOnly="true" opacity="0.75" horzTextAlign="center" vertTextAlign="center" fontSize="14" transparent="true"/>
+			<rectangle name="bgTotalXP" left="61" top="80" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtTotalXP" type="number" decimalPlaces="0" left="61" top="80" width="90" height="25" readOnly="true" opacity="0.75" horzTextAlign="center" vertTextAlign="center" fontSize="14" transparent="true"/>
 
-			<label left="210" top="43" width="141" height="20" text="Spent Experience" horzTextAlign="center"/>
+			<label left="210" top="50" width="141" height="20" text="Spent Experience" horzTextAlign="center"/>
 			<!-- Authored LOCKED, and the lock moves at runtime with the storyteller's flag
 			     (SPEC I44, V245): the sheet has to read right before any Lua runs, and OFF is
 			     what the flag defaults to. Typing here writes a MANUAL line into the log, never
 			     a second number beside it (SPEC V246). -->
-			<rectangle name="bgSpentXP" left="235" top="65" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
-			<edit name="edtSpentXP" type="number" decimalPlaces="0" left="235" top="65" width="90" height="25" readOnly="true" opacity="0.75" horzTextAlign="center" vertTextAlign="center" fontSize="14" transparent="true" onUserChange="xpSetSpent(self, self.edtSpentXP.text);"/>
+			<rectangle name="bgSpentXP" left="235" top="80" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtSpentXP" type="number" decimalPlaces="0" left="235" top="80" width="90" height="25" readOnly="true" opacity="0.75" horzTextAlign="center" vertTextAlign="center" fontSize="14" transparent="true" onUserChange="xpSetSpent(self, self.edtSpentXP.text);"/>
 
-			<label left="384" top="43" width="141" height="20" text="Current Experience" horzTextAlign="center"/>
-			<rectangle name="bgCurrentXP" left="409" top="65" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
-			<edit name="edtCurrentXP" type="number" decimalPlaces="0" left="409" top="65" width="90" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);" transparent="true"/>
+			<label left="384" top="50" width="141" height="20" text="Current Experience" horzTextAlign="center"/>
+			<rectangle name="bgCurrentXP" left="409" top="80" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtCurrentXP" type="number" decimalPlaces="0" left="409" top="80" width="90" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXP.text);" transparent="true"/>
 		</layout>
 
 		<!--
@@ -212,7 +212,7 @@
 			column headings belong to it, the rows belong to the scrollBox below them, and
 			nothing in Lua writes this height any more.
 		-->
-		<layout name="xpLogBox" left="0" top="110" width="561" height="550">
+		<layout name="xpLogBox" left="0" top="125" width="561" height="550">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="521" height="20" text="EXPERIENCE LOG" horzTextAlign="center"/>
 

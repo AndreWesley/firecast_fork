@@ -1,6 +1,76 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## ⚑ COMECE AQUI — 180ª rodada (2026-09-04, tarde). **Fechou §T950 §T951 §T948 §T955; ⊥ ∃ pergunta bloqueante**
+## ⚑ COMECE AQUI — 182ª rodada (2026-09-04, noite). **Construiu §T956..§T965 (10 §T, `--all` do user); §T963 SONDA fechada (§B155); §T966 construída & FECHADA pelo user ("tudo testado, tudo ok"); INSTALADO 10:12 (2.833.520 B)**
+
+### ✔ INSTALADO 2026-09-05 09:59 c/ o Firecast fechado (`rdk -i` offline): instalado & `output/` em **2.833.630 B**, mesmo tamanho
+### ⚠ **§B155 (2026-09-05 manhã): o host ⊥ tem `VertTextAlign` em `textEditor` & a FICHA ⊥ ABRIU** com o build das 09:59 (`_obj_setProp - Unknown property` em `constructNew_frmWoD20th`). Atributo REMOVIDO, §V412(h) INVERTIDA (nenhum `textEditor` declara `vertTextAlign`), §T963 fechada como SONDA, `output/` rebuildado 10:06 (2.833.615 B). **✔ INSTALADO 2026-09-05 10:12 c/ o Firecast fechado (2.833.520 B, ≡ `output/`), gate `-Build` VERDE antes.** ▶ 1º ATO da próxima: **`/ck:research T850`** (o texto das 23 famílias, `descFamily_en/pt.lua`) — é a ÚNICA §T aberta que ⊥ é teste de tela. ▶ 2º: TRIAGEM das 84 §T de teste [USER] (T114…T795): quase todas são de rodadas fechadas há semanas & o user acabou de aprovar a ficha inteira em tela — `/ck:spec` p/ aposentar as que o tempo já respondeu, 1 rodada só, ⊥ construir nada. ▶ **§T966 CONSTRUÍDA na mesma manhã** (gate verde): o texto da fraqueza é `<label name="dynRevWeakness" wordWrap="true" horzTextAlign="center" vertTextAlign="center">` (sem `text=`, sem `opacity`; `renderRevWeakness` escreve `dynRevWeakness`), §V412 (d)(e)(g) leem o rótulo. Fica `~` até a TELA: `Basarab` (1 linha) no MEIO do box & `Szantovich` (4 linhas) inteiro — se a 4ª linha clipar, `height` 73 → 78
+### ▶ 3º ATO: `/ck:research T850` (o texto da lista `family`) — segue sendo a próxima §T aberta que ⊥ é teste do user
+### ⊥ pedir `--all` de novo: das 85 §T abertas, 82 são TESTE/PROBE em Firecast [USER] + T114/T153/T239 (testes antigos) + T850 (research)
+
+**Estado:** gate **VERDE** (`-Build` também, 21:36) · `rdk -l` OK · **INSTALADO** 09:59 · **⊥ commitado** — 16 arquivos no working tree (os 10 `.lfm` tocados, `localization.lang`, `SPEC.md`, gate, `HANDOFF.md`, o `.rpk` de `output/` & `research/family_weakness.tsv`, este último da rodada anterior).
+
+### ⚑ O QUE A 182ª FECHOU (pedidos do user 2026-09-04, 2º & 3º lotes + §Q67)
+
+| §T | o quê |
+|---|---|
+| T956 | `ROAD_LABEL_W = { en = 45, pt = 80 }`, `cw = 160`; XML `lblRoad 30/80` · `btnQroad 115` · `dynroad`/`edtRoad 140/160` |
+| T957 | rótulo `Theme` → `Age` (pt `Idade`); **`Victorian Era` → `Victorian Age` como VALOR** em 9 sítios + 5 do gate; semente de migração no `onNodeReady` da raiz; §V52 perna (e) |
+| T958 | 18 títulos em CAIXA ALTA (`MERITS BOOK PAGE COST` ×2, `LANGUAGES MORAL FLAWS FEARS GOALS PRELUDE`, `NOTES` ×5); 11 chaves no `PT` + `.lang`; gate: `BoxByTitle`, V290/V349/V392 seguem o título novo |
+| T959 | `EXPERIENCE` de `WoD20.9` 105→120, rótulos 43→50, números 65→80, log 110→125 |
+| T960 | roster `XP_FRAME` + bloco em `applyTheme` (canto da paleta, raio `min`); **§V427 nasce**; §V66 EMENDADA (2 cercas) — §B154 |
+| T961 | bolinhas **49/79** (⊥ 50/80: o ímpar cai ABAIXO); §V403 EMENDADA (datum = `height − ORN_IN`, lido do Lua) |
+| T962 | `renderClanFamilyButton` no `onShow` da Ghoul, `renderSpecialities` no `onShow` da Main, `mfLabel` 0,60→**0,80**; **§V429 nasce**; §V244/§V355/§V383 EMENDADAS (§B154 2ª face) |
+| T963 | `vertTextAlign="center"` em `edtRevWeakness`; §V412 perna (h) — **`~` até o Firecast** |
+| T964 | banda `590 · 307 · 365 · 131`: fraqueza cede 20, `DOMINATOR` +12 (coluna de entrada 237), `BLOOD POOL` +8 (bolinhas `left` +4); `$V361_RESIZED` → T964 |
+| T965 | os 3 números de XP no mesmo datum do filete: Main 53 · Numina 66 · Ghoul 64; §V399 EMENDADA (§Q67 "siga") |
+
+**Bateria (11 mutações, 4 lotes, tudo VERMELHO como escrito):** M1-M3 → V427 (a)(c)(b) · M4-M5 → V52(e) (+V22) · M6 → V403 · M7 → V429(a) · M8 → V244+V429(c)+V355+V383 · M9 → V412(h) · M10 → V399 · M11 (sonda, `DOMINATOR` 578 sem pagar) → V27/V361/V239/V280/V298/V414. Gate limpo depois: VERDE.
+
+### ⚠ LIÇÕES DA 182ª
+- **Emendar um NÚMERO do spec ⇒ `grep -F` do literal no gate ANTES de escrever a §T** (§B154): o `0.60` de §V244 morava em V355/V383 e a cerca de canto de §V66 media por subtração sem conhecer o roster de §V427 — 3 rodadas de gate a mais por isso.
+- **A conta de centragem segue a regra da régua, ⊥ a de cabeça:** 14,5 → `⌊⌋` → 49, "o ímpar cai ABAIXO" (§V403). O SPEC dizia 50/80 e o gate corrigiu no 1º build.
+- **`SPEC.md` tinha 2 CR soltos** (emendas da 181ª em §V421/§T946, uma em dobro): regravar por `ReadAllLines` os transforma em linha própria começando com espaço — `grep -c '^ [^ ]' SPEC.md` tem de dar 0 depois de todo script que regrava o spec.
+- **Bateria de mutações em lotes de ≤3** (teto de 10 min do tool), capturar com `*>&1` (o gate escreve com Write-Host) e cada reverso ! ser único (marcar a mutação com `-- M2` / `mutation="M9"`).
+
+---
+
+
+## ⚑ COMECE AQUI — 181ª rodada (2026-09-04, fim de tarde). **Fechou §T954; ⊥ ∃ pergunta bloqueante; INSTALL PENDENTE**
+
+### ▶ O COMANDO: **`/ck:research T850`** — o texto da lista `family` (23 nomes, `descFamily_en/pt.lua`). §T954 já lhe deu o botão: `dynfamily` abre `mfOpen(self, 'clanFamily', 'family', 'Family')` ∴ o módulo nasce COM leitor & §V408 mede o par `(family, Family)` no dia em que o arquivo ∃ em disco (hoje ⊥ ∃ → isenção §V364a, legítima)
+### ⚠ **INSTALL ⊥ FEITO**: o Firecast estava ABERTO (pid 178236) na hora de fechar & a regra é avisar antes (form velho na tela + código novo atrás = sintoma que se disfarça de bug). `rdk -i` da raiz do plugin, com o Firecast fechado, é o 1º ato da próxima rodada. `output/` está em **2.830.462 B** 18:52; o instalado ainda é o de 18:25 (2.829.123 B)
+### ⊥ pedir `--all`: ~82 das abertas são TESTE/PROBE em Firecast [USER]
+
+**Estado:** gate **VERDE** (`-Build` também) · `rdk -l` OK · **⊥ instalado** · **⊥ commitado** — 7 arquivos no working tree (`WoD20.11.lfm` `WoD20.6.lfm` `WoD20th.lfm` `localization.lang` `SPEC.md` gate + o `.rpk` de `output/`).
+
+### ⚑ O QUE A 181ª FECHOU — §T954, o picker só de `clan` (§Q65 saída 2, §I145)
+
+| sítio | o quê |
+|---|---|
+| `WoD20.11.lfm` | `DOMINATOR` c/ **3** fileiras no passo 25 (`39`/`64`/`89`), caixa PARADA em `578×128`, pé **15**. `Clan` + `dynclan` (`'clan'`,`'Clan'`) na 2ª, `Family` + `dynfamily` (`'family'`,`'Family'`) na 3ª, só no par esquerdo. `edtClanFamily` segue dono único, no rect de `dynclan` |
+| `WoD20th.lfm` | a UNIÃO `PICKER_LIST["clanFamily"]` + marcadores SAÍRAM · `mfRevenantShown` lê `"family"` · `renderClanFamilyButton` acha 2 & decide por pertinência em `PICKER_LIST["family"]` (laço inline, o outro botão recebe `nil` → convite) |
+| `WoD20.6.lfm` | `renderManualEntry` c/ **5** nomes (a flag do mestre esconde os 2 botões) · mapa `PT` ganha `Clan` `Family` `Select Clan` `Select Family` & perde os 2 `Clan/Family` |
+| `localization.lang` | as 4 chaves novas nas 2 metades; `Clan/Family` & `Select Clan/Family` saem; `Edit Clan/Family` FICA (checkbox do mestre em `WoD20.10`) |
+| gate | **§V426 nasce** (6 pernas a-f) · V413(a)→`family` · V274 trio (c: `edtClanFamily`≡`dynclan`, `dynfamily` mesma coluna; d: 5 nomes) · V407 nomeia os 2 · V224 = 10 controles, par esquerdo 3/3 & direito 2/2 · V408 roster `@()` · V294(a) & marcadores SAEM · V341(d) SAI · `$BARE_DYN` = `dynclan`,`dynfamily` · V383(b) aceita `<teste> and sheet.X or nil` |
+| `SPEC.md` | `/ck:spec`: **§V294(a) & §V341(d) APOSENTADAS, §V224 emendada** (3 linhas/10 controles) — as 3 diziam que a união ∃ & §V426(d) manda ela sair |
+
+**Bateria de §V426 (M0 + 5 + sonda), tudo como escrito:** M1 kind `Family`→`Clan` = **V426a** (+V408) · M2 `field=` em `dynclan` = **V426b + V1** · M3 `mfRevenantShown` em `"clanFamily"` = **V426e + V413** · M4 união de volta = **V426d** · M5 `string.find` no pintor = **V426c** · sonda largura 225→220 nos 2 = **V426 VERDE**, V224/V407 acendem (quem manda no grid é §V224)
+
+### ⚠ LIÇÕES DA 181ª
+- **`localization.lang` é LF no working tree** (autocrlf=true; git guarda LF & o arquivo NUNCA foi CRLF localmente) — a regra "todo arquivo é CRLF" do CLAUDE.md ⊥ vale p/ ele. Inserir `\r\n` nele deixou 8 linhas mistas; `git diff --stat` é a prova rápida de que o final de linha sobreviveu (contagem de linhas ≈ mudança real).
+- **`rdk -l` da RAIZ do repo sai 1 mudo & ⊥ toca o `.rpk`** — só da raiz do plugin.
+- **A perna (b) de §V383 exige `sheet.X` LITERAL no 2º arg de `mfLabel`** — 2 botões sobre 1 campo ⊥ cabem nessa forma sem que a 1ª ocorrência textual de um deles receba `nil`; a 3ª forma aceita (`<teste> and sheet.X or nil`) ainda nomeia 1 campo só.
+- Script de bateria: filtrar `^FAIL` — linhas `ok` do gate contêm a palavra FAIL & poluem a lista de ids (V175/V245/V274/V385/V79 eram ruído constante).
+
+### ⚑ O QUE SOBROU
+- **§T850** (`/ck:research`, destravada) · **§T239 §T421 §T496**: probes velhas em `~`/`.` — decisão do user · ~82 testes em Firecast [USER].
+- §I145f é esperado & ⊥ é §T: ficha c/ FAMÍLIA salva abre o picker de CLÃ c/ ela pendurada no fim do pool (§V200/§V346b).
+
+**Numeração MEDIDA 2026-09-04 18:55:** próximo §T = **956** · §V = **427** · §B = **154**. Conferir com `grep -o "^B[0-9]*|" SPEC.md | sort -t B -k2 -n | tail -1` antes de usar.
+
+---
+
+## (ARQUIVADO pela 181ª) COMECE AQUI — 180ª rodada (2026-09-04, tarde). **Fechou §T950 §T951 §T948 §T955; ⊥ ∃ pergunta bloqueante**
 
 ### ▶ O COMANDO: **`/ck:build T954`** — o picker só de `clan` (§Q65 saída 2, §I145). Ela destrava §T850
 ### ⊥ pedir `--all`: ~82 das abertas são TESTE/PROBE em Firecast [USER]

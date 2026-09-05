@@ -66,13 +66,13 @@
 		     `baseline` does. That is visibility, not secrecy. -->
 		<layout left="0" top="0" width="440" height="591">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="400" height="20" text="Notes" horzTextAlign="center"/>
+			<label left="20" top="15" width="400" height="20" text="NOTES" horzTextAlign="center"/>
 			<textEditor left="35" top="36" width="370" height="540" field="stNotes1"/>
 		</layout>
 
 		<layout left="445" top="0" width="440" height="591">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="400" height="20" text="Notes" horzTextAlign="center"/>
+			<label left="20" top="15" width="400" height="20" text="NOTES" horzTextAlign="center"/>
 			<textEditor left="35" top="36" width="370" height="540" field="stNotes2"/>
 		</layout>
 
