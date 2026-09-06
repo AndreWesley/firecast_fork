@@ -2587,12 +2587,31 @@ else {
     # V67: one outline width, declared once. The requirement is that the four MATCH, and four
     # copies that agree today can drift tomorrow - so the equality is structural, like
     # HEALTH_MARKS on the root form (SPEC V41).
-    if ($themesBlock -match '(?m)^\s+strokeSize\s*=') { Fail "V67 a palette declares its own strokeSize - the outlines must be one shared width" }
+    #
+    # V67 AMENDED 2026-09-06 (user): the shared width still governs, and there is now ONE declared
+    # way out of it - a palette key named `outline`, fenced by sectionBox so it reaches the boxes
+    # and the avatar frame and nothing else. The fence is what has teeth: THEME_STROKE also draws
+    # the open sub-tab's foot rule (I140b, V404), so an unfenced per-era width halves the only
+    # signal an open tab carries, in an era away from whoever wrote the key (family B6).
+    if ($themesBlock -match '(?m)^\s+strokeSize\s*=') { Fail "V67 a palette declares its own strokeSize - the width is either the shared one or the declared `outline` key, not a third spelling" }
     elseif ($hh6 -notmatch 'local THEME_STROKE = (\d+);') { Fail "V67 THEME_STROKE is not declared" }
     else {
         $null = $hh6 -match 'local THEME_STROKE = (\d+);'
         $strokeVal = $Matches[1]
-        if ($body -notmatch 'paint\(c, "strokeSize", THEME_STROKE') { Fail "V67 applyTheme does not paint the shared width" }
+
+        # The fallback is still THEME_STROKE and the authored value is still the way back out
+        # (V316c): drop either and the eras that declare nothing lose their outline the moment the
+        # Classical has been on, with rdk -l exiting 0 and this gate green (B58, B62).
+        $hairRe = 'paint\(c, "strokeSize", \(hair and t\.outline\) or THEME_STROKE, authored\(c, "strokeSize"\)\);'
+        $fenceRe = 'local hair = t\.outline ~= nil and sectionBox\(c, fill\);'
+        $outlines = [regex]::Matches($themesBlock, '(?m)^\s+outline\s*=\s*([0-9.]+),')
+
+        if ($body -notmatch $hairRe) { Fail "V67 applyTheme does not paint the shared width in the declared shape - `(hair and t.outline) or THEME_STROKE` with the authored value behind it (SPEC V316c)" }
+        elseif ($outlines.Count -gt 0 -and $body -notmatch $fenceRe) {
+            Fail "V67 the per-era outline is not fenced by sectionBox - unfenced it thins EVERY rectangle the era repaints, including the open sub-tab's 3px foot rule, which is the only signal that tab has (SPEC I140b, V404)"
+        }
+        elseif ($outlines.Count -gt 1) { Fail "V67 $($outlines.Count) palettes declare `outline` - the exception is one era wide, and a second is a width nobody asked for in an era nobody asked" }
+        elseif ($outlines.Count -eq 1) { Pass "V67 shared outline width $strokeVal for all $($themeKeys.Count) periods, with one fenced exception of $($outlines[0].Groups[1].Value) on the section boxes" }
         else { Pass "V67 one shared outline width ($strokeVal) for all $($themeKeys.Count) periods" }
     }
 
@@ -14306,8 +14325,8 @@ else {
     else {
         # (a) computed from BOTH sides - the radius off the palette, the inset off the Lua.
         $depth326 = [double]$r326.Groups[1].Value + [double]$murIn326.Groups[1].Value
-        if ($depth326 -ne 16) {
-            $v326Bad += "the Classical rule reaches $depth326 into the box and the round declared 16 - AMENDED by the 124th round, which shrank the step to 1 and with it the overshoot: the rule now sits INSIDE the 20px margin of I73 and under the 23 the filigree respects, and this leg keeps it there. At radius 14 it was 29 and at radius 20 it would be 35, with only the screen to warn (SPEC V326a, I97b, I73)"
+        if ($depth326 -ne 12) {
+            $v326Bad += "the Classical rule reaches $depth326 into the box and the round declared 12 - AMENDED 2026-09-06, when the era's outline went from the shared 3px to its own 1px (V67) and the crown closed up on the edge behind it: the two EMPTY gaps are 2 each (outline to dente, ameia to rule), which is what sets ORN_MUR_OUT and ORN_MUR_IN, and the rule now stops 9 short of the 20px content margin instead of 5. It was 16 from the 124th round, which shrank the step to 1 and killed the overshoot; at radius 14 it was 29 and at radius 20 it would be 35, with only the screen to warn (SPEC V326a, I97b, I73)"
         }
         # (c) the merlon stays INSIDE the rule that frames it.
         if ([double]$murOut326.Groups[1].Value -ge [double]$murIn326.Groups[1].Value) {

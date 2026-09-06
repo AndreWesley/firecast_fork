@@ -3161,7 +3161,8 @@
 					-- seeing 14 on screen). At radius 1 the step is a single pixel, so the outline reads as a
 					-- square 90 degree corner while the SELECTOR stays alive: sectionBox refuses radius <= 0
 					-- and a true zero would drop all 73 boxes out of the ornament walk (SPEC V316a, V278).
-					-- It also pulls the rule back to radius + ORN_MUR_IN = 16, inside the 20px margin of I73
+					-- It also pulls the rule back to radius + ORN_MUR_IN = 12 (16 until 2026-09-06, when the
+					-- thinner outline let the crown close up on the edge), inside the 20px margin of I73
 					-- and the 23 the filigree respects - the overshoot I97b measured at 29 is gone with it.
 					--
 					-- innerLine is no longer a guess: the user read the step on screen in the 124th round,
@@ -3174,6 +3175,19 @@
 					-- on its FIRST value for both roster names, and the corner write sits under that first
 					-- value (SPEC I96b, V324e).
 					boxCorner = { type = "innerLine", radius = 1 },
+
+					-- The HAIRLINE outline, the third key that is geometry rather than colour
+					-- (user 2026-09-06). The mural crown draws in 1px - rule, merlon and tower are
+					-- one path - and the 3px THEME_STROKE around it read as a heavy band with a
+					-- hairline drawing inside, two weights for one frame. Here the frame is ONE.
+					--
+					-- Declared as its own key rather than by moving THEME_STROKE: the shared width
+					-- is what the other three eras wear, and what V67 buys is that they cannot
+					-- drift apart by accident. This is the exception said out loud, and the write
+					-- below is fenced by sectionBox so it reaches the boxes and the avatar frame
+					-- and NOTHING else - THEME_STROKE also draws the open sub-tab's foot rule
+					-- (I140b), and a 1px foot is the only signal an open tab has, halved.
+					outline = 1,
 				},
 			};
 
@@ -3885,8 +3899,10 @@
 			-- MEASURED before drawing (SPEC I94b): deepest ink is the rule on the corner diagonal at
 			-- (ORN_BOXR + ORN_MUR_IN) / sqrt(2) = 20.5, against the 23 the filigree already spends,
 			-- so this is SHALLOWER than the drawing that already exists and the 20px margin of I73 is
-			-- not a new question. The merlon alone reaches 11, and the tower 14 - still under the
+			-- not a new question. The merlon alone reaches 8, and the tower 9 - still under the
 			-- rule that frames it, so the crown's deepest ink is where it always was.
+			-- (2026-09-06 depths. The ORDER between the three never moved, and the tower has stayed
+			-- a pixel clear of the rule through every one of that day's four adjustments.)
 			-- Four corners and four runs, stamped from ONE drawing each, exactly as the filigree and
 			-- the filete are: four hand-authored copies are four things that drift apart.
 			--
@@ -3903,11 +3919,31 @@
 			-- here ORN_OUT and ORN_IN are still reachable and still unread, and ORN_MUR_* are now
 			-- unreachable to everyone else by construction rather than by convention.
 			local function ornCoronaMuralis(w, h, radius)
-				local ORN_MUR_OUT   = 6;    -- the merlon course, in from the box edge
-				local ORN_MUR_IN    = 15;   -- the inner rule
+				-- The DEPTHS are set by the EMPTY GAPS, not the other way round (user 2026-09-06).
+				-- Every number here is an edge-to-edge distance, and a 1px stroke draws centred, so
+				-- each course spends half a pixel on either side of the number it is written as:
+				--
+				--   outline 0 (edge 0.5) --3-- dente 4 ... ameia 8 (edge 8.5) --2-- rule 11
+				--
+				-- The 3 and the 2 are DELIBERATELY different, and this is the whole reason the
+				-- crenellation sits where it does. The sheet's far edges - right and bottom - carry
+				-- their outline one pixel further in than the near ones do, because the near edges
+				-- are measured from the origin and the far ones from w and h. The drawing is
+				-- symmetric; the outline is not. At an outer gap of 2 that difference read as the
+				-- merlon TOUCHING the outline on two sides of every box, so the course was pushed
+				-- one deeper: 3 on the near edges, 2 on the far ones, and no contact anywhere.
+				--
+				-- The rule and the outline were both held FIXED while this moved (user 2026-09-06),
+				-- so the whole adjustment is spent inside the crenellation: RISE pays for the step
+				-- out, which keeps the ameia at 8 and the inner gap at 2 on all four sides, and the
+				-- TOWER pays the same pixel, because its inner face sits at OUT + TOWER and at 6 it
+				-- would land on 10 - edge to edge with the rule at 11, which is the contact this
+				-- round exists to remove, one layer further in.
+				local ORN_MUR_OUT   = 4;    -- the merlon course, in from the box edge
+				local ORN_MUR_IN    = 11;   -- the inner rule
 				local ORN_MUR_STEP  = 12;   -- one merlon plus one embrasure
-				local ORN_MUR_RISE  = 5;    -- how far the merlon stands above its course
-				local ORN_MUR_TOWER = 8;    -- the corner tower, side
+				local ORN_MUR_RISE  = 4;    -- how far the merlon stands above its course
+				local ORN_MUR_TOWER = 5;    -- the corner tower, side (6 before this round, 8 before that)
 
 				-- Where a run at depth d leaves the corner, in from it along the edge. The era cuts its
 				-- corner as innerLine - a STEP, the straight partner of innerRound the way bevel is the
@@ -4797,7 +4833,15 @@
 
 						paint(c, "color", t.fill[normColor(fill)], fill);
 						paint(c, "strokeColor", t.stroke[normColor(line)], line);
-						paint(c, "strokeSize", THEME_STROKE, authored(c, "strokeSize"));
+						-- The shared width, EXCEPT on the boxes of an era that declares its own
+						-- (V67, and the Classical Age is the one - `outline`). The fence is the
+						-- point and not tidiness: THEME_STROKE is also what draws the open sub-tab's
+						-- foot rule (I140b), so an unfenced hairline halves the only signal that
+						-- says which tab is open. The other three palettes declare no `outline`, so
+						-- the `and` short-circuits and they never even ask the selector.
+						local hair = t.outline ~= nil and sectionBox(c, fill);
+
+						paint(c, "strokeSize", (hair and t.outline) or THEME_STROKE, authored(c, "strokeSize"));
 
 						-- The CORNER, and only on the 73 that the SAME selector the ornament uses
 						-- says yes to (SPEC I89b, V316d). Without sectionBox this branch runs on
