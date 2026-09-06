@@ -371,7 +371,7 @@
 		     three columns under it never hear about any of this. -->
 		<layout left="0" top="10" width="590" height="128">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="550" height="20" text="DOMINATOR" horzTextAlign="center"/>
+			<label left="20" top="15" width="550" height="20" text="DOMITOR" horzTextAlign="center"/>
 
 			<label left="20" top="39" width="72" height="24" text="Name"/>
 			<edit left="97" top="39" width="237" height="24" field="dominator"/>
@@ -404,13 +404,24 @@
 			     The button carries no field=: the typed twin below is the one widget bound to
 			     `clanFamily`, so V1 and V2 see exactly what they saw before (SPEC V426b, kept). -->
 			<label left="20" top="64" width="72" height="24" text="Clan/Family"/>
-			<!-- NO ? here, and it is the picker on the sheet without one (SPEC V407, I140g, user
-			     2026-09-02 item 5 - his word, `e uma excecao`). V365(a) asks every picker for its
-			     ?; this is the named exception, and it cuts both ways - a ? coming back reddens V407.
-			     What it pays for: with nothing leading it, the entry opens at 97 and closes at 334,
-			     the same span as <edit field="dominator" /> above, so the rows of this box are the
-			     ONE grid V224 asks for. The ? was the only reason they were not (SPEC V224, T910). -->
-			<button name="dynclanFamily" left="97" top="64" width="237" height="24" fontSize="12" text="Select Clan/Family" onClick="mfOpen(self, 'clanFamily', 'clanFamily', 'Clan');"/>
+			<!-- The ? is BACK and the exception of 2026-09-02 is over (SPEC Q71, I151c, T978, user
+			     2026-09-06: "diminuir o botão do picker"). What paid for its absence was the grid -
+			     the entry opened at 97 and closed at 334, the same span as <edit field="dominator" />
+			     above - and the grid is STILL paid: the entry is read as the ? PLUS the button, the
+			     same span V297 reads on the affiliation row, so it opens at 97 and closes at 334 as
+			     it always did. What shrank is the BUTTON, by the 25 the ? and its gutter take.
+			     212 is enough TODAY and that is a measured statement, not a hope: the widest name
+			     the button can carry is `Bratovich (Idade das Trevas)`, and the `Família: ` prefix
+			     that would push the worst case to 222 was never built (SPEC I149f, Q70 still OPEN).
+			     ⚠ answering Q70 with "build the prefix" makes this button truncate - the two
+			     questions are not independent and whoever answers Q70 has to read Q71 first.
+			     The KIND is resolved from the NAME, not authored: one list holds clans and families
+			     (SPEC I149a, V433c), so the ? asks isFamilyName - the same body mfKind calls, so no
+			     second owner of the species is born (SPEC V135). mfKind itself cannot serve here:
+			     it reads MF.list, which is state of the OPEN box. popOpen returns early on an empty
+			     key, so a sheet with no clan picked opens nothing (SPEC I151c). -->
+			<button name="btnQclanFamily" left="97" top="64" width="20" height="24" text="?" onClick="popOpen(self, isFamilyName(sheet['clanFamily']) and 'Family' or 'Clan', sheet['clanFamily'], nil, 'clanFamily');"/>
+			<button name="dynclanFamily" left="122" top="64" width="212" height="24" fontSize="12" text="Select Clan/Family" onClick="mfOpen(self, 'clanFamily', 'clanFamily', 'Clan');"/>
 
 			<!-- The typed twin of the two pickers, one field and two widgets with exactly one of
 			     them visible (SPEC I71, V274, user 2026-08-23). It is a DECLARED mirror in SPEC I3
@@ -423,7 +434,7 @@
 			     still enabled takes Tab focus, which is the bug no screenshot shows (SPEC V274c,
 			     V274d). A sheet that never opened the storyteller's tab paints right with no Lua
 			     at all (SPEC V56). -->
-			<edit name="edtClanFamily" left="97" top="64" width="237" height="24" field="clanFamily" visible="false" enabled="false"/>
+			<edit name="edtClanFamily" left="122" top="64" width="212" height="24" field="clanFamily" visible="false" enabled="false"/>
 
 			<!-- Derived, so it has no `field` and is never saved (SPEC I3, V29): a number that can be
 			     recomputed must not be able to disagree with what it was computed from. -->

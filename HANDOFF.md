@@ -1,5 +1,175 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## COMECE AQUI - 188a rodada (2026-09-06, noite). **`/ck:build --all`: §T983 & §T984 CONSTRUIDAS & FECHADAS (gate `-Build` VERDE 19:22; M0 + 8 mutacoes + 1 sonda RODADAS); INSTALADO 19:23:45 com o Firecast FECHADO**
+
+### **INSTALADO 2026-09-06 19:23:45** - `output/` & instalado nos MESMOS **2.811.505 B**. O Firecast estava FECHADO (`rdk -i` disse "instalacao offline") assim que a rodada abriu, entao o install do 187a (que ficou pendente) & o desta rodada sairam JUNTOS, num `rdk -i` so (§B103). O instalado velho era o de **2.799.056 B** das 17:20.
+
+### **NAO commitado** - working tree: `SPEC.md` `HANDOFF.md` `verify-hunters-hunted.ps1` `WoD20th.lfm` `WoD20.11.lfm` `WoD20.6.lfm` `localization.lang` + o `.rpk` de `output/` (+ `WoD20.1.lfm` `WoD20.7.lfm` da 186a, tambem nao commitados)
+
+### **NAO ha §T de codigo ABERTA.** Todas as `.` que sobram no §T sao **teste no Firecast [USER]** - tela, nao build. A proxima rodada precisa de pedido novo do user | de um `/ck:spec`.
+
+### DIVIDAS DE SPEC (todas p/ o `/ck:spec`, NENHUMA bloqueia build)
+1. **§I73 diz 68 caixas de secao & o gate mede 69** (herdada da 187a) - o gemeo `mfSearchB` trouxe o proprio fundo. O numero mudou no GATE (§V280 & §V298) & nao na spec.
+2. **A clausula de SONDA de §V438 esta FALSA** (herdada da 186a/187a) - "trocar a ORDEM de 2 nomes dentro do `fixed` de 1 cla ! VERDE" acende §V432(b) nas 2 linguas. A sonda valida & ja RODADA: `"Potence"` entre aspas dentro de um COMENTARIO de `renderClanDisc`.
+3. **NOVA: §I153f ganhou regua & ela mora em §V237, nao em §V440.** A perna do `dataLink` de §V237 passou a exigir `clanFamily` **&** `clanFamilyCustomDisc_1..3` no mesmo `fields=`. §V440 tem 4 pernas fixas na spec & nenhuma delas fala de `dataLink`; sem essa perna, tirar os 3 campos do link seria falha CALADA (§B58/§B62). A spec deve dizer QUEM mede §I153f.
+4. **NOVA: a emenda de §V295a ganhou perna no gate & ela mede 2 coisas.** O bloco §V295 agora deriva o trio de 2 lugares - `name="dynMfClanDisc_N"` no XML (**3**) & o teto do laco de `clanEntry` (**3**) - exige que os 2 CONCORDEM & que `trio + 1 <= CLAN_DISC_ROWS`. Sem isso a emenda de §V295a ("a sintetizada fecha EXATO em 4") era texto sem regua.
+
+### TESTES DE TELA c/ este build (o Firecast ja esta com o `.rpk` novo)
+**§T983 - o trio custom vira as `clanDisc_*`:**
+- **Ghoul (`WoD20.11`) -> `Clan/Family` -> `-- Custom --`**, digitar um nome & escolher **3** disciplinas distintas, NENHUMA delas `Potence`, & dar `OK` no picker de baixo ! as **4** linhas de `Clan Disciplines` lerem **`Potence`** + as 3 escolhidas, nessa ordem (4/4, o teto EXATO de §V295a)
+- MESMO caminho c/ `Potence` entre as 3 (ex.: `Celerity` `Potence` `Fortitude`) ! ler **`Potence` `Celerity` `Fortitude`** & o **4o slot VAZIO** - Potence nao aparece 2x (§V438c)
+- trio `Presence` `Dominate` `Obfuscate` ! **`Potence` `Presence` `Dominate` `Obfuscate`**, 4/4 (os 2 exemplos que o user deu em §I152d)
+- **a TRAVA (§V440d / §Q73.2):** com o trio gravado & a caixa FECHADA, os 4 `clanDisc_*` NAO abrem picker nenhum (salvo `stEditClanDisc` ligado no Storyteller). A porta p/ trocar de ideia e REABRIR o picker de `Clan/Family`
+- **trio VAZIO** (nome digitado & 0 picker preenchido) ! os 4 slots seguem do JOGADOR, abrindo normal - trio vazio nao e entrada (§I152d)
+- **so o trio muda:** reabrir a caixa, trocar UMA disciplina sem tocar no nome & dar `OK` ! os slots REPINTAREM. E o que os 3 campos novos no `dataLink` compram; sem eles a caixa fecharia sobre 4 slots parados, calada
+- **regressao:** escolher um cla de LIVRO depois disso ! os 4 slots voltarem ao trio do livro c/ Potence na frente (`Assamite` ! `Potence` `Celerity` `Obfuscate` `Quietus`)
+
+**§T984 - `Dominator` -> `Domitor`:**
+- aba Ghoul: o titulo da caixa le **`DOMITOR`** nas 2 linguas (o PT NAO traduz - decisao do user)
+- subir uma disciplina acima do que a geracao permite ! o aviso ler `...what the **domitor's** generation allows` / `...a geracao do **domitor** permite`
+- o CAMPO nao mudou: ficha salva antes desta rodada abre com `Name` & `Generation` preenchidos igual (§V2, §I154a)
+
+**Estado:** gate **VERDE** (`-Build` 19:22) · `rdk -l` OK · `output/` **2.811.505 B** · **INSTALADO** 19:23:45 · **NAO commitado**.
+
+### O QUE A 188a FECHOU
+
+| §T | o que |
+|---|---|
+| T983 | **`clanEntry()`** nasce no form RAIZ, ao lado de `clanDiscOpen()` - devolve `CLANS[sheet.clanFamily or ""]` &, quando ela e `nil` & o nome nao e vazio, sintetiza `{ fixed = trio }` c/ os `clanFamilyCustomDisc_1..3` nao vazios & SEM repetido (`nil` quando o trio e vazio). `renderClanDisc` & `clanDiscOpen()` param de soletrar a tabela & chamam ELA - o corpo de `renderClanDisc` NAO mudou de forma. `dataLink` da raiz vai a `{'language','clanFamily','clanFamilyCustomDisc_1..3'}`. Gate: **§V440 nasce** (4 pernas + zero-guard), **§V295 ganha a perna da sintetizada**, & os 2 ancoras de §V237 (`CLANS[` dentro de `renderClanDisc` & a string exata do `dataLink`) foram REAPONTADOS |
+| T984 | `text="DOMINATOR"` -> `"DOMITOR"` (`WoD20.11:374`) · `wod.DOMITOR=DOMITOR` nas 2 metades do `.lang` · `["DOMITOR"] = "DOMITOR"` no mapa PT de `WoD20.6` · o `xpWarn` & as 3 copias dele (`dominator's`->`domitor's`, `dominador`->`domitor`) · os **2** rosters `T = 'DOMINATOR'` do gate -> `'DOMITOR'`. **§V441 nasce** (4 pernas + zero-guard). Os campos `dominator` `dominatorGen` `cmbDominatorGen` NAO mudaram |
+
+**Bateria (M0 + 8 mutacoes + 1 sonda):** M0 arvore limpa = VERDE · M1 `clanDiscOpen` voltando a ler a tabela direto = **§V440 (a) x2 + (d)** · M2 `open = 1` na sintetizada = **§V440(b)** · M3 teste de repetido morto = **§V440(c)** · M4 laco de `clanEntry` 3->4 = **§V295 nas 2 pernas novas** · M5 `text="DOMINATOR"` de volta = **§V441(a)** (+ V10 V28 V361) · M6 `DOMINADOR` no valor [pt] = **§V441(b) x2** (+ V22) · M7 `field="dominator"` -> `"domitor"` = **§V441(c)** (+ V362 V407) · M8 1 roster `T = 'DOMINATOR'` no gate = **§V441(d)** (+ V361) · **SONDA** `dominator`/`dominador` dentro de COMENTARIO XML = **VERDE**. Arvore restaurada & CONFERIDA byte a byte depois de cada uma.
+
+### LICOES DA 188a
+
+- **`@( @('a','b') )` com UM elemento so ACHATA em PowerShell.** Um lote de trocas escrito como `R = @( @($old,$new) )` virou array de 2 STRINGS, o laco iterou sobre as strings, `$r[0]` devolveu o 1o CARACTERE & `$n.Replace('t','e')` trocou **todo `t` por `e` em `WoD20.11.lfm`** & **todo `x` por `p` em `WoD20th.lfm`**. Os 2 arquivos ficaram ilegiveis com `delta=0` (substituicao de 1 char preserva o tamanho) - **`delta=0` nao e prova de nada**. Regra: **em lote de troca, usar `[pscustomobject]@{O=..;N=..}` | `,@(...)` (virgula na frente), NUNCA `@(@(...))`; & imprimir o proprio `$old` antes de trocar.**
+- **O `.rpk` de `output/` carrega os `.lfm` FONTE, nao so o `.lua` compilado** - foi ele que restaurou os 2 arquivos (o de 17:57 da 187a, byte a byte). E o unico backup do trabalho nao commitado. Restaurar = `[IO.Compression.ZipFile]::OpenRead(rpk)` + `ExtractToFile`. **`git checkout` teria torrado o §T982 inteiro.**
+- **`-notcontains` do PowerShell e case-INSENSITIVE & isso matou uma perna calada.** §V441(a) compara o literal achado contra o roster `dominator`/`dominatorGen`/`cmbDominatorGen`; com `-notcontains`, o titulo `DOMINATOR` casava com o campo `dominator` & a mutacao M5 passava VERDE. So a bateria pegou. **Comparacao de nome em roster: `-cnotcontains` / `-ccontains`.**
+- **Ancora de gate que mede por TEXTO anda quando o texto anda, & duas delas nao estavam na lista de §T983:** §V237 procurava `CLANS[` DENTRO de `renderClanDisc` & a string EXATA `<dataLink fields="{'language', 'clanFamily'}">`. As 2 ficaram vermelhas no 1o gate depois do §T983 - nao e bug de codigo, e a mesma familia do item (5) de §I154 (roster que acha caixa por titulo). **Toda §T que muda de ONDE um dado se le tem de varrer o gate por quem lia dali.**
+- **`Select-String` no `SPEC.md` com `^\|\s*T9` nao acha nada:** a linha do §T e `T983|.|...`, sem barra na frente & sem tabela markdown. O padrao que funciona e `^T\d+\|[.~]\|`.
+
+---
+## 187ª RODADA - SUPERADA pela 188ª acima (o install que ela pedia JA FOI FEITO 19:23:45). **`/ck:spec` do 8º lote + `/ck:build T982`: CONSTRUÍDA & FECHADA (gate `-Build` VERDE 17:57; 6 mutações + 1 sonda RODADAS, todas como escritas); ⊥ INSTALADO — o Firecast estava ABERTO**
+
+### ▶ **O COMANDO: `/ck:build T983`** — é a outra metade do MESMO pedido & ⊥ arrasta pergunta nenhuma (as **3** de §Q73 já foram RESPONDIDAS pelo user nesta rodada). O plano inteiro está escrito na própria linha: `.\spec-slice.ps1 T983`
+
+### ⚠ **1º ATO, ANTES do build: INSTALAR o que a 187ª já construiu.** `output/` está em **2.809.889 B** (17:57:34) & o instalado é o de **2.799.056 B** das 17:20 (o §T981 da sessão anterior). O `rdk -i` ⊥ rodou porque o **Firecast estava ABERTO** (PID 186248) & instalar c/ a ficha carregada deixa o form velho na tela c/ o código novo atrás (§B103). Conferir se fechou → `rdk -i` → aí sim os testes de tela. Se o plano for buildar §T983 primeiro, **1 install só, no fim** (§B103).
+
+### ⚠ **⊥ commitado** — working tree: `SPEC.md` `HANDOFF.md` `verify-hunters-hunted.ps1` `WoD20th.lfm` `WoD20.6.lfm` `localization.lang` + o `.rpk` de `output/` (+ `WoD20.1.lfm` `WoD20.7.lfm` `WoD20.11.lfm` da 186ª, que também ⊥ foram commitados)
+
+### ⚠ **DÍVIDA DE SPEC (p/ o `/ck:spec`, ⊥ p/ o build):** §I73 diz **68** caixas de seção & o gate agora mede **69** — o gêmeo `mfSearchB` trouxe o próprio fundo (`<rectangle align="client">`). O número mudou no GATE (§V280 & §V298, 2 sítios + a mensagem) & ⊥ na spec. ⊥ é bug: é a spec atrás do código, & buildar sem saber disso faz "consertar" gate correto.
+
+### ▶ **A 3ª §T ABERTA, & ela ⊥ é do 8º lote: `§T984`** — o termo `Dominator`/`Dominador` vira **`Domitor`** na TELA & o PT ⊥ traduz, fica `DOMITOR` (§I154, §V441 nasce; pedido AVULSO do user 2026-09-06 noite, escrito enquanto o 8º lote corria em OUTRA sessão). **INDEPENDENTE de §T982/§T983** & ⊥ encosta em `renderClanDisc`: mexe em `WoD20.11.lfm:374` (`text="DOMINATOR"` → `"DOMITOR"`) · `localization.lang` (`wod.DOMINATOR` nas 2 metades → `wod.DOMITOR=DOMITOR`, & a chave do `xpWarn` c/ `dominator's` → `domitor's`) · o mapa PT de `WoD20.6.lfm` (`:137` & `:513`) · a string do `xpWarn` em `WoD20th.lfm:6067` · os **2** rosters `T = 'DOMINATOR'` do gate (achar caixa por TÍTULO; §V224/§V433 acham por `lblMaxDisc` & ⊥ sentem). ⚠ **o CAMPO ⊥ MUDA** — `dominator` `dominatorGen` `cmbDominatorGen` ficam (§V2, §I154a), & é a perna **(c)** de §V441 que existe justamente p/ impedir que "trocar o termo" vire renomear campo & torrar ficha salva
+
+### ⚠ **DÍVIDA DE SPEC nº2 (⊥ bloqueia build): a cláusula de SONDA de §V438 está FALSA, & isso foi MEDIDO & ⊥ deduzido.** A linha manda "trocar a ORDEM de 2 nomes dentro do `fixed` de 1 clã ! VERDE". RODADO em `Brujah` na 186ª: acende **§V432(b) nas 2 línguas** — `descClan_*` compara o `Disciplines:` do pane c/ `CLANS.fixed` **NA ORDEM** ∴ a árvore ⊥ fica verde & a sonda ⊥ cumpre §V222(b), que pede VERDE. A sonda VÁLIDA, & ela RODOU verde na 186ª: `"Potence"` entre aspas dentro de um COMENTÁRIO de `renderClanDisc` — vale mais, porque é a forma de falso positivo de §V217/§B120 (check casando palavra em PROSA). **`/ck:spec` ! trocar a cláusula de sonda de §V438 por esta.**
+
+### ⚠ **LIÇÃO DE 2 ESCRITORES, & ela custou 1 renumeração:** o `/ck:spec` da noite escaneou o maior id NO COMEÇO da sessão (V437/T980/I152), escreveu horas depois & nasceu ocupando `I153`/`V439`/`T982`, que o 8º lote já tinha tomado. Corrigido na mesma escrita p/ `I154`/`V441`/`T984`. **∀ `/ck:spec` ! reler o máximo de id NA HORA de escrever, ⊥ no começo.** O irmão disso é a lição de gate vermelho aleatório ↓ — as 2 têm a mesma causa & ⊥ ∃ trava no repo p/ nenhuma das 2.
+
+### ▶ TESTES DE TELA c/ este build (depois de instalar):
+- **Ghoul (`WoD20.11`) → `Clan/Family` → `-- Custom --`**: abaixo da bolinha `Revenant` aparecem o rótulo **`Clan Disciplines`** (pt `Disciplinas de Clã`) & **3** botões `-- Select Discipline --`. Marcar a bolinha ! o bloco DESCER p/ depois da caixa `Revenant Weakness`; desmarcar ! ele SUBIR de volta
+- **clicar 1 dos 3**: abre um **2º picker inteiro** (busca, 20 fileiras, `< >`, pane de descrição, `OK`) **por cima** do 1º, deslocado 40px p/ baixo & p/ a direita — o de baixo fica na tela nos 2 lados. O de cima **⊥ tem** a linha `-- Custom --`
+- escolher & dar `OK` no de cima ! ele fecha, o de baixo CONTINUA aberto & o botão mostra o nome escolhido · `X` | `Esc` no de cima ! fecha só ele, sem gravar nada
+- reabrir o MESMO botão ! o picker de cima abre já marcado no que está lá (⊥ no que a ficha salvou)
+- `OK` no picker de BAIXO ! grava `clanFamilyCustomDisc_1..3`. ⚠ **os 4 `clanDisc_*` ainda ⊥ se preenchem — isso é §T983**
+- fechar o de baixo c/ o `X` ! os **2** frames somem (o de cima é IRMÃO, ⊥ filho — se ele ficasse na tela seria §B103 pelo lado do widget)
+- **regressão a conferir**: abrir Merit, Background, Speciality (o estreito de 520), Ritual (nível), Road — o picker de baixo ⊥ pode ter mudado em nada
+
+**Estado:** gate **VERDE** (`-Build` 17:57) · `rdk -l` OK · `output/` **2.809.889 B** · **⊥ instalado** · **⊥ commitado** · CRLF conferido byte a byte nos 4 arquivos CRLF; `localization.lang` segue **LF puro** (4.097 LF, 0 CR).
+
+### ⚑ O QUE A 187ª FECHOU
+
+| § | o quê |
+|---|---|
+| `/ck:spec` | **§I153** (a..g) nasce — o custom de `clanFamily` escolhe as **3** disciplinas do clã inventado · **§V439** & **§V440** nascem · **§T982** & **§T983** nascem · **§Q73** nasce & é RESPONDIDA nas 3 · EMENDADAS: **§I152d** (o custom passa a TER trio) · **§V438(b)** (a 85ª entrada, a sintetizada) · **§V295(a)** (a sintetizada fecha EXATO em 4 ∴ o **3** de §I153 é o teto de §V295a na tela) · **§V413(e)** (a cascata ganha 1 degrau & carrega 4 controles) · **§V175** (`clanDiscOpen()` para de soletrar `CLANS`) |
+| T982 | XML: 4 controles na pane (`lblMfClanDisc` + `dynMfClanDisc_1..3`) & **`mfSearchB`** — IRMÃO de `mfSearch`, declarado DEPOIS dele, em **340,120,1000×635**, c/ os **52** nomes gerados mecanicamente (`name` + `B`). Lua: **`mfFound(from)`** (1 `xpFind`, re-chaveia pelo nome canônico conforme `MF.depth`) & os **13** sítios que pinavam o frame viraram `mfFound(from)` **sem 1 literal `found["…"]` mudado** · `mfPush`/`mfPop` (pilha de **1** degrau) · `mfSubOpen` · ramo de profundidade 2 em `mfConfirm` (escreve `MF.prev.disc`, **0** `setField`) & a escrita dos 3 campos no OK de baixo · `mfClose` esconde os 2 frames em profundidade 1 & só o de cima em 2 · `mfCustom` carrega o trio & RECUSA custom em profundidade 2 (`btnMfCustom` escondido lá) · `mfCustomPane` c/ **1** cascata alimentando **5** controles (`base` 185/237, `edtMfDesc.top = base + 117`) · `mfSize` · `mfFilter` (o `cur` de profundidade 2 sai de `MF.prev.disc`) · `kbRefocus` (o gêmeo é perguntado PRIMEIRO) · `DESC_PANES` · `MF` ganha `depth`/`prev`/`slot`/`disc`. `.lang`: `Clan Disciplines` / `Disciplinas de Clã` nas 2 metades + a chave no mapa `PT` de `WoD20.6` |
+
+**Bateria (6 mutações + 1 sonda, todas como escritas):** M1 `top` das 3 fileiras em literal ! (a) ×2 · M2 gêmeo declarado ANTES ! (b) · M3 `btnMfOkB`→`btnMfOkX` ! (c) ×2 (os 2 sentidos) · M4 um corpo voltou a chamar `xpFind` direto ! (d) · M5 o OK do gêmeo escreveu na ficha ! (e) ×2 · M6 `mfClose` parou de esconder o gêmeo ! (f) · **SONDA** pouso do gêmeo 340,120→360,140 = **VERDE**. Árvore restaurada & CONFERIDA byte a byte depois de cada uma.
+
+### ⚑ O QUE §T983 TEM DE FAZER (o build da próxima)
+
+`WoD20th.lfm` + `verify-hunters-hunted.ps1`, & **⊥ toca XML nenhum**:
+
+1. **`clanEntry()`** no form RAIZ, ao lado de `clanDiscOpen()` — devolve `CLANS[sheet.clanFamily or ""]` &, quando ela é `nil` & `(sheet.clanFamily or "") ~= ""`, monta `{ fixed = t }` c/ os `clanFamilyCustomDisc_1..3` ⊥ vazios & **SEM repetido**; `nil` quando `#t == 0`.
+2. `renderClanDisc` troca `local entry = CLANS[...]` por `local entry = clanEntry();` — **o corpo ⊥ muda de forma**: o `{ GHOUL_DISC } ⊎ (entry.fixed − GHOUL_DISC)` que a 186ª construiu já faz o resto (§V438b/c).
+3. `clanDiscOpen()` troca `CLANS[...]` por `clanEntry()` ∴ trio custom passa a **SETTLED** & os 4 slots TRAVAM (§Q73.2, resposta do user: *"ficam as opções escolhidas pelo jogador durante a criação do custom, mas fora do momento da criação elas passam a ficar travadas"*).
+4. `dataLink` da raiz vai a `{'language', 'clanFamily', 'clanFamilyCustomDisc_1', 'clanFamilyCustomDisc_2', 'clanFamilyCustomDisc_3'}` — sem os 3 campos, trocar SÓ o trio ⊥ move `clanFamily` & o pintor ⊥ roda (falha CALADA).
+5. Gate: **§V440 LIGAR** (4 pernas + zero-guard, escritas na linha) — o gate de hoje **⊥ tem nada de §V440**. Bateria: M0 + as 3 mutações de §V440 + a sonda (3 nomes distintos, nenhum `Potence` ! VERDE c/ 4 slots).
+
+### ⚠ LIÇÕES DA 187ª (todas custaram uma rodada de ferramenta)
+- **`.ps1` sem BOM come o `§` do próprio script** (§B da memória `powershell-bom-e-crlf`): um `StartsWith('- §Q73 …')` falhou CALADO contra a linha certa. **Âncora de script ! ser ASCII** — usei `RX:Q73 \*\*ABERTA` c/ `-match`.
+- **O Bash tool & o PowerShell tool COMPARTILHAM o cwd.** Um `cd` no Bash deixou o `.\verify-hunters-hunted.ps1` "não reconhecido" na chamada seguinte de PowerShell. `Set-Location` explícito em toda chamada, | caminho absoluto.
+- **`[IO.File]::ReadAllBytes` ⊥ enxerga o `Set-Location`** — o cwd do .NET é outro. Caminho ABSOLUTO em toda API de `System.IO`.
+- **`$rootDoc` do gate só nasce lá pela linha 19.000.** Régua nova que roda na altura da §V438 (~8.600) ! abrir o próprio `Doc (Join-Path $dir "WoD20th.lfm")`.
+- **Régua que casa PALAVRA pega o comentário que explica a palavra**: o `\bMF2\b` de §V439(d) acendeu contra o comentário XML que diz por que `MF2` foi RECUSADA. Casar **USO** (`MF2\s*(=|\.)`), ⊥ menção. E `NoComments` do gate só tira comentário **Lua** (`--`) — `<!-- -->` do XML passa inteiro.
+- **Duas sessões no mesmo repo = gate vermelho ALEATÓRIO.** 2 rodadas do gate acenderam §V438(d) & §V295 c/ `Panders` em "4 open" — era a bateria da OUTRA sessão mutando `WoD20th.lfm` no meio. **Conferir `mtime` do `.lfm` antes de culpar o próprio código.**
+- **Gêmeo de frame DOBRA todo roster que conta controle de `mfSearch`** — foram **4** réguas: `$DESC_BRIGHT` (§V111/§V244), a derivação de panes **&** do par de zoom (§V334), a contagem de caixas (§V280/§V298, 68→69) & a perna (e) da §V413. Nenhuma delas fala o nome `mfSearch`: elas VARREM o XML.
+- **`mfLabel` só aceita controle achado por NOME** (§V357a): `mfLabel(c, …)` c/ `c` local acende vermelho — tem de ser `mfLabel(found["…"], …)`.
+
+---
+
+## ⚑ COMECE AQUI — 186ª rodada (2026-09-06, noite). **`/ck:spec` do 7º lote + `/ck:build T981`: CONSTRUÍDA & FECHADA (gate `-Build` VERDE 17:16; M0 + 5 mutações + 1 sonda RODADAS, & a sonda que a §V438 mandava rodar ⊥ servia — ↓)**
+
+### ✔ **INSTALADO 2026-09-06 17:20** com o OK do user — instalado em **2.799.056 B**, mesmo size do `output/` recém-gerado (a diferença de 1 B contra os 2.799.057 do `rdk -l` é recompressão do ZIP, mesma fonte: §B103 diz p/ ⊥ reinstalar por causa dela)
+### ⚠ **⊥ commitado** — working tree: `SPEC.md` `HANDOFF.md` gate `WoD20th.lfm` `WoD20.1.lfm` `WoD20.6.lfm` `WoD20.7.lfm` `WoD20.11.lfm` + o `.rpk` de `output/`
+### ▶ TESTE DE TELA c/ este build — **Ghoul (`WoD20.11`) → `Clan Disciplines`**, escolhendo no `Clan/Family`:
+- `Assamite` ! as 4 linhas lerem **`Potence` `Celerity` `Obfuscate` `Quietus`** (Potence na 1ª) · `Brujah` ! ler **`Potence` `Celerity` `Presence`** & a 4ª VAZIA (⊥ Potence 2×) · `Gargoyles (Modern)` ! ler **`Potence` `Flight` `Fortitude` `Visceratika`**
+- `Panders` ! pôr `Potence` na 1ª & deixar as 3 de baixo do jogador · `Angellis Ater` ! `Potence` `Daimonion` `Dominate` + 1 escolha entre `Presence` & `Obfuscate` (⊥ Potence de novo) · `-- Custom --` c/ nome digitado ! ⊥ escrever NADA (§Q72 saída (a))
+- ⚠ o `?` do clã segue mostrando o trio do LIVRO, **sem** Potence: o pane é do CLÃ & os slots são do GHOUL. ⊥ é bug (↓)
+
+**Estado:** gate **VERDE** (`-Build` 17:16) · `rdk -l` OK · `output/` **2.799.056 B** · **INSTALADO** 17:20 · **⊥ commitado**.
+
+### ⚑ O QUE A 186ª FECHOU
+
+| §T | o quê |
+|---|---|
+| T981 | `GHOUL_DISC = "Potence"` no form raiz & `renderClanDisc` monta `{ GHOUL_DISC } ⊎ (entry.fixed − GHOUL_DISC)` em vez de ler `entry.fixed` direto; o ramo `choice` recusa leftover ≡ `GHOUL_DISC` (§I152b). **§V438 nasce** (4 pernas + zero-guard) & **§V295a EMENDADA** (o total de uma entrada ganha o slot do ghoul) |
+
+**Bateria (M0 + 5 mutações + 1 sonda, em processo FILHO, §B120):** M0 árvore limpa = **VERDE** · M1 `{ GHOUL_DISC }` → `entry.fixed or {}` = **§V438(b), as 2 pernas** · M2 cópia sem pular o repetido = **§V438(c)** · M3 `choice` aceita Potence = **§V438(d)** · M4 `GHOUL_DISC = "Potencia"` = **§V438(a) + §V295** · M5 `Panders` `open` 3→4 = **§V295 SOZINHA**, §V236 VERDE — é a prova de que a emenda enxerga o que §V236c ⊥ enxerga · SONDA `"Potence"` entre aspas dentro de COMENTÁRIO = **VERDE**
+
+### ⚠ DÍVIDA DE SPEC que a 186ª CRIOU (1 linha, ⊥ bloqueia build)
+- **§V438 descreve uma SONDA INVÁLIDA & a 186ª mediu isso.** A linha diz "trocar a ORDEM de 2 nomes dentro do `fixed` de 1 clã ! VERDE" — RODADA em `Brujah`: acende **§V432(b) nas 2 línguas** (`descClan_*` compara o `Disciplines:` do pane c/ `CLANS.fixed` NA ORDEM) ∴ a árvore ⊥ fica verde & a sonda ⊥ cumpre §V222(b), que pede VERDE. A sonda que RODOU & é válida: `"Potence"` entre aspas dentro de um COMENTÁRIO de `renderClanDisc` → **VERDE**, & ela vale mais, porque é a forma de falso positivo de §V217/§B120 (check casando palavra em PROSA). **`/ck:spec` ! trocar a cláusula de sonda de §V438 por esta.**
+- ⚠ **ACHADO junto, & ⊥ é bug:** o pane do `?` mostra o trio do LIVRO (`entry.fixed`, imposto por §V432b) & os SLOTS mostram o do GHOUL (Potence na frente). São 2 leitores c/ 2 perguntas diferentes — o `?` responde "o que este clã ensina" & os slots respondem "o que este ghoul tem". É a 1ª vez que os 2 divergem na tela, & é o último item do teste de tela ↑.
+
+---
+
+## 185ª RODADA (2026-09-06, tarde) — SUPERADA pela 186ª acima; guardada pelos testes de tela que o user ainda ⊥ fez. **`/ck:spec` do 6º lote + `/ck:build --all`: §T975…§T980 CONSTRUÍDAS & FECHADAS (gate `-Build` VERDE 16:07; 12 mutações + 1 sonda RODADAS, todas como escritas); INSTALADO 16:08**
+
+### ✔ INSTALADO 2026-09-06 16:08 — instalado & `output/` em **2.798.027 B**, mesmo tamanho
+### ⚠ **⊥ commitado** — working tree: `SPEC.md` `HANDOFF.md` gate `WoD20th.lfm` `WoD20.1.lfm` `WoD20.6.lfm` `WoD20.7.lfm` `WoD20.11.lfm` + o `.rpk` de `output/`
+### ⚠ 1 pergunta ABERTA & ela ficou ACOPLADA: §Q70 (prefixo `Família: ` no botão `Clan/Family`) — o botão encolheu p/ **212** em §T978 & o prefixo põe o pior caso em **222** ∴ responder §Q70 por "construir" faz o botão TRUNCAR. Quem for responder §Q70 ! ler §Q71 antes
+### ▶ TESTES DE TELA c/ este build:
+- **Main → Specialities → `Select Speciality`**: a caixa abre ESTREITA (520, só a lista, sem a coluna de descrição) · clicar `-- Custom --` a alarga p/ 840 & mostra o campo `Name` · escolher uma da lista a estreita de novo. Abrir DEPOIS um picker qualquer de outra aba (Merit, Background) ! a pane de descrição estar LÁ (o esconde é de mão dupla — §V436c)
+- **Numina → `Affiliation`**: `?` novo à esquerda do botão; c/ uma afiliação escolhida ele abre o texto de `descNumina` (as 27 já estão em disco). A fileira ⊥ pode ter escada: `Affiliation`, `Essence` & `Casting Attribute` fecham todas em **446**
+- **Ghoul (`WoD20.11`) → `Clan/Family`**: `?` novo em **97..117** & o botão em **122..334** · c/ clã escolhido abre o texto do CLÃ, c/ família o da FAMÍLIA (`isFamilyName` decide) · ficha sem clã: o `?` ⊥ abre nada
+- **Picker `Clan/Family` → `-- Custom --`**: o `Revenant` é uma BOLINHA (prime_on/prime_off) & ⊥ mais um dropdown — marcar acende a caixa `Revenant Weakness`, desmarcar apaga
+
+**Estado:** gate **VERDE** (`-Build` 16:07) · `rdk -l` OK · `output/` **2.798.027 B** · **INSTALADO** 16:08 · **⊥ commitado**.
+
+### ⚑ O QUE A 185ª FECHOU
+
+| §T | o quê |
+|---|---|
+| T975 | (fechada pelo `/ck:spec`) a moldura do `Classical Age` de 2026-09-06 — `outline = 1` cercado por `sectionBox`, `ORN_MUR_*` **4·11·12·4·5**, corrida ligada às torres, passo elástico. §V67 & §V326a EMENDADAS |
+| T976 | picker de `speciality` SEM pane: **`MF_LIST = 520`** (3ª largura), `MF.size` guardado em `mfOpen`, `mfSize` esconde `lblMfDescTitle`/`edtMfDesc`/`mfDescRule` no modo `list`, `mfCustomPane` devolve a coluna do `Name` (840) enquanto custom está ligado, `mfConfirm` ⊥ grava `customDesc` nesse modo (§V2). **§V436 nasce**; §V359a de **2** p/ **3** larguras |
+| T977 | `?` no `hedgeAffiliation` (`WoD20.7`): `btnQhedgeAffiliation` **180..200**, botão **205..446**, gêmeo `edtHedgeAffiliation` junto. §V312 passa a derivar a coluna do SPAN (⊥ do `left` do botão) & §V297 lê o par; `btnQhedgeAffiliation` entra em `$BARE_Q333` |
+| T978 | `?` no `clanFamily` (`WoD20.11`, §Q71 saída (c)): `btnQclanFamily` **97..117** & botão **122..334**; o kind sai de `isFamilyName` no próprio `onClick`. **§V407 REVOGADA & REESCRITA** — o `?` passa a ser OBRIGATÓRIO & a grade é medida pelo SPAN; `btnQclanFamily` volta a `$BARE_Q333` |
+| T979 | `cmbMfRevenant` → **`chkMfRevenant`** (`imageCheckBox`, `prime_on/off`, `autoChange="false"`, autorado desmarcado); `mfRevenantChange` TOGGLA (⊥ lê `.checked`); `mfRevenantPane` escreve guardado. **§V437 nasce**; §V413 perde a perna (c) p/ ela |
+| T980 | **§V435 nasce** — a corrida do merlão fecha nas 2 torres & os dentes de uma borda medem igual (3 pernas + zero-guard) |
+
+**Bateria (12 mutações + 1 sonda, todas como escritas):** V436 (a)(b)(c) · V435 (a)(b)(c) · V437 (b)(c) · V407 span · V333 opener · V297 coluna · V224 `?` fora da grade · sonda `MF_LIST` 520→522 = VERDE.
+
+### ⚠ LIÇÕES DA 185ª
+- **`sed -i` MATOU o CRLF de `WoD20.1.lfm` inteiro** (869 LF soltos) numa troca de 1 linha — §B74/§V318 de novo. Consertado por `-replace` em PowerShell & CONFERIDO por `git diff --stat` (1 linha, ⊥ o arquivo todo). **Neste repo: `Edit` ou PowerShell, NUNCA `sed -i`.**
+- **Mutação que ⊥ muda o texto passa VERDE** — a 1ª tentativa de M2 procurou a string do `road` em `WoD20th.lfm` & ela mora em `WoD20.1.lfm`: `Replace` ⊥ achou nada, o gate ficou verde & a mutação "passou". É §B120 pelo lado do arnês. **∀ mutação ! imprimir `$novo -ne $velho` ANTES de rodar o gate.**
+- **§V224 já sabia ler `?`**: ela EXCLUI da contagem o controle "liderado" por um `btnQ*` a exatamente **+5px** & mede o span. Mover o `?` p/ longe do botão ⊥ é "geometria livre" — quebra a contagem de células. O mesmo idioma está em §V297 & agora em §V312 & §V407.
+- **`autoChange="false"` muda quem lê o quê**: o clique ⊥ move o controle ∴ `from.checked` no handler lê o estado que o jogador ⊥ mudou. Marca com `autoChange="false"` se lê do MODELO (`MF.revenant`), nunca do widget.
+
+### ✅ DÍVIDA DE SPEC — **PAGA 2026-09-06** pelo `/ck:spec` do 7º lote (pedido direto do user). ⊥ perguntar de novo
+- **§V359** emendada (2 → **3** larguras; entra `MF_LIST` **520**, & quem recusa roster segue sendo a perna (b)) · **§V312** emendada (a coluna de entrada da `HEDGE MAGIC` deriva do **SPAN** `?`+botão, ⊥ do `left` do botão) · **§V413** emendada em 3 pontos (perna (a) VOLTA a `MF.list == "clanFamily"` · (c) SUPERSEDIDA por §V437(b) · (f) perde os 2 valores do dropdown, que ⊥ ∃) · **§V407 REVOGADA & REESCRITA** (o `?` é OBRIGATÓRIO, a exceção de §V365(a) morreu, a entrada é o span **97..334**). O GATE ⊥ mudou nesta rodada — ele já media assim & seguiu VERDE depois da escrita.
+- **▶ A §T que a spec acabou de abrir: `§T981`** — a 1ª `clanDisc_*` do ghoul é **`Potence`** & as do clã vêm depois, sem repetir (§I152, **§V438 nasce**, **§V295a EMENDADA**). ⊥ é teste de tela & ⊥ arrasta pergunta: §Q72 já foi RESPONDIDA (saída (a) — custom ⊥ recebe Potence). Toca `WoD20th.lfm` + o gate, & a bateria está escrita na própria §T981. **O COMANDO: `/ck:build T981`**
+
+---
+
 ## ⚑ COMECE AQUI — 184ª rodada (2026-09-05, tarde). **5º lote: `/ck:spec` + `/ck:build --all`: §T973 §T974 §T972 §T970 §T971 CONSTRUÍDAS & FECHADAS (gate `-Build` VERDE 15:22; 15 mutações RODADAS, todas VERMELHAS); INSTALADO 15:33**
 
 ### ✔ INSTALADO 2026-09-05 15:33 c/ o Firecast fechado (`rdk -i` offline): instalado & `output/` em **2.788.713 B**, mesmo tamanho (os `descClan_*` perderam 130 KB de prosa, por isso menor que o de 12:06)

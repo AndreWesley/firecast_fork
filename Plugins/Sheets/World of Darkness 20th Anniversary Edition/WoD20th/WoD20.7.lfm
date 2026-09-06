@@ -239,7 +239,17 @@
 			     (SPEC V270d amended).
 			-->
 			<label left="20" top="36" width="150" height="24" text="Affiliation"/>
-			<button name="dynhedgeAffiliation" left="180" top="36" width="266" height="24" fontSize="12" text="Select Affiliation" onClick="mfOpen(self, 'hedgeAffiliation', 'hedgeAffiliation', 'Numina');"/>
+			<!-- The ? is BACK (SPEC I151b, T977, user 2026-09-06), and it costs the row nothing the
+			     grid can see: the entry still opens at 180 and still closes at 446, the same span
+			     the essence edit and the attribute combo keep, because V297 reads this entry as the
+			     ? PLUS the button and not as the button alone. The gutter is 5, the same the three
+			     row pickers of this file already keep.
+			     It opens what is ALREADY on disk: every one of the 27 affiliations has an entry in
+			     descNumina_*.lua (MEASURED 2026-09-06 - The Arcanum, Uzoma, The Fenian, Giovanni),
+			     which is why this is a widget and not a research task. The kind is the same 'Numina'
+			     the picker itself hands mfOpen, so one module answers both doors (SPEC V360). -->
+			<button name="btnQhedgeAffiliation" left="180" top="36" width="20" height="24" text="?" onClick="popOpen(self, 'Numina', sheet['hedgeAffiliation'], nil, 'hedgeAffiliation');"/>
+			<button name="dynhedgeAffiliation" left="205" top="36" width="241" height="24" fontSize="12" text="Select Affiliation" onClick="mfOpen(self, 'hedgeAffiliation', 'hedgeAffiliation', 'Numina');"/>
 
 			<!-- The typed twin of the picker above, one field and two widgets with exactly one
 			     of them visible (SPEC I71, V274, user 2026-08-23). A DECLARED mirror in SPEC I3
@@ -253,7 +263,7 @@
 			     ⚠ what is typed here is FREE text while the picker stores the canonical EN
 			     (SPEC V24), so the filters of I67/I68 read an affiliation they do not know and
 			     prune nothing - which is the right answer for homebrew, not an accident. -->
-			<edit name="edtHedgeAffiliation" left="180" top="36" width="266" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
+			<edit name="edtHedgeAffiliation" left="205" top="36" width="241" height="24" field="hedgeAffiliation" visible="false" enabled="false"/>
 
 			<!-- The label column is 150 because SPEC V16 prices it there and not by eye:
 			     `Atributo de Conjuracao` is 22 characters, which the house ruler puts at
