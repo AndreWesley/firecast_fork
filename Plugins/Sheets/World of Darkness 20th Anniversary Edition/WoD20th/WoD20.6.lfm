@@ -4024,24 +4024,42 @@
 					-- spare, and under it the first merlon would walk back INTO the tower.
 					local m0  = ORN_MUR_OUT + ORN_MUR_TOWER;
 					local run = span - 2 * m0;
-					local n   = math.floor(run / ORN_MUR_STEP);
+					-- ROUNDED, not floored, and that is the whole of how the residue dies: the run
+					-- is cut into n EQUAL steps instead of into n steps of exactly ORN_MUR_STEP plus
+					-- whatever is left over. Rounding is what keeps the step near the 12 the drawing
+					-- was approved at - flooring always stretches and never shrinks, so it would
+					-- spend the entire error in one direction (SPEC I95, user 2026-09-06).
+					local n = math.floor(run / ORN_MUR_STEP + 0.5);
 
 					if n < 1 then return; end;
 
-					local half = ORN_MUR_STEP / 2;
+					-- ORN_MUR_STEP is the TARGET step from here on, and `step` is the one this edge
+					-- actually walks. Every tooth on a given edge is then the SAME length, and the
+					-- course closes on the far tower with nothing left to spend - which is what the
+					-- previous round had to pay for with a straight run at each end, up to 5.5px
+					-- long against teeth of 6, so the two segments touching the towers read longer
+					-- than every other one on the box.
+					--
+					-- The price is that the step is no longer the same NUMBER on every edge: a
+					-- 1010-wide box walks 11.95 and a 105-tall one walks 12.43, against a target of
+					-- 12. That is under half a pixel of difference between two edges nobody sees
+					-- side by side, against a 5.5px difference between two teeth on the SAME edge,
+					-- which is the one the eye actually catches.
+					local step = run / n;
+					local half = step / 2;
 					local lo   = ORN_MUR_OUT;
 					local hi   = ORN_MUR_OUT + ORN_MUR_RISE;
-					local u    = m0 + (run - n * ORN_MUR_STEP) / 2;
+					local u    = m0;
 
 					ornMove(o, t, u, lo);
 
 					for _ = 1, n, 1 do
 						ornLine(o, t, u + half, lo);
 						ornLine(o, t, u + half, hi);
-						ornLine(o, t, u + ORN_MUR_STEP, hi);
-						ornLine(o, t, u + ORN_MUR_STEP, lo);
+						ornLine(o, t, u + step, hi);
+						ornLine(o, t, u + step, lo);
 
-						u = u + ORN_MUR_STEP;
+						u = u + step;
 					end;
 				end;
 
