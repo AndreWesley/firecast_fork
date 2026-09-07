@@ -5911,10 +5911,26 @@
 				return FAMILY_WEAKNESS[name];
 			end;
 
-			-- The two POOLS, blood and quintessence (SPEC V219, V264b, V446). They wear the art of
-			-- a rating dot and none of its rules - no XP_TRAIT, no declareTrait, no ledger line and
-			-- no price in I9 - and since T986 they MARK the way a rating does: the clicked dot names
-			-- the level and the row is written as a prefix of itself (SPEC I155i, V443).
+			-- The row of a POOL written as a prefix of itself (SPEC V443, V446): boxes 1..alvo on,
+			-- the rest off. It is the one writer of a pool field, and it writes only what differs -
+			-- so a click that changes nothing writes nothing, and the onChange of the willpower
+			-- boxes below cannot chase its own tail (SPEC V447b).
+			--
+			-- `base` is the WHOLE prefix, separator included - "bloodPool_", "quint_", "willpower_c"
+			-- (SPEC V446 amended). The third of those has no underscore before its number, and a
+			-- writer that glued one on would miss every field it owns.
+			function poolPrefix(base, count, alvo)
+				for i = 1, count, 1 do
+					local on = (i <= alvo);
+
+					if (sheet[base .. i] == true) ~= on then setField(base .. i, on); end;
+				end;
+			end;
+
+			-- The two POOLS of DOTS, blood and quintessence (SPEC V219, V264b, V446). They wear the
+			-- art of a rating dot and none of its rules - no XP_TRAIT, no declareTrait, no ledger
+			-- line and no price in I9 - and since T986 they MARK the way a rating does: the clicked
+			-- dot names the level and the row goes out as a prefix (SPEC I155i, V443).
 			--
 			-- ONE function for the two, because the only thing that tells them apart is a ceiling
 			-- that one of them has. The entry points are two and the rule is read in one place,
@@ -5926,7 +5942,7 @@
 			function poolClick(base, count, field, cap)
 				if sheet == nil or field == nil then return; end;
 
-				local n = tonumber(string.match(field, "_(%d+)$"));
+				local n = tonumber(string.match(field, "(%d+)$"));
 
 				if n == nil then return; end;
 
@@ -5935,7 +5951,7 @@
 				local cur = 0;
 
 				for i = 1, count, 1 do
-					if sheet[base .. "_" .. i] == true then cur = cur + 1; end;
+					if sheet[base .. i] == true then cur = cur + 1; end;
 				end;
 
 				-- The same leg the rating dots read (SPEC I155b): the one click that goes DOWN is
@@ -5957,23 +5973,67 @@
 					xpWarn("That family caps this trait");
 				end;
 
-				for i = 1, count, 1 do
-					local on = (i <= alvo);
-
-					if (sheet[base .. "_" .. i] == true) ~= on then setField(base .. "_" .. i, on); end;
-				end;
+				poolPrefix(base, count, alvo);
 			end;
 
 			-- The twenty blood dots (SPEC I108c). The ceiling is read HERE and handed over, so the
 			-- pool that has one and the pool that does not walk the same code (SPEC V337c).
 			function bloodClick(field, ctrl)
-				poolClick("bloodPool", 20, field, familyCap("bloodPool"));
+				poolClick("bloodPool_", 20, field, familyCap("bloodPool"));
 			end;
 
 			-- The ten quintessence dots (SPEC I155i, V264b, T987). No family caps quintessence, so
 			-- the ceiling is nil and the branch above never opens.
 			function quintClick(field, ctrl)
-				poolClick("quint", 10, field, nil);
+				poolClick("quint_", 10, field, nil);
+			end;
+
+			-- The ten WILLPOWER SPENT boxes take the same prefix (SPEC I155j, V447, T988), and they
+			-- take it by another road, because the widget is another one: a checkBox has no
+			-- autoChange - MEASURED in SDK3/API/rrpgGUI.lua:718-730, whose props are `checked` and
+			-- `field` and nothing else, while autoChange lives on ImageCheckBox alone (:786). The
+			-- host marks the box itself, so the decide-before-you-write of V135 cannot reach here.
+			--
+			-- The pair is onClick then onChange. onClick - inherited from gui.Control (:269), which
+			-- is why a checkBox accepts it - only ANNOUNCES that a player's hand touched the box.
+			-- onChange, which is what every Core plugin uses to read `checked` once it has settled,
+			-- is what WRITES, and only for the field the click named.
+			--
+			-- WP_CLICK is one stamp doing THREE jobs, which is why no second flag exists:
+			--   1. it says a CLICK happened. The onChange the host fires while the sheet is opening
+			--      has no click behind it and is ignored - without that, box c1 of a row standing at
+			--      five would wipe the four above it on open, silently (SPEC V447b).
+			--   2. it is the re-entrancy guard: the prefix written below fires the onChange of the
+			--      other nine, and they find the stamp already cleared.
+			--   3. it covers the MIRROR (SPEC V36): two boxes carry each field - Main and WoD20.3 -
+			--      so two onChange arrive and only the first finds the stamp.
+			--
+			-- GLOBAL for the reason V347 counts, and declared here beside its two readers: nothing
+			-- else on the sheet may write it (SPEC V135).
+			WP_CLICK = nil;
+
+			function wpSpentClick(field)
+				WP_CLICK = field;
+			end;
+
+			-- The write. `alvo` is read off the value the host has ALREADY stored: true at n fills
+			-- 1..n, false at n clears n..10 (SPEC I155j). That last leg is one thread away from the
+			-- dots, where a lit dot below the top goes TO n - and the difference is forced, not
+			-- chosen: the host has already cleared box n, and writing it back is the write made
+			-- from inside its own onChange that B36/B38 measured does not survive the dispatch.
+			--
+			-- The stamp is cleared BEFORE the write, never after: there is no order of events in
+			-- which this pair loses data, and the worst case is that it does nothing (SPEC V447c).
+			function wpSpentChange(field)
+				if sheet == nil or WP_CLICK ~= field then return; end;
+
+				WP_CLICK = nil;
+
+				local n = tonumber(string.match(field, "(%d+)$"));
+
+				if n == nil then return; end;
+
+				poolPrefix("willpower_c", 10, (sheet[field] == true) and n or (n - 1));
 			end;
 
 			-- WHICH entry this ghoul has - ONE function, and it owns the question (SPEC I153e,

@@ -1,6 +1,34 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - 189a rodada (2026-09-06, noite). **`/ck:build --all`: §T985 §T986 §T987 CONSTRUIDAS & FECHADAS (gate `-Build` VERDE; 11 mutacoes + 1 sonda RODADAS); INSTALADO 21:08:45 com o Firecast FECHADO**
+## COMECE AQUI - 190a rodada (2026-09-06, noite). **Pedido do user: as 10 CAIXAS de willpower gasto enchem/esvaziam em bloco. §T988 CONSTRUIDA & FECHADA (gate `-Build` VERDE; 4 mutacoes + 1 sonda RODADAS)**
+
+### **INSTALADO 2026-09-06 21:56:45** - `output/` & instalado nos MESMOS **2.820.151 B**, com o Firecast FECHADO (`rdk -i` disse "instalacao offline"). 1 install na rodada (§B103). O user CONFIRMOU a 189a na tela ("tudo funcionou bem corretamente") & COMMITOU ele mesmo (`19f3660f`) ∴ o working tree de agora e so a 190a: `SPEC.md` `HANDOFF.md` `verify-hunters-hunted.ps1` `WoD20th.lfm` `WoD20.1.lfm` `WoD20.3.lfm` + o `.rpk`. **NAO commitado.**
+
+### O que mudou
+- **`poolPrefix(base, count, alvo)`** saiu de dentro do `poolClick`: o `base` virou o PREFIXO INTEIRO (`bloodPool_`, `quint_`, `willpower_c`), porque `willpower_c1` nao tem `_` antes do digito.
+- **`wpSpentClick` + `wpSpentChange`** (root) & o carimbo global **`WP_CLICK`**. As 20 caixas (10 do molde `Willpower` em `WoD20.1` + 10 do espelho em `WoD20.3`) ganharam `onClick` **&** `onChange`.
+- **XP nao entra**: `willpower_c*` segue fora de `XP_TRAIT`, sem preco & sem ledger. §V447(d) mede as 4 palavras.
+
+### ⚠ O RISCO CONHECIDO desta rodada, & e o unico
+`checkBox` **nao tem `autoChange`** (MEDIDO em `SDK3/API/rrpgGUI.lua:718-730`; so `ImageCheckBox` tem, `:786`) ∴ o host marca a caixa sozinho & nao ha como decidir antes da escrita. A forma escolhida e `onClick` (so ANUNCIA, `WP_CLICK = field`) + `onChange` (ESCREVE, e so se `WP_CLICK` nomear o campo dele).
+**A ordem `onClick` antes de `onChange` NAO esta medida** - nao ha 1 `checkBox` com `onClick` no repo inteiro nem nos plugins do Core, e o SDK nao diz. Se sair ao contrario:
+- sintoma EXATO: a caixa marca **1 so**, como antes; nada mais acontece.
+- **nao ha perda de dado em ordem nenhuma** - o carimbo e limpo ANTES da escrita, e o `onChange` do LOAD nao tem clique atras (§V447b/c).
+- conserto: 1 linha - aplicar dentro do `wpSpentClick` em vez do `wpSpentChange`.
+
+### DIVIDAS DE SPEC (todas p/ o `/ck:spec`, NENHUMA bloqueia build)
+1. **§I73 diz 68 caixas de secao & o gate mede 69** (herdada da 187a).
+2. **A clausula de SONDA de §V438 esta FALSA** (herdada da 186a/187a).
+3. **§I153f ganhou regua & ela mora em §V237, nao em §V440** (herdada da 188a).
+4. **A emenda de §V295a ganhou perna no gate & ela mede 2 coisas** (herdada da 188a).
+
+### TESTES DE TELA desta rodada
+- **WILLPOWER gasto, na Main**: clicar a caixa 6 vazia ! encher 1..6 de uma vez. Clicar a 6 de novo ! apagar 6..10 (sobra 1..5). Clicar a 3 marcada ! apagar 3..10 (sobra 1..2).
+- **espelho** (`WoD20.3`, aba Combat): a mesma fileira ! seguir a da Main, & clicar LA ! funcionar igual.
+- **abrir a ficha** com a fileira em 1..5 ! continuar 1..5. (E o §V447b: se o `onChange` do load agisse, ela viraria 1..1.)
+- **experiencia**: o `Current` da ficha ! nao se mexer 1 ponto em nenhum desses cliques.
+
+## 189a rodada (2026-09-06, noite). **`/ck:build --all`: §T985 §T986 §T987 CONSTRUIDAS & FECHADAS (gate `-Build` VERDE; 11 mutacoes + 1 sonda RODADAS); INSTALADO 21:08:45 com o Firecast FECHADO**
 
 ### **INSTALADO 2026-09-06 21:08:45** - `output/` & instalado nos MESMOS **2.816.818 B**. O user fechou o Firecast a pedido & o `rdk -i` disse "instalacao offline". O instalado velho era o de **2.811.505 B** das 19:23. 1 install na rodada (§B103).
 

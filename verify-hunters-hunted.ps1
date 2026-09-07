@@ -5049,7 +5049,7 @@ else { Pass "V445 the three repaints the click owns fire once per click, after t
 
 # V446 (T986/T987): the two POOLS take the same prefix the ratings do, and pay none of the
 # price. One rule, two entry points - the shape familyCap already gives the ceiling (SPEC V337c).
-$poolFn  = NoComments (LuaFn $rootTxt 'poolClick')
+$poolFn  = NoComments ((LuaFn $rootTxt 'poolClick') + "`r`n" + (LuaFn $rootTxt 'poolPrefix'))
 $bloodFn = NoComments (LuaFn $rootTxt 'bloodClick')
 $quintFn = NoComments (LuaFn $rootTxt 'quintClick')
 $poolBad = @()
@@ -5058,16 +5058,56 @@ if (-not $bloodFn) { $poolBad += "bloodClick is not on the root form" }
 if (-not $quintFn) { $poolBad += "quintClick is not on the root form" }
 if ($poolFn) {
     if ($poolFn -notmatch 'local alvo = \(\(sheet\[field\] == true\) and n == cur\) and \(n - 1\) or n;') { $poolBad += "the pool reads the clicked dot differently from a rating - one rule, two readings (SPEC I155b)" }
-    if ($poolFn -notmatch 'for i = 1, count, 1 do') { $poolBad += "poolClick does not walk the whole pool - the dots above the level would keep whatever they had" }
+    if ($poolFn -notmatch 'for i = 1, count, 1 do') { $poolBad += "poolPrefix does not walk the whole pool - the dots above the level would keep whatever they had" }
     if ($poolFn -notmatch 'local on = \(i <= alvo\);') { $poolBad += "poolClick does not light 1..alvo - a gap would survive the click (SPEC V443)" }
     foreach ($bannedPool in @('xpClick', 'declareTrait', 'xpLedgerRows', 'XP_TRAIT')) {
         if ($poolFn -match "\b$bannedPool\b") { $poolBad += "poolClick reaches $bannedPool - the pools are FREE and are priced by nothing (SPEC V219, I9)" }
     }
 }
-if ($bloodFn -and $bloodFn -notmatch 'poolClick\("bloodPool", 20, field, familyCap\("bloodPool"\)\)') { $poolBad += "bloodClick does not hand its twenty dots and its ceiling to poolClick (SPEC V337c)" }
-if ($quintFn -and $quintFn -notmatch 'poolClick\("quint", 10, field, nil\)') { $poolBad += "quintClick does not hand its ten dots to poolClick with no ceiling (SPEC I60)" }
+if ($bloodFn -and $bloodFn -notmatch 'poolClick\("bloodPool_", 20, field, familyCap\("bloodPool"\)\)') { $poolBad += "bloodClick does not hand its twenty dots and its ceiling to poolClick (SPEC V337c)" }
+if ($quintFn -and $quintFn -notmatch 'poolClick\("quint_", 10, field, nil\)') { $poolBad += "quintClick does not hand its ten dots to poolClick with no ceiling (SPEC I60)" }
 if ($poolBad) { foreach ($b in $poolBad) { Fail "V446 $b" } }
 else { Pass "V446 blood pool and quintessence take the same prefix a rating does, through one rule and two entry points" }
+
+# V447 (T988): the ten WILLPOWER SPENT boxes take the same prefix, by a pair of events instead
+# of autoChange - a checkBox has none (SPEC I155j). Twenty controls carry the pair, because the
+# field is mirrored (SPEC V36), and the stamp that gates the write is what keeps the onChange of
+# a sheet OPENING from wiping the row.
+$wpBoxes = @()
+foreach ($f in $files) {
+    foreach ($n in (Doc $f.FullName).SelectNodes("//checkBox")) {
+        $wf = $n.GetAttribute("field")
+        if ($wf -notmatch '^(\$\(field\)|willpower)_c\d+$') { continue }
+        $wpBoxes += @{ file = $f.Name; field = $wf; click = $n.GetAttribute("onClick"); change = $n.GetAttribute("onChange") }
+    }
+}
+$wpClickFn  = NoComments (LuaFn $rootTxt 'wpSpentClick')
+$wpChangeFn = NoComments (LuaFn $rootTxt 'wpSpentChange')
+$wpBad = @()
+if ($wpBoxes.Count -ne 20) { Fail "V447 $($wpBoxes.Count) willpower spent box(es) were read, expected 20 - ten on Main and ten on the WoD20.3 mirror (SPEC V36, V209)" }
+else {
+    foreach ($w in $wpBoxes) {
+        if ($w.click  -ne "wpSpentClick('$($w.field)');")  { $wpBad += "$($w.file) $($w.field) runs '$($w.click)' on the click, expected wpSpentClick('$($w.field)'); - the box that does not announce the click leaves the player clicking into nothing (SPEC V447a)" }
+        if ($w.change -ne "wpSpentChange('$($w.field)');") { $wpBad += "$($w.file) $($w.field) runs '$($w.change)' on the change, expected wpSpentChange('$($w.field)'); (SPEC V447a)" }
+    }
+    if (-not $wpClickFn)  { $wpBad += "wpSpentClick is not on the root form - twenty boxes name a function that does not exist" }
+    if (-not $wpChangeFn) { $wpBad += "wpSpentChange is not on the root form" }
+    if ($wpClickFn -and $wpClickFn -notmatch 'WP_CLICK = field;') { $wpBad += "wpSpentClick does not stamp the click - every change would then read as one, the sheet OPENING included (SPEC V447b)" }
+    if ($wpClickFn -and $wpClickFn -match 'setField\(') { $wpBad += "wpSpentClick writes a field - it only announces, and the write belongs to the change (SPEC V447d)" }
+    if ($wpChangeFn) {
+        if ($wpChangeFn -notmatch 'if sheet == nil or WP_CLICK ~= field then return; end;') { $wpBad += "wpSpentChange does not stand down when the change was not clicked - the onChange fired while the sheet opens would rewrite the row and box c1 of a row at five would wipe the four above it (SPEC V447b)" }
+        $iClear = $wpChangeFn.IndexOf('WP_CLICK = nil;')
+        $iWrite = $wpChangeFn.IndexOf('poolPrefix("willpower_c", 10,')
+        if ($iClear -lt 0) { $wpBad += "wpSpentChange never clears the stamp - the prefix it writes would fire nine more changes that all pass (SPEC V447c)" }
+        elseif ($iWrite -lt 0) { $wpBad += "wpSpentChange never writes the row - this check is reading nothing (SPEC V20)" }
+        elseif ($iClear -gt $iWrite) { $wpBad += "wpSpentChange clears the stamp AFTER it writes - the write re-enters through its own onChange (SPEC V447c)" }
+        foreach ($bannedWp in @('xpClick', 'declareTrait', 'xpLedgerRows', 'XP_TRAIT')) {
+            if ($wpChangeFn -match "\b$bannedWp\b") { $wpBad += "wpSpentChange reaches $bannedWp - the spent boxes cost no experience, which is the whole of the ask (SPEC V447d)" }
+        }
+    }
+    if ($wpBad) { foreach ($b in $wpBad) { Fail "V447 $b" } }
+    else { Pass "V447 the twenty willpower spent boxes carry the click stamp and the change that writes the prefix, and the write costs nothing" }
+}
 
 # ---- V136: pricing a click writes nothing ---------------------------------------------
 # The ledger is asked what the sheet WOULD cost, and it answers without touching it. The
@@ -6995,12 +7035,12 @@ if ($rootCode -notmatch 'bloodPool_1 == nil') { $bpBad += "the ten-dot seed is g
 $bc219 = LuaFn $rootTxt 'bloodClick'
 if (-not $bc219) { $bpBad += "bloodClick is not on the root form - twenty dots name a function that does not exist, and every one of them is dead (SPEC V209)" }
 else {
-    $bcb219 = NoComments ($bc219 + "`r`n" + (LuaFn $rootTxt 'poolClick'))
+    $bcb219 = NoComments ($bc219 + "`r`n" + (LuaFn $rootTxt 'poolClick') + "`r`n" + (LuaFn $rootTxt 'poolPrefix'))
     foreach ($banned219 in @('xpClick', 'declareTrait')) {
         if ($bcb219 -match "\b$banned219\b") { $bpBad += "bloodClick reaches $banned219 - the dots are FREE, and that is the half of V219 the amendment did NOT touch (SPEC I108c)" }
     }
     if ($bcb219 -notmatch 'familyCap\("bloodPool"\)') { $bpBad += "bloodClick never asks familyCap for the ceiling - the cap would be data nobody reads, which V337a calls worse than absent (SPEC V337c)" }
-    if ($bcb219 -notmatch 'setField\(base \.\. "_" \.\. i, on\)') { $bpBad += "the pool row is never written - the twenty dots would be dead (SPEC V446, T986)" }
+    if ($bcb219 -notmatch 'setField\(base \.\. i, on\)') { $bpBad += "the pool row is never written - the twenty dots would be dead (SPEC V446, T986)" }
     if ($bcb219 -notmatch 'alvo > cur and alvo > cap') { $bpBad += "the ceiling is read on a click that goes DOWN too - spending blood is the one thing it never refuses (SPEC I108c, V446)" }
 }
 if ($bpBad) { foreach ($b in $bpBad) { Fail "V219 $b" } }
@@ -10627,7 +10667,7 @@ else {
     }
     if ($rootFor263 -match 'declareTrait\("quint') { $v264Bad += "quint_* is declared as a trait - it would be priced, refused and logged like a rating (SPEC V219)" }
     if ($rootFor263 -notmatch 'function quintClick\(field, ctrl\)') { $v264Bad += "quintClick is not on the root form - ten dots name a function that does not exist and every one of them is dead (SPEC T987)" }
-    if ($rootFor263 -notmatch 'poolClick\("quint", 10, field, nil\)') { $v264Bad += "quintClick does not hand the ten dots to poolClick with no ceiling - quintessence has no family cap (SPEC V446)" }
+    if ($rootFor263 -notmatch 'poolClick\("quint_", 10, field, nil\)') { $v264Bad += "quintClick does not hand the ten dots to poolClick with no ceiling - quintessence has no family cap (SPEC V446)" }
 
     # (c) one row, one pitch: a resource row split across two tops is V37's defect in a shape
     # nothing measures, because V37 weighs a row against its NEIGHBOUR and this is one row.
@@ -15311,9 +15351,9 @@ $blood337 = NoComments (LuaFn $rootTxt 'poolClick')
 if (-not $blood337) { $v337Bad += "bloodClick not found - leg (d) measured nothing on the blood pool side (SPEC V209)" }
 else {
     $bCap337 = $blood337.IndexOf('xpWarn("That family caps this trait")')
-    $bSet337 = $blood337.IndexOf('setField(base .. "_" .. i, on)')
+    $bSet337 = $blood337.IndexOf('poolPrefix(base, count, alvo)')
     if ($bCap337 -lt 0) { $v337Bad += "poolClick never refuses over the ceiling - the blood cap would be data nobody reads (SPEC V337c)" }
-    elseif ($bSet337 -lt 0) { $v337Bad += "poolClick never writes the row - the twenty dots would be dead (SPEC V209, V446)" }
+    elseif ($bSet337 -lt 0) { $v337Bad += "poolClick never hands the row to poolPrefix - the twenty dots would be dead (SPEC V209, V446)" }
     elseif ($bCap337 -gt $bSet337) { $v337Bad += "poolClick clamps to the ceiling AFTER it writes the row - that is the write-then-undo the whole amendment of V219 was made to avoid (SPEC V337d, Q20)" }
 }
 
