@@ -1289,6 +1289,15 @@ function LuaFn($txt, $name) {
     if ($m.Success) { return $m.Value }
     return ''
 }
+# T985: the click is THREE functions now and not one (SPEC I155a, V444) - xpPrefix writes the
+# row, xpStep decides ONE level, xpClick walks the levels between where the trait stands and
+# where the clicked dot says it should stand. Every check that asks "what does the click do"
+# has to read the three of them: reading xpClick alone would measure a body that moved out
+# from under it and pass on nothing, which is a check turned no-op (SPEC V20, B7).
+function LuaClickPath($txt) {
+    return (LuaFn $txt 'xpStep') + "`r`n" + (LuaFn $txt 'xpClick') + "`r`n" + (LuaFn $txt 'xpPrefix')
+}
+
 $cycFn  = LuaFn $root 'cycleHealthMark'
 $healFn = LuaFn $root 'healHealthMark'
 $rendFn = LuaFn $root 'renderHealthTrack'
@@ -4252,7 +4261,7 @@ else {
 # ---- V100: experience is worked out, never booked ---------------------------------
 # The balance is xpTotal minus the log. A deducted balance would be a second count of the
 # same purchases, and the two would part company the first time a click was missed.
-$guardFn = LuaFn $root 'xpClick'
+$guardFn = LuaClickPath $root
 $boxesFn = LuaFn $root 'renderXPBoxes'
 $paintFn = LuaFn $root 'xpPaint'
 $writes = @([regex]::Matches($root, 'setField\("xpTotal",')).Count
@@ -4288,12 +4297,12 @@ else { Pass "V108 a click walks the ledger once" }
 # ---- V101: the guard sleeps until the character is frozen -------------------------
 # Building a character spends nothing, so a balance of zero must not stop the first dot.
 if ($guardFn -notmatch 'baselineOf\(\)') { Fail "V101 the guard does not look for a baseline - a character could not be built at all" }
-elseif ($guardFn -notmatch '(?s)if base == nil then.{0,220}return;') { Fail "V101 the guard does not stand down without a baseline (SPEC I8c)" }
+elseif ($guardFn -notmatch '(?s)if base == nil then.{0,220}return true,') { Fail "V101 the guard does not stand down without a baseline (SPEC I8c)" }
 else { Pass "V101 the guard sleeps until the storyteller freezes the character" }
 
 # ---- V103: only a point that is IN the log can be sold back -----------------------
 if ($guardFn -notmatch 'traitLevel\(base,') { Fail "V103 the guard never reads the baseline rating - it would let a frozen point be sold" }
-elseif ($guardFn -notmatch '(?s)if after < traitLevel\(base,.{0,80}return;') { Fail "V103 the guard does not refuse a sale that would drop the trait below the frozen character" }
+elseif ($guardFn -notmatch '(?s)if after < traitLevel\(base,.{0,80}return false;') { Fail "V103 the guard does not refuse a sale that would drop the trait below the frozen character" }
 else { Pass "V103 a point the storyteller froze cannot be sold back" }
 
 # ---- V102: the three experience boxes own no field --------------------------------
@@ -4691,7 +4700,7 @@ if ($rootTxt -notmatch 'function xpSum\(rows\)') { Fail "V125 xpSum is missing -
 elseif ($rootTxt -notmatch 'function xpSpent\(\)\s*\r?\n\s*return xpSum\(xpLedgerRows\(\)\);') { Fail "V125 xpSpent does not total the rows through xpSum" }
 else { Pass "V125 totalling is split from walking" }
 
-$guardFn = [regex]::Match($rootTxt, 'function xpClick\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
+$guardFn = [regex]::Match($rootTxt, 'function xpPrefix\(form, trait, t, level\)(.*?function xpClick\(field, form\).*?)\n\t\t\tend;', 'Singleline')
 if (-not $guardFn.Success) { Fail "V125 xpClick not found on the root form" }
 else {
     $g = NoComments $guardFn.Groups[1].Value
@@ -4772,11 +4781,11 @@ else { Pass "V128 the Magika keys are out of localization.lang" }
 # the message describes a sheet nothing was written to. It stays fenced to the balance
 # branch: selling back a point the storyteller paid for (V103) is a different refusal, and a
 # message naming the wrong reason is worse than one that never comes.
-$guardFn = [regex]::Match($rootTxt, 'function xpClick\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
+$guardFn = [regex]::Match($rootTxt, 'function xpPrefix\(form, trait, t, level\)(.*?function xpClick\(field, form\).*?)\n\t\t\tend;', 'Singleline')
 if (-not $guardFn.Success) { Fail "V129 xpClick not found on the root form" }
 else {
     $g     = NoComments $guardFn.Groups[1].Value
-    $buy   = [regex]::Match($g, 'if want then(.*?)else', 'Singleline')
+    $buy   = [regex]::Match($g, '(if not free and \(\(tonumber\(sheet\.xpTotal\) or 0\) - spent\) < 0 then.*?\n\t\t\t\t\tend;)', 'Singleline')
     $warns = @([regex]::Matches($g, 'xpWarn\("([^"]*)"\)'))
     # EIGHT refusals speak, and each one says its own reason: want of experience (this check),
     # the three a speciality row adds - no trait chosen, the storyteller allowing none
@@ -4958,19 +4967,19 @@ else { Pass "V145 $bgRows background rows, one declared count, both loops readin
 # out what the click is asking for, price the sheet as it WOULD be, and only then write. The
 # three rounds before this one all let the mark land and tried to take it back, and a write
 # made from inside the dot's own onChange never survived the dispatch (SPEC B36/B38).
-$clickFn = [regex]::Match($rootTxt, 'function xpClick\(field, form\)(.*?)\n\t\t\tend;', 'Singleline')
+$clickFn = [regex]::Match($rootTxt, 'function xpPrefix\(form, trait, t, level\)(.*?function xpClick\(field, form\).*?)\n\t\t\tend;', 'Singleline')
 $markFn  = LuaFn $rootTxt 'markDot'
 if (-not $clickFn.Success) { Fail "V135 xpClick not found on the root form" }
 else {
     $c     = NoComments $clickFn.Groups[1].Value
     $iPr   = $c.IndexOf('xpLedgerRows(field, want, key, want and okey or nil)')
-    $iMark = $c.LastIndexOf('markDot(form, field, want)')
+    $iMark = $c.LastIndexOf('xpPrefix(form, trait, t, want and (level + 1) or (level - 1));')
     $marks = @([regex]::Matches($c, 'markDot\('))
-    if ($c -notmatch 'local want = not \(sheet\[field\] == true\);') { Fail "V135 xpClick never works out what the click is asking for - with autoChange off, nothing else does" }
+    if ($c -notmatch 'local alvo = \(\(sheet\[field\] == true\) and n == cur\) and \(n - 1\) or n;') { Fail "V135 the click never works out the LEVEL it is asking for (SPEC I155b) - with autoChange off, nothing else does" }
     elseif ($c -match 'if undo then') { Fail "V135 xpClick still has an undo branch - a mark taken back does not stick (SPEC B36/B38)" }
     elseif ($iPr -lt 0) { Fail "V135 xpClick does not price the click before deciding" }
-    elseif ($iMark -lt $iPr) { Fail "V135 xpClick marks the dot before it prices the click (SPEC B38)" }
-    elseif ($marks.Count -ne 3) { Fail "V135 xpClick marks the dot in a place it should not - exactly three marks: no baseline, nothing to price, and the one the rules allowed" }
+    elseif ($iMark -lt $iPr) { Fail "V135 the step writes the row before it prices the level (SPEC B38)" }
+    elseif ($marks.Count -ne 2) { Fail "V135 the click marks a dot in $($marks.Count) place(s) - exactly two: xpPrefix, which owns every rating dot (SPEC V443), and the one-dot toggle for what carries no rating (SPEC I155i)" }
     else { Pass "V135 the click is priced first and marked only if the rules allow it" }
 }
 if (-not $markFn) { Fail "V135 markDot not found on the root form" }
@@ -4978,6 +4987,87 @@ elseif ($markFn -notmatch 'setField\(field, v\);') { Fail "V135 markDot does not
 elseif ($markFn -notmatch 'findDot\(form, field\)') { Fail "V135 markDot never looks the dot up" }
 elseif ($markFn -notmatch 'dot\.checked = v;') { Fail "V135 markDot does not paint the dot - with autoChange off nothing else will" }
 else { Pass "V135 the accepted mark writes the field and paints the dot in one step" }
+
+# ---------------------------------------------------------------------------------------
+# T985 (SPEC I155): the clicked dot names the LEVEL and the click walks to it. Four rules,
+# each measured where it can actually be broken.
+# ---------------------------------------------------------------------------------------
+$clickOnly = NoComments (LuaFn $rootTxt 'xpClick')
+$stepOnly  = NoComments (LuaFn $rootTxt 'xpStep')
+$prefixFn  = NoComments (LuaFn $rootTxt 'xpPrefix')
+
+# V442: `alvo` is read straight off the `_N` suffix with no table in between, and that is only
+# sound while the dot index IS the level - first - fixed = 1 for every declared trait. One
+# declared with another ruler would buy the wrong level, silently and with no pop-up.
+$declares = @([regex]::Matches($rootTxt, 'declareTrait\([^,]+, *(\d+), *(\d+), *(\d+)\)'))
+$declBad  = @()
+foreach ($d in $declares) {
+    $dFirst = [int]$d.Groups[1].Value
+    $dFixed = [int]$d.Groups[3].Value
+    if (($dFirst - $dFixed) -ne 1) { $declBad += "$($d.Value) has first - fixed = $($dFirst - $dFixed)" }
+}
+if ($declares.Count -lt 8) { Fail "V442 only $($declares.Count) declareTrait call(s) found - this check is reading nothing (SPEC V20)" }
+elseif ($declBad) { foreach ($b in $declBad) { Fail "V442 $b, not 1 - the dot index stops being the level and the click buys the wrong one (SPEC I155a)" } }
+else { Pass "V442 all $($declares.Count) declareTrait calls keep first - fixed = 1, so the dot index IS the level" }
+
+# V443: after an accepted write the row is a PREFIX of itself, and xpPrefix is its one writer.
+if (-not $prefixFn) { Fail "V443 xpPrefix not found on the root form - nothing writes the row" }
+elseif ($prefixFn -notmatch 'for i = t\.first, t\.last, 1 do') { Fail "V443 xpPrefix does not walk the whole row - the dots above the level would keep whatever they had" }
+elseif ($prefixFn -notmatch 'local on = \(i <= level\);') { Fail "V443 xpPrefix does not light 1..level - a gap would survive the click (SPEC I155c)" }
+elseif ($prefixFn -notmatch 'markDot\(form, trait \.\. "_" \.\. i, on\)') { Fail "V443 xpPrefix never marks a dot - this check is reading nothing (SPEC V20)" }
+elseif ($clickOnly -notmatch 'if alvo == cur then xpPrefix\(form, trait, t, cur\); return; end;') { Fail "V443 the gap-closing click is gone - a click that moves no level would leave the hole on screen (SPEC I155c)" }
+elseif (@([regex]::Matches($clickOnly, [regex]::Escape('xpPrefix(form, trait, t, cur);'))).Count -ne 2) { Fail "V443 the row is not straightened before the sequence - on a gap row the step would reach for a dot that is lit already and price the level at nothing (SPEC V136)" }
+elseif ($clickOnly.LastIndexOf('xpPrefix(form, trait, t, cur);') -gt $clickOnly.IndexOf('while lvl ~= alvo do')) { Fail "V443 the row is straightened after the loop has already walked it - the first level would still be priced against a gap (SPEC V136)" }
+else { Pass "V443 the row is written as a prefix of itself, by xpPrefix and nowhere else" }
+
+# V444: the click is a SEQUENCE of one-level steps and the first refusal stops it. The price
+# lives in the step and nowhere else - a jump priced in one go is a second cost table (SPEC I9).
+if (-not $clickOnly) { Fail "V444 xpClick not found on the root form" }
+elseif (-not $stepOnly) { Fail "V444 xpStep not found on the root form - the click has no step to walk" }
+elseif ($clickOnly -notmatch 'while lvl ~= alvo do') { Fail "V444 the click does not walk the levels between where the trait stands and where the dot says (SPEC I155d)" }
+elseif ($clickOnly -notmatch 'xpStep\(form, trait, t, lvl, want, base, free\)') { Fail "V444 the click does not hand each level to xpStep - the rules would be asked somewhere else" }
+elseif ($clickOnly -notmatch 'if not ok then break; end;') { Fail "V444 the sequence does not stop at the first refusal - a refused level would let the next one through (SPEC I155e)" }
+elseif ($clickOnly -match 'xpLedgerRows\(') { Fail "V444 the click prices outside the step - a jump priced in one go is a second cost table (SPEC I9, V125)" }
+elseif ($stepOnly -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil\)') { Fail "V444 the step does not price the level it is about to write (SPEC V136)" }
+else { Pass "V444 the click walks one level at a time and the first refusal stops it" }
+
+# V445: the three repaints the CLICK owns leave the loop. Inside it they fire once per level,
+# and xpLedgerRefresh drags a ledger walk with it while the boxes climb the whole sheet (V133).
+$iLoop445 = $clickOnly.IndexOf('while lvl ~= alvo do')
+$iEnd445  = if ($iLoop445 -ge 0) { $clickOnly.IndexOf("`n`t`t`t`tend;", $iLoop445) } else { -1 }
+$paintBad = @()
+foreach ($p445 in @('renderSpecialities(', 'renderAllXPBoxes(', 'xpLedgerRefresh(')) {
+    $nClick = @([regex]::Matches($clickOnly, [regex]::Escape($p445))).Count
+    $nStep  = @([regex]::Matches($stepOnly,  [regex]::Escape($p445))).Count
+    if ($nStep -ne 0) { $paintBad += "$p445 is called from xpStep - it would paint once per level" }
+    elseif ($nClick -ne 1) { $paintBad += "$p445 is called $nClick time(s) in xpClick - exactly one, after the loop" }
+    elseif ($clickOnly.IndexOf($p445) -lt $iEnd445) { $paintBad += "$p445 is called INSIDE the loop - once per level instead of once per click" }
+}
+if ($iLoop445 -lt 0 -or $iEnd445 -lt 0) { Fail "V445 the click has no loop to measure - this check is reading nothing (SPEC V20)" }
+elseif ($paintBad) { foreach ($b in $paintBad) { Fail "V445 $b (SPEC I155f)" } }
+else { Pass "V445 the three repaints the click owns fire once per click, after the loop" }
+
+# V446 (T986/T987): the two POOLS take the same prefix the ratings do, and pay none of the
+# price. One rule, two entry points - the shape familyCap already gives the ceiling (SPEC V337c).
+$poolFn  = NoComments (LuaFn $rootTxt 'poolClick')
+$bloodFn = NoComments (LuaFn $rootTxt 'bloodClick')
+$quintFn = NoComments (LuaFn $rootTxt 'quintClick')
+$poolBad = @()
+if (-not $poolFn)  { $poolBad += "poolClick is not on the root form - both pools name a rule that does not exist" }
+if (-not $bloodFn) { $poolBad += "bloodClick is not on the root form" }
+if (-not $quintFn) { $poolBad += "quintClick is not on the root form" }
+if ($poolFn) {
+    if ($poolFn -notmatch 'local alvo = \(\(sheet\[field\] == true\) and n == cur\) and \(n - 1\) or n;') { $poolBad += "the pool reads the clicked dot differently from a rating - one rule, two readings (SPEC I155b)" }
+    if ($poolFn -notmatch 'for i = 1, count, 1 do') { $poolBad += "poolClick does not walk the whole pool - the dots above the level would keep whatever they had" }
+    if ($poolFn -notmatch 'local on = \(i <= alvo\);') { $poolBad += "poolClick does not light 1..alvo - a gap would survive the click (SPEC V443)" }
+    foreach ($bannedPool in @('xpClick', 'declareTrait', 'xpLedgerRows', 'XP_TRAIT')) {
+        if ($poolFn -match "\b$bannedPool\b") { $poolBad += "poolClick reaches $bannedPool - the pools are FREE and are priced by nothing (SPEC V219, I9)" }
+    }
+}
+if ($bloodFn -and $bloodFn -notmatch 'poolClick\("bloodPool", 20, field, familyCap\("bloodPool"\)\)') { $poolBad += "bloodClick does not hand its twenty dots and its ceiling to poolClick (SPEC V337c)" }
+if ($quintFn -and $quintFn -notmatch 'poolClick\("quint", 10, field, nil\)') { $poolBad += "quintClick does not hand its ten dots to poolClick with no ceiling (SPEC I60)" }
+if ($poolBad) { foreach ($b in $poolBad) { Fail "V446 $b" } }
+else { Pass "V446 blood pool and quintessence take the same prefix a rating does, through one rule and two entry points" }
 
 # ---- V136: pricing a click writes nothing ---------------------------------------------
 # The ledger is asked what the sheet WOULD cost, and it answers without touching it. The
@@ -5062,7 +5152,7 @@ else { Pass "V139 all ten row groups carry their field, and a stamp zeroes a pri
 # would refuse a point that costs nothing (SPEC C, 40th round).
 $cc      = NoComments $clickFn.Groups[1].Value
 $iStamp  = $cc.IndexOf('setField("xpFree"')
-$iMarkOk = $cc.LastIndexOf('markDot(form, field, want)')
+$iMarkOk = $cc.LastIndexOf('xpPrefix(form, trait, t, want and (level + 1) or (level - 1));')
 $buyBr   = [regex]::Match($cc, 'if want then(.*?)else', 'Singleline')
 if ($iStamp -lt 0) { Fail "V140 xpClick never writes the stamp - a free point would be charged again on the next render" }
 elseif ($iStamp -lt $iMarkOk) { Fail "V140 the stamp is written before the mark - a refused click would leave one behind (SPEC V135)" }
@@ -5317,7 +5407,7 @@ else {
 $costSpecFn = LuaFn $rootTxt 'specCost'
 $forbidFn   = LuaFn $rootTxt 'specForbidden'
 $xpCostFn   = LuaFn $rootTxt 'xpCost'
-$specGuard  = [regex]::Match($cc, 'if trait ~= nil and string\.match\(trait, "\^speciality_%d\+\$"\) ~= nil then(.*?)\n\t\t\t\tend;', 'Singleline')
+$specGuard  = [regex]::Match($cc, 'if string\.match\(trait, "\^speciality_%d\+\$"\) ~= nil then(.*?)\n\t\t\t\tend;', 'Singleline')
 if (-not $costSpecFn) { Fail "V154 specCost not found on the root form" }
 elseif (-not $forbidFn) { Fail "V154 specForbidden not found - the closed door has no reader of its own, so zero would have to mean both price and refusal again (SPEC V254b)" }
 elseif ($forbidFn -notmatch 'if sheet == nil then return true; end;') { Fail "V154 specForbidden does not fail closed on a sheet with no room (SPEC V80)" }
@@ -5330,7 +5420,7 @@ elseif ($specGuard.Groups[1].Value -notmatch 'if want and base ~= nil and specFo
 elseif ($specGuard.Groups[1].Value -notmatch 'xpWarn\("Specialties cannot be bought"\);') { Fail "V154 a closed door refuses in silence" }
 elseif ($specGuard.Groups[1].Value -notmatch 'xpWarn\("Choose a trait first"\);') { Fail "V156 a row with no trait refuses in silence" }
 elseif ($specGuard.Groups[1].Value -match 'markDot\(|setField\(') { Fail "V154/V156 the speciality branch writes before it has decided (SPEC V135)" }
-elseif ($cc.IndexOf('if trait ~= nil and string.match(trait, "^speciality_%d+$")') -gt $cc.LastIndexOf('markDot(form, field, want)')) { Fail "V154/V156 the speciality refusals come after the mark - there would be nothing to refuse" }
+elseif ($cc.IndexOf('if string.match(trait, "^speciality_%d+$")') -gt $cc.LastIndexOf('xpPrefix(form, trait, t, want and (level + 1) or (level - 1));')) { Fail "V154/V156 the speciality refusals come after the mark - there would be nothing to refuse" }
 else { Pass "V154/V156 a specialty is bought only where the storyteller allowed it, zero is a price and not a shut door, and every refusal says why" }
 
 # ---- V157: selling a speciality does not take the typing with it ---------------------
@@ -5360,7 +5450,7 @@ else { Pass "V159 a revoked gift gives back trait, text, dot and stamp in one st
 # The lock is settled BEFORE the baseline test: a gift is never the player's to take off,
 # not even while the character is being built.
 $renderSpecFn = LuaFn $rootTxt 'renderSpecialities'
-$iSpecGuard   = $cc.IndexOf('if trait ~= nil and string.match(trait, "^speciality_%d+$")')
+$iSpecGuard   = $cc.IndexOf('if string.match(trait, "^speciality_%d+$")')
 $iBaseTest    = $cc.IndexOf('if base == nil then')
 $specDotOpacity = @($mainDoc.SelectNodes("//template[@name='SpecialityRow']//imageCheckBox[@opacity]"))
 if (-not $renderSpecFn) { Fail "V161 renderSpecialities not found on the root form" }
@@ -5398,7 +5488,7 @@ elseif ($renderSpecFn -notmatch 'xpFind\(tabRootOf\(from\), names, found\);') { 
 # 4 since T842: the declaration, the two accepted click paths, and the speciality dataLink the
 # BUTTON needs. The combo painted itself from the field; a button's text is not a field, so the
 # seven rows need the same watcher the sixteen backgrounds have had since T808 (SPEC I107a2).
-elseif ($renderCalls.Count -ne 4) { Fail "V164 renderSpecialities is called from $($renderCalls.Count - 1) place(s) on the root form - the two accepted click paths, the speciality dataLink, and no more" }
+elseif ($renderCalls.Count -ne 3) { Fail "V164 renderSpecialities is called from $($renderCalls.Count - 1) place(s) on the root form - the ONE accepted click path (T985 made the click a sequence and the repaint left the loop, SPEC V445) and the speciality dataLink, and no more" }
 elseif ($specLinks2.Count -ne 1) { Fail "V164 WoD20.1 carries $($specLinks2.Count) xpFree links - one, so a grant made on another client locks the row here too" }
 elseif ($mainRawTxt -notmatch '<dataLink field="xpFree" onChange="renderSpecialities\(self\);"/>') { Fail "V164 the xpFree link does not repaint the lock" }
 elseif ($mainRawTxt -notmatch '(?s)<event name="onNodeReady">.*?renderSpecialities\(self\);.*?</event>') { Fail "V164 opening the sheet does not paint the lock - a saved gift would show as editable" }
@@ -6154,7 +6244,7 @@ else { Pass "V181/V182/V185/V186 the four picker rules each speak their own reas
 # before anything is written (SPEC V135). V187: lowering a Discipline does NOT erase the
 # paths and rituals bought under it - one click may not destroy what the player built, and
 # a load-time sweep is exactly the shape that reopened V121.
-$clickFn2 = LuaFn $rootTxt 'xpClick'
+$clickFn2 = LuaClickPath $rootTxt
 $sweepBad = @()
 if (-not $clickFn2) { $sweepBad += "V183 xpClick not found on the root form" }
 else {
@@ -6162,7 +6252,7 @@ else {
     if ($c2 -notmatch 'secPath_') { $sweepBad += "V183 xpClick does not special-case a secondary path row - the cap is not enforced where the dot is bought" }
     if ($c2 -notmatch 'markDot\(') { $sweepBad += "V183 xpClick never marks the dot - the check reads nothing (SPEC V20)" }
     $capIdx  = $c2.IndexOf('secPath_')
-    $markIdx = $c2.IndexOf('markDot(')
+    $markIdx = $c2.IndexOf('xpPrefix(form,')
     if ($capIdx -ge 0 -and $markIdx -ge 0 -and $capIdx -gt $markIdx) { $sweepBad += "V183/V135 the secondary path cap is tested AFTER the dot is written - a refused purchase would leave the dot behind" }
 }
 # The erasing sweep: a loop that clears a path or ritual field outside a click handler.
@@ -6905,12 +6995,13 @@ if ($rootCode -notmatch 'bloodPool_1 == nil') { $bpBad += "the ten-dot seed is g
 $bc219 = LuaFn $rootTxt 'bloodClick'
 if (-not $bc219) { $bpBad += "bloodClick is not on the root form - twenty dots name a function that does not exist, and every one of them is dead (SPEC V209)" }
 else {
-    $bcb219 = NoComments $bc219
+    $bcb219 = NoComments ($bc219 + "`r`n" + (LuaFn $rootTxt 'poolClick'))
     foreach ($banned219 in @('xpClick', 'declareTrait')) {
         if ($bcb219 -match "\b$banned219\b") { $bpBad += "bloodClick reaches $banned219 - the dots are FREE, and that is the half of V219 the amendment did NOT touch (SPEC I108c)" }
     }
     if ($bcb219 -notmatch 'familyCap\("bloodPool"\)') { $bpBad += "bloodClick never asks familyCap for the ceiling - the cap would be data nobody reads, which V337a calls worse than absent (SPEC V337c)" }
-    if ($bcb219 -notmatch 'setField\(field, false\)') { $bpBad += "bloodClick cannot turn a dot OFF - a cap limits what the family HOLDS, and spending blood is the one thing it never refuses" }
+    if ($bcb219 -notmatch 'setField\(base \.\. "_" \.\. i, on\)') { $bpBad += "the pool row is never written - the twenty dots would be dead (SPEC V446, T986)" }
+    if ($bcb219 -notmatch 'alvo > cur and alvo > cap') { $bpBad += "the ceiling is read on a click that goes DOWN too - spending blood is the one thing it never refuses (SPEC I108c, V446)" }
 }
 if ($bpBad) { foreach ($b in $bpBad) { Fail "V219 $b" } }
 else { Pass "V219 twenty free blood pool dots, Lua-driven through one refuser that prices nothing and reads the family ceiling from familyCap" }
@@ -6918,12 +7009,12 @@ else { Pass "V219 twenty free blood pool dots, Lua-driven through one refuser th
 # ---- V220: the ceiling refuses BEFORE anything is written -------------------------
 # Same spot and same shape as the path ceiling it sits beside. A guard that lets the mark
 # land and argues afterwards cost three rounds once already (SPEC B38, V135).
-$clickBody = LuaFn $rootTxt 'xpClick'
+$clickBody = LuaClickPath $rootTxt
 if (-not $clickBody) { Fail "V220 xpClick not found on the root form" }
 else {
     $cb = NoComments $clickBody
     $capAt = $cb.IndexOf("maxDiscLevel()")
-    $markAt = $cb.IndexOf("markDot(")
+    $markAt = $cb.IndexOf("xpPrefix(form,")
     if ($capAt -lt 0) { Fail "V220 nothing in xpClick asks for the generation ceiling" }
     elseif (-not $cb.Contains('"^clanDisc_%d+$"')) { Fail "V220 the ceiling does not cover clan Discipline dots" }
     elseif (-not $cb.Contains('"^disc_%d+$"')) { Fail "V220 the ceiling does not cover out-of-clan Discipline dots" }
@@ -10531,10 +10622,12 @@ if ($quintDots.Count -ne 10) { Fail "V264 $($quintDots.Count) quintessence dot(s
 else {
     foreach ($q in $quintDots) {
         $qf = $q.GetAttribute("field")
-        if ($q.GetAttribute("onClick")) { $v264Bad += "$qf carries an onClick - quintessence is a RESOURCE and reaches xpClick through nothing (SPEC V219, I9)" }
-        if ($q.GetAttribute("autoChange") -eq 'false') { $v264Bad += "$qf is autoChange='false' - a free dot marks itself, which is what makes it free" }
+        if ($q.GetAttribute("onClick") -ne "quintClick('$qf', self);") { $v264Bad += "$qf runs '$($q.GetAttribute('onClick'))' on the click, expected quintClick('$qf', self); - one dot, one field, and the level it names (SPEC I155i, T987)" }
+        if ($q.GetAttribute("autoChange") -ne 'false') { $v264Bad += "$qf is not autoChange='false' - the host would mark it behind quintClick and the row would stop being a prefix (SPEC V443, V446)" }
     }
     if ($rootFor263 -match 'declareTrait\("quint') { $v264Bad += "quint_* is declared as a trait - it would be priced, refused and logged like a rating (SPEC V219)" }
+    if ($rootFor263 -notmatch 'function quintClick\(field, ctrl\)') { $v264Bad += "quintClick is not on the root form - ten dots name a function that does not exist and every one of them is dead (SPEC T987)" }
+    if ($rootFor263 -notmatch 'poolClick\("quint", 10, field, nil\)') { $v264Bad += "quintClick does not hand the ten dots to poolClick with no ceiling - quintessence has no family cap (SPEC V446)" }
 
     # (c) one row, one pitch: a resource row split across two tops is V37's defect in a shape
     # nothing measures, because V37 weighs a row against its NEIGHBOUR and this is one row.
@@ -15206,22 +15299,22 @@ if ($readers337.Count -ne 1) { $v337Bad += "FAMILY_CAP is indexed $($readers337.
 
 # (d) BOTH refusers say no BEFORE they write. A guard that lets the mark land and argues
 # afterwards cost three rounds once already (SPEC B38, V135, V337d).
-$click337 = NoComments (LuaFn $rootTxt 'xpClick')
+$click337 = NoComments (LuaClickPath $rootTxt)
 if (-not $click337) { $v337Bad += "xpClick not found - leg (d) measured nothing on the rating side (SPEC V209)" }
 else {
     $capAt337 = $click337.IndexOf('familyCap(trait)')
-    $markAt337 = $click337.IndexOf('markDot(')
+    $markAt337 = $click337.IndexOf('xpPrefix(form,')
     if ($capAt337 -lt 0) { $v337Bad += "xpClick never asks familyCap - humanity and conscience would take the dot with no ceiling in the way (SPEC I106b, I106c)" }
     elseif ($markAt337 -ge 0 -and $capAt337 -gt $markAt337) { $v337Bad += "xpClick asks familyCap AFTER it marks - the dot would land and the refusal would arrive too late to mean anything (SPEC V337d, B38)" }
 }
-$blood337 = NoComments (LuaFn $rootTxt 'bloodClick')
+$blood337 = NoComments (LuaFn $rootTxt 'poolClick')
 if (-not $blood337) { $v337Bad += "bloodClick not found - leg (d) measured nothing on the blood pool side (SPEC V209)" }
 else {
-    $bCap337 = $blood337.IndexOf('familyCap("bloodPool")')
-    $bSet337 = $blood337.IndexOf('setField(field, true)')
-    if ($bCap337 -lt 0) { $v337Bad += "bloodClick never asks familyCap - the blood ceiling would be data nobody reads (SPEC V337c)" }
-    elseif ($bSet337 -lt 0) { $v337Bad += "bloodClick never turns a dot ON - the twenty dots would be one-way (SPEC V209)" }
-    elseif ($bCap337 -gt $bSet337) { $v337Bad += "bloodClick asks familyCap AFTER it writes - that is the write-then-undo the whole amendment of V219 was made to avoid (SPEC V337d, Q20)" }
+    $bCap337 = $blood337.IndexOf('xpWarn("That family caps this trait")')
+    $bSet337 = $blood337.IndexOf('setField(base .. "_" .. i, on)')
+    if ($bCap337 -lt 0) { $v337Bad += "poolClick never refuses over the ceiling - the blood cap would be data nobody reads (SPEC V337c)" }
+    elseif ($bSet337 -lt 0) { $v337Bad += "poolClick never writes the row - the twenty dots would be dead (SPEC V209, V446)" }
+    elseif ($bCap337 -gt $bSet337) { $v337Bad += "poolClick clamps to the ceiling AFTER it writes the row - that is the write-then-undo the whole amendment of V219 was made to avoid (SPEC V337d, Q20)" }
 }
 
 # (e) nothing REACHES BACK. Choosing a capped family with a rating already above it must not

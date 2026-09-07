@@ -280,12 +280,12 @@
 			</comboBox>
 		</layout>
 
-		<!-- Ten FREE dots (SPEC I60, V264b). They wear the rating art and they are not rating
-		     dots: quintessence is spent and regained, so autoChange stays ON and there is no
-		     onClick - nothing here reaches xpClick, nothing is declared in XP_TRAIT, and no
-		     ledger line is ever written. Same standing as bloodPool_* (SPEC V219) and
-		     willpower_c*, and the gate names them by field PREFIX rather than loosening
-		     V134, which would let ANY dot mark itself and bring B38 back.
+		<!-- Ten FREE dots (SPEC I60, V264b, amended by T987). They wear the rating art and they
+		     are not rating dots: quintessence is spent and regained, and since T987 they mark the
+		     way a rating does - the clicked dot names the level and quintClick writes the row as a
+		     prefix of itself (SPEC I155i, V446). FREE is untouched by that: nothing here reaches
+		     xpClick, nothing is declared in XP_TRAIT and no ledger line is ever written. Same
+		     standing as bloodPool_*, which went Lua-driven first (SPEC V219, I108c), and the gate names the two by field PREFIX rather than loosening V134 for everyone.
 
 		     Pitch 29 and not 28: the row spans 9*pitch + 25, and 286 leaves an integer gap on
 		     both sides of the 460-wide box I73 left it in - 87 and 87 (SPEC V239).
@@ -294,16 +294,16 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="286" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
 
-			<imageCheckBox left="20" top="63" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="49" top="63" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="78" top="63" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="107" top="63" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="136" top="63" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="165" top="63" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="194" top="63" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="223" top="63" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="252" top="63" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
-			<imageCheckBox left="281" top="63" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+			<imageCheckBox left="20" top="63" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_1', self);"/>
+			<imageCheckBox left="49" top="63" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_2', self);"/>
+			<imageCheckBox left="78" top="63" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_3', self);"/>
+			<imageCheckBox left="107" top="63" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_4', self);"/>
+			<imageCheckBox left="136" top="63" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_5', self);"/>
+			<imageCheckBox left="165" top="63" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_6', self);"/>
+			<imageCheckBox left="194" top="63" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_7', self);"/>
+			<imageCheckBox left="223" top="63" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_8', self);"/>
+			<imageCheckBox left="252" top="63" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_9', self);"/>
+			<imageCheckBox left="281" top="63" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_10', self);"/>
 		</layout>
 
 		<!--

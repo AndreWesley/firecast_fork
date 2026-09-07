@@ -1,6 +1,40 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - 188a rodada (2026-09-06, noite). **`/ck:build --all`: §T983 & §T984 CONSTRUIDAS & FECHADAS (gate `-Build` VERDE 19:22; M0 + 8 mutacoes + 1 sonda RODADAS); INSTALADO 19:23:45 com o Firecast FECHADO**
+## COMECE AQUI - 189a rodada (2026-09-06, noite). **`/ck:build --all`: §T985 §T986 §T987 CONSTRUIDAS & FECHADAS (gate `-Build` VERDE; 11 mutacoes + 1 sonda RODADAS); INSTALADO 21:08:45 com o Firecast FECHADO**
+
+### **INSTALADO 2026-09-06 21:08:45** - `output/` & instalado nos MESMOS **2.816.818 B**. O user fechou o Firecast a pedido & o `rdk -i` disse "instalacao offline". O instalado velho era o de **2.811.505 B** das 19:23. 1 install na rodada (§B103).
+
+### **NAO commitado** - working tree: `SPEC.md` `HANDOFF.md` `verify-hunters-hunted.ps1` `WoD20th.lfm` `WoD20.7.lfm` + o `.rpk` de `output/` (+ tudo o que ja vinha das rodadas 186a-188a)
+
+### O que mudou no CODIGO (o pedido do user: bolinha clicavel marca como o custom de Hedge Ritual)
+- **`xpClick` mudou de SIGNIFICADO, nao de assinatura**: o sufixo `_N` do campo era o dot a virar & passou a ser o NIVEL ALVO. Os **70** `onClick="xpClick(...)"` do XML NAO foram tocados.
+- 3 funcoes onde havia 1: **`xpPrefix`** escreve a linha como prefixo `1..R`, **`xpStep`** decide UM nivel (e o corpo antigo do `xpClick`, sem repintura), **`xpClick`** anda os niveis de `cur` ate `alvo`. As 2 primeiras sao GLOBAIS de proposito - §V347 conta locais de chunk & o teto e 50.
+- desmarcar = clicar o dot ACESO que esta no topo (`n == cur`); as 2 condicoes sao 2 por causa de ficha velha com BURACO.
+- recusa no meio PARA a sequencia, o comprado FICA, 1 pop-up (§I155e).
+- 1 repintura por CLIQUE (`renderAllXPBoxes` + `xpLedgerRefresh` + `renderSpecialities`), fora do laco.
+- **`poolClick(base, count, field, cap)`** nasceu: 1 regra, 2 portas - `bloodClick` (20 dots, teto de familia) & `quintClick` (10 dots, sem teto). As 10 de `quint` ganharam `autoChange="false"` + `onClick` em `WoD20.7`.
+
+### O que mudou no GATE
+- **`LuaClickPath`** (novo helper, perto de `LuaFn`): junta `xpStep` + `xpClick` + `xpPrefix`. **A ORDEM importa** - os checks de ordem (V183/V220/V337/V154) medem "teto antes da escrita" & a escrita e a CHAMADA `xpPrefix(form,`, nao `markDot(`. Pondo `xpPrefix` primeiro, a assinatura dela aparece antes de tudo & os checks viram no-op.
+- checks NOVOS: **V442** (`first - fixed == 1` em todo `declareTrait`), **V443** (prefixo + endireitar antes do laco), **V444** (sequencia + para na 1a recusa + preco so no passo), **V445** (as 3 repinturas fora do laco), **V446** (os 2 pools).
+- checks REAPONTADOS: V101 V103 V125 V129 V135 V137 V138 V140 V141 V154 V158 V161 V164 V183 V219 V220 V260 V264 V337.
+
+### DIVIDAS DE SPEC (todas p/ o `/ck:spec`, NENHUMA bloqueia build)
+1. **§I73 diz 68 caixas de secao & o gate mede 69** (herdada da 187a).
+2. **A clausula de SONDA de §V438 esta FALSA** (herdada da 186a/187a).
+3. **§I153f ganhou regua & ela mora em §V237, nao em §V440** (herdada da 188a).
+4. **A emenda de §V295a ganhou perna no gate & ela mede 2 coisas** (herdada da 188a).
+
+### TESTES DE TELA (o Firecast ja esta com o `.rpk` novo - nada disto foi visto rodando)
+- **atributo/pericia/antecedente/disciplina**: clicar o dot 4 de uma linha vazia ! acender 1..4 de uma vez & o log cobrar os 4 niveis, na ordem.
+- **descer**: clicar o dot ACESO do topo ! apagar so ele; clicar um dot aceso do meio (o 2 de uma linha em 5) ! a linha ir para 2.
+- **sem saldo**: pedir 5 dots com XP para 3 ! a linha parar em 3, com **1** pop-up so.
+- **especialidade**: subir uma pericia de 2 direto para 5 ! o brinde de nivel 4 ser concedido (o clique CRUZA o nivel).
+- **`speciality_N_1`**: continuar igual - 1 dot, liga/desliga.
+- **blood pool & quintessencia**: clicar o dot 12 ! encher 1..12; clicar o 12 de novo ! cair para 11; com familia de teto 8, pedir 12 ! parar em 8 com 1 aviso.
+- **ficha VELHA com buraco** (se alguma existir): clicar um dot apagado abaixo do topo ! a linha se endireitar sem cobrar XP.
+
+## 188a rodada (2026-09-06, noite). **`/ck:build --all`: §T983 & §T984 CONSTRUIDAS & FECHADAS (gate `-Build` VERDE 19:22; M0 + 8 mutacoes + 1 sonda RODADAS); INSTALADO 19:23:45 com o Firecast FECHADO**
 
 ### **INSTALADO 2026-09-06 19:23:45** - `output/` & instalado nos MESMOS **2.811.505 B**. O Firecast estava FECHADO (`rdk -i` disse "instalacao offline") assim que a rodada abriu, entao o install do 187a (que ficou pendente) & o desta rodada sairam JUNTOS, num `rdk -i` so (§B103). O instalado velho era o de **2.799.056 B** das 17:20.
 
