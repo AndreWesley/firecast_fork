@@ -1,9 +1,15 @@
 # bg_essence.tsv - a essencia MECANICA de cada antecedente de PICKER_LIST["background"]
-# (SPEC T764, I105b, R8). Colunas: nome_EN <TAB> jogo <TAB> livro <TAB> pag impressa <TAB>
-# resumo de 1 linha da mecanica.
+# (SPEC T764, T998, I105e, R8). Colunas: nome_EN <TAB> jogo <TAB> epoca <TAB> livro <TAB>
+# pag impressa <TAB> resumo de 1 linha da mecanica.
 #
-# UMA LINHA POR (nome, livro). Um nome que aparece em 2 JOGOS gera 2 linhas, e e a comparacao
-# entre elas que decide o dedupe de I105b - a decisao sai DESTA tabela, nao de memoria (R8).
+# UMA LINHA POR (nome, livro). Um nome que aparece em 2 livros gera 2 linhas, e e a comparacao
+# entre elas que decide o corte de I105e - a decisao sai DESTA tabela, nao de memoria (R8).
+#
+# A coluna `epoca` NASCEU em T998 (12o lote do user, 2026-09-07) e e o eixo NOVO: I105b cortava
+# por JOGO e I105e corta por SENTIDO, com rotulo de EPOCA, de JOGO ou de LIVRO conforme o caso.
+# epoca sai do livro: core/hh/anarch/bh/m20/w20/w20kin = Modern Nights, da/w20da = Dark Ages,
+# m20va = Victorian Age, ca/camyth = Classical Age. Sao os mesmos 4 valores do combo `Era`
+# (cboSheetTheme, WoD20.10.lfm), byte a byte - V453(b) mede isso.
 #
 # Medido em 2026-08-28 sobre os despejos -layout -enc UTF-8 de research/README.md (armadilhas
 # 8 e 9), cortando na calha. Paginas sao IMPRESSAS.
@@ -20,38 +26,60 @@
 # NAO HA MAIS BURACO DE FONTE. Os 5 nomes que a 1a passada deixou com `?` (Ancestors, Fetish,
 # Kinfolk, Pure Breed, Rites) estao medidos em `w20` 135-140, e `Totem` agora tem os DOIS lados.
 #
-# ================ A DECISAO DE DEDUPE DE I105b, TIRADA DESTA TABELA ================
+# ================ O CORTE DE I105e, TIRADO DESTA TABELA (T998, 2026-09-07) ================
 #
-# 15 dos 46 nomes aparecem em MAIS DE UM JOGO. Um a um:
+# SUPERSEDE o bloco que estava aqui, que media o eixo-JOGO de I105b e fechava em 47 itens.
+# O piso do corte e I105e(3): parte quando muda a ESCADA de pontos ou mudam os REFERENTES
+# (o que os pontos compram) ou quando o livro imprime uma REGRA nova. Redacao diferente para
+# a mesma escada, e degrau renomeado com cargo de epoca, NAO cortam.
 #
-# 1 ITEM (mecanica igual nos jogos, so muda a ambientacao):
-#   Allies · Alternate Identity · Contacts · Fame · Influence · Library · Mentor · Rank ·
-#   Requisitions · Resources · Retainers
-#   Sao tracos do mundo MORTAL que os livros descrevem do mesmo jeito - dinheiro, informantes,
-#   um mais-velho que orienta, um posto numa hierarquia. `Resources` chega a repetir a frase
-#   ("actual cash, but as this Background increases...") em V20 p.115 e W20 p.138. Um sufixo
-#   `(Origem)` aqui nao separaria mecanica nenhuma, so encheria a lista.
+# 7 nomes cortam. Uma vez cortado o nome, TODA epoca com fonte ganha item - I105e(6) - senao
+# o rotulo mentiria sobre a epoca que o item cobre:
 #
-# 2 ITENS - `Status (Vampire)` e `Status (Mage)`:
-#   V20 p.118 = pe dentro da comunidade KINDRED, e o Status vem do senhor e da linhagem na
-#   Camarilla ou da matilha no Saba. M20 p.325 = respeito entre os pares DESPERTOS, e so em 4-5
-#   pontos alcanca grupos aliados. Duas escadas sociais diferentes, e uma nao converte na outra.
-#   E o exemplo que o proprio user deu em I105b. Werewolf NAO tem Status (tem Renome, que e
-#   outro eixo) entao nao ha um terceiro irmao.
-#   (hh p.123 e uma TERCEIRA escada - a Society of Leopold - mas hh e Vampire, e I105b manda
-#   dividir por JOGO, nao por livro, entao ela nao gera um 3o item.)
+#   Generation  3 : (Classical Age) ca 156 - sem pontos = 11a geracao, escada 10a..6a
+#                   (Dark Ages)     da 181 - sem pontos = 12a geracao, escada 11a..7a
+#                   (Modern Nights) core 114 - sem pontos = 13a geracao, escada 12a..8a
+#   Resources   4 : (Classical Age) ca 157 - especiarias, sal, terras, servos, titulo de Patricio
+#                   (Dark Ages)     da 181 - ouro, dizimo, impostos, classe mercante
+#                   (Modern Nights) core 115 - dinheiro, acoes, titulos, infraestrutura criminosa
+#                   (Victorian Age) m20va 121 - escada propria Poor..Opulence
+#   Influence   4 : (Classical Age) ca 157 - cursus honorum + REGRA `acima de 1 tem que ser Patricio`
+#                   (Dark Ages)     da 181 - escala generica, igual a do core
+#                   (Mage)          m20 316 - deferencia SOCIAL entre Adormecidos, rola como
+#                                   parada (Manipulacao + Influencia), sobe ate 10 e CAI por ato
+#                                   imprudente. Referente novo + 2 regras impressas novas (R155)
+#                   (Modern Nights) core 114 - escala generica
+#   Status      3 : (Hunters Hunted) hh 123 - a Society of Leopold, escada de Inquisidor
+#                   (Mage)           m20 325 - respeito entre os DESPERTOS
+#                   (Vampire)        core 118 - a comunidade KINDRED
+#   Library     2 : (Hunters Hunted) hh 140 / (Mage) m20 318
+#   Rank        2 : (Hunters Hunted) hh 134 / (Mage) m20 321
+#   Requisitions 2: (Hunters Hunted) hh 134 / (Mage) m20 321
+#   Totem       2 : (Mage) m20 326 / (Werewolf) w20 140   [ja era assim desde T764, R132]
 #
-# 2 ITENS - `Totem (Mage)` e `Totem (Werewolf)`:
-#   M20 p.326 = pacto PESSOAL com um espirito ajudante, comprado pelo personagem. W20 p.140 =
-#   "a Background that applies directly to the character's PACK, rather than the individual",
-#   e a matilha inteira poe os pontos num totem so. O que se compra e diferente (um espirito
-#   seu contra um espirito do grupo) e quem paga e diferente. Esta era a linha que a 1a passada
-#   deixou em aberto por falta do livro de Werewolf; com w20 no disco ela fecha em DOIS.
+# ==> LISTA FINAL: 59 itens + o vazio. Eram 47; as 7 familias acima ocupavam 8 e passam a 20.
+#     (T998 fechou em 58; `Influence (Mage)` entrou em T1011, R155.)
 #
-# Os 4 nomes so-de-Werewolf (Ancestors · Fetish · Kinfolk · Pure Breed) e o `Rites` NAO geram
-# homonimo: nenhum outro jogo reivindica esses nomes (V20 tem `Rituals`, que e outro nome).
+# 3 CORTES QUE A MEDICAO RECUSOU, e o porque - para ninguem tentar de novo:
 #
-# ==> LISTA FINAL: 47 itens + o vazio (45 de origem, `Status` e `Totem` valendo 2 cada).
+# a) `Status (Classical Age)` NAO existe. A escada do ca 159 e a do core 118 com cargo romano
+#    no degrau, e a unica regra que parecia nova - `Caitiff nao compra Status na criacao` -
+#    esta no core tambem (`Note that Caitiff characters may not purchase Status`, core p.118).
+#    Cargo renomeado nao e referente novo. MEDIDO ao construir T998; SPEC R147 dizia que
+#    cortava e esta ERRADA nesse ponto (divida de spec, ver HANDOFF).
+# b) `Mentor` nao corta em epoca nenhuma. As 5 leituras (core 115, da 181, hh 140, m20 318,
+#    w20 138) sao todas `um mais-velho que orienta, e o nivel e o poder dele`. O ca 157 poe
+#    Imperator e Pater Patriae nos degraus - de novo, cargo renomeado.
+# c) `Fame` nao corta. A reducao de dificuldade de cacada por ponto esta no core 114 E no
+#    da 180 E no ca 156. A 1a leitura achou que era so do Dark Ages e estava errada.
+#
+# Os 8 nomes do ca que nao cortam entram na tabela mesmo assim (procedencia, V454) mas nao
+# geram item: Allies, Alternate Identity, Contacts, Domain, Fame, Herd, Mentor, Retainers.
+#
+# 5 nomes que o m20va SO RESSALVA (logistica, paradigma, politica da Ordem da Razao) e nao
+# redefine, entao nao viram linha: Enhancements, Secret Weapons, Backup, Library, Requisitions.
+# So `Resources` ganha escada propria la (R140).
+#
 #
 # ================ 2 ACHADOS QUE A MEDICAO TROUXE JUNTO ================
 #
@@ -62,95 +90,112 @@
 #    traz outros 2: `Fate` (w20 p.137) e `Spirit Heritage` (w20 p.139). Incluir qualquer um
 #    seria alargar I105a, que so mandou entrar `Artifacts` - nao entraram.
 #
-nome_EN	jogo	livro	pag	essencia
-Allies	Vampire	core	111	Mortals who help you willingly, without coaxing; may lend their own Backgrounds and indirect access to their contacts, influence and resources.
-Allies	Vampire	da	179	Mortals who support you willingly, without coercion, and are not always available when you call.
-Allies	Mage	m20	303	Folks who have your back in time of need - badass friends, helpful animals, people who owe you.
-Allies	Werewolf	w20	135	People who help and support you out of love or common interest - family, friends, or a group that owes you.
-Alternate Identity	Vampire	core	111	A second persona with papers and documentation; dots buy how deep the cover runs and how much recognition it carries.
-Alternate Identity	Vampire	da	179	A complete alternate identity with proper documentation for the period.
-Alternate Identity	Mage	m20	304	An identity to disappear into, meant for shapechangers, clones and people in dangerous professions.
-Ancestors	Werewolf	w20	136	Contact with the spirits of the Garou who came before; the rating is how readily an ancestor answers and lends what it knew.
-Arcane	Mage	m20	305	The fine art of disappearing: records get lost, cameras glitch, people fail to place you; the Technocratic side is Cloaking.
-Armory	Vampire	hh	37	A stocked and maintained weapons cache; each dot buys more potent weapons plus the ammunition and upkeep to keep them fire-ready.
-Armory	Vampire	anarch	99	Same trait reprinted for Anarch characters: a functional armory plus the ability to maintain every weapon in it.
-Artifacts	Vampire	hh	140	Printed `Artifact`, singular. Arcanum trait: begin play owning a supernaturally potent item, its power set by the dots.
-Avatar	Mage	m20	305	The Awakened self; the rating measures it, sets how much Quintessence the mage can hold and shift, and how real it feels; the Technocratic side is Genius.
-Backup	Mage	m20	306	You can call in the cavalry and expect help, in a limited capacity, through your membership in an organization.
-Base of Operations	Vampire	hh	38	A secure HQ the hunter owns; points are split across three categories - Luxury, Size and Security.
-Certification	Mage	m20	308	In an age of permits for everything, the right certifications open the doors the paperwork guards.
-Chantry	Mage	m20	308	A stronghold shared with like-minded associates that pools territory, resources and mutual defense; the Technocratic side is Construct.
-Contacts	Vampire	core	112	People you bribe, manipulate or coerce for information; dots buy the reach of the network plus a few major Contacts.
-Contacts	Vampire	da	179	People you manipulate or coerce into offering information, with minor contacts spread around.
-Contacts	Mage	m20	309	People who know things - not as helpful or reliable as Allies, but they help you dig things up.
-Contacts	Werewolf	w20	136	Acquaintances from all walks of life who do not mind telling you what is going on.
-Cult	Mage	m20	310	Devotees who go past friendship: they trust you and act on your word.
-Demesne	Mage	m20	310	The mage's mind is her castle: a world of her own making that she can retreat into.
-Destiny	Mage	m20	311	You are a Chosen One with a part to play in the cosmic drama; prophecy hints at your coming greatness.
-Domain	Vampire	core	112	Physical territory whose access you control FOR FEEDING; dots buy its size and the strength of the claim.
-Domain	Vampire	da	180	Feeding territory your character controls, held by leave of the local Prince or elder Cainite.
-Dream	Mage	m20	312	Conduits to cosmic consciousness that feed the mage insight she did not study for; the Technocratic side is Hypercram.
-Enhancement	Mage	m20	312	Enlightened hypertech grafted into living tissue - cyborg implants or genetic biomods - in one of three declared configurations.
-Fame	Vampire	core	114	Recognition in mortal society; dots buy privileges and how far you can sway public opinion.
-Fame	Vampire	da	180	Widespread recognition as entertainer, scholar, warrior or criminal.
-Fame	Mage	m20	313	You are famous within the Sleeper world, for a story-based reason.
-Familiar	Mage	m20	314	An animal ally bound to the mage, in the classic witch's-cat mold; the Technocratic side is Companion.
-Fetish	Werewolf	w20	137	You own a fetish - a physical object with a spirit bound into it, and the spirit is what grants the object its powers.
-Generation	Vampire	core	114	Purity of the blood and closeness to the First Vampire; without dots you start as 13th Generation.
-Generation	Vampire	da	181	Same trait, medieval era: purity of blood and proximity to the First Vampire.
-Generation	Vampire	bh	50	Tal'Mahe'Ra variant: the sect does not recruit the weak, so its characters run to lower Generation.
-Guide	Vampire	hh	39	A spiritual entity that aids the hunter through dreams, signs and portents, with hidden motives and a price of its own.
-Herd	Vampire	core	114	A group of mortals you feed from without fear; dots buy how much blood per night and what minor tasks they will run.
-Herd	Vampire	da	181	A group of mortals to feed on safely, useful for minor tasks besides nourishment.
-Influence	Vampire	core	114	Pull in the mortal community through wealth, office or blackmail; dots buy how far you sway political and social process.
-Influence	Vampire	da	181	Pull in the mortal community through wealth, lineage, prestige, politics or blackmail.
-Influence	Mage	m20	316	Attention and respect within the Sleepers' world - celebrity, gang boss, politician, cult leader.
-Kinfolk	Werewolf	w20	138	Contact with the humans and wolves descended from Garou who did not inherit the spiritual duty; dots buy how many and how useful.
-Legend	Mage	m20	317	Humanity's collective imagination focuses on you; you carry a mythic reputation you did not ask for.
-Library	Vampire	hh	140	Arcanum trait: the research difficulty number drops by the rating, and it does not stack with Axis Mundi access.
-Library	Mage	m20	318	A collection of books and files worth having in the Internet age; dots buy how far the archive reaches.
-Mentor	Vampire	core	115	A Kindred or group of Kindred who guides and aids you now and then; dots buy their power and reach.
-Mentor	Vampire	da	181	A Cainite or group of Cainites who look out for you with guidance and occasional aid.
-Mentor	Vampire	hh	140	Arcanum trait: the Elder Brother or Sister who initiated you; the rating is their standing and your starting reputation.
-Mentor	Mage	m20	318	An elder mage who took an interest in you and provides training, guidance and occasional assistance.
-Mentor	Werewolf	w20	138	A Garou of higher Rank who has taken an interest in you and will look after you, up to a point; the rating is how powerful the mentor is.
-Node	Mage	m20	319	A place of gathered Quintessence where the mage meditates to restore her inner reserves.
-Past Lives	Mage	m20	320	Meditate on an earlier incarnation for help with the situation at hand: once per session the Background pool is added to another task's pool.
-Patron	Mage	m20	320	A faction player who moves you as a piece and conceals his face from the pawns.
-Pure Breed	Werewolf	w20	138	Descent from renowned Garou forbears; the rating is the standing that ancestry alone buys in Garou society.
-Rank	Vampire	hh	134	Position in a government agency's chain of command; the Rank difference is a Social bonus inside the agency and counts two dots lower outside it.
-Rank	Mage	m20	321	A title of some distinction among the masses - military rank, religious office, executive position.
-Requisitions	Vampire	hh	134	Printed `Requisition`, singular. A pool of equipment points per story equal to the dots; no single item above (Rank + 2), and surviving gear goes back at story's end.
-Requisitions	Mage	m20	321	The epic materiel a Technocratic operative can draw on, by chart of cost.
-Resources	Vampire	core	115	Assets you control - cash, property, investments, criminal infrastructure; dots buy holdings and monthly income.
-Resources	Vampire	da	181	Assets the character controls: gold, investments, property, commercial inventory.
-Resources	Vampire	hh	140	Arcanum trait: the society houses new members at about one dot; anything above that comes from family or another job.
-Resources	Mage	m20	322	Money made from magick, and the Syndicate's side of it; dots buy income and holdings.
-Resources	Werewolf	w20	138	Access to and control over valuable assets - cash at first, then investments and property as the rating climbs.
-Retainers	Vampire	core	116	Loyal servants and companions, often ghouls or repeatedly Dominated mortals; dots buy how many and how capable.
-Retainers	Vampire	da	182	Servants, assistants and steadfast companions, mostly ghouls.
-Retainers	Vampire	bh	50	Tal'Mahe'Ra variant: the ghoul servitors come from the three revenant lines that have served the sect for centuries.
-Retainers	Mage	m20	323	A faithful retainer who patches you up and covers the chores.
-Rites	Werewolf	w20	139	How many rites the character knows at the start of play; the rating is the count, not a level of skill.
-Rituals	Vampire	core	117	Sabbat only: knowledge of the ritae; without this Background a Pack Priest's ritae simply do not work.
-Sanctum	Mage	m20	323	A place to get away from the consensual reality that hinders your Arts; the Technocratic side is the Laboratory.
-Secret Weapons	Mage	m20	325	Access to Q Division experimental technology; a new device is issued on a roll against this Background.
-Spies	Mage	m20	325	Little birds in various nests keep you informed; the informants are not necessarily your friends.
-Status	Vampire	core	118	Standing in the local KINDRED community - Camarilla status runs from sire and bloodline, Sabbat status from pack and zeal.
-Status	Vampire	hh	123	Standing as an Inquisitor inside the SOCIETY OF LEOPOLD, earned by dedicated work or by a notable kill.
-Status	Mage	m20	325	Respect within your chosen AWAKENED group; at 4-5 dots it reaches allied groups and outside your faction.
-Totem	Mage	m20	326	A personal pact with a spirit helper, in the shamanic mold; each side of the pact gets something.
-Totem	Werewolf	w20	140	A PACK trait, not a personal one: the pack pools all the points into one totem spirit and shares what it grants.
-Wonder	Mage	m20	328	An item that carries Sphere Effects of its own - Talisman, Device, Fetish, Charm; the Storyteller sets form and function.
+nome_EN	jogo	epoca	livro	pag	essencia
+Allies	Vampire	Modern Nights	core	111	Mortals who help you willingly, without coaxing; may lend their own Backgrounds and indirect access to their contacts, influence and resources.
+Allies	Vampire	Dark Ages	da	179	Mortals who support you willingly, without coercion, and are not always available when you call.
+Allies	Mage	Modern Nights	m20	303	Folks who have your back in time of need - badass friends, helpful animals, people who owe you.
+Allies	Werewolf	Modern Nights	w20	135	People who help and support you out of love or common interest - family, friends, or a group that owes you.
+Alternate Identity	Vampire	Modern Nights	core	111	A second persona with papers and documentation; dots buy how deep the cover runs and how much recognition it carries.
+Alternate Identity	Vampire	Dark Ages	da	179	A complete alternate identity with proper documentation for the period.
+Alternate Identity	Mage	Modern Nights	m20	304	An identity to disappear into, meant for shapechangers, clones and people in dangerous professions.
+Ancestors	Werewolf	Modern Nights	w20	136	Contact with the spirits of the Garou who came before; the rating is how readily an ancestor answers and lends what it knew.
+Arcane	Mage	Modern Nights	m20	305	The fine art of disappearing: records get lost, cameras glitch, people fail to place you; the Technocratic side is Cloaking.
+Armory	Vampire	Modern Nights	hh	37	A stocked and maintained weapons cache; each dot buys more potent weapons plus the ammunition and upkeep to keep them fire-ready.
+Armory	Vampire	Modern Nights	anarch	99	Same trait reprinted for Anarch characters: a functional armory plus the ability to maintain every weapon in it.
+Artifacts	Vampire	Modern Nights	hh	140	Printed `Artifact`, singular. Arcanum trait: begin play owning a supernaturally potent item, its power set by the dots.
+Avatar	Mage	Modern Nights	m20	305	The Awakened self; the rating measures it, sets how much Quintessence the mage can hold and shift, and how real it feels; the Technocratic side is Genius.
+Backup	Mage	Modern Nights	m20	306	You can call in the cavalry and expect help, in a limited capacity, through your membership in an organization.
+Base of Operations	Vampire	Modern Nights	hh	38	A secure HQ the hunter owns; points are split across three categories - Luxury, Size and Security.
+Certification	Mage	Modern Nights	m20	308	In an age of permits for everything, the right certifications open the doors the paperwork guards.
+Chantry	Mage	Modern Nights	m20	308	A stronghold shared with like-minded associates that pools territory, resources and mutual defense; the Technocratic side is Construct.
+Contacts	Vampire	Modern Nights	core	112	People you bribe, manipulate or coerce for information; dots buy the reach of the network plus a few major Contacts.
+Contacts	Vampire	Dark Ages	da	179	People you manipulate or coerce into offering information, with minor contacts spread around.
+Contacts	Mage	Modern Nights	m20	309	People who know things - not as helpful or reliable as Allies, but they help you dig things up.
+Contacts	Werewolf	Modern Nights	w20	136	Acquaintances from all walks of life who do not mind telling you what is going on.
+Cult	Mage	Modern Nights	m20	310	Devotees who go past friendship: they trust you and act on your word.
+Demesne	Mage	Modern Nights	m20	310	The mage's mind is her castle: a world of her own making that she can retreat into.
+Destiny	Mage	Modern Nights	m20	311	You are a Chosen One with a part to play in the cosmic drama; prophecy hints at your coming greatness.
+Domain	Vampire	Modern Nights	core	112	Physical territory whose access you control FOR FEEDING; dots buy its size and the strength of the claim.
+Domain	Vampire	Dark Ages	da	180	Feeding territory your character controls, held by leave of the local Prince or elder Cainite.
+Dream	Mage	Modern Nights	m20	312	Conduits to cosmic consciousness that feed the mage insight she did not study for; the Technocratic side is Hypercram.
+Enhancement	Mage	Modern Nights	m20	312	Enlightened hypertech grafted into living tissue - cyborg implants or genetic biomods - in one of three declared configurations.
+Fame	Vampire	Modern Nights	core	114	Recognition in mortal society; dots buy privileges and how far you can sway public opinion.
+Fame	Vampire	Dark Ages	da	180	Widespread recognition as entertainer, scholar, warrior or criminal.
+Fame	Mage	Modern Nights	m20	313	You are famous within the Sleeper world, for a story-based reason.
+Familiar	Mage	Modern Nights	m20	314	An animal ally bound to the mage, in the classic witch's-cat mold; the Technocratic side is Companion.
+Fetish	Werewolf	Modern Nights	w20	137	You own a fetish - a physical object with a spirit bound into it, and the spirit is what grants the object its powers.
+Generation	Vampire	Modern Nights	core	114	Purity of the blood and closeness to the First Vampire; without dots you start as 13th Generation.
+Generation	Vampire	Dark Ages	da	181	Same trait, medieval era: purity of blood and proximity to the First Vampire.
+Generation	Vampire	Modern Nights	bh	50	Tal'Mahe'Ra variant: the sect does not recruit the weak, so its characters run to lower Generation.
+Guide	Vampire	Modern Nights	hh	39	A spiritual entity that aids the hunter through dreams, signs and portents, with hidden motives and a price of its own.
+Herd	Vampire	Modern Nights	core	114	A group of mortals you feed from without fear; dots buy how much blood per night and what minor tasks they will run.
+Herd	Vampire	Dark Ages	da	181	A group of mortals to feed on safely, useful for minor tasks besides nourishment.
+Influence	Vampire	Modern Nights	core	114	Pull in the mortal community through wealth, office or blackmail; dots buy how far you sway political and social process.
+Influence	Vampire	Dark Ages	da	181	Pull in the mortal community through wealth, lineage, prestige, politics or blackmail.
+Influence	Mage	Modern Nights	m20	316	Attention and respect within the Sleepers' world - celebrity, gang boss, politician, cult leader.
+Kinfolk	Werewolf	Modern Nights	w20	138	Contact with the humans and wolves descended from Garou who did not inherit the spiritual duty; dots buy how many and how useful.
+Legend	Mage	Modern Nights	m20	317	Humanity's collective imagination focuses on you; you carry a mythic reputation you did not ask for.
+Library	Vampire	Modern Nights	hh	140	Arcanum trait: the research difficulty number drops by the rating, and it does not stack with Axis Mundi access.
+Library	Mage	Modern Nights	m20	318	A collection of books and files worth having in the Internet age; dots buy how far the archive reaches.
+Mentor	Vampire	Modern Nights	core	115	A Kindred or group of Kindred who guides and aids you now and then; dots buy their power and reach.
+Mentor	Vampire	Dark Ages	da	181	A Cainite or group of Cainites who look out for you with guidance and occasional aid.
+Mentor	Vampire	Modern Nights	hh	140	Arcanum trait: the Elder Brother or Sister who initiated you; the rating is their standing and your starting reputation.
+Mentor	Mage	Modern Nights	m20	318	An elder mage who took an interest in you and provides training, guidance and occasional assistance.
+Mentor	Werewolf	Modern Nights	w20	138	A Garou of higher Rank who has taken an interest in you and will look after you, up to a point; the rating is how powerful the mentor is.
+Node	Mage	Modern Nights	m20	319	A place of gathered Quintessence where the mage meditates to restore her inner reserves.
+Past Lives	Mage	Modern Nights	m20	320	Meditate on an earlier incarnation for help with the situation at hand: once per session the Background pool is added to another task's pool.
+Patron	Mage	Modern Nights	m20	320	A faction player who moves you as a piece and conceals his face from the pawns.
+Pure Breed	Werewolf	Modern Nights	w20	138	Descent from renowned Garou forbears; the rating is the standing that ancestry alone buys in Garou society.
+Rank	Vampire	Modern Nights	hh	134	Position in a government agency's chain of command; the Rank difference is a Social bonus inside the agency and counts two dots lower outside it.
+Rank	Mage	Modern Nights	m20	321	A title of some distinction among the masses - military rank, religious office, executive position.
+Requisitions	Vampire	Modern Nights	hh	134	Printed `Requisition`, singular. A pool of equipment points per story equal to the dots; no single item above (Rank + 2), and surviving gear goes back at story's end.
+Requisitions	Mage	Modern Nights	m20	321	The epic materiel a Technocratic operative can draw on, by chart of cost.
+Resources	Vampire	Modern Nights	core	115	Assets you control - cash, property, investments, criminal infrastructure; dots buy holdings and monthly income.
+Resources	Vampire	Dark Ages	da	181	Assets the character controls: gold, investments, property, commercial inventory.
+Resources	Vampire	Modern Nights	hh	140	Arcanum trait: the society houses new members at about one dot; anything above that comes from family or another job.
+Resources	Mage	Modern Nights	m20	322	Money made from magick, and the Syndicate's side of it; dots buy income and holdings.
+Resources	Werewolf	Modern Nights	w20	138	Access to and control over valuable assets - cash at first, then investments and property as the rating climbs.
+Retainers	Vampire	Modern Nights	core	116	Loyal servants and companions, often ghouls or repeatedly Dominated mortals; dots buy how many and how capable.
+Retainers	Vampire	Dark Ages	da	182	Servants, assistants and steadfast companions, mostly ghouls.
+Retainers	Vampire	Modern Nights	bh	50	Tal'Mahe'Ra variant: the ghoul servitors come from the three revenant lines that have served the sect for centuries.
+Retainers	Mage	Modern Nights	m20	323	A faithful retainer who patches you up and covers the chores.
+Rites	Werewolf	Modern Nights	w20	139	How many rites the character knows at the start of play; the rating is the count, not a level of skill.
+Rituals	Vampire	Modern Nights	core	117	Sabbat only: knowledge of the ritae; without this Background a Pack Priest's ritae simply do not work.
+Sanctum	Mage	Modern Nights	m20	323	A place to get away from the consensual reality that hinders your Arts; the Technocratic side is the Laboratory.
+Secret Weapons	Mage	Modern Nights	m20	325	Access to Q Division experimental technology; a new device is issued on a roll against this Background.
+Spies	Mage	Modern Nights	m20	325	Little birds in various nests keep you informed; the informants are not necessarily your friends.
+Status	Vampire	Modern Nights	core	118	Standing in the local KINDRED community - Camarilla status runs from sire and bloodline, Sabbat status from pack and zeal.
+Status	Vampire	Modern Nights	hh	123	Standing as an Inquisitor inside the SOCIETY OF LEOPOLD, earned by dedicated work or by a notable kill.
+Status	Mage	Modern Nights	m20	325	Respect within your chosen AWAKENED group; at 4-5 dots it reaches allied groups and outside your faction.
+Totem	Mage	Modern Nights	m20	326	A personal pact with a spirit helper, in the shamanic mold; each side of the pact gets something.
+Totem	Werewolf	Modern Nights	w20	140	A PACK trait, not a personal one: the pack pools all the points into one totem spirit and shares what it grants.
+Wonder	Mage	Modern Nights	m20	328	An item that carries Sphere Effects of its own - Talisman, Device, Fetish, Charm; the Storyteller sets form and function.
+Resources	Mage	Victorian Age	m20va	121	Purchasing power inside industrialised societies, on a ladder of its own: Poor, Working Class, Established, Professional, Wealthy, Opulence; outside industrialised areas the Storyteller restates the trait in the story's own terms.
+Resources	Werewolf	Dark Ages	w20da	56	Printed `Recursos`, PT. The V20 Dark Ages ladder word for word: gold, investments, property, commercial stock, taxes and land; Sufficient, Moderate, Comfortable, Rich, Extremely Rich.
+Resources	Werewolf	Modern Nights	w20kin	55	The Garou trait with a Kinfolk note attached: the rating is also how much money the character can put behind her Garou relatives.
+Allies	Vampire	Classical Age	ca	154	Printed `Aliados`, PT. The V20 Dark Ages ladder translated: one to five allies, one of them increasingly influential.
+Alternate Identity	Vampire	Classical Age	ca	154	Printed `Identidade Alternativa`, PT. The same infiltration ladder as V20 Dark Ages p.179.
+Contacts	Vampire	Classical Age	ca	155	Printed `Contatos`, PT. Same as V20 Dark Ages: roll the rating at difficulty 7 for minor contacts, one to five major ones.
+Domain	Vampire	Classical Age	ca	155	Printed `Dominio`, PT. Same as V20 Dark Ages: feeding territory the Prince acknowledges, dots split between size and security.
+Fame	Vampire	Classical Age	ca	156	Printed `Fama`, PT. Same as V20 core and Dark Ages, hunting-difficulty reduction included; only the examples turn Roman (performing for senators).
+Generation	Vampire	Classical Age	ca	156	Printed `Geracao`, PT. No dots = ELEVENTH generation; the ladder runs Tenth (13 blood) to Sixth (30 blood, traits to 7).
+Herd	Vampire	Classical Age	ca	157	Printed `Rebanho`, PT. The same 3/7/15/30/60 vessels as V20 core and Dark Ages.
+Influence	Vampire	Classical Age	ca	157	Printed `Influencia`, PT. The ladder IS the cursus honorum - Tribune of the Plebs, Quaestor/Promagistrate, Princeps Senatus/Praetor, Aedile/Legate, Consul/Censor - and above Influence 1 the character must become a Patrician.
+Mentor	Vampire	Classical Age	ca	157	Printed `Mentor`, PT. The V20 Dark Ages rungs with Roman offices on them (an Imperator's advisor, an Algoz or Immune, a Pater Patriae); no new rule.
+Resources	Vampire	Classical Age	ca	157	Printed `Recursos`, PT. Roman economy: spices, salt, coin, land and the number of servants; the ladder buys plebeian housing, standing in the merchant class, a Patrician title and a villa of your own.
+Retainers	Vampire	Classical Age	ca	159	Printed `Lacaios`, PT. Same as V20 core and Dark Ages: one to five loyal servants, mostly ghouls.
+Status	Vampire	Classical Age	ca	159	Printed `Status`, PT. The V20 core trait with Roman rungs (Neonate/Scourge to Pater Patriae) - and the Caitiff bar is in core too (p.118) so nothing new is printed here.
 
 # >>> BG_PICK_BEGIN  (gerado por research/resolve_bg_pick.ps1 - SPEC T765)
 #
-# QUAL linha vale quando um nome tem varias: precedencia de LIVRO
-#   core > da > hh > anarch > bh > m20 > w20
+# QUAL linha vale quando um nome tem varias: primeiro o SUFIXO filtra (epoca -> coluna Epoca,
+# jogo -> coluna Jogo, `Hunters Hunted` -> livro hh, SPEC I105e(1)); o que sobrar desempata
+# pela precedencia de LIVRO
+#   core > da > ca > hh > anarch > bh > camyth > m20 > m20va > w20 > w20da > w20kin
 # A ficha e da linha VAMPIRO e mortal (SPEC G) entao o V20 core manda; o eixo Vampire vem
 # antes na ordem que o research/README.md ja usa, e Mage e Werewolf so entram onde Vampire
-# nao tem o traco. E ESTA tabela que T765 le para o bloco 1 de I21 - nao a de cima, que tem
-# uma linha por (nome, livro) e serviu para DECIDIR o dedupe de I105b.
+# nao tem o traco. E ESTA tabela que T765/T998 le para o bloco 1 de I21 - nao a de cima, que
+# tem uma linha por (nome, livro) e serviu para DECIDIR o corte de I105e.
 #
 # O bloco 2 de I21 imprime o nome do PICKER, nao o do livro: `Artifacts` e `Requisitions`
 # ficam no plural por decisao do user 2026-08-28, e o livro escreve os dois no singular.
@@ -178,27 +223,39 @@ Enhancement	m20	312
 Fame	core	114
 Familiar	m20	314
 Fetish	w20	137
-Generation	core	114
+Generation (Classical Age)	ca	156
+Generation (Dark Ages)	da	181
+Generation (Modern Nights)	core	114
 Guide	hh	39
 Herd	core	114
-Influence	core	114
+Influence (Classical Age)	ca	157
+Influence (Dark Ages)	da	181
+Influence (Mage)	m20	316
+Influence (Modern Nights)	core	114
 Kinfolk	w20	138
 Legend	m20	317
-Library	hh	140
+Library (Hunters Hunted)	hh	140
+Library (Mage)	m20	318
 Mentor	core	115
 Node	m20	319
 Past Lives	m20	320
 Patron	m20	320
 Pure Breed	w20	138
-Rank	hh	134
-Requisitions	hh	134
-Resources	core	115
+Rank (Hunters Hunted)	hh	134
+Rank (Mage)	m20	321
+Requisitions (Hunters Hunted)	hh	134
+Requisitions (Mage)	m20	321
+Resources (Classical Age)	ca	157
+Resources (Dark Ages)	da	181
+Resources (Modern Nights)	core	115
+Resources (Victorian Age)	m20va	121
 Retainers	core	116
 Rites	w20	139
 Rituals	core	117
 Sanctum	m20	323
 Secret Weapons	m20	325
 Spies	m20	325
+Status (Hunters Hunted)	hh	123
 Status (Mage)	m20	325
 Status (Vampire)	core	118
 Totem (Mage)	m20	326

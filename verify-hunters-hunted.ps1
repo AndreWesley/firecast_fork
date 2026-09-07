@@ -130,7 +130,9 @@ function DescMap($entries) {
 # hashtable named below its use is $null with no error to show for it.
 $DESC_MARKER = @{ 'Background' = 'BACKGROUND_DESC'; 'Disc' = 'DISC_DESC'; 'Merit' = 'MERIT_DESC'; 'Road' = 'ROAD_DESC';
                   'Nature' = 'NATURE_DESC'; 'Numina' = 'DESC'; 'Path' = 'PATH_DESC'; 'Ritual' = 'RITUAL_DESC';
-                  'Clan' = 'CLAN_DESC'; 'Family' = 'FAMILY_DESC' }
+                  'Clan' = 'CLAN_DESC'; 'Family' = 'FAMILY_DESC';
+                  # 13th batch, the two COMBAT pickers (SPEC I157h, T1004/T1007)
+                  'Weapon' = 'WEAPON_DESC'; 'Armor' = 'ARMOR_DESC' }
 
 
 # ---- the BAND of a tab, ONE owner (SPEC V406, I140q, Q53) ------------------------------
@@ -4484,7 +4486,12 @@ $DIM_ART  = '0.40'
 # the ? box and the search box (SPEC V365d, V365f, I102i). The roster shrinks to what still
 # exists rather than keeping names as documentation: the count leg below reads it, so a name
 # with no widget behind it would fail this check every round for a pane nobody wants back.
-$DESC_BRIGHT = @('edtPopDesc','edtMfDesc','edtMfDescB')
+# FOUR since T1005: armorDescription went read-only with the rest of the ARMOR box when the
+# Class column became a picker, and it is the same shape as the three above - a block of PROSE
+# the player opened the tab to read. It pays for the lock with the lock alone: opacity on a
+# TextControl dims the TEXT away and there is no text-only opacity to reach for (SPEC V241,
+# V458b, I157k), so dimming it would hide the very thing choosing an armour just wrote there.
+$DESC_BRIGHT = @('edtPopDesc','edtMfDesc','edtMfDescB','armorDescription')
 $comboBright = 0
 $descSeen = 0
 $dimSeen = 0
@@ -15119,7 +15126,9 @@ else {
 # The three Numina ones joined in T874 (wave 4): 12 hedge paths, 19 psychic phenomena and 12
 # picked hedge rituals, the PICKER rows of each box and never the typed ones under them - a ? on
 # a typed row is what I102f refuses and V365(b) charges by form.
-$V333_SRC   = @{ MeritPicked = 22; OpenAbility = 21; HeaderPicker = 2; DiscRow = 19; MainPathRow = 4; SecPathRow = 15; RitualRow = 22; HedgePicker = 20; PsychicPicker = 20; HedgeRitualPicker = 20 }
+# Attack joined in T1005 (13th batch): the eleven Weapon/Attack rows of WoD20.3 became pickers
+# and each one carries its own ?, keyed on the weapon the row holds (SPEC I157a, V455a).
+$V333_SRC   = @{ MeritPicked = 22; OpenAbility = 21; HeaderPicker = 2; DiscRow = 19; MainPathRow = 4; SecPathRow = 15; RitualRow = 22; HedgePicker = 20; PsychicPicker = 20; HedgeRitualPicker = 20; Attack = 11 }
 $q333       = @{}
 $qCalls333  = 0
 $qOpen333   = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
@@ -15158,7 +15167,7 @@ else {
     foreach ($k333 in $V333_SRC.Keys) {
         if (-not $q333.ContainsKey($k333)) { $v333Bad += "'$k333' carries no ? button - the $($V333_SRC[$k333]) rows it draws lost their description door (SPEC I102b, V333g)" }
     }
-    if ($qCalls333 -ne 165) { $v333Bad += "$qCalls333 ? button(s) in a TEMPLATE on the sheet, expected the 165 of I102b/I102h - 22 on the merit/flaw rows, 21 on the background rows, 2 on the nature/demeanor headers, the 60 the Ghoul tab carries after T879 and T880 (19 discipline, 4 main path, 15 secondary path, 22 ritual) and the 52 the Numina tab carries after T875 (20 hedge path, 20 psychic, and 12 hedge ritual - seventeen after T892 converted the last five and TWENTY since T912 squared the box with HEDGE MAGIC PATHS, SPEC V269b, I136m) (SPEC V333g, T846, T872, T873, T874, T830, T875)" }
+    if ($qCalls333 -ne 176) { $v333Bad += "$qCalls333 ? button(s) in a TEMPLATE on the sheet, expected the 176 of I102b/I102h - 11 on the Weapon/Attack rows since T1005 (SPEC I157a) - 22 on the merit/flaw rows, 21 on the background rows, 2 on the nature/demeanor headers, the 60 the Ghoul tab carries after T879 and T880 (19 discipline, 4 main path, 15 secondary path, 22 ritual) and the 52 the Numina tab carries after T875 (20 hedge path, 20 psychic, and 12 hedge ritual - seventeen after T892 converted the last five and TWENTY since T912 squared the box with HEDGE MAGIC PATHS, SPEC V269b, I136m) (SPEC V333g, T846, T872, T873, T874, T830, T875)" }
     # The ? buttons authored OUTSIDE a template, which the walk above cannot see: it reads
     # templates because that is where 148 buttons come from two dozen <button> elements. T874 made
     # this a real category for the first time - btnQFaith is a ? on a row that is not drawn by a
@@ -15173,7 +15182,10 @@ else {
     # BACK on 2026-09-06 (SPEC Q71, I151c, T978): it was struck in T925 while clanFamily was
     # V407's named exception, and that exception is over. btnQhedgeAffiliation joined in T977
     # (SPEC I151b). The roster cuts both ways - a name here that is authored nowhere reddens too.
-    $BARE_Q333 = @('btnQFaith', 'btnQroad', 'btnQhedgeAffiliation', 'btnQclanFamily')
+    # btnQconceal joined in T1005 (SPEC I157p, V461a, user 2026-09-07 ask 4): it is a LEGEND and
+    # not a row - it sits beside the Conceal column HEADER and opens one fixed key, the way
+    # btnQFaith does for the one Path that has no slot behind it.
+    $BARE_Q333 = @('btnQFaith', 'btnQroad', 'btnQhedgeAffiliation', 'btnQclanFamily', 'btnQconceal')
     $bareSeen333 = @()
     foreach ($f333c in $files) {
         foreach ($b333c in (Doc $f333c.FullName).SelectNodes("//button[@text='?']")) {
@@ -15763,6 +15775,122 @@ if ($bg336.Count -lt 2) {
 }
 if ($v336Bad) { foreach ($b in $v336Bad) { Fail "V336 $b" } }
 else { Pass "V336 the background list holds $($bg336.Count - 1) items with 'Artifacts' between 'Armory' and 'Avatar', Node/Pure Breed translated on the [pt] side only, no item twice, and each of the $($v336Paren.Count) origin suffixes with a sibling$v336DescNote" }
+
+
+# ---- V453: the background suffix comes out of a CLOSED vocabulary (SPEC V453, I105e, T998,
+# T1003) ------------------------------------------------------------------------------------
+# I105b deduped the list by GAME and closed at 47 items. The 12th batch replaced that axis with
+# MEANING (I105e), so a suffix now names whichever of ERA, GAME or BOOK actually separates two
+# readings - and the moment three classes are allowed, nothing stops a fourth from being
+# invented per item. `(Arcanum)`, `(Kinfolk)`, `(hh)`, `(Mortal)`: each is a plausible label
+# somebody reaches for, and each would leave the list with a vocabulary nobody can enumerate.
+# Five legs:
+#   (a) every `Name (X)` item has X in the eight-word vocabulary of I105e(1);
+#   (b) the four ERA words are byte-for-byte the `values` of cboSheetTheme in WoD20.10.lfm.
+#       This is the leg that costs something: renaming an era on the combo and forgetting the
+#       background list would leave a suffix pointing at an era the sheet no longer has, and
+#       the sheet would still compile. It is the pair of V12;
+#   (c) every label X has a [pt] key of its own in localization.lang, so a future item can be
+#       composed from parts that both translate - `Werewolf` and `Hunters Hunted` joined the
+#       map in T1000 for exactly this;
+#   (d) a label outside the vocabulary is RED, which is (a) stated as the failure it is;
+#   (e) zero-guard: nought suffixed items makes (a) and (d) true by vacuum (SPEC V209, B7).
+$V453_ERA  = @('Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age')
+$V453_VOC  = $V453_ERA + @('Vampire', 'Mage', 'Werewolf', 'Hunters Hunted')
+$v453Bad = @()
+$bg453 = @($PICKER['background'])
+$v453Sfx = @()
+foreach ($it453 in $bg453) {
+    if ($it453 -eq '') { continue }
+    $m453 = [regex]::Match($it453, '^(.*) \(([^)]+)\)$')
+    if (-not $m453.Success) { continue }
+    $v453Sfx += $it453
+    $x453 = $m453.Groups[2].Value
+    # (a)/(d) are one comparison read two ways: in the list, or RED.
+    if ($V453_VOC -cnotcontains $x453) {
+        $v453Bad += "(a) '$it453' carries the label '$x453', which is not one of the eight of I105e(1) ($($V453_VOC -join ' | ')) - a label nobody can enumerate is a list nobody can check (SPEC I105e, Q76.1)"
+    }
+}
+if ($v453Sfx.Count -eq 0) {
+    $v453Bad += "(e) not one item of PICKER_LIST[`"background`"] carries a parenthesis - legs (a) and (d) would be true by vacuum (SPEC V209, B7)"
+}
+# (b) the era half of the vocabulary IS the combo, measured on the combo and not on memory.
+$f453 = Join-Path $dir 'WoD20.10.lfm'
+if (-not (Test-Path $f453)) { $v453Bad += "(b) WoD20.10.lfm is not where this check looks for it - the era vocabulary cannot be measured (SPEC V209)" }
+else {
+    $t453 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f453))
+    $c453 = [regex]::Match($t453, 'name="cboSheetTheme"[^>]*?values="\{([^}]*)\}"')
+    if (-not $c453.Success) { $v453Bad += "(b) cboSheetTheme has no values= in WoD20.10.lfm - the era vocabulary cannot be measured (SPEC V209, I5)" }
+    else {
+        $vals453 = @([regex]::Matches($c453.Groups[1].Value, "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
+        foreach ($e453 in $V453_ERA) {
+            if ($vals453 -cnotcontains $e453) { $v453Bad += "(b) '$e453' is a background suffix but is NOT among the cboSheetTheme values ($($vals453 -join ' | ')) - the era was renamed on the combo and the list still points at the old word (SPEC V12, I105e(1))" }
+        }
+        foreach ($v453 in $vals453) {
+            if ($V453_ERA -cnotcontains $v453) { $v453Bad += "(b) cboSheetTheme offers the era '$v453', which the background vocabulary does not know - the two lists have drifted apart (SPEC V12, I105e(1))" }
+        }
+    }
+}
+# (c) each label translates on its own, so a composed item is never half-translated.
+$v453LangTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($langFile))
+$v453Pt = $v453LangTxt
+$i453pt = $v453Pt.IndexOf("[en]")
+if ($i453pt -gt 0) { $v453Pt = $v453Pt.Substring(0, $i453pt) }
+foreach ($x453 in $V453_VOC) {
+    if ($v453Pt -notmatch ("(?m)^wod\." + [regex]::Escape($x453) + "=\S")) {
+        $v453Bad += "(c) the label '$x453' has no wod.$x453 key in the [pt] half of localization.lang - an item built from it would show half in English (SPEC I105c, V28)"
+    }
+}
+if ($v453Bad) { foreach ($b in $v453Bad) { Fail "V453 $b" } }
+else { Pass "V453 all $($v453Sfx.Count) suffixed background items draw on the eight-word vocabulary of I105e(1), the four era words match cboSheetTheme byte for byte, and all eight translate on the [pt] side" }
+
+
+# ---- V454: no background item without a MEASURED source (SPEC V454, I105e(5), R8, T998,
+# T1003) ------------------------------------------------------------------------------------
+# R8 is the oldest rule about this list: content is not written as fact without being measured
+# in a book. The BG_PICK block of research/bg_essence.tsv is where that measurement lands - one
+# row per picker item, carrying the book code and the PRINTED page - and gen_bg_desc.ps1 reads
+# it to build block 1 of every description (I21). An item with no row would print a source that
+# nobody checked; a row with no item is a name the list dropped and the table still claims.
+# Four legs:
+#   (a) every item (bar the empty one) has a row in BG_PICK;
+#   (b) every BG_PICK row has an item - the table carries no dead name;
+#   (c) every row's book code is one the research/README.md table knows, so no invented sigla
+#       reaches block 1 of I21;
+#   (d) zero-guard: an empty block makes (a) and (b) true by vacuum (SPEC V209, B7).
+$V454_BOOKS = @('core','da','ca','camyth','hh','anarch','bh','gr','m20','m20va','bos','trel','bcm','sorc','sorcc','w20','w20da','w20kin','rob','lotc','lob','tos','dac','caunlife','cadisc','cablood')
+$v454Bad = @()
+$f454 = Join-Path $PSScriptRoot 'research\bg_essence.tsv'
+if (-not (Test-Path $f454)) { $v454Bad += "(d) research/bg_essence.tsv is not where this check looks for it - the source of every background line cannot be measured (SPEC V209, R8)" }
+else {
+    $rows454 = @{}
+    $in454 = $false
+    foreach ($l454 in [IO.File]::ReadAllLines($f454, (New-Object Text.UTF8Encoding($false)))) {
+        if ($l454 -match 'BG_PICK_BEGIN') { $in454 = $true; continue }
+        if ($l454 -match 'BG_PICK_END') { break }
+        if (-not $in454) { continue }
+        if ($l454.StartsWith('#') -or $l454.Trim() -eq '') { continue }
+        $c454 = $l454 -split "`t"
+        if ($c454.Count -lt 3) { $v454Bad += "(c) BG_PICK row '$l454' has $($c454.Count) column(s), not the three of <item><TAB><book><TAB><printed page>"; continue }
+        $rows454[$c454[0].Trim()] = @{ Book = $c454[1].Trim(); Page = $c454[2].Trim() }
+    }
+    if ($rows454.Count -eq 0) {
+        $v454Bad += "(d) the BG_PICK block of bg_essence.tsv holds no row - legs (a) and (b) would be true by vacuum (SPEC V209, B7)"
+    } else {
+        foreach ($it454 in $bg453) {
+            if ($it454 -eq '') { continue }
+            if (-not $rows454.ContainsKey($it454)) { $v454Bad += "(a) '$it454' is offered by the list with no row in BG_PICK - block 1 of its description would name a source nobody measured (SPEC R8, I105e(5))" }
+        }
+        foreach ($k454 in $rows454.Keys) {
+            if ($bg453 -cnotcontains $k454) { $v454Bad += "(b) BG_PICK carries '$k454', which the list does not offer - the table is claiming a name that shipped out (SPEC V454)" }
+            $bk454 = $rows454[$k454].Book
+            if ($V454_BOOKS -cnotcontains $bk454) { $v454Bad += "(c) '$k454' cites the book code '$bk454', which is not in the table of research/README.md - block 1 of I21 would print a title nobody can look up" }
+            if ($rows454[$k454].Page -notmatch '^\d+$') { $v454Bad += "(c) '$k454' cites the page '$($rows454[$k454].Page)', which is not a printed page number (SPEC I21)" }
+        }
+    }
+}
+if ($v454Bad) { foreach ($b in $v454Bad) { Fail "V454 $b" } }
+else { Pass "V454 all $($bg453.Count - 1) background items trace to a BG_PICK row with a known book code and a printed page, and the block carries no dead name" }
 
 
 # ---- V344: the DESCRIPTION module of merits and flaws has no key that eats another --------
@@ -16836,7 +16964,18 @@ $V354_WAVE = @(
     # pickers and their fields came off the declareTrait loop that was already there.
     # What held it back was the level - the typed rows kept it in BOUND dots, so converting ate 25
     # fields with data (SPEC B122) - and the Ritual Level row of the picker pane is where it went.
-       Roots = @( @{ Root = 'hedgeRitual'; Form = 'numbered'; Rows = 20 } ) }
+       Roots = @( @{ Root = 'hedgeRitual'; Form = 'numbered'; Rows = 20 } ) },
+    # Wave 5 (T1005, 13th batch): the Weapon/Attack column of the Combat tab. INDIRECT, like
+    # SpecialityRow - the call site is <Attack num="N"> and the field is built inside the
+    # template - so the root is named here and nowhere in the XML.
+    #
+    # The module is 'Weapon' and the ARMOR box beside it declares 'Armor': two modules on one
+    # tab, because the two lists are two books' worth of different columns and a shared module
+    # would put a weapon's Roll under an armour's Rating. The armour picker is not a wave at all
+    # - it is ONE row, authored inline, so it rides $BARE_DYN and $BARE_Q333 the way the
+    # affiliation row does (SPEC I157b, V455a).
+    @{ Tpl = 'Attack'; File = 'WoD20.3.lfm'; Mod = 'Weapon'; FieldAttr = 'attack_$(num)'; RootArg = 'weapon';
+       Roots = @( @{ Root = 'weapon'; Form = 'indirect'; Rows = 11 } ) }
 )
 
 # Templates allowed to open the box WITHOUT being a wave of I113e. NAMED, never a generic skip:
@@ -17144,7 +17283,11 @@ else {
 # writing all four in one step exists to avoid.
 if ($confirmFn355) {
     $ce355 = NoComments $confirmFn355
-    $br355 = 'elseif MF.picked == "" and num ~= nil and MF.data ~= nil then'
+    # `isMf and` since T1006: the two COMBAT lists carry columns too, so `MF.data ~= nil` stopped
+    # meaning "this is a merit or a flaw" and the branch had to say which list it answers for -
+    # without it, choosing a weapon on attack_3 writes book_3/type_3/costy_3 into the NDB, orphan
+    # fields with no widget behind them (SPEC I157f, V457a).
+    $br355 = 'elseif isMf and MF.picked == "" and num ~= nil and MF.data ~= nil then'
     if ($ce355 -notmatch ([regex]::Escape($br355))) { $v355Bad += "(e) mfConfirm has no branch for the blank being CHOSEN - the name would empty and its book, page and cost would stay behind (SPEC I114, I107i)" }
     else {
         $tail355 = $ce355.Substring($ce355.IndexOf($br355))
@@ -18214,7 +18357,8 @@ foreach ($kn383 in @('MERIT_ROWS','BACKGROUND_ROWS','BACKGROUND_FREE_ROWS','SPEC
                      'CLAN_DISC_ROWS','DISC_ROWS','DISC_FREE_ROWS','MAIN_PATH_ROWS',
                      'SEC_PATH_ROWS','SEC_PATH_FREE_ROWS','RITUAL_ROWS','RITUAL_FREE_ROWS',
                      'NUMINA_ROWS','NUMINA_FREE_ROWS','PSYCHIC_ROWS','PSYCHIC_FREE_ROWS',
-                     'HEDGE_RITUAL_ROWS','HEDGE_RITUAL_FREE_ROWS')) {
+                     'HEDGE_RITUAL_ROWS','HEDGE_RITUAL_FREE_ROWS',
+                     'ATTACK_ROWS')) {
     $km383 = [regex]::Match($lua383, '(?m)^\s*' + $kn383 + '\s*=\s*(\d+);')
     if ($km383.Success) { $K383[$kn383] = [int]$km383.Groups[1].Value }
 }
@@ -18285,6 +18429,12 @@ foreach ($f383 in $files) {
             if ($m383.Success) { Add383 ('dyn' + $m383.Groups[1].Value + '_') $m383.Groups[2].Value }
         }
     }
+    # Attack joined in T1005 and it is the INDIRECT shape, like SpecialityRow: the call site says
+    # <Attack num="N"> and the field is built inside the template, so the row number comes off
+    # `num` and the prefix is known from the template rather than read out of a field attribute.
+    foreach ($i383 in $d383.SelectNodes("//Attack")) {
+        if ($i383.GetAttribute("num") -match '^\d+$') { Add383 'dynattack_' $i383.GetAttribute("num") }
+    }
 }
 
 # Every loop that PAINTS, in every file that holds one. The bound is the whole point, so the
@@ -18344,7 +18494,10 @@ if ($v383Bad.Count -eq 0) {
 #
 # NAMED and closed, never a skip: a second bare picker button has to redden here rather than be
 # absorbed by a wildcard, which is the whole difference between a roster and a hole (SPEC V328d).
-$BARE_DYN = @('dynhedgeAffiliation', 'dynroad', 'dynclanFamily')
+# dynarmorClass joined in T1005 (SPEC I157b, V455a): the ARMOR box has ONE Class row and it is a
+# label+entry grid row, not a template-drawn list row, so its button is authored inline the way
+# the affiliation one is.
+$BARE_DYN = @('dynhedgeAffiliation', 'dynroad', 'dynclanFamily', 'dynarmorClass')
 $bareSeen383 = @()
 foreach ($f383b in $files) {
     foreach ($b383b in (Doc $f383b.FullName).SelectNodes("//button")) {
@@ -20801,6 +20954,539 @@ else {
     if ($v452Bad) { foreach ($b in $v452Bad) { Fail "V452 $b" } }
     else { Pass "V452 a paid dot edited off keeps its line: one writer with both branches, one reader, one loop, and no widget on the stamp" }
 }
+
+
+# ============================================================================================
+# 13th batch (2026-09-07): the two COMBAT pickers. SPEC V455..V461, I157, T1008.
+# ============================================================================================
+# The shared readers, built ONCE for the seven rules below: reading combatData.lua and the two
+# research tables seven times is seven parsers to keep in step, which is B70 by another door.
+$wo3455  = Join-Path $dir 'WoD20.3.lfm'
+$comb455 = Join-Path $plugin 'combatData.lua'
+# The nine Do techniques the user kept OUT (SPEC R150, Q77.1). Named here so V456(d) reads a
+# roster and not a memory - eight was the first count and it was wrong.
+$DO455   = @('Arrow Cutting','Hurricane Throw','Iron Shirt','Kiaijutsu','Plum Blossom',
+             'Soft Fist','10,000 Weapons','Typhoon Kick','Weapon Art')
+$TITLE455 = @('Vampire: The Masquerade 20th Anniversary Edition',
+              'Vampire: The Dark Ages 20th Anniversary Edition',
+              'Vampire: The Classical Age 20th Anniversary Edition',
+              'Mage: The Ascension 20th Anniversary Edition',
+              'Werewolf: The Apocalypse 20th Anniversary Edition')
+
+function Tsv455($path) {
+    if (-not (Test-Path -LiteralPath $path)) { return $null }
+    $arr = ([Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($path)) -replace "`r`n", "`n") -split "`n"
+    $head = $arr[0] -split "`t"
+    $out = New-Object System.Collections.ArrayList
+    for ($i = 1; $i -lt $arr.Count; $i++) {
+        if ($arr[$i].Trim() -eq '' -or $arr[$i].StartsWith('#')) { continue }
+        $c = $arr[$i] -split "`t"
+        $h = @{}
+        for ($j = 0; $j -lt $head.Count; $j++) {
+            if ($j -lt $c.Count) { $h[$head[$j]] = $c[$j].Trim() } else { $h[$head[$j]] = '' }
+        }
+        [void]$out.Add([pscustomobject]$h)
+    }
+    , $out.ToArray()
+}
+
+# One entry of combatData.lua is `["<name>"] = { en = { ... }, pt = { ... } },`. Ordinal, like
+# every other name map in this gate: two weapons one letter apart in case would fold into one.
+function Combat455($txt, $name) {
+    $m = [regex]::Match($txt, '(?s)local ' + $name + ' = \{\n(.*?)\n\};')
+    if (-not $m.Success) { return $null }
+    $d = New-Object 'System.Collections.Generic.Dictionary[string,psobject]' ([StringComparer]::Ordinal)
+    foreach ($e in [regex]::Matches($m.Groups[1].Value, '(?s)\["([^"]+)"\] = \{\n\t\ten = \{([^}]*)\},\n\t\tpt = \{([^}]*)\},\n\t\},')) {
+        $d[$e.Groups[1].Value] = [pscustomobject]@{ En = $e.Groups[2].Value; Pt = $e.Groups[3].Value }
+    }
+    , $d
+}
+function Cells455($s) {
+    $h = @{}
+    foreach ($c in [regex]::Matches($s, '([A-Za-z]+) = "([^"]*)"')) { $h[$c.Groups[1].Value] = $c.Groups[2].Value }
+    return $h
+}
+
+$wpnTsv455 = Tsv455 (Join-Path $PSScriptRoot 'research\weapon.tsv')
+$armTsv455 = Tsv455 (Join-Path $PSScriptRoot 'research\armor.tsv')
+$wpnList455 = @()
+$armList455 = @()
+if ($PICKER.ContainsKey('weapon')) { $wpnList455 = @($PICKER['weapon'] | Where-Object { $_ -ne '' }) }
+if ($PICKER.ContainsKey('armor'))  { $armList455 = @($PICKER['armor']  | Where-Object { $_ -ne '' }) }
+
+# ---- V455: the two COMBAT pickers are the generic box in the shape of V354a, and the ? sits
+# only where it was asked for (SPEC V455, I157a, I157b, I157g, T1005) -------------------------
+# Five legs. (a) the eleven rows carry the ?/button/twin trio and the ARMOR box carries the
+# pair; (b) both openings hand mfOpen the field, the root and the module; (c) there is NO ? in
+# the ARMOR box and no popOpen anywhere opens 'Armor' - the pane inside the picker is another
+# thing, and the user asked for the ? in COMBAT only; (d) renderCombatButtons reaches all twelve
+# and bounds on ATTACK_ROWS, which equals the number of <Attack num=> instances; (e) the
+# dataLink that fires it watches the twelve slots and the language, and onNodeReady calls it.
+$v455Bad = @()
+$QCLICK455 = "popOpen(self, 'Weapon', sheet['attack_" + '$(num)' + "'], nil, 'attack_" + '$(num)' + "');"
+$BCLICK455 = "mfOpen(self, 'attack_" + '$(num)' + "', 'weapon', 'Weapon');"
+if (-not (Test-Path -LiteralPath $wo3455)) { $v455Bad += "(a) WoD20.3.lfm is not where this check looks for it - the whole COMBAT tab would be measured by nothing (SPEC V209)" }
+else {
+    $d455    = Doc $wo3455
+    $raw455  = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($wo3455))
+    $code455 = CodeOf $wo3455
+    $inst455 = @([regex]::Matches($raw455, '<Attack\s+num="\d+"')).Count
+
+    # (g) zero-guard FIRST: every count under it is per instance, and a count over zero rows is
+    # the check that measures nothing and says PASS (SPEC V20, B7, B92).
+    if ($inst455 -eq 0) { $v455Bad += "(a) not one <Attack num=> instance was read out of WoD20.3.lfm - every count below would be zero against zero (SPEC V20, B7)" }
+    else {
+        $tpl455 = $d455.SelectSingleNode('//template[@name="Attack"]')
+        if ($null -eq $tpl455) { $v455Bad += "(a) WoD20.3.lfm declares no Attack template - the eleven rows have no shape at all (SPEC I157a, V209)" }
+        else {
+            $q455 = @($tpl455.SelectNodes('button[@name="btnQattack_$(num)"]'))
+            $b455 = @($tpl455.SelectNodes('button[@name="dynattack_$(num)"]'))
+            $t455 = @($tpl455.SelectNodes('edit[@name="edtattack_$(num)"]'))
+            if ($q455.Count -ne 1) { $v455Bad += "(a) the Attack template draws $($q455.Count) btnQattack, expected 1 - a row without its ? is a description the player cannot reach (SPEC I157a, V333)" }
+            elseif ($q455[0].GetAttribute("onClick") -cne $QCLICK455) { $v455Bad += "(a) the row ? opens with '$($q455[0].GetAttribute('onClick'))' and I157a writes it '$QCLICK455' - it has to hand popOpen the value of ITS OWN row, or one description opens from every row (SPEC V333d, I102b)" }
+            if ($b455.Count -ne 1) { $v455Bad += "(a) the Attack template draws $($b455.Count) dynattack, expected 1 - two openers are two doors onto one row (SPEC I157a, V135)" }
+            elseif ($b455[0].GetAttribute("onClick") -cne $BCLICK455) { $v455Bad += "(b) the Attack row opens with '$($b455[0].GetAttribute('onClick'))' - the arguments of I113a are the FIELD, the root 'weapon' and the module 'Weapon', and the root is what mfOpen derives the box TITLE from (SPEC I113a, I157a, V459)" }
+            if ($t455.Count -ne 1) { $v455Bad += "(a) the Attack template hands attack_ to $($t455.Count) hidden twin(s), expected 1 (SPEC I157a, V354a)" }
+            else {
+                if ($t455[0].GetAttribute("field") -cne 'attack_$(num)') { $v455Bad += "(a) the twin of the Attack row carries field '$($t455[0].GetAttribute('field'))' and not attack_ - the row would stop saving (SPEC V2)" }
+                if ($t455[0].GetAttribute("visible") -ne 'false') { $v455Bad += "(a) the twin of the Attack row is not authored visible=false - two entries would stand on the same pixels and the button's text would be the one nobody sees (SPEC I107a1)" }
+                if ($t455[0].GetAttribute("enabled") -ne 'false') { $v455Bad += "(a) the twin of the Attack row is not authored enabled=false - the field would take the keyboard back, which is what the picker replaced (SPEC I107a1, V13)" }
+            }
+        }
+        # the ARMOR box: ONE row, authored inline, so the counts are 1 and not one per instance
+        $ab455 = @($d455.SelectNodes('//button[@name="dynarmorClass"]'))
+        $at455 = @($d455.SelectNodes('//edit[@name="edtarmorClass"]'))
+        if ($ab455.Count -ne 1) { $v455Bad += "(a) WoD20.3.lfm draws $($ab455.Count) dynarmorClass, expected 1 (SPEC I157b)" }
+        elseif ($ab455[0].GetAttribute("onClick") -cne "mfOpen(self, 'armorClass', 'armor', 'Armor');") { $v455Bad += "(b) the ARMOR row opens with '$($ab455[0].GetAttribute('onClick'))' - the arguments of I113a are the FIELD, the root 'armor' and the module 'Armor' (SPEC I113a, I157b)" }
+        if ($at455.Count -ne 1) { $v455Bad += "(a) WoD20.3.lfm draws $($at455.Count) edtarmorClass, expected the one hidden twin (SPEC I157b)" }
+        else {
+            if ($at455[0].GetAttribute("field") -cne 'armorClass') { $v455Bad += "(a) the ARMOR twin carries field '$($at455[0].GetAttribute('field'))' and not armorClass (SPEC V2)" }
+            if ($at455[0].GetAttribute("visible") -ne 'false' -or $at455[0].GetAttribute("enabled") -ne 'false') { $v455Bad += "(a) the ARMOR twin is not authored visible=false enabled=false (SPEC I107a1)" }
+        }
+        # No VISIBLE entry left on either field: the twin is the only <edit> that may carry them,
+        # and a second visible one would be the typing door I157k just closed.
+        foreach ($f455x in $files) {
+            foreach ($e455 in (Doc $f455x.FullName).SelectNodes("//edit")) {
+                $fl455 = $e455.GetAttribute("field")
+                if ($fl455 -notmatch '^attack_' -and $fl455 -cne 'armorClass') { continue }
+                if ($e455.GetAttribute("visible") -eq 'false') { continue }
+                $v455Bad += "(a) $($f455x.Name) carries a VISIBLE edit on '$fl455' - the picker's twin is the only entry allowed on that field, and a second one is the typing door I157k closed (SPEC I157a, I157b)"
+            }
+        }
+        # (c) the ? the user did NOT ask for: none in the ARMOR box, and no opener anywhere on
+        # the sheet names the Armor module - the pane inside the picker reads it, the tab does not.
+        foreach ($f455y in $files) {
+            if ($null -ne (Doc $f455y.FullName).SelectSingleNode('//button[@name="btnQarmorClass"]')) { $v455Bad += "(c) $($f455y.Name) draws a btnQarmorClass - the user asked for the ? in COMBAT only, and the ARMOR box is not it (SPEC Q77, I157l, I157b)" }
+            foreach ($m455y in [regex]::Matches((CodeOf $f455y.FullName), "popOpen\(\s*[^,]+,\s*'([^']+)'")) {
+                if ($m455y.Groups[1].Value -ceq 'Armor') { $v455Bad += "(c) $($f455y.Name) opens a ? on the 'Armor' module - there is no ? in that box (SPEC I157l)" }
+            }
+        }
+        # (d) the painter, and the bound is the whole point (SPEC V383b, B112).
+        $rc455 = LuaFn $code455 'renderCombatButtons'
+        if (-not $rc455) { $v455Bad += "(d) WoD20.3.lfm declares no renderCombatButtons - the twelve buttons would keep their AUTHORED label and a filled row would read as empty on every open (SPEC I157g, V383a)" }
+        else {
+            if ($rc455 -notmatch 'for i = 1, ATTACK_ROWS, 1 do') { $v455Bad += "(d) renderCombatButtons does not bound on ATTACK_ROWS - a literal does not follow the family when it grows (SPEC V383b, B112)" }
+            if ($rc455 -notmatch 'mfLabel\(found\["dynattack_" \.\. i\], sheet\["attack_" \.\. i\], "Select Weapon", lang\)') { $v455Bad += "(d) renderCombatButtons does not paint the attack rows through mfLabel with the Select Weapon fallback (SPEC I157g, V459)" }
+            if ($rc455 -notmatch 'mfLabel\(found\["dynarmorClass"\], sheet\.armorClass, "Select Armor", lang\)') { $v455Bad += "(d) renderCombatButtons does not paint dynarmorClass through mfLabel with the Select Armor fallback (SPEC I157g, V459)" }
+            if ($rc455 -notmatch 'names\["dynarmorClass"\] = true;') { $v455Bad += "(d) renderCombatButtons does not enrol dynarmorClass in the names it looks for - xpFind would never reach it and the paint would land on nil (SPEC V209)" }
+        }
+        $ar455 = [regex]::Match($rootTxt, '(?m)^\s*ATTACK_ROWS\s*=\s*(\d+);')
+        if (-not $ar455.Success) { $v455Bad += "(d) ATTACK_ROWS is not declared on the root form beside the other row counts - the painter's bound would be a literal on the tab (SPEC I157g, V204, V383b)" }
+        elseif ([int]$ar455.Groups[1].Value -ne $inst455) { $v455Bad += "(d) ATTACK_ROWS says $($ar455.Groups[1].Value) and WoD20.3.lfm draws $inst455 <Attack num=> row(s) - a bound short is a row nobody ever paints (SPEC V455d, B112)" }
+        # (e) the way back to the screen: picking only does setField, so the dataLink IS the
+        # repaint (SPEC B123). A slot missing from fields= is a button that stops following it.
+        $dl455 = @($d455.SelectNodes("//dataLink[contains(@onChange,'renderCombatButtons')]"))
+        if ($dl455.Count -ne 1) { $v455Bad += "(e) $($dl455.Count) dataLink(s) fire renderCombatButtons in WoD20.3.lfm, expected 1 - none is a button that never follows its field, two are two owners of one repaint (SPEC I107a2, V123, V135)" }
+        else {
+            $ff455 = $dl455[0].GetAttribute("fields")
+            if ($ff455 -notmatch "'language'")   { $v455Bad += "(e) the dataLink of renderCombatButtons does not watch 'language' - the twelve buttons would keep the old language until the next pick (SPEC I107a2, V448)" }
+            if ($ff455 -notmatch "'armorClass'") { $v455Bad += "(e) the dataLink of renderCombatButtons does not watch 'armorClass' - the ARMOR button would stop being repainted (SPEC B123)" }
+            for ($i455 = 1; $i455 -le $inst455; $i455++) {
+                if ($ff455 -notmatch "'attack_$i455'") { $v455Bad += "(e) the dataLink of renderCombatButtons does not watch 'attack_$i455' - that row's button would sit reading Select Weapon with a value inside it (SPEC B123)" }
+            }
+        }
+        $nr455 = [regex]::Match($raw455, '(?s)<event name="onNodeReady">(.*?)</event>')
+        if (-not $nr455.Success) { $v455Bad += "(e) WoD20.3.lfm has no onNodeReady - nothing paints the tab when a saved sheet opens (SPEC V19, V33)" }
+        elseif ($nr455.Groups[1].Value -notmatch 'renderCombatButtons\(self\);') { $v455Bad += "(e) onNodeReady does not call renderCombatButtons - the twelve buttons would come up blank on a saved sheet until something was touched (SPEC V19, V33, I107a2)" }
+    }
+}
+if ($v455Bad) { foreach ($b in $v455Bad) { Fail "V455 $b" } }
+else { Pass "V455 the eleven Attack rows and the ARMOR Class row are the generic picker in the V354a shape, painted by one bound loop, with the ? only where it was asked for" }
+
+# ---- V456: combatData.lua, the two lists, the four desc modules and the .lang AGREE, and the
+# ruler reads the ARTIFACTS (SPEC V456, I157c, I157d, I157h, I157i, V20, T1004) ---------------
+$v456Bad = @()
+$wMap456 = $null; $aMap456 = $null
+if (-not (Test-Path -LiteralPath $comb455)) { $v456Bad += "(a) combatData.lua is not at the plugin root - the two pickers would fill nothing at all (SPEC I157d, V209)" }
+else {
+    $ctxt456 = ([Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($comb455))) -replace "`r`n", "`n"
+    $cnc456  = [regex]::Replace($ctxt456, '(?m)^\s*--.*$', '')
+    $wMap456 = Combat455 $ctxt456 'WEAPON_DATA'
+    $aMap456 = Combat455 $ctxt456 'ARMOR_DATA'
+    # (e) data only, and the module's own header SAYS so - which is why the test runs on the
+    # body with the comments stripped (SPEC I24, V456e).
+    foreach ($bad456 in @('function', 'require', 'gui\.', 'ndb\.')) {
+        if ($cnc456 -match $bad456) { $v456Bad += "(e) combatData.lua names '$bad456' outside its comments - the module is DATA, and a sheet that parses logic once per open is the disease T479 cured (SPEC I24, V456e)" }
+    }
+    if ($null -eq $wMap456) { $v456Bad += "(a) combatData.lua declares no WEAPON_DATA in the shape this rule reads - it would be certifying a table it cannot see (SPEC V209, V20)" }
+    if ($null -eq $aMap456) { $v456Bad += "(a) combatData.lua declares no ARMOR_DATA in the shape this rule reads (SPEC V209, V20)" }
+}
+$wdEn456 = DescEntries (Join-Path $plugin 'descWeapon_en.lua') 'WEAPON_DESC' 'en'
+$wdPt456 = DescEntries (Join-Path $plugin 'descWeapon_pt.lua') 'WEAPON_DESC' 'pt'
+$adEn456 = DescEntries (Join-Path $plugin 'descArmor_en.lua')  'ARMOR_DESC'  'en'
+$adPt456 = DescEntries (Join-Path $plugin 'descArmor_pt.lua')  'ARMOR_DESC'  'pt'
+if ($null -eq $wdEn456) { $v456Bad += "(b) descWeapon_en.lua is missing or its generator markers are gone - a half nobody can read is a half that ships unmeasured (SPEC V210, V408)" }
+if ($null -eq $wdPt456) { $v456Bad += "(b) descWeapon_pt.lua is missing or its generator markers are gone (SPEC V210, V408)" }
+if ($null -eq $adEn456) { $v456Bad += "(b) descArmor_en.lua is missing or its generator markers are gone (SPEC V210, V408)" }
+if ($null -eq $adPt456) { $v456Bad += "(b) descArmor_pt.lua is missing or its generator markers are gone (SPEC V210, V408)" }
+# (g) zero-guard, and it comes BEFORE every count below (SPEC V20, B7, B92).
+if ($wpnList455.Count -eq 0) { $v456Bad += "(g) PICKER_LIST['weapon'] is empty - every leg of this rule would be true over nothing (SPEC V20, B7)" }
+if ($armList455.Count -eq 0) { $v456Bad += "(g) PICKER_LIST['armor'] is empty - every leg of this rule would be true over nothing (SPEC V20, B7)" }
+if ($null -eq $wpnTsv455 -or $wpnTsv455.Count -eq 0) { $v456Bad += "(f) research/weapon.tsv is not where this check looks for it, or holds no row - the list would answer to nothing measured (SPEC R8, V20)" }
+if ($null -eq $armTsv455 -or $armTsv455.Count -eq 0) { $v456Bad += "(f) research/armor.tsv is not where this check looks for it, or holds no row (SPEC R8, V20)" }
+if ($v456Bad.Count -eq 0) {
+    $WCELL456 = @('roll','diff','damage','range','rate','clip','conceal')
+    $ACELL456 = @('rating','penalty','notes')
+    foreach ($trio456 in @(@('weapon', $wpnList455, $wMap456, $WCELL456), @('armor', $armList455, $aMap456, $ACELL456))) {
+        $root456 = $trio456[0]; $list456 = $trio456[1]; $map456 = $trio456[2]; $cols456 = $trio456[3]
+        foreach ($it456 in $list456) {
+            if (-not $map456.ContainsKey($it456)) { $v456Bad += "(a) '$it456' is offered by PICKER_LIST['$root456'] and combatData carries no entry for it - choosing it would empty every cell of the row (SPEC I157d, I157f)"; continue }
+            foreach ($half456 in @('En', 'Pt')) {
+                $cel456 = Cells455 $map456[$it456].$half456
+                foreach ($c456 in $cols456) {
+                    if (-not $cel456.ContainsKey($c456)) { $v456Bad += "(a) '$it456' has no '$c456' in its $half456 half - the cell would be written nil and read empty (SPEC I157d)" }
+                    elseif ($cel456[$c456] -eq '' -and $c456 -ne 'notes') { $v456Bad += "(a) '$it456' has an EMPTY '$c456' in its $half456 half - a cell the book leaves blank is written '-', and the dash is a VALUE (SPEC I157d, V457b)" }
+                }
+            }
+        }
+        foreach ($k456 in $map456.Keys) {
+            if ($list456 -cnotcontains $k456) { $v456Bad += "(a) combatData['$root456'] carries '$k456', which PICKER_LIST does not offer - the module is claiming a name that shipped out (SPEC I157c)" }
+        }
+        # (d) the nine Do techniques, in the list AND in the module (SPEC R150, Q77.1).
+        foreach ($do456 in $DO455) {
+            if ($list456 -ccontains $do456) { $v456Bad += "(d) PICKER_LIST['$root456'] offers '$do456', which is a Do technique and the user kept those OUT (SPEC R150, Q77.1)" }
+            if ($map456.ContainsKey($do456)) { $v456Bad += "(d) combatData['$root456'] carries the Do technique '$do456' (SPEC R150)" }
+        }
+        # (c) one key per name in BOTH halves of the .lang and in the PT map (SPEC V10, V22, V28).
+        foreach ($it456 in $list456) {
+            if (-not $ptK.Contains($it456))       { $v456Bad += "(c) '$it456' has no [pt] key in localization.lang - the picker would show it in English on a Portuguese sheet (SPEC V10, V22)" }
+            if (-not $enK.Contains($it456))       { $v456Bad += "(c) '$it456' has no [en] key in localization.lang (SPEC V10)" }
+            if (-not $embedded.ContainsKey($it456)) { $v456Bad += "(c) '$it456' is absent from the PT map of WoD20.6.lfm - it would never translate (SPEC V28, B14)" }
+        }
+    }
+    foreach ($sel456 in @('Select Weapon', 'Select Armor')) {
+        if (-not $ptK.Contains($sel456))         { $v456Bad += "(c) '$sel456' has no [pt] key - the box title and the empty button would stay English (SPEC I113a, V459)" }
+        if (-not $enK.Contains($sel456))         { $v456Bad += "(c) '$sel456' has no [en] key (SPEC V10, V459)" }
+        if (-not $embedded.ContainsKey($sel456)) { $v456Bad += "(c) '$sel456' is absent from the PT map (SPEC V28, V459)" }
+    }
+    # (b) one description entry per item, in both halves, with the three blocks of I21.
+    foreach ($q456 in @(@('weapon', $wpnList455, $wdEn456, $wdPt456, 'descWeapon'), @('armor', $armList455, $adEn456, $adPt456, 'descArmor'))) {
+        foreach ($half456 in @(@('en', $q456[2]), @('pt', $q456[3]))) {
+            $mp456 = DescMap $half456[1]
+            foreach ($it456 in $q456[1]) {
+                if (-not $mp456.ContainsKey($it456)) { $v456Bad += "(b) '$it456' has no entry in $($q456[4])_$($half456[0]).lua - the ? would open on the sentence of V360c for an item the book describes (SPEC I157h, V210a)"; continue }
+                $body456 = $mp456[$it456]
+                if (([regex]::Matches($body456, "`n`n`n")).Count -ne 2) { $v456Bad += "(b) '$it456' in $($q456[4])_$($half456[0]).lua does not carry the THREE blocks of I21 - source, name, text, two blank lines between each (SPEC I21, I157h)"; continue }
+                $b1456 = ($body456 -split "`n`n`n")[0]
+                $ok456 = $false
+                foreach ($ti456 in $TITLE455) { if ($b1456.StartsWith($ti456 + ', ')) { $ok456 = $true } }
+                if (-not $ok456) { $v456Bad += "(b) block 1 of '$it456' in $($q456[4])_$($half456[0]).lua reads '$b1456' - it has to open with the spelled-out title of one of the books (SPEC I21, I157h)" }
+                elseif ($b1456 -notmatch '\s\d+$') { $v456Bad += "(b) block 1 of '$it456' in $($q456[4])_$($half456[0]).lua ends '$b1456' and not on a PRINTED page number (SPEC I21, R8)" }
+            }
+            # The ONLY key outside the list is the Conceal legend, and only in descWeapon_*.
+            foreach ($k456 in $mp456.Keys) {
+                if ($q456[1] -ccontains $k456) { continue }
+                if ($q456[0] -eq 'weapon' -and $k456 -ceq 'Conceal') { continue }
+                $v456Bad += "(b) $($q456[4])_$($half456[0]).lua carries '$k456', which PICKER_LIST['$($q456[0])'] does not offer - a description nothing can open (SPEC I157h, V456b)"
+            }
+        }
+    }
+    # (f) both directions against the research tables: an item with no measured row must not
+    # exist, and a measured row the list dropped is the table claiming a name that shipped out.
+    foreach ($r456 in @(@('weapon', $wpnList455, $wpnTsv455, 'weapon.tsv'), @('armor', $armList455, $armTsv455, 'armor.tsv'))) {
+        $names456 = @($r456[2] | ForEach-Object { $_.name })
+        foreach ($it456 in $r456[1]) {
+            if ($names456 -cnotcontains $it456) { $v456Bad += "(f) PICKER_LIST['$($r456[0])'] offers '$it456' and research/$($r456[3]) has no row for it - the sheet would be voting against the book (SPEC R8, V456f)" }
+        }
+        foreach ($n456 in $names456) {
+            if ($r456[1] -cnotcontains $n456) { $v456Bad += "(f) research/$($r456[3]) measures '$n456' and PICKER_LIST['$($r456[0])'] does not offer it - a row nobody can reach (SPEC V456f)" }
+        }
+    }
+}
+if ($v456Bad) { foreach ($b in $v456Bad) { Fail "V456 $b" } }
+else { Pass "V456 $($wpnList455.Count) weapons and $($armList455.Count) armours agree across combatData.lua, the four desc halves, both halves of the .lang and the PT map, and every one of them traces to a measured row" }
+
+# ---- V457: the filling comes out of ONE door, in the SAME step as the name, and it is the
+# module (or the pane) that says '-' (SPEC V457, I157f, I107i, V135, T1006) --------------------
+$v457Bad = @()
+$conf457 = LuaFn $rootTxt 'mfConfirm'
+if (-not $conf457) { $v457Bad += "(a) mfConfirm was not found - nothing writes what the box chose (SPEC V209)" }
+else {
+    $cb457 = NoComments $conf457
+    $rc457 = NoComments $rootTxt
+    # (a) ONE site. The cells are written THROUGH the two tables, so both shapes are counted: a
+    # literal setField("roll_" anywhere and a setField(MF_WPN_CELL[i][1] outside mfConfirm are
+    # the same second writer, and the second writer is the one that goes stale (SPEC V135).
+    foreach ($pat457 in @('setField\(\s*"(?:roll_|difficulty_|damage_|range_|rate_|clip_|conceal_|armorRating|armorPenalty|armorDescription)',
+                          'setField\(\s*MF_(?:WPN|ARM)_CELL\[i\]\[1\]')) {
+        $all457 = 0
+        foreach ($f457 in $files) { $all457 += @([regex]::Matches((NoComments (CodeOf $f457.FullName)), $pat457)).Count }
+        $in457 = @([regex]::Matches($cb457, $pat457)).Count
+        if ($in457 -eq 0) { $v457Bad += "(a) mfConfirm holds no write matching /$pat457/ - the cells would be filled by nothing, or by somebody else (SPEC V209, V20)" }
+        elseif ($all457 -ne $in457) { $v457Bad += "(a) $all457 write(s) match /$pat457/ across the sheet and only $in457 of them are in mfConfirm - a second writer of these cells is the one that goes stale (SPEC V457a, V135)" }
+    }
+    # the merit branch beside it, asked of the LIST and not of MF.data (SPEC I157f, the trap)
+    if ($cb457 -notmatch 'local isMf = MF\.list == "merit" or MF\.list == "flaw";') { $v457Bad += "(a) mfConfirm does not ask which LIST it is confirming before writing book_/type_/costy_ - MF.data ~= nil is TRUE for a weapon row now, so choosing a weapon on attack_3 would write book_3, type_3 and costy_3 into the NDB, orphan and silent (SPEC I157f, V457a)" }
+    if ($cb457 -match '(?m)^\s*if info ~= nil and num ~= nil then') { $v457Bad += "(a) mfConfirm still opens the book branch on 'info ~= nil and num ~= nil' - that is the OLD test, and it fires on a weapon (SPEC I157f, V457a)" }
+    # (b) all seven together, no test per cell, and no dash written by the Lua.
+    if ($cb457 -notmatch 'for i = 1, #MF_WPN_CELL, 1 do\s*setField\(MF_WPN_CELL\[i\]\[1\] \.\. num, L and L\[MF_WPN_CELL\[i\]\[2\]\] or ""\);') { $v457Bad += "(b) the book branch does not write the seven weapon cells together through MF_WPN_CELL - a cell written under its own test is a cell that can be left behind (SPEC V457b, I157f)" }
+    if ($cb457 -notmatch 'for i = 1, #MF_ARM_CELL, 1 do\s*setField\(MF_ARM_CELL\[i\]\[1\], L and L\[MF_ARM_CELL\[i\]\[2\]\] or ""\);') { $v457Bad += "(b) the book branch does not write the armour cells together through MF_ARM_CELL (SPEC V457b, I157f)" }
+    if ($cb457 -notmatch 'setField\("armorDescription", L and L\.notes or ""\);') { $v457Bad += "(b) the book branch does not write armorDescription from the module's notes - the field would keep the note of the armour before it (SPEC Q77.6, V29)" }
+    if ($cb457 -match 'or "-"') { $v457Bad += "(b) mfConfirm writes 'or `"-`"' - the dash is combatData's to say, so a dash born here would mean the module was never asked (SPEC V457b, I157d)" }
+    # (c) the blank arrives by two doors and leaves by one line (SPEC V388d).
+    if ($cb457 -notmatch 'local cols = \(MF\.data ~= nil and MF\.picked ~= ""\) and MF\.data\[MF\.picked\] or nil;') { $v457Bad += "(c) mfConfirm does not leave L nil when the blank is CHOSEN - the Remove line and the empty first item would each need a write of their own to clear the cells (SPEC V388d, V457c)" }
+    # (d) the custom half reads the PANE, cell by cell through mfCell, on the same door.
+    if ($cb457 -notmatch 'setField\(MF_WPN_CELL\[i\]\[1\] \.\. n, mfCell\(found\["edtMfWpn_" \.\. MF_WPN_CELL\[i\]\[2\]\]\)\);') { $v457Bad += "(d) the custom branch does not read the seven weapon cells off the pane through mfCell (SPEC I157f, V457d, Q77.3)" }
+    if ($cb457 -notmatch 'setField\(MF_ARM_CELL\[i\]\[1\], mfCell\(found\["edtMfArm_" \.\. MF_ARM_CELL\[i\]\[2\]\]\)\);') { $v457Bad += "(d) the custom branch does not read the armour cells off the pane through mfCell (SPEC I157o, V457d)" }
+    if ($cb457 -notmatch 'setField\("armorDescription", tx\);') { $v457Bad += "(d) the custom branch does not write the pane's text to armorDescription - the big field and the pane would tell two stories about one armour (SPEC I157o)" }
+    # (e) the language of the cell is read with the SAME expression mfOpen uses (SPEC V448).
+    if ($cb457 -notmatch 'local lang = \(sheet\.language == "en"\) and "en" or "pt";') { $v457Bad += "(e) mfConfirm does not read sheet.language with the expression mfOpen uses - two spellings of one question is how a default flips in one place only (SPEC V448, V135)" }
+    # (f) mfCell is GLOBAL and is the ONE place a blank becomes a dash.
+    if ($rc457 -match 'local function mfCell\(') { $v457Bad += "(f) mfCell is a local function on the root form - the root declares 49 chunk locals against a ceiling of 53 and a local here is a dead build with no message (SPEC I113g, B19)" }
+    if ($rc457 -notmatch '(?m)^\s*function mfCell\(ctrl\)') { $v457Bad += "(f) mfCell is not declared on the root form - the custom cells would be read raw and an empty one would print as an empty box (SPEC I157f, V457f)" }
+    $dash457 = @([regex]::Matches($rc457, 'return "-";')).Count
+    if ($dash457 -ne 2) { $v457Bad += "(f) the root form turns a blank into a dash in $dash457 place(s), expected the 2 guards of mfCell - a second translator is a second answer for one absence (SPEC V457f, V135)" }
+    # the two cell tables are the ONE place these names live, and they are GLOBAL (SPEC I113g).
+    if ($rc457 -match 'local MF_WPN_CELL' -or $rc457 -match 'local MF_ARM_CELL') { $v457Bad += "(f) a cell table is declared local on the root form - the chunk local ceiling is 53 and a local here is a dead build with no message (SPEC I113g, B19)" }
+    $wt457 = [regex]::Match($rc457, '(?s)MF_WPN_CELL = \{(.*?)\};')
+    if (-not $wt457.Success) { $v457Bad += "(b) MF_WPN_CELL is not declared on the root form - the seven cells would have no owner (SPEC I157f, V135)" }
+    else {
+        # SORTED on both sides, and that is the SONDA of V457 written into the rule: which order
+        # the seven cells are written in is not the question - that they are all seven, and all
+        # seven together, is. A pair dropped here is a cell the picker silently stops filling, in
+        # all four readers at once, because this table is the only place their names live.
+        $got457 = @([regex]::Matches($wt457.Groups[1].Value, '\{ "([^"]+)", "([^"]+)" \}') | ForEach-Object { $_.Groups[1].Value + '/' + $_.Groups[2].Value } | Sort-Object)
+        $want457 = @('roll_/roll','difficulty_/diff','damage_/damage','range_/range','rate_/rate','clip_/clip','conceal_/conceal') | Sort-Object
+        if (($got457 -join ' ') -cne ($want457 -join ' ')) { $v457Bad += "(b) MF_WPN_CELL holds [$($got457 -join ', ')] and the seven cells of I157f are [$($want457 -join ', ')] - a pair dropped here is a cell the picker silently stops filling, in all four readers at once (SPEC V457b, I157f)" }
+    }
+    $at457 = [regex]::Match($rc457, '(?s)MF_ARM_CELL = \{(.*?)\};')
+    if (-not $at457.Success) { $v457Bad += "(b) MF_ARM_CELL is not declared on the root form (SPEC I157f)" }
+    else {
+        $gota457 = @([regex]::Matches($at457.Groups[1].Value, '\{ "([^"]+)", "([^"]+)" \}') | ForEach-Object { $_.Groups[1].Value + '/' + $_.Groups[2].Value } | Sort-Object)
+        if (($gota457 -join ' ') -cne 'armorPenalty/penalty armorRating/rating') { $v457Bad += "(b) MF_ARM_CELL holds [$($gota457 -join ', ')] and the two cells of I157o are [armorRating/rating armorPenalty/penalty] (SPEC V457b)" }
+    }
+}
+if ($v457Bad) { foreach ($b in $v457Bad) { Fail "V457 $b" } }
+else { Pass "V457 the nine COMBAT cells are written by mfConfirm alone, all of them in the step that writes the name, and the dash comes from combatData or from mfCell and nowhere else" }
+
+# ---- V458: the nine COMBAT cells are READ-ONLY, centred and keep the field they always had
+# (SPEC V458, Q77.3, I157k, R153, T1005) ------------------------------------------------------
+# The form is MeritPicked's, byte for byte (WoD20.2.lfm:94-96): readOnly, 0.75 and centred. It
+# is a PRECEDENT and not an invention - three cells mfConfirm writes and the player never types.
+$v458Bad = @()
+$CELLF458 = @('roll_','difficulty_','damage_','range_','rate_','clip_','conceal_')
+$seen458 = 0
+foreach ($f458 in $files) {
+    foreach ($e458 in (Doc $f458.FullName).SelectNodes("//edit")) {
+        $fd458 = $e458.GetAttribute("field")
+        $hit458 = ($fd458 -ceq 'armorRating' -or $fd458 -ceq 'armorPenalty')
+        foreach ($p458 in $CELLF458) { if ($fd458.StartsWith($p458)) { $hit458 = $true } }
+        if (-not $hit458) { continue }
+        $seen458++
+        if ($e458.GetAttribute("readOnly") -ne 'true')        { $v458Bad += "(a) $($f458.Name) '$fd458' is not readOnly - the player would type over what choosing a weapon just wrote, and the row would disagree with the book it names (SPEC Q77.3, I157k)" }
+        # PRESENCE and not the NUMBER, which is the SONDA of V458 written into the rule: the value
+        # of the dim already has an owner one rule over - V111/V244 holds every read-only text on
+        # this sheet to DIM_TEXT - and two owners for one number is B70 (SPEC V135, V244).
+        if ($e458.GetAttribute("opacity") -eq '')             { $v458Bad += "(a) $($f458.Name) '$fd458' carries no opacity - a read-only cell reads live, and the eye has nothing to tell it apart from a field it may type in (SPEC V244, R153)" }
+        if ($e458.GetAttribute("horzTextAlign") -ne 'center') { $v458Bad += "(a) $($f458.Name) '$fd458' is not centred - the nine cells read as one row of columns, or they read as nine left-hugging entries (SPEC I157k, R153)" }
+    }
+}
+if ($seen458 -eq 0) { $v458Bad += "(a) not one COMBAT cell was reached - the rule is measuring an empty set (SPEC V20, B7)" }
+foreach ($f458 in $files) {
+    foreach ($te458 in (Doc $f458.FullName).SelectNodes("//textEditor[@field='armorDescription']")) {
+        if ($te458.GetAttribute("readOnly") -ne 'true') { $v458Bad += "(b) $($f458.Name) armorDescription is not readOnly - choosing an armour writes the book's rule into it, and a field the player can also type is two owners of one text (SPEC I157k, V135)" }
+        if ($te458.GetAttribute("opacity") -ne '')      { $v458Bad += "(b) $($f458.Name) armorDescription carries opacity '$($te458.GetAttribute('opacity'))' - opacity on a TextControl dims the TEXT away, and this one pays for the lock with the lock alone (SPEC V241, I157k)" }
+    }
+}
+# (c) the geometry of C 137 / T145 did NOT move: the picker took the first column and the seven
+# behind it stayed exactly where they were, or the header labels would sit over nothing.
+if (Test-Path -LiteralPath $wo3455) {
+    $doc458  = Doc $wo3455
+    $tplA458 = $doc458.SelectSingleNode('//template[@name="Attack"]')
+    if ($null -eq $tplA458) { $v458Bad += "(c) the Attack template is gone - the seven columns have no geometry to measure (SPEC V209)" }
+    else {
+        foreach ($g458 in @(@('roll_',220,100), @('difficulty_',320,50), @('damage_',370,90), @('range_',460,50),
+                            @('rate_',510,50), @('clip_',560,50), @('conceal_',610,70))) {
+            $n458 = $tplA458.SelectSingleNode('edit[@field="' + $g458[0] + '$(num)"]')
+            if ($null -eq $n458) { $v458Bad += "(c) the Attack template has no cell on '$($g458[0])' (SPEC C 137, T145)"; continue }
+            if ([int]$n458.GetAttribute("left") -ne $g458[1] -or [int]$n458.GetAttribute("width") -ne $g458[2]) {
+                $v458Bad += "(c) '$($g458[0])' sits at left=$($n458.GetAttribute('left')) width=$($n458.GetAttribute('width')), and C 137 fixed it at left=$($g458[1]) width=$($g458[2]) - the header label above it is as wide as its column and would stop sitting over it (SPEC T145, V11)"
+            }
+        }
+        foreach ($a458 in @('armorRating', 'armorPenalty')) {
+            $n458 = $doc458.SelectSingleNode('//edit[@field="' + $a458 + '"]')
+            if ($null -eq $n458) { $v458Bad += "(c) the ARMOR box has no '$a458' cell (SPEC V209)"; continue }
+            if ([int]$n458.GetAttribute("left") -ne 75 -or [int]$n458.GetAttribute("width") -ne 275) { $v458Bad += "(c) '$a458' sits at left=$($n458.GetAttribute('left')) width=$($n458.GetAttribute('width')) - all three rows of the ARMOR box put their entry at x=75 (SPEC V26, B.12)" }
+        }
+    }
+}
+if ($v458Bad) { foreach ($b in $v458Bad) { Fail "V458 $b" } }
+else { Pass "V458 the $seen458 COMBAT cells are read-only, dimmed to 0.75 and centred in the MeritPicked form, armorDescription is locked and bright, and the seven columns did not move" }
+
+# ---- V459: 'Select Weapon' and 'Select Armor' are ONE string in three places, and the same one
+# mfOpen DERIVES (SPEC V459, I113a, I107a2, V10, V28, T1005) ----------------------------------
+# mfOpen builds the box title as "Select " plus the list with its first letter raised, so the
+# fallback on the button, the title over the box and the .lang key are one text and not three.
+# A list renamed in the mfOpen call alone leaves the derived title with no key behind it.
+$v459Bad = @()
+if (-not (Test-Path -LiteralPath $wo3455)) { $v459Bad += "WoD20.3.lfm is not where this check looks for it (SPEC V209)" }
+else {
+    $code459 = CodeOf $wo3455
+    $open459 = @([regex]::Matches($code459, "mfOpen\(self, '[^']+', '([a-zA-Z]+)'"))
+    if ($open459.Count -eq 0) { $v459Bad += "no mfOpen call was read out of WoD20.3.lfm - the rule is measuring an empty set (SPEC V20, B7)" }
+    foreach ($l459 in @($open459 | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)) {
+        $t459 = 'Select ' + $l459.Substring(0,1).ToUpperInvariant() + $l459.Substring(1)
+        if (-not $enK.Contains($t459))         { $v459Bad += "WoD20.3.lfm opens the list '$l459', which mfOpen turns into the title '$t459', and localization.lang has no [en] key for it - the box would be titled from a key nobody carries (SPEC I113a, V10)" }
+        if (-not $ptK.Contains($t459))         { $v459Bad += "'$t459' has no [pt] key - the title and the empty button would stay in English on a Portuguese sheet (SPEC I113a, V22)" }
+        if (-not $embedded.ContainsKey($t459)) { $v459Bad += "'$t459' is absent from the PT map of WoD20.6.lfm - translateSheetText would hand the English straight back (SPEC V28)" }
+        foreach ($b459 in (Doc $wo3455).SelectNodes("//button")) {
+            if ($b459.GetAttribute("onClick") -notmatch ("mfOpen\(self, '[^']+', '" + $l459 + "'")) { continue }
+            if ($b459.GetAttribute("text") -cne $t459) { $v459Bad += "the button opening '$l459' is authored text='$($b459.GetAttribute('text'))' and the derived title is '$t459' - the label an empty row shows and the title over the box are ONE string (SPEC I107a2, V459)" }
+        }
+        if ($code459 -cnotmatch ('"' + [regex]::Escape($t459) + '"')) { $v459Bad += "renderCombatButtons never names '$t459' - the fallback the painter writes on an empty row would be some other text (SPEC I107a2, V31)" }
+    }
+}
+if ($v459Bad) { foreach ($b in $v459Bad) { Fail "V459 $b" } }
+else { Pass "V459 the two COMBAT box titles are derived from the list name and carried by the .lang, the PT map and the authored button label as one string" }
+
+# ---- V460: the CUSTOM pane of each COMBAT list exists WHOLE, is reached, and is the only door
+# left for editing a cell (SPEC V460, Q77.3, I157n, I157o, T1006) -----------------------------
+$v460Bad = @()
+$WCOL460 = @('roll','diff','damage','range','rate','clip','conceal')
+$ACOL460 = @('rating','penalty')
+$rc460 = NoComments $rootTxt
+# (a) ONE question per list, GLOBAL, and nothing else decides these panes.
+foreach ($fn460 in @(@('mfWeaponShown', 'weapon'), @('mfArmorShown', 'armor'))) {
+    if ($rc460 -match ('local function ' + $fn460[0] + '\(')) { $v460Bad += "(a) $($fn460[0]) is a local function on the root form - the chunk local ceiling is 53 and a local here is a dead build with no message (SPEC I113g, B19)" }
+    $body460 = LuaFn $rootTxt $fn460[0]
+    if (-not $body460) { $v460Bad += "(a) $($fn460[0]) is not declared - the pane and the read in mfConfirm would each answer the question their own way (SPEC V135, V460a)"; continue }
+    if ((NoComments $body460) -notmatch ('return MF\.custom == true and MF\.list == "' + $fn460[1] + '";')) { $v460Bad += "(a) $($fn460[0]) does not answer 'MF.custom == true and MF.list == the list' - a box that shows the cells and confirms without them is the same bug twice (SPEC V460a, V135)" }
+}
+# (b) the eighteen controls exist under those exact names, born hidden, carry no field, and
+# every one of them is on the mfNames roster - a name missing there is xpFind never reaching it
+# and every write landing on nil, which is the hole T892 came through (SPEC V209).
+$mfn460 = NoComments (LuaFn $rootTxt 'mfNames')
+if (-not $mfn460) { $v460Bad += "(b) mfNames was not found - nothing enrols the pane's controls and xpFind would reach none of them (SPEC V209)" }
+else {
+    foreach ($en460 in @('"lblMfWpn_" \.\. MF_WPN_CELL\[i\]\[2\]', '"edtMfWpn_" \.\. MF_WPN_CELL\[i\]\[2\]',
+                         '"lblMfArm_" \.\. MF_ARM_CELL\[i\]\[2\]', '"edtMfArm_" \.\. MF_ARM_CELL\[i\]\[2\]')) {
+        if ($mfn460 -notmatch $en460) { $v460Bad += "(b) mfNames does not enrol the pane controls by /$en460/ - a hand-written roster is a name to forget, and the one forgotten is a write landing on nil with rdk -l exiting 0 (SPEC V209, T892)" }
+    }
+}
+$pane460 = (Doc (Join-Path $dir 'WoD20th.lfm')).SelectSingleNode('//layout[@name="mfSearch"]')
+if ($null -eq $pane460) { $v460Bad += "(b) the mfSearch layout is gone - the pane has nowhere to live (SPEC V209)" }
+else {
+    foreach ($grp460 in @(@('Wpn', $WCOL460), @('Arm', $ACOL460))) {
+        foreach ($c460 in $grp460[1]) {
+            foreach ($kind460 in @('lbl', 'edt')) {
+                $nm460 = $kind460 + 'Mf' + $grp460[0] + '_' + $c460
+                $n460 = $pane460.SelectSingleNode('*[@name="' + $nm460 + '"]')
+                if ($null -eq $n460) { $v460Bad += "(b) the mfSearch pane has no control named '$nm460' - the cell would have no door and mfConfirm would read nil (SPEC I157n, I157o)"; continue }
+                if ($n460.GetAttribute("visible") -ne 'false') { $v460Bad += "(b) '$nm460' is not authored visible=false - the box opens on a book entry far more often than on a custom one, and what is authored is the common case (SPEC I129d)" }
+                if ($n460.GetAttribute("field") -ne '') { $v460Bad += "(b) '$nm460' carries a field - the pane is a QUESTION the open box asks and nothing here survives the box closing, so a field would be a second writer of the cell (SPEC V269a, V333e, V460e)" }
+            }
+        }
+    }
+}
+# (c) mfCustomPane writes visibility in BOTH directions and the cascade lands where I157n/o say.
+$pn460 = NoComments (LuaFn $rootTxt 'mfCustomPane')
+if (-not $pn460) { $v460Bad += "(c) mfCustomPane was not found - nothing shows or hides the pane (SPEC V209)" }
+else {
+    if ($pn460 -notmatch 'local wpn = on and mfWeaponShown\(\);') { $v460Bad += "(c) mfCustomPane does not ask mfWeaponShown - the weapon pane would be shown by somebody else's test (SPEC V460a, V135)" }
+    if ($pn460 -notmatch 'local arm = on and mfArmorShown\(\);')  { $v460Bad += "(c) mfCustomPane does not ask mfArmorShown (SPEC V460a)" }
+    if ($pn460 -notmatch 'found\["lblMfWpn_" \.\. c\]\.visible = wpn;') { $v460Bad += "(c) mfCustomPane does not drive the lblMfWpn_ group from 'wpn' - turning one group on without turning the other off leaves seven cells on screen over the wrong row, which is B58/B62 (SPEC V460c)" }
+    if ($pn460 -notmatch 'found\["edtMfWpn_" \.\. c\]\.visible = wpn;') { $v460Bad += "(c) mfCustomPane does not drive the edtMfWpn_ group from 'wpn' (SPEC V460c)" }
+    if ($pn460 -notmatch 'found\["lblMfArm_" \.\. c\]\.visible = arm;') { $v460Bad += "(c) mfCustomPane does not drive the lblMfArm_ group from 'arm' (SPEC V460c, B58, B62)" }
+    if ($pn460 -notmatch 'found\["edtMfArm_" \.\. c\]\.visible = arm;') { $v460Bad += "(c) mfCustomPane does not drive the edtMfArm_ group from 'arm' (SPEC V460c)" }
+    if ($pn460 -notmatch 'if lvl or rev or arm then base = 185; end;') { $v460Bad += "(c) the armour pane does not land on base 185 - one row of cells sits where the level dots and the Revenant mark sit (SPEC I157o, V460c)" }
+    if ($pn460 -notmatch 'if \(rev and MF\.revenant == true\) or wpn then base = 237; end;') { $v460Bad += "(c) the weapon pane does not land on base 237 - two rows of cells need the floor the weakness field already reaches (SPEC I157n, V460c)" }
+    if ($pn460 -notmatch 'found\["edtMfDesc"\]\.height = 625 - top;') { $v460Bad += "(c) edtMfDesc no longer derives its height from the pane floor - four authored tops beside one computed one is what B70 is about (SPEC V460c)" }
+}
+# (d) the pane opens on what the ROW holds: a pane that opened blank over a filled row is data
+# going off the screen, which is V383 coming in through the picker's own door.
+$cu460 = NoComments (LuaFn $rootTxt 'mfCustom')
+if (-not $cu460) { $v460Bad += "(d) mfCustom was not found (SPEC V209)" }
+else {
+    if ($cu460 -notmatch 'c\.text = \(n ~= nil and sheet ~= nil and sheet\[MF_WPN_CELL\[i\]\[1\] \.\. n\]\) or "";') { $v460Bad += "(d) mfCustom does not prefill the seven weapon cells from the row - the player opens Custom on a book weapon precisely to adjust one cell, and a blank pane would lose the other six (SPEC V460d, I157n)" }
+    if ($cu460 -notmatch 'c\.text = \(sheet ~= nil and sheet\[MF_ARM_CELL\[i\]\[1\]\]\) or "";') { $v460Bad += "(d) mfCustom does not prefill the armour cells from the row (SPEC V460d, I157o)" }
+    $pre460 = $cu460.IndexOf('MF_WPN_CELL')
+    $arm460 = $cu460.IndexOf('mfArm(found, true);')
+    if ($pre460 -ge 0 -and $arm460 -ge 0 -and $pre460 -gt $arm460) { $v460Bad += "(d) mfCustom prefills the cells AFTER mfArm - the box would arm on a pane it has not filled yet (SPEC V460d)" }
+}
+# (f) the confirm reaches the pane by a name DERIVED from the cell table and never off the
+# control that was clicked: `self` on an inline handler is the FORM and not the widget (R134).
+if ($conf457) {
+    $cc460 = NoComments $conf457
+    if ($cc460 -match 'found\["edtMfWpn_[a-z]') { $v460Bad += "(f) mfConfirm names a pane cell literally instead of deriving it from MF_WPN_CELL - two rosters of seven names is one roster to forget (SPEC V135, V460f)" }
+    if ($cc460 -match 'found\["edtMfArm_[a-z]') { $v460Bad += "(f) mfConfirm names an armour pane cell literally instead of deriving it from MF_ARM_CELL (SPEC V135, V460f)" }
+}
+if ($v460Bad) { foreach ($b in $v460Bad) { Fail "V460 $b" } }
+else { Pass "V460 both COMBAT custom panes exist whole under derived names, ride the same cascade in both directions, open on what the row holds and are the only door left for editing a cell" }
+
+# ---- V461: the CONCEALMENT legend is a ? with a FIXED key and it explains EVERY letter the
+# cells can show (SPEC V461, Q77.4, I157p, R154, T1005) ---------------------------------------
+$v461Bad = @()
+if (-not (Test-Path -LiteralPath $wo3455)) { $v461Bad += "(a) WoD20.3.lfm is not where this check looks for it (SPEC V209)" }
+else {
+    $d461 = Doc $wo3455
+    $q461 = @($d461.SelectNodes('//button[@name="btnQconceal"]'))
+    if ($q461.Count -ne 1) { $v461Bad += "(a) WoD20.3.lfm draws $($q461.Count) btnQconceal, expected 1 - the letters of the Conceal column would have no legend at all (SPEC I157p, Q77.4)" }
+    else {
+        if ($q461[0].GetAttribute("onClick") -cne "popOpen(self, 'Weapon', 'Conceal', nil, nil);") { $v461Bad += "(a) btnQconceal opens with '$($q461[0].GetAttribute('onClick'))' - it is a LEGEND and not a row, so the key is fixed and there is no slot behind it (SPEC I157p, the btnQFaith form)" }
+        $l461 = [int]$q461[0].GetAttribute("left"); $w461 = [int]$q461[0].GetAttribute("width")
+        if ($l461 + $w461 -ne 730) { $v461Bad += "(a) btnQconceal closes at $($l461 + $w461) and the box's content edge is 730 (750 - 20) - one pixel past it and the ? hangs off the COMBAT box (SPEC I73, V461a)" }
+        $lab461 = $null
+        foreach ($n461 in $d461.SelectNodes('//label[@text="Conceal"]')) { if ($n461.GetAttribute("top") -eq '36') { $lab461 = $n461 } }
+        if ($null -eq $lab461) { $v461Bad += "(a) the Conceal column header is gone - the ? would stand beside nothing (SPEC V209)" }
+        else {
+            $le461 = [int]$lab461.GetAttribute("left") + [int]$lab461.GetAttribute("width")
+            if ($le461 -ne $l461) { $v461Bad += "(a) the Conceal header closes at $le461 and btnQconceal opens at $l461 - the label gave up five pixels so the two would touch, and a gap or an overlap is the header sitting off its own column (SPEC I157p, V11)" }
+        }
+    }
+}
+# (b) the legend is a real entry in BOTH halves. That it is the ONLY key outside the list is
+# charged by V456(b) above, which reads the same two modules.
+$leg461 = @{}
+foreach ($h461 in @(@('en', 'descWeapon_en.lua'), @('pt', 'descWeapon_pt.lua'))) {
+    $ent461 = DescEntries (Join-Path $plugin $h461[1]) 'WEAPON_DESC' $h461[0]
+    if ($null -eq $ent461) { $v461Bad += "(b) $($h461[1]) could not be read - the legend cannot be measured in a module nobody can open (SPEC V210, V408)"; continue }
+    $mp461 = DescMap $ent461
+    if (-not $mp461.ContainsKey('Conceal')) { $v461Bad += "(b) $($h461[1]) carries no 'Conceal' entry - the ? beside the header would open on the sentence of V360c (SPEC I157p, V461b)"; continue }
+    $body461 = $mp461['Conceal']
+    if (([regex]::Matches($body461, "`n`n`n")).Count -ne 2) { $v461Bad += "(b) the 'Conceal' entry of $($h461[1]) does not carry the three blocks of I21 (SPEC I21, I157p)"; continue }
+    $leg461[$h461[0]] = ($body461 -split "`n`n`n")[2]
+}
+# (c)(d) every letter the cells can show is explained, and the map from one column to the other
+# is a FUNCTION - the same EN letter never becomes two PT ones (SPEC R154, V461d).
+if ($null -eq $wpnTsv455 -or $wpnTsv455.Count -eq 0) { $v461Bad += "(c) research/weapon.tsv holds no row - the legend would be certified against nothing (SPEC V20, B7)" }
+else {
+    $PT461 = @('B','R','M','N','varia','-')
+    $map461 = @{}
+    foreach ($r461 in $wpnTsv455) {
+        if ($map461.ContainsKey($r461.conceal) -and $map461[$r461.conceal] -cne $r461.conceal_pt) { $v461Bad += "(d) research/weapon.tsv turns the conceal letter '$($r461.conceal)' into both '$($map461[$r461.conceal])' and '$($r461.conceal_pt)' - the map is not a function and one letter would mean two things on the same sheet (SPEC V461d, R154)" }
+        $map461[$r461.conceal] = $r461.conceal_pt
+        if ($PT461 -cnotcontains $r461.conceal_pt) { $v461Bad += "(d) research/weapon.tsv writes conceal_pt '$($r461.conceal_pt)' for '$($r461.name)', which is outside the closed set of the Classical Age book (SPEC R154, V461d)" }
+    }
+    foreach ($h461 in @(@('en', 'conceal'), @('pt', 'conceal_pt'))) {
+        if (-not $leg461.ContainsKey($h461[0])) { continue }
+        foreach ($v461 in @($wpnTsv455 | ForEach-Object { $_.($h461[1]) } | Sort-Object -Unique)) {
+            if ($v461 -ceq '-') { continue }
+            if ($leg461[$h461[0]] -cnotmatch ([regex]::Escape($v461) + ' = ')) { $v461Bad += "(c) the cells can read '$v461' and the [$($h461[0])] legend does not explain it - a ? that leaves a letter unanswered is a ? with no answer (SPEC V461c, I157p)" }
+        }
+    }
+}
+if ($v461Bad) { foreach ($b in $v461Bad) { Fail "V461 $b" } }
+else { Pass "V461 the Conceal legend is one fixed-key ? closing on the box edge, it is a real entry in both halves, and it explains every letter the column can show" }
 
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

@@ -711,11 +711,53 @@ You possess a fetish — a physical object into which a werewolf has bound a spi
 
 ••••• You possess one or more fetishes with a total of five levels.]==],
 				},
-				["Generation"] = {
+				["Generation (Classical Age)"] = {
+					en = [==[Vampire: The Classical Age 20th Anniversary Edition, p. 156
+
+
+Generation (Classical Age)
+
+
+This Background represents your Generation: the purity of your blood and your closeness to the First Vampire. A high Generation rating may stand for a powerful sire or a decidedly dangerous taste for diablerie. If you take no dots in this Trait, you begin play as an Eleventh Generation vampire. See Chapter Six for further information.
+
+Players are advised to start their characters no lower than the eighth generation, so as to get the true vampire experience. Cainites of the seventh and sixth generation can be powerful even for neonates, and can show a side of the game far removed from what a game of personal horror asks for.
+
+• Tenth Generation: 13 blood points, can spend 1 blood point per turn.
+
+•• Ninth Generation: 14 blood points, can spend 2 blood points per turn.
+
+••• Eighth Generation: 15 blood points, can spend 3 blood points per turn.
+
+•••• Seventh Generation: 20 blood points, can spend 4 blood points per turn and possess Traits at up to 6 dots.
+
+••••• Sixth Generation: 30 blood points, can spend 6 blood points per turn and possess Traits at up to 7 dots.
+
+[Translated from the Portuguese: Vampire: The Classical Age has no English edition.]]==],
+				},
+				["Generation (Dark Ages)"] = {
+					en = [==[Vampire: The Dark Ages 20th Anniversary Edition, p. 181
+
+
+Generation (Dark Ages)
+
+
+This Background represents your Generation: the purity of your blood, and your proximity to the First Vampire. A high Generation rating may represent a powerful sire or a decidedly dangerous taste for diablerie. If you don’t take any dots in this Trait, you begin play as a Twelfth Generation vampire. See p. 341 for further information.
+
+• Eleventh Generation: 12 blood pool, can spend 1 blood point per turn
+
+•• Tenth Generation: 13 blood pool, can spend 1 blood point per turn
+
+••• Ninth Generation: 14 blood pool, can spend 2 blood points per turn
+
+•••• Eighth Generation: 15 blood pool, can spend 3 blood points per turn
+
+••••• Seventh Generation: 20 blood pool, can spend 4 blood points per turn and possess Traits at 6 dots]==],
+				},
+				["Generation (Modern Nights)"] = {
 					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 114
 
 
-Generation
+Generation (Modern Nights)
 
 
 This Background represents your Generation: the purity of your blood, and your proximity to the First Vampire. A high Generation rating may represent a powerful sire or a decidedly dangerous taste for diablerie. If you don’t take any dots in this Trait, you begin play as a Thirteenth Generation vampire. See p. 270 for further information.
@@ -776,11 +818,88 @@ Players may purchase pooled Herd with Background points.
 
 ••••• 60 vessels]==],
 				},
-				["Influence"] = {
+				["Influence (Classical Age)"] = {
+					en = [==[Vampire: The Classical Age 20th Anniversary Edition, p. 157
+
+
+Influence (Classical Age)
+
+
+You have drawn the mortal community to you through wealth, familial lineage, prestige, politics, blackmail, or supernatural sway. Influence represents the sum of your opinion or policy-swaying power in your community, particularly among law enforcement and bureaucracy. Influence can be used with pooled Background points. During the Roman Empire, characters above Influence 1 had to become Patricians — though forging ties inside the Senate is not so hard using Cainite gifts, and there are ways around the requirement.
+
+• Barely influential. A member of the Tribune of the Plebs or of a military tribe.
+
+•• Moderately influential. A force in the politics of the city, such as a Promagistrate or a Quaestor.
+
+••• Position of influence. A factor in regional politics, such as a Princeps Senatus or a Praetor.
+
+•••• Broad personal power. A force in imperial politics, such as an Aedile or a Legate.
+
+••••• Vastly influential. A Consul or a Censor, holding the organisation of the empire together.
+
+[Translated from the Portuguese: Vampire: The Classical Age has no English edition.]]==],
+				},
+				["Influence (Dark Ages)"] = {
+					en = [==[Vampire: The Dark Ages 20th Anniversary Edition, p. 181
+
+
+Influence (Dark Ages)
+
+
+You have pull in the mortal community through wealth, familial lineage, prestige, politics, blackmail, or supernatural sway. Influence represents the sum of your opinion or policy-swaying power in your community, particularly among law enforcement and bureaucracy. Influence can be used with pooled Background points.
+
+• Moderately influential; a factor in local politics
+
+•• Well-connected; a force in nearby politics
+
+••• Position of influence; a factor in regional politics
+
+•••• Broad personal power; a force in large-scale politics
+
+••••• Vastly influential; a factor in politics of the known world]==],
+				},
+				["Influence (Mage)"] = {
+					en = [==[Mage: The Ascension 20th Anniversary Edition, p. 316
+
+
+Influence (Mage)
+
+
+You command attention and respect within the Sleepers’ world. Perhaps you’re a celebrity, gang boss, politician, or cult leader… or maybe you’ve just got lots of powerful friends. Either way, when you speak, folks listen and frequently obey.
+
+Generally, this Background reflects a certain amount of social deference that you receive even without rolling the Trait. When a high-Influence person walks into a room, people notice; folks behave themselves accordingly, small favors are offered, impossible arrangements suddenly get made in your favor… that sort of thing. By combining Social Attributes with this Background (say, Manipulation + Influence), you can work your mojo with the appropriate parties. Mental Attributes (like Perception + Influence) help you spot or secure information through your social network. And although Physical Traits won’t help you accomplish actions through your Influence, a showy athletic feat (say, Stamina + Influence to reflect one of those “Nobody could survive THAT!” sorts of stunts) can impress a large number of people if you do something lots of people can see.
+
+To reflect the fame certain people command, this Background can go up to 10. Remember, though, that famous and influential people are easily recognized and tend to be responsible for (and held accountable by) lots of people. Influence is double-edged in that regard, and unwise activities can lower your Influence rating. Sure, you can walk into a restaurant and treat people like dirt — just expect some nasty social media reactions to you as soon as your back is turned…
+
+Certain magickal practices tend to utilize this sort of Influence; see the Art of Desire and Dominion entries, and their associated instruments, in the Practices section of Chapter Ten (pp. 573 and 577).
+
+X No influence to speak of.
+
+• Folks within your profession recognize you.
+
+•• You’ve got various associates and a small degree of clout.
+
+••• People within your field respect your abilities.
+
+•••• You’ve got quite a bit of clout.
+
+••••• You’re a force to be reckoned with.
+
+••••• • You command influence within your nation’s political affairs.
+
+••••• •• Your actions influence various allied nations.
+
+••••• ••• You command vast respect across whole cultural regions.
+
+••••• •••• Your dominance extends across whole socio-political spheres. (The EU, UN, ANC, etc.)
+
+••••• ••••• Your influence extends across the mortal world, with some respect granted even in the Otherworlds.]==],
+				},
+				["Influence (Modern Nights)"] = {
 					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 114
 
 
-Influence
+Influence (Modern Nights)
 
 
 You have pull in the mortal community, whether through wealth, prestige, political office, blackmail, or supernatural manipulation. Kindred with high Influence can sway, and in rare cases even control, the political and social processes of human society. Influence represents the sum of your opinion- or policy-swaying power in your community, particularly among the police and bureaucracy. In some cases, cultivating Influence is a path to generating Resources (see below).
@@ -857,11 +976,11 @@ X No legendary connection.
 
 ••••• A universally popular legend (Cinderella, King Arthur, the Mona Lisa).]==],
 				},
-				["Library"] = {
+				["Library (Hunters Hunted)"] = {
 					en = [==[The Hunters Hunted II, p. 140
 
 
-Library
+Library (Hunters Hunted)
 
 
 Arcanists often devote their entire lives to research, and build up tremendous libraries over the course of their careers; those who live near Chapter Houses with long established and well-developed libraries do even better. Arcanists who have to research a particular fact in libraries have the difficulty number of research rolls reduced by this Background (note that this cannot be combined with access to the Axis Mundi).
@@ -877,6 +996,29 @@ Players may opt to pool Background points for a shared library. See pp. 118-119 
 •••• Difficulty reduced by 4
 
 ••••• Difficulty reduced by 5]==],
+				},
+				["Library (Mage)"] = {
+					en = [==[Mage: The Ascension 20th Anniversary Edition, p. 318
+
+
+Library (Mage)
+
+
+Wow… do people even need books in the Internet Age? Well, yes, actually. Although the Internet has a near-infinite supply of information, there’s still plenty of information that’s available only in books. Especially when you’re dealing with esoteric, mystic, historical, or academic information, a good library can offer data that no net search can uncover. As much as new-millennium mages learn to appreciate the Internet, hard-copy archives are still essential to the serious student of the magickal Arts and Enlightened hypersciences.
+
+In the late 20th and early 21st centuries, this Background Trait reflects access to a multimedia archive that’s vital to that particular mage. An old-fashioned magus might shake his gray head at all that Internet foolishness, but even he will probably still have photographs, record albums, film reels and DVDs in his archive, if only because so much of the last century has been recorded in such media. Because your Library is based around a store of information, you can use it to raise or learn certain Traits by making successful Mental Trait + Library rolls, and a group can pool its members’ Library ratings into a single, larger one.
+
+X Those copies of Cosmo won’t help you learn Spheres.
+
+• You’ve got a few New Age paperbacks.
+
+•• Lots of fiction, little substance.
+
+••• There’s some useful stuff in there when you go digging for it.
+
+•••• Your collection of arcane data is respectable.
+
+••••• You’ve got a pretty decent collection of lore.]==],
 				},
 				["Mentor"] = {
 					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 115
@@ -1015,11 +1157,11 @@ Some tribes place more value on good breeding than others, but Pure Breed is alm
 
 ••••• The greatest of heroes live on in you.]==],
 				},
-				["Rank"] = {
+				["Rank (Hunters Hunted)"] = {
 					en = [==[The Hunters Hunted II, p. 134
 
 
-Rank
+Rank (Hunters Hunted)
 
 
 Government agencies enforce strict rank privilege — a private in the Army can’t get a captain to listen to him, let alone give orders to his superior officers. This Background represents an agent’s position in the chain of command. An agent with no dots of Rank is the lowest grade appropriate for the organization: a junior agent in the SAD or CIA, or a lieutenant 2nd class in the NSA. Though the character with the highest Rank will technically be in charge of other agents, extenuating circumstances in the field can screw up the chain of command.
@@ -1036,11 +1178,34 @@ When dealing with people in the same agency of lower Rank, apply the difference 
 
 ••••• A regional director in SAD or a general in the NSA.]==],
 				},
-				["Requisitions"] = {
+				["Rank (Mage)"] = {
+					en = [==[Mage: The Ascension 20th Anniversary Edition, p. 321
+
+
+Rank (Mage)
+
+
+You hold a title of some distinction among the masses — perhaps a military rank, a religious office, an executive position with a powerful corporation, or some similarly influential post. That position grants you a degree of respect, certain perks related to the job, and probably the immediate deference of lower-ranking personnel. Naturally, this rank demands responsibility to that office too; a head of state can’t just run off and have adventures when she pleases.
+
+Especially common among Technocrats, this Background commands Influence — as per that Background Trait — equal to the Rank rating. However, that Influence activates only among the people under the Rank’s dominion and in situations in which the character is acting within the limits of her office. Other people might not be so easily impressed, in which case the Influence counts as half the Rank. When acting in an official capacity, your character may also access Resources equal to half her Rank as a perk of her office, and may have Fame at half her Rank among the people she commands. If she wants Influence, Resources or Fame independent of that Rank, she needs to buy them separately.
+
+X No rank worth noticing.
+
+• Minor rank: Army sergeant, squire, deacon, school board member, novice journalist, junior manager, university instructor.
+
+•• Low rank: Junior officer, knight, priest, councilor, staff reporter, senior manager, professor.
+
+••• Medium rank: Captain, baron, abbot, mayor, local columnist, corporate middle-management, tenured faculty.
+
+•••• High rank: Major, count, bishop, syndicated columnist, junior VP, department head.
+
+••••• Command staff: General, prince, archbishop, senator, international correspondent, corporate VP, dean.]==],
+				},
+				["Requisitions (Hunters Hunted)"] = {
 					en = [==[The Hunters Hunted II, p. 134
 
 
-Requisitions
+Requisitions (Hunters Hunted)
 
 
 You’re a master of red tape, able to fill out the right forms to get your hands on some special equipment, from silver bullets to a chaoscope. You begin each story with a pool of points to spend on equipment equal to your dots in this Background. Once the equipment is used up or destroyed, that’s it — and any surviving requisitioned equipment must be returned at the end of the story. You can save your Requisition points until you need a specific item or service, but cannot acquire a single item that costs more than (your Rank + 2). Some examples of equipment that can be requisitioned are on pp. 155-157.
@@ -1057,11 +1222,66 @@ Players may opt to pool Background points for a shared stock of equipment. See p
 
 ••••• You possess one or more items worth a total of five Requisition points.]==],
 				},
-				["Resources"] = {
+				["Requisitions (Mage)"] = {
+					en = [==[Mage: The Ascension 20th Anniversary Edition, p. 321
+
+
+Requisitions (Mage)
+
+
+There are reasons for Technocratic dominance. One of them involves the epic resources available to Technocratic operatives. With this Background — a Trait available only to Technocrats in good standing with the Order — you ask for goodies from your superiors and often expect to get them.
+
+Before a mission, you and your team will be issued the gear your superiors expect you to need. If you want more than that, as most agents do, you need to requisition it: you tap your contacts and file an official request for the desired goodies. In game terms, you roll your Requisitions rating as a dice pool, and each success on that roll gives you five Background points with which to buy Devices for that mission. More than three successes get you as much mundane Sleepertech as you can use. At mission’s end you must return the borrowed gear; if Q Division has to come for it themselves, you’ll be short a few dots of Requisitions for a while.
+
+The difficulty of the roll depends on your standing with the Powers That Be: Doubtful Loyalty 9, Questionable Loyalty 8, Assumed Loyalty 7, Assured Loyalty 6, Total Loyalty 5. With no standing at all, the answer is “Get out of my office.”]==],
+				},
+				["Resources (Classical Age)"] = {
+					en = [==[Vampire: The Classical Age 20th Anniversary Edition, p. 157
+
+
+Resources (Classical Age)
+
+
+Resources are the token of your character’s economic standing. In other moments of history the main currency became money or coin, but Rome had a very diverse economy. Under the empire, characters could trade in spices, coin, salt and even land. But the great measure of how rich someone truly was lay in the number of servants that person held and in the size and importance of her lands.
+
+That, in turn, let her use those lands to raise markets and small villages, trade spices, work farms, or even set aside military encampments and receive the empire’s support in return. Players may purchase Resources for their characters with pooled Background points.
+
+• Sufficient. You can maintain a residence typical of the plebs with stability, even if lavish spending comes very seldom.
+
+•• Moderate. You can display yourself as a member in good standing of the merchant class. You can maintain a servant or hire specific help as needed. A fraction of your resources is available in spices, readily portable property such as jewelry, and other valuables. Resources 2 lets you keep a low standard of living for six months should you stop working.
+
+••• Comfortable. You are a prominent and established member of your community, with a plot of land and a house of your own. You probably hold assets and some property scattered about the city. You might even buy a Patrician title, at great cost. You have servants who work for you. You can likely maintain a Resources 1 quality of life wherever you are, without difficulty, for as long as you choose.
+
+•••• Wealthy. You rarely touch spices, salt or whatever else, since most of your assets exist in tangible forms more valuable and stable than coin. You probably hold great tracts of land, some reserves in the city, and vendors who work for you. You are likely building a villa of your own. If you wished, you could keep a Resources 3 life for up to a year, and a Resources 2 existence indefinitely.
+
+••••• Extremely wealthy. You are the model others try to reach, at least in the popular mind. You have vast and widely distributed assets, perhaps tied to the fates of nations, each with huge staffs and connections at every level of society through a region. You travel with a minimum of three-dot comforts, and more with a little effort.
+
+[Translated from the Portuguese: Vampire: The Classical Age has no English edition.]]==],
+				},
+				["Resources (Dark Ages)"] = {
+					en = [==[Vampire: The Dark Ages 20th Anniversary Edition, p. 181
+
+
+Resources (Dark Ages)
+
+
+Resources are assets your character controls. These may be gold, investments, property, commercial inventories, or even taxes and tithes. A character with no dots in Resources may have enough clothing and supplies to get by, or she may be destitute and squatting. You receive a basic allowance each month based on your rating, so detail exactly where this money comes from. Players may purchase Resources for their characters with pooled Background points.
+
+• Sufficient. You can maintain a typical residence in the style of the working class with stability, even if spending sprees come seldom.
+
+•• Moderate. You can display yourself as a member in good standing of the merchant class, with the occasional gift and indulgence seemly for a person of even higher station. You can maintain a servant or hire specific help as necessary. A fraction of your resources are available in coin or gold, readily portable property (like jewelry), and other valuables that let you maintain a standard of living at the one-dot level wherever you happen to be, for up to six months.
+
+••• Comfortable. You are a prominent and established member of your community, with land and an owned dwelling. You likely hold more of your wealth in property than in coin. You can maintain a one-dot quality of existence wherever you are without difficulty, for as long as you choose.
+
+•••• Wealthy. You rarely touch gold, as most of your assets exist in tangible forms that are themselves more valuable and stable than coin. You hold more wealth than many of your community. When earning your Resources doesn’t enjoy your usual degree of attention, you can maintain a three-dot existence for up to a year, and a two-dot existence indefinitely.
+
+••••• Extremely wealthy. You are the model others try to reach, at least in the popular mind. You have vast and widely distributed assets, perhaps tied to the fates of nations, each with huge staffs and connections to every level of society through a region. You travel with a minimum of three-dot comforts, more with a little effort.]==],
+				},
+				["Resources (Modern Nights)"] = {
 					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 115
 
 
-Resources
+Resources (Modern Nights)
 
 
 Resources are valuable goods whose disposition your character controls. These assets may be actual cash, but as this Background increases, they’re more likely to be investments, property, or earning capital of some sort — land, industrial assets, stocks and bonds, commercial inventories, criminal infrastructure, contraband, even taxes or tithes. Remember that vampires don’t need to arrange for any food except blood and their actual needs (as opposed to wants) for shelter are very easily accommodated. Resources for vampires go mostly to pay for luxuries and the associated expenses of developing and maintaining Status, Influence, and other Backgrounds. A character with no dots in Resources may have enough clothing and supplies to get by, or she may be destitute and squatting in a refrigerator box under an overpass.
@@ -1079,6 +1299,29 @@ Players may purchase Resources for their characters with pooled Background point
 •••• Wealthy. You rarely touch cash, as most of your assets exist in tangible forms that are themselves more valuable and stable than paper money. You hold more wealth than many of your local peers (if they can be called such a thing). When earning your Resources doesn’t enjoy your usual degree of attention, you can maintain a three-dot existence for up to a year, and a two-dot existence indefinitely.
 
 ••••• Extremely Wealthy. You are the model to which others strive to achieve, at least in the popular mind. Television shows, magazine spreads, and gossip websites speculate about your clothing, the appointments of your numerous homes, and the luxury of your modes of transportation. You have vast and widely distributed assets, perhaps tied to the fates of nations, each with huge staffs and connections to every level of society through a region. You travel with a minimum of three-dot comforts, more with a little effort. Corporations and governments sometimes come to you to buy into stocks or bond programs.]==],
+				},
+				["Resources (Victorian Age)"] = {
+					en = [==[M20 Victorian Age, p. 121
+
+
+Resources (Victorian Age)
+
+
+This Background represents purchasing ability within industrialized societies. It may, but does not always, represent standards of living as identified in future eras. If your stories all take place within large cities of industrialized nations, characters manage Resources in a very traditional manner. However, when introducing characters or locations that have vastly different economies and definitions of wealth, the effect of this Background may radically change. Express this Background in terms relevant to the story, as opposed to measuring cultural differences in terms of finances.
+
+The following guidelines apply to stories taking place in industrialized areas. Some cultures might resist or punish individuals whose success exceeds their caste or accepted social status. Similarly, people with significant means may have financial or social obligations imposed upon them by local customs or governments. Wealth always comes at a price.
+
+X Poor. You live a hand-to-mouth existence and reside in squalid conditions.
+
+• Working Class. You have a basic job and can feed your family.
+
+•• Established. You have a respectable occupation and can afford a modest home.
+
+••• Professional. You can afford a few luxuries; perhaps employ one or two personal assistants (cook, nanny, etc.).
+
+•••• Wealthy. Whether from family influence or personal accomplishment, you have amassed considerable wealth. A large estate, an ample staff, and significant luxury are all readily accessible.
+
+••••• Opulence. Your fortune is unimaginable to the common person. Multiple estates are at your disposal, luxury is commonplace, and innumerable people are paid to maintain your lifestyle.]==],
 				},
 				["Retainers"] = {
 					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 116
@@ -1247,6 +1490,27 @@ X No special informants.
 ••••• •••• Big Brother.
 
 ••••• ••••• Big Brother on a global scale.]==],
+				},
+				["Status (Hunters Hunted)"] = {
+					en = [==[The Hunters Hunted II, p. 123
+
+
+Status (Hunters Hunted)
+
+
+You are an Inquisitor of status in the Society of Leopold. Such distinction might come from a reputation of dedicated work, the slaying of a particularly powerful servant of the Devil, the performing of a holy miracle, the gathering of esoteric knowledge, or even simple longevity, a rarity in witch-hunters. As with any institution, having friends in high places helps as well. Regardless of status, a Society member is always called an Inquisitor. An Inquisitor without a Status rating begins as a novice.
+
+When dealing with Inquisitors of lower Status, apply the difference in Status as a bonus to any Social dice pools.
+
+• Tertiary
+
+•• Councilor
+
+••• Abbé
+
+•••• Censor
+
+••••• Provincial]==],
 				},
 				["Status (Mage)"] = {
 					en = [==[Mage: The Ascension 20th Anniversary Edition, p. 325

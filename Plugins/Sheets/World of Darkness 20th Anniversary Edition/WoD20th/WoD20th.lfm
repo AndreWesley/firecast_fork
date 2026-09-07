@@ -124,22 +124,65 @@
 					"Ride", "Ritual", "Science", "Seneschal", "Stealth", "Streetwise", "Subterfuge", "Survival",
 					"Technology", "Theology",
 				},
-				-- Forty-seven items since T764, which MEASURED where each name is defined and wrote
-				-- research/bg_essence.tsv. TWO names carry an origin suffix because their games do
-				-- not share a mechanic: `Status` (V20 p.118 is standing among the Kindred, M20
-				-- p.325 is respect among Awakened peers) and `Totem` (M20 p.326 is a personal pact
-				-- with a spirit, W20 p.140 is a PACK trait the whole pack pools its points into).
-				-- Every other cross-game homonym (Allies, Contacts, Fame, Influence, Library,
-				-- Mentor, Rank, Requisitions, Resources, Retainers) reads the same in every book -
-				-- `Resources` repeats the sentence word for word in V20 p.115 and W20 p.138 - and
-				-- stays ONE item: a suffix there would separate nothing (SPEC I105b).
+				-- Fifty-nine items since T998, which re-measured every source on the ERA axis and
+				-- rewrote research/bg_essence.tsv. Until then the list held 47 and deduped by GAME
+				-- (SPEC I105b); the user replaced that axis with MEANING (SPEC I105e), so the
+				-- suffix now names whichever of era, game or book actually separates the two
+				-- readings. Seven names carry one:
+				--
+				--   Generation   - no dots means 13th generation in V20 p.114, 12th in V20 Dark
+				--                  Ages p.181 and 11th in the Classical Age p.156, and each book
+				--                  prints its own five rungs.
+				--   Resources    - what the dots buy changes with the century: spices, salt, land
+				--                  and servants (Classical Age p.157), gold, tithes and taxes
+				--                  (Dark Ages p.181), cash, stock and criminal infrastructure
+				--                  (V20 p.115), and M20 Victorian Age p.121 prints a ladder of
+				--                  its own, Poor through Opulence.
+				--   Influence    - the Classical Age ladder IS the cursus honorum and bars anyone
+				--                  above one dot from staying a plebeian (p.157); M20 p.316 buys
+				--                  social deference among Sleepers instead of political weight,
+				--                  rolls as a dice pool, climbs to ten and can be LOST by acting
+				--                  badly (SPEC R155); V20 p.114 and Dark Ages p.181 are the same
+				--                  generic scale as each other.
+				--   Status       - three different social ladders: the Kindred (V20 p.118), the
+				--                  Awakened (M20 p.325) and the Society of Leopold (Hunters
+				--                  Hunted II p.123).
+				--   Library      - Hunters Hunted II p.140 lowers a research difficulty by the
+				--                  rating; M20 p.318 is a collection of books.
+				--   Rank         - a government agency's chain of command (HH II p.134) against a
+				--                  title among the masses (M20 p.321).
+				--   Requisitions - equipment points per story (HH II p.134) against the
+				--                  Technocracy's materiel chart (M20 p.321).
+				--   Totem        - a personal pact with a spirit (M20 p.326) against a PACK trait
+				--                  the whole pack pools its points into (W20 p.140).
+				--
+				-- `Hunters Hunted` is a BOOK label, not a game: HH II is a Vampire-line book about
+				-- mortal hunters, so `(Vampire)` would lie (SPEC Q76.1, R145).
+				--
+				-- Once a name splits, EVERY era with a source gets an item even where two of them
+				-- read alike (SPEC I105e(6)) - `Influence (Dark Ages)` and `Influence (Modern
+				-- Nights)` each cite their own book, and a single label could not honestly cover
+				-- both. Names that do NOT split stay one item: `Mentor` is "an elder who guides
+				-- you, and the rating is his power" in all five books, `Fame` prints the same
+				-- hunting-difficulty cut in V20, Dark Ages and the Classical Age, and `Allies`
+				-- and `Contacts` are the same ladder everywhere (SPEC I105e(3)).
 				["background"] = {
 					"", "Allies", "Alternate Identity", "Ancestors", "Arcane", "Armory", "Artifacts", "Avatar", "Backup",
 					"Base of Operations", "Certification", "Chantry", "Contacts", "Cult", "Demesne", "Destiny", "Domain",
-					"Dream", "Enhancement", "Fame", "Familiar", "Fetish", "Generation", "Guide", "Herd", "Influence",
-					"Kinfolk", "Legend", "Library", "Mentor", "Node", "Past Lives", "Patron", "Pure Breed", "Rank",
-					"Requisitions", "Resources", "Retainers", "Rites", "Rituals", "Sanctum", "Secret Weapons", "Spies",
-					"Status (Mage)", "Status (Vampire)", "Totem (Mage)", "Totem (Werewolf)", "Wonder",
+					"Dream", "Enhancement", "Fame", "Familiar", "Fetish",
+					"Generation (Classical Age)", "Generation (Dark Ages)", "Generation (Modern Nights)",
+					"Guide", "Herd",
+					"Influence (Classical Age)", "Influence (Dark Ages)", "Influence (Mage)", "Influence (Modern Nights)",
+					"Kinfolk", "Legend",
+					"Library (Hunters Hunted)", "Library (Mage)",
+					"Mentor", "Node", "Past Lives", "Patron", "Pure Breed",
+					"Rank (Hunters Hunted)", "Rank (Mage)",
+					"Requisitions (Hunters Hunted)", "Requisitions (Mage)",
+					"Resources (Classical Age)", "Resources (Dark Ages)", "Resources (Modern Nights)",
+					"Resources (Victorian Age)",
+					"Retainers", "Rites", "Rituals", "Sanctum", "Secret Weapons", "Spies",
+					"Status (Hunters Hunted)", "Status (Mage)", "Status (Vampire)",
+					"Totem (Mage)", "Totem (Werewolf)", "Wonder",
 				},
 				-- Twenty-seven hedge paths since the 94th round, when the three books were swept whole
 				-- and six the sheet did not carry came back with a page each (SPEC I69, R106, R107, R108).
@@ -540,6 +583,64 @@
 					"Vulnerability (1)", "Vulnerability (2)", "Vulnerability (3)", "Vulnerability (4)", "Vulnerability (5)",
 					"Vulnerability (6)", "Vulnerability (7)", "Vulnerability to Silver", "Ward", "Weak Blood",
 					"Weak-Willed", "Whimsy", "Witch-Hunted",
+				},
+				-- The two COMBAT lists, 13th batch (SPEC I157c, T1006, user 2026-09-07). 189 weapons
+				-- and manoeuvres and 33 pieces of armour, generated from research/weapon.tsv and
+				-- research/armor.tsv by research/gen_combat_data.ps1 - the SAME tables combatData.lua
+				-- and the four desc modules come out of, so a name here without a measured row there
+				-- cannot happen (SPEC V456f, the shape V454 already holds the backgrounds to).
+				--
+				-- Canonical ENGLISH, because that is what the sheet saves (SPEC V24); the PT map and
+				-- the .lang carry one key per name. Four books: V20 core, M20, W20 and V20 Dark Ages
+				-- (SPEC R149, Q77.1) - the Victorian Age, the Dark Ages Companion and the Garou-form
+				-- manoeuvres stayed out, and so did the nine Do techniques (SPEC R150, V456d).
+				--
+				-- The suffix vocabulary is the CLOSED one of I105e(1) - (Mage), (Werewolf),
+				-- (Dark Ages) - plus `, Thrown`, which is the book's own spelling for a weapon that
+				-- appears in both the melee and the throwing table of one book. A name repeats only
+				-- when a cell differs; same name and same cells is ONE entry, from the book with the
+				-- higher precedence, core > m20 > w20 > da (SPEC R151).
+				["weapon"] = {
+					"", ".30 Caliber Machine Gun", ".50 Caliber Machine Gun", "30 mm Cannon", "3-Round Burst", "Aiming",
+					"Aiming (Dark Ages)", "Assault Rifle", "Assault Rifle (Mage)", "Automatic Fire", "Axe", "Axe (Mage)",
+					"Axe (Werewolf)", "Barbed Cat", "Baseball Bat", "Battle-Ax", "Bear Mace", "Biggs Mjollner Mk. IV",
+					"Biggs X-5 Model A Protector", "Biggs X-5 Model R Protector", "Bite", "Bite (Mage)", "Blinding",
+					"Block", "Body Slam", "Bolan Mk.13 Weapons System", "Brass Knuckles", "Broadsword", "Broken Bottle",
+					"Bullwhip", "Castle-Graves WW-3", "Chain", "Chain Whip", "Chainsaw", "Chair", "Claw", "Claw (Mage)",
+					"Clinch", "Clinch (Dark Ages)", "Club", "Club (Dark Ages)", "Counter Throw", "Crossbow",
+					"Crossbow (Dark Ages)", "Crossbow (Mage)", "Crossbow, Commando", "Crossbow, Hvy.", "Crowbar",
+					"Curbstomp", "Dagger", "Death Strike", "Deflecting Block", "Disarm", "Disarm (Mage)", "Dodge",
+					"Dragon Tail Sweep", "Elbow/Knee Strike", "Flamethrower", "Flank/Rear Attack", "Flogger", "Flying Kick",
+					"Full-Auto", "Grand Klaive", "Grapple", "Great Axe", "Great Blow", "Great Sword", "Greatsword",
+					"Hail of Arrows", "Halberd", "Hand Ax", "Hand Claws (large)", "Hand Claws (small)", "Hard/Soft Strike",
+					"Hatchet", "Hatchet (Dark Ages)", "Haymaker", "Head Butt", "Heavy Crossbow", "HIT Mark Chain-Gun",
+					"Hold", "Hook Sword(s)", "Huge Spiked Club", "Hunting Bow", "Impale", "Iron Staff", "Jab Pistol",
+					"Javelin", "Joint Lock", "Katana", "Katar", "Kick", "Kick (Mage)", "Klaive", "Knife",
+					"Knife (Dark Ages)", "Knife (Mage)", "Knife, Thrown", "Kusarigama", "Lance (Mounted)", "Long Bow",
+					"Longbow", "Low Blow", "M-19 Grenade Launcher", "M-79 Grenade Launcher", "Mace", "Mace (Dark Ages)",
+					"Manriki-Gusari", "Martial Arts Disarm", "Morning Star", "Multiple Shots", "Nerve Strike", "Nunchaku",
+					"Pacification Spray", "Parry", "Pick Ax", "Pistol Whip", "Pistol, Hvy.", "Pistol, Lt.", "Pitchfork",
+					"Point Blank", "Polearm", "Punch", "Quarterstaff", "Reading Opponent", "Revolver, Hvy.",
+					"Revolver, Lt.", "Rifle", "Rifle (Mage)", "Riot Baton", "Riposte", "Rock", "Rocket Launcher", "Saber",
+					"Sai", "Sap", "Sap (Mage)", "Sap (Werewolf)", "Semi-Automatic Pistol, Hvy.",
+					"Semi-Automatic Pistol, Lt.", "Short Bow", "Short Sword", "Shortbow", "Shotgun", "Shotgun, Assault",
+					"Shotgun, Sawed Off", "Shotgun, Semi-auto", "Shotgun, Semi-Automatic", "Shuriken", "Sling",
+					"SMG, Large", "SMG, Small", "SMG, Small (Mage)", "Snake Step", "Snap Kick", "Spear",
+					"Spear (Dark Ages)", "Spiked Club", "Spiked Gauntlet", "Spinning Kick", "Staff", "Stake",
+					"Stake (Dark Ages)", "Stiletto", "Stone", "Stone, Large", "Strafing", "Strike", "Suppressive Fire",
+					"Sweep", "Sweep (Mage)", "Sword", "Table", "Tackle", "Tackle (Mage)", "Taser", "Tear Gas", "Throw",
+					"Thunder Kick", "Tomahawk", "Tomahawk, Thrown", "Two Weapons", "Vital Strike", "War Fan", "Warhammer",
+					"Weapon Strike", "Whip", "Whip (Werewolf)", "Wind and Fire Wheel", "Withering Grasp",
+				},
+				["armor"] = {
+					"", "Alanson Hardsuit", "Bearskin Coat", "Biker Jacket", "Chainmail", "Class Five (Full Riot Gear)",
+					"Class Five (Knight's Armor)", "Class Four (Flak Jacket)", "Class Four (Heavy Armor)",
+					"Class One (Heavy Clothing)", "Class One (Reinforced Clothing)", "Class Three (Composite Armor)",
+					"Class Three (Kevlar Vest)", "Class Two (Armor T-Shirt)", "Class Two (Cloth/Textile Armor)",
+					"Cosplay Mail", "Cybernetic Armor", "Enhanced Clothing", "Flak Vest", "Full Plate", "Kevlar Vest",
+					"Leather Duster", "Metal Shield", "Military Armor", "Reinforced Clothing",
+					"Reinforced Clothing (Werewolf)", "Riot Shield", "Riot Suit", "Riot Suit (Werewolf)",
+					"Steel Breastplate", "Tough Hide", "Trash Can Lid", "Trashcan Lid", "Wooden Shield",
 				},
 				-- <<< PICKER_LIST_END
 			};
@@ -2552,6 +2653,14 @@
 			-- charges for and nothing shows in the log (SPEC I3, I9).
 			BACKGROUND_ROWS = 21;
 
+			-- How many Weapon/Attack rows the Combat tab draws (SPEC I157g, V455d, T1005). Here
+			-- and not on WoD20.3, for the same reason every other row count is here: the painter
+			-- that bounds on it has to read a CONSTANT and not a literal, or the day a twelfth row
+			-- is authored the loop stops one short and the row is never painted (SPEC V383b, B112).
+			-- There are no typed rows in this family, so 'picker = total - typed' is the whole box
+			-- and no FREE_ROWS sits beside it.
+			ATTACK_ROWS = 11;
+
 			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
 			-- 2026-08-22). The LAST five, so every reader is 'picker = total - typed' and no list of
 			-- indices exists to drift from this number.
@@ -2604,6 +2713,33 @@
 			-- 500 is where the result column ends and 20 is the margin the query keeps on the left,
 			-- so this is the list's own right edge and not a number of its own.
 			MF_LIST   = 520;
+
+			-- The CELLS of the two COMBAT pickers, and the ONE place their names are written
+			-- (SPEC I157f, I157n, I157o, V135, T1006). Each pair is <sheet field> and <column of
+			-- combatData.lua>, and the custom pane's control name is DERIVED from the column -
+			-- `edtMfWpn_` .. col and `edtMfArm_` .. col - so a cell added here reaches all four
+			-- readers at once: mfNames enrols it, mfCustomPane shows it, mfCustom fills it and
+			-- mfConfirm writes it. Four hand-written lists of seven names would be four places to
+			-- forget one, and the one that gets forgotten is mfNames - which is xpFind never
+			-- reaching the control and the write landing on nil, silently (SPEC V209, T892).
+			--
+			-- GLOBAL like every other helper up here: the root declares 49 chunk locals against a
+			-- ceiling of 53 and a `local` here is a dead build with no message (SPEC I113g, B19).
+			--
+			-- `difficulty_` against `diff`: the field was named on the sheet years before the
+			-- column was, and renaming a field drops what saved sheets already hold (SPEC V2).
+			MF_WPN_CELL = {
+				{ "roll_", "roll" }, { "difficulty_", "diff" }, { "damage_", "damage" },
+				{ "range_", "range" }, { "rate_", "rate" }, { "clip_", "clip" },
+				{ "conceal_", "conceal" },
+			};
+
+			-- Armour has no row, so the field is the whole name and there is no suffix to append.
+			-- `armorDescription` is NOT here: it is the pane's own text in custom and the book's
+			-- notes otherwise, so it travels with the description and not with the cells.
+			MF_ARM_CELL = {
+				{ "armorRating", "rating" }, { "armorPenalty", "penalty" },
+			};
 
 			-- Rows of the Vampire tab (SPEC I16). Same contract as BACKGROUND_ROWS above: the loop
 			-- that lets experience buy a dot and the loop that prices it for the log both read
@@ -4490,6 +4626,21 @@
 				-- SPEC I153a: the three Disciplines a made-up Clan/Family settles.
 				for i = 1, 3, 1 do n["dynMfClanDisc_" .. i] = true; end;
 
+				-- The eighteen controls of the two COMBAT custom panes, DERIVED from the cell
+				-- tables and never retyped (SPEC I157n, I157o, V460b). Enrolling them here is not
+				-- bookkeeping: a name missing from this roster is a control xpFind never reaches,
+				-- and every write to it below lands on nil with rdk -l exiting 0 - the exact hole
+				-- the level dots came through in T892 (SPEC V209).
+				for i = 1, #MF_WPN_CELL, 1 do
+					n["lblMfWpn_" .. MF_WPN_CELL[i][2]] = true;
+					n["edtMfWpn_" .. MF_WPN_CELL[i][2]] = true;
+				end;
+
+				for i = 1, #MF_ARM_CELL, 1 do
+					n["lblMfArm_" .. MF_ARM_CELL[i][2]] = true;
+					n["edtMfArm_" .. MF_ARM_CELL[i][2]] = true;
+				end;
+
 				-- The twin frame's names are DERIVED and never retyped (SPEC I153b, V439c). The
 				-- XML twin is `name .. "B"` for every control it has, so this table is too, and a
 				-- name added above reaches BOTH frames without anybody having to remember the
@@ -5012,6 +5163,21 @@
 						-- the blank left the pool in T856: it is btnMfRemove now (SPEC I121b, V369a).
 						if MF.data ~= nil then for nm in pairs(MF.data) do MF.pool[#MF.pool + 1] = nm; end; end;
 					else
+						-- SPEC I157e, T1006: the two COMBAT lists carry COLUMNS and not a pool. The
+						-- names come from PICKER_LIST like every other prose list, and combatData
+						-- only says what each of them fills the seven (or three) cells with - so
+						-- this loads MF.data and then falls straight through to the pool below.
+						--
+						-- Deliberately NOT guarded by pcall, exactly as the meritData require above:
+						-- that file always ships, and a guard here would hide a broken build behind
+						-- a picker that fills nothing, which is B19 coming in the door of silence
+						-- (SPEC V364d).
+						if MF.list == "weapon" or MF.list == "armor" then
+							local COMBAT = require("combatData.lua");
+
+							if type(COMBAT) == "table" then MF.data = COMBAT[MF.list]; end;
+						end;
+
 						local vals = PICKER_LIST[MF.list];
 
 						-- SPEC I113c / V199 / T872: the filter is not a program, it is this call. Wave 3
@@ -5170,6 +5336,33 @@
 				return MF.custom == true and MF.list == "clanFamily";
 			end;
 
+			-- The same ONE question, twice, for the two COMBAT panes (SPEC I157n, I157o, V460a).
+			-- The pane and the read in mfConfirm both ask it and they have to agree - a box that
+			-- shows seven cells and confirms without them, or reads a pane nobody can see, is the
+			-- same bug twice (SPEC V135). Custom AND the list, both: the other ten lists have no
+			-- cells at all, and a BOOK entry fills them from combatData instead.
+			function mfWeaponShown()
+				return MF.custom == true and MF.list == "weapon";
+			end;
+
+			function mfArmorShown()
+				return MF.custom == true and MF.list == "armor";
+			end;
+
+			-- What a custom cell READS as, and the only place a blank becomes a dash (SPEC I157f,
+			-- V457f). The book side gets its `-` from combatData.lua, written there by the
+			-- generator; this is the same answer for the side the player types, so the two halves
+			-- of one column cannot print an empty box and a dash for the same absence.
+			function mfCell(ctrl)
+				if ctrl == nil then return "-"; end;
+
+				local t = string.match(ctrl.text or "", "^%s*(.-)%s*$");
+
+				if t == "" then return "-"; end;
+
+				return t;
+			end;
+
 			-- Paints the pair from MF.revenant. It never READS the widgets: MF.revenant is the
 			-- answer, the combo is its picture, and asking the picture what it says is the second
 			-- source V269d already closed one door over (SPEC V135, V269d).
@@ -5223,9 +5416,29 @@
 				-- height is DERIVED from the top rather than written out three times (SPEC B70).
 				local lvl = on and mfLevelShown();
 				local rev = on and mfRevenantShown();
+				-- The two COMBAT panes ride the same cascade (SPEC I157n, I157o, V460c). Written
+				-- in BOTH directions, and that is the whole of B58/B62: turning the weapon pane on
+				-- without turning the armour pane off leaves seven cells on screen over an armour
+				-- row the first time one box follows the other.
+				local wpn = on and mfWeaponShown();
+				local arm = on and mfArmorShown();
 
 				mfLevelPane(found, lvl);
 				mfRevenantPane(found, rev);
+
+				for i = 1, #MF_WPN_CELL, 1 do
+					local c = MF_WPN_CELL[i][2];
+
+					if found["lblMfWpn_" .. c] ~= nil then found["lblMfWpn_" .. c].visible = wpn; end;
+					if found["edtMfWpn_" .. c] ~= nil then found["edtMfWpn_" .. c].visible = wpn; end;
+				end;
+
+				for i = 1, #MF_ARM_CELL, 1 do
+					local c = MF_ARM_CELL[i][2];
+
+					if found["lblMfArm_" .. c] ~= nil then found["lblMfArm_" .. c].visible = arm; end;
+					if found["edtMfArm_" .. c] ~= nil then found["edtMfArm_" .. c].visible = arm; end;
+				end;
 
 				-- THE cascade (SPEC B70, V413e, V439a): where the pane''s stack of rows ends. The
 				-- three Discipline rows and the description pane both hang off it, so the two
@@ -5234,8 +5447,11 @@
 				local base = 76;
 
 				if on then base = 130; end;
-				if lvl or rev then base = 185; end;
-				if rev and MF.revenant == true then base = 237; end;
+				-- Armour adds ONE row of cells, so it lands on the same 185 the level dots and the
+				-- Revenant mark do; a weapon adds TWO rows and lands on 237, the floor the
+				-- weakness field already reaches (SPEC I157n, I157o, V460c).
+				if lvl or rev or arm then base = 185; end;
+				if (rev and MF.revenant == true) or wpn then base = 237; end;
 
 				-- SPEC I153a: the three Disciplines a made-up Clan/Family settles. They ride the
 				-- SAME question the Revenant row does - one pane, one test (SPEC V135) - and they
@@ -5353,6 +5569,28 @@
 
 				if found["edtMfCustomName"] ~= nil then found["edtMfCustomName"].text = nm; end;
 				if found["edtMfWeak"] ~= nil then found["edtMfWeak"].text = wk; end;
+
+				-- The COMBAT cells come back from the ROW, not from the custom pair (SPEC I157n,
+				-- I157o, V460d): the player opens Custom on a row that already holds a book weapon
+				-- precisely to adjust one of its cells, so a pane that opened blank over a filled
+				-- row would be data going off the screen - V383 by the picker's own door.
+				if mfWeaponShown() then
+					local n = string.match(MF.field or "", "^[^_]+_(.+)$");
+
+					for i = 1, #MF_WPN_CELL, 1 do
+						local c = found["edtMfWpn_" .. MF_WPN_CELL[i][2]];
+
+						if c ~= nil then c.text = (n ~= nil and sheet ~= nil and sheet[MF_WPN_CELL[i][1] .. n]) or ""; end;
+					end;
+				end;
+
+				if mfArmorShown() then
+					for i = 1, #MF_ARM_CELL, 1 do
+						local c = found["edtMfArm_" .. MF_ARM_CELL[i][2]];
+
+						if c ~= nil then c.text = (sheet ~= nil and sheet[MF_ARM_CELL[i][1]]) or ""; end;
+					end;
+				end;
 
 				mfDesc(found, nil, tx);
 				mfArm(found, true);
@@ -5578,6 +5816,31 @@
 						end;
 					end;
 
+					-- SPEC I157f, Q77.3: a CUSTOM weapon or armour writes its cells off the pane,
+					-- on the SAME door as the name. mfCell turns a cell the player left blank into
+					-- the dash, which is what combatData.lua writes for a cell the BOOK leaves
+					-- blank - so one column never shows two shapes for one absence (SPEC V457d).
+					if mfWeaponShown() then
+						local n = string.match(MF.field, "^[^_]+_(.+)$");
+
+						if n ~= nil then
+							for i = 1, #MF_WPN_CELL, 1 do
+								setField(MF_WPN_CELL[i][1] .. n, mfCell(found["edtMfWpn_" .. MF_WPN_CELL[i][2]]));
+							end;
+						end;
+					end;
+
+					if mfArmorShown() then
+						for i = 1, #MF_ARM_CELL, 1 do
+							setField(MF_ARM_CELL[i][1], mfCell(found["edtMfArm_" .. MF_ARM_CELL[i][2]]));
+						end;
+
+						-- The notes ARE the pane's text here (SPEC I157o): the same `tx` that goes
+						-- to armorClassCustomDesc, so the big field on the tab and the pane inside
+						-- the box cannot tell two stories about one armour.
+						setField("armorDescription", tx);
+					end;
+
 					setField(MF.field, nm);
 					mfClose(from);
 
@@ -5606,19 +5869,54 @@
 				-- field - merit_m1 -> m1 - because the three siblings are named by it (I113a).
 				local info = nil;
 				local num = string.match(MF.field, "^[^_]+_(.+)$");
+				-- Asked of the LIST and no longer of `MF.data ~= nil` (SPEC I157f, V457a). The
+				-- test used to mean "this wave carries columns", and merit and flaw were the only
+				-- two that did; the two COMBAT lists carry columns as well, so the old test is now
+				-- TRUE for attack_3 - and choosing a weapon there would write book_3, type_3 and
+				-- costy_3 into the NDB: orphan fields with no widget, silently.
+				local isMf = MF.list == "merit" or MF.list == "flaw";
 
 				if MF.data ~= nil then info = MF.data[MF.picked]; end;
 
-				if info ~= nil and num ~= nil then
+				if isMf and info ~= nil and num ~= nil then
 					setField("book_" .. num, info.book or "");
 					setField("type_" .. num, info.page or "");
 					setField("costy_" .. num, info.cost or "");
-				elseif MF.picked == "" and num ~= nil and MF.data ~= nil then
+				elseif isMf and MF.picked == "" and num ~= nil and MF.data ~= nil then
 					-- Emptying the name empties what came WITH it: a row holding a book and a page for a
 					-- merit it no longer names is the half-filled row I107i writes all four to avoid.
 					setField("book_" .. num, "");
 					setField("type_" .. num, "");
 					setField("costy_" .. num, "");
+				end;
+
+				-- SPEC I157f, T1006: the seven weapon cells - or the three of an armour - land on
+				-- the SAME step as the name, exactly as the three book columns of a merit do
+				-- (SPEC I107i). All seven are written TOGETHER, with no test per cell: a `-` is a
+				-- VALUE and combatData.lua is where it is written, so a cell the book leaves blank
+				-- arrives as a dash and not as an empty box the Lua had to guess at (SPEC V457b).
+				--
+				-- The Remove line and the blank first item both arrive here as MF.picked == "",
+				-- which leaves L nil and sends "" through these SAME lines - one write for both
+				-- doors, which is what V388d is about.
+				local lang = (sheet.language == "en") and "en" or "pt";
+				local cols = (MF.data ~= nil and MF.picked ~= "") and MF.data[MF.picked] or nil;
+				local L = (cols ~= nil) and cols[lang] or nil;
+
+				if MF.list == "weapon" and num ~= nil then
+					for i = 1, #MF_WPN_CELL, 1 do
+						setField(MF_WPN_CELL[i][1] .. num, L and L[MF_WPN_CELL[i][2]] or "");
+					end;
+				elseif MF.list == "armor" then
+					for i = 1, #MF_ARM_CELL, 1 do
+						setField(MF_ARM_CELL[i][1], L and L[MF_ARM_CELL[i][2]] or "");
+					end;
+
+					-- The book's notes OVERWRITE what was in the big field, empty ones included
+					-- (user 2026-09-07, ask 6): the field describes the armour the row names, so
+					-- a note left over from the armour before it would be the stale answer V29
+					-- refuses one field over (SPEC V388d).
+					setField("armorDescription", L and L.notes or "");
 				end;
 
 				-- Nothing repaints the row from HERE (SPEC V357, B96). `self` on an inline handler
@@ -7216,6 +7514,36 @@
 			<button name="dynMfClanDisc_2" left="520" top="289" width="460" height="24" visible="false" onClick="mfSubOpen(self, 2);"/>
 			<button name="dynMfClanDisc_3" left="520" top="317" width="460" height="24" visible="false" onClick="mfSubOpen(self, 3);"/>
 			
+			<!-- The seven cells of a CUSTOM weapon, and they belong to the weapon list ALONE
+			     (SPEC I157n, Q77.3, user 2026-09-07 ask 3). The cells on the sheet became
+			     read-only in the same batch, so THIS is the only door left for typing one -
+			     which is why they live in the pane and not on the tab (SPEC I157k, V460e).
+			     Two rows, at the same y the level dots and the Revenant row use: the lists are
+			     different, so no two of these groups can ever be lit at once, and a second set
+			     of coordinates for one place would be two owners of it (SPEC V135).
+			     Born hidden, like every other group in here: the box opens on a book entry far
+			     more often than on a custom one, and what is authored is the common case. -->
+			<label name="lblMfWpn_roll" left="520" top="125" width="160" height="20" text="Roll" visible="false"/>
+			<edit name="edtMfWpn_roll" left="520" top="147" width="160" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_diff" left="690" top="125" width="50" height="20" text="Diff." visible="false"/>
+			<edit name="edtMfWpn_diff" left="690" top="147" width="50" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_damage" left="750" top="125" width="130" height="20" text="Damage" visible="false"/>
+			<edit name="edtMfWpn_damage" left="750" top="147" width="130" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_range" left="890" top="125" width="90" height="20" text="Range" visible="false"/>
+			<edit name="edtMfWpn_range" left="890" top="147" width="90" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_rate" left="520" top="177" width="80" height="20" text="Rate" visible="false"/>
+			<edit name="edtMfWpn_rate" left="520" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_clip" left="610" top="177" width="80" height="20" text="Clip" visible="false"/>
+			<edit name="edtMfWpn_clip" left="610" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_conceal" left="700" top="177" width="80" height="20" text="Conceal" visible="false"/>
+			<edit name="edtMfWpn_conceal" left="700" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<!-- The two cells of a CUSTOM armour (SPEC I157o). One row, so the pane closes one
+			     step higher than the weapon one does; the notes are the description editor the
+			     pane already has, and mfConfirm writes that text to armorDescription as well. -->
+			<label name="lblMfArm_rating" left="520" top="125" width="160" height="20" text="Rating" visible="false"/>
+			<edit name="edtMfArm_rating" left="520" top="147" width="160" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfArm_penalty" left="690" top="125" width="160" height="20" text="Penalty" visible="false"/>
+			<edit name="edtMfArm_penalty" left="690" top="147" width="160" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
 			<textEditor name="edtMfDesc" left="520" top="71" width="460" height="549" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onKeyDown="escClose(self, event, true);"/>
 		</layout>
 		<!-- SPEC I153b, V439b/c, ask of 2026-09-06, outcome (b) of Q73. The picker opens OVER
@@ -7291,6 +7619,36 @@
 			<button name="dynMfClanDisc_1B" left="520" top="261" width="460" height="24" visible="false" onClick="mfSubOpen(self, 1);"/>
 			<button name="dynMfClanDisc_2B" left="520" top="289" width="460" height="24" visible="false" onClick="mfSubOpen(self, 2);"/>
 			<button name="dynMfClanDisc_3B" left="520" top="317" width="460" height="24" visible="false" onClick="mfSubOpen(self, 3);"/>
+			<!-- The seven cells of a CUSTOM weapon, and they belong to the weapon list ALONE
+			     (SPEC I157n, Q77.3, user 2026-09-07 ask 3). The cells on the sheet became
+			     read-only in the same batch, so THIS is the only door left for typing one -
+			     which is why they live in the pane and not on the tab (SPEC I157k, V460e).
+			     Two rows, at the same y the level dots and the Revenant row use: the lists are
+			     different, so no two of these groups can ever be lit at once, and a second set
+			     of coordinates for one place would be two owners of it (SPEC V135).
+			     Born hidden, like every other group in here: the box opens on a book entry far
+			     more often than on a custom one, and what is authored is the common case. -->
+			<label name="lblMfWpn_rollB" left="520" top="125" width="160" height="20" text="Roll" visible="false"/>
+			<edit name="edtMfWpn_rollB" left="520" top="147" width="160" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_diffB" left="690" top="125" width="50" height="20" text="Diff." visible="false"/>
+			<edit name="edtMfWpn_diffB" left="690" top="147" width="50" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_damageB" left="750" top="125" width="130" height="20" text="Damage" visible="false"/>
+			<edit name="edtMfWpn_damageB" left="750" top="147" width="130" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_rangeB" left="890" top="125" width="90" height="20" text="Range" visible="false"/>
+			<edit name="edtMfWpn_rangeB" left="890" top="147" width="90" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_rateB" left="520" top="177" width="80" height="20" text="Rate" visible="false"/>
+			<edit name="edtMfWpn_rateB" left="520" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_clipB" left="610" top="177" width="80" height="20" text="Clip" visible="false"/>
+			<edit name="edtMfWpn_clipB" left="610" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_concealB" left="700" top="177" width="80" height="20" text="Conceal" visible="false"/>
+			<edit name="edtMfWpn_concealB" left="700" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<!-- The two cells of a CUSTOM armour (SPEC I157o). One row, so the pane closes one
+			     step higher than the weapon one does; the notes are the description editor the
+			     pane already has, and mfConfirm writes that text to armorDescription as well. -->
+			<label name="lblMfArm_ratingB" left="520" top="125" width="160" height="20" text="Rating" visible="false"/>
+			<edit name="edtMfArm_ratingB" left="520" top="147" width="160" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfArm_penaltyB" left="690" top="125" width="160" height="20" text="Penalty" visible="false"/>
+			<edit name="edtMfArm_penaltyB" left="690" top="147" width="160" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
 			<textEditor name="edtMfDescB" left="520" top="71" width="460" height="549" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onKeyDown="escClose(self, event, true);"/>
 		</layout>
 	</layout>

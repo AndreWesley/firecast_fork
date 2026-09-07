@@ -19,10 +19,16 @@ $PAG = 'p' + [char]0xE1 + 'g.'
 # Titulo por extenso, a mesma grafia do research/README.md e dos 10 modulos que ja existem.
 # O titulo NAO traduz; so o rotulo p./pag. muda de idioma (SPEC I100e, I21).
 $TITLE = @{
-    core = 'Vampire: The Masquerade 20th Anniversary Edition'
-    hh   = 'The Hunters Hunted II'
-    m20  = 'Mage: The Ascension 20th Anniversary Edition'
-    w20  = 'Werewolf: The Apocalypse 20th Anniversary Edition'
+    core   = 'Vampire: The Masquerade 20th Anniversary Edition'
+    da     = 'Vampire: The Dark Ages 20th Anniversary Edition'
+    ca     = 'Vampire: The Classical Age 20th Anniversary Edition'
+    camyth = 'Immortal Mythology'
+    hh     = 'The Hunters Hunted II'
+    m20    = 'Mage: The Ascension 20th Anniversary Edition'
+    m20va  = 'M20 Victorian Age'
+    w20    = 'Werewolf: The Apocalypse 20th Anniversary Edition'
+    w20da  = 'Lobisomem W20: A Idade das Trevas'
+    w20kin = 'W20 Kinfolk'
 }
 
 function Read-Bodies([string]$path) {

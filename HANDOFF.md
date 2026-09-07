@@ -1,5 +1,211 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-07, fim da 193a rodada)
+
+### O ESTADO EM UMA LINHA
+`/ck:build --all` fechou **§T1011** (resto do 12o lote) **& o 13o lote inteiro** (§T1004…§T1009,
+picker de armas/armaduras). Gate `-Build` VERDE. **INSTALADO 04:29:53**, Firecast FECHADO,
+1 install so (§B103). **Nada commitado.** So falta a **§T1010**, que e teste de tela [USER].
+
+### O QUE PEDIR, NESTA ORDEM
+1. **Abrir o Firecast & rodar a §T1010** - a lista de testes esta em `.\spec-slice.ps1 T1010`
+   & repetida abaixo em "TESTES DE TELA". **Nada desta rodada foi visto rodando.**
+2. Depois disso, o proximo lote. ⊥ ha §T aberta fora da §T1010.
+
+### O que virou codigo nesta rodada
+- **§T1011** - `Influence (Mage)` entrou & a lista de antecedente fechou em **59**. A linha de
+  essencia ja existia em `bg_essence.tsv:131`; o que faltava era o item, as 3 chaves (mapa PT +
+  2 metades do `.lang`), os 2 corpos & rodar `resolve_bg_pick.ps1` -> `gen_bg_desc.ps1`.
+  O bloco de decisao do cabecalho da TSV foi corrigido (`Influence 3` -> `4`, total 58 -> 59).
+- **§T1004** - `research/gen_combat_data.ps1` (BOM UTF-8, codigo 100% ASCII, acentos por
+  `[char]0x..`). Le `weapon.tsv` (189) & `armor.tsv` (33) & escreve em `%TEMP%\combatgen\`:
+  `combatData.lua` + os 4 `desc{Weapon,Armor}_{en,pt}.lua` + `picker_combat.txt` +
+  `lang_{pt,en}.txt` + `ptmap.txt`. **222 chaves novas** (220 nomes + `Select Weapon`/
+  `Select Armor`); `Dodge` & `Tough Hide` foram PULADOS porque ja estavam no mapa PT.
+- **§T1005** - `WoD20.3.lfm`: as 11 linhas `Attack` viraram `?` + botao + gemeo escondido; as 7
+  celulas & `armorRating`/`armorPenalty` viraram `readOnly + 0.75 + center`; `armorDescription`
+  so `readOnly`; `Class` da caixa ARMOR virou picker; `btnQconceal` no cabecalho;
+  `renderCombatButtons` + `<dataLink>` + `onNodeReady`.
+- **§T1006** - raiz: as 2 listas coladas na regiao marcada, o `require("combatData.lua")` no
+  `mfOpen`, `mfConfirm` c/ os 2 ramos, o painel de 18 controles (**+ os 18 gemeos `B`**) &
+  3 helpers GLOBAIS novos (`mfWeaponShown` `mfArmorShown` `mfCell`) + 2 tabelas GLOBAIS
+  (`MF_WPN_CELL` `MF_ARM_CELL`).
+- **§T1007** - os 5 `.lua` copiados p/ a raiz do plugin, as 222 chaves coladas nas 2 metades do
+  `.lang` & no mapa PT.
+- **§T1008** - §V455…§V461 no gate + **5 rosters de checks VELHOS** que o lote novo obrigou a
+  atualizar (ver abaixo).
+
+### ⚠ AS 6 COISAS QUE CUSTARAM, & NENHUMA ESTAVA NO SPEC
+1. **O gate REPROVOU 14 vezes na 1a passada, & todas eram roster de check velho.** O lote novo
+   ⊥ pede so §V novas: `$DESC_MARKER` (+`Weapon`/`Armor`), `$DESC_BRIGHT`
+   (+`armorDescription`), `$V333_SRC` (+`Attack = 11`, & o total 165 -> **176**), `$BARE_Q333`
+   (+`btnQconceal`), `$BARE_DYN` (+`dynarmorClass`), `$V354_WAVE` (+ a onda `Attack`, forma
+   **`indirect`**), `$K383` (+`ATTACK_ROWS`), o coletor de `Add383` (+`//Attack`) & o padrao de
+   §V355(e) (que ganhou o `isMf and`). **Toda onda de picker nova paga esses 9 pedagios.**
+2. **`local ATTACK_ROWS = 11` no form ⊥ passa (§V383b).** §I157g manda declarar no form; §V383b
+   diz que limite LITERAL de laco de pintura e VERMELHO (e B112). A constante foi p/ a RAIZ, ao
+   lado de `BACKGROUND_ROWS`/`DISC_ROWS`, & entrou no `$K383` - assim §V204/§V383 medem ela
+   contra o XML, que e exatamente o que §V455d queria. **Divida de spec: §I157g diz `local`.**
+3. **§V345 cobra LF em TODO `desc*.lua` da raiz.** §T1004 dizia "CRLF nos 5 `.lua`" & isso vale
+   so p/ o `combatData.lua` (irmao do `meritData.lua`). Os 4 `desc*` sao **LF**. Se sairem CRLF
+   o gate fica vermelho na hora. **Divida de spec.**
+4. **`opacity` em `textEditor` apaga o TEXTO (§V241) & §V111 cobrava 0.75.** `armorDescription`
+   entrou no `$DESC_BRIGHT` - e prosa que o jogador ABRE p/ ler, ≡ `edtMfDesc`. §V458b ja
+   mandava `readOnly` sem `opacity`; quem ⊥ sabia era o §V111.
+5. **As 2 SONDAS de §V458 & §V459 ficam VERMELHAS por OUTRO check, & esta certo.** `opacity`
+   0.75->0.80 acende §V111/§V244 (dono do NUMERO) & §V458 fica verde (mede PRESENCA); mudar o
+   PT de `Select Armor` acende §V22 (mapa PT x `.lang`) & §V459 fica verde. As 2 invariantes
+   se comportaram como a sonda pede - o gate reprova por dono diferente. **Anotado p/ ninguem
+   "consertar" o check achando que ele esta apertado demais.**
+6. **`$t.Replace($from,$to,1)` ⊥ EXISTE no .NET Framework** (so 2 argumentos) & a excecao ⊥
+   para o script: 2 mutacoes sairam "VERDE" sem nunca terem sido aplicadas. O helper de
+   mutacao esta em `%TEMP%\claude\...\scratchpad\mut.ps1` & usa `Substring` + splice.
+
+### As 23 MUTACOES & as 7 SONDAS que foram RODADAS (§V20)
+Todas as 23 VERMELHAS: tirar `btnQattack` · `ATTACK_ROWS = 10` · plantar `btnQarmorClass` ·
+tirar o `pt` de 1 entrada de `combatData` · plantar `Iron Shirt` na lista · apagar 1 entrada de
+`descArmor_pt` · tirar o par `clip_` de `MF_WPN_CELL` · voltar o teste do ramo de merit p/
+`MF.data ~= nil` · `or "-"` no ramo de livro · custom sem `mfCell` · tirar `readOnly` de
+`rate_` · tirar `horzTextAlign` de `clip_` · `opacity` no `textEditor` · renomear a lista so no
+`mfOpen` · tirar as celulas de arma de `mfNames` · `mfCustom` sem prefill · ligar arma sem
+desligar armadura · apagar a chave `Conceal` do `_pt` · `width=70` de volta no label · `X` numa
+celula `conceal` · legenda sem explicar `P` · zero-guard de `MF_WPN_CELL` · zero-guard de
+`mfArmorShown`.
+As 7 sondas: `left` do `?` 0->2 VERDE · reordenar 2 itens da lista VERDE · trocar a ORDEM das 7
+escritas VERDE · `opacity` 0.75->0.80 (§V458 VERDE, gate vermelho por §V111) · PT de
+`Select Armor` (§V459 VERDE, gate vermelho por §V22) · mover `left` de `lblMfWpn_rate` VERDE ·
+mexer na redacao da legenda VERDE.
+
+### DIVIDAS DE SPEC desta rodada (todas p/ o `/ck:spec`, NENHUMA bloqueia build)
+1. **§I157g diz `local ATTACK_ROWS = 11` no form & ele mora na RAIZ** (item 2 acima, §V383b).
+2. **§T1004 diz `file` = CRLF nos 5 `.lua` & os 4 `desc*` sao LF** (item 3, §V345).
+3. **§V458(a) diz "0.75 byte a byte" & a SONDA da propria §V458 diz que o NUMERO ⊥ e medido.**
+   O check mede PRESENCA; o numero e de §V111/§V244. Contradicao DENTRO de §V458.
+4. **§I157e diz `elseif` na cadeia do merit** & o carregamento e um `if` guardado no COMECO do
+   ramo do `PICKER_LIST` - tinha de ser, ou a pool ⊥ viria de `PICKER_LIST` como §I157e manda.
+5. **A mutacao de §V457 ("apagar a escrita de `clip_`") virou "tirar o par de `MF_WPN_CELL`"**:
+   as 7 escritas sao dirigidas por tabela (1 dono, §V135) ∴ ⊥ ∃ linha de `clip_` p/ apagar.
+6. **§I157i diz 222 chaves & sao 222**, mas a conta e 220 nomes + 2 `Select` (2 nomes PULADOS
+   por ja estarem no mapa). O total bate; a quebra ⊥ estava escrita.
+7. **`Trash Can Lid` (`m20`) & `Trashcan Lid` (`w20`) sao 2 itens de grafia diferente** ∴ ⊥
+   ganham sufixo por §I157c - mas o `name_pt` do segundo carrega `(Lobisomem)` & o EN ⊥.
+   Decidir se o EN ganha sufixo ou se o PT perde o dele e trabalho de `/ck:spec`.
+8. Herdadas & ⊥ tocadas: §I73 conta 68 caixas & o gate mede 70 · a clausula de SONDA de §V438
+   esta FALSA · §I153f mora em §V237 · a emenda de §V295a mede 2 coisas · §I156a quebra 17+11 &
+   o medido foi 18+10 · §I156e diz 420x55 & ficou 420x68 · §I156i descreve `pushRise` diferente.
+
+### ⚠ O RISCO CONHECIDO desta rodada, & e o unico
+**Nada foi visto rodando.** O gate mede FORMA - "o painel ∃, esta em `mfNames`, `mfConfirm`
+escreve pela tabela" - & o que ele ⊥ prova e a tela. O ponto exato a olhar e o **painel CUSTOM
+de arma**: os 18 controles nasceram HOJE e a `base = 237` do `mfCustomPane` nunca foi vista com
+7 campos em cima dela. Se o `edtMfDesc` cobrir os campos, o conserto e 1 numero (§I157n).
+
+### TESTES DE TELA desta rodada (o `.rpk` novo JA esta instalado - fazer no Firecast)
+- **§T1010 inteira** - `.\spec-slice.ps1 T1010` tem as 9 alineas (a)…(i). As 3 que mais importam:
+  **(a)** aba Combat, linha 1: o botao abre a caixa; `Sword` -> Roll `Dex + Melee`, Diff. `6`,
+  Damage `Str + 2 (L)`, Range/Rate/Clip `-`, Conceal `T`, tudo CENTRADO & a 0.75; clicar numa
+  celula ⊥ edita. Em pt: `Des + Armas Brancas` / `For + 2 (L)` / Conceal **`M`**, botao `Espada`.
+  **(d)** `-- Custom --` numa linha que ja tem `Sword`: o painel abre c/ os 7 campos JA
+  preenchidos; apagar `Conceal` & dar OK -> a celula le `-`.
+  **(i)** escolher arma na linha 3 & olhar o NDB: **⊥ pode nascer `book_3`/`type_3`/`costy_3`**.
+- **antecedente (§T1011)**: o picker tem **59** itens & `Influence (Mage)` esta entre
+  `Influence (Dark Ages)` & `Influence (Modern Nights)`; o `?` dele abre `Mage: The Ascension
+  20th Anniversary Edition, p. 316` & a escada vai ate **10** degraus.
+
+---
+
+## 192a rodada (2026-09-07)
+
+### O QUE PEDIR, NESTA ORDEM
+1. **`/ck:build §T1011`** - `Influence (Mage)`. E o RESTO do 12o lote: a lista esta em **58** & o alvo e **59**. A §T1011 tem os 6 passos escritos um a um, cada um no arquivo que §T998…§T1003 ja ensinaram. Curta - 1 linha de tabela, 1 item, 1 chave PT em 2 casas, 1 corpo em 2 idiomas, 2 scripts na ordem, gate.
+2. **`rdk -i`** - ⚠ **O `.rpk` DA 192a NUNCA FOI INSTALADO.** `rdk -l` rodou & o arquivo mudou (**2026-09-07 02:25:07**, **2.836.608 B** contra os 2.824.291 B instalados as 01:08), mas o **Firecast estava ABERTO** ∴ parou ali (CLAUDE.md). Se a §T1011 for construida antes, o install dela cobre as duas & **1 basta** (§B103). **Nenhuma tela do 12o lote foi vista rodando.**
+3. Depois disso, **`/ck:build --all`** p/ o **13o lote** (§T1004…§T1010, picker de armas): **§Q77 FOI RESPONDIDA pelo user as 02:30 & as 6 respostas JA estao no spec** (§I157a…§I157p, §V455…§V461, §T1004…§T1010 reescritas na 2a volta). Ordem: §T1004 → §T1005 → §T1006 → §T1007 → §T1008 → §T1009; §T1010 e tela [USER]. Gate `-Quiet` = ALL CHECKS PASSED as 02:33 com o spec aplicado. Ver o bloco `13o lote` logo abaixo deste.
+
+### O ESTADO EM UMA LINHA
+12o lote (antecedentes homonimos) CONSTRUIDO & fechado, menos a §T1011 que nasceu no fim da rodada. Gate `-Build` VERDE. Nada commitado. Working tree tem o 12o lote + os `.tsv` que o 13o lote deixou.
+
+### ⚠ AS 3 ARMADILHAS DESTA RODADA, & elas CUSTARAM
+1. **`sed -i` come o CRLF do arquivo INTEIRO** (§B74, §V318). Quebrou o `SPEC.md` aqui; ja esta consertado (3595 CR / 3595 LF). **Pior:** o `grep -c $'\r'` do Git Bash devolveu **0 antes E depois** - ele come o CR & a conferencia MENTE. **Conferir CRLF SO por contagem de bytes em PowerShell.** No `SPEC.md` & no `HANDOFF.md`, usar a ferramenta `Edit`, NUNCA `sed -i`.
+2. **Heredoc do Bash corta acima de ~8 KB** & o erro MENTE (fala de aspas, e tamanho). Os corpos de antecedente entraram em lotes de 2-3 linhas por isso.
+3. **Mutacao INVALIDA passa por check frouxo.** Tirar o marcador `# <<< BG_PICK_END` p/ testar o zero-guard de §V454 saiu VERDE - & o check esta certo: sem o marcador o leitor vai ate o EOF & junta as MESMAS linhas. A mutacao valida e esvaziar o bloco ENTRE os 2 marcadores. Antes de acusar um check de frouxo, conferir se a mutacao mexeu na condicao que ele guarda.
+
+---
+
+## 192a rodada (2026-09-07). **12o lote CONSTRUIDO: §T998 §T999 §T1000 §T1001 §T1002 §T1003 FECHADAS (gate `-Build` VERDE; 8 mutacoes RODADAS). ⚠ NAO INSTALADO. §T1011 ABERTA.**
+
+### ⚠ **A 1a COISA DA PROXIMA RODADA E `rdk -i`**
+`rdk -l` rodou & o `.rpk` mudou (**2026-09-07 02:25:07**, **2.836.608 B** contra os 2.824.291 B instalados as 01:08), mas o **Firecast estava ABERTO** ∴ o install parou aqui, como manda o CLAUDE.md. **Nenhuma tela desta rodada foi vista rodando.** Se o §T1009 do 13o lote for construido antes, ele ja faz o install & 1 basta (§B103).
+
+### ISTO DESTRAVA O 13o LOTE
+O bloco do 13o lote (logo abaixo) diz que **§T999 e §T1000 estao `~`** e manda fechar as duas antes de abrir §T1006/§T1007, que escrevem as MESMAS regioes (`PICKER_LIST` na raiz, mapa PT no `WoD20.6`). **As duas estao `x` agora** ∴ a condicao dele esta satisfeita & aquele aviso esta VENCIDO. O 13o lote segue `.` - chegou de outra sessao DEPOIS do `/ck:build --all` desta, tem 6 perguntas em §Q77 sem resposta & o §T1010 dele e teste de tela do user ∴ NAO foi construido de proposito, ⊥ por esquecimento.
+
+### O que o user pediu no 12o lote & o que virou codigo
+Repassar os livros que tem antecedente, achar os que repetem NOME com explicacao DIFERENTE, partir em versoes com rotulo de epoca/jogo/livro, e atualizar lista + descricoes.
+
+- **A lista foi de 47 para 58 itens.** 7 nomes partiram: `Generation` 3 · `Resources` 4 · `Influence` 3 · `Status` 3 · `Library` 2 · `Rank` 2 · `Requisitions` 2 (`Totem` 2 ja era).
+- **O eixo mudou**: §I105b cortava por JOGO, §I105e corta por SENTIDO. Vocabulario FECHADO de 8 rotulos = 4 epocas (as do `cboSheetTheme`) + 3 jogos + 1 LIVRO (`Hunters Hunted`, aberto em §Q76.1 porque `hh` e livro da linha Vampiro sobre cacador MORTAL & `(Vampire)` mentiria).
+- **5 livros novos varridos** (`Vampiro/Vampiro - Era Classica/`): `ca` `camyth` `caunlife` `cadisc` `cablood`. So `ca` rende item. **`ca` & `camyth` sao PT e nao existem em ingles** - o user autorizou traduzir (§Q76.3) ∴ nesses 2 o **[en] e o derivado**, unica direcao invertida do repo.
+- **`ca` tem offset NEGATIVO (-1)**, o unico do repo: a impressa e MAIOR que a do PDF (pdf 153 = impressa 154). A formula `impressa = PDF - offset` continua valendo, so o sinal e novo. Ja esta na tabela do `research/README.md`.
+- **§V453 & §V454 nasceram no gate.** V453 = vocabulario fechado do sufixo, com a perna (b) casando os 4 rotulos de epoca BYTE A BYTE com o `values` do `cboSheetTheme` - renomear epoca no combo e esquecer a lista fica VERMELHO. V454 = todo item tem linha medida no bloco `BG_PICK` com livro & pagina impressa.
+
+### As 8 mutacoes que foram RODADAS (§V20), todas VERMELHAS
+`(Arcanum)` plantado na lista · epoca renomeada so no `cboSheetTheme` · `wod.Werewolf` tirado do [pt] · linha tirada do `BG_PICK` · nome morto (`Mob`) posto no `BG_PICK` · sigla `zzz` no lugar de `m20` · bloco `BG_PICK` esvaziado (zero-guard) · lista sem nenhum parentese (zero-guard).
+⚠ A 1a tentativa do zero-guard de V454 - **tirar o marcador `# <<< BG_PICK_END`** - saiu VERDE, e ela era **mutacao INVALIDA, ⊥ check frouxo**: sem o marcador o leitor vai ate o EOF e junta as MESMAS linhas. A mutacao valida e esvaziar o bloco ENTRE os 2 marcadores, e ai fica vermelha. Fica anotado p/ ninguem repetir a leitura errada.
+
+### ⚠ O RISCO CONHECIDO desta rodada, & e o unico
+**`localization.lang` esta LF e ninguem sabe se ja estava.** Foi reescrito com `awk` p/ ganhar as 19 chaves novas, e §V318 - o check que existe justamente p/ §B74 - **cobre so os 12 `.lfm` + o gate + o SPEC + este HANDOFF**, ⊥ o `.lang`. O repo e MISTO de verdade (`descNature_en.lua` & `rd_core.tsv` sao LF sem ninguem ter mexido; `sdk/sdk3.lang` & `clan_weakness.tsv` sao CRLF) ∴ LF pode ser a forma dele desde sempre. `rdk -l` compilou sem uma palavra, que e exatamente o sintoma que §B74 diz ⊥ existir. **Decidir se §V318 passa a cobrir o `.lang` & os `.tsv` e trabalho de `/ck:spec`.**
+O `SPEC.md` mesmo FOI quebrado nesta rodada por 2 `sed -i` & esta CONSERTADO (3585 CR / 3585 LF, conferido por byte). O `grep -c $'\r'` do Git Bash devolveu **0 antes E depois** - ele come o CR & a conferencia MENTE. **Conferir CRLF so por contagem de bytes em PowerShell.**
+
+### DIVIDAS DE SPEC desta rodada - ⚠ **AS 5 PRIMEIRAS FORAM PAGAS no fim da rodada, a pedido do user.** O `SPEC.md` ja esta certo; a lista fica so como registro do que mudou & por que.
+- **PAGA** - §R147 ganhou a emenda de `Status` · §I105e(6) ganhou a conta certa (58 construido, 59 alvo, quebra por familia) · §I105c ganhou as 2 chaves novas & o porque de `["Generation"]` ficar · §I105e(3) ganhou a 3a condicao (REGRA impressa nova) com a fronteira do teto de 10 escrita · §R145 ganhou o aviso de que ⊥ e a lista completa do grupo.
+- **NASCERAM** - **§R155** (`Influence` do M20 e outro traco, medido) · **§R156** (os 5 nomes que a mesma conferencia LIMPOU) · **§T1011** (construir `Influence (Mage)`).
+- ⚠ **A armadilha de contagem, & ela quase passou**: o `59` original de §I105e(6) estava certo pelo motivo ERRADO - contava `Status` 4 (falso) & `Influence` 3 (falso). Os 2 erros se cancelavam no TOTAL. **⊥ conferir aquela linha pelo total, so por familia.**
+
+#### o texto original das dividas, p/ quem quiser o rastro
+1. **§R147 diz que `Status` parte pela Era Classica & NAO parte.** Medido ao construir §T998: a escada do `ca` p.159 e a do `core` p.118 com cargo romano no degrau, & a regra que parecia nova (`Caitiff nao compra Status na criacao`) esta no core tambem (`Note that Caitiff characters may not purchase Status`, core p.118). O porque esta escrito no cabecalho do `research/bg_essence.tsv`.
+2. **§I105e(6) diz `LISTA FINAL = 59 itens` & sao 58.** Consequencia direta da divida 1.
+3. **§T1000 mandou as 6 chaves [pt] velhas sairem & `["Generation"]` FICOU.** `WoD20.11.lfm:397` tem `text="Generation"` como rotulo de campo ∴ tirar a chave apagaria a traducao de um label VIVO. As outras 5 sairam.
+4. **§V453(c) cobra chave [pt] por rotulo & 2 dos 8 ⊥ existiam** - `wod.Werewolf` & `wod.Hunters Hunted` foram CRIADOS em §T1000 p/ a perna fechar. A ficha traduz o item INTEIRO (`Totem (Werewolf)` ja tinha chave propria) ∴ as 2 chaves novas sao p/ composicao futura, ⊥ p/ uso de hoje.
+5. **§I105e(3) ganhou uma 3a condicao ao construir**: o corte tambem vale quando o livro imprime uma REGRA nova - e o que separa `Influence (Classical Age)`, pela exigencia de ser Patricio acima de 1 ponto. O texto de §I105e so fala de escada & de referente.
+6. Herdadas da 191a & ⊥ tocadas: §I73 conta 68 caixas & o gate mede 70 · a clausula de SONDA de §V438 esta FALSA · §I153f mora em §V237 · a emenda de §V295a mede 2 coisas · §I156a quebra 17+11 & o medido foi 18+10 · §I156e diz 420x55 & ficou 420x68 · §I156i descreve `pushRise` diferente do construido.
+
+### TESTES DE TELA desta rodada (⊥ instalado ainda - fazer DEPOIS do `rdk -i`)
+- abrir o picker de antecedente: **58** itens, com `Generation (...)`, `Influence (...)`, `Resources (...)` juntos em ordem alfabetica.
+- clicar o `?` de `Resources (Classical Age)`: bloco 1 tem de dizer `Vampire: The Classical Age 20th Anniversary Edition, pag. 157` & o corpo fala de especiarias, sal & titulo de Patricio - ⊥ de acoes & infraestrutura criminosa.
+- trocar p/ [en] na mesma linha: o corpo vira o traduzido & traz `[Translated from the Portuguese: Vampire: The Classical Age has no English edition.]` no fim.
+- `Resources (Victorian Age)` tem escada de **6** degraus (`X Poor` ate `Opulence`), ⊥ 5.
+- ⚠ **ficha VELHA salva com `Resources` cru**: o campo guarda a string velha, que ⊥ esta mais na lista ∴ conferir o que o combo mostra - §V17 manda valor de fora virar item da lista, & isso ⊥ foi visto rodando.
+
+## COMECE AQUI - 13o lote, SO SPEC (2026-09-07, `/ck:spec`, 2 voltas; ambiente preparado as 02:55 p/ chat SEM contexto). **§T1004…§T1010 ABERTAS (`.`), nada construido. §Q77 RESPONDIDA pelo user & incorporada.**
+
+### O QUE PEDIR
+**`/ck:build --all`** (depois de §T1011 & do `rdk -i` do bloco acima). Sequencia que o build deve seguir: §T1004 (gerador, so escreve em `%TEMP%\combatgen\`) → §T1005 (`WoD20.3.lfm`, independente) → §T1006 (raiz: listas, `mfOpen`, `mfConfirm`, painel custom) → §T1007 (copiar 5 `.lua`, colar `.lang` & mapa PT) → §T1008 (gate: 7 §V) → §T1009 (build + 1 install). §T1010 e tela [USER]. Cada §T diz o arquivo & as letras de §I157 que ela realiza; `.\spec-slice.ps1 T1004` etc. devolve a linha & o que ela cita.
+
+### O pedido (5 itens) & onde esta escrito
+`Weapon/Attack` (aba Combat, `WoD20.3`) vira PICKER de armas/manobras/artes marciais (sem Do); escolher preenche `Roll` `Diff.` `Damage` `Range` `Rate` `Clip` `Conceal` (`-` onde nao ha, tudo CENTRADO e SO-LEITURA); `Class` da caixa ARMOR vira picker e preenche `Rating` `Penalty` e o campo grande; `?` so nos pickers de COMBAT + 1 `?` de LEGENDA ao lado do cabecalho `Conceal`. Edicao de celula so em CUSTOM, dentro do painel da caixa. Tudo em **§I157a…§I157p**, invariantes **§V455…§V461**, pesquisa **§R149…§R154**, tarefas **§T1004…§T1010**, perguntas & respostas **§Q77** (em §C, 2 linhas: ABERTA & RESPONDIDA).
+
+### As 6 decisoes do user (§Q77), em 1 linha cada
+1. Livros: `core` `m20` `da` `w20` ficam; Victorian, DA Companion, HH2 & manobras Garou FORA. 2. Filtro por epoca: NAO. 3. Celulas SO-LEITURA na ficha (forma de `MeritPicked`, `WoD20.2.lfm:94-96`); edicao so em CUSTOM, dentro do painel da caixa (7 campos arma / 2 armadura). 4. `Conceal` traduzido pelo modelo do livro base da Era Classica (`B R M N`, `ca` p.330) + `?` de legenda no cabecalho. 5. Penalidade de armadura como IMPRESSA (M20 `-2`, DA Classe Um `-`). 6. Escolher armadura sobrescreve `armorDescription` sempre.
+
+### O que JA existe no disco (feito no spec, NAO commitado)
+- `research/weapon.tsv` (**189** linhas, **17** colunas, com `conceal_pt`) e `research/armor.tsv` (**33**, 8 colunas), CRLF, PT a mao, dedupe feito (§R151). Sao a FONTE unica do gerador de §T1004. `Tough Hide` = `Couro Grosso` porque a chave ja existia no mapa PT.
+- `research/README.md`: 2 linhas novas na tabela de arquivos (as 2 TSVs).
+- `SPEC.md`: §C (lote + §Q77 ABERTA + RESPONDIDA), §I157a-p, §R149-154, §V455-461, §T1004-1010, e a linha `combat` de §I3 ganhou os 6 campos derivados (`attackDesc_N` etc.). CRLF conferido por `file` (3595 CR = 3595 LF), 0 CR orfao.
+- Cache de texto dos livros em `%TEMP%\wod_books_layout\` (15 livros, `pdftotext -layout`, inclui `ca.txt`) - NAO precisa p/ o build; as TSVs ja tem tudo. Se precisar reler uma tabela: `pdftotext -table -f N -l N` na pagina (o `-layout` embaralha tabelas de 2 colunas).
+- O scratchpad desta sessao (fragmentos & scripts de emenda) NAO sobrevive - nada nele e necessario.
+
+### ARMADILHAS ja medidas (nao redescobrir)
+- **2 sessoes no MESMO working tree nesta madrugada** (a 192a rodou em paralelo a este spec; ultima escrita dela: `HANDOFF.md` 02:45, `SPEC.md` 02:44). Antes de editar `SPEC.md`/`HANDOFF.md`/`WoD20th.lfm`, `git status` & mtime; ler o arquivo FRESCO na hora de escrever.
+- **`localization.lang`, `descBackground_{en,pt}.lua`, `research/gen_bg_desc.ps1` & `bg_essence.tsv` estao em LF** (a 192a os regravou com `awk`; a 192a mesma aponta como risco). §T1007 cola chaves no `.lang`: manter o EOL que o arquivo tiver na hora, & conferir por `file` - `grep -c $'\r'` no Git Bash devolve 0 sempre (mente).
+- `mfConfirm` (`WoD20th.lfm:~5604`): o ramo de merit testa `MF.data ~= nil and num ~= nil`; com `MF.data` vivo p/ `attack_N` ele gravaria `book_N`/`type_N`/`costy_N` orfaos. Trocar p/ `MF.list == "merit" or "flaw"` (§I157f, §V457a).
+- As celulas so-leitura copiam `MeritPicked` (`WoD20.2.lfm:94-96`): `readOnly="true" opacity="0.75" horzTextAlign="center"` - precedente REAL (§R153 corrigida).
+- Painel custom: 18 controles novos no `mfSearch` (§I157n/o) e TODOS em `mfNames`, senao `xpFind` nao chega e a escrita cai em nil (§V209, o buraco de §T892). `mfWeaponShown`/`mfArmorShown`/`mfCell` GLOBAIS - o root esta em 49/53 locais (§I113g).
+- `mfCustomPane` liga um grupo E desliga o outro (§B58/§B62); `edtMfDesc.top` = 237 (arma) / 185 (armadura).
+- `clearRowDots("attack_N")` e no-op (fora de `XP_TRAIT`) - o Remove nao tropeca (§I157j).
+- Nada comentado dentro de `<template>` (§B19) ao mexer no `Attack`.
+- `btnQconceal` fecha em 730 = borda do conteudo (§I73); o label `Conceal` do cabecalho vai a `width=65`.
+- Nome de variavel PowerShell e CASE-INSENSITIVE: `$h` & `$H` sao a MESMA variavel (custou 2 execucoes do script de emenda desta sessao).
+
 ## COMECE AQUI - 191a rodada (2026-09-06/07, madrugada). **11o lote do user, 7 itens: `/ck:spec` + `/ck:build --all`. §T989 §T990 §T992 §T993 §T994 §T995 §T996 CONSTRUIDAS & FECHADAS (gate `-Build` VERDE; 17 mutacoes + 5 sondas RODADAS). §T991 CANCELADA pelo user. Depois, pedido avulso: §T997 (centragem) CONSTRUIDA & FECHADA (+2 mutacoes +2 sondas).**
 
 ### **INSTALADO 2026-09-07 00:54:52** - `output/` & instalado nos MESMOS **2.823.795 B**. **2 installs nesta rodada, & o 2o foi COM O FIRECAST ABERTO a pedido explicito do user** ("instalar o rpk com o firecast aberto no final, apos as alteracoes") - o 1o foi as 00:22:38, offline, com 2.823.697 B, antes do §T997. §B103 segue valendo p/ o que NAO for pedido: com a ficha carregada na tela o form velho fica com o codigo novo atras, & so fechar & reabrir a ficha cura. **O user foi avisado disso na entrega.** **NAO commitado** - working tree: `SPEC.md` `HANDOFF.md` `verify-hunters-hunted.ps1` `module.xml` `localization.lang` `WoD20th.lfm` `WoD20.6.lfm` `WoD20.10.lfm` (+ os outros 4 `.lfm` do item 1) + o `.rpk`, & tudo o que ja vinha das rodadas 186a-190a.

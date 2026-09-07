@@ -13,6 +13,7 @@ lugar. Os 7 marcados **NOVO** entraram nesta reorganização e ainda não foram 
 | `Mago/` | `Mage - The Ascension` (**o M20 EM INGLES**, entrou 2026-08-28 no lugar do `M20.pdf` PT) · `M20_Victorian_Age_(Final_Download)` · `Mage - Book of Common Magicks` · `Mage - Book of Secrets` · `Mage - Technocracy Reloaded` |
 | `Werewolf/` | **PASTA NOVA 2026-08-28**: `Werewolf W20` (core, EN) · `Werewolf W20 - Changing Breeds` · `Werewolf W20 - Changing Ways` · `Werewolf W20 - Kinfolk` · `Werewolf W20 - Rage Across the World` · `Werewolf W20 - Charactersheet` · `Lobisomem W20 - A idade das Trevas` (**PT**, unico do lote que nao esta em ingles) |
 | `Sorcerer/` | `M20 Sorcerer` (saiu de `~\Downloads\`) · `Sorcerer_s_Companion` (**NOVO**) |
+| `Vampiro/Vampiro - Era Clássica/` | **PASTA NOVA 2026-09-07** (§R146): `_Vampiro V20 - Era Clássica - Livro Base` (**PT**) · `Mitologia Imortal` (**PT**) · `Unlife Secrets` (EN) · `Discipline Compendium` · `Blood Sorcery`. Os 2 PT são a exceção declarada em §Q76.3 — ⊥ ∃ edição inglesa deles |
 | (raiz) | `Ghouls_and_Revnants_(Final_Download)` · `TheHuntersHunted_II_Revised_ (2)` |
 Só nome, nível, dona e página — **⊥ ∃ prosa de livro aqui**. O texto corrido de §T444–446
 sai do PDF na hora, ⊥ deste diretório.
@@ -52,6 +53,9 @@ o `.lfm` precisar ser regerado, e para §T444–446 saberem o que procurar em qu
 | `clan_weakness.tsv` | `<nome do picker>\t<livro>\t<pág>\t<en>\t<pt>` — o parágrafo `Weakness:` de cada um dos 61 clãs, VERBATIM (§T970); pt à mão; `Caitiff` = core p.124 (custo ×6), `Panders`/`Children of Osiris` = a frase do livro | 61 |
 | `clan_disc_open.tsv` | `<nome do picker>\t<en>\t<pt>` — a linha `Disciplines:` de trio ABERTO, em palavras (§I148d, §V432b); 1 família (§T850) + 7 clãs (§T970 — `Children of Osiris` também é trio aberto) | 1 |
 | `gen_traits_desc.ps1` | escreve `descFamily_{en,pt}.lua` & `descClan_{en,pt}.lua` (§T850, §T971; `gen_clan_desc.ps1` SAIU em §T971) a partir de `CLANS` + `FAMILY_WEAKNESS` do `WoD20th.lfm`, do `.lang`, de `family_source.tsv` & de `clan_disc_open.tsv` — bloco 3 = `Disciplines:` ↵↵ `Weakness:`, mais nada | — |
+| `weapon.tsv` | `name⇥kind⇥book⇥page⇥roll⇥roll_pt⇥diff⇥damage⇥damage_pt⇥range⇥rate⇥clip⇥conceal⇥conceal_pt⇥notes_en⇥notes_pt⇥name_pt` — as ARMAS & MANOBRAS de `core` p.279-281 · `m20` p.447-453 · `da` p.349-350 · `w20` p.302-303, já DEDUPADAS (precedência `core` > `m20` > `w20` > `da`, sufixo `(Mage)`/`(Werewolf)`/`(Dark Ages)` quando o nome repete c/ célula ≠ — §R151); Do FORA (§R150); células normalizadas por §R152; `conceal_pt` = as letras do livro base da Era Clássica (`B R M N`, §R154); PT à mão (§T1004, 13º lote) | 189 |
+| `armor.tsv` | `name⇥book⇥page⇥rating⇥penalty⇥notes_en⇥notes_pt⇥name_pt` — armaduras & escudos dos mesmos 4 livros (`core` p.280 · `m20` p.447 · `da` p.350 · `w20` p.292); `penalty` como IMPRESSO em cada livro (M20 `-2`, DA Classe Um `-`); `Tough Hide` = `Couro Grosso` porque a chave já ∃ no mapa PT | 33 |
+| `gen_combat_data.ps1` | lê as 2 TSVs acima & escreve em `%TEMP%\combatgen\`: `combatData.lua` (CRLF, ≡ `meritData.lua`), `descWeapon_{en,pt}.lua` & `descArmor_{en,pt}.lua` (**LF puro**, §V345; o `descWeapon_*` leva a chave EXTRA `Conceal`, a legenda de §I157p), `picker_combat.txt`, `lang_pt.txt`, `lang_en.txt`, `ptmap.txt`. Só GERA — quem cola é §T1006/§T1007. PULA chave que já ∃ no mapa `PT` (`Dodge`, `Tough Hide`) & acende se a TSV discordar dela | — |
 
 Os 5 `rd_*.tsv` de livro já vêm **dedupados entre si**, na precedência
 core > RoB > (LotC/LoB/DAC/BH) > TOS > DA. Somados dão 284 sem repetir nome.
@@ -86,6 +90,11 @@ arquivo PDF de onde o texto sai.
 | `bcm` | `Book of Common Magicks` | **2** | `Mago/Mage - Book of Common Magicks` — offset MEDIDO 2026-08-28. **0** qualidades/defeitos
 | `bos` | `Book of Secrets` | **1** | `Mago/Mage - Book of Secrets` — offset MEDIDO 2026-08-28. **245** qualidades/defeitos, o MAIOR de todos
 | `trel` | `Technocracy Reloaded` | **1** | `Mago/Mage - Technocracy Reloaded` — offset MEDIDO 2026-08-28. **0** qualidades/defeitos
+| `ca` | `Vampire: The Classical Age 20th Anniversary Edition` | **−1** ⚠ | `Vampiro/Vampiro - Era Clássica/_Vampiro V20 - Era Clássica - Livro Base` — offset MEDIDO 2026-09-07 (§T998). **EM PORTUGUÊS & ⊥ ∃ em inglês** — o user autorizou traduzir (§Q76.3) ∴ é o ÚNICO livro em que o **[en]** é derivado & o [pt] é o original. **ÚNICO offset NEGATIVO do repo**: a impressa é MAIOR que a do PDF (pdf 153 = impressa 154) ∴ `impressa = PDF + 1`, & a fórmula geral `impressa = PDF − offset` continua valendo com offset `−1`. Antecedentes em **154-159**
+| `camyth` | `Immortal Mythology` | **0** | `Vampiro/Vampiro - Era Clássica/Vampiro V20 - Era Clássica - Mitologia Imortal` — offset MEDIDO 2026-09-07. **PT.** 1 antecedente NOVO (`Artefato`, p.139) que ⊥ entrou (§R148)
+| `caunlife` | `Unlife Secrets` | `?` | `Vampiro/Vampiro - Era Clássica/Vampiro V20 - Era Clássica - Unlife Secrets` — **EN.** 298×`Merit` & **0** antecedente definido ∴ offset ⊥ medido; quem for varrer qualidade/defeito mede
+| `cadisc` | `Discipline Compendium` | `?` | `Vampiro/Vampiro - Era Clássica/Vampiro V20 - Era Clássica - Discipline Compendium` — **0** antecedente
+| `cablood` | `Blood Sorcery` | `?` | `Vampiro/Vampiro - Era Clássica/Vampiro V20 - Era Clássica - Blood Sorcery` — **0** antecedente
 
 Os `?` de offset e de título dos 7 NOVOS são **honestos**: ninguém abriu esses PDFs ainda.
 Medir o offset antes de usar a página — a regra de sempre é `impressa = PDF − offset`, e

@@ -9,7 +9,16 @@ $enc = New-Object Text.UTF8Encoding($false)
 
 # Precedencia de livro. A ficha e da linha VAMPIRO e mortal (SPEC G) entao o V20 core manda,
 # depois o resto do eixo Vampire na ordem em que o README ja usa, e so entao Mage e Werewolf.
-$prec = @('core','da','hh','anarch','bh','m20','w20')
+# T998: entraram ca/camyth (Era Classica), m20va (Victorian) e w20da/w20kin. A precedencia so
+# desempata o que SOBRA depois do filtro de sufixo - com sufixo de epoca ou de livro costuma
+# sobrar 1 linha so, e ela nem e consultada.
+$prec = @('core','da','ca','hh','anarch','bh','camyth','m20','m20va','w20','w20da','w20kin')
+
+# Vocabulario FECHADO do sufixo (SPEC I105e(1), V453). 3 classes, e a classe decide por QUAL
+# coluna a linha e filtrada: epoca -> coluna Epoca, jogo -> coluna Jogo, livro -> coluna Livro.
+$ERA  = @('Modern Nights','Victorian Age','Dark Ages','Classical Age')
+$GAME = @('Vampire','Mage','Werewolf')
+$BOOK = @{ 'Hunters Hunted' = 'hh' }
 
 $rows = @()
 $keep = New-Object System.Collections.Generic.List[string]
@@ -21,7 +30,7 @@ foreach ($l in [IO.File]::ReadAllLines($p, [Text.Encoding]::UTF8)) {
     $keep.Add($l)
     if ($l.StartsWith('#') -or $l.StartsWith('nome_EN') -or $l.Trim() -eq '') { continue }
     $c = $l -split "`t"
-    $rows += [pscustomobject]@{ Nome = $c[0]; Jogo = $c[1]; Livro = $c[2]; Pag = $c[3] }
+    $rows += [pscustomobject]@{ Nome = $c[0]; Jogo = $c[1]; Epoca = $c[2]; Livro = $c[3]; Pag = $c[4] }
 }
 while ($keep.Count -gt 0 -and $keep[$keep.Count - 1].Trim() -eq '') { $keep.RemoveAt($keep.Count - 1) }
 
@@ -33,10 +42,16 @@ $itens = @([regex]::Matches($m.Groups[1].Value, '"([^"]*)"') | ForEach-Object { 
 $out = New-Object System.Collections.Generic.List[string]
 $bad = @()
 foreach ($i in $itens) {
-    $base = $i -replace ' \((Mage|Vampire|Werewolf)\)$', ''
-    $jogo = $null
-    if ($i -match ' \((Mage|Vampire|Werewolf)\)$') { $jogo = $Matches[1] }
-    $cand = @($rows | Where-Object { $_.Nome -eq $base -and ($null -eq $jogo -or $_.Jogo -eq $jogo) })
+    $base = $i
+    $sfx  = $null
+    if ($i -match '^(.*) \(([^)]+)\)$') { $base = $Matches[1]; $sfx = $Matches[2] }
+    $cand = @($rows | Where-Object { $_.Nome -eq $base })
+    if ($null -ne $sfx) {
+        if     ($ERA  -contains $sfx) { $cand = @($cand | Where-Object { $_.Epoca -eq $sfx }) }
+        elseif ($GAME -contains $sfx) { $cand = @($cand | Where-Object { $_.Jogo  -eq $sfx }) }
+        elseif ($BOOK.ContainsKey($sfx)) { $cand = @($cand | Where-Object { $_.Livro -eq $BOOK[$sfx] }) }
+        else { $bad += "$i : rotulo '$sfx' fora do vocabulario de I105e(1)"; continue }
+    }
     if ($cand.Count -eq 0) { $bad += $i; continue }
     $win = $cand | Sort-Object { [array]::IndexOf($prec, $_.Livro) } | Select-Object -First 1
     if ([array]::IndexOf($prec, $win.Livro) -lt 0) { $bad += "$i : livro '$($win.Livro)' fora da precedencia"; continue }
@@ -51,12 +66,14 @@ $hdr = @(
 '',
 '# >>> BG_PICK_BEGIN  (gerado por research/resolve_bg_pick.ps1 - SPEC T765)',
 '#',
-'# QUAL linha vale quando um nome tem varias: precedencia de LIVRO',
-'#   core > da > hh > anarch > bh > m20 > w20',
+'# QUAL linha vale quando um nome tem varias: primeiro o SUFIXO filtra (epoca -> coluna Epoca,',
+'# jogo -> coluna Jogo, `Hunters Hunted` -> livro hh, SPEC I105e(1)); o que sobrar desempata',
+'# pela precedencia de LIVRO',
+'#   core > da > ca > hh > anarch > bh > camyth > m20 > m20va > w20 > w20da > w20kin',
 '# A ficha e da linha VAMPIRO e mortal (SPEC G) entao o V20 core manda; o eixo Vampire vem',
 '# antes na ordem que o research/README.md ja usa, e Mage e Werewolf so entram onde Vampire',
-'# nao tem o traco. E ESTA tabela que T765 le para o bloco 1 de I21 - nao a de cima, que tem',
-'# uma linha por (nome, livro) e serviu para DECIDIR o dedupe de I105b.',
+'# nao tem o traco. E ESTA tabela que T765/T998 le para o bloco 1 de I21 - nao a de cima, que',
+'# tem uma linha por (nome, livro) e serviu para DECIDIR o corte de I105e.',
 '#',
 '# O bloco 2 de I21 imprime o nome do PICKER, nao o do livro: `Artifacts` e `Requisitions`',
 '# ficam no plural por decisao do user 2026-08-28, e o livro escreve os dois no singular.',

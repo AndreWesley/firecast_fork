@@ -365,23 +365,37 @@
 
 		     TWO rows on the 25 ruler since T972 (SPEC I149b, V433). T954 had split the line into
 		     three rows (Clan, Family); the 5th batch of 2026-09-05 put the ONE line `Clan/Family`
-		     back over the union, so the rows are 39 (Name, Generation) and 64 (Clan/Family, Max
-		     Discipline Level). The content closes at 88 and the box stays 590x128 on purpose: the
-		     BAND is the master (SPEC V414) and the foot is what pays for it (SPEC V280d) - the
-		     three columns under it never hear about any of this. -->
+		     back over the union, so the rows are Name/Generation and Clan/Family/Max Discipline
+		     Level. The box stays 590x128 on purpose: the BAND is the master (SPEC V414) and the
+		     foot is what pays for it (SPEC V280d) - the three columns under it never hear about
+		     any of this.
+
+		     The pair SAT at 39/64 until the user asked for the inside to be organised
+		     (2026-09-07). The box was never going to shrink, so the 40px the foot carried was
+		     dead space under a block glued to the title: the rows moved to 57/82, which is the
+		     SAME 25 step (the ruler is the STEP, never the slack - SPEC V370b) with the pair
+		     CENTRED in the body - 22 between the title and the first row and 22 of foot. The
+		     head stays the 15 V280a fixes as an EQUALITY and the foot stays over its floor.
+
+		     The four row labels are `trailing` for the same reason ROAD is on the Main tab
+		     (SPEC I124e): a label column is as wide as its LONGEST translation - 156 here, for
+		     `Nivel Max. de Disciplina` - so `Generation` left-aligned floated 91px away from
+		     the combo it names. Right-aligned it touches its own field, and the two label
+		     columns close on one edge each (92 and 510) the way V224 already asks of the entry
+		     columns. Nothing here moves an x: V224 and V407 read the same four columns. -->
 		<layout left="0" top="10" width="590" height="128">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="550" height="20" text="DOMITOR" horzTextAlign="center"/>
 
-			<label left="20" top="39" width="72" height="24" text="Name"/>
-			<edit left="97" top="39" width="237" height="24" field="dominator"/>
+			<label left="20" top="57" width="72" height="24" text="Name" horzTextAlign="trailing"/>
+			<edit left="97" top="57" width="237" height="24" field="dominator"/>
 
 			<!-- cmb, not cbo: pickerItems only touches controls named cbo* (WoD20.6), which is what
 			     lets this one keep an items/values pair that DIFFERS - the ordinal is what the player
 			     reads, the number is what GEN_MAX is keyed by (SPEC I29). Same footing as
 			     cmbHealthLevels: a combo of VALUE, not a picker of prose (SPEC V208 scope). -->
-			<label left="354" top="39" width="156" height="24" text="Generation"/>
-			<comboBox name="cmbDominatorGen" left="520" top="39" width="50" height="24" field="dominatorGen"
+			<label left="354" top="57" width="156" height="24" text="Generation" horzTextAlign="trailing"/>
+			<comboBox name="cmbDominatorGen" left="520" top="57" width="50" height="24" field="dominatorGen"
 			          items="{'', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th'}"
 			          values="{'', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'}"/>
 
@@ -403,7 +417,7 @@
 			     already ask, one body (isFamilyName), no second owner of the species (SPEC V135).
 			     The button carries no field=: the typed twin below is the one widget bound to
 			     `clanFamily`, so V1 and V2 see exactly what they saw before (SPEC V426b, kept). -->
-			<label left="20" top="64" width="72" height="24" text="Clan/Family"/>
+			<label left="20" top="82" width="72" height="24" text="Clan/Family" horzTextAlign="trailing"/>
 			<!-- The ? is BACK and the exception of 2026-09-02 is over (SPEC Q71, I151c, T978, user
 			     2026-09-06: "diminuir o botão do picker"). What paid for its absence was the grid -
 			     the entry opened at 97 and closed at 334, the same span as <edit field="dominator" />
@@ -420,8 +434,8 @@
 			     second owner of the species is born (SPEC V135). mfKind itself cannot serve here:
 			     it reads MF.list, which is state of the OPEN box. popOpen returns early on an empty
 			     key, so a sheet with no clan picked opens nothing (SPEC I151c). -->
-			<button name="btnQclanFamily" left="97" top="64" width="20" height="24" text="?" onClick="popOpen(self, isFamilyName(sheet['clanFamily']) and 'Family' or 'Clan', sheet['clanFamily'], nil, 'clanFamily');"/>
-			<button name="dynclanFamily" left="122" top="64" width="212" height="24" fontSize="12" text="Select Clan/Family" onClick="mfOpen(self, 'clanFamily', 'clanFamily', 'Clan');"/>
+			<button name="btnQclanFamily" left="97" top="82" width="20" height="24" text="?" onClick="popOpen(self, isFamilyName(sheet['clanFamily']) and 'Family' or 'Clan', sheet['clanFamily'], nil, 'clanFamily');"/>
+			<button name="dynclanFamily" left="122" top="82" width="212" height="24" fontSize="12" text="Select Clan/Family" onClick="mfOpen(self, 'clanFamily', 'clanFamily', 'Clan');"/>
 
 			<!-- The typed twin of the two pickers, one field and two widgets with exactly one of
 			     them visible (SPEC I71, V274, user 2026-08-23). It is a DECLARED mirror in SPEC I3
@@ -434,12 +448,12 @@
 			     still enabled takes Tab focus, which is the bug no screenshot shows (SPEC V274c,
 			     V274d). A sheet that never opened the storyteller's tab paints right with no Lua
 			     at all (SPEC V56). -->
-			<edit name="edtClanFamily" left="122" top="64" width="212" height="24" field="clanFamily" visible="false" enabled="false"/>
+			<edit name="edtClanFamily" left="122" top="82" width="212" height="24" field="clanFamily" visible="false" enabled="false"/>
 
 			<!-- Derived, so it has no `field` and is never saved (SPEC I3, V29): a number that can be
 			     recomputed must not be able to disagree with what it was computed from. -->
-			<label left="354" top="64" width="156" height="24" text="Max Discipline Level"/>
-			<label name="lblMaxDisc" left="520" top="64" width="50" height="24" text="-"/>
+			<label left="354" top="82" width="156" height="24" text="Max Discipline Level" horzTextAlign="trailing"/>
+			<label name="lblMaxDisc" left="520" top="82" width="50" height="24" text="-"/>
 		</layout>
 
 		<!-- 405 -> 299 in T936, and the number came off the DOTS and not off the box: the step

@@ -1,0 +1,34 @@
+name	book	page	rating	penalty	notes_en	notes_pt	name_pt
+Class One (Reinforced Clothing)	core	280	1	0	Adds its rating to soak against bashing, lethal and aggravated damage from fangs and claws; not against fire or sunlight. The penalty comes off Dexterity-based dice pools.	Soma o valor à absorção contra dano de contusão, letal e agravado de presas e garras; não contra fogo ou luz do sol. A penalidade sai das paradas baseadas em Destreza.	Classe Um (Roupa Reforçada)
+Class Two (Armor T-Shirt)	core	280	2	1	Adds its rating to soak against bashing, lethal and aggravated damage from fangs and claws; not against fire or sunlight. The penalty comes off Dexterity-based dice pools.	Soma o valor à absorção contra dano de contusão, letal e agravado de presas e garras; não contra fogo ou luz do sol. A penalidade sai das paradas baseadas em Destreza.	Classe Dois (Camiseta Blindada)
+Class Three (Kevlar Vest)	core	280	3	1	Adds its rating to soak against bashing, lethal and aggravated damage from fangs and claws; not against fire or sunlight. The penalty comes off Dexterity-based dice pools.	Soma o valor à absorção contra dano de contusão, letal e agravado de presas e garras; não contra fogo ou luz do sol. A penalidade sai das paradas baseadas em Destreza.	Classe Três (Colete de Kevlar)
+Class Four (Flak Jacket)	core	280	4	2	Adds its rating to soak against bashing, lethal and aggravated damage from fangs and claws; not against fire or sunlight. The penalty comes off Dexterity-based dice pools.	Soma o valor à absorção contra dano de contusão, letal e agravado de presas e garras; não contra fogo ou luz do sol. A penalidade sai das paradas baseadas em Destreza.	Classe Quatro (Colete Antifragmentação)
+Class Five (Full Riot Gear)	core	280	5	3	Adds its rating to soak against bashing, lethal and aggravated damage from fangs and claws; not against fire or sunlight. The penalty comes off Dexterity-based dice pools.	Soma o valor à absorção contra dano de contusão, letal e agravado de presas e garras; não contra fogo ou luz do sol. A penalidade sai das paradas baseadas em Destreza.	Classe Cinco (Equipamento Antimotim Completo)
+Class One (Heavy Clothing)	da	350	1	-			Classe Um (Roupas Pesadas)
+Class Two (Cloth/Textile Armor)	da	350	2	1			Classe Dois (Armadura de Tecido)
+Class Three (Composite Armor)	da	350	3	1			Classe Três (Armadura Composta)
+Class Four (Heavy Armor)	da	350	4	2			Classe Quatro (Armadura Pesada)
+Class Five (Knight's Armor)	da	350	5	3			Classe Cinco (Armadura de Cavaleiro)
+Tough Hide	m20	447	1-3	0	Animals, Bygones, constructs or shapechanged mages with especially thick or armored skin.	Animais, Relíquias, constructos ou magos transformados com pele especialmente grossa ou blindada.	Couro Grosso
+Cybernetic Armor	m20	447	1-4	0	Built into the wearer; see the Background: Enhancement.	Embutida no portador; ver o Antecedente: Aprimoramento.	Armadura Cibernética
+Reinforced Clothing	m20	447	1-2	0	Clothing stiffened, padded or layered against harm.	Roupa enrijecida, acolchoada ou em camadas contra ferimentos.	Roupa Reforçada
+Enhanced Clothing	m20	447	1-5	0	Clothing woven with advanced or Enlightened materials.	Roupa tecida com materiais avançados ou Iluminados.	Roupa Aprimorada
+Biker Jacket	m20	447	1	-1			Jaqueta de Motoqueiro
+Leather Duster	m20	447	2	-2			Sobretudo de Couro
+Cosplay Mail	m20	447	2	-1			Cota de Cosplay
+Chainmail	m20	447	4	-2			Cota de Malha
+Steel Breastplate	m20	447	3	-2			Peitoral de Aço
+Full Plate	m20	447	5	-2			Armadura Completa
+Kevlar Vest	m20	447	3	-1			Colete de Kevlar
+Flak Vest	m20	447	4	-2			Colete Antifragmentação
+Riot Suit	m20	447	4	-2			Traje Antimotim
+Military Armor	m20	447	5	-2			Armadura Militar
+Alanson Hardsuit	m20	447	7	-2			Traje Blindado Alanson
+Trash Can Lid	m20	447	3/+1	0	Shield: soak bonus / difficulty bonus against attacks.	Escudo: bônus de absorção / bônus de dificuldade contra ataques.	Tampa de Lata de Lixo
+Wooden Shield	m20	447	2/+2	-1	Shield: soak bonus / difficulty bonus against attacks.	Escudo: bônus de absorção / bônus de dificuldade contra ataques.	Escudo de Madeira
+Metal Shield	m20	447	4/+2	-2	Shield: soak bonus / difficulty bonus against attacks.	Escudo: bônus de absorção / bônus de dificuldade contra ataques.	Escudo de Metal
+Riot Shield	m20	447	5/+2	-1	Shield: soak bonus / difficulty bonus against attacks.	Escudo: bônus de absorção / bônus de dificuldade contra ataques.	Escudo Antimotim
+Reinforced Clothing (Werewolf)	w20	292	1	0			Roupa Reforçada (Lobisomem)
+Bearskin Coat	w20	292	3	3			Casaco de Pele de Urso
+Riot Suit (Werewolf)	w20	292	5	3			Traje Antimotim (Lobisomem)
+Trashcan Lid	w20	292	2	0	No Dexterity penalty, but a difficulty 6 Dexterity + Melee roll to employ.	Sem penalidade de Destreza, mas exige jogada de Destreza + Armas Brancas, dificuldade 6, para usar.	Tampa de Lata de Lixo (Lobisomem)

@@ -711,11 +711,51 @@ Você possui um fetiche — um objeto físico no qual um lobisomem prendeu um es
 
 ••••• Você possui um ou mais fetiches somando cinco níveis.]==],
 				},
-				["Generation"] = {
+				["Generation (Classical Age)"] = {
+					pt = [==[Vampire: The Classical Age 20th Anniversary Edition, pág. 156
+
+
+Generation (Classical Age)
+
+
+Este Antecedente representa sua Geração: a pureza de seu sangue e sua proximidade com o Primeiro Vampiro. Uma alta classificação de Geração pode representar um senhor poderoso ou um gosto decididamente perigoso por diablerie. Se você não tirar nenhum ponto nesta Característica, você começa a jogar como um vampiro da décima primeira geração. Veja o Capítulo 6 para mais informações.
+
+É recomendável que o jogador comece seu personagem utilizando até a 8ª geração para aproveitar a verdadeira experiência de vampiro. Cainitas de 7ª e 6ª geração podem ser poderosos até mesmo para neófitos e podem mostrar um lado afastado do que se espera para um jogo de horror pessoal.
+
+• Décima Geração: 13 pontos de sangue, pode gastar 1 ponto de sangue por turno.
+
+•• Nona Geração: 14 pontos de sangue, pode gastar 2 pontos de sangue por turno.
+
+••• Oitava Geração: 15 pontos de sangue, pode gastar 3 pontos de sangue por turno.
+
+•••• Sétima Geração: 20 pontos de sangue, pode gastar 4 pontos de sangue por turno e possuir características até 6 pontos.
+
+••••• Sexta Geração: 30 pontos de sangue, pode gastar 6 pontos de sangue por turno e possuir Características até 7 pontos.]==],
+				},
+				["Generation (Dark Ages)"] = {
+					pt = [==[Vampire: The Dark Ages 20th Anniversary Edition, pág. 181
+
+
+Generation (Dark Ages)
+
+
+Este Antecedente representa sua Geração: a pureza do seu sangue e sua proximidade do Primeiro Vampiro. Uma Geração alta pode representar um senhor poderoso ou um gosto decididamente perigoso por diablerie. Se você não colocar nenhum ponto nesta Característica, começa o jogo como um vampiro de Décima Segunda geração. Veja a pág. 341 para mais informações.
+
+• Décima Primeira Geração: 12 de reserva de sangue, pode gastar 1 ponto de sangue por turno
+
+•• Décima Geração: 13 de reserva de sangue, pode gastar 1 ponto de sangue por turno
+
+••• Nona Geração: 14 de reserva de sangue, pode gastar 2 pontos de sangue por turno
+
+•••• Oitava Geração: 15 de reserva de sangue, pode gastar 3 pontos de sangue por turno
+
+••••• Sétima Geração: 20 de reserva de sangue, pode gastar 4 pontos de sangue por turno e possuir Características em 6 pontos]==],
+				},
+				["Generation (Modern Nights)"] = {
 					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 114
 
 
-Generation
+Generation (Modern Nights)
 
 
 Este Antecedente representa sua Geração: a pureza do seu sangue e a sua proximidade do Primeiro Vampiro. Uma pontuação alta de Geração pode representar um senhor poderoso ou um gosto decididamente perigoso por diablerie. Se você não colocar nenhum ponto neste Traço, começa o jogo como vampiro de Décima Terceira Geração. Veja a p. 270 para mais informações.
@@ -776,11 +816,86 @@ Os jogadores podem comprar Rebanho somado com pontos de Antecedente.
 
 ••••• 60 vasos]==],
 				},
-				["Influence"] = {
+				["Influence (Classical Age)"] = {
+					pt = [==[Vampire: The Classical Age 20th Anniversary Edition, pág. 157
+
+
+Influence (Classical Age)
+
+
+Você atraiu a comunidade mortal por meio de riqueza, linhagem familiar, prestígio, política, chantagem ou influência sobrenatural. Influência representa a soma de sua opinião ou poder de influência sobre as políticas em sua comunidade, especialmente entre as autoridades policiais e burocráticas. A influência pode ser usada com pontos de Antecedente combinados. Durante o Império Romano, personagens com mais de Influência 1 precisavam tornar-se Patrícios, embora não seja tão difícil criar laços dentro do senado utilizando as capacidades cainitas. Há formas de contornar tal situação.
+
+• Pouco influente. Um membro do Tribuno da Plebe ou de uma tribo militar.
+
+•• Moderadamente influente. Uma força na política da cidade, como um membro do Promagistrado ou Questor.
+
+••• Posição de influência. Um fator na política regional, como um Príncipe do Senado ou Pretor.
+
+•••• Amplo poder pessoal. Uma força na política imperial, como um Édil ou Legado.
+
+••••• Muito influente. Um Cônsul ou Censor, mantendo a organização do império.]==],
+				},
+				["Influence (Dark Ages)"] = {
+					pt = [==[Vampire: The Dark Ages 20th Anniversary Edition, pág. 181
+
+
+Influence (Dark Ages)
+
+
+Você tem influência na comunidade mortal por meio de riqueza, linhagem familiar, prestígio, política, chantagem ou domínio sobrenatural. Influência representa a soma do seu poder de moldar a opinião ou a política da sua comunidade, em especial entre as autoridades e a burocracia. Influência pode ser usada com pontos de Antecedente combinados.
+
+• Moderadamente influente; um fator na política local
+
+•• Bem relacionado; uma força na política das redondezas
+
+••• Posição de influência; um fator na política regional
+
+•••• Amplo poder pessoal; uma força na política de larga escala
+
+••••• Imensamente influente; um fator na política do mundo conhecido]==],
+				},
+				["Influence (Mage)"] = {
+					pt = [==[Mage: The Ascension 20th Anniversary Edition, pág. 316
+
+
+Influence (Mage)
+
+
+Você atrai atenção e respeito dentro do mundo dos Adormecidos. Talvez você seja uma celebridade, um chefe de gangue, um político ou um líder de culto… ou talvez apenas tenha muitos amigos poderosos. De um jeito ou de outro, quando você fala, as pessoas escutam e com frequência obedecem.
+
+Em geral, este Antecedente representa uma certa deferência social que você recebe mesmo sem rolar o Traço. Quando alguém de Influência alta entra numa sala, as pessoas notam; todos se comportam, pequenos favores são oferecidos, arranjos impossíveis de repente acontecem a seu favor… esse tipo de coisa. Combinando Atributos Sociais com este Antecedente (por exemplo, Manipulação + Influência), você faz sua mágica junto às pessoas certas. Atributos Mentais (como Percepção + Influência) ajudam a farejar ou garantir informação por meio da sua rede social. E, embora Traços Físicos não ajudem a realizar ações por meio da sua Influência, um feito atlético de exibição (digamos, Vigor + Influência, para representar uma daquelas proezas do tipo “Ninguém sobreviveria a ISSO!”) pode impressionar muita gente, se você fizer algo que muita gente possa ver.
+
+Para representar a fama que certas pessoas têm, este Antecedente pode chegar a 10. Lembre-se, porém, de que pessoas famosas e influentes são reconhecidas com facilidade e tendem a ser responsáveis por (e cobradas por) muita gente. A Influência tem dois gumes nesse sentido, e atitudes imprudentes podem baixar o seu nível de Influência. Claro que você pode entrar num restaurante e tratar as pessoas como lixo — só espere reações desagradáveis nas redes sociais assim que virar as costas…
+
+Certas práticas mágicas costumam usar esse tipo de Influência; veja as entradas da Arte do Desejo e do Domínio, e os instrumentos associados a elas, na seção de Práticas do Capítulo Dez (pp. 573 e 577).
+
+X Nenhuma influência digna de nota.
+
+• As pessoas da sua profissão reconhecem você.
+
+•• Você tem vários contatos e um pequeno grau de prestígio.
+
+••• As pessoas da sua área respeitam a sua competência.
+
+•••• Você tem bastante prestígio.
+
+••••• Você é uma força a ser levada em conta.
+
+••••• • Você tem influência nos assuntos políticos do seu país.
+
+••••• •• Suas ações influenciam várias nações aliadas.
+
+••••• ••• Você desfruta de vasto respeito por regiões culturais inteiras.
+
+••••• •••• Seu domínio se estende por esferas sociopolíticas inteiras (a UE, a ONU, o CNA etc.).
+
+••••• ••••• Sua influência se estende pelo mundo mortal, com algum respeito concedido até nos Outros Mundos.]==],
+				},
+				["Influence (Modern Nights)"] = {
 					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 114
 
 
-Influence
+Influence (Modern Nights)
 
 
 Você tem peso na comunidade mortal, seja por riqueza, prestígio, cargo político, chantagem ou manipulação sobrenatural. Membros com Influência alta podem inclinar, e em casos raros até controlar, os processos políticos e sociais da sociedade humana. Influência representa a soma do seu poder de mover opiniões ou políticas na sua comunidade, sobretudo junto à polícia e à burocracia. Em alguns casos, cultivar Influência é um caminho para gerar Recursos (veja adiante).
@@ -857,11 +972,11 @@ X Nenhuma conexão lendária.
 
 ••••• Uma lenda universalmente popular (Cinderela, o Rei Artur, a Mona Lisa).]==],
 				},
-				["Library"] = {
+				["Library (Hunters Hunted)"] = {
 					pt = [==[The Hunters Hunted II, pág. 140
 
 
-Library
+Library (Hunters Hunted)
 
 
 Arcanistas frequentemente dedicam a vida inteira à pesquisa e acumulam bibliotecas tremendas ao longo de suas carreiras; os que vivem perto de Casas Capitulares com bibliotecas antigas e bem desenvolvidas se saem ainda melhor. Arcanistas que precisam pesquisar um fato específico em bibliotecas reduzem o número de dificuldade dos testes de pesquisa por este Antecedente (observe que isso não pode ser combinado com o acesso ao Axis Mundi).
@@ -877,6 +992,29 @@ Os jogadores podem optar por somar pontos de Antecedente para uma biblioteca com
 •••• Dificuldade reduzida em 4
 
 ••••• Dificuldade reduzida em 5]==],
+				},
+				["Library (Mage)"] = {
+					pt = [==[Mage: The Ascension 20th Anniversary Edition, pág. 318
+
+
+Library (Mage)
+
+
+Uau… as pessoas ainda precisam de livros na Era da Internet? Bem, sim, precisam. Embora a Internet tenha um suprimento quase infinito de informação, ainda há muita coisa disponível apenas em livros. Especialmente quando se trata de informação esotérica, mística, histórica ou acadêmica, uma boa biblioteca oferece dados que nenhuma busca na rede desenterra. Por mais que os magos do novo milênio aprendam a apreciar a Internet, os arquivos em papel continuam essenciais para o estudante sério das Artes mágicas e das hiperciências Iluminadas.
+
+No fim do século XX e no início do XXI, esta Característica de Antecedente reflete o acesso a um arquivo multimídia vital para aquele mago em particular. Um magus à moda antiga pode balançar a cabeça grisalha diante de toda essa tolice de Internet, mas mesmo ele provavelmente terá fotografias, discos, rolos de filme e DVDs em seu arquivo, nem que seja porque boa parte do século passado foi registrada nessas mídias. Como sua Biblioteca se organiza em torno de um acervo de informação, você pode usá-la para elevar ou aprender certas Características com testes bem-sucedidos de Característica Mental + Biblioteca, e um grupo pode combinar as Bibliotecas de seus membros em uma só, maior.
+
+X Aquelas edições da Cosmo não vão te ensinar Esferas.
+
+• Você tem alguns livros de bolso da Nova Era.
+
+•• Muita ficção, pouca substância.
+
+••• Há coisa útil ali dentro quando você vai cavar.
+
+•••• Sua coleção de dados arcanos é respeitável.
+
+••••• Você tem um acervo de saber bem decente.]==],
 				},
 				["Mentor"] = {
 					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 115
@@ -1015,11 +1153,11 @@ Algumas tribos dão mais valor à boa linhagem do que outras, mas Raça Pura é 
 
 ••••• Os maiores dos heróis vivem em você.]==],
 				},
-				["Rank"] = {
+				["Rank (Hunters Hunted)"] = {
 					pt = [==[The Hunters Hunted II, pág. 134
 
 
-Rank
+Rank (Hunters Hunted)
 
 
 Agências governamentais impõem privilégio estrito de posto — um soldado raso do Exército não consegue fazer um capitão ouvi-lo, muito menos dar ordens a seus superiores. Este Antecedente representa a posição de um agente na cadeia de comando. Um agente sem nenhum ponto de Posto ocupa o grau mais baixo apropriado à organização: um agente júnior na SAD ou na CIA, ou um tenente de 2ª classe na NSA. Embora o personagem com o Posto mais alto esteja tecnicamente no comando dos outros agentes, circunstâncias atenuantes em campo podem bagunçar a cadeia de comando.
@@ -1036,11 +1174,34 @@ Ao lidar com pessoas da mesma agência e de Posto inferior, aplique a diferença
 
 ••••• Um diretor regional na SAD ou um general na NSA.]==],
 				},
-				["Requisitions"] = {
+				["Rank (Mage)"] = {
+					pt = [==[Mage: The Ascension 20th Anniversary Edition, pág. 321
+
+
+Rank (Mage)
+
+
+Você detém um título de certa distinção entre as massas — talvez uma patente militar, um cargo religioso, uma posição executiva numa corporação poderosa ou algum posto igualmente influente. Essa posição lhe garante um grau de respeito, certas regalias ligadas ao cargo e provavelmente a deferência imediata do pessoal de escalão inferior. Naturalmente, essa posição também cobra responsabilidade: um chefe de estado não pode simplesmente sair por aí em aventuras quando bem entende.
+
+Especialmente comum entre os Tecnocratas, este Antecedente comanda Influência — como no Antecedente de mesmo nome — igual à pontuação de Posto. Porém, essa Influência só se ativa entre as pessoas sob o domínio do Posto e em situações nas quais o personagem age dentro dos limites do cargo. Outras pessoas podem não se impressionar tão facilmente, e nesse caso a Influência conta como metade do Posto. Agindo em caráter oficial, seu personagem também acessa Recursos iguais à metade do Posto como regalia do cargo, e pode ter Fama pela metade do Posto entre as pessoas que comanda. Se quiser Influência, Recursos ou Fama independentes do Posto, precisa comprá-los à parte.
+
+X Nenhum posto digno de nota.
+
+• Posto menor: sargento do exército, escudeiro, diácono, membro de conselho escolar, jornalista novato, gerente júnior, instrutor universitário.
+
+•• Posto baixo: oficial subalterno, cavaleiro, padre, vereador, repórter de redação, gerente sênior, professor.
+
+••• Posto médio: capitão, barão, abade, prefeito, colunista local, gerência intermediária corporativa, docente efetivo.
+
+•••• Posto alto: major, conde, bispo, colunista sindicalizado, vice-presidente júnior, chefe de departamento.
+
+••••• Alto-comando: general, príncipe, arcebispo, senador, correspondente internacional, vice-presidente corporativo, reitor.]==],
+				},
+				["Requisitions (Hunters Hunted)"] = {
 					pt = [==[The Hunters Hunted II, pág. 134
 
 
-Requisitions
+Requisitions (Hunters Hunted)
 
 
 Você é mestre da burocracia, capaz de preencher os formulários certos para pôr as mãos em equipamento especial, de balas de prata a um caoscópio. Você começa cada história com uma reserva de pontos para gastar em equipamento igual à sua pontuação neste Antecedente. Uma vez que o equipamento seja consumido ou destruído, acabou — e todo equipamento requisitado que sobreviver precisa ser devolvido no fim da história. Você pode guardar seus pontos de Requisição até precisar de um item ou serviço específico, mas não pode adquirir um único item que custe mais do que (seu Posto + 2). Alguns exemplos de equipamento que pode ser requisitado estão nas pp. 155-157.
@@ -1057,11 +1218,64 @@ Os jogadores podem optar por somar pontos de Antecedente para um estoque compart
 
 ••••• Você possui um ou mais itens que somam cinco pontos de Requisição.]==],
 				},
-				["Resources"] = {
+				["Requisitions (Mage)"] = {
+					pt = [==[Mage: The Ascension 20th Anniversary Edition, pág. 321
+
+
+Requisitions (Mage)
+
+
+Há razões para o domínio Tecnocrata. Uma delas envolve os recursos épicos à disposição dos operativos da Tecnocracia. Com este Antecedente — uma Característica disponível apenas para Tecnocratas em boa situação junto à Ordem — você pede tranqueiras aos seus superiores e não raro espera recebê-las.
+
+Antes de uma missão, você e sua equipe recebem o equipamento que seus superiores acham que vocês vão precisar. Se quiser mais do que isso, como a maioria dos agentes quer, você precisa requisitar: aciona seus contatos e protocola um pedido oficial das tranqueiras desejadas. Em termos de jogo, você rola sua pontuação de Requisições como parada de dados, e cada sucesso nessa rolagem lhe dá cinco pontos de Antecedente para comprar Dispositivos para aquela missão. Mais de três sucessos garantem toda a tecnologia mundana de Adormecidos que você conseguir usar. No fim da missão, você tem de devolver o equipamento emprestado; se a Divisão Q tiver de vir buscá-lo, você fica alguns pontos de Requisições mais pobre por um tempo.
+
+A dificuldade da rolagem depende da sua situação junto aos Poderes Constituídos: Lealdade Duvidosa 9, Lealdade Questionável 8, Lealdade Presumida 7, Lealdade Assegurada 6, Lealdade Total 5. Sem situação nenhuma, a resposta é “saia da minha sala”.]==],
+				},
+				["Resources (Classical Age)"] = {
+					pt = [==[Vampire: The Classical Age 20th Anniversary Edition, pág. 157
+
+
+Resources (Classical Age)
+
+
+Recursos são o simbolismo da situação econômica de seu personagem. Em outros momentos da história, a moeda principal tornou-se o dinheiro ou as moedas, mas Roma tinha uma economia muito diversa. Durante o império, personagens podiam trocar especiarias, moedas, sal e até mesmo terras. Mas o grande valor, e que demonstrava realmente o quão rico era alguém, era a quantidade de servos que aquela pessoa tinha e o tamanho e a importância de suas terras.
+
+Desta forma, isto permitia que ele utilizasse das terras para criar mercados, pequenas aldeias, trocar especiarias, criar fazendas ou até mesmo reservar campos militares e receber apoio do império em troca. Os jogadores podem comprar Recursos para seus personagens com pontos de Antecedentes combinados.
+
+• Suficiente. Você pode manter uma residência típica no estilo da plebe com estabilidade, mesmo que os gastos excessivos sejam raros.
+
+•• Moderado. Você pode se exibir como um membro em boa posição da classe comerciante. Você pode manter um servo ou contratar ajuda específica conforme necessário. Uma fração de seus recursos está disponível em especiarias, propriedades facilmente transportáveis (como joias) e outros objetos de valor. Recursos 2 permite manter um padrão de vida baixo por seis meses se você deixar de trabalhar.
+
+••• Confortável. Você é um membro proeminente e estabelecido em sua comunidade, com um terreno e uma casa própria. Provavelmente você tem ativos e algumas propriedades espalhadas pela cidade. É possível que até mesmo consiga comprar um título de Patrício, com muito custo. Você possui alguns servos que trabalham para você. É possível que você mantenha uma qualidade de vida de um Recursos 1 onde quer que esteja, sem dificuldade, pelo tempo que escolher.
+
+•••• Rico. Você raramente toca em especiarias, sal ou o que quer que seja, já que a maioria de seus ativos existe em formas tangíveis que são mais valiosas e estáveis do que as moedas. Você provavelmente tem grandes pedaços de terra, algumas reservas na cidade e vendedores que trabalham para você. É provável que você esteja construindo sua própria villa. Se desejasse, você poderia manter uma vida de Recursos 3 por até um ano e uma existência de Recursos 2 indefinidamente.
+
+••••• Extremamente rico. Você é o modelo que os outros buscam alcançar, pelo menos na mente popular. Você tem ativos vastos e amplamente distribuídos, talvez ligados ao destino das nações, cada um com enormes equipes e conexões com todos os níveis da sociedade em uma região. Você viaja com um mínimo de conforto de três pontos de Recurso, mas com um pouco de esforço pode mais.]==],
+				},
+				["Resources (Dark Ages)"] = {
+					pt = [==[Vampire: The Dark Ages 20th Anniversary Edition, pág. 181
+
+
+Resources (Dark Ages)
+
+
+Recursos são posses que seu personagem controla. Essas posses podem ser ouro, investimentos, propriedades, estoques comerciais ou até mesmo impostos a receber ou terras. Um personagem sem pontos em Recursos pode possuir roupas e suprimentos o suficiente para sobreviver, ou talvez esteja em necessidade. Você recebe um valor a cada mês baseado na sua pontuação, então detalhe exatamente de onde vem esse dinheiro. Os jogadores podem comprar Recursos para seus personagens com pontos de Antecedentes combinados.
+
+• Suficiente. Você pode manter uma residência comum aos trabalhadores com certa estabilidade, com raríssimos momentos em que é capaz de se dar algum luxo.
+
+•• Moderado. Você se mostra como um membro de boa posição da classe mercante, com uma ocasional indulgência digna de uma pessoa de maior status. Você é capaz de manter um serviçal ou contratar um ajudante específico caso necessário. Uma fração de seus recursos está disponível em moeda ou ouro, propriedade portátil (como joias) e outros itens valiosos que o permitem manter um padrão de vida equivalente ao nível anterior onde quer que você esteja, por um máximo de seis meses.
+
+••• Confortável. Você é um membro proeminente e estabelecido da sua comunidade, com terras e uma residência própria. Você provavelmente tem a maior parte de suas riquezas na forma de posses, e não de moedas. Você é capaz de manter uma vida equivalente ao descrito no nível um desse Antecedente onde quer que esteja, sem dificuldade, por quanto tempo desejar.
+
+•••• Rico. Você raramente toca em ouro, uma vez que a maioria das suas posses tangíveis são em formas mais estáveis e valiosas do que as moedas. Você possui mais riqueza do que muitos de sua comunidade. Quando você não está tão preocupado em ganhar seus Recursos, você é capaz de manter uma vida equivalente ao nível três por até um ano, e uma existência como descrita no nível dois por tempo indefinido.
+
+••••• Extremamente Rico. Você é o modelo que os outros tentam alcançar, pelo menos na mentalidade popular. Você possui vastas e amplamente distribuídas posses, talvez ligadas ao destino das nações, cada uma delas com muitos empregados e conexões em todos os níveis da sociedade de uma região. Você viaja com os confortos do nível três do Antecedente, talvez mais caso se esforce um pouco mais.]==],
+				},
+				["Resources (Modern Nights)"] = {
 					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 115
 
 
-Resources
+Resources (Modern Nights)
 
 
 Recursos são bens de valor cuja disposição seu personagem controla. Esses ativos podem ser dinheiro vivo, mas, à medida que este Antecedente aumenta, é mais provável que sejam investimentos, imóveis ou capital produtivo de algum tipo — terras, ativos industriais, ações e títulos, estoques comerciais, infraestrutura criminosa, contrabando, até impostos ou dízimos. Lembre-se de que vampiros não precisam providenciar alimento algum além do sangue, e suas necessidades reais (em oposição aos desejos) de abrigo são muito facilmente atendidas. Os Recursos de um vampiro vão sobretudo para luxos e para as despesas associadas ao desenvolvimento e à manutenção de Status, Influência e outros Antecedentes. Uma personagem sem nenhum ponto em Recursos pode ter roupas e suprimentos suficientes para se virar, ou pode estar na miséria, morando numa caixa de geladeira embaixo de um viaduto.
@@ -1079,6 +1293,29 @@ Os jogadores podem comprar Recursos para seus personagens com pontos de Antecede
 •••• Rico. Você raramente toca em dinheiro, pois a maior parte dos seus ativos existe em formas tangíveis que são em si mais valiosas e estáveis do que papel-moeda. Detém mais riqueza do que muitos dos seus pares locais (se é que se pode chamá-los assim). Quando a obtenção dos seus Recursos não recebe sua atenção habitual, você consegue manter uma existência de três pontos por até um ano, e uma existência de dois pontos indefinidamente.
 
 ••••• Extremamente Rico. Você é o modelo que os outros tentam alcançar, ao menos na imaginação popular. Programas de televisão, matérias de revista e sites de fofoca especulam sobre suas roupas, os aposentos de suas numerosas casas e o luxo dos seus meios de transporte. Você tem ativos vastos e amplamente distribuídos, talvez atados ao destino de nações, cada um com enormes equipes e conexões com todos os níveis da sociedade de uma região. Você viaja com um mínimo de conforto de três pontos, mais com um pouco de esforço. Corporações e governos às vezes procuram você para comprar ações ou entrar em programas de títulos.]==],
+				},
+				["Resources (Victorian Age)"] = {
+					pt = [==[M20 Victorian Age, pág. 121
+
+
+Resources (Victorian Age)
+
+
+Este Antecedente representa o poder de compra dentro das sociedades industrializadas. Ele pode, mas nem sempre, representar padrões de vida como se entendem em eras futuras. Se todas as suas histórias se passam em grandes cidades de nações industrializadas, os personagens administram Recursos de maneira bastante tradicional. No entanto, ao introduzir personagens ou lugares com economias e definições de riqueza muito diferentes, o efeito deste Antecedente pode mudar radicalmente. Expresse este Antecedente em termos relevantes para a história, em vez de medir diferenças culturais em termos financeiros.
+
+As diretrizes a seguir valem para histórias que se passam em áreas industrializadas. Algumas culturas podem resistir ou punir indivíduos cujo sucesso ultrapasse sua casta ou o status social aceito. Da mesma forma, pessoas de posses significativas podem ter obrigações financeiras ou sociais impostas a elas por costumes locais ou governos. A riqueza sempre cobra um preço.
+
+X Pobre. Você vive de expediente e reside em condições miseráveis.
+
+• Classe Trabalhadora. Você tem um emprego simples e consegue alimentar sua família.
+
+•• Estabelecido. Você tem uma ocupação respeitável e pode manter uma casa modesta.
+
+••• Profissional. Você pode se dar alguns luxos; talvez empregue um ou dois assistentes pessoais (cozinheira, babá etc.).
+
+•••• Rico. Seja por influência da família ou por conquista pessoal, você acumulou riqueza considerável. Uma grande propriedade, uma criadagem ampla e luxo significativo estão todos ao seu alcance.
+
+••••• Opulência. Sua fortuna é inimaginável para uma pessoa comum. Múltiplas propriedades estão à sua disposição, o luxo é o corriqueiro e um sem-número de pessoas é pago para manter seu estilo de vida.]==],
 				},
 				["Retainers"] = {
 					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 116
@@ -1247,6 +1484,27 @@ X Nenhum informante especial.
 ••••• •••• O Grande Irmão.
 
 ••••• ••••• O Grande Irmão em escala global.]==],
+				},
+				["Status (Hunters Hunted)"] = {
+					pt = [==[The Hunters Hunted II, pág. 123
+
+
+Status (Hunters Hunted)
+
+
+Você é um Inquisidor de status na Sociedade de Leopold. Tal distinção pode vir de uma reputação de trabalho dedicado, do abate de um servo particularmente poderoso do Diabo, da realização de um milagre sagrado, do acúmulo de conhecimento esotérico ou mesmo da simples longevidade, uma raridade entre caçadores de bruxas. Como em qualquer instituição, ter amigos em posições altas também ajuda. Independentemente do status, um membro da Sociedade é sempre chamado de Inquisidor. Um Inquisidor sem pontos em Status começa como noviço.
+
+Ao lidar com Inquisidores de Status menor, aplique a diferença de Status como bônus em qualquer parada de dados Social.
+
+• Terciário
+
+•• Conselheiro
+
+••• Abade
+
+•••• Censor
+
+••••• Provincial]==],
 				},
 				["Status (Mage)"] = {
 					pt = [==[Mage: The Ascension 20th Anniversary Edition, pág. 325
