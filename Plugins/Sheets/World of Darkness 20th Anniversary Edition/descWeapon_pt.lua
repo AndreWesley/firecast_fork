@@ -625,7 +625,7 @@ Clinch
 
 Parada: For + Briga
 Dificuldade: 6
-Dano: For (C)
+Dano: For (P)
 Alcance: -
 Cadência: -
 Pente: -
@@ -642,7 +642,7 @@ Clinch (Dark Ages)
 
 Parada: Des + Briga
 Dificuldade: 6
-Dano: For (C)
+Dano: For (P)
 Alcance: -
 Cadência: -
 Pente: -
@@ -1338,7 +1338,7 @@ Hold
 
 Parada: For + Briga
 Dificuldade: 6
-Dano: Nenhum (C)
+Dano: Nenhum (P)
 Alcance: -
 Cadência: -
 Pente: -
@@ -3150,7 +3150,40 @@ Ocultação: -]==],
 Conceal
 
 
-B = Bolsa · R = Roupa Solta · M = Manto Longo · N = Não Pode Ser Escondido. varia = depende do item.]==],
+B = Bolsa
+
+R = Roupa Solta
+
+M = Manto Longo
+
+N = Não Pode Ser Escondido
+
+varia = Depende do item
+
+- = O livro não dá valor]==],
+				},
+				["Damage"] = {
+					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 279
+
+
+Damage
+
+
+C = Dano de Contusão
+
+L = Dano Letal
+
+A = Dano Agravado
+
+K = Derrubada: o alvo cai
+
+R = Reduz os sucessos de ataque do oponente
+
+P = Agarrão: continua nos turnos seguintes
+
+fogo = Dano de Fogo: ver a tabela de Explosivos
+
+- = O livro não dá valor]==],
 				},
 				-- <<< WEAPON_DESC_END
 };

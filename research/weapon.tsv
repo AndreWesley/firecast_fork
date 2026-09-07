@@ -19,10 +19,10 @@ Crossbow	ranged	core	281	Dex + Firearms	Des + Armas de Fogo	6	5	5	20	1	1	T	M	Fiv
 Bite	maneuver	core	279	Dex + Brawl	Des + Briga	6	Str + 1 (A)	For + 1 (A)	-	-	-	-	-	Accuracy +1. Needs a successful clinch, hold or tackle first. (A) aggravated damage.	Precisão +1. Exige agarrão, imobilização ou investida bem-sucedida antes. (A) dano agravado.	Mordida
 Block	maneuver	core	279	Dex + Brawl	Des + Briga	6	None (R)	Nenhum (R)	-	-	-	-	-	Accuracy: special. (R) reduces an opponent's attack successes.	Precisão: especial. (R) reduz os sucessos de ataque do oponente.	Bloqueio
 Claw	maneuver	core	279	Dex + Brawl	Des + Briga	6	Str + 1 (A)	For + 1 (A)	-	-	-	-	-	Vampires with claws (Protean, Vicissitude). (A) aggravated damage.	Vampiros com garras (Metamorfose, Vicissitude). (A) dano agravado.	Garra
-Clinch	maneuver	core	279	Str + Brawl	For + Briga	6	Str (C)	For (C)	-	-	-	-	-	Accuracy: special. (C) carries over on successive turns.	Precisão: especial. (C) continua nos turnos seguintes.	Agarrão
+Clinch	maneuver	core	279	Str + Brawl	For + Briga	6	Str (C)	For (P)	-	-	-	-	-	Accuracy: special. (C) carries over on successive turns.	Precisão: especial. (C) continua nos turnos seguintes.	Agarrão
 Disarm	maneuver	core	279	Dex + Melee	Des + Armas Brancas	7	Special	Especial	-	-	-	-	-	Successes exceeding the opponent's Strength knock the weapon away.	Sucessos acima da Força do oponente arrancam a arma.	Desarmar
 Dodge	maneuver	core	279	Dex + Athletics	Des + Esportes	6	None (R)	Nenhum (R)	-	-	-	-	-	Accuracy: special. (R) reduces an opponent's attack successes.	Precisão: especial. (R) reduz os sucessos de ataque do oponente.	Esquiva
-Hold	maneuver	core	279	Str + Brawl	For + Briga	6	None (C)	Nenhum (C)	-	-	-	-	-	(C) carries over on successive turns.	(C) continua nos turnos seguintes.	Imobilização
+Hold	maneuver	core	279	Str + Brawl	For + Briga	6	None (C)	Nenhum (P)	-	-	-	-	-	(C) carries over on successive turns.	(C) continua nos turnos seguintes.	Imobilização
 Kick	maneuver	core	279	Dex + Brawl	Des + Briga	7	Str + 1	For + 1	-	-	-	-	-			Chute
 Parry	maneuver	core	279	Dex + Melee	Des + Armas Brancas	6	None (R)	Nenhum (R)	-	-	-	-	-	Accuracy: special. (R) reduces an opponent's attack successes.	Precisão: especial. (R) reduz os sucessos de ataque do oponente.	Aparar
 Strike	maneuver	core	279	Dex + Brawl	Des + Briga	6	Str	For	-	-	-	-	-			Golpe
@@ -174,7 +174,7 @@ Greatsword	melee	da	349	Dex + Melee	Des + Armas Brancas	6	Str + 4 (L)	For + 4 (L
 Halberd	melee	da	349	Dex + Melee	Des + Armas Brancas	7	Str + 4 (L)	For + 4 (L)	-	-	-	N	N	Min. Strength 3. Two-handed. Difficulty +1.	Força mínima 3. Duas mãos. Dificuldade +1.	Alabarda
 Lance (Mounted)	melee	da	349	Dex + Melee	Des + Armas Brancas	6	Str + 3 (L)	For + 3 (L)	-	-	-	N	N	Min. Strength 3. Armor piercing 3.	Força mínima 3. Perfuração de armadura 3.	Lança de Cavalaria (Montado)
 Pitchfork	melee	da	349	Dex + Melee	Des + Armas Brancas	6	Str + 1 (L)	For + 1 (L)	-	-	-	N	N	Min. Strength 2. Armor piercing 1. Two-handed.	Força mínima 2. Perfuração de armadura 1. Duas mãos.	Forcado
-Clinch (Dark Ages)	maneuver	da	350	Dex + Brawl	Des + Briga	6	Str (C)	For (C)	-	-	-	-	-	(C) continues into further turns.	(C) continua nos turnos seguintes.	Agarrão (Idade das Trevas)
+Clinch (Dark Ages)	maneuver	da	350	Dex + Brawl	Des + Briga	6	Str (C)	For (P)	-	-	-	-	-	(C) continues into further turns.	(C) continua nos turnos seguintes.	Agarrão (Idade das Trevas)
 Great Blow	maneuver	da	350	Dex + Brawl/Melee	Des + Briga/Armas Brancas	7	Normal + 2	Normal + 2	-	-	-	-	-	Two more damage dice than the base attack.	Dois dados de dano a mais que o ataque básico.	Golpe Poderoso
 Riposte	maneuver	da	350	Dex + Brawl/Melee	Des + Briga/Armas Brancas	7	Normal + 1	Normal + 1	-	-	-	-	-	Counterattack after a successful parry or block.	Contra-ataque depois de aparar ou bloquear com sucesso.	Ripostar
 Stake (Dark Ages)	maneuver	da	350	Dex + Melee	Des + Armas Brancas	9	Special	Especial	-	-	-	-	-	Plunge a stake through a vampire's heart: damage per weapon or Str + 1 (L).	Cravar uma estaca no coração de um vampiro: dano conforme a arma ou For + 1 (L).	Estacar (Idade das Trevas)

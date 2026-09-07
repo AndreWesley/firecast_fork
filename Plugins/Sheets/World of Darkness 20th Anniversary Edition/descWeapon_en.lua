@@ -3150,7 +3150,44 @@ Conceal: -]==],
 Conceal
 
 
-P = Pocket · J = Jacket · T = Trenchcoat · N = Cannot be concealed. Dark Ages: C = loose Clothing · L = Long cloak. varies = depends on the item.]==],
+P = Pocket
+
+J = Jacket
+
+T = Trenchcoat
+
+N = Cannot be concealed
+
+C = Loose Clothing (Dark Ages)
+
+L = Long Cloak (Dark Ages)
+
+varies = Varies with the item
+
+- = The book gives no value]==],
+				},
+				["Damage"] = {
+					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 279
+
+
+Damage
+
+
+B = Bashing damage
+
+L = Lethal damage
+
+A = Aggravated damage
+
+K = Knockdown: the target falls
+
+R = Reduces the opponent's attack successes
+
+C = Clinch: carries over on successive turns
+
+fire = Fire damage: see the Explosives chart
+
+- = The book gives no value]==],
 				},
 				-- <<< WEAPON_DESC_END
 };

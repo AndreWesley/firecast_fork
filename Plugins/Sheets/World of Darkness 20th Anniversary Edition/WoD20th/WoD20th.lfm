@@ -638,9 +638,18 @@
 					"Class One (Heavy Clothing)", "Class One (Reinforced Clothing)", "Class Three (Composite Armor)",
 					"Class Three (Kevlar Vest)", "Class Two (Armor T-Shirt)", "Class Two (Cloth/Textile Armor)",
 					"Cosplay Mail", "Cybernetic Armor", "Enhanced Clothing", "Flak Vest", "Full Plate", "Kevlar Vest",
-					"Leather Duster", "Metal Shield", "Military Armor", "Reinforced Clothing",
-					"Reinforced Clothing (Werewolf)", "Riot Shield", "Riot Suit", "Riot Suit (Werewolf)",
-					"Steel Breastplate", "Tough Hide", "Trash Can Lid", "Trashcan Lid", "Wooden Shield",
+					"Leather Duster", "Military Armor", "Reinforced Clothing", "Reinforced Clothing (Werewolf)",
+					"Riot Suit", "Riot Suit (Werewolf)", "Steel Breastplate", "Tough Hide", "Trashcan Lid",
+				},
+				-- The four SHIELDS live in a list of their own so the ARMOR box cannot offer one and
+				-- the SHIELD box cannot offer a jacket - a character wears both at once, which is
+				-- the whole point of the box (SPEC I159a, I159b, user 2026-09-07). Only the LIST
+				-- splits: combatData.armor still holds all thirty-three and descArmor_* still
+				-- describes all thirty-three, because a shield reads the same columns an armour
+				-- does. The split is driven by the `kind` column of research/armor.tsv, so nothing
+				-- here is hand-picked, and V466c measures that the two lists never overlap.
+				["shield"] = {
+					"", "Metal Shield", "Riot Shield", "Trash Can Lid", "Wooden Shield",
 				},
 				-- <<< PICKER_LIST_END
 			};
@@ -2734,11 +2743,17 @@
 				{ "conceal_", "conceal" },
 			};
 
-			-- Armour has no row, so the field is the whole name and there is no suffix to append.
-			-- `armorDescription` is NOT here: it is the pane's own text in custom and the book's
-			-- notes otherwise, so it travels with the description and not with the cells.
+			-- Protection has no row, so there is no numeric suffix to append - but there ARE two
+			-- boxes since the 15th batch, ARMOR and SHIELD, and a character wears both at once
+			-- (SPEC I159a). So the first element is the field's TAIL and the caller puts the
+			-- prefix on: `pfx .. "Rating"` with pfx from MF.list. Two literal tables, one per
+			-- box, would be two owners of the same two cells (SPEC V135, V466d).
+			--
+			-- `armorDescription`/`shieldDescription` are NOT here: they are the pane's own text
+			-- in custom and the book's notes otherwise, so they travel with the description and
+			-- not with the cells.
 			MF_ARM_CELL = {
-				{ "armorRating", "rating" }, { "armorPenalty", "penalty" },
+				{ "Rating", "rating" }, { "Penalty", "penalty" },
 			};
 
 			-- Rows of the Vampire tab (SPEC I16). Same contract as BACKGROUND_ROWS above: the loop
@@ -5172,10 +5187,15 @@
 						-- that file always ships, and a guard here would hide a broken build behind
 						-- a picker that fills nothing, which is B19 coming in the door of silence
 						-- (SPEC V364d).
-						if MF.list == "weapon" or MF.list == "armor" then
+						--
+						-- THREE lists, TWO tables (SPEC I159b): `shield` is a slice of the armour
+						-- list and reads the same columns, so it reads the same table - only
+						-- PICKER_LIST splits, and it splits on the `kind` column of the TSV.
+						if MF.list == "weapon" or MF.list == "armor" or MF.list == "shield" then
 							local COMBAT = require("combatData.lua");
+							local key    = (MF.list == "shield") and "armor" or MF.list;
 
-							if type(COMBAT) == "table" then MF.data = COMBAT[MF.list]; end;
+							if type(COMBAT) == "table" then MF.data = COMBAT[key]; end;
 						end;
 
 						local vals = PICKER_LIST[MF.list];
@@ -5345,18 +5365,34 @@
 				return MF.custom == true and MF.list == "weapon";
 			end;
 
+			-- BOTH protection lists, one pane: ARMOR and SHIELD have the same two cells and the
+			-- same four widgets serve them, so this asks about the pane and not about the box
+			-- (SPEC I159c, V466d, V460a). Which FIELD the pane writes is the caller's prefix.
 			function mfArmorShown()
-				return MF.custom == true and MF.list == "armor";
+				return MF.custom == true and (MF.list == "armor" or MF.list == "shield");
 			end;
 
 			-- What a custom cell READS as, and the only place a blank becomes a dash (SPEC I157f,
 			-- V457f). The book side gets its `-` from combatData.lua, written there by the
 			-- generator; this is the same answer for the side the player types, so the two halves
 			-- of one column cannot print an empty box and a dash for the same absence.
+			--
+			-- `.value` FIRST since the 14th batch: Conceal is a comboBox now (SPEC I158b, I158c,
+			-- V463d) and a combo's `.text` is the DISPLAYED line - `B = Bolsa` - while the cell
+			-- wants the code alone. An <edit> has no `.value` at all, so the six other cells fall
+			-- through to `.text` untouched (SPEC R4).
 			function mfCell(ctrl)
 				if ctrl == nil then return "-"; end;
 
-				local t = string.match(ctrl.text or "", "^%s*(.-)%s*$");
+				-- The test is "did .value hand me a non-empty STRING", not "is .value nil": an
+				-- <edit> that aliased value to text would answer the same thing either way, and
+				-- a combo with nothing picked has to fall through to .text and read "" - which
+				-- is the dash, not a silent wrong cell.
+				local raw = ctrl.value;
+
+				if type(raw) ~= "string" or raw == "" then raw = ctrl.text; end;
+
+				local t = string.match(raw or "", "^%s*(.-)%s*$");
 
 				if t == "" then return "-"; end;
 
@@ -5578,17 +5614,63 @@
 					local n = string.match(MF.field or "", "^[^_]+_(.+)$");
 
 					for i = 1, #MF_WPN_CELL, 1 do
-						local c = found["edtMfWpn_" .. MF_WPN_CELL[i][2]];
+						local c   = found["edtMfWpn_" .. MF_WPN_CELL[i][2]];
+						local cur = (n ~= nil and sheet ~= nil and sheet[MF_WPN_CELL[i][1] .. n]) or "";
 
-						if c ~= nil then c.text = (n ~= nil and sheet ~= nil and sheet[MF_WPN_CELL[i][1] .. n]) or ""; end;
+						if c ~= nil and MF_WPN_CELL[i][2] == "conceal" then
+							-- Conceal is the one cell with a CLOSED list, so it is a dropdown and the
+							-- other six stay typed (SPEC I158b, V463, user 2026-09-07 ask 2). The list
+							-- is not authored in the XML and is not a second copy of the letters in
+							-- Lua: it is the LEGEND the ? already shows, split one option per line -
+							-- which is exactly why the user asked for that format in the same message
+							-- (SPEC I158a, V462a, V463b). One owner, and the gate measures it once.
+							--
+							-- Block 3 is what is wanted: descText hands back the three blocks I21
+							-- writes - book line, name, body - separated by two blank lines.
+							local body  = string.match(descText("Weapon", "Conceal", nil, lang) or "", "\n\n\n.-\n\n\n(.*)$") or "";
+							local vals  = { "" };
+							local items = { "" };
+							local seen  = false;
+
+							for line in string.gmatch(body, "[^\n]+") do
+								local code = string.match(line, "^(%S+) = ");
+
+								if code ~= nil then
+									vals[#vals + 1]  = code;
+									items[#items + 1] = line;
+
+									if code == cur then seen = true; end;
+								end;
+							end;
+
+							-- A value the list does not carry goes IN, the decision the sheet already
+							-- made for the rating combos on 2026-08-21 (SPEC I45): a comboBox whose
+							-- `value` is outside `values` shows BLANK, so a legacy cell - or one typed
+							-- in the other language - would look like data that was thrown away.
+							if cur ~= "" and not seen then
+								vals[#vals + 1]  = cur;
+								items[#items + 1] = cur;
+							end;
+
+							c.values = vals;
+							c.items  = items;
+							c.value  = cur;
+						elseif c ~= nil then
+							c.text = cur;
+						end;
 					end;
 				end;
 
+				-- ARMOR and SHIELD share these four widgets, so the FIELD comes from the prefix and
+				-- not from a second table (SPEC I159c, V466d). One `pfx` per function is the whole
+				-- of the rule.
 				if mfArmorShown() then
+					local pfx = (MF.list == "shield") and "shield" or "armor";
+
 					for i = 1, #MF_ARM_CELL, 1 do
 						local c = found["edtMfArm_" .. MF_ARM_CELL[i][2]];
 
-						if c ~= nil then c.text = (sheet ~= nil and sheet[MF_ARM_CELL[i][1]]) or ""; end;
+						if c ~= nil then c.text = (sheet ~= nil and sheet[pfx .. MF_ARM_CELL[i][1]]) or ""; end;
 					end;
 				end;
 
@@ -5831,14 +5913,16 @@
 					end;
 
 					if mfArmorShown() then
+						local pfx = (MF.list == "shield") and "shield" or "armor";
+
 						for i = 1, #MF_ARM_CELL, 1 do
-							setField(MF_ARM_CELL[i][1], mfCell(found["edtMfArm_" .. MF_ARM_CELL[i][2]]));
+							setField(pfx .. MF_ARM_CELL[i][1], mfCell(found["edtMfArm_" .. MF_ARM_CELL[i][2]]));
 						end;
 
 						-- The notes ARE the pane's text here (SPEC I157o): the same `tx` that goes
-						-- to armorClassCustomDesc, so the big field on the tab and the pane inside
-						-- the box cannot tell two stories about one armour.
-						setField("armorDescription", tx);
+						-- to <pfx>ClassCustomDesc, so the big field on the tab and the pane inside
+						-- the box cannot tell two stories about one armour - or one shield.
+						setField(pfx .. "Description", tx);
 					end;
 
 					setField(MF.field, nm);
@@ -5907,16 +5991,18 @@
 					for i = 1, #MF_WPN_CELL, 1 do
 						setField(MF_WPN_CELL[i][1] .. num, L and L[MF_WPN_CELL[i][2]] or "");
 					end;
-				elseif MF.list == "armor" then
+				elseif MF.list == "armor" or MF.list == "shield" then
+					local pfx = (MF.list == "shield") and "shield" or "armor";
+
 					for i = 1, #MF_ARM_CELL, 1 do
-						setField(MF_ARM_CELL[i][1], L and L[MF_ARM_CELL[i][2]] or "");
+						setField(pfx .. MF_ARM_CELL[i][1], L and L[MF_ARM_CELL[i][2]] or "");
 					end;
 
 					-- The book's notes OVERWRITE what was in the big field, empty ones included
 					-- (user 2026-09-07, ask 6): the field describes the armour the row names, so
 					-- a note left over from the armour before it would be the stale answer V29
 					-- refuses one field over (SPEC V388d).
-					setField("armorDescription", L and L.notes or "");
+					setField(pfx .. "Description", L and L.notes or "");
 				end;
 
 				-- Nothing repaints the row from HERE (SPEC V357, B96). `self` on an inline handler
@@ -7535,8 +7621,8 @@
 			<edit name="edtMfWpn_rate" left="520" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
 			<label name="lblMfWpn_clip" left="610" top="177" width="80" height="20" text="Clip" visible="false"/>
 			<edit name="edtMfWpn_clip" left="610" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
-			<label name="lblMfWpn_conceal" left="700" top="177" width="80" height="20" text="Conceal" visible="false"/>
-			<edit name="edtMfWpn_conceal" left="700" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_conceal" left="700" top="177" width="280" height="20" text="Conceal" visible="false"/>
+			<comboBox name="edtMfWpn_conceal" left="700" top="199" width="280" height="24" visible="false"/>
 			<!-- The two cells of a CUSTOM armour (SPEC I157o). One row, so the pane closes one
 			     step higher than the weapon one does; the notes are the description editor the
 			     pane already has, and mfConfirm writes that text to armorDescription as well. -->
@@ -7640,8 +7726,8 @@
 			<edit name="edtMfWpn_rateB" left="520" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
 			<label name="lblMfWpn_clipB" left="610" top="177" width="80" height="20" text="Clip" visible="false"/>
 			<edit name="edtMfWpn_clipB" left="610" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
-			<label name="lblMfWpn_concealB" left="700" top="177" width="80" height="20" text="Conceal" visible="false"/>
-			<edit name="edtMfWpn_concealB" left="700" top="199" width="80" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
+			<label name="lblMfWpn_concealB" left="700" top="177" width="280" height="20" text="Conceal" visible="false"/>
+			<comboBox name="edtMfWpn_concealB" left="700" top="199" width="280" height="24" visible="false"/>
 			<!-- The two cells of a CUSTOM armour (SPEC I157o). One row, so the pane closes one
 			     step higher than the weapon one does; the notes are the description editor the
 			     pane already has, and mfConfirm writes that text to armorDescription as well. -->

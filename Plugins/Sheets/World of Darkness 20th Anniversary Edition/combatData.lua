@@ -165,11 +165,11 @@ local WEAPON_DATA = {
 	},
 	["Clinch"] = {
 		en = { roll = "Str + Brawl", diff = "6", damage = "Str (C)", range = "-", rate = "-", clip = "-", conceal = "-" },
-		pt = { roll = "For + Briga", diff = "6", damage = "For (C)", range = "-", rate = "-", clip = "-", conceal = "-" },
+		pt = { roll = "For + Briga", diff = "6", damage = "For (P)", range = "-", rate = "-", clip = "-", conceal = "-" },
 	},
 	["Clinch (Dark Ages)"] = {
 		en = { roll = "Dex + Brawl", diff = "6", damage = "Str (C)", range = "-", rate = "-", clip = "-", conceal = "-" },
-		pt = { roll = "Des + Briga", diff = "6", damage = "For (C)", range = "-", rate = "-", clip = "-", conceal = "-" },
+		pt = { roll = "Des + Briga", diff = "6", damage = "For (P)", range = "-", rate = "-", clip = "-", conceal = "-" },
 	},
 	["Club"] = {
 		en = { roll = "Dex + Melee", diff = "6", damage = "Str + 2 (B)", range = "-", rate = "-", clip = "-", conceal = "T" },
@@ -337,7 +337,7 @@ local WEAPON_DATA = {
 	},
 	["Hold"] = {
 		en = { roll = "Str + Brawl", diff = "6", damage = "None (C)", range = "-", rate = "-", clip = "-", conceal = "-" },
-		pt = { roll = "For + Briga", diff = "6", damage = "Nenhum (C)", range = "-", rate = "-", clip = "-", conceal = "-" },
+		pt = { roll = "For + Briga", diff = "6", damage = "Nenhum (P)", range = "-", rate = "-", clip = "-", conceal = "-" },
 	},
 	["Hook Sword(s)"] = {
 		en = { roll = "Dex + Melee", diff = "7", damage = "Str + 3 (L)", range = "-", rate = "-", clip = "-", conceal = "T" },

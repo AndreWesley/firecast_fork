@@ -61,9 +61,12 @@
 				paintWillpower(form);
 			end;
 
-			-- SPEC I157g, T1005. The twelve picker buttons of this tab - eleven Attack rows and
-			-- the ARMOR Class - carry no text of their own: mfLabel writes what the slot holds, or
-			-- the Select line when it holds nothing, which is why they are dyn* (SPEC V31, I107a2).
+			-- SPEC I157g, T1005, I159c. The THIRTEEN picker buttons of this tab - eleven Attack
+			-- rows, the ARMOR Class and the SHIELD Class - carry no text of their own: mfLabel
+			-- writes what the slot holds, or the Select line when it holds nothing, which is why
+			-- they are dyn* (SPEC V31, I107a2). mfLabel also SHRINKS the font when the name is
+			-- wider than the button (fitSize, WoD20th.lfm:5956) - which is the whole answer to
+			-- the 150px Class button the 15th batch left behind (SPEC I159f, Q79.2).
 			--
 			-- The bound is ATTACK_ROWS, declared on the ROOT form beside every other row count
 			-- of this sheet (SPEC I157g, V204, V383b). A LITERAL here would be B112: it does not
@@ -75,6 +78,7 @@
 				local names = {};
 
 				names["dynarmorClass"] = true;
+				names["dynshieldClass"] = true;
 
 				for i = 1, ATTACK_ROWS, 1 do names["dynattack_" .. i] = true; end;
 
@@ -89,6 +93,63 @@
 				end;
 
 				mfLabel(found["dynarmorClass"], sheet.armorClass, "Select Armor", lang);
+				mfLabel(found["dynshieldClass"], sheet.shieldClass, "Select Shield", lang);
+
+				-- The CELLS follow the language too, and until the 14th batch they did not: the
+				-- name is a label mfLabel repaints on every walk, but Roll/Damage/Conceal are
+				-- SAVED DATA written once, in whatever language was in force when the row was
+				-- picked. The user found it exactly there - "muda o idioma, o nome do picker e
+				-- traduzido, mas os outros campos nao" (SPEC Q78.2, I158f, V465).
+				--
+				-- This is the SECOND writer of those ten fields and there is no third (SPEC
+				-- V465c): mfConfirm writes them when the row is chosen, this rewrites them when
+				-- the language moves. setField is guarded, so a walk that changes nothing writes
+				-- nothing (WoD20th.lfm:932) - which is what makes it safe on the attack_N
+				-- dataLink as well, where it lands on the values mfConfirm just wrote.
+				--
+				-- The TEST is the module key, never a flag: a custom row carries a name the book
+				-- never had, so data.weapon[name] is nil and the row is left alone. Rewriting it
+				-- would delete what the player typed on the first language switch (SPEC V2, V465b).
+				local any = (sheet.armorClass or "") ~= "" or (sheet.shieldClass or "") ~= "";
+
+				for i = 1, ATTACK_ROWS, 1 do
+					if (sheet["attack_" .. i] or "") ~= "" then any = true; end;
+				end;
+
+				-- An EMPTY combat tab pays nothing: the module is 60KB of book data and a sheet
+				-- with no weapon on it has no cell to derive (SPEC B30 - this runs on every open).
+				if not any then return; end;
+
+				local data = require("combatData.lua");
+
+				for i = 1, ATTACK_ROWS, 1 do
+					local e = data.weapon[sheet["attack_" .. i] or ""];
+
+					if e ~= nil then
+						local L = e[lang];
+
+						for k = 1, #MF_WPN_CELL, 1 do
+							setField(MF_WPN_CELL[k][1] .. i, L[MF_WPN_CELL[k][2]]);
+						end;
+					end;
+				end;
+
+				-- Both protection boxes read the SAME table and the same prefix rule mfConfirm
+				-- uses, so shield and armour cannot drift apart (SPEC I159c, V466d).
+				for p = 1, 2, 1 do
+					local pfx = (p == 1) and "armor" or "shield";
+					local e = data.armor[sheet[pfx .. "Class"] or ""];
+
+					if e ~= nil then
+						local L = e[lang];
+
+						for k = 1, #MF_ARM_CELL, 1 do
+							setField(pfx .. MF_ARM_CELL[k][1], L[MF_ARM_CELL[k][2]]);
+						end;
+
+						setField(pfx .. "Description", L.notes or "");
+					end;
+				end;
 			end;
 		]]>
 	</script>
@@ -182,69 +243,84 @@
 		     comment in there takes the next line with it (SPEC B19). -->
 		<template name="Attack">
 			<button name="btnQattack_$(num)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Weapon', sheet['attack_$(num)'], nil, 'attack_$(num)');"/>
-			<button name="dynattack_$(num)" left="20" top="0" width="200" height="24" text="Select Weapon" onClick="mfOpen(self, 'attack_$(num)', 'weapon', 'Weapon');"/>
-			<edit name="edtattack_$(num)" left="20" top="0" width="200" height="24" field="attack_$(num)" visible="false" enabled="false"/>
-			<edit left="220" top="0" width="100" height="24" field="roll_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-			<edit left="320" top="0" width="50" height="24" field="difficulty_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-			<edit left="370" top="0" width="90" height="24" field="damage_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-			<edit left="460" top="0" width="50" height="24" field="range_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-			<edit left="510" top="0" width="50" height="24" field="rate_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-			<edit left="560" top="0" width="50" height="24" field="clip_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-			<edit left="610" top="0" width="70" height="24" field="conceal_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<button name="dynattack_$(num)" left="20" top="0" width="345" height="24" text="Select Weapon" onClick="mfOpen(self, 'attack_$(num)', 'weapon', 'Weapon');"/>
+			<edit name="edtattack_$(num)" left="20" top="0" width="345" height="24" field="attack_$(num)" visible="false" enabled="false"/>
+			<edit left="365" top="0" width="170" height="24" field="roll_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<edit left="535" top="0" width="50" height="24" field="difficulty_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<edit left="585" top="0" width="90" height="24" field="damage_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<edit left="675" top="0" width="50" height="24" field="range_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<edit left="725" top="0" width="50" height="24" field="rate_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<edit left="775" top="0" width="50" height="24" field="clip_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<edit left="825" top="0" width="70" height="24" field="conceal_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 		</template>
 
-		<!-- 660 wide to close on VIRTUES, 320 tall to close on COMBAT TRAITS (SPEC T145). Each
-		     header label is as wide as its column and centred on it, so the titles sit over the
-		     fields instead of hugging their left edge. One label per column, no padding runs (V11). -->
-		<layout left="0" top="0" width="750" height="351">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="710" height="20" text="COMBAT" horzTextAlign="center"/>
+		<!-- 965 wide since the 15th batch: ARMOR gave up a quarter of its width so SHIELD could
+		     sit beside it, which pushed the middle column and HEALTH right, and COMBAT TRAITS
+		     followed HEALTH to stay aligned - so the top band had 215px of new room and the user
+		     asked for it here (SPEC I159d, I159e, V467, user 2026-09-07). The two bands now close
+		     on the SAME 1290, which is what V467 measures and nothing measured before.
 
-			<label left="35" top="36" width="220" height="20" text="Weapon/Attack" horzTextAlign="center"/>
-			<label left="255" top="36" width="100" height="20" text="Roll" horzTextAlign="center"/>
-			<label left="355" top="36" width="50" height="20" text="Diff." horzTextAlign="center"/>
-			<label left="405" top="36" width="90" height="20" text="Damage" horzTextAlign="center"/>
-			<label left="495" top="36" width="50" height="20" text="Range" horzTextAlign="center"/>
-			<label left="545" top="36" width="50" height="20" text="Rate" horzTextAlign="center"/>
-			<label left="595" top="36" width="50" height="20" text="Clip" horzTextAlign="center"/>
-			<label left="645" top="36" width="65" height="20" text="Conceal" horzTextAlign="center"/>
+		     Each header label is as wide as its column and centred on it, so the titles sit over
+		     the fields instead of hugging their left edge. One label per column, no padding
+		     runs (V11). The 215 went to TWO columns and the ruler is 6.5px per character against
+		     the longest value the TSV holds (SPEC V312, V468d): Roll 100 -> 170 for
+		     `Des + Briga/Armas Brancas`, and the picker button 200 -> 345 for
+		     `Escopeta Semiautomatica (Mago)`. Damage stayed at 90 because the user looked at it
+		     and said so (SPEC Q79.3) - which is why V468d carries no floor for it. -->
+		<layout left="0" top="0" width="965" height="351">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="925" height="20" text="COMBAT" horzTextAlign="center"/>
+
+			<label left="35" top="36" width="365" height="20" text="Weapon/Attack" horzTextAlign="center"/>
+			<label left="400" top="36" width="170" height="20" text="Roll" horzTextAlign="center"/>
+			<label left="570" top="36" width="50" height="20" text="Diff." horzTextAlign="center"/>
+			<label left="620" top="36" width="70" height="20" text="Damage" horzTextAlign="center"/>
+			<!-- The legend of the Damage codes, the twin of the Conceal one below and the same
+			     shape: a ? with a FIXED key and no row behind it (SPEC I158e, V464b, R157, user
+			     2026-09-07 ask 5). The label gave up twenty pixels so the two close on 710, which
+			     is where the Range column starts. -->
+			<button name="btnQdamage" left="690" top="36" width="20" height="20" text="?" onClick="popOpen(self, 'Weapon', 'Damage', nil, nil);"/>
+			<label left="710" top="36" width="50" height="20" text="Range" horzTextAlign="center"/>
+			<label left="760" top="36" width="50" height="20" text="Rate" horzTextAlign="center"/>
+			<label left="810" top="36" width="50" height="20" text="Clip" horzTextAlign="center"/>
+			<label left="860" top="36" width="65" height="20" text="Conceal" horzTextAlign="center"/>
 			<!-- The legend of the Conceal letters, and it is a ? with a FIXED key and no row
 			     behind it - the shape of btnQFaith on WoD20.7 (SPEC I157p, V461a, R154, user
-			     2026-09-07 ask 4). The label gave up five pixels so the two close on 730, which
-			     is the box's content edge (750 - 20, SPEC I73). -->
-			<button name="btnQconceal" left="710" top="36" width="20" height="20" text="?" onClick="popOpen(self, 'Weapon', 'Conceal', nil, nil);"/>
+			     2026-09-07 ask 4). The label gave up five pixels so the two close on 945, which
+			     is the box's content edge (965 - 20, SPEC I73). -->
+			<button name="btnQconceal" left="925" top="36" width="20" height="20" text="?" onClick="popOpen(self, 'Weapon', 'Conceal', nil, nil);"/>
 
-			<layout left="35" top="61" width="680" height="25" >
+			<layout left="35" top="61" width="895" height="25" >
 				<Attack num="1"/>
 			</layout>
-			<layout left="35" top="86" width="680" height="25" >
+			<layout left="35" top="86" width="895" height="25" >
 				<Attack num="2"/>
 			</layout>
-			<layout left="35" top="111" width="680" height="25" >
+			<layout left="35" top="111" width="895" height="25" >
 				<Attack num="3"/>
 			</layout>
-			<layout left="35" top="136" width="680" height="25" >
+			<layout left="35" top="136" width="895" height="25" >
 				<Attack num="4"/>
 			</layout>
-			<layout left="35" top="161" width="680" height="25" >
+			<layout left="35" top="161" width="895" height="25" >
 				<Attack num="5"/>
 			</layout>
-			<layout left="35" top="186" width="680" height="25" >
+			<layout left="35" top="186" width="895" height="25" >
 				<Attack num="6"/>
 			</layout>
-			<layout left="35" top="211" width="680" height="25" >
+			<layout left="35" top="211" width="895" height="25" >
 				<Attack num="7"/>
 			</layout>
-			<layout left="35" top="236" width="680" height="25" >
+			<layout left="35" top="236" width="895" height="25" >
 				<Attack num="8"/>
 			</layout>
-			<layout left="35" top="261" width="680" height="25" >
+			<layout left="35" top="261" width="895" height="25" >
 				<Attack num="9"/>
 			</layout>
-			<layout left="35" top="286" width="680" height="25" >
+			<layout left="35" top="286" width="895" height="25" >
 				<Attack num="10"/>
 			</layout>
-			<layout left="35" top="311" width="680" height="25" >
+			<layout left="35" top="311" width="895" height="25" >
 				<Attack num="11"/>
 			</layout>
 		</layout>
@@ -254,35 +330,93 @@
 			(SPEC T87 / V35).
 
 			One input column: all three rows put their edit at x=75 (SPEC V26 / B.12).
+
+			420 -> 315 in the 15th batch, a quarter off the WIDTH and not a pixel off the height:
+			a character wears armour AND carries a shield, so SHIELD had to fit beside this box
+			and the user asked for the two to be the same size (SPEC I159d, Q79.1, user
+			2026-09-07 ask 1-2). The height is untouched because the notes editor needs it and
+			because this box closes at 597 together with the VIRTUES+WILLPOWER column beside it.
+
+			The price is paid by the NAME: the Class button is 150 wide now and the longest PT
+			armour name wants 292 (SPEC I159f, Q79.2). Nothing here fixes that - fitSize does,
+			from mfLabel, dropping the font to its floor of 7 (WoD20th.lfm:5956) - and the user
+			took that trade knowing the longest name still loses about one character to it. The
+			whole name is one click away, in the picker and in the ? beside it.
 		-->
-		<layout left="0" top="356" width="420" height="241">
+		<layout left="0" top="356" width="315" height="241">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="380" height="20" text="ARMOR" horzTextAlign="center"/>
+			<label left="20" top="15" width="275" height="20" text="ARMOR" horzTextAlign="center"/>
 
 			<!-- Class became a PICKER in the 13th batch (SPEC I157b, T1005). It opens at the
 			     STANDARD size, with the description pane and the Armor module: without a module
-			     the pane would say "No description available" for all thirty-three book entries,
+			     the pane would say "No description available" for all twenty-nine book entries,
 			     which is the complaint I151a exists over - and the Custom pane needs that editor
-			     to take the notes in (SPEC Q77.3, I157o). There is NO ? in this box: the user
-			     asked for the ? in COMBAT only, and the pane inside the picker is another
-			     thing (SPEC I157l, V455c). -->
-			<layout left="35" top="36" width="350" height="25" >
+			     to take the notes in (SPEC Q77.3, I157o).
+
+			     The ? arrived in the 14th batch and REVERSED what stood here: the user had asked
+			     for it in COMBAT only, then asked for it here too (SPEC I158d, V464a, user
+			     2026-09-07 ask 4). It is the shape btnQattack_$(num) already wears - the key is
+			     whatever name the row holds - and the button gave up its last twenty pixels so
+			     the pair still closes at 350, where Rating and Penalty close. -->
+			<layout left="35" top="36" width="245" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Class" horzTextAlign="trailing"/>
-				<button name="dynarmorClass" left="75" top="0" width="275" height="25" text="Select Armor" onClick="mfOpen(self, 'armorClass', 'armor', 'Armor');"/>
-				<edit name="edtarmorClass" left="75" top="0" width="275" height="25" field="armorClass" visible="false" enabled="false"/>
+				<button name="dynarmorClass" left="75" top="0" width="150" height="25" text="Select Armor" onClick="mfOpen(self, 'armorClass', 'armor', 'Armor');"/>
+				<edit name="edtarmorClass" left="75" top="0" width="150" height="25" field="armorClass" visible="false" enabled="false"/>
+				<button name="btnQarmorClass" left="225" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Armor', sheet['armorClass'], nil, 'armorClass');"/>
 			</layout>
-			<layout left="35" top="61" width="350" height="25" >
+			<layout left="35" top="61" width="245" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Rating" horzTextAlign="trailing"/>
-				<edit left="75" top="0" width="275" height="25" field="armorRating" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+				<edit left="75" top="0" width="170" height="25" field="armorRating" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 			</layout>
-			<layout left="35" top="86" width="350" height="25" >
+			<layout left="35" top="86" width="245" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Penalty" horzTextAlign="trailing"/>
-				<edit left="75" top="0" width="275" height="25" field="armorPenalty" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+				<edit left="75" top="0" width="170" height="25" field="armorPenalty" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 			</layout>
 
 			<!-- readOnly and NO opacity: opacity on a TextControl dims the TEXT itself away
 			     (SPEC V241, I157k), so this one pays for the lock with the lock alone. -->
-			<textEditor left="35" top="116" width="350" height="110" field="armorDescription" readOnly="true"/>
+			<textEditor left="35" top="116" width="245" height="110" field="armorDescription" readOnly="true"/>
+		</layout>
+
+		<!--
+			SHIELD, and it is ARMOR with one letter of the field name changed (SPEC I159a, V466,
+			user 2026-09-07 ask 1: "voce pode usar uma armadura e um escudo ao mesmo tempo").
+			Same size as ARMOR because the user asked for that in the same breath, and same
+			shape row for row so nothing here is a second way of doing what the box beside it
+			already does.
+
+			What is NOT duplicated is the DATA: combatData.armor still holds all thirty-three
+			entries and descArmor_* still describes all thirty-three, because a shield reads the
+			same columns an armour does. Only the LIST splits, on the `kind` column of
+			research/armor.tsv, so ARMOR cannot offer a shield and SHIELD cannot offer a jacket
+			(SPEC I159b, V466c). That is why mfOpen gets the list `shield` and the module
+			`Armor`: they have been separate arguments since I157h.
+
+			Four NEW data fields - the first this tab has taken since the third round (SPEC I3,
+			I159a). A sheet saved before today opens with them empty and nothing has to migrate,
+			which is the whole of V2 here.
+		-->
+		<layout left="320" top="356" width="315" height="241">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="275" height="20" text="SHIELD" horzTextAlign="center"/>
+
+			<layout left="35" top="36" width="245" height="25" >
+				<label left="0" top="5" width="70" height="20" text="Class" horzTextAlign="trailing"/>
+				<button name="dynshieldClass" left="75" top="0" width="150" height="25" text="Select Shield" onClick="mfOpen(self, 'shieldClass', 'shield', 'Armor');"/>
+				<edit name="edtshieldClass" left="75" top="0" width="150" height="25" field="shieldClass" visible="false" enabled="false"/>
+				<button name="btnQshieldClass" left="225" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Armor', sheet['shieldClass'], nil, 'shieldClass');"/>
+			</layout>
+			<layout left="35" top="61" width="245" height="25" >
+				<label left="0" top="5" width="70" height="20" text="Rating" horzTextAlign="trailing"/>
+				<edit left="75" top="0" width="170" height="25" field="shieldRating" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			</layout>
+			<layout left="35" top="86" width="245" height="25" >
+				<label left="0" top="5" width="70" height="20" text="Penalty" horzTextAlign="trailing"/>
+				<edit left="75" top="0" width="170" height="25" field="shieldPenalty" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			</layout>
+
+			<!-- readOnly and NO opacity, for the reason the ARMOR one carries (SPEC V241). -->
+			<textEditor left="35" top="116" width="245" height="110" field="shieldDescription" readOnly="true"/>
 		</layout>
 
 		<!--
@@ -293,7 +427,7 @@
 			(SPEC I3 ESPELHOS, V36). Spending willpower is what a player does mid-fight; raising
 			the permanent rating is not.
 		-->
-		<layout left="425" top="487" width="325" height="110">
+		<layout left="640" top="487" width="325" height="110">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="285" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
@@ -321,7 +455,7 @@
 		     (SPEC V49), so the file declares the tallest this box can ever be.
 		     top=356 opens this box on the same line as ARMOR and VIRTUES - the second row of the
 		     tab starts 5 under the first one, which now closes at 351 (SPEC V418c, V298). -->
-		<layout name="dynHealth3_box" left="755" top="356" width="320" height="325">
+		<layout name="dynHealth3_box" left="970" top="356" width="320" height="325">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- The track length lives on the storyteller's tab since the 82nd round (SPEC I35,
 			     V234). The title spans the box now, so it is centred on the box. -->
@@ -344,7 +478,7 @@
 			x=670), so it is 270 wide, not 280: 390+270 leaves the same 10px gutter on both sides.
 			The rows lose 5px of indent to keep the 250px template inside the narrower box.
 		-->
-		<layout left="425" top="356" width="325" height="126">
+		<layout left="640" top="356" width="325" height="126">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="285" height="20" text="VIRTUES" horzTextAlign="center"/>
 
@@ -370,7 +504,7 @@
 			Attributes show five dots with the first always lit, matching the Attribute template
 			where dot 1 is a fixed image and only `_2`..`_5` are real fields.
 		-->
-		<layout left="755" top="0" width="320" height="351">
+		<layout left="970" top="0" width="320" height="351">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="280" height="20" text="COMBAT TRAITS" horzTextAlign="center"/>
 
@@ -408,7 +542,7 @@
 	     a row added to either of the two above, for the reason the comment up there gives: the
 	     health track and the trait mirror watch different things, and this one watches the
 	     twelve slots plus the language. -->
-	<dataLink fields="{'language', 'attack_1', 'attack_2', 'attack_3', 'attack_4', 'attack_5', 'attack_6', 'attack_7', 'attack_8', 'attack_9', 'attack_10', 'attack_11', 'armorClass'}" onChange="renderCombatButtons(self);"/>
+	<dataLink fields="{'language', 'attack_1', 'attack_2', 'attack_3', 'attack_4', 'attack_5', 'attack_6', 'attack_7', 'attack_8', 'attack_9', 'attack_10', 'attack_11', 'armorClass', 'shieldClass'}" onChange="renderCombatButtons(self);"/>
 
 	<event name="onNodeReady">
 		renderHealthTrack(self, 'dynHealth3_');

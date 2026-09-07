@@ -2278,6 +2278,8 @@
 				["Wooden Shield"] = "Escudo de Madeira",
 				["Select Weapon"] = "Selecionar Arma",
 				["Select Armor"] = "Selecionar Armadura",
+				["Select Shield"] = "Selecionar Escudo",
+				["SHIELD"] = "ESCUDO",
 			};
 
 			-- PT is local to this file, but text written by Lua lives on other tabs too - the

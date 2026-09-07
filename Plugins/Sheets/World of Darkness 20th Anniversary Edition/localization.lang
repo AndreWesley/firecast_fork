@@ -2292,6 +2292,8 @@ wod.Trashcan Lid=Tampa de Lata de Lixo (Lobisomem)
 wod.Wooden Shield=Escudo de Madeira
 wod.Select Weapon=Selecionar Arma
 wod.Select Armor=Selecionar Armadura
+wod.Select Shield=Selecionar Escudo
+wod.SHIELD=ESCUDO
 [en]
 wod.Select Merit=Select Merit
 wod.Select Flaw=Select Flaw
@@ -4569,3 +4571,5 @@ wod.Trashcan Lid=Trashcan Lid
 wod.Wooden Shield=Wooden Shield
 wod.Select Weapon=Select Weapon
 wod.Select Armor=Select Armor
+wod.Select Shield=Select Shield
+wod.SHIELD=SHIELD

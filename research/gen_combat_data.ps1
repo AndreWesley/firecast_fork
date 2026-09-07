@@ -4,15 +4,16 @@
 # ANSI, e um literal acentuado chegaria mojibake DENTRO DO TEXTO QUE O JOGADOR LE, sem erro.
 #
 # gen_combat_data.ps1 - monta o dado dos 2 pickers de COMBAT a partir de research/weapon.tsv
-# (17 colunas, 189 armas) e research/armor.tsv (8 colunas, 33 armaduras). SPEC T1004, I157c,
-# I157d, I157h, I157i, I157p, R151, R152, R154.
+# (17 colunas, 189 armas) e research/armor.tsv (9 colunas, 33 protecoes: 29 armor + 4 shield,
+# partidas pela coluna kind). SPEC T1004, T1012, T1019, I157c, I157d, I157h, I157i, I157p,
+# I158a, I158e, I159b, R151, R152, R154, R157, R159.
 #
 #   -OutDir\combatData.lua      WEAPON_DATA / ARMOR_DATA (SPEC I157d), CRLF como meritData.lua
 #   -OutDir\descWeapon_en.lua   as 3 caixas de SPEC I21, 1 entrada por arma  (LF, SPEC V345)
 #   -OutDir\descWeapon_pt.lua   idem                                          + a chave Conceal
 #   -OutDir\descArmor_en.lua    1 entrada por armadura                        (LF)
 #   -OutDir\descArmor_pt.lua    idem
-#   -OutDir\picker_combat.txt   os 2 blocos de PICKER_LIST p/ WoD20th.lfm
+#   -OutDir\picker_combat.txt   os 3 blocos de PICKER_LIST p/ WoD20th.lfm (weapon/armor/shield)
 #   -OutDir\lang_pt.txt         as linhas wod.<nome>=<pt> da secao [pt]
 #   -OutDir\lang_en.txt         as linhas wod.<nome>=<nome> da secao [en]
 #   -OutDir\ptmap.txt           as linhas ["<en>"] = "<pt>", do mapa PT de WoD20.6.lfm
@@ -50,14 +51,54 @@ $W_LAB_PT = @('Parada', 'Dificuldade', 'Dano', 'Alcance',
 $A_LAB_EN = @('Rating', 'Penalty', 'Notes')
 $A_LAB_PT = @('Valor', 'Penalidade', 'Notas')
 
-# A LEGENDA do ? do cabecalho (SPEC I157p, R154, V461). Ela tem de explicar TODA letra que a
-# coluna conceal/conceal_pt usa - inclusive `varies`/`varia`, senao o ? fica sem resposta p/
-# a unica linha que a carrega.
-$LEGEND_EN = ('P = Pocket' + $MID + 'J = Jacket' + $MID + 'T = Trenchcoat' + $MID +
-              'N = Cannot be concealed. Dark Ages: C = loose Clothing' + $MID +
-              'L = Long cloak. varies = depends on the item.')
-$LEGEND_PT = ('B = Bolsa' + $MID + 'R = Roupa Solta' + $MID + 'M = Manto Longo' + $MID +
-              'N = N' + [char]0xE3 + 'o Pode Ser Escondido. varia = depende do item.')
+# As 2 LEGENDAS dos ? de chave FIXA do cabecalho (SPEC I158a, I158e, I159, V462). UMA OPCAO
+# POR LINHA, com 1 linha em branco entre duas - foi o pedido do user de 2026-09-07 e e o que
+# V462a mede. Cada linha e "<codigo> = <texto>" e NENHUMA junta 2 opcoes: o - e o varies/varia
+# contam como valor e tem linha propria (V462b), senao o ? fica sem resposta para as celulas
+# que os carregam. Este mapa e o UNICO dono do texto (V462d): o dropdown de Conceal do painel
+# custom monta a lista PARTINDO estas mesmas linhas em runtime (I158b), nao ha 2a copia.
+$SEP = "`n`n"
+$LEGEND_EN = (@(
+    'P = Pocket'
+    'J = Jacket'
+    'T = Trenchcoat'
+    'N = Cannot be concealed'
+    'C = Loose Clothing (Dark Ages)'
+    'L = Long Cloak (Dark Ages)'
+    'varies = Varies with the item'
+    '- = The book gives no value'
+) -join $SEP)
+$LEGEND_PT = (@(
+    'B = Bolsa'
+    'R = Roupa Solta'
+    'M = Manto Longo'
+    ('N = N' + [char]0xE3 + 'o Pode Ser Escondido')
+    'varia = Depende do item'
+    ('- = O livro n' + [char]0xE3 + 'o d' + [char]0xE1 + ' valor')
+) -join $SEP)
+# A legenda do ? de Damage (SPEC I158e, R157). O codigo e o que vem entre parenteses na coluna
+# damage/damage_pt. Em PT o B de bashing virou C de contusao (I157p) e o C do agarrao virou P
+# de Persiste, senao o C valeria 2 coisas na mesma legenda (Q78.1, V462c).
+$DMG_EN = (@(
+    'B = Bashing damage'
+    'L = Lethal damage'
+    'A = Aggravated damage'
+    'K = Knockdown: the target falls'
+    "R = Reduces the opponent's attack successes"
+    'C = Clinch: carries over on successive turns'
+    'fire = Fire damage: see the Explosives chart'
+    '- = The book gives no value'
+) -join $SEP)
+$DMG_PT = (@(
+    ('C = Dano de Contus' + [char]0xE3 + 'o')
+    'L = Dano Letal'
+    'A = Dano Agravado'
+    'K = Derrubada: o alvo cai'
+    'R = Reduz os sucessos de ataque do oponente'
+    ('P = Agarr' + [char]0xE3 + 'o: continua nos turnos seguintes')
+    'fogo = Dano de Fogo: ver a tabela de Explosivos'
+    ('- = O livro n' + [char]0xE3 + 'o d' + [char]0xE1 + ' valor')
+) -join $SEP)
 
 # ReadAllLines com UTF8 explicito: Get-Content do PS 5.1 cai em ANSI e devolveria os acentos
 # das colunas _pt como mojibake, sem erro. A 1a linha nomeia as colunas - nenhuma
@@ -93,8 +134,9 @@ foreach ($w in $weapons) {
     if (-not $TITLE.ContainsKey($w.book)) { throw "weapon.tsv: '$($w.name)' cita o livro '$($w.book)', fora da tabela de research/README.md" }
 }
 foreach ($a in $armors) {
-    foreach ($k in @('name', 'book', 'page', 'rating', 'penalty', 'name_pt')) { if ($a.$k -eq $null -or $a.$k -eq '') { throw "armor.tsv: '$($a.name)' tem a coluna '$k' vazia" } }
+    foreach ($k in @('name', 'kind', 'book', 'page', 'rating', 'penalty', 'name_pt')) { if ($a.$k -eq $null -or $a.$k -eq '') { throw "armor.tsv: '$($a.name)' tem a coluna '$k' vazia" } }
     if (-not $TITLE.ContainsKey($a.book)) { throw "armor.tsv: '$($a.name)' cita o livro '$($a.book)', fora da tabela de research/README.md" }
+    if ($a.kind -ne 'armor' -and $a.kind -ne 'shield') { throw "armor.tsv: '$($a.name)' tem kind '$($a.kind)', fora de armor|shield" }
 }
 foreach ($pair in @(@('weapon.tsv', $weapons), @('armor.tsv', $armors))) {
     $d = @($pair[1] | Group-Object name | Where-Object Count -gt 1)
@@ -221,23 +263,30 @@ foreach ($kind in @('Weapon', 'Armor')) {
             $o.Add(("`t`t`t`t`t{0} = [==[{1}]==]," -f $lang, (Blocks $it.book $it.page $it.name $lang $body)))
             $o.Add("`t`t`t`t},")
         }
-        # A chave EXTRA de descWeapon_*: a LEGENDA do ? do cabecalho Conceal (SPEC I157p, V461b).
-        # Ela e a UNICA chave dos 2 modulos fora de PICKER_LIST["weapon"] - o ? do cabecalho nao
-        # tem linha, entao a chave e FIXA e nao um nome de arma.
+        # As 2 chaves EXTRA de descWeapon_*: as LEGENDAS dos ? de cabecalho Conceal e Damage
+        # (SPEC I157p, I158e, V461b, V464c). Sao as UNICAS 2 chaves dos 2 modulos fora de
+        # PICKER_LIST["weapon"] - um ? de cabecalho nao tem linha atras dele, entao a chave e
+        # FIXA e nao um nome de arma. descArmor_* segue com ZERO delas.
         if ($kind -eq 'Weapon') {
-            $lg = if ($lang -eq 'en') { $LEGEND_EN } else { $LEGEND_PT }
-            $bk = if ($lang -eq 'en') { 'core' } else { 'ca' }
-            $pp = if ($lang -eq 'en') { '281' } else { '330' }
-            $o.Add("`t`t`t`t[""Conceal""] = {")
-            $o.Add(("`t`t`t`t`t{0} = [==[{1}]==]," -f $lang, (Blocks $bk $pp 'Conceal' $lang $lg)))
-            $o.Add("`t`t`t`t},")
+            $fixed = @(
+                @{ Key = 'Conceal'; En = $LEGEND_EN; Pt = $LEGEND_PT; BkEn = 'core'; PgEn = '281'; BkPt = 'ca';   PgPt = '330' },
+                @{ Key = 'Damage';  En = $DMG_EN;    Pt = $DMG_PT;    BkEn = 'core'; PgEn = '279'; BkPt = 'core'; PgPt = '279' }
+            )
+            foreach ($f in $fixed) {
+                $lg = if ($lang -eq 'en') { $f.En }   else { $f.Pt }
+                $bk = if ($lang -eq 'en') { $f.BkEn } else { $f.BkPt }
+                $pp = if ($lang -eq 'en') { $f.PgEn } else { $f.PgPt }
+                $o.Add(("`t`t`t`t[""{0}""] = {{" -f $f.Key))
+                $o.Add(("`t`t`t`t`t{0} = [==[{1}]==]," -f $lang, (Blocks $bk $pp $f.Key $lang $lg)))
+                $o.Add("`t`t`t`t},")
+            }
         }
         $o.Add("`t`t`t`t-- <<< $($kind.ToUpperInvariant())_DESC_END")
         $o.Add('};')
         # LF, a forma da CASA dos modulos de descricao, inclusive DENTRO do literal [==[ ]==]
         # (SPEC V345, B87). Misturar CRLF aqui nao muda 1 char de texto e faz o diff mentir.
         [IO.File]::WriteAllText("$OutDir\desc$($kind)_$lang.lua", (($o -join "`n") + "`n"), $U8)
-        "desc$($kind)_$lang.lua : $($list.Count) entradas$(if ($kind -eq 'Weapon') { ' + Conceal' } else { '' })"
+        "desc$($kind)_$lang.lua : $($list.Count) entradas$(if ($kind -eq 'Weapon') { ' + Conceal + Damage' } else { '' })"
     }
 }
 
@@ -256,9 +305,18 @@ function PickerBlock([string]$key, $list) {
     $o.Add('				},')
     return $o
 }
+# TRES blocos desde o 15o lote (SPEC I159b, V466c): a coluna kind parte a lista de protecao em
+# armor e shield, e quem separa e a LISTA - combatData.armor e descArmor_* seguem com as 33
+# entradas inteiras, porque escudo e armadura leem o mesmo dado e a mesma descricao. Item em 2
+# listas seria escolha dupla para 1 objeto, e a interseccao vazia e o que V466c mede.
+$shSorted = @($aSorted | Where-Object { $_.kind -eq 'shield' })
+$arSorted = @($aSorted | Where-Object { $_.kind -eq 'armor'  })
+if (($shSorted.Count + $arSorted.Count) -ne $aSorted.Count) { throw 'armor.tsv: kind fora de armor|shield' }
+"protecao ..: $($arSorted.Count) armor + $($shSorted.Count) shield = $($aSorted.Count)"
 $pk = New-Object System.Collections.Generic.List[string]
-foreach ($x in (PickerBlock 'weapon' $wSorted)) { $pk.Add($x) }
-foreach ($x in (PickerBlock 'armor'  $aSorted)) { $pk.Add($x) }
+foreach ($x in (PickerBlock 'weapon' $wSorted))  { $pk.Add($x) }
+foreach ($x in (PickerBlock 'armor'  $arSorted)) { $pk.Add($x) }
+foreach ($x in (PickerBlock 'shield' $shSorted)) { $pk.Add($x) }
 [IO.File]::WriteAllText("$OutDir\picker_combat.txt", (($pk -join "`r`n") + "`r`n"), $U8)
 "picker_combat.txt .: $($pk.Count) linhas"
 
@@ -273,10 +331,14 @@ foreach ($l in [IO.File]::ReadAllLines($Map, [Text.Encoding]::UTF8)) {
 }
 $pairs = New-Object System.Collections.Generic.List[psobject]
 foreach ($it in @($wSorted + $aSorted)) { $pairs.Add([pscustomobject]@{ En = $it.name; Pt = $it.name_pt }) }
-# SPEC I157i/V459: os 2 titulos das caixas sao chave como qualquer nome, e a string e a MESMA
-# que mfOpen deriva de `weapon`/`armor` (SPEC I113a).
+# SPEC I157i/V459: os 3 rotulos de "vazio" sao chave como qualquer nome, e a string e a MESMA
+# que mfOpen deriva de `weapon`/`armor`/`shield` (SPEC I113a). SHIELD entra junto: o TITULO da
+# caixa e rotulo como qualquer outro e passa pelo mesmo mapa (SPEC V10, V28, I159a) - ARMOR,
+# COMBAT e VIRTUES ja estao la desde sempre, e o gerador PULA quem ja esta.
 $pairs.Add([pscustomobject]@{ En = 'Select Weapon'; Pt = 'Selecionar Arma' })
 $pairs.Add([pscustomobject]@{ En = 'Select Armor';  Pt = 'Selecionar Armadura' })
+$pairs.Add([pscustomobject]@{ En = 'Select Shield'; Pt = 'Selecionar Escudo' })
+$pairs.Add([pscustomobject]@{ En = 'SHIELD';        Pt = 'ESCUDO' })
 
 $skip = @()
 $clash = @()
