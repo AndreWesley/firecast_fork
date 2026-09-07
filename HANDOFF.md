@@ -1,6 +1,42 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - 190a rodada (2026-09-06, noite). **Pedido do user: as 10 CAIXAS de willpower gasto enchem/esvaziam em bloco. §T988 CONSTRUIDA & FECHADA (gate `-Build` VERDE; 4 mutacoes + 1 sonda RODADAS)**
+## COMECE AQUI - 191a rodada (2026-09-06/07, madrugada). **11o lote do user, 7 itens: `/ck:spec` + `/ck:build --all`. §T989 §T990 §T992 §T993 §T994 §T995 §T996 CONSTRUIDAS & FECHADAS (gate `-Build` VERDE; 17 mutacoes + 5 sondas RODADAS). §T991 CANCELADA pelo user. Depois, pedido avulso: §T997 (centragem) CONSTRUIDA & FECHADA (+2 mutacoes +2 sondas).**
+
+### **INSTALADO 2026-09-07 00:54:52** - `output/` & instalado nos MESMOS **2.823.795 B**. **2 installs nesta rodada, & o 2o foi COM O FIRECAST ABERTO a pedido explicito do user** ("instalar o rpk com o firecast aberto no final, apos as alteracoes") - o 1o foi as 00:22:38, offline, com 2.823.697 B, antes do §T997. §B103 segue valendo p/ o que NAO for pedido: com a ficha carregada na tela o form velho fica com o codigo novo atras, & so fechar & reabrir a ficha cura. **O user foi avisado disso na entrega.** **NAO commitado** - working tree: `SPEC.md` `HANDOFF.md` `verify-hunters-hunted.ps1` `module.xml` `localization.lang` `WoD20th.lfm` `WoD20.6.lfm` `WoD20.10.lfm` (+ os outros 4 `.lfm` do item 1) + o `.rpk`, & tudo o que ja vinha das rodadas 186a-190a.
+
+### O que o user pediu (7 itens) & o que virou codigo
+1. **idioma default = pt** (§T989): os **28** sitios de fallback dos 12 `.lfm` INVERTERAM (`== "pt") and "pt" or "en"` -> `== "en") and "en" or "pt"`; `or "en"` -> `or "pt"`) + `defaultValue="pt"` no `<dataLink field="language">`. Ficha salva com `language="en"` segue EN; ficha velha SEM o campo passa a abrir em PT. **§V448 nasce.**
+2. **`Game` & `Era` foram p/ a caixa do narrador** (§T990), como as 2 PRIMEIRAS linhas (`top` 51 & 81, `left` 210, `width` 150). Os 2 `<dataLink>` FICARAM em `WoD20.6` - o de `sheetTheme` e quem chama `sheetReveal`. Tudo abaixo desceu +60 & a caixa foi 409 -> 469. **§V449 nasce**; §V243 & §V419 emendadas; 7 ancoras do gate reapontadas de `WoD20.6` p/ `WoD20.10`.
+3. **CANCELADO pelo user** (§T991 `x` sem trabalho): "Storyteller Settings pode manter o nome".
+4. **caixa nova da versao** abaixo do `CREDITS` (§T992): `CREDITS` 232 -> 196, caixa nova em `top=274`, `420x68`. **§V450 nasce.**
+5. **versao 0.1.1 -> 0.2.0** em 5 sitios (§T993), `module.xml` `<version>` incluso (o user mandou: "mude para 0.2.0 tambem"). §V450 ganhou a perna **(e)**.
+6. **`Edit dots freely` vale nos 2 sentidos** (§T994 + §T996). Duas metades:
+   - §T994: `local free = sheet.stFreeBuy == true;` (sem o `want and`) & o piso do `baseline` ganhou `not free` ∴ a bolinha SAI, inclusive abaixo do personagem inicial. **§V451 nasce**; §V103 & §V137 emendadas.
+   - §T996: **`xpSunk`**, o 3o carimbo (§I3). O log e um DIFF ∴ tirar a bolinha tirava a linha & devolvia o XP - o user respondeu "**nao devolve a experiencia**" (§Q75.1). Agora a venda livre de nivel PAGO carimba `|traco#nivel|` & `pushRise` empurra a linha mesmo com o dot apagado (o laco vai ate `last`, ⊥ ate `to`). A recompra desafunda, com a flag ON **ou OFF**. **§V452 nasce.**
+7. **rotulo `Free dots` -> `Edit dots freely`** (§T995) nas 3 casas; o campo segue `stFreeBuy`.
+
+8. **`Language` & `Version` CENTRADOS nas caixas deles** (§T997, pedido avulso depois do lote): as 2 nasceram ESTICADAS - o conteudo pede 55 & 50 & o piso do filete (§V314e) cobra 68 de lado menor - ∴ o par cabeca/pe de §V240 jogava toda a sobra p/ BAIXO & o olho via o conteudo colado no topo. Agora pagam **CENTRAGEM**, a mesma troca que as 2 caixas da faixa de `tabHedge` ja pagavam (§V267b). `boxLanguage` 68 -> **69** (`(69-25)/2` = 22 exato) com o combo em `top=22` & o rotulo em `top=25`; `CREDITS` desce p/ `top=74`; `boxVersion` em `top=275` com o rotulo em `top=24`. As 2 ganharam `name` porque a excecao de §V240 e NOMEADA & elas nao tem titulo p/ chavear. **§V240 EMENDADA & a excecao teve de ser contada NAS DUAS reguas** - §V280(a) cobra a mesma igualdade de cabeca (ele "REVOGA os numeros de V240" desde a 108a) ∴ dizer so p/ uma deixaria a outra vermelha.
+
+### ⚠ O RISCO CONHECIDO desta rodada, & e o unico
+**Nada do item 6 foi visto rodando.** A regra do `xpSunk` e o unico pedaco desta rodada que o gate so mede por FORMA - "o carimbo e escrito aqui, lido ali, 1 laco so" - & o que ele NAO prova e o numero na tela. O ponto exato a olhar e o `Current`: ele nao pode se mexer 1 ponto em nenhum clique com a flag ligada. Se ele se mexer, o defeito esta no par `sunk`/`wasSunk` do `xpStep` & o log dira qual - a linha que sumiu e a que a bolinha carregava.
+
+### DIVIDAS DE SPEC (todas p/ o `/ck:spec`, NENHUMA bloqueia build)
+1. **§I73 diz 68 caixas de secao & o gate agora mede 70** (era 69; a caixa da versao entrou). Herdada da 187a & piorada aqui.
+2. **A clausula de SONDA de §V438 esta FALSA** (herdada da 186a/187a).
+3. **§I153f ganhou regua & ela mora em §V237, nao em §V440** (herdada da 188a).
+4. **A emenda de §V295a ganhou perna no gate & ela mede 2 coisas** (herdada da 188a).
+5. **§I156a conta 17 ternarios + 11 planos & o MEDIDO ao construir foi 18 + 10.** O total (28) esta certo & §V448 mede o total ∴ so a quebra por forma esta errada.
+6. **§I156e diz que a caixa 1 da aba Settings fica `420x55` & ela ficou `420x68`.** §V314e cobra 68 de lado menor em toda caixa de secao (o filete precisa disso p/ as cruzes) ∴ 55 e VERMELHO. Pelo mesmo motivo o `CREDITS` subiu p/ `top=73` dentro do §T990 (e nao do §T992): §V298 cobra o vao de 5 entre caixas irmas.
+7. **§I156i diz que `pushRise` ganha `last` & que o sink le `sheet.xpFree` direto.** O `last` entrou como escrito; o resto mudou ao construir - o sink pergunta por `isFreeRow(trait, level)` (que ganhou o 2o parametro) porque §V160 cobra **1** leitor de carimbo no arquivo inteiro, & nasceu `wasSunk` (que §I156i nao previa) porque sem ele a recompra com a flag ligada carimbava o nivel como GRATIS & devolvia o preco que tinha ficado.
+
+### TESTES DE TELA desta rodada (o `.rpk` novo ja esta instalado - nada disto foi visto rodando)
+- **idioma**: abrir uma ficha NOVA -> ela vem em portugues. Abrir uma ficha velha que nunca tocou no combo -> tambem. Uma que esta salva em ingles -> segue em ingles.
+- **aba Storyteller**: `Game` & `Era` sao as 2 primeiras linhas da caixa; trocar a `Era` ainda pinta a ficha inteira & os pickers trocam de palavra junto.
+- ⚠ **ficha aberta FORA DE MESA nao tem mais como trocar de epoca** (a aba do narrador nao abre sem mesa, §V79). Foi avisado em §Q75.2 & o user seguiu com o pedido.
+- **aba Settings**: 3 caixas - Idioma / CREDITS / Versao - com 5px entre elas, e a versao diz **0.2.0**.
+- **`Edit dots freely` LIGADO**: (a) desmarcar uma bolinha do personagem inicial FUNCIONA & o `Current` NAO se mexe; (b) desmarcar uma bolinha PAGA -> o dot apaga, a linha CONTINUA no log & o `Current` NAO sobe; (c) remarcar essa mesma bolinha -> nao cobra de novo & o `Current` segue parado; (d) desligar a flag & comprar 1 ponto novo -> cobra normal.
+- **experiencia**: com a flag DESLIGADA nada mudou - o piso do `baseline` volta a barrar a venda, muda.
+## 190a rodada (2026-09-06, noite). **Pedido do user: as 10 CAIXAS de willpower gasto enchem/esvaziam em bloco. §T988 CONSTRUIDA & FECHADA (gate `-Build` VERDE; 4 mutacoes + 1 sonda RODADAS)**
 
 ### **INSTALADO 2026-09-06 21:56:45** - `output/` & instalado nos MESMOS **2.820.151 B**, com o Firecast FECHADO (`rdk -i` disse "instalacao offline"). 1 install na rodada (§B103). O user CONFIRMOU a 189a na tela ("tudo funcionou bem corretamente") & COMMITOU ele mesmo (`19f3660f`) ∴ o working tree de agora e so a 190a: `SPEC.md` `HANDOFF.md` `verify-hunters-hunted.ps1` `WoD20th.lfm` `WoD20.1.lfm` `WoD20.3.lfm` + o `.rpk`. **NAO commitado.**
 
@@ -8,6 +44,8 @@
 - **`poolPrefix(base, count, alvo)`** saiu de dentro do `poolClick`: o `base` virou o PREFIXO INTEIRO (`bloodPool_`, `quint_`, `willpower_c`), porque `willpower_c1` nao tem `_` antes do digito.
 - **`wpSpentClick` + `wpSpentChange`** (root) & o carimbo global **`WP_CLICK`**. As 20 caixas (10 do molde `Willpower` em `WoD20.1` + 10 do espelho em `WoD20.3`) ganharam `onClick` **&** `onChange`.
 - **XP nao entra**: `willpower_c*` segue fora de `XP_TRAIT`, sem preco & sem ledger. §V447(d) mede as 4 palavras.
+
+8. **`Language` & `Version` CENTRADOS nas caixas deles** (§T997, pedido avulso depois do lote): as 2 nasceram ESTICADAS - o conteudo pede 55 & 50 & o piso do filete (§V314e) cobra 68 de lado menor - ∴ o par cabeca/pe de §V240 jogava toda a sobra p/ BAIXO & o olho via o conteudo colado no topo. Agora pagam **CENTRAGEM**, a mesma troca que as 2 caixas da faixa de `tabHedge` ja pagavam (§V267b). `boxLanguage` 68 -> **69** (`(69-25)/2` = 22 exato) com o combo em `top=22` & o rotulo em `top=25`; `CREDITS` desce p/ `top=74`; `boxVersion` em `top=275` com o rotulo em `top=24`. As 2 ganharam `name` porque a excecao de §V240 e NOMEADA & elas nao tem titulo p/ chavear. **§V240 EMENDADA & a excecao teve de ser contada NAS DUAS reguas** - §V280(a) cobra a mesma igualdade de cabeca (ele "REVOGA os numeros de V240" desde a 108a) ∴ dizer so p/ uma deixaria a outra vermelha.
 
 ### ⚠ O RISCO CONHECIDO desta rodada, & e o unico
 `checkBox` **nao tem `autoChange`** (MEDIDO em `SDK3/API/rrpgGUI.lua:718-730`; so `ImageCheckBox` tem, `:786`) ∴ o host marca a caixa sozinho & nao ha como decidir antes da escrita. A forma escolhida e `onClick` (so ANUNCIA, `WP_CLICK = field`) + `onChange` (ESCREVE, e so se `WP_CLICK` nomear o campo dele).
