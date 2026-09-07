@@ -79,6 +79,8 @@
 
 				names["dynarmorClass"] = true;
 				names["dynshieldClass"] = true;
+				names["dynRateHdr"]     = true;
+				names["dynRateFoot"]    = true;
 
 				for i = 1, ATTACK_ROWS, 1 do names["dynattack_" .. i] = true; end;
 
@@ -94,6 +96,27 @@
 
 				mfLabel(found["dynarmorClass"], sheet.armorClass, "Select Armor", lang);
 				mfLabel(found["dynshieldClass"], sheet.shieldClass, "Select Shield", lang);
+
+				-- The Rate column and its legend are ONE pair, and the language is the only thing
+				-- that moves them (SPEC I161g, I161i, V471). In pt the header reads CdT* and the
+				-- italic line under the protection box says what it is short for; in en it reads
+				-- Rate, spelled out, and the line is not on screen at all - an asterisk with no
+				-- legend under it is the one way this ask goes wrong.
+				--
+				-- Both are dyn*, so applyLanguage skips them and whoever writes the text owns BOTH
+				-- languages for it (SPEC V31). No dataLink of their own: this walk already runs on
+				-- the one that watches `language`, and on onNodeReady (SPEC V123, V19, V33).
+				if translateSheetText ~= nil then
+					local rateHdr  = found["dynRateHdr"];
+					local rateFoot = found["dynRateFoot"];
+
+					if rateHdr ~= nil then rateHdr.text = translateSheetText("Rate of Fire", lang) or "Rate"; end;
+
+					if rateFoot ~= nil then
+						rateFoot.text    = translateSheetText("* Rate of Fire", lang) or "* Rate of Fire";
+						rateFoot.visible = (lang == "pt");
+					end;
+				end;
 
 				-- The CELLS follow the language too, and until the 14th batch they did not: the
 				-- name is a label mfLabel repaints on every walk, but Roll/Damage/Conceal are
@@ -183,7 +206,13 @@
 		</template>
 
 		<!-- Ten read-only dots over ten real boxes (SPEC V51). The dots carry no `field=` and
-		     are painted by paintWillpower(); only the boxes below own anything. -->
+		     are painted by paintWillpower(); only the boxes below own anything.
+
+		     The two rows share their lefts since the 17th batch, and that is the whole of the
+		     user's ask: "cada checkbox de willpower deve ter o centro alinhado com o centro de
+		     cada bolinha que esta em cima". Both controls are 25 wide, so one left IS one centre
+		     and the rule needs no number of its own - the boxes used to open at 2 and hung two
+		     pixels right of every dot (SPEC I161c, V470b, Q81.3). -->
 		<template name="WillpowerMirror">
 			<imageCheckBox name="roWp_1" left="0" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox name="roWp_2" left="25" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
@@ -196,16 +225,16 @@
 			<imageCheckBox name="roWp_9" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox name="roWp_10" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 
-			<checkBox left="2" top="20" width="25" height="25" field="willpower_c1" onClick="wpSpentClick('willpower_c1');" onChange="wpSpentChange('willpower_c1');"/>
-			<checkBox left="27" top="20" width="25" height="25" field="willpower_c2" onClick="wpSpentClick('willpower_c2');" onChange="wpSpentChange('willpower_c2');"/>
-			<checkBox left="52" top="20" width="25" height="25" field="willpower_c3" onClick="wpSpentClick('willpower_c3');" onChange="wpSpentChange('willpower_c3');"/>
-			<checkBox left="77" top="20" width="25" height="25" field="willpower_c4" onClick="wpSpentClick('willpower_c4');" onChange="wpSpentChange('willpower_c4');"/>
-			<checkBox left="102" top="20" width="25" height="25" field="willpower_c5" onClick="wpSpentClick('willpower_c5');" onChange="wpSpentChange('willpower_c5');"/>
-			<checkBox left="127" top="20" width="25" height="25" field="willpower_c6" onClick="wpSpentClick('willpower_c6');" onChange="wpSpentChange('willpower_c6');"/>
-			<checkBox left="152" top="20" width="25" height="25" field="willpower_c7" onClick="wpSpentClick('willpower_c7');" onChange="wpSpentChange('willpower_c7');"/>
-			<checkBox left="177" top="20" width="25" height="25" field="willpower_c8" onClick="wpSpentClick('willpower_c8');" onChange="wpSpentChange('willpower_c8');"/>
-			<checkBox left="202" top="20" width="25" height="25" field="willpower_c9" onClick="wpSpentClick('willpower_c9');" onChange="wpSpentChange('willpower_c9');"/>
-			<checkBox left="227" top="20" width="25" height="25" field="willpower_c10" onClick="wpSpentClick('willpower_c10');" onChange="wpSpentChange('willpower_c10');"/>
+			<checkBox left="0" top="20" width="25" height="25" field="willpower_c1" onClick="wpSpentClick('willpower_c1');" onChange="wpSpentChange('willpower_c1');"/>
+			<checkBox left="25" top="20" width="25" height="25" field="willpower_c2" onClick="wpSpentClick('willpower_c2');" onChange="wpSpentChange('willpower_c2');"/>
+			<checkBox left="50" top="20" width="25" height="25" field="willpower_c3" onClick="wpSpentClick('willpower_c3');" onChange="wpSpentChange('willpower_c3');"/>
+			<checkBox left="75" top="20" width="25" height="25" field="willpower_c4" onClick="wpSpentClick('willpower_c4');" onChange="wpSpentChange('willpower_c4');"/>
+			<checkBox left="100" top="20" width="25" height="25" field="willpower_c5" onClick="wpSpentClick('willpower_c5');" onChange="wpSpentChange('willpower_c5');"/>
+			<checkBox left="125" top="20" width="25" height="25" field="willpower_c6" onClick="wpSpentClick('willpower_c6');" onChange="wpSpentChange('willpower_c6');"/>
+			<checkBox left="150" top="20" width="25" height="25" field="willpower_c7" onClick="wpSpentClick('willpower_c7');" onChange="wpSpentChange('willpower_c7');"/>
+			<checkBox left="175" top="20" width="25" height="25" field="willpower_c8" onClick="wpSpentClick('willpower_c8');" onChange="wpSpentChange('willpower_c8');"/>
+			<checkBox left="200" top="20" width="25" height="25" field="willpower_c9" onClick="wpSpentClick('willpower_c9');" onChange="wpSpentChange('willpower_c9');"/>
+			<checkBox left="225" top="20" width="25" height="25" field="willpower_c10" onClick="wpSpentClick('willpower_c10');" onChange="wpSpentChange('willpower_c10');"/>
 		</template>
 
 		<!--
@@ -281,7 +310,7 @@
 			     is where the Range column starts. -->
 			<button name="btnQdamage" left="690" top="36" width="20" height="20" text="?" onClick="popOpen(self, 'Weapon', 'Damage', nil, nil);"/>
 			<label left="710" top="36" width="50" height="20" text="Range" horzTextAlign="center"/>
-			<label left="760" top="36" width="50" height="20" text="Rate" horzTextAlign="center"/>
+			<label name="dynRateHdr" left="760" top="36" width="50" height="20" text="Rate" horzTextAlign="center"/>
 			<label left="810" top="36" width="50" height="20" text="Clip" horzTextAlign="center"/>
 			<label left="860" top="36" width="65" height="20" text="Conceal" horzTextAlign="center"/>
 			<!-- The legend of the Conceal letters, and it is a ? with a FIXED key and no row
@@ -329,23 +358,56 @@
 			WoD20.8 in T76/T77 and came back on 2026-08-17, field names untouched both times
 			(SPEC T87 / V35).
 
-			One input column: all three rows put their edit at x=75 (SPEC V26 / B.12).
+			ONE box since the 16th batch, and it carries TWO columns (SPEC I160a, V469, user
+			2026-09-07). ARMOR and SHIELD were two boxes of 315 with the 5px gap of V298 between
+			them; 315 + 5 + 315 was 635, and the 17th batch took it to 645 - the ten VIRTUES and
+			WILLPOWER gave up when they shrank (SPEC I161a, I161d). The band still closes on the
+			same 1290: 645 + 315 + 320 and TWO gaps, which is what V467(a) sums and the only
+			reason nothing outside these three boxes had to move.
 
-			420 -> 315 in the 15th batch, a quarter off the WIDTH and not a pixel off the height:
-			a character wears armour AND carries a shield, so SHIELD had to fit beside this box
-			and the user asked for the two to be the same size (SPEC I159d, Q79.1, user
-			2026-09-07 ask 1-2). The height is untouched because the notes editor needs it and
-			because this box closes at 597 together with the VIRTUES+WILLPOWER column beside it.
+			The merge freed SEVENTY-FIVE pixels and not one more: 35 of slack to the right of the
+			ARMOR block, the 5 of the gap, and 35 of inset to the left of the SHIELD one. Twenty
+			stayed as the SEPARATOR between the two columns and fifty-five went to ARMOR. The
+			17th batch came back for the separator: EIGHT of those twenty crossed over - the
+			"about 40%" the user asked for, measured against the 20 that were there - so the gap
+			is 12 and the ARMOR column is 300 + 10 + 8 = 318 (SPEC I161d, Q81.2).
 
-			The price is paid by the NAME: the Class button is 150 wide now and the longest PT
-			armour name wants 292 (SPEC I159f, Q79.2). Nothing here fixes that - fitSize does,
-			from mfLabel, dropping the font to its floor of 7 (WoD20th.lfm:5956) - and the user
-			took that trade knowing the longest name still loses about one character to it. The
-			whole name is one click away, in the picker and in the ? beside it.
+			What the 18 buy, measured, and it is pixels and NOT a font point: the worst PT armour
+			name is 45 characters and fitSize asks for 45 * size * 0.5 px (WoD20th.lfm:6042,
+			SPEC V468f). At 205 it closed at size 9 (202.5); at 223 it closes at size 9 again,
+			because size 10 wants 225 and the column stops two short. The cut ended on the 16th
+			batch and stays ended; what the 17th adds is slack, and one point for every name but
+			the worst - the second longest (39 characters) goes 10 -> 11. The user was told this
+			before choosing the 8 (SPEC Q81.2, I161f), which is why V470(c) locks size NINE and
+			not ten: charging the ten would light the gate over the very number that was asked
+			for (SPEC B106).
+
+			The two titles sit one per column, each as wide as its column and centred on it - the
+			header rule COMBAT already follows (SPEC I159e, V469c). ARMOR is declared FIRST and
+			that is a CONTRACT, not taste: V280, V298 and V418 name a box by the first label they
+			find inside it, so swapping the two renames this box for the gate (SPEC I160b, V469a).
+
+			One input column per column: all three rows of each put their edit at x=75 (SPEC V26 /
+			B.12). V26 groups sibling rows by their `left`, so 35 and 355 are two columns by its
+			own definition and the two label widths never meet.
+
+			The SHIELD column keeps its WIDTH and no longer its left: 245 wide before the merge,
+			245 after it, and 245 now - what the 17th batch changed is that it WALKS ten to the
+			right, 355 -> 365, so the box keeps the same 35 of inset on both edges (SPEC I160e
+			amended, I161d). The width is the half V469(f) measures, and it measures it because
+			everything ARMOR has gained came from dead gaps and never from the shield (Q80.2).
+
+			What is NOT duplicated is the DATA: combatData.armor still holds all thirty-three
+			entries and descArmor_* still describes all thirty-three, because a shield reads the
+			same columns an armour does. Only the LIST splits, on the `kind` column of
+			research/armor.tsv, so ARMOR cannot offer a shield and SHIELD cannot offer a jacket
+			(SPEC I159b, V466c). That is why mfOpen gets the list `shield` and the module
+			`Armor`: they have been separate arguments since I157h.
 		-->
-		<layout left="0" top="356" width="315" height="241">
+		<layout left="0" top="356" width="645" height="241">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="275" height="20" text="ARMOR" horzTextAlign="center"/>
+			<label left="35" top="15" width="318" height="20" text="ARMOR" horzTextAlign="center"/>
+			<label left="365" top="15" width="245" height="20" text="SHIELD" horzTextAlign="center"/>
 
 			<!-- Class became a PICKER in the 13th batch (SPEC I157b, T1005). It opens at the
 			     STANDARD size, with the description pane and the Armor module: without a module
@@ -356,68 +418,70 @@
 			     The ? arrived in the 14th batch and REVERSED what stood here: the user had asked
 			     for it in COMBAT only, then asked for it here too (SPEC I158d, V464a, user
 			     2026-09-07 ask 4). It is the shape btnQattack_$(num) already wears - the key is
-			     whatever name the row holds - and the button gave up its last twenty pixels so
-			     the pair still closes at 350, where Rating and Penalty close. -->
-			<layout left="35" top="36" width="245" height="25" >
+			     whatever name the row holds - and it opens exactly where the button closes and
+			     closes exactly on the row's width, where Rating and Penalty close. That is a
+			     RELATION and no longer the literal 225/20 it used to be: the literal went red on
+			     the 16th batch, which is the ask that widened this column (SPEC V469d, B106). -->
+			<layout left="35" top="36" width="318" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Class" horzTextAlign="trailing"/>
-				<button name="dynarmorClass" left="75" top="0" width="150" height="25" text="Select Armor" onClick="mfOpen(self, 'armorClass', 'armor', 'Armor');"/>
-				<edit name="edtarmorClass" left="75" top="0" width="150" height="25" field="armorClass" visible="false" enabled="false"/>
-				<button name="btnQarmorClass" left="225" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Armor', sheet['armorClass'], nil, 'armorClass');"/>
+				<button name="dynarmorClass" left="75" top="0" width="223" height="25" text="Select Armor" onClick="mfOpen(self, 'armorClass', 'armor', 'Armor');"/>
+				<edit name="edtarmorClass" left="75" top="0" width="223" height="25" field="armorClass" visible="false" enabled="false"/>
+				<button name="btnQarmorClass" left="298" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Armor', sheet['armorClass'], nil, 'armorClass');"/>
 			</layout>
-			<layout left="35" top="61" width="245" height="25" >
+			<layout left="35" top="61" width="318" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Rating" horzTextAlign="trailing"/>
-				<edit left="75" top="0" width="170" height="25" field="armorRating" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+				<edit left="75" top="0" width="243" height="25" field="armorRating" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 			</layout>
-			<layout left="35" top="86" width="245" height="25" >
+			<layout left="35" top="86" width="318" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Penalty" horzTextAlign="trailing"/>
-				<edit left="75" top="0" width="170" height="25" field="armorPenalty" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+				<edit left="75" top="0" width="243" height="25" field="armorPenalty" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 			</layout>
 
 			<!-- readOnly and NO opacity: opacity on a TextControl dims the TEXT itself away
 			     (SPEC V241, I157k), so this one pays for the lock with the lock alone. -->
-			<textEditor left="35" top="116" width="245" height="110" field="armorDescription" readOnly="true"/>
-		</layout>
+			<textEditor left="35" top="116" width="318" height="110" field="armorDescription" readOnly="true"/>
 
-		<!--
-			SHIELD, and it is ARMOR with one letter of the field name changed (SPEC I159a, V466,
-			user 2026-09-07 ask 1: "voce pode usar uma armadura e um escudo ao mesmo tempo").
-			Same size as ARMOR because the user asked for that in the same breath, and same
-			shape row for row so nothing here is a second way of doing what the box beside it
-			already does.
+			<!-- The SHIELD column, and it is the ARMOR one with one letter of the field name
+			     changed (SPEC I159a, V466, user 2026-09-07 ask 1: "voce pode usar uma armadura e
+			     um escudo ao mesmo tempo"). Same shape row for row, so nothing here is a second
+			     way of doing what the column beside it already does - and 245 wide because the
+			     16th batch gave ARMOR what the MERGE freed and not what the shield had (SPEC
+			     I160e, Q80.2, V469f).
 
-			What is NOT duplicated is the DATA: combatData.armor still holds all thirty-three
-			entries and descArmor_* still describes all thirty-three, because a shield reads the
-			same columns an armour does. Only the LIST splits, on the `kind` column of
-			research/armor.tsv, so ARMOR cannot offer a shield and SHIELD cannot offer a jacket
-			(SPEC I159b, V466c). That is why mfOpen gets the list `shield` and the module
-			`Armor`: they have been separate arguments since I157h.
-
-			Four NEW data fields - the first this tab has taken since the third round (SPEC I3,
-			I159a). A sheet saved before today opens with them empty and nothing has to migrate,
-			which is the whole of V2 here.
-		-->
-		<layout left="320" top="356" width="315" height="241">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="275" height="20" text="SHIELD" horzTextAlign="center"/>
-
-			<layout left="35" top="36" width="245" height="25" >
+			     Four NEW data fields since the 15th batch - the first this tab had taken since
+			     the third round (SPEC I3, I159a). A sheet saved before then opens with them empty
+			     and nothing has to migrate, which is the whole of V2 here. -->
+			<layout left="365" top="36" width="245" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Class" horzTextAlign="trailing"/>
 				<button name="dynshieldClass" left="75" top="0" width="150" height="25" text="Select Shield" onClick="mfOpen(self, 'shieldClass', 'shield', 'Armor');"/>
 				<edit name="edtshieldClass" left="75" top="0" width="150" height="25" field="shieldClass" visible="false" enabled="false"/>
 				<button name="btnQshieldClass" left="225" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Armor', sheet['shieldClass'], nil, 'shieldClass');"/>
 			</layout>
-			<layout left="35" top="61" width="245" height="25" >
+			<layout left="365" top="61" width="245" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Rating" horzTextAlign="trailing"/>
 				<edit left="75" top="0" width="170" height="25" field="shieldRating" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 			</layout>
-			<layout left="35" top="86" width="245" height="25" >
+			<layout left="365" top="86" width="245" height="25" >
 				<label left="0" top="5" width="70" height="20" text="Penalty" horzTextAlign="trailing"/>
 				<edit left="75" top="0" width="170" height="25" field="shieldPenalty" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 			</layout>
 
 			<!-- readOnly and NO opacity, for the reason the ARMOR one carries (SPEC V241). -->
-			<textEditor left="35" top="116" width="245" height="110" field="shieldDescription" readOnly="true"/>
+			<textEditor left="365" top="116" width="245" height="110" field="shieldDescription" readOnly="true"/>
 		</layout>
+
+		<!-- The legend of the Rate column, and it exists in PORTUGUESE ONLY: CdT is short for
+		     Cadencia de Tiro and the English header spells Rate out, so an English sheet has
+		     nothing to explain (SPEC I161h, I161i, V471, user 2026-09-07 ask 3).
+
+		     It sits OUTSIDE every box, ten under the protection box that closes at 597 - the
+		     spacing is the user's own number and neither the 5 of V298 nor the 20 of V280a
+		     (SPEC Q81.5). It opens on the ARMOR column and closes where SHIELD closes.
+
+		     dyn* so applyLanguage leaves it alone, visible=false because only Lua turns it on,
+		     and the authored text is the ENGLISH one - the Portuguese lives in localization.lang
+		     like every other sentence on this sheet (SPEC V9, V10, V31). -->
+		<label name="dynRateFoot" left="35" top="607" width="575" height="20" text="* Rate of Fire" fontStyle="italic" visible="false"/>
 
 		<!--
 			Willpower on the Combat tab (SPEC T138 / V51). The two halves are deliberately
@@ -427,11 +491,11 @@
 			(SPEC I3 ESPELHOS, V36). Spending willpower is what a player does mid-fight; raising
 			the permanent rating is not.
 		-->
-		<layout left="640" top="487" width="325" height="110">
+		<layout left="650" top="487" width="315" height="110">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="285" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<label left="20" top="15" width="275" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
-			<layout left="30" top="41" width="250" height="45">
+			<layout left="32" top="41" width="250" height="45">
 				<WillpowerMirror/>
 			</layout>
 		</layout>
@@ -474,21 +538,28 @@
 		</layout>
 
 		<!--
-			VIRTUES sits in the gap between ARMOR (ends at x=380) and the right column (starts at
-			x=670), so it is 270 wide, not 280: 390+270 leaves the same 10px gutter on both sides.
-			The rows lose 5px of indent to keep the 250px template inside the narrower box.
-		-->
-		<layout left="640" top="356" width="325" height="126">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="285" height="20" text="VIRTUES" horzTextAlign="center"/>
+			VIRTUES and WILLPOWER are one column between the protection box and HEALTH, and the
+			17th batch took ten off their width so the ARMOR picker could have it (SPEC I161a,
+			I161b, user 2026-09-07): 325 -> 315, left 640 -> 650, and the band still closes on
+			1290 because the ten went straight into the box on their left.
 
-			<layout left="30" top="36" width="250" height="25" >
+			Their content is CENTRED on the box now, which is the ask in the user's own words.
+			The content is the 250px template both boxes carry, so the rows open at 32 and close
+			33 short of the right edge: 315 - 250 is 65 and a pixel does not split. That one is
+			the closest 315 allows, and it is why V470(a) charges a difference of at most 1 and
+			not an equality - 314 would have been exact, and the user chose 10px over 11.
+		-->
+		<layout left="650" top="356" width="315" height="126">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="275" height="20" text="VIRTUES" horzTextAlign="center"/>
+
+			<layout left="32" top="36" width="250" height="25" >
 				<VirtueMirror field="conscience" nome="Conscience"/>
 			</layout>
-			<layout left="30" top="61" width="250" height="25" >
+			<layout left="32" top="61" width="250" height="25" >
 				<VirtueMirror field="selfControl" nome="Self-Control"/>
 			</layout>
-			<layout left="30" top="86" width="250" height="25" >
+			<layout left="32" top="86" width="250" height="25" >
 				<VirtueMirror field="courage" nome="Courage"/>
 			</layout>
 		</layout>

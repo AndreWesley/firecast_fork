@@ -10000,6 +10000,12 @@ foreach ($bx418 in (Doc (Join-Path $dir 'WoD20.3.lfm')).SelectNodes("//scrollBox
     $v418Box[$lb418.GetAttribute("text")] = $bx418
 }
 $v418Bad = @()
+# $missing418 is declared HERE and not only inside the else below, because the PASS line at
+# the bottom reads $v418Box['ARMOR'] to build its message: with a title missing the Fail
+# fires AND the Pass branch still ran, and the whole gate died on a null instead of printing
+# a red. Found by the T1028 mutation that swaps the two protection titles, which is exactly
+# the order contract I160b writes down (SPEC V20, V209, I160b).
+$missing418 = @()
 if ($v418Box.Count -lt 6) {
     Fail "V418 only $($v418Box.Count) titled section box(es) were read on WoD20.3.lfm, expected the 6 the tab draws - a row rule over the boxes it cannot see is true by vacancy (SPEC V209, B7)"
 } else {
@@ -10037,7 +10043,7 @@ if ($v418Box.Count -lt 6) {
     }
 }
 if ($v418Bad.Count -gt 0) { foreach ($b418 in $v418Bad) { Fail "V418 $b418" } }
-elseif ($v418Box.Count -ge 6) { Pass "V418 the $($v418Box.Count) Combat boxes close in rows - the top row on y=$(([int]$v418Box['COMBAT'].GetAttribute('top')) + [int]$v418Box['COMBAT'].GetAttribute('height')), ARMOR and WILLPOWER on y=$(([int]$v418Box['ARMOR'].GetAttribute('top')) + [int]$v418Box['ARMOR'].GetAttribute('height')), and the second row opening together 5 below" }
+elseif ($v418Box.Count -ge 6 -and $missing418.Count -eq 0) { Pass "V418 the $($v418Box.Count) Combat boxes close in rows - the top row on y=$(([int]$v418Box['COMBAT'].GetAttribute('top')) + [int]$v418Box['COMBAT'].GetAttribute('height')), ARMOR and WILLPOWER on y=$(([int]$v418Box['ARMOR'].GetAttribute('top')) + [int]$v418Box['ARMOR'].GetAttribute('height')), and the second row opening together 5 below" }
 # ---- V420: the domitor's generation is BORN 13th, and the seed is keyed on nil ----------
 # SPEC V420, I144i, the owner's ask of 2026-09-04 (Ghoul item 3). Two things are measured and
 # neither is the sentence: WHERE the seed lives and WHAT it writes.
@@ -12437,7 +12443,7 @@ foreach ($f in $files) {
             L = $bl; T = $bt; W = $bw; H = $bh; Node = $box; P = $box.ParentNode }
     }
 }
-if ($v280Boxes.Count -ne 71) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 71 I73 measures (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
+if ($v280Boxes.Count -ne 70) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
 else {
     # (a) TWO numbers since T913: 20 on the X sides, 15 on the Y ones (SPEC I137c, user
     # 2026-09-02). The X pair is a FLOOR and always was. The Y pair splits: the FOOT is a floor,
@@ -12579,7 +12585,7 @@ else { Pass "V280 (d) the $($colBottoms.Count) Ghoul columns all close at $(@($c
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
 # (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
 # on them would be a false alarm on numbers this round agreed not to touch.
-if ($v280Boxes.Count -ne 71) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 71 I73 measures (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
+if ($v280Boxes.Count -ne 70) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
 else {
     # The declared HOLE is GONE with T908 and the 5px rule is whole again. T904 had left the
     # 680..1010 band of the Main grid with no bottom box, so two boxes faced each other a whole
@@ -21371,7 +21377,11 @@ if (Test-Path -LiteralPath $wo3455) {
     foreach ($a458 in @('armorRating', 'armorPenalty', 'shieldRating', 'shieldPenalty')) {
         $n458 = $doc458.SelectSingleNode('//edit[@field="' + $a458 + '"]')
         if ($null -eq $n458) { $v458Bad += "(c) no '$a458' cell was found (SPEC V209, I159a)"; continue }
-        if ([int]$n458.GetAttribute("left") -ne 75 -or [int]$n458.GetAttribute("width") -ne 170) { $v458Bad += "(c) '$a458' sits at left=$($n458.GetAttribute('left')) width=$($n458.GetAttribute('width')) - all three rows of both protection boxes put their entry at x=75 and close at 245 (SPEC V26, B.12, I159f)" }
+        # The WIDTH left this leg on the 16th batch, for the reason written six lines above about
+        # the COMBAT columns: T1027 widened the ARMOR column and a frozen 170 would have gone red
+        # on the very ask it was asked to allow (SPEC B106, I160g). Where the cell CLOSES is now
+        # V469(d), measured against its own row - what stays here is the entry column of V26.
+        if ([int]$n458.GetAttribute("left") -ne 75) { $v458Bad += "(c) '$a458' opens at $($n458.GetAttribute('left')) and all three rows of both protection columns put their entry at x=75 (SPEC V26, B.12, I160d, V469d)" }
     }
 }
 if ($v458Bad) { foreach ($b in $v458Bad) { Fail "V458 $b" } }
@@ -21683,11 +21693,14 @@ else {
         if ($q464.Count -ne 1) { $v464Bad += "(a) WoD20.3.lfm draws $($q464.Count) btnQ${p464}Class, expected 1 - the user asked for the ? in that box (SPEC I158d, I159a)"; continue }
         $want464 = "popOpen(self, 'Armor', sheet['${p464}Class'], nil, '${p464}Class');"
         if ($q464[0].GetAttribute("onClick") -cne $want464) { $v464Bad += "(a) btnQ${p464}Class opens with '$($q464[0].GetAttribute('onClick'))' and I158d writes it '$want464' - it has to hand popOpen the value of ITS OWN box (SPEC V333d, I158d)" }
-        if ([int]$q464[0].GetAttribute("left") -ne 225 -or [int]$q464[0].GetAttribute("width") -ne 20) { $v464Bad += "(a) btnQ${p464}Class sits at left=$($q464[0].GetAttribute('left')) width=$($q464[0].GetAttribute('width')) and I159f puts it at 225/20, closing at 245 where Rating and Penalty close (SPEC I159f)" }
+        # The GEOMETRY of the trio moved to V469(d) on the 16th batch and did not become a no-op:
+        # T1027 widened the ARMOR column, and 225/20 frozen here would have gone red on the ask
+        # itself, which is B106 exactly. V469(d) asks the RELATION instead - the ? opens where the
+        # button closes and closes on the row's width (SPEC I160g, V464 amended, B106).
         foreach ($n464 in @("dyn${p464}Class", "edt${p464}Class")) {
             $c464 = $d464.SelectSingleNode("//*[@name='$n464']")
             if ($null -eq $c464) { $v464Bad += "(a) $n464 is gone (SPEC I159a)"; continue }
-            if ([int]$c464.GetAttribute("left") -ne 75 -or [int]$c464.GetAttribute("width") -ne 150) { $v464Bad += "(a) $n464 sits at left=$($c464.GetAttribute('left')) width=$($c464.GetAttribute('width')) and I159f puts it at 75/150 - the ? took the last twenty (SPEC I159f, V26)" }
+            # left and width are V469(d)'s since the 16th batch - see the note above (SPEC I160g).
         }
     }
     # (b) the Damage legend, and its geometry is a RELATION: the label closes where the ? opens
@@ -21812,7 +21825,12 @@ if (-not (Test-Path -LiteralPath $wo3455)) { $v467Bad += "(a) WoD20.3.lfm is not
 else {
     $d467 = Doc $wo3455
     $box467 = @{}
-    foreach ($t467 in @('COMBAT', 'COMBAT TRAITS', 'ARMOR', 'SHIELD', 'VIRTUES', 'WILLPOWER')) {
+    # SHIELD is NOT collected here since the 16th batch, and that is the whole point: it and
+    # ARMOR are two columns of ONE layout now, so `//label[@text='SHIELD']`.ParentNode hands back
+    # the SAME box ARMOR does. Summing it would count 635 twice, and comparing the two would
+    # compare the box with itself and pass over any imbalance at all - B145 through the TITLE
+    # instead of through the border. The two columns are V469's to measure (SPEC I160g, V467c).
+    foreach ($t467 in @('COMBAT', 'COMBAT TRAITS', 'ARMOR', 'VIRTUES', 'WILLPOWER')) {
         foreach ($l467 in $d467.SelectNodes("//label[@text='$t467']")) {
             $p467 = $l467.ParentNode
             if ($null -eq $p467 -or $p467.Name -ne 'layout') { continue }
@@ -21823,31 +21841,305 @@ else {
     if ($null -ne $hl467) { $box467['HEALTH'] = @([int]$hl467.GetAttribute("left"), [int]$hl467.GetAttribute("top"), [int]$hl467.GetAttribute("width"), [int]$hl467.GetAttribute("height")) }
     # (d) zero-guard, and it comes first: a collector that matched nothing would make every
     # equality below true over an empty set (SPEC V20, B7).
-    foreach ($n467 in @('COMBAT', 'COMBAT TRAITS', 'ARMOR', 'SHIELD', 'VIRTUES', 'WILLPOWER', 'HEALTH')) {
+    foreach ($n467 in @('COMBAT', 'COMBAT TRAITS', 'ARMOR', 'VIRTUES', 'WILLPOWER', 'HEALTH')) {
         if (-not $box467.ContainsKey($n467)) { $v467Bad += "(d) the '$n467' box was not collected off the Combat tab - the two bands would be compared over a fraction of it (SPEC V20, B7, V209)" }
     }
     if ($v467Bad.Count -eq 0) {
         # (a) the SUM of the widths plus the gaps, and NOT the edge each band closes on: a box
         # that grows INTO its neighbour moves no edge at all and would sail past (SPEC B145, V414a).
+        # THREE boxes and TWO gaps below since T1027 merged the protection pair: 635 + 325 + 320
+        # + 10 is the same 1290 four boxes and three gaps asked for (SPEC I159d amended, I160a).
         $GAP467 = 5
         $topSum = $box467['COMBAT'][2] + $box467['COMBAT TRAITS'][2] + (1 * $GAP467)
-        $botSum = $box467['ARMOR'][2] + $box467['SHIELD'][2] + $box467['VIRTUES'][2] + $box467['HEALTH'][2] + (3 * $GAP467)
+        $botSum = $box467['ARMOR'][2] + $box467['VIRTUES'][2] + $box467['HEALTH'][2] + (2 * $GAP467)
         if ($topSum -ne $botSum) { $v467Bad += "(a) the top band wants $topSum and the bottom one wants $botSum - the two have to ask for the same width or a box hangs off the paper, or a strip of it sits empty (SPEC I159d, V467a)" }
-        # (c) the two protection boxes are the SAME size, and COMBAT TRAITS did not change size.
-        if ($box467['ARMOR'][2] -ne $box467['SHIELD'][2] -or $box467['ARMOR'][3] -ne $box467['SHIELD'][3]) { $v467Bad += "(c) ARMOR is $($box467['ARMOR'][2])x$($box467['ARMOR'][3]) and SHIELD is $($box467['SHIELD'][2])x$($box467['SHIELD'][3]) - the user asked for two boxes of the same size (SPEC I159d, Q79.1)" }
+        # (c) COMBAT TRAITS did not change size. The other half of (c) - the two protection boxes
+        # being twins - is REVOKED and did NOT become a no-op: what replaced it is V469(b), which
+        # measures the two COLUMNS against each other inside the one box (SPEC I160g, B145, B7).
         if ($box467['COMBAT TRAITS'][2] -ne 320 -or $box467['COMBAT TRAITS'][3] -ne 351) { $v467Bad += "(c) COMBAT TRAITS is $($box467['COMBAT TRAITS'][2])x$($box467['COMBAT TRAITS'][3]) and it was to be REALIGNED without changing size - 320x351 is what it has always been (SPEC I159d, user 2026-09-07 ask 2)" }
         # (d) realigned means the same left, and that is the word the user used.
         if ($box467['COMBAT TRAITS'][0] -ne $box467['HEALTH'][0]) { $v467Bad += "(d) COMBAT TRAITS opens at $($box467['COMBAT TRAITS'][0]) and HEALTH at $($box467['HEALTH'][0]) - 'realinhado com health' is the same left edge (SPEC I159d)" }
         if ($box467['VIRTUES'][0] -ne $box467['WILLPOWER'][0]) { $v467Bad += "(d) VIRTUES opens at $($box467['VIRTUES'][0]) and WILLPOWER at $($box467['WILLPOWER'][0]) - they are one column (SPEC I159d)" }
         # And the gaps really are the 5 the sum assumes (SPEC V298).
-        foreach ($pair467 in @(@('ARMOR', 'SHIELD'), @('SHIELD', 'VIRTUES'), @('VIRTUES', 'HEALTH'), @('COMBAT', 'COMBAT TRAITS'))) {
+        foreach ($pair467 in @(@('ARMOR', 'VIRTUES'), @('VIRTUES', 'HEALTH'), @('COMBAT', 'COMBAT TRAITS'))) {
             $g467 = $box467[$pair467[1]][0] - ($box467[$pair467[0]][0] + $box467[$pair467[0]][2])
             if ($g467 -ne $GAP467) { $v467Bad += "(a) $($pair467[0]) and $($pair467[1]) sit $g467 apart and the sum above assumes the $GAP467 of V298 - the ruler and the sheet have to agree on the gap or the equality means nothing (SPEC V298, V467a)" }
         }
     }
 }
 if ($v467Bad) { foreach ($b in $v467Bad) { Fail "V467 $b" } }
-else { Pass "V467 the two bands of the Combat tab ask for the same width, ARMOR and SHIELD are the same size, and COMBAT TRAITS was moved onto HEALTH without changing size" }
+else { Pass "V467 the two bands of the Combat tab ask for the same width and COMBAT TRAITS was moved onto HEALTH without changing size" }
+
+# ---- V469: the PROTECTION box is ONE and it carries TWO columns, and what gets measured is the
+# COLUMN and not the box (SPEC V469, I160a..I160f, T1027; V467c revoked, V464a and V458c amended)
+$v469Bad = @()
+if (-not (Test-Path -LiteralPath $wo3455)) { $v469Bad += "(a) WoD20.3.lfm is not where this check looks for it (SPEC V209)" }
+else {
+    $d469 = Doc $wo3455
+    # (a) ONE section layout carries both titles as DIRECT children, and ARMOR is the FIRST of
+    # the two. The order is a CONTRACT and not taste: V280, V298 and V418 each name a box by the
+    # first label they find inside it, so swapping the pair renames this box for three other
+    # rules at once (SPEC I160b).
+    $box469 = $null
+    $ghost469 = 0
+    foreach ($b469 in $d469.SelectNodes("//layout[rectangle[@color='black'][@xradius]]")) {
+        $hasA469 = $null -ne $b469.SelectSingleNode("label[@text='ARMOR']")
+        $hasS469 = $null -ne $b469.SelectSingleNode("label[@text='SHIELD']")
+        if ($hasA469) { $box469 = $b469 }
+        elseif ($hasS469) { $ghost469++ }
+    }
+    if ($null -eq $box469) { $v469Bad += "(a) no section box on the Combat tab is titled ARMOR - the two columns would have no box to be measured inside (SPEC V20, B7, I160a)" }
+    else {
+        if ($ghost469 -ne 0) { $v469Bad += "(a) $ghost469 section box(es) are titled SHIELD on their own - the 16th batch left ONE box with two columns, not two boxes (SPEC I160a, T1027)" }
+        $tls469 = @($box469.SelectNodes("label[@text='ARMOR' or @text='SHIELD']"))
+        if ($tls469.Count -ne 2) { $v469Bad += "(a) the protection box carries $($tls469.Count) of the two titles and it has to carry both, as direct children - ARMOR and SHIELD are two columns of one box (SPEC I160a, I160b)" }
+        elseif ($tls469[0].GetAttribute("text") -cne 'ARMOR') { $v469Bad += "(a) the first title inside the protection box is '$($tls469[0].GetAttribute('text'))' and it has to be ARMOR - V280, V298 and V418 all name a box by its first label, so the declaration order is a contract (SPEC I160b, V418)" }
+
+        # the two COLUMNS, found by the picker each one carries and never by position
+        $col469 = @{}
+        foreach ($p469 in @('armor', 'shield')) {
+            $btn469 = $box469.SelectSingleNode(".//button[@name='dyn${p469}Class']")
+            if ($null -eq $btn469) { $v469Bad += "(a) dyn${p469}Class is not inside the protection box (SPEC I159a, I160a)"; continue }
+            $row469 = $btn469.ParentNode
+            if ($null -eq $row469 -or $row469.Name -ne 'layout') { $v469Bad += "(a) dyn${p469}Class does not sit in a row layout - the column it belongs to cannot be read (SPEC V209)"; continue }
+            $col469[$p469] = $row469
+        }
+        # zero-guard: both columns or nothing. One column read would make (b) true by vacancy,
+        # which is the same hole the pair of boxes fell through in V467c (SPEC V20, B7).
+        if ($col469.Count -ne 2) { $v469Bad += "(b) $($col469.Count) column(s) were read inside the protection box, expected 2 - a separation rule over one column is true by vacancy (SPEC V20, B7, V209)" }
+        else {
+            $la469  = [int]$col469['armor'].GetAttribute("left");  $wa469 = [int]$col469['armor'].GetAttribute("width")
+            $lsh469 = [int]$col469['shield'].GetAttribute("left"); $ws469 = [int]$col469['shield'].GetAttribute("width")
+            $bw469  = [int]$box469.GetAttribute("width")
+            # (b) the two columns neither touch nor leave. This is the SUM rule of V414a/V467a
+            # turned INWARDS: two blocks inside one box move no border at all when one grows into
+            # the other, so measuring the box edge here would be B145 all over again.
+            $sep469 = $lsh469 - ($la469 + $wa469)
+            if ($sep469 -le 0) { $v469Bad += "(b) the ARMOR column closes at $($la469 + $wa469) and the SHIELD one opens at $lsh469 - a separator of $sep469 means the two columns touch or overlap, and the box border would not move an inch to say so (SPEC I160c, B145)" }
+            $tail469 = $bw469 - ($lsh469 + $ws469)
+            if ($tail469 -lt 20) { $v469Bad += "(b) the SHIELD column closes at $($lsh469 + $ws469) and the box is $bw469 wide - $tail469 of inset is under the 20 every box owes its edge (SPEC V280a, I160b)" }
+            # (c) each title is as wide as ITS column and sits on it - the RELATION, and not the
+            # literals 35/300 and 355/245 (SPEC V468b, I160b, I159e).
+            foreach ($t469 in @(@('ARMOR', 'armor'), @('SHIELD', 'shield'))) {
+                $lb469 = $box469.SelectSingleNode("label[@text='$($t469[0])']")
+                if ($null -eq $lb469) { continue }
+                $cl469 = [int]$col469[$t469[1]].GetAttribute("left"); $cw469 = [int]$col469[$t469[1]].GetAttribute("width")
+                if ([int]$lb469.GetAttribute("left") -ne $cl469 -or [int]$lb469.GetAttribute("width") -ne $cw469) { $v469Bad += "(c) the $($t469[0]) title sits at $($lb469.GetAttribute('left'))/$($lb469.GetAttribute('width')) and its column is at $cl469/$cw469 - one title per column, as wide as the column and centred on it and not on the box (SPEC I160b, I159e, V11)" }
+            }
+            # (d) the Class row of each column is ADJACENT: the picker opens at 75, the ? opens
+            # exactly where it closes and closes exactly on the row's width, which is where
+            # Rating and Penalty close. The literals 75/150 and 225/20 that V464(a) used to
+            # freeze are GONE: they were a starting point, and the 16th batch is the ask that
+            # moved them (SPEC B106, V468a, I160d).
+            foreach ($p469 in @('armor', 'shield')) {
+                $rw469 = [int]$col469[$p469].GetAttribute("width")
+                $wid469 = @()
+                foreach ($n469 in @("dyn${p469}Class", "edt${p469}Class")) {
+                    $c469 = $box469.SelectSingleNode(".//*[@name='$n469']")
+                    if ($null -eq $c469) { $v469Bad += "(d) $n469 is gone from the protection box (SPEC I159a)"; continue }
+                    if ([int]$c469.GetAttribute("left") -ne 75) { $v469Bad += "(d) $n469 opens at $($c469.GetAttribute('left')) and the entry column of every protection row is 75 (SPEC V26, B.12, I160d)" }
+                    $wid469 += [int]$c469.GetAttribute("width")
+                }
+                if ($wid469.Count -eq 2 -and $wid469[0] -ne $wid469[1]) { $v469Bad += "(d) dyn${p469}Class is $($wid469[0]) wide and its hidden twin edt${p469}Class is $($wid469[1]) - the two are one control on screen and a twin of another size is a second geometry (SPEC I157b, I160d)" }
+                $q469 = $box469.SelectSingleNode(".//button[@name='btnQ${p469}Class']")
+                if ($null -eq $q469) { $v469Bad += "(d) btnQ${p469}Class is gone from the protection box (SPEC I158d, I159a)" }
+                elseif ($wid469.Count -eq 2) {
+                    if ([int]$q469.GetAttribute("left") -ne (75 + $wid469[0])) { $v469Bad += "(d) dyn${p469}Class closes at $(75 + $wid469[0]) and btnQ${p469}Class opens at $($q469.GetAttribute('left')) - the ? touches the button it belongs to, no hole and no overlap (SPEC V469d, V468a)" }
+                    if (([int]$q469.GetAttribute("left") + [int]$q469.GetAttribute("width")) -ne $rw469) { $v469Bad += "(d) btnQ${p469}Class closes at $([int]$q469.GetAttribute('left') + [int]$q469.GetAttribute('width')) and the $p469 row is $rw469 wide - the pair closes where Rating and Penalty close (SPEC I160d, V458c)" }
+                }
+                foreach ($f469 in @("${p469}Rating", "${p469}Penalty")) {
+                    $e469 = $box469.SelectSingleNode(".//edit[@field='$f469']")
+                    if ($null -eq $e469) { $v469Bad += "(d) no '$f469' cell inside the protection box (SPEC V209, I159a)"; continue }
+                    if (([int]$e469.GetAttribute("left") + [int]$e469.GetAttribute("width")) -ne $rw469) { $v469Bad += "(d) '$f469' closes at $([int]$e469.GetAttribute('left') + [int]$e469.GetAttribute('width')) and its row is $rw469 wide - the three rows of one column close on one line (SPEC V26, I160d)" }
+                }
+                $td469 = $box469.SelectSingleNode(".//textEditor[@field='${p469}Description']")
+                if ($null -eq $td469) { $v469Bad += "(d) no '${p469}Description' editor inside the protection box (SPEC I159a)" }
+                elseif ([int]$td469.GetAttribute("left") -ne [int]$col469[$p469].GetAttribute("left") -or [int]$td469.GetAttribute("width") -ne $rw469) { $v469Bad += "(d) the $p469 notes pane is at $($td469.GetAttribute('left'))/$($td469.GetAttribute('width')) and its column is at $($col469[$p469].GetAttribute('left'))/$rw469 - the pane is as wide as the column above it (SPEC I160d, I160e)" }
+            }
+            # (e) the ARMOR picker holds the longest PT name in its list WITHOUT falling to
+            # fitSize's floor. Measured against the DATA and not against the literal 205: the
+            # ruler is 6.0px per character at 12pt, linear in the size, and the floor is 7
+            # (fitSize in WoD20th.lfm, SPEC V468f, V312, I160f). This is the first rule on the
+            # sheet that charges the CUT and not the full size, and that is deliberate - the user
+            # ACCEPTED the shrink in Q79.2 and undid the CUT in I160, so the cut is what it guards.
+            if ($null -eq $armTsv455 -or $armTsv455.Count -eq 0) { $v469Bad += "(e) research/armor.tsv holds no row - the floor below would be zero and true of anything (SPEC V20, B7)" }
+            else {
+                $max469 = 0
+                foreach ($r469 in $armTsv455) { if ($r469.kind -ceq 'armor' -and $r469.name_pt.Length -gt $max469) { $max469 = $r469.name_pt.Length } }
+                if ($max469 -eq 0) { $v469Bad += "(e) research/armor.tsv gave no armour name_pt to measure - leg (e) would be true over nothing (SPEC V20, B7)" }
+                else {
+                    $floor469 = [int][Math]::Ceiling($max469 * 3.5)
+                    $ab469 = $box469.SelectSingleNode(".//button[@name='dynarmorClass']")
+                    if ($null -ne $ab469 -and [int]$ab469.GetAttribute("width") -lt $floor469) { $v469Bad += "(e) dynarmorClass is $($ab469.GetAttribute('width')) wide and the longest PT armour name is $max469 characters, which wants $floor469 even at fitSize's floor of 7 - under that the name CUTS, and undoing the cut is what the 16th batch was asked for (SPEC I160f, Q79.2, V312)" }
+                }
+            }
+            # (f) the SHIELD column did NOT pay for it: what ARMOR got is what the MERGE freed,
+            # and not what the shield had (SPEC I160e, Q80.2).
+            if ($ws469 -ne 245) { $v469Bad += "(f) the SHIELD column is $ws469 wide and it was 245 on both sides of the merge - the 55 ARMOR gained came from the dead gap, not from the shield (SPEC I160e, Q80.2)" }
+            $sb469 = $box469.SelectSingleNode(".//button[@name='dynshieldClass']")
+            if ($null -ne $sb469 -and [int]$sb469.GetAttribute("width") -ne 150) { $v469Bad += "(f) dynshieldClass is $($sb469.GetAttribute('width')) wide and it was 150 on both sides of the merge (SPEC I160e, Q80.2)" }
+        }
+    }
+}
+if ($v469Bad) { foreach ($b in $v469Bad) { Fail "V469 $b" } }
+else { Pass "V469 the protection box is one and carries two columns, they neither touch nor leave, each title sits on its own column, both Class rows are adjacent, and the armour picker holds the longest PT name without cutting" }
+
+# ---- V470: the middle column of the Combat tab is CENTRED, the ten willpower boxes sit on the
+# dots above them, and the armour picker does not lose the size it has (SPEC V470, I161b, I161c,
+# I161f, T1033; user 2026-09-07 Q81.1..Q81.3) -------------------------------------------------
+$v470Bad = @()
+if (-not (Test-Path -LiteralPath $wo3455)) { $v470Bad += "(a) WoD20.3.lfm is not where this check looks for it (SPEC V209)" }
+else {
+    $d470 = Doc $wo3455
+
+    # (a) VIRTUES and WILLPOWER are one column: same width, and every child that declares a
+    # geometry is centred on the box. The tolerance is ONE pixel and that is not slack: the box
+    # is 315 over a 250px template, 65 is odd, and a pixel does not split - 314 would have been
+    # exact and the user chose 10px over 11 (SPEC Q81.1, I161b). Two is off-centre and lights.
+    $box470 = @{}
+    foreach ($b470 in $d470.SelectNodes("//layout[rectangle[@color='black'][@xradius]]")) {
+        foreach ($t470 in @('VIRTUES', 'WILLPOWER')) {
+            if ($null -ne $b470.SelectSingleNode("label[@text='$t470']")) { $box470[$t470] = $b470 }
+        }
+    }
+    if ($box470.Count -ne 2) { $v470Bad += "(a) $($box470.Count) of the two middle boxes were read on the Combat tab, expected VIRTUES and WILLPOWER - a centring rule over a box it cannot see is true by vacancy (SPEC V20, B7, V209)" }
+    else {
+        if ([int]$box470['VIRTUES'].GetAttribute("width") -ne [int]$box470['WILLPOWER'].GetAttribute("width")) { $v470Bad += "(a) VIRTUES is $($box470['VIRTUES'].GetAttribute('width')) wide and WILLPOWER $($box470['WILLPOWER'].GetAttribute('width')) - they are ONE column and the band sums them as one (SPEC I161a, V467a)" }
+        foreach ($t470 in @('VIRTUES', 'WILLPOWER')) {
+            $w470 = [int]$box470[$t470].GetAttribute("width")
+            $kids470 = 0
+            foreach ($c470 in $box470[$t470].ChildNodes) {
+                if ($c470 -isnot [System.Xml.XmlElement]) { continue }
+                $l470 = $c470.GetAttribute("left")
+                $cw470 = $c470.GetAttribute("width")
+                # align="client" children (the black rectangle) declare no geometry at all
+                if ($l470 -eq '' -or $cw470 -eq '') { continue }
+                $kids470++
+                $off470 = [Math]::Abs([int]$l470 - ($w470 - ([int]$l470 + [int]$cw470)))
+                if ($off470 -gt 1) { $v470Bad += "(a) '$($c470.Name)' in $t470 opens at $l470 and leaves $($w470 - ([int]$l470 + [int]$cw470)) on the other side - $off470 px off centre in a box the user asked to be centred horizontally (SPEC I161b, Q81.1)" }
+            }
+            if ($kids470 -lt 2) { $v470Bad += "(a) only $kids470 child(ren) of $t470 declare a geometry - a centring rule over one child is true by vacancy (SPEC V20, B7)" }
+        }
+    }
+
+    # (b) every willpower SPENT box shares the centre of the dot above it - the user's own words
+    # in Q81.3. Read by INDEX and never as a block: a whole row two pixels off breaks the centre
+    # exactly as one box does, and only the per-index read catches both (SPEC I161c).
+    $tpl470 = $d470.SelectSingleNode("//template[@name='WillpowerMirror']")
+    if ($null -eq $tpl470) { $v470Bad += "(b) the WillpowerMirror template is gone - the pairing below would be true over nothing (SPEC V20, B7, V209)" }
+    else {
+        $seen470 = 0
+        for ($i470 = 1; $i470 -le 10; $i470++) {
+            $dot470 = $tpl470.SelectSingleNode("imageCheckBox[@name='roWp_$i470']")
+            $bx470  = $tpl470.SelectSingleNode("checkBox[@field='willpower_c$i470']")
+            if ($null -eq $dot470 -or $null -eq $bx470) { continue }
+            $seen470++
+            $cd470 = (2 * [int]$dot470.GetAttribute("left")) + [int]$dot470.GetAttribute("width")
+            $cb470 = (2 * [int]$bx470.GetAttribute("left")) + [int]$bx470.GetAttribute("width")
+            if ($cd470 -ne $cb470) { $v470Bad += "(b) willpower_c$i470 is centred on $($cb470 / 2) and the dot roWp_$i470 above it on $($cd470 / 2) - the user asked for the two centres to be the same (SPEC I161c, Q81.3)" }
+        }
+        if ($seen470 -ne 10) { $v470Bad += "(b) $seen470 of the ten dot/box pairs were read inside WillpowerMirror - a pairing rule that skips a pair is true by vacancy (SPEC V20, B7)" }
+    }
+
+    # (c) the ARMOR picker still holds the longest PT armour name at fitSize's size NINE, and
+    # NINE is the number on purpose: with the 8px of Q81.2 the column gives 223 and size ten
+    # wants 225, so charging ten would light the gate over the very number the user chose
+    # (SPEC B106, I161f). V469(e) charges the floor of 7 - "does not cut"; this charges "does
+    # not regress", and the two measure against the same TSV.
+    if ($null -eq $armTsv455 -or $armTsv455.Count -eq 0) { $v470Bad += "(c) research/armor.tsv holds no row - the floor below would be zero and true of anything (SPEC V20, B7)" }
+    else {
+        $max470 = 0
+        foreach ($r470 in $armTsv455) { if ($r470.kind -ceq 'armor' -and $r470.name_pt.Length -gt $max470) { $max470 = $r470.name_pt.Length } }
+        if ($max470 -eq 0) { $v470Bad += "(c) research/armor.tsv gave no armour name_pt to measure - leg (c) would be true over nothing (SPEC V20, B7)" }
+        else {
+            $floor470 = [int][Math]::Ceiling($max470 * 4.5)
+            $ab470 = $d470.SelectSingleNode("//button[@name='dynarmorClass']")
+            if ($null -eq $ab470) { $v470Bad += "(c) dynarmorClass is gone from the Combat tab (SPEC I159a, I161e)" }
+            elseif ([int]$ab470.GetAttribute("width") -lt $floor470) { $v470Bad += "(c) dynarmorClass is $($ab470.GetAttribute('width')) wide and the longest PT armour name is $max470 characters, which wants $floor470 at fitSize's size 9 - under that the 16th batch's fit is LOST, and the 17th was asked to give the column room and never to take it (SPEC I161f, V468f, V312)" }
+        }
+    }
+}
+if ($v470Bad) { foreach ($b in $v470Bad) { Fail "V470 $b" } }
+else { Pass "V470 VIRTUES and WILLPOWER are one centred column, the ten willpower boxes sit on the centres of the ten dots, and the armour picker still fits the longest PT name at size 9" }
+
+# ---- V471: the Rate column and its legend are ONE pair - the asterisk and the sentence are
+# born and die together, and in the LANGUAGE (SPEC V471, I161g, I161h, I161i, T1033) ----------
+$v471Bad = @()
+$CAD471 = "* Cad" + [char]0xEA + "ncia de Tiro"
+
+# (a) the two new keys live in BOTH halves of localization.lang and in the PT map, the old
+# `Rate` key reads CdT for the CUSTOM weapon panel (Q81.4), and NO Portuguese sentence is
+# authored inside the tab itself (SPEC V9, V10, V24, V28).
+if ($ptVal.Count -eq 0) { $v471Bad += "(a) localization.lang gave no [pt] key - every key test below would pass by vacuum (SPEC V209, B7)" }
+else {
+    foreach ($k471 in @('Rate of Fire', '* Rate of Fire')) {
+        if (-not $ptVal.ContainsKey($k471)) { $v471Bad += "(a) '$k471' has no [pt] key in localization.lang (SPEC V17, I161g)" }
+        if (-not $enK.Contains($k471)) { $v471Bad += "(a) '$k471' has no [en] key in localization.lang (SPEC V17, I161g)" }
+    }
+    if ($ptVal.ContainsKey('Rate') -and $ptVal['Rate'] -cne 'CdT') { $v471Bad += "(a) the [pt] side of 'Rate' reads '$($ptVal['Rate'])' and the CUSTOM weapon panel is to read CdT - the user asked for the two to agree (SPEC Q81.4, I161g)" }
+}
+foreach ($m471 in @('["Rate"] = "CdT"', '["Rate of Fire"] = "CdT*"', '["* Rate of Fire"] = "' + $CAD471 + '"')) {
+    if ($hh6.IndexOf($m471) -lt 0) { $v471Bad += "(a) the PT map of WoD20.6.lfm does not carry $m471 - the map is the half the sheet reads (SPEC V22, I161g)" }
+}
+if ($hh3t.IndexOf($CAD471) -ge 0) { $v471Bad += "(a) the Portuguese legend is authored inside WoD20.3.lfm - every sentence this sheet shows lives in localization.lang and nowhere else (SPEC V9, V10, V24)" }
+
+# (b) the two labels are dyn*, so applyLanguage skips them and this walk owns both languages,
+# and NEITHER got a dataLink of its own: renderCombatButtons already runs on the one that
+# watches `language` (SPEC V31, V123, V19, V33).
+if (-not (Test-Path -LiteralPath $wo3455)) { $v471Bad += "(b) WoD20.3.lfm is not where this check looks for it (SPEC V209)" }
+else {
+    $d471 = Doc $wo3455
+    $hdr471 = $d471.SelectSingleNode("//label[@name='dynRateHdr']")
+    $foot471 = $d471.SelectSingleNode("//label[@name='dynRateFoot']")
+    if ($null -eq $hdr471) { $v471Bad += "(b) no label named dynRateHdr on the Combat tab - the Rate header has to be dyn* or applyLanguage writes Taxa over it (SPEC V31, I161g)" }
+    elseif ($hdr471.GetAttribute("text") -cne 'Rate') { $v471Bad += "(b) dynRateHdr is authored '$($hdr471.GetAttribute('text'))' and the authored text is the ENGLISH one - the Portuguese comes off the map (SPEC V9, I161g)" }
+    if ($null -eq $foot471) { $v471Bad += "(b) no label named dynRateFoot on the Combat tab - the legend the user asked for is gone (SPEC I161h)" }
+    else {
+        if ($foot471.GetAttribute("fontStyle") -notmatch 'italic') { $v471Bad += "(b) dynRateFoot is not italic and the user asked for the legend in italics (SPEC I161h)" }
+        if ($foot471.GetAttribute("visible") -cne 'false') { $v471Bad += "(b) dynRateFoot is authored visible='$($foot471.GetAttribute('visible'))' - only Lua turns it on, and an English sheet is not to carry the sentence at all (SPEC I161h, I161i)" }
+        $anc471 = $foot471.ParentNode
+        while ($null -ne $anc471 -and $anc471 -is [System.Xml.XmlElement]) {
+            if ($anc471.Name -eq 'layout' -and $null -ne $anc471.SelectSingleNode("rectangle[@color='black'][@xradius]")) { $v471Bad += "(b) dynRateFoot sits INSIDE a section box and the user asked for it below the protection box, outside it (SPEC Q81.5, I161h)"; break }
+            $anc471 = $anc471.ParentNode
+        }
+    }
+    foreach ($n471 in @('names["dynRateHdr"]', 'names["dynRateFoot"]', 'translateSheetText("Rate of Fire", lang)', 'translateSheetText("* Rate of Fire", lang)')) {
+        if ($hh3t.IndexOf($n471) -lt 0) { $v471Bad += "(b) renderCombatButtons does not carry $n471 - the pair is painted by the walk that already reads the language, and by nothing else (SPEC I161h, V123)" }
+    }
+    $link471 = 0
+    foreach ($dl471 in $d471.SelectNodes("//dataLink")) {
+        if ($dl471.GetAttribute("onChange") -match 'renderCombatButtons') {
+            $link471++
+            if ($dl471.GetAttribute("fields") -notmatch "'language'") { $v471Bad += "(b) the dataLink that calls renderCombatButtons does not watch 'language' - the header and the legend would only move on a reopen (SPEC V123, I161h)" }
+        }
+    }
+    if ($link471 -ne 1) { $v471Bad += "(b) $link471 dataLink(s) call renderCombatButtons and there is exactly one - a second link for the two new labels is the link this ask was built to avoid (SPEC V123, I161h)" }
+}
+
+# (c) the asterisk only ever exists where the legend does, and it is readable STATICALLY: pt
+# header ends in *, en header does not, the legend starts with * in both, and the panel key
+# carries none. An asterisk with no line under it is the one way this ask goes wrong (I161i).
+$lang471 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($langFile))
+$iEn471 = $lang471.IndexOf("[en]")
+if ($iEn471 -lt 0) { $v471Bad += "(c) localization.lang has no [en] section - half of this leg would pass by vacuum (SPEC V209, B7)" }
+else {
+    $en471 = $lang471.Substring($iEn471)
+    foreach ($p471 in @(@('Rate of Fire', 'Rate'), @('* Rate of Fire', '* Rate of Fire'), @('Rate', 'Rate'))) {
+        if ($en471.IndexOf("wod." + $p471[0] + "=" + $p471[1]) -lt 0) { $v471Bad += "(c) the [en] side of '$($p471[0])' is not '$($p471[1])' - the English column spells Rate out and needs no legend (SPEC I161i)" }
+    }
+}
+if ($ptVal.ContainsKey('Rate of Fire')) {
+    if (-not $ptVal['Rate of Fire'].EndsWith('*')) { $v471Bad += "(c) the [pt] header reads '$($ptVal['Rate of Fire'])' and it carries the asterisk the legend explains (SPEC I161i)" }
+}
+if ($ptVal.ContainsKey('* Rate of Fire')) {
+    if (-not $ptVal['* Rate of Fire'].StartsWith('*')) { $v471Bad += "(c) the [pt] legend reads '$($ptVal['* Rate of Fire'])' and it opens on the asterisk it answers (SPEC I161i)" }
+}
+if ($ptVal.ContainsKey('Rate')) {
+    if ($ptVal['Rate'].EndsWith('*')) { $v471Bad += "(c) the [pt] 'Rate' of the CUSTOM panel ends in an asterisk and there is no legend under that panel - the asterisk goes where the sentence is (SPEC I161i, Q81.4)" }
+}
+if ($hh3t.IndexOf('rateFoot.visible = (lang == "pt")') -lt 0) { $v471Bad += "(c) the legend's visibility does not come off the language - it is the pt sheet that gets the sentence, and the en one that gets none (SPEC I161h, I161i)" }
+if ($v471Bad) { foreach ($b in $v471Bad) { Fail "V471 $b" } }
+else { Pass "V471 the Rate column reads CdT* in pt and Rate in en, the italic legend lives outside the boxes and only in pt, both labels are dyn* painted by the walk that already watches the language, and the asterisk never appears without the line that explains it" }
 
 # ---- V468: the eleven Attack rows are ONE sum, the header sits on top of it, and the columns
 # the user asked to grow are measured against the DATA (SPEC V468, I159e, T1022) --------------

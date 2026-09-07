@@ -35,10 +35,11 @@ Toda vez que terminar de buildar: gerar o `.rpk` **e instalar**. Build sem insta
 tarefa incompleta — o Firecast continua rodando a versão velha.
 
 **Mas 1 install por RODADA, no fim — não por §T (§B103 do SPEC).** `rdk -l` roda quantas
-vezes precisar; `rdk -i` roda uma vez, ao fechar a rodada. Instalar com o Firecast aberto e
-a ficha carregada deixa o form velho na tela com o código novo atrás: o controle some e
-nenhum handler o traz de volta — só fechar e reabrir a ficha cura, e o sintoma se disfarça
-de bug de código. Se a ficha puder estar aberta, **avise antes de instalar**.
+vezes precisar; `rdk -i` roda uma vez, ao fechar a rodada.
+
+**Com o Firecast ABERTO pode instalar — não pergunte** (user, 2026-09-07; revoga o "avise
+antes de instalar" que estava aqui). Só avise DEPOIS que, se a ficha estava carregada, ela
+precisa ser fechada e reaberta para a versão nova aparecer na tela.
 
 Da raiz do plugin (`Plugins/Sheets/World of Darkness 20th Anniversary Edition/`):
 
