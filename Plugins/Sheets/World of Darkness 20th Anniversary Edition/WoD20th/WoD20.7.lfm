@@ -54,7 +54,7 @@
 
 				xpFind(tabRootOf(form), names, found);
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 
 				mfLabel(found["dynhedgeAffiliation"], sheet.hedgeAffiliation, "Select Affiliation", lang);
 

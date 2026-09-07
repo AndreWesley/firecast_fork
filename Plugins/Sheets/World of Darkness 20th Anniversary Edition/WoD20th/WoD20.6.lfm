@@ -235,7 +235,7 @@
 				["Follower"] = "Seguidor",
 				["Font"] = "Fonte",
 				["Fortune"] = "Fortuna",
-				["Free dots"] = "Pontos grátis",
+				["Edit dots freely"] = "Editar pontos livremente",
 				["Free specialties are lost only by lowering the trait"] = "Especializações gratuitas só são perdidas ao baixar o traço",
 				["Gallant"] = "Galante",
 				["Gambler"] = "Jogador",
@@ -537,7 +537,7 @@
 				["Tyrant"] = "Tirano",
 				["Update"] = "Atualizar",
 				["Version"] = "Versão Atual",
-				["Version: 0.1.1"] = "Versão: 0.1.1",
+				["Version: 0.2.0"] = "Versão: 0.2.0",
 				["Victorian Age"] = "Era Vitoriana",
 				-- Latin, and the book leaves it Latin inside English prose - so the entry is the SAME
 				-- string on both sides (SPEC I17). The key still has to exist: V10 collects every picker
@@ -2611,7 +2611,7 @@
 				local names  = { cboHedgeAttr = true };
 
 				local found  = {};
-				local lang   = sheet.language or "en";
+				local lang   = sheet.language or "pt";
 				local era    = currentTheme();
 				local levels = discLevels();
 
@@ -4955,7 +4955,7 @@
 						-- the one being asked for, and an unknown value renames nothing, which
 						-- is the same fallback the palette takes above.
 						if cls == "comboBox" then
-							pickerItems(c, (sheet ~= nil and sheet.language) or "en", v, levels);
+							pickerItems(c, (sheet ~= nil and sheet.language) or "pt", v, levels);
 						end;
 					elseif cls == "imageCheckBox" then
 						paint(c, "checkedImage", t.dotOn, authored(c, "checkedImage"));
@@ -4985,62 +4985,37 @@
 			Options first, credits last (SPEC T141): the settings are what a player opens this
 			tab to change; the credits are a signature.
 		-->
-		<layout left="0" top="0" width="420" height="135">
+		<layout name="boxLanguage" left="0" top="0" width="420" height="69">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="20" top="15" width="80" height="20" text="Language" horzTextAlign="center"/>
-			<comboBox left="100" top="15" width="300" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
-			<dataLink field="language" defaultValue="en">
+			<label left="20" top="25" width="80" height="20" text="Language" horzTextAlign="center"/>
+			<comboBox left="100" top="22" width="300" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
+			<dataLink field="language" defaultValue="pt">
 				<event name="onChange">
 					if sheet == nil then return end;
-					applyLanguage(sheet.language or "en", self);
-					renderAbilityLabels(sheet.language or "en", self);
+					applyLanguage(sheet.language or "pt", self);
+					renderAbilityLabels(sheet.language or "pt", self);
 				</event>
 			</dataLink>
 
-			<!-- `Game` says what the table is playing (SPEC C, T75). Nothing reads it - no
-			     content is filtered by it, on purpose. Named cbo* so the language switch
-			     translates the shown items while `values` stay English (SPEC V24).
-
-			     Three games since the 32nd round, and the box is NOT editable: the value is
-			     information, not a choice (SPEC V109). No empty row goes with that - a locked
-			     combo carrying a default has nothing to clear - which is the same declared
-			     exception to V15 that cboSheetTheme carries. A sheet holding one of the four
-			     older, longer names is normalised on load (SPEC V110), because a locked box
-			     showing a dead value is one nobody could fix. -->
-			<label left="20" top="55" width="80" height="20" text="Game" horzTextAlign="center"/>
-			<comboBox left="100" top="55" width="300" height="25" name="cboGame" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}">
-			</comboBox>
-			<dataLink field="game" defaultValue="Mortal"/>
-
 			<!--
-				`Theme` is the era the table plays in and, like `Game`, only stores state today
-				(SPEC C, T141). The field is `sheetTheme`, NOT `theme`: sheets saved from the Mage
-				plugin still carry theme="Dark", and reusing the name would put that value in a
-				combo that never offered it.
+				`Game` and `Era` MOVED to the storyteller's box on WoD20.10 in the 191st round
+				(user 2026-09-06, SPEC I156b): what era the table plays in is the storyteller's
+				call, and the two combos are the first rows of that box now.
 
-				Named cbo* ON PURPOSE: only those combos get their `items` rebuilt when the
-				language changes, and without the prefix a [pt] sheet would still read
-				"Dark Ages" instead of "Idade das Trevas". `values` stay canonical English
-				(SPEC V24). It is the
-				one declared exception to V15 - a state combo with a real default has no empty
-				first row to clear.
-
-				As of the 14th round this combo PAINTS (SPEC I5/I6): the four values are the
-				keys the palette table is looked up by, so changing this list means changing
-				THEMES and defaultValue in the same commit (SPEC V12).
-
-				The 16th round dropped the palette-less baseline that used to be called `Modern`
-				and gave the name to the contemporary palette. Every value paints now, so there
-				is no way back to the sheet as the XML authors it (SPEC C, 16th round).
+				What did NOT move is these two dataLinks. A dataLink watches a FIELD, not a
+				widget (SPEC V1, B3), so the combos over there answer through these just the
+				same - and the `sheetTheme` handler below is the one that calls sheetReveal,
+				the last paint of the load (SPEC I15, V166, V167, B40). WoD20.10 is hidden by
+				ROLE and a player never opens it (SPEC V79), so hanging the reveal there would
+				bet the whole sheet on the root form's 1500ms net (SPEC V95, B26, I156c).
 			-->
-			<label left="20" top="95" width="80" height="20" text="Era" horzTextAlign="center"/>
-			<comboBox name="cboSheetTheme" left="100" top="95" width="300" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}"/>
+			<dataLink field="game" defaultValue="Mortal"/>
 			<dataLink field="sheetTheme" defaultValue="Modern Nights">
 				<event name="onChange">
 					if sheet == nil then return end;
 					applyTheme(sheet.sheetTheme or THEME_DEFAULT, self);
-					renderAbilityLabels(sheet.language or "en", self);
+					renderAbilityLabels(sheet.language or "pt", self);
 
 					-- Last paint of the load, so the sheet is safe to show (SPEC I15, V167).
 					-- It lives at the END of this handler on purpose: everything above it is
@@ -5082,7 +5057,7 @@
 			which has sat in this width at this size since the 82nd round. V16 asks a label to fit
 			its longest translation, and the sibling is the proof it does (SPEC I136l, V16, V25).
 		-->
-		<layout left="0" top="140" width="420" height="232">
+		<layout left="0" top="74" width="420" height="196">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<label left="20" top="15" width="380" height="20" text="CREDITS" horzTextAlign="center"/>
@@ -5095,7 +5070,25 @@
 
 			<label left="20" top="161" width="380" height="20" text="System: Storyteller 20th Anniversary Edition" horzTextAlign="center"/>
 
-			<label left="20" top="197" width="380" height="20" text="Version: 0.1.1" horzTextAlign="center"/>
+		</layout>
+
+		<!--
+			The version, in a box of its own under the credits (user 2026-09-06, item 4 of the
+			11th batch, SPEC I156e). It sat as the last line INSIDE the credits box until this
+			round; what the credits say is who made the sheet, and what release you are looking
+			at is a different question.
+
+			No title label: the first box on this tab has none either, and V240 reads an
+			untitled box without complaint. 68 tall and not the 50 the content asks for - that
+			is the floor a section box needs to hold the ornament's crosses, and a box under it
+			comes out with the bare rule while its neighbours carry the motif (SPEC V314e, B59).
+			Head is the house 15 and the foot is what is left (SPEC V240), and the 5px gutter to
+			the box above is the one this tab has always used (SPEC V298).
+		-->
+		<layout name="boxVersion" left="0" top="275" width="420" height="68">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+
+			<label left="20" top="24" width="380" height="20" text="Version: 0.2.0" horzTextAlign="center"/>
 		</layout>
 	</scrollBox>
 </form>

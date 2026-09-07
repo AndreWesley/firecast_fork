@@ -20,7 +20,7 @@
 
 				if ctrl == nil then return; end;
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 				local txt  = familyWeakness();
 
 				if txt == nil or txt == "" then txt = "-- no weakness --"; end;
@@ -59,7 +59,7 @@
 
 				xpFind(tabRootOf(form), names, found);
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 
 				for i = 1, last, 1 do
 					mfLabel(found["dyndisc_" .. i], sheet["disc_" .. i], "Select Discipline", lang);
@@ -100,7 +100,7 @@
 
 				xpFind(tabRootOf(form), names, found);
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 
 				for i = 1, MAIN_PATH_ROWS, 1 do
 					mfLabel(found["dynmainPath_" .. i], sheet["mainPath_" .. i], "Select Main Path", lang);
@@ -141,7 +141,7 @@
 
 				xpFind(tabRootOf(form), names, found);
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 
 				for i = 1, last, 1 do
 					if not RITUAL_VACANT[i] then

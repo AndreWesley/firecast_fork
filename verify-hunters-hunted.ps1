@@ -891,7 +891,7 @@ foreach ($l in $listReport) {
 # The three checks above are only worth as much as what the collector saw: a picker named
 # without the `cbo` prefix, or one that lost its inline `items=`, drops out of $listReport
 # and every check on it becomes a silent no-op (SPEC V20 / B.7). Name the new ones.
-foreach ($must in @('WoD20.6.lfm/cboGame','WoD20.7.lfm/cboHedgeAttr','WoD20.6.lfm/cboSheetTheme')) {
+foreach ($must in @('WoD20.10.lfm/cboGame','WoD20.7.lfm/cboHedgeAttr','WoD20.10.lfm/cboSheetTheme')) {
     if ($listReport | Where-Object { $_.Name -eq $must }) { Pass "V14/V15/V17 $must reaches the list checks" }
     else { Fail "V14/V15/V17 $must was never collected - its list is unchecked" }
 }
@@ -899,7 +899,7 @@ foreach ($must in @('WoD20.6.lfm/cboGame','WoD20.7.lfm/cboHedgeAttr','WoD20.6.lf
 # cboGame is a closed roster, not an open vocabulary: assert the names themselves, so a
 # dropped, renamed or added entry fails instead of passing as "no duplicates" (SPEC V109).
 # Three since the 32nd round, and no leading empty one to discount.
-$gameList = @($listReport | Where-Object { $_.Name -eq 'WoD20.6.lfm/cboGame' })
+$gameList = @($listReport | Where-Object { $_.Name -eq 'WoD20.10.lfm/cboGame' })
 if ($gameList.Count -eq 1) {
     $wantGames = @('Vampire', 'Mortal', 'Mage')
     $gotGames = @($gameList[0].Items)
@@ -1954,7 +1954,7 @@ else { Pass "V21 traversal walks up to the sheet root" }
 # Information, not a choice. Which makes what it holds the sheet's problem: a value outside
 # the three - one of the four longer names this sheet used to offer, or nothing at all - would
 # sit in a box nobody can open, so the load puts it back inside the roster.
-$gameNode = @((Doc (Join-Path $dir "WoD20.6.lfm")).SelectNodes("//comboBox[@name='cboGame']"))
+$gameNode = @((Doc (Join-Path $dir "WoD20.10.lfm")).SelectNodes("//comboBox[@name='cboGame']"))
 if ($gameNode.Count -ne 1) { Fail "V109 expected exactly one cboGame, found $($gameNode.Count)" }
 elseif ($gameNode[0].GetAttribute("enabled") -ne 'false') { Fail "V109 cboGame is editable - the game is information, not a choice" }
 elseif ($hh6 -notmatch 'dataLink field="game" defaultValue="Mortal"') { Fail "V109 cboGame has no default - a new sheet would show an empty locked box" }
@@ -2114,7 +2114,7 @@ elseif ($eraFn.Groups[1].Value -notmatch 'ERA_NAME\[v\]') { Fail "V194 eraName d
 elseif ($eraFn.Groups[1].Value -notmatch '"Dark Ages"' -or $eraFn.Groups[1].Value -notmatch '"Classical Age"') { Fail "V194 eraName does not gate on both medieval eras - one table serves the two (SPEC C, I22)" }
 elseif ($hh6 -notmatch 'c\.items = shown;') { Fail "V194 nothing writes a picker's items in WoD20.6 - the era and the language would both stop reaching the rows" }
 elseif ($hh6 -notmatch 'pickerItems\(c, lang, currentTheme\(\), levels\);') { Fail "V194 applyLanguage no longer rebuilds the items through pickerItems" }
-elseif ($hh6 -notmatch 'pickerItems\(c, \(sheet ~= nil and sheet\.language\) or "en", v, levels\);') { Fail "V194 applyTheme no longer rebuilds the items - changing era would leave the old era's words on the rows (SPEC T469)" }
+elseif ($hh6 -notmatch 'pickerItems\(c, \(sheet ~= nil and sheet\.language\) or "pt", v, levels\);') { Fail "V194 applyTheme no longer rebuilds the items - changing era would leave the old era's words on the rows (SPEC T469)" }
 elseif ($hh6 -match 'dataLink[^>]*field="sheetTheme"[^>]*pickerItems') { Fail "V194 a second era trigger was added - the era must ride applyTheme's own walk (SPEC T469)" }
 else { Pass "V194 one reader of ERA_NAME, called from both switches, with no era trigger of its own" }
 
@@ -2495,7 +2495,7 @@ else {
     $body = $themeFn.Groups[1].Value
 
     # V52: the three values, the table that answers them, and the fallback.
-    $themeCb = @($listReport | Where-Object { $_.Name -eq 'WoD20.6.lfm/cboSheetTheme' })
+    $themeCb = @($listReport | Where-Object { $_.Name -eq 'WoD20.10.lfm/cboSheetTheme' })
     $wantThemes = @('Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age')
     if ($themeCb.Count -ne 1) { Fail "V52 cboSheetTheme was never collected - its value list is unchecked" }
     elseif (Compare-Object $themeCb[0].Items $wantThemes) {
@@ -2503,7 +2503,7 @@ else {
     } else { Pass "V52 cboSheetTheme offers the $($wantThemes.Count) declared themes" }
 
     # The combo saves what it shows, so items and values must not drift apart (SPEC V24).
-    $themeNode = (Doc (Join-Path $dir "WoD20.6.lfm")).SelectSingleNode("//comboBox[@name='cboSheetTheme']")
+    $themeNode = (Doc (Join-Path $dir "WoD20.10.lfm")).SelectSingleNode("//comboBox[@name='cboSheetTheme']")
     if ($null -eq $themeNode) { Fail "V52 cboSheetTheme node missing" }
     elseif ($themeNode.GetAttribute("items") -ne $themeNode.GetAttribute("values")) {
         Fail "V52 cboSheetTheme items and values differ - a [pt] sheet would save a translated theme name"
@@ -4302,7 +4302,7 @@ else { Pass "V101 the guard sleeps until the storyteller freezes the character" 
 
 # ---- V103: only a point that is IN the log can be sold back -----------------------
 if ($guardFn -notmatch 'traitLevel\(base,') { Fail "V103 the guard never reads the baseline rating - it would let a frozen point be sold" }
-elseif ($guardFn -notmatch '(?s)if after < traitLevel\(base,.{0,80}return false;') { Fail "V103 the guard does not refuse a sale that would drop the trait below the frozen character" }
+elseif ($guardFn -notmatch '(?s)if not free and after < traitLevel\(base,.{0,80}return false;') { Fail "V103 the guard does not refuse a sale that would drop the trait below the frozen character, or it refuses one with Edit dots freely on (SPEC V103 amended, V451b)" }
 else { Pass "V103 a point the storyteller froze cannot be sold back" }
 
 # ---- V102: the three experience boxes own no field --------------------------------
@@ -4972,7 +4972,7 @@ $markFn  = LuaFn $rootTxt 'markDot'
 if (-not $clickFn.Success) { Fail "V135 xpClick not found on the root form" }
 else {
     $c     = NoComments $clickFn.Groups[1].Value
-    $iPr   = $c.IndexOf('xpLedgerRows(field, want, key, want and okey or nil)')
+    $iPr   = $c.IndexOf('xpLedgerRows(field, want, key, want and okey or nil, sunk)')
     $iMark = $c.LastIndexOf('xpPrefix(form, trait, t, want and (level + 1) or (level - 1));')
     $marks = @([regex]::Matches($c, 'markDot\('))
     if ($c -notmatch 'local alvo = \(\(sheet\[field\] == true\) and n == cur\) and \(n - 1\) or n;') { Fail "V135 the click never works out the LEVEL it is asking for (SPEC I155b) - with autoChange off, nothing else does" }
@@ -5028,7 +5028,7 @@ elseif ($clickOnly -notmatch 'while lvl ~= alvo do') { Fail "V444 the click does
 elseif ($clickOnly -notmatch 'xpStep\(form, trait, t, lvl, want, base, free\)') { Fail "V444 the click does not hand each level to xpStep - the rules would be asked somewhere else" }
 elseif ($clickOnly -notmatch 'if not ok then break; end;') { Fail "V444 the sequence does not stop at the first refusal - a refused level would let the next one through (SPEC I155e)" }
 elseif ($clickOnly -match 'xpLedgerRows\(') { Fail "V444 the click prices outside the step - a jump priced in one go is a second cost table (SPEC I9, V125)" }
-elseif ($stepOnly -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil\)') { Fail "V444 the step does not price the level it is about to write (SPEC V136)" }
+elseif ($stepOnly -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil, sunk\)') { Fail "V444 the step does not price the level it is about to write (SPEC V136)" }
 else { Pass "V444 the click walks one level at a time and the first refusal stops it" }
 
 # V445: the three repaints the CLICK owns leave the loop. Inside it they fire once per level,
@@ -5116,7 +5116,7 @@ else {
 $rowsSim = LuaFn $rootTxt 'xpLedgerRows'
 $liveFn  = LuaFn $rootTxt 'liveLevel'
 if (-not $rowsSim) { Fail "V136 xpLedgerRows not found on the root form" }
-elseif ($rowsSim -notmatch 'function xpLedgerRows\(clickField, clickValue, clickFree, clickOrder\)') { Fail "V136 xpLedgerRows cannot be handed a pending click" }
+elseif ($rowsSim -notmatch 'function xpLedgerRows\(clickField, clickValue, clickFree, clickOrder, clickSunk\)') { Fail "V136 xpLedgerRows cannot be handed a pending click" }
 elseif ($rowsSim -notmatch 'simField, simValue = clickField, clickValue;') { Fail "V136 the pending click is never put in front of the ledger" }
 elseif ($rowsSim -notmatch 'simTrait, simField, simValue = nil, nil, nil;') { Fail "V136 the simulation is never cleared - a later price would carry an answered click" }
 elseif ($rowsSim.IndexOf('simTrait, simField, simValue = nil, nil, nil;') -gt $rowsSim.IndexOf('return rows;')) { Fail "V136 the simulation is cleared after the ledger has returned, which is never" }
@@ -5139,7 +5139,7 @@ foreach ($ff in $files) {
 }
 if ($flagReads.Count -ne 1) { Fail "V137 stFreeBuy is read in $($flagReads.Count) place(s) ($($flagReads -join ', ')) - exactly one, inside xpClick" }
 elseif ($flagReads[0] -ne 'WoD20th.lfm') { Fail "V137 stFreeBuy is read from $($flagReads[0]) - the flag belongs to the click, not to a tab" }
-elseif ($clickFn.Groups[1].Value -notmatch 'local free = want and sheet\.stFreeBuy == true;') { Fail "V137 xpClick does not read the flag at the click - the answer would come from somewhere else in time" }
+elseif ($clickFn.Groups[1].Value -notmatch 'local free = sheet\.stFreeBuy == true;') { Fail "V137 xpClick does not read the flag at the click - the answer would come from somewhere else in time (SPEC V137 amended: the want and came off in T994)" }
 else { Pass "V137 Free dots is read once, at the click, and by nothing else" }
 
 # ---- V138: the stamp holds names, keyed by the rating REACHED ------------------------
@@ -5172,12 +5172,16 @@ else { Pass "V138 the stamp keeps names keyed by the rating reached, and no burn
 # the fact. That is also what stops a free point from making the next one cheaper - the
 # price still reads the rating reached, never how many points were paid for.
 $riseFn    = LuaFn $rootTxt 'pushRise'
-$riseCalls = @([regex]::Matches($rootTxt, 'ctx, (field|"humanity"|"willpower"|"faith")\);'))
+# The `last` that follows the field since T996 is the top of the ladder, and every group hands
+# it over: without it the loop stops at the rating the trait stands at and a SUNK level - one
+# paid for and then edited off - would have no line, which is the experience coming back the
+# quiet way (SPEC V452c, I156i).
+$riseCalls = @([regex]::Matches($rootTxt, 'ctx, (field|"humanity"|"willpower"|"faith"), \d+\);'))
 # Derived, not a literal: the 51st round took the ledger from ten row groups to thirteen,
 # and a number typed here would have to be edited by hand every time a box is added.
 $riseTotal = @([regex]::Matches($rootTxt, [regex]::Escape('pushRise(rows, "'))).Count
 if (-not $riseFn) { Fail "V139 pushRise not found on the root form" }
-elseif ($riseFn -notmatch 'function pushRise\(rows, kind, name, from, to, ctx, field\)') { Fail "V139 pushRise cannot tell which trait the row belongs to - it could not read a stamp" }
+elseif ($riseFn -notmatch 'function pushRise\(rows, kind, name, from, to, ctx, field, last\)') { Fail "V139 pushRise cannot tell which trait the row belongs to - it could not read a stamp" }
 elseif ($riseFn -notmatch 'local cost = xpCost\(kind, lvl - 1, ctx\);') { Fail "V139 pushRise no longer prices the row through xpCost (SPEC V86)" }
 elseif ($riseFn -notmatch 'string\.find\(ctx\.free, "\|" \.\. field \.\. "#" \.\. lvl \.\. "\|", 1, true\)') { Fail "V139 pushRise does not look the row's level up in the stamps" }
 elseif ($riseFn.IndexOf('string.find(ctx.free') -lt $riseFn.IndexOf('local cost = xpCost(')) { Fail "V139 the discount lands before the price exists - it must zero a cost the table already worked out (SPEC V86)" }
@@ -5398,7 +5402,7 @@ $stampFinds = @([regex]::Matches($rootTxt, 'string\.find\(sheet\.xpFree'))
 if (-not $isFreeFn) { Fail "V160 isFreeRow not found - the stamp question would be asked three different ways" }
 elseif (-not $freeRowFn) { Fail "V160 freeRowOf not found - the dedup and the revoke would each look the row up their own way" }
 elseif ($stampFinds.Count -ne 1) { Fail "V160 the stamps are read directly in $($stampFinds.Count) places - isFreeRow is meant to be the only one" }
-elseif ($isFreeFn -notmatch '"\|" \.\. field \.\. "#1\|"') { Fail "V160 isFreeRow does not key off the row's own stamp" }
+elseif ($isFreeFn -notmatch '"\|" \.\. field \.\. "#" \.\. \(level or 1\) \.\. "\|"') { Fail "V160 isFreeRow does not key off the row's own stamp" }
 elseif ($freeRowFn -notmatch 'sheet\["speciality_" \.\. i\] == name and isFreeRow\("speciality_" \.\. i\)') { Fail "V151 freeRowOf does not check name AND stamp together - a speciality the player PAID for would be taken for the gift" }
 elseif ($grantFn -notmatch 'if freeRowOf\(t\.name\) ~= nil then return false; end;') { Fail "V151 the grant does not ask whether the trait already has its gift" }
 elseif ($revokeFn -notmatch 'local slot = freeRowOf\(t\.name\);') { Fail "V151 the revoke does not find its row through the same lookup - it could take a paid speciality" }
@@ -6912,11 +6916,17 @@ else { Pass "V213 the credit to the base plugin stands on the Settings tab (labe
 # V233): this is a mortal's sheet and the roster says so. Counting the bare word would be
 # a HOLE - "Mortal" already appears inside two power names in this same file - so the
 # three sites are asserted as needles, the shape the credit check above already uses.
+#
+# Read across the TWELVE and not inside WoD20.6 alone: T990 moved the combo to the
+# storyteller's box on WoD20.10 and left its dataLink behind, so the roster now lives in two
+# files and an anchor on one of them stops reading the other (SPEC I156b, B7).
 $rosterBad = @()
+$rosterTxt = ''
+foreach ($f213 in $files) { $rosterTxt += [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f213.FullName)) }
 foreach ($needle in @("items=""{'Vampire', 'Mortal', 'Mage'}""",
                       "values=""{'Vampire', 'Mortal', 'Mage'}""",
                       '<dataLink field="game" defaultValue="Mortal"/>')) {
-    if ($creditTxt.IndexOf($needle) -lt 0) { $rosterBad += "missing: $needle" }
+    if ($rosterTxt.IndexOf($needle) -lt 0) { $rosterBad += "missing: $needle" }
 }
 if ($rosterBad) { foreach ($b in $rosterBad) { Fail "V213 Game roster $b" } }
 else { Pass "V213 the Game roster offers Vampire, Mortal, Mage and defaults to Mortal" }
@@ -8128,14 +8138,19 @@ else {
 if ($v291Bad) { foreach ($b in $v291Bad) { Fail "V291 $b" } }
 else { Pass "V291 Prelude closes with Goals on Y, the header closes with Prelude on X, and the 130px it gained went to its three columns" }
 
-# ---- V292: the two Settings boxes close on one edge --------------------------------
+# ---- V292: the three Settings boxes close on one edge ------------------------------
 $v292Bad = @()
 $doc292 = Doc (Join-Path $dir "WoD20.6.lfm")
 $boxes292 = @($doc292.SelectNodes("//scrollBox/layout"))
-if ($boxes292.Count -ne 2) { $v292Bad += "the Settings tab holds $($boxes292.Count) section box(es), expected 2 - the ruler is one against the other and there is no literal to fall back on (SPEC V209)" }
+if ($boxes292.Count -ne 3) { $v292Bad += "the Settings tab holds $($boxes292.Count) section box(es), expected 3 - the ruler is one against the other and there is no literal to fall back on (SPEC V209, I156e)" }
 else {
-    $a = BoxRect $boxes292[0]; $b = BoxRect $boxes292[1]
-    if ($a.R -ne $b.R) { $v292Bad += "the boxes close at x=$($a.R) and x=$($b.R) - the tab has one right edge (SPEC V292)" }
+    # Three since T992 gave the version a box of its own (SPEC I156e), and they are all read
+    # against the FIRST: a third box that drifted right is caught exactly as the second is.
+    $a = BoxRect $boxes292[0]
+    foreach ($o292 in @($boxes292[1], $boxes292[2])) {
+        $b = BoxRect $o292
+        if ($a.R -ne $b.R) { $v292Bad += "the boxes close at x=$($a.R) and x=$($b.R) - the tab has one right edge (SPEC V292)" }
+    }
     foreach ($bx in $boxes292) {
         $r = BoxRect $bx
         $ends = @($bx.ChildNodes | Where-Object { $_.NodeType -eq 'Element' -and $_.LocalName -ne 'rectangle' -and $_.LocalName -ne 'dataLink' } | ForEach-Object {
@@ -8148,7 +8163,7 @@ else {
     }
 }
 if ($v292Bad) { foreach ($b in $v292Bad) { Fail "V292 $b" } }
-else { Pass "V292 both Settings boxes close on one edge and each spends its width on its widest child" }
+else { Pass "V292 all three Settings boxes close on one edge and each spends its width on its widest child" }
 
 # ---- V293: hedgeStrip breathes the same on both sides, RETIRED (SPEC B64, I117) ------------
 # It measured ONE bar - the only one on the sheet with content above AND below it - and asked that
@@ -9312,6 +9327,10 @@ else { Pass "V400 all $v400Seen box backdrops cover their box exactly - none cli
 # rect: the box is the same 407x146 stretched to the band's base, so it pays CENTRING in place of
 # the gap under its last row, exactly as the one beside it does.
 $STRETCHED_BAND = @('QUINTESSENCE', 'TRUE FAITH')
+# The two the ORNAMENT stretched, on the Settings tab (SPEC I156j, T997). Named in the XML,
+# because neither has a title this check could key on - see the block below.
+$CENTRED_BY_FLOOR = @('boxLanguage', 'boxVersion')
+$centredSeen = 0
 $vpadBad = @()
 $vpadSeen = 0
 $stretchSeen = 0
@@ -9378,6 +9397,22 @@ foreach ($f in $files) {
         # CENTRED in the body, top gap equal to bottom gap, which is V239 turned 90 degrees
         # (SPEC V267b). The body opens at 41 - the title band plus the 10 V240 asks under it,
         # the same 41 the list boxes count with (466 = 41 + 25*17).
+        # The two Settings boxes the ORNAMENT stretched (user 2026-09-07, SPEC I156j). Their
+        # content asks for 55 and 50; V314e's filete needs 68 of shortest side to hold its
+        # crosses, so both were born taller than anything in them - and the head/foot pair put
+        # all of that slack UNDER the content, which is what the owner saw. They pay the same
+        # swap the tabHedge band pays: centred, top gap EQUAL to bottom gap (SPEC V267b).
+        #
+        # By NAME and not by title, which is the other difference from the band: one of them has
+        # no title at all and the only label in the other IS its content - the detector above
+        # reads it as a title because it is centred and wide. A name is a thing the XML has to
+        # say on purpose (SPEC V209).
+        if ($CENTRED_BY_FLOOR -contains $box.GetAttribute("name")) {
+            $centredSeen++
+            if ($hi -ne $gapB) { $vpadBad += "$($f.Name) '$($box.GetAttribute("name"))' leaves $hi above its content and $gapB under it - a box stretched by the ornament pays CENTRING, not the head and foot (SPEC V240 amended, I156j, V314e)" }
+            continue
+        }
+
         if ($f.Name -eq 'WoD20.7.lfm' -and $STRETCHED_BAND -contains $ttl) {
             $stretchSeen++
 
@@ -9429,6 +9464,7 @@ foreach ($f in $files) {
     }
 }
 if ($vpadSeen -lt 70) { Fail "V240 only $vpadSeen box(es) were measured, expected the 70 the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
+elseif ($centredSeen -ne 2) { Fail "V240 $centredSeen box(es) stretched by the ornament took the centring rule, expected the 2 of the Settings tab - an exception nothing reaches is an exception that stopped measuring (SPEC V209, I156j)" }
 elseif ($stretchSeen -ne 2) { Fail "V240 $stretchSeen stretched box(es) took the centring rule, expected the 2 of the tabHedge band - an exception nothing reaches is an exception that stopped measuring (SPEC V209, V267b)" }
 elseif ($vpadBad) { foreach ($b in $vpadBad) { Fail "V240 $b" } }
 else { Pass "V240 all $vpadSeen boxes breathe at least 20 above their title and 20 under their last row, and the $stretchSeen stretched ones centre their content instead" }
@@ -10426,7 +10462,7 @@ if ($clickC -notmatch 'string\.gsub\(sheet\.xpOrder, "\|" \.\. okey \.\. "\|", "
 # something else redraws the sheet - green build, green gate, and the player watching (B6)
 if ($rowsC -notmatch 'clickOrder') { $ordBad += "xpLedgerRows cannot be handed the stamp of the click being priced - the row just bought would sort to the bottom until the next render (SPEC V260d)" }
 if ($rowsC -notmatch 'local ord = \(sheet\.xpOrder or ""\) \.\. "\|" \.\. \(clickOrder or ""\) \.\. "\|"') { $ordBad += "the walk does not append the pending click LAST - that append is the whole of why the new line lands on top (SPEC V260d)" }
-if ($clickC -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil\)') { $ordBad += "xpClick prices without handing over the order stamp it is about to write (SPEC V260d)" }
+if ($clickC -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil, sunk\)') { $ordBad += "xpClick prices without handing over the order stamp it is about to write (SPEC V260d)" }
 
 # (e) one sorter. Summing does not depend on order (V100) and two sorters diverge in silence.
 $sortAll = @([regex]::Matches((NoComments $rootTxt), 'table\.sort\(rows'))
@@ -11290,8 +11326,11 @@ else {
     # place the sheet wrote the same number down, and the margin change is what made the three
     # disagree out loud (SPEC B70, B130, I137c). Content closes at 419 - 20 = 399 whatever the
     # margin is; the box is that plus one head and one foot.
+    # T990 put Game and Era at the TOP of the box (user 2026-09-06, SPEC I156b) and everything
+    # under them moved 60 again, exactly as the two flags of the 94th round did: the content now
+    # closes at 459 - 20, and the derivation is untouched.
     $h274 = [int]$stBox274.GetAttribute("height")
-    $want274 = 399 - 20 + (2 * $BOX_PAD_Y)
+    $want274 = 459 - 20 + (2 * $BOX_PAD_Y)
     if ($h274 -ne $want274) { $v274Bad += "the box is $h274 tall, expected $want274 - two flags of 25 at a pitch of 30 moved everything under them by 60, and the box carries one head and one foot on top of that (SPEC V274e, I71, I73, I137c)" }
     $kids274 = @($stBox274.ChildNodes | Where-Object { $_.NodeType -eq "Element" -and $_.LocalName -ne "rectangle" -and $_.HasAttribute("top") })
     if ($kids274.Count -eq 0) { $v274Bad += "the box holds no placed control - the two gaps below would be measured against nothing (SPEC V209)" }
@@ -12391,13 +12430,14 @@ foreach ($f in $files) {
             L = $bl; T = $bt; W = $bw; H = $bh; Node = $box; P = $box.ParentNode }
     }
 }
-if ($v280Boxes.Count -ne 69) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 69 I73 measures (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
+if ($v280Boxes.Count -ne 70) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
 else {
     # (a) TWO numbers since T913: 20 on the X sides, 15 on the Y ones (SPEC I137c, user
     # 2026-09-02). The X pair is a FLOOR and always was. The Y pair splits: the FOOT is a floor,
     # for V240's old reason - boxes welded to a closing line carry the slack INSIDE (SPEC B63) -
     # and the HEAD is an EQUALITY, because it has no freedom at all and a floor there would let a
     # new box keep 20 and never be told (SPEC I137c).
+    $v280Centred = 0
     foreach ($b in $v280Boxes) {
         $ml = [int]::MaxValue; $mr = [int]::MaxValue; $mt = [int]::MaxValue; $mb = [int]::MaxValue
         foreach ($k in $b.Node.ChildNodes) {
@@ -12415,9 +12455,21 @@ else {
             if (($b.W - $kl - $kw) -lt $mr) { $mr = $b.W - $kl - $kw }
             if (($b.H - $kt - $kh) -lt $mb) { $mb = $b.H - $kt - $kh }
         }
+        # Counted BEFORE the chain below, on membership alone: hanging the tally off the
+        # branch would drop it whenever one of these two also broke a margin, and the guard
+        # would then report an exception that stopped reaching while the real defect is a
+        # margin (SPEC V209, I156j).
+        $isCentred280 = $CENTRED_BY_FLOOR -contains $b.Node.GetAttribute("name")
+        if ($isCentred280) { $v280Centred++ }
         if ($ml -eq [int]::MaxValue) { $v280Bad += "$($b.F) '$($b.N)' holds nothing this leg can measure - a box with no placed child is a box with no margin to read (SPEC V209)"; continue }
         if ($ml -lt $BOX_PAD_X -or $mr -lt $BOX_PAD_X -or $mt -lt $BOX_PAD_Y -or $mb -lt $BOX_PAD_Y) {
             $v280Bad += "$($b.F) '$($b.N)' ($($b.W)x$($b.H)) leaves L=$ml R=$mr T=$mt B=$mb - a section box clears $BOX_PAD_X on the X sides and $BOX_PAD_Y on the Y ones (SPEC I73, V280a, I137c)"
+        }
+        elseif ($isCentred280) {
+            # The two the ornament stretched (SPEC I156j, V240 amended): they pay CENTRING in
+            # place of the head/foot pair, and V240 is where that is measured. The head equality
+            # is skipped HERE and nowhere else - V280 and V240 enforce one number and both had to
+            # be told, which is the two-owners lesson of B70/B130 all over again.
         }
         elseif ($mt -ne $BOX_PAD_Y) {
             $v280Bad += "$($b.F) '$($b.N)' opens $mt above its first child where the head is exactly $BOX_PAD_Y - the head is the one margin with no freedom, so a floor there would let a box keep the old number and never be told (SPEC I137c, V280a)"
@@ -12429,7 +12481,8 @@ else {
     if ($v280Overlay -ne $OVERLAY_BOXES.Count) { $v280Bad += "$v280Overlay overlay box(es) were skipped, expected $($OVERLAY_BOXES.Count) - the exclusion is reading a name nothing carries, and a floating box would be measured for a margin and a neighbour it does not have (SPEC V20, B7)" }
     if ($v280Rot -eq 0) { $v280Bad += "no rotated child was skipped by (a) - the cut V27/V239/V240 make is not firing here, and the next rotated label would be read as a margin it is not (SPEC V209, V280c, B61)" }
 
-    if ($v280Bad) { foreach ($b in $v280Bad) { Fail "V280 $b" } }
+    if ($v280Centred -ne 2) { Fail "V280 $v280Centred box(es) skipped the head equality for centring, expected the 2 the ornament stretched on the Settings tab - an exception nothing reaches is an exception that stopped measuring (SPEC V209, I156j)" }
+elseif ($v280Bad) { foreach ($b in $v280Bad) { Fail "V280 $b" } }
     else { Pass "V280 all $($v280Boxes.Count) section boxes clear 20 on four sides, and $v280Rot rotated child(ren) were cut out of the margin" }
 }
 
@@ -12519,7 +12572,7 @@ else { Pass "V280 (d) the $($colBottoms.Count) Ghoul columns all close at $(@($c
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
 # (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
 # on them would be a false alarm on numbers this round agreed not to touch.
-if ($v280Boxes.Count -ne 69) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 69 I73 measures (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
+if ($v280Boxes.Count -ne 70) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
 else {
     # The declared HOLE is GONE with T908 and the 5px rule is whole again. T904 had left the
     # 680..1010 band of the Main grid with no bottom box, so two boxes faced each other a whole
@@ -17174,8 +17227,8 @@ else { Pass "V355 one mfShown decides what both readers show, mfLabel paints the
 # all, which is half of why B95 found it unguarded.
 $V356_KEEP = @(
     @{ File = 'WoD20.6.lfm';  Where = 'Settings';    Field = 'language' },
-    @{ File = 'WoD20.6.lfm';  Where = 'Settings';    Field = 'game' },
-    @{ File = 'WoD20.6.lfm';  Where = 'Settings';    Field = 'sheetTheme' },
+    @{ File = 'WoD20.10.lfm'; Where = 'Storyteller'; Field = 'game' },
+    @{ File = 'WoD20.10.lfm'; Where = 'Storyteller'; Field = 'sheetTheme' },
     @{ File = 'WoD20.10.lfm'; Where = 'Storyteller'; Field = 'healthLevels' },
     @{ File = 'WoD20.10.lfm'; Where = 'Storyteller'; Field = 'stSpecCost' },
     @{ File = 'WoD20.10.lfm'; Where = 'Storyteller'; Field = 'stBackgroundCost' },
@@ -20114,9 +20167,17 @@ $doc419 = Doc (Join-Path $dir "WoD20.6.lfm")
 $v419Bad = @()
 $seen419 = 0
 foreach ($w419 in @('language', 'cboGame', 'cboSheetTheme')) {
-    if ($w419 -eq 'language') { $cb419 = @($doc419.SelectNodes("//comboBox[@field='language']"))[0] }
-    else                      { $cb419 = @($doc419.SelectNodes("//comboBox[@name='$w419']"))[0] }
-    if ($null -eq $cb419) { $v419Bad += "(1) the Settings combo '$w419' is gone from WoD20.6.lfm (SPEC V419, I144h)"; continue }
+    # By NAME across the twelve, not by file: T990 moved Game and Era to the storyteller's box
+    # on WoD20.10 and left their dataLinks behind, so an anchor keyed on WoD20.6 would stop
+    # reaching two of the three and go on passing (SPEC V419 amended 2026-09-06, I156b, B7).
+    $cb419 = $null
+    foreach ($f419 in $files) {
+        $d419 = Doc $f419.FullName
+        if ($w419 -eq 'language') { $cb419 = @($d419.SelectNodes("//comboBox[@field='language']"))[0] }
+        else                      { $cb419 = @($d419.SelectNodes("//comboBox[@name='$w419']"))[0] }
+        if ($null -ne $cb419) { break }
+    }
+    if ($null -eq $cb419) { $v419Bad += "(1) the Settings combo '$w419' is gone from the twelve .lfm (SPEC V419, I144h, I156b)"; continue }
     $seen419++
     $ha419 = $cb419.GetAttribute('horzTextAlign')
     if ($ha419 -ne 'center') { $v419Bad += "(1) the Settings combo '$w419' authors horzTextAlign='$ha419' and not 'center' (SPEC V419, I144h)" }
@@ -20524,6 +20585,222 @@ foreach ($k432 in $V432_KINDS) {
 if ($v432Seen -eq 0) { $v432Bad += "(e) not one entry was read against its table - every leg passed by vacancy (SPEC V432e, B7)" }
 if ($v432Bad) { foreach ($b in ($v432Bad | Select-Object -First 12)) { Fail "V432 $b" } }
 else { Pass "V432 $v432Seen entries of $($V432_KINDS.Count) traits module(s) carry exactly Disciplines + Weakness, the trio read off CLANS and the family sentence off FAMILY_WEAKNESS, in both halves" }
+
+# ---- V448: the language default is `pt`, in EVERY place that defaults -----------------
+# The user asked for a sheet that opens in Portuguese (11th batch, item 1). The combo's
+# defaultValue is only half the answer: defaultValue does not WRITE the field, so a sheet
+# that never touched the dropdown arrives with `language` empty and the LUA fallback is what
+# actually decides - which is why the two are measured together and neither alone.
+#
+# Leg (a) is the one that catches the site nobody edited: 28 places spelled the default, and
+# a single `or "en"` left behind is a painter that speaks English on a Portuguese sheet with
+# the build green and the defect only on screen (SPEC B58, B62).
+#
+# Leg (c) is the zero-guard with teeth: (a) alone passes on a tree that DELETED its
+# fallbacks, which trades one defect for another (SPEC V209, B7).
+$v448Bad = @()
+$v448Seen = 0
+foreach ($f in $files) {
+    $code448 = CodeOf $f.FullName
+    $en448 = ([regex]::Matches($code448, ' or "en"')).Count
+    if ($en448 -gt 0) { $v448Bad += "(a) $($f.Name) still falls back to `"en`" in $en448 place(s) - a second, silent default (SPEC V448a, I156a)" }
+    # The guard counts SITES, whatever they answer: counting only the `pt` ones would fire on
+    # the very mutation leg (a) exists to catch, and leg (a) would never be reached (SPEC B7).
+    $v448Seen += $en448 + ([regex]::Matches($code448, ' or "pt"')).Count
+}
+$lang448 = (Doc (Join-Path $dir "WoD20.6.lfm")).SelectSingleNode("//dataLink[@field='language']")
+if ($null -eq $lang448) { $v448Bad += "(b) the <dataLink field='language'> is gone from WoD20.6 - this check reads nothing (SPEC V209)" }
+elseif ($lang448.GetAttribute("defaultValue") -ne 'pt') { $v448Bad += "(b) the language dataLink defaults to '$($lang448.GetAttribute("defaultValue"))', not 'pt' - the dropdown and the Lua would answer differently for an empty field (SPEC V448b, V12)" }
+if ($v448Seen -lt 28) { Fail "V448 only $v448Seen language fallback(s) read, expected the 28 the sheet spells - the fallbacks were deleted rather than flipped (SPEC V448c, V209)" }
+elseif ($v448Bad) { foreach ($b in $v448Bad) { Fail "V448 $b" } }
+else { Pass "V448 all $v448Seen language fallbacks answer 'pt' and the dataLink defaults to it" }
+
+# ---- V449: Game and Era moved house, and their dataLinks did NOT ----------------------
+# The user had the two combos put at the top of the storyteller's box (11th batch, item 2).
+# The widgets travelled; the two <dataLink>s stayed on WoD20.6, and that half is the one
+# with teeth: the `sheetTheme` handler is what calls sheetReveal, the last paint of the load,
+# and WoD20.10 is hidden by ROLE - a player never instantiates it (SPEC V79, V95, I156c).
+# Hanging the reveal there would bet the whole sheet on the root form's 1500ms net, which
+# exists to be a net (SPEC I15, V166, B40).
+$v449Bad = @()
+$doc449st = Doc (Join-Path $dir "WoD20.10.lfm")
+$doc449se = Doc (Join-Path $dir "WoD20.6.lfm")
+$cbo449 = @()
+foreach ($n449 in @('cboGame', 'cboSheetTheme')) {
+    if ($null -eq $doc449st.SelectSingleNode("//comboBox[@name='$n449']")) { $v449Bad += "(a) $n449 is not on WoD20.10 - the combo the user moved to the storyteller's box is gone from it (SPEC V449a, I156b)" }
+    else { $cbo449 += $n449 }
+}
+foreach ($fl449 in @('game', 'sheetTheme')) {
+    if ($null -ne $doc449se.SelectSingleNode("//comboBox[@field='$fl449']")) { $v449Bad += "(a) WoD20.6 still carries a comboBox on '$fl449' - two owners of one field (SPEC V449a, V1)" }
+    if ($null -eq $doc449se.SelectSingleNode("//dataLink[@field='$fl449']")) { $v449Bad += "(b) the <dataLink field='$fl449'> left WoD20.6 - the handler that reveals the sheet cannot live on a tab the player never opens (SPEC V449b, I156c, V79)" }
+    if ($null -ne $doc449st.SelectSingleNode("//dataLink[@field='$fl449']")) { $v449Bad += "(b) WoD20.10 declares a <dataLink field='$fl449'> - that is the reveal moving onto the hidden tab (SPEC V449b, V95, B26)" }
+}
+$rev449 = @()
+foreach ($f in $files) { foreach ($m in [regex]::Matches((CodeOf $f.FullName), '(?<!function )sheetReveal\(')) { $rev449 += $f.Name } }
+if ($rev449.Count -ne 2) { $v449Bad += "(c) sheetReveal is called from $($rev449.Count) place(s) [$($rev449 -join ', ')] - it has to be the two: the sheetTheme handler on WoD20.6 and the root form's net (SPEC V449c, I15, V166)" }
+elseif ($rev449 -contains 'WoD20.10.lfm') { $v449Bad += "(c) WoD20.10 calls sheetReveal - the reveal is on the tab hidden by role (SPEC V449c, V79)" }
+$box449 = BoxOf $doc449st "STORYTELLER SETTINGS"
+if ($null -eq $box449) { $v449Bad += "(d) the STORYTELLER SETTINGS box is gone from WoD20.10 - this check reads nothing (SPEC V209)" }
+else {
+    # checkBox counts here and does NOT in V243: that one measures the entry COLUMN, which the
+    # ticks were never in (x=35 against 210); this one measures the ORDER the user asked for,
+    # and a flag put above Game breaks it exactly as a fourth combo would (SPEC V449d, V238a).
+    $ent449 = @($box449.SelectNodes("comboBox[@top] | button[@top] | edit[@top] | checkBox[@top]") | Sort-Object { [int]$_.GetAttribute("top") })
+    if ($ent449.Count -lt 3) { $v449Bad += "(d) only $($ent449.Count) entry widget(s) read inside the box - the order rule would be true by vacancy (SPEC V209)" }
+    else {
+        $first449 = @($ent449[0].GetAttribute("name"), $ent449[1].GetAttribute("name")) | Sort-Object
+        if (($first449 -join ',') -ne 'cboGame,cboSheetTheme') { $v449Bad += "(d) the two topmost entry widgets are [$($first449 -join ', ')], expected cboGame and cboSheetTheme - the user asked for them FIRST, top to bottom (SPEC V449d, I156b)" }
+        if ([int]$ent449[0].GetAttribute("top") -ge [int]$ent449[1].GetAttribute("top")) { $v449Bad += "(d) Game and Era do not sit on two different rows (SPEC V449d)" }
+    }
+}
+if ($cbo449.Count -lt 2) { Fail "V449 only $($cbo449.Count) of the two moved combos was read on WoD20.10 - a rule over controls it cannot see is true by vacancy (SPEC V449, V209, B7)" }
+elseif ($v449Bad) { foreach ($b in $v449Bad) { Fail "V449 $b" } }
+else { Pass "V449 Game and Era open the storyteller's box, their dataLinks stayed on WoD20.6, and the reveal is still called from the two places it always was" }
+
+# ---- V450: the Settings tab has three boxes and the version lives alone in the last ---
+# The user asked for a box under the credits with the version in it (11th batch, item 4).
+# Leg (c) is keyed on the SHAPE of the number and not on the number itself, which is the
+# whole point: the release moves and the ruler does not have to be edited to let it
+# (SPEC I156f, and it is why T993 changes four files and no check).
+$v450Bad = @()
+$doc450 = Doc (Join-Path $dir "WoD20.6.lfm")
+$boxes450 = @($doc450.SelectNodes("//scrollBox/layout"))
+if ($boxes450.Count -ne 3) { $v450Bad += "(a) the Settings tab holds $($boxes450.Count) box(es), expected 3 - Language, Credits and Version (SPEC V450a, I156e)" }
+else {
+    $last450 = $boxes450[2]
+    $kids450 = @($last450.ChildNodes | Where-Object { $_.NodeType -eq 'Element' -and $_.LocalName -ne 'rectangle' })
+    if ($kids450.Count -ne 1 -or $kids450[0].LocalName -ne 'label') { $v450Bad += "(b) the last Settings box holds $($kids450.Count) child(ren) besides its backdrop, expected the one version label - a box that accumulates is a second credits box (SPEC V450b, I156e)" }
+    elseif ($kids450[0].GetAttribute("text") -notmatch '^Version: \d+\.\d+\.\d+$') { $v450Bad += "(b) the last Settings box carries '$($kids450[0].GetAttribute("text"))' and not a 'Version: x.y.z' line (SPEC V450b/c)" }
+}
+$ver450 = @()
+foreach ($f in $files) {
+    foreach ($n450 in (Doc $f.FullName).SelectNodes("//label[@text]")) {
+        if ($n450.GetAttribute("text") -match '^Version: \d+\.\d+\.\d+$') { $ver450 += $n450.GetAttribute("text") }
+    }
+}
+if ($ver450.Count -eq 0) { Fail "V450 no 'Version: x.y.z' label was found in the $($files.Count) .lfm - the version the sheet shows is gone and this check reads nothing (SPEC V450c, V209)" }
+else {
+    if ($ver450.Count -ne 1) { $v450Bad += "(c) the sheet spells its version in $($ver450.Count) labels [$($ver450 -join ', ')] - one number, one place (SPEC V450c)" }
+    $vs450 = $ver450[0]
+    # (d) the three homes V10/V22/V28 ask of every visible string, and the SAME number in all
+    # of them: a bump that moves the label and forgets the .lang shows the old release in pt
+    # with the gate green, which is B57 through the language door (SPEC V230c).
+    if (-not $ptK.Contains($vs450)) { $v450Bad += "(d) '$vs450' has no [pt] key in localization.lang (SPEC V450d, V10)" }
+    if (-not $enK.Contains($vs450)) { $v450Bad += "(d) '$vs450' has no [en] key in localization.lang (SPEC V450d, V10)" }
+    if ($creditTxt.IndexOf('["' + $vs450 + '"]') -lt 0) { $v450Bad += "(d) '$vs450' is not a key of the PT map on WoD20.6 - translateSheetText would never find it (SPEC V450d, V28)" }
+
+    # (e) the PACKAGE says the same number as the label (user 2026-09-06, "mude para 0.2.0
+    # tambem" - SPEC Q75.3, I156f). Two homes for one release drift the moment one of them is
+    # bumped alone. Nothing is asked of `sdkVersion` beside it: that one belongs to the rdk,
+    # which rewrites it at prepare (SPEC C, B2).
+    $mod450 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $plugin "module.xml")))
+    $mv450 = [regex]::Match($mod450, '<version>([^<]*)</version>')
+    if (-not $mv450.Success) { $v450Bad += "(e) module.xml has no <version> - the package number this label agrees with is gone (SPEC V450e, V209)" }
+    elseif ($mv450.Groups[1].Value -ne $vs450.Substring('Version: '.Length)) { $v450Bad += "(e) module.xml says version '$($mv450.Groups[1].Value)' and the Settings tab shows '$vs450' - one release, two numbers (SPEC V450e, I156f)" }
+
+    if ($v450Bad) { foreach ($b in $v450Bad) { Fail "V450 $b" } }
+    else { Pass "V450 the Settings tab closes on a version box of its own and '$vs450' stands in all three homes" }
+}
+
+# ---- V451: Edit dots freely answers BOTH directions, and still opens no ceiling -------
+# The user renamed the flag and widened what it does (11th batch, items 6 and 7): a dot goes
+# on and comes off freely, the baseline floor included. What it does NOT do is lift a rule of
+# the books - a generation cap, a path cap, a family cap or the specialty gift - because
+# "free" prices a dot, it does not license one (SPEC C(ii), I156g).
+# Read off the CODE and not the file: this leg counts an identifier, and the prose around
+# these refusals talks about free dots in every other line (SPEC V222 - the first battery
+# reddened on four words in comments).
+$stepFn451 = LuaFn (CodeOf $rootPath) 'xpStep'
+$v451Bad = @()
+if ($stepFn451 -eq '') { Fail "V451 xpStep was not found on the root form - every leg below would read nothing (SPEC V209, B7)" }
+else {
+    # (a) the flag is read for both directions, and the free STAMP is still purchase-only: a
+    # sale that stamped would write a key for a level nobody bought (SPEC V451a, V138).
+    if ($clickFn.Groups[1].Value -match 'local free = want and sheet\.stFreeBuy') { $v451Bad += "(a) the flag is still read as `"want and ...`" - it would price purchases only, and the sale would go on refusing (SPEC V451a, I156g)" }
+    if ($stepFn451 -notmatch 'local key\s+= \(free and want and not wasSunk\) and \(trait') { $v451Bad += "(a) the free stamp is not gated by `"want`" - with the flag answering sales too, a sale would append a stamp instead of dropping one (SPEC V451a, V138, V141)" }
+
+    # (b) the baseline floor is the flag's, and only the flag's.
+    if ($stepFn451 -notmatch 'if not free and after < traitLevel\(base,') { $v451Bad += "(b) the baseline floor does not read the flag - the dot the storyteller froze would still refuse to come off (SPEC V451b, V103)" }
+
+    # (c) the ceilings never see it. Measured on the REGION between xpStep's signature and the
+    # free stamp, which is where all four refusals live: `free` may not be named in it. The
+    # capital in isFreeRow and in "Free specialties" is what keeps this from matching prose.
+    $sig451 = [regex]::Match($stepFn451, '(?m)^.*function xpStep\([^)]*\)')
+    $key451 = $stepFn451.IndexOf('local key  = (free and want and not wasSunk)')
+    if (-not $sig451.Success -or $key451 -lt 0) { $v451Bad += "(c) the refusal region could not be cut out of xpStep - the leg would pass over nothing (SPEC V209)" }
+    else {
+        $reg451 = $stepFn451.Substring($sig451.Index + $sig451.Length, $key451 - ($sig451.Index + $sig451.Length))
+        $warn451 = ([regex]::Matches($reg451, 'xpWarn\(')).Count
+        if ($warn451 -lt 3) { $v451Bad += "(c) only $warn451 refusal(s) were read between the signature and the stamp - the ceilings moved and this leg measures nothing (SPEC V209, B7)" }
+        $lit451 = ([regex]::Matches($reg451, '\bfree\b')).Count
+        if ($lit451 -gt 0) { $v451Bad += "(c) the ceiling region names `"free`" $lit451 time(s) - a cap the flag can open is a dot with no way back (SPEC V451c, V183, V220, V337, V161)" }
+    }
+
+    # (d) the label. The field stays stFreeBuy whatever the box says (SPEC V2, V138).
+    $lbl451 = (Doc (Join-Path $dir "WoD20.10.lfm")).SelectSingleNode("//checkBox[@field='stFreeBuy']")
+    if ($null -eq $lbl451) { $v451Bad += "(d) no checkBox on stFreeBuy was found on WoD20.10 - the flag the storyteller flips is gone (SPEC V451d, V274a)" }
+    else {
+        $txt451 = $lbl451.GetAttribute("text")
+        if ($txt451 -ne 'Edit dots freely') { $v451Bad += "(d) the flag reads '$txt451', not 'Edit dots freely' (SPEC V451d, I156g)" }
+        else {
+            if (-not $ptK.Contains($txt451)) { $v451Bad += "(d) '$txt451' has no [pt] key in localization.lang (SPEC V451d, V10)" }
+            if (-not $enK.Contains($txt451)) { $v451Bad += "(d) '$txt451' has no [en] key in localization.lang (SPEC V451d, V10)" }
+            if ($creditTxt.IndexOf('["' + $txt451 + '"]') -lt 0) { $v451Bad += "(d) '$txt451' is not a key of the PT map on WoD20.6 (SPEC V451d, V28)" }
+        }
+        if ($lbl451.GetAttribute("field") -ne 'stFreeBuy') { $v451Bad += "(d) the flag binds '$($lbl451.GetAttribute("field"))' - the label changed, the field does not (SPEC V2, V451d)" }
+    }
+    $old451 = @()
+    foreach ($f in $files) { if (([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f.FullName))).IndexOf('"Free dots"') -ge 0) { $old451 += $f.Name } }
+    if ($ptK.Contains('Free dots') -or $enK.Contains('Free dots') -or $old451.Count -gt 0) { $v451Bad += "(d) the old 'Free dots' key is still around [$(($old451 + @($(if ($ptK.Contains('Free dots')) { 'lang[pt]' })) + @($(if ($enK.Contains('Free dots')) { 'lang[en]' }))) -join ', ')] - two names for one flag (SPEC V451d, V22)" }
+
+    if ($v451Bad) { foreach ($b in $v451Bad) { Fail "V451 $b" } }
+    else { Pass "V451 Edit dots freely prices both directions, stamps only purchases, opens no ceiling, and stands in all three homes" }
+}
+
+# ---- V452: the cost SINKS - a paid dot edited off keeps its line ----------------------
+# "Nao devolve a experiencia" (user 2026-09-06, SPEC Q75.1). The log is a DIFF and not a
+# journal, so removing a dot removes its row and hands the experience back; the only way to
+# keep the charge without a second number - which V100 forbids - is a stamp of NAMES, the
+# third of the same shape xpFree and xpOrder already use (SPEC I156i, V138).
+$stepC452 = NoComments (LuaFn $rootTxt 'xpStep')
+$rowsC452 = NoComments (LuaFn $rootTxt 'xpLedgerRows')
+$riseC452 = NoComments (LuaFn $rootTxt 'pushRise')
+$v452Bad = @()
+$wr452 = @([regex]::Matches((NoComments $rootTxt), 'setField\("xpSunk"'))
+if ($wr452.Count -eq 0) { Fail "V452 nothing writes xpSunk - the stamp the whole rule rests on is gone and every leg below would pass over nothing (SPEC V209, B7)" }
+else {
+    # (a) ONE writer, TWO branches: sink on a free sale, unsink on the buy-back. The second is
+    # not optional - without it the level is charged twice, live and sunk at once.
+    if ($wr452.Count -ne 2) { $v452Bad += "(a) xpSunk is written in $($wr452.Count) place(s), expected the two branches of xpStep - sink and unsink (SPEC V452a)" }
+    if (([regex]::Matches($stepC452, 'setField\("xpSunk"')).Count -ne 2) { $v452Bad += "(a) the two writes are not both inside xpStep - a second owner of the stamp is B31 by the other door (SPEC V452a, V140)" }
+    if ($stepC452 -notmatch 'if free and not want and level > traitLevel\(base, trait, t\.first, t\.last, t\.fixed\)') { $v452Bad += "(a) the sink does not ask all three questions - flag ON, a SALE, and a level that is IN the log (SPEC V452a, I156i)" }
+    if ($stepC452 -notmatch 'and not isFreeRow\(trait, level\) then') { $v452Bad += "(a) the sink does not skip a level already stamped free - it would strand a row worth zero for a dot nobody has (SPEC V452a)" }
+    if ($stepC452 -notmatch 'local key  = \(free and want and not wasSunk\) and') { $v452Bad += "(a) the free stamp is not held back on a level being bought BACK - remove-then-add with the flag on would zero the charge that stayed behind (SPEC V452a, Q75.1)" }
+    if ($stepC452 -notmatch 'elseif \(want and wasSunk\) then') { $v452Bad += "(a) the unsink is not gated on `"want`" ALONE - it has to drop the stamp whether the flag is on or off, because the player already paid for that level (SPEC V452a, C(iii))" }
+
+    # (b) ONE reader, once per walk, beside the free stamps - and the pending click is handed
+    # in rather than written first, which is what keeps pricing free of writes (SPEC V136).
+    if ($rowsC452 -notmatch 'sunk\s+= \(sheet\.xpSunk or ""\) \.\. "\|" \.\. \(clickSunk or ""\) \.\. "\|"') { $v452Bad += "(b) xpLedgerRows does not read the stamp once per walk into ctx.sunk with the pending key appended (SPEC V452b, V125, V136)" }
+    # Four namings and no more: the sink appends to it, the unsink guards on it and gsubs it,
+    # and the walk reads it into ctx. A fifth is a second reader, which is the render-per-click
+    # the stamps were kept out of (SPEC V452b, V121, V125).
+    if (([regex]::Matches((NoComments $rootTxt), 'sheet\.xpSunk')).Count -ne 4) { $v452Bad += "(b) sheet.xpSunk is named in $(([regex]::Matches((NoComments $rootTxt), 'sheet\.xpSunk')).Count) places, expected the 4 of the two writes and the one walk (SPEC V452b)" }
+
+    # (c) ONE loop. A second one would be a second grammar of row, which is what V260b refuses
+    # of the stamps and for the same reason.
+    if (([regex]::Matches($riseC452, 'for lvl = ')).Count -ne 1) { $v452Bad += "(c) pushRise walks $(([regex]::Matches($riseC452, 'for lvl = ')).Count) loops - the live row and the sunk row come out of ONE (SPEC V452c)" }
+    if ($riseC452 -notmatch 'for lvl = from \+ 1, last, 1 do') { $v452Bad += "(c) pushRise does not walk to the top of the ladder - it would stop at the rating and the sunk level would have no line (SPEC V452c, I156i)" }
+    if ($riseC452 -notmatch 'if lvl <= to or string\.find\(ctx\.sunk, "\|" \.\. field \.\. "#" \.\. lvl \.\. "\|", 1, true\) ~= nil then') { $v452Bad += "(c) the row is not pushed for a level that is live OR sunk (SPEC V452c)" }
+
+    # (e) no widget, no link: it is Lua-owned like the two stamps beside it (SPEC I3, V8).
+    foreach ($f in $files) {
+        $d452 = Doc $f.FullName
+        if ($null -ne $d452.SelectSingleNode("//*[@field='xpSunk']")) { $v452Bad += "(e) $($f.Name) carries a widget or link on xpSunk - the stamp is Lua-owned and a reader would pay a render per click (SPEC V452e, V121, V125)" }
+    }
+
+    if ($v452Bad) { foreach ($b in $v452Bad) { Fail "V452 $b" } }
+    else { Pass "V452 a paid dot edited off keeps its line: one writer with both branches, one reader, one loop, and no widget on the stamp" }
+}
 
 Write-Host ""
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

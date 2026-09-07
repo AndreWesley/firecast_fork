@@ -1851,7 +1851,7 @@
 
 				local n = tonumber(sheet.healthLevels) or 7;
 				local levels = HEALTH_LEVELS[n];
-				local lang = sheet.language or "en";
+				local lang = sheet.language or "pt";
 
 				-- The black box ends right under the last visible row instead of always being
 				-- ten rows tall (SPEC V49). It only ever shrinks: the .lfm declares the ten-row
@@ -2431,23 +2431,30 @@
 			-- keys off the rating the point REACHED, never off the dot that was clicked:
 			-- strength_5 clicked with two dots lit is level 3, and keying off the field is the
 			-- mistake that made the 34th round's version charge for stamped points (SPEC B31).
-			local function pushRise(rows, kind, name, from, to, ctx, field)
-				for lvl = from + 1, to, 1 do
-					local cost = xpCost(kind, lvl - 1, ctx);
+			-- `last` is the top of the ladder, and it is what lets the loop walk PAST the rating
+			-- the trait stands at today (SPEC I156i, V452c): a level that was paid for and then
+			-- edited off with `Edit dots freely` on is not live any more, and its line has to
+			-- stay all the same. One loop for both - a second one would be a second grammar of
+			-- row, which is what V260b refuses on the stamps for the same reason.
+			local function pushRise(rows, kind, name, from, to, ctx, field, last)
+				for lvl = from + 1, last, 1 do
+					if lvl <= to or string.find(ctx.sunk, "|" .. field .. "#" .. lvl .. "|", 1, true) ~= nil then
+						local cost = xpCost(kind, lvl - 1, ctx);
 
-					-- A stamp DISCOUNTS a price the table already worked out; it is not a second
-					-- table (SPEC V86/V139). A free point does not make the next one cheaper -
-					-- the price reads the rating reached, not how many were paid for.
-					if string.find(ctx.free, "|" .. field .. "#" .. lvl .. "|", 1, true) ~= nil then cost = 0; end;
+						-- A stamp DISCOUNTS a price the table already worked out; it is not a second
+						-- table (SPEC V86/V139). A free point does not make the next one cheaper -
+						-- the price reads the rating reached, not how many were paid for.
+						if string.find(ctx.free, "|" .. field .. "#" .. lvl .. "|", 1, true) ~= nil then cost = 0; end;
 
-					-- The key the ORDER stamp is looked up by (SPEC I56). Same shape the free
-					-- stamp is keyed on, built from the same two parts a line away: one grammar
-					-- for both stamps, so a point that can be found in one can be found in the
-					-- other (SPEC V138, V260b).
-					rows[#rows + 1] = { kind = kind, name = name, level = lvl, cost = cost, key = field .. "#" .. lvl };
+						-- The key the ORDER stamp is looked up by (SPEC I56). Same shape the free
+						-- stamp is keyed on, built from the same two parts a line away: one grammar
+						-- for both stamps, so a point that can be found in one can be found in the
+						-- other (SPEC V138, V260b).
+						rows[#rows + 1] = { kind = kind, name = name, level = lvl, cost = cost, key = field .. "#" .. lvl };
 
-					-- 21 buys the FIRST point of the new kind and nothing after it.
-					ctx.newType = false;
+						-- 21 buys the FIRST point of the new kind and nothing after it.
+						ctx.newType = false;
+					end;
 				end;
 			end;
 
@@ -2961,7 +2968,10 @@
 			-- the log in the very repaint that click pays for. Without it the row just bought
 			-- comes up at the BOTTOM until something else redraws the sheet - nothing breaks,
 			-- the build is green, and the player watches it happen (SPEC B6, V260d).
-			function xpLedgerRows(clickField, clickValue, clickFree, clickOrder)
+			-- `clickSunk` is the third of the same arrangement (SPEC I156i, V452b): the key the
+			-- click being priced WOULD sink, handed in so the row it is about to strand is
+			-- already in the walk that click pays for. Pricing still writes nothing (SPEC V136).
+			function xpLedgerRows(clickField, clickValue, clickFree, clickOrder, clickSunk)
 				local base = baselineOf();
 
 				if base == nil then return nil; end;
@@ -2980,6 +2990,12 @@
 				local ctx  = {
 					backgroundCost = tonumber(sheet.stBackgroundCost) or 0,
 					free           = (sheet.xpFree or "") .. "|" .. (clickFree or "") .. "|",
+
+					-- The SUNK levels, read once per walk beside the free ones and in the same
+					-- shape (SPEC V452b, V125). A level in here still has a line even though the
+					-- dot is off: it was PAID, and `Edit dots freely` takes the dot away without
+					-- giving the experience back (SPEC I156i, user 2026-09-06).
+					sunk           = (sheet.xpSunk or "") .. "|" .. (clickSunk or "") .. "|",
 				};
 
 				-- The ORDER stamp, read once per walk like the price stamp beside it (SPEC I56,
@@ -3004,7 +3020,7 @@
 
 					pushRise(rows, "Attribute", nome,
 						traitLevel(base, field, first, 5, fixed),
-						liveLevel(field, first, 5, fixed), ctx, field);
+						liveLevel(field, first, 5, fixed), ctx, field, 5);
 				end;
 
 				for i = 1, #XP_ABILITIES, 1 do
@@ -3013,7 +3029,7 @@
 
 					pushRise(rows, "Ability", nome,
 						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field);
+						liveLevel(field, 1, 5, 0), ctx, field, 5);
 				end;
 
 				for i = 1, #XP_CUSTOM, 1 do
@@ -3021,7 +3037,7 @@
 
 					pushRise(rows, "Ability", slotName(field),
 						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field);
+						liveLevel(field, 1, 5, 0), ctx, field, 5);
 				end;
 
 				for i = 1, #XP_VIRTUES, 1 do
@@ -3029,23 +3045,23 @@
 
 					pushRise(rows, "Virtue", nome,
 						traitLevel(base, field, 2, 5, 1),
-						liveLevel(field, 2, 5, 1), ctx, field);
+						liveLevel(field, 2, 5, 1), ctx, field, 5);
 				end;
 
 				pushRise(rows, "Humanity", "Humanity",
 					traitLevel(base, "humanity", 1, 10, 0),
-					liveLevel("humanity", 1, 10, 0), ctx, "humanity");
+					liveLevel("humanity", 1, 10, 0), ctx, "humanity", 10);
 
 				pushRise(rows, "Willpower", "Willpower",
 					traitLevel(base, "willpower", 1, 10, 0),
-					liveLevel("willpower", 1, 10, 0), ctx, "willpower");
+					liveLevel("willpower", 1, 10, 0), ctx, "willpower", 10);
 
 				for i = 1, BACKGROUND_ROWS, 1 do
 					local field = "background_" .. i;
 
 					pushRise(rows, "Background", slotName(field),
 						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field);
+						liveLevel(field, 1, 5, 0), ctx, field, 5);
 				end;
 
 				-- Which kinds the character already had when the storyteller froze the sheet.
@@ -3072,13 +3088,13 @@
 						-- read them as a purchase the moment anything else moved (SPEC V204, Q32).
 						if (grp.vacant ~= nil and grp.vacant[i]) then to = from; end;
 
-						if to > from then
+						if to > from or string.find(ctx.sunk, "|" .. field .. "#", 1, true) ~= nil then
 							-- SPEC V88: the affinity path is the FIRST hedge row, always. It is
 							-- the ROW that is cheap, not whichever numina currently sits on it.
 							ctx.affinity = (field == "numina_1");
 							ctx.newType  = (from == 0) and not unlocked[grp.kind];
 
-							pushRise(rows, "Numina", slotName(field), from, to, ctx, field);
+							pushRise(rows, "Numina", slotName(field), from, to, ctx, field, 5);
 
 							unlocked[grp.kind] = true;
 						end;
@@ -3090,11 +3106,11 @@
 				local ff = traitLevel(base, "faith", 1, 5, 0);
 				local ft = liveLevel("faith", 1, 5, 0);
 
-				if ft > ff then
+				if ft > ff or string.find(ctx.sunk, "|faith#", 1, true) ~= nil then
 					ctx.affinity = false;
 					ctx.newType  = (ff == 0) and not unlocked.faith;
 
-					pushRise(rows, "Numina", "True Faith", ff, ft, ctx, "faith");
+					pushRise(rows, "Numina", "True Faith", ff, ft, ctx, "faith", 5);
 				end;
 
 				-- Static magic rituals (SPEC I65, V269c, user 2026-08-23). This is the ONE
@@ -3152,7 +3168,7 @@
 
 					pushRise(rows, "Discipline", slotName(field),
 						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field);
+						liveLevel(field, 1, 5, 0), ctx, field, 5);
 				end;
 
 				for i = 1, DISC_ROWS, 1 do
@@ -3163,7 +3179,7 @@
 
 					pushRise(rows, "Discipline", slotName(field),
 						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field);
+						liveLevel(field, 1, 5, 0), ctx, field, 5);
 				end;
 
 				-- Only the secondary paths: a main path rides its blood sorcery and was paid for
@@ -3173,7 +3189,7 @@
 
 					pushRise(rows, "Path", slotName(field),
 						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field);
+						liveLevel(field, 1, 5, 0), ctx, field, 5);
 				end;
 
 				-- Specialities close the order (SPEC I10). The Trait column carries the TRAIT
@@ -3185,7 +3201,7 @@
 
 					pushRise(rows, "Specialty", slotName(field),
 						traitLevel(base, field, 1, 1, 0),
-						liveLevel(field, 1, 1, 0), ctx, field);
+						liveLevel(field, 1, 1, 0), ctx, field, 1);
 				end;
 
 				-- The storyteller's own correction, LAST of all (SPEC I44, V246). It is a line
@@ -3359,7 +3375,7 @@
 				local txt = msg;
 
 				if translateSheetText ~= nil then
-					txt = translateSheetText(msg, (sheet ~= nil and sheet.language) or "en");
+					txt = translateSheetText(msg, (sheet ~= nil and sheet.language) or "pt");
 				end;
 
 				Dialogs.showMessage(txt);
@@ -3510,8 +3526,11 @@
 			-- Returns whether it wrote anything, so the caller knows its ledger rows are stale.
 			-- Is THIS row a gift? One question, one line, and the primitive under all three
 			-- places that ask about the stamp: the lock, the dedup and the revoke (SPEC V160).
-			function isFreeRow(field)
-				return string.find(sheet.xpFree or "", "|" .. field .. "#1|", 1, true) ~= nil;
+			-- $level since T996 (SPEC V452a): the sink asks the same question of a LEVEL, and
+			-- asking it a second way is what V160 exists to stop. Nothing passes it for a
+			-- speciality row, which is a one-dot ladder and always level 1.
+			function isFreeRow(field, level)
+				return string.find(sheet.xpFree or "", "|" .. field .. "#" .. (level or 1) .. "|", 1, true) ~= nil;
 			end;
 
 			-- Where is the gift for this trait? A row only counts as the gift if it carries the
@@ -4068,7 +4087,7 @@
 
 				if road == nil or road == "" then road = ROAD_DEFAULT; end;
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 				local bear = BEARING[road] or "";
 
 				-- WoD20.6 owns the PT map and may not have loaded yet, so the call is guarded the same way
@@ -4637,7 +4656,7 @@
 				if MF.page < 1 then MF.page = 1; end;
 
 				local first = (MF.page - 1) * MF.rows;
-				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet ~= nil and sheet.language == "en") and "en" or "pt";
 
 				for i = 1, MF.rows, 1 do
 					local c = found["dynMfRow_" .. i];
@@ -4701,7 +4720,7 @@
 					term = string.lower(found["edtMfQuery"].text);
 				end;
 
-				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet ~= nil and sheet.language == "en") and "en" or "pt";
 				local hits = {};
 				local key = {};
 
@@ -4901,7 +4920,7 @@
 				-- one of the names, so it does not go through mfShown and it has no business being
 				-- rebuilt on every repaint (SPEC I129c, V355a).
 				if found["btnMfCustom"] ~= nil then
-					local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+					local lang = (sheet ~= nil and sheet.language == "en") and "en" or "pt";
 
 					found["btnMfCustom"].text = translateSheetText("-- Custom --", lang);
 					-- Hidden in the twin (SPEC I153c4): a hand-typed Discipline would land in
@@ -4915,7 +4934,7 @@
 
 				mfArm(found, false);
 
-				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet ~= nil and sheet.language == "en") and "en" or "pt";
 				local title = MF.title;
 
 				if translateSheetText ~= nil then title = translateSheetText(title, lang); end;
@@ -5222,7 +5241,7 @@
 				-- SAME question the Revenant row does - one pane, one test (SPEC V135) - and they
 				-- are painted from MF.disc, which is the answer; the buttons are its picture, and
 				-- asking the picture what it says is the second source V269d closed a door over.
-				local dlang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local dlang = (sheet ~= nil and sheet.language == "en") and "en" or "pt";
 
 				if found["lblMfClanDisc"] ~= nil then
 					found["lblMfClanDisc"].visible = rev;
@@ -5300,7 +5319,7 @@
 				-- "not a revenant" paint the same empty box, so it is not a state worth storing.
 				MF.revenant = false;
 
-				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet ~= nil and sheet.language == "en") and "en" or "pt";
 				local nm = "";
 				local tx = "";
 
@@ -5355,7 +5374,7 @@
 					mfCustomPane(found, false);
 				end;
 
-				local lang = (sheet ~= nil and sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet ~= nil and sheet.language == "en") and "en" or "pt";
 				local txt = "";
 
 				-- ONE reader, and the order lives in it (SPEC V381, I129k). This used to call
@@ -5700,7 +5719,7 @@
 
 				xpFind(tabRootOf(from), names, found);
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 
 				for i = 1, last, 1 do
 					mfLabel(found["dynbackground_" .. i], sheet["background_" .. i], "Select Background", lang);
@@ -5722,7 +5741,7 @@
 
 				xpFind(tabRootOf(from), { dynnature = true, dyndemeanor = true }, found);
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 
 				mfLabel(found["dynnature"], sheet.nature, "Select Nature", lang);
 				mfLabel(found["dyndemeanor"], sheet.demeanor, "Select Demeanor", lang);
@@ -5744,7 +5763,7 @@
 
 				xpFind(tabRootOf(from), names, found);
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 
 				for i = 0, MERIT_ROWS, 1 do
 					mfLabel(found["dynMerit_m" .. i], sheet["merit_m" .. i], "Select Merit", lang);
@@ -6147,7 +6166,7 @@
 				end;
 
 				local found = xpFind(tabRootOf(from), { dynclanFamily = true }, {});
-				local lang  = (sheet.language == "pt") and "pt" or "en";
+				local lang  = (sheet.language == "en") and "en" or "pt";
 
 				mfLabel(found["dynclanFamily"], sheet.clanFamily, "Select Clan/Family", lang);
 			end;
@@ -6281,7 +6300,7 @@
 				--
 				-- The group grew 25 - the ? plus its gutter - and it still centres: 80 + 5 + 20 + 5 +
 				-- 160 is 270 inside 290, so the WIDEST language leaves 10px of air on the left and 10 on
-				local w  = ROAD_LABEL_W[sheet.language or "en"] or ROAD_LABEL_W["en"];
+				local w  = ROAD_LABEL_W[sheet.language or "pt"] or ROAD_LABEL_W["en"];
 				local qw = 20;
 				local cw = 160;
 				local left = 20 + math.floor((290 - (w + 5 + qw + 5 + cw)) / 2);
@@ -6305,7 +6324,7 @@
 
 				xpFind(tabRootOf(from), names, found);
 
-				local lang = (sheet.language == "pt") and "pt" or "en";
+				local lang = (sheet.language == "en") and "en" or "pt";
 
 				-- The row used to be a comboBox and this function's whole job was the LOCK. The box of
 				-- I113e wave 2 took the combo away, so the same walk now does what renderBgButtons does
@@ -6502,22 +6521,51 @@
 				-- purchase" true by construction: ticking it later cannot reach a price that
 				-- was already settled, and unticking it cannot take back one that was not
 				-- charged. The stamp carries the answer from here on (SPEC V138).
-				local key  = free and (trait .. "#" .. (level + 1)) or nil;
-
 				-- The key this step would leave in the ORDER (SPEC I56). Same grammar as the
-				-- price stamp above and built one line from it on purpose: two stamps that drift
+				-- price stamp below and built one line from it on purpose: two stamps that drift
 				-- into two key shapes is what burned `freeDots` for good (SPEC V138, V260b).
 				--
 				-- A purchase reaches level+1; a sale gives back the level the trait is standing
-				-- on right now. Same reading the sale of the price stamp already takes.
+				-- on right now. Same reading the sale of the price stamp already takes. It is
+				-- declared FIRST because the sink reads the same key (SPEC V452a) - three stamps,
+				-- one grammar, and none of them building it a second way.
 				local okey = trait .. "#" .. (want and (level + 1) or level);
+
+				-- Is this level already SUNK - paid for once and edited off (SPEC V452a)? Read
+				-- before anything is written, because both branches below turn on it.
+				local wasSunk = string.find(sheet.xpSunk or "", "|" .. okey .. "|", 1, true) ~= nil;
+
+				-- `want and` on the free key, and it is not redundant since the flag answers for
+				-- both directions (SPEC V451a): the stamp is a PRICE, and a sale has no price to
+				-- stamp. Without it a free sale would append `trait#(level+1)` - a stamp for a
+				-- level nobody bought - instead of dropping the one the point it sold carried.
+				--
+				-- `not wasSunk` is the other half of "no experience comes back" (SPEC V452a): a
+				-- level being bought BACK was already paid for, and stamping it free now would
+				-- zero the charge that stayed behind when the dot came off. Remove-then-add with
+				-- the flag on would hand the player the price of the dot.
+				local key  = (free and want and not wasSunk) and (trait .. "#" .. (level + 1)) or nil;
 
 				-- ONE walk, of the sheet as it WOULD be (SPEC V125/V135/V136): the balance
 				-- boxes take the sum and the log takes the rows, and both already describe the
 				-- state this step is about to create. A free click is priced with its stamp in
 				-- hand, so the new line is already worth zero. One walk per LEVEL crossed, which
 				-- is what V125 was amended to (SPEC I155d).
-				local rows  = xpLedgerRows(field, want, key, want and okey or nil);
+				-- The key this step would SINK (SPEC I156i, V452a, user 2026-09-06): a SALE, with
+				-- the flag on, of a level that is IN the log and was PAID for. Below the baseline
+				-- there is no line to keep, and a level already stamped free is worth nothing to
+				-- keep - a row of zero for a dot nobody has is noise in the storyteller's log.
+				--
+				-- It is handed to the walk below rather than written first, exactly like the
+				-- price and the order stamps: pricing writes nothing (SPEC V136).
+				local sunk = nil;
+
+				if free and not want and level > traitLevel(base, trait, t.first, t.last, t.fixed)
+					and not isFreeRow(trait, level) then
+					sunk = okey;
+				end;
+
+				local rows  = xpLedgerRows(field, want, key, want and okey or nil, sunk);
 				local spent = xpSum(rows);
 
 				if want then
@@ -6538,9 +6586,16 @@
 					-- SPEC V103: only a point that is IN the log can be sold back. Below the
 					-- baseline is the storyteller's character, not the player's purchase. This
 					-- step would leave the trait one lower, and it stays MUTE (SPEC V129).
+					--
+					-- `not free` since the 191st round (SPEC V103 amended, V451b, I156g): with
+					-- `Edit dots freely` on, the floor does not refuse and the dot comes off -
+					-- including one the storyteller froze into the initial character. Nothing is
+					-- given back for it either, and that is the DIFF and not a test of its own:
+					-- pushRise only ever walks upward, so a level under the baseline has no line
+					-- in the log to erase and no experience to return (SPEC I156h).
 					local after = level - 1;
 
-					if after < traitLevel(base, trait, t.first, t.last, t.fixed) then return false; end;
+					if not free and after < traitLevel(base, trait, t.first, t.last, t.fixed) then return false; end;
 				end;
 
 				xpPrefix(form, trait, t, want and (level + 1) or (level - 1));
@@ -6554,6 +6609,16 @@
 					setField("xpFree", (sheet.xpFree or "") .. "|" .. key .. "|");
 				elseif not want and sheet.xpFree ~= nil then
 					setField("xpFree", (string.gsub(sheet.xpFree, "|" .. trait .. "#" .. level .. "|", "|")));
+				end;
+
+				-- The SUNK stamp goes down with the same mark and in the same grammar (SPEC V452a,
+				-- V138): written when a paid point is edited off, dropped when THAT level is
+				-- bought again - with the flag on or off, because the player already paid for it
+				-- and a level charged twice is the defect this second branch exists to stop.
+				if sunk ~= nil then
+					setField("xpSunk", (sheet.xpSunk or "") .. "|" .. sunk .. "|");
+				elseif (want and wasSunk) then
+					setField("xpSunk", (string.gsub(sheet.xpSunk, "|" .. okey .. "|", "|")));
 				end;
 
 				-- The ORDER stamp goes down with the same mark, on the line below the one that
@@ -6619,10 +6684,15 @@
 				local base = baselineOf();
 				local want = (alvo > cur);
 
-				-- SPEC V137: `Free dots` is read HERE, at the click, and in no other place on
-				-- the sheet - ONCE, however many levels the click crosses (SPEC I155d). Only a
-				-- purchase can be free; a sale reads it as false and the branch never opens.
-				local free = want and sheet.stFreeBuy == true;
+				-- SPEC V137: `Edit dots freely` is read HERE, at the click, and in no other place
+				-- on the sheet - ONCE, however many levels the click crosses (SPEC I155d).
+				--
+				-- It answers for BOTH directions since the 191st round (user 2026-09-06, SPEC
+				-- V451a, I156g): the flag used to be `want and ...`, which made it a discount on
+				-- purchases only. What the owner asked for is an EDIT - a dot goes on and comes
+				-- off freely, the baseline floor included - so the sale reads it too and what
+				-- each branch does with it is the branch's business (SPEC V103 amended, V452).
+				local free = sheet.stFreeBuy == true;
 
 				-- The row is straightened BEFORE the first level is priced, and the count does not
 				-- move when it is: a gap row lit at 1 and 3 stands at two either way (SPEC V443).

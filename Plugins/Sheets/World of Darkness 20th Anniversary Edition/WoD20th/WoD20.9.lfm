@@ -88,7 +88,7 @@
 				-- about it either.
 				if form.dynXpType == nil then return; end;
 
-				local lang = sheet.language or "en";
+				local lang = sheet.language or "pt";
 
 				if rows == nil then rows = xpLedgerRows(); end;
 
