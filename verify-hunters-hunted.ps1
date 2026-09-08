@@ -2790,7 +2790,9 @@ if ($paletteOk) { Pass "V53 every authored colour is mapped by all $($themeKeys.
 # check measures the FORM of the path; V58 below measures the file. B20 passed V58 green while
 # every dot in both Victorian themes was broken, because only the file was ever checked.
 $artPrefix = '/WoD20th/images/'
-$themeArt = @([regex]::Matches($hh6, '(?:dotOn|dotOff|paper)\s*=\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+# dotPending joined the three in the 19th batch (SPEC I163g, V480a): the pending dot is palette
+# art like any other, and art a palette names is art the folder is allowed to hold.
+$themeArt = @([regex]::Matches($hh6, '(?:dotOn|dotOff|dotPending|paper)\s*=\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
 if ($themeArt.Count -eq 0) { Fail "V58/V60 no theme art referenced - the palettes point at nothing" }
 else {
     foreach ($img in $themeArt) {
@@ -4567,7 +4569,9 @@ if ($fail -eq $imgBefore) { Pass "V111 the fixed dot1 art is dimmed on the mirro
 # needs a different weight or the two cues collapse into one (user 2026-08-29). The ART number
 # is deliberately NOT here: every runtime write on this sheet lands on text, so 0.40 inside Lua
 # is the side door this check was written to shut. A number added here has to earn a clause.
-$LUA_OPACITY = @($DIM_TEXT, '0.80')
+# 0.50 joined on 2026-09-07 (SPEC V244 as amended, V476, I162j): the DEAD action button, the
+# user's own number, and V476 is the clause that pins it to btnXpApply and nowhere else.
+$LUA_OPACITY = @($DIM_TEXT, '0.80', '0.50')
 $luaDimBad  = @()
 $luaDimSeen = 0
 foreach ($f in $files) {
@@ -4617,6 +4621,13 @@ $stTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((
 if ($stTxt -notmatch 'btnSaveBaseline\.enabled\s*=\s*not saved;') { Fail "V112 the Save button is not disabled once the baseline is saved (SPEC V82)" }
 elseif ($stTxt -notmatch 'btnSaveBaseline\.opacity\s*=\s*saved and 0\.75 or 1;') { Fail "V112 the Save button locks without dimming, or dims at the wrong number - a button is TEXT and dims at 0.75 (SPEC V244)" }
 else { Pass "V112 the Save button dims in the same breath it locks" }
+# 18th batch (SPEC V112 as amended, I162h, V475e, V476, T1037): btnXpApply is the SECOND control
+# that locks at runtime. Same shape as the Save button, other number - 0.50 is the user's own
+# (SPEC Q82.8), and V476 keeps it to this one button.
+$xp9Txt112 = CodeOf (Join-Path $dir "WoD20.9.lfm")
+if ($xp9Txt112 -notmatch 'form\.btnXpApply\.enabled\s*=\s*pending;') { Fail "V112 the Apply button is never disabled - it would stay live with nothing pending (SPEC V475e)" }
+elseif ($xp9Txt112 -notmatch 'form\.btnXpApply\.enabled\s*=\s*pending;\s*\r?\n\s*form\.btnXpApply\.opacity\s*=\s*pending and 1 or 0\.50;') { Fail "V112 the Apply button locks without dimming in the same breath, or dims at a number that is not the user's 0.50 (SPEC V476)" }
+else { Pass "V112 the Apply button dims in the same breath it locks, at 0.50" }
 
 
 # ---- V121: nothing redraws off a whole-node observer -------------------------------
@@ -4804,7 +4815,7 @@ else {
     # the sale refusal of V103 growing one.
     $buyWarns = @([regex]::Matches($buy.Groups[1].Value, 'xpWarn\("([^"]*)"\)'))
     if (-not $buy.Success) { Fail "V129 xpClick has no purchase branch" }
-    elseif ($warns.Count -ne 8) { Fail "V129 xpClick raises $($warns.Count) pop-ups - eight refusals speak: the balance, the empty trait, the closed door, the generation ceiling (SPEC V220), the gift that is not the player's to take off (SPEC V161), the secondary path row with nothing picked in it, the secondary path above what its blood sorcery allows (SPEC V183), and the family ceiling on a trait (SPEC V337, T781)" }
+    elseif ($warns.Count -ne 9) { Fail "V129 xpClick raises $($warns.Count) pop-ups - nine refusals speak: the applied floor (SPEC V475c, 18th batch), the balance, the empty trait, the closed door, the generation ceiling (SPEC V220), the gift that is not the player's to take off (SPEC V161), the secondary path row with nothing picked in it, the secondary path above what its blood sorcery allows (SPEC V183), and the family ceiling on a trait (SPEC V337, T781)" }
     elseif ($buyWarns.Count -ne 1) { Fail "V129 the balance branch raises $($buyWarns.Count) pop-ups - only the refusal for want of experience may speak there" }
     elseif ($buy.Groups[1].Value -notmatch 'xpWarn\(') { Fail "V129 the refusal for want of experience says nothing" }
     elseif ($buy.Groups[1].Value -match 'markDot\(') { Fail "V129 the refused purchase marks the dot anyway (SPEC V135)" }
@@ -4979,7 +4990,7 @@ $markFn  = LuaFn $rootTxt 'markDot'
 if (-not $clickFn.Success) { Fail "V135 xpClick not found on the root form" }
 else {
     $c     = NoComments $clickFn.Groups[1].Value
-    $iPr   = $c.IndexOf('xpLedgerRows(field, want, key, want and okey or nil, sunk)')
+    $iPr   = $c.IndexOf('xpLedgerRows(field, want, key, want and okey or nil, sunk, want and (okey .. "@" .. now) or nil)')
     $iMark = $c.LastIndexOf('xpPrefix(form, trait, t, want and (level + 1) or (level - 1));')
     $marks = @([regex]::Matches($c, 'markDot\('))
     if ($c -notmatch 'local alvo = \(\(sheet\[field\] == true\) and n == cur\) and \(n - 1\) or n;') { Fail "V135 the click never works out the LEVEL it is asking for (SPEC I155b) - with autoChange off, nothing else does" }
@@ -5035,7 +5046,7 @@ elseif ($clickOnly -notmatch 'while lvl ~= alvo do') { Fail "V444 the click does
 elseif ($clickOnly -notmatch 'xpStep\(form, trait, t, lvl, want, base, free\)') { Fail "V444 the click does not hand each level to xpStep - the rules would be asked somewhere else" }
 elseif ($clickOnly -notmatch 'if not ok then break; end;') { Fail "V444 the sequence does not stop at the first refusal - a refused level would let the next one through (SPEC I155e)" }
 elseif ($clickOnly -match 'xpLedgerRows\(') { Fail "V444 the click prices outside the step - a jump priced in one go is a second cost table (SPEC I9, V125)" }
-elseif ($stepOnly -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil, sunk\)') { Fail "V444 the step does not price the level it is about to write (SPEC V136)" }
+elseif ($stepOnly -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil, sunk, want and \(okey \.\. "@" \.\. now\) or nil\)') { Fail "V444 the step does not price the level it is about to write (SPEC V136)" }
 else { Pass "V444 the click walks one level at a time and the first refusal stops it" }
 
 # V445: the three repaints the CLICK owns leave the loop. Inside it they fire once per level,
@@ -5123,7 +5134,7 @@ else {
 $rowsSim = LuaFn $rootTxt 'xpLedgerRows'
 $liveFn  = LuaFn $rootTxt 'liveLevel'
 if (-not $rowsSim) { Fail "V136 xpLedgerRows not found on the root form" }
-elseif ($rowsSim -notmatch 'function xpLedgerRows\(clickField, clickValue, clickFree, clickOrder, clickSunk\)') { Fail "V136 xpLedgerRows cannot be handed a pending click" }
+elseif ($rowsSim -notmatch 'function xpLedgerRows\(clickField, clickValue, clickFree, clickOrder, clickSunk, clickWhen\)') { Fail "V136 xpLedgerRows cannot be handed a pending click" }
 elseif ($rowsSim -notmatch 'simField, simValue = clickField, clickValue;') { Fail "V136 the pending click is never put in front of the ledger" }
 elseif ($rowsSim -notmatch 'simTrait, simField, simValue = nil, nil, nil;') { Fail "V136 the simulation is never cleared - a later price would carry an answered click" }
 elseif ($rowsSim.IndexOf('simTrait, simField, simValue = nil, nil, nil;') -gt $rowsSim.IndexOf('return rows;')) { Fail "V136 the simulation is cleared after the ledger has returned, which is never" }
@@ -9341,6 +9352,7 @@ $centredSeen = 0
 $vpadBad = @()
 $vpadSeen = 0
 $stretchSeen = 0
+$applyBoxSeen = 0
 foreach ($f in $files) {
     foreach ($box in (Doc $f.FullName).SelectNodes("//layout[@width][@height]")) {
         $bw = -1; $bh = -1
@@ -9358,6 +9370,20 @@ foreach ($f in $files) {
             if ($k.GetAttribute("align") -eq 'client' -or ($kl -eq 0 -and $kt -eq 0 -and $kw -eq $bw)) { $back = $k; break }
         }
         if ($null -eq $back) { continue }
+
+        # SPEC I163f / V479c: the Apply box lost its title on the owner's word, so it is not a
+        # section box at all (SPEC V48) and neither the head equality nor the foot floor reaches
+        # it. Cut BY CONSTRUCTION - a layout whose only child beside the backdrop is a single
+        # <button> - and NOT by name, so a box that merely forgot its title cannot leave by the
+        # same door (SPEC V68, B18). Counted, so the exception cannot quietly stop matching and
+        # go on passing, which is the shape of B7 (SPEC V209).
+        $btn240 = 0; $oth240 = 0
+        foreach ($k in $box.ChildNodes) {
+            if ($k.NodeType -ne 'Element' -or $k -eq $back) { continue }
+            if ($k.LocalName -in @('dataLink', 'script', 'event', 'template')) { continue }
+            if ($k.LocalName -eq 'button') { $btn240++ } else { $oth240++ }
+        }
+        if ($btn240 -eq 1 -and $oth240 -eq 0 -and $back.GetAttribute("color") -eq 'black') { $applyBoxSeen++; continue }
 
         $hi = [int]::MaxValue
         $lo = [int]::MinValue
@@ -9470,7 +9496,8 @@ foreach ($f in $files) {
         }
     }
 }
-if ($vpadSeen -lt 70) { Fail "V240 only $vpadSeen box(es) were measured, expected the 70 the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
+if ($applyBoxSeen -ne 1) { Fail "V240 $applyBoxSeen titleless one-button box(es) were cut, expected the 1 the Apply box is - the construction that excuses it stopped matching, and either a box slipped out or the Apply box slipped back in (SPEC I163f, V479c, V209, B7)" }
+elseif (($vpadSeen + $applyBoxSeen) -lt 70) { Fail "V240 only $vpadSeen box(es) were measured beside the $applyBoxSeen cut, expected the 70 the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($centredSeen -ne 2) { Fail "V240 $centredSeen box(es) stretched by the ornament took the centring rule, expected the 2 of the Settings tab - an exception nothing reaches is an exception that stopped measuring (SPEC V209, I156j)" }
 elseif ($stretchSeen -ne 2) { Fail "V240 $stretchSeen stretched box(es) took the centring rule, expected the 2 of the tabHedge band - an exception nothing reaches is an exception that stopped measuring (SPEC V209, V267b)" }
 elseif ($vpadBad) { foreach ($b in $vpadBad) { Fail "V240 $b" } }
@@ -9563,11 +9590,52 @@ else {
     $scrW    = [int]$logScroll.GetAttribute("width")
     $needLvl = NeededPx 'MANUAL'
 
-    if ($logW -ne $expW) { Fail "V247 the log box is $logW wide and the EXPERIENCE box $expW - the two boxes of this tab close on the same x or the tab reads crooked" }
-    elseif ($scrW -ne ($costEnd + 16)) { Fail "V247 the scrolling box is $scrW wide and its last column ends at $costEnd - the columns are the Cost column plus the 16px the vertical bar comes out of, or a column grew and the box did not (SPEC I44, I57)" }
-    elseif ($logW -ne (2 * $scrL + $scrW)) { Fail "V247 the log box is $logW wide around a scrolling box $scrW wide at left=$scrL - the frame is the columns plus the margin on both sides, or a column grew and the frame did not (SPEC I44, I73)" }
-    elseif ([int]$lvlCol.GetAttribute("width") -lt $needLvl) { Fail "V247 the Level column is $($lvlCol.GetAttribute('width'))px and MANUAL needs about $needLvl - the one row whose Level is a word would come up cut (SPEC V16)" }
-    else { Pass "V247 both Experience boxes are $logW wide, the last column closes 16 short of the box that scrolls it, and Level holds MANUAL" }
+    # 18th batch (SPEC V247 as amended, I162c, I162f, T1037, user 2026-09-07): the two boxes
+    # no longer share a width - the user released the alignment and EXPERIENCE stays at 561
+    # while the log grew for the hour column and the revert buttons. What holds is the
+    # RELATION: the scroll is its rightmost child plus the bar's 16, the box is the scroll
+    # plus the margin both sides, and the two BANDS still close on the same x - EXPERIENCE,
+    # the 5px gap of V298, then APPLY, end where the log box ends (SPEC Q82.9, B160). The rightmost child
+    # is a template INSTANCE (XpRevRow), so its geometry is read off the template's button.
+    # EMENDED in the 19th batch (SPEC I163b, V478a): the XML authors the PLAYER, and the
+    # storyteller's column of X buttons is NOT in the static width any more. So the edge the
+    # scroll is measured against is the columns' - the buttons are read separately and their
+    # overhang has to be exactly XP_REV_W, which is what the sheet adds at runtime.
+    $edge247   = 0
+    $btnEdge247 = 0
+    $tplBtn247 = $xp9Doc.SelectSingleNode("//template[@name='XpRevRow']/button")
+    foreach ($k247 in $logScroll.ChildNodes) {
+        if ($k247.NodeType -ne 'Element') { continue }
+        if ($k247.LocalName -eq 'XpRevRow') {
+            if ($null -ne $tplBtn247) {
+                $b247 = [int]$tplBtn247.GetAttribute("left") + [int]$tplBtn247.GetAttribute("width")
+                if ($b247 -gt $btnEdge247) { $btnEdge247 = $b247 }
+            }
+            continue
+        }
+        if ($k247.HasAttribute("left") -and $k247.HasAttribute("width")) {
+            $e247 = [int]$k247.GetAttribute("left") + [int]$k247.GetAttribute("width")
+            if ($e247 -gt $edge247) { $edge247 = $e247 }
+        }
+    }
+    $revW247 = 0
+    $mW247 = [regex]::Match((NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))), 'local XP_REV_W = (\d+);')
+    if ($mW247.Success) { $revW247 = [int]$mW247.Groups[1].Value }
+    $applyBox247 = $xp9Doc.SelectSingleNode("//layout[@name='xpApplyBox']")
+    $expL247     = [int]$expBox.GetAttribute("left")
+    $applyW247   = 0
+    if ($null -ne $applyBox247) { $applyW247 = [int]$applyBox247.GetAttribute("width") }
+
+    if ($expW -ne 561) { Fail "V247 the EXPERIENCE box is $expW wide - it stays at 561 while the log grows (SPEC V247 as amended, I162c)" }
+    elseif ($scrW -ne ($edge247 + 16)) { Fail "V247 the scrolling box is $scrW wide and its rightmost COLUMN closes at $edge247 - the scroll the XML authors is the player's: that edge plus the 16px the vertical bar comes out of (SPEC V478a, I163b)" }
+    elseif ($revW247 -eq 0) { Fail "V247 XP_REV_W was not found on WoD20.9 - the storyteller's extra width is a named constant (SPEC V478b, V383b)" }
+    elseif (($btnEdge247 - $edge247) -ne $revW247) { Fail "V247 the revert buttons close $($btnEdge247 - $edge247)px past the last column and XP_REV_W says $revW247 - the constant IS that overhang, or the storyteller's log grows by the wrong amount (SPEC V478b)" }
+    elseif ($logW -ne (2 * $scrL + $scrW)) { Fail "V247 the log box is $logW wide around a scrolling box $scrW wide at left=$scrL - the frame is the columns plus the margin on both sides, or a column has moved without its box" }
+    elseif ($null -eq $applyBox247) { Fail "V247 xpApplyBox was not found on WoD20.9 - the top band has lost its second box (SPEC I162f)" }
+    elseif ([int]$applyBox247.GetAttribute("left") -ne ($expL247 + $expW + 5)) { Fail "V247 xpApplyBox sits at left=$($applyBox247.GetAttribute('left')) and EXPERIENCE closes at $($expL247 + $expW) - the gap between section boxes is 5 (SPEC V298, I76a, B160)" }
+    elseif (($expL247 + $expW + 5 + $applyW247) -ne $logW) { Fail "V247 EXPERIENCE, the 5px gap and APPLY close at $($expL247 + $expW + 5 + $applyW247) and the log box at $logW - the two bands of this tab close on the same x (SPEC Q82.9, V298)" }
+    elseif ([int]$lvlCol.GetAttribute("width") -lt $needLvl) { Fail "V247 the Level column is $($lvlCol.GetAttribute('width'))px and MANUAL needs about $needLvl - the one row whose Level is a word would wrap" }
+    else { Pass "V247 the log box is $logW wide off its rightmost child, EXPERIENCE stays 561, and EXPERIENCE + APPLY close on the log's x" }
 }
 
 # ---- V249/V250: the typed rows' DESCRIPTION is the storyteller's to write -----------------
@@ -10475,7 +10543,7 @@ if ($clickC -notmatch 'string\.gsub\(sheet\.xpOrder, "\|" \.\. okey \.\. "\|", "
 # something else redraws the sheet - green build, green gate, and the player watching (B6)
 if ($rowsC -notmatch 'clickOrder') { $ordBad += "xpLedgerRows cannot be handed the stamp of the click being priced - the row just bought would sort to the bottom until the next render (SPEC V260d)" }
 if ($rowsC -notmatch 'local ord = \(sheet\.xpOrder or ""\) \.\. "\|" \.\. \(clickOrder or ""\) \.\. "\|"') { $ordBad += "the walk does not append the pending click LAST - that append is the whole of why the new line lands on top (SPEC V260d)" }
-if ($clickC -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil, sunk\)') { $ordBad += "xpClick prices without handing over the order stamp it is about to write (SPEC V260d)" }
+if ($clickC -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil, sunk, want and \(okey \.\. "@" \.\. now\) or nil\)') { $ordBad += "xpClick prices without handing over the order stamp it is about to write (SPEC V260d)" }
 
 # (e) one sorter. Summing does not depend on order (V100) and two sorters diverge in silence.
 $sortAll = @([regex]::Matches((NoComments $rootTxt), 'table\.sort\(rows'))
@@ -10501,7 +10569,7 @@ $scrBad  = @()
 # named list of its own: $cols is reused further up the file and PowerShell leaks script
 # scope, so borrowing it here reads whatever the last loop left behind - which is how this
 # check first came back measuring nothing at all
-$LEDGER_COLS = @('dynXpType', 'dynXpTrait', 'dynXpLevel', 'dynXpCost')
+$LEDGER_COLS = @('dynXpType', 'dynXpTrait', 'dynXpLevel', 'dynXpCost', 'dynXpWhen')
 $logScr  = $logDoc.SelectSingleNode("//layout[@name='xpLogBox']/scrollBox")
 $logCols = @($logDoc.SelectNodes("//textEditor") | Where-Object { $LEDGER_COLS -contains $_.GetAttribute("name") })
 
@@ -10513,7 +10581,7 @@ if ($logCode -match 'xpLogHeight') { $scrBad += "xpLogHeight is back - it was th
 if ($null -eq $logScr) { $scrBad += "there is no scrollBox inside xpLogBox - the rows would have nowhere to scroll and the box would have to grow again (SPEC V261b)" }
 else {
     $inScroll = @($logScr.SelectNodes("textEditor") | Where-Object { $LEDGER_COLS -contains $_.GetAttribute("name") })
-    if ($inScroll.Count -ne 4) { $scrBad += "$($inScroll.Count) of the four ledger columns are children of the scrollBox - a column outside it does not scroll with its row and line N stops reading across (SPEC V261b)" }
+    if ($inScroll.Count -ne 5) { $scrBad += "$($inScroll.Count) of the five ledger columns are children of the scrollBox - a column outside it does not scroll with its row and line N stops reading across (SPEC V261b)" }
 }
 
 # (c) the heading and the state sentence do NOT scroll
@@ -10529,12 +10597,12 @@ $colHCalls = @([regex]::Matches($logCode, '(?m)^\s*xpColsHeight\('))
 $colHWrite = @([regex]::Matches($logCode, '(?m)form\.dynXp\w+\.height\s*='))
 if ($logCode -notmatch 'local function xpColsHeight\(form, h\)') { $scrBad += "there is no single writer for the column height - four heights written apart scroll four different amounts (SPEC V261d)" }
 if ($colHCalls.Count -lt 2) { $scrBad += "xpColsHeight is called $($colHCalls.Count) time(s) - the empty path and the populated path must BOTH set a height, or one of them keeps a stale scroll range (SPEC V261d)" }
-if ($colHWrite.Count -ne 4) { $scrBad += "$($colHWrite.Count) column height(s) are written, expected the four inside xpColsHeight - a height written anywhere else is a column scrolling on its own (SPEC V261d)" }
+if ($colHWrite.Count -ne 5) { $scrBad += "$($colHWrite.Count) column height(s) are written, expected the five inside xpColsHeight - a height written anywhere else is a column scrolling on its own (SPEC V261d)" }
 
 # (e) zero-guard: if the traversal breaks, say so instead of passing on nothing
-if ($logCols.Count -ne 4) { Fail "V261 found $($logCols.Count) ledger column(s) on WoD20.9, expected 4 - this check is reading a tab that is not there (SPEC V209)" }
+if ($logCols.Count -ne 5) { Fail "V261 found $($logCols.Count) ledger column(s) on WoD20.9, expected 5 - this check is reading a tab that is not there (SPEC V209)" }
 elseif ($scrBad) { foreach ($b in $scrBad) { Fail "V261 $b" } }
-else { Pass "V261 the four columns scroll together inside a fixed box, and nothing grows the frame" }
+else { Pass "V261 the five columns scroll together inside a fixed box, and nothing grows the frame" }
 
 # ---- V262: the Numina tab tiles, and there is no strip left to clear (SPEC I58, I117) ------
 # Four legs until T830, and three of them had the STRIP and the three stacked PANES as their
@@ -12430,11 +12498,22 @@ $v280Bad = @()
 $v280Boxes = @()
 $v280Rot = 0
 $v280Overlay = 0
+$v280Apply = 0
 foreach ($f in $files) {
     foreach ($box in (Doc $f.FullName).SelectNodes("//layout[rectangle[@color='black'][@xradius]]")) {
         $bl = 0; $bt = 0; $bw = 0; $bh = 0
         if (-not ([int]::TryParse($box.GetAttribute("width"), [ref]$bw) -and [int]::TryParse($box.GetAttribute("height"), [ref]$bh))) { continue }
         if ($OVERLAY_BOXES -contains $box.GetAttribute("name")) { $v280Overlay++; continue }
+        # The Apply box is titleless from the 19th batch on and therefore not a section box
+        # (SPEC V48 as amended, I163f, V479c). Cut BY CONSTRUCTION - one <button> and no <label>
+        # beside the backdrop - and counted, so a box that forgot its title cannot leave the
+        # same way and the exception cannot quietly stop matching (SPEC V68, B18, B7).
+        $btn280 = 0; $lbl280 = 0
+        foreach ($k280 in $box.ChildNodes) {
+            if ($k280.NodeType -ne 'Element') { continue }
+            if ($k280.LocalName -eq 'button') { $btn280++ } elseif ($k280.LocalName -eq 'label') { $lbl280++ }
+        }
+        if ($btn280 -eq 1 -and $lbl280 -eq 0) { $v280Apply++; continue }
         [void][int]::TryParse($box.GetAttribute("left"), [ref]$bl)
         [void][int]::TryParse($box.GetAttribute("top"), [ref]$bt)
         $t280 = $box.SelectSingleNode("label[@horzTextAlign='center']")
@@ -12443,7 +12522,8 @@ foreach ($f in $files) {
             L = $bl; T = $bt; W = $bw; H = $bh; Node = $box; P = $box.ParentNode }
     }
 }
-if ($v280Boxes.Count -ne 70) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
+if ($v280Apply -ne 1) { Fail "V280 $v280Apply titleless one-button box(es) were cut, expected the 1 the Apply box is (SPEC I163f, V479c, V209, B7)" }
+elseif ($v280Boxes.Count -ne 70) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
 else {
     # (a) TWO numbers since T913: 20 on the X sides, 15 on the Y ones (SPEC I137c, user
     # 2026-09-02). The X pair is a FLOOR and always was. The Y pair splits: the FOOT is a floor,
@@ -12585,7 +12665,7 @@ else { Pass "V280 (d) the $($colBottoms.Count) Ghoul columns all close at $(@($c
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
 # (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
 # on them would be a false alarm on numbers this round agreed not to touch.
-if ($v280Boxes.Count -ne 70) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
+if ($v280Boxes.Count -ne 70) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
 else {
     # The declared HOLE is GONE with T908 and the 5px rule is whole again. T904 had left the
     # 680..1010 band of the Main grid with no bottom box, so two boxes faced each other a whole
@@ -18368,7 +18448,7 @@ foreach ($kn383 in @('MERIT_ROWS','BACKGROUND_ROWS','BACKGROUND_FREE_ROWS','SPEC
                      'SEC_PATH_ROWS','SEC_PATH_FREE_ROWS','RITUAL_ROWS','RITUAL_FREE_ROWS',
                      'NUMINA_ROWS','NUMINA_FREE_ROWS','PSYCHIC_ROWS','PSYCHIC_FREE_ROWS',
                      'HEDGE_RITUAL_ROWS','HEDGE_RITUAL_FREE_ROWS',
-                     'ATTACK_ROWS')) {
+                     'ATTACK_ROWS','XP_REV_POOL')) {
     $km383 = [regex]::Match($lua383, '(?m)^\s*' + $kn383 + '\s*=\s*(\d+);')
     if ($km383.Success) { $K383[$kn383] = [int]$km383.Groups[1].Value }
 }
@@ -22210,5 +22290,437 @@ else {
 if ($v468Bad) { foreach ($b in $v468Bad) { Fail "V468 $b" } }
 else { Pass "V468 the nine Attack columns are adjacent and close on the row, every header sits over its own column, and Roll and the picker button hold the longest value the books carry" }
 
+# 18th batch (2026-09-07): the hour column, the storyteller's revert and APPLY on the Experience
+# tab. SPEC V472..V476, I162, T1036..T1039.
+
+# ---- V472: xpWhen - the fourth stamp, the only one carrying a value after its key ----------
+# SPEC V472, I162b, R160, T1036, user 2026-09-07. The hour of a purchase rides the SAME okey
+# the order stamp writes, in xpStep and xpSetSpent and nowhere else; it is read once per walk
+# in xpLedgerRows and handed forward as clickWhen; renderXPLedger draws what was STORED and
+# never asks the clock, because the hour of a render is "now" and not "when".
+$v472Bad  = @()
+$step472  = LuaFn $rootTxt 'xpStep'
+$ledg472  = LuaFn $rootTxt 'xpLedgerRows'
+$setSp472 = LuaFn $rootTxt 'xpSetSpent'
+$xp9c472  = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+if (-not $step472)  { $v472Bad += "xpStep not found on the root form (SPEC V209)" }
+if (-not $ledg472)  { $v472Bad += "xpLedgerRows not found on the root form (SPEC V209)" }
+if (-not $setSp472) { $v472Bad += "xpSetSpent not found on the root form (SPEC V209)" }
+if (-not $v472Bad) {
+    $s472 = NoComments $step472
+    $l472 = NoComments $ledg472
+    $m472 = NoComments $setSp472
+    # (a)+(b) the purchase writes the hour on the line under the order, with the SAME okey and an @
+    if ($s472 -notmatch 'setField\("xpOrder", \(sheet\.xpOrder or ""\) \.\. "\|" \.\. okey \.\. "\|"\);\s+setField\("xpWhen", \(sheet\.xpWhen or ""\) \.\. "\|" \.\. okey \.\. "@" \.\. now \.\. "\|"\);') { $v472Bad += "(a)(b) the purchase does not write xpWhen on the line under xpOrder, with the same okey and an @ before the hour - the hour has to be the hour OF that order (SPEC V472a/b, V260a)" }
+    # (b) the sale drops the hour in the same step, on the line under the order's drop
+    if ($s472 -notmatch 'setField\("xpOrder", \(string\.gsub\(sheet\.xpOrder, "\|" \.\. okey \.\. "\|", "\|"\)\)\);\s+setField\("xpWhen", \(string\.gsub\(sheet\.xpWhen or "", "\|" \.\. okey \.\. "@\[\^\|\]\*\|", "\|"\)\)\);') { $v472Bad += "(b) the sale does not drop the hour of the level it sells on the line under the order's drop - an orphan hour outlives its line (SPEC V472b, V260c)" }
+    # (b) writers: two in xpStep, one in xpSetSpent, none anywhere else
+    $wStep472 = ([regex]::Matches($s472, 'setField\("xpWhen"')).Count
+    $wSet472  = ([regex]::Matches($m472, 'setField\("xpWhen"')).Count
+    $wAll472  = 0
+    foreach ($f in $files) { $wAll472 += ([regex]::Matches((NoComments (CodeOf $f.FullName)), 'setField\("xpWhen"')).Count }
+    if ($wStep472 -ne 2) { $v472Bad += "(b) xpStep writes xpWhen $wStep472 time(s), expected 2 - the purchase append and the sale drop (SPEC V472b)" }
+    if ($wSet472 -ne 1) { $v472Bad += "(b) xpSetSpent writes xpWhen $wSet472 time(s), expected 1 - the MANUAL line takes its hour where it takes its order (SPEC V472b)" }
+    if ($wAll472 -ne ($wStep472 + $wSet472)) { $v472Bad += "(b) xpWhen is written $wAll472 time(s) across the sheet and only $($wStep472 + $wSet472) of them are in xpStep and xpSetSpent - a third writer (SPEC V472b)" }
+    if ($m472 -notmatch 'string\.gsub\(sheet\.xpWhen or "", "\|xpManual#0@\[\^\|\]\*\|", "\|"\)') { $v472Bad += "(b) xpSetSpent does not drop the MANUAL line's old hour before writing the new one - the string would carry two (SPEC V472b)" }
+    # (c) os.date once per step, BEFORE the walk, and the walk is handed the pending key@hour
+    $dates472 = @([regex]::Matches($s472, 'os\.date\('))
+    $iNow472  = $s472.IndexOf('local now = ')
+    $iWalk472 = $s472.IndexOf('local rows  = xpLedgerRows(')
+    if ($dates472.Count -ne 1) { $v472Bad += "(c) xpStep calls os.date $($dates472.Count) time(s) - once per accepted step (SPEC V472c)" }
+    if ($iNow472 -lt 0 -or $iWalk472 -lt 0 -or $iNow472 -gt $iWalk472) { $v472Bad += "(c) the hour is not read BEFORE the walk - the line being priced would be born without it until the next render (SPEC V472c, V260d)" }
+    if ($s472 -notmatch 'xpLedgerRows\(field, want, key, want and okey or nil, sunk, want and \(okey \.\. "@" \.\. now\) or nil\)') { $v472Bad += "(c) the walk is not handed the pending key@hour as its sixth argument (SPEC V472c, V136)" }
+    if ($iNow472 -ge 0 -and $iWalk472 -gt $iNow472) {
+        if ($s472.Substring($iNow472, $iWalk472 - $iNow472) -match 'setField\(') { $v472Bad += "(c) something is written between reading the hour and the walk - pricing writes nothing (SPEC V136)" }
+    }
+    # (f) the host without os.date gets a ? and the sale goes through
+    if ($s472 -notmatch 'local now = \(os ~= nil and os\.date ~= nil\) and os\.date\("%Y-%m-%d %H:%M"\) or "\?";') { $v472Bad += "(f) the hour is not 'os.date or ?' - a host without os.date would raise inside the purchase instead of leaving a ? in the column (SPEC V472f, R160)" }
+    # (d) read once per walk in xpLedgerRows, beside ord, into rows[i].when; nobody else reads sheet.xpWhen
+    if ($l472 -notmatch 'function xpLedgerRows\(clickField, clickValue, clickFree, clickOrder, clickSunk, clickWhen\)') { $v472Bad += "(d) xpLedgerRows does not take clickWhen as its sixth parameter (SPEC V472c/d)" }
+    if ($l472 -notmatch 'local whn = \(sheet\.xpWhen or ""\) \.\. "\|" \.\. \(clickWhen or ""\) \.\. "\|";') { $v472Bad += "(d) xpLedgerRows does not read xpWhen once, beside ord, with the pending hour appended (SPEC V472d, V125)" }
+    if ($l472 -notmatch 'rows\[i\]\.when = string\.match\(whn, "\|" \.\. rows\[i\]\.key \.\. "@\(\[\^\|\]\*\)\|"\);') { $v472Bad += "(d) the row does not carry its hour out of the walk as rows[i].when (SPEC V472d)" }
+    $nRead472 = ([regex]::Matches($l472, 'sheet\.xpWhen')).Count
+    if ($nRead472 -ne 1) { $v472Bad += "(d) xpLedgerRows reads sheet.xpWhen $nRead472 time(s) - once per walk (SPEC V125)" }
+    if ($xp9c472 -match 'sheet\.xpWhen') { $v472Bad += "(d) WoD20.9 reads sheet.xpWhen - the renderer draws rows[i].when and the walk is the one reader (SPEC V472d)" }
+    # (e) drawn by renderXPLedger from what was stored, in the reader's order; never from the clock
+    if ($xp9c472 -match 'os\.date') { $v472Bad += "(e) WoD20.9 calls os.date - the hour of a render is now, not when (SPEC V472e)" }
+    if ($xp9c472 -notmatch 'form\.dynXpWhen\.text\s*=\s*table\.concat\(whens, "\\n"\);') { $v472Bad += "(e) renderXPLedger does not write the fifth column from the rows (SPEC V472e, I162c)" }
+    if ($xp9c472 -notmatch 'if r\.when == nil then\s+whens\[i\] = "-";\s+elseif lang == "pt" then\s+whens\[i\] = \(string\.gsub\(r\.when, "\^\(%d\+\)-\(%d\+\)-\(%d\+\)", "%3/%2/%1"\)\);\s+else\s+whens\[i\] = r\.when;') { $v472Bad += "(e) the hour is not drawn as - when unstamped, day-first in pt and as stored in en (SPEC V472e, Q82.2)" }
+}
+if ($v472Bad) { foreach ($b in $v472Bad) { Fail "V472 $b" } }
+else { Pass "V472 the hour rides the order's key, written by xpStep and xpSetSpent only, read once per walk, drawn from what was stored and never from the clock" }
+
+# ---- V473: the fifth column, the pool of revert buttons and the roster --------------------
+# SPEC V473, I162c, I162d, T1037. The width relation itself is V247's (amended); what is
+# measured here is WHERE the new controls live, that the pool is exactly XP_REV_POOL buttons
+# each on its own row and naming its own row, that they are born hidden, and that the walker
+# is handed every one of them off the same constant.
+$v473Bad = @()
+$doc473  = Doc (Join-Path $dir "WoD20.9.lfm")
+$scr473  = $doc473.SelectSingleNode("//scrollBox[@name='xpLogScroll']")
+$tpl473  = $doc473.SelectSingleNode("//template[@name='XpRevRow']/button")
+$code473 = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+$pool473 = 0
+if ($K383.ContainsKey('XP_REV_POOL')) { $pool473 = $K383['XP_REV_POOL'] }
+if ($null -eq $scr473) { $v473Bad += "xpLogScroll is gone from WoD20.9 (SPEC V209)" }
+elseif ($null -eq $tpl473) { $v473Bad += "the XpRevRow template has no button - the pool would be sixty empty rows (SPEC V473b, V209)" }
+elseif ($pool473 -lt 1) { $v473Bad += "(b) XP_REV_POOL is not declared on the root form as a literal constant - the pool has no number to be measured against (SPEC V383b)" }
+else {
+    # (a) dynXpWhen is a DIRECT child of the scroll; the heading is outside, beside the four
+    if ($null -eq $scr473.SelectSingleNode("textEditor[@name='dynXpWhen']")) { $v473Bad += "(a) dynXpWhen is not a direct child of xpLogScroll - a column outside it does not scroll with its row (SPEC V261b)" }
+    if ($null -ne $scr473.SelectSingleNode(".//label[@text='Date/Time']")) { $v473Bad += "(a) the Date/Time heading sits inside the scrollBox - a heading that scrolls is a log without one (SPEC V261c)" }
+    if ($null -eq $doc473.SelectSingleNode("//layout[@name='xpLogBox']/label[@text='Date/Time']")) { $v473Bad += "(a) the Date/Time heading is not a child of xpLogBox beside the four it joins (SPEC I162c)" }
+    # (b) pool count == XP_REV_POOL, each instance on its own row and naming its own row
+    $inst473 = @($scr473.SelectNodes("XpRevRow"))
+    if ($inst473.Count -ne $pool473) { $v473Bad += "(b) the XML authors $($inst473.Count) XpRevRow instance(s) and XP_REV_POOL says $pool473 - a row past the constant has no button and a button past the rows has no row (SPEC V473b)" }
+    $seen473 = @{}
+    foreach ($i473 in $inst473) {
+        $n473 = [int]$i473.GetAttribute("num")
+        $t473 = [int]$i473.GetAttribute("top")
+        if ($seen473.ContainsKey($n473)) { $v473Bad += "(b) XpRevRow num=$n473 is authored twice" }
+        $seen473[$n473] = $true
+        if ($t473 -ne (($n473 - 1) * 20)) { $v473Bad += "(b) XpRevRow num=$n473 sits at top=$t473 and row $n473 of the columns is at $(($n473 - 1) * 20) - the button would revert the line beside another row (SPEC V473b)" }
+    }
+    for ($n473 = 1; $n473 -le $pool473; $n473++) { if (-not $seen473.ContainsKey($n473)) { $v473Bad += "(b) XpRevRow num=$n473 is missing - a hole in the pool is a row with no button (SPEC V473b)" } }
+    if ($tpl473.GetAttribute("name") -ne 'btnXpRev_$(num)') { $v473Bad += "(b) the pool button is named '$($tpl473.GetAttribute('name'))' and not btnXpRev_ plus its num - the renderer lights them by that name (SPEC V473e)" }
+    if ($tpl473.GetAttribute("onClick") -notmatch '^\s*xpRevert\(self, \$\(num\)\);\s*$') { $v473Bad += "(b) the pool button's onClick is '$($tpl473.GetAttribute('onClick'))' - it must hand xpRevert its OWN num (SPEC V473b, V474)" }
+    if ($tpl473.GetAttribute("top") -ne '$(top)') { $v473Bad += "(b) the pool button's top is not the instance's top - sixty buttons on one row (SPEC V473b)" }
+    # (c) born hidden - the XML has to read right for a PLAYER before any Lua runs
+    if ($tpl473.GetAttribute("visible") -ne 'false') { $v473Bad += "(c) the pool button is not authored visible=false - a player would see the storyteller's buttons before any Lua ran (SPEC V473c)" }
+    # (d) the pool is the RIGHTMOST child of the scroll - it is what V247 measures the frame from
+    $btnEdge473 = [int]$tpl473.GetAttribute("left") + [int]$tpl473.GetAttribute("width")
+    foreach ($k473 in $scr473.ChildNodes) {
+        if ($k473.NodeType -ne 'Element' -or $k473.LocalName -eq 'XpRevRow') { continue }
+        if ($k473.HasAttribute("left") -and $k473.HasAttribute("width")) {
+            $e473 = [int]$k473.GetAttribute("left") + [int]$k473.GetAttribute("width")
+            if ($e473 -gt [int]$tpl473.GetAttribute("left")) { $v473Bad += "(d) '$($k473.GetAttribute('name'))' closes at $e473, past where the revert buttons open ($($tpl473.GetAttribute('left'))) - the buttons are the last column (SPEC I162d)" }
+        }
+    }
+    # (e) the roster names the eight controls, the pool joins it off the constant, one walker
+    $roster473 = [regex]::Match($code473, 'local XP_LOG = \{([^}]*)\}')
+    $names473  = @()
+    if ($roster473.Success) { $names473 = @([regex]::Matches($roster473.Groups[1].Value, '(\w+)\s*=\s*true') | ForEach-Object { $_.Groups[1].Value }) }
+    # Three names joined in the 19th batch: the log box, the scroll and the title all take a
+    # width from xpLogWidth now, and a control nothing finds is a control nothing can widen
+    # (SPEC I163b, V473e as amended, V478c).
+    foreach ($need473 in @('dynXpType','dynXpTrait','dynXpLevel','dynXpCost','dynXpWhen','dynXpEmpty','xpApplyBox','btnXpApply','xpLogBox','xpLogScroll','lblXpLogTitle')) { if ($names473 -notcontains $need473) { $v473Bad += "(e) '$need473' is not on the XP_LOG roster - the one walker would never find it (SPEC V473e, V143)" } }
+    if ($names473.Count -ne 11) { $v473Bad += "(e) the XP_LOG roster names $($names473.Count) controls, expected 11 (SPEC V473e as amended)" }
+    if ($code473 -notmatch 'for i = 1, XP_REV_POOL, 1 do XP_LOG\["btnXpRev_" \.\. i\] = true; end;') { $v473Bad += "(e) the pool does not join the XP_LOG roster off the constant - sixty names typed out would drift from it (SPEC V473e, V383b)" }
+    if ($code473 -notmatch 'local function xpRevButtons\(form, rows, st\)[\s\S]*?for i = 1, XP_REV_POOL, 1 do') { $v473Bad += "(e) xpRevButtons does not take the role and bound its loop on XP_REV_POOL (SPEC V473b, V383b, V474a as amended)" }
+    if ($code473 -match 'for i = 1, 60') { $v473Bad += "(e) a loop is bounded on the literal 60 - the bound is the constant (SPEC V383b)" }
+}
+if ($v473Bad) { foreach ($b in $v473Bad) { Fail "V473 $b" } }
+else { Pass "V473 the fifth column and the $pool473 revert buttons are children of the scroll, born hidden, one per row naming its own row, and the roster hands the one walker all of them" }
+
+# ---- V474: the storyteller's revert asks who is clicking, refuses first, confirms, then SELLS
+# through the player's own step (SPEC V474, I162d, I162e, T1036) ------------------------------
+$v474Bad = @()
+$rev474  = LuaFn $rootTxt 'xpRevert'
+$led474  = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+if (-not $rev474) { $v474Bad += "xpRevert not found on the root form (SPEC V209)" }
+else {
+    $r474 = NoComments $rev474
+    # (a) isStoryteller() where the buttons are lit AND again in the click - fail closed
+    if ($r474 -notmatch 'if sheet == nil or not isStoryteller\(\) then return; end;') { $v474Bad += "(a) xpRevert does not ask isStoryteller() itself - a button lit for a storyteller who became a player would still sell (SPEC V474a, V96, V79)" }
+    if ($r474.IndexOf('isStoryteller()') -gt $r474.IndexOf('xpLedgerRows()')) { $v474Bad += "(a) xpRevert walks the ledger before asking who is clicking (SPEC V474a, V125)" }
+    # EMENDED in the 19th batch (SPEC I163d, V474a as amended): the reading moved UP, out of
+    # xpRevButtons and into renderXPLedger, because the width of the two boxes asks the same
+    # question about the same person. Still ONE reading per render, and the count is what says
+    # so - a second isStoryteller() anywhere on this tab is the drift the leg exists to catch.
+    if ($led474 -notmatch 'function renderXPLedger\(node, rows\)[\s\S]*?local st = isStoryteller\(\);') { $v474Bad += "(a) renderXPLedger does not read isStoryteller() into st (SPEC V474a as amended, I163d)" }
+    if (([regex]::Matches($led474, 'isStoryteller\(\)')).Count -ne 1) { $v474Bad += "(a) WoD20.9 reads isStoryteller() $(([regex]::Matches($led474, 'isStoryteller\(\)')).Count) time(s), expected the 1 per render renderXPLedger takes (SPEC V474a as amended)" }
+    if ($led474 -notmatch 'xpLogWidth\(form, st\);') { $v474Bad += "(a) the role read in renderXPLedger is not handed to xpLogWidth - the box would keep the other reader's width (SPEC I163d, V478e)" }
+    if ($led474 -notmatch 'xpRevButtons\(form, rows, st\);' -or $led474 -notmatch 'xpRevButtons\(form, nil, st\);') { $v474Bad += "(a) the role is not handed to xpRevButtons on both paths of the log (SPEC I163d, V474a)" }
+    # (f) no button on a MANUAL or Ritual line
+    if ($led474 -notmatch '\.visible = \(r ~= nil and r\.kind ~= "MANUAL" and r\.kind ~= "Ritual"\);') { $v474Bad += "(f) the buttons are not lit off the row and its kind - a MANUAL or Ritual line would get a button (SPEC V474f, Q82.3)" }
+    # (b) ONE stamp written here; everything else through xpStep with two literal falses
+    $sf474 = @([regex]::Matches($r474, 'setField\("(\w+)"'))
+    if ($sf474.Count -ne 1 -or $sf474[0].Groups[1].Value -ne 'xpApplied') { $v474Bad += "(b) xpRevert writes $($sf474.Count) field(s) itself - it lifts xpApplied and sells everything else through xpStep (SPEC V474b)" }
+    if ($r474 -notmatch 'xpStep\(tabRootOf\(form\), trait, t, lvl, false, baselineOf\(\), false\)') { $v474Bad += "(b) xpRevert does not sell through xpStep from the sheet ROOT with want and free both literally false (SPEC V474b, V137, V143)" }
+    if ($r474 -match 'stFreeBuy') { $v474Bad += "(b) xpRevert reads stFreeBuy - the flag is read in one place only (SPEC V137)" }
+    if ($r474 -match 'markDot\(|xpPrefix\(') { $v474Bad += "(b) xpRevert marks a dot itself instead of selling through xpStep (SPEC V474b)" }
+    # (c) both refusals BEFORE the dialog and before any write, and they speak
+    $iDlg474 = $r474.IndexOf('Dialogs.confirmOkCancel(')
+    foreach ($msg474 in @('That point is already off the sheet', 'Revert the higher level first')) {
+        $iw474 = $r474.IndexOf('xpWarn("' + $msg474 + '")')
+        if ($iw474 -lt 0) { $v474Bad += "(c) the refusal '$msg474' is gone (SPEC V474c, V129)" }
+        elseif ($iDlg474 -ge 0 -and $iw474 -gt $iDlg474) { $v474Bad += "(c) the refusal '$msg474' comes after the dialog - it must refuse before asking (SPEC V474c, V135)" }
+    }
+    if ($r474 -notmatch 'if lvl > live then xpWarn\("That point is already off the sheet"\); return; end;') { $v474Bad += "(c) the sunk line is not refused on lvl > live (SPEC V474c)" }
+    if ($r474 -notmatch 'if lvl < live then xpWarn\("Revert the higher level first"\); return; end;') { $v474Bad += "(c) the lower line is not refused on lvl < live - Strength 3 under a bought 4 would come off (SPEC V474c)" }
+    # (d) the one dialog shape, and every write inside its answer
+    if ($iDlg474 -lt 0) { $v474Bad += "(d) xpRevert does not ask through Dialogs.confirmOkCancel (SPEC V474d, V81, R161)" }
+    else {
+        if ($r474.Substring(0, $iDlg474) -match 'setField\(|xpStep\(') { $v474Bad += "(d) something is written before the storyteller answered (SPEC V474d)" }
+        if ($r474 -notmatch 'if not ok or sheet == nil then return; end;') { $v474Bad += "(d) the callback does not stop on a cancelled dialog (SPEC V474d)" }
+        if ($r474 -notmatch 'translateSheetText\("Revert this purchase\? The point comes off the sheet and its experience is returned\.", lang\)') { $v474Bad += "(d) the question is not the authored English sentence through translateSheetText (SPEC V9, V28)" }
+        # (e) the applied key comes out BEFORE the sale
+        $iApp474 = $r474.IndexOf('setField("xpApplied"')
+        $iStp474 = $r474.IndexOf('xpStep(tabRootOf(form)')
+        if ($iApp474 -lt 0 -or $iStp474 -lt 0 -or $iApp474 -gt $iStp474) { $v474Bad += "(e) the applied key is not lifted BEFORE the sale - the floor in xpStep refuses the storyteller's own revert (SPEC V474e)" }
+        if ($r474 -notmatch 'setField\("xpApplied", \(string\.gsub\(sheet\.xpApplied or "", "\|" \.\. r\.key \.\. "\|", "\|"\)\)\);') { $v474Bad += "(e) the lift is not a gsub of that one key (SPEC V474e, V475a)" }
+    }
+    # (f) one walk per click, one repaint with what the step returned
+    $nWalk474 = ([regex]::Matches($r474, 'xpLedgerRows\(')).Count
+    if ($nWalk474 -ne 1) { $v474Bad += "(f) xpRevert walks the ledger $nWalk474 time(s) - once per click (SPEC V474f, V125)" }
+    if ($r474 -notmatch 'renderAllXPBoxes\(form, spent\);') { $v474Bad += "(f) xpRevert does not repaint the boxes with the sum the step returned (SPEC V445)" }
+    if ($r474 -notmatch 'xpLedgerRefresh\(form, rows2\)') { $v474Bad += "(f) xpRevert does not redraw the log with the rows the step returned (SPEC V445, V125)" }
+    # it lives BELOW xpClick, which is below the local xpLedgerRefresh it calls (SPEC V223, B51)
+    if ($rootTxt.IndexOf('function xpRevert(') -lt $rootTxt.IndexOf('local function xpLedgerRefresh(')) { $v474Bad += "xpRevert is declared above the local xpLedgerRefresh it calls - a GETGLOBAL on nil (SPEC V223, B51)" }
+}
+if ($v474Bad) { foreach ($b in $v474Bad) { Fail "V474 $b" } }
+else { Pass "V474 the revert asks who is clicking twice, refuses before it asks, asks before it writes, lifts the applied key and then sells through xpStep with the flag off" }
+
+# ---- V475: xpApplied - the fifth stamp, the player's floor (SPEC V475, I162f..I162h, T1036,
+# T1037) --------------------------------------------------------------------------------------
+$v475Bad  = @()
+$step475  = LuaFn $rootTxt 'xpStep'
+$xp9475   = CodeOf (Join-Path $dir "WoD20.9.lfm")
+$c475     = NoComments $xp9475
+$apply475 = LuaFn $xp9475 'xpApply'
+$rend475  = LuaFn $xp9475 'renderXPApply'
+if (-not $step475)  { $v475Bad += "xpStep not found on the root form (SPEC V209)" }
+if (-not $apply475) { $v475Bad += "xpApply not found on WoD20.9 (SPEC V209)" }
+if (-not $rend475)  { $v475Bad += "renderXPApply not found on WoD20.9 (SPEC V209)" }
+if (-not $v475Bad) {
+    $s475  = NoComments $step475
+    $a475  = NoComments $apply475
+    $rb475 = NoComments $rend475
+    # (a) exactly two writers: xpApply REPLACES inside the answer, xpRevert lifts one key
+    $wr475 = @()
+    foreach ($f in $files) { $cc475 = NoComments (CodeOf $f.FullName); foreach ($m475 in [regex]::Matches($cc475, 'setField\("xpApplied"')) { $wr475 += $f.Name } }
+    if ($wr475.Count -ne 2) { $v475Bad += "(a) xpApplied is written $($wr475.Count) time(s) across the sheet ($($wr475 -join ', ')) - exactly two: xpApply replaces it, xpRevert lifts one key (SPEC V475a)" }
+    if ($a475 -notmatch 'setField\("xpApplied", table\.concat\(keys\)\);') { $v475Bad += "(a) xpApply does not REPLACE the stamp with the keys it walked - an append carries a key twice per click (SPEC V475a)" }
+    if ($a475 -match 'sheet\.xpApplied') { $v475Bad += "(a) xpApply reads the old stamp back - it replaces, it does not merge (SPEC V475a)" }
+    if ($a475 -notmatch 'for i = 1, #rows, 1 do keys\[i\] = "\|" \.\. rows\[i\]\.key \.\. "\|"; end;') { $v475Bad += "(a) the applied keys are not every row's key in the stamp grammar (SPEC V475a, V138)" }
+    $iDlg475 = $a475.IndexOf('Dialogs.confirmOkCancel(')
+    if ($iDlg475 -lt 0) { $v475Bad += "(a) xpApply does not ask first (SPEC V475a, V81)" }
+    elseif ($a475.Substring(0, $iDlg475) -match 'setField\(') { $v475Bad += "(a) xpApply writes before the player answered (SPEC V475a)" }
+    if ($a475 -notmatch 'translateSheetText\("Apply the spent experience\? The points bought stay on the sheet and can no longer be removed\.", lang\)') { $v475Bad += "(a) the question is not the authored English sentence through translateSheetText (SPEC V9, V28)" }
+    $nWalk475 = ([regex]::Matches($a475, 'xpLedgerRows\(')).Count
+    if ($nWalk475 -ne 1) { $v475Bad += "(a) xpApply walks the ledger $nWalk475 time(s) - once per click (SPEC V125)" }
+    # (c) the floor sits in the SALE branch, after the baseline floor, with not free, and speaks
+    $sale475 = [regex]::Match($s475, '(?s)\r?\n\t\t\t\telse\r?\n(.*?)\r?\n\t\t\t\tend;\s*xpPrefix\(form, trait, t, want and')
+    if (-not $sale475.Success) { $v475Bad += "(c) the sale branch of xpStep could not be found (SPEC V209)" }
+    else {
+        $sb475  = $sale475.Groups[1].Value
+        $iBase475 = $sb475.IndexOf('after < traitLevel(base,')
+        $iApp475  = $sb475.IndexOf('sheet.xpApplied')
+        if ($iApp475 -lt 0) { $v475Bad += "(c) the sale branch never reads xpApplied - an applied dot would come off (SPEC V475c)" }
+        elseif ($iBase475 -lt 0 -or $iApp475 -lt $iBase475) { $v475Bad += "(c) the applied floor does not come AFTER the baseline floor (SPEC V475c)" }
+        if ($sb475 -notmatch 'if not free and string\.find\(sheet\.xpApplied or "", "\|" \.\. okey \.\. "\|", 1, true\) ~= nil then\s+xpWarn\("Applied experience cannot be taken back"\);\s+return false;') { $v475Bad += "(c) the applied floor is not 'not free and find(xpApplied, okey)' refusing OUT LOUD before any write (SPEC V475c, V129, V451b)" }
+    }
+    $buy475 = [regex]::Match($s475, '(?s)\r?\n\t\t\t\tif want then\r?\n(.*?)\r?\n\t\t\t\telse\r?\n')
+    if ($buy475.Success -and $buy475.Groups[1].Value -match 'xpApplied') { $v475Bad += "(c) the purchase branch reads xpApplied - a purchase is never refused by the floor (SPEC V475c)" }
+    # (b) readers: the floor in xpStep, the button state in renderXPApply, the lift in xpRevert
+    $rd475 = 0
+    foreach ($f in $files) { $rd475 += ([regex]::Matches((NoComments (CodeOf $f.FullName)), 'sheet\.xpApplied')).Count }
+    if ($rd475 -ne 4) { $v475Bad += "(b) sheet.xpApplied is read $rd475 time(s) across the sheet, expected 4 - the floor in xpStep, the button state in renderXPApply, the lift in xpRevert and the pending set in xpPendingDots (SPEC V475b as amended, V480d)" }
+    # (d) renderXPApply called from renderXPLedger and nowhere else; no dataLink of its own
+    $calls475 = @([regex]::Matches($c475, 'renderXPApply\(form, rows\);'))
+    $ledFn475 = [regex]::Match($c475, '(?s)function renderXPLedger\(node, rows\)(.*?)\r?\n\t\t\tend;')
+    if ($calls475.Count -lt 1) { $v475Bad += "(d) renderXPApply is never called (SPEC V475d)" }
+    elseif (-not $ledFn475.Success) { $v475Bad += "(d) renderXPLedger not found (SPEC V209)" }
+    elseif (([regex]::Matches($ledFn475.Groups[1].Value, 'renderXPApply\(form, rows\);')).Count -ne $calls475.Count) { $v475Bad += "(d) renderXPApply is called from outside renderXPLedger - the log already redraws on every event that changes the answer (SPEC V475d)" }
+    if ($xp9475 -match 'dataLink[^>]*renderXPApply') { $v475Bad += "(d) a dataLink names renderXPApply - no new dataLink (SPEC V475d)" }
+    # (e) shown off the rows, enabled and opacity in one pair off pending
+    # The first half of (e) FELL in the 19th batch (SPEC I163e, V475e as amended, V479b): the
+    # box is always on screen and nothing writes it. The leg inverted - what would be a defect
+    # now is a write coming back.
+    foreach ($f475v in $files) { if ((NoComments (CodeOf $f475v.FullName)) -match 'xpApplyBox\.visible') { $v475Bad += "(e) $($f475v.Name) writes xpApplyBox.visible - the box is always visible and only the BUTTON speaks (SPEC V479b, I163e)" } }
+    if ($rb475 -notmatch 'form\.btnXpApply\.enabled = pending;\s+form\.btnXpApply\.opacity = pending and 1 or 0\.50;') { $v475Bad += "(e) enabled and opacity are not written as one pair off pending (SPEC V475e, V112)" }
+    if ($rb475 -notmatch 'if string\.find\(sheet\.xpApplied or "", "\|" \.\. rows\[i\]\.key \.\. "\|", 1, true\) == nil then\s+pending = true;') { $v475Bad += "(e) pending is not 'a row whose key is not in xpApplied' (SPEC V475e)" }
+    # (f) closing the sheet writes nothing: no close, hide or destroy handler anywhere
+    foreach ($f in $files) { $d475 = Doc $f.FullName; if ($null -ne $d475.SelectSingleNode("//event[@name='onClose' or @name='onDestroy' or @name='onHide']")) { $v475Bad += "(f) $($f.Name) carries a close, hide or destroy handler - closing the sheet writes nothing and reverts nothing (SPEC V475f)" } }
+    # the eight new strings translate (SPEC I162i, V28)
+    # Seven, not eight: APPLY left with the label that showed it (SPEC I163e, V479a, T1046).
+    foreach ($s475s in @('Apply the spent experience? The points bought stay on the sheet and can no longer be removed.', 'Revert this purchase? The point comes off the sheet and its experience is returned.', 'Revert the higher level first', 'That point is already off the sheet', 'Applied experience cannot be taken back', 'Date/Time', 'Apply Spent Experience')) { if (-not $ptVal.ContainsKey($s475s)) { $v475Bad += "'$s475s' has no entry in the PT map (SPEC I162i, V28)" } }
+}
+if ($v475Bad) { foreach ($b in $v475Bad) { Fail "V475 $b" } }
+else { Pass "V475 the applied stamp is replaced by xpApply inside the answer, lifted one key at a time by xpRevert, refuses the sale out loud unless the flag is on, and lights the button only while something is pending" }
+
+# ---- V476: 0.50 is btnXpApply's dim and nobody else's (SPEC V476, I162j, T1037; V244 and
+# V112 as amended) -----------------------------------------------------------------------------
+$v476Bad = @()
+$doc476  = Doc (Join-Path $dir "WoD20.9.lfm")
+$btn476  = $doc476.SelectSingleNode("//button[@name='btnXpApply']")
+if ($null -eq $btn476) { $v476Bad += "btnXpApply is not authored on WoD20.9 (SPEC V209)" }
+else {
+    if ($btn476.GetAttribute("enabled") -ne 'false') { $v476Bad += "(a) btnXpApply is not authored enabled=false - it must be born dead (SPEC V476a)" }
+    if ($btn476.GetAttribute("opacity") -ne '0.50') { $v476Bad += "(a) btnXpApply is authored at opacity '$($btn476.GetAttribute('opacity'))' and the user asked for 0.50 (SPEC V476a, Q82.8)" }
+    if ($btn476.GetAttribute("text") -ne 'Apply Spent Experience') { $v476Bad += "(a) the button reads '$($btn476.GetAttribute('text'))' and 3.4 of the request says Apply Spent Experience (SPEC I162f)" }
+}
+foreach ($f in $files) {
+    $d476 = Doc $f.FullName
+    foreach ($n476 in $d476.SelectNodes("//*[@opacity='0.50' or @opacity='0.5']")) { if ($n476.GetAttribute("name") -ne 'btnXpApply') { $v476Bad += "(b) $($f.Name) authors opacity 0.50 on '$($n476.LocalName) $($n476.GetAttribute('name'))' - that number belongs to btnXpApply alone (SPEC V476b, V244)" } }
+    $cc476 = NoComments (CodeOf $f.FullName)
+    foreach ($m476 in [regex]::Matches($cc476, '(?m)^.*\b0\.50\b.*$')) {
+        $line476 = $m476.Value
+        if ($line476 -match 'btnXpApply') { continue }
+        $v476Bad += "(b) $($f.Name) carries the literal 0.50 outside btnXpApply: '$($line476.Trim())' (SPEC V476b)"
+    }
+    if (([regex]::Matches($cc476, 'opacity = pending and 1 or 0\.50;')).Count -gt 1) { $v476Bad += "(b) $($f.Name) writes the 0.50 dim more than once (SPEC V476b)" }
+    if ($cc476 -match '(?m)\.opacity\s*=.*\b0\.5\b') { $v476Bad += "(b) $($f.Name) writes an opacity of 0.5 with one decimal - the named literal is 0.50, two places like 0.75 and 0.40 (SPEC V476b, V244)" }
+}
+$st476 = CodeOf (Join-Path $dir "WoD20.10.lfm")
+if ($st476 -notmatch 'btnSaveBaseline\.opacity\s*=\s*saved and 0\.75 or 1;') { $v476Bad += "(c) btnSaveBaseline moved off 0.75 - two dead buttons with two brightnesses is a recorded decision, not a drift to fix here (SPEC V476c, Q82.8)" }
+if ($v476Bad) { foreach ($b in $v476Bad) { Fail "V476 $b" } }
+else { Pass "V476 0.50 is authored on btnXpApply with enabled=false beside it, written once in Lua, and nowhere else on the sheet" }
+
 Write-Host ""
+# ---- V477: the empty-log sentence reads as a TRAIT (SPEC V477, I163a, T1045) ------------------
+$v477Bad = @()
+$d477 = Doc (Join-Path $dir "WoD20.9.lfm")
+$e477 = $d477.SelectSingleNode("//label[@name='dynXpEmpty']")
+$s477 = $d477.SelectSingleNode("//scrollBox[@name='xpLogScroll']")
+$t477 = $d477.SelectSingleNode("//textEditor[@name='dynXpTrait']")
+$c477 = $d477.SelectSingleNode("//textEditor[@name='dynXpCost']")
+if ($null -eq $e477 -or $null -eq $s477 -or $null -eq $t477 -or $null -eq $c477) { $v477Bad += "dynXpEmpty, the scroll or one of the two columns it is measured from is missing (SPEC V209)" }
+else {
+    # RELATION, not literal: the sentence opens where the Trait column's text opens and closes
+    # where the Cost column closes, so moving a column and leaving the sentence behind reddens.
+    $sl477 = [int]$s477.GetAttribute("left")
+    $want477L = $sl477 + [int]$t477.GetAttribute("left")
+    $want477W = $sl477 + [int]$c477.GetAttribute("left") + [int]$c477.GetAttribute("width") - $want477L
+    if ([int]$e477.GetAttribute("left") -ne $want477L) { $v477Bad += "(a) dynXpEmpty opens at $($e477.GetAttribute('left')) and the Trait column opens at $want477L - the sentence starts where a trait name starts (SPEC V477a)" }
+    if ($e477.GetAttribute("horzTextAlign") -ne 'leading') { $v477Bad += "(a) dynXpEmpty is aligned '$($e477.GetAttribute('horzTextAlign'))' - a trait reads from the left (SPEC V477a)" }
+    if ([int]$e477.GetAttribute("width") -ne $want477W) { $v477Bad += "(b) dynXpEmpty is $($e477.GetAttribute('width')) wide and the span from Trait to the right edge of Cost is $want477W (SPEC V477b)" }
+    if ($e477.GetAttribute("visible") -ne 'false') { $v477Bad += "(c) dynXpEmpty is not authored visible=false (SPEC V477c, V235b)" }
+    if ($null -ne $s477.SelectSingleNode("descendant::label[@name='dynXpEmpty']")) { $v477Bad += "(c) dynXpEmpty sits inside xpLogScroll - it is the state of the BLOCK and must not scroll away from it (SPEC V477c, V261c)" }
+}
+$code477 = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+foreach ($p477 in @('dynXpEmpty.width', 'dynXpEmpty.left')) { if ($code477 -match ([regex]::Escape($p477) + '\s*=')) { $v477Bad += "(b) Lua writes $p477 - the sentence is fixed by the XML and takes no part in the role widening (SPEC V477b, V478c)" } }
+foreach ($m477 in @('Nothing bought yet', 'Initial character not saved yet')) {
+    if (-not $ptK.Contains($m477)) { $v477Bad += "(d) '$m477' has no [pt] key in localization.lang (SPEC V477d, V10)" }
+    if (-not $enK.Contains($m477)) { $v477Bad += "(d) '$m477' has no [en] key in localization.lang (SPEC V477d, V10)" }
+}
+if ($v477Bad) { foreach ($b in $v477Bad) { Fail "V477 $b" } }
+else { Pass "V477 the empty-log sentence opens where a trait name opens, spans Trait to Cost, is authored hidden outside the scroll and takes no width from Lua" }
+
+# ---- V481: text alignment is the SDK's enum and nothing else (SPEC V481, B161, T1045) ---------
+# MEASURED 2026-09-07 in SDK3/API/rrpgGUI.lua and sceneWrappers.dlua: horzTextAlign and
+# vertTextAlign take center, leading or trailing. horzTextAlign="left" cost a build in the 19th
+# batch - rdk -l exits 1, deletes the .rpk and names no file or line, exactly the way a duplicate
+# control name does (SPEC B19, B77, B161). Caught statically here or found by bisection there.
+$v481Bad = @()
+$ALIGN481 = @('center', 'leading', 'trailing')
+$n481 = 0
+foreach ($f in $files) {
+    foreach ($a481 in @('horzTextAlign', 'vertTextAlign')) {
+        foreach ($node481 in (Doc $f.FullName).SelectNodes("//*[@$a481]")) {
+            $n481++
+            $val481 = $node481.GetAttribute($a481)
+            if ($ALIGN481 -cnotcontains $val481) { $v481Bad += "$($f.Name) '$($node481.GetAttribute('name'))' authors $a481='$val481' - the enum is center, leading or trailing, and anything else makes rdk -l exit 1 with no message and delete the .rpk (SPEC B161, B19)" }
+        }
+    }
+}
+if ($n481 -lt 150) { Fail "V481 only $n481 alignment attribute(s) were read - this check is covering less than the sheet has (SPEC V209)" }
+elseif ($v481Bad) { foreach ($b in $v481Bad) { Fail "V481 $b" } }
+else { Pass "V481 all $n481 horzTextAlign and vertTextAlign values are the SDK's own enum" }
+
+# ---- V478: the log has TWO widths and the difference is exactly the X column ------------------
+# (SPEC V478, I163b, I163c, I163d, T1045). The XML authors the PLAYER; V247 already measures the
+# scroll against the columns and the overhang against XP_REV_W, so this leg measures what V247
+# does not: the other three widths, the writer, and the order it runs in.
+$v478Bad = @()
+$d478    = Doc (Join-Path $dir "WoD20.9.lfm")
+$code478 = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+$box478 = $d478.SelectSingleNode("//layout[@name='xpLogBox']")
+$scr478 = $d478.SelectSingleNode("//scrollBox[@name='xpLogScroll']")
+$ttl478 = $d478.SelectSingleNode("//label[@name='lblXpLogTitle']")
+$app478 = $d478.SelectSingleNode("//layout[@name='xpApplyBox']")
+$btn478 = $d478.SelectSingleNode("//button[@name='btnXpApply']")
+if ($null -eq $box478 -or $null -eq $scr478 -or $null -eq $ttl478 -or $null -eq $app478 -or $null -eq $btn478) { $v478Bad += "one of the five controls the role widens is missing from WoD20.9 (SPEC V209, V478a)" }
+else {
+    if ([int]$ttl478.GetAttribute("width") -ne [int]$scr478.GetAttribute("width")) { $v478Bad += "(a) the title is $($ttl478.GetAttribute('width')) wide over a scroll of $($scr478.GetAttribute('width')) - they are one width, or the title sits off centre in the wider box (SPEC V478a)" }
+    if ([int]$btn478.GetAttribute("width") -ne ([int]$app478.GetAttribute("width") - 40)) { $v478Bad += "(a) btnXpApply is $($btn478.GetAttribute('width')) wide inside a box of $($app478.GetAttribute('width')) - the box less the 20 margin either side (SPEC V478a, V280a)" }
+}
+if ($code478 -notmatch 'local XP_REV_W = \d+;') { $v478Bad += "(b) XP_REV_W is not a named constant on WoD20.9 - a repeated coordinate is a second owner (SPEC V478b, V383b)" }
+$fn478 = [regex]::Match($code478, '(?s)local function xpLogWidth\(form, st\)(.*?)\r?\n\t\t\tend;')
+if (-not $fn478.Success) { $v478Bad += "(c) xpLogWidth(form, st) was not found (SPEC V478c)" }
+else {
+    $body478 = $fn478.Groups[1].Value
+    foreach ($w478 in @('xpLogBox', 'xpLogScroll', 'lblXpLogTitle', 'xpApplyBox', 'btnXpApply')) {
+        if ($body478 -notmatch ('form\.' + $w478 + '\.width\s*=')) { $v478Bad += "(c) xpLogWidth does not write $w478.width - the five move together or the two bands stop closing on one x (SPEC V478c, V247)" }
+    }
+    $nAdd478 = ([regex]::Matches($body478, '\+ add')).Count
+    if ($nAdd478 -ne 5) { $v478Bad += "(c) xpLogWidth adds the role's width $nAdd478 time(s), expected 5 (SPEC V478c)" }
+    if ($body478 -notmatch 'local add = st and XP_REV_W or 0;') { $v478Bad += "(c) the widening is not 'st and XP_REV_W or 0' - the storyteller's extra width is the named constant (SPEC V478c, V478b)" }
+}
+$nDyn478 = ([regex]::Matches($code478, 'dynXp\w+\.width\s*=')).Count
+if ($nDyn478 -ne 0) { $v478Bad += "(c) WoD20.9 writes a column width $nDyn478 time(s) - no column ever moves, in any state (SPEC V235a, V478c)" }
+if ($code478 -notmatch 'b\.left = st and xpRevX or 0;') { $v478Bad += "(d) the revert buttons are not parked out of the player's scroll range (SPEC V478d, I163c, R104)" }
+if ($code478 -notmatch 'if xpRevX == nil then xpRevX = form\.btnXpRev_1\.left; end;') { $v478Bad += "(d) the buttons' left is not read once off the template - repeating it here would be a second owner of that coordinate (SPEC V478d, I163c)" }
+$iSt478  = $code478.IndexOf('local st = isStoryteller();')
+$iW478   = $code478.IndexOf('xpLogWidth(form, st);')
+$iNil478 = $code478.IndexOf('xpRevButtons(form, nil, st);')
+if ($iSt478 -lt 0 -or $iW478 -lt 0 -or $iNil478 -lt 0) { $v478Bad += "(e) the role, the widening or the empty-log path is missing from renderXPLedger (SPEC V478e)" }
+elseif ($iW478 -lt $iSt478) { $v478Bad += "(e) the boxes are widened before the role is read (SPEC V478e)" }
+elseif ($iW478 -gt $iNil478) { $v478Bad += "(e) the widening runs AFTER the empty-log branch, so a log with no rows keeps the other reader's width (SPEC V478e, V235c)" }
+if ($v478Bad) { foreach ($b in $v478Bad) { Fail "V478 $b" } }
+else { Pass "V478 the XML authors the player's log, xpLogWidth grows the same five controls by XP_REV_W in all three paths, and no column ever moves" }
+
+# ---- V479: the Apply box has no title, no visible written, and its button is centred ----------
+$v479Bad = @()
+$d479 = Doc (Join-Path $dir "WoD20.9.lfm")
+$app479 = $d479.SelectSingleNode("//layout[@name='xpApplyBox']")
+if ($null -eq $app479) { $v479Bad += "xpApplyBox is not authored on WoD20.9 (SPEC V209)" }
+else {
+    $nLbl479 = @($app479.SelectNodes("label")).Count
+    $nBtn479 = @($app479.SelectNodes("button")).Count
+    if ($nLbl479 -ne 0) { $v479Bad += "(a) xpApplyBox holds $nLbl479 label(s) - the title came off on the owner's word (SPEC V479a, I163e)" }
+    if ($nBtn479 -ne 1) { $v479Bad += "(c) xpApplyBox holds $nBtn479 button(s) - the construction that excuses it from the section-box census is ONE button and no label (SPEC V479c, V240, V280)" }
+    if ($app479.HasAttribute("visible")) { $v479Bad += "(b) xpApplyBox authors visible='$($app479.GetAttribute('visible'))' - it is always on screen from the 19th batch on (SPEC V479b)" }
+    $r479 = $app479.SelectSingleNode("rectangle[@align='client']")
+    if ($null -eq $r479 -or $r479.GetAttribute("color") -ne 'black') { $v479Bad += "(c) xpApplyBox has no black client backdrop - what changed is which check owns it, not how it looks (SPEC V479c, V48)" }
+    $b479 = $app479.SelectSingleNode("button[@name='btnXpApply']")
+    if ($null -ne $b479) {
+        $mid479 = [math]::Floor(([int]$app479.GetAttribute("height") - [int]$b479.GetAttribute("height")) / 2)
+        if ([int]$b479.GetAttribute("top") -ne $mid479) { $v479Bad += "(d) btnXpApply opens at top=$($b479.GetAttribute('top')) and centring it in a $($app479.GetAttribute('height'))px box puts it at $mid479 (SPEC V479d)" }
+        if ([int]$b479.GetAttribute("left") -ne 20) { $v479Bad += "(d) btnXpApply opens at left=$($b479.GetAttribute('left')), not the 20 every box on this sheet keeps (SPEC V479d, V280a)" }
+    }
+}
+if ($ptK.Contains('APPLY')) { $v479Bad += "(a) 'APPLY' still has a [pt] key - the label that showed it is gone and a key with no owner is silent drift (SPEC V479a, T1046)" }
+if ($enK.Contains('APPLY')) { $v479Bad += "(a) 'APPLY' still has an [en] key in localization.lang (SPEC V479a)" }
+if ($ptVal.ContainsKey('APPLY')) { $v479Bad += "(a) 'APPLY' is still in the PT map of WoD20.6.lfm (SPEC V479a, V28)" }
+if ($v479Bad) { foreach ($b in $v479Bad) { Fail "V479 $b" } }
+else { Pass "V479 the Apply box carries one button, no title and no visible attribute, its button is centred, and the APPLY string left with the label" }
+
+# ---- V480: the pending dot is a palette key with ONE owner (SPEC V480, I163g, I163h, T1043) ---
+$v480Bad = @()
+$code480 = NoComments (CodeOf (Join-Path $dir "WoD20.6.lfm"))
+$nPend480 = ([regex]::Matches($code480, 'dotPending\s*=\s*"')).Count
+if ($nPend480 -ne 4) { $v480Bad += "(a) $nPend480 palette(s) declare dotPending, expected the 4 THEMES holds - an era without one would paint a pending point as if it were applied (SPEC V480a)" }
+foreach ($art480 in @([regex]::Matches($code480, 'dotPending\s*=\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)) {
+    if ($art480 -notmatch '^/WoD20th/images/') { $v480Bad += "(a) dotPending '$art480' is not plugin-absolute - a relative path handed to a setter at runtime resolves to nothing and the art fails silently (SPEC V480a, B20, V60)" }
+    if (-not (Test-Path -LiteralPath (Join-Path $dir ("images\" + (Split-Path $art480 -Leaf))))) { $v480Bad += "(a) the art '$art480' a palette names does not exist in images/ (SPEC V480a, V3)" }
+}
+$nArt480 = ([regex]::Matches($code480, 'function xpDotArt\(')).Count
+if ($nArt480 -ne 1) { $v480Bad += "(b) xpDotArt is defined $nArt480 time(s) - one owner of the rule, or the two copies drift the first time one learns a new state (SPEC V480b, V260b)" }
+# Three: the declaration and the two calls that paint dots - applyTheme's own walk and
+# repaintXpDots. Counted with the signature so a third caller, or a copy of the and/or written
+# out by hand somewhere else, moves the number.
+$nUse480 = ([regex]::Matches($code480, 'xpDotArt\(c, t, pending\)')).Count
+if ($nUse480 -ne 3) { $v480Bad += "(b) the xpDotArt signature appears $nUse480 time(s), expected the 3 that are its declaration and its two callers - applyTheme's own walk and repaintXpDots (SPEC V480b)" }
+$fn480 = [regex]::Match($code480, '(?s)function xpDotArt\(c, t, pending\)(.*?)\r?\n\t\t\tend;')
+if (-not $fn480.Success) { $v480Bad += "(b) xpDotArt was not found on WoD20.6 (SPEC V209)" }
+elseif ($fn480.Groups[1].Value -match 'uncheckedImage') { $v480Bad += "(f) xpDotArt touches uncheckedImage - an unlit dot is dotOff in every state, pending or not (SPEC V480f)" }
+$nPaint480 = ([regex]::Matches($code480, 'paint\(c, "checkedImage", xpDotArt\(c, t, pending\), authored\(c, "checkedImage"\)\)')).Count
+if ($nPaint480 -ne 2) { $v480Bad += "(c) the dot art is written through paint/authored $nPaint480 time(s), expected 2 (SPEC V480c, V61, V62)" }
+foreach ($f480 in $files) {
+    if ((NoComments (CodeOf $f480.FullName)) -match '\.checkedImage\s*=') { $v480Bad += "(c) $($f480.Name) writes checkedImage raw - the pending art would become what authored() reads back and the era's own dot would never return, with a green gate (SPEC V480c, B21)" }
+}
+$nRd480 = ([regex]::Matches($code480, 'sheet\.xpApplied')).Count
+if ($nRd480 -ne 1) { $v480Bad += "(d) WoD20.6 reads sheet.xpApplied $nRd480 time(s) - the pending set is derived once, inside xpPendingDots (SPEC V480d, V125)" }
+if ($code480 -notmatch 'if rows == nil then rows = xpLedgerRows\(\); end;') { $v480Bad += "(d) xpPendingDots does not take the caller's rows - a second walk of the ledger per event is what B34 froze the sheet doing (SPEC V480d, V125)" }
+$nCall480 = 0
+foreach ($f480 in $files) { $nCall480 += ([regex]::Matches((NoComments (CodeOf $f480.FullName)), 'repaintXpDots\(')).Count }
+if ($nCall480 -ne 3) { $v480Bad += "(e) repaintXpDots appears $nCall480 time(s) with a call's parenthesis, expected 3 - its definition on WoD20.6 and its two call sites, xpLedgerRefresh and xpApply (SPEC V480e)" }
+# Read off the ELEMENT and not off the raw text: `dataLink` followed by the name with no '>'
+# between them also matches a COMMENT that says the two do not belong together, which is the
+# check reddening on its own documentation.
+foreach ($f480 in $files) { foreach ($dl480 in (Doc $f480.FullName).SelectNodes("//dataLink")) { if ($dl480.OuterXml -match 'repaintXpDots') { $v480Bad += "(e) $($f480.Name) hangs repaintXpDots off a dataLink of its own - its two callers already run on every event that changes the answer (SPEC V480e, V475d)" } } }
+if ($v480Bad) { foreach ($b in $v480Bad) { Fail "V480 $b" } }
+else { Pass "V480 all four palettes name a pending dot, the rule lives in xpDotArt alone, every write goes through paint/authored, and the pending set is derived once per event" }
+
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

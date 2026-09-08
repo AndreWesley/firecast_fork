@@ -2670,6 +2670,13 @@
 			-- and no FREE_ROWS sits beside it.
 			ATTACK_ROWS = 11;
 
+			-- How many revert buttons the Experience log carries, one per row, for the
+			-- storyteller (SPEC I162d, V473b, user 2026-09-07). Here for the same reason as every
+			-- row count above: WoD20.9 bounds its loop on this and the gate measures it against
+			-- the buttons the XML authors (SPEC V383b). Row 61 and beyond - the oldest, at the
+			-- bottom of the log (SPEC I56) - carry no button (SPEC Q82.4).
+			XP_REV_POOL = 60;
+
 			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
 			-- 2026-08-22). The LAST five, so every reader is 'picker = total - typed' and no list of
 			-- indices exists to drift from this number.
@@ -3122,7 +3129,7 @@
 			-- `clickSunk` is the third of the same arrangement (SPEC I156i, V452b): the key the
 			-- click being priced WOULD sink, handed in so the row it is about to strand is
 			-- already in the walk that click pays for. Pricing still writes nothing (SPEC V136).
-			function xpLedgerRows(clickField, clickValue, clickFree, clickOrder, clickSunk)
+			function xpLedgerRows(clickField, clickValue, clickFree, clickOrder, clickSunk, clickWhen)
 				local base = baselineOf();
 
 				if base == nil then return nil; end;
@@ -3158,6 +3165,12 @@
 				-- top. Pricing still writes nothing (SPEC V136): this string is local, and the
 				-- sheet learns about the stamp only on the way through xpClick.
 				local ord = (sheet.xpOrder or "") .. "|" .. (clickOrder or "") .. "|";
+
+				-- The WHEN stamp, read once per walk beside the order and in the same shape (SPEC
+				-- I162b, V472c/d): pricing never reads it, and the step being priced is appended
+				-- so its line is born with its hour instead of waiting for the next render
+				-- (SPEC V260d). Same key as the order, with the hour after an `@`.
+				local whn = (sheet.xpWhen or "") .. "|" .. (clickWhen or "") .. "|";
 
 				local rows = {};
 
@@ -3393,6 +3406,11 @@
 				for i = 1, #rows, 1 do
 					rows[i].seq = i;
 					rows[i].at  = string.find(ord, "|" .. rows[i].key .. "|", 1, true);
+
+					-- nil where nothing was stamped: a line bought before the 18th batch has no
+					-- hour, and the column says so with a dash rather than inventing one (SPEC
+					-- I162b, the same reading V260f gives the order).
+					rows[i].when = string.match(whn, "|" .. rows[i].key .. "@([^|]*)|");
 				end;
 
 				table.sort(rows, function(a, b)
@@ -3571,6 +3589,17 @@
 				if from ~= nil and renderXPLedger ~= nil then
 					renderXPLedger(tabRootOf(from), rows);
 				end;
+
+				-- The pending dots, and deliberately OUTSIDE the guard above (SPEC I163h, V480e):
+				-- they live on the trait tabs, not on Progress, so a sheet whose owner never opened
+				-- the Progress tab still has to show them - renderXPLedger does not exist until
+				-- that tab's script has run, and the dots do not wait for it.
+				--
+				-- The rows this call already holds go straight through: one walk of the ledger per
+				-- event and not two (SPEC V125, B34). repaintXpDots is declared on WoD20.6.
+				if from ~= nil and repaintXpDots ~= nil then
+					repaintXpDots(tabRootOf(from), rows);
+				end;
 			end;
 
 			-- The storyteller types SPENT, and what that writes is a LINE in the log (SPEC I44,
@@ -3626,6 +3655,19 @@
 				if (tonumber(sheet.xpManual) or 0) ~= 0 then ord = ord .. "|xpManual#0|"; end;
 
 				setField("xpOrder", ord);
+
+				-- The hour goes with the order, the same way (SPEC I162b, V472b): out with the old
+				-- stamp, back in with the correction if there is one. The clock is the typist's
+				-- own - the SDK exposes no server time (SPEC R160).
+				local whn = (string.gsub(sheet.xpWhen or "", "|xpManual#0@[^|]*|", "|"));
+
+				if (tonumber(sheet.xpManual) or 0) ~= 0 then
+					local now = (os ~= nil and os.date ~= nil) and os.date("%Y-%m-%d %H:%M") or "?";
+
+					whn = whn .. "|xpManual#0@" .. now .. "|";
+				end;
+
+				setField("xpWhen", whn);
 
 				renderAllXPBoxes(form);
 				xpLedgerRefresh(form);
@@ -6949,7 +6991,14 @@
 					sunk = okey;
 				end;
 
-				local rows  = xpLedgerRows(field, want, key, want and okey or nil, sunk);
+				-- WHEN this step happened (SPEC I162b, V472c): the buyer's own clock, read ONCE per
+				-- accepted step and BEFORE the walk, so the line being priced is born with its hour
+				-- and pricing still writes nothing (SPEC V136). The SDK exposes no server time
+				-- (SPEC R160). A host without `os.date` puts a `?` in the column and the purchase
+				-- goes through - the hour is a trace, not a condition of the sale (SPEC V472f).
+				local now = (os ~= nil and os.date ~= nil) and os.date("%Y-%m-%d %H:%M") or "?";
+
+				local rows  = xpLedgerRows(field, want, key, want and okey or nil, sunk, want and (okey .. "@" .. now) or nil);
 				local spent = xpSum(rows);
 
 				if want then
@@ -6980,6 +7029,18 @@
 					local after = level - 1;
 
 					if not free and after < traitLevel(base, trait, t.first, t.last, t.fixed) then return false; end;
+
+					-- The APPLIED floor, the second half of V103 since the 18th batch (SPEC I162g,
+					-- V475c): a level the player consolidated with `Apply Spent Experience` does not
+					-- come off either - and this one SPEAKS (SPEC V129), because the player bought
+					-- it, and a dot that stays lit with no word looks like a bug. `not free` is the
+					-- request's own exception: with `Edit dots freely` on the dot comes off as it
+					-- does today and its cost sinks (SPEC V452). The storyteller's revert lifts the
+					-- key BEFORE it sells through here (SPEC V474e).
+					if not free and string.find(sheet.xpApplied or "", "|" .. okey .. "|", 1, true) ~= nil then
+						xpWarn("Applied experience cannot be taken back");
+						return false;
+					end;
 				end;
 
 				xpPrefix(form, trait, t, want and (level + 1) or (level - 1));
@@ -7013,10 +7074,16 @@
 				-- EVERY purchase stamps, the free one included, which is why this is a branch of
 				-- its own instead of a line inside the one above: a point that cost nothing still
 				-- happened, and the log shows it (SPEC I10, V120).
+				--
+				-- The WHEN stamp is written on the line under the order's, with the SAME key
+				-- (SPEC I162b, V472b): it is the hour OF that order, and two stamps that move in
+				-- different places are an hour with no line or a line with no hour.
 				if want then
 					setField("xpOrder", (sheet.xpOrder or "") .. "|" .. okey .. "|");
+					setField("xpWhen", (sheet.xpWhen or "") .. "|" .. okey .. "@" .. now .. "|");
 				elseif sheet.xpOrder ~= nil then
 					setField("xpOrder", (string.gsub(sheet.xpOrder, "|" .. okey .. "|", "|")));
+					setField("xpWhen", (string.gsub(sheet.xpWhen or "", "|" .. okey .. "@[^|]*|", "|")));
 				end;
 
 				-- The gift, if this step earned one or lost one (SPEC I14/V158). Either way it
@@ -7126,6 +7193,77 @@
 				renderAllXPBoxes(form, spent);
 
 				if rows ~= nil then xpLedgerRefresh(form, rows); end;
+			end;
+
+			-- The storyteller's revert (SPEC I162e, V474; user 2026-09-07, 18th batch). One
+			-- button per ledger row on the Progress tab, shown to the storyteller only (SPEC
+			-- I162d); the click sells the point back through the SAME step the player's sale
+			-- takes, with the flag literally off, so nothing sinks and no stamp gains a second
+			-- writer (SPEC V137, V452a, V260a, V472b). The refund is the subtraction itself: the
+			-- line leaves the diff, Spent falls, Current rises, nothing is credited (SPEC V103,
+			-- V100).
+			--
+			-- Below xpClick on purpose: it reaches xpLedgerRefresh, which is a `local function`
+			-- declared far above - a body written above that declaration compiles a GETGLOBAL
+			-- and calls nil (SPEC B51, V223).
+			function xpRevert(form, i)
+				-- Asked AGAIN here, not only where the buttons were lit (SPEC V474a): the room's
+				-- roles publish no event (SPEC V96), so a button lit for a storyteller who has
+				-- since become a player would otherwise still fire. Fails closed (SPEC V79).
+				if sheet == nil or not isStoryteller() then return; end;
+
+				-- ONE walk per click (SPEC V125). The row is looked up NOW rather than kept from
+				-- the render: another client may have moved the sheet since the log was drawn.
+				local rows = xpLedgerRows();
+
+				if rows == nil or rows[i] == nil then return; end;
+
+				local r          = rows[i];
+				local trait, lvl = string.match(r.key, "^(.+)#(%d+)$");
+				local t          = trait ~= nil and XP_TRAIT[trait] or nil;
+
+				-- MANUAL and Ritual lines carry no button (SPEC V474f); a stale click on one of
+				-- them names no rated trait and has nothing to sell.
+				if t == nil then return; end;
+
+				lvl = tonumber(lvl);
+
+				local live = traitLevel(sheet, trait, t.first, t.last, t.fixed);
+
+				-- Both refusals BEFORE the dialog and before any write (SPEC V135, V129): the
+				-- higher purchase comes off first - the user's own example, Strength 3 under a
+				-- bought 4 - and a sunk line (SPEC I156i) has no dot left to take.
+				if lvl > live then xpWarn("That point is already off the sheet"); return; end;
+				if lvl < live then xpWarn("Revert the higher level first"); return; end;
+
+				local lang = sheet.language or "pt";
+
+				-- The dialog shape saveBaseline uses (SPEC V81, R161), and every write lives
+				-- INSIDE the answer (SPEC V474d).
+				Dialogs.confirmOkCancel(
+					translateSheetText("Revert this purchase? The point comes off the sheet and its experience is returned.", lang),
+					function(ok)
+						if not ok or sheet == nil then return; end;
+
+						-- Read again on the way in: the dialog is modal for this client only.
+						if traitLevel(sheet, trait, t.first, t.last, t.fixed) ~= lvl then return; end;
+
+						-- The applied key comes out FIRST (SPEC V474e): the floor in xpStep would
+						-- otherwise refuse the storyteller's own revert.
+						setField("xpApplied", (string.gsub(sheet.xpApplied or "", "|" .. r.key .. "|", "|")));
+
+						-- The sheet ROOT and not this tab: markDot looks for the dot DOWN from the
+						-- node it is given, the button lives on the Progress tab and the dot on
+						-- another one, and the walk from the root crosses the <import> (SPEC V143).
+						local sold, rows2, spent = xpStep(tabRootOf(form), trait, t, lvl, false, baselineOf(), false);
+
+						if not sold then return; end;
+
+						-- ONE repaint, with the rows the step priced (SPEC V445, V125).
+						renderAllXPBoxes(form, spent);
+
+						if rows2 ~= nil then xpLedgerRefresh(form, rows2); end;
+					end);
 			end;
 
 

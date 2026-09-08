@@ -2282,6 +2282,15 @@
 				["Select Armor"] = "Selecionar Armadura",
 				["Select Shield"] = "Selecionar Escudo",
 				["SHIELD"] = "ESCUDO",
+				-- 18th batch (SPEC I162i, T1038): the hour column, the APPLY box and the
+				-- storyteller's revert - two questions, three refusals.
+				["Date/Time"] = "Data/Hora",
+				["Apply Spent Experience"] = "Aplicar Experiência Gasta",
+				["Apply the spent experience? The points bought stay on the sheet and can no longer be removed."] = "Aplicar a experiência gasta? Os pontos comprados ficam na ficha e não poderão mais ser removidos.",
+				["Revert this purchase? The point comes off the sheet and its experience is returned."] = "Reverter esta compra? O ponto sai da ficha e a experiência é devolvida.",
+				["Revert the higher level first"] = "Reverta o nível mais alto primeiro",
+				["That point is already off the sheet"] = "Esse ponto já saiu da ficha",
+				["Applied experience cannot be taken back"] = "Experiência aplicada não pode ser retirada",
 			};
 
 			-- PT is local to this file, but text written by Lua lives on other tabs too - the
@@ -3241,6 +3250,12 @@
 					dotOff = "/WoD20th/images/prime_off_slate.png",
 					paper  = "/WoD20th/images/paper_present.png",
 
+					-- The thirteenth key (SPEC I163g, V480a): the dot of a point that has been bought
+					-- and not yet applied. Same hue as the era's own dot with half the light, so it
+					-- reads as unconfirmed without introducing a colour the palette does not carry
+					-- (SPEC V53). Plugin-absolute like the two above (SPEC B20, V60, R26).
+					dotPending = "/WoD20th/images/prime_on_pending_crimson.png",
+
 					-- The tenth and eleventh keys, and they arrive together in the 118th round: the
 					-- era gets a frame, and it is drawn FOR the cut corner below rather than in
 					-- spite of it (SPEC I90a).
@@ -3299,6 +3314,7 @@
 					dotOn  = "/WoD20th/images/prime_on_gold.png",
 					dotOff = "/WoD20th/images/prime_off_gold.png",
 					paper  = "/WoD20th/images/paper_victorian.png",
+					dotPending = "/WoD20th/images/prime_on_pending_gold.png",
 					ornament = "#D8BC72",   -- brighter than the 3px outline, so the filigree reads as applied metal
 				},
 
@@ -3328,6 +3344,7 @@
 					dotOn  = "/WoD20th/images/prime_on_silver.png",
 					dotOff = "/WoD20th/images/prime_off_silver.png",
 					paper  = "/WoD20th/images/paper_dark_ages.png",
+					dotPending = "/WoD20th/images/prime_on_pending_silver.png",
 
 					-- The era's OWN silver, and not a brighter one (user 2026-08-26). The Victorian
 					-- key above is lighter than its outline so the filigree reads as applied metal;
@@ -3370,6 +3387,9 @@
 					dotOn  = "/WoD20th/images/prime_on_gold.png",
 					dotOff = "/WoD20th/images/prime_off_gold.png",
 					paper  = "/WoD20th/images/paper_classical.png",
+					-- The SAME art the Victorian Age wears, exactly as dotOn already is: two eras
+					-- sharing a gold dot share the pending one too (SPEC V480a).
+					dotPending = "/WoD20th/images/prime_on_pending_gold.png",
 
 					-- The 122nd round: of the four palettes this was the ONLY one declaring no ornament,
 					-- so V277 hid its path and the box has been bare outline since the system was written.
@@ -5041,6 +5061,57 @@
 				end;
 			end;
 
+			-- The dots a purchase is still waiting on (SPEC I163h, V480d). ONE walk of the
+			-- ledger per event, like every other reader of it (SPEC V125): a caller that has
+			-- just built the rows hands them over rather than making this build them again.
+			--
+			-- A row whose key is not in the applied stamp is pending, and the dot that key
+			-- belongs to is `<trait>_<level>` - the field the sheet saves it under (SPEC I162g,
+			-- V138). The MANUAL and Ritual keys come through here too and match no dot at all,
+			-- which costs one table entry and no special case.
+			--
+			-- No baseline means no ledger and nothing bought, so nothing pending.
+			-- GLOBAL, and that is a budget decision, not a style one: a `local function` at chunk
+			-- scope costs one of the hundred slots V325 caps this file at, and it was standing at
+			-- exactly a hundred. Two more would have taken it to 102 and rdk -l would exit 1,
+			-- delete the .rpk and name no file (SPEC B77, B19). Same for xpDotArt below.
+			function xpPendingDots(rows)
+				local out = {};
+
+				if sheet == nil or xpLedgerRows == nil then return out; end;
+
+				if rows == nil then rows = xpLedgerRows(); end;
+
+				if rows == nil then return out; end;
+
+				local applied = sheet.xpApplied or "";
+
+				for i = 1, #rows, 1 do
+					local key = rows[i].key;
+
+					if string.find(applied, "|" .. key .. "|", 1, true) == nil then
+						out[(string.gsub(key, "#", "_"))] = true;
+					end;
+				end;
+
+				return out;
+			end;
+
+			-- Which art a dot wears (SPEC I163h, V480b). The ONE owner of the rule: applyTheme's
+			-- own walk and repaintXpDots both come through here, because two copies of the same
+			-- `and/or` would be the second grammar V260b exists to refuse - and the two would
+			-- drift the first time one of them learned about a new state.
+			--
+			-- Reads `field` off the control rather than off a roster: the era ability dots are
+			-- given their field at RUNTIME by renderAbilityLabels, so no list written here could
+			-- name them. A control with no field at all (the merit picker's boxes) simply is not
+			-- in the set.
+			function xpDotArt(c, t, pending)
+				local f = c.field;
+
+				return ((f ~= nil and pending[f]) and t.dotPending) or t.dotOn;
+			end;
+
 			local function applyTheme(v, from)
 				-- Every value the combo offers has a palette since the 16th round, so this never
 				-- resolves to nil: a sheet carrying something else - "Present Day" from before
@@ -5065,6 +5136,11 @@
 
 				-- Once for the whole repaint, not once per picker (SPEC V205).
 				local levels = discLevels();
+
+				-- And once for the whole repaint, beside it and for the same reason (SPEC V480d,
+				-- V125): the walk below asks EVERY dot the same question, and asking the ledger
+				-- once per dot is what B34 froze the sheet doing.
+				local pending = xpPendingDots(nil);
 
 				for i = 1, #all, 1 do
 					local c = all[i];
@@ -5199,7 +5275,11 @@
 							pickerItems(c, (sheet ~= nil and sheet.language) or "pt", v, levels);
 						end;
 					elseif cls == "imageCheckBox" then
-						paint(c, "checkedImage", t.dotOn, authored(c, "checkedImage"));
+						-- The era's dot, or the pending one where a point is still waiting to be
+						-- applied (SPEC I163h, V480b). The question is asked HERE and not in a pass
+						-- of its own because this walk already visits every dot on the sheet: a
+						-- second traversal for the same repaint is what V205 refuses.
+						paint(c, "checkedImage", xpDotArt(c, t, pending), authored(c, "checkedImage"));
 						paint(c, "uncheckedImage", t.dotOff, authored(c, "uncheckedImage"));
 					elseif cls == "image" then
 						-- The fixed first dot (SPEC B22 / V65). Keyed on the authored art, exactly
@@ -5213,6 +5293,45 @@
 						elseif art == DOT_OFF then
 							paint(c, "src", t.dotOff, authored(c, "src"));
 						end;
+					end;
+				end;
+			end;
+
+			-- The pending dots, repainted without the whole theme walk (SPEC I163h, V480e).
+			--
+			-- Two call sites and no dataLink of its own: xpLedgerRefresh on the root, which
+			-- already runs on every event that can change what is pending, and xpApply. Opening
+			-- the sheet and switching era need no call at all - applyTheme's own walk asks the
+			-- same question through the same dotArt, and it is the last paint of the load
+			-- (SPEC I15, V167).
+			--
+			-- It writes through paint/authored like everything else the theme touches (SPEC V61,
+			-- V62). A raw `c.checkedImage = ...` would make the PENDING art the value authored()
+			-- reads back the next time the era changed, and the era's own dot would never come
+			-- back - B21 on a fourth axis, green gate and all.
+			--
+			-- GLOBAL, because the callers are the root and WoD20.9 (SPEC V133): a tab form
+			-- cannot reach its siblings, and this is the only file that can see THEMES.
+			function repaintXpDots(from, rows)
+				if sheet == nil or from == nil then return; end;
+
+				-- Same fallback the repaint takes: a sheet carrying an unknown era paints the
+				-- default rather than nothing (SPEC V52).
+				local t = THEMES[currentTheme()] or THEMES[THEME_DEFAULT];
+
+				if t == nil then return; end;
+
+				local pending = xpPendingDots(rows);
+				local root = rootOf(from);
+				local all = {root};
+
+				collect(root, all);
+
+				for i = 1, #all, 1 do
+					local c = all[i];
+
+					if c:getClassName() == "imageCheckBox" then
+						paint(c, "checkedImage", xpDotArt(c, t, pending), authored(c, "checkedImage"));
 					end;
 				end;
 			end;

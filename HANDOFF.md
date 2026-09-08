@@ -1,5 +1,122 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-07, fim da 195ª rodada)
+
+### O ESTADO EM UMA LINHA
+`/ck:spec` escreveu o **19º lote** & o build fechou **§T1042…§T1047** na MESMA rodada (o user
+respondeu *"siga suas recomendações"* ∴ §Q83 nasceu RESPONDIDA pelas 6 recomendações). Gate
+`-Build` VERDE, **12 mutações vermelhas no check certo & 3 sondas verdes**. **INSTALADO 22:25:06**
+(2953285 B, mesmo size do `output/`), c/ o Firecast ABERTO. **Nada commitado.**
+
+### O QUE PEDIR, NESTA ORDEM
+1. **§T1041** (teste de tela do **18º** lote, ainda `.` — nada da 194ª foi visto rodando).
+2. **§T1048** (teste de tela do 19º, alíneas (a)…(h)). Se a ficha estava aberta às 22:25, FECHAR
+   & REABRIR antes — a versão velha fica na tela até isso (cosmético).
+
+### O que virou código nesta rodada
+- **§T1042 arte** — `research/gen_dot_pending.ps1` (ASCII puro) lê `prime_on_{crimson,gold,silver}.png`
+  & escreve `prime_on_pending_*.png` trocando o RGB & PRESERVANDO o alpha (288-300 px de alpha
+  parcial sobrevivem). Cores `#7A2E3A` · `#7A6636` · `#6E747A`, 1 constante no topo do script.
+- **§T1043 `WoD20.6`** — `dotPending` nas 4 paletas; `xpPendingDots(rows)` & `xpDotArt(c, t, pending)`
+  **GLOBAIS** (§B162) acima de `applyTheme`; o ramo `imageCheckBox` passa a `xpDotArt` c/ `pending`
+  calculado 1× por varredura ao lado de `levels`; `repaintXpDots(from, rows)` global no fim.
+- **§T1044 raiz** — `xpLedgerRefresh` chama `repaintXpDots` FORA do guard de `renderXPLedger`.
+- **§T1045 `WoD20.9`** — `XP_REV_W = 30`; roster `XP_LOG` 8 → **11**; `xpRevButtons(form, rows, st)`
+  c/ `b.left = st and xpRevX or 0`; `xpLogWidth(form, st)` (carimbo `xpWidth0` + 5 escritas);
+  `local st = isStoryteller();` no topo de `renderXPLedger`; XML autora o JOGADOR (scroll **751**,
+  box **791**, apply **225**, botão **185** `top=47`), `dynXpEmpty` `178/347/leading`,
+  `lblXpLogTitle` ganhou NOME, o `<label APPLY>` & o `visible` da caixa SAÍRAM.
+- **§T1046** — a chave `wod.APPLY` saiu das 2 metades do `.lang` & do mapa `PT`.
+- **§T1047 gate** — §V477…§V480 NOVAS + **§V481 NOVA** (§B161) + emendas: V64 (`dotPending` na
+  regex da arte), V240 & V280 & V298 (censo **71 → 70** + exceção POR CONSTRUÇÃO da caixa sem
+  título, CONTADA), V247 (relação vira a do jogador + `XP_REV_W`), V473e (roster 11), V474a
+  (`isStoryteller` no topo de `renderXPLedger`, 1× por render), V475b (3 leitores) & V475e
+  (a escrita de `visible` INVERTEU: agora VERMELHO se voltar), roster PT sem `APPLY`.
+
+### ⚠ AS 3 COISAS QUE CUSTARAM
+1. **`horzTextAlign="left"` ⊥ ∃ (§B161).** O enum é `center`/`leading`/`trailing`. O `rdk -l` saiu
+   **1**, APAGOU o `.rpk` & ⊥ nomeou arquivo nem linha — `XmlDocument` valida (é XML legal) & o
+   gate estava verde. **6 builds de bisseção.** Virou **§V481** (mutação rodada, vermelha).
+   O `.rpk` apagado foi recuperado do INSTALADO (`%APPDATA%\Firecast\Plugins\*.rpk` é ZIP & traz
+   os `.lfm` da rodada anterior) — vale guardar essa saída.
+2. **§V325 estava em 100 EXATOS (§B162).** As 2 `local function` novas de `WoD20.6` levariam a 102
+   & é a MESMA morte calada. Achado pelo GATE, ⊥ por bisseção — a margem de 5 de §V325a pagou-se.
+   Corrigido virando as 2 GLOBAIS (`xpPendingDots`, `xpDotArt`).
+3. **O check novo reprovou na PRÓPRIA documentação.** `'dataLink[^>]*repaintXpDots'` sobre o texto
+   cru casa com um COMENTÁRIO que diz que os 2 ⊥ andam juntos. Ler do ELEMENTO (`//dataLink` &
+   `OuterXml`), ⊥ do texto. Idem: contar `xpDotArt(c, t, pending)` conta a DECLARAÇÃO junto (3, ⊥ 2).
+
+### DIVIDAS DE SPEC (nenhuma bloqueia)
+1. §I163c/§V478d nasceram dizendo `left = st and 745 or 0` & o construído lê o `745` do TEMPLATE
+   (`xpRevX`) p/ ⊥ ter 2 donos da coordenada — as 2 linhas JÁ foram emendadas no lugar.
+2. §V475(b) foi de 2 p/ 3 LEITORES; o gate conta **4** ocorrências de `sheet.xpApplied` (o `gsub`
+   de `xpRevert` lê a string p/ escrever). A distinção está escrita na emenda.
+
+---
+
+---
+
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-07, fim da 194a rodada)
+
+### O ESTADO EM UMA LINHA
+`/ck:spec` escreveu o **18o lote** (§I162, §Q82, §R160…§R162, §V472…§V476, §T1036…§T1041) & `/ck:build --all`
+fechou **§T1036…§T1039**. Gate `-Build` VERDE, 20 mutações/sondas RODADAS (14 vermelhas no check certo, 6 verdes).
+**INSTALADO 20:57:04** (2939472 B, mesmo size do `output/`), c/ o Firecast ABERTO — o user confirmou 2026-09-07 que é
+seguro & o `CLAUDE.md` (linhas 40-42) já dizia; §T1040 `x`. **Nada commitado.**
+
+### O QUE PEDIR, NESTA ORDEM
+1. **Rodar a §T1041** (`.\spec-slice.ps1 T1041`, alíneas (a)…(g)) — se a ficha estava aberta às 20:57, fechar & reabrir
+   a ficha antes (form velho na tela até isso; cosmético). Nada desta rodada foi visto rodando.
+2. As 10 perguntas de **§Q82** têm recomendação & o lote foi construído por ela; a resposta do user EMENDA.
+
+### O que virou código nesta rodada
+- **§T1036 raiz** — `xpWhen` (4o carimbo, `|traço#nível@AAAA-MM-DD HH:MM|`, escrito COLADO ao `xpOrder` em `xpStep` & `xpSetSpent`,
+  lido 1× em `xpLedgerRows` → `rows[i].when`); o piso APLICADO no ramo de venda de `xpStep` (`not free` & fala);
+  `XP_REV_POOL = 60` na raiz; `xpRevert(form, i)` abaixo de `xpClick` — pergunta `isStoryteller()`, recusa (`lvl < live`
+  / `lvl > live`) ANTES do `confirmOkCancel`, tira a chave de `xpApplied` & VENDE por `xpStep(tabRootOf(form), …, false, base, false)`.
+- **§T1037 `WoD20.9`** — coluna `dynXpWhen` `515/0/220/470` + rótulo `Date/Time`; `<template name="XpRevRow">` + 60 instâncias
+  no `xpLogScroll` (`745/20`, `visible=false`, `onClick="xpRevert(self, n)"`); scroll `20/65/781/470`, `xpLogBox` `0/125/821/550`;
+  caixa `xpApplyBox` **`566/0/255/120`** (vão de **5**, §V298 — ⊥ os 581/240 que a spec trazia, §B160) c/ `btnXpApply` `20/50/215/26`
+  `enabled=false opacity=0.50`; `xpRevButtons`, `renderXPApply` (locais, acima de `renderXPLedger`) & `xpApply` (global).
+- **§T1038** — 8 chaves nas 2 metades do `.lang` & no mapa `PT` (bloco "18th batch" no fim do mapa).
+- **§T1039 gate** — §V472…§V476 NOVAS no fim do arquivo (antes do sumário) + 10 checks velhos emendados: V244 (`0.50` na lista),
+  V129 (8 → 9 pop-ups), V135/V444/V136/V260d (o literal da chamada `xpLedgerRows(…)` ganhou o 6o argumento), V247 (relação
+  reescrita: filho MAIS À DIREITA do scroll, `EXPERIENCE` fixa em 561, `EXPERIENCE + 5 + APPLY == log`), V261 (4 → 5 colunas),
+  V280/V298 (censo 70 → **71** caixas), V112 (2o controle que trava: `btnXpApply`), `$K383` (+`XP_REV_POOL`).
+
+### ⚠ AS 5 COISAS QUE CUSTARAM
+1. **§V280(b) dizia vão de 20 & o dono é §V298 (5 desde 2026-08-25).** O gate acendeu V298 na 1a passada; a caixa `APPLY` foi
+   p/ 566/255 & o botão p/ 215. Virou **§B160** & a §V280(b) ganhou o aviso de REVOGADA no próprio texto — quem lê pela fatia
+   (1 nível) ⊥ via a §V298. §I162f, §V247 (emenda), §Q82.9 & §T1037 foram corrigidas no lugar.
+2. **PowerShell 5.1: `'\('` dentro de `"$( … )"` numa string de aspas duplas quebra o PARSER** (`$(subexpression) não tem o ')'`).
+   3 mensagens de check tinham `$(([regex]::Matches($x, 'xpLedgerRows\(')).Count)` — o gate inteiro deixou de carregar. Forma
+   segura: contar numa variável ANTES & interpolar a variável (memória `powershell-armadilhas-de-script`, item 7).
+3. **10 checks velhos vermelhos na 1a passada, todos roster** (lista acima) — ≡ 193a. A sonda "`width` dos 60 botões 20 → 22"
+   escrita em §V474 seria VERMELHA por §V247 (a relação mede a borda direita) ∴ a sonda RODADA foi `height` 20 → 18 (VERDE).
+4. **`markDot` procura a bolinha DESCENDO do nó recebido** — o `X` mora na Progress & a bolinha noutra aba ∴ `xpRevert` passa
+   `tabRootOf(form)` ao `xpStep`, ⊥ `form`. Está em §I162e; ⊥ foi visto rodando (é a alínea (c) de §T1041).
+5. **Pulei o `rdk -i` por "Firecast aberto" — regra JÁ revogada no `CLAUDE.md` do disco (linhas 40-42, user 2026-09-07)**
+   que a cópia velha no meu contexto ⊥ tinha. O user mandou instalar & registrar: Firecast aberto NUNCA impede o install
+   (memória `instalar-com-firecast-aberto`). Antes de agir sobre regra que BLOQUEIA, reler o `CLAUDE.md` do disco.
+
+### DIVIDAS DE SPEC (p/ `/ck:spec`, nenhuma bloqueia)
+1. §V474 sonda diz `width` 20 → 22 VERDE — é VERMELHA por §V247; a sonda válida é `height` 20 → 18.
+2. §V473(d) descreve a RELAÇÃO de largura & o gate mede isso em §V247 (dono único); o check de §V473(d) mede só "o pool é o
+   filho mais à direita do scroll".
+3. §V472(c) diz `os.date` ≤1× por passo & ∃ 2o sítio legítimo em `xpSetSpent` (linha MANUAL) — o check conta 1 em `xpStep`
+   & aceita o de `xpSetSpent`.
+4. §V244 no SPEC fala em `0.60` como 2o literal Lua & o gate carrega `0.80` (`$LUA_OPACITY`) — herdado, ⊥ desta rodada.
+5. **§B103 manda "avisar antes de instalar" c/ a ficha aberta & o user revogou isso 2026-09-07** ("é seguro"): emendar §B103
+   no lugar — o que fica verdadeiro é só o SINTOMA (form velho na tela até reabrir a ficha), ⊥ a regra de avisar/adiar.
+
+### TESTES DE TELA desta rodada (`.\spec-slice.ps1 T1041`)
+**(c)** é o que decide: Força 2 → comprar 3 & 4 como Mestre → `X` da linha 3 = pop-up `Reverta o nível mais alto primeiro`;
+`X` da 4 → confirmação → bolinha 4 apaga & `Current` sobe. **(d)/(e)**: `APPLY` invisível sem `baseline`, apagada a 50% sem
+compra pendente, acesa depois de comprar; aplicada, a bolinha ⊥ sai (pop-up) a menos que `Edit dots freely` esteja ON.
+**(g)**: log c/ > 23 linhas — os `X` rolam c/ as linhas.
+
+---
+
 ## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-07, fim da 193a rodada)
 
 ### O ESTADO EM UMA LINHA
