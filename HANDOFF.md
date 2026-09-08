@@ -1,5 +1,198 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## ⚠ CORREÇÃO DENTRO DA 199ª RODADA (2026-09-08, §B167) — LEIA JUNTO COM A SEÇÃO ABAIXO
+
+O 23º lote foi instalado quebrado & o user pegou na tela: *"ta dando erros quando tentei gastar
+experience"* — `attempt to index a nil value (field '?')` em `renderXPLedger`, em TODO caminho
+que renderiza o log. **JÁ CONSERTADO & REINSTALADO 02:50:38** (3011259 B). Gate `-Build` VERDE.
+
+**A causa (§B167):** `xpFind(node, names, out)` (`WoD20th.lfm:3437`) **⊥ devolve o form** — varre
+a árvore & devolve `out`, uma TABELA com `out[nm] = c` **só p/ os nomes que o roster tem**. Eu
+registrei em `XP_LOG` apenas `xpRow_` & `btnXpRev_`; os **300** rótulos `dynXp*_N` ficaram fora ∴
+`form["dynXpType_1"]` = `nil`. Pior: escrevi no comentário do laço que os 300 ficavam fora *"on
+purpose"* — leitura errada virada FATO, **sem abrir `xpFind`**. É §B166 outra vez (o `MEDIDO` que
+⊥ foi medido), agora na porta da API interna do próprio sheet.
+
+**O conserto:** o laço do roster registra os **7** nomes por linha (`btnXpRev_`, `xpRow_` & os 5
+`dynXp*_`), & **§V486f NOVA** liga os 2 lados — o gate lê os prefixos de `form["<x>_" .. i]` no
+código & exige `XP_LOG["<x>_" .. i]` DENTRO do laço que escreve em `XP_LOG` (⊥ o 1º laço sobre a
+constante: `xpRowsHide` & `xpRevButtons` também varrem o pool). **2** mutações VERMELHAS.
+
+**REGRA (vale p/ toda sessão):** `rdk -l` sai 0 & o gate fica verde num índice de `nil` em runtime.
+Antes de escrever no comentário o que uma função interna FAZ, **abrir a função**. E toda vez que o
+código passar a endereçar controle por nome montado (`form["x_" .. i]`), perguntar QUEM resolve
+esse nome — neste sheet é o roster, ⊥ o form.
+
+---
+
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-08, fim da 199ª rodada)
+
+### O ESTADO EM UMA LINHA
+O user mandou **2 prints** & eles derrubaram uma premissa do SPEC: `/ck:spec` escreveu **§B166**
+(a causa raiz), **§Q87** & o **23º lote** (§I167, §R167, §V486, §T1063…§T1066) & o build fechou
+**§T1063…§T1065** na MESMA rodada. **§V483 & §V485(a)…(d) REVOGADAS.** Gate `-Build` VERDE,
+**12 mutações vermelhas no check certo & 1 sonda verde forte** (re-escala 32→24 inteira).
+**INSTALADO 02:33:36** (3010707 B, mesmo size do `output/`), c/ o Firecast ABERTO. **Nada commitado.**
+
+### O QUE PEDIR, NESTA ORDEM
+1. **§T1066** (teste de tela do 23º lote, alíneas (a)…(g)) — a (a) & a (b) são as que provam
+   §B166 morto. §T1062, §T1058, §T1041/§T1048/§T1052 seguem `.` mas **§T1062 & §T1058 foram em
+   parte SUPERADAS**: o log que elas testariam ⊥ ∃ mais na forma antiga.
+   FECHAR & REABRIR a ficha antes.
+2. **§Q87 ABERTA & ⊥ bloqueia**: o log agora mostra no máximo **60** registros (os mais recentes).
+   O lote foi construído PELA recomendação; se o user quiser outro teto, é **1 número** (o
+   gerador das 60+60 instâncias & `XP_REV_POOL`), ~6 controles por linha.
+
+### ⚠ O QUE §B166 DERRUBOU (leia antes de mexer no log)
+`XP_LINE_H = 16` era declarado *"MEDIDO, ⊥ escolhido"* em §I164b/§V483c — **nunca foi medido**.
+§Q84.1 recomendou 16 & §T1052(b), o teste que o mediria, nunca rodou. Nos prints: escala **1,5**
+(largura de `xpHiRow`, 720 → ~1075 px), passo do `X` **48**/1,5 = **32** ✔ (confere c/ o XML),
+passo do TEXTO **40,8**/1,5 = **27,2** ✗. **~4,8 de erro por registro, ACUMULANDO** — no 13º o `X`
+estava ~57 abaixo do registro dele & a caixa de destaque desenhava ao lado de outro registro.
+A causa ⊥ é o VALOR, é a DEPENDÊNCIA: altura de linha renderizada é do HOST (§R165b, 0 métrica no
+SDK) ∴ inteiro nenhum acerta & QUALQUER passo autorado deriva. Trocar 16 por 13/14 só encurta.
+
+### O que virou código nesta rodada
+- **§T1063 `WoD20.9` XML** — `<template name="XpLogRow">` → `<layout name="xpRow_$(num)"
+  left="0" top="$(top)" width="735" height="32">` c/ os **5** `<label name="dynXp*_$(num)">`
+  (`top="0" height="32" vertTextAlign="center"`, mesmos `left`/`width`/`horzTextAlign`/`fontSize`
+  das colunas) & **60** instâncias em `(N−1) × 32`. O `<template name="XpRevRow">` FICA, o botão
+  segue IRMÃO da linha (dentro dela o layout precisaria de 765 num scroll de 751 do jogador →
+  barra horizontal, §R104) & suas 60 instâncias vão a `(N−1) × 32 + 8`. As **5** `<textEditor>`
+  voltam a `top="0" height="470"` & viram CHÃO (as 5 faixas cinzentas + o alcance da rolagem).
+- **§T1064 `WoD20.9` Lua** — `XP_LOG_MIN_H` volta a **470**; `xpRowsHide(form)` nova; os 5
+  `table.concat(x, "\n\n")` viram 1 laço `for i = 1, XP_REV_POOL` que escreve os 5 `text` da
+  linha & o `visible` dela; altura = `math.min(#rows, XP_REV_POOL) * XP_ROW_H`; o roster registra
+  `xpRow_` no MESMO laço do `btnXpRev_`. `XP_LINE_H`/`XP_ROW_H` param de nomear texto & passam a
+  nomear XML autorado (`btnXpRev.height` & `xpRow.height`).
+- **§T1065 gate** — **§V486 NOVA** (5 pernas + zero-guard, a (b) é a EQUAÇÃO DO CENTRO
+  `2 * (btnTop − rowTop) + XP_LINE_H == XP_ROW_H`); **§V483 REVOGADA INTEIRA** & **§V485(a)…(d)
+  REVOGADAS** (mediam a relação certa contra o número errado — verdes com a tela quebrada);
+  §V473(b) passa a medir as 2 listas de instâncias & o `top` da LINHA; §V473(e) lê o laço duplo;
+  §V472(e) lê a escrita POR LINHA. §V484, §V485(e)/(f), §V478, §V247, §V68, §V240 INTACTAS.
+
+### ⚠ AS 3 COISAS QUE CUSTARAM
+1. **Um `?` de teste de tela que nunca roda vira um FATO falso no SPEC.** §T1052(b) existia desde
+   a 196ª rodada exatamente p/ medir isto & ficou `.`; nesse meio tempo §V483, §V484 & §V485
+   foram escritas EM CIMA do número não medido, & as 3 passavam verdes. REGRA: número que só a
+   tela responde ⊥ pode virar `MEDIDO` no SPEC antes da tela responder — escrever `?` no valor.
+2. **Gate verde ⊥ é tela certa quando o dono do número é o host.** 11 pernas mediam a relação
+   correta contra 16. O que consertou ⊥ foi um número melhor: foi tirar o host da conta.
+3. **Layout dentro de `scrollBox` ⊥ pode ser mais largo que o scroll.** O 1º rascunho pôs o botão
+   DENTRO da linha (layout de 765) — no scroll de 751 do jogador isso é barra horizontal, & o SDK
+   ⊥ tem propriedade que a recuse (§R104). O botão ficou irmão da linha, colocado pela mesma conta.
+
+---
+
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-08, fim da 198ª rodada)
+
+### O ESTADO EM UMA LINHA
+`/ck:spec` escreveu o **22º lote** (§I166, §Q86, §R166, §V485, §T1059…§T1062) & o build fechou
+**§T1059…§T1061** na MESMA rodada. Gate `-Build` VERDE, **10 mutações vermelhas no check certo &
+2 sondas verdes**. **INSTALADO 01:36:37** (2969183 B, mesmo size do `output/`), c/ o Firecast
+ABERTO. **Nada commitado.**
+
+### O QUE PEDIR, NESTA ORDEM
+1. **§T1062** (teste de tela do 22º lote, alíneas (a)…(f)) — & §T1058 (21º lote) & §T1041/§T1048/
+   §T1052 seguem `.`, do 18º, 19º & 20º lote. FECHAR & REABRIR a ficha antes: a versão velha fica
+   na tela até isso.
+2. **§Q86 já nasceu RESPONDIDA** & a **(1)** SUPEROU a recomendação (ver ⚠ 2 abaixo). O único
+   número que ainda ⊥ dá p/ medir sem tela é a LINHA de 2px na cor do ORNAMENTO nas 4 eras —
+   §T1062(b) é quem responde. Se ficar fraca, a saída ⊥ é trocar de chave (o user escolheu o
+   ornamento): é o `strokeSize`, & ele emenda em 1 lugar (`WoD20.9`, atributo autorado).
+
+### O que virou código nesta rodada
+- **§T1059 `WoD20.9`** — `PAD` = **8** AUTORADO no XML (⊥ ∃ constante Lua p/ ele, de propósito:
+  os 60 `top` o carregam & coordenada tem 1 dono, §V383b): as **5** `dynXp*` vão de
+  `top="0" height="470"` p/ `top="8" height="462"`; os **60** `<XpRevRow>` ganham +8
+  (`8·40·72…1896`); os **5** `dynXpHi*` trocam `vertTextAlign="leading"` por `"center"`; &
+  `XP_LOG_MIN_H` **470 → 462** (a ÚNICA linha de Lua do §T). A conta que segura os 3 primeiros
+  pedidos é 1 só: `2 * PAD + XP_LINE_H == XP_ROW_H`. **0** mudança em `XP_LINE_H` (16),
+  `XP_ROW_H` (32), nos `"\n\n"`, no `+ 12` de cauda, no `xpColsHeight` & no `xpHiRow` (top/height).
+- **§T1060 `WoD20.9` + `WoD20.6`** — o `<rectangle align="client" color="black"/>` da faixa vira
+  `<rectangle name="xpHiEdge" align="client" color="black" strokeColor="black" strokeSize="2"/>`
+  & o ramo `elseif THEME_SHAPES[cls]` de `applyTheme` ganha
+  `if nm == "xpHiEdge" then paint(c, "strokeColor", t.ornament, line); else … end;` — a cor do
+  ORNAMENTO da era, & o `paint` de `strokeSize` passa a morar SÓ no `else` (senão `THEME_STROKE`
+  = 3 cobre o 2 calado). `strokeColor="black"` autorado ⊥ é a cor final: é a TESTEMUNHA sem a
+  qual `paint` desiste (guarda de §B21).
+- **§T1061 gate** — **§V485 NOVA** (6 pernas + zero-guard) & **§V473(b) EMENDADA**: lê `PAD` de
+  `dynXpType.top` & compara `(N − 1) * step + PAD`, ⊥ literal. §V483, §V484, §V68, §V240 & §V247
+  INTACTAS (o retângulo nomeado & com stroke ⊥ derrubou `IsBandLayout` — MEDIDO antes, §R166d).
+
+### ⚠ AS 3 COISAS QUE CUSTARAM
+1. **`grep -c $'\r'` do Git Bash MENTE, & eu confiei nele.** Deu `0` num `SPEC.md` que era CRLF,
+   li isso como "já é LF" & emendei o arquivo por `sed -e ... > SPEC.new` → saiu 100% LF & §V318
+   ficou vermelho. Reparo pelo PowerShell (`ReadAllText` → CRLF→LF → LF→CRLF → `WriteAllText`
+   sem BOM). REGRA: final de linha SÓ se confere contando os bytes 13 & 10 no PowerShell.
+   E o **`Edit` tool PRESERVA CRLF** (medido nesta rodada: 809 → 828 CR com 828 LF) ∴ é a
+   ferramenta certa p/ bloco de comentário; `sed`/`awk` ⊥ são, nunca.
+2. **A minha recomendação de §Q86.1 era PIOR que a resposta do user.** Recomendei
+   `t.stroke["black"]` — a chave de BORDA, `#3A4150` sobre `#12141A` em Modern Nights. O user
+   pediu *"a cor dos ornamentos dos boxes da época selecionada"* = `t.ornament` = `#A83232` ali,
+   muito mais visível. PREÇO que eu ⊥ tinha visto: `t.ornament` é VALOR & ⊥ chave ∴ ⊥ dá p/
+   autorar no XML & deixar a paleta mapear — virou 1 escrita de `applyTheme`. REGRA: antes de
+   recomendar chave de cor, abrir as 4 paletas **E o painter que usa a chave** (`ornColour =
+   t.ornament`, `:5127` — ⊥ o `accent` de `:5133`, que é da BARRA). É §B165 pelo lado bom.
+3. **Âncora de mutação tem de ser única no ARQUIVO INTEIRO, comentário incluído.**
+   `strokeSize="2"` apareceu **2×** em `WoD20.9` — a 2ª no comentário que eu tinha acabado de
+   escrever — & o harness PULOU a mutação em vez de rodá-la (o guard `hits -ne 1` salvou; sem
+   ele teria mutado o comentário & passado verde de graça). Ancorar em
+   `strokeColor="black" strokeSize="2"`.
+
+---
+
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-08, fim da 197ª rodada)
+
+### O ESTADO EM UMA LINHA
+`/ck:spec` escreveu o **21º lote** (§I165, §Q85, §R165, §V484, §T1053…§T1058, §B165) & o build
+fechou **§T1054…§T1057** na MESMA rodada; **§T1053 morreu NO PLANO** (§B165), com 0 linha de
+código. Gate `-Build` VERDE, **11 mutações vermelhas no check certo & 1 sonda verde**.
+**INSTALADO 00:35:11** (2965535 B, mesmo size do `output/`), c/ o Firecast ABERTO. **Nada commitado.**
+
+### O QUE PEDIR, NESTA ORDEM
+1. **§T1058** (teste de tela do 21º lote, alíneas (a)…(g)) — & §T1041/§T1048/§T1052 seguem `.`,
+   do 18º, 19º & 20º lote. FECHAR & REABRIR a ficha antes: a versão velha fica na tela até isso.
+2. **§Q85 já nasceu RESPONDIDA** (*"siga suas recomendações"*) & a **(2)** foi CORRIGIDA no plano
+   (§B165). O único número que ainda ⊥ dá p/ medir sem tela é o `fontSize="14"` do destaque:
+   §T1058(b) é quem o responde, & os **5** rótulos emendam JUNTOS (1 número, 5 lugares, §V484c).
+
+### O que virou código nesta rodada
+- **§T1054 `WoD20.9` XML** — `<layout name="xpHiRow">` (15,0,720,32, `visible="false"`) como
+  ÚLTIMO filho de `xpLogScroll`: 1 `<rectangle align="client" color="black"/>` SEM `xradius` &
+  5 `<label name="dynXpHi*">` nos `left`/`width`/`horzTextAlign` das 5 colunas menos os 15 do
+  layout (0·143·353·445·500), `fontSize="14"` `fontStyle="bold"` `fontColor="#C2A14D"`
+  `opacity="1"` `vertTextAlign="leading"`, **0** `fontFamily`. O `<template name="XpRevRow">`
+  ganhou `onMouseEnter="xpHiShow(self, $(num));"` & `onMouseLeave="xpHiHide(self);"`.
+- **§T1055 `WoD20.9` Lua** — 6 nomes novos em `XP_LOG`; `xpHiKinds/Traits/Levels/Costs/Whens`
+  (cache do render, §V125) & `xpHiArmed`; `xpHiDrop(form)` local + os GLOBAIS `xpHiShow(node,i)`,
+  `xpHiHide(node)`, `xpHiArm(node,i)` & `xpHiClear(node)`; `renderXPLedger` chama `xpHiDrop(form)`
+  **1×**, ACIMA dos 3 ramos, guarda as 5 listas junto dos `table.concat` & as zera no ramo vazio.
+- **§T1056 raiz** — `xpHiArm(form, i)` 1 linha ANTES de `Dialogs.confirmOkCancel` & `xpHiClear(form)`
+  na 1ª linha da resposta, ACIMA do `if not ok` ∴ confirmar & cancelar saem iguais. As 2 recusas
+  de §V474c & os 3 `return` de guarda ficam ACIMA do arme ∴ ⊥ armam.
+- **§T1057 gate** — `IsBandLayout` (função NOVA, declarada 1× acima de §V68: `layout` cujo fundo é
+  `align="client"` & cujos demais filhos abrem em `top` 0 com `height` == a do layout) + **§V484
+  NOVA**; §V68 & §V240 ganham a isenção CONTADA (1 cada, §V209) & §V473e vai de 11 p/ **17** nomes.
+
+### ⚠ AS 3 COISAS QUE CUSTARAM
+1. **A cor recomendada em §Q85.2 estava ERRADA & o user já a tinha aprovado.** `t.stroke["#FFFFFF"]`
+   é a chave de BORDA: em Modern Nights vale `#3A4150` sobre o chão `#12141A` — destaque mais
+   escuro que o texto que ele destaca. O acento de TEXTO já ∃ nas 4 paletas (`t.font["#C2A14D"]`,
+   o rótulo da sub-aba aberta) & ainda dispensa o global, a guarda & a única escrita de fonte em
+   Lua do lote ∴ **§T1053 inteira morreu & o lote ficou MENOR**. Pego no PLANO (§B165). REGRA:
+   cor de TEXTO sai de `t.font`, cor de BORDA sai de `t.stroke`, & ⊥ se nomeia chave antes de
+   abrir as 4 paletas lado a lado.
+2. **§V484(f) nasceu apontando p/ os checks errados.** O rascunho ADIVINHOU §V37/§V40; rodando o
+   gate, quem acendeu com a faixa foi **§V68** (retângulo preto sem canto), **§V240** (caixa sem
+   cabeça nem pé) & **§V473e** (contagem do roster). A perna foi emendada PELO MEDIDO.
+3. **O harness de mutação bateu nas 2 armadilhas já documentadas.** `$M` & `$m` são a MESMA
+   variável (o loop comeu o array na 2ª volta) & o gate FILHO estoura `$MaximumVariableCount`
+   (4096). O filho tem de rodar
+   `powershell -Command '$MaximumVariableCount = 32768; & "<gate>" -Quiet'` — sem `-NoProfile` ⊥
+   basta. E `'\('` dentro de `"$( )"` derruba o parser do PS 5.1: contar numa variável ANTES.
+
+---
 ## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-07, fim da 196ª rodada)
 
 ### O ESTADO EM UMA LINHA

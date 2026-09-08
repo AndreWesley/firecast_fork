@@ -7238,11 +7238,23 @@
 
 				local lang = sheet.language or "pt";
 
+				-- The record stays lit while the question is on screen (SPEC I165d, V484, user
+				-- 2026-09-07). ARMED on the line before the dialog and not a line earlier: every
+				-- refusal above - the two of V474c and the three guards - returns without asking
+				-- anything, and a refusal is not a question. Armed, the leave the modal causes
+				-- when it takes the pointer off the X does nothing, which is the whole reason the
+				-- flag exists. Guarded because the pair lives in WoD20.9's chunk (SPEC V480e).
+				if xpHiArm ~= nil then xpHiArm(form, i); end;
+
 				-- The dialog shape saveBaseline uses (SPEC V81, R161), and every write lives
 				-- INSIDE the answer (SPEC V474d).
 				Dialogs.confirmOkCancel(
 					translateSheetText("Revert this purchase? The point comes off the sheet and its experience is returned.", lang),
 					function(ok)
+						-- FIRST line of the answer, above the `not ok` return, so confirming and
+						-- cancelling put the record back to normal the same way (SPEC I165d).
+						if xpHiClear ~= nil then xpHiClear(form); end;
+
 						if not ok or sheet == nil then return; end;
 
 						-- Read again on the way in: the dialog is modal for this client only.

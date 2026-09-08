@@ -5168,16 +5168,44 @@
 						local line = authored(c, "strokeColor");
 
 						paint(c, "color", t.fill[normColor(fill)], fill);
-						paint(c, "strokeColor", t.stroke[normColor(line)], line);
-						-- The shared width, EXCEPT on the boxes of an era that declares its own
-						-- (V67, and the Classical Age is the one - `outline`). The fence is the
-						-- point and not tidiness: THEME_STROKE is also what draws the open sub-tab's
-						-- foot rule (I140b), so an unfenced hairline halves the only signal that
-						-- says which tab is open. The other three palettes declare no `outline`, so
-						-- the `and` short-circuits and they never even ask the selector.
-						local hair = t.outline ~= nil and sectionBox(c, fill);
 
-						paint(c, "strokeSize", (hair and t.outline) or THEME_STROKE, authored(c, "strokeSize"));
+						-- The XP log's highlight box, and the ONE rectangle on the sheet that is
+						-- neither (SPEC I166e, V485f, Q86.1, user 2026-09-08: "sera pintado igual
+						-- a cor dos ornamentos dos boxes da epoca selecionada").
+						--
+						-- Two things, and each of them is why the branch exists at all.
+						--
+						-- The COLOUR is t.ornament - what this era draws the box ornaments with,
+						-- read four lines above into ornColour. It has to be WRITTEN because it is
+						-- a VALUE and not a key: t.stroke maps `black` and `white` to the era's
+						-- BORDER accent, and there is no strokeColor anybody could author that a
+						-- palette would map to the ornament (SPEC R166e). `line` is still the
+						-- original, so paint keeps its B21 guard - the box authors strokeColor and
+						-- that is what makes this write legal.
+						--
+						-- The WIDTH is not written at all. The user asked for 2px and 2px is what
+						-- the XML authors; THEME_STROKE is 3 and would cover it silently, with
+						-- rdk -l at 0 and the gate green (SPEC B58, B62). This is the SECOND
+						-- declared exception to V67's shared width, beside t.outline, and it is
+						-- fenced by NAME exactly as themePaper is - a name is global across the
+						-- sheet's .lfm files (SPEC V59, B19), so one name reaches one control.
+						--
+						-- Nothing here writes a font property: B21 lives on the other side of
+						-- that wall, and the band's five labels author their colour (SPEC V484c).
+						if nm == "xpHiEdge" then
+							paint(c, "strokeColor", t.ornament, line);
+						else
+							paint(c, "strokeColor", t.stroke[normColor(line)], line);
+							-- The shared width, EXCEPT on the boxes of an era that declares its own
+							-- (V67, and the Classical Age is the one - `outline`). The fence is the
+							-- point and not tidiness: THEME_STROKE is also what draws the open sub-tab's
+							-- foot rule (I140b), so an unfenced hairline halves the only signal that
+							-- says which tab is open. The other three palettes declare no `outline`, so
+							-- the `and` short-circuits and they never even ask the selector.
+							local hair = t.outline ~= nil and sectionBox(c, fill);
+
+							paint(c, "strokeSize", (hair and t.outline) or THEME_STROKE, authored(c, "strokeSize"));
+						end;
 
 						-- The CORNER, and only on the 73 that the SAME selector the ornament uses
 						-- says yes to (SPEC I89b, V316d). Without sectionBox this branch runs on

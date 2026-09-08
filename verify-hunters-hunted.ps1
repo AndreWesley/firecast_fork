@@ -1419,12 +1419,40 @@ else { Pass "V77 all $titleCount section titles clear the box border" }
 # SCREEN, because Modern Nights rewrites the corner at runtime (SPEC I89a). What it buys is
 # still real: a box copied from an older file lands among its siblings with a different corner
 # and reddens here. What it no longer promises is ONE corner across the four eras.
+# A HIGHLIGHT BAND is not a section box (SPEC I165a, V484f): a layout whose backdrop fills it
+# and whose every other child opens at top 0 and runs the layout's full height. That is content
+# which IS the box - no head, no foot, and nothing for V68's corner or V240's padding to be the
+# ruler of. Told by CONSTRUCTION and not by name, exactly like the Apply box's cut and for the
+# same reason: a box that merely forgot its title or its radius must not leave by this door
+# (SPEC V68, V240, B18). Both callers COUNT what it takes out, so the cut cannot quietly stop
+# matching and go on passing, which is the shape of B7 (SPEC V209).
+function IsBandLayout($lay) {
+    if ($null -eq $lay -or $lay.LocalName -ne 'layout') { return $false }
+    $lh = 0
+    if (-not [int]::TryParse($lay.GetAttribute("height"), [ref]$lh)) { return $false }
+    if ($lh -le 0) { return $false }
+    $kids = 0
+    foreach ($k in $lay.ChildNodes) {
+        if ($k.NodeType -ne 'Element') { continue }
+        if ($k.LocalName -in @('dataLink', 'script', 'event', 'template')) { continue }
+        if ($k.LocalName -eq 'rectangle' -and $k.GetAttribute("align") -eq 'client') { continue }
+        $kt = 0; $kh = 0
+        if (-not [int]::TryParse($k.GetAttribute("top"), [ref]$kt)) { return $false }
+        if (-not [int]::TryParse($k.GetAttribute("height"), [ref]$kh)) { return $false }
+        if ($kt -ne 0 -or $kh -ne $lh) { return $false }
+        $kids++
+    }
+    return ($kids -gt 0)
+}
+
 $corners = @{}
 $boxSeen = 0
 $floorCut = 0
+$bandCut68 = 0
 foreach ($f in $files) {
     foreach ($r in (Doc $f.FullName).SelectNodes("//rectangle[@color='black']")) {
         if ($r.GetAttribute("align") -eq 'client' -and $r.ParentNode.SelectSingleNode("rectangle[@onClick]")) { $floorCut++; continue }
+        if ($r.GetAttribute("align") -eq 'client' -and (IsBandLayout $r.ParentNode)) { $bandCut68++; continue }
         $boxSeen++
         $key = "{0}|{1}|{2}" -f $r.GetAttribute("cornerType"), $r.GetAttribute("xradius"), $r.GetAttribute("yradius")
         if (-not $corners.ContainsKey($key)) { $corners[$key] = New-Object System.Collections.Generic.HashSet[string] }
@@ -1432,6 +1460,7 @@ foreach ($f in $files) {
     }
 }
 if ($floorCut -ne 1) { Fail "V68 the strip-floor cut matched $floorCut rectangle(s), expected exactly 1 - a wider cut is a hole B18 walks back through (SPEC V209)" }
+elseif ($bandCut68 -ne 1) { Fail "V68 the highlight-band cut matched $bandCut68 rectangle(s), expected exactly 1 - the band is xpHiRow's backdrop and nothing else on the sheet is built that way (SPEC I165a, V484f, V209)" }
 elseif ($boxSeen -lt 60) { Fail "V68 only $boxSeen black section box(es) were read, expected at least 60 - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($corners.Count -eq 0) { Fail "V68 no black section box found - the check has nothing to measure" }
 elseif ($corners.Count -gt 1) {
@@ -9353,6 +9382,7 @@ $vpadBad = @()
 $vpadSeen = 0
 $stretchSeen = 0
 $applyBoxSeen = 0
+$bandSeen240 = 0
 foreach ($f in $files) {
     foreach ($box in (Doc $f.FullName).SelectNodes("//layout[@width][@height]")) {
         $bw = -1; $bh = -1
@@ -9384,6 +9414,11 @@ foreach ($f in $files) {
             if ($k.LocalName -eq 'button') { $btn240++ } else { $oth240++ }
         }
         if ($btn240 -eq 1 -and $oth240 -eq 0 -and $back.GetAttribute("color") -eq 'black') { $applyBoxSeen++; continue }
+
+        # The highlight band has no head and no foot to measure: its five labels ARE its height
+        # (SPEC I165a, V484f). Same door the Apply box goes out of - construction, not name - and
+        # counted for the same reason (SPEC V209, B7).
+        if (IsBandLayout $box) { $bandSeen240++; continue }
 
         $hi = [int]::MaxValue
         $lo = [int]::MinValue
@@ -9497,6 +9532,7 @@ foreach ($f in $files) {
     }
 }
 if ($applyBoxSeen -ne 1) { Fail "V240 $applyBoxSeen titleless one-button box(es) were cut, expected the 1 the Apply box is - the construction that excuses it stopped matching, and either a box slipped out or the Apply box slipped back in (SPEC I163f, V479c, V209, B7)" }
+elseif ($bandSeen240 -ne 1) { Fail "V240 $bandSeen240 highlight band(s) were cut, expected the 1 xpHiRow is - the construction that excuses it stopped matching (SPEC I165a, V484f, V209, B7)" }
 elseif (($vpadSeen + $applyBoxSeen) -lt 70) { Fail "V240 only $vpadSeen box(es) were measured beside the $applyBoxSeen cut, expected the 70 the sheet draws - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($centredSeen -ne 2) { Fail "V240 $centredSeen box(es) stretched by the ornament took the centring rule, expected the 2 of the Settings tab - an exception nothing reaches is an exception that stopped measuring (SPEC V209, I156j)" }
 elseif ($stretchSeen -ne 2) { Fail "V240 $stretchSeen stretched box(es) took the centring rule, expected the 2 of the tabHedge band - an exception nothing reaches is an exception that stopped measuring (SPEC V209, V267b)" }
@@ -22344,7 +22380,10 @@ if (-not $v472Bad) {
     if ($xp9c472 -match 'sheet\.xpWhen') { $v472Bad += "(d) WoD20.9 reads sheet.xpWhen - the renderer draws rows[i].when and the walk is the one reader (SPEC V472d)" }
     # (e) drawn by renderXPLedger from what was stored, in the reader's order; never from the clock
     if ($xp9c472 -match 'os\.date') { $v472Bad += "(e) WoD20.9 calls os.date - the hour of a render is now, not when (SPEC V472e)" }
-    if ($xp9c472 -notmatch 'form\.dynXpWhen\.text\s*=\s*table\.concat\(whens, "\\n\\n"\);') { $v472Bad += "(e) renderXPLedger does not write the fifth column from the rows (SPEC V472e, I162c)" }
+    # 23rd batch (SPEC I167a, V486d, B166): the fifth column is written PER ROW now. It used to be
+    # one text block joined with a blank line, which is what put record i where the host felt like
+    # putting it - the drift B166 measured.
+    if ($xp9c472 -notmatch 'form\["dynXpWhen_"\s*\.\. i\]\.text = whens\[i\];') { $v472Bad += "(e) renderXPLedger does not write the fifth column of row i from the rows (SPEC V472e, I162c, V486d)" }
     if ($xp9c472 -notmatch 'if r\.when == nil then\s+whens\[i\] = "-";\s+elseif lang == "pt" then\s+whens\[i\] = \(string\.gsub\(r\.when, "\^\(%d\+\)-\(%d\+\)-\(%d\+\)", "%3/%2/%1"\)\);\s+else\s+whens\[i\] = r\.when;') { $v472Bad += "(e) the hour is not drawn as - when unstamped, day-first in pt and as stored in en (SPEC V472e, Q82.2)" }
 }
 if ($v472Bad) { foreach ($b in $v472Bad) { Fail "V472 $b" } }
@@ -22380,18 +22419,26 @@ else {
     $step473 = $lineH473 * 2
     if ($step473 -lt 1) { $v473Bad += "(b) the row step could not be read off XP_LINE_H and XP_ROW_H on WoD20.9 - this leg would measure all sixty buttons against zero (SPEC V209, V483c)" }
 
-    # (b) pool count == XP_REV_POOL, each instance on its own row and naming its own row
-    $inst473 = @($scr473.SelectNodes("XpRevRow"))
-    if ($inst473.Count -ne $pool473) { $v473Bad += "(b) the XML authors $($inst473.Count) XpRevRow instance(s) and XP_REV_POOL says $pool473 - a row past the constant has no button and a button past the rows has no row (SPEC V473b)" }
-    $seen473 = @{}
-    foreach ($i473 in $inst473) {
+    # (b) pool count == XP_REV_POOL, each instance on its own row and naming its own row. 23rd
+    # batch (SPEC I167a, V486, B166): there are TWO instance lists now and the pool bounds both -
+    # the ROW the record is drawn in and the BUTTON that reverts it. The row's top is the step;
+    # where the button sits INSIDE that row is the centre equation, and V486(b) owns it.
+    foreach ($tag473 in @('XpLogRow', 'XpRevRow')) {
+        $inst473 = @($scr473.SelectNodes($tag473))
+        if ($inst473.Count -ne $pool473) { $v473Bad += "(b) the XML authors $($inst473.Count) $tag473 instance(s) and XP_REV_POOL says $pool473 - a record past the constant has no row and a row past the records has nothing to draw (SPEC V473b, I167d)" }
+        $seen473 = @{}
+        foreach ($i473 in $inst473) {
+            $n473 = [int]$i473.GetAttribute("num")
+            if ($seen473.ContainsKey($n473)) { $v473Bad += "(b) $tag473 num=$n473 is authored twice" }
+            $seen473[$n473] = $true
+        }
+        for ($n473 = 1; $n473 -le $pool473; $n473++) { if (-not $seen473.ContainsKey($n473)) { $v473Bad += "(b) $tag473 num=$n473 is missing - a hole in the pool is a record with no row or a row with no button (SPEC V473b)" } }
+    }
+    foreach ($i473 in @($scr473.SelectNodes("XpLogRow"))) {
         $n473 = [int]$i473.GetAttribute("num")
         $t473 = [int]$i473.GetAttribute("top")
-        if ($seen473.ContainsKey($n473)) { $v473Bad += "(b) XpRevRow num=$n473 is authored twice" }
-        $seen473[$n473] = $true
-        if ($step473 -ge 1 -and $t473 -ne (($n473 - 1) * $step473)) { $v473Bad += "(b) XpRevRow num=$n473 sits at top=$t473 and row $n473 of the columns is at $(($n473 - 1) * $step473) - the button would revert the line beside another row (SPEC V473b as amended, V483d)" }
+        if ($step473 -ge 1 -and $t473 -ne (($n473 - 1) * $step473)) { $v473Bad += "(b) XpLogRow num=$n473 sits at top=$t473 and row $n473 of the log is at $(($n473 - 1) * $step473) - the rows would overlap or gap, and the X beside them reverts by number (SPEC V473b as amended, V486a)" }
     }
-    for ($n473 = 1; $n473 -le $pool473; $n473++) { if (-not $seen473.ContainsKey($n473)) { $v473Bad += "(b) XpRevRow num=$n473 is missing - a hole in the pool is a row with no button (SPEC V473b)" } }
     if ($tpl473.GetAttribute("name") -ne 'btnXpRev_$(num)') { $v473Bad += "(b) the pool button is named '$($tpl473.GetAttribute('name'))' and not btnXpRev_ plus its num - the renderer lights them by that name (SPEC V473e)" }
     if ($tpl473.GetAttribute("onClick") -notmatch '^\s*xpRevert\(self, \$\(num\)\);\s*$') { $v473Bad += "(b) the pool button's onClick is '$($tpl473.GetAttribute('onClick'))' - it must hand xpRevert its OWN num (SPEC V473b, V474)" }
     if ($tpl473.GetAttribute("top") -ne '$(top)') { $v473Bad += "(b) the pool button's top is not the instance's top - sixty buttons on one row (SPEC V473b)" }
@@ -22413,9 +22460,13 @@ else {
     # Three names joined in the 19th batch: the log box, the scroll and the title all take a
     # width from xpLogWidth now, and a control nothing finds is a control nothing can widen
     # (SPEC I163b, V473e as amended, V478c).
-    foreach ($need473 in @('dynXpType','dynXpTrait','dynXpLevel','dynXpCost','dynXpWhen','dynXpEmpty','xpApplyBox','btnXpApply','xpLogBox','xpLogScroll','lblXpLogTitle')) { if ($names473 -notcontains $need473) { $v473Bad += "(e) '$need473' is not on the XP_LOG roster - the one walker would never find it (SPEC V473e, V143)" } }
-    if ($names473.Count -ne 11) { $v473Bad += "(e) the XP_LOG roster names $($names473.Count) controls, expected 11 (SPEC V473e as amended)" }
-    if ($code473 -notmatch 'for i = 1, XP_REV_POOL, 1 do XP_LOG\["btnXpRev_" \.\. i\] = true; end;') { $v473Bad += "(e) the pool does not join the XP_LOG roster off the constant - sixty names typed out would drift from it (SPEC V473e, V383b)" }
+    # The six of the highlight band joined the roster in the 21st batch (SPEC I165a, V484): the
+    # band is written by the SAME one walker, so a name missing here is a band nothing can raise.
+    foreach ($need473 in @('dynXpType','dynXpTrait','dynXpLevel','dynXpCost','dynXpWhen','dynXpEmpty','xpApplyBox','btnXpApply','xpLogBox','xpLogScroll','lblXpLogTitle','xpHiRow','dynXpHiType','dynXpHiTrait','dynXpHiLevel','dynXpHiCost','dynXpHiWhen')) { if ($names473 -notcontains $need473) { $v473Bad += "(e) '$need473' is not on the XP_LOG roster - the one walker would never find it (SPEC V473e, V143)" } }
+    if ($names473.Count -ne 17) { $v473Bad += "(e) the XP_LOG roster names $($names473.Count) controls, expected 17 (SPEC V473e as amended, V484)" }
+    # ONE walk for the whole pool, off the constant: sixty names typed out would drift from it
+    # (SPEC V383b). WHICH names have to be on it is V486(f), which reads them off the renderer.
+    if ($code473 -notmatch 'for i = 1, XP_REV_POOL, 1 do[\s\S]{0,800}?XP_LOG\["btnXpRev_" \.\. i\]\s*= true;') { $v473Bad += "(e) the pool does not join the XP_LOG roster off the constant - sixty names typed out would drift from it (SPEC V473e, V383b, V486f)" }
     if ($code473 -notmatch 'local function xpRevButtons\(form, rows, st\)[\s\S]*?for i = 1, XP_REV_POOL, 1 do') { $v473Bad += "(e) xpRevButtons does not take the role and bound its loop on XP_REV_POOL (SPEC V473b, V383b, V474a as amended)" }
     if ($code473 -match 'for i = 1, 60') { $v473Bad += "(e) a loop is bounded on the literal 60 - the bound is the constant (SPEC V383b)" }
 }
@@ -22790,45 +22841,320 @@ foreach ($n482 in @('xpLogBox', 'xpApplyBox')) {
 if ($v482Bad) { foreach ($b in ($v482Bad | Sort-Object -Unique)) { Fail "V482 $b" } }
 else { Pass "V482 the two boxes xpLogWidth resizes are the only ornamented boxes Lua resizes by name, and both are redrawn after the write, from the measurement they are handed, under the global's guard" }
 
-# ---- V483: the log's row step has ONE owner and the revert button fits inside it ----------
-# SPEC V483, I164b, B164, T1050. The step used to be owned twice: XP_ROW_H placed AND sized the
-# sixty X buttons, and the rendered line height of the five columns - a host default nobody
-# authored - placed the rows. Two owners of one measure is an error that ACCUMULATES: the first
-# line matches and the thirtieth does not. The step is two rendered lines now, so the button
-# covers its own line and has a blank one under it in every state.
-$v483Bad  = @()
-$doc483   = Doc (Join-Path $dir "WoD20.9.lfm")
-$code483  = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
-$cols483  = @('dynXpType', 'dynXpTrait', 'dynXpLevel', 'dynXpCost', 'dynXpWhen')
-$nodes483 = @($doc483.SelectNodes("//textEditor") | Where-Object { $cols483 -contains $_.GetAttribute("name") })
-if ($nodes483.Count -ne 5) { $v483Bad += "found $($nodes483.Count) of the five log columns on WoD20.9 - this check is reading a tab that is not there any more (SPEC V209)" }
+# ---- V483: REVOKED 2026-09-08 by B166 --------------------------------------------------
+# It said the row step had one owner and the button fitted inside it. Both were true of the
+# XML and neither was true on screen: the step it measured, XP_ROW_H = 2 * XP_LINE_H, was
+# built on a line height nobody ever measured, and the five columns were laid out by the
+# HOST at about 27 to the pair while the buttons stepped 32. Five green legs, five px of
+# drift per row. The legs did not move to a better number - they moved to a construction
+# with no number of the host in it at all: (a)/(b) are V486(c), (d) is V486(b), (e) is
+# V486(a), and (c) - the "\n\n" joins - is what V486(d) now forbids outright.
+
+# ---- V484: the row highlight is ONE band, glued to its columns, held by the dialog --------
+# SPEC V484, I165, R165, B165, T1054..T1056. Font properties in this SDK belong to the whole
+# control and gui.TextEditor carries no rich text (SPEC R165b), so one record inside a
+# five-column block cannot be styled on its own: the highlight is a band drawn OVER the line.
+# That buys three ways to be quietly wrong - the band beside its columns, the band wearing a
+# colour nobody can read, and the band outliving the question that raised it - and this is the
+# check for all three.
+$v484Bad  = @()
+$doc484   = Doc (Join-Path $dir "WoD20.9.lfm")
+$code484  = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+$root484  = NoComments (CodeOf (Join-Path $dir "WoD20th.lfm"))
+$band484  = @($doc484.SelectNodes("//scrollBox[@name='xpLogScroll']/layout[@name='xpHiRow']"))
+
+# Zero-guard. Without it this whole block turns into a no-op the day the band is renamed or
+# lifted out of the scroll, and the gate would go on saying green (SPEC V20, B7).
+if ($band484.Count -ne 1) { $v484Bad += "(a) found $($band484.Count) <layout name='xpHiRow'> directly under xpLogScroll, expected exactly 1 - two bands would be two records lit at once and the modal is one (SPEC V484a)" }
 else {
-    # (a) all five author the SAME fontSize - a column in another body reads the row at another y
-    $sizes483 = @($nodes483 | ForEach-Object { $_.GetAttribute("fontSize") } | Sort-Object -Unique)
-    if ($sizes483 -contains '') { $v483Bad += "(a) a log column authors no fontSize - the step of the rows would go back to being a host default nobody owns, which is what B164 cost (SPEC V483a)" }
-    elseif ($sizes483.Count -ne 1) { $v483Bad += "(a) the five log columns author $($sizes483.Count) different fontSize values - a column in another body reads the same row at another y (SPEC V483a, V261b)" }
-    # (b) and none authors a FAMILY: applyTheme paints only what was authored, so a family here
-    # would let the era's serif into the log and move the step from era to era
-    foreach ($c483 in $nodes483) {
-        if ($c483.GetAttribute("fontFamily")) { $v483Bad += "(b) a log column authors a fontFamily - applyTheme paints only what was authored, so the era's serif would reach the log and the step would move with the era (SPEC V483b, V53)" }
+    $hi484  = $band484[0]
+    $rect484 = @($hi484.SelectNodes("rectangle"))
+    $lbl484  = @($hi484.SelectNodes("label"))
+
+    # (a) authored hidden, exactly as the sixty X buttons are: the XML has to read right for a
+    # PLAYER before any Lua runs (SPEC V473c).
+    if ($hi484.GetAttribute("visible") -ne 'false') { $v484Bad += "(a) xpHiRow does not author visible='false' - the band would be on screen before any Lua had chosen a record (SPEC V484a, V473c)" }
+    if ($rect484.Count -ne 1) { $v484Bad += "(a) xpHiRow holds $($rect484.Count) rectangle(s), expected the 1 that covers the 12px line underneath - without it the base glyphs read through the bold ones (SPEC V484a, I165a)" }
+    if ($lbl484.Count -ne 5) { $v484Bad += "(a) xpHiRow holds $($lbl484.Count) label(s), expected the 5 the log has columns (SPEC V484a)" }
+
+    # (b) the five labels ARE the five columns, shifted by the band's own left. Read from BOTH
+    # sides and compared: repeating 15/158/368/460/515 here would make this file the second
+    # owner of a coordinate, which is what V478b exists to refuse (SPEC V383b).
+    $bl484 = 0
+    [void][int]::TryParse($hi484.GetAttribute("left"), [ref]$bl484)
+    foreach ($p484 in @(@('dynXpHiType','dynXpType'), @('dynXpHiTrait','dynXpTrait'), @('dynXpHiLevel','dynXpLevel'), @('dynXpHiCost','dynXpCost'), @('dynXpHiWhen','dynXpWhen'))) {
+        $h484 = $doc484.SelectSingleNode("//label[@name='$($p484[0])']")
+        $c484 = $doc484.SelectSingleNode("//textEditor[@name='$($p484[1])']")
+        if ($null -eq $h484 -or $null -eq $c484) { $v484Bad += "(b) '$($p484[0])' or '$($p484[1])' is missing - a band cannot be measured against a column that is not there (SPEC V209)"; continue }
+        if (($bl484 + [int]$h484.GetAttribute("left")) -ne [int]$c484.GetAttribute("left")) { $v484Bad += "(b) '$($p484[0])' opens at $($bl484 + [int]$h484.GetAttribute('left')) inside the scroll and '$($p484[1])' opens at $($c484.GetAttribute('left')) - the highlight would sit beside the text it is highlighting (SPEC V484b)" }
+        if ([int]$h484.GetAttribute("width") -ne [int]$c484.GetAttribute("width")) { $v484Bad += "(b) '$($p484[0])' is $($h484.GetAttribute('width'))px wide and '$($p484[1])' is $($c484.GetAttribute('width')) - one clips where the other does not (SPEC V484b)" }
+        if ($h484.GetAttribute("horzTextAlign") -ne $c484.GetAttribute("horzTextAlign")) { $v484Bad += "(b) '$($p484[0])' is aligned '$($h484.GetAttribute('horzTextAlign'))' and '$($p484[1])' is '$($c484.GetAttribute('horzTextAlign'))' - a centred figure would jump sideways the moment it lit (SPEC V484b)" }
+    }
+
+    # (c) one body, one weight, one colour - and the colour is the era's TEXT accent. The first
+    # draft named the STROKE accent, which is #3A4150 over a #12141A ground in Modern Nights: a
+    # highlight darker than the text it highlights (SPEC B165). Lua writes no font property at
+    # all here, which is what keeps B21 out of reach.
+    $colSz484 = $doc484.SelectSingleNode("//textEditor[@name='dynXpType']")
+    $sz484 = @($lbl484 | ForEach-Object { $_.GetAttribute("fontSize") } | Sort-Object -Unique)
+    if ($sz484.Count -ne 1) { $v484Bad += "(c) the band's labels author $($sz484.Count) different fontSize values ($($sz484 -join ', ')) - one column reading at another body is V483(a) one floor up (SPEC V484c)" }
+    elseif ($null -ne $colSz484 -and $sz484[0] -eq $colSz484.GetAttribute("fontSize")) { $v484Bad += "(c) the band authors fontSize $($sz484[0]), the same body the columns already read at - a highlight that does not grow is not the one that was asked for (SPEC V484c, Q85.1)" }
+    foreach ($l484 in $lbl484) {
+        if ($l484.GetAttribute("fontStyle") -ne 'bold') { $v484Bad += "(c) '$($l484.GetAttribute('name'))' does not author fontStyle='bold' (SPEC V484c)" }
+        if ($l484.GetAttribute("fontColor") -ne '#C2A14D') { $v484Bad += "(c) '$($l484.GetAttribute('name'))' authors fontColor '$($l484.GetAttribute('fontColor'))', not the '#C2A14D' all four palettes map to the era's TEXT accent - the stroke accent is a BORDER colour and reads darker than the text in Modern Nights (SPEC V484c, B165, V305d)" }
+        if ($l484.HasAttribute("fontFamily")) { $v484Bad += "(c) '$($l484.GetAttribute('name'))' authors a fontFamily - the era's serif does not reach the log, so the highlight changes size, weight and colour and never the face (SPEC V484c, V483b)" }
+    }
+    if ($code484 -match '\.fontColor\s*=') { $v484Bad += "(c) a font colour is written from Lua on this tab - the band authors its colour and applyTheme paints it, and a font setter detaches the control from the form theme before it writes (SPEC V484c, I165f, B21, B165)" }
+
+    # (d) one record tall, and landing on the step the columns and the sixty buttons share
+    $lh484 = 0
+    [void][int]::TryParse($hi484.GetAttribute("height"), [ref]$lh484)
+    $mL484 = [regex]::Match($code484, 'local\s+XP_LINE_H\s*=\s*(\d+)')
+    if (-not $mL484.Success) { $v484Bad += "(d) XP_LINE_H is not a named constant any more - the band's height has nothing to be measured against (SPEC V209, V483c)" }
+    elseif ($lh484 -ne (2 * [int]$mL484.Groups[1].Value)) { $v484Bad += "(d) xpHiRow is $($lh484)px tall and a record is $(2 * [int]$mL484.Groups[1].Value) - a shorter band clips the bigger font, a taller one covers the record under it (SPEC V484d, V483c)" }
+    if ($code484 -notmatch 'xpHiRow\.top\s*=\s*\(i - 1\) \* XP_ROW_H') { $v484Bad += "(d) the band's top is not (i - 1) * XP_ROW_H - the band, the text and the X would each carry their own idea of where row i is, and they drift apart sixty rows down (SPEC V484d, V483d)" }
+}
+
+# (e) the band reads the render's CACHE. One ledger walk per button the pointer crosses is the
+# arithmetic that froze the sheet in B34 (SPEC V125).
+$iA484 = $code484.IndexOf('function xpHiShow')
+$iB484 = $code484.IndexOf('function xpHiHide')
+if ($iA484 -lt 0 -or $iB484 -le $iA484) { $v484Bad += "(e) xpHiShow and xpHiHide are not both declared in that order - the hover has no owner to measure (SPEC V209)" }
+elseif ($code484.Substring($iA484, $iB484 - $iA484) -match 'xpLedgerRows\(\)') { $v484Bad += "(e) xpHiShow walks the ledger - that is one walk per button the pointer crosses, which is B34 coming straight back (SPEC V484e, V125)" }
+if ($code484 -notmatch 'xpHiKinds, xpHiTraits, xpHiLevels, xpHiCosts, xpHiWhens = kinds, traits, levels, costs, whens') { $v484Bad += "(e) the five column lists are not kept for the highlight - the band would format row i a second time, and two places that format one row are two that can disagree about it (SPEC V484e)" }
+
+# Every state of the log takes the band down, in ONE line above all three branches (SPEC I165g).
+# Told by position rather than by three call sites: a highlight that outlives its render is a
+# highlight sitting on somebody else's record.
+$iR484 = $code484.IndexOf('function renderXPLedger')
+$iD484 = $code484.IndexOf('xpHiDrop(form);')
+$iE484 = $code484.IndexOf('if rows == nil or #rows == 0')
+if ($iD484 -lt 0) { $v484Bad += "renderXPLedger never takes the band down - the highlight would survive into a log that has been rebuilt under it (SPEC V484, I165g, V473c)" }
+elseif ($iR484 -lt 0 -or $iE484 -le $iR484) { $v484Bad += "renderXPLedger or its empty-log branch is not where this check expects it - the position it measures stopped existing (SPEC V209)" }
+elseif ($iD484 -lt $iR484 -or $iD484 -gt $iE484) { $v484Bad += "xpHiDrop is not called inside renderXPLedger above its empty-log branch - one of the three states would keep the band it was handed (SPEC V484, I165g)" }
+
+# ARMED: the record stays lit for exactly as long as the question is on screen (SPEC I165d).
+$iArm484 = $root484.IndexOf('xpHiArm(form, i);')
+$iDlg484 = $root484.IndexOf('Dialogs.confirmOkCancel')
+$iClr484 = $root484.IndexOf('xpHiClear(form);')
+$iOk484  = $root484.IndexOf('if not ok or sheet == nil then return; end;')
+if ($iArm484 -lt 0 -or $iClr484 -lt 0) { $v484Bad += "ARMED xpRevert does not both arm and clear the highlight - the band would drop the moment the modal took the pointer off the X (SPEC V484, I165d)" }
+elseif ($iDlg484 -lt 0 -or $iOk484 -lt 0) { $v484Bad += "ARMED the dialog or its 'not ok' return is not where this check expects it in xpRevert (SPEC V209)" }
+elseif ($iArm484 -gt $iDlg484 -or ($iDlg484 - $iArm484) -gt 120) { $v484Bad += "ARMED the arm is not the line before Dialogs.confirmOkCancel - armed any earlier it would survive a refusal, and the two refusals of V474c are not questions (SPEC V484, V474c, Q85.4)" }
+elseif ($iClr484 -lt $iDlg484 -or $iClr484 -gt $iOk484) { $v484Bad += "ARMED xpHiClear is not the first line of the answer, above the 'not ok' return - cancelling would leave the record lit for good (SPEC V484, I165d)" }
+# Counted into a variable first, and not inline in the message: a regex escape inside a
+# $(...) subexpression inside a double-quoted string derails the PowerShell 5.1 parser, and it
+# reports the error three lines away from the one that caused it.
+$nArm484 = ([regex]::Matches($root484, 'xpHiArm\(')).Count
+if ($nArm484 -ne 1) { $v484Bad += "ARMED xpHiArm is called $nArm484 time(s) on the root, expected the 1 place that asks the question (SPEC V484)" }
+
+# Zero-guard on the two events: the band is reachable only from the button that would revert
+# the record, so a template that lost them is a feature nothing can start (SPEC V484, I165c).
+$tplHi484 = $doc484.SelectSingleNode("//template[@name='XpRevRow']/button")
+if ($null -eq $tplHi484) { $v484Bad += "the XpRevRow template has no button - there is nothing left to hover (SPEC V209)" }
+else {
+    if ($tplHi484.GetAttribute("onMouseEnter") -notmatch 'xpHiShow\(self,') { $v484Bad += "the revert button does not call xpHiShow from onMouseEnter - nothing would ever raise the band (SPEC V484, I165c)" }
+    if ($tplHi484.GetAttribute("onMouseLeave") -notmatch 'xpHiHide\(self\)') { $v484Bad += "the revert button does not call xpHiHide from onMouseLeave - the record would stay lit after the pointer left it (SPEC V484, I165c)" }
+}
+
+if ($v484Bad) { foreach ($b in ($v484Bad | Sort-Object -Unique)) { Fail "V484 $b" } }
+else { Pass "V484 the row highlight is one hidden band under xpLogScroll, its five labels sit exactly on the five columns, it authors one larger bold body in the era's text accent with no family and no Lua font write, it lands on the shared row step, it reads the render's cache, every state of the log takes it down, and it survives the confirm dialog to both answers" }
+
+
+# ---- V485: the record is a BOX, its text centred in it, and the box IS the highlight ------
+# SPEC V485, I166, R166, Q86, T1059..T1061. The 20th batch gave the record a step of two
+# rendered lines and the 21st drew a band on it - but both put the LINE at the top of the box
+# and let the blank half hang underneath. The user asked for four things (2026-09-08): the line
+# in the MIDDLE of its box, the margin above and below equal to half the old gap, nothing
+# between one box and the next, and the box showing itself under the pointer as a 2px line in
+# the era's ornament colour. The first three are ONE number - PAD - and this check measures the
+# equation rather than the number, so amending PAD cannot leave the buttons or the floor behind.
+$v485Bad  = @()
+$doc485   = Doc (Join-Path $dir "WoD20.9.lfm")
+$code485  = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+$code486  = NoComments (CodeOf (Join-Path $dir "WoD20.6.lfm"))
+$cols485  = @('dynXpType', 'dynXpTrait', 'dynXpLevel', 'dynXpCost', 'dynXpWhen')
+$nodes485 = @($doc485.SelectNodes("//textEditor") | Where-Object { $cols485 -contains $_.GetAttribute("name") })
+
+# Legs (a)..(d) are REVOKED by B166 and replaced by V486: PAD used to be the `top` the five
+# columns shared, and the box those legs measured was made of RENDERED TEXT - a height this
+# SDK reports to nobody (SPEC R165b). The record is a layout we size now, so the equation
+# moved to V486(b) and the floor to V486(e). What survives here is what was never about text:
+# the band centres what it covers, and the box shows itself as a 2px line in the era ornament.
+
+# (e) the band centres what it covers. Leading stood the bigger body PAD above the line it was
+# drawn over, on every row, the moment the columns stopped opening at 0 (SPEC V485e, I166d).
+$hiLbl485 = @($doc485.SelectNodes("//layout[@name='xpHiRow']/label"))
+if ($hiLbl485.Count -ne 5) { $v485Bad += "(e) xpHiRow holds $($hiLbl485.Count) label(s), expected the 5 the log has columns (SPEC V209, V484a)" }
+else {
+    foreach ($l485 in $hiLbl485) {
+        if ($l485.GetAttribute("vertTextAlign") -ne 'center') { $v485Bad += "(e) '$($l485.GetAttribute('name'))' is vertically aligned '$($l485.GetAttribute('vertTextAlign'))' and not 'center' - the highlight would stand PAD above the line it is covering, on every row (SPEC V485e, I166d)" }
     }
 }
-# (c) the step is TWO rendered lines, and both halves of that arithmetic live in one place
-if ($code483 -notmatch 'local XP_ROW_H\s*=\s*2 \* XP_LINE_H;') { $v483Bad += "(c) XP_ROW_H is not written as 2 * XP_LINE_H - the step and the line it is made of would be two numbers again (SPEC V483c, B164)" }
-$mLine483 = [regex]::Match($code483, 'local XP_LINE_H\s*=\s*(\d+);')
-if (-not $mLine483.Success) { $v483Bad += "(c) XP_LINE_H is not declared as a literal on WoD20.9 - there is no owner of the line height for the button to be measured against (SPEC V483c, V209)" }
-foreach ($p483 in @('kinds', 'traits', 'levels', 'costs', 'whens')) {
-    if (-not $code483.Contains('table.concat(' + $p483 + ', "\n\n");')) { $v483Bad += "(c) the '$p483' column is not joined with a blank line between rows - one column single-spaced inside a double-spaced step is exactly the misalignment this check exists to stop (SPEC V483c)" }
+
+# (f) the box is invisible until the pointer comes, and then it is 2px of the era's ORNAMENT.
+# Two authored attributes, one written colour and one write that must NOT happen (SPEC V485f).
+$edge485 = @($doc485.SelectNodes("//layout[@name='xpHiRow']/rectangle"))
+if ($edge485.Count -ne 1) { $v485Bad += "(f) xpHiRow holds $($edge485.Count) rectangle(s), expected the 1 that is both the band's ground and the box's outline (SPEC V209, V484a)" }
+else {
+    $e485 = $edge485[0]
+    if ($e485.GetAttribute("name") -ne 'xpHiEdge') { $v485Bad += "(f) the band's rectangle is named '$($e485.GetAttribute('name'))' and not 'xpHiEdge' - applyTheme fences it by NAME, so an unnamed one takes THEME_STROKE's 3px and the era's border colour instead (SPEC V485f, V59)" }
+    if (-not $e485.HasAttribute("strokeColor")) { $v485Bad += "(f) the band's rectangle authors no strokeColor - paint() returns early with no original to record, so the ornament colour would never be written at all (SPEC V485f, R166b, B21)" }
+    if ($e485.GetAttribute("strokeSize") -ne '2') { $v485Bad += "(f) the band's rectangle authors strokeSize='$($e485.GetAttribute('strokeSize'))' and the user asked for 2 (SPEC V485f, Q86.2)" }
+    if ($e485.HasAttribute("xradius")) { $v485Bad += "(f) the band's rectangle authors an xradius - sectionBox would say yes and the box would take the era's filigree and bevel, which is the ornament the user asked it NOT to have (SPEC V485f, I89b, V316d)" }
 }
-# (d) the button is exactly as tall as the line it covers. The instance STEP is V473(b)'s, and
-# it is measured there off these same two constants.
-$tpl483 = $doc483.SelectSingleNode("//template[@name='XpRevRow']/button")
-if ($null -eq $tpl483) { $v483Bad += "(d) the XpRevRow template has no button - there is nothing to align (SPEC V209)" }
-elseif ($mLine483.Success -and [int]$tpl483.GetAttribute("height") -ne [int]$mLine483.Groups[1].Value) {
-    $v483Bad += "(d) the revert button is $($tpl483.GetAttribute('height'))px tall and a log line is $($mLine483.Groups[1].Value)px - a button that does not match its line is the one the user called 'um pouco grande', and it drifts row by row (SPEC V483d, B164)"
+$iA485 = $code486.IndexOf('if nm == "xpHiEdge" then')
+$iB485 = $code486.IndexOf('paint(c, "strokeColor", t.stroke[normColor(line)], line);')
+if ($iA485 -lt 0) { $v485Bad += "(f) applyTheme has no branch for xpHiEdge - the box would wear the era's BORDER accent at 3px, and the user asked for the ORNAMENT colour at 2 (SPEC V485f, I166e, Q86.1)" }
+elseif ($iB485 -le $iA485) { $v485Bad += "(f) the xpHiEdge branch does not sit above the shared strokeColor write it fences - the construction this check measures stopped existing (SPEC V209)" }
+else {
+    $br485 = $code486.Substring($iA485, $iB485 - $iA485)
+    if ($br485 -notmatch 'paint\(c, "strokeColor", t\.ornament, line\);') { $v485Bad += "(f) the xpHiEdge branch does not write strokeColor from t.ornament - t.ornament is a VALUE and not a key, so no authored colour can reach the box any other way (SPEC V485f, R166e, Q86.1)" }
+    if ($br485 -match 'strokeSize') { $v485Bad += "(f) the xpHiEdge branch writes a strokeSize - THEME_STROKE is 3, it would cover the authored 2, and the defect would exist only on screen with rdk -l at 0 and this gate green (SPEC V485f, B58, B62)" }
+    if ($br485 -match 'font') { $v485Bad += "(f) the xpHiEdge branch writes a font property - a font setter detaches the control from the form theme before it writes, and B21 lives on the other side of that wall (SPEC V485f, B21)" }
 }
-# (e) the content height is measured by the SAME step
-if ($code483 -notmatch '#rows \* XP_ROW_H \+ 12') { $v483Bad += "(e) the column height is not measured by XP_ROW_H - the content and the buttons would disagree about how tall a row is (SPEC V483e, I57)" }
-if ($v483Bad) { foreach ($b in ($v483Bad | Sort-Object -Unique)) { Fail "V483 $b" } }
-else { Pass "V483 the five log columns author one fontSize and no family, the step is two of those lines, every column is joined with the blank line that makes it, and the revert button is exactly one line tall" }
+$nSize485 = ([regex]::Matches($code486, 'paint\(c, "strokeSize"')).Count
+if ($nSize485 -ne 1) { $v485Bad += "(f) applyTheme writes strokeSize in $nSize485 place(s), expected the 1 the else branch holds - a second write would reach xpHiEdge past the fence (SPEC V485f, V67)" }
+$nEdge485 = ([regex]::Matches($code486, 'xpHiEdge')).Count
+if ($nEdge485 -ne 1) { $v485Bad += "(f) 'xpHiEdge' appears $nEdge485 time(s) in WoD20.6, expected the 1 fence - a name that is tested twice is a second owner of the exception (SPEC V485f, V383b)" }
+$nOrn485 = ([regex]::Matches($code486, 'ornament\s*=\s*"#')).Count
+if ($nOrn485 -ne 4) { $v485Bad += "(f) $nOrn485 of the four palettes declare an ornament colour - the box would have nothing to wear in the eras that do not, and paint() would leave it on the authored black (SPEC V485f, R166e, V53, V61)" }
+
+if ($v485Bad) { foreach ($b in ($v485Bad | Sort-Object -Unique)) { Fail "V485 $b" } }
+else { Pass "V485 the highlight centres what it covers, and the box shows itself as an authored 2px line that applyTheme paints from t.ornament and never resizes" }
+
+# ---- V486: the record's line is a control WE size, not text the host places ---------------
+# SPEC V486, I167, R167, B166, Q87, T1063..T1065. B164 fixed a step with two owners by giving
+# it one - and the owner it chose was the host: XP_LINE_H claimed to be the rendered line height
+# of the five columns, was never measured, and came out near 13.6 against the 16 that was
+# written. The five columns were five tall textEditors carrying every record as text, so where
+# record i landed was the host's answer and where its X landed was ours, and the two walked
+# apart about 5px a row until the thirteenth X pointed at a different purchase. This SDK reports
+# no text metric at all (SPEC R165b), so no integer could have been right. The record is a
+# <layout> of XP_ROW_H now with its labels centred in it: this check is what keeps it that way.
+$v486Bad  = @()
+$doc486   = Doc (Join-Path $dir "WoD20.9.lfm")
+$code489  = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+$COLS486  = @(@('dynXpType_', 'dynXpType'), @('dynXpTrait_', 'dynXpTrait'), @('dynXpLevel_', 'dynXpLevel'), @('dynXpCost_', 'dynXpCost'), @('dynXpWhen_', 'dynXpWhen'))
+
+# The two constants, read where the Lua declares them. They name AUTHORED XML now and the legs
+# below measure them against it - which is the whole difference from V483 (SPEC I167b).
+$line486 = -1
+$row486  = -1
+$mL486 = [regex]::Match($code489, 'local XP_LINE_H\s*=\s*(\d+);')
+if (-not $mL486.Success -or $code489 -notmatch 'local XP_ROW_H\s*=\s*2 \* XP_LINE_H;') { $v486Bad += "XP_LINE_H or XP_ROW_H is not declared on WoD20.9 - the row has nothing to be measured against (SPEC V209, V486a)" }
+else { $line486 = [int]$mL486.Groups[1].Value; $row486 = 2 * $line486 }
+
+# (a) one row is one AUTHORED layout, and its height is the step
+$tplRow486 = $doc486.SelectSingleNode("//template[@name='XpLogRow']/layout")
+$lbl486 = @()
+if ($null -eq $tplRow486) { $v486Bad += "(a) there is no <template name='XpLogRow'> with a layout in it - the record would be text the host lays out again, which is B166 (SPEC V486a, I167a)" }
+else {
+    $lbl486 = @($tplRow486.SelectNodes("label"))
+    $btn486 = @($tplRow486.SelectNodes("button"))
+    $rh486 = -1
+    [void][int]::TryParse($tplRow486.GetAttribute("height"), [ref]$rh486)
+    if ($lbl486.Count -ne 5) { $v486Bad += "(a) the row layout holds $($lbl486.Count) label(s), expected the 5 the log has columns (SPEC V486a)" }
+    if ($btn486.Count -ne 0) { $v486Bad += "(a) the row layout holds a button - it would need a layout of 765 inside the player's 751 scroll, and gui.ScrollBox has no property that refuses the horizontal bar that follows (SPEC I167a, R104, V478d)" }
+    if ($row486 -ge 0 -and $rh486 -ne $row486) { $v486Bad += "(a) the row layout is $($rh486)px tall and XP_ROW_H is $row486 - the step and the box it steps by would be two numbers again, which is what B164 cost (SPEC V486a)" }
+}
+
+# (b) THE CENTRE EQUATION, and it is the user's request whole (2026-09-08): the label is centred
+# in the row and the button is centred beside it, so both centres are the row's centre - for
+# record 1 and record 60 by the same construction, with nothing left to accumulate.
+$tplBtn486 = $doc486.SelectSingleNode("//template[@name='XpRevRow']/button")
+$rows486 = @($doc486.SelectNodes("//scrollBox[@name='xpLogScroll']/XpLogRow"))
+$btns486 = @($doc486.SelectNodes("//scrollBox[@name='xpLogScroll']/XpRevRow"))
+if ($null -eq $tplBtn486) { $v486Bad += "(b) the XpRevRow template has no button - there is nothing to centre against the row (SPEC V209)" }
+elseif ($rows486.Count -lt 1 -or $btns486.Count -ne $rows486.Count) { $v486Bad += "(b) the XML authors $($rows486.Count) row(s) and $($btns486.Count) button(s) - V473(b) counts them, and this leg cannot pair what is not paired (SPEC V209, V473b)" }
+else {
+    $bh486 = -1
+    [void][int]::TryParse($tplBtn486.GetAttribute("height"), [ref]$bh486)
+    if ($line486 -ge 0 -and $bh486 -ne $line486) { $v486Bad += "(b) the revert button is $($bh486)px tall and XP_LINE_H is $line486 - the constant names the button now, and a button of another height is a constant that names nothing (SPEC V486b, I167b)" }
+    $top486 = @{}
+    foreach ($r486 in $rows486) { $top486[[int]$r486.GetAttribute("num")] = [int]$r486.GetAttribute("top") }
+    $pads486 = @{}
+    foreach ($x486 in $btns486) {
+        $n486 = [int]$x486.GetAttribute("num")
+        if (-not $top486.ContainsKey($n486)) { $v486Bad += "(b) XpRevRow num=$n486 has no XpLogRow to sit in (SPEC V473b)"; continue }
+        $pads486[($([int]$x486.GetAttribute("top")) - $top486[$n486])] = $true
+    }
+    $seenPads486 = @($pads486.Keys)
+    if ($seenPads486.Count -ne 1) { $v486Bad += "(b) the buttons sit at $($seenPads486.Count) different offsets inside their rows ($($seenPads486 -join ', ')) - one of them is not centred on its record, and which one drifts with the row number (SPEC V486b)" }
+    elseif ($row486 -ge 0 -and $line486 -ge 0 -and ((2 * $seenPads486[0]) + $line486) -ne $row486) {
+        $got486 = (2 * $seenPads486[0]) + $line486
+        $v486Bad += "(b) 2 * $($seenPads486[0]) + XP_LINE_H makes $got486 and the row is $row486 tall - the button's centre and the row's centre are not the same centre, which is exactly what the user reported (SPEC V486b, I167b)"
+    }
+}
+
+# (c) the five labels ARE the five columns, read from both sides, and none authors a family
+$col486 = $doc486.SelectSingleNode("//textEditor[@name='dynXpType']")
+foreach ($p486 in $COLS486) {
+    $l486 = $doc486.SelectSingleNode("//template[@name='XpLogRow']/layout/label[@name='$($p486[0])" + '$(num)' + "']")
+    $g486 = $doc486.SelectSingleNode("//textEditor[@name='$($p486[1])']")
+    if ($null -eq $l486 -or $null -eq $g486) { $v486Bad += "(c) '$($p486[0])' or its ground column '$($p486[1])' is missing - a row cannot be measured against a column that is not there (SPEC V209)"; continue }
+    foreach ($at486 in @('left', 'width', 'horzTextAlign', 'fontSize')) {
+        if ($l486.GetAttribute($at486) -ne $g486.GetAttribute($at486)) { $v486Bad += "(c) the row label '$($p486[0])' authors $at486='$($l486.GetAttribute($at486))' and its ground column '$($p486[1])' authors '$($g486.GetAttribute($at486))' - the text would read beside the band it stands on (SPEC V486c, V383b)" }
+    }
+    if ($l486.HasAttribute("fontFamily")) { $v486Bad += "(c) the row label '$($p486[0])' authors a fontFamily - the era's serif does not reach the log (SPEC V486c, V483b as inherited)" }
+    if ($l486.GetAttribute("vertTextAlign") -ne 'center') { $v486Bad += "(c) the row label '$($p486[0])' is vertically aligned '$($l486.GetAttribute('vertTextAlign'))' and not 'center' - the whole point of the row being a control we size is that the line sits in the middle of it (SPEC V486b, I167b)" }
+    if ($l486.GetAttribute("top") -ne '0') { $v486Bad += "(c) the row label '$($p486[0])' opens at top='$($l486.GetAttribute('top'))' inside its row - a label that does not fill the row is not centred on the row (SPEC V486b)" }
+    if ($null -ne $tplRow486 -and $l486.GetAttribute("height") -ne $tplRow486.GetAttribute("height")) { $v486Bad += "(c) the row label '$($p486[0])' is $($l486.GetAttribute('height'))px tall inside a row of $($tplRow486.GetAttribute('height')) - same reason (SPEC V486b)" }
+}
+
+# (d) NO text metric anywhere in the log. This is the leg B166 bought: the "\n\n" joins are what
+# made the host the owner of where record i lands, and one of them coming back brings the drift
+# back with it.
+if ($code489 -match 'table\.concat\([a-z]+, "\\n\\n"\)') { $v486Bad += "(d) a log column is still joined with a blank line between records - that is the host laying out the rows again, and the X drifts about 5px a row away from the record it reverts (SPEC V486d, B166)" }
+foreach ($w486 in @('Type', 'Trait', 'Level', 'Cost', 'When')) {
+    if ($code489 -notmatch ('form\["dynXp' + $w486 + '_"\s*\.\. i\]\.text = ')) { $v486Bad += "(d) renderXPLedger does not write the $w486 column of row i into that row's own label - a column written any other way is a column the host places (SPEC V486d, I167a)" }
+    if ($code489 -match ('form\.dynXp' + $w486 + '\.text')) { $v486Bad += "(d) the Lua writes text into the '$w486' GROUND column - the five are the grey band each column reads on and nothing else, and text there would render under the rows (SPEC V486e, I167c)" }
+}
+
+# (e) the five columns are ground: full height, opening at 0, and what gives the scroll its reach
+$scr486 = $doc486.SelectSingleNode("//scrollBox[@name='xpLogScroll']")
+$mMin486 = [regex]::Match($code489, 'local XP_LOG_MIN_H\s*=\s*(\d+);')
+if ($null -eq $scr486 -or -not $mMin486.Success) { $v486Bad += "(e) xpLogScroll or XP_LOG_MIN_H is not there - the ground has no box to be measured against (SPEC V209)" }
+else {
+    $min486 = [int]$mMin486.Groups[1].Value
+    $sh486 = -1
+    [void][int]::TryParse($scr486.GetAttribute("height"), [ref]$sh486)
+    if ($min486 -ne $sh486) { $v486Bad += "(e) the ground floor is $min486 and the scroll box is $sh486 tall - ground shorter than its box leaves a seam, taller hangs a scrollbar off an EMPTY log, and V235 asks an empty log to have the shape of a full one (SPEC V486e, I167c)" }
+    foreach ($p486 in $COLS486) {
+        $g486 = $doc486.SelectSingleNode("//textEditor[@name='$($p486[1])']")
+        if ($null -eq $g486) { $v486Bad += "(e) the ground column '$($p486[1])' is gone - with it go the five grey bands and the scroll's reach, and there is no palette key that reproduces that shade (SPEC V486e, R167a, R167c)"; continue }
+        if ($g486.GetAttribute("top") -ne '0') { $v486Bad += "(e) the ground column '$($p486[1])' opens at top='$($g486.GetAttribute('top'))' - ground starts where the box starts (SPEC V486e)" }
+        if ([int]$g486.GetAttribute("height") -ne $min486) { $v486Bad += "(e) the ground column '$($p486[1])' authors height=$($g486.GetAttribute('height')) and the floor is $min486 - the XML has to read right before any Lua runs (SPEC V486e, V473c)" }
+    }
+}
+# The rows are drawn per record, so the reach is what the POOL can show and not what the ledger
+# holds: a 61st record has no row to scroll down to (SPEC I167d, Q87).
+if ($code489 -notmatch 'if shown > XP_REV_POOL then shown = XP_REV_POOL; end;') { $v486Bad += "(e) the content height is not capped at XP_REV_POOL - the scroll would run down to records that have no row to draw them (SPEC V486e, I167d)" }
+if ($code489 -notmatch 'if shown \* XP_ROW_H > h then h = shown \* XP_ROW_H; end;') { $v486Bad += "(e) the content height is not measured by XP_ROW_H - the ground and the rows would disagree about how tall a record is (SPEC V486e, I57)" }
+
+# (f) EVERY per-row control the renderer addresses is on the roster, and off the same constant
+# (SPEC B167, V473e). xpFind does not hand back the form - it walks the tree and returns a TABLE
+# holding exactly the controls whose names are in XP_LOG. A name left off is not a slower lookup,
+# it is nil, and the first record drawn indexes nil. Read from BOTH sides rather than listed
+# here: the renderer says which prefixes it uses and the roster has to carry them (SPEC V383b).
+# The ROSTER loop, and not the first loop over the pool that turns up: xpRowsHide and
+# xpRevButtons walk the same constant, and taking whichever came first would measure a body that
+# was never meant to name anything (SPEC V209).
+$body486 = $null
+foreach ($cand486 in [regex]::Matches($code489, '(?s)for i = 1, XP_REV_POOL, 1 do(.*?)end;')) {
+    if ($cand486.Groups[1].Value -match 'XP_LOG\[') { $body486 = $cand486.Groups[1].Value; break }
+}
+if ($null -eq $body486) { $v486Bad += "(f) there is no 'for i = 1, XP_REV_POOL' loop that writes into XP_LOG - the pool's names would be typed out and drift from the constant (SPEC V473e, V383b)" }
+else {
+    $used486 = @{}
+    foreach ($u486 in [regex]::Matches($code489, 'form\["([A-Za-z]+_)"\s*\.\. i\]')) { $used486[$u486.Groups[1].Value] = $true }
+    if ($used486.Count -lt 1) { $v486Bad += "(f) the renderer addresses no per-row control at all - the rows would never be written (SPEC V209, V486d)" }
+    foreach ($k486 in @($used486.Keys)) {
+        if ($body486 -notmatch ('XP_LOG\["' + [regex]::Escape($k486) + '"\s*\.\. i\]\s*= true;')) { $v486Bad += "(f) the renderer addresses form[`"$k486`" .. i] but '$k486' never joins the XP_LOG roster - xpFind returns only what the roster names, so that lookup is nil and the first record drawn indexes nil (SPEC B167, V486f, V473e)" }
+    }
+}
+
+if ($v486Bad) { foreach ($b in ($v486Bad | Sort-Object -Unique)) { Fail "V486 $b" } }
+else { Pass "V486 a record is an authored layout of XP_ROW_H with its five labels centred in it, the revert button is centred beside it by the same equation, the labels sit exactly on the five ground columns, no coordinate in the log is derived from rendered text any more, and the five columns are ground that fills the scroll box exactly" }
+
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }
