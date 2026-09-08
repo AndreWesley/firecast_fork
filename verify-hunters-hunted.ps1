@@ -18,6 +18,18 @@
 
 param([switch]$Build, [switch]$Quiet)
 
+# PowerShell 5.1 caps ONE scope at $MaximumVariableCount names, default 4096. This gate
+# names about nine variables per check and crossed 4096 at V478: run as -File it dies
+# mid-check with VariableOverflow, prints NO verdict and exits 1 without a single FAIL
+# line, while "& .erify-hunters-hunted.ps1" still printed ALL CHECKS PASSED - one gate
+# answering two ways depending on how it was called, which is SPEC B7 by another road.
+#
+# The ceiling is raised instead of splitting the checks into scopes ON PURPOSE: hundreds
+# of checks READ a variable an earlier check built, and a scope wrapper turns every one of
+# those reads into a silent nil - a no-op check that still prints ok (SPEC V20, B7).
+# 32768 is the documented maximum and leaves room for roughly 3000 more checks.
+$MaximumVariableCount = 32768
+
 $ErrorActionPreference = 'Stop'
 $plugin = Join-Path $PSScriptRoot "Plugins\Sheets\World of Darkness 20th Anniversary Edition"
 $dir    = Join-Path $plugin "WoD20th"
