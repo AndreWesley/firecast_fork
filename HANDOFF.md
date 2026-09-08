@@ -1,5 +1,42 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-07, fim da 196ª rodada)
+
+### O ESTADO EM UMA LINHA
+`/ck:spec` escreveu o **20º lote** (§I164, §Q84, §V482, §V483, §T1049…§T1052, §B163, §B164) & o
+build fechou **§T1049…§T1051** na MESMA rodada. Gate `-Build` VERDE, **11 mutações vermelhas no
+check certo & 1 sonda verde**. **INSTALADO 23:35:06** (2955662 B, mesmo size do `output/`), c/ o
+Firecast ABERTO. **Nada commitado.**
+
+### O QUE PEDIR, NESTA ORDEM
+1. **§T1052** (teste de tela do 20º lote, alíneas (a)(b)(c)) — & §T1041/§T1048 seguem `.`, do 18º
+   & do 19º. FECHAR & REABRIR a ficha antes: a versão velha fica na tela até isso.
+2. **§Q84.1** é a única pergunta aberta & o lote foi construído pela recomendação (`fontSize="12"`,
+   `XP_LINE_H` = 16). §T1052(b) é o que a responde: se o `X` da 10ª linha estiver fora, os **3**
+   números (`XP_LINE_H` · `XP_ROW_H` = 2× · `height` do botão) emendam JUNTOS, ⊥ um de cada vez.
+
+### O que virou código nesta rodada
+- **§T1049 `WoD20.9`** — 2 `refreshOrnament` no fim de `xpLogWidth`, sob 1 `if refreshOrnament ~= nil then`,
+  largura ENTREGUE (`xpWidth0.<k> + add`) & altura LIDA (autorada, nunca escrita).
+- **§T1050 `WoD20.9`** — `XP_LINE_H = 16` novo & `XP_ROW_H = 2 * XP_LINE_H`; `fontSize="12"` nas 5
+  colunas; os 5 `table.concat` viram `"\n\n"`; `XpRevRow` `height` 20 → **16**; os 60 `top` a passo **32**.
+- **§T1051 gate** — §V482 & §V483 NOVAS + 4 emendas de check velho: §V473b (o passo do `top` sai do
+  literal 20 & passa a ser lido de `XP_LINE_H`/`XP_ROW_H`), §V261a (`xpLogBox\.height` → exige o `=`:
+  a leitura nova da altura era falso positivo), §V472e (o 5º `table.concat` agora é `"\n\n"`),
+  §V478c (o `+ add` era contado solto & os 2 refresh o usam — passa a contar só as 5 escritas de largura).
+
+### ⚠ AS 2 COISAS QUE CUSTARAM
+1. **A causa raiz do §B163 nasceu ERRADA no 1º rascunho do spec.** "a moldura atualiza mas o box não"
+   foi lido como o `<scrollBox>` ⊥ aceitando `.width`; o user corrigiu — *"o que não atualiza são os
+   ornamentos"*. As 5 escritas de `xpLogWidth` estavam CERTAS o tempo todo; faltava `refreshOrnament`.
+   O lote inteiro (§I164a, §V482, §T1049, §B163) foi reescrito NO LUGAR antes de qualquer build.
+2. **O gate ⊥ roda com `-NoProfile`**: estoura `$MaximumVariableCount` (4096) em `$iSt478` (§V478,
+   linha ~22664) & morre ANTES dos checks do fim — um harness de mutação que rode `powershell -NoProfile
+   -File .\verify...` reporta VERDE em tudo que vem depois. Rodar in-process (`.\verify-hunters-hunted.ps1`)
+   ou sem `-NoProfile`.
+
+---
+
 ## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-07, fim da 195ª rodada)
 
 ### O ESTADO EM UMA LINHA

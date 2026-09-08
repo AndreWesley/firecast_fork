@@ -18,7 +18,18 @@
 			--
 			-- XP_LOG_MIN_H is the floor of the CONTENT now, not of the box - it keeps the empty
 			-- log the same shape as a full one (SPEC V235).
-			local XP_ROW_H    = 20;
+			-- The rendered line height of the five columns, at the fontSize they now author
+			-- (SPEC I164b, V483). MEASURED and not chosen: the SDK reports no text metrics, so
+			-- the number that has to hold is the one on screen (SPEC T1052b) - and it is the ONE
+			-- owner of the step, which is what B164 cost when the buttons had a step of their own.
+			local XP_LINE_H   = 16;
+
+			-- A log row is TWO text lines - the row and a blank one under it - because the revert
+			-- button has to sit ON its row and still be there sixty rows down (SPEC B164, user
+			-- 2026-09-07: "deve haver uma distancia entre um registro e outro que seja grande o
+			-- suficiente"). The columns are joined with "\n\n" for exactly this, and both halves
+			-- of the arithmetic live on this line so they cannot come apart.
+			local XP_ROW_H    = 2 * XP_LINE_H;
 			local XP_LOG_MIN_H = 470;
 
 			-- What the storyteller's column of X buttons is worth in width (SPEC I163b, V478b).
@@ -154,6 +165,25 @@
 				form.lblXpLogTitle.width = xpWidth0.title + add;
 				form.xpApplyBox.width    = xpWidth0.apply + add;
 				form.btnXpApply.width    = xpWidth0.button + add;
+
+				-- The ornament is drawn PER BOX, from the size the box had when it was painted
+				-- (SPEC I72d, V284): the two boxes just changed size and the filigree would keep
+				-- the shape it was born with, with nothing raised anywhere (SPEC B163). I72d used
+				-- to say the health track was the only box that moves at runtime; the 19th batch
+				-- made that false and no check noticed, which is why V482 counts these two.
+				--
+				-- The WIDTH is HANDED OVER rather than read back (SPEC V285c, B62): asking the box
+				-- how wide it is on this side of the write can still answer with the role it is
+				-- leaving, and the redraw then compares equal and skips. The HEIGHT is authored and
+				-- never written, so reading it is safe - the exact inverse of renderHealthTrack,
+				-- which hands the height it just wrote and reads the width it never touches.
+				--
+				-- Guarded because refreshOrnament is a GLOBAL living in WoD20.6's chunk, and that
+				-- script may not have run when this one did (SPEC V480e, T1044).
+				if refreshOrnament ~= nil then
+					refreshOrnament(form.xpLogBox, xpWidth0.box + add, form.xpLogBox.height);
+					refreshOrnament(form.xpApplyBox, xpWidth0.apply + add, form.xpApplyBox.height);
+				end;
 			end;
 
 			-- The APPLY box (SPEC I162f, I162h, V475d/e): shown once the initial character is
@@ -259,11 +289,11 @@
 				-- are. Nothing here writes a width (SPEC V235a).
 				form.dynXpEmpty.visible = false;
 
-				form.dynXpType.text  = table.concat(kinds, "\n");
-				form.dynXpTrait.text = table.concat(traits, "\n");
-				form.dynXpLevel.text = table.concat(levels, "\n");
-				form.dynXpCost.text  = table.concat(costs, "\n");
-				form.dynXpWhen.text  = table.concat(whens, "\n");
+				form.dynXpType.text  = table.concat(kinds, "\n\n");
+				form.dynXpTrait.text = table.concat(traits, "\n\n");
+				form.dynXpLevel.text = table.concat(levels, "\n\n");
+				form.dynXpCost.text  = table.concat(costs, "\n\n");
+				form.dynXpWhen.text  = table.concat(whens, "\n\n");
 
 				-- The columns grow, the box does not (SPEC I57). Past the floor this runs longer
 				-- than the scrollBox holding it, which is what puts a bar on the side instead of
@@ -330,7 +360,7 @@
 		     isStoryteller(). `top` is (num - 1) * XP_ROW_H, so button N sits on row N of the
 		     columns beside it; `X` is the glyph the ? box already closes with (SPEC Q82.5). -->
 		<template name="XpRevRow">
-			<button name="btnXpRev_$(num)" left="745" top="$(top)" width="20" height="20" text="X" visible="false" onClick="xpRevert(self, $(num));"/>
+			<button name="btnXpRev_$(num)" left="745" top="$(top)" width="20" height="16" text="X" visible="false" onClick="xpRevert(self, $(num));"/>
 		</template>
 		<!--
 			Progress tab (SPEC T106). Current Experience used to be an NDB mirror of the box on
@@ -479,76 +509,76 @@
 				the screen, not for the XML (SPEC R104).
 			-->
 			<scrollBox name="xpLogScroll" left="20" top="65" width="751" height="470">
-				<textEditor name="dynXpType" left="15" top="0" width="133" height="470" readOnly="true" opacity="0.75"/>
-				<textEditor name="dynXpTrait" left="158" top="0" width="200" height="470" readOnly="true" opacity="0.75"/>
-				<textEditor name="dynXpLevel" left="368" top="0" width="82" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-				<textEditor name="dynXpCost" left="460" top="0" width="45" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+				<textEditor name="dynXpType" left="15" top="0" width="133" height="470" readOnly="true" opacity="0.75" fontSize="12"/>
+				<textEditor name="dynXpTrait" left="158" top="0" width="200" height="470" readOnly="true" opacity="0.75" fontSize="12"/>
+				<textEditor name="dynXpLevel" left="368" top="0" width="82" height="470" readOnly="true" opacity="0.75" fontSize="12" horzTextAlign="center"/>
+				<textEditor name="dynXpCost" left="460" top="0" width="45" height="470" readOnly="true" opacity="0.75" fontSize="12" horzTextAlign="center"/>
 				<!-- The hour of the purchase (SPEC I162c, V472e): centred like the two figures, and
 				     220 wide so this band and the one above close on the same x (SPEC V247). -->
-				<textEditor name="dynXpWhen" left="515" top="0" width="220" height="470" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+				<textEditor name="dynXpWhen" left="515" top="0" width="220" height="470" readOnly="true" opacity="0.75" fontSize="12" horzTextAlign="center"/>
 				<!-- The storyteller's revert buttons, XP_REV_POOL of them, one per row (SPEC I162d,
 				     V473b): the rightmost children of the scroll, and what the 16px bar reserve
 				     and the box width are measured from (SPEC V247). -->
 				<XpRevRow num="1" top="0"/>
-				<XpRevRow num="2" top="20"/>
-				<XpRevRow num="3" top="40"/>
-				<XpRevRow num="4" top="60"/>
-				<XpRevRow num="5" top="80"/>
-				<XpRevRow num="6" top="100"/>
-				<XpRevRow num="7" top="120"/>
-				<XpRevRow num="8" top="140"/>
-				<XpRevRow num="9" top="160"/>
-				<XpRevRow num="10" top="180"/>
-				<XpRevRow num="11" top="200"/>
-				<XpRevRow num="12" top="220"/>
-				<XpRevRow num="13" top="240"/>
-				<XpRevRow num="14" top="260"/>
-				<XpRevRow num="15" top="280"/>
-				<XpRevRow num="16" top="300"/>
-				<XpRevRow num="17" top="320"/>
-				<XpRevRow num="18" top="340"/>
-				<XpRevRow num="19" top="360"/>
-				<XpRevRow num="20" top="380"/>
-				<XpRevRow num="21" top="400"/>
-				<XpRevRow num="22" top="420"/>
-				<XpRevRow num="23" top="440"/>
-				<XpRevRow num="24" top="460"/>
-				<XpRevRow num="25" top="480"/>
-				<XpRevRow num="26" top="500"/>
-				<XpRevRow num="27" top="520"/>
-				<XpRevRow num="28" top="540"/>
-				<XpRevRow num="29" top="560"/>
-				<XpRevRow num="30" top="580"/>
-				<XpRevRow num="31" top="600"/>
-				<XpRevRow num="32" top="620"/>
-				<XpRevRow num="33" top="640"/>
-				<XpRevRow num="34" top="660"/>
-				<XpRevRow num="35" top="680"/>
-				<XpRevRow num="36" top="700"/>
-				<XpRevRow num="37" top="720"/>
-				<XpRevRow num="38" top="740"/>
-				<XpRevRow num="39" top="760"/>
-				<XpRevRow num="40" top="780"/>
-				<XpRevRow num="41" top="800"/>
-				<XpRevRow num="42" top="820"/>
-				<XpRevRow num="43" top="840"/>
-				<XpRevRow num="44" top="860"/>
-				<XpRevRow num="45" top="880"/>
-				<XpRevRow num="46" top="900"/>
-				<XpRevRow num="47" top="920"/>
-				<XpRevRow num="48" top="940"/>
-				<XpRevRow num="49" top="960"/>
-				<XpRevRow num="50" top="980"/>
-				<XpRevRow num="51" top="1000"/>
-				<XpRevRow num="52" top="1020"/>
-				<XpRevRow num="53" top="1040"/>
-				<XpRevRow num="54" top="1060"/>
-				<XpRevRow num="55" top="1080"/>
-				<XpRevRow num="56" top="1100"/>
-				<XpRevRow num="57" top="1120"/>
-				<XpRevRow num="58" top="1140"/>
-				<XpRevRow num="59" top="1160"/>
-				<XpRevRow num="60" top="1180"/>
+				<XpRevRow num="2" top="32"/>
+				<XpRevRow num="3" top="64"/>
+				<XpRevRow num="4" top="96"/>
+				<XpRevRow num="5" top="128"/>
+				<XpRevRow num="6" top="160"/>
+				<XpRevRow num="7" top="192"/>
+				<XpRevRow num="8" top="224"/>
+				<XpRevRow num="9" top="256"/>
+				<XpRevRow num="10" top="288"/>
+				<XpRevRow num="11" top="320"/>
+				<XpRevRow num="12" top="352"/>
+				<XpRevRow num="13" top="384"/>
+				<XpRevRow num="14" top="416"/>
+				<XpRevRow num="15" top="448"/>
+				<XpRevRow num="16" top="480"/>
+				<XpRevRow num="17" top="512"/>
+				<XpRevRow num="18" top="544"/>
+				<XpRevRow num="19" top="576"/>
+				<XpRevRow num="20" top="608"/>
+				<XpRevRow num="21" top="640"/>
+				<XpRevRow num="22" top="672"/>
+				<XpRevRow num="23" top="704"/>
+				<XpRevRow num="24" top="736"/>
+				<XpRevRow num="25" top="768"/>
+				<XpRevRow num="26" top="800"/>
+				<XpRevRow num="27" top="832"/>
+				<XpRevRow num="28" top="864"/>
+				<XpRevRow num="29" top="896"/>
+				<XpRevRow num="30" top="928"/>
+				<XpRevRow num="31" top="960"/>
+				<XpRevRow num="32" top="992"/>
+				<XpRevRow num="33" top="1024"/>
+				<XpRevRow num="34" top="1056"/>
+				<XpRevRow num="35" top="1088"/>
+				<XpRevRow num="36" top="1120"/>
+				<XpRevRow num="37" top="1152"/>
+				<XpRevRow num="38" top="1184"/>
+				<XpRevRow num="39" top="1216"/>
+				<XpRevRow num="40" top="1248"/>
+				<XpRevRow num="41" top="1280"/>
+				<XpRevRow num="42" top="1312"/>
+				<XpRevRow num="43" top="1344"/>
+				<XpRevRow num="44" top="1376"/>
+				<XpRevRow num="45" top="1408"/>
+				<XpRevRow num="46" top="1440"/>
+				<XpRevRow num="47" top="1472"/>
+				<XpRevRow num="48" top="1504"/>
+				<XpRevRow num="49" top="1536"/>
+				<XpRevRow num="50" top="1568"/>
+				<XpRevRow num="51" top="1600"/>
+				<XpRevRow num="52" top="1632"/>
+				<XpRevRow num="53" top="1664"/>
+				<XpRevRow num="54" top="1696"/>
+				<XpRevRow num="55" top="1728"/>
+				<XpRevRow num="56" top="1760"/>
+				<XpRevRow num="57" top="1792"/>
+				<XpRevRow num="58" top="1824"/>
+				<XpRevRow num="59" top="1856"/>
+				<XpRevRow num="60" top="1888"/>
 			</scrollBox>
 
 			<!-- Why the log is empty, on a line of its own (SPEC I39, V235). Declared LAST because

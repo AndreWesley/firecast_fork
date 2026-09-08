@@ -10574,7 +10574,7 @@ $logScr  = $logDoc.SelectSingleNode("//layout[@name='xpLogBox']/scrollBox")
 $logCols = @($logDoc.SelectNodes("//textEditor") | Where-Object { $LEDGER_COLS -contains $_.GetAttribute("name") })
 
 # (a) nothing writes the box height any more, and the grower is gone by name
-if ($logCode -match 'xpLogBox\.height') { $scrBad += "xpLogBox.height is written from Lua - a box that grows with its rows is the request undone (SPEC V261a)" }
+if ($logCode -match 'xpLogBox\.height\s*=') { $scrBad += "xpLogBox.height is written from Lua - a box that grows with its rows is the request undone (SPEC V261a)" }
 if ($logCode -match 'xpLogHeight') { $scrBad += "xpLogHeight is back - it was the routine that grew the frame, and the columns' height has a writer of its own now (SPEC V261a)" }
 
 # (b) the four columns hang off ONE scrollBox
@@ -22344,7 +22344,7 @@ if (-not $v472Bad) {
     if ($xp9c472 -match 'sheet\.xpWhen') { $v472Bad += "(d) WoD20.9 reads sheet.xpWhen - the renderer draws rows[i].when and the walk is the one reader (SPEC V472d)" }
     # (e) drawn by renderXPLedger from what was stored, in the reader's order; never from the clock
     if ($xp9c472 -match 'os\.date') { $v472Bad += "(e) WoD20.9 calls os.date - the hour of a render is now, not when (SPEC V472e)" }
-    if ($xp9c472 -notmatch 'form\.dynXpWhen\.text\s*=\s*table\.concat\(whens, "\\n"\);') { $v472Bad += "(e) renderXPLedger does not write the fifth column from the rows (SPEC V472e, I162c)" }
+    if ($xp9c472 -notmatch 'form\.dynXpWhen\.text\s*=\s*table\.concat\(whens, "\\n\\n"\);') { $v472Bad += "(e) renderXPLedger does not write the fifth column from the rows (SPEC V472e, I162c)" }
     if ($xp9c472 -notmatch 'if r\.when == nil then\s+whens\[i\] = "-";\s+elseif lang == "pt" then\s+whens\[i\] = \(string\.gsub\(r\.when, "\^\(%d\+\)-\(%d\+\)-\(%d\+\)", "%3/%2/%1"\)\);\s+else\s+whens\[i\] = r\.when;') { $v472Bad += "(e) the hour is not drawn as - when unstamped, day-first in pt and as stored in en (SPEC V472e, Q82.2)" }
 }
 if ($v472Bad) { foreach ($b in $v472Bad) { Fail "V472 $b" } }
@@ -22370,6 +22370,16 @@ else {
     if ($null -eq $scr473.SelectSingleNode("textEditor[@name='dynXpWhen']")) { $v473Bad += "(a) dynXpWhen is not a direct child of xpLogScroll - a column outside it does not scroll with its row (SPEC V261b)" }
     if ($null -ne $scr473.SelectSingleNode(".//label[@text='Date/Time']")) { $v473Bad += "(a) the Date/Time heading sits inside the scrollBox - a heading that scrolls is a log without one (SPEC V261c)" }
     if ($null -eq $doc473.SelectSingleNode("//layout[@name='xpLogBox']/label[@text='Date/Time']")) { $v473Bad += "(a) the Date/Time heading is not a child of xpLogBox beside the four it joins (SPEC I162c)" }
+    # The step of a row is the LOG's and not the button's: XP_ROW_H is TWO rendered text lines,
+    # because the columns are joined with a blank line between rows so the button has somewhere
+    # to sit (SPEC I164b, V483c, B164). Read here rather than repeated, or amending the pitch
+    # leaves the pool behind - which is the second owner B164 was.
+    $lineH473 = 0
+    $mLine473 = [regex]::Match($code473, 'local XP_LINE_H\s*=\s*(\d+);')
+    if ($mLine473.Success -and $code473 -match 'local XP_ROW_H\s*=\s*2 \* XP_LINE_H;') { $lineH473 = [int]$mLine473.Groups[1].Value }
+    $step473 = $lineH473 * 2
+    if ($step473 -lt 1) { $v473Bad += "(b) the row step could not be read off XP_LINE_H and XP_ROW_H on WoD20.9 - this leg would measure all sixty buttons against zero (SPEC V209, V483c)" }
+
     # (b) pool count == XP_REV_POOL, each instance on its own row and naming its own row
     $inst473 = @($scr473.SelectNodes("XpRevRow"))
     if ($inst473.Count -ne $pool473) { $v473Bad += "(b) the XML authors $($inst473.Count) XpRevRow instance(s) and XP_REV_POOL says $pool473 - a row past the constant has no button and a button past the rows has no row (SPEC V473b)" }
@@ -22379,7 +22389,7 @@ else {
         $t473 = [int]$i473.GetAttribute("top")
         if ($seen473.ContainsKey($n473)) { $v473Bad += "(b) XpRevRow num=$n473 is authored twice" }
         $seen473[$n473] = $true
-        if ($t473 -ne (($n473 - 1) * 20)) { $v473Bad += "(b) XpRevRow num=$n473 sits at top=$t473 and row $n473 of the columns is at $(($n473 - 1) * 20) - the button would revert the line beside another row (SPEC V473b)" }
+        if ($step473 -ge 1 -and $t473 -ne (($n473 - 1) * $step473)) { $v473Bad += "(b) XpRevRow num=$n473 sits at top=$t473 and row $n473 of the columns is at $(($n473 - 1) * $step473) - the button would revert the line beside another row (SPEC V473b as amended, V483d)" }
     }
     for ($n473 = 1; $n473 -le $pool473; $n473++) { if (-not $seen473.ContainsKey($n473)) { $v473Bad += "(b) XpRevRow num=$n473 is missing - a hole in the pool is a row with no button (SPEC V473b)" } }
     if ($tpl473.GetAttribute("name") -ne 'btnXpRev_$(num)') { $v473Bad += "(b) the pool button is named '$($tpl473.GetAttribute('name'))' and not btnXpRev_ plus its num - the renderer lights them by that name (SPEC V473e)" }
@@ -22643,7 +22653,7 @@ else {
     foreach ($w478 in @('xpLogBox', 'xpLogScroll', 'lblXpLogTitle', 'xpApplyBox', 'btnXpApply')) {
         if ($body478 -notmatch ('form\.' + $w478 + '\.width\s*=')) { $v478Bad += "(c) xpLogWidth does not write $w478.width - the five move together or the two bands stop closing on one x (SPEC V478c, V247)" }
     }
-    $nAdd478 = ([regex]::Matches($body478, '\+ add')).Count
+    $nAdd478 = ([regex]::Matches($body478, '\.width\s*=\s*xpWidth0\.\w+ \+ add;')).Count
     if ($nAdd478 -ne 5) { $v478Bad += "(c) xpLogWidth adds the role's width $nAdd478 time(s), expected 5 (SPEC V478c)" }
     if ($body478 -notmatch 'local add = st and XP_REV_W or 0;') { $v478Bad += "(c) the widening is not 'st and XP_REV_W or 0' - the storyteller's extra width is the named constant (SPEC V478c, V478b)" }
 }
@@ -22723,4 +22733,102 @@ foreach ($f480 in $files) { foreach ($dl480 in (Doc $f480.FullName).SelectNodes(
 if ($v480Bad) { foreach ($b in $v480Bad) { Fail "V480 $b" } }
 else { Pass "V480 all four palettes name a pending dot, the rule lives in xpDotArt alone, every write goes through paint/authored, and the pending set is derived once per event" }
 
+# ---- V482: a box that changes size at runtime redraws its ornament in the SAME function ----
+# SPEC V482, I164a, B163, T1049. I72d used to say the health track was the only section box on
+# the sheet whose size moves at runtime. The 19th batch made that false - xpLogWidth widens the
+# log box and the APPLY box when the reader turns out to be the storyteller - and the ornament
+# kept the size it was painted at, with nothing raised and every check green. V284 guards the
+# health path; this guards the other two, and (c) guards the NEXT one.
+$v482Bad = @()
+$code482 = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+$fn482   = LuaFn $code482 'xpLogWidth'
+if (-not $fn482) { $v482Bad += "xpLogWidth is gone from WoD20.9 - the resize this check guards does not exist (SPEC V209)" }
+else {
+    # (a) two calls, both AFTER the last width write, both handed the value that was WRITTEN
+    $calls482 = @([regex]::Matches($fn482, 'refreshOrnament\s*\('))
+    if ($calls482.Count -ne 2) { $v482Bad += "(a) xpLogWidth calls refreshOrnament $($calls482.Count) time(s), expected the 2 boxes it resizes - a box widened without a redraw keeps the filigree it was born with (SPEC I164a, B163)" }
+    $lastW482 = $fn482.LastIndexOf('= xpWidth0.')
+    if ($lastW482 -lt 0) { $v482Bad += "(a) no width write was found in xpLogWidth - this leg has no order to measure (SPEC V209)" }
+    else {
+        foreach ($c482 in $calls482) {
+            if ($c482.Index -lt $lastW482) { $v482Bad += "(a) a refreshOrnament call sits BEFORE the last width write - the frame would be rebuilt to the measure the box is leaving, and exit 0 doing it (SPEC V284b, V482a)" }
+        }
+    }
+    foreach ($need482 in @('refreshOrnament(form.xpLogBox, xpWidth0.box + add, form.xpLogBox.height);', 'refreshOrnament(form.xpApplyBox, xpWidth0.apply + add, form.xpApplyBox.height);')) {
+        if (-not $fn482.Contains($need482)) { $v482Bad += "(a) the call '$need482' is not there as written - the width has to be the value HANDED over and never one read back off the control, which is half of what B62 cost (SPEC V285c, V482a)" }
+    }
+    if ($fn482 -match 'refreshOrnament\([^)]*\.width') { $v482Bad += "(a) a refresh reads .width back off the box - on this side of the write the host can still answer with the role the box is LEAVING, and the redraw then compares equal and skips (SPEC V285c, B62)" }
+    # (b) the guard: refreshOrnament is a global in WoD20.6's chunk, which may not have run yet
+    if (-not $fn482.Contains('if refreshOrnament ~= nil then')) { $v482Bad += "(b) the calls are not guarded by 'if refreshOrnament ~= nil then' - WoD20.6's script may not have run when this one did (SPEC V482b, V480e)" }
+    # (d) a label and a button carry no ornament - it lives on a layout's align=client backdrop
+    foreach ($not482 in @('lblXpLogTitle', 'btnXpApply')) {
+        if ($fn482 -match ('refreshOrnament\(form\.' + $not482)) { $v482Bad += "(d) refreshOrnament is called on $not482 - the ornament lives on a layout's align=client backdrop and neither a label nor a button has one (SPEC V482d, V285a)" }
+    }
+}
+# (c) the CENSUS, and the leg that catches the RECURRENCE: every ornamented layout that Lua
+# resizes by name, anywhere in the twelve .lfm, has to be one of the two xpLogWidth redraws.
+# A new box that starts moving at runtime turns up here before its filigree is caught crooked.
+$orn482 = @{}
+foreach ($f482 in $files) {
+    foreach ($ly482 in (Doc $f482.FullName).SelectNodes("//layout[@name]")) {
+        if ($null -ne $ly482.SelectSingleNode("rectangle[@align='client']")) { $orn482[$ly482.GetAttribute("name")] = $true }
+    }
+}
+if ($orn482.Count -lt 8) { $v482Bad += "(c) only $($orn482.Count) named ornamented layout(s) were found across the sheet - this leg is covering less than the sheet has (SPEC V209)" }
+$written482 = @{}
+foreach ($f482 in $files) {
+    foreach ($w482 in [regex]::Matches((NoComments (CodeOf $f482.FullName)), 'form\.(\w+)\.(?:width|height)\s*=')) {
+        if ($orn482.ContainsKey($w482.Groups[1].Value)) { $written482[$w482.Groups[1].Value] = $true }
+    }
+}
+foreach ($n482 in $written482.Keys) {
+    if ($n482 -ne 'xpLogBox' -and $n482 -ne 'xpApplyBox') { $v482Bad += "(c) '$n482' is an ornamented box whose size is written from Lua and it is not one of the two xpLogWidth redraws - its filigree would keep the size it was painted at (SPEC V482c, I72d, B163)" }
+}
+foreach ($n482 in @('xpLogBox', 'xpApplyBox')) {
+    if (-not $written482.ContainsKey($n482)) { $v482Bad += "(c) '$n482' is no longer resized from Lua by name - if the role width is gone this whole check is measuring nothing (SPEC V209)" }
+}
+if ($v482Bad) { foreach ($b in ($v482Bad | Sort-Object -Unique)) { Fail "V482 $b" } }
+else { Pass "V482 the two boxes xpLogWidth resizes are the only ornamented boxes Lua resizes by name, and both are redrawn after the write, from the measurement they are handed, under the global's guard" }
+
+# ---- V483: the log's row step has ONE owner and the revert button fits inside it ----------
+# SPEC V483, I164b, B164, T1050. The step used to be owned twice: XP_ROW_H placed AND sized the
+# sixty X buttons, and the rendered line height of the five columns - a host default nobody
+# authored - placed the rows. Two owners of one measure is an error that ACCUMULATES: the first
+# line matches and the thirtieth does not. The step is two rendered lines now, so the button
+# covers its own line and has a blank one under it in every state.
+$v483Bad  = @()
+$doc483   = Doc (Join-Path $dir "WoD20.9.lfm")
+$code483  = NoComments (CodeOf (Join-Path $dir "WoD20.9.lfm"))
+$cols483  = @('dynXpType', 'dynXpTrait', 'dynXpLevel', 'dynXpCost', 'dynXpWhen')
+$nodes483 = @($doc483.SelectNodes("//textEditor") | Where-Object { $cols483 -contains $_.GetAttribute("name") })
+if ($nodes483.Count -ne 5) { $v483Bad += "found $($nodes483.Count) of the five log columns on WoD20.9 - this check is reading a tab that is not there any more (SPEC V209)" }
+else {
+    # (a) all five author the SAME fontSize - a column in another body reads the row at another y
+    $sizes483 = @($nodes483 | ForEach-Object { $_.GetAttribute("fontSize") } | Sort-Object -Unique)
+    if ($sizes483 -contains '') { $v483Bad += "(a) a log column authors no fontSize - the step of the rows would go back to being a host default nobody owns, which is what B164 cost (SPEC V483a)" }
+    elseif ($sizes483.Count -ne 1) { $v483Bad += "(a) the five log columns author $($sizes483.Count) different fontSize values - a column in another body reads the same row at another y (SPEC V483a, V261b)" }
+    # (b) and none authors a FAMILY: applyTheme paints only what was authored, so a family here
+    # would let the era's serif into the log and move the step from era to era
+    foreach ($c483 in $nodes483) {
+        if ($c483.GetAttribute("fontFamily")) { $v483Bad += "(b) a log column authors a fontFamily - applyTheme paints only what was authored, so the era's serif would reach the log and the step would move with the era (SPEC V483b, V53)" }
+    }
+}
+# (c) the step is TWO rendered lines, and both halves of that arithmetic live in one place
+if ($code483 -notmatch 'local XP_ROW_H\s*=\s*2 \* XP_LINE_H;') { $v483Bad += "(c) XP_ROW_H is not written as 2 * XP_LINE_H - the step and the line it is made of would be two numbers again (SPEC V483c, B164)" }
+$mLine483 = [regex]::Match($code483, 'local XP_LINE_H\s*=\s*(\d+);')
+if (-not $mLine483.Success) { $v483Bad += "(c) XP_LINE_H is not declared as a literal on WoD20.9 - there is no owner of the line height for the button to be measured against (SPEC V483c, V209)" }
+foreach ($p483 in @('kinds', 'traits', 'levels', 'costs', 'whens')) {
+    if (-not $code483.Contains('table.concat(' + $p483 + ', "\n\n");')) { $v483Bad += "(c) the '$p483' column is not joined with a blank line between rows - one column single-spaced inside a double-spaced step is exactly the misalignment this check exists to stop (SPEC V483c)" }
+}
+# (d) the button is exactly as tall as the line it covers. The instance STEP is V473(b)'s, and
+# it is measured there off these same two constants.
+$tpl483 = $doc483.SelectSingleNode("//template[@name='XpRevRow']/button")
+if ($null -eq $tpl483) { $v483Bad += "(d) the XpRevRow template has no button - there is nothing to align (SPEC V209)" }
+elseif ($mLine483.Success -and [int]$tpl483.GetAttribute("height") -ne [int]$mLine483.Groups[1].Value) {
+    $v483Bad += "(d) the revert button is $($tpl483.GetAttribute('height'))px tall and a log line is $($mLine483.Groups[1].Value)px - a button that does not match its line is the one the user called 'um pouco grande', and it drifts row by row (SPEC V483d, B164)"
+}
+# (e) the content height is measured by the SAME step
+if ($code483 -notmatch '#rows \* XP_ROW_H \+ 12') { $v483Bad += "(e) the column height is not measured by XP_ROW_H - the content and the buttons would disagree about how tall a row is (SPEC V483e, I57)" }
+if ($v483Bad) { foreach ($b in ($v483Bad | Sort-Object -Unique)) { Fail "V483 $b" } }
+else { Pass "V483 the five log columns author one fontSize and no family, the step is two of those lines, every column is joined with the blank line that makes it, and the revert button is exactly one line tall" }
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }
