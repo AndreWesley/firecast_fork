@@ -23169,4 +23169,34 @@ else {
 if ($v486Bad) { foreach ($b in ($v486Bad | Sort-Object -Unique)) { Fail "V486 $b" } }
 else { Pass "V486 a record is an authored layout of XP_ROW_H with its five labels centred in it, the revert button is centred beside it by the same equation, the labels sit exactly on the five ground columns, no coordinate in the log is derived from rendered text any more, and the five columns are ground that fills the scroll box exactly" }
 
+# ---- V487: ONE Lua environment per form INSTANCE (SPEC I168, B169, R168) ---------------------
+# Firecast opens each character sheet as its own instance of frmWoD20th, and the rdk compiler
+# copies the root CDATA - tab scripts included - into constructNew_frmWoD20th() right under
+# `local sheet = nil;` (MEASURED in output/rdkObjs/WoD20th/WoD20th.lfm.lua:13-19, B169). Every
+# `function name()` in it is a global the newest instance overwrites, closing over ITS `sheet`:
+# with two sheets open every renderer and guard on the older tab read the newer character.
+# The one line that isolates them is the _ENV rebind, and it only works as the FIRST statement
+# of the script - a global assigned above it lands in _G and is shared again (SPEC I168a).
+$v487Bad = @()
+$cdata487 = [regex]::Match($rootTxt, '(?s)<script>\s*<!\[CDATA\[(.*?)\]\]>\s*</script>')
+if (-not $cdata487.Success) { $v487Bad += "the root <script> CDATA was not found - nothing below reads anything (SPEC V20, V209)" }
+else {
+    $code487 = NoComments $cdata487.Groups[1].Value
+    $first487 = @($code487 -split "`r?`n" | Where-Object { $_.Trim().Length -gt 0 } | Select-Object -First 1)
+    if ($first487.Count -eq 0) { $v487Bad += "the root script is empty once comments are stripped - the check reads nothing (SPEC V20)" }
+    elseif ($first487[0].Trim() -ne 'local _ENV = setmetatable({}, { __index = _G });') { $v487Bad += "(a) the first statement of the root script is '$($first487[0].Trim())' and not the _ENV rebind - every global below it is shared by all open sheets again, and the newest one wins (SPEC I168a, B169)" }
+
+    # (b) exactly once across the sheet: a second rebind in a tab script would nest an
+    # environment inside this one and split the globals in two (SPEC I168a).
+    $envCount487 = 0
+    foreach ($f487 in $files) { $envCount487 += [regex]::Matches((NoComments (CodeOf $f487.FullName)), '\blocal _ENV\b').Count }
+    if ($envCount487 -ne 1) { $v487Bad += "(b) 'local _ENV' is declared $envCount487 time(s) across the sheet and the rule is exactly one, at the top of the root script (SPEC I168a, V487b)" }
+
+    # (c) Lua 5.4: setfenv/getfenv do not exist there, and a call is a nil index at load with
+    # no message - a dead sheet (SPEC R168a).
+    if ($code487 -match '\b(setfenv|getfenv)\s*\(') { $v487Bad += "(c) the root script calls setfenv/getfenv - Firecast runs Lua 5.4 and neither exists there (SPEC R168a)" }
+}
+if ($v487Bad) { foreach ($b in $v487Bad) { Fail "V487 $b" } }
+else { Pass "V487 the root script opens with the per-instance _ENV rebind, declared once across the sheet, and no setfenv is called (SPEC I168, B169)" }
+
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

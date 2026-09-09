@@ -2,6 +2,26 @@
 <form name="frmWoD20th" formType="sheetTemplate" dataType="AndreOliveira.Styllern.WoD20th" title="World of Darkness 20th Anniversary Edition" align="client" theme="dark">
 	<script>
 		<![CDATA[
+			-- ONE Lua environment per form INSTANCE (SPEC I168, B169, R168). Firecast opens every
+			-- character sheet as its own instance of this form, and the compiler copies this whole
+			-- CDATA - the tab scripts included - into the body of constructNew_frmWoD20th(), right
+			-- under `local sheet = nil;`. Every `function name()` below is therefore a GLOBAL that
+			-- the newest instance overwrites, closing over ITS `sheet`: with two sheets open, every
+			-- renderer, price and guard called from the older tab read and wrote the newer character.
+			-- The speciality pickers (repainted on show) and the storyteller flags read at click time
+			-- (`stFreeBuy`, SPEC B168) were where it showed.
+			--
+			-- Rebinding _ENV to a fresh table that falls back to _G makes every global this script
+			-- writes land in a table of this instance alone, and every closure created after this
+			-- line - the event listeners the compiler emits below the script included - looks names
+			-- up there first. The SDK globals (gui, NDB, Log, setTimeout, require) still come from _G
+			-- through the fallback. Lua 5.4 (Firecast ships lua54x64.dll; setfenv does not exist),
+			-- and it MUST be the first statement: a global assigned above it would land in _G and be
+			-- shared by every open sheet again (SPEC V487a).
+			--
+			-- It costs one chunk-scope local (SPEC V347): tabRootOf gave its slot back for it.
+			local _ENV = setmetatable({}, { __index = _G });
+
 			-- Every field write this sheet makes to ITSELF goes through here (SPEC V122).
 			--
 			-- Writing a value that is already there is not free: it wakes every dataLink on
@@ -2191,7 +2211,11 @@
 			-- Tabs are found by walking from the root and matching names, not by form.<name>:
 			-- the calls come from WoD20.10 (the checkboxes) and WoD20.6 (the language switch), and a
 			-- tab form cannot reach its siblings (SPEC R.9 / B.9).
-			local function tabRootOf(ctrl)
+			--
+			-- GLOBAL since the 200th round, not local: its chunk slot went to the _ENV line at the top
+			-- of this script (SPEC I168b, V347), and with one environment per instance a global is the
+			-- same scope a chunk local was.
+			function tabRootOf(ctrl)
 				local p = ctrl;
 
 				while true do

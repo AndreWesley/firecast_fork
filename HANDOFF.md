@@ -1,5 +1,40 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## ⚠ 200ª RODADA (2026-09-08, §B169) — 1 AMBIENTE LUA POR FICHA ABERTA. LEIA ANTES DE TUDO
+
+O user relatou na tela: *"os pickers de specialties, quando eu mudo de uma ficha pra outra pelas
+abas do firecast, não estão atualizando… o mesmo com os checkboxes da aba do storyteller… mostram
+os valores dos personagens errados"*. **Causa (§B169, MEDIDA no GERADO):** o CDATA do root — & os
+`<script>` das abas — é copiado p/ dentro de `constructNew_frmWoD20th()`, logo abaixo de
+`local sheet = nil;`. Cada `function nome()` é GLOBAL & a instância mais nova sobrescreve,
+fechando sobre o `sheet` DELA. O Firecast abre **1 instância por ficha** ∴ c/ 2 fichas, todo
+global (`renderSpecialities`, `applyTabVisibility`, `xpClick`, `setField`, `mfOpen`…) lê/escreve
+o nó da ÚLTIMA aberta. Os listeners (`self` = form da própria instância, §R134) & o que o XML liga
+por `field=` seguem certos — por isso "os outros pickers estão ok" (só pintam no `onNodeReady`).
+**§B168 (causa `?`, `Edit dots freely` ON abrindo "Experiência insuficiente") é o MESMO bug**:
+`sheet.stFreeBuy` lido da outra ficha.
+
+**Conserto (§I168, §T1067):** **1 linha**, 1º statement do CDATA de `WoD20th.lfm`:
+`local _ENV = setmetatable({}, { __index = _G });` (Lua 5.4 — o Firecast carrega
+`lua54x64.dll`, §R168a; `setfenv` ⊥ ∃). Custou 1 local de chunk & o root estava em 50 = teto
+do §V347 ∴ `tabRootOf` virou global (mesmo escopo c/ 1 ambiente por instância). **§V487 NOVA**
+(1º statement, 1 só no sheet, 0 `setfenv`), 3 mutações VERMELHAS + sonda VERDE.
+
+Gate `-Build` VERDE 20:22, **INSTALADO 20:22:56** (3012986 B, = `output/`), c/ o Firecast ABERTO. **Nada commitado.**
+
+**O QUE PEDIR:** **§T1068** [USER] — teste de tela c/ **2 fichas** abertas (B por último): (a)
+especializações de A ao voltar p/ A; (b) `Show Numina` na Storyteller de A mexe só em A; (c) §B168
+c/ flags diferentes nas 2; (d) picker de clã/merit em A grava em A; (e) fechar B & seguir em A.
+Depois §T1066 (23º lote) & os §T1062/§T1058 que seguem `.` (parte SUPERADA, ver abaixo).
+
+**REGRA nova (vale p/ toda sessão):** "form único" era premissa, ⊥ medida (§B168 escreveu
+`form único: sheet é upvalue`). Toda vez que um global do sheet ler `sheet`, a pergunta é
+"de QUAL instância?" — & a resposta agora é "da que está rodando", por causa do `_ENV`. Não
+religar `sheet` por argumento, não prefixar handler c/ bind, não "recarregar no onShow"
+(§I168d/§R168: rejeitados, o dataLink de ficha escondida continuaria errado).
+
+---
+
 ## ⚠ CORREÇÃO DENTRO DA 199ª RODADA (2026-09-08, §B167) — LEIA JUNTO COM A SEÇÃO ABAIXO
 
 O 23º lote foi instalado quebrado & o user pegou na tela: *"ta dando erros quando tentei gastar
