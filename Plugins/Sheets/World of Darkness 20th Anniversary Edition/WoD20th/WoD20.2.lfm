@@ -87,12 +87,19 @@
 			edt* beside it: ONE field, TWO widgets, ONE visible, which is exactly the pair the
 			sheet already runs for cboClanFamily/edtClanFamily (SPEC I107a1, I71, V274).
 
+			The picker is also the row's drag HANDLE, in both templates (SPEC I174b, V508b): press,
+			move 4px and the whole dragRow_<field> layout around it follows the pointer, up or
+			down only. onClick is guarded by rowDragAte() because the host fires it on the release
+			with the pointer still over the button - it travelled with the row - so without the
+			guard every drop would open the search box. The tooltip shares onMouseMove and only
+			runs while no drag is armed.
+
 			NOTHING may be commented INSIDE a <template> - rdk exits 1 with an empty message and
 			deletes the .rpk (SPEC B19).
 		-->
 		<template name="MeritPicked">
 			<button name="btnQmerit_$(num)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Merit', sheet['merit_$(num)'], '$(sub)', 'merit_$(num)');"/>
-			<button name="dynMerit_$(num)" left="20" top="0" width="264" height="24" text="$(lbl)" onClick="mfOpen(self, 'merit_$(num)', '$(sub)', 'Merit');" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'dynMerit_$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<button name="dynMerit_$(num)" left="20" top="0" width="264" height="24" text="$(lbl)" onClick="if not rowDragAte() then mfOpen(self, 'merit_$(num)', '$(sub)', 'Merit'); end;" onStartDrag="rowDragStart(self, drag, x, y, event, '$(sub)', 'merit_$(num)');" onMouseDown="rowDragDown(self, event, '$(sub)', 'merit_$(num)');" onMouseUp="rowDragUp(self, event);" onMouseMove="if not rowDragMove(self, event) then noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'dynMerit_$(num)'); end;" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edtMerit_$(num)" left="20" top="0" width="264" height="24" field="merit_$(num)" visible="false" enabled="false"/>
 			<button name="btnNmerit_$(num)" left="284" top="0" width="20" height="20" text="!" onClick="noteOpen(self, '$(sub)', 'merit_$(num)');"/>
 			<edit left="304" top="0" width="117" height="24" field="book_$(num)" readOnly="true" opacity="0.75"/>
@@ -114,7 +121,7 @@
 		-->
 		<template name="OpenAbility">
 			<button name="btnQ$(field)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Background', sheet['$(field)'], nil, '$(field)');"/>
-			<button name="dyn$(field)" left="20" top="0" width="170" height="25" text="Select Background" onClick="mfOpen(self, '$(field)', 'background', 'Background');" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dyn$(field)');" onMouseLeave="noteTipLeave(self);"/>
+			<button name="dyn$(field)" left="20" top="0" width="170" height="25" text="Select Background" onClick="if not rowDragAte() then mfOpen(self, '$(field)', 'background', 'Background'); end;" onStartDrag="rowDragStart(self, drag, x, y, event, 'background', '$(field)');" onMouseDown="rowDragDown(self, event, 'background', '$(field)');" onMouseUp="rowDragUp(self, event);" onMouseMove="if not rowDragMove(self, event) then noteTipMove(self, event, 'background', '$(field)', 'dyn$(field)'); end;" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edt$(field)" left="20" top="0" width="170" height="25" field="$(field)" visible="false" enabled="false"/>
 			<button name="btnN$(field)" left="190" top="0" width="20" height="20" text="!" onClick="noteOpen(self, 'background', '$(field)');"/>
 			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
@@ -148,72 +155,77 @@
 
 		     The row count lives in BACKGROUND_ROWS on the root form (SPEC V145). A row added
 		     here and nowhere else would be a background nothing prices: free, and invisible
-		     in the log. -->
+		     in the log.
+
+		     Every row layout here, in MERITS and in FLAWS is named dragRow_<field> (SPEC I174a):
+		     a drag moves it by top and never moves its data, and the top written here is the
+		     factory order - what a sheet with no orderBackground/orderMerit/orderFlaw shows.
+		     One pitch per box (30 here, 25 in the other two), the one ROW_LISTS reads. -->
 		<layout left="0" top="0" width="384" height="679">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="344" height="20" text="BACKGROUNDS" horzTextAlign="center"/>
 
-			<layout left="20" top="36" width="340" height="25" >
+			<layout name="dragRow_background_1" left="20" top="36" width="340" height="25" >
 				<OpenAbility field="background_1"/>
 			</layout>
-			<layout left="20" top="66" width="340" height="25" >
+			<layout name="dragRow_background_2" left="20" top="66" width="340" height="25" >
 				<OpenAbility field="background_2"/>
 			</layout>
-			<layout left="20" top="96" width="340" height="25" >
+			<layout name="dragRow_background_3" left="20" top="96" width="340" height="25" >
 				<OpenAbility field="background_3"/>
 			</layout>
-			<layout left="20" top="126" width="340" height="25" >
+			<layout name="dragRow_background_4" left="20" top="126" width="340" height="25" >
 				<OpenAbility field="background_4"/>
 			</layout>
-			<layout left="20" top="156" width="340" height="25" >
+			<layout name="dragRow_background_5" left="20" top="156" width="340" height="25" >
 				<OpenAbility field="background_5"/>
 			</layout>
-			<layout left="20" top="186" width="340" height="25" >
+			<layout name="dragRow_background_6" left="20" top="186" width="340" height="25" >
 				<OpenAbility field="background_6"/>
 			</layout>
-			<layout left="20" top="216" width="340" height="25" >
+			<layout name="dragRow_background_7" left="20" top="216" width="340" height="25" >
 				<OpenAbility field="background_7"/>
 			</layout>
-			<layout left="20" top="246" width="340" height="25" >
+			<layout name="dragRow_background_8" left="20" top="246" width="340" height="25" >
 				<OpenAbility field="background_8"/>
 			</layout>
-			<layout left="20" top="276" width="340" height="25" >
+			<layout name="dragRow_background_9" left="20" top="276" width="340" height="25" >
 				<OpenAbility field="background_9"/>
 			</layout>
-			<layout left="20" top="306" width="340" height="25" >
+			<layout name="dragRow_background_10" left="20" top="306" width="340" height="25" >
 				<OpenAbility field="background_10"/>
 			</layout>
-			<layout left="20" top="336" width="340" height="25" >
+			<layout name="dragRow_background_11" left="20" top="336" width="340" height="25" >
 				<OpenAbility field="background_11"/>
 			</layout>
-			<layout left="20" top="366" width="340" height="25" >
+			<layout name="dragRow_background_12" left="20" top="366" width="340" height="25" >
 				<OpenAbility field="background_12"/>
 			</layout>
-			<layout left="20" top="396" width="340" height="25" >
+			<layout name="dragRow_background_13" left="20" top="396" width="340" height="25" >
 				<OpenAbility field="background_13"/>
 			</layout>
-			<layout left="20" top="426" width="340" height="25" >
+			<layout name="dragRow_background_14" left="20" top="426" width="340" height="25" >
 				<OpenAbility field="background_14"/>
 			</layout>
-			<layout left="20" top="456" width="340" height="25" >
+			<layout name="dragRow_background_15" left="20" top="456" width="340" height="25" >
 				<OpenAbility field="background_15"/>
 			</layout>
-			<layout left="20" top="486" width="340" height="25" >
+			<layout name="dragRow_background_16" left="20" top="486" width="340" height="25" >
 				<OpenAbility field="background_16"/>
 			</layout>
-			<layout left="20" top="516" width="340" height="25" >
+			<layout name="dragRow_background_17" left="20" top="516" width="340" height="25" >
 				<OpenAbility field="background_17"/>
 			</layout>
-			<layout left="20" top="546" width="340" height="25" >
+			<layout name="dragRow_background_18" left="20" top="546" width="340" height="25" >
 				<OpenAbility field="background_18"/>
 			</layout>
-			<layout left="20" top="576" width="340" height="25" >
+			<layout name="dragRow_background_19" left="20" top="576" width="340" height="25" >
 				<OpenAbility field="background_19"/>
 			</layout>
-			<layout left="20" top="606" width="340" height="25" >
+			<layout name="dragRow_background_20" left="20" top="606" width="340" height="25" >
 				<OpenAbility field="background_20"/>
 			</layout>
-			<layout left="20" top="636" width="340" height="25" >
+			<layout name="dragRow_background_21" left="20" top="636" width="340" height="25" >
 				<OpenAbility field="background_21"/>
 			</layout>
 		</layout>
@@ -227,37 +239,37 @@
 			<label left="441" top="15" width="45" height="20" text="PAGE" horzTextAlign="center"/>
 			<label left="486" top="15" width="50" height="20" text="COST" horzTextAlign="center"/>
 
-			<layout left="20" top="36" width="516" height="25" >
+			<layout name="dragRow_merit_m0" left="20" top="36" width="516" height="25" >
 				<MeritPicked sub="merit" num="m0" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="61" width="516" height="25" >
+			<layout name="dragRow_merit_m1" left="20" top="61" width="516" height="25" >
 				<MeritPicked sub="merit" num="m1" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="86" width="516" height="25" >
+			<layout name="dragRow_merit_m2" left="20" top="86" width="516" height="25" >
 				<MeritPicked sub="merit" num="m2" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="111" width="516" height="25" >
+			<layout name="dragRow_merit_m3" left="20" top="111" width="516" height="25" >
 				<MeritPicked sub="merit" num="m3" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="136" width="516" height="25" >
+			<layout name="dragRow_merit_m4" left="20" top="136" width="516" height="25" >
 				<MeritPicked sub="merit" num="m4" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="161" width="516" height="25" >
+			<layout name="dragRow_merit_m5" left="20" top="161" width="516" height="25" >
 				<MeritPicked sub="merit" num="m5" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="186" width="516" height="25" >
+			<layout name="dragRow_merit_m6" left="20" top="186" width="516" height="25" >
 				<MeritPicked sub="merit" num="m6" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="211" width="516" height="25" >
+			<layout name="dragRow_merit_m7" left="20" top="211" width="516" height="25" >
 				<MeritPicked sub="merit" num="m7" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="236" width="516" height="25" >
+			<layout name="dragRow_merit_m8" left="20" top="236" width="516" height="25" >
 				<MeritPicked sub="merit" num="m8" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="261" width="516" height="25" >
+			<layout name="dragRow_merit_m9" left="20" top="261" width="516" height="25" >
 				<MeritPicked sub="merit" num="m9" lbl="Select Merit"/>
 			</layout>
-			<layout left="20" top="286" width="516" height="25" >
+			<layout name="dragRow_merit_m10" left="20" top="286" width="516" height="25" >
 				<MeritPicked sub="merit" num="m10" lbl="Select Merit"/>
 			</layout>
 		</layout>
@@ -269,37 +281,37 @@
 			<label left="441" top="15" width="45" height="20" text="PAGE" horzTextAlign="center"/>
 			<label left="486" top="15" width="50" height="20" text="COST" horzTextAlign="center"/>
 
-			<layout left="20" top="36" width="516" height="25" >
+			<layout name="dragRow_merit_f0" left="20" top="36" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f0" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="61" width="516" height="25" >
+			<layout name="dragRow_merit_f1" left="20" top="61" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f1" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="86" width="516" height="25" >
+			<layout name="dragRow_merit_f2" left="20" top="86" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f2" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="111" width="516" height="25" >
+			<layout name="dragRow_merit_f3" left="20" top="111" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f3" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="136" width="516" height="25" >
+			<layout name="dragRow_merit_f4" left="20" top="136" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f4" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="161" width="516" height="25" >
+			<layout name="dragRow_merit_f5" left="20" top="161" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f5" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="186" width="516" height="25" >
+			<layout name="dragRow_merit_f6" left="20" top="186" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f6" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="211" width="516" height="25" >
+			<layout name="dragRow_merit_f7" left="20" top="211" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f7" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="236" width="516" height="25" >
+			<layout name="dragRow_merit_f8" left="20" top="236" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f8" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="261" width="516" height="25" >
+			<layout name="dragRow_merit_f9" left="20" top="261" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f9" lbl="Select Flaw"/>
 			</layout>
-			<layout left="20" top="286" width="516" height="25" >
+			<layout name="dragRow_merit_f10" left="20" top="286" width="516" height="25" >
 				<MeritPicked sub="flaw" num="f10" lbl="Select Flaw"/>
 			</layout>
 		</layout>

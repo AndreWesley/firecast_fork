@@ -1,6 +1,62 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-24, 205ª rodada — 28º lote CONSTRUÍDO)
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-25, 206ª rodada — 29º lote CONSTRUÍDO & INSTALADO)
+
+### 29º LOTE CONSTRUÍDO (206ª) — §T1097…§T1100 `x` (`/ck:build --all`)
+Gate `-Build -Quiet` **ALL CHECKS PASSED** (61 s, 2026-09-25 00:00). Bateria §V508/§V502e: **11/11 mutações VERMELHAS no check certo & 2/2 sondas VERDES**, hashes dos 4 arquivos mutados = os de antes.
+**INSTALADO 2026-09-25 00:00:53** (3093572 B = `output/`). Se a ficha estava aberta, FECHAR & REABRIR. **PRÓXIMO:** pedir ao user **§T1101** (tela) junto de
+§T1096/§T1090/§T1083/§T1080/§T1074, que seguem `.`; & a resposta de §Q95 (4 perguntas). **Nada commitado.** Backups de antes
+do build no scratchpad `d30d1769…\scratchpad\`: `WoD20.2.before29.lfm`, `WoD20th.before29.lfm`, `WoD20.6.before29.lfm`,
+`localization.before29.lang`, `gate.before29.ps1`; bateria: `battery29.ps1` (+ `mutfn29.ps1`, log `battery29.log`, hashes
+`battery29.hashes.txt`).
+
+**O QUE VIROU CÓDIGO**
+- `WoD20.2.lfm` — os 43 `<layout>` de linha com `name="dragRow_<field>"`; `dyn$(field)` (OpenAbility) & `dynMerit_$(num)`
+  (MeritPicked) com `onMouseDown`→`rowDragDown`, `onMouseUp`→`rowDragUp`, `onMouseMove` = `if not rowDragMove(…) then
+  noteTipMove(…); end;`, `onClick` = `if not rowDragAte() then mfOpen(…); end;`; comentários FORA dos templates.
+- `WoD20th.lfm` — `ROW_LISTS` (+ `prefix`) & `ROW_DRAG_MIN`/`ROW_TWEEN_MS`/`ROW_TWEEN_K` logo depois de `MERIT_ROWS`;
+  `rowOrderOf` `rowOrderApply` `rowDragDown` `rowDragMove` `rowDragUp` `rowDragAte` `rowTweenStart` `rowTween` depois de
+  `noteTipHide`; `rowOrderApply(self, true)` no `onNodeReady` junto de `renderBgButtons`; `<dataLink fields="{'orderBackground',
+  'orderMerit', 'orderFlaw'}">` → `rowOrderApply(self, false)`. Coluna: `Blood Pool`, rótulos 117, barras 205/133;
+  `MC_BARS.blood.label = "Blood Pool"`.
+- `WoD20.6.lfm:87` & `localization.lang:2307/4603` — chave `Blood` RENOMEADA p/ `Blood Pool` (pt `Reserva de Sangue`).
+- `verify-hunters-hunted.ps1` — §V508 nova (5 pernas + zero-guard); §V502(e) lê `Blood Pool` + (e2) folga +6 + (e3) dica =
+  rótulo + valor pt pinado nos 2 lados; §V501(b) aceita o `onMouseMove` guardado; `$luaOwned` + os 3 campos de ordem.
+
+**DESVIOS DO SPEC NO BUILD → EMENDAS PENDENTES p/ `/ck:spec`** (o build só vira status de §T):
+1. §I174d/§I174h dizem "tabela Lua LOCAL `ROW_DRAG`": saiu GLOBAL (`ROW_DRAG`, `ROW_ANIM`, `ROW_TICKING`). §V347 — o chunk
+   do raiz estava a 3 do teto REAL de 53 locais & os 3 `local` acenderam o check; global aqui é POR FICHA (o `_ENV` é
+   religado no topo do script, §V487a) ∴ o que "local" queria dizer (⊥ NDB, ⊥ compartilhado) segue valendo.
+2. §I174c: as entradas de `ROW_LISTS` ganharam `prefix` (`background_` · `merit_` · `merit_`) — os flaws moram em
+   `merit_f*`, & o nome da linha é `dragRow_` .. prefix .. id. §V508(a) lê o `prefix`.
+3. §V501(b) EMENDADA no gate (previsto em §T1097): o regex aceita `^(if not rowDragMove\(self, event\) then )?noteTipMove(`;
+   a guarda em si é cobrada por §V508(b). A linha de §V501 no SPEC ainda diz `^noteTipMove(`.
+4. §V145 conta SÓ os laços `for i = 1, BACKGROUND_ROWS, 1 do` (os 2 do XP): o laço dos ids usa `rowI`, o mesmo expediente
+   do `for noteI = 1, BACKGROUND_ROWS` que já existia.
+5. §V242 (prosa sem `--`): `if not d.dragging then` casa com a heurística (4 palavras, 0 pontuação Lua) → saiu
+   `if d.dragging ~= true then`. Armadilha p/ quem escrever Lua aqui.
+6. `rowOrderApply(…, true)` também zera o alvo pendente da linha em `ROW_ANIM` (senão um tween velho a arrastaria de volta).
+7. Bateria: + M11 (onMouseMove do MeritPicked sem a guarda ! VERMELHO por §V508b), além das 7 + sonda de §V508 & das 3 +
+   sonda de §V502.
+
+### 29º LOTE ESPECIFICADO (206ª) — arrastar Backgrounds/Merits/Flaws + `Blood Pool` na coluna (§I174)
+`/ck:spec` só: §C (29º lote + §Q95 ABERTA, 4 perguntas c/ rec.), §I3 (+3 LUA-OWNED), §I173b ⚠, §I174a…i, §R173, §V502
+EMENDADA, §V508 NOVA, §T1097…§T1101 (+ nota ⚠ em §T1096). **0 código tocado, nada commitado.** Backup de antes: scratchpad
+`d30d1769…\scratchpad\SPEC.before29.md` & `HANDOFF.before29.md`.
+- **PRÓXIMO:** `/ck:build` §T1097…§T1100 (§T1097 em `WoD20.2`; §T1098 & §T1099 os 2 em `WoD20th.lfm` — ⊥ paralelizar;
+  §T1100 no gate) → 1 install no fim → pedir ao user §T1101 (tela) junto de §T1096/§T1090/§T1083/§T1080/§T1074.
+- **Pedido (3) do user (janelas escurecem a 50%) JÁ ESTÁ construído** (27º lote, §R173g: os 5 que abrem janela sobem
+  `popScrim`, `mfSearchB` tem `popScrimB`, §V503d deriva) → 0 §T; quem responde é §T1090(a)(b)(c); §Q95.1 pergunta.
+- **Desenho:** a ordem é VISUAL — o dado FICA no slot & só o `top` do `<layout name="dragRow_<field>">` muda; a ordem mora
+  em `orderBackground`/`orderMerit`/`orderFlaw` (LUA-OWNED, escrita 1× ao soltar). Tween = `setInterval` 15 ms × 0,35.
+- **Armadilhas p/ o build:** (1) ⊥ mover VALOR de campo entre slots — o log de XP é derivado POR SLOT (`baseline` + chaves
+  `background_k#nível`, §R173b) & o gasto mudaria calado; (2) `self` nos handlers é o FORM da aba (§R134) & `xpFind` devolve
+  SÓ os nomes pedidos (§B167) — os `dragRow_` saem de 1 `xpFind` no `rowDragDown` & ficam em `ROW_DRAG`, ⊥ por pixel;
+  (3) o host dispara `onClick` DEPOIS do arrasto (o botão veio junto c/ o cursor) — sem `rowDragAte()` o soltar abre a busca;
+  (4) o `onMouseMove` do picker já é da dica (`noteTipMove`) — `rowDragMove` vem ANTES & guarda, & §V501 lê esse atributo;
+  (5) comentário DENTRO de `<template>` = `rdk -l` exit 1 mudo & `.rpk` apagado (§B19); (6) `Blood` → `Blood Pool` é
+  RENOMEAR a chave nos 5 lugares (§I174g), ⊥ criar 2ª; (7) 110/198/140 & `'Blood'` moram também no gate (§V502e) — mudam
+  junto em §T1100.
 
 ### 28º LOTE CONSTRUÍDO (205ª) — §T1092…§T1095 `x` (`/ck:build --all`)
 Gate `-Build -Quiet` **ALL CHECKS PASSED** (23:12). Bateria §V334/§V353/§V405/§V502: **12/12 mutações VERMELHAS no check
