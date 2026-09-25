@@ -1,5 +1,172 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-24, 203ª rodada — 25º lote CONSTRUÍDO & BATIDO)
+
+### O ESTADO EM UMA LINHA
+25º lote (coluna `Characters List` v2 + nota `!`, §I170) CONSTRUÍDO: **§T1075…§T1079 `x`**. Bateria
+de §V496…§V501 COMPLETA (§V222): **26/26 mutações VERMELHAS no check certo & 7/7 sondas VERDES**
+(202ª rodou 13, a 203ª as 20 que faltavam — log em `212b1d36…\scratchpad\battery25-rest2.log`),
+hashes dos 4 arquivos = os de antes. Gate `-Build -Quiet` **ALL CHECKS PASSED** (104 s, 18:49).
+**REINSTALADO 18:52:08** a pedido do user (3069436 B, = `output/`; fontes = os da bateria).
+**Nada commitado.** Se a ficha estava
+aberta, FECHAR & REABRIR p/ ver.
+
+### 26º LOTE CONSTRUÍDO (203ª) — §T1081 & §T1082 `x`, INSTALADO 19:52:47 (3074277 B = `output/`)
+Gate `-Build -Quiet` VERDE (58 s); bateria de §V502 **9/9 VERMELHAS & a sonda VERDE**, hashes = os de
+antes (log `212b1d36…\scratchpad\battery26.log`). No caminho: **§B172** (o `0.7` do contorno ⊥ estava
+na lista NOMEADA de §V244 → virou `0.70`, só em `mcOn_`) & comentário XML DENTRO do `<template
+name="McRow">` → `rdk -l` exit 1 MUDO & `.rpk` APAGADO (regra já escrita acima do template; ⊥ ∃ check
+no gate — pergunta ao user se vira §V). `NeededPx` ganhou `-Literal` (texto `dyn*` medido como é
+mostrado, §V502e). **Falta: §T1083 (tela)** & §T1080. **Nada commitado.**
+
+### (histórico) 26º LOTE ESPECIFICADO (203ª) — ajustes na coluna, §I171/§V502/§T1081…§T1083, §Q91 RESPONDIDA
+8 pedidos (Settings maior, traço no lugar da foto, contorno ⊥ selecionado a 70%, rótulos
+`Name`/vontade/`Blood`/`Quintessence`, barras alinhadas). §Q91 RESPONDIDA: **(1)** `Vontade` em pt &
+`Willpower` em en → rótulo `dynMcWpTag_$(num)` c/ texto escrito por `mcRender` (a ficha ⊥ tem 2
+traduções p/ a mesma palavra; precedente `HEALTH_PT`), coluna **85**, barras **173/165**; **(2)** os
+70% só no contorno. Próximo: `/ck:build §T1081` & `§T1082` (o 2º é o gate + bateria de 8 mutações
+& 1 sonda; ler antes como §V9/§V10/§V28 tratam texto do Lua) → install → §T1083 (tela). Gate VERDE c/ o spec novo (39 s). Backup do
+spec antes do lote: `212b1d36…\scratchpad\SPEC.before26.md`.
+
+### O QUE FAZER, NESTA ORDEM
+1. Pedir ao user: **§T1080** (tela, alíneas (a)…(i); as que decidem: (a) abas À DIREITA da coluna,
+   (d) clicar na barra edita as bolinhas, (h) tooltip à direita do cursor & rolável). §T1074 (o que
+   sobrou), §T1068 & §T1066 seguem `.`.
+2. ~~§I107a5 com as colunas velhas~~ — EMENDADA na 203ª (nota no fim: 304/421/466, fecha em 516).
+   §T1078 segue dizendo que as 4 cores entraram nas paletas: §T feita = histórico, a verdade está
+   em §I170c (decisão do user, 203ª).
+
+### ✅ SPEC EM DIA — os 4 pontos abaixo foram EMENDADOS pelo `/ck:spec amend` (203ª, gate VERDE)
+Onde: §I170g (helper, título 40/280, chave `!`), §I170c (paletas), §V500e, & 1 nota `⚠ EMENDADA
+2026-09-24` no fim de §V40 §V280 §V287 §V290 §V300 §V332 §V333 §V349 §V367 §V392. Backup de antes:
+`212b1d36…\scratchpad\SPEC.before-amend25.md`.
+- **§I170g/§V500e:** o `!` acende por 1 helper `noteButton(btn, value)` chamado pelos 2
+  renderizadores (o texto diz que eles escrevem `.enabled` direto); o gate cobra o helper.
+- **§I170g:** título da `popNote` `left="40" width="280"` (⊥ 20/290): §V27 cobra simetria em
+  rótulo ≥ 80% do box.
+- **§I170i/§I170c:** o `!` ganhou chave idêntica `wod.!=!` nos 2 lados do `.lang` & `["!"] = "!"` no
+  `PT` (§V10/§V28, ≡ o `X`); das 4 cores novas SÓ `#80000000` entrou nas paletas (§V53 cobra `color=`
+  de `<rectangle>`, ⊥ de `<progressBar>` — as barras ficam na cor fixa pedida).
+- **gate que aprendeu os controles novos** (registrar no §V de cada um): §V40 exclui `noteTip` por
+  nome; §V287 admite o fundo `contents` de `noteTip` & largou `mcGrip`; §V290 ⊥ conta o `!` como
+  coluna & admite a largura dele colada no nome; §V300 isenta `noteTip`/`noteTipScroll`; §V333 = 4
+  portas (`btnPopNoteClose`); `$OVERLAY_BOXES` + `popNote` (§V280/§V298 seguem 71); §V367 overlays
+  + `mcSettings` + `popNote` & `sheetMain` conta como o portador das abas; §V332/§V392/§V349
+  remedidos p/ 1635 (§B171).
+
+### O QUE VIROU CÓDIGO (por arquivo)
+- **`WoD20th.lfm`** — `sheetMain` (`client`) envolve `tabStrip` + 11 abas; `mcDock` 370 fixo, sem
+  grip; `mcHead` c/ `dynMcTitle` (`(N/10)`, ATUAL/MÁXIMO); `McRow` v2 (346×108, passo 114, contorno
+  sempre 1/2 px, nome c/ `onEnter` seleciona, 3 `<progressBar>` azul-claro/carmesim/dourado c/
+  `onMouseDown` → `mcSelect` + `mcBarClick`); `popScrim` 2005; `popNote`; 1 `<dataLink>` de 51 campos
+  → `mcBarsSoon`; vigias de nome completos (m0…m10, f0…f10, 1…21). Lua: `mcShow` (o ÚNICO
+  `setNodeObject`), `mcWipe` (raiz removível: `mcRootGone` + atributos ∉ `MC_KEEP`, entre
+  `beginUpdate`/`endUpdate`), `MC_KEEP` `MC_BARS` `mcCount` `mcBarMax` `mcBarsRow` `mcBarsNow`
+  `mcBarsSoon` `mcBarClick` (escreve PELAS portas `bloodClick`/`quintClick`/`poolClick`), `NOTE`
+  `NOTE_NAMES` `noteKey` `noteOpen` `savePopNote` `noteButton` `noteTipMove/Leave/Hold/Hide`. SAÍRAM
+  grip, `mcSetWidth`, `poolFromNumber`, `poolCount`, `mcBloodChanged`, `mcQuintChanged`, sementes de
+  número, `return alvo`, ramo `node` de `poolPrefix`. Root segue em **50** locais.
+- **`WoD20.2.lfm`** — `!` em `OpenAbility` (bolinhas +20) & `MeritPicked` (entre nome & livro);
+  BACKGROUNDS 384, MERITS/FLAWS 556, tudo à direita +40 → Traits fecha em **1635**; hover nos 43
+  pickers; `noteTip` último filho do `scrollBox`.
+- **`WoD20.6.lfm`** — `#80000000` nas 4 paletas; `["!"] = "!"`. **`localization.lang`** — `wod.!=!` ×2.
+- **`verify-hunters-hunted.ps1`** — §V496…§V501 novos; §V488/§V489/§V490/§V491/§V493 emendados;
+  §V494/§V495 APAGADOS; os 10 checks da lista acima.
+- **`SPEC.md`** — §Q90 RESPONDIDA, §I170/§V496…§V501/§T1075…§T1080 reescritas no lugar, as 8 emendas
+  pendentes do 24º aplicadas (6 viraram texto, 2 sem objeto), §B170 & §B171.
+
+### ⚠ AS 4 COISAS QUE CUSTARAM
+1. **§B171 — número citado pelo §V errado.** O spec disse que o nome de qualidade tinha 24 px de
+   folga citando §V196 (240); o `(N)` de custo já tinha levado o mais longo a 264 & quem mede é
+   §V349c. O gate acendeu no 1º run; MERITS/FLAWS alargaram em vez do nome encolher. Lição: citar a
+   régua PELO CHECK que a mede.
+2. **Install pedido NO MEIO da bateria** — a bateria muta os arquivos da ficha um a um; parar &
+   instalar direto empacotaria a mutação. Foi parada, o `WoD20th.lfm` estava MUTADO & voltou do
+   `battery-backups\` (hash conferido) ANTES do `rdk -i`. Regra na memória da bateria.
+3. **`self` num handler é o FORM, ⊥ o controle** (§R170l) — o tooltip precisava do picker; achado lendo
+   o GERADO antes de escrever, ⊥ na tela.
+4. **`sed` com `\|`, `$m`/`$M` & pares de mutação numa linha** — 3 armadilhas de ferramenta, 0 dano
+   (rascunho, `throw` antes de gravar, SETUP ERROR); as 3 na memória.
+
+---
+
+## CONTEXTO DA RODADA ANTERIOR (2026-09-24, fim da 201ª rodada — 24º lote CONSTRUÍDO)
+
+### O ESTADO EM UMA LINHA
+O 24º lote (múltiplos personagens numa ficha, §I169) foi especificado (`/ck:spec` ×2, §Q88 & §Q89
+respondidas) & CONSTRUÍDO na mesma sessão pelo `/cavepony:cavepony-build`: **§T1069…§T1073 `x`**,
+gate `-Build` VERDE (8 checks novos §V488…§V495 + 16 checks antigos ensinados a ler `dataScopeBox`,
+bateria 25 mutações VERMELHAS + 7 sondas VERDES), **INSTALADO 00:30:56** (3060378 B, = `output/`),
+c/ o Firecast ABERTO. **Nada commitado.** Se a ficha estava aberta, FECHAR & REABRIR p/ ver.
+
+### O QUE PEDIR, NESTA ORDEM
+1. **§T1074** [USER] — teste de tela, alíneas (a)…(n). As que decidem o desenho: **(c)** trocar de
+   personagem & voltar: TUDO volta? (§I169k(1): o host re-dispara `onNodeReady`/`dataLink` depois de
+   `setNodeObject(filho)`? se ⊥ → `/ck:spec`, `mcSelect` passa a chamar os renderizadores);
+   **(h)** mudar `Era` na janela c/ o personagem 2 ativo muda a época p/ TODOS na hora (o espelho
+   `mcShared` + `dataLink` dentro de `stSharedScope`); **(l)** reabrir: último clicado ativo & ordem;
+   **(n)** arrastar a borda direita (`event.x` em `onMouseMove` de `rectangle` = `?`, §R169i).
+2. **`/ck:spec amend`** — o build DESVIOU do texto em 6 pontos, todos por causa de checks/fatos que
+   o spec ⊥ conhecia; o spec está ATRÁS do código até absorver:
+   - **§I169e(4):** janela `mcSettings` `height="500"` & `mcSettingsScope` `height="450"` (⊥ 440/390:
+     as linhas copiadas do box terminam em 416+25); §Q88.10 já dizia que geometria ⊥ é contrato.
+   - **§I169b/§I169c (§V190):** o fundo do `mcDock` é `<rectangle align="contents">` (⊥ `client`:
+     §V190 recusa 2 filhos `client` no mesmo contêiner) & `mcOn_$(num)` tem `left/top/width/height`
+     explícitos; **§I169e(1):** `stSharedScope` tem `left="0" top="0" width="445" height="499"`, ⊥
+     `align="client"`, pelo mesmo motivo.
+   - **§I169h (§V10/§V22):** as 8 strings novas entraram TAMBÉM em `localization.lang` (`[pt]` &
+     `[en]`) — o gate exige o mapa `PT` da `WoD20.6` & o `.lang` em sincronia; o spec só citava o `PT`.
+   - **§I169e(4) (§V419/§B153):** os 5 combos `*Mc` entraram em `PICKER_ANCHOR` (`WoD20.6:2529`) —
+     sem isso perdem o centro na troca de idioma. Fato novo p/ §R169f.
+   - **§I73 (censo de boxes):** 70 → **71** — a janela `mcSettings` é box por construção (retângulo
+     preto `innerRound` + título estático + 15/19) & §V280/§V298 já contam 71.
+   - **§R169a:** o `?` FECHOU — `gui.fromHandle` (`rrpgGUI.lua:1674-1683`) consulta `objHandlers`
+     ANTES de montar tabela ∴ `tabRootOf(from)` também devolveria o objeto do construtor; o código
+     segue c/ `self` (§V490a) — a regra fica, a dúvida some.
+   - **§V489 sonda:** `text="Current"` → `"Now"` ⊥ é sonda limpa: acende §V10/§V28 (string sem chave
+     no `.lang`). Trocar a sonda por `width="55"` → `"56"` no mesmo rótulo.
+   - **§V494/§I169l:** `poolPrefix(base, count, alvo, node)` tem 2 ramos — `node == sheet` mantém o
+     literal `setField(base .. i, on)` (§V219 casa a string), o outro escreve `node[base .. i]`.
+3. Depois: §T1068 (teste de §B169 c/ 2 fichas) & §T1066 seguem `.` — testar junto c/ §T1074(m).
+
+### O QUE VIROU CÓDIGO (por arquivo)
+- **`WoD20.10.lfm`** — box `STORYTELLER SETTINGS` inteiro dentro de `<dataScopeBox name="stSharedScope">`
+  (pinado na raiz por `mcInit`); 8ª flag `chkMultipleChars` (`multipleCharacters`, top 321); preços &
+  `Save` +30, box 469 → 499; `<dataLink fields="{13 + 'multipleCharacters'}" onChange="mcShared(self);"/>`
+  DENTRO do scope (precedente `Plugins/Core/rrpginlua/ConfigDice/ConfigDice.lfm:145`).
+- **`WoD20th.lfm`** (8127 → 8717 linhas) — `<template name="McRow">` (`:7779`), `mcDock` 1º filho de
+  `sheetBody` (`:7855`: fundo `contents`, `mcHead` c/ `Characters List` + `Add Character` + `Settings`,
+  `mcGrip`, `mcRows` c/ 10 `<McRow>`), `popScrim` `#66000000`/1945, `mcSettings` + `mcSettingsScope`
+  (13 twins `*Mc`); Lua: `MC`, `MC_*`, `MC_SHARED_FIELDS`, `MC_NAMES` & `mcNodes` `mcInit` `mcApply`
+  `mcRender` `mcSelect` (`self:setNodeObject`, o ÚNICO) `mcAdd` `mcRemove` `mcShared` `mcSettingsOpen`
+  `mcSetWidth` `mcGripDown/Move/Up` `mcBloodChanged` `mcQuintChanged` (`:4640-4960`); `poolClick`
+  devolve `alvo`, `bloodClick`/`quintClick` gravam o número, `poolPrefix`/`familyCap` c/ `node`
+  opcional, `poolFromNumber`/`poolCount` (`:6728-6840`); `onNodeReady`: 2 `setField` de nascimento +
+  `mcInit(self)`. Root segue em **50** locais.
+- **`WoD20.6.lfm`** — 8 linhas `PT`, chave `#66000000` nas 4 paletas, `langScope` em volta do combo de
+  idioma (`:5400`), `PICKER_ANCHOR` +5.
+- **`localization.lang`** — 8 linhas em `[pt]` (antes de `[en]`) & 8 em `[en]` (fim).
+- **`verify-hunters-hunted.ps1`** (23202 → 23872) — helpers `BoxKids` (`:5361`, desce por
+  `dataScopeBox`) & `ContentRoot` (`:75`, `/form/scrollBox`); §V1 conta por escopo (`mcRow_K/campo`) &
+  `$mirrors` +13; §V137 ignora literais entre aspas; `$STATE_COMBOS` p/ §V208/§V211 (+ perna (d):
+  `values=` do twin == original); rosters de §V287/§V68/§V234/§V333 (3 portas); §V274 469 → 499;
+  censo 71; §V484 procura o diálogo a partir do arm; §V430 passa `NoComments` antes da varredura
+  (um comentário Lua citava `<dataLink` & engolia 183 KB); §V488…§V495 (`:23403-23811`).
+
+### ⚠ AS 3 COISAS QUE CUSTARAM
+1. **Worker de XML pôs `mcDock` FORA de `sheetBody`** (irmão antes dele) — compilava, gate ⊥ tinha
+   check ainda, & na tela o scrim ⊥ cobriria a coluna. Pego na REVISÃO do orquestrador antes do
+   gate; movido p/ dentro (`mv-dock.ps1`). §V488a agora acende se sair de lá.
+2. **§V190 & os rosters por nome** — 53 FAIL depois da onda 1, TODOS do lado do gate: contêiner c/ 2
+   `align="client"`, listas de nomes admitidos (§V287, §V419, §V333), contagens fixas (70 boxes, 469
+   de altura, 2 portas), leitores de box por eixo filho (§V238/§V240/§V243/§V274/§V449). Lição:
+   controle NOVO no sheet = 1 rodada de gate, sempre — orçar isso no plano, ⊥ descobrir na onda 2.
+3. **Comentário Lua que cita XML derruba varredura de XML** (§V430): a regex de `<dataLink` casou o
+   `<dataLink` de um comentário `--` & engoliu até o próximo `</dataLink>` real. Toda varredura de
+   XML por regex em `.lfm` ! passar por `NoComments` antes.
+
+---
+
 ## ⚠ 200ª RODADA (2026-09-08, §B169) — 1 AMBIENTE LUA POR FICHA ABERTA. LEIA ANTES DE TUDO
 
 O user relatou na tela: *"os pickers de specialties, quando eu mudo de uma ficha pra outra pelas

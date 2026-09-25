@@ -73,7 +73,14 @@ function ColId361($node) {
 }
 
 function ContentRoot($doc) {
-    $r = $doc.SelectSingleNode("//scrollBox")
+    # DIRECT CHILD of <form> only, since the 24th batch (SPEC I169b, V286 amended): the root
+    # form now carries its OWN scrollBox too (mcRows, three layouts down inside sheetBody), and
+    # an unscoped //scrollBox found that one FIRST and returned it as if the column were the
+    # root's content - the fallback below never ran, and V286 counted a twelfth content form
+    # where the sheet has eleven. Every real content tab wraps its whole body in ONE scrollBox
+    # that is a direct child of <form> (measured across all eleven), so scoping the XPath this
+    # way costs those eleven nothing and excludes exactly the column it was never meant to see.
+    $r = $doc.SelectSingleNode("/form/scrollBox")
     if ($null -ne $r) { return $r }
     # The fallback is reached ONLY by a form with no scrollBox at all, and there are exactly
     # two shapes of those: WoD20th.lfm, whose one align=client child is sheetBody and HOSTS the
@@ -341,6 +348,12 @@ foreach ($f in $files) {
     $xml = Doc $f.FullName
 
     $tpl = @{}
+    # SPEC I169c/V489a, 24th batch: a template whose own ROOT is a <dataScopeBox> gives every
+    # instance its OWN data namespace - McRow's health_1 shows the row's character, not a third
+    # owner of Main's health_1 - so its scope-name PATTERN (e.g. "mcRow_$(num)") is captured
+    # here, off the template's root, the same way a field pattern is captured below. Empty for
+    # every other template (Willpower, HealthRow, XpRevRow...), none of which root on a scope.
+    $tplScope = @{}
     foreach ($t in $xml.SelectNodes("//template")) {
         $pats = @()
         foreach ($n in $t.SelectNodes(".//*[@field]")) {
@@ -352,6 +365,8 @@ foreach ($f in $files) {
             }
         }
         $tpl[$t.GetAttribute("name")] = $pats
+        $troot = @($t.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })[0]
+        if ($null -ne $troot -and $troot.LocalName -eq 'dataScopeBox') { $tplScope[$t.GetAttribute("name")] = $troot.GetAttribute("name") }
     }
 
     foreach ($n in $xml.SelectNodes("//*")) {
@@ -369,6 +384,15 @@ foreach ($f in $files) {
         if ($inTemplate) { continue }
 
         if ($tpl.ContainsKey($n.LocalName)) {
+            # SPEC I169c/V489a: this instance's own data namespace, if its template roots on a
+            # scope - the same $(...) substitution a field pattern gets below, applied to the
+            # scope's name pattern instead. "mcRow_$(num)" -> "mcRow_3" for THIS <McRow>.
+            $scopePrefix = $null
+            if ($tplScope.ContainsKey($n.LocalName)) {
+                $sc = $tplScope[$n.LocalName]
+                foreach ($a in $n.Attributes) { $sc = $sc.Replace("`$($($a.Name))", $a.Value) }
+                if ($sc -notmatch '\$\(') { $scopePrefix = $sc }
+            }
             foreach ($pat in $tpl[$n.LocalName]) {
                 $expanded = $pat.Field
                 foreach ($a in $n.Attributes) { $expanded = $expanded.Replace("`$($($a.Name))", $a.Value) }
@@ -382,8 +406,13 @@ foreach ($f in $files) {
                     $radios += [pscustomobject]@{ File=$f.Name; Field=$expanded; Value=$val; Group=$pat.Group; Via="<$($n.LocalName)>" }
                     continue
                 }
-                if (-not $allFields.ContainsKey($expanded)) { $allFields[$expanded] = @() }
-                $allFields[$expanded] += "$($f.Name):<$($n.LocalName)>"
+                # A CHARACTER-scoped instance (its scope matches ^mcRow_) is keyed inside that
+                # scope's own namespace, not the sheet's flat one (SPEC I169c/V489a): the ten
+                # rows show ten different characters, so health_1 in row 3 is not a third owner
+                # of the health_1 the active character's Main/Combat tabs already share.
+                $fieldKey = if ($scopePrefix -and $scopePrefix -match '^mcRow_') { "$scopePrefix/$expanded" } else { $expanded }
+                if (-not $allFields.ContainsKey($fieldKey)) { $allFields[$fieldKey] = @() }
+                $allFields[$fieldKey] += "$($f.Name):<$($n.LocalName)>"
             }
         }
         elseif ($n.HasAttribute("field")) {
@@ -414,11 +443,20 @@ foreach ($rf in ($radios | ForEach-Object { $_.Field } | Sort-Object -Unique)) {
 # The list is the declaration from SPEC I3 - anything multi-owned and NOT here is the accident
 # V1 exists to catch, and anything here that is NOT multi-owned is a declaration gone stale.
 $mirrors = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
-# healthLevels was a mirror until the 82nd round: the two HEALTH boxes each carried the
-# combo. It moved to the storyteller's box, where ONE widget owns it, so listing it here
-# would be the stale declaration V36's second half exists to catch (SPEC I35, V234).
 1..10 | ForEach-Object { [void]$mirrors.Add("health_$_") }
 1..10 | ForEach-Object { [void]$mirrors.Add("willpower_c$_") }
+
+# SPEC I169e/V489a, 24th batch: the settings window (WoD20th/mcSettingsScope) is a TWIN of the
+# storyteller's box (WoD20.10/stSharedScope) - same 13 fields, both pinned to the root node, so
+# either one writes and both show the change. This is the SAME shape V36 already names above
+# (two widgets, one field, the NDB the single source of truth) and not a new kind of double.
+# healthLevels REJOINS the list here: it left it in the 82nd round when the mirror across
+# Main/Combat closed to one owner (SPEC I35, V234), and the settings window reopens it to
+# exactly two - WoD20.10's own cmbHealthLevels and the window's cmbHealthLevelsMc, both
+# pinned to the root, never three. `language` is NOT here: it owns one widget, langScope on
+# WoD20.6 (SPEC I169e(2)) - the window has no language combo, so there is no second widget to
+# mirror it with.
+foreach ($sf169 in @('game', 'sheetTheme', 'stShowNumina', 'stShowDisciplines', 'stFreeBuy', 'stEditClanDisc', 'stEditSpentXP', 'stManualAffiliation', 'stManualClanFamily', 'healthLevels', 'stSpecCost', 'stBackgroundCost', 'multipleCharacters')) { [void]$mirrors.Add($sf169) }
 # The 94th round adds two of a different shape: a PICKER and a typed twin on one field, one
 # visible at a time behind a storyteller flag (SPEC I71, V274b). The NDB is still the single
 # source of truth and still keeps them in step - what the flag changes is which one the reader
@@ -460,7 +498,9 @@ $luaOwned = @('baseline', 'xpTotal', 'xpFree', 'xpManual', 'xpOrder', 'descFontS
 # V328c's reason - a wildcard would excuse the next box that is simply in the wrong place.
 # Both sites below COUNT what they skipped and fail on a count that is not the list's own
 # length, so the exclusion cannot go quiet the way B7 describes.
-$OVERLAY_BOXES = @('popDesc', 'mfSearch')
+# popNote joined in the 25th batch (SPEC I170g): the ! note window floats over the grid the same
+# way the ? box does, with the same black rectangle and a Lua-written title.
+$OVERLAY_BOXES = @('popDesc', 'mfSearch', 'popNote')
 foreach ($l in $linkFields) {
     if ($allFields.ContainsKey($l.Field)) { Pass "V8 dataLink '$($l.Field)' observes a real field" }
     elseif ($luaOwned -contains $l.Field) { Pass "V8 dataLink '$($l.Field)' observes a declared Lua-owned field (SPEC I3)" }
@@ -966,9 +1006,11 @@ if ($noEn) { foreach ($s in $noEn) { Fail "V10 no [en] key for '$s'" } } else { 
 # and what waits on the other side is a comboBox that CLIPS rather than wraps (SPEC V196, B43).
 $PX_PER_CHAR    = 6.5
 $PX_PER_CHAR_12 = 6.0
-function NeededPx($txt, $fontSize) {
+function NeededPx($txt, $fontSize, [switch]$Literal) {
     $longest = $txt.Length
-    if ($ptVal.ContainsKey($txt) -and $ptVal[$txt].Length -gt $longest) { $longest = $ptVal[$txt].Length }
+    # -Literal: a text a Lua writer shows AS IS in its own language (a dyn* label that owns both
+    # languages, SPEC V502e) - looking it up in the PT map would measure a word it never shows.
+    if (-not $Literal -and $ptVal.ContainsKey($txt) -and $ptVal[$txt].Length -gt $longest) { $longest = $ptVal[$txt].Length }
     # Callers that measure a plain label pass nothing and get the default body ruler, which is
     # the calibration this check has always run on (SPEC V312a).
     $ruler = if ("$fontSize" -eq '12') { $PX_PER_CHAR_12 } else { $PX_PER_CHAR }
@@ -1153,6 +1195,11 @@ foreach ($f in $files) {
         }
         foreach ($bx in $sb.SelectNodes("layout")) {
             if ($bx.SelectSingleNode("import")) { continue }
+            # The ! note's tooltip (SPEC I170h) floats: hidden until hovered, placed by Lua at the
+            # cursor, and it is SUPPOSED to draw over the boxes - that is what a tooltip is. Its
+            # authored 0,0 is a placeholder, not a place. Excluded by exact name, like popDesc is
+            # from the section-box census (SPEC I76a).
+            if ($bx.GetAttribute('name') -ceq 'noteTip') { continue }
             $pk = "$($bx.GetAttribute('left'))/$($bx.GetAttribute('top'))/$($bx.GetAttribute('width'))/$($bx.GetAttribute('height'))"
             if ($paneRect.ContainsKey($pk) -and $paneRect[$pk] -gt 1) { $paneByRect++; continue }
             $bl = 0; $bt = 0; $bw = 0; $bh = 0
@@ -1461,10 +1508,17 @@ $corners = @{}
 $boxSeen = 0
 $floorCut = 0
 $bandCut68 = 0
+$dockFloorCut68 = 0
 foreach ($f in $files) {
     foreach ($r in (Doc $f.FullName).SelectNodes("//rectangle[@color='black']")) {
         if ($r.GetAttribute("align") -eq 'client' -and $r.ParentNode.SelectSingleNode("rectangle[@onClick]")) { $floorCut++; continue }
         if ($r.GetAttribute("align") -eq 'client' -and (IsBandLayout $r.ParentNode)) { $bandCut68++; continue }
+        # mcDock's own floor (SPEC I169b, 24th batch): align="contents", not "client" - it is
+        # a BACKDROP under the character column, not a section box, so it authors no corner at
+        # all and must not be asked to match the 73 that do. Cut by the SAME construction as
+        # the strip floor (an unnamed rectangle painting the ground under other content) and
+        # counted for B18's reason - a box that merely forgot its radius must not leave here.
+        if ($r.GetAttribute("align") -eq 'contents' -and $r.ParentNode.GetAttribute("name") -eq 'mcDock') { $dockFloorCut68++; continue }
         $boxSeen++
         $key = "{0}|{1}|{2}" -f $r.GetAttribute("cornerType"), $r.GetAttribute("xradius"), $r.GetAttribute("yradius")
         if (-not $corners.ContainsKey($key)) { $corners[$key] = New-Object System.Collections.Generic.HashSet[string] }
@@ -1473,6 +1527,7 @@ foreach ($f in $files) {
 }
 if ($floorCut -ne 1) { Fail "V68 the strip-floor cut matched $floorCut rectangle(s), expected exactly 1 - a wider cut is a hole B18 walks back through (SPEC V209)" }
 elseif ($bandCut68 -ne 1) { Fail "V68 the highlight-band cut matched $bandCut68 rectangle(s), expected exactly 1 - the band is xpHiRow's backdrop and nothing else on the sheet is built that way (SPEC I165a, V484f, V209)" }
+elseif ($dockFloorCut68 -ne 1) { Fail "V68 the mcDock-floor cut matched $dockFloorCut68 rectangle(s), expected exactly 1 - mcDock's own backdrop is the only align=contents black rectangle on the sheet (SPEC I169b, V209)" }
 elseif ($boxSeen -lt 60) { Fail "V68 only $boxSeen black section box(es) were read, expected at least 60 - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($corners.Count -eq 0) { Fail "V68 no black section box found - the check has nothing to measure" }
 elseif ($corners.Count -gt 1) {
@@ -1482,7 +1537,7 @@ elseif ($corners.Count -gt 1) {
     }
 } else {
     $p = ($corners.Keys | Select-Object -First 1) -split '\|'
-    Pass "V68 all $boxSeen section boxes AUTHOR cornerType='$($p[0])' radius $($p[1])/$($p[2]) - the floor every era without a boxCorner falls back to - and the one strip floor is cut out by construction"
+    Pass "V68 all $boxSeen section boxes AUTHOR cornerType='$($p[0])' radius $($p[1])/$($p[2]) - the floor every era without a boxCorner falls back to - and the strip floor and mcDock's floor are cut out by construction"
 }
 
 
@@ -2909,7 +2964,11 @@ foreach ($f in $files) {
 # content form wraps its widgets in a <scrollBox>, and a shell that only holds a tabControl
 # has none. Derived, so a tab added later is picked up without editing a number here.
 $wantPaper = @($files | Where-Object {
-    $_.Name -ne 'WoD20.6.lfm' -and $null -ne (Doc $_.FullName).SelectSingleNode("//scrollBox")
+    # DIRECT CHILD of <form>, since the 24th batch (SPEC I169b): the root form now carries a
+    # scrollBox of its own too (mcRows, the character column), and an unscoped //scrollBox
+    # found it and asked WoD20th.lfm for a backdrop it was never meant to have. A real
+    # content tab wraps its whole body in ONE scrollBox that is a direct child of <form>.
+    $_.Name -ne 'WoD20.6.lfm' -and $null -ne (Doc $_.FullName).SelectSingleNode("/form/scrollBox")
 } | ForEach-Object { $_.Name })
 $missPaper = @($wantPaper | Where-Object { $paperTabs -notcontains $_ })
 $extraPaper = @($paperTabs | Where-Object { $wantPaper -notcontains $_ })
@@ -4612,7 +4671,9 @@ if ($fail -eq $imgBefore) { Pass "V111 the fixed dot1 art is dimmed on the mirro
 # is the side door this check was written to shut. A number added here has to earn a clause.
 # 0.50 joined on 2026-09-07 (SPEC V244 as amended, V476, I162j): the DEAD action button, the
 # user's own number, and V476 is the clause that pins it to btnXpApply and nowhere else.
-$LUA_OPACITY = @($DIM_TEXT, '0.80', '0.50')
+# 0.70 joined on 2026-09-24 (SPEC V244 as amended, B172, I171c): the unselected character's
+# outline in the column, the user's "70%", and V502c pins it to mcOn_ and nowhere else.
+$LUA_OPACITY = @($DIM_TEXT, '0.80', '0.50', '0.70')
 $luaDimBad  = @()
 $luaDimSeen = 0
 foreach ($f in $files) {
@@ -5137,6 +5198,10 @@ foreach ($f in $files) {
     foreach ($n in (Doc $f.FullName).SelectNodes("//checkBox")) {
         $wf = $n.GetAttribute("field")
         if ($wf -notmatch '^(\$\(field\)|willpower)_c\d+$') { continue }
+        # SPEC V489b/I169c: McRow's own c1..c10 belong to the row's CHARACTER, not to the
+        # sheet's twenty - they are declared ONCE inside the template (SPEC B167's namespace),
+        # so an unscoped sweep counted them as ten more owners of a field that already has two.
+        if ($n.ParentNode.LocalName -eq 'dataScopeBox' -and $n.ParentNode.GetAttribute("name") -like 'mcRow_*') { continue }
         $wpBoxes += @{ file = $f.Name; field = $wf; click = $n.GetAttribute("onClick"); change = $n.GetAttribute("onChange") }
     }
 }
@@ -5194,7 +5259,13 @@ else { Pass "V136 the live side is traitLevel plus at most the one dot being cli
 # mind, which is the lens the 31st round shipped and the user rejected (SPEC V105).
 $flagReads = @()
 foreach ($ff in $files) {
-    foreach ($m in [regex]::Matches((CodeOf $ff.FullName), '(?<!field=")stFreeBuy')) { $flagReads += $ff.Name }
+    # SPEC V489c spirit, 24th batch: a quote right before the word is a NAME, not a read - the
+    # 'stFreeBuy' inside stSharedScope's <dataLink fields="{...}"> list (WoD20.10, the mirror's
+    # trigger, SPEC I169e) and the "stFreeBuy" inside the Lua table MC_SHARED_FIELDS both name
+    # the field so the mirror can copy it; neither one ASKS what it is set to. A read reads
+    # sheet.stFreeBuy - preceded by '.', which this lookbehind never excludes. This single
+    # lookbehind replaces the old (?<!field=") one: field="stFreeBuy" is quote-preceded too.
+    foreach ($m in [regex]::Matches((CodeOf $ff.FullName), '(?<![''"])stFreeBuy')) { $flagReads += $ff.Name }
 }
 if ($flagReads.Count -ne 1) { Fail "V137 stFreeBuy is read in $($flagReads.Count) place(s) ($($flagReads -join ', ')) - exactly one, inside xpClick" }
 elseif ($flagReads[0] -ne 'WoD20th.lfm') { Fail "V137 stFreeBuy is read from $($flagReads[0]) - the flag belongs to the click, not to a tab" }
@@ -5283,6 +5354,51 @@ else { Pass "V141 a sold point hands its stamp back" }
 # HEALTH (item 14). Only the column name in the V168 map moved: both boxes are 290 wide on
 # the same top, so nothing this check measures changed with them.
 function BoxOf($doc, $title) { @($doc.SelectNodes("//layout[label/@text='$title']"))[0] }
+
+# A <dataScopeBox> child is TRANSPARENT to a box reader (SPEC I169a/I169e, 24th batch): the
+# STORYTELLER SETTINGS box (WoD20.10) and the settings window (WoD20th) both wrap their real
+# rows in one this round, so the settings keep reading/writing the ROOT node no matter which
+# character is active (SPEC Q88.8) - but every check that walks a section box's placed
+# children still has to see those rows exactly where they visually sit, or the box reads as
+# holding nothing (V243), ending on the scope's own name instead of Save (V274/V238), and
+# breathing 0 top/bottom because the scope's own left=0/top=0..40 box was read as one more
+# child instead of a window onto its own (V240/V280).
+#
+# Returns one [pscustomobject] per LOGICAL child, carrying Node (the real element, for
+# anything not surfaced below), LocalName, Name and the EFFECTIVE Left/Top - the scope's own
+# left/top added on, so a caller never has to know whether a given row came through a scope or
+# not. The add is a no-op for stSharedScope and every mcRow_$(num) (both left=0/top=0) and
+# load-bearing for mcSettingsScope, which opens at top=40 inside its window (SPEC I169e(4)).
+function BoxKids($box) {
+    $out = New-Object System.Collections.Generic.List[object]
+    foreach ($k in $box.ChildNodes) {
+        if ($k.NodeType -ne 'Element') { continue }
+        if ($k.LocalName -eq 'dataScopeBox') {
+            $dl = 0; $dt = 0
+            [void][int]::TryParse($k.GetAttribute("left"), [ref]$dl)
+            [void][int]::TryParse($k.GetAttribute("top"), [ref]$dt)
+            foreach ($gk in $k.ChildNodes) {
+                if ($gk.NodeType -ne 'Element') { continue }
+                $gl = 0; $gt = 0
+                # HasTop/HasLeft mirror a caller's own TryParse-or-skip, the way every box
+                # reader before this one worked: a child with no NUMERIC top was invisible to
+                # the margin math, not zero. Losing that would hand V240/V280's generic,
+                # whole-sheet loops a false top=0 for the one kind of child that never had one
+                # (SPEC V209) - a change this helper must not make for boxes it was not asked
+                # to fix.
+                $hasL = [int]::TryParse($gk.GetAttribute("left"), [ref]$gl)
+                $hasT = [int]::TryParse($gk.GetAttribute("top"), [ref]$gt)
+                $out.Add([pscustomobject]@{ Node = $gk; LocalName = $gk.LocalName; Name = $gk.GetAttribute("name"); Left = $dl + $gl; Top = $dt + $gt; Width = $gk.GetAttribute("width"); Height = $gk.GetAttribute("height"); HasLeft = $hasL; HasTop = $hasT })
+            }
+            continue
+        }
+        $kl = 0; $kt = 0
+        $hasL = [int]::TryParse($k.GetAttribute("left"), [ref]$kl)
+        $hasT = [int]::TryParse($k.GetAttribute("top"), [ref]$kt)
+        $out.Add([pscustomobject]@{ Node = $k; LocalName = $k.LocalName; Name = $k.GetAttribute("name"); Left = $kl; Top = $kt; Width = $k.GetAttribute("width"); Height = $k.GetAttribute("height"); HasLeft = $hasL; HasTop = $hasT })
+    }
+    , $out.ToArray()
+}
 $mainDoc = Doc (Join-Path $dir "WoD20.1.lfm")
 $sb = BoxOf $mainDoc "SPECIALTIES"
 $specTpl = @($mainDoc.SelectNodes("//template[@name='SpecialityRow']"))[0]
@@ -6777,6 +6893,13 @@ else { Pass "V199-V205 one predicate feeds both the list and the guard; the list
 # T493 took every picker list out of the XML and put it in one map on the root form. These
 # three measure the map: that it holds each list ONCE, that every picker actually reaches
 # it, and that the sixty clan names did not quietly fork into two spellings.
+#
+# STATE combos are the declared exception (SPEC V15, V24): a combo of STATE with a real
+# default has no empty first row to clear, so it keeps its own inline items=/values= rather
+# than a PICKER_LIST entry. cboGame/cboSheetTheme were the pair until the 24th batch; their
+# settings-window twins cboGameMc/cboSheetThemeMc (SPEC I169e(4)) are the same state, painted
+# twice, and V211's own new leg below is what keeps the two lists from drifting apart instead.
+$STATE_COMBOS = @('cboGame', 'cboSheetTheme', 'cboGameMc', 'cboSheetThemeMc')
 $v208Bad = @()
 
 # V208a: no list is in the map twice. The three ALIASES are excluded on purpose - they are
@@ -6797,6 +6920,7 @@ foreach ($f in $files) {
     if ($f.Name -notin $PICKER_SCOPE) { continue }
     foreach ($cb in (Doc $f.FullName).SelectNodes("//comboBox[@name]")) {
         if ($cb.GetAttribute("name") -notlike 'cbo*') { continue }
+        if ($STATE_COMBOS -contains $cb.GetAttribute("name")) { continue }
         if ($cb.HasAttribute("items") -or $cb.HasAttribute("values")) {
             $v208Bad += "$($f.Name)/$($cb.GetAttribute('name')) still authors items=/values= inline - the list would live in two places (SPEC I27)"
         }
@@ -6819,6 +6943,7 @@ foreach ($f in $files) {
     foreach ($cb in (Doc $f.FullName).SelectNodes("//comboBox[@name]")) {
         $nm = $cb.GetAttribute("name")
         if ($nm -notlike 'cbo*') { continue }
+        if ($STATE_COMBOS -contains $nm) { continue }
         $v211Seen++
         $k = PickerKeyOf $nm $cb.GetAttribute("field") (TplOf $cb)
         if (-not $k) { $v211Bad += "$($f.Name)/$nm resolves to no PICKER_LIST key at all" }
@@ -6834,8 +6959,22 @@ foreach ($a in $PICKER_ALIAS.Keys) {
         $v211Bad += "PICKER_LIST['$a'] aliases '$($PICKER_ALIAS[$a])', which the map does not declare"
     }
 }
+
+# (d) the two STATE twins never drift (SPEC V489c spirit, 24th batch): cboGameMc and
+# cboSheetThemeMc are excluded above like cboGame/cboSheetTheme, but a state combo with no
+# PICKER_LIST key has nothing else policing its inline list against its original's - so this
+# reads both XML files directly and compares the literal values= each one authors.
+$stDoc211v = Doc (Join-Path $dir "WoD20.10.lfm")
+$rtDoc211v = Doc (Join-Path $dir "WoD20th.lfm")
+foreach ($pair211 in @(@('cboGame', 'cboGameMc'), @('cboSheetTheme', 'cboSheetThemeMc'))) {
+    $orig211 = $stDoc211v.SelectSingleNode("//comboBox[@name='$($pair211[0])']")
+    $twin211 = $rtDoc211v.SelectSingleNode("//comboBox[@name='$($pair211[1])']")
+    if ($null -eq $orig211 -or $null -eq $twin211) { $v211Bad += "(d) $($pair211[0]) or $($pair211[1]) is missing - the twin comparison reads nothing (SPEC V209)" }
+    elseif ($orig211.GetAttribute("values") -ne $twin211.GetAttribute("values")) { $v211Bad += "(d) $($pair211[1]) authors values=$($twin211.GetAttribute('values')) and $($pair211[0]) authors values=$($orig211.GetAttribute('values')) - the settings window would offer a choice the storyteller's own box does not (SPEC V489c, I169e(4))" }
+}
+
 if ($v211Bad) { foreach ($b in $v211Bad) { Fail "V211 $b" } }
-else { Pass "V211 all $v211Seen pickers in scope resolve to a list, found by marker, with $($PICKER_ALIAS.Count) alias(es) by identity" }
+else { Pass "V211 all $v211Seen pickers in scope resolve to a list, found by marker, with $($PICKER_ALIAS.Count) alias(es) by identity, and the two STATE twins agree with their originals" }
 
 # V212: the sixty clan names exist twice - as the ordered list the picker shows, and as the
 # keys of CLANS (SPEC I17), which maps a clan to its three fixed Disciplines. Not a V208
@@ -7983,6 +8122,23 @@ foreach ($f in $files) {
         # direction below stays as strict as it was.
         if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -eq 'ornAvatar') { continue }
         if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -eq 'popScrim') { continue }
+        # 24th batch (SPEC I169b, I169c). mcBg_$(num) is the row's click CATCHER (a click
+        # anywhere on the row selects it, SPEC V490b) and mcGrip is the drag handle (SPEC
+        # I169m) - both fully transparent by design, same idiom as popScrim: a click-catcher
+        # or a drag handle is not a section box, and the era's 3px rule has no fillet to paint
+        # on either. mcBg is admitted by PATTERN because it is declared once inside a
+        # <template> and stamps out ten instance names; mcGrip by exact name like its siblings.
+        if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -like 'mcBg_*') { continue }
+        # (mcGrip left with the 25th batch - the column is fixed, SPEC I170b - and its admission
+        # left with it: a name admitted here with no control behind it is the roster that ages.)
+        # The ! note's tooltip fill (SPEC I170h, V501a): 50% black with NO outline by the user's
+        # own ask - the same align="contents" backdrop construction as mcDock's floor below.
+        if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("align") -eq 'contents' -and $n287.ParentNode.GetAttribute("name") -eq 'noteTip') { continue }
+        # mcDock's own floor (SPEC I169b), unnamed like the strip floor above and cut by the
+        # SAME construction - align="contents" backdrop of a layout that is not a section box
+        # (no black rectangle-with-radius sibling, no title) - so the era's rule has nothing to
+        # paint a fillet on here either.
+        if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("align") -eq 'contents' -and $n287.ParentNode.GetAttribute("name") -eq 'mcDock') { continue }
         $v287Others += "$($f.Name) <$($n287.LocalName) name='$($n287.GetAttribute('name'))'>"
     }
 }
@@ -7990,7 +8146,7 @@ if ($v287Others.Count) {
     $v287Bad += "a transparent contour is authored outside the strip floor, the 19 buttons, the 19 markers, the 5 separators, the avatar carrier and popScrim, on $($v287Others -join ', ') - the era paints a rule on every black rectangle and this idiom silently erases it (SPEC I74b, I5)"
 }
 if ($v287Bad) { foreach ($b in $v287Bad) { Fail "V287 $b" } }
-else { Pass "V287 the strip floor, the 19 buttons, the 19 markers, the 5 separators, the avatar carrier and popScrim are the only controls authoring a transparent contour, and the floor does author it" }
+else { Pass "V287 the strip floor, the 19 buttons, the 19 markers, the 5 separators, the avatar carrier, popScrim, mcBg's ten rows, mcDock's floor and noteTip's fill are the only controls authoring a transparent contour, and the floor does author it" }
 
 # ---- V288..V292: the five alignments the 106th round was asked for -----------------
 # Every one of them is a RELATION between two things in the sheet, never a literal here: the
@@ -8095,7 +8251,10 @@ foreach ($tn290 in @('MeritPicked')) {
     # back and the entry x does not move for it (SPEC I102b, I102f). Read as a column it would
     # be a fifth one in the picked half that the typed half has no answer for, and the seam leg
     # below would redden on a table that lines up perfectly on screen.
-    $colsBy290[$tn290] = @($node290.SelectNodes("edit|button") | Where-Object { $_.GetAttribute("visible") -ne "false" -and $_.GetAttribute("name") -notlike 'btnQ*' } | ForEach-Object {
+    # The ! (SPEC I170g, B171) is not a column either: it has no heading and no field, it is the
+    # note door glued to the name's right edge. The tiling leg below admits exactly its width.
+    $bang290 = $node290.SelectSingleNode("button[starts-with(@name,'btnN')]")
+    $colsBy290[$tn290] = @($node290.SelectNodes("edit|button") | Where-Object { $_.GetAttribute("visible") -ne "false" -and $_.GetAttribute("name") -notlike 'btnQ*' -and $_.GetAttribute("name") -notlike 'btnN*' } | ForEach-Object {
         $l = 0; $w = 0
         [void][int]::TryParse($_.GetAttribute("left"), [ref]$l)
         [void][int]::TryParse($_.GetAttribute("width"), [ref]$w)
@@ -8120,8 +8279,16 @@ else {
     elseif ((($cols290 | ForEach-Object { $_.Root }) -join ',') -ne ($want290 -join ',')) {
         $v290Bad += "the columns run $((($cols290 | ForEach-Object { $_.Root }) -join ' ')) - Book goes between the name and Page (SPEC I74, V290a)"
     } else {
+        $bangL290 = 0; $bangW290 = 0
+        if ($null -eq $bang290) { $v290Bad += "the ! note button is gone from MeritPicked (SPEC V500a, V209)" }
+        else {
+            [void][int]::TryParse($bang290.GetAttribute("left"), [ref]$bangL290)
+            [void][int]::TryParse($bang290.GetAttribute("width"), [ref]$bangW290)
+            if ($bangL290 -ne ($cols290[0].L + $cols290[0].W)) { $v290Bad += "the ! opens at $bangL290, not where the name closes ($($cols290[0].L + $cols290[0].W)) (SPEC V500a)" }
+        }
         for ($i = 0; $i -lt 3; $i++) {
-            if (($cols290[$i].L + $cols290[$i].W) -ne $cols290[$i + 1].L) {
+            $gap290 = if ($i -eq 0) { $bangW290 } else { 0 }
+            if (($cols290[$i].L + $cols290[$i].W + $gap290) -ne $cols290[$i + 1].L) {
                 $v290Bad += "column '$($cols290[$i].Root)' closes at $($cols290[$i].L + $cols290[$i].W) and '$($cols290[$i + 1].Root)' opens at $($cols290[$i + 1].L) - the four columns tile with no seam (SPEC V290a)"
             }
         }
@@ -8454,19 +8621,23 @@ $stBox = BoxOf (Doc (Join-Path $dir "WoD20.10.lfm")) "STORYTELLER SETTINGS"
 $stChecks = @()
 if ($null -eq $stBox) { $orderBad += "WoD20.10 has no STORYTELLER SETTINGS box - the settings the tab exists for are gone (SPEC I8)" }
 else {
-    $stChecks = @($stBox.SelectNodes("checkBox[@name][@top]"))
-    $stInputs = @($stBox.SelectNodes("checkBox[@top] | button[@top] | comboBox[@top] | edit[@top] | textEditor[@top] | radioButton[@top]"))
+    # SPEC I169a, 24th batch: every row moved inside stSharedScope this round (a <dataScopeBox>
+    # the whole box now pins to the root, SPEC I169e) - BoxKids descends through it so the
+    # rows still read as if they sat where they always did (SPEC V209, B7).
+    $stKids = BoxKids $stBox
+    $stChecks = @($stKids | Where-Object { $_.LocalName -eq 'checkBox' -and $_.Name })
+    $stInputs = @($stKids | Where-Object { $_.LocalName -in @('checkBox', 'button', 'comboBox', 'edit', 'textEditor', 'radioButton') })
     if ($stChecks.Count -lt 7) { $orderBad += "the box holds $($stChecks.Count) named checkBox(es), expected at least the SEVEN flags it carries - five until the 93rd round, plus the two manual-entry flags of the 94th (SPEC I49, I51, I71, V209)" }
     else {
-        $ranked = @($stChecks | Sort-Object { [int]$_.GetAttribute("top") })
-        $firstTwo = @($ranked[0].GetAttribute("name"), $ranked[1].GetAttribute("name")) | Sort-Object
+        $ranked = @($stChecks | Sort-Object { $_.Top })
+        $firstTwo = @($ranked[0].Name, $ranked[1].Name) | Sort-Object
         $wantTwo = @('chkShowDisciplines', 'chkShowNumina')
         if (($firstTwo -join ',') -ne ($wantTwo -join ',')) {
             $orderBad += "the box opens with $($firstTwo -join ' and '), not the two Show flags - the settings that hide a tab were asked to come first (SPEC I35)"
         }
-        $lowest = @($stInputs | Sort-Object { [int]$_.GetAttribute("top") })[-1]
-        if ($lowest.GetAttribute("name") -ne 'btnSaveBaseline') {
-            $orderBad += "the last input in the box is $($lowest.LocalName) '$($lowest.GetAttribute('name'))' at top=$($lowest.GetAttribute('top')) - Save Initial Character was asked to come after everything (SPEC I35)"
+        $lowest = @($stInputs | Sort-Object { $_.Top })[-1]
+        if ($lowest.Name -ne 'btnSaveBaseline') {
+            $orderBad += "the last input in the box is $($lowest.LocalName) '$($lowest.Name)' at top=$($lowest.Top) - Save Initial Character was asked to come after everything (SPEC I35)"
         }
     }
 }
@@ -8480,18 +8651,24 @@ else { Pass "V238 the storyteller box opens with the two Show flags and ends on 
 # two combos on one field - a declared mirror (SPEC I3, V36) reachable from Main and from
 # Combat. It moved to the storyteller's box on the user's ask (SPEC I35).
 #
-# Three legs. (a) exactly one input widget owns the field, and it is in WoD20.10 - which is
-# also what retires the mirror declaration, so V36's stale half now guards the way back.
-# (b) neither HEALTH box carries a combo on it any more. (c) the HEALTH title of both boxes
-# spans its box with left=0, so horzTextAlign centres it on the BOX rather than on the
-# 215px it was left with when the combo shared the row. V27 cannot hold (c) alone: it only
-# looks at labels spanning >=80% of their box, so a title narrowed back to 215 drops out of
-# its reach and reads off-centre in silence - which is the whole of what item 13 was.
+# Three legs. (a) exactly one input widget owns the field, and it is in WoD20.10 - besides the
+# ONE declared mirror the 24th batch reopened (SPEC I169e, V489a): the settings window's own
+# cmbHealthLevelsMc, pinned to the same root node, twin of this one the way stSharedScope and
+# mcSettingsScope are twins for the other twelve. (b) neither HEALTH box carries a combo on it
+# any more. (c) the HEALTH title of both boxes spans its box with left=0, so horzTextAlign
+# centres it on the BOX rather than on the 215px it was left with when the combo shared the
+# row. V27 cannot hold (c) alone: it only looks at labels spanning >=80% of their box, so a
+# title narrowed back to 215 drops out of its reach and reads off-centre in silence - which is
+# the whole of what item 13 was.
 $hlBad = @()
 $hlOwners = @()
 foreach ($f in $files) {
     foreach ($n in (Doc $f.FullName).SelectNodes("//*[@field='healthLevels']")) {
         if ($n.LocalName -eq 'dataLink') { continue }
+        # The declared mirror (SPEC I169e(4), V489a, V36): the settings window's twin of
+        # cmbHealthLevels, both pinned to MC.root. Excluded here by NAME, not by file, so the
+        # leg below still demands exactly one REAL owner and that it is WoD20.10's.
+        if ($n.GetAttribute("name") -eq 'cmbHealthLevelsMc') { continue }
         $hlOwners += "$($f.Name)/$($n.LocalName)"
     }
 }
@@ -9432,19 +9609,23 @@ foreach ($f in $files) {
         # counted for the same reason (SPEC V209, B7).
         if (IsBandLayout $box) { $bandSeen240++; continue }
 
+        # SPEC I169a/I169e, 24th batch: BoxKids descends through a <dataScopeBox> child as if
+        # it were transparent - the two STORYTELLER SETTINGS boxes wrap their rows in one this
+        # round, and an unscoped ChildNodes walk read the scope ITSELF as one more child at its
+        # own left=0/top=0..40, which is how a box that breathes 15 on every side measured 0
+        # (SPEC V209, B7).
         $hi = [int]::MaxValue
         $lo = [int]::MinValue
-        foreach ($k in $box.ChildNodes) {
-            if ($k.NodeType -ne 'Element') { continue }
-            if ($k -eq $back) { continue }
+        foreach ($k in (BoxKids $box)) {
+            if ($k.Node -eq $back) { continue }
             if ($k.LocalName -in @('dataLink', 'script', 'event', 'template')) { continue }
-            if ($k.HasAttribute("rotationAngle")) { continue }
-            if ($k.GetAttribute("align") -eq 'client') { continue }
-            $kt = 0; $kh = 0
-            if (-not [int]::TryParse($k.GetAttribute("top"), [ref]$kt)) { continue }
-            [void][int]::TryParse($k.GetAttribute("height"), [ref]$kh)
-            if ($kt -lt $hi) { $hi = $kt }
-            if (($kt + $kh) -gt $lo) { $lo = $kt + $kh }
+            if ($k.Node.HasAttribute("rotationAngle")) { continue }
+            if ($k.Node.GetAttribute("align") -eq 'client') { continue }
+            if (-not $k.HasTop) { continue }
+            $kh = 0
+            [void][int]::TryParse($k.Height, [ref]$kh)
+            if ($k.Top -lt $hi) { $hi = $k.Top }
+            if (($k.Top + $kh) -gt $lo) { $lo = $k.Top + $kh }
         }
         if ($hi -eq [int]::MaxValue) { continue }
 
@@ -9568,7 +9749,15 @@ foreach ($f in $files) { $stateW += @((Doc $f.FullName).SelectNodes("//*[@name='
 
 $stColBox = BoxOf $stDocX "STORYTELLER SETTINGS"
 $stColX = @()
-if ($null -ne $stColBox) { $stColX = @($stColBox.SelectNodes("comboBox[@left] | button[@left] | edit[@left]") | ForEach-Object { $_.GetAttribute("left") } | Sort-Object -Unique) }
+# SPEC I169a, 24th batch: the column's entry widgets moved inside stSharedScope this round -
+# BoxKids descends through it so they still read as the box's own rows (SPEC V209, B7).
+if ($null -ne $stColBox) {
+    # Assigned before filtering, not piped straight from the call: PowerShell's pipeline drops
+    # BoxKids' whole return when a downstream Where-Object consumes it inline (measured on this
+    # exact box - 26 kids in, 0 out through a direct pipe, 6 through an assigned one).
+    $stColKids = BoxKids $stColBox
+    $stColX = @($stColKids | Where-Object { $_.LocalName -in @('comboBox', 'button', 'edit') } | ForEach-Object { $_.Left } | Sort-Object -Unique)
+}
 
 if ($null -eq $btnSave) { Fail "V243 btnSaveBaseline is not on WoD20.10 - the box lost the one action it exists to offer" }
 elseif ($null -eq $cmbHL) { Fail "V243 cmbHealthLevels is not on WoD20.10 - the column the button lines up with is gone (SPEC V234)" }
@@ -11439,12 +11628,17 @@ $stDoc274 = Doc (Join-Path $dir "WoD20.10.lfm")
 $stBox274 = $stDoc274.SelectSingleNode("//layout[label/@text='STORYTELLER SETTINGS']")
 if ($null -eq $stBox274) { $v274Bad += "the STORYTELLER SETTINGS box is gone from WoD20.10 - this check reads nothing (SPEC V209)" }
 else {
+    # SPEC I169a, 24th batch: every row moved inside stSharedScope this round - BoxKids
+    # descends through the scope so the flags and the height math below still read the box as
+    # it always looked (SPEC V209, B7).
+    $stKids274 = BoxKids $stBox274
+
     # (a) the two flags exist, and NEITHER declares a default: nil is already false, and a
     # declared default would be a second answer to the same question (SPEC V80, V89, V175).
     foreach ($chk274 in @(@('chkManualAffiliation', 'stManualAffiliation'), @('chkManualClanFamily', 'stManualClanFamily'))) {
-        $node274 = $stBox274.SelectSingleNode("checkBox[@name='$($chk274[0])']")
+        $node274 = @($stKids274 | Where-Object { $_.LocalName -eq 'checkBox' -and $_.Name -eq $chk274[0] })[0]
         if ($null -eq $node274) { $v274Bad += "$($chk274[0]) is not in the STORYTELLER SETTINGS box - the flag the storyteller flips is gone (SPEC V274a)" }
-        elseif ($node274.GetAttribute("field") -ne $chk274[1]) { $v274Bad += "$($chk274[0]) binds '$($node274.GetAttribute('field'))', not $($chk274[1]) (SPEC V274a, I3)" }
+        elseif ($node274.Node.GetAttribute("field") -ne $chk274[1]) { $v274Bad += "$($chk274[0]) binds '$($node274.Node.GetAttribute('field'))', not $($chk274[1]) (SPEC V274a, I3)" }
         if ($stDoc274.SelectSingleNode("//dataLink[@field='$($chk274[1])'][@defaultValue]")) { $v274Bad += "$($chk274[1]) declares a defaultValue - the flag must be fail-closed on nil, and a default is a second place for that answer to live (SPEC V274a, V80, V89)" }
     }
 
@@ -11458,18 +11652,21 @@ else {
     # T990 put Game and Era at the TOP of the box (user 2026-09-06, SPEC I156b) and everything
     # under them moved 60 again, exactly as the two flags of the 94th round did: the content now
     # closes at 459 - 20, and the derivation is untouched.
+    # The 24th batch adds an EIGHTH flag below the first seven and moves the three prices and
+    # Save down 30 more (SPEC I169a) - so the anchor moves the same 30, 459 -> 489, and the
+    # rest of the derivation (margin in, margin out) is untouched.
     $h274 = [int]$stBox274.GetAttribute("height")
-    $want274 = 459 - 20 + (2 * $BOX_PAD_Y)
-    if ($h274 -ne $want274) { $v274Bad += "the box is $h274 tall, expected $want274 - two flags of 25 at a pitch of 30 moved everything under them by 60, and the box carries one head and one foot on top of that (SPEC V274e, I71, I73, I137c)" }
-    $kids274 = @($stBox274.ChildNodes | Where-Object { $_.NodeType -eq "Element" -and $_.LocalName -ne "rectangle" -and $_.HasAttribute("top") })
+    $want274 = 489 - 20 + (2 * $BOX_PAD_Y)
+    if ($h274 -ne $want274) { $v274Bad += "the box is $h274 tall, expected $want274 - eight flags of 25 at a pitch of 30 moved everything under them, and the box carries one head and one foot on top of that (SPEC V274e, I71, I73, I137c, I169a)" }
+    $kids274 = @($stKids274 | Where-Object { $_.LocalName -ne "rectangle" -and $_.HasTop })
     if ($kids274.Count -eq 0) { $v274Bad += "the box holds no placed control - the two gaps below would be measured against nothing (SPEC V209)" }
     else {
-        $minTop274 = ($kids274 | ForEach-Object { [int]$_.GetAttribute("top") } | Measure-Object -Minimum).Minimum
-        $maxBot274 = ($kids274 | ForEach-Object { [int]$_.GetAttribute("top") + [int]$_.GetAttribute("height") } | Measure-Object -Maximum).Maximum
+        $minTop274 = ($kids274 | ForEach-Object { $_.Top } | Measure-Object -Minimum).Minimum
+        $maxBot274 = ($kids274 | ForEach-Object { $_.Top + [int]$_.Height } | Measure-Object -Maximum).Maximum
         if ($minTop274 -ne $BOX_PAD_Y) { $v274Bad += "the box breathes $minTop274 above its title, expected $BOX_PAD_Y (SPEC V240, V274e, I137c)" }
         if (($h274 - $maxBot274) -ne $BOX_PAD_Y) { $v274Bad += "the box breathes $($h274 - $maxBot274) under its last row, expected $BOX_PAD_Y (SPEC V240, V274e, I137c)" }
-        $lowest274 = @($kids274 | Where-Object { $_.GetAttribute("name") } | Sort-Object { [int]$_.GetAttribute("top") })[-1]
-        if ($lowest274.GetAttribute("name") -ne 'btnSaveBaseline') { $v274Bad += "the last named control in the box is '$($lowest274.GetAttribute('name'))' - Save Initial Character is the one irreversible action here and comes after everything (SPEC V238b, V274e)" }
+        $lowest274 = @($kids274 | Where-Object { $_.Name } | Sort-Object { $_.Top })[-1]
+        if ($lowest274.Name -ne 'btnSaveBaseline') { $v274Bad += "the last named control in the box is '$($lowest274.Name)' - Save Initial Character is the one irreversible action here and comes after everything (SPEC V238b, V274e)" }
     }
 }
 
@@ -12571,30 +12768,35 @@ foreach ($f in $files) {
     }
 }
 if ($v280Apply -ne 1) { Fail "V280 $v280Apply titleless one-button box(es) were cut, expected the 1 the Apply box is (SPEC I163f, V479c, V209, B7)" }
-elseif ($v280Boxes.Count -ne 70) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
+elseif ($v280Boxes.Count -ne 71) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 71 I73 measures (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
 else {
     # (a) TWO numbers since T913: 20 on the X sides, 15 on the Y ones (SPEC I137c, user
     # 2026-09-02). The X pair is a FLOOR and always was. The Y pair splits: the FOOT is a floor,
     # for V240's old reason - boxes welded to a closing line carry the slack INSIDE (SPEC B63) -
     # and the HEAD is an EQUALITY, because it has no freedom at all and a floor there would let a
     # new box keep 20 and never be told (SPEC I137c).
+    #
+    # SPEC I169a/I169e, 24th batch: BoxKids descends through a <dataScopeBox> child as if it
+    # were transparent - the settings window (and WoD20.10's own box, measured elsewhere) wrap
+    # their rows in one this round, and an unscoped ChildNodes walk read the scope ITSELF as a
+    # child sitting at its own left=0/top=0..40, which reads as a margin of 0 on every side
+    # (SPEC V209, B7).
     $v280Centred = 0
     foreach ($b in $v280Boxes) {
         $ml = [int]::MaxValue; $mr = [int]::MaxValue; $mt = [int]::MaxValue; $mb = [int]::MaxValue
-        foreach ($k in $b.Node.ChildNodes) {
-            if ($k.NodeType -ne 'Element') { continue }
+        foreach ($k in (BoxKids $b.Node)) {
             if ($k.LocalName -in @('dataLink', 'script', 'event', 'template')) { continue }
-            if ($k.GetAttribute("align") -eq 'client') { continue }              # the backdrop, and anything else filling the box
-            if ($k.LocalName -eq 'rectangle' -and $k.GetAttribute("left") -eq '0' -and $k.GetAttribute("top") -eq '0') { continue }
-            if ($k.HasAttribute("rotationAngle")) { $v280Rot++; continue }       # (c)
-            $kl = 0; $kt = 0; $kw = 0; $kh = 0
-            if (-not ([int]::TryParse($k.GetAttribute("left"), [ref]$kl) -and [int]::TryParse($k.GetAttribute("top"), [ref]$kt))) { continue }
-            [void][int]::TryParse($k.GetAttribute("width"), [ref]$kw)
-            [void][int]::TryParse($k.GetAttribute("height"), [ref]$kh)
-            if ($kl -lt $ml) { $ml = $kl }
-            if ($kt -lt $mt) { $mt = $kt }
-            if (($b.W - $kl - $kw) -lt $mr) { $mr = $b.W - $kl - $kw }
-            if (($b.H - $kt - $kh) -lt $mb) { $mb = $b.H - $kt - $kh }
+            if ($k.Node.GetAttribute("align") -eq 'client') { continue }              # the backdrop, and anything else filling the box
+            if ($k.LocalName -eq 'rectangle' -and $k.Left -eq 0 -and $k.Top -eq 0) { continue }
+            if ($k.Node.HasAttribute("rotationAngle")) { $v280Rot++; continue }       # (c)
+            if (-not ($k.HasLeft -and $k.HasTop)) { continue }
+            $kw = 0; $kh = 0
+            [void][int]::TryParse($k.Width, [ref]$kw)
+            [void][int]::TryParse($k.Height, [ref]$kh)
+            if ($k.Left -lt $ml) { $ml = $k.Left }
+            if ($k.Top -lt $mt) { $mt = $k.Top }
+            if (($b.W - $k.Left - $kw) -lt $mr) { $mr = $b.W - $k.Left - $kw }
+            if (($b.H - $k.Top - $kh) -lt $mb) { $mb = $b.H - $k.Top - $kh }
         }
         # Counted BEFORE the chain below, on membership alone: hanging the tally off the
         # branch would drop it whenever one of these two also broke a margin, and the guard
@@ -12713,7 +12915,7 @@ else { Pass "V280 (d) the $($colBottoms.Count) Ghoul columns all close at $(@($c
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
 # (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
 # on them would be a false alarm on numbers this round agreed not to touch.
-if ($v280Boxes.Count -ne 70) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 70 I73 measures (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
+if ($v280Boxes.Count -ne 71) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 71 I73 measures (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
 else {
     # The declared HOLE is GONE with T908 and the 5px rule is whole again. T904 had left the
     # 680..1010 band of the Main grid with no bottom box, so two boxes faced each other a whole
@@ -13393,6 +13595,9 @@ foreach ($f300 in $files) {
     foreach ($n300 in (Doc $f300.FullName).SelectNodes("//*[starts-with(@name,'note')]")) {
         $nn300 = $n300.GetAttribute("name")
         if ($nn300 -eq 'noteHedgePaths') { continue }
+        # 25th batch (SPEC I170h): the ! note's tooltip and its scroller are named for the NOTE
+        # they show, not for a pane - admitted by exact name, so a note<X> caption still reddens.
+        if ($nn300 -ceq 'noteTip' -or $nn300 -ceq 'noteTipScroll') { continue }
         $v300Bad += "$($f300.Name) declares '$nn300' - note<X> paired a caption with a PANE, T830 took the last pane, and a caption named for one is named for something that does not exist (SPEC I76c, I117, B98)"
     }
 }
@@ -15228,13 +15433,22 @@ foreach ($n333 in @('popScrim', 'popDesc')) {
     elseif ($c333.GetAttribute("visible") -ne 'false') { $v333Bad += "$n333 is authored visible - it would cover the grid from the moment the tab opens (SPEC I102a, V333c)" }
 }
 
-# (e) ONE closer, reached from BOTH doors and from nowhere else. Two closers is how the scrim
-# ends up hidden with the box still on screen - the V135 disease in its geometry form.
+# (e) ONE closer, reached from the doors and from nowhere else. An UNNAMED closer is how the
+# scrim ends up hidden with the box still on screen - the V135 disease in its geometry form.
+#
+# THREE since the 24th batch, by DESIGN and not by drift (SPEC V493d, I169e(4)): the settings
+# window's own X, btnMcSettingsClose, closes through the SAME popClose the ? box's X and the
+# scrim already share - POP_BOX carries mcSettings now (SPEC I169e(1)) precisely so a second
+# closing function never has to exist. All three are named here, so a FOURTH still reddens.
 $close333 = @($ovl333.SelectNodes("//*[@onClick]") | Where-Object { $_.GetAttribute("onClick") -match 'popClose\(' })
 $closeNames333 = @($close333 | ForEach-Object { $_.GetAttribute("name") })
-if ($closeNames333 -notcontains 'btnPopClose') { $v333Bad += "btnPopClose does not call popClose - the X is one of the two doors I102c declares (SPEC V333e)" }
+if ($closeNames333 -notcontains 'btnPopClose') { $v333Bad += "btnPopClose does not call popClose - the X is one of the doors I102c declares (SPEC V333e)" }
 if ($closeNames333 -notcontains 'popScrim')    { $v333Bad += "popScrim does not call popClose - a click outside would leave the box standing (SPEC V333e)" }
-if ($close333.Count -ne 2) { $v333Bad += "$($close333.Count) control(s) call popClose, expected the X and the scrim - a third door is a third place the two visibles can disagree (SPEC V135, V333e)" }
+if ($closeNames333 -notcontains 'btnMcSettingsClose') { $v333Bad += "btnMcSettingsClose does not call popClose - the settings window would need a closing function of its own (SPEC V333e, V493d, I169e(4))" }
+# FOUR since the 25th batch, for the same reason: the ! note window's X closes through the
+# same popClose, and POP_BOX carries popNote (SPEC I170g, V500d). A FIFTH still reddens.
+if ($closeNames333 -cnotcontains 'btnPopNoteClose') { $v333Bad += "btnPopNoteClose does not call popClose - the note window would need a closing function of its own (SPEC V333e, V500d)" }
+if ($close333.Count -ne 4) { $v333Bad += "$($close333.Count) control(s) call popClose, expected btnPopClose, popScrim, btnMcSettingsClose and btnPopNoteClose - a fifth door is a fifth place the visibles can disagree (SPEC V135, V333e)" }
 
 # (f) wordWrap is the ONLY thing between this box and the horizontal scrollbar the user ruled
 # out: SDK3 has no scroll property on textEditor, so the fix is to give it nothing to scroll.
@@ -16206,9 +16420,11 @@ else { Pass "V348 all 873 merit/flaw entries cost one fixed number, the 313 spli
 $v349Bad = @()
 $doc349 = Doc (Join-Path $dir "WoD20.2.lfm")
 # left;width of every column, per template. The ? is in the gutter and is not a column (I102f).
+# 25th batch (SPEC I170g, B171): the ! note door sits between the name and Book, 20 wide, so the
+# three right-hand columns moved 20 and the name did NOT give way - leg (c) below is exactly why.
 $V349_COLS = @{
-    'MeritPicked' = @{ 'merit_' = '20;264'; 'book_' = '284;117'; 'type_' = '401;45'; 'costy_' = '446;50' }
-    'MeritFree'   = @{ 'merit_' = '20;264'; 'book_' = '284;117'; 'type_' = '401;45'; 'costy_' = '446;50' }
+    'MeritPicked' = @{ 'merit_' = '20;264'; 'book_' = '304;117'; 'type_' = '421;45'; 'costy_' = '466;50' }
+    'MeritFree'   = @{ 'merit_' = '20;264'; 'book_' = '304;117'; 'type_' = '421;45'; 'costy_' = '466;50' }
 }
 $seen349 = 0
 foreach ($tn349 in @('MeritPicked')) {
@@ -16267,7 +16483,7 @@ foreach ($h349 in $hdr349) {
 }
 if ($seen349 -lt 4) { $v349Bad += "(d) only $seen349 of the 4 field columns were measured - this check is covering less than MeritPicked draws (SPEC V209)" }
 if ($v349Bad) { foreach ($b in $v349Bad) { Fail "V349 $b" } }
-else { Pass "V349 the four merit/flaw columns tile 20;264 284;117 401;45 446;50 in both templates, the Page heading still holds its own label, and the name column fits all $n349 items in both languages at 6.0 px/char" }
+else { Pass "V349 the four merit/flaw columns sit at 20;264 304;117 421;45 466;50 around the ! door in both templates, the Page heading still holds its own label, and the name column fits all $n349 items in both languages at 6.0 px/char" }
 
 # ---- V350: the dropdown comes out in the order it is READ ------------------------------
 # SPEC I110, C Q26, T799. The gate cannot RUN Lua (SPEC B30, B34), so every leg here measures
@@ -16841,11 +17057,14 @@ if ($boxes332.Count -ne 14) {
     # The tab floor went 693 -> 695 and that is arithmetic, not taste: MERITS = FLAWS closing on
     # BACKGROUNDS wants 2h+5 = floor, and the ten right-hand boxes on one height want 4h+15 =
     # floor. At 693 the second gives 169.5. 695 gives 345 and 170, both whole (SPEC I134j).
+    # REMEASURED 2026-09-24 (SPEC I170g, B171): the ! note door took 20 in BACKGROUNDS (364 ->
+    # 384) and 20 in MERITS/FLAWS (536 -> 556, the name could not give way); everything right of
+    # each moved with it, every gap is still 5 and the floor did not move.
     $want332 = @(
-        '0;0;364;679', '369;0;536;337', '369;342;536;337', '1370;0;225;337',
-        '910;0;225;166', '1140;0;225;166', '910;171;225;166', '1140;171;225;166',
-        '910;342;225;166', '1140;342;225;166', '1370;342;225;166',
-        '910;513;225;166', '1140;513;225;166', '1370;513;225;166'
+        '0;0;384;679', '389;0;556;337', '389;342;556;337', '1410;0;225;337',
+        '950;0;225;166', '1180;0;225;166', '950;171;225;166', '1180;171;225;166',
+        '950;342;225;166', '1180;342;225;166', '1410;342;225;166',
+        '950;513;225;166', '1180;513;225;166', '1410;513;225;166'
     )
     $got332 = @($boxes332 | ForEach-Object { "$($_.L);$($_.T);$($_.W);$($_.H)" } | Sort-Object)
     $extra332 = @($got332 | Where-Object { $want332 -notcontains $_ })
@@ -16865,9 +17084,9 @@ if ($boxes332.Count -ne 14) {
         }
     }
 
-    # (c) the tab closes on 1595 and the columns keep the 5px gutter V298 measures elsewhere.
+    # (c) the tab closes on 1635 and the columns keep the 5px gutter V298 measures elsewhere.
     $right332 = ($boxes332 | ForEach-Object { $_.L + $_.W } | Measure-Object -Maximum).Maximum
-    if ($right332 -ne 1595) { $v332Bad += "(c) the rightmost box closes at $right332, not the 1595 T790's arithmetic lands on (364+5+536+5+225+5+225+5+225) - this tab reaches for a horizontal scrollbar first (SPEC I101h)" }
+    if ($right332 -ne 1635) { $v332Bad += "(c) the rightmost box closes at $right332, not the 1635 the 25th batch's arithmetic lands on (384+5+556+5+225+5+225+5+225) - this tab reaches for a horizontal scrollbar first (SPEC I101h, I170g, B171)" }
     $colL332 = @($boxes332 | ForEach-Object { $_.L } | Sort-Object -Unique)
     foreach ($cl332 in $colL332) {
         if ($cl332 -eq 0) { continue }
@@ -16892,7 +17111,7 @@ if ($sta332.Count -ne 0) { $v332Bad += "(e) the label STATUS is back on the Trai
 if ($art332.Count -ne 1) { $v332Bad += "(e) the ARTIFACTS label appears $($art332.Count) time(s), expected 1 (SPEC I101g)" }
 if (@($doc331.SelectNodes("//*[@field='status']")).Count -ne 1) { $v332Bad += "(e) the field 'status' is no longer owned exactly once on this tab - renaming it drops what saved sheets hold (SPEC V2)" }
 if ($v332Bad) { foreach ($b in $v332Bad) { Fail "V332 $b" } }
-else { Pass "V332 the Traits tab draws the 14 boxes of I101h with no overlap, closes on 1595 with 5px gutters, and still owns 'status' once under the ARTIFACTS label - its ten background boxes are V392's now" }
+else { Pass "V332 the Traits tab draws the 14 boxes of I101h with no overlap, closes on 1635 with 5px gutters, and still owns 'status' once under the ARTIFACTS label - its ten background boxes are V392's now" }
 
 # ---- V345: every description module breaks lines the SAME way, and that way is LF ---------
 # (SPEC V345, B87) The ten modules are written by script, and a module coming out with the
@@ -18108,7 +18327,9 @@ else { Pass "V366 descNature partitions PICKER_LIST[nature] exactly - $(@($natEn
 # popOpen and mfOpen already walk from tabRootOf(from) - the top of the whole form - so they
 # found the controls the whole time (SPEC B9). What was broken is WHERE the controls hang.
 $v367Bad = @()
-$OVERLAYS_367 = @('popScrim', 'popDesc', 'mfSearch')
+# mcSettings (24th batch) and popNote (25th, SPEC I170g) float over the tabs the same way, and
+# hang off sheetBody for the same reason (SPEC I170a).
+$OVERLAYS_367 = @('popScrim', 'popDesc', 'mfSearch', 'mcSettings', 'popNote')
 $rootDoc367 = Doc (Join-Path $dir "WoD20th.lfm")
 $body367 = $rootDoc367.SelectSingleNode("//layout[@name='sheetBody']")
 
@@ -18136,7 +18357,9 @@ else {
         # .LocalName and NOT .Name: PowerShell's XML adapter exposes the `name` ATTRIBUTE as
         # .Name and shadows the element's own, so `.Name -eq 'layout'` was false for every
         # child and leg (b) reported an empty tab list against a body full of tabs.
-        if ($kn367 -like 'tab*' -and $kids367[$i367].LocalName -eq 'layout') { $lastTab367 = $i367 }
+        # sheetMain HOLDS the strip and the eleven panes since the 25th batch (SPEC I170a, B170):
+        # it is the tabs' own box among sheetBody's children, so the overlays come after IT.
+        if (($kn367 -like 'tab*' -or $kn367 -ceq 'sheetMain') -and $kids367[$i367].LocalName -eq 'layout') { $lastTab367 = $i367 }
         if ($OVERLAYS_367 -contains $kn367 -and $firstOv367 -lt 0) { $firstOv367 = $i367 }
     }
     if ($lastTab367 -lt 0) { $v367Bad += "(b) sheetBody carries no tab layout - leg (b) has nothing to be after and would pass by vacancy (SPEC V367b, V209, V20)" }
@@ -19303,7 +19526,9 @@ if ($null -eq $merit392 -or $null -eq $flaw392 -or $null -eq $bg392 -or $null -e
             $v392Bad += "(d) DERANGEMENTS is $($der392.H)px, the same as the ten it is excepted from - either it stopped needing the exception, in which case the exception goes, or the ten drifted onto it (SPEC I134k, V209)"
         }
         # (c) again, for the column: the LAST box of each of the three stacks closes on the floor.
-        foreach ($cl392 in @(910, 1140, 1370)) {
+        # 950/1180/1410 since the 25th batch: BACKGROUNDS and MERITS/FLAWS each grew 20 for the
+        # ! note door and every column right of them moved 40 (SPEC I170g, B171, V332a).
+        foreach ($cl392 in @(950, 1180, 1410)) {
             $stack392 = @($doc392.SelectNodes("//scrollBox/layout") | Where-Object {
                 -not $_.HasAttribute("name") -and [int]$_.GetAttribute("left") -eq $cl392
             } | ForEach-Object { [int]$_.GetAttribute("top") + [int]$_.GetAttribute("height") })
@@ -20739,6 +20964,15 @@ $v430Links = New-Object System.Collections.ArrayList
 foreach ($f430 in $files) {
     $raw430 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f430.FullName))
     $raw430 = [regex]::Replace($raw430, '(?s)<!--.*?-->', '')
+    # 24th batch (SPEC B7 by another road): a Lua `--` comment quoting the real tag for a human
+    # reader ("the ONLY caller is the <dataLink onChange=\"mcShared(self);\">...") is not an
+    # XML comment, so the strip above left it standing - and the sweep below, seeing a literal
+    # "<dataLink" with no idea it was reading prose, opened a match there and swallowed every
+    # real <dataLink> up to the next literal </dataLink> as if it were this one's own body,
+    # hiding the one that actually calls renderClanFamilyButton along with its 'language'
+    # observer. NoComments (the SAME stripper CodeOf already runs, SPEC line 94) removes the
+    # whole Lua comment line, "<dataLink" prose included, before the tag sweep ever sees it.
+    $raw430 = NoComments $raw430
     $code430 = CodeOf $f430.FullName
     foreach ($m430 in [regex]::Matches($code430, 'function\s+(render\w+)\s*\(')) {
         $nm430 = $m430.Groups[1].Value
@@ -20936,12 +21170,18 @@ else {
     # checkBox counts here and does NOT in V243: that one measures the entry COLUMN, which the
     # ticks were never in (x=35 against 210); this one measures the ORDER the user asked for,
     # and a flag put above Game breaks it exactly as a fourth combo would (SPEC V449d, V238a).
-    $ent449 = @($box449.SelectNodes("comboBox[@top] | button[@top] | edit[@top] | checkBox[@top]") | Sort-Object { [int]$_.GetAttribute("top") })
+    #
+    # SPEC I169a, 24th batch: every row moved inside stSharedScope this round - BoxKids
+    # descends through it so the order still reads as the box always looked (SPEC V209, B7).
+    # Assigned before filtering, not piped straight from the call (see V243's own note: a
+    # direct pipe off a BoxKids call drops the whole result).
+    $box449Kids = BoxKids $box449
+    $ent449 = @($box449Kids | Where-Object { $_.LocalName -in @('comboBox', 'button', 'edit', 'checkBox') -and $_.HasTop } | Sort-Object { $_.Top })
     if ($ent449.Count -lt 3) { $v449Bad += "(d) only $($ent449.Count) entry widget(s) read inside the box - the order rule would be true by vacancy (SPEC V209)" }
     else {
-        $first449 = @($ent449[0].GetAttribute("name"), $ent449[1].GetAttribute("name")) | Sort-Object
+        $first449 = @($ent449[0].Name, $ent449[1].Name) | Sort-Object
         if (($first449 -join ',') -ne 'cboGame,cboSheetTheme') { $v449Bad += "(d) the two topmost entry widgets are [$($first449 -join ', ')], expected cboGame and cboSheetTheme - the user asked for them FIRST, top to bottom (SPEC V449d, I156b)" }
-        if ([int]$ent449[0].GetAttribute("top") -ge [int]$ent449[1].GetAttribute("top")) { $v449Bad += "(d) Game and Era do not sit on two different rows (SPEC V449d)" }
+        if ($ent449[0].Top -ge $ent449[1].Top) { $v449Bad += "(d) Game and Era do not sit on two different rows (SPEC V449d)" }
     }
 }
 if ($cbo449.Count -lt 2) { Fail "V449 only $($cbo449.Count) of the two moved combos was read on WoD20.10 - a rule over controls it cannot see is true by vacancy (SPEC V449, V209, B7)" }
@@ -22947,7 +23187,11 @@ elseif ($iD484 -lt $iR484 -or $iD484 -gt $iE484) { $v484Bad += "xpHiDrop is not 
 
 # ARMED: the record stays lit for exactly as long as the question is on screen (SPEC I165d).
 $iArm484 = $root484.IndexOf('xpHiArm(form, i);')
-$iDlg484 = $root484.IndexOf('Dialogs.confirmOkCancel')
+# SEARCHED FROM $iArm484, not from the start of the file, since the 24th batch (SPEC I169i):
+# mcRemove's own Dialogs.confirmOkCancel (SPEC V491d) is declared earlier in the root script
+# than xpRevert, so an unanchored IndexOf found that dialog instead and measured the gap
+# against the wrong question.
+$iDlg484 = $root484.IndexOf('Dialogs.confirmOkCancel', [Math]::Max($iArm484, 0))
 $iClr484 = $root484.IndexOf('xpHiClear(form);')
 $iOk484  = $root484.IndexOf('if not ok or sheet == nil then return; end;')
 if ($iArm484 -lt 0 -or $iClr484 -lt 0) { $v484Bad += "ARMED xpRevert does not both arm and clear the highlight - the band would drop the moment the modal took the pointer off the X (SPEC V484, I165d)" }
@@ -23198,5 +23442,847 @@ else {
 }
 if ($v487Bad) { foreach ($b in $v487Bad) { Fail "V487 $b" } }
 else { Pass "V487 the root script opens with the per-instance _ENV rebind, declared once across the sheet, and no setfenv is called (SPEC I168, B169)" }
+
+# ---- V488: the flag OFF is TODAY's sheet, and the column exists on screen for ONE write (SPEC I169a/I169b, Q88; V80/V89 fail-closed) ----
+$v488Bad = @()
+$rootDoc488 = Doc $rootPath
+$sheetBody488 = $rootDoc488.SelectSingleNode("//layout[@name='sheetBody']")
+$mcDockNode488 = $rootDoc488.SelectSingleNode("//layout[@name='mcDock']")
+$mcApplyFn488 = LuaFn $rootTxt 'mcApply'
+if ($null -eq $mcDockNode488 -or -not $mcApplyFn488) { $v488Bad += "mcDock or mcApply is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) invisible from birth, docked left, and the FIRST child of sheetBody - before tabStrip.
+    if ($mcDockNode488.GetAttribute("visible") -ne 'false') { $v488Bad += "(a) mcDock does not author visible='false' - the column would be on screen before any Lua ran (SPEC V488a, V484a)" }
+    if ($mcDockNode488.GetAttribute("align") -ne 'left') { $v488Bad += "(a) mcDock does not author align='left' - it would not dock left of the strip by construction (SPEC V488a)" }
+    if ($null -eq $sheetBody488) { $v488Bad += "(a) sheetBody is gone from the root form (SPEC V209)" }
+    else {
+        $sbKids488 = @($sheetBody488.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
+        if ($sbKids488.Count -eq 0 -or $sbKids488[0].GetAttribute('name') -ne 'mcDock') { $v488Bad += "(a) mcDock is not the FIRST element child of sheetBody (SPEC V488a, I169b)" }
+        # 25th batch (SPEC B170, I170a): declaration order never put the column beside the strip -
+        # the engine aligns top before left - so the strip lives in sheetMain now, and V496a is the
+        # leg that measures the NESTING. This leg only keeps sheetMain as mcDock's sibling.
+        if (-not ($sbKids488 | Where-Object { $_.GetAttribute('name') -eq 'sheetMain' })) { $v488Bad += "(a) sheetMain is not a child of sheetBody - the column has nothing to sit beside (SPEC V488a as amended, V496a, V209)" }
+    }
+
+    # (b) mcDock.visible has ONE writer, mcApply, reading MC.root.multipleCharacters == true.
+    $mcApplyBody488 = NoComments $mcApplyFn488
+    $dockVisTotal488 = @([regex]::Matches((NoComments $rootTxt), 'mcDock"\]\.visible\s*=')).Count
+    if ($dockVisTotal488 -ne 1) { $v488Bad += "(b) mcDock.visible is written $dockVisTotal488 time(s) sheet-wide, expected exactly 1 - two writers of one flag is how a storyteller's OFF and a stray render disagree (SPEC V488b)" }
+    elseif ($mcApplyBody488 -notmatch 'mcDock"\]\.visible\s*=') { $v488Bad += "(b) the one writer of mcDock.visible is not inside mcApply (SPEC V488b)" }
+    if ($mcApplyBody488 -notmatch 'local on = MC\.root\.multipleCharacters == true;') { $v488Bad += "(b) mcApply does not read 'local on = MC.root.multipleCharacters == true;' - a bare ~= false would read nil (an old sheet) as ON (SPEC V488b, V80, V89)" }
+
+    # (c) mcApply sends the form back to the ROOT NODE when the flag is OFF - a storyteller who
+    # unticks it must not leave the screen pointed at character 3. mcShow(MC.root and not
+    # mcSelect(1 since the 25th batch: with the root removed, row 1 is a child (SPEC V499a).
+    if ($mcApplyBody488 -notmatch 'if not on then mcShow\(MC\.root, from\); end;') { $v488Bad += "(c) mcApply does not call mcShow(MC.root, from) under 'if not on' - turning the flag off would leave the sheet on whichever character was active (SPEC V488c as amended, V499a)" }
+}
+
+# (d) chkMultipleChars sits inside stSharedScope, carries no onChange of its own, and no
+# <dataLink field='multipleCharacters'> exists outside stSharedScope - the scope's own trigger
+# (SPEC V492d) is the only listener.
+$stDoc488 = Doc (Join-Path $dir "WoD20.10.lfm")
+$chk488 = $stDoc488.SelectSingleNode("//checkBox[@name='chkMultipleChars']")
+if ($null -eq $chk488) { $v488Bad += "(d) chkMultipleChars is not declared on WoD20.10 (SPEC V209)" }
+else {
+    if ($chk488.HasAttribute("onChange")) { $v488Bad += "(d) chkMultipleChars authors an onChange of its own - stSharedScope's own dataLink is the only listener, or the mirror could fire twice for one click (SPEC V488d, V492d)" }
+    if ($null -eq $stDoc488.SelectSingleNode("//dataScopeBox[@name='stSharedScope']//checkBox[@name='chkMultipleChars']")) { $v488Bad += "(d) chkMultipleChars is not inside stSharedScope - it would read and write whichever character is ACTIVE, not the ficha (SPEC V488d, I169a)" }
+}
+$outsideLinks488 = @()
+foreach ($f488 in $files) {
+    $d488 = Doc $f488.FullName
+    foreach ($ln488 in $d488.SelectNodes("//dataLink[@field='multipleCharacters']")) {
+        if ($null -eq $ln488.SelectSingleNode("ancestor::dataScopeBox[@name='stSharedScope']")) { $outsideLinks488 += "$($f488.Name)" }
+    }
+}
+if ($outsideLinks488) { $v488Bad += "(d) a <dataLink field='multipleCharacters'> exists outside stSharedScope, in $($outsideLinks488 -join ', ') - it would watch the ACTIVE node after a swap instead of the ficha's own flag (SPEC V488d)" }
+
+if ($v488Bad) { foreach ($b in $v488Bad) { Fail "V488 $b" } }
+else { Pass "V488 mcDock is born invisible and docks left beside sheetMain, mcApply is its one writer and sends the form back to the root node when the flag goes off, and the flag itself is pinned to the ficha with one listener" }
+
+# ---- V489: field= counts BY DATA SCOPE - V1 amended (SPEC I169c/I169e, V222, R169b) ----
+$v489Bad = @()
+$dsbCount489 = 0
+foreach ($f489z in $files) { $dsbCount489 += @((Doc $f489z.FullName).SelectNodes("//dataScopeBox")).Count }
+if ($dsbCount489 -eq 0) { $v489Bad += "no <dataScopeBox> was found anywhere in the sheet - this whole check reads nothing (SPEC V20, B7)" }
+else {
+    # (a) McRow's OWN field list has no internal duplicate (V1's one-owner rule still holds
+    # WITHIN a scope), and each of the 13 shared fields' WoD20th-side owner is INSIDE
+    # mcSettingsScope specifically - not merely somewhere in the settings window.
+    $MC_SHARED_13 = @('game', 'sheetTheme', 'stShowNumina', 'stShowDisciplines', 'stFreeBuy', 'stEditClanDisc', 'stEditSpentXP', 'stManualAffiliation', 'stManualClanFamily', 'healthLevels', 'stSpecCost', 'stBackgroundCost', 'multipleCharacters')
+    $mcRowTpl489 = $rootDoc488.SelectSingleNode("//template[@name='McRow']")
+    if ($null -eq $mcRowTpl489) { $v489Bad += "(a) <template name='McRow'> is gone - the row's own field list cannot be measured (SPEC V209)" }
+    else {
+        $mcRowFieldList489 = @($mcRowTpl489.SelectNodes(".//*[@field]") | ForEach-Object { $_.GetAttribute("field") })
+        foreach ($d489 in ($mcRowFieldList489 | Group-Object | Where-Object { $_.Count -gt 1 })) {
+            $v489Bad += "(a) McRow declares field '$($d489.Name)' $($d489.Count) times - within one row's own scope, V1's one-owner rule still holds (SPEC V489a)"
+        }
+    }
+    foreach ($sf489 in $MC_SHARED_13) {
+        if ($null -eq $rootDoc488.SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']//*[@field='$sf489']")) {
+            $v489Bad += "(a) '$sf489' has no owner inside mcSettingsScope - a widget moved out of the scope still shares the name but no longer shares the ROOT node (SPEC V489a, I169e(4))"
+        }
+    }
+
+    # (b) McRow's field SET equals exactly the I3 contract for a character row - nothing more,
+    # nothing less. 25th batch (SPEC I170c, V497a): the willpower boxes and the three number
+    # fields left the row - its bars read the dots and carry no field= at all.
+    $MC_ROW_FIELDS = @('name', 'avatar', 'health_1', 'health_2', 'health_3', 'health_4', 'health_5', 'health_6', 'health_7', 'health_8', 'health_9', 'health_10')
+    if ($null -ne $mcRowTpl489) {
+        $mcRowSet489 = @($mcRowFieldList489 | Sort-Object -Unique)
+        $missing489 = @($MC_ROW_FIELDS | Where-Object { $mcRowSet489 -notcontains $_ })
+        $extra489 = @($mcRowSet489 | Where-Object { $MC_ROW_FIELDS -notcontains $_ })
+        if ($missing489) { $v489Bad += "(b) McRow is missing field(s) $($missing489 -join ', ') - the row's own I3 contract is incomplete (SPEC V489b)" }
+        if ($extra489) { $v489Bad += "(b) McRow authors field(s) $($extra489 -join ', ') outside its I3 contract - the row shows something Main/Combat never asked for (SPEC V489b)" }
+    }
+
+    # (c) stSharedScope's fields == mcSettingsScope's fields (13 == 13); MC_SHARED_FIELDS ==
+    # (that set - multipleCharacters + language); the trigger dataLink's fields= ==
+    # MC_SHARED_FIELDS union {multipleCharacters}.
+    $stSharedNode489 = (Doc (Join-Path $dir "WoD20.10.lfm")).SelectSingleNode("//dataScopeBox[@name='stSharedScope']")
+    $mcSetNode489 = $rootDoc488.SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']")
+    if ($null -eq $stSharedNode489 -or $null -eq $mcSetNode489) { $v489Bad += "(c) stSharedScope or mcSettingsScope is gone - the twin comparison reads nothing (SPEC V209)" }
+    else {
+        $stSharedFields489 = @($stSharedNode489.SelectNodes(".//*[@field]") | ForEach-Object { $_.GetAttribute("field") } | Where-Object { $_ } | Sort-Object -Unique)
+        $mcSetFields489 = @($mcSetNode489.SelectNodes(".//*[@field]") | ForEach-Object { $_.GetAttribute("field") } | Where-Object { $_ } | Sort-Object -Unique)
+        if (($stSharedFields489 -join ',') -ne ($mcSetFields489 -join ',')) {
+            $v489Bad += "(c) stSharedScope holds {$($stSharedFields489 -join ', ')} and mcSettingsScope holds {$($mcSetFields489 -join ', ')} - the window would offer a field the box does not, or hide one it has (SPEC V489c)"
+        }
+        if ($stSharedFields489.Count -ne 13) { $v489Bad += "(c) stSharedScope holds $($stSharedFields489.Count) field(s), expected 13 (SPEC V489c, I169e)" }
+
+        $msfMatch489 = [regex]::Match($rootTxt, '(?s)MC_SHARED_FIELDS\s*=\s*\{(.*?)\};')
+        if (-not $msfMatch489.Success) { $v489Bad += "(c) MC_SHARED_FIELDS is not declared on the root form - the mirror has no list to copy (SPEC V209, V492a)" }
+        else {
+            $msfSet489 = @([regex]::Matches($msfMatch489.Groups[1].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+            $wantMsf489 = @((@($stSharedFields489) | Where-Object { $_ -ne 'multipleCharacters' }) + 'language' | Sort-Object -Unique)
+            if (($msfSet489 -join ',') -ne ($wantMsf489 -join ',')) {
+                $v489Bad += "(c) MC_SHARED_FIELDS is {$($msfSet489 -join ', ')}, expected {$($wantMsf489 -join ', ')} - stSharedScope minus multipleCharacters plus language (SPEC V489c)"
+            }
+
+            $trigLink489 = $stSharedNode489.SelectSingleNode("dataLink[contains(@onChange,'mcShared')]")
+            if ($null -eq $trigLink489) { $v489Bad += "(c) no direct-child <dataLink onChange='mcShared(...)'> was found inside stSharedScope - the mirror's own trigger is gone (SPEC V489c, V492d)" }
+            else {
+                $linkFields489 = @([regex]::Matches($trigLink489.GetAttribute("fields"), "'([^']+)'") | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+                $wantLink489 = @($msfSet489 + 'multipleCharacters' | Sort-Object -Unique)
+                if (($linkFields489 -join ',') -ne ($wantLink489 -join ',')) {
+                    $v489Bad += "(c) the trigger dataLink watches {$($linkFields489 -join ', ')}, expected MC_SHARED_FIELDS plus multipleCharacters - a field left out would not mirror when the storyteller changes it (SPEC V489c)"
+                }
+            }
+        }
+    }
+}
+if ($v489Bad) { foreach ($b in $v489Bad) { Fail "V489 $b" } }
+else { Pass "V489 field= is namespaced by data scope, McRow's own list matches the I3 contract exactly, and the settings window's 13 fields agree with the storyteller's box, MC_SHARED_FIELDS and the mirror's own trigger" }
+
+# ---- V490: the SWAP has one owner, the TOUCH selects, and the index persists what the screen shows (SPEC I169c/I169d, R169a, Q88.3) ----
+$v490Bad = @()
+# 25th batch (SPEC I170f, V499a): the swap's owner is mcShow, which takes a NODE - the root can
+# be out of the list and still be where the form falls back to. mcSelect(k) is a one-line door
+# into it, so every leg below that read "mcSelect" reads mcShow now.
+$mcSelectFn490 = LuaFn $rootTxt 'mcShow'
+if (-not $mcSelectFn490) { $v490Bad += "mcShow is not declared on the root form - this whole check reads nothing (SPEC V20, V209)" }
+else {
+    $mcSelectBody490 = NoComments $mcSelectFn490
+    # (a) setNodeObject occurs exactly once across the sheet's .lfm code, inside mcSelect, and
+    # its receiver is self (the CONSTRUCTOR's own local, SPEC R169a) - not tabRootOf(/from),
+    # whose objs.objectFromHandle builds a fresh table every call and never touches the
+    # upvalue `sheet` the 410 reads of the root, and the whole XML, close over (SPEC I168c).
+    $allSetNode490 = 0
+    foreach ($f490 in $files) { $allSetNode490 += @([regex]::Matches((NoComments (CodeOf $f490.FullName)), 'setNodeObject\(')).Count }
+    if ($allSetNode490 -ne 1) { $v490Bad += "(a) setNodeObject( occurs $allSetNode490 time(s) across the sheet, expected exactly 1 - a second re-bind is a second way to point the form somewhere the other one does not know about (SPEC V490a)" }
+    elseif ($mcSelectBody490 -notmatch 'setNodeObject\(') { $v490Bad += "(a) the one setNodeObject( is not inside mcShow - the swap has moved to a function this check does not expect (SPEC V209, V499a)" }
+    elseif ($mcSelectBody490 -notmatch 'self:setNodeObject\(') { $v490Bad += "(a) mcShow calls setNodeObject on something other than self: - tabRootOf(from)/objs.objectFromHandle builds a table whose setNodeObject never touches the upvalue sheet closes over (SPEC R169a, V490a)" }
+
+    # (c) mcRender runs AFTER setNodeObject (the highlight reads sheet, SPEC I169d) and
+    # mcSelect writes no field of its own - trading rows must not also change data.
+    $iSet490 = $mcSelectBody490.IndexOf('setNodeObject(')
+    $iRender490 = $mcSelectBody490.IndexOf('mcRender(')
+    if ($iSet490 -ge 0 -and ($iRender490 -lt 0 -or $iRender490 -lt $iSet490)) { $v490Bad += "(c) mcShow does not call mcRender AFTER setNodeObject - the highlight would still be reading the OLD node (SPEC I169d, V490c)" }
+    if ($mcSelectBody490 -match 'setField\(' -or $mcSelectBody490 -match '\bsheet\[' -or $mcSelectBody490 -match 'MC\.root\.\w+\s*=(?!=)') { $v490Bad += "(c) mcShow writes a field - selecting a row must not also change data (SPEC V490c)" }
+}
+
+# (b) every McRow handler naming cycleHealthMark(/healHealthMark(/wpSpentClick( carries
+# mcSelect($(num), self); BEFORE it in the SAME attribute - those three functions read
+# `sheet`, and sheet is only the row's node after the swap runs (SPEC V490b).
+$mcRowTpl490 = (Doc $rootPath).SelectSingleNode("//template[@name='McRow']")
+if ($null -eq $mcRowTpl490) { $v490Bad += "<template name='McRow'> is gone - leg (b) reads nothing (SPEC V209)" }
+else {
+    $seen490 = 0
+    foreach ($hn490 in $mcRowTpl490.SelectNodes(".//*[@onClick or @onMenu]")) {
+        foreach ($attr490 in @('onClick', 'onMenu')) {
+            if (-not $hn490.HasAttribute($attr490)) { continue }
+            $val490 = $hn490.GetAttribute($attr490)
+            if ($val490 -notmatch '\b(cycleHealthMark|healHealthMark|wpSpentClick)\(') { continue }
+            $seen490++
+            if ($val490 -notmatch '^\s*mcSelect\(\$\(num\), self\);.*\b(cycleHealthMark|healHealthMark|wpSpentClick)\(') {
+                $v490Bad += "(b) $($hn490.LocalName)/$attr490='$val490' does not open with mcSelect(`$(num), self); before the handler it names - that handler reads sheet, and sheet is not the row until the swap runs (SPEC V490b)"
+            }
+        }
+    }
+    if ($seen490 -eq 0) { $v490Bad += "(b) no McRow handler names cycleHealthMark/healHealthMark/wpSpentClick - leg (b) reads nothing (SPEC V20, V209)" }
+}
+
+# (d) the active row has NO Lua variable of its own - MC.active must not exist anywhere; the
+# active node is read off the handle every time, the same way sheet == MC.root is elsewhere.
+if ($rootTxt -match '\bMC\.active\b') { $v490Bad += "(d) MC.active is referenced somewhere in the sheet - the active row must be read off ndb.getNodeHandle every time, never cached in a second variable (SPEC V490d)" }
+
+# (e) MC.root.mcActive has ONE writer (mcRender, only when the shown index differs) and ONE
+# reader (mcInit, restoring the last active row) - mcSelect/mcAdd/mcRemove never touch it: the
+# NDB remembers what the screen last SHOWED, never what anyone merely asked for.
+$mcRenderFn490 = NoComments (LuaFn $rootTxt 'mcRender')
+$mcInitFn490 = NoComments (LuaFn $rootTxt 'mcInit')
+if (-not $mcRenderFn490 -or -not $mcInitFn490) { $v490Bad += "(e) mcRender or mcInit is not declared on the root form - leg (e) reads nothing (SPEC V209)" }
+else {
+    $totalActive490 = @([regex]::Matches((NoComments $rootTxt), 'MC\.root\.mcActive')).Count
+    $renderActive490 = @([regex]::Matches($mcRenderFn490, 'MC\.root\.mcActive')).Count
+    $initActive490 = @([regex]::Matches($mcInitFn490, 'MC\.root\.mcActive')).Count
+    if ($mcRenderFn490 -notmatch 'MC\.root\.mcActive\s*=\s*k;') { $v490Bad += "(e) mcRender does not write MC.root.mcActive = k - the index would not persist what the screen shows (SPEC V490e)" }
+    elseif ($totalActive490 -ne ($renderActive490 + $initActive490)) { $v490Bad += "(e) MC.root.mcActive is touched $totalActive490 time(s) sheet-wide but only $($renderActive490 + $initActive490) of them are inside mcRender/mcInit - a third function is deciding or restoring the active row on its own (SPEC V490e)" }
+}
+if ($v490Bad) { foreach ($b in $v490Bad) { Fail "V490 $b" } }
+else { Pass "V490 the swap is one setNodeObject inside mcShow, every row handler selects before it acts, and mcActive has one writer and one reader" }
+
+# ---- V491: row k <-> node k, the root is FIRST and never leaves (SPEC I169d/I169i) ----
+$v491Bad = @()
+$mcNodesFn491 = NoComments (LuaFn $rootTxt 'mcNodes')
+$mcRemoveFn491 = NoComments (LuaFn $rootTxt 'mcRemove')
+if (-not $mcRemoveFn491 -or -not $mcNodesFn491) { $v491Bad += "mcRemove or mcNodes is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) MC.root first - unless it was removed (SPEC I170f) - then mcChars' own children in ndb
+    # order; no table.sort re-orders them.
+    if ($mcNodesFn491 -notmatch 'if MC\.root\.mcRootGone ~= true then out\[1\] = MC\.root; end;') { $v491Bad += "(a) mcNodes does not put MC.root in [1] under 'if MC.root.mcRootGone ~= true' - the root would not be first, or a removed root would come back (SPEC V491a as amended, V499d)" }
+    if ($mcNodesFn491 -match 'table\.sort') { $v491Bad += "(a) mcNodes calls table.sort - the order is creation order, and a sort would reorder the row a character is pinned to (SPEC I169i, V491a)" }
+    if ($mcNodesFn491 -notmatch 'ndb\.getChildNodes\(MC\.chars\)') { $v491Bad += "(a) mcNodes does not read ndb.getChildNodes(MC.chars) - leg (a) is measuring the wrong source (SPEC V209)" }
+
+    # (c) RETIRED in the 25th batch: the root LEAVES now (SPEC I170f, pedido 13). V499b measures
+    # that nothing refuses it any more.
+
+    # (d) irreversible, so it ASKS (SPEC R30) - through the same dialog xpRevert already uses.
+    # The order "move the form, then remove" moved to V499b with the neighbour rule.
+    if ($mcRemoveFn491 -notmatch 'Dialogs\.confirmOkCancel\(') { $v491Bad += "(d) mcRemove does not call Dialogs.confirmOkCancel - deleting a character would need no confirmation at all (SPEC V491d, R30)" }
+    elseif ($mcRemoveFn491 -notmatch 'translateSheetText\(') { $v491Bad += "(d) mcRemove's question is not run through translateSheetText - the refusal and the question would not speak the same language (SPEC V491d, V129, R30)" }
+}
+
+$mcRowTpl491 = (Doc $rootPath).SelectSingleNode("//template[@name='McRow']")
+if ($null -eq $mcRowTpl491) { $v491Bad += "<template name='McRow'> is gone (SPEC V209)" }
+elseif ($null -eq $mcRowTpl491.SelectSingleNode(".//button[starts-with(@name,'btnMcRemove_')]")) { $v491Bad += "no btnMcRemove_ button is declared in McRow - the row has no door of its own to leave by (SPEC V499b)" }
+$mcRenderFn491b = NoComments (LuaFn $rootTxt 'mcRender')
+if (-not $mcRenderFn491b) { $v491Bad += "mcRender is not declared on the root form (SPEC V209)" }
+else {
+    # (b) mcRender checks every visible row's node on EVERY call, and re-pins a row whose node
+    # CHANGED - never the same node again, which could rebind the name <edit> under a player
+    # typing in it (SPEC V491b as amended, I170e).
+    if ($mcRenderFn491b -notmatch 'row\.node\s*=\s*n;') { $v491Bad += "(b) mcRender does not write row.node = n for the visible rows - a row would keep showing whichever node it was pinned to first, deleted or not (SPEC V491b)" }
+    elseif ($mcRenderFn491b -notmatch 'ndb\.getNodeHandle\(row\.node\)\s*~=\s*ndb\.getNodeHandle\(n\)') { $v491Bad += "(b) mcRender re-pins without comparing handles - the same node pinned again can rebind the row's name edit mid-typing (SPEC V491b as amended)" }
+}
+
+if ($v491Bad) { foreach ($b in $v491Bad) { Fail "V491 $b" } }
+else { Pass "V491 the root opens mcNodes (unless removed) unsorted, a row re-pins only when its node changed, and removal asks first" }
+
+# ---- V492: settings are the FICHA's alone, a new character is born BLANK, and the mirror has ONE trigger (SPEC I169e, Q88.8/Q88.9, R169h) ----
+$v492Bad = @()
+$mcAddFn492 = LuaFn $rootTxt 'mcAdd'
+$mcSharedFn492 = LuaFn $rootTxt 'mcShared'
+if (-not $mcAddFn492 -or -not $mcSharedFn492) { $v492Bad += "mcAdd or mcShared is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    $mcAddBody492 = NoComments $mcAddFn492
+    # (a) mcAdd writes n[f] = MC.root[f] inside the MC_SHARED_FIELDS loop and NOTHING else - a
+    # blank character carries no baseline, no name, no dots (SPEC Q88.9).
+    $dotWrites492 = @([regex]::Matches($mcAddBody492, '\bn\.\w+\s*=(?!=)'))
+    $bracketWrites492 = @([regex]::Matches($mcAddBody492, 'n\[[^\]]+\]\s*=(?!=)'))
+    if ($dotWrites492.Count -gt 0) { $v492Bad += "(a) mcAdd writes n.<field> = with dot notation ($($dotWrites492.Count) time(s)) - the new character must carry only the MC_SHARED_FIELDS loop (SPEC V492a, Q88.9)" }
+    if ($bracketWrites492.Count -ne 1) { $v492Bad += "(a) mcAdd writes n[...] = $($bracketWrites492.Count) time(s), expected exactly the one MC_SHARED_FIELDS loop - anything more is a key the blank character was not supposed to carry (SPEC V492a, Q88.9)" }
+    elseif ($mcAddBody492 -notmatch 'n\[f\]\s*=\s*MC\.root\[f\];') { $v492Bad += "(a) mcAdd's one write is not n[f] = MC.root[f] - the mirror copies by NAME, off the shared list, never a literal key (SPEC V492a)" }
+
+    # (d) exactly ONE <dataLink onChange naming mcShared( in the whole sheet, and it lives
+    # inside stSharedScope; mcShared is called from nowhere else and ends in mcApply(.
+    $mcSharedBody492 = NoComments $mcSharedFn492
+    if ($mcSharedBody492 -notmatch 'mcApply\(from\);') { $v492Bad += "(d) mcShared does not call mcApply(from) - the mirror would leave the column and the settings window unrendered after a change (SPEC V492d)" }
+    $linkCount492 = @([regex]::Matches((NoComments $rootTxt), 'onChange="mcShared\(self\);"')).Count
+    foreach ($f492 in $files) {
+        if ($f492.Name -eq 'WoD20th.lfm') { continue }
+        $linkCount492 += @([regex]::Matches((NoComments (CodeOf $f492.FullName)), 'onChange="mcShared\(self\);"')).Count
+    }
+    if ($linkCount492 -ne 1) { $v492Bad += "(d) onChange=`"mcShared(self);`" appears $linkCount492 time(s) across the sheet, expected exactly 1 - a second trigger is a second place the mirror can fire from, possibly on the wrong node (SPEC V492d)" }
+    else {
+        $stSharedNode492 = (Doc (Join-Path $dir "WoD20.10.lfm")).SelectSingleNode("//dataScopeBox[@name='stSharedScope']")
+        if ($null -eq $stSharedNode492 -or $null -eq $stSharedNode492.SelectSingleNode(".//dataLink[contains(@onChange,'mcShared')]")) { $v492Bad += "(d) the one mcShared trigger is not inside stSharedScope - a dataLink outside the scope watches the ACTIVE node, not the root the mirror is supposed to read (SPEC V492d, R169h)" }
+    }
+    # Swept over EVERY file, not just the root: mcShared is declared on WoD20th.lfm but its one
+    # legitimate caller - the trigger dataLink - lives on WoD20.10.lfm, inside stSharedScope.
+    $mcSharedCallers492 = 0
+    foreach ($f492d in $files) { $mcSharedCallers492 += @([regex]::Matches((NoComments (CodeOf $f492d.FullName)), '\bmcShared\(')).Count }
+    # -1 for the function's own declaration line ("function mcShared(from)" also matches
+    # \bmcShared\() - what is left is real CALL sites, which must be exactly the one trigger.
+    if (($mcSharedCallers492 - 1) -ne $linkCount492) { $v492Bad += "(d) mcShared is referenced $($mcSharedCallers492 - 1) time(s) outside its own declaration, expected exactly the $linkCount492 dataLink trigger - a second caller is a second reason the mirror can fire (SPEC V492d)" }
+}
+
+# (c) the 3 configuration scopes exist, mcInit pins each to MC.root, and stSharedScope holds
+# EVERY field= of the STORYTELLER SETTINGS box - none of them left outside it.
+$mcInitFn492 = NoComments (LuaFn $rootTxt 'mcInit')
+if (-not $mcInitFn492) { $v492Bad += "mcInit is not declared on the root form (SPEC V209)" }
+else {
+    foreach ($sc492 in @('stSharedScope', 'langScope', 'mcSettingsScope')) {
+        if ($mcInitFn492 -notmatch "found\[`"$sc492`"\][^;]*\.node\s*=\s*MC\.root;") { $v492Bad += "(c) mcInit does not pin $sc492 to MC.root - its fields would read and write whichever character is ACTIVE, not the ficha (SPEC V492c, I169e)" }
+    }
+}
+$langScope492x = (Doc (Join-Path $dir "WoD20.6.lfm")).SelectSingleNode("//dataScopeBox[@name='langScope']")
+$mcSetScope492x = (Doc $rootPath).SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']")
+if ($null -eq $langScope492x) { $v492Bad += "(c) langScope does not exist on WoD20.6 (SPEC V492c)" }
+elseif ($null -eq $langScope492x.SelectSingleNode(".//comboBox[@field='language']")) { $v492Bad += "(c) langScope does not contain the language combo (SPEC V492c, I169e(2))" }
+if ($null -eq $mcSetScope492x) { $v492Bad += "(c) mcSettingsScope does not exist on the root form (SPEC V492c)" }
+$stBoxNode492 = BoxOf (Doc (Join-Path $dir "WoD20.10.lfm")) "STORYTELLER SETTINGS"
+if ($null -eq $stBoxNode492) { $v492Bad += "(c) the STORYTELLER SETTINGS box is gone from WoD20.10 (SPEC V209)" }
+else {
+    $allFieldsInBox492 = @($stBoxNode492.SelectNodes(".//*[@field]"))
+    $fieldsInScope492 = @($stBoxNode492.SelectNodes(".//dataScopeBox[@name='stSharedScope']//*[@field]"))
+    if ($allFieldsInBox492.Count -eq 0) { $v492Bad += "(c) no field= widget was read inside the STORYTELLER SETTINGS box - leg (c) verifies nothing (SPEC V209)" }
+    elseif ($allFieldsInBox492.Count -ne $fieldsInScope492.Count) { $v492Bad += "(c) the STORYTELLER SETTINGS box holds $($allFieldsInBox492.Count) field= widget(s) but only $($fieldsInScope492.Count) are inside stSharedScope - a widget outside the scope would read/write whichever character is ACTIVE, not the ficha (SPEC V492c, I169e)" }
+}
+
+# (b) outside mcAdd/mcShared, no write-by-address to a child node (nodes[k][... or a field
+# written straight onto MC.chars). Writing to `sheet` stays free - it is the active node,
+# exactly as it is today.
+$nodesAddrWrites492 = @([regex]::Matches((NoComments $rootTxt), 'nodes\[[^\]]+\]\[')).Count
+if ($nodesAddrWrites492 -ne 0) { $v492Bad += "(b) nodes[k][...] is written to $nodesAddrWrites492 time(s) - a child node's field must be reached through a local (n[f] = ...), never addressed directly off the nodes array (SPEC V492b)" }
+$mcCharsFieldWrites492 = @([regex]::Matches((NoComments $rootTxt), 'MC\.chars(\.\w+|\[[^\]]+\])\s*=(?!=)')).Count
+if ($mcCharsFieldWrites492 -ne 0) { $v492Bad += "(b) a field is written straight onto MC.chars $mcCharsFieldWrites492 time(s) - MC.chars is the CONTAINER, and data belongs on the child nodes n[f] reaches (SPEC V492b)" }
+
+# (e) mcInit creates no node, and mcDefaults does not exist - opening with the flag OFF must
+# leave the NDB exactly as it was.
+if ($mcInitFn492 -match 'createChildNode\(') { $v492Bad += "(e) mcInit calls createChildNode - opening a sheet with the flag OFF must not touch the NDB (SPEC V492e)" }
+if ($rootTxt -match '\bmcDefaults\b') { $v492Bad += "(e) mcDefaults is referenced somewhere in the sheet - that name was never supposed to exist (SPEC V492e)" }
+
+if ($v492Bad) { foreach ($b in $v492Bad) { Fail "V492 $b" } }
+else { Pass "V492 mcAdd writes only the shared fields, the three configuration scopes pin to the root with stSharedScope holding every field of the box, the mirror has one trigger inside it, and mcInit creates no node" }
+
+# ---- V493: ONE scrim for the 3, it DARKENS and COVERS the column at any width (SPEC I169f/I169m, R169c; V53 intact) ----
+$v493Bad = @()
+$popScrimNode493 = (Doc $rootPath).SelectSingleNode("//rectangle[@name='popScrim']")
+if ($null -eq $popScrimNode493) { $v493Bad += "popScrim is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) popScrim authors a color other than fully transparent, and that literal is a key in
+    # each of the 4 THEMES fill maps (the SAME tone in all 4) - V53 already demands every
+    # authored color be mapped; this leg demands the TONE not be transparent any more.
+    $scrimColor493 = $popScrimNode493.GetAttribute("color")
+    if (-not $scrimColor493 -or $scrimColor493 -eq '#00000000') { $v493Bad += "(a) popScrim authors color='$scrimColor493' - the fade the storyteller asked for needs a REAL tone, not full transparency (SPEC V493a, Q88.6)" }
+    else {
+        $fillBlocks493 = @([regex]::Matches($hh6, "(?m)^\s*fill\s*=\s*\{(.*?)\}", 'Singleline'))
+        if ($fillBlocks493.Count -ne $themeKeys.Count) { $v493Bad += "(a) expected one fill map per palette ($($themeKeys.Count)), found $($fillBlocks493.Count) - leg (a) cannot see them all (SPEC V209)" }
+        else {
+            foreach ($fb493 in $fillBlocks493) {
+                if (-not $fb493.Groups[1].Value.Contains('["' + $scrimColor493 + '"]')) { $v493Bad += "(a) one of the $($themeKeys.Count) 'fill' maps has no key for '$scrimColor493' - popScrim would keep its Modern colour in that era (SPEC V493a, V53)" }
+            }
+        }
+    }
+
+    # (b) moved to V496d in the 25th batch (SPEC I170b): the column no longer resizes, so the
+    # scrim's width is an AUTHORED literal - widest tab + MC_DOCK_W - with no Lua writer at all.
+}
+
+# (c) mcSettings and popNote are in POP_BOX and popClose hides them; mcSettingsOpen shows popScrim.
+if ($rootTxt -notmatch 'POP_BOX\s*=\s*\{[^}]*mcSettings\s*=\s*true') { $v493Bad += "(c) mcSettings is not in POP_BOX - popClose would not know to hide the settings window (SPEC V493c, I169e(4))" }
+if (-not (LuaFn $rootTxt 'popClose')) { $v493Bad += "(c) popClose is not declared on the root form (SPEC V209)" }
+$mcSettingsOpenFn493 = NoComments (LuaFn $rootTxt 'mcSettingsOpen')
+if (-not $mcSettingsOpenFn493) { $v493Bad += "(c) mcSettingsOpen is not declared on the root form (SPEC V209)" }
+elseif ($mcSettingsOpenFn493 -notmatch 'popScrim"\]\.visible\s*=\s*true;') { $v493Bad += "(c) mcSettingsOpen does not set popScrim visible - the settings window would open with no fade behind it (SPEC V493c)" }
+
+# (d) btnMcSettingsClose calls popClose(self), and no function mcSettingsClose exists.
+$btnClose493 = (Doc $rootPath).SelectSingleNode("//button[@name='btnMcSettingsClose']")
+if ($null -eq $btnClose493) { $v493Bad += "(d) btnMcSettingsClose is not on the root form (SPEC V493d, V209)" }
+elseif ($btnClose493.GetAttribute("onClick") -notmatch 'popClose\(self\);') { $v493Bad += "(d) btnMcSettingsClose does not call popClose(self) - a second closing function is a second place the two visibles can disagree (SPEC V493d, V135)" }
+if ($rootTxt -match 'function\s+mcSettingsClose\s*\(') { $v493Bad += "(d) a function mcSettingsClose exists - the window closes through popClose alone (SPEC V493d)" }
+
+if ($v493Bad) { foreach ($b in $v493Bad) { Fail "V493 $b" } }
+else { Pass "V493 popScrim darkens with a real tone mapped by all 4 palettes, and the settings window opens and closes through the same doors as every other overlay" }
+
+# ---- V494: RETIRED in the 25th batch (SPEC I170d) - the row's number fields left and the bars
+# read the dots (V498), so there is no second side left to keep in step with the first. V498e
+# charges the three dead fields instead. The check was DELETED, not commented out (SPEC T1079).
+# ---- V495: RETIRED in the 25th batch (SPEC I170b) - the column is FIXED; V496b/c charge the
+# absence of the grip, of its one writer and of the width it saved.
+
+# Shared by V496..V501: code with XML comments and full-line Lua comments taken out, so a
+# comment that NAMES a retired function or quotes a tag is never read as the thing itself
+# (the V430 lesson, SPEC I169 round).
+function Strip25($t) { NoComments ([regex]::Replace($t, '(?s)<!--.*?-->', '')) }
+$root25Doc = Doc $rootPath
+$root25Code = Strip25 $rootTxt
+$tr25Path = Join-Path $dir "WoD20.2.lfm"
+$tr25Doc = Doc $tr25Path
+$all25Code = ''
+foreach ($f25 in $files) { $all25Code += (Strip25 ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f25.FullName)))) + "`n" }
+
+# ---- V496: the tabs sit BESIDE the column, and the column is FIXED (SPEC I170a/I170b, B170, R170a/R170b) ----
+$v496Bad = @()
+$body496 = $root25Doc.SelectSingleNode("//layout[@name='sheetBody']")
+$main496 = $root25Doc.SelectSingleNode("//layout[@name='sheetMain']")
+if ($null -eq $main496 -or $null -eq $body496) { $v496Bad += "sheetMain or sheetBody is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) the NESTING, not the declaration order: the engine aligns top before left (SPEC R170a),
+    # so only a strip that lives inside sheetMain can sit beside the column (SPEC B170).
+    $kids496 = @($body496.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
+    if ($kids496.Count -lt 2 -or $kids496[0].GetAttribute('name') -ne 'mcDock' -or $kids496[1].GetAttribute('name') -ne 'sheetMain') { $v496Bad += "(a) sheetBody's first two children are not mcDock then sheetMain - the column and the tabs do not sit side by side (SPEC V496a)" }
+    if ($main496.GetAttribute('align') -ne 'client') { $v496Bad += "(a) sheetMain does not author align='client' - it would not take what the column leaves (SPEC V496a)" }
+    $inMain496 = 0
+    $direct496 = @()
+    foreach ($t496 in $root25Doc.SelectNodes("//layout[@name='tabStrip' or (starts-with(@name,'tab') and @align='client')]")) {
+        $pn496 = $t496.ParentNode.GetAttribute('name')
+        if ($pn496 -eq 'sheetMain') { $inMain496++ }
+        elseif ($pn496 -eq 'sheetBody') { $direct496 += $t496.GetAttribute('name') }
+    }
+    if ($direct496) { $v496Bad += "(a) $($direct496 -join ', ') are direct children of sheetBody - a strip aligned top there takes the whole width and pushes the column below it (SPEC B170, V496a)" }
+    if ($inMain496 -ne 12) { $v496Bad += "(a) sheetMain holds $inMain496 of the tab strip and the 11 panes, expected 12 (SPEC V496a, V209)" }
+}
+# (b) the dock's width is ONE number, authored and mirrored, and no Lua writes it.
+$dock496 = $root25Doc.SelectSingleNode("//layout[@name='mcDock']")
+$mW496 = [regex]::Match($root25Code, 'MC_DOCK_W\s*=\s*(\d+);')
+if ($null -eq $dock496 -or -not $mW496.Success) { $v496Bad += "(b) mcDock or MC_DOCK_W is gone (SPEC V209)" }
+else {
+    if ($dock496.GetAttribute('width') -ne $mW496.Groups[1].Value) { $v496Bad += "(b) mcDock authors width=$($dock496.GetAttribute('width')) but MC_DOCK_W is $($mW496.Groups[1].Value) - two numbers for one width (SPEC V496b)" }
+    if ($mW496.Groups[1].Value -ne '370') { $v496Bad += "(b) MC_DOCK_W is $($mW496.Groups[1].Value), expected 370 = 4 + the 346 row + 4 + the 16px scrollbar (SPEC I170b, R170b)" }
+}
+if ($root25Code -match 'mcDock"\]\.width\s*=' -or $root25Code -match 'mcDock\.width\s*=') { $v496Bad += "(b) the Lua writes mcDock.width - the column is FIXED since the 25th batch (SPEC V496b)" }
+# (c) nothing of the grip survives.
+foreach ($gone496 in @('mcGrip', 'mcSetWidth', 'mcGripDown', 'mcGripMove', 'mcGripUp', 'MC_DOCK_MIN', 'MC_DOCK_MAX', 'mcDockWidth')) {
+    if ($all25Code -cmatch "\b$gone496\b") { $v496Bad += "(c) '$gone496' still occurs in the sheet's code - the grip left in the 25th batch (SPEC V496c, I170b)" }
+}
+# (d) the scrim is as wide as the widest tab PLUS the column, from the same sweep as V396.
+$scrim496 = $root25Doc.SelectSingleNode("//rectangle[@name='popScrim']")
+if ($null -eq $scrim496 -or -not $mW496.Success -or -not $wide396) { $v496Bad += "(d) popScrim, MC_DOCK_W or V396's sweep of the widest tab is missing - leg (d) reads nothing (SPEC V20, V209)" }
+else {
+    $wantScrim496 = $wide396 + [int]$mW496.Groups[1].Value
+    if ($scrim496.GetAttribute('width') -ne "$wantScrim496") { $v496Bad += "(d) popScrim authors width=$($scrim496.GetAttribute('width')), expected the widest tab ($wide396) + MC_DOCK_W = $wantScrim496 (SPEC V496d)" }
+}
+if ($root25Code -match 'popScrim"\]\.width\s*=' -or $root25Code -match 'popScrim\.width\s*=') { $v496Bad += "(d) the Lua writes popScrim.width - its width is an authored literal now (SPEC V496d)" }
+# (e) sheetMain.visible has ONE writer, mcRender.
+$mainVis496 = @([regex]::Matches($root25Code, 'sheetMain"\]\.visible\s*=')).Count
+$render496 = NoComments (LuaFn $rootTxt 'mcRender')
+if ($mainVis496 -ne 1) { $v496Bad += "(e) sheetMain.visible is written $mainVis496 time(s), expected exactly 1 (SPEC V496e)" }
+elseif ($render496 -notmatch 'sheetMain"\]\.visible\s*=') { $v496Bad += "(e) the one writer of sheetMain.visible is not mcRender (SPEC V496e)" }
+if ($v496Bad) { foreach ($b in $v496Bad) { Fail "V496 $b" } }
+else { Pass "V496 the strip and the 11 panes live in sheetMain beside mcDock, the column is a fixed 370 with no grip left, the scrim spans the widest tab plus the column, and mcRender alone empties the right side" }
+
+# ---- V497: the v2 row - fields, bars, outline and touch (SPEC I170c/I170e) ----
+$v497Bad = @()
+$tpl497 = $root25Doc.SelectSingleNode("//template[@name='McRow']")
+if ($null -eq $tpl497) { $v497Bad += "<template name='McRow'> is gone - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) the row's fields are name, avatar and the ten health boxes - V489b owns the exact set;
+    # this leg only refuses the three that LEFT with the 25th batch coming back.
+    foreach ($dead497 in @('bloodCurrent', 'bloodMax', 'quintessence')) {
+        if ($null -ne $tpl497.SelectSingleNode(".//*[@field='$dead497']")) { $v497Bad += "(a) McRow authors field='$dead497' again - the bars read the dots, the number fields are dead (SPEC V497a)" }
+    }
+    if ($null -ne $tpl497.SelectSingleNode(".//*[starts-with(@field,'willpower_c')]")) { $v497Bad += "(a) McRow authors a willpower_c box again - the willpower bar replaced the ten boxes (SPEC V497a)" }
+    # (b) exactly three bars, named and coloured in order, bound to NO field.
+    $bars497 = @($tpl497.SelectNodes(".//progressBar"))
+    $wantBars497 = @(@('mcWp_$(num)', '#87CEFA', 'wp'), @('mcBlood_$(num)', '#DC143C', 'blood'), @('mcQuint_$(num)', '#FFD700', 'quint'))
+    if ($bars497.Count -ne 3) { $v497Bad += "(b) McRow has $($bars497.Count) progressBar(s), expected exactly 3 (SPEC V497b)" }
+    else {
+        for ($i497 = 0; $i497 -lt 3; $i497++) {
+            $bar497 = $bars497[$i497]
+            $want497 = $wantBars497[$i497]
+            if ($bar497.GetAttribute('name') -cne $want497[0]) { $v497Bad += "(b) bar $($i497 + 1) is named '$($bar497.GetAttribute('name'))', expected '$($want497[0])' (SPEC V497b)" }
+            if ($bar497.GetAttribute('color') -ne $want497[1]) { $v497Bad += "(b) $($want497[0]) authors color='$($bar497.GetAttribute('color'))', expected $($want497[1]) (SPEC V497b)" }
+            foreach ($fa497 in @('field', 'fieldMax', 'fieldMin')) { if ($bar497.HasAttribute($fa497)) { $v497Bad += "(b) $($want497[0]) authors $fa497= - no field holds how many dots are lit, mcBarsRow writes the bar (SPEC V497b)" } }
+            # (c) for the bars: select first, then the click names the bar's own key.
+            $md497 = $bar497.GetAttribute('onMouseDown')
+            $keyRx497 = "^\s*mcSelect\(\`$\(num\), self\);\s*mcBarClick\(\`$\(num\), '" + $want497[2] + "', self, event\);\s*$"
+            if ($md497 -notmatch $keyRx497) { $v497Bad += "(c) $($want497[0]) onMouseDown='$md497' is not mcSelect(`$(num), self); then mcBarClick(`$(num), '$($want497[2])', self, event); (SPEC V497c)" }
+        }
+    }
+    # (c) every other control that takes a click selects first; the X does not.
+    $bg497 = $tpl497.SelectSingleNode(".//rectangle[starts-with(@name,'mcBg_')]")
+    if ($null -eq $bg497 -or $bg497.GetAttribute('onClick') -notmatch '^\s*mcSelect\(\$\(num\), self\);') { $v497Bad += "(c) mcBg_ does not open its onClick with mcSelect(`$(num), self); (SPEC V497c)" }
+    $hpSeen497 = 0
+    foreach ($hp497 in $tpl497.SelectNodes(".//rectangle[starts-with(@name,'mcHp_')]")) {
+        $hpSeen497++
+        foreach ($a497 in @('onClick', 'onMenu')) {
+            if ($hp497.GetAttribute($a497) -notmatch '^\s*mcSelect\(\$\(num\), self\);') { $v497Bad += "(c) $($hp497.GetAttribute('name')) $a497 does not open with mcSelect(`$(num), self); (SPEC V497c)" }
+        }
+    }
+    if ($hpSeen497 -ne 10) { $v497Bad += "(c) McRow has $hpSeen497 health box(es), expected 10 (SPEC V209)" }
+    $name497 = $tpl497.SelectSingleNode(".//edit[@field='name']")
+    if ($null -eq $name497 -or $name497.GetAttribute('onEnter') -notmatch '^\s*mcSelect\(\$\(num\), self\);') { $v497Bad += "(c) the name edit does not select on onEnter - clicking into the name would edit a row that is not the one shown (SPEC V497c)" }
+    $x497 = $tpl497.SelectSingleNode(".//button[starts-with(@name,'btnMcRemove_')]")
+    if ($null -eq $x497) { $v497Bad += "(c) btnMcRemove_ is gone from McRow (SPEC V209)" }
+    elseif ($x497.GetAttribute('onClick') -match 'mcSelect\(') { $v497Bad += "(c) btnMcRemove_ selects before it removes - the sheet would flash the character about to go (SPEC V497c, Q90.4)" }
+    # (d) the outline is always there; mcRender writes its width and never its visibility.
+    $on497 = $tpl497.SelectSingleNode(".//rectangle[starts-with(@name,'mcOn_')]")
+    if ($null -eq $on497) { $v497Bad += "(d) mcOn_ is gone from McRow (SPEC V209)" }
+    elseif ($on497.HasAttribute('visible')) { $v497Bad += "(d) mcOn_ authors visible= - every row is outlined, always (SPEC V497d, I170e)" }
+    if ($render496 -notmatch 'mcOn_"\s*\.\.\s*k\]\.strokeSize\s*=\s*active and 2 or 1;') { $v497Bad += "(d) mcRender does not write mcOn_k.strokeSize = active and 2 or 1 (SPEC V497d)" }
+    if ($render496 -match 'mcOn_"\s*\.\.\s*k\]\.visible\s*=') { $v497Bad += "(d) mcRender still toggles mcOn_k.visible - the outline would vanish off the idle rows (SPEC V497d)" }
+    # (e) the pool: MC_POOL rows, stacked at MC_ROW_H + 6, and the template's own height.
+    $pool497 = [regex]::Match($root25Code, 'MC_POOL\s*=\s*(\d+);')
+    $rowH497 = [regex]::Match($root25Code, 'MC_ROW_H\s*=\s*(\d+);')
+    $dsb497 = $tpl497.SelectSingleNode("dataScopeBox")
+    $inst497 = @($root25Doc.SelectNodes("//McRow"))
+    if (-not $pool497.Success -or -not $rowH497.Success -or $null -eq $dsb497) { $v497Bad += "(e) MC_POOL, MC_ROW_H or the row's dataScopeBox is gone (SPEC V209)" }
+    else {
+        $poolN497 = [int]$pool497.Groups[1].Value
+        $rowHN497 = [int]$rowH497.Groups[1].Value
+        if ($poolN497 -ne 10) { $v497Bad += "(e) MC_POOL is $poolN497, expected 10 - the ceiling STAYS 10 (SPEC Q90.6)" }
+        if ($inst497.Count -ne $poolN497) { $v497Bad += "(e) $($inst497.Count) <McRow> instance(s) against MC_POOL = $poolN497 (SPEC V497e)" }
+        if ($rowHN497 -ne 108 -or $dsb497.GetAttribute('height') -ne "$rowHN497") { $v497Bad += "(e) MC_ROW_H is $rowHN497 and the row's dataScopeBox is $($dsb497.GetAttribute('height')) tall, expected both 108 (SPEC V497e)" }
+        foreach ($r497 in $inst497) {
+            $k497 = [int]$r497.GetAttribute('num')
+            $wantTop497 = 4 + ($k497 - 1) * ($rowHN497 + 6)
+            if ($r497.GetAttribute('top') -ne "$wantTop497") { $v497Bad += "(e) McRow $k497 sits at top=$($r497.GetAttribute('top')), expected $wantTop497 = 4 + (k-1) x (MC_ROW_H + 6) (SPEC V497e)" }
+        }
+    }
+}
+if ($v497Bad) { foreach ($b in $v497Bad) { Fail "V497 $b" } }
+else { Pass "V497 the row carries name, avatar and health only, three unbound bars in willpower/blood/quintessence colours, every touch but the X selects first, the outline is always drawn, and ten rows stack at MC_ROW_H + 6" }
+
+# ---- V498: bars - the MAX comes from the dots, the CURRENT is edited through the dots' door (SPEC I170d, R170f/R170m, Q90.2) ----
+$v498Bad = @()
+$count498 = @([regex]::Matches($root25Code, 'function\s+mcCount\s*\(')).Count
+$max498Def = @([regex]::Matches($root25Code, 'function\s+mcBarMax\s*\(')).Count
+$maxFn498 = NoComments (LuaFn $rootTxt 'mcBarMax')
+$rowFn498 = NoComments (LuaFn $rootTxt 'mcBarsRow')
+$clickFn498 = NoComments (LuaFn $rootTxt 'mcBarClick')
+$nowFn498 = NoComments (LuaFn $rootTxt 'mcBarsNow')
+$soonFn498 = NoComments (LuaFn $rootTxt 'mcBarsSoon')
+if (-not $rowFn498 -or -not $clickFn498) { $v498Bad += "mcBarsRow or mcBarClick is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) one counter, one reader of the maximum, and the three maxima it returns.
+    if ($count498 -ne 1) { $v498Bad += "(a) mcCount is declared $count498 time(s), expected 1 (SPEC V498a)" }
+    if ($max498Def -ne 1 -or -not $maxFn498) { $v498Bad += "(a) mcBarMax is declared $max498Def time(s), expected 1 (SPEC V498a)" }
+    else {
+        if ($maxFn498 -notmatch 'return mcCount\(n, "willpower_", 10\);') { $v498Bad += "(a) mcBarMax does not read willpower's maximum off the PERMANENT dots (mcCount(n, `"willpower_`", 10)) (SPEC V498a, pedido 6)" }
+        if ($maxFn498 -notmatch 'return familyCap\("bloodPool", n\) or 20;') { $v498Bad += "(a) mcBarMax does not read blood's maximum as familyCap(`"bloodPool`", n) or 20 (SPEC V498a)" }
+        if ($maxFn498 -notmatch 'return 10;') { $v498Bad += "(a) mcBarMax does not return 10 for quintessence (SPEC V498a)" }
+    }
+    if ($rowFn498 -notmatch 'mcBarMax\(' -or $clickFn498 -notmatch 'mcBarMax\(') { $v498Bad += "(a) mcBarsRow and mcBarClick do not both read the maximum through mcBarMax (SPEC V498a)" }
+    foreach ($gone498 in @('poolCount', 'poolFromNumber', 'mcBloodChanged', 'mcQuintChanged')) {
+        if ($all25Code -cmatch "\b$gone498\b") { $v498Bad += "(a) '$gone498' still occurs in the sheet's code - it left with the row's number fields (SPEC V498a)" }
+    }
+    # (b) the painter: max BEFORE position, position clamped, and nobody else writes the bars.
+    # Read by SHAPE, not by the locals' names: renaming m or c is not a change of rule.
+    $mMax498 = [regex]::Match($rowFn498, '\.max\s*=\s*\w+;')
+    $mPos498 = [regex]::Match($rowFn498, '\.position\s*=\s*[^;\r\n]+;')
+    if (-not $mMax498.Success -or -not $mPos498.Success) { $v498Bad += "(b) mcBarsRow does not write both .max and .position (SPEC V498b)" }
+    elseif ($mPos498.Value -notmatch 'math\.min\(') { $v498Bad += "(b) mcBarsRow writes .position without math.min( - a current above the maximum is not clamped to a full bar (SPEC V498b)" }
+    elseif ($mMax498.Index -gt $mPos498.Index) { $v498Bad += "(b) mcBarsRow writes position BEFORE max - a value above the old max is clamped by the control before the new max lands (SPEC V498b)" }
+    if ($rowFn498 -notmatch 'ctrl\.hint\s*=') { $v498Bad += "(b) mcBarsRow does not write the hint (SPEC V498b)" }
+    $barWrites498 = @([regex]::Matches($root25Code, '\.(max|position|hint)\s*=(?!=)')).Count
+    $rowWrites498 = @([regex]::Matches($rowFn498, '\.(max|position|hint)\s*=(?!=)')).Count
+    if ($barWrites498 -ne $rowWrites498) { $v498Bad += "(b) .max/.position/.hint are written $barWrites498 time(s) on the root form, $rowWrites498 of them in mcBarsRow - a second painter of the bars (SPEC V498b)" }
+    # (c) the click: left button only, a real maximum, a clamped segment, and only the dots' doors.
+    if ($clickFn498 -notmatch 'event\.button ~= "left"') { $v498Bad += "(c) mcBarClick does not refuse every button but the left (SPEC V498c)" }
+    if ($clickFn498 -notmatch 'm < 1') { $v498Bad += "(c) mcBarClick does not refuse a maximum below 1 (SPEC V498c)" }
+    if ($clickFn498 -notmatch 'math\.max\(1, math\.min\(m, ') { $v498Bad += "(c) mcBarClick does not clamp the segment into 1..m (SPEC V498c)" }
+    if ($clickFn498 -notmatch 'bloodClick\(' -or $clickFn498 -notmatch 'quintClick\(' -or $clickFn498 -notmatch 'poolClick\("willpower_c"') { $v498Bad += "(c) mcBarClick does not write through bloodClick(, quintClick( and poolClick(`"willpower_c`" (SPEC V498c)" }
+    if ($clickFn498 -match 'setField\(' -or $clickFn498 -match 'poolPrefix\(' -or $clickFn498 -match 'sheet\[[^\]]+\]\s*=(?!=)') { $v498Bad += "(c) mcBarClick writes a field itself - the bar must take the dots' own door, toggle and family cap included (SPEC V498c)" }
+    # (e) the three dead fields have no reader and no writer anywhere.
+    foreach ($dead498 in @('bloodCurrent', 'bloodMax', 'quintessence')) {
+        if ($all25Code -cmatch "\b$dead498\b") { $v498Bad += "(e) '$dead498' still occurs in the sheet's code - a dead field keeps no reader and no writer (SPEC V498e)" }
+    }
+    # (f) the active-row repaint paints ONE row.
+    if (-not $nowFn498) { $v498Bad += "(f) mcBarsNow is not declared on the root form (SPEC V209)" }
+    else {
+        if (@([regex]::Matches($nowFn498, 'mcBarsRow\(')).Count -ne 1) { $v498Bad += "(f) mcBarsNow does not call mcBarsRow exactly once (SPEC V498f)" }
+        elseif ($nowFn498 -notmatch '(?m)^\t{4}[^\t\r\n].*mcBarsRow\(') { $v498Bad += "(f) mcBarsNow does not call mcBarsRow at the function's own level - inside a loop a click would repaint every row (SPEC V498f)" }
+    }
+}
+# (d) ONE deferred trigger in the root's scope over the 52 fields, compared as a SET: the 50
+# dots, clanFamily and - since the 26th batch - avatar, which lights the photo's placeholder
+# (SPEC V498d as amended, I171b).
+$links498 = @($root25Doc.SelectNodes("//dataLink[contains(@onChange,'mcBarsSoon(')]"))
+if ($links498.Count -ne 1) { $v498Bad += "(d) $($links498.Count) dataLink(s) call mcBarsSoon, expected exactly 1 (SPEC V498d)" }
+else {
+    if ($null -ne $links498[0].SelectSingleNode("ancestor::dataScopeBox")) { $v498Bad += "(d) the bars trigger sits inside a dataScopeBox - it must watch the ACTIVE node, from the root's scope (SPEC V498d)" }
+    $want498 = New-Object System.Collections.Generic.List[string]
+    for ($i498 = 1; $i498 -le 10; $i498++) { $want498.Add("willpower_$i498"); $want498.Add("willpower_c$i498"); $want498.Add("quint_$i498") }
+    for ($i498 = 1; $i498 -le 20; $i498++) { $want498.Add("bloodPool_$i498") }
+    $want498.Add('clanFamily')
+    $want498.Add('avatar')
+    $got498 = @([regex]::Matches($links498[0].GetAttribute('fields'), "'([^']+)'") | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+    $wantSorted498 = @($want498 | Sort-Object -Unique)
+    if (($got498 -join ',') -cne ($wantSorted498 -join ',')) { $v498Bad += "(d) the bars trigger watches {$($got498 -join ', ')}, expected the 50 dot fields, clanFamily and avatar - 52 (SPEC V498d)" }
+}
+if (-not $soonFn498 -or $soonFn498 -notmatch 'MC\.barsDue' -or $soonFn498 -notmatch 'setTimeout\(') { $v498Bad += "(d) mcBarsSoon does not defer through MC.barsDue and setTimeout( - twenty dot writes would be twenty full-tree repaints (SPEC V498d, R170f)" }
+if ($v498Bad) { foreach ($b in $v498Bad) { Fail "V498 $b" } }
+else { Pass "V498 the bars count the dots through one counter and one reader of the maximum, one painter writes max before a clamped position, a click writes through the dots' own doors, one deferred trigger watches the 52 fields, and the three number fields are gone" }
+
+# ---- V499: the root LEAVES, empty is EMPTY, and the counter has one writer (SPEC I170f, R170d) ----
+$v499Bad = @()
+$show499 = NoComments (LuaFn $rootTxt 'mcShow')
+$sel499 = NoComments (LuaFn $rootTxt 'mcSelect')
+$apply499 = NoComments (LuaFn $rootTxt 'mcApply')
+$remove499 = NoComments (LuaFn $rootTxt 'mcRemove')
+$wipe499 = NoComments (LuaFn $rootTxt 'mcWipe')
+$nodes499 = NoComments (LuaFn $rootTxt 'mcNodes')
+if (-not $show499 -or -not $wipe499) { $v499Bad += "mcShow or mcWipe is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) mcShow owns the swap; mcSelect goes through it; flag OFF shows the ROOT NODE.
+    if ($show499 -notmatch 'self:setNodeObject\(n\);') { $v499Bad += "(a) mcShow does not call self:setNodeObject(n); (SPEC V499a)" }
+    if ($sel499 -notmatch 'mcShow\(') { $v499Bad += "(a) mcSelect does not go through mcShow( (SPEC V499a)" }
+    if ($apply499 -notmatch 'mcShow\(MC\.root') { $v499Bad += "(a) mcApply does not send the form to mcShow(MC.root - with the root removed, row 1 is a child (SPEC V499a)" }
+    # (b) nothing refuses the root any more, and the form moves BEFORE the removal.
+    if ($remove499 -match '\bk\s*<=\s*1\b') { $v499Bad += "(b) mcRemove still refuses k <= 1 - the root leaves now (SPEC V499b, pedido 13)" }
+    if ($render496 -match 'btnMcRemove_"\s*\.\.\s*k\]\.visible\s*=\s*k\s*>\s*1') { $v499Bad += "(b) mcRender still hides the root's X behind k > 1 (SPEC V499b)" }
+    $iShow499 = $remove499.IndexOf('mcShow(')
+    $iWipe499 = $remove499.IndexOf('mcWipe(')
+    $iDel499 = $remove499.IndexOf('ndb.deleteNode(')
+    if ($iShow499 -lt 0 -or $iWipe499 -lt 0 -or $iDel499 -lt 0) { $v499Bad += "(b) mcRemove does not call mcShow(, mcWipe( and ndb.deleteNode( - leg (b) is reading the wrong shape (SPEC V209)" }
+    elseif ($iShow499 -gt $iWipe499 -or $iShow499 -gt $iDel499) { $v499Bad += "(b) mcRemove removes BEFORE it moves the form - it would be left bound to a node that is gone (SPEC V499b)" }
+    if ($remove499 -notmatch 'MC\.root\.mcRootGone = true;' -or $remove499 -notmatch 'mcWipe\(MC\.root\);') { $v499Bad += "(b) mcRemove's root branch does not write MC.root.mcRootGone = true; and call mcWipe(MC.root); (SPEC V499b)" }
+    if ($remove499 -notmatch 'nodes\[k \+ 1\] or nodes\[k - 1\] or MC\.root') { $v499Bad += "(b) mcRemove does not hand the screen to the neighbour below, else above, else the root node (SPEC I170f)" }
+    # (c) the wipe: attributes only, MC_KEEP spared, inside begin/endUpdate; clearNode nowhere.
+    if ($wipe499 -notmatch 'pairs\(ndb\.getAttributes\(node\)\)') { $v499Bad += "(c) mcWipe does not walk ndb.getAttributes(node) (SPEC V499c, R170d)" }
+    if ($wipe499 -notmatch 'MC_KEEP\[name\]') { $v499Bad += "(c) mcWipe does not spare the names in MC_KEEP (SPEC V499c)" }
+    $iBegin499 = $wipe499.IndexOf('ndb.beginUpdate(node);')
+    $iWrite499 = $wipe499.IndexOf('node[gone[i]] = nil;')
+    $iEnd499 = $wipe499.IndexOf('ndb.endUpdate(node);')
+    if ($iBegin499 -lt 0 -or $iWrite499 -lt 0 -or $iEnd499 -lt 0 -or -not ($iBegin499 -lt $iWrite499 -and $iWrite499 -lt $iEnd499)) { $v499Bad += "(c) mcWipe's writes are not between ndb.beginUpdate(node); and ndb.endUpdate(node); (SPEC V499c)" }
+    if ($all25Code -match 'ndb\.clearNode\(') { $v499Bad += "(c) ndb.clearNode( occurs in the sheet - it takes mcChars with it (SPEC V499c, R170d)" }
+    $keep499 = [regex]::Match($root25Code, '(?s)MC_KEEP\s*=\s*\{(.*?)\};')
+    if (-not $keep499.Success) { $v499Bad += "(c) MC_KEEP is not declared (SPEC V209)" }
+    else {
+        foreach ($k499 in @('multipleCharacters', 'mcActive', 'mcRootGone')) {
+            if ($keep499.Groups[1].Value -notmatch "\b$k499\s*=\s*true") { $v499Bad += "(c) MC_KEEP does not keep $k499 (SPEC V499c)" }
+        }
+        if ($root25Code -notmatch 'for mcI = 1, #MC_SHARED_FIELDS, 1 do MC_KEEP\[MC_SHARED_FIELDS\[mcI\]\] = true; end;') { $v499Bad += "(c) MC_KEEP does not take every name of MC_SHARED_FIELDS - a wipe would erase the ficha's settings (SPEC V499c)" }
+    }
+    # (d) mcRootGone: written in mcRemove only, read in mcNodes only.
+    $goneAll499 = @([regex]::Matches($root25Code, 'MC\.root\.mcRootGone')).Count
+    $goneRem499 = @([regex]::Matches($remove499, 'MC\.root\.mcRootGone')).Count
+    $goneNod499 = @([regex]::Matches($nodes499, 'MC\.root\.mcRootGone')).Count
+    if ($goneRem499 -lt 1 -or $goneNod499 -lt 1 -or $goneAll499 -ne ($goneRem499 + $goneNod499)) { $v499Bad += "(d) MC.root.mcRootGone is touched $goneAll499 time(s), $goneRem499 in mcRemove and $goneNod499 in mcNodes - a third reader would decide the list on its own (SPEC V499d)" }
+    # (e) the title: one writer, current BEFORE max.
+    $titleAll499 = @([regex]::Matches($root25Code, 'dynMcTitle"\]\.text\s*=')).Count
+    if ($titleAll499 -ne 1 -or $render496 -notmatch 'dynMcTitle"\]\.text\s*=') { $v499Bad += "(e) dynMcTitle.text is written $titleAll499 time(s), expected once, in mcRender (SPEC V499e)" }
+    elseif ($render496 -notmatch '#nodes \.\. "/" \.\. MC_POOL') { $v499Bad += "(e) the title does not read CURRENT/MAX (#nodes .. `"/`" .. MC_POOL) (SPEC V499e, Q90.1)" }
+}
+if ($v499Bad) { foreach ($b in $v499Bad) { Fail "V499 $b" } }
+else { Pass "V499 mcShow owns the swap, any row leaves with the form moved to a neighbour first, the root is wiped (attributes only, MC_KEEP spared, batched) and marked, and the title counts current/max from one writer" }
+
+# ---- V500: the ! - one button per row, one key per VALUE, one writer of the note (SPEC I170g, R170g/R170i) ----
+$v500Bad = @()
+$key500 = NoComments (LuaFn $rootTxt 'noteKey')
+$open500 = NoComments (LuaFn $rootTxt 'noteOpen')
+$save500 = NoComments (LuaFn $rootTxt 'savePopNote')
+$tip500 = NoComments (LuaFn $rootTxt 'noteTipMove')
+$popNote500 = $root25Doc.SelectSingleNode("//layout[@name='popNote']")
+if (-not $key500 -or $null -eq $popNote500) { $v500Bad += "noteKey or popNote is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) the button, its door and its place in both templates.
+    foreach ($spec500 in @(@('OpenAbility', 'btnN$(field)', "noteOpen\(self, 'background', '\`$\(field\)'\);", 'dyn$(field)'), @('MeritPicked', 'btnNmerit_$(num)', "noteOpen\(self, '\`$\(sub\)', 'merit_\`$\(num\)'\);", 'dynMerit_$(num)'))) {
+        $t500 = $tr25Doc.SelectSingleNode("//template[@name='$($spec500[0])']")
+        if ($null -eq $t500) { $v500Bad += "(a) the $($spec500[0]) template is gone (SPEC V209)"; continue }
+        $b500 = @($t500.SelectNodes("button[@text='!']"))
+        if ($b500.Count -ne 1) { $v500Bad += "(a) $($spec500[0]) has $($b500.Count) ! button(s), expected 1 (SPEC V500a)"; continue }
+        if ($b500[0].GetAttribute('name') -cne $spec500[1]) { $v500Bad += "(a) the ! of $($spec500[0]) is named '$($b500[0].GetAttribute('name'))', expected '$($spec500[1])' (SPEC V500a)" }
+        if ($b500[0].GetAttribute('onClick') -notmatch $spec500[2]) { $v500Bad += "(a) the ! of $($spec500[0]) does not call noteOpen with its category and row field (SPEC V500a)" }
+        $pk500 = $t500.SelectSingleNode("button[@name='$($spec500[3])']")
+        if ($null -eq $pk500) { $v500Bad += "(a) $($spec500[0]) lost its picker $($spec500[3]) (SPEC V209)"; continue }
+        $bl500 = [int]$b500[0].GetAttribute('left'); $bw500 = [int]$b500[0].GetAttribute('width')
+        if ($bl500 -ne ([int]$pk500.GetAttribute('left') + [int]$pk500.GetAttribute('width'))) { $v500Bad += "(a) the ! of $($spec500[0]) is not glued to the right of its picker (SPEC V500a)" }
+        if ($spec500[0] -eq 'OpenAbility') {
+            $dots500 = @($t500.SelectNodes("imageCheckBox") | ForEach-Object { [int]$_.GetAttribute('left') } | Sort-Object)
+            if ($dots500.Count -ne 5 -or $dots500[0] -ne ($bl500 + $bw500 + 5)) { $v500Bad += "(a) the first background dot is not 5px right of the ! (SPEC V500a)" }
+        } else {
+            $book500 = $t500.SelectSingleNode("edit[starts-with(@field,'book_')]")
+            if ($null -eq $book500 -or [int]$book500.GetAttribute('left') -ne ($bl500 + $bw500)) { $v500Bad += "(a) the BOOK column does not start where the merit ! ends (SPEC V500a, B171)" }
+        }
+    }
+    # (b) one key, one literal.
+    if (@([regex]::Matches($all25Code, 'function\s+noteKey\s*\(')).Count -ne 1) { $v500Bad += "(b) noteKey is not declared exactly once (SPEC V500b)" }
+    $lit500 = @([regex]::Matches($all25Code, '"note_"')).Count
+    if ($lit500 -ne 1 -or $key500 -notmatch '"note_"') { $v500Bad += "(b) the literal `"note_`" occurs $lit500 time(s) - only noteKey may spell a note's field name (SPEC V500b)" }
+    if ($open500 -notmatch 'noteKey\(' -or $tip500 -notmatch 'noteKey\(') { $v500Bad += "(b) noteOpen and noteTipMove do not both name the field through noteKey( (SPEC V500b)" }
+    # (c) one writer, quiet while Lua fills the box, and the box binds nothing.
+    if (@([regex]::Matches($root25Code, 'setField\(NOTE\.key')).Count -ne 1 -or $save500 -notmatch 'setField\(NOTE\.key') { $v500Bad += "(c) setField(NOTE.key is not written exactly once, in savePopNote (SPEC V500c)" }
+    if ($save500 -notmatch 'if descQuiet or') { $v500Bad += "(c) savePopNote does not return while descQuiet is up - opening the window would save it back (SPEC V500c)" }
+    $ed500 = $root25Doc.SelectSingleNode("//textEditor[@name='edtPopNote']")
+    if ($null -eq $ed500 -or $ed500.HasAttribute('field') -or $ed500.HasAttribute('readOnly')) { $v500Bad += "(c) edtPopNote is missing or authors field=/readOnly= (SPEC V500c)" }
+    $iQon500 = $open500.IndexOf('descQuiet = true;'); $iTx500 = $open500.IndexOf('"edtPopNote"].text ='); $iQoff500 = $open500.IndexOf('descQuiet = false;')
+    if ($iQon500 -lt 0 -or $iTx500 -lt 0 -or $iQoff500 -lt 0 -or -not ($iQon500 -lt $iTx500 -and $iTx500 -lt $iQoff500)) { $v500Bad += "(c) noteOpen does not write edtPopNote.text between descQuiet = true and descQuiet = false (SPEC V500c)" }
+    # (d) the doors every overlay shares.
+    if ($rootTxt -notmatch 'POP_BOX\s*=\s*\{[^}]*popNote\s*=\s*true') { $v500Bad += "(d) popNote is not in POP_BOX (SPEC V500d)" }
+    $close500 = NoComments (LuaFn $rootTxt 'popClose')
+    if ($close500 -notmatch 'popNote"\]\.visible = false;' -or $close500 -notmatch 'NOTE\.key = nil;') { $v500Bad += "(d) popClose does not hide popNote and clear NOTE.key (SPEC V500d)" }
+    $xb500 = $root25Doc.SelectSingleNode("//button[@name='btnPopNoteClose']")
+    if ($null -eq $xb500 -or $xb500.GetAttribute('onClick') -notmatch '^popClose\(self\);$') { $v500Bad += "(d) btnPopNoteClose does not call popClose(self) (SPEC V500d)" }
+    # (e) the ! lights from the two row painters, through one helper, and they watch EVERY row.
+    $en500 = @([regex]::Matches($root25Code, '\.enabled\s*=\s*filled;')).Count
+    $btnFn500 = NoComments (LuaFn $rootTxt 'noteButton')
+    if ($en500 -ne 1 -or $btnFn500 -notmatch '\.enabled\s*=\s*filled;') { $v500Bad += "(e) the ! buttons' enabled is not written once, in noteButton (SPEC V500e)" }
+    $nbCalls500 = @([regex]::Matches($root25Code, 'noteButton\(')).Count
+    $bgR500 = NoComments (LuaFn $rootTxt 'renderBgButtons'); $mR500 = NoComments (LuaFn $rootTxt 'renderMeritButtons')
+    $inR500 = @([regex]::Matches($bgR500, 'noteButton\(')).Count + @([regex]::Matches($mR500, 'noteButton\(')).Count
+    if ($inR500 -ne 3 -or $nbCalls500 -ne 4) { $v500Bad += "(e) noteButton is called $nbCalls500 time(s), $inR500 from renderBgButtons/renderMeritButtons - expected its definition plus the 3 row-painter calls (SPEC V500e)" }
+    $bgRows500 = [regex]::Match($root25Code, 'BACKGROUND_ROWS\s*=\s*(\d+);'); $mRows500 = [regex]::Match($root25Code, 'MERIT_ROWS\s*=\s*(\d+);')
+    if (-not $bgRows500.Success -or -not $mRows500.Success) { $v500Bad += "(e) BACKGROUND_ROWS or MERIT_ROWS is not declared (SPEC V209)" }
+    else {
+        $wantBg500 = @('language'); for ($i500 = 1; $i500 -le [int]$bgRows500.Groups[1].Value; $i500++) { $wantBg500 += "background_$i500" }
+        $wantM500 = @('language'); for ($i500 = 0; $i500 -le [int]$mRows500.Groups[1].Value; $i500++) { $wantM500 += "merit_m$i500"; $wantM500 += "merit_f$i500" }
+        foreach ($pair500 in @(@('renderBgButtons', $wantBg500), @('renderMeritButtons', $wantM500))) {
+            $lk500 = $null
+            foreach ($d500 in $root25Doc.SelectNodes("//dataLink[@fields]")) { if ($d500.InnerText -match "$($pair500[0])\(") { $lk500 = $d500 } }
+            if ($null -eq $lk500) { $v500Bad += "(e) no dataLink calls $($pair500[0]) (SPEC V209)"; continue }
+            $got500 = @([regex]::Matches($lk500.GetAttribute('fields'), "'([^']+)'") | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+            $want500 = @($pair500[1] | Sort-Object -Unique)
+            if (($got500 -join ',') -cne ($want500 -join ',')) { $v500Bad += "(e) the $($pair500[0]) watcher lists $($got500.Count) field(s), expected $($want500.Count) - every row of the table, or the last rows never light their ! (SPEC V500e, R170g)" }
+        }
+    }
+}
+if ($v500Bad) { foreach ($b in $v500Bad) { Fail "V500 $b" } }
+else { Pass "V500 every background and merit/flaw row has its ! glued between picker and dots or book, one noteKey names every note, savePopNote is its one quiet writer, the window closes through popClose, and both watchers cover every row" }
+
+# ---- V501: the tooltip - no frame, 50%, RIGHT of the cursor, reachable and cheap per pixel (SPEC I170h, R170e/R170f/R170l/R170m, Q90.9) ----
+$v501Bad = @()
+$tip501 = $tr25Doc.SelectSingleNode("//layout[@name='noteTip']")
+$move501 = NoComments (LuaFn $rootTxt 'noteTipMove')
+$leave501 = NoComments (LuaFn $rootTxt 'noteTipLeave')
+if ($null -eq $tip501 -or -not $move501) { $v501Bad += "noteTip or noteTipMove is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) last child of the scrollBox, hidden, a 50% black fill with no outline, no title.
+    $sb501 = $tr25Doc.SelectSingleNode("/form/scrollBox")
+    $last501 = @($sb501.ChildNodes | Where-Object { $_.NodeType -eq 'Element' }) | Select-Object -Last 1
+    if ($null -eq $last501 -or $last501.GetAttribute('name') -ne 'noteTip') { $v501Bad += "(a) noteTip is not the LAST child of WoD20.2's scrollBox - a box declared after it would paint over the tip (SPEC V501a)" }
+    if ($tip501.GetAttribute('visible') -ne 'false') { $v501Bad += "(a) noteTip does not author visible='false' (SPEC V501a)" }
+    $fill501 = $tip501.SelectSingleNode("rectangle")
+    if ($null -eq $fill501 -or $fill501.GetAttribute('color') -ne '#80000000' -or $fill501.GetAttribute('strokeColor') -ne '#00000000') { $v501Bad += "(a) noteTip's fill is not color='#80000000' with strokeColor='#00000000' - 50% black, no outline (SPEC V501a)" }
+    if (@($tip501.SelectNodes(".//label[@text]")).Count -ne 0) { $v501Bad += "(a) noteTip carries a label with static text - the tip has no title (SPEC V501a)" }
+    if ($null -eq $tip501.SelectSingleNode("scrollBox/label[@name='dynNoteTip' and @wordWrap='true']")) { $v501Bad += "(a) dynNoteTip (wordWrap) is not inside a scrollBox of noteTip - a long note could not scroll (SPEC V501a)" }
+    # (b) every picker reports its moves and its exit; the tip holds and hides.
+    foreach ($p501 in @(@('OpenAbility', 'dyn$(field)'), @('MeritPicked', 'dynMerit_$(num)'))) {
+        $pk501 = $tr25Doc.SelectSingleNode("//template[@name='$($p501[0])']/button[@name='$($p501[1])']")
+        if ($null -eq $pk501) { $v501Bad += "(b) $($p501[0]) lost its picker (SPEC V209)"; continue }
+        if ($pk501.GetAttribute('onMouseMove') -notmatch '^noteTipMove\(self, event, ') { $v501Bad += "(b) the $($p501[0]) picker does not report onMouseMove to noteTipMove(self, event, ... (SPEC V501b)" }
+        if ($pk501.GetAttribute('onMouseLeave') -notmatch '^noteTipLeave\(') { $v501Bad += "(b) the $($p501[0]) picker does not report onMouseLeave to noteTipLeave( (SPEC V501b)" }
+    }
+    if ($tip501.GetAttribute('onMouseEnter') -notmatch '^noteTipHold\(' -or $tip501.GetAttribute('onMouseLeave') -notmatch '^noteTipHide\(') { $v501Bad += "(b) noteTip does not hold on enter and hide on leave (SPEC V501b)" }
+    # (c) one tree walk per instance, never per pixel.
+    $walks501 = @([regex]::Matches($move501, 'xpFind\(')).Count
+    if ($walks501 -ne 1 -or $move501 -notmatch 'NOTE\.found = NOTE\.found or xpFind\(') { $v501Bad += "(c) noteTipMove walks the tree outside 'NOTE.found = NOTE.found or xpFind(' - onMouseMove fires per pixel (SPEC V501c, R170f)" }
+    # (d) leaving only schedules; visible has two writers.
+    if (-not $leave501 -or $leave501 -match '\.visible\s*=' -or $leave501 -notmatch 'setTimeout\(' -or $leave501 -notmatch 'NOTE\.hold') { $v501Bad += "(d) noteTipLeave writes visible itself or does not schedule the hide off NOTE.hold (SPEC V501d)" }
+    $vis501 = @([regex]::Matches($root25Code, '\btip\.visible\s*=')).Count
+    $visIn501 = @([regex]::Matches($move501, '\btip\.visible\s*=')).Count + @([regex]::Matches((NoComments (LuaFn $rootTxt 'noteTipHide')), '\btip\.visible\s*=')).Count
+    if ($vis501 -ne $visIn501) { $v501Bad += "(d) the tip's visible is written outside noteTipMove and noteTipHide (SPEC V501d)" }
+    # (e) the tip rides to the RIGHT of the cursor, on both axes.
+    if ($move501 -notmatch 'event\.x' -or $move501 -notmatch 'event\.y') { $v501Bad += "(e) noteTipMove does not read event.x and event.y - the tip would not follow the cursor (SPEC V501e)" }
+    $left501 = [regex]::Match($move501, 'tip\.left\s*=\s*x\s*\+\s*(\d+);')
+    if (-not $left501.Success -or [int]$left501.Groups[1].Value -le 0) { $v501Bad += "(e) the tip's left is not x + a positive offset - it would sit over the cursor, not beside it (SPEC V501e, Q90.9)" }
+    if ($move501 -notmatch 'tip\.top\s*=\s*y\s*-') { $v501Bad += "(e) the tip's top does not follow the cursor's own line (SPEC V501e)" }
+}
+if ($v501Bad) { foreach ($b in $v501Bad) { Fail "V501 $b" } }
+else { Pass "V501 the tip is the last, hidden, frameless 50% overlay of Traits, every picker feeds it, it walks the tree once per instance, leaving only schedules the hide, and it rides to the right of the cursor" }
+
+# ---- V502: the column's 26th-batch adjustments (SPEC I171a..e, Q91, B172) ----
+# Measured as RELATIONS between controls, never as I171's pixels: those are initial numbers the
+# screen confirms (SPEC B166), and a check pinned to them would turn a good resize red.
+$v502Bad = @()
+function Int502($n, $attr) { $v = 0; [void][int]::TryParse($n.GetAttribute($attr), [ref]$v); $v }
+$tpl502 = $root25Doc.SelectSingleNode("//template[@name='McRow']")
+$title502 = $root25Doc.SelectSingleNode("//layout[@name='mcHead']/label[@name='dynMcTitle']")
+$add502 = $root25Doc.SelectSingleNode("//layout[@name='mcHead']/button[@name='btnMcAdd']")
+$set502 = $root25Doc.SelectSingleNode("//layout[@name='mcHead']/button[@name='btnMcSettings']")
+$render502 = LuaFn $root25Code 'mcRender'
+$barsRow502 = LuaFn $root25Code 'mcBarsRow'
+if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -eq $set502 -or -not $render502 -or -not $barsRow502) {
+    $v502Bad += "McRow, mcHead's title or buttons, mcRender or mcBarsRow is not declared - this check reads nothing (SPEC V502, V20, V209)"
+} else {
+    # (a) Add and Settings tile the title's band with one 6px gap, and Settings fits its longer word.
+    $bandL502 = Int502 $title502 'left'; $bandR502 = $bandL502 + (Int502 $title502 'width')
+    $addL502 = Int502 $add502 'left'; $addR502 = $addL502 + (Int502 $add502 'width')
+    $setL502 = Int502 $set502 'left'; $setW502 = Int502 $set502 'width'
+    if ($addL502 -ne $bandL502 -or ($addR502 + 6) -ne $setL502 -or ($setL502 + $setW502) -ne $bandR502) {
+        $v502Bad += "(a) Add ($addL502..$addR502) and Settings ($setL502..$($setL502 + $setW502)) do not tile the title's band $bandL502..$bandR502 with one 6px gap (SPEC V502a, I171a)"
+    }
+    $needSet502 = NeededPx $set502.GetAttribute('text')
+    if ($setW502 -lt $needSet502) { $v502Bad += "(a) Settings is $setW502 wide and its longer translation needs $needSet502 - the word the user asked to fit does not (SPEC V502a, V16)" }
+
+    # (b) the photo's placeholder: one, on the image's rect, before it, hidden, written once.
+    $img502 = $tpl502.SelectSingleNode(".//image[@field='avatar']")
+    $avs502 = @($tpl502.SelectNodes(".//rectangle[starts-with(@name,'mcAv_')]"))
+    if ($avs502.Count -ne 1 -or $null -eq $img502) { $v502Bad += "(b) McRow has $($avs502.Count) mcAv_ placeholder(s) beside its avatar image - expected exactly one, and the image (SPEC V502b)" }
+    else {
+        $av502 = $avs502[0]
+        foreach ($k502 in @('left', 'top', 'width', 'height')) {
+            if ($av502.GetAttribute($k502) -ne $img502.GetAttribute($k502)) { $v502Bad += "(b) mcAv_ $k502='$($av502.GetAttribute($k502))' but the avatar image has '$($img502.GetAttribute($k502))' - the line would not frame the photo's place (SPEC V502b)" }
+        }
+        $sib502 = @($av502.ParentNode.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
+        $iAv502 = [array]::IndexOf($sib502, $av502); $iImg502 = [array]::IndexOf($sib502, $img502)
+        if ($iAv502 -lt 0 -or $iImg502 -lt 0 -or $iAv502 -gt $iImg502) { $v502Bad += "(b) mcAv_ is not declared before the avatar image - it would paint over the photo (SPEC V502b)" }
+        if ($av502.GetAttribute('visible') -ne 'false' -or $av502.GetAttribute('hitTest') -ne 'false' -or $av502.HasAttribute('field')) { $v502Bad += "(b) mcAv_ must author visible='false' and hitTest='false' and no field= (SPEC V502b)" }
+    }
+    $avAll502 = @([regex]::Matches($root25Code, 'mcAv_"\s*\.\.\s*\w+\s*\]\.visible\s*=')).Count
+    $avIn502 = [regex]::Match($barsRow502, 'mcAv_"\s*\.\.\s*\w+\s*\]\.visible\s*=([^;\r\n]+)')
+    if ($avAll502 -ne 1 -or -not $avIn502.Success -or $avIn502.Groups[1].Value -notmatch '\bavatar\b') { $v502Bad += "(b) mcAv_.visible is written $avAll502 time(s) - expected exactly one, in mcBarsRow, reading avatar (SPEC V502b)" }
+    $link502 = $root25Doc.SelectSingleNode("//dataLink[contains(@onChange,'mcBarsSoon(')]")
+    if ($null -eq $link502 -or $link502.GetAttribute('fields') -notmatch "'avatar'") { $v502Bad += "(b) the bars trigger does not watch avatar - setting the photo on the Main would leave the placeholder lit (SPEC V502b, V498d)" }
+
+    # (c) the unselected outline fades to 0.70 in mcRender, and 0.70 is that outline's alone.
+    $opAll502 = @([regex]::Matches($root25Code, 'mcOn_"\s*\.\.\s*\w+\s*\]\.opacity\s*=')).Count
+    $opIn502 = [regex]::Match($render502, 'mcOn_"\s*\.\.\s*\w+\s*\]\.opacity\s*=([^;\r\n]+)')
+    if ($opAll502 -ne 1 -or -not $opIn502.Success -or $opIn502.Groups[1].Value -notmatch '\b0\.70\b' -or $opIn502.Groups[1].Value -notmatch '\b1\b') { $v502Bad += "(c) mcOn_.opacity is written $opAll502 time(s) - expected exactly one, in mcRender, naming 0.70 and 1 (SPEC V502c, I171c)" }
+    $o70Lua502 = @([regex]::Matches($all25Code, '\.opacity\s*=[^;\r\n]*\b0\.70?\b')).Count
+    $o70Xml502 = @([regex]::Matches($all25Code, '\sopacity="0\.70?"')).Count
+    if ($o70Lua502 -ne 1 -or $o70Xml502 -ne 0) { $v502Bad += "(c) 0.70 is in $o70Lua502 runtime opacity write(s) and $o70Xml502 authored opacity - it is the column outline's number and nobody else's (SPEC V502c, V244, B172)" }
+
+    # (d) the Name label sits 6px left of the name edit, on the edit's own line.
+    $nameLbl502 = @($tpl502.SelectNodes(".//label[@text='Name']"))
+    $nameEd502 = $tpl502.SelectSingleNode(".//edit[@field='name']")
+    if ($nameLbl502.Count -ne 1 -or $null -eq $nameEd502) { $v502Bad += "(d) McRow has $($nameLbl502.Count) 'Name' label(s) beside its name edit - expected exactly one, and the edit (SPEC V502d)" }
+    else {
+        $nl502 = $nameLbl502[0]
+        $nlR502 = (Int502 $nl502 'left') + (Int502 $nl502 'width')
+        if (($nlR502 + 6) -ne (Int502 $nameEd502 'left')) { $v502Bad += "(d) the Name label closes at $nlR502 and the name edit opens at $(Int502 $nameEd502 'left') - expected a 6px gap (SPEC V502d, I171d)" }
+        if ($nl502.GetAttribute('top') -ne $nameEd502.GetAttribute('top') -or $nl502.GetAttribute('height') -ne $nameEd502.GetAttribute('height')) { $v502Bad += "(d) the Name label is not on the name edit's line (same top and height) (SPEC V502d)" }
+        if ($nl502.GetAttribute('hitTest') -ne 'false') { $v502Bad += "(d) the Name label does not author hitTest='false' - a click on it would not select the row (SPEC V502d, I170e)" }
+    }
+
+    # (e) one label column, each label centred on its bar, three bars on one left and one width
+    # that close where the X closes. The willpower label is dyn*, so V16 never sees its words:
+    # they are read out of mcRender's one write and measured here as shown (NeededPx -Literal).
+    $wpTag502 = @($tpl502.SelectNodes(".//label[starts-with(@name,'dynMcWpTag_')]"))
+    $bdLbl502 = @($tpl502.SelectNodes(".//label[@text='Blood']"))
+    $qtLbl502 = @($tpl502.SelectNodes(".//label[@text='Quintessence']"))
+    $wpBar502 = $tpl502.SelectSingleNode(".//progressBar[starts-with(@name,'mcWp_')]")
+    $bdBar502 = $tpl502.SelectSingleNode(".//progressBar[starts-with(@name,'mcBlood_')]")
+    $qtBar502 = $tpl502.SelectSingleNode(".//progressBar[starts-with(@name,'mcQuint_')]")
+    $xBtn502 = $tpl502.SelectSingleNode(".//button[starts-with(@name,'btnMcRemove_')]")
+    $tagW502 = @([regex]::Matches($root25Code, 'dynMcWpTag_"\s*\.\.\s*\w+\s*\]\.text\s*=')).Count
+    $tagIn502 = [regex]::Match($render502, 'dynMcWpTag_"\s*\.\.\s*\w+\s*\]\.text\s*=([^;\r\n]+)')
+    if ($wpTag502.Count -ne 1 -or $bdLbl502.Count -ne 1 -or $qtLbl502.Count -ne 1 -or $null -eq $wpBar502 -or $null -eq $bdBar502 -or $null -eq $qtBar502 -or $null -eq $xBtn502) {
+        $v502Bad += "(e) McRow does not carry exactly one dynMcWpTag_, one Blood and one Quintessence label beside its three bars and its X - fewer than 3 bar labels were read (SPEC V502e, V209)"
+    } elseif ($tagW502 -ne 1 -or -not $tagIn502.Success) {
+        $v502Bad += "(e) dynMcWpTag_.text is written $tagW502 time(s), $(if ($tagIn502.Success) { 'one of them' } else { 'none' }) in mcRender - expected exactly one, in mcRender (SPEC V502e, V209)"
+    } else {
+        $tagExpr502 = $tagIn502.Groups[1].Value
+        if ($tagExpr502 -notmatch '"Vontade"' -or $tagExpr502 -notmatch '"Willpower"') { $v502Bad += "(e) mcRender writes the willpower label as $($tagExpr502.Trim()) - expected the pair the user asked for, Vontade (pt) and Willpower (en) (SPEC V502e, Q91.1)" }
+        if ($wpTag502[0].HasAttribute('text')) { $v502Bad += "(e) dynMcWpTag_ authors text= - the language traversal skips dyn* and Lua owns it, so an authored text is a second owner (SPEC V502e)" }
+        foreach ($st502 in @($bdLbl502[0], $qtLbl502[0])) { if ($st502.GetAttribute('name') -like 'dyn*') { $v502Bad += "(e) the '$($st502.GetAttribute('text'))' label is dyn* - it would never be translated (SPEC V502e)" } }
+        $lblL502 = Int502 $wpTag502[0] 'left'; $lblW502 = Int502 $wpTag502[0] 'width'
+        $barL502 = Int502 $wpBar502 'left'; $barW502 = Int502 $wpBar502 'width'
+        $edge502 = (Int502 $xBtn502 'left') + (Int502 $xBtn502 'width')
+        $pairs502 = @(
+            ,@($wpTag502[0], $wpBar502)
+            ,@($bdLbl502[0], $bdBar502)
+            ,@($qtLbl502[0], $qtBar502)
+        )
+        foreach ($p502 in $pairs502) {
+            $lb502 = $p502[0]; $br502 = $p502[1]
+            $who502 = "$($lb502.GetAttribute('name'))$($lb502.GetAttribute('text'))"
+            if ((Int502 $lb502 'left') -ne $lblL502 -or (Int502 $lb502 'width') -ne $lblW502) { $v502Bad += "(e) the '$who502' label is not in the one label column ($lblL502/$lblW502) (SPEC V502e)" }
+            if ($lb502.GetAttribute('hitTest') -ne 'false') { $v502Bad += "(e) the '$who502' label does not author hitTest='false' - a click on it would not select the row (SPEC V502e, I170e)" }
+            $midL502 = 2 * (Int502 $lb502 'top') + (Int502 $lb502 'height'); $midB502 = 2 * (Int502 $br502 'top') + (Int502 $br502 'height')
+            if ($midL502 -ne $midB502) { $v502Bad += "(e) the '$who502' label is not centred on $($br502.GetAttribute('name')) (2*top+height $midL502 against $midB502) (SPEC V502e)" }
+            if ((Int502 $br502 'left') -ne $barL502 -or (Int502 $br502 'width') -ne $barW502) { $v502Bad += "(e) $($br502.GetAttribute('name')) is not on the bars' one left and width ($barL502/$barW502) - the three would not line up (SPEC V502e, I171e)" }
+        }
+        if ($barL502 -ne ($lblL502 + $lblW502 + 6)) { $v502Bad += "(e) the bars open at $barL502 and the label column closes at $($lblL502 + $lblW502) - expected a 6px gap (SPEC V502e)" }
+        if (($barL502 + $barW502) -ne $edge502) { $v502Bad += "(e) the bars close at $($barL502 + $barW502) and the X at $edge502 - the row's right edge is one line (SPEC V502e, I170c)" }
+        $needLbl502 = @((NeededPx 'Blood'), (NeededPx 'Quintessence'))
+        foreach ($w502 in [regex]::Matches($tagExpr502, '(?:and|or)\s+"([^"]+)"')) { $needLbl502 += NeededPx $w502.Groups[1].Value -Literal }
+        $needMax502 = ($needLbl502 | Measure-Object -Maximum).Maximum
+        if ($lblW502 -lt $needMax502) { $v502Bad += "(e) the label column is $lblW502 wide and its longest word needs $needMax502 (SPEC V502e, V16)" }
+    }
+}
+if ($v502Bad) { foreach ($b in $v502Bad) { Fail "V502 $b" } }
+else { Pass "V502 Add and Settings tile the band, the photo's placeholder is one hidden line written once, the unselected outline alone fades to 0.70, and Name plus the three bar labels sit in their columns with the bars on one left and width" }
 
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

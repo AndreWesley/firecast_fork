@@ -4341,7 +4341,11 @@
 			--
 			-- Both walk from the tab root rather than reaching for form.<name>: a tab form cannot see
 			-- its siblings, and the walk is what crosses the import (SPEC R9, B9).
-			local POP_BOX = { popScrim = true, popDesc = true, dynPopDescTitle = true, edtPopDesc = true };
+			-- mcSettings joins so popClose closes it the SAME way it closes popDesc - the
+			-- scrim and the X share one door (SPEC I169e(4), V493c). popNote, the ! window, joins
+			-- for the same reason (SPEC I170g, V500d).
+			local POP_BOX = { popScrim = true, popDesc = true, dynPopDescTitle = true, edtPopDesc = true, mcSettings = true,
+				popNote = true, dynPopNoteTitle = true, edtPopNote = true };
 			-- TWO since T874, and they are the two that are not panes of a TAB: the ? box and the
 			-- search box. Wave 4 took the four Numina panes with it (SPEC V365d), and a name left
 			-- behind here would be a control fontStep walks for and never finds - the roster that
@@ -4623,8 +4627,486 @@
 
 				if found["popScrim"] ~= nil then found["popScrim"].visible = false; end;
 				if found["popDesc"] ~= nil then found["popDesc"].visible = false; end;
+				if found["mcSettings"] ~= nil then found["mcSettings"].visible = false; end;
+				if found["popNote"] ~= nil then found["popNote"].visible = false; end;
 
 				popRow = nil;
+				NOTE.key = nil;
+			end;
+
+			-- ---- Multiple Characters (SPEC I169, T1071) ----------------------------------------
+			--
+			-- ONE Lua environment per form instance (SPEC I168/R168, top of this script) is what
+			-- makes a second `sheet` possible at all: MC.root is the character the sheet was
+			-- OPENED on, MC.chars is its mcChars node (found, never created, until mcAdd needs
+			-- one) and MC.barsDue says a bars repaint is already queued (SPEC I170d). All three
+			-- are per-instance state, same shelf as WP_CLICK above (SPEC V347 - global because the
+			-- chunk-local slot went to the _ENV line, not because it is shared).
+			--
+			-- MC_POOL is the row ceiling the column authors (SPEC Q88.5 - and it STAYS 10, Q90.6);
+			-- MC_ROW_H/MC_DOCK_W mirror the XML's own row height and dock width so the one true
+			-- number lives here AND there, not just there (SPEC V496b, V497e). The dock is FIXED
+			-- since the 25th batch: no grip, no live width, nothing in Lua writes it (SPEC I170b).
+			MC = { root = nil, chars = nil, barsDue = false };
+			MC_POOL = 10;
+			MC_ROW_H = 108;
+			MC_DOCK_W = 370;
+
+			-- The settings a CHARACTER owns rather than a FICHA are the 13 mcAdd copies onto a
+			-- blank node and mcShared re-copies on every root write (SPEC I169e, Q88.8/Q88.9).
+			-- `language` stands in for `multipleCharacters` here: the flag lives on the root only
+			-- and is never mirrored onto a child (SPEC V489c) - a child does not need to know the
+			-- column that shows it exists.
+			MC_SHARED_FIELDS = { "game", "sheetTheme", "language", "stShowNumina", "stShowDisciplines",
+				"stFreeBuy", "stEditClanDisc", "stEditSpentXP", "stManualAffiliation", "stManualClanFamily",
+				"healthLevels", "stSpecCost", "stBackgroundCost" };
+
+			-- What survives when the ROOT character is removed (SPEC I170f, V499c): the FICHA's
+			-- own fields - the 13 shared settings, the flag, the active index and the removal
+			-- mark itself. Everything else on the root is the character, and mcWipe clears it.
+			MC_KEEP = { multipleCharacters = true, mcActive = true, mcRootGone = true };
+
+			for mcI = 1, #MC_SHARED_FIELDS, 1 do MC_KEEP[MC_SHARED_FIELDS[mcI]] = true; end;
+
+			-- The three bars of a row (SPEC I170d): the control prefix, the dots or boxes that ARE
+			-- the current value, and the label the hint says. The MAXIMUM is not here - it has one
+			-- reader, mcBarMax, because each bar takes it from somewhere else (SPEC V498a).
+			MC_BARS = {
+				wp    = { name = "mcWp_",    base = "willpower_c", count = 10, label = "Willpower" },
+				blood = { name = "mcBlood_", base = "bloodPool_",  count = 20, label = "Blood" },
+				quint = { name = "mcQuint_", base = "quint_",      count = 10, label = "Quintessence" },
+			};
+
+			-- Every control name the column's Lua addresses, in the one roster xpFind reads
+			-- (SPEC B167): a name missing here is a name mcRender/mcSelect/mcInit can never find,
+			-- silently. Built with a loop, not ten pasted lines, so MC_POOL stays the one place
+			-- the row count is decided (SPEC V135) - and a loop at this level is not a chunk
+			-- `local`, so it does not touch the ceiling V347 counts (SPEC I168b).
+			MC_NAMES = {
+				mcDock = true, mcRows = true, btnMcAdd = true, btnMcSettings = true, dynMcTitle = true,
+				sheetMain = true, mcSettings = true, mcSettingsScope = true, stSharedScope = true,
+				langScope = true, popScrim = true,
+			};
+
+			for mcI = 1, MC_POOL, 1 do
+				MC_NAMES["mcRow_" .. mcI] = true;
+				MC_NAMES["mcOn_" .. mcI] = true;
+				MC_NAMES["btnMcRemove_" .. mcI] = true;
+				MC_NAMES["mcWp_" .. mcI] = true;
+				MC_NAMES["mcBlood_" .. mcI] = true;
+				MC_NAMES["mcQuint_" .. mcI] = true;
+				MC_NAMES["mcAv_" .. mcI] = true;
+				MC_NAMES["dynMcWpTag_" .. mcI] = true;
+
+				for mcJ = 1, 10, 1 do
+					MC_NAMES["mcHp_" .. mcI .. "_" .. mcJ] = true;
+				end;
+			end;
+
+			-- The root plus every mcChar, root FIRST and never re-sorted (SPEC I169i, V491a): the
+			-- order IS creation order, because ndb.getChildNodes never had a reason to promise
+			-- anything else and a sort here would be a second one, disagreeing the day a book
+			-- name sorts differently in pt.
+			--
+			-- The root is FIRST only while it has not been removed (SPEC I170f): mcRootGone is the
+			-- one mark, written by mcRemove alone and read here alone (SPEC V499d), so the row
+			-- index k and mcActive count THIS list - never "1 = the root".
+			function mcNodes()
+				local out = {};
+
+				if MC.root.mcRootGone ~= true then out[1] = MC.root; end;
+
+				if MC.chars ~= nil then
+					local kids = ndb.getChildNodes(MC.chars);
+
+					for i = 1, #kids, 1 do out[#out + 1] = kids[i]; end;
+				end;
+
+				return out;
+			end;
+
+			-- Runs once per open, from the root onNodeReady, BEFORE the reveal timer (SPEC I169d).
+			-- Finds mcChars if a previous session made one; never creates it - a ficha opened with
+			-- the flag OFF must leave the NDB exactly as it was (SPEC V492e). Pins the three
+			-- root-scoped boxes (storyteller settings, language, the settings window mirror) onto
+			-- MC.root so their field= always reads and writes the FICHA, whichever node is active.
+			function mcInit(from)
+				if from == nil then return; end;
+				if MC.root == nil then MC.root = sheet; end;
+
+				if MC.chars == nil then
+					local kids = ndb.getChildNodes(MC.root);
+
+					for i = 1, #kids, 1 do
+						if ndb.getNodeName(kids[i]) == "mcChars" then
+							MC.chars = kids[i];
+							break;
+						end;
+					end;
+				end;
+
+				local found = xpFind(tabRootOf(from), MC_NAMES, {});
+
+				if found["stSharedScope"] ~= nil then found["stSharedScope"].node = MC.root; end;
+				if found["langScope"] ~= nil then found["langScope"].node = MC.root; end;
+				if found["mcSettingsScope"] ~= nil then found["mcSettingsScope"].node = MC.root; end;
+
+				mcApply(from);
+
+				-- Reopens on the character last shown, not always the root (SPEC Q88.3). mcSelect
+				-- already refuses a nil row or one that is already `sheet`, so nothing here repeats
+				-- that guard.
+				if MC.root.multipleCharacters == true then
+					mcSelect(tonumber(MC.root.mcActive), from);
+				end;
+			end;
+
+			-- The column's own visibility has ONE writer (SPEC V488b) and this is it. Also the one
+			-- place a flag turned OFF sends the sheet back to the root (SPEC V488c) - a storyteller
+			-- who unticks it must not leave a player's screen pointed at character 3. mcShow and
+			-- not mcSelect(1): with the root removed, row 1 is a child, and OFF means "the ficha
+			-- as it was", which is the root node - blank, if it was removed (SPEC I170f, V499a).
+			function mcApply(from)
+				if MC.root == nil then return; end;
+
+				local found = xpFind(tabRootOf(from), MC_NAMES, {});
+				local on = MC.root.multipleCharacters == true;
+
+				if found["mcDock"] ~= nil then found["mcDock"].visible = on; end;
+
+				if not on then mcShow(MC.root, from); end;
+
+				mcRender(from);
+			end;
+
+			-- Paints the pool: which rows show, which one is lit, the health/add/remove state, the
+			-- title count, the bars and whether the sheet beside the column shows at all
+			-- (SPEC I169d, I170e, I170f). Checks every visible row's node on EVERY call, because
+			-- mcRemove and mcAdd both change what mcChars holds without this function knowing
+			-- which row moved - but re-pins only a row whose node CHANGED: pinning the same node
+			-- again could rebind the row's name <edit> under a player typing in it (SPEC V491b as
+			-- amended, I170i(2)).
+			function mcRender(from)
+				if MC.root == nil then return; end;
+
+				local found = xpFind(tabRootOf(from), MC_NAMES, {});
+				local nodes = mcNodes();
+				local st = isStoryteller();
+				local on = MC.root.multipleCharacters == true;
+				local lang = (sheet ~= nil and sheet.language == "en") and "en" or "pt";
+
+				if found["btnMcAdd"] ~= nil then
+					found["btnMcAdd"].visible = st;
+					found["btnMcAdd"].enabled = #nodes < MC_POOL;
+					found["btnMcAdd"].opacity = (#nodes < MC_POOL) and 1 or 0.75;
+				end;
+
+				if found["btnMcSettings"] ~= nil then found["btnMcSettings"].visible = st; end;
+
+				-- CURRENT/MAX, "(3/10)" - the order the storyteller reads a counter in (SPEC Q90.1).
+				-- The title's ONE writer (SPEC V499e); dyn*, so the language traversal leaves it.
+				if found["dynMcTitle"] ~= nil then
+					found["dynMcTitle"].text = translateSheetText("Characters List", lang) .. " (" .. #nodes .. "/" .. MC_POOL .. ")";
+				end;
+
+				-- Flag ON and nobody left: the right side is EMPTY, waiting for Add (SPEC I170f,
+				-- V496e). The form stays bound to the root node meanwhile - it always exists.
+				if found["sheetMain"] ~= nil then found["sheetMain"].visible = (not on) or #nodes > 0; end;
+
+				for k = 1, MC_POOL, 1 do
+					local row = found["mcRow_" .. k];
+					local n   = nodes[k];
+
+					if row ~= nil then
+						row.visible = n ~= nil;
+
+						if n ~= nil then
+							if row.node == nil or ndb.getNodeHandle(row.node) ~= ndb.getNodeHandle(n) then row.node = n; end;
+
+							-- The active row has no Lua variable of its own (SPEC V490d): it is
+							-- read off the handle every time, the same way `sheet == MC.root`
+							-- is read everywhere else on this sheet.
+							local active = ndb.getNodeHandle(n) == ndb.getNodeHandle(sheet);
+							local levels = tonumber(n.healthLevels) or 7;
+
+							-- Every row is outlined; the active one is outlined THICKER (SPEC
+							-- I170e, V497d) and the others fade to 70% (SPEC I171c, V502c) - only
+							-- the outline, the row's contents stay at full strength. 0.70 is a NAMED
+							-- runtime number, this outline's and nobody else's (SPEC V244, B172).
+							if found["mcOn_" .. k] ~= nil then
+								found["mcOn_" .. k].strokeSize = active and 2 or 1;
+								found["mcOn_" .. k].opacity = active and 1 or 0.70;
+							end;
+
+							-- pt "Vontade" beside en "Willpower": two translations of one English
+							-- word, so this label is dyn* and its text lives here, next to the title's
+							-- (SPEC I171e, V502e) - a language switch reaches mcRender the same way.
+							if found["dynMcWpTag_" .. k] ~= nil then found["dynMcWpTag_" .. k].text = (lang == "pt") and "Vontade" or "Willpower"; end;
+
+							-- mcActive's ONE writer (SPEC V490e): only when the shown index
+							-- differs, so an unrelated render does not restamp the NDB.
+							if active and tonumber(MC.root.mcActive) ~= k then MC.root.mcActive = k; end;
+
+							-- Every row has its X now, the root's included (SPEC I170f, V499b).
+							if found["btnMcRemove_" .. k] ~= nil then found["btnMcRemove_" .. k].visible = st; end;
+
+							for i = 1, 10, 1 do
+								local hp = found["mcHp_" .. k .. "_" .. i];
+
+								if hp ~= nil then hp.visible = i <= levels; end;
+							end;
+
+							mcBarsRow(k, n, found);
+						end;
+					end;
+				end;
+			end;
+
+			-- The ONE place the form's node ever changes (SPEC V490a). `self`, not
+			-- `tabRootOf(from)`: the generated constructor wraps setNodeObject on its OWN local
+			-- (the upvalue `sheet` closes over, SPEC R169a, output/rdkObjs/WoD20th/WoD20th.lfm.lua
+			-- :11-21). Every other control lookup - tabRootOf included - runs through
+			-- objs.objectFromHandle, which builds a brand new table on every call
+			-- (rrpgObjs.lua:493-499) and whose setNodeObject is the plain class method: it never
+			-- touches `sheet`. Only the table the compiler closed THIS script over does.
+			--
+			-- Takes a NODE since the 25th batch (SPEC I170f, V499a): the root may be out of the
+			-- list and still be the node the form must fall back to - flag OFF, or the last
+			-- character removed - so "show the root" cannot be spelled as a row index any more.
+			function mcShow(n, from)
+				if n == nil or ndb.getNodeHandle(n) == ndb.getNodeHandle(sheet) then return; end;
+
+				self:setNodeObject(n);
+
+				mcRender(from);
+			end;
+
+			-- A row's click: the k-th node of the CURRENT list (SPEC I170f).
+			function mcSelect(k, from)
+				mcShow(mcNodes()[k], from);
+			end;
+
+			-- A blank node under mcChars, seeded with the 13 shared fields and nothing else
+			-- (SPEC Q88.9) - no baseline, no name, no dots. mcChars is created here, lazily, the
+			-- first time the pool needs one (SPEC I169i). The count is read AGAIN after the create
+			-- because the new node has to be part of it for the select below to land on it, not on
+			-- the row that was last before it.
+			function mcAdd(from)
+				if #mcNodes() >= MC_POOL then return; end;
+
+				MC.chars = MC.chars or ndb.createChildNode(MC.root, "mcChars");
+
+				local n = ndb.createChildNode(MC.chars, "mcChar");
+
+				for i = 1, #MC_SHARED_FIELDS, 1 do
+					local f = MC_SHARED_FIELDS[i];
+
+					n[f] = MC.root[f];
+				end;
+
+				mcSelect(#mcNodes(), from);
+			end;
+
+			-- ANY row leaves, the root's included (SPEC I170f, pedido 13 of the 25th batch).
+			-- Irreversible, so it asks first (SPEC R30). If the row being removed is the active
+			-- one, the form moves to its NEIGHBOUR - the row below, else the row above, else the
+			-- root node itself, which always exists even out of the list - BEFORE the removal,
+			-- never after, or it is left pointing at a handle the NDB no longer has (SPEC V499b).
+			--
+			-- The root cannot be deleted - it IS the ficha, and it carries mcChars and the shared
+			-- settings - so "removing" it is mcRootGone plus mcWipe: the character goes, the
+			-- ficha stays (SPEC Q90.5).
+			function mcRemove(k, from)
+				local nodes = mcNodes();
+				local lang  = (sheet ~= nil and sheet.language) or "pt";
+
+				if nodes[k] == nil then return; end;
+
+				Dialogs.confirmOkCancel(
+					translateSheetText("Remove this character? This cannot be undone.", lang),
+					function(confirmed)
+						if not confirmed then return; end;
+
+						local n = nodes[k];
+
+						if ndb.getNodeHandle(n) == ndb.getNodeHandle(sheet) then
+							mcShow(nodes[k + 1] or nodes[k - 1] or MC.root, from);
+						end;
+
+						if ndb.getNodeHandle(n) == ndb.getNodeHandle(MC.root) then
+							MC.root.mcRootGone = true;
+							mcWipe(MC.root);
+						else
+							ndb.deleteNode(n);
+						end;
+
+						mcRender(from);
+					end);
+			end;
+
+			-- Clears a CHARACTER off a node and keeps the FICHA (SPEC I170f, V499c): every
+			-- attribute not in MC_KEEP goes. Names are collected first and written after - the
+			-- map ndb.getAttributes hands back is name -> value and holds attributes only, never
+			-- child nodes (SPEC R170d), so mcChars survives. ndb.clearNode is exactly what this
+			-- must NOT be: it takes the children too. begin/endUpdate batch the burst of writes,
+			-- which matters when the removed root was the node on screen (SPEC I170i(8)).
+			function mcWipe(node)
+				local gone = {};
+
+				for name, _ in pairs(ndb.getAttributes(node)) do
+					if MC_KEEP[name] ~= true then gone[#gone + 1] = name; end;
+				end;
+
+				ndb.beginUpdate(node);
+
+				for i = 1, #gone, 1 do node[gone[i]] = nil; end;
+
+				ndb.endUpdate(node);
+			end;
+
+			-- The mirror (SPEC I169e(3)): copies the 13 shared fields from the root onto every
+			-- mcChar, only where they differ, then repaints. The ONLY caller is the <dataLink
+			-- onChange="mcShared(self);"> inside stSharedScope (WoD20.10/T1069) - a dataLink
+			-- watches a FIELD, not a widget, so one link catches the settings box, the settings
+			-- window and the language combo alike, all three pinned to the same root (SPEC V492d).
+			function mcShared(from)
+				if MC.root ~= nil and MC.chars ~= nil then
+					local kids = ndb.getChildNodes(MC.chars);
+
+					for i = 1, #kids, 1 do
+						local n = kids[i];
+
+						for j = 1, #MC_SHARED_FIELDS, 1 do
+							local f = MC_SHARED_FIELDS[j];
+
+							if n[f] ~= MC.root[f] then n[f] = MC.root[f]; end;
+						end;
+					end;
+				end;
+
+				mcApply(from);
+			end;
+
+			-- Opens the settings window the same way popOpen opens the ? box (SPEC I169e(4)):
+			-- re-pin, then show scrim and box. Re-pinning here as well as in mcInit costs nothing
+			-- and covers a window opened before the first render ever ran.
+			function mcSettingsOpen(from)
+				local found = xpFind(tabRootOf(from), MC_NAMES, {});
+
+				if found["mcSettingsScope"] ~= nil then found["mcSettingsScope"].node = MC.root; end;
+				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+				if found["mcSettings"] ~= nil then found["mcSettings"].visible = true; end;
+			end;
+
+			-- ---- The row's three bars (SPEC I170d, T1076) ---------------------------------------
+			--
+			-- The ONE count of a pool on a given node (SPEC V498a): how many of base..1..count are
+			-- lit. The node is an argument because a row paints ITS node, not the active one.
+			function mcCount(n, base, count)
+				local c = 0;
+
+				for i = 1, count, 1 do
+					if n[base .. i] == true then c = c + 1; end;
+				end;
+
+				return c;
+			end;
+
+			-- The ONE reader of a bar's MAXIMUM (SPEC V498a), for the painter and the click alike.
+			-- Willpower's ceiling is the PERMANENT dots, bought with XP - the bar never raises it,
+			-- only buying a dot does (pedido 6). Blood is twenty, or the family's cap (SPEC I108c).
+			-- Quintessence is its ten dots.
+			function mcBarMax(bar, n)
+				if bar == "wp" then return mcCount(n, "willpower_", 10); end;
+				if bar == "blood" then return familyCap("bloodPool", n) or 20; end;
+
+				return 10;
+			end;
+
+			-- The ONE writer of a bar's max, position and hint (SPEC V498b). max goes first: a
+			-- position above the old max would be clamped by the control before the new max lands.
+			-- A current above the maximum (seven boxes over five dots) fills the bar and leaves the
+			-- data alone - painting is not the place to correct a sheet.
+			function mcBarsRow(k, n, found)
+				local lang = (sheet ~= nil and sheet.language == "en") and "en" or "pt";
+
+				for bar, def in pairs(MC_BARS) do
+					local ctrl = found[def.name .. k];
+
+					if ctrl ~= nil then
+						local m = mcBarMax(bar, n);
+						local c = mcCount(n, def.base, def.count);
+
+						ctrl.max = m;
+						ctrl.position = math.min(c, m);
+						ctrl.hint = translateSheetText(def.label, lang) .. " " .. c .. "/" .. m;
+					end;
+				end;
+
+				-- The photo's placeholder rides on the same repaint: the photo is set on the Main of
+				-- the ACTIVE row, the node whose dots this trigger already watches (SPEC I171b, V502b).
+				if found["mcAv_" .. k] ~= nil then found["mcAv_" .. k].visible = n.avatar == nil or n.avatar == ""; end;
+			end;
+
+			-- Repaints the ACTIVE row only (SPEC V498f): the bars trigger watches the active node,
+			-- and only the active node's dots ever change.
+			function mcBarsNow(from)
+				if MC.root == nil or sheet == nil then return; end;
+
+				local found = xpFind(tabRootOf(from), MC_NAMES, {});
+				local nodes = mcNodes();
+				local k = 0;
+
+				for i = 1, #nodes, 1 do
+					if ndb.getNodeHandle(nodes[i]) == ndb.getNodeHandle(sheet) then k = i; end;
+				end;
+
+				if k > 0 then mcBarsRow(k, sheet, found); end;
+			end;
+
+			-- The bars trigger (SPEC I170d, V498d). DEFERRED: one prefix write lights up to twenty
+			-- dots and the dataLink fires once per field, while mcBarsNow walks the whole control
+			-- tree (SPEC R170f) - so the first fire queues ONE repaint and the rest find it queued.
+			function mcBarsSoon(from)
+				if MC.barsDue then return; end;
+
+				MC.barsDue = true;
+
+				setTimeout(function()
+					MC.barsDue = false;
+					mcBarsNow(from);
+				end, 0);
+			end;
+
+			-- A click on a bar EDITS the current value (SPEC Q90.2). mcSelect ran first in the same
+			-- onMouseDown, so `sheet` is the row's node already. The x the host hands over is
+			-- local to the bar (SPEC R170m), so it names a segment of the maximum; that segment is
+			-- then written through the SAME door a click on that dot or box would take - the
+			-- toggle (the top segment steps down one, so 0 is reachable), the family cap and its
+			-- warning all come from there, and the dots and boxes on the sheet ARE the value, so
+			-- they change with it (SPEC V498c). The boxes' own onChange find WP_CLICK nil and stay
+			-- quiet (SPEC I155j). Left button only: the right one edits nothing.
+			function mcBarClick(k, bar, from, event)
+				if sheet == nil or event == nil or event.button ~= "left" then return; end;
+
+				local def = MC_BARS[bar];
+				local m = mcBarMax(bar, sheet);
+
+				if def == nil or m < 1 then return; end;
+
+				local ctrl = xpFind(tabRootOf(from), MC_NAMES, {})[def.name .. k];
+
+				if ctrl == nil or ctrl.width == nil or ctrl.width <= 0 then return; end;
+
+				local s = math.max(1, math.min(m, math.ceil((tonumber(event.x) or 0) / ctrl.width * m)));
+
+				if bar == "blood" then
+					bloodClick(def.base .. s);
+				elseif bar == "quint" then
+					quintClick(def.base .. s);
+				else
+					poolClick("willpower_c", 10, def.base .. s, nil);
+				end;
 			end;
 
 			-- What the storyteller types in the ? box lands on the row that OPENED it, read at the
@@ -4649,6 +5131,162 @@
 				if fld == nil then return; end;
 
 				setField(fld, form.edtPopDesc.text);
+			end;
+
+			-- ---- The ! note of a background, merit or flaw (SPEC I170g/I170h, T1076) -----------
+			--
+			-- NOTE.key is the field the open window edits; NOTE.found caches the tooltip's controls
+			-- (the pickers and the tip itself) after ONE walk, because the tooltip runs on
+			-- onMouseMove - per pixel - and xpFind walks the whole tree (SPEC R170f, V501c). The
+			-- controls are built once with the form and never replaced, so the cache cannot go
+			-- stale. NOTE.hold says the pointer is inside the tip; NOTE.tipKey is the note the tip
+			-- shows, so its text and size are rewritten only when that changes. Global for the
+			-- reason every root helper is (SPEC V347).
+			NOTE = { key = nil, found = nil, hold = false, tipKey = nil };
+
+			NOTE_NAMES = { noteTip = true, dynNoteTip = true };
+
+			for noteI = 1, BACKGROUND_ROWS, 1 do NOTE_NAMES["dynbackground_" .. noteI] = true; end;
+			for noteI = 0, MERIT_ROWS, 1 do
+				NOTE_NAMES["dynMerit_m" .. noteI] = true;
+				NOTE_NAMES["dynMerit_f" .. noteI] = true;
+			end;
+
+			-- The ONE name a note is stored under (SPEC V500b): keyed by the chosen VALUE, not by
+			-- the row, so the same background in two rows opens the same note and emptying a row's
+			-- dots loses nothing. The value is the canonical English name the picker writes
+			-- (SPEC R170h); anything that is not a letter or a digit becomes "_" so the attribute
+			-- name stays plain. It lives on `sheet` - the active character - so it is per character.
+			function noteKey(cat, value)
+				return "note_" .. cat .. "_" .. (string.gsub(value, "[^%w]", "_"));
+			end;
+
+			-- Opens the ! window on the note of THIS row's value (SPEC I170g). The button is
+			-- disabled while the row is empty, and the empty guard here says the same thing again
+			-- for a click that lands in between. The text goes in under descQuiet, because the
+			-- textEditor's onChange cannot tell this write from the player's typing (SPEC R170i).
+			function noteOpen(from, cat, field)
+				if from == nil or sheet == nil then return; end;
+
+				local v = sheet[field];
+
+				if v == nil or v == "" then return; end;
+
+				local found = xpFind(tabRootOf(from), POP_BOX, {});
+				local lang = (sheet.language == "en") and "en" or "pt";
+
+				if found["popNote"] == nil then return; end;
+
+				NOTE.key = noteKey(cat, v);
+
+				if found["dynPopNoteTitle"] ~= nil then found["dynPopNoteTitle"].text = translateSheetText(v, lang) or v; end;
+
+				if found["edtPopNote"] ~= nil then
+					descQuiet = true;
+					found["edtPopNote"].text = sheet[NOTE.key] or "";
+					descQuiet = false;
+				end;
+
+				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+
+				found["popNote"].visible = true;
+			end;
+
+			-- The ONE writer of a note (SPEC V500c). Anyone who edits the sheet edits its notes
+			-- (SPEC Q90.10) - there is no storyteller test here, unlike savePopDesc above.
+			function savePopNote(form)
+				if descQuiet or NOTE.key == nil or sheet == nil or form == nil then return; end;
+
+				setField(NOTE.key, form.edtPopNote.text);
+			end;
+
+			-- The tooltip (SPEC I170h, V501). Runs per pixel while the pointer is over a picker:
+			-- no tree walk after the first, 2 parent hops, and the text rewritten only when the
+			-- note changes. `from` is the FORM, not the button - a handler's self is the form
+			-- (SPEC R170l) - so the button comes by NAME. event.x/y are local to the button
+			-- (SPEC R170m): the tip goes 16px to the RIGHT of the pointer and 8px above its line,
+			-- following both axes (SPEC Q90.9), so the line the pointer is on runs INTO the tip
+			-- and leaving the picker to the right reaches it - where the wheel scrolls it.
+			function noteTipMove(from, event, cat, field, name)
+				if sheet == nil then return; end;
+
+				NOTE.found = NOTE.found or xpFind(tabRootOf(from), NOTE_NAMES, {});
+
+				local tip = NOTE.found["noteTip"];
+				local btn = NOTE.found[name];
+				local v   = sheet[field];
+
+				if tip == nil or btn == nil then return; end;
+
+				local key = (v ~= nil and v ~= "") and noteKey(cat, v) or nil;
+				local txt = key and sheet[key] or nil;
+
+				if txt == nil or txt == "" then
+					tip.visible = false;
+					NOTE.tipKey = nil;
+					return;
+				end;
+
+				local row = btn.parent;
+				local box = row and row.parent;
+
+				if box == nil then return; end;
+
+				local x = box.left + row.left + btn.left + ((event and tonumber(event.x)) or 0);
+				local y = box.top + row.top + btn.top + ((event and tonumber(event.y)) or 0);
+
+				if NOTE.tipKey ~= key then
+					-- The fitSize ruler (half the point size per character) sizes the tip to its
+					-- text: at most 300 wide and 160 tall, the rest scrolls (SPEC I170h).
+					local _, cont = string.gsub(txt, "[\128-\191]", "");
+					local chars = #txt - cont;
+					local w = math.min(300, chars * 6 + 24);
+					local lines = 0;
+
+					for para in string.gmatch(txt .. "\n", "([^\n]*)\n") do
+						local _, pc = string.gsub(para, "[\128-\191]", "");
+						lines = lines + math.max(1, math.ceil(((#para - pc) * 6) / (w - 24)));
+					end;
+
+					tip.width = w;
+					tip.height = math.min(160, lines * 16 + 12);
+
+					local lbl = NOTE.found["dynNoteTip"];
+
+					if lbl ~= nil then
+						lbl.width = w - 24;
+						lbl.text = txt;
+					end;
+
+					NOTE.tipKey = key;
+				end;
+
+				tip.left = x + 16;
+				tip.top = y - 8;
+				tip.visible = true;
+			end;
+
+			-- Leaving the picker does not hide the tip at once: 150ms of grace lets the pointer
+			-- reach it, and a pointer inside it holds it open (SPEC I170h, V501d).
+			function noteTipLeave(from)
+				NOTE.hold = false;
+
+				setTimeout(function()
+					if not NOTE.hold then noteTipHide(from); end;
+				end, 150);
+			end;
+
+			function noteTipHold(from)
+				NOTE.hold = true;
+			end;
+
+			function noteTipHide(from)
+				NOTE.hold = false;
+				NOTE.tipKey = nil;
+
+				local tip = NOTE.found and NOTE.found["noteTip"];
+
+				if tip ~= nil then tip.visible = false; end;
 			end;
 			-- ---- The merit/flaw search box (SPEC I107) ----------------------------------------
 			--
@@ -6163,7 +6801,10 @@
 				local names = {};
 				local last = BACKGROUND_ROWS - BACKGROUND_FREE_ROWS;
 
-				for i = 1, last, 1 do names["dynbackground_" .. i] = true; end;
+				for i = 1, last, 1 do
+					names["dynbackground_" .. i] = true;
+					names["btnNbackground_" .. i] = true;
+				end;
 
 				local found = {};
 
@@ -6173,7 +6814,21 @@
 
 				for i = 1, last, 1 do
 					mfLabel(found["dynbackground_" .. i], sheet["background_" .. i], "Select Background", lang);
+					noteButton(found["btnNbackground_" .. i], sheet["background_" .. i]);
 				end;
+			end;
+
+			-- The ! beside a picked row is live only while the row HAS a value (SPEC I170g,
+			-- V500e): disabled but still drawn when empty, dimmed the way btnMcAdd is at its
+			-- ceiling (SPEC V82). Written only from the two row painters, which already run on
+			-- every change of every row's field.
+			function noteButton(btn, value)
+				if btn == nil then return; end;
+
+				local filled = value ~= nil and value ~= "";
+
+				btn.enabled = filled;
+				btn.opacity = filled and 1 or 0.75;
 			end;
 
 			-- Nature and Demeanor, the two BARE rows of I113e wave 2 (SPEC T842). Same watcher and
@@ -6207,6 +6862,8 @@
 				for i = 0, MERIT_ROWS, 1 do
 					names["dynMerit_m" .. i] = true;
 					names["dynMerit_f" .. i] = true;
+					names["btnNmerit_m" .. i] = true;
+					names["btnNmerit_f" .. i] = true;
 				end;
 
 				local found = {};
@@ -6218,6 +6875,8 @@
 				for i = 0, MERIT_ROWS, 1 do
 					mfLabel(found["dynMerit_m" .. i], sheet["merit_m" .. i], "Select Merit", lang);
 					mfLabel(found["dynMerit_f" .. i], sheet["merit_f" .. i], "Select Flaw", lang);
+					noteButton(found["btnNmerit_m" .. i], sheet["merit_m" .. i]);
+					noteButton(found["btnNmerit_f" .. i], sheet["merit_f" .. i]);
 				end;
 			end;
 
@@ -6272,10 +6931,16 @@
 			-- entry points HAVE to be two - a blood pool dot may not reach xpClick (SPEC V219) and a
 			-- rating dot may not skip it - but the ceiling itself is read in a single place, which is
 			-- what V135 is really about (SPEC V337c).
-			function familyCap(trait)
-				if sheet == nil or trait == nil then return nil; end;
+			-- `node` is OPTIONAL and trails the signature so every call site that exists today
+			-- (all of them asking about the active sheet) still reads exactly as before
+			-- (SPEC I169l): a row's own node is what mcBarMax passes when it paints a row that is
+			-- not the active one (SPEC I170d).
+			function familyCap(trait, node)
+				node = node or sheet;
 
-				local row = FAMILY_CAP[sheet.clanFamily];
+				if node == nil or trait == nil then return nil; end;
+
+				local row = FAMILY_CAP[node.clanFamily];
 
 				if row == nil then return nil; end;
 
@@ -6388,6 +7053,9 @@
 			-- `base` is the WHOLE prefix, separator included - "bloodPool_", "quint_", "willpower_c"
 			-- (SPEC V446 amended). The third of those has no underscore before its number, and a
 			-- writer that glued one on would miss every field it owns.
+			-- Active sheet only again since the 25th batch: the one caller that wrote another
+			-- node's dots (the number-to-dots writer) left with the row's number fields (SPEC I170d, V494
+			-- retired). A bar click selects its row FIRST, so it writes the active node too.
 			function poolPrefix(base, count, alvo)
 				for i = 1, count, 1 do
 					local on = (i <= alvo);
@@ -6446,13 +7114,15 @@
 			end;
 
 			-- The twenty blood dots (SPEC I108c). The ceiling is read HERE and handed over, so the
-			-- pool that has one and the pool that does not walk the same code (SPEC V337c).
+			-- pool that has one and the pool that does not walk the same code (SPEC V337c). A click
+			-- on the column's blood bar comes through this same door (SPEC I170d, V498c).
 			function bloodClick(field, ctrl)
 				poolClick("bloodPool_", 20, field, familyCap("bloodPool"));
 			end;
 
 			-- The ten quintessence dots (SPEC I155i, V264b, T987). No family caps quintessence, so
-			-- the ceiling is nil and the branch above never opens.
+			-- the ceiling is nil and the branch above never opens. The quintessence bar clicks
+			-- through here too (SPEC V498c).
 			function quintClick(field, ctrl)
 				poolClick("quint_", 10, field, nil);
 			end;
@@ -7372,141 +8042,284 @@
 		Authored hidden, like the tabControl it replaces: the host paints before any hook of
 		ours runs (SPEC R47) and sheetReveal is still the one thing that lights it (V166).
 	-->
+	<!--
+		SPEC I170c/I170e, T1075c - one dataScopeBox per pool slot, PINNED to its own node in
+		mcRender (re-pinned only when the handle differs, SPEC V491b as amended), so the column
+		shows every character at once while the sheet itself shows one (SPEC I169). Authored
+		invisible until a real node exists to pin it.
+
+		field= here reads and writes the node the ROW is pinned to, and it is name, avatar and
+		health_1..10 and nothing else (SPEC V497a). Every control that takes a click SELECTS
+		first, in the same attribute, so what runs after it reads the row's node through
+		`sheet` (SPEC V497c): the background, the ten health boxes, the three bars and the
+		name's onEnter. The X is the one exception - clicking it is removing, not choosing
+		(SPEC Q90.4).
+
+		The three bars carry no field=: no field holds "how many dots are lit", so mcBarsRow
+		writes max and position from the dots themselves (SPEC I170d). onMouseDown, not
+		onClick: it is the event a published sheet reads event.x from (SPEC R170m), and
+		mcBarClick turns that x into the segment the player pointed at, then writes it through
+		the same door the dots use (SPEC V498c).
+
+		The outline is always drawn: strokeSize 1 idle, 2 active, written by mcRender alone
+		(SPEC I170e, V497d); idle it also fades to 0.70 (SPEC I171c).
+
+		26th batch (SPEC I171b/d/e, V502): the labels are hitTest="false", so a click on one
+		falls through to mcBg_ and selects the row like anywhere else on it. mcAv_ is where the
+		photo goes, drawn only while there is none - mcBarsRow is its one writer - and it is
+		declared before the image on the same rect, so a photo paints over it. One label
+		column, each label centred on its bar, and all three bars start after the longest
+		label so they share one left and one width. The willpower label is dyn*: pt "Vontade"
+		beside en "Willpower" is a second translation of one English word, which the PT map
+		cannot hold, so mcRender writes it.
+
+		NOTHING is commented inside a <template> - rdk exits 1 with an empty message and
+		deletes the .rpk (SPEC B19), the same door Willpower and HealthRow (WoD20.1) avoid.
+	-->
+	<template name="McRow">
+		<dataScopeBox name="mcRow_$(num)" left="4" top="$(top)" width="346" height="108" visible="false">
+			<rectangle name="mcBg_$(num)" align="client" color="#00000000" strokeColor="#00000000" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self);"/>
+			<rectangle name="mcOn_$(num)" left="0" top="0" width="346" height="108" color="#00000000" strokeColor="white" strokeSize="1" xradius="8" yradius="8" hitTest="false"/>
+
+			<label left="8" top="8" width="26" height="22" text="Name" vertTextAlign="center" hitTest="false"/>
+			<edit left="40" top="8" width="270" height="22" field="name" onEnter="mcSelect($(num), self);"/>
+			<button name="btnMcRemove_$(num)" left="316" top="8" width="22" height="22" text="X" onClick="mcRemove($(num), self);"/>
+
+			<rectangle name="mcAv_$(num)" left="8" top="38" width="62" height="62" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="false" visible="false"/>
+			<image left="8" top="38" width="62" height="62" field="avatar" style="autoFit" hitTest="false"/>
+
+			<rectangle name="mcHp_$(num)_1" left="82" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(1);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_1" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+			<rectangle name="mcHp_$(num)_2" left="108" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(2);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_2" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+			<rectangle name="mcHp_$(num)_3" left="134" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(3);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_3" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+			<rectangle name="mcHp_$(num)_4" left="160" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(4);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_4" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+			<rectangle name="mcHp_$(num)_5" left="186" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(5);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_5" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+			<rectangle name="mcHp_$(num)_6" left="212" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(6);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_6" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+			<rectangle name="mcHp_$(num)_7" left="238" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(7);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_7" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+			<rectangle name="mcHp_$(num)_8" left="264" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(8);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_8" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+			<rectangle name="mcHp_$(num)_9" left="290" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(9);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_9" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+			<rectangle name="mcHp_$(num)_10" left="316" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(10);" onMenu="mcSelect($(num), self); healHealthMark();">
+				<label align="client" field="health_10" horzTextAlign="center" vertTextAlign="center"/>
+			</rectangle>
+
+			<label name="dynMcWpTag_$(num)" left="82" top="59" width="85" height="14" fontSize="12" vertTextAlign="center" hitTest="false"/>
+			<label left="82" top="73" width="85" height="14" text="Blood" fontSize="12" vertTextAlign="center" hitTest="false"/>
+			<label left="82" top="87" width="85" height="14" text="Quintessence" fontSize="12" vertTextAlign="center" hitTest="false"/>
+
+			<progressBar name="mcWp_$(num)" left="173" top="60" width="165" height="12" min="0" max="10" position="0" color="#87CEFA" hitTest="true" cursor="handPoint" onMouseDown="mcSelect($(num), self); mcBarClick($(num), 'wp', self, event);"/>
+			<progressBar name="mcBlood_$(num)" left="173" top="74" width="165" height="12" min="0" max="10" position="0" color="#DC143C" hitTest="true" cursor="handPoint" onMouseDown="mcSelect($(num), self); mcBarClick($(num), 'blood', self, event);"/>
+			<progressBar name="mcQuint_$(num)" left="173" top="88" width="165" height="12" min="0" max="10" position="0" color="#FFD700" hitTest="true" cursor="handPoint" onMouseDown="mcSelect($(num), self); mcBarClick($(num), 'quint', self, event);"/>
+		</dataScopeBox>
+	</template>
+
 	<layout name="sheetBody" align="client" visible="false">
-		<layout name="tabStrip" align="top" height="40">
-			<rectangle align="client" color="black" strokeColor="#00000000"/>
+		<!--
+			SPEC I170a/I170b, T1075a/b, B170 - sheetBody holds TWO aligned children: the column
+			(align="left") and sheetMain (align="client"), which carries the tab strip and the
+			eleven panes. The engine aligns top/bottom BEFORE left/right whatever the XML order is
+			(SPEC R170a - Firecast's own LFMDark.style proves it: its alBottom scrollbar takes the
+			full width although the alRight one is declared first), so a tabStrip align="top"
+			sitting beside the column in sheetBody took the WHOLE width and pushed the column below
+			it. That is B170: V488a measured declaration order while the screen showed the strip on
+			top. Nested, the strip only ever sees what is left to the right of the column.
 
-			<rectangle name="tabOnMain" left="30" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabMain" left="30" top="5" width="99" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabMain', self);">
-				<label left="0" top="0" width="99" height="20" text="Main" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
+			370 wide and FIXED (SPEC I170b): 4 + a 346 row + 4 + the 16px vertical scrollbar the
+			scrollBox style draws in both themes (SPEC R170b). Nothing in Lua writes this width.
+			Authored invisible like sheetBody itself, so the XML reads right before any Lua runs.
+		-->
+		<layout name="mcDock" align="left" width="370" visible="false">
+			<!-- contents, not client: mcRows below is the column's one align="client" child, and
+			     V190 refuses a second (SPEC I169b). contents fills the same rect without competing
+			     for it. -->
+			<rectangle align="contents" color="black" strokeColor="#00000000"/>
 
-			<rectangle name="tabOnTraits" left="133" top="5" width="79" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabTraits" left="133" top="5" width="79" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabTraits', self);">
-				<label left="0" top="0" width="79" height="20" text="Traits" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
+			<!-- Title, buttons and rows share ONE 4..350 band; 354..370 is the scrollbar's track
+			     (SPEC I170b). dynMcTitle is dyn* because mcRender writes it - the translated
+			     "Characters List" plus the (current/max) count - and the language traversal would
+			     otherwise put authored text back over it (SPEC I170f, V499e). -->
+			<layout name="mcHead" align="top" height="66">
+				<label name="dynMcTitle" left="4" top="6" width="346" height="20" horzTextAlign="center"/>
+				<!-- Settings is wide enough for "Configurações" and Add gives up the difference: the
+				     same 4..350 band and the same 6px gap (SPEC I171a, V502a). -->
+				<button name="btnMcAdd" left="4" top="32" width="236" height="26" text="Add Character" onClick="mcAdd(self);"/>
+				<button name="btnMcSettings" left="246" top="32" width="104" height="26" text="Settings" onClick="mcSettingsOpen(self);"/>
+			</layout>
 
-			<rectangle name="tabOnNumina" left="216" top="5" width="79" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabNumina" left="216" top="5" width="79" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabNumina', self);">
-				<label left="0" top="0" width="79" height="20" text="Numina" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="tabOnDisciplines" left="299" top="5" width="92" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabDisciplines" left="299" top="5" width="92" height="30" color="#00000000" visible="false"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabDisciplines', self);">
-				<label left="0" top="0" width="92" height="20" text="Ghoul" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="tabOnCombat" left="395" top="5" width="86" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabCombat" left="395" top="5" width="86" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabCombat', self);">
-				<label left="0" top="0" width="86" height="20" text="Combat" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="tabOnInventory" left="485" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabInventory" left="485" top="5" width="105" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabInventory', self);">
-				<label left="0" top="0" width="105" height="20" text="Inventory" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="tabOnBackground" left="594" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabBackground" left="594" top="5" width="105" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabBackground', self);">
-				<label left="0" top="0" width="105" height="20" text="Background" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="tabOnProgress" left="703" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabProgress" left="703" top="5" width="112" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabProgress', self);">
-				<label left="0" top="0" width="112" height="20" text="Experience" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="tabOnNotes" left="819" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabNotes" left="819" top="5" width="99" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabNotes', self);">
-				<label left="0" top="0" width="99" height="20" text="Notes" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="tabOnSettings" left="922" top="5" width="125" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabSettings" left="922" top="5" width="125" height="30" color="#00000000"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabSettings', self);">
-				<label left="0" top="0" width="125" height="20" text="Settings" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
-
-			<rectangle name="tabOnStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
-			           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-			<rectangle name="btnTabStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" visible="false"
-			           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
-			           onClick="selectTab('tabStoryteller', self);">
-				<label left="0" top="0" width="112" height="20" text="Storyteller" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
-			</rectangle>
+			<scrollBox name="mcRows" align="client">
+				<McRow num="1" top="4"/>
+				<McRow num="2" top="118"/>
+				<McRow num="3" top="232"/>
+				<McRow num="4" top="346"/>
+				<McRow num="5" top="460"/>
+				<McRow num="6" top="574"/>
+				<McRow num="7" top="688"/>
+				<McRow num="8" top="802"/>
+				<McRow num="9" top="916"/>
+				<McRow num="10" top="1030"/>
+			</scrollBox>
 		</layout>
 
-		<layout name="tabMain" align="client" visible="false">
-			<import file="WoD20.1.lfm"/>
-		</layout>
+		<!--
+			SPEC I170a, T1075a - the strip and the eleven panes live INSIDE sheetMain so the column
+			beside it gets the full height (SPEC B170, R170a). sheetMain is the one align="client"
+			child of sheetBody; the overlays below stay DIRECT children of sheetBody, so they still
+			float over the column and the tabs alike (SPEC V367). Its visible flag has one writer,
+			mcRender: with the flag ON and no character left, the right side is empty (SPEC I170f,
+			V496e).
+		-->
+		<layout name="sheetMain" align="client">
+			<layout name="tabStrip" align="top" height="40">
+				<rectangle align="client" color="black" strokeColor="#00000000"/>
 
-		<layout name="tabTraits" align="client" visible="false">
-			<import file="WoD20.2.lfm"/>
-		</layout>
+				<rectangle name="tabOnMain" left="30" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabMain" left="30" top="5" width="99" height="30" color="#00000000"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabMain', self);">
+					<label left="0" top="0" width="99" height="20" text="Main" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
 
-		<layout name="tabNumina" align="client" visible="false">
-			<import file="WoD20.7.lfm"/>
-		</layout>
+				<rectangle name="tabOnTraits" left="133" top="5" width="79" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabTraits" left="133" top="5" width="79" height="30" color="#00000000"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabTraits', self);">
+					<label left="0" top="0" width="79" height="20" text="Traits" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
 
-		<layout name="tabDisciplines" align="client" visible="false">
-			<import file="WoD20.11.lfm"/>
-		</layout>
+				<rectangle name="tabOnNumina" left="216" top="5" width="79" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabNumina" left="216" top="5" width="79" height="30" color="#00000000"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabNumina', self);">
+					<label left="0" top="0" width="79" height="20" text="Numina" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
 
-		<layout name="tabCombat" align="client" visible="false">
-			<import file="WoD20.3.lfm"/>
-		</layout>
+				<rectangle name="tabOnDisciplines" left="299" top="5" width="92" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabDisciplines" left="299" top="5" width="92" height="30" color="#00000000" visible="false"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabDisciplines', self);">
+					<label left="0" top="0" width="92" height="20" text="Ghoul" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
 
-		<layout name="tabInventory" align="client" visible="false">
-			<import file="WoD20.8.lfm"/>
-		</layout>
+				<rectangle name="tabOnCombat" left="395" top="5" width="86" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabCombat" left="395" top="5" width="86" height="30" color="#00000000"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabCombat', self);">
+					<label left="0" top="0" width="86" height="20" text="Combat" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
 
-		<layout name="tabBackground" align="client" visible="false">
-			<import file="WoD20.4.lfm"/>
-		</layout>
+				<rectangle name="tabOnInventory" left="485" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabInventory" left="485" top="5" width="105" height="30" color="#00000000"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabInventory', self);">
+					<label left="0" top="0" width="105" height="20" text="Inventory" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
 
-		<layout name="tabProgress" align="client" visible="false">
-			<import file="WoD20.9.lfm"/>
-		</layout>
+				<rectangle name="tabOnBackground" left="594" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabBackground" left="594" top="5" width="105" height="30" color="#00000000"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabBackground', self);">
+					<label left="0" top="0" width="105" height="20" text="Background" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
 
-		<layout name="tabNotes" align="client" visible="false">
-			<import file="WoD20.5.lfm"/>
-		</layout>
+				<rectangle name="tabOnProgress" left="703" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabProgress" left="703" top="5" width="112" height="30" color="#00000000"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabProgress', self);">
+					<label left="0" top="0" width="112" height="20" text="Experience" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
 
-		<layout name="tabSettings" align="client" visible="false">
-			<import file="WoD20.6.lfm"/>
-		</layout>
+				<rectangle name="tabOnNotes" left="819" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabNotes" left="819" top="5" width="99" height="30" color="#00000000"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabNotes', self);">
+					<label left="0" top="0" width="99" height="20" text="Notes" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
 
-		<layout name="tabStoryteller" align="client" visible="false">
-			<import file="WoD20.10.lfm"/>
+				<rectangle name="tabOnSettings" left="922" top="5" width="125" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabSettings" left="922" top="5" width="125" height="30" color="#00000000"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabSettings', self);">
+					<label left="0" top="0" width="125" height="20" text="Settings" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
+
+				<rectangle name="tabOnStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" visible="false"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabStoryteller', self);">
+					<label left="0" top="0" width="112" height="20" text="Storyteller" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
+			</layout>
+
+			<layout name="tabMain" align="client" visible="false">
+				<import file="WoD20.1.lfm"/>
+			</layout>
+
+			<layout name="tabTraits" align="client" visible="false">
+				<import file="WoD20.2.lfm"/>
+			</layout>
+
+			<layout name="tabNumina" align="client" visible="false">
+				<import file="WoD20.7.lfm"/>
+			</layout>
+
+			<layout name="tabDisciplines" align="client" visible="false">
+				<import file="WoD20.11.lfm"/>
+			</layout>
+
+			<layout name="tabCombat" align="client" visible="false">
+				<import file="WoD20.3.lfm"/>
+			</layout>
+
+			<layout name="tabInventory" align="client" visible="false">
+				<import file="WoD20.8.lfm"/>
+			</layout>
+
+			<layout name="tabBackground" align="client" visible="false">
+				<import file="WoD20.4.lfm"/>
+			</layout>
+
+			<layout name="tabProgress" align="client" visible="false">
+				<import file="WoD20.9.lfm"/>
+			</layout>
+
+			<layout name="tabNotes" align="client" visible="false">
+				<import file="WoD20.5.lfm"/>
+			</layout>
+
+			<layout name="tabSettings" align="client" visible="false">
+				<import file="WoD20.6.lfm"/>
+			</layout>
+
+			<layout name="tabStoryteller" align="client" visible="false">
+				<import file="WoD20.10.lfm"/>
+			</layout>
 		</layout>
 
 		<!--
@@ -7566,7 +8379,12 @@
 			V280/V298 collector would sweep it up, and a floating overlay has no neighbour to be 5px
 			from - it is excluded there BY NAME, the way cboRoad is named in V328c (SPEC I73, I76a).
 		-->
-		<rectangle name="popScrim" left="0" top="0" width="1595" height="936" color="#00000000" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
+		<!-- 2005 = 1635 + MC_DOCK_W: the widest tab (Traits, 1635 since the ! columns of the 25th
+		     batch) plus the fixed column, so the fade covers the column too and a click on a row
+		     while the picker is open cannot swap the character under the picker's own field
+		     (SPEC I169f, I170b, V496d). No Lua writes this width any more - the column does not
+		     resize. #66000000 is the 40% black fade the overlays share. -->
+		<rectangle name="popScrim" left="0" top="0" width="2005" height="936" color="#66000000" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
 
 		<layout name="popDesc" left="440" top="150" width="500" height="490" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
@@ -7583,6 +8401,83 @@
 			     no scroll property on this control in SDK3, so the only way to have no horizontal
 			     bar is to give it nothing to scroll (SPEC I102c, V333f). -->
 			<textEditor name="edtPopDesc" left="20" top="40" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePopDesc(self);" onKeyDown="escClose(self, event, true);"/>
+		</layout>
+
+		<!--
+			SPEC I169e(4)/T1070d - the Storyteller Settings mirror for whichever character is
+			showing. mcSettingsScope pins to MC.root in mcInit/mcSettingsOpen (never the active
+			node), so every field here reads and writes the FICHA's settings even with a child
+			selected (SPEC Q88.8) - the same reason stSharedScope (WoD20.10) exists.
+
+			Same 13 field= as stSharedScope (SPEC V489c: the gate compares both sides), same
+			labels, same items=/values=/defaultValue and the same x columns (35 label / 210
+			entry, 150 wide, SPEC V243) as the box T1069 grows to 8 flags. Only the control
+			NAME gains the Mc suffix, never _2: fieldRoot (WoD20.6:2416) strips a trailing
+			"_<digits>", not letters, so Mc reads as its own key with no PICKER_LIST entry -
+			pickerItems falls back to the inline items=, and cmbItems still translates by
+			VALUE, so "Purchase Forbidden" reads pt the same way it does in the original box
+			(SPEC I169e(4), V9).
+
+			No Save button, no notes, no <dataLink onChange> here: this window writes the root
+			and the ONE dataLink that reacts lives inside stSharedScope, already pinned to the
+			same node (SPEC I169e(1), V492d) - a second reactor here would be a second owner
+			of the same event.
+
+			Height is 500, not the 440 first written in I169e(4): the last copied row
+			(Background Cost) ends at 416 + 25 = 441 inside a scope that starts at top=40, and
+			the box wants the same gap under it T1069 leaves under Save. Geometry is not
+			contract (SPEC Q88.10).
+		-->
+		<layout name="mcSettings" left="440" top="150" width="445" height="500" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+
+			<label left="20" top="15" width="405" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
+			<button name="btnMcSettingsClose" left="405" top="15" width="20" height="20" text="X" onClick="popClose(self);"/>
+
+			<dataScopeBox name="mcSettingsScope" left="0" top="40" width="445" height="450">
+				<label left="35" top="54" width="170" height="20" text="Game"/>
+				<comboBox name="cboGameMc" left="210" top="51" width="150" height="25" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}"/>
+
+				<label left="35" top="84" width="170" height="20" text="Era"/>
+				<comboBox name="cboSheetThemeMc" left="210" top="81" width="150" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}"/>
+
+				<checkBox name="chkShowNuminaMc" left="35" top="111" width="375" height="25" field="stShowNumina" text="Show Numina"/>
+				<checkBox name="chkShowDisciplinesMc" left="35" top="141" width="375" height="25" field="stShowDisciplines" text="Show Ghoul"/>
+				<checkBox name="chkFreeBuyMc" left="35" top="171" width="375" height="25" field="stFreeBuy" text="Edit dots freely"/>
+				<checkBox name="chkEditClanDiscMc" left="35" top="201" width="375" height="25" field="stEditClanDisc" text="Edit Clan Disciplines"/>
+				<checkBox name="chkEditSpentXPMc" left="35" top="231" width="375" height="25" field="stEditSpentXP" text="Edit Spent XP"/>
+				<checkBox name="chkManualAffiliationMc" left="35" top="261" width="375" height="25" field="stManualAffiliation" text="Edit Affiliation"/>
+				<checkBox name="chkManualClanFamilyMc" left="35" top="291" width="375" height="25" field="stManualClanFamily" text="Edit Clan/Family"/>
+				<checkBox name="chkMultipleCharsMc" left="35" top="321" width="375" height="25" field="multipleCharacters" text="Multiple Characters"/>
+
+				<label left="35" top="359" width="170" height="20" text="Health Levels"/>
+				<comboBox name="cmbHealthLevelsMc" left="210" top="356" width="150" height="25" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+				<dataLink field="healthLevels" defaultValue="7"/>
+
+				<label left="35" top="389" width="170" height="20" text="Specialty Cost"/>
+				<comboBox name="cmbSpecCostMc" left="210" top="386" width="150" height="25" field="stSpecCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5','Purchase Forbidden'}" values="{'0','1','2','3','4','5','Purchase Forbidden'}"/>
+				<dataLink field="stSpecCost" defaultValue="3"/>
+
+				<label left="35" top="419" width="170" height="20" text="Background Cost"/>
+				<comboBox name="cmbBgCostMc" left="210" top="416" width="150" height="25" field="stBackgroundCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5'}" values="{'0','1','2','3','4','5'}"/>
+				<dataLink field="stBackgroundCost" defaultValue="0"/>
+			</dataScopeBox>
+		</layout>
+		<!--
+			SPEC I170g, T1075e - the ! note window. Same shape as popDesc and raised the same way:
+			scrim + box, closed by popClose from the X or the scrim (SPEC V500d). The text box has
+			NO field=: the field it edits is named at open time by noteKey from the row's chosen
+			VALUE, so the same background in two rows opens the same note (SPEC I170g). noteOpen
+			writes the text under descQuiet and savePopNote writes it back - the pattern
+			popOpen/savePopDesc already run, because a textEditor's onChange cannot tell a Lua write
+			from the player's typing (SPEC R170i). No readOnly: whoever edits the sheet edits its
+			notes (SPEC Q90.10). dynPopNoteTitle is dyn* because Lua writes the translated name.
+		-->
+		<layout name="popNote" left="510" top="200" width="360" height="260" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label name="dynPopNoteTitle" left="40" top="15" width="280" height="20" horzTextAlign="center"/>
+			<button name="btnPopNoteClose" left="320" top="15" width="20" height="20" text="X" onClick="popClose(self);"/>
+			<textEditor name="edtPopNote" left="20" top="40" width="320" height="205" wordWrap="true" transparent="true" fontSize="12" onChange="savePopNote(self);"/>
 		</layout>
 
 		<!--
@@ -7974,27 +8869,44 @@
 	</dataLink>
 
 	<!--
-		The fourteen name buttons carry TEXT and text is not data (SPEC I107a2): nothing brings it
-		back when the sheet opens, so one watcher over the twelve fields repaints them. Listed one
+		The twenty-two merit/flaw name buttons carry TEXT and text is not data (SPEC I107a2):
+		nothing brings it back when the sheet opens, so one watcher over their fields repaints
+		them - and lights or dims the ! note button beside each (SPEC I170g, V500e). Listed one
 		by one and not by prefix, for the reason the ten humanity fields are: `fields` takes a
-		literal table and a row that fell out of it would go unwatched in silence.
+		literal table and a row that fell out of it would go unwatched in silence. It stopped at
+		m6/f6 until the 25th batch while the tables ran to m10/f10 (SPEC R170g); V500e reads
+		both ends off MERIT_ROWS now.
 	-->
-	<dataLink fields="{'language', 'merit_m0', 'merit_m1', 'merit_m2', 'merit_m3', 'merit_m4', 'merit_m5', 'merit_m6', 'merit_f0', 'merit_f1', 'merit_f2', 'merit_f3', 'merit_f4', 'merit_f5', 'merit_f6'}">
+	<dataLink fields="{'language', 'merit_m0', 'merit_m1', 'merit_m2', 'merit_m3', 'merit_m4', 'merit_m5', 'merit_m6', 'merit_m7', 'merit_m8', 'merit_m9', 'merit_m10', 'merit_f0', 'merit_f1', 'merit_f2', 'merit_f3', 'merit_f4', 'merit_f5', 'merit_f6', 'merit_f7', 'merit_f8', 'merit_f9', 'merit_f10'}">
 		<event name="onChange">
 			renderMeritButtons(self);
 		</event>
 	</dataLink>
 
 	<!--
-		The sixteen background name buttons, the same watcher for the same reason (SPEC I107a2,
-		I113, T808). The last five background rows are TYPED and carry no button, so they are
-		not in this list - "picker = total - typed" (SPEC I50, V255).
+		The twenty-one background name buttons, the same watcher for the same reason (SPEC
+		I107a2, I113, T808), and the same ! note buttons (SPEC V500e). It stopped at
+		background_16 until the 25th batch - a leftover from when the last five rows were
+		typed; BACKGROUND_FREE_ROWS is 0, so every row is a picker and every row is here
+		(SPEC R170g).
 	-->
-	<dataLink fields="{'language', 'background_1', 'background_2', 'background_3', 'background_4', 'background_5', 'background_6', 'background_7', 'background_8', 'background_9', 'background_10', 'background_11', 'background_12', 'background_13', 'background_14', 'background_15', 'background_16'}">
+	<dataLink fields="{'language', 'background_1', 'background_2', 'background_3', 'background_4', 'background_5', 'background_6', 'background_7', 'background_8', 'background_9', 'background_10', 'background_11', 'background_12', 'background_13', 'background_14', 'background_15', 'background_16', 'background_17', 'background_18', 'background_19', 'background_20', 'background_21'}">
 		<event name="onChange">
 			renderBgButtons(self);
 		</event>
 		</dataLink>
+
+	<!--
+		SPEC I170d, T1075f - the ONE trigger of the column's bars. It watches the ACTIVE node
+		(this is the root's scope, so `sheet`): only the active character's dots ever change - a
+		bar selects its row before it writes, and mcShared never touches a dot - so repainting
+		the active row is enough. The 52 fields are written out, not prefixed, for the reason the
+		name watchers above give; `avatar` is the 52nd, so setting the photo on the Main clears
+		the row's photo placeholder at once (SPEC I171b). mcBarsSoon DEFERS: a prefix write lights up to twenty fields and
+		a dataLink fires once per field, and each repaint walks the whole control tree (SPEC
+		R170f), so twenty writes become one repaint (SPEC V498d).
+	-->
+	<dataLink fields="{'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'willpower_c1', 'willpower_c2', 'willpower_c3', 'willpower_c4', 'willpower_c5', 'willpower_c6', 'willpower_c7', 'willpower_c8', 'willpower_c9', 'willpower_c10', 'bloodPool_1', 'bloodPool_2', 'bloodPool_3', 'bloodPool_4', 'bloodPool_5', 'bloodPool_6', 'bloodPool_7', 'bloodPool_8', 'bloodPool_9', 'bloodPool_10', 'bloodPool_11', 'bloodPool_12', 'bloodPool_13', 'bloodPool_14', 'bloodPool_15', 'bloodPool_16', 'bloodPool_17', 'bloodPool_18', 'bloodPool_19', 'bloodPool_20', 'quint_1', 'quint_2', 'quint_3', 'quint_4', 'quint_5', 'quint_6', 'quint_7', 'quint_8', 'quint_9', 'quint_10', 'clanFamily', 'avatar'}" onChange="mcBarsSoon(self);"/>
 
 		<!--
 			Wave 2 of I113e (SPEC T842): the two header buttons and the seven speciality buttons.
@@ -8122,6 +9034,12 @@
 		-- staring at nothing. A timer cannot fire early and cannot depend on the paint,
 		-- which is exactly the two properties this needs. setTimeout is only
 		-- asynchronous with a positive interval (SPEC R44).
+		--
+		-- mcInit runs before the timer, not after: it restores the last active character
+		-- (SPEC Q88.3) and that restore is itself a setNodeObject, which sheetReveal's own
+		-- delay should not race (SPEC I169d).
+		mcInit(self);
+
 		setTimeout(function() sheetReveal(self); end, 1500);
 	</event>
 </form>

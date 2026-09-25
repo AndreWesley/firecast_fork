@@ -32,6 +32,7 @@
 				["Ability"] = "Habilidade",
 				["Academics"] = "Acadêmicos",
 				["Activist"] = "Ativista",
+				["Add Character"] = "Adicionar Personagem",
 				["Age"] = "Idade",
 				["Alchemy"] = "Alquimia",
 				["Alertness"] = "Prontidão",
@@ -84,6 +85,7 @@
 				["Battle Scars"] = "Cicatrizes de Batalhas",
 				["Benefactor"] = "Benfeitor",
 				["Biocontrol"] = "Biocontrole",
+				["Blood"] = "Sangue",
 				["Blood Sorcery: Paths"] = "Feitiçaria de Sangue: Trilhas",
 				["Blood Sorcery: Rituals"] = "Feitiçaria de Sangue: Rituais",
 				["Bon Vivant"] = "Bon Vivant",
@@ -102,6 +104,7 @@
 				["Change Log"] = "Notas da Versão",
 				["Channeling"] = "Canalização",
 				["Chantry"] = "Capela",
+				["Characters List"] = "Lista de Personagens",
 				["Charisma"] = "Carisma",
 				["Child"] = "Criança",
 				["Choose a path first"] = "Escolha uma trilha primeiro",
@@ -140,6 +143,7 @@
 				["+"] = "+",
 				["<"] = "<",
 				[">"] = ">",
+				["!"] = "!",
 				["X"] = "X",
 				["Clan/Family"] = "Clã/Família",
 				["BLOOD POOL"] = "RESERVA DE SANGUE",
@@ -153,6 +157,7 @@
 				["Crusader"] = "Cruzado",
 				["Cult"] = "Culto",
 				["Curmudgeon"] = "Rabugento",
+				["Current"] = "Atual",
 				["Current Experience"] = "Experiência Atual",
 				["Current Version:"] = "Versão Atual:",
 				["Curses"] = "Maldições",
@@ -318,6 +323,7 @@
 				["Martyr"] = "Mártir",
 				["Masochist"] = "Masoquista",
 				["Mauled (-2)"] = " Espancado (-2)",
+				["Max"] = "Máximo",
 				["Mediator"] = "Mediador",
 				["Medicine"] = "Medicina",
 				["medicine"] = "Medicina",
@@ -438,6 +444,7 @@
 				["Psychoportation"] = "Psicoportação",
 				["Pure Breed"] = "Raça Pura",
 				["Pyrokinesis"] = "Pirocinese",
+				["Quintessence"] = "Quintessência",
 				["Quintessence Manipulation"] = "Manipulação de Quintessência",
 				["Rage"] = "Fúria",
 				["Range"] = "Alcance",
@@ -454,6 +461,7 @@
 				["Rebel (2)"] = "Rebelde (2)",
 				["Rebel (3)"] = "Rebelde (3)",
 				["Religion"] = "Religião",
+				["Remove this character? This cannot be undone."] = "Remover este personagem? Isso não pode ser desfeito.",
 				["Requisitions (Hunters Hunted)"] = "Requisições (Caçadores Caçados)",
 				["Requisitions (Mage)"] = "Requisições (Mago)",
 				["Research"] = "Pesquisa",
@@ -1707,6 +1715,7 @@
 				["Mortuario (4)"] = "Mortuario (4)",
 				["Mr. Red Tape"] = "Sr. Burocracia",
 				["Multi-Lingual"] = "Multilíngue",
+				["Multiple Characters"] = "Múltiplos Personagens",
 				["Multiple Curses"] = "Maldições Múltiplas",
 				["Mute"] = "Mudo",
 				["Mute Devotion"] = "Devoção Muda",
@@ -2519,7 +2528,12 @@
 			-- is the control - it has no name, neither routine reaches it, and it was the only one
 			-- of the three that never lost its anchor (SPEC I144h).
 			PICKER_ANCHOR = { cboGame = "center", cboSheetTheme = "center",
-							  cmbHealthLevels = "center", cmbSpecCost = "center", cmbBgCost = "center" };
+							  cmbHealthLevels = "center", cmbSpecCost = "center", cmbBgCost = "center",
+							  -- The storyteller settings WINDOW carries a twin of each of the five (SPEC I169e(4)):
+							  -- same lists, same rewrite on a language switch, so the same anchor has to be put
+							  -- back for them too (SPEC V419, B153).
+							  cboGameMc = "center", cboSheetThemeMc = "center",
+							  cmbHealthLevelsMc = "center", cmbSpecCostMc = "center", cmbBgCostMc = "center" };
 
 			function keepAnchor(c, nm)
 				local a = PICKER_ANCHOR[nm];
@@ -3226,6 +3240,8 @@
 						["#0A0A0A"]  = "#0A0B10",    -- charcoal, one step under the box
 						["DimGray"]   = "#2A2F3A",
 						["#00000000"] = "#00000000",  -- health mark box: the cut-out IS the effect (SPEC V48)
+						["#66000000"] = "#66000000",  -- popScrim: the 40% black behind picker, description and settings (SPEC I169f, V493a)
+						["#80000000"] = "#80000000",  -- noteTip: the 50% black behind a ! note tooltip, no outline (SPEC I170h, V501a)
 						-- The one-second flash on a newly sorted ritual row (SPEC I47, V253). Alpha,
 						-- so the name reads through it, and the period's own accent rather than one
 						-- loose colour outside the theme (SPEC V53).
@@ -3299,6 +3315,8 @@
 						["#0A0A0A"]  = "#120C0A",    -- mahogany, one step under the box
 						["DimGray"]   = "#6B4F2A",
 						["#00000000"] = "#00000000",
+						["#66000000"] = "#66000000",
+						["#80000000"] = "#80000000",
 						["#55FFFFFF"] = "#55C2A14D",  -- aged gold
 					},
 					stroke = {
@@ -3329,6 +3347,8 @@
 						["#0A0A0A"]  = "#070605",    -- soot, one step under the box
 						["DimGray"]   = "#5A4A32",
 						["#00000000"] = "#00000000",
+						["#66000000"] = "#66000000",
+						["#80000000"] = "#80000000",
 						["#55FFFFFF"] = "#55C0C6CC",  -- polished silver
 					},
 					stroke = {
@@ -3372,6 +3392,8 @@
 						["#0A0A0A"]  = "#0E0B0F",    -- basalt, one step under the box
 						["DimGray"]   = "#6B2A4A",    -- Tyrian purple on the avatar frame
 						["#00000000"] = "#00000000",
+						["#66000000"] = "#66000000",
+						["#80000000"] = "#80000000",
 						["#55FFFFFF"] = "#55BFA05A",  -- laurel gold
 					},
 					stroke = {
@@ -5377,7 +5399,17 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<label left="20" top="25" width="80" height="20" text="Language" horzTextAlign="center"/>
-			<comboBox left="100" top="22" width="300" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
+			<!--
+				I169e(2)/I169f (SPEC Q89.4): the UI language is shared by every character of
+				the sheet. Switching the active character re-binds this form to that
+				character's node, so this combo must keep reading and writing the ROOT node
+				regardless of who is active - mcInit pins langScope.node to the root, and the
+				root-scope dataLink below keeps calling applyLanguage because mcShared mirrors
+				the active node's language field too.
+			-->
+			<dataScopeBox name="langScope" left="100" top="22" width="300" height="25">
+				<comboBox left="0" top="0" width="300" height="25" field="language" fontColor="white" horzTextAlign="center" items="{'English', 'Português BR'}" values="{'en', 'pt'}"/>
+			</dataScopeBox>
 			<dataLink field="language" defaultValue="pt">
 				<event name="onChange">
 					if sheet == nil then return end;
