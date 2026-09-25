@@ -96,12 +96,17 @@
 
 			NOTHING may be commented INSIDE a <template> - rdk exits 1 with an empty message and
 			deletes the .rpk (SPEC B19).
+
+			hit* (33rd batch, SPEC I178e, V519) is the FIRST child of both templates, behind
+			everything and filling the row's layout: the tip shows anywhere on the row, gaps
+			included. It is no drag handle - only the picker starts a drag (SPEC V508).
 		-->
 		<template name="MeritPicked">
+			<rectangle name="hitmerit_$(num)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'hitmerit_$(num)');" onMouseLeave="noteTipLeave(self);"/>
 			<button name="btnQmerit_$(num)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Merit', sheet['merit_$(num)'], '$(sub)', 'merit_$(num)');" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'btnQmerit_$(num)');" onMouseLeave="noteTipLeave(self);"/>
 			<button name="dynMerit_$(num)" left="20" top="0" width="264" height="24" text="$(lbl)" onClick="mfOpen(self, 'merit_$(num)', '$(sub)', 'Merit');" onStartDrag="rowDragStart(self, drag, x, y, event, '$(sub)', 'merit_$(num)');" onMouseMove="if not rowDragMove(self, event) then noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'dynMerit_$(num)'); end;" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edtMerit_$(num)" left="20" top="0" width="264" height="24" field="merit_$(num)" visible="false" enabled="false"/>
-			<button name="btnNmerit_$(num)" left="284" top="0" width="20" height="20" text="!" onClick="noteOpen(self, '$(sub)', 'merit_$(num)');" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'btnNmerit_$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<button name="btnNmerit_$(num)" left="284" top="0" width="20" height="20" text="!" fontColor="white" onClick="noteOpen(self, '$(sub)', 'merit_$(num)');" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'btnNmerit_$(num)');" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edtBook_$(num)" left="304" top="0" width="117" height="24" field="book_$(num)" readOnly="true" opacity="0.75" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtBook_$(num)');" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edtType_$(num)" left="421" top="0" width="45" height="24" field="type_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtType_$(num)');" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edtCost_$(num)" left="466" top="0" width="50" height="24" field="costy_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtCost_$(num)');" onMouseLeave="noteTipLeave(self);"/>
@@ -120,10 +125,11 @@
 			deletes the .rpk (SPEC B19).
 		-->
 		<template name="OpenAbility">
+			<rectangle name="hit$(field)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'hit$(field)');" onMouseLeave="noteTipLeave(self);"/>
 			<button name="btnQ$(field)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Background', sheet['$(field)'], nil, '$(field)');" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'btnQ$(field)');" onMouseLeave="noteTipLeave(self);"/>
 			<button name="dyn$(field)" left="20" top="0" width="170" height="25" text="Select Background" onClick="mfOpen(self, '$(field)', 'background', 'Background');" onStartDrag="rowDragStart(self, drag, x, y, event, 'background', '$(field)');" onMouseMove="if not rowDragMove(self, event) then noteTipMove(self, event, 'background', '$(field)', 'dyn$(field)'); end;" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edt$(field)" left="20" top="0" width="170" height="25" field="$(field)" visible="false" enabled="false"/>
-			<button name="btnN$(field)" left="190" top="0" width="20" height="20" text="!" onClick="noteOpen(self, 'background', '$(field)');" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'btnN$(field)');" onMouseLeave="noteTipLeave(self);"/>
+			<button name="btnN$(field)" left="190" top="0" width="20" height="20" text="!" fontColor="white" onClick="noteOpen(self, 'background', '$(field)');" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'btnN$(field)');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_1" left="215" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_1');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_2" left="240" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_2');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_3" left="265" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_3');" onMouseLeave="noteTipLeave(self);"/>
@@ -401,16 +407,17 @@
 			SPEC I170h, T1077 - the ! note's tooltip. LAST child of the scrollBox, so it paints over
 			every box and scrolls with them: its left/top are CONTENT coordinates, the same space the
 			box layouts' own left/top live in, and noteTipMove reaches them in two parent hops from
-			the control under the pointer (control -> row layout -> box). Black at 50% with NO outline and NO title - the
-			text alone (SPEC V501a); contents, not client, for the background, so it does not compete
+			the control under the pointer (control -> row layout -> box). The era's box colour at 80% -
+			authored black, which applyTheme maps to the fill of every box, plus opacity - with NO
+			outline and NO title, the text alone (SPEC V501a, I177a, I178c); no xradius, so it is no box; contents, not client, for the background, so it does not compete
 			with the scrollBox for the client rect (SPEC V190). The inner scrollBox is what the wheel
 			scrolls once the pointer is inside - there is no wheel event to forward (SPEC R170e) -
 			and entering holds the tip open while leaving hides it (SPEC V501b/d).
 		-->
 		<layout name="noteTip" left="0" top="0" width="300" height="60" visible="false" onMouseEnter="noteTipHold(self);" onMouseLeave="noteTipHide(self);">
-			<rectangle align="contents" color="#80000000" strokeColor="#00000000" hitTest="false"/>
+			<rectangle align="contents" color="black" opacity="0.80" strokeColor="#00000000" hitTest="false"/>
 			<scrollBox name="noteTipScroll" align="client">
-				<label name="dynNoteTip" left="8" top="4" width="276" height="20" wordWrap="true" autoSize="true"/>
+				<label name="dynNoteTip" left="8" top="4" width="276" height="20" fontSize="12" wordWrap="true" autoSize="true"/>
 			</scrollBox>
 		</layout>
 	</scrollBox>

@@ -3246,7 +3246,8 @@
 						["#0A0A0A"]  = "#0A0B10",    -- charcoal, one step under the box
 						["DimGray"]   = "#2A2F3A",
 						["#00000000"] = "#00000000",  -- health mark box: the cut-out IS the effect (SPEC V48)
-						["#80000000"] = "#80000000",  -- the 50% black: popScrim/popScrimB behind every window (SPEC I172a, V503a) and the ! note tooltip (SPEC I170h, V501a)
+						["#80000000"] = "#80000000",  -- the 50% black: popScrim/popScrimB behind every window (SPEC I172a, V503a)
+						["#99D32F2F"] = "#99D32F2F",  -- the !* blink, the same red in every era (SPEC I178b, V518a)
 					},
 					stroke = {
 						["white"]   = "#3A4150",      -- cold graphite
@@ -3283,6 +3284,7 @@
 					-- refuse, and the plate's gold is the VICTORIAN key - the plate says shape,
 					-- not colour (user 2026-08-26).
 					ornament = "#A83232",
+					bang     = "#32A8A8",  -- the ! with something to show: the complement of the text accent #A83232 (SPEC I178a, V517)
 					ornStyle = "corrente",
 
 					-- The twelfth key, OPTIONAL like the two above, and the only one that is
@@ -3317,6 +3319,7 @@
 						["DimGray"]   = "#6B4F2A",
 						["#00000000"] = "#00000000",
 						["#80000000"] = "#80000000",
+						["#99D32F2F"] = "#99D32F2F",
 					},
 					stroke = {
 						["white"]   = "#C2A14D",      -- aged gold
@@ -3333,6 +3336,7 @@
 					paper  = "/WoD20th/images/paper_victorian.png",
 					dotPending = "/WoD20th/images/prime_on_pending_gold.png",
 					ornament = "#D8BC72",   -- brighter than the 3px outline, so the filigree reads as applied metal
+					bang     = "#728ED8",  -- complement of #D8BC72
 				},
 
 				-- Europe around 1300: stone and oak by candlelight, now with a silvered rule. The
@@ -3347,6 +3351,7 @@
 						["DimGray"]   = "#5A4A32",
 						["#00000000"] = "#00000000",
 						["#80000000"] = "#80000000",
+						["#99D32F2F"] = "#99D32F2F",
 					},
 					stroke = {
 						["white"]   = "#C0C6CC",      -- polished silver
@@ -3368,6 +3373,7 @@
 					-- here rule and frame are meant to be one family, which is what austerity means
 					-- in a drawing whose whole argument is that there is only one line (SPEC I87a).
 					ornament = "#C0C6CC",
+					bang     = "#A6B9E6",  -- silver has no hue to turn, so the complement of the era candle-light tone (SPEC Q99.1)
 
 					-- The tenth key, and it is OPTIONAL like the ninth: an era that declares no
 					-- style falls to the default, which is the filigree of I72 - so the Victorian
@@ -3390,6 +3396,7 @@
 						["DimGray"]   = "#6B2A4A",    -- Tyrian purple on the avatar frame
 						["#00000000"] = "#00000000",
 						["#80000000"] = "#80000000",
+						["#99D32F2F"] = "#99D32F2F",
 					},
 					stroke = {
 						["white"]   = "#BFA05A",      -- laurel gold
@@ -3420,6 +3427,7 @@
 					-- The 123rd round REVOKES that by taking the radius (below), which is what turns the
 					-- same derivation around: the gate now DEMANDS the key instead of forbidding it.
 					ornament = "#BFA05A",
+					bang     = "#5A79BF",  -- complement of #BFA05A
 					ornStyle = "corona-muralis",
 
 					-- The thirteenth key, and the second that is GEOMETRY rather than colour
@@ -3592,6 +3600,23 @@
 				if rec[prop] == nil then rec[prop] = original; end;
 
 				c[prop] = value;
+			end;
+
+			-- A ! is accented - bold, in the palette's `bang`, the complement of the era's text
+			-- accent (user, SPEC I178a, V517) - while its tip has something to show (SPEC I177c, V515). The colour goes through paint, the palette's own door: the first
+			-- write records the AUTHORED white (the B21 guard), so applyTheme repaints from that and
+			-- the accent never becomes the original. GLOBAL, because the two painters live on the
+			-- root (specBangPaint, noteBangPaint); HERE, because THEMES, paint, authored and
+			-- normColor are this file's locals.
+			function bangAccent(c, on)
+				if c == nil then return; end;
+
+				c.fontStyle = on and "bold" or "";
+
+				local t = THEMES[currentTheme()] or THEMES[THEME_DEFAULT];
+				local fc = authored(c, "fontColor");
+
+				paint(c, "fontColor", on and t.bang or (t.font[normColor(fc)] or fc), fc);
 			end;
 
 			-- SPEC V55 / R21 / B9: `findClass`, which the rdk generates into every .lfm, starts
@@ -5340,6 +5365,11 @@
 						end;
 					end;
 				end;
+
+				-- The walk above put every ! back to its era's plain colour; the accent is Lua's, so
+				-- it goes back on here, last (SPEC I177c, V515d - B179 again, for colour).
+				specBangPaint(from);
+				noteBangPaint(from);
 			end;
 
 			-- The pending dots, repainted without the whole theme walk (SPEC I163h, V480e).

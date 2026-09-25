@@ -1519,8 +1519,13 @@ $boxSeen = 0
 $floorCut = 0
 $bandCut68 = 0
 $dockFloorCut68 = 0
+$tipFloorCut68 = 0
 foreach ($f in $files) {
     foreach ($r in (Doc $f.FullName).SelectNodes("//rectangle[@color='black']")) {
+        # The two tip backgrounds (SPEC I177a(iii), 32nd batch): authored black so applyTheme
+        # gives them the era's box fill, at opacity 0.50 - a backdrop floating over the boxes,
+        # not a box, so no corner. Cut by the PARENT's exact name, as V40/V287 cut the tips.
+        if ($r.GetAttribute("align") -eq 'contents' -and $r.ParentNode.GetAttribute("name") -in @('noteTip', 'specTip')) { $tipFloorCut68++; continue }
         if ($r.GetAttribute("align") -eq 'client' -and $r.ParentNode.SelectSingleNode("rectangle[@onClick]")) { $floorCut++; continue }
         if ($r.GetAttribute("align") -eq 'client' -and (IsBandLayout $r.ParentNode)) { $bandCut68++; continue }
         # mcDock's own floor (SPEC I169b, 24th batch): align="contents", not "client" - it is
@@ -1537,7 +1542,8 @@ foreach ($f in $files) {
 }
 if ($floorCut -ne 1) { Fail "V68 the strip-floor cut matched $floorCut rectangle(s), expected exactly 1 - a wider cut is a hole B18 walks back through (SPEC V209)" }
 elseif ($bandCut68 -ne 1) { Fail "V68 the highlight-band cut matched $bandCut68 rectangle(s), expected exactly 1 - the band is xpHiRow's backdrop and nothing else on the sheet is built that way (SPEC I165a, V484f, V209)" }
-elseif ($dockFloorCut68 -ne 1) { Fail "V68 the mcDock-floor cut matched $dockFloorCut68 rectangle(s), expected exactly 1 - mcDock's own backdrop is the only align=contents black rectangle on the sheet (SPEC I169b, V209)" }
+elseif ($dockFloorCut68 -ne 1) { Fail "V68 the mcDock-floor cut matched $dockFloorCut68 rectangle(s), expected exactly 1 - mcDock's own backdrop is the only align=contents black rectangle on the sheet besides the two tip backgrounds (SPEC I169b, V209)" }
+elseif ($tipFloorCut68 -ne 2) { Fail "V68 the tip-background cut matched $tipFloorCut68 rectangle(s), expected exactly 2 - noteTip's and specTip's (SPEC I177a, V513f, V209)" }
 elseif ($boxSeen -lt 60) { Fail "V68 only $boxSeen black section box(es) were read, expected at least 60 - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($corners.Count -eq 0) { Fail "V68 no black section box found - the check has nothing to measure" }
 elseif ($corners.Count -gt 1) {
@@ -8080,6 +8086,11 @@ foreach ($f in $files) {
         # on either. mcBg is admitted by PATTERN because it is declared once inside a
         # <template> and stamps out ten instance names; mcGrip by exact name like its siblings.
         if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -like 'mcBg_*') { continue }
+        # 33rd batch (SPEC I178b/e, V287 as amended): hit* fills a row behind everything so the tip
+        # shows anywhere on it, and blinkSp* is the red flashed over a starred ! - neither is a box,
+        # and the era's 3px rule would draw a frame round every row and every !. Admitted by NAME
+        # PREFIX and only as a direct child of a <template>, like mcBg_ above.
+        if ($n287.LocalName -eq 'rectangle' -and $n287.ParentNode.LocalName -eq 'template' -and ($n287.GetAttribute("name") -like 'hit*' -or $n287.GetAttribute("name") -like 'blinkSp*')) { continue }
         # (mcGrip left with the 25th batch - the column is fixed, SPEC I170b - and its admission
         # left with it: a name admitted here with no control behind it is the roster that ages.)
         # The ! note's tooltip fill (SPEC I170h, V501a): 50% black with NO outline by the user's
@@ -14331,7 +14342,10 @@ else {
     foreach ($c330 in @('dynroad','dynBearingName')) {
         if (-not $body330.Contains($c330)) { $v329Bad += "renderBearing never touches '$c330' - one of the three states it is supposed to own has another writer or none (SPEC V330a)" }
     }
-    if ($body330 -notmatch 'fam ~= nil and fam ~= ""') { $v329Bad += "renderBearing does not gate on clanFamily being FILLED - Q1 opened the road to clans, and a leg testing anything else is measuring the retired rule (SPEC I99d, V330b)" }
+    # (b) RETIRED 2026-09-25 (32nd batch, SPEC B180, I177d): the clanFamily gate is gone. Its
+    # lock had been writing into cboRoad - nil since T876 - and this leg read the PREDICATE's
+    # text, not the control it locked, so it stayed green over a dead half. V516 checks the
+    # reverse: 0 .visible, 0 clanFamily and 0 cboRoad in renderBearing.
     if ($body330 -match 'REVENANT') { $v329Bad += "renderBearing still reads a REVENANT set - Q1 retired it as the gate, so this is the old predicate surviving next to the new one (SPEC I99d)" }
     if ($body330 -notmatch 'sheet\["humanity_" \.\. i\]') { $v329Bad += "renderBearing does not count the dots off the NDB - reading widgets scores a silent zero for a row not built yet (SPEC I99g)" }
 }
@@ -14380,7 +14394,7 @@ if (-not $dl328.Success) { $v329Bad += "the road default is not on a dataLink - 
 elseif ($dl328.Groups[1].Value -ne $ROAD_DEFAULT) { $v329Bad += "the road dataLink defaults to '$($dl328.Groups[1].Value)', not the $ROAD_DEFAULT I99b declares - a character with no road IS on Humanity, and a sheet saved before the 125th round would open on a road it never walked (SPEC V328b)" }
 
 if ($v329Bad) { foreach ($b in $v329Bad) { Fail "V329/V330 $b" } }
-else { Pass "V329/V330 the ladder cuts at 10,8,4,2 with a bare last rung; BEARING and ROAD_ERA both answer for all $($roadItems329.Count) roads and nothing else; renderBearing owns all three states off one clanFamily test, is the only place on the sheet that names the three, and the road default sits on its dataLink at Humanity" }
+else { Pass "V329/V330 the ladder cuts at 10,8,4,2 with a bare last rung; BEARING and ROAD_ERA both answer for all $($roadItems329.Count) roads and nothing else; renderBearing owns the road line with no clanFamily gate (V330b retired, V516), is the only place on the sheet that names the three, and the road default sits on its dataLink at Humanity" }
 
 # ---- V318: the line ending is CONTENT, and it is MEASURED --------------------------------
 # SPEC B74, the 118th round. The Git Bash text tools rewrite a file WITHOUT its carriage
@@ -20023,8 +20037,14 @@ if (Test-Path $specPath410) { $specLines410 = [IO.File]::ReadAllLines($specPath4
 
 $v410Bad    = @()
 $v410Rows   = 0
+$v410All    = 0
 $v410Claims = 0
 foreach ($l410 in $specLines410) {
+    # The zero-guard counts EVERY task row, open or closed (SPEC B182): it proves the parser
+    # reads the task table, and a table with nothing left open is a legitimate state - the
+    # user closed all 102 open rows on 2026-09-25 and the old guard, counting open rows only,
+    # called that parser drift.
+    if ($l410 -match '^T[0-9]+\|[.~x]\|') { $v410All++ }
     if ($l410 -notmatch '^(T[0-9]+)\|[.~]\|') { continue }
     $row410 = $Matches[1]
     $v410Rows++
@@ -20056,9 +20076,9 @@ foreach ($l410 in $specLines410) {
         }
     }
 }
-if ($v410Rows -lt 1) { Fail "V410 not one open task row (T<n> with status . or ~) was found in SPEC.md - the parser drifted and this rule would certify a spec whose every open row lies (SPEC V20, B7)" }
+if ($v410All -lt 1) { Fail "V410 not one task row (T<n> with status . ~ or x) was found in SPEC.md - the parser drifted and this rule would certify a spec whose every open row lies (SPEC V20, B7, B182)" }
 elseif ($v410Bad) { foreach ($b410 in ($v410Bad | Select-Object -First 8)) { Fail "V410 $b410" } }
-else { Pass "V410 none of the $v410Rows open task row(s) claims a file that is on disk ($v410Claims file claim(s) tested against 3 roots)" }
+else { Pass "V410 none of the $v410Rows open task row(s) of $v410All claims a file that is on disk ($v410Claims file claim(s) tested against 3 roots)" }
 
 # ---- V411: the [pt] half carries ACCENTS, or the translation never happened ------------
 # T931 wrote the first 120 lines of road_sins_pt.tsv in plain ASCII - "egoistas", "acao",
@@ -22809,9 +22829,12 @@ else {
     if ($btn476.GetAttribute("text") -ne 'Apply Spent Experience') { $v476Bad += "(a) the button reads '$($btn476.GetAttribute('text'))' and 3.4 of the request says Apply Spent Experience (SPEC I162f)" }
 }
 $own476 = 0
+# The two tip backgrounds were owners 3 and 4 in the 32nd batch only: the 33rd moved them to 0.80
+# (user, SPEC I178c, V476b as amended), so the closed list is back to two and a tip background at
+# 0.50 is red like any other third owner.
 foreach ($f in $files) {
     $d476 = Doc $f.FullName
-    foreach ($n476 in $d476.SelectNodes("//*[@opacity='0.50' or @opacity='0.5']")) { if ($n476.GetAttribute("name") -ne 'btnXpApply') { $v476Bad += "(b) $($f.Name) authors opacity 0.50 on '$($n476.LocalName) $($n476.GetAttribute('name'))' - that number belongs to btnXpApply alone (SPEC V476b, V244)" } }
+    foreach ($n476 in $d476.SelectNodes("//*[@opacity='0.50' or @opacity='0.5']")) { if ($n476.GetAttribute("name") -ne 'btnXpApply') { $v476Bad += "(b) $($f.Name) authors opacity 0.50 on '$($n476.LocalName) $($n476.GetAttribute('name'))' - in the XML that number belongs to btnXpApply alone (SPEC V476b, V244)" } }
     $cc476 = NoComments (CodeOf $f.FullName)
     foreach ($m476 in [regex]::Matches($cc476, '(?m)^.*\b0\.50\b.*$')) {
         $line476 = $m476.Value
@@ -24101,7 +24124,10 @@ else {
     if ($null -eq $last501 -or $last501.GetAttribute('name') -ne 'noteTip') { $v501Bad += "(a) noteTip is not the LAST child of WoD20.2's scrollBox - a box declared after it would paint over the tip (SPEC V501a)" }
     if ($tip501.GetAttribute('visible') -ne 'false') { $v501Bad += "(a) noteTip does not author visible='false' (SPEC V501a)" }
     $fill501 = $tip501.SelectSingleNode("rectangle")
-    if ($null -eq $fill501 -or $fill501.GetAttribute('color') -ne '#80000000' -or $fill501.GetAttribute('strokeColor') -ne '#00000000') { $v501Bad += "(a) noteTip's fill is not color='#80000000' with strokeColor='#00000000' - 50% black, no outline (SPEC V501a)" }
+    # Amended 2026-09-25 (32nd batch, SPEC Q98.1, I177a(iii)): the fill is the era's BOX colour
+    # - authored black, which applyTheme maps to every box's fill - plus opacity; 0.80 since the
+    # 33rd batch (user, SPEC I178c).
+    if ($null -eq $fill501 -or $fill501.GetAttribute('color') -ne 'black' -or $fill501.GetAttribute('opacity') -ne '0.80' -or $fill501.GetAttribute('strokeColor') -ne '#00000000') { $v501Bad += "(a) noteTip's fill is not color='black' opacity='0.80' with strokeColor='#00000000' - the era's box colour at 80%, no outline (SPEC V501a as amended, I178c)" }
     if (@($tip501.SelectNodes(".//label[@text]")).Count -ne 0) { $v501Bad += "(a) noteTip carries a label with static text - the tip has no title (SPEC V501a)" }
     if ($null -eq $tip501.SelectSingleNode("scrollBox/label[@name='dynNoteTip' and @wordWrap='true']")) { $v501Bad += "(a) dynNoteTip (wordWrap) is not inside a scrollBox of noteTip - a long note could not scroll (SPEC V501a)" }
     # (b) every picker reports its moves and its exit; the tip holds and hides.
@@ -24686,7 +24712,10 @@ if (-not $lists508.Success -or $rows508.Count -eq 0 -or $missTpl508.Count -gt 0 
         if (@('rowAnimTo', 'rowTween') -contains $fnN508) { continue }
         if ($fm508.Value -match 'dragRow_' -and $fm508.Value -match '\.top\s*=[^=]') { $v508Bad += "(d) $fnN508 names dragRow_ and writes .top - the rows' position has two owners, rowAnimTo and rowTween (SPEC I174f, V508d)" }
     }
-    $si508 = @([regex]::Matches($all25Code, '\bsetInterval\(')).Count
+    # Amended in the 33rd build (SPEC I178b, V518c): the sheet has a SECOND interval now, the
+    # blink of a starred !, which moves no row - V518 pins it to one call inside specBangPaint. So
+    # what counts here is the ROW animator: every interval that is not the blink.
+    $si508 = @([regex]::Matches($all25Code, '\bsetInterval\((?!bangBlink, BANG_BLINK_MS\))')).Count
     if ($si508 -ne 1 -or $fns508['rowTweenStart'] -notmatch '\bsetInterval\(rowTween, ROW_TWEEN_MS\)') { $v508Bad += "(d) setInterval appears $si508 time(s) and not once, in rowTweenStart - a second interval is a second animator (SPEC I174e, V508d)" }
     if ($fns508['rowTween'] -notmatch 'return false;' -or $fns508['rowTween'] -notmatch 'ROW_DRAG\.live') { $v508Bad += "(d) rowTween does not return false and read ROW_DRAG.live - it has to stop, and the watchdog of a drag the host never finished lives in it (SPEC I174d/e)" }
     foreach ($w508 in @('ROW_WATCH_TICKS', 'ROW_WATCH_MAX')) {
@@ -24802,11 +24831,12 @@ else {
     if ($null -eq $last510 -or $last510.GetAttribute('name') -cne 'specTip') { $v510Bad += "(a) specTip is not the LAST child of WoD20.1's scrollBox - a box declared after it would paint over the tip (SPEC V510a)" }
     $tw510 = Twin510 $spec510 $note510 'left,top,width,height,visible,onMouseEnter,onMouseLeave' 'the tip layout'
     if ($tw510) { $v510Bad += $tw510 }
-    $tw510 = Twin510 $spec510.SelectSingleNode('rectangle') $note510.SelectSingleNode('rectangle') 'align,color,strokeColor,hitTest' 'the fill'
+    # opacity and fontSize joined the two pairs in the 32nd batch (SPEC V510a as amended, I177a).
+    $tw510 = Twin510 $spec510.SelectSingleNode('rectangle') $note510.SelectSingleNode('rectangle') 'align,color,opacity,strokeColor,hitTest' 'the fill'
     if ($tw510) { $v510Bad += $tw510 }
     $tw510 = Twin510 $spec510.SelectSingleNode('scrollBox') $note510.SelectSingleNode('scrollBox') 'align' 'the scroller'
     if ($tw510) { $v510Bad += $tw510 }
-    $tw510 = Twin510 $spec510.SelectSingleNode('scrollBox/label') $note510.SelectSingleNode('scrollBox/label') 'left,top,width,height,wordWrap,autoSize' 'the text label'
+    $tw510 = Twin510 $spec510.SelectSingleNode('scrollBox/label') $note510.SelectSingleNode('scrollBox/label') 'left,top,width,height,fontSize,wordWrap,autoSize' 'the text label'
     if ($tw510) { $v510Bad += $tw510 }
     if ($null -eq $spec510.SelectSingleNode("scrollBox[@name='specTipScroll']/label[@name='dynSpecTip']")) { $v510Bad += "(a) specTip does not carry specTipScroll > dynSpecTip - noteTipMove reads the label by that name (SPEC V510a)" }
     foreach ($nm510 in @('specTip', 'specTipScroll', 'dynSpecTip')) {
@@ -24964,13 +24994,334 @@ else {
     if ($rs512 -notmatch 'specBangPaint\(from\);') { $v512Bad += "(c) renderSpecialities does not call specBangPaint(from) - buying, naming or a gift would not move the star (SPEC V512c)" }
     if ($ral512 -notmatch 'xpQuiet = false;[\s\S]*specBangPaint\(from\);') { $v512Bad += "(c) renderAbilityLabels does not call specBangPaint(from) after xpQuiet = false - an era change would leave the star on the old row (SPEC V512c)" }
     if ($al512 -notmatch 'specBangPaint\(from\);\s*\r?\n\t\t\tend;$') { $v512Bad += "(c) specBangPaint(from) is not the last instruction of applyLanguage - the translation would put every ! back to the text it saw first (SPEC V512c, B179)" }
+    # A fourth caller since the 32nd batch (SPEC V512c as amended, I177c): applyTheme repaints the
+    # COLOUR of every text from its original, the accent included - B179 again, for colour. Where
+    # in applyTheme it sits is V515d's to measure.
+    $at512 = NoComments (LuaFn $lang512 'applyTheme')
+    if ($at512 -notmatch 'specBangPaint\(from\);') { $v512Bad += "(c) applyTheme does not call specBangPaint(from) - an era change would put every accented ! back to plain (SPEC V512c, V515d)" }
     $calls512 = @([regex]::Matches($all25Code, 'specBangPaint\(from\);')).Count
-    if ($calls512 -ne 3) { $v512Bad += "(c) specBangPaint(from) is called $calls512 time(s), expected 3 (SPEC V512c)" }
+    if ($calls512 -ne 4) { $v512Bad += "(c) specBangPaint(from) is called $calls512 time(s), expected 4 (SPEC V512c as amended)" }
     # (d) the ability rows: the LIVE first dot, counted by the XML.
     if ($bang512 -notmatch '"abil" \.\. col \.\. num \.\. "_1"' -or $bang512 -notmatch '\.field' -or $bang512 -notmatch 'specKey\(') { $v512Bad += "(d) specBangPaint does not read an ability row's trait off the live field of its first dot (SPEC V512d, I172d)" }
     if ($bang512 -match '\b(11|13|37)\b') { $v512Bad += "(d) specBangPaint spells a row count - the rows are counted by the XML, the loop stops at the first missing name (SPEC V512d, R176c)" }
 }
 if ($v512Bad) { foreach ($b in $v512Bad) { Fail "V512 $b" } }
-else { Pass "V512 one painter stars the ! of a trait holding a speciality bought or given with no name, reading ability rows off their live dot, and it runs after the list, the era and the translation" }
+else { Pass "V512 one painter stars the ! of a trait holding a speciality bought or given with no name, reading ability rows off their live dot, and it runs after the list, the era, the translation and the theme" }
+
+# ---- V513: the tip fits its WHOLE text plus the bar (SPEC I177a, R177e, Q98.1) ----
+# The width comes from the LONGEST paragraph at the worst per-character width MEASURED at the
+# fontSize both labels author, and the scrollBox's bar is ALWAYS added, so the text stops TIP_PAD
+# short of it whether the bar shows or not. The background is the era's box colour at 50%: no
+# radius, so it is no section box and draws no ornament.
+$v513Bad = @()
+$move513 = NoComments (LuaFn $rootTxt 'noteTipMove')
+$lbl513 = @($tr25Doc.SelectSingleNode("//layout[@name='noteTip']/scrollBox/label[@name='dynNoteTip']"), $main510Doc.SelectSingleNode("//layout[@name='specTip']/scrollBox/label[@name='dynSpecTip']"))
+$bg513 = @($tr25Doc.SelectSingleNode("//layout[@name='noteTip']/rectangle"), $main510Doc.SelectSingleNode("//layout[@name='specTip']/rectangle"))
+$val513 = @{}
+foreach ($c513 in @('TIP_CHAR_W', 'TIP_TEXT_MAX', 'TIP_PAD', 'TIP_BAR')) {
+    $d513 = [regex]::Matches($all25Code, "(?m)^\s*(local\s+)?$c513\s*=\s*([0-9.]+)\s*;")
+    if ($d513.Count -ne 1) { $v513Bad += "(b) $c513 is declared $($d513.Count) time(s) across the sheet, expected 1 - one owner per number (SPEC V513b, V347)"; continue }
+    if ($d513[0].Groups[1].Value -ne '') { $v513Bad += "(b) $c513 is a local - the tip's ruler is a global of the root, like every root helper (SPEC V513b, V347)" }
+    if ($root25Code -notmatch "(?m)^\s*$c513\s*=") { $v513Bad += "(b) $c513 is not declared on the root form - noteTipMove lives there (SPEC V513b)" }
+    $val513[$c513] = [double]::Parse($d513[0].Groups[2].Value, [System.Globalization.CultureInfo]::InvariantCulture)
+}
+if (-not $move513 -or $val513.Count -ne 4 -or $null -eq $lbl513[0] -or $null -eq $lbl513[1] -or $null -eq $bg513[0] -or $null -eq $bg513[1]) { $v513Bad += "noteTipMove, one of the four TIP_ constants or one of the two tip labels or backgrounds is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) both labels author the size the ruler was measured at
+    foreach ($l513 in $lbl513) { if ($l513.GetAttribute('fontSize') -ne '12') { $v513Bad += "(a) $($l513.GetAttribute('name')) authors fontSize '$($l513.GetAttribute('fontSize'))', expected 12 - otherwise the ruler measures a size nobody fixed (SPEC V513a)" } }
+    # (b) the ruler is at least the worst measured, and the bar is the scrollBox's
+    if ($val513['TIP_CHAR_W'] -lt 8.25) { $v513Bad += "(b) TIP_CHAR_W is $($val513['TIP_CHAR_W']), under the 8.25 px per character MEASURED at fontSize 12 - the tip would cut its own text (SPEC V513b, R172b)" }
+    if ($val513['TIP_BAR'] -ne 16) { $v513Bad += "(b) TIP_BAR is $($val513['TIP_BAR']), not the 16 of the scrollBox's vertical bar (SPEC V513b, R170b)" }
+    # (c) sized once per row entered, by the longest paragraph, with the bar always added
+    $blk513 = [regex]::Match($move513, '(?s)if NOTE\.tipKey ~= key then(.*?)\r?\n\t{4}end;')
+    if (-not $blk513.Success) { $v513Bad += "(c) noteTipMove has no 'if NOTE.tipKey ~= key then' block - the tip would be measured per pixel, or never (SPEC V513c, I176c)" }
+    else {
+        $b513 = $blk513.Groups[1].Value
+        $para513 = [regex]::Match($b513, '(?s)for para in (.*?)end;')
+        if (-not $para513.Success -or $para513.Groups[1].Value -notmatch 'longest = math\.max\(longest, ') { $v513Bad += "(c) the paragraph loop does not keep the LONGEST paragraph with math.max - the width would follow the whole text again (SPEC V513c)" }
+        if ($b513 -notmatch 'local tw = math\.min\(TIP_TEXT_MAX, math\.ceil\(longest \* TIP_CHAR_W\)\);') { $v513Bad += "(c) the text column is not math.min(TIP_TEXT_MAX, math.ceil(longest * TIP_CHAR_W)) (SPEC V513c, I177a)" }
+        $tw513 = [regex]::Match($b513, '(?m)^(\t+)local tw = ')
+        $w513 = [regex]::Match($b513, '(?m)^(\t+)tip\.width = TIP_PAD \+ tw \+ TIP_PAD \+ TIP_BAR;\s*$')
+        if (-not $w513.Success) { $v513Bad += "(c) tip.width is not TIP_PAD + tw + TIP_PAD + TIP_BAR - the bar is added always, so the text never runs under it (SPEC V513c, V513e)" }
+        elseif (-not $tw513.Success -or $tw513.Groups[1].Value -ne $w513.Groups[1].Value) { $v513Bad += "(c) tip.width is not written at the depth tw is - the bar sits under a condition (SPEC V513c)" }
+        if ($b513 -notmatch 'lbl\.width = tw;') { $v513Bad += "(c) the label is not written tw wide - it would run past the pad into the bar (SPEC V513c, V513e)" }
+    }
+    if ($move513 -match '\*\s*6\b') { $v513Bad += "(c) noteTipMove still spells the old ruler '* 6' (SPEC V513c)" }
+    # (d)(e) the label starts at TIP_PAD, so it closes TIP_PAD short of the bar
+    foreach ($l513 in $lbl513) { if ($l513.GetAttribute('left') -ne [string]$val513['TIP_PAD']) { $v513Bad += "(d) $($l513.GetAttribute('name')) authors left '$($l513.GetAttribute('left'))', not TIP_PAD $($val513['TIP_PAD']) (SPEC V513d, V513e)" } }
+    # (f) the era's box colour at 50%, and no box
+    foreach ($r513 in $bg513) {
+        $who513 = $r513.ParentNode.GetAttribute('name')
+        # 0.80 since the 33rd batch (user, SPEC I178c, V513f as amended).
+        if ($r513.GetAttribute('color') -ne 'black' -or $r513.GetAttribute('opacity') -ne '0.80' -or $r513.GetAttribute('strokeColor') -ne '#00000000' -or $r513.GetAttribute('align') -ne 'contents') { $v513Bad += "(f) $who513's background is not color=black opacity=0.80 strokeColor=#00000000 align=contents - the era's box colour at 80% (SPEC V513f, I178c)" }
+        if ($r513.HasAttribute('xradius') -or $r513.HasAttribute('yradius')) { $v513Bad += "(f) $who513's background authors a radius - that makes it a section box, ornament and all (SPEC V513f)" }
+    }
+}
+if ($v513Bad) { foreach ($b in $v513Bad) { Fail "V513 $b" } }
+else { Pass "V513 both tips are sized by their longest paragraph at $($val513['TIP_CHAR_W']) px per char at fontSize 12, capped at $($val513['TIP_TEXT_MAX']), the bar always added, the text TIP_PAD short of it, on the era's box colour at 80%" }
+
+# ---- V514: Esc closes the settings window through the others' door (SPEC I177b, V405, R177c) ----
+# A key only reaches the control holding focus and only a text control takes it, so the window
+# carries one that only listens, opening gives it the focus, and every live control of the
+# window hands the focus back after a click.
+$v514Bad = @()
+$ms514 = $root25Doc.SelectSingleNode("//layout[@name='mcSettings']")
+$open514 = NoComments (LuaFn $rootTxt 'mcSettingsOpen')
+$kb514 = NoComments (LuaFn $rootTxt 'kbRefocus')
+$esc514 = NoComments (LuaFn $rootTxt 'escClose')
+if ($null -eq $ms514 -or -not $open514 -or -not $kb514 -or -not $esc514) { $v514Bad += "mcSettings, mcSettingsOpen, kbRefocus or escClose is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) one receiver: read-only, no field, outside the scope, Esc to escClose
+    $rx514 = @($ms514.SelectNodes(".//textEditor[@name='edtMcSettingsKey']"))
+    if ($rx514.Count -ne 1) { $v514Bad += "(a) mcSettings holds $($rx514.Count) edtMcSettingsKey, expected 1 - with no text control the key never arrives (SPEC V514a, V405)" }
+    else {
+        $r514 = $rx514[0]
+        if ($r514.GetAttribute('readOnly') -ne 'true') { $v514Bad += "(a) edtMcSettingsKey is not readOnly - it only listens (SPEC V514a)" }
+        if ($r514.HasAttribute('field')) { $v514Bad += "(a) edtMcSettingsKey authors field='$($r514.GetAttribute('field'))' - the receiver holds no data (SPEC V514a)" }
+        if ($r514.ParentNode.GetAttribute('name') -ne 'mcSettings') { $v514Bad += "(a) edtMcSettingsKey is not a direct child of mcSettings - inside mcSettingsScope it would sit on a character's node (SPEC V514a)" }
+        if ($r514.GetAttribute('onKeyDown') -ne 'escClose(self, event, false);') { $v514Bad += "(a) edtMcSettingsKey's onKeyDown is '$($r514.GetAttribute('onKeyDown'))', not escClose(self, event, false); (SPEC V514a)" }
+    }
+    # (b) opening arms and focuses, after the box is up
+    if ($open514 -notmatch 'kbEscArmed = true;') { $v514Bad += "(b) mcSettingsOpen does not write kbEscArmed = true; (SPEC V514b)" }
+    if ($open514 -notmatch '(?s)mcSettings"\]\.visible = true;.*kbRefocus\(from\);') { $v514Bad += "(b) mcSettingsOpen does not call kbRefocus(from) AFTER raising mcSettings - focus on a hidden control does not take (SPEC V514b, V353a)" }
+    # (c) the two doors know the window, and kbRefocus stays the one setFocus
+    if ($kb514 -notmatch 'mcSettings = true' -or $kb514 -notmatch 'edtMcSettingsKey = true') { $v514Bad += "(c) kbRefocus's roster does not name mcSettings and edtMcSettingsKey - xpFind returns only the names asked (SPEC V514c, B167)" }
+    if ($kb514 -notmatch 'f\["mcSettings"\] ~= nil and f\["mcSettings"\]\.visible then ctrl = f\["edtMcSettingsKey"\];') { $v514Bad += "(c) kbRefocus has no branch focusing edtMcSettingsKey while mcSettings is shown (SPEC V514c)" }
+    if ($esc514 -notmatch 'mcSettings = true') { $v514Bad += "(c) escClose's roster does not name mcSettings (SPEC V514c)" }
+    if ($esc514 -notmatch 'for _, nm in ipairs\(\{[^}]*"mcSettings"[^}]*\}\) do\s*if f\[nm\] ~= nil and f\[nm\]\.visible then popClose\(from\);') { $v514Bad += "(c) escClose does not close mcSettings through popClose, the door its X and the scrim use (SPEC V514c, V333e)" }
+    $sf514 = @([regex]::Matches($all25Code, ':setFocus\(')).Count
+    $sfIn514 = @([regex]::Matches($kb514, ':setFocus\(')).Count
+    if ($sfIn514 -lt 1 -or $sf514 -ne $sfIn514) { $v514Bad += "(c) setFocus is called $sf514 time(s) in the sheet and $sfIn514 inside kbRefocus - there is one setFocus and it is kbRefocus's (SPEC V514c, V353b)" }
+    # (d) every live control hands the focus back
+    $chk514 = @($ms514.SelectNodes(".//checkBox"))
+    $cbo514 = @($ms514.SelectNodes(".//comboBox[not(@enabled='false')]"))
+    if ($chk514.Count -eq 0 -or $cbo514.Count -eq 0) { $v514Bad += "(d) mcSettings has $($chk514.Count) checkBox(es) and $($cbo514.Count) live comboBox(es) - this leg reads nothing (SPEC V20)" }
+    foreach ($c514 in $chk514) { if ($c514.GetAttribute('onClick') -ne 'kbRefocus(self);') { $v514Bad += "(d) $($c514.GetAttribute('name')) does not author onClick='kbRefocus(self);' - one click inside and Esc is dead (SPEC V514d, V405)" } }
+    foreach ($c514 in $cbo514) { if ($c514.GetAttribute('onChange') -ne 'kbRefocus(self);') { $v514Bad += "(d) $($c514.GetAttribute('name')) does not author onChange='kbRefocus(self);' - one pick inside and Esc is dead (SPEC V514d, V405)" } }
+}
+if ($v514Bad) { foreach ($b in $v514Bad) { Fail "V514 $b" } }
+else { Pass "V514 Esc closes the settings window: one read-only receiver outside the scope, focused on open, both doors name the window, and its $($chk514.Count) checkBoxes and $($cbo514.Count) live comboBoxes hand the focus back" }
+
+# ---- V515: the ! is accented exactly while its tip has content, through the palette's door (SPEC I177c, R177b, Q98.2) ----
+# One writer of the accent, on WoD20.6 where THEMES, paint, authored and normColor are locals: the
+# colour goes through paint, so the first write records the AUTHORED white (the B21 guard) and a
+# theme walk repaints from that. The two painters on the root decide WHEN, and run again after
+# the theme walk has put every ! back to plain.
+$v515Bad = @()
+$acc515 = NoComments (LuaFn $lang512 'bangAccent')
+$note515 = NoComments (LuaFn $rootTxt 'noteBangPaint')
+$at515 = NoComments (LuaFn $lang512 'applyTheme')
+$spec515 = NoComments (LuaFn $rootTxt 'specBangPaint')
+if (-not $acc515 -or -not $note515 -or -not $at515 -or -not $spec515) { $v515Bad += "bangAccent (WoD20.6), noteBangPaint, specBangPaint or applyTheme is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) one writer, through paint, from the authored colour, to the era's accent
+    if (@([regex]::Matches($all25Code, 'function\s+bangAccent\s*\(')).Count -ne 1) { $v515Bad += "(a) bangAccent is not declared exactly once (SPEC V515a)" }
+    if ($acc515 -notmatch '\.fontStyle\s*=') { $v515Bad += "(a) bangAccent does not write fontStyle (SPEC V515a)" }
+    # The accent is t.bang since the 33rd batch - the palette's complement (SPEC I178a, V515a as
+    # amended); V517 measures the four values and that the old key is gone from here.
+    if ($acc515 -notmatch 'paint\(c, "fontColor", ' -or $acc515 -notmatch 'authored\(c, "fontColor"\)' -or $acc515 -notmatch 'on and t\.bang or ') { $v515Bad += "(a) bangAccent does not paint fontColor through paint, from authored(c, `"fontColor`"), to t.bang (SPEC V515a as amended, I178a)" }
+    if ($acc515 -match '\.fontColor\s*=') { $v515Bad += "(a) bangAccent writes fontColor directly - the accent would become the original applyTheme repaints from (SPEC V515a, B21)" }
+    # (b) nobody else writes the font of a !, and the six author the white the palette maps
+    $raw515 = @([regex]::Matches($all25Code, '(?m)^[^\r\n]*(btnSp|btnN)[^\r\n]*\.(fontStyle|fontColor)\s*=')).Count
+    if ($raw515 -ne 0) { $v515Bad += "(b) $raw515 line(s) naming btnSp or btnN write fontStyle or fontColor - bangAccent is the one writer (SPEC V515b)" }
+    foreach ($p515 in @{ specBangPaint = $spec515; noteBangPaint = $note515 }.GetEnumerator()) {
+        if ($p515.Value -match '\.(fontStyle|fontColor)\s*=') { $v515Bad += "(b) $($p515.Key) writes a font property itself - bangAccent is the one writer (SPEC V515b)" }
+    }
+    $bangs515 = @()
+    foreach ($d515 in @($main510Doc, $tr25Doc)) { $bangs515 += @($d515.SelectNodes("//template//button[@text='!']")) }
+    if ($bangs515.Count -ne 6) { $v515Bad += "(b) $($bangs515.Count) ! button(s) are authored in the row templates of WoD20.1 and WoD20.2, expected 6 (SPEC V515b)" }
+    foreach ($b515 in $bangs515) { if ($b515.GetAttribute('fontColor') -ne 'white') { $v515Bad += "(b) $($b515.GetAttribute('name')) does not author fontColor='white' - with no authored colour the B21 guard in paint refuses the accent, silently (SPEC V515b, R27)" } }
+    # (c) the two painters and their condition
+    if ($spec515 -notmatch 'bangAccent\([^\r\n]*named\[') { $v515Bad += "(c) specBangPaint does not accent a ! off named[...] (SPEC V515c)" }
+    # No trailing $: the file is CRLF and .NET's multiline $ stops before \n, never before \r.
+    $nl515 = [regex]::Match($spec515, '(?m)^[^\r\n]*named\[key\] = true[^\r\n]*')
+    if (-not $nl515.Success -or $nl515.Value -notmatch '"_1"\] == true' -or $nl515.Value -notmatch 'name ~= ""') { $v515Bad += "(c) named[key] is not set under specTipText's own test - dot lit AND a name - so the accent and the tip could disagree (SPEC V515c)" }
+    if (@([regex]::Matches($all25Code, 'function\s+noteBangPaint\s*\(')).Count -ne 1) { $v515Bad += "(c) noteBangPaint is not declared exactly once (SPEC V515c)" }
+    if ($note515 -notmatch 'noteKey\(' -or $note515 -notmatch 'bangAccent\(') { $v515Bad += "(c) noteBangPaint does not read the note by noteKey and accent through bangAccent (SPEC V515c)" }
+    foreach ($n515 in @('"btnNbackground_"', '"btnNmerit_m"', '"btnNmerit_f"')) { if (-not $note515.Contains($n515)) { $v515Bad += "(c) noteBangPaint never names $n515 - that row's ! would never light (SPEC V515c)" } }
+    # (d) who calls, and applyTheme last
+    foreach ($fn515 in @('renderBgButtons', 'renderMeritButtons')) {
+        if ((NoComments (LuaFn $rootTxt $fn515)) -notmatch 'noteBangPaint\(from\);') { $v515Bad += "(d) $fn515 does not call noteBangPaint(from) - a row's new value would keep the old accent (SPEC V515d)" }
+    }
+    if ((NoComments (LuaFn $rootTxt 'savePopNote')) -notmatch '(?s)setField\(.*noteBangPaint\(form\);') { $v515Bad += "(d) savePopNote does not call noteBangPaint(form) after its setField - typing a note would not light its ! (SPEC V515d)" }
+    if ($at515 -notmatch 'specBangPaint\(from\);\s*noteBangPaint\(from\);\s*end;$') { $v515Bad += "(d) specBangPaint(from); noteBangPaint(from); are not the last two instructions of applyTheme - the walk repaints every ! plain after them (SPEC V515d, B179)" }
+    # (e) off puts the style back
+    if ($acc515 -notmatch '\.fontStyle\s*=[^\r\n]*or ""') { $v515Bad += "(e) bangAccent has no way back to the plain style - a ! once accented would stay bold (SPEC V515e)" }
+}
+if ($v515Bad) { foreach ($b in $v515Bad) { Fail "V515 $b" } }
+else { Pass "V515 the ! is accented through paint by bangAccent alone, while its tip has content, repainted after the list, a note, a row and the theme walk" }
+
+# ---- V516: the road's text shows for Show Ghoul or a vampire (SPEC I177d, B180; REWRITTEN I178d, B181) ----
+# T876 turned cboRoad into the dynroad picker and the clanFamily gate stayed half alive: the lock
+# wrote into a nil and the text hid on a sheet with no clan. The gate is gone, and what is
+# measured is its absence - including the dead name, which is how a lock goes on writing nowhere.
+$v516Bad = @()
+$rb516 = NoComments (LuaFn $rootTxt 'renderBearing')
+$nm516 = $main510Doc.SelectSingleNode("//label[@name='dynBearingName']")
+if (-not $rb516 -or $null -eq $nm516) { $v516Bad += "renderBearing or dynBearingName (WoD20.1) is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    if ($nm516.HasAttribute('visible')) { $v516Bad += "(a) dynBearingName authors visible='$($nm516.GetAttribute('visible'))' - whether the line shows is renderBearing's to decide (SPEC V516a, I178d)" }
+    # (b) REWRITTEN in the 33rd batch (user, SPEC B181, I178d): the line has a gate again - Show
+    # Ghoul or a vampire, strict like applyTabVisibility (SPEC B103) - and clanFamily stays out.
+    $vis516 = @([regex]::Matches($rb516, '\.visible\s*=\s*([^\r\n;]*);'))
+    if ($vis516.Count -ne 1) { $v516Bad += "(b) renderBearing writes .visible $($vis516.Count) time(s), expected 1 - the bearing line's one gate (SPEC V516b, I178d)" }
+    elseif ($vis516[0].Groups[1].Value.Trim() -cne 'sheet.stShowDisciplines == true or sheet.game == "Vampire"') { $v516Bad += "(b) the bearing line is gated on '$($vis516[0].Groups[1].Value.Trim())' and not on sheet.stShowDisciplines == true or sheet.game == `"Vampire`" - Show Ghoul or a vampire, strict (SPEC V516b, B181, B103)" }
+    if ($rb516 -match 'clanFamily') { $v516Bad += "(b) renderBearing reads clanFamily - the road is open on every sheet (SPEC V516b, Q98.3)" }
+    if ($rb516 -notmatch '\.text\s*=') { $v516Bad += "(b) renderBearing no longer writes the bearing line's text (SPEC V516b)" }
+}
+# (d) the gate's two inputs reach it: the one dataLink that watches road and calls renderBearing
+# watches game and stShowDisciplines too, or ticking Show Ghoul leaves the line as it was.
+$dl516 = @($root25Doc.SelectNodes("//dataLink[@fields]") | Where-Object { $_.GetAttribute('fields') -match "'road'" -and $_.InnerText -match 'renderBearing\(self\)' })
+if ($dl516.Count -ne 1) { $v516Bad += "(d) $($dl516.Count) dataLink(s) watch road and call renderBearing, expected 1 - this leg reads nothing (SPEC V516d, V20)" }
+else { foreach ($fld516 in @('game', 'stShowDisciplines')) { if ($dl516[0].GetAttribute('fields') -notmatch "'$fld516'") { $v516Bad += "(d) the road dataLink does not watch '$fld516' - changing it would not repaint the bearing line (SPEC V516d, I178d)" } } }
+if ($all25Code -match 'cboRoad') { $v516Bad += "(c) cboRoad is named in the sheet's code - it has not existed since T876, and a dead name in Lua is a lock writing into nil, silently (SPEC V516c, B180)" }
+if ($v516Bad) { foreach ($b in $v516Bad) { Fail "V516 $b" } }
+else { Pass "V516 the road's bearing line shows for Show Ghoul or a vampire, one strict gate in renderBearing on a link that watches both, no clanFamily and no dead cboRoad anywhere in code" }
+
+# ---- V517: the ! with content wears the COMPLEMENT of the era's palette (SPEC I178a, Q99.1, R178a) ----
+# One `bang` value per palette. Three are the exact hue complement (+180, same S and L) of the
+# palette's own text accent, and the check DOES the arithmetic rather than copying the table;
+# Dark Ages is the declared exception - its silver accent has almost no hue to turn - and the
+# table pins it.
+$v517Bad = @()
+$want517 = [ordered]@{ 'Modern Nights' = '#32A8A8'; 'Victorian Age' = '#728ED8'; 'Dark Ages' = '#A6B9E6'; 'Classical Age' = '#5A79BF' }
+function Complement517([string]$hex) {
+    $r1 = [Convert]::ToInt32($hex.Substring(1, 2), 16) / 255.0
+    $g1 = [Convert]::ToInt32($hex.Substring(3, 2), 16) / 255.0
+    $b1 = [Convert]::ToInt32($hex.Substring(5, 2), 16) / 255.0
+    $mx1 = [Math]::Max($r1, [Math]::Max($g1, $b1)); $mn1 = [Math]::Min($r1, [Math]::Min($g1, $b1))
+    $l1 = ($mx1 + $mn1) / 2; $d1 = $mx1 - $mn1; $h1 = 0.0; $s1 = 0.0
+    if ($d1 -gt 0) {
+        if ($l1 -gt 0.5) { $s1 = $d1 / (2 - $mx1 - $mn1) } else { $s1 = $d1 / ($mx1 + $mn1) }
+        if ($mx1 -eq $r1) { $h1 = (($g1 - $b1) / $d1) % 6 } elseif ($mx1 -eq $g1) { $h1 = ($b1 - $r1) / $d1 + 2 } else { $h1 = ($r1 - $g1) / $d1 + 4 }
+        $h1 = $h1 * 60; if ($h1 -lt 0) { $h1 += 360 }
+    }
+    $h1 = ($h1 + 180) % 360
+    $c1 = (1 - [Math]::Abs(2 * $l1 - 1)) * $s1; $x1 = $c1 * (1 - [Math]::Abs((($h1 / 60) % 2) - 1)); $o1 = $l1 - $c1 / 2
+    $rgb1 = switch ([int][Math]::Floor($h1 / 60)) { 0 { @($c1, $x1, 0) } 1 { @($x1, $c1, 0) } 2 { @(0, $c1, $x1) } 3 { @(0, $x1, $c1) } 4 { @($x1, 0, $c1) } default { @($c1, 0, $x1) } }
+    return @($rgb1 | ForEach-Object { [int][Math]::Round(($_ + $o1) * 255) })
+}
+$acc517 = NoComments (LuaFn $lang512 'bangAccent')
+$pal517 = @{}
+foreach ($era517 in $want517.Keys) {
+    $pm517 = [regex]::Match($lang512, '(?s)\t{4}\["' + [regex]::Escape($era517) + '"\] = \{(.*?)\r?\n\t{4}\},')
+    if ($pm517.Success) { $pal517[$era517] = NoComments $pm517.Groups[1].Value }
+}
+if ($pal517.Count -ne 4 -or -not $acc517) { $v517Bad += "THEMES does not hold the four palettes ($($pal517.Count) found) or bangAccent is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    foreach ($era517 in $want517.Keys) {
+        $bang517 = @([regex]::Matches($pal517[$era517], '(?m)^\s*bang\s*=\s*"(#[0-9A-Fa-f]{6})"'))
+        if ($bang517.Count -ne 1) { $v517Bad += "(a) $era517 declares bang $($bang517.Count) time(s), expected 1 (SPEC V517a)"; continue }
+        $got517 = $bang517[0].Groups[1].Value.ToUpper()
+        if ($got517 -ne $want517[$era517]) { $v517Bad += "(a) $era517 bang is $got517, not the $($want517[$era517]) of the table (SPEC V517a, Q99.1)" }
+        if ($era517 -eq 'Dark Ages') { continue }
+        $ac517 = [regex]::Match($pal517[$era517], '\["#C2A14D"\]\s*=\s*"(#[0-9A-Fa-f]{6})"')
+        if (-not $ac517.Success) { $v517Bad += "(b) $era517 has no text accent font[`"#C2A14D`"] to take the complement of (SPEC V517b)"; continue }
+        $cmp517 = Complement517 $ac517.Groups[1].Value
+        $gotRgb517 = @(1, 3, 5 | ForEach-Object { [Convert]::ToInt32($got517.Substring($_, 2), 16) })
+        for ($k517 = 0; $k517 -lt 3; $k517++) {
+            if ([Math]::Abs($cmp517[$k517] - $gotRgb517[$k517]) -gt 2) { $v517Bad += "(b) $era517 bang $got517 is not the complement of its accent $($ac517.Groups[1].Value) - hue + 180 at the same S and L gives #{0:X2}{1:X2}{2:X2} (SPEC V517b, I178a)" -f $cmp517[0], $cmp517[1], $cmp517[2]; break }
+        }
+    }
+    if ($acc517 -notmatch 't\.bang\b') { $v517Bad += "(c) bangAccent does not paint t.bang (SPEC V517c)" }
+    if ($acc517 -match 'normColor\("#C2A14D"\)') { $v517Bad += "(c) bangAccent still reads the text accent #C2A14D - the ! wears the complement now (SPEC V517c, I178a)" }
+}
+if ($v517Bad) { foreach ($b in $v517Bad) { Fail "V517 $b" } }
+else { Pass "V517 each palette declares bang, three are the exact hue complement of their text accent and Dark Ages the declared one, and bangAccent paints t.bang" }
+
+# ---- V518: a starred ! blinks red on ONE timer that stops itself (SPEC I178b, R178b/c, Q99.2) ----
+# A <button> has no background of its own, so the red is a rectangle right after the !, over it
+# and deaf to the mouse. specBangPaint decides which blink - the same test that writes the star -
+# and bangBlink flips them, dropping what the host destroyed and disarming itself when none is left.
+$v518Bad = @()
+$sbp518 = NoComments (LuaFn $rootTxt 'specBangPaint')
+$blk518 = NoComments (LuaFn $rootTxt 'bangBlink')
+$tpl518 = @('Attribute', 'AttributeZeroable', 'Ability', 'CustomAbility')
+$nodes518 = @{}
+foreach ($t518 in $tpl518) { $nodes518[$t518] = $main510Doc.SelectSingleNode("//template[@name='$t518']") }
+if (-not $sbp518 -or -not $blk518 -or @($nodes518.Values | Where-Object { $null -eq $_ }).Count -gt 0) { $v518Bad += "specBangPaint, bangBlink or one of the four speciality templates of WoD20.1 is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) the red rectangle right after each !
+    foreach ($t518 in $tpl518) {
+        $kids518 = @($nodes518[$t518].ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
+        $i518 = -1
+        for ($j518 = 0; $j518 -lt $kids518.Count; $j518++) { if ($kids518[$j518].LocalName -eq 'button' -and $kids518[$j518].GetAttribute('name') -like 'btnSp*') { $i518 = $j518; break } }
+        if ($i518 -lt 0 -or $i518 + 1 -ge $kids518.Count) { $v518Bad += "(a) $t518 has no ! followed by a sibling (SPEC V518a)"; continue }
+        $btn518 = $kids518[$i518]; $rc518 = $kids518[$i518 + 1]
+        $sfx518 = $btn518.GetAttribute('name').Substring(5)
+        if ($rc518.LocalName -ne 'rectangle' -or $rc518.GetAttribute('name') -cne ('blinkSp' + $sfx518)) { $v518Bad += "(a) the element right after $t518's ! is not <rectangle name='blinkSp$sfx518'> - the red has to sit over its own ! (SPEC V518a)"; continue }
+        foreach ($at518 in @('left', 'top', 'width', 'height')) { if ($rc518.GetAttribute($at518) -ne $btn518.GetAttribute($at518)) { $v518Bad += "(a) blinkSp$sfx518 in $t518 differs from its ! on '$at518' (SPEC V518a)" } }
+        if ($rc518.GetAttribute('color') -ne '#99D32F2F' -or $rc518.GetAttribute('strokeColor') -ne '#00000000' -or $rc518.GetAttribute('hitTest') -ne 'false' -or $rc518.GetAttribute('visible') -ne 'false') { $v518Bad += "(a) blinkSp$sfx518 in $t518 is not color=#99D32F2F strokeColor=#00000000 hitTest=false visible=false - it has to let the click and the tip through and start hidden (SPEC V518a)" }
+        if (@($rc518.Attributes | Where-Object { $_.Name -like 'on*' }).Count -ne 0) { $v518Bad += "(a) blinkSp$sfx518 in $t518 carries an event - it is paint only (SPEC V518a)" }
+    }
+    foreach ($era518 in $want517.Keys) { if ($pal517.ContainsKey($era518) -and $pal517[$era518] -notmatch '\["#99D32F2F"\]\s*=') { $v518Bad += "(a) $era518 has no fill key #99D32F2F - applyTheme would leave the red to chance (SPEC V518a, V53)" } }
+    # (b) the state, global, and the rhythm the user took
+    foreach ($c518 in @('BANG_BLINK_MS', 'BANG_BLINK')) {
+        $d518 = [regex]::Matches($all25Code, "(?m)^\s*(local\s+)?$c518\s*=\s*([^\r\n]*)")
+        if ($d518.Count -ne 1) { $v518Bad += "(b) $c518 is declared $($d518.Count) time(s), expected 1 (SPEC V518b)"; continue }
+        if ($d518[0].Groups[1].Value -ne '') { $v518Bad += "(b) $c518 is a local - it is a global of the root (SPEC V518b, V347)" }
+        if ($c518 -eq 'BANG_BLINK_MS' -and $d518[0].Groups[2].Value.Trim() -ne '500;') { $v518Bad += "(b) BANG_BLINK_MS is '$($d518[0].Groups[2].Value.Trim())', not 500; - one cycle a second, 500ms red and 500ms plain (SPEC V518b, Q99.2)" }
+    }
+    # (c) specBangPaint alone decides, under the star's own test, and arms the ONE timer
+    $loc518 = [regex]::Match($sbp518, 'local\s+(\w+)\s*=\s*from\["blinkSp" \.\. sfx\];')
+    if (-not $loc518.Success) { $v518Bad += "(c) specBangPaint does not find blinkSp by the row's suffix (SPEC V518c)" }
+    else {
+        $rv518 = [regex]::Escape($loc518.Groups[1].Value)
+        if ($sbp518 -notmatch 'local starred = key ~= nil and bare\[key\] == true;' -or $sbp518 -notmatch 'btn\.text = starred and "!\*" or "!";') { $v518Bad += "(c) the blink and the star are not decided by one test (starred off bare[key]) - they could disagree (SPEC V518c)" }
+        if ($sbp518 -notmatch ('(?s)if starred then\s*BANG_BLINK\.rects\[' + $rv518 + '\] = true;\s*' + $rv518 + '\.visible = BANG_BLINK\.on;\s*else\s*BANG_BLINK\.rects\[' + $rv518 + '\] = nil;\s*' + $rv518 + '\.visible = false;')) { $v518Bad += "(c) specBangPaint does not put a starred ! into the set and take a plain one out AND hide its red at once (SPEC V518c, I178b)" }
+    }
+    $lit518 = @([regex]::Matches($all25Code, '"blinkSp"')).Count
+    if ($lit518 -ne @([regex]::Matches($sbp518, '"blinkSp"')).Count) { $v518Bad += "(c) blinkSp is reached by name outside specBangPaint - the red has one writer besides the timer (SPEC V518c)" }
+    $set518 = @([regex]::Matches($all25Code, 'BANG_BLINK\.rects\[')).Count
+    if ($set518 -ne (@([regex]::Matches($sbp518, 'BANG_BLINK\.rects\[')).Count + @([regex]::Matches($blk518, 'BANG_BLINK\.rects\[')).Count)) { $v518Bad += "(c) BANG_BLINK.rects is written outside specBangPaint and bangBlink (SPEC V518c)" }
+    $si518 = @([regex]::Matches($all25Code, 'setInterval\(bangBlink, BANG_BLINK_MS\)')).Count
+    if ($si518 -ne 1 -or $sbp518 -notmatch '(?s)BANG_BLINK\.ticking ~= true then\s*BANG_BLINK\.ticking = true;\s*setInterval\(bangBlink, BANG_BLINK_MS\);') { $v518Bad += "(c) the blink timer is armed $si518 time(s) or not under BANG_BLINK.ticking inside specBangPaint - a second timer doubles the rhythm (SPEC V518c)" }
+    # (d) the tick stops itself
+    if (@([regex]::Matches($all25Code, 'function\s+bangBlink\s*\(')).Count -ne 1) { $v518Bad += "(d) bangBlink is not declared exactly once (SPEC V518d)" }
+    if ($blk518 -notmatch '\.handle == nil') { $v518Bad += "(d) bangBlink does not drop a destroyed rectangle (handle nil) - a closed sheet would keep the timer writing to dead controls (SPEC V518d, R178c)" }
+    if ($blk518 -notmatch '(?s)next\(BANG_BLINK\.rects\) == nil then\s*BANG_BLINK\.ticking = false;.*?return false;') { $v518Bad += "(d) bangBlink does not clear ticking and return false once the set is empty - the interval would never disarm (SPEC V518d)" }
+    # (e) and there is still nothing that runs on close
+    if ($all25Code -match 'name="(onClose|onDestroy|onHide)"') { $v518Bad += "(e) a close, destroy or hide handler exists - the timer stops by itself (SPEC V518e, V475f)" }
+}
+if ($v518Bad) { foreach ($b in $v518Bad) { Fail "V518 $b" } }
+else { Pass "V518 the four speciality ! carry their red right over them, specBangPaint alone decides off the star's own test and arms one 500ms timer, and bangBlink stops itself" }
+
+# ---- V519: the tip shows on the WHOLE row of the six templates with a ! (SPEC I178e, R178d, Q99.4) ----
+# A transparent rectangle, the first child - behind everything - filling the row's own layout,
+# which runs from the name's start to the last dot's end: the name and the 5px gaps report to the
+# tip even where no control does. Its row and key are its !'s.
+$v519Bad = @()
+$tpl519 = @(
+    [pscustomobject]@{ D = $main510Doc; T = 'Attribute' }, [pscustomobject]@{ D = $main510Doc; T = 'AttributeZeroable' },
+    [pscustomobject]@{ D = $main510Doc; T = 'Ability' }, [pscustomobject]@{ D = $main510Doc; T = 'CustomAbility' },
+    [pscustomobject]@{ D = $tr25Doc; T = 'OpenAbility' }, [pscustomobject]@{ D = $tr25Doc; T = 'MeritPicked' }
+)
+$rxMove519 = '^noteTipMove\(self, event, ([^,]+), ([^,]+), ''([^'']+)''\);$'
+foreach ($p519 in $tpl519) {
+    $tn519 = $p519.D.SelectSingleNode("//template[@name='$($p519.T)']")
+    if ($null -eq $tn519) { $v519Bad += "template $($p519.T) is not declared - this leg reads nothing (SPEC V20, V209)"; continue }
+    $kids519 = @($tn519.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
+    $bang519 = @($kids519 | Where-Object { $_.LocalName -eq 'button' -and $_.GetAttribute('text') -eq '!' }) | Select-Object -First 1
+    if ($null -eq $bang519) { $v519Bad += "(b) $($p519.T) has no ! to take the row and key from (SPEC V519b)"; continue }
+    $sfx519 = $bang519.GetAttribute('name') -replace '^btn(Sp|N)', ''
+    $hit519 = $kids519[0]
+    # (a) first child, the rectangle, by construction
+    if ($hit519.LocalName -ne 'rectangle' -or $hit519.GetAttribute('name') -cne ('hit' + $sfx519)) { $v519Bad += "(a) the first child of $($p519.T) is not <rectangle name='hit$sfx519'> - behind everything, or the dots and the ! lose their clicks (SPEC V519a)"; continue }
+    if ($hit519.GetAttribute('align') -ne 'contents' -or $hit519.GetAttribute('color') -ne '#00000000' -or $hit519.GetAttribute('strokeColor') -ne '#00000000' -or $hit519.GetAttribute('hitTest') -ne 'true') { $v519Bad += "(a) hit$sfx519 in $($p519.T) is not align=contents color=#00000000 strokeColor=#00000000 hitTest=true (SPEC V519a)" }
+    foreach ($at519 in @('left', 'top', 'width', 'height')) { if ($hit519.HasAttribute($at519)) { $v519Bad += "(a) hit$sfx519 in $($p519.T) authors '$at519' - the row's layout gives the size (SPEC V519a)" } }
+    # (b) same row, same key as its !
+    $mh519 = [regex]::Match($hit519.GetAttribute('onMouseMove'), $rxMove519)
+    $mb519 = [regex]::Match($bang519.GetAttribute('onMouseMove'), $rxMove519)
+    if (-not $mh519.Success -or -not $mb519.Success) { $v519Bad += "(b) hit$sfx519 or the ! of $($p519.T) does not call noteTipMove(self, event, <cat>, <field>, '<name>'); (SPEC V519b)" }
+    else {
+        if ($mh519.Groups[1].Value -cne $mb519.Groups[1].Value -or $mh519.Groups[2].Value -cne $mb519.Groups[2].Value) { $v519Bad += "(b) hit$sfx519 in $($p519.T) reports ($($mh519.Groups[1].Value), $($mh519.Groups[2].Value)) and its ! ($($mb519.Groups[1].Value), $($mb519.Groups[2].Value)) - the row's tip would show another row's text (SPEC V519b)" }
+        if ($mh519.Groups[3].Value -cne $hit519.GetAttribute('name')) { $v519Bad += "(b) hit$sfx519 hands noteTipMove the name '$($mh519.Groups[3].Value)' - the tip is placed off the control named (SPEC V519b, V510b)" }
+    }
+    if ($hit519.GetAttribute('onMouseLeave') -notmatch 'noteTipLeave\(') { $v519Bad += "(b) hit$sfx519 in $($p519.T) does not call noteTipLeave on the way out (SPEC V519b)" }
+    # (c) not a drag handle
+    if ($hit519.HasAttribute('onStartDrag')) { $v519Bad += "(c) hit$sfx519 in $($p519.T) starts a drag - the handle is the picker alone (SPEC V519c, V508)" }
+}
+if ($v519Bad) { foreach ($b in $v519Bad) { Fail "V519 $b" } }
+else { Pass "V519 the six templates with a ! start with a transparent hit rectangle filling the row, reporting the same row and key as their !, and it is no drag handle" }
 
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

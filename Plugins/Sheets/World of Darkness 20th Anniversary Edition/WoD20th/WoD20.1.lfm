@@ -179,9 +179,17 @@
 			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
 			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
+		<!-- Two rectangles ride every row that has a ! (33rd batch). hit* is the FIRST child, behind
+		     everything, filling the row's own layout - which runs from the name's start to the last
+		     dot's end - so the tip shows on the name and on the 5px gaps too (SPEC I178e, V519).
+		     blinkSp* sits right AFTER the !, over it, hidden and deaf to the mouse: the red that
+		     specBangPaint and bangBlink flash while the ! is starred - a <button> has no
+		     background colour of its own (SPEC I178b, V518, R178b). -->
 		<template name="Attribute">
+			<rectangle name="hit$(field)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'hit$(field)');" onMouseLeave="noteTipLeave(self);"/>
 			<label name="lbl$(field)" left="0" top="5" width="95" height="20" text="$(nome)" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'lbl$(field)');" onMouseLeave="noteTipLeave(self);"/>
-			<button name="btnSp$(field)" left="100" top="2" width="20" height="20" text="!" onClick="specOpen(self, '$(field)_1');" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'btnSp$(field)');" onMouseLeave="noteTipLeave(self);"/>
+			<button name="btnSp$(field)" left="100" top="2" width="20" height="20" text="!" fontColor="white" onClick="specOpen(self, '$(field)_1');" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'btnSp$(field)');" onMouseLeave="noteTipLeave(self);"/>
+			<rectangle name="blinkSp$(field)" left="100" top="2" width="20" height="20" color="#99D32F2F" strokeColor="#00000000" hitTest="false" visible="false"/>
 			<image name="dot$(field)_1" left="125" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_1');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_2" left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_2');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_3" left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_3');" onMouseLeave="noteTipLeave(self);"/>
@@ -191,8 +199,10 @@
 		<!-- Attribute, but dot 1 is a real checkbox instead of a fixed image, so the rating can
 		     drop to zero. Only Appearance uses it (SPEC T95). -->
 		<template name="AttributeZeroable">
+			<rectangle name="hit$(field)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'hit$(field)');" onMouseLeave="noteTipLeave(self);"/>
 			<label name="lbl$(field)" left="0" top="5" width="95" height="20" text="$(nome)" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'lbl$(field)');" onMouseLeave="noteTipLeave(self);"/>
-			<button name="btnSp$(field)" left="100" top="2" width="20" height="20" text="!" onClick="specOpen(self, '$(field)_1');" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'btnSp$(field)');" onMouseLeave="noteTipLeave(self);"/>
+			<button name="btnSp$(field)" left="100" top="2" width="20" height="20" text="!" fontColor="white" onClick="specOpen(self, '$(field)_1');" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'btnSp$(field)');" onMouseLeave="noteTipLeave(self);"/>
+			<rectangle name="blinkSp$(field)" left="100" top="2" width="20" height="20" color="#99D32F2F" strokeColor="#00000000" hitTest="false" visible="false"/>
 			<imageCheckBox name="dot$(field)_1" left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_1');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_2" left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_2');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_3" left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_3');" onMouseLeave="noteTipLeave(self);"/>
@@ -200,8 +210,10 @@
 			<imageCheckBox name="dot$(field)_5" left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_5');" onMouseLeave="noteTipLeave(self);"/>
 		</template>
 		<template name="Ability">
+			<rectangle name="hit$(col)$(num)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'hit$(col)$(num)');" onMouseLeave="noteTipLeave(self);"/>
 			<label name="dynAbil$(col)$(num)" left="0" top="5" width="135" height="20" text="$(nome)" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'dynAbil$(col)$(num)');" onMouseLeave="noteTipLeave(self);"/>
-			<button name="btnSp$(col)$(num)" left="140" top="2" width="20" height="20" text="!" onClick="specOpen(self, self.abil$(col)$(num)_1.field);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'btnSp$(col)$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<button name="btnSp$(col)$(num)" left="140" top="2" width="20" height="20" text="!" fontColor="white" onClick="specOpen(self, self.abil$(col)$(num)_1.field);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'btnSp$(col)$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<rectangle name="blinkSp$(col)$(num)" left="140" top="2" width="20" height="20" color="#99D32F2F" strokeColor="#00000000" hitTest="false" visible="false"/>
 			<imageCheckBox name="abil$(col)$(num)_1" left="165" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_1.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_1');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="abil$(col)$(num)_2" left="190" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_2.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_2');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="abil$(col)$(num)_3" left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_3.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_3');" onMouseLeave="noteTipLeave(self);"/>
@@ -213,8 +225,10 @@
 		     ability keeps them in place (SPEC I172d, Q92.3). The Ability row above hands over the
 		     LIVE field of its first dot instead, because the era re-binds it (SPEC R171c). -->
 		<template name="CustomAbility">
+			<rectangle name="hit$(field)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'hit$(field)');" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edt$(field)" left="0" top="2" width="135" height="21" field="$(field)" fontSize="12" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'edt$(field)');" onMouseLeave="noteTipLeave(self);"/>
-			<button name="btnSp$(field)" left="140" top="2" width="20" height="20" text="!" onClick="specOpen(self, '$(field)_1');" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'btnSp$(field)');" onMouseLeave="noteTipLeave(self);"/>
+			<button name="btnSp$(field)" left="140" top="2" width="20" height="20" text="!" fontColor="white" onClick="specOpen(self, '$(field)_1');" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'btnSp$(field)');" onMouseLeave="noteTipLeave(self);"/>
+			<rectangle name="blinkSp$(field)" left="140" top="2" width="20" height="20" color="#99D32F2F" strokeColor="#00000000" hitTest="false" visible="false"/>
 			<imageCheckBox name="dot$(field)_1" left="165" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_1');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_2" left="190" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_2');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_3" left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_3');" onMouseLeave="noteTipLeave(self);"/>
@@ -821,12 +835,13 @@
 			for attribute. Its NAMES are its own: the tabs are <import>ed into ONE form, and every
 			named control of every tab is a field of that one root object (SPEC R176) - a second
 			noteTip here would overwrite the first. LAST child of the scrollBox, so it paints over
-			every box in CONTENT coordinates; black at 50%, no outline, no title (SPEC V501a, V510a).
+			every box in CONTENT coordinates; the era's box colour at 80%, no outline, no title (SPEC
+			V501a, V510a, I177a, I178c).
 		-->
 		<layout name="specTip" left="0" top="0" width="300" height="60" visible="false" onMouseEnter="noteTipHold(self);" onMouseLeave="noteTipHide(self);">
-			<rectangle align="contents" color="#80000000" strokeColor="#00000000" hitTest="false"/>
+			<rectangle align="contents" color="black" opacity="0.80" strokeColor="#00000000" hitTest="false"/>
 			<scrollBox name="specTipScroll" align="client">
-				<label name="dynSpecTip" left="8" top="4" width="276" height="20" wordWrap="true" autoSize="true"/>
+				<label name="dynSpecTip" left="8" top="4" width="276" height="20" fontSize="12" wordWrap="true" autoSize="true"/>
 			</scrollBox>
 		</layout>
 	</scrollBox>

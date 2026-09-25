@@ -4343,14 +4343,15 @@
 				return "+2";
 			end;
 
-			-- ONE writer for all three states of the road line (SPEC I99h, V330a): the combo`s lock and
-			-- the two bearing labels. Splitting them would give one pixel two owners, which is exactly
-			-- what V135 forbids and what B38 cost.
+			-- ONE writer for the road line (SPEC I99h, V330a): the picker's name and the bearing
+			-- label. Splitting them would give one pixel two owners, which is exactly what V135
+			-- forbids and what B38 cost.
 			--
-			-- The gate is `clanFamily` FILLED, not "is a revenant". Q1 (user 2026-08-28) opened it to
-			-- clans as well, so the road is editable for any sheet that has declared what it is, and
-			-- locked for one that has not (SPEC I99d). The bearing line rides the SAME predicate - read
-			-- once, written to all three, so the two can never disagree on screen.
+			-- No gate on `clanFamily` any more (SPEC I177d, B180, V516): T876 turned the combo into
+			-- the dynroad picker and the lock kept writing into a control that no longer existed,
+			-- while the bearing line kept hiding on a sheet with no clan. The picker and the dots are
+			-- open on every sheet (Q98.3); the bearing LINE is shown for a vampire or a ghoul only
+			-- (33rd batch, SPEC I178d, B181) - its dataLink watches game and stShowDisciplines.
 			function renderBearing(from)
 				if sheet == nil or from == nil then return; end;
 
@@ -4358,11 +4359,6 @@
 				local found = {};
 
 				xpFind(tabRootOf(from), names, found);
-
-				local fam  = sheet.clanFamily;
-				local open = fam ~= nil and fam ~= "";
-
-				if found["cboRoad"] ~= nil then found["cboRoad"].enabled = open; end;
 
 				-- The rating is the DOT COUNT taken off the NDB and never off the widgets: a row that has
 				-- not been built yet answers nil, and counting widgets would score a silent zero.
@@ -4423,8 +4419,11 @@
 				-- centred in their own half never read as one sentence, which is what was asked.
 				local nm = found["dynBearingName"];
 
+				-- Shown for a vampire or a ghoul and nobody else - the road is theirs (user, SPEC
+				-- I178d, B181, V516). Strict, like applyTabVisibility: loosening to ~= false would
+				-- show it on every sheet saved before the flag existed (SPEC B103).
 				if nm ~= nil then
-					nm.visible = open;
+					nm.visible = sheet.stShowDisciplines == true or sheet.game == "Vampire";
 					nm.text    = bear .. " (" .. bearingMod(dots) .. ")";
 				end;
 			end;
@@ -4562,6 +4561,10 @@
 			--
 			-- 28º lote (SPEC I173c): as 2 janelas do `!` (`popNote`, `popSpec`) entram no MESMO
 			-- desenho ∴ são 4 overlays, & ∀ controle de texto deles chama escClose.
+			--
+			-- 32nd batch (SPEC I177b, V514): the settings window is the 5th. It had no text control
+			-- at all, so it got one that only listens - edtMcSettingsKey, read-only like edtPopDesc -
+			-- and its 12 live controls hand the focus back through kbRefocus(self).
 			kbEscArmed = false;
 
 			-- Devolve o foco ao controle de teclado do overlay que estiver aberto. Chamada do
@@ -4572,7 +4575,7 @@
 				local f = {};
 				local names = { mfSearch = true, edtMfQuery = true, mfSearchB = true,
 					edtMfQueryB = true, popDesc = true, edtPopDesc = true, popNote = true,
-					edtPopNote = true, popSpec = true };
+					edtPopNote = true, popSpec = true, mcSettings = true, edtMcSettingsKey = true };
 
 				for k = 1, SPEC_PER_TRAIT, 1 do names["edtPopSpec_" .. k] = true; end;
 
@@ -4599,6 +4602,7 @@
 					while k < SPEC_PER_TRAIT and SPEC_WIN.rows[k] ~= nil do k = k + 1; end;
 
 					ctrl = f["edtPopSpec_" .. k];
+				elseif f["mcSettings"] ~= nil and f["mcSettings"].visible then ctrl = f["edtMcSettingsKey"];
 				end;
 
 				if ctrl ~= nil then ctrl:setFocus(); end;
@@ -4635,13 +4639,13 @@
 				if isEscKey(ev) then
 					local f = {};
 
-					xpFind(tabRootOf(from), { mfSearch = true, popDesc = true, popNote = true, popSpec = true }, f);
+					xpFind(tabRootOf(from), { mfSearch = true, popDesc = true, popNote = true, popSpec = true, mcSettings = true }, f);
 
 					if f["mfSearch"] ~= nil and f["mfSearch"].visible then mfClose(from); return; end;
 
-					-- The ? and the two ! windows share popClose, the door their X and the scrim
-					-- already use (SPEC V333e, I173c).
-					for _, nm in ipairs({"popDesc", "popNote", "popSpec"}) do
+					-- The ?, the two ! windows and the settings window share popClose, the door their
+					-- X and the scrim already use (SPEC V333e, I173c, I177b).
+					for _, nm in ipairs({"popDesc", "popNote", "popSpec", "mcSettings"}) do
 						if f[nm] ~= nil and f[nm].visible then popClose(from); return; end;
 					end;
 
@@ -5136,9 +5140,14 @@
 				if found["mcSettingsScope"] ~= nil then found["mcSettingsScope"].node = MC.root; end;
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
 				if found["mcSettings"] ~= nil then found["mcSettings"].visible = true; end;
+
+				-- AFTER the box is up, the way popOpen does it: focus on a hidden control does not
+				-- take, and without focus Esc never arrives (SPEC V353a, I177b).
+				kbEscArmed = true;
+				kbRefocus(from);
 			end;
 
-			-- ---- The row's three bars (SPEC I170d, T1076) ---------------------------------------
+			-- ---- The row's three bars (SPEC I170d, T1076)---------------------------------------
 			--
 			-- The ONE count of a pool on a given node (SPEC V498a): how many of base..1..count are
 			-- lit. The node is an argument because a row paints ITS node, not the active one.
@@ -5284,6 +5293,17 @@
 			-- helper is (SPEC V347).
 			NOTE = { key = nil, hold = false, tipKey = nil, tipText = nil };
 
+			-- The tip's ruler (SPEC I177a, V513), one owner each. TIP_CHAR_W is px per character
+			-- at the fontSize="12" both tip labels author: the WORST measured (`Nome` is about 33
+			-- px in 4 chars, SPEC R172b) rounded up, so real text runs under it and the tip is
+			-- wide enough rather than cut. TIP_TEXT_MAX caps the text column (user, Q98.1),
+			-- TIP_PAD is the label's authored left, TIP_BAR the scrollBox's vertical bar (SPEC
+			-- R170b) - always added, so the text never runs under it, bar shown or not.
+			TIP_CHAR_W   = 8.5;
+			TIP_TEXT_MAX = 400;
+			TIP_PAD      = 8;
+			TIP_BAR      = 16;
+
 			-- The ONE name a note is stored under (SPEC V500b): keyed by the chosen VALUE, not by
 			-- the row, so the same background in two rows opens the same note and emptying a row's
 			-- dots loses nothing. The value is the canonical English name the picker writes
@@ -5336,6 +5356,9 @@
 				if descQuiet or NOTE.key == nil or sheet == nil or form == nil then return; end;
 
 				setField(NOTE.key, form.edtPopNote.text);
+
+				-- The note's TEXT changed, so its ! may light or go out (SPEC I177c, V515d).
+				noteBangPaint(form);
 			end;
 
 			-- ---- The ! of a trait: its specialities (SPEC I172e, T1085) ------------------------
@@ -5572,25 +5595,35 @@
 					local txt = NOTE.tipText;
 
 					if txt ~= "" then
-						-- The fitSize ruler (half the point size per character) sizes the tip to
-						-- its text: at most 300 wide and 160 tall, the rest scrolls (SPEC I170h).
-						local _, cont = string.gsub(txt, "[\128-\191]", "");
-						local chars = #txt - cont;
-						local w = math.min(300, chars * 6 + 24);
-						local lines = 0;
+						-- Sized by the LONGEST paragraph, not by the whole text (SPEC I177a): three
+						-- short lines make a tip as wide as the widest of them. Characters, not
+						-- bytes - UTF-8 continuation bytes are no letters. At most TIP_TEXT_MAX of
+						-- text and 160 tall, the rest scrolls; `longest` starts at 1 so a note of
+						-- blank lines still has a column to wrap in.
+						local lens = {};
+						local longest = 1;
 
 						for para in string.gmatch(txt .. "\n", "([^\n]*)\n") do
 							local _, pc = string.gsub(para, "[\128-\191]", "");
-							lines = lines + math.max(1, math.ceil(((#para - pc) * 6) / (w - 24)));
+
+							lens[#lens + 1] = #para - pc;
+							longest = math.max(longest, #para - pc);
 						end;
 
-						tip.width = w;
+						local tw = math.min(TIP_TEXT_MAX, math.ceil(longest * TIP_CHAR_W));
+						local lines = 0;
+
+						for k = 1, #lens, 1 do
+							lines = lines + math.max(1, math.ceil(lens[k] * TIP_CHAR_W / tw));
+						end;
+
+						tip.width = TIP_PAD + tw + TIP_PAD + TIP_BAR;
 						tip.height = math.min(160, lines * 16 + 12);
 
 						local lbl = from[spec and "dynSpecTip" or "dynNoteTip"];
 
 						if lbl ~= nil then
-							lbl.width = w - 24;
+							lbl.width = tw;
 							lbl.text = txt;
 						end;
 					end;
@@ -7711,6 +7744,8 @@
 					noteButton(found["btnNbackground_" .. i], sheet["background_" .. i]);
 					noteButton(found["btnQbackground_" .. i], sheet["background_" .. i]);
 				end;
+
+				noteBangPaint(from);
 			end;
 
 			-- The ! beside a picked row, and the ? of every row whose key is its value, are live
@@ -7725,6 +7760,30 @@
 
 				btn.enabled = filled;
 				btn.opacity = filled and 1 or 0.75;
+			end;
+
+			-- The ! of a background, merit or flaw is accented while its tip has something to show
+			-- (SPEC I177c, V515): the row holds a value and that value's note is not empty. By NAME
+			-- off the root form (SPEC R176), no walk, so savePopNote can afford it per keystroke.
+			-- bangAccent is WoD20.6's: every <script> of the sheet runs in the constructor, before
+			-- the first event listener is added (MEASURED in the generated Lua), so it is there.
+			function noteBangPaint(from)
+				if sheet == nil or from == nil then return; end;
+
+				local function hasNote(field, cat)
+					local v = sheet[field];
+
+					return v ~= nil and v ~= "" and (sheet[noteKey(cat, v)] or "") ~= "";
+				end;
+
+				for i = 1, BACKGROUND_ROWS - BACKGROUND_FREE_ROWS, 1 do
+					bangAccent(from["btnNbackground_" .. i], hasNote("background_" .. i, "background"));
+				end;
+
+				for i = 0, MERIT_ROWS, 1 do
+					bangAccent(from["btnNmerit_m" .. i], hasNote("merit_m" .. i, "merit"));
+					bangAccent(from["btnNmerit_f" .. i], hasNote("merit_f" .. i, "flaw"));
+				end;
 			end;
 
 			-- Nature and Demeanor, the two BARE rows of I113e wave 2 (SPEC T842). Same watcher and
@@ -7780,6 +7839,8 @@
 					noteButton(found["btnQmerit_m" .. i], sheet["merit_m" .. i]);
 					noteButton(found["btnQmerit_f" .. i], sheet["merit_f" .. i]);
 				end;
+
+				noteBangPaint(from);
 			end;
 
 
@@ -8334,6 +8395,37 @@
 				ctrl.left = left + w + 5 + qw + 5;
 			end;
 
+			-- The red behind a starred ! blinks on ONE timer for the whole sheet (user 2026-09-25,
+			-- SPEC I178b, V518): 500ms red, 500ms plain. `rects` is the set of blinkSp* rectangles
+			-- whose ! is starred, the control itself the key; specBangPaint fills it and arms the
+			-- timer, bangBlink flips them. Globals for the reason every root helper is (SPEC V347).
+			BANG_BLINK_MS = 500;
+			BANG_BLINK = { on = false, ticking = false, rects = {} };
+
+			-- One tick. It stops ITSELF - there is no close handler to stop it (SPEC V475f): a
+			-- rectangle the host destroyed has handle nil (rrpgObjs.lua:167, SPEC R178c) and leaves
+			-- the set, and an empty set returns false, which disarms the interval (rrpgUtil.lua:150).
+			function bangBlink()
+				BANG_BLINK.on = not BANG_BLINK.on;
+
+				for r in pairs(BANG_BLINK.rects) do
+					if r.handle == nil then
+						BANG_BLINK.rects[r] = nil;
+					else
+						r.visible = BANG_BLINK.on;
+					end;
+				end;
+
+				if next(BANG_BLINK.rects) == nil then
+					BANG_BLINK.ticking = false;
+					BANG_BLINK.on = false;
+
+					return false;
+				end;
+
+				return true;
+			end;
+
 			-- The ! of a trait is starred while it holds a speciality BOUGHT, or given, with no name,
 			-- and plain again once one is typed (user 2026-09-25, SPEC I176h, V512). One pass over
 			-- the pool, then every ! by NAME off the root form (SPEC R176): the nine attributes by
@@ -8342,27 +8434,52 @@
 			-- era re-binds it (SPEC I172d); the typed rows are their own key. Written every time,
 			-- so the star goes the way it came.
 			--
-			-- Three callers (SPEC V512c): renderSpecialities, the end of every path that buys,
+			-- Four callers (SPEC V512c): renderSpecialities, the end of every path that buys,
 			-- refunds, names or gives one; renderAbilityLabels, when the era moves a trait to
-			-- another row; and applyLanguage, which rewrites the text of every button not named
-			-- dyn* from what it saw first (SPEC B179).
+			-- another row; applyLanguage, which rewrites the text of every button not named
+			-- dyn* from what it saw first (SPEC B179); and applyTheme, which repaints the colour
+			-- of every text from its original, the accent included (SPEC I177c).
 			function specBangPaint(from)
 				if sheet == nil or from == nil then return; end;
 
+				-- `named` is what the tip shows - a bought row WITH a name, specTipText's own test -
+				-- and it accents the ! (SPEC I177c, V515c). Star and accent are separate axes: one
+				-- named and one bare is a starred ! in accent.
 				local bare = {};
+				local named = {};
 
 				for i = 1, SPECIALITY_ROWS, 1 do
 					local key  = sheet["speciality_" .. i];
 					local name = sheet["specialityName_" .. i];
 
 					if key ~= nil and key ~= "" and sheet["speciality_" .. i .. "_1"] == true and (name == nil or name == "") then bare[key] = true; end;
+					if key ~= nil and key ~= "" and sheet["speciality_" .. i .. "_1"] == true and name ~= nil and name ~= "" then named[key] = true; end;
 				end;
 
-				for k = 1, #XP_ATTRS, 1 do
-					local btn = from["btnSp" .. XP_ATTRS[k][2]];
+				-- One ! of the row suffixed `sfx`, holding `key`: its star, its accent and its red,
+				-- which blinks while starred and goes the moment it is not (SPEC I178b, V518c).
+				local function bang(sfx, key)
+					local btn = from["btnSp" .. sfx];
+					local r   = from["blinkSp" .. sfx];
+					local starred = key ~= nil and bare[key] == true;
 
-					if btn ~= nil then btn.text = bare[XP_ATTRS[k][1]] and "!*" or "!"; end;
+					if btn == nil then return; end;
+
+					btn.text = starred and "!*" or "!";
+					bangAccent(btn, key ~= nil and named[key] == true);
+
+					if r ~= nil then
+						if starred then
+							BANG_BLINK.rects[r] = true;
+							r.visible = BANG_BLINK.on;
+						else
+							BANG_BLINK.rects[r] = nil;
+							r.visible = false;
+						end;
+					end;
 				end;
+
+				for k = 1, #XP_ATTRS, 1 do bang(XP_ATTRS[k][2], XP_ATTRS[k][1]); end;
 
 				for _, col in ipairs({ "talents", "skills", "knowledges" }) do
 					local num = 1;
@@ -8370,9 +8487,8 @@
 					while from["btnSp" .. col .. num] ~= nil do
 						local dot   = from["abil" .. col .. num .. "_1"];
 						local field = dot and string.match(dot.field or "", "^(.+)_1$");
-						local key   = field and specKey(field);
 
-						from["btnSp" .. col .. num].text = (key ~= nil and bare[key]) and "!*" or "!";
+						bang(col .. num, field and specKey(field));
 						num = num + 1;
 					end;
 				end;
@@ -8381,9 +8497,14 @@
 					local k = 1;
 
 					while from["btnSp" .. pre .. k] ~= nil do
-						from["btnSp" .. pre .. k].text = bare[pre .. k] and "!*" or "!";
+						bang(pre .. k, pre .. k);
 						k = k + 1;
 					end;
+				end;
+
+				if next(BANG_BLINK.rects) ~= nil and BANG_BLINK.ticking ~= true then
+					BANG_BLINK.ticking = true;
+					setInterval(bangBlink, BANG_BLINK_MS);
 				end;
 			end;
 
@@ -9415,27 +9536,27 @@
 				<comboBox name="cboGameMc" left="210" top="51" width="150" height="25" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}"/>
 
 				<label left="35" top="84" width="170" height="20" text="Era"/>
-				<comboBox name="cboSheetThemeMc" left="210" top="81" width="150" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}"/>
+				<comboBox name="cboSheetThemeMc" left="210" top="81" width="150" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" onChange="kbRefocus(self);"/>
 
-				<checkBox name="chkShowNuminaMc" left="35" top="111" width="375" height="25" field="stShowNumina" text="Show Numina"/>
-				<checkBox name="chkShowDisciplinesMc" left="35" top="141" width="375" height="25" field="stShowDisciplines" text="Show Ghoul"/>
-				<checkBox name="chkFreeBuyMc" left="35" top="171" width="375" height="25" field="stFreeBuy" text="Edit dots freely"/>
-				<checkBox name="chkEditClanDiscMc" left="35" top="201" width="375" height="25" field="stEditClanDisc" text="Edit Clan Disciplines"/>
-				<checkBox name="chkEditSpentXPMc" left="35" top="231" width="375" height="25" field="stEditSpentXP" text="Edit Spent XP"/>
-				<checkBox name="chkManualAffiliationMc" left="35" top="261" width="375" height="25" field="stManualAffiliation" text="Edit Affiliation"/>
-				<checkBox name="chkManualClanFamilyMc" left="35" top="291" width="375" height="25" field="stManualClanFamily" text="Edit Clan/Family"/>
-				<checkBox name="chkMultipleCharsMc" left="35" top="321" width="375" height="25" field="multipleCharacters" text="Multiple Characters"/>
+				<checkBox name="chkShowNuminaMc" left="35" top="111" width="375" height="25" field="stShowNumina" text="Show Numina" onClick="kbRefocus(self);"/>
+				<checkBox name="chkShowDisciplinesMc" left="35" top="141" width="375" height="25" field="stShowDisciplines" text="Show Ghoul" onClick="kbRefocus(self);"/>
+				<checkBox name="chkFreeBuyMc" left="35" top="171" width="375" height="25" field="stFreeBuy" text="Edit dots freely" onClick="kbRefocus(self);"/>
+				<checkBox name="chkEditClanDiscMc" left="35" top="201" width="375" height="25" field="stEditClanDisc" text="Edit Clan Disciplines" onClick="kbRefocus(self);"/>
+				<checkBox name="chkEditSpentXPMc" left="35" top="231" width="375" height="25" field="stEditSpentXP" text="Edit Spent XP" onClick="kbRefocus(self);"/>
+				<checkBox name="chkManualAffiliationMc" left="35" top="261" width="375" height="25" field="stManualAffiliation" text="Edit Affiliation" onClick="kbRefocus(self);"/>
+				<checkBox name="chkManualClanFamilyMc" left="35" top="291" width="375" height="25" field="stManualClanFamily" text="Edit Clan/Family" onClick="kbRefocus(self);"/>
+				<checkBox name="chkMultipleCharsMc" left="35" top="321" width="375" height="25" field="multipleCharacters" text="Multiple Characters" onClick="kbRefocus(self);"/>
 
 				<label left="35" top="359" width="170" height="20" text="Health Levels"/>
-				<comboBox name="cmbHealthLevelsMc" left="210" top="356" width="150" height="25" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}"/>
+				<comboBox name="cmbHealthLevelsMc" left="210" top="356" width="150" height="25" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}" onChange="kbRefocus(self);"/>
 				<dataLink field="healthLevels" defaultValue="7"/>
 
 				<label left="35" top="389" width="170" height="20" text="Specialty Cost"/>
-				<comboBox name="cmbSpecCostMc" left="210" top="386" width="150" height="25" field="stSpecCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5','Purchase Forbidden'}" values="{'0','1','2','3','4','5','Purchase Forbidden'}"/>
+				<comboBox name="cmbSpecCostMc" left="210" top="386" width="150" height="25" field="stSpecCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5','Purchase Forbidden'}" values="{'0','1','2','3','4','5','Purchase Forbidden'}" onChange="kbRefocus(self);"/>
 				<dataLink field="stSpecCost" defaultValue="3"/>
 
 				<label left="35" top="419" width="170" height="20" text="Background Cost"/>
-				<comboBox name="cmbBgCostMc" left="210" top="416" width="150" height="25" field="stBackgroundCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5'}" values="{'0','1','2','3','4','5'}"/>
+				<comboBox name="cmbBgCostMc" left="210" top="416" width="150" height="25" field="stBackgroundCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5'}" values="{'0','1','2','3','4','5'}" onChange="kbRefocus(self);"/>
 				<dataLink field="stBackgroundCost" defaultValue="0"/>
 
 				<!-- The column's order, mcOrder on the root (SPEC I175h(6), V509b): the one field of
@@ -9445,6 +9566,13 @@
 				     widgets only, so the two boxes still hold the same 13. -->
 				<dataLink field="mcOrder" onChange="mcRowOrderApply(self, false);"/>
 			</dataScopeBox>
+
+			<!-- Esc's receiver (SPEC I177b, V514): a key only reaches the control holding focus and only
+			     a text control takes it (SPEC V405), and this window had none. Read-only like
+			     edtPopDesc, no field=, outside the scope, in the empty band under the last row: 481
+			     to 485, so the box keeps its 15 of foot (SPEC V240, V280) and, read-only, its 0.75
+			     (SPEC V111, V244). -->
+			<textEditor name="edtMcSettingsKey" left="20" top="481" width="405" height="4" readOnly="true" transparent="true" opacity="0.75" onKeyDown="escClose(self, event, false);"/>
 		</layout>
 		<!--
 			SPEC I170g, T1075e - the ! note window. Same shape as popDesc and raised the same way:
@@ -9878,8 +10006,10 @@
 		the painters translate what they write and the traversal of WoD20.6 skips dyn* controls
 		(SPEC V31), so the link is the only thing that repaints them the moment the language is
 		switched. The tabs already had it on their links; the root form had not.
+		'game' and 'stShowDisciplines' since the 33rd batch: they decide whether the bearing line
+		shows at all (SPEC I178d, V516d).
 	-->
-	<dataLink fields="{'language', 'road', 'humanity_1', 'humanity_2', 'humanity_3', 'humanity_4', 'humanity_5', 'humanity_6', 'humanity_7', 'humanity_8', 'humanity_9', 'humanity_10'}">
+	<dataLink fields="{'language', 'road', 'humanity_1', 'humanity_2', 'humanity_3', 'humanity_4', 'humanity_5', 'humanity_6', 'humanity_7', 'humanity_8', 'humanity_9', 'humanity_10', 'game', 'stShowDisciplines'}">
 		<event name="onChange">
 			renderBearing(self);
 		</event>

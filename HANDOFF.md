@@ -1,6 +1,131 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-25, 208ª rodada — 31º lote CONSTRUÍDO: §T1110 §T1111 §T1112 §T1113 §T1115 `x` + §T1116 `x` (209ª), gate VERDE, `.rpk` INSTALADO 14:32:40)
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-25, fim da 212ª rodada — 33º lote CONSTRUÍDO: §T1122…§T1126 `x`)
+
+**TELA OK (user 2026-09-25, "todos os testes estão ok, pode fechar todos"):** as **102** linhas abertas do §T (72 `[USER]` + 30
+testes/sondas de tela sem a marca, §T114…§T1127) → `x`. **§T tem 0 linha aberta.** Backup de antes: scratchpad
+`b25e575f…\SPEC.before-close-tests.md`. **§V508d EMENDADA** (desvio abaixo, a pedido do user) + nota em §I178b. **§B182** (NOVA): fechar as 102 acendeu §V410 — o
+zero-guard contava linhas ABERTAS como prova de que o parser lê o §T; agora conta ∀ linha (`.` `~` `x`), §V410 EMENDADA, gate
+consertado & provado (M0 VERDE, M1 parser-quebrado VERMELHA, hash restaurado). **Spec em dia com o código; 0 pendência.** **0 §T de CÓDIGO em aberto.** **Nada commitado.** §Q99 RESPONDIDA
+(*"siga suas recomendações"*, registrada no §C).
+
+### 33º LOTE CONSTRUÍDO (212ª) — `/ck:build §T1122 §T1123 §T1124 §T1125 §T1126`
+Gate `-Build -Quiet` **ALL CHECKS PASSED** (74 s, 18:02). Bateria **23/23**: M0 VERDE, 18 mutações VERMELHAS no check certo, 4
+sondas VERDES, 0 erro de setup, hashes dos 4 `.lfm` = os de antes. **INSTALADO 18:03:18** (3156533 B = `output/`). Se a ficha
+estava aberta, FECHAR & REABRIR. Scratchpad `b25e575f…\scratchpad\`: `*.before33.lfm` (4),
+`gate.before33.ps1`, `SPEC.before33build.md`, `battery33.ps1` (+ `battery33.log`, `pre-battery33.hashes.txt`).
+
+**O QUE VIROU CÓDIGO**
+- `WoD20.6.lfm` — `bang` depois de `ornament` nas 4 paletas; `["#99D32F2F"]` nas 4 `fill`; `bangAccent` pinta `t.bang`.
+- `WoD20.1.lfm` — nos 4 templates de spec: `hit…` 1º filho & `blinkSp…` logo depois do `btnSp…`; fundo do `specTip` `0.80`; 1
+  comentário FORA dos templates explicando os 2. `WoD20.2.lfm` — `hit…` 1º filho de `OpenAbility`/`MeritPicked`; `noteTip` `0.80`.
+- `WoD20th.lfm` — `BANG_BLINK_MS`/`BANG_BLINK` & `bangBlink` antes de `specBangPaint`; os 3 laços de `specBangPaint` chamam 1
+  pintor local `bang(sfx, key)` (texto, destaque & piscar de 1 `!`) & o timer arma no fim; `renderBearing` escreve `nm.visible`
+  (Ghoul|Vampire, estrito); `'game', 'stShowDisciplines'` no `<dataLink>` da Road.
+- `verify-hunters-hunted.ps1` — §V517 (faz a conta HSL da complementar) §V518 §V519 NOVAS; §V516 REESCRITA (+ perna d);
+  §V501a/§V513f `0.80`; §V476b de volta a 2 donos (saiu o corte por pai); §V515a `t.bang`; §V287 admite `hit*`/`blinkSp*` só
+  como filho direto de `<template>`; §V508d (desvio abaixo).
+
+**DESVIO DO SPEC NO BUILD → EMENDA PENDENTE p/ `/ck:spec`:**
+1. **§V508d cobrava `setInterval` 1× na FICHA** (o animador das linhas) & o timer do piscar é o 2º → o gate passou a contar
+   ∀ `setInterval(` MENOS `setInterval(bangBlink, BANG_BLINK_MS)` (que §V518c pina em 1, dentro de `specBangPaint`). O spec do
+   33º ⊥ previu a colisão (§I178b cita o precedente `rowTween` & ⊥ a perna que o pina). Mutação M18 da bateria cobre.
+
+## ANTERIOR (2026-09-25, 211ª rodada — 33º lote ESPECIFICADO)
+
+`/ck:spec` + §Q99 respondida. Backup do spec de antes: scratchpad `b25e575f…\SPEC.before33.md`.
+
+### 33º LOTE ESPECIFICADO (211ª) — `!` na complementar, `!*` piscando, tip a 80%, Road só Ghoul|Vampire, tip na linha inteira (§I178)
+`/ck:spec` 1×: §C (33º lote), §Q99 ABERTA, §I178a…f, §R178a…g, §V517/§V518/§V519 NOVAS, §V516 REESCRITA, §B181, §T1122…§T1127,
+emendas em §I177a/b/c/d §V68 §V287 §V476 §V501 §V510 §V512 §V513 §V514 §V515. **As 5 emendas pendentes do build do 32º (abaixo)
+foram APLICADAS nesta escrita.** Gate `-Quiet` VERDE c/ o spec novo.
+- **Armadilhas p/ o build:** (1) `bang` é VALOR de paleta (≡ `ornament`), ⊥ chave de `font`; `bangAccent` lê `t.bang`; (2) o `button`
+  do SDK ⊥ tem cor de fundo — o vermelho é um `<rectangle blinkSp…>` POR CIMA do `!` c/ `hitTest="false"` (`?` na tela); a cor
+  `#99D32F2F` ! entrar nas 4 `fill` (§V53) & o retângulo ! autorar `strokeColor="#00000000"` (senão `applyTheme` desenha o
+  contorno da época) → §V287 ganha os prefixos `hit…`/`blinkSp…`; (3) `bangBlink` para SOZINHO (`r.handle == nil` & `return false`)
+  — 0 handler de fechar (§V475f); `BANG_BLINK` global (§V347, raiz a 3 do teto); (4) `hit…` é o 1º filho (ATRÁS) de cada template,
+  `align="contents"`, c/ o `<cat>`/`<campo>` do `!` do MESMO template (§V510b compara); 0 comentário em `<template>` (§B19);
+  (5) `0.50` volta a 2 donos — o corte por pai que o build do 32º pôs em §V476 SAI junto c/ o `0.80`; (6) Road: `'game'` &
+  `'stShowDisciplines'` no `<dataLink>` de `road`/`humanity_*`, predicado ESTRITO `== true` (§B103); (7) regex .NET
+  `(?m)…[^\r\n]*$` ⊥ casa em CRLF (32º); (8) sonda de §V ! ser RODADA (§B178).
+
+## ANTERIOR (2026-09-25, 210ª rodada — 32º lote CONSTRUÍDO: §T1117 §T1118 §T1119 §T1120 `x`)
+
+**Estado:** INSTALADO 16:09:57; §T1121 (tela) segue `.`. **0 §T de CÓDIGO em aberto** até o 33º lote. Os 5 desvios abaixo foram
+APLICADOS ao spec na 211ª.
+
+### 32º LOTE CONSTRUÍDO (210ª) — `/ck:build §T1117 §T1118 §T1119 §T1120`
+Gate `-Build -Quiet` **ALL CHECKS PASSED** (72 s, 16:08). Bateria **25/25**: M0 VERDE, 20 mutações VERMELHAS no check certo, 4 sondas
+VERDES, 0 erro de setup, hashes dos 4 `.lfm` = os de antes. **INSTALADO 16:09:57** (3136312 B = `output/`). Scratchpad
+`b25e575f…\scratchpad\`: `*.before32.lfm` (4), `gate.before32.ps1`, `SPEC.before32build.md`, `before32.hashes.txt`,
+`battery32.ps1` (+ `battery32.log`, `pre-battery32.hashes.txt`).
+
+**O QUE VIROU CÓDIGO**
+- `WoD20th.lfm` — `TIP_CHAR_W` `TIP_TEXT_MAX` `TIP_PAD` `TIP_BAR` (globais, logo depois de `NOTE`); `noteTipMove` mede pelo maior
+  parágrafo (`lens`/`longest`), `tip.width = TIP_PAD + tw + TIP_PAD + TIP_BAR`, `lbl.width = tw`; `edtMcSettingsKey` último filho
+  de `mcSettings` (fora do scope); `mcSettingsOpen` arma & foca; `kbRefocus` (roster + ramo por último) & `escClose` (roster +
+  laço do `popClose`) c/ `mcSettings`; `onClick`/`onChange` = `kbRefocus(self);` nos 8 checkBox & 4 comboBox vivos;
+  `noteBangPaint` NOVA (depois de `noteButton`) + chamada no fim de `renderBgButtons`/`renderMeritButtons` & em `savePopNote`;
+  `specBangPaint` monta `named` & chama `bangAccent` nos 3 laços; `renderBearing` sem `fam`/`open`/`cboRoad`/`visible`.
+- `WoD20.1.lfm`/`WoD20.2.lfm` — `fontSize="12"` nos 2 rótulos de tip; fundo `color="black" opacity="0.50"`; `fontColor="white"`
+  nos 6 `!`. `WoD20.6.lfm` — `bangAccent` NOVA logo depois de `paint`; `specBangPaint(from); noteBangPaint(from);` no fim de
+  `applyTheme`; comentário da chave `#80000000` sem o tip.
+- `verify-hunters-hunted.ps1` — §V513…§V516 NOVAS no fim; §V330(b) APOSENTADA c/ nota; §V512c 4 chamadas; §V510a c/ `opacity` &
+  `fontSize`; §V501a `black` + `0.50`; §V476b 4 donos; §V68 corta os 2 fundos pelo nome do pai (== 2).
+
+**DESVIOS DO SPEC NO BUILD → EMENDAS PENDENTES p/ `/ck:spec`** (o build só vira status de §T):
+1. **§I177b/§V514: o receptor é `top="481" height="4" opacity="0.75"`, ⊥ `482`/`16`.** O XML do spec acendeu 2 §V vigentes no 1º
+   gate: §V240/§V280 (482 + 16 = 498 deixa **2** px de pé na janela de 500; o piso é 15) & §V111/§V244 (texto só-leitura lê a
+   0.75). 481…485 fecha o pé em 15. A sonda de §V514 vira `top 481 → 480` (VERDE, RODADA — a do spec, 482 → 484, ⊥ vale mais).
+2. **§V515(b) do gate cobra TAMBÉM o corpo dos 2 pintores** (0 `.fontStyle =`/`.fontColor =` em `specBangPaint`/`noteBangPaint`):
+   a mutação do próprio spec (`btn.fontColor = "#C2A14D"` em `noteBangPaint`) ⊥ nomeia `btnSp`/`btnN` na linha ∴ a perna
+   escrita como está ⊥ a pegaria.
+3. **Só §V68 contava os fundos pretos como caixa** — corte `$tipFloorCut68` pelo nome do pai, contado == 2. §V40/§V287/§V375 ⊥
+   acenderam. (Na M6, `xradius` no fundo acende TAMBÉM §V280/§V298/§V314: vira caixa de seção — esperado.)
+4. **§V476b no gate**: o passe XML amarra cada `opacity="0.50"` de `<rectangle>` ao pai `noteTip`/`specTip` (conta == 2) & o passe
+   de linha deixa passar SÓ a linha XML exata do fundo — o retângulo ⊥ tem nome p/ o passe de linha ver.
+5. **MEDIDO (candidato a §R):** no Lua gerado (`WoD20th.lfm.lua` dentro do `.rpk`), ∀ `<script>` das abas roda no construtor
+   ANTES do 1º `addEventListener` (raiz :7727, `WoD20.6` :51860, 1º listener :54678) & sob o MESMO `_ENV` ∴ global de `WoD20.6`
+   chamada de handler do raiz ⊥ precisa de guarda `~= nil` — `bangAccent` é chamada sem. (As guardas velhas de
+   `translateSheetText`/`repaintXpDots` sobram, mas ⊥ foram tocadas.) Também: `longest` começa em 1 — nota só de linhas vazias
+   daria `tw = 0` & divisão por 0 (§I177a ⊥ disse).
+
+**Armadilha medida:** regex .NET `(?m)^…[^\r\n]*$` ⊥ casa em arquivo CRLF (o `$` multiline para antes de `\n`, ⊥ de `\r`) — o
+1º gate de §V515c deu VERMELHO falso por isso; tirar o `$` final.
+
+## ANTERIOR (2026-09-25, 209ª rodada — 32º lote ESPECIFICADO & §Q98 RESPONDIDA; NADA construído)
+
+**PRÓXIMO COMANDO:** `/ck:build §T1117 §T1118 §T1119 §T1120` — ⚠ ⊥ `--all`: os outros `.` do §T são TELA [USER] (§T1121 & os
+velhos) & o `--all` varre ~90 linhas p/ achar 0 construível. §T1117 (`WoD20th.lfm`), §T1118 (`WoD20.1` + `WoD20.2`), §T1119
+(`WoD20.6`) são arquivos DISJUNTOS; §T1120 (o gate) por ÚLTIMO, sobre a árvore pronta. Depois: 1 `rdk -i` & pedir ao user §T1121
+(+ §T1114/§T1108/§T1109, tela, ainda `.`). **Git:** o 31º lote & §T1116 estão no commit `522eaf06` (14:56, "no message" — ⊥ feito
+por esta sessão); o 32º (só `SPEC.md` & `HANDOFF.md`) está SEM commit. Ler ANTES: `.\spec-slice.ps1 I177` (a/b/c/d/e + as emendas no fim
+da linha a), `.\spec-slice.ps1 V513` … `V516`, `.\spec-slice.ps1 B180`.
+
+### 32º LOTE ESPECIFICADO (209ª) — tip na largura do texto, Esc no Settings, `!` em destaque, texto da Road (§I177)
+`/ck:spec` 2×: (1) §C (32º lote), §Q98 ABERTA, §I177a…e, §R177, §V513…§V516, §B180, notas em §V330 (b APOSENTADA) §V405 §V510
+§V512 §I170h §I99d, §T1117…§T1121; (2) §Q98 RESPONDIDA — (2)(3)(4) como recomendado; **(1) c/ acréscimo**: tetos 400/160 FICAM,
+o texto ⊥ invade a barra, & o FUNDO dos 2 tips vira a cor das caixas da época a 50% (`color="black" opacity="0.50"`) → §I177a,
+§V513 (e)(f), §V501a, §V476b (4 donos de `0.50`), §V510a EMENDADAS & §T1118/§T1119/§T1120/§T1121 REESCRITAS. Backups scratchpad
+`fa7d14ae…\SPEC.before32.md` & `SPEC.before32b.md`.
+- **Causas MEDIDAS (§R177):** (1) o tip mede `chars * 6` sobre o texto INTEIRO & um rótulo sem `fontSize` → estreito p/ letra larga;
+  (2) `mcSettings` tem 0 controle de texto & o Esc só chega em texto focado (§V405); (3) `applyTheme` repinta a cor de ∀ texto do
+  original gravado & `THEMES` é local de `WoD20.6` → o destaque passa por `bangAccent` lá, pela porta `paint`; (4) **§B180**: a §T876
+  deixou a trava da Road escrevendo em `found["cboRoad"]` (nil) & o texto c/ `visible = open` → sem clã, picker aberto & texto sumido.
+- **Armadilhas p/ o build:** (1) `bangAccent` ! morar em `WoD20.6` (os locais da paleta) & ser GLOBAL; `specBangPaint`/`noteBangPaint`
+  ! rodar DEPOIS da varredura de `applyTheme` (§B179 p/ cor); (2) os 6 `!` autoram `fontColor="white"` — sem cor autorada a guarda
+  de §B21 em `paint` recusa a escrita & o destaque ⊥ aparece, calado; (3) §V330(b) do gate cobra `fam ~= nil and fam ~= ""` em
+  `renderBearing` — sai JUNTO c/ o Lua (§T1120), senão vermelho; (4) `TIP_*` globais (§V347); (5) 0 comentário em `<template>`
+  (§B19); (6) o receptor de Esc é `textEditor` `readOnly` (≡ `edtPopDesc`, o precedente MEDIDO); (7) `onChange` nos combos de
+  `mcSettings` dispara por troca de nó — `kbRefocus` sem overlay visível ⊥ foca nada; (8) o fundo PRETO do tip (`color="black"`)
+  pode acender check que conta retângulo preto como caixa — isentar pelo nome do pai (≡ §V40 linha ~1211, §V375 ~5765, §V287
+  ~8083, que JÁ isentam `noteTip`/`specTip`); o `0.50` acende §V476 até o gate ganhar os 2 donos novos; (9) PowerShell: `$T`/`$t`
+  & `$P`/`$p` são a MESMA variável (2 scripts pararam por isso no 31º); `IndexOf` c/ `[StringComparison]::Ordinal`; (10) sonda de
+  §V ! ser RODADA contra o gate atual (§B178: 2 sondas mortas pegas no 31º — `top` de `btnXpApply` & o local `filled`); (11) o gate
+  leva ~66 s/rodada (~110 s c/ `-Build`) ∴ bateria de ~20 mutações ≈ 25 min em background (`battery31.ps1` do scratchpad é o molde:
+  aplica/reverte em `finally`, 1 par por linha, `*>&1`, hashes antes/depois).
+
+## ANTERIOR (2026-09-25, 208ª rodada — 31º lote CONSTRUÍDO: §T1110 §T1111 §T1112 §T1113 §T1115 `x` + §T1116 `x` (209ª), gate VERDE, `.rpk` INSTALADO 14:32:40)
 
 **PRÓXIMO COMANDO:** pedir ao user os testes de TELA **§T1114** (tooltip na linha inteira, `!*`, `?` apagado) + **§T1108/§T1109**
 (do 30º, ainda `.`) — FECHAR & REABRIR a ficha antes. **§T1116 FEITA na 209ª** (rodada própria, `/ck:build --all`): as 4 chaves `["#55FFFFFF"]` + as 3 linhas de comentário
