@@ -14,7 +14,6 @@
 				["Select Background"] = "Selecionar Antecedente",
 				["Select Nature"] = "Selecionar Natureza",
 				["Select Demeanor"] = "Selecionar Comportamento",
-				["Select Speciality"] = "Selecionar Especialidade",
 				["Select Discipline"] = "Selecionar Disciplina",
 				["Select Main Path"] = "Selecionar Trilha Principal",
 				["Select Secondary Path"] = "Selecionar Trilha Secundária",
@@ -579,7 +578,7 @@
 				["Werewolf"] = "Lobisomem",
 				["Weather Control"] = "Controle do Clima",
 				["Weight"] = "Peso",
-				["Willpower"] = "Força-de-Vontade",
+				["Willpower"] = "Força de Vontade",
 				["WILLPOWER"] = "FORÇA DE VONTADE",
 				["Wisdom"] = "Sabedoria",
 				["Ghoul"] = "Carniçal",
@@ -3240,8 +3239,7 @@
 						["#0A0A0A"]  = "#0A0B10",    -- charcoal, one step under the box
 						["DimGray"]   = "#2A2F3A",
 						["#00000000"] = "#00000000",  -- health mark box: the cut-out IS the effect (SPEC V48)
-						["#66000000"] = "#66000000",  -- popScrim: the 40% black behind picker, description and settings (SPEC I169f, V493a)
-						["#80000000"] = "#80000000",  -- noteTip: the 50% black behind a ! note tooltip, no outline (SPEC I170h, V501a)
+						["#80000000"] = "#80000000",  -- the 50% black: popScrim/popScrimB behind every window (SPEC I172a, V503a) and the ! note tooltip (SPEC I170h, V501a)
 						-- The one-second flash on a newly sorted ritual row (SPEC I47, V253). Alpha,
 						-- so the name reads through it, and the period's own accent rather than one
 						-- loose colour outside the theme (SPEC V53).
@@ -3315,7 +3313,6 @@
 						["#0A0A0A"]  = "#120C0A",    -- mahogany, one step under the box
 						["DimGray"]   = "#6B4F2A",
 						["#00000000"] = "#00000000",
-						["#66000000"] = "#66000000",
 						["#80000000"] = "#80000000",
 						["#55FFFFFF"] = "#55C2A14D",  -- aged gold
 					},
@@ -3347,7 +3344,6 @@
 						["#0A0A0A"]  = "#070605",    -- soot, one step under the box
 						["DimGray"]   = "#5A4A32",
 						["#00000000"] = "#00000000",
-						["#66000000"] = "#66000000",
 						["#80000000"] = "#80000000",
 						["#55FFFFFF"] = "#55C0C6CC",  -- polished silver
 					},
@@ -3392,7 +3388,6 @@
 						["#0A0A0A"]  = "#0E0B0F",    -- basalt, one step under the box
 						["DimGray"]   = "#6B2A4A",    -- Tyrian purple on the avatar frame
 						["#00000000"] = "#00000000",
-						["#66000000"] = "#66000000",
 						["#80000000"] = "#80000000",
 						["#55FFFFFF"] = "#55BFA05A",  -- laurel gold
 					},

@@ -13,8 +13,8 @@
 			                                 DERANGEMENTS 1410..1635                    y   0..345
 			  FLAWS 389..945   y 350..695    CONTACTS 950..  FAME 1180..  ARTIFACTS 1410..  y 350..520
 			                                 INFLUENCE 950.. BASE OF OP 1180..  OTHER 1410.. y 525..695
-FLAWSFLAWSFLAWS25th batch (SPEC I170g): BACKGROUNDS grew 20 for the ! column between picker and dots,
-FLAWSFLAWSFLAWSand MERITS/FLAWS grew 20 for theirs between name and BOOK - the widest name with its (N) cost
+			25th batch (SPEC I170g): BACKGROUNDS grew 20 for the ! column between picker and dots,
+			and MERITS/FLAWS grew 20 for theirs between name and BOOK - the widest name with its (N) cost
 			needs all 264 (SPEC V349c, B171). Every box right of each moved with it; the tab closes on 1635.
 
 			2026-09-02, T901 and T902 (SPEC I134j, I134k): MERITS and FLAWS are ONE height and FLAWS
@@ -385,21 +385,21 @@ FLAWSFLAWSFLAWSand MERITS/FLAWS grew 20 for theirs between name and BOOK - the w
 		</layout>
 
 
-FLAWSFLAWS<!--
-FLAWSFLAWSFLAWSSPEC I170h, T1077 - the ! note's tooltip. LAST child of the scrollBox, so it paints over
-FLAWSFLAWSFLAWSevery box and scrolls with them: its left/top are CONTENT coordinates, the same space the
-FLAWSFLAWSFLAWSbox layouts' own left/top live in, and noteTipMove reaches them in two parent hops from
-FLAWSFLAWSFLAWSthe picker (button -> row layout -> box). Black at 50% with NO outline and NO title - the
-FLAWSFLAWSFLAWStext alone (SPEC V501a); contents, not client, for the background, so it does not compete
-FLAWSFLAWSFLAWSwith the scrollBox for the client rect (SPEC V190). The inner scrollBox is what the wheel
-FLAWSFLAWSFLAWSscrolls once the pointer is inside - there is no wheel event to forward (SPEC R170e) -
-FLAWSFLAWSFLAWSand entering holds the tip open while leaving hides it (SPEC V501b/d).
-FLAWSFLAWS-->
-FLAWSFLAWS<layout name="noteTip" left="0" top="0" width="300" height="60" visible="false" onMouseEnter="noteTipHold(self);" onMouseLeave="noteTipHide(self);">
-FLAWSFLAWSFLAWS<rectangle align="contents" color="#80000000" strokeColor="#00000000" hitTest="false"/>
-FLAWSFLAWSFLAWS<scrollBox name="noteTipScroll" align="client">
-FLAWSFLAWSFLAWSFLAWS<label name="dynNoteTip" left="8" top="4" width="276" height="20" wordWrap="true" autoSize="true"/>
-FLAWSFLAWSFLAWS</scrollBox>
-FLAWSFLAWS</layout>
+		<!--
+			SPEC I170h, T1077 - the ! note's tooltip. LAST child of the scrollBox, so it paints over
+			every box and scrolls with them: its left/top are CONTENT coordinates, the same space the
+			box layouts' own left/top live in, and noteTipMove reaches them in two parent hops from
+			the picker (button -> row layout -> box). Black at 50% with NO outline and NO title - the
+			text alone (SPEC V501a); contents, not client, for the background, so it does not compete
+			with the scrollBox for the client rect (SPEC V190). The inner scrollBox is what the wheel
+			scrolls once the pointer is inside - there is no wheel event to forward (SPEC R170e) -
+			and entering holds the tip open while leaving hides it (SPEC V501b/d).
+		-->
+		<layout name="noteTip" left="0" top="0" width="300" height="60" visible="false" onMouseEnter="noteTipHold(self);" onMouseLeave="noteTipHide(self);">
+			<rectangle align="contents" color="#80000000" strokeColor="#00000000" hitTest="false"/>
+			<scrollBox name="noteTipScroll" align="client">
+				<label name="dynNoteTip" left="8" top="4" width="276" height="20" wordWrap="true" autoSize="true"/>
+			</scrollBox>
+		</layout>
 	</scrollBox>
 </form>

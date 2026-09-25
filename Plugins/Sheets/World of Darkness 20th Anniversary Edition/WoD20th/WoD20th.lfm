@@ -134,16 +134,9 @@
 					"Sensualist", "Soldier", "Survivor", "Thrill-Seeker", "Traditionalist", "Trendsetter", "Trickster",
 					"Tyrant", "Visionary",
 				},
-				["speciality"] = {
-					"", "Strength", "Dexterity", "Stamina", "Charisma", "Manipulation", "Appearance", "Perception",
-					"Inteligence", "Wits", "Academics", "Alertness", "Animal Ken", "Archery", "Arts", "Athletics",
-					"Awareness", "Brawl", "Commerce", "Computer", "Cosmology", "Crafts", "Drive", "Empathy", "Enigmas",
-					"Esoterica", "Etiquette", "Expression", "Finance", "Firearms", "Hearth Wisdom", "Intimidation",
-					"Investigation", "Larceny", "Law", "Leadership", "Legerdemain", "Martial Arts", "Medicine",
-					"Meditation", "Melee", "Occult", "Performance", "Philosophy", "Politics", "Religion", "Research",
-					"Ride", "Ritual", "Science", "Seneschal", "Stealth", "Streetwise", "Subterfuge", "Survival",
-					"Technology", "Theology",
-				},
+				-- No "speciality" list since the 27th batch: the trait picker of the SPECIALTIES box
+				-- left with its rows, and each trait's ! opens its own specialities (SPEC I172g, V148
+				-- retired). The fifty names live on in SPEC_TRAIT, which the ! window reads.
 				-- Fifty-nine items since T998, which re-measured every source on the ERA axis and
 				-- rewrote research/bg_essence.tsv. Until then the list held 47 and deduped by GAME
 				-- (SPEC I105b); the user replaced that axis with MEANING (SPEC I105e), so the
@@ -2600,6 +2593,11 @@
 
 			local XP_VIRTUES = { {"Conscience", "conscience"}, {"Self-Control", "selfControl"}, {"Courage", "courage"} };
 
+			-- SIX of the nine typed ability rows, and the three left out are left out ON PURPOSE:
+			-- customTalent_3, customTalent_4 and customKnowledge_3 (the 154th round's rows, SPEC
+			-- I123a) cost no experience and reach no log line - the user's decision of 2026-09-24,
+			-- "fica como está hoje" (SPEC Q93, B174). Not an oversight to fix: the gate names the
+			-- three and reddens on a typed row that is in neither list (SPEC V507e).
 			local XP_CUSTOM = { "customTalent_1", "customTalent_2", "customSkill_1", "customSkill_2", "customKnowledge_1", "customKnowledge_2" };
 
 			-- The 41 ability names, sorted so the ledger is in the same order every render.
@@ -2707,11 +2705,23 @@
 			BACKGROUND_FREE_ROWS = 0;
 
 
-			-- How many speciality rows the box on the Main tab draws (SPEC V147). Same reason
-			-- as BACKGROUND_ROWS: both the loop that lets experience buy them and the loop that
-			-- prices them for the log read this, so a tenth row added to the XML alone would be
-			-- a dot nothing charges for and nothing shows.
-			SPECIALITY_ROWS = 10;
+			-- How many speciality rows the sheet keeps (SPEC V147). Same reason as
+			-- BACKGROUND_ROWS: both the loop that lets experience buy them and the loop that
+			-- prices them for the log read this, so a row used and not declared would be a dot
+			-- nothing charges for and nothing shows.
+			--
+			-- No box draws them any more: the ! window of each trait shows that trait's rows and
+			-- the SPECIALTIES box lists the bought ones (SPEC I172e/g). The ONLY ceiling is
+			-- SPEC_PER_TRAIT per trait (user 2026-09-24, Q92.4), so the pool is sized to never
+			-- run out: 5 x 65 keys - the 9 attributes, the 47 abilities of ABILITY_FIELD (every
+			-- era's, since the 154th round) and the 9 typed ability rows of WoD20.1. The gate
+			-- re-derives the product from those three sources (SPEC V507a); this literal is the
+			-- one owner.
+			SPECIALITY_ROWS = 325;
+
+			-- The ! window's slots, and the most rows one trait may hold (SPEC I172e/f). The XML
+			-- draws exactly this many slots (SPEC V505a), and the free grant refuses a sixth.
+			SPEC_PER_TRAIT = 5;
 
 			-- How many of those the storyteller TYPES instead of picking (SPEC I50, V255, user
 			-- 2026-08-22). Same contract as the three on the Ghoul tab: they are the LAST rows, so
@@ -3383,11 +3393,13 @@
 				-- Specialities close the order (SPEC I10). The Trait column carries the TRAIT
 				-- the row belongs to, not the text the player typed into it: that column is
 				-- translated (SPEC V70) and free text is not - the storyteller reads what was
-				-- written on the sheet itself.
+				-- written on the sheet itself. A typed ability row is keyed by its FIELD and reads
+				-- as the name typed in it right now (SPEC I172f): specTraitName is the one place
+				-- that knows, and it hands every other key back untouched.
 				for i = 1, SPECIALITY_ROWS, 1 do
 					local field = "speciality_" .. i;
 
-					pushRise(rows, "Specialty", slotName(field),
+					pushRise(rows, "Specialty", specTraitName(slotName(field)),
 						traitLevel(base, field, 1, 1, 0),
 						liveLevel(field, 1, 1, 0), ctx, field, 1);
 				end;
@@ -3761,6 +3773,32 @@
 				return nil;
 			end;
 
+			-- The first speciality row nobody holds (SPEC I172e, V505c). ONE owner for "a free
+			-- row": the gift below and the ! window's first click both take their row here, so
+			-- the two can never disagree about which row is empty. Global for V347.
+			function specFreeRow()
+				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do
+					local v = sheet["speciality_" .. i];
+
+					if v == nil or v == "" then return i; end;
+				end;
+
+				return nil;
+			end;
+
+			-- The rows that hold this key, in row order (SPEC I172e). The ! window shows the
+			-- first SPEC_PER_TRAIT of them and the gift counts them against the same ceiling
+			-- (SPEC V507b), so "how many does this trait have" has one reader.
+			function specRowsOf(key)
+				local rows = {};
+
+				for i = 1, SPECIALITY_ROWS, 1 do
+					if sheet["speciality_" .. i] == key then rows[#rows + 1] = i; end;
+				end;
+
+				return rows;
+			end;
+
 			local function grantSpeciality(form, trait, reached)
 				local t = SPEC_TRAIT[trait];
 
@@ -3768,15 +3806,12 @@
 				if freeRowOf(t.name) ~= nil then return false; end;
 
 				local stamps = sheet.xpFree or "";
-				local slot   = nil;
 
-				-- The slot the gift takes is a PICKER row (SPEC V255d): a typed row is locked by nothing,
-				-- so a granted specialty written into one could be typed over and the stamp would stay.
-				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do
-					local v = sheet["speciality_" .. i];
+				-- The slot the gift takes is the first free row (SPEC V255d, V505c) - unless the
+				-- trait already holds its SPEC_PER_TRAIT, the one ceiling there is (SPEC I172f).
+				local slot = nil;
 
-					if slot == nil and (v == nil or v == "") then slot = i; end;
-				end;
+				if #specRowsOf(t.name) < SPEC_PER_TRAIT then slot = specFreeRow(); end;
 
 				-- The gift fails on its own (SPEC V153): the dot that earned it stays bought,
 				-- because the player asked for that one and got it.
@@ -4344,13 +4379,21 @@
 			-- mcSettings joins so popClose closes it the SAME way it closes popDesc - the
 			-- scrim and the X share one door (SPEC I169e(4), V493c). popNote, the ! window, joins
 			-- for the same reason (SPEC I170g, V500d).
+			-- popSpec, the ! of a trait, joins the same way (SPEC I172e, V505b), slots derived
+			-- from SPEC_PER_TRAIT so the roster cannot miss one.
 			local POP_BOX = { popScrim = true, popDesc = true, dynPopDescTitle = true, edtPopDesc = true, mcSettings = true,
-				popNote = true, dynPopNoteTitle = true, edtPopNote = true };
+				popNote = true, dynPopNoteTitle = true, edtPopNote = true, popSpec = true, dynPopSpecTitle = true };
+
+			for k = 1, SPEC_PER_TRAIT, 1 do
+				POP_BOX["edtPopSpec_" .. k] = true;
+				POP_BOX["dotPopSpec_" .. k] = true;
+			end;
 			-- TWO since T874, and they are the two that are not panes of a TAB: the ? box and the
 			-- search box. Wave 4 took the four Numina panes with it (SPEC V365d), and a name left
 			-- behind here would be a control fontStep walks for and never finds - the roster that
-			-- ages, which I114f refuses and V334 measures from both sides.
-			local DESC_PANES = { edtPopDesc = true, edtMfDesc = true, edtMfDescB = true };
+			-- ages, which I114f refuses and V334 measures from both sides. The ! note joined in the
+			-- 28th batch (SPEC I173d): the same - and + in its header, the same one size.
+			local DESC_PANES = { edtPopDesc = true, edtMfDesc = true, edtMfDescB = true, edtPopNote = true };
 
 			-- kind names the module family and key is the canonical EN name the row stores
 			-- (SPEC V24), which is also what the title shows. The require is lazy - the module is
@@ -4454,17 +4497,24 @@
 			-- de texto, nada acontece"):
 			--   (1) ABRIR dá foco - `mfOpen` já dava, `popOpen` ⊥ dava a ninguém;
 			--   (2) CLICAR dentro devolve o foco, senão o 1º clique numa linha mata o Esc.
+			--
+			-- 28º lote (SPEC I173c): as 2 janelas do `!` (`popNote`, `popSpec`) entram no MESMO
+			-- desenho ∴ são 4 overlays, & ∀ controle de texto deles chama escClose.
 			kbEscArmed = false;
 
-			-- Devolve o foco ao ÚNICO controle de teclado do overlay que estiver aberto. Chamada
-			-- do fim de todo handler de clique de dentro dos 2 (SPEC V405).
+			-- Devolve o foco ao controle de teclado do overlay que estiver aberto. Chamada do
+			-- fim de todo handler de clique de dentro deles (SPEC V405).
 			function kbRefocus(from)
 				if from == nil then return; end;
 
 				local f = {};
+				local names = { mfSearch = true, edtMfQuery = true, mfSearchB = true,
+					edtMfQueryB = true, popDesc = true, edtPopDesc = true, popNote = true,
+					edtPopNote = true, popSpec = true };
 
-				xpFind(tabRootOf(from), { mfSearch = true, edtMfQuery = true, mfSearchB = true,
-					edtMfQueryB = true, popDesc = true, edtPopDesc = true }, f);
+				for k = 1, SPEC_PER_TRAIT, 1 do names["edtPopSpec_" .. k] = true; end;
+
+				xpFind(tabRootOf(from), names, f);
 
 				-- ONE setFocus in the whole sheet, and this is it (SPEC V353b): the two overlays
 				-- pick WHICH control, never whether to ask. mfOpen and popOpen route through here
@@ -4476,7 +4526,18 @@
 				-- would type into a query box nobody can see.
 				if f["mfSearchB"] ~= nil and f["mfSearchB"].visible then ctrl = f["edtMfQueryB"];
 				elseif f["mfSearch"] ~= nil and f["mfSearch"].visible then ctrl = f["edtMfQuery"];
-				elseif f["popDesc"] ~= nil and f["popDesc"].visible then ctrl = f["edtPopDesc"]; end;
+				elseif f["popDesc"] ~= nil and f["popDesc"].visible then ctrl = f["edtPopDesc"];
+				elseif f["popNote"] ~= nil and f["popNote"].visible then ctrl = f["edtPopNote"];
+				elseif f["popSpec"] ~= nil and f["popSpec"].visible then
+					-- The first FREE slot, where the next speciality is typed - never a bought
+					-- one, where one stray key would rename it (SPEC I173c). The last when all
+					-- are held.
+					local k = 1;
+
+					while k < SPEC_PER_TRAIT and SPEC_WIN.rows[k] ~= nil do k = k + 1; end;
+
+					ctrl = f["edtPopSpec_" .. k];
+				end;
 
 				if ctrl ~= nil then ctrl:setFocus(); end;
 			end;
@@ -4512,10 +4573,15 @@
 				if isEscKey(ev) then
 					local f = {};
 
-					xpFind(tabRootOf(from), { mfSearch = true, popDesc = true }, f);
+					xpFind(tabRootOf(from), { mfSearch = true, popDesc = true, popNote = true, popSpec = true }, f);
 
 					if f["mfSearch"] ~= nil and f["mfSearch"].visible then mfClose(from); return; end;
-					if f["popDesc"] ~= nil and f["popDesc"].visible then popClose(from); end;
+
+					-- The ? and the two ! windows share popClose, the door their X and the scrim
+					-- already use (SPEC V333e, I173c).
+					for _, nm in ipairs({"popDesc", "popNote", "popSpec"}) do
+						if f[nm] ~= nil and f[nm].visible then popClose(from); return; end;
+					end;
 
 					return;
 				end;
@@ -4629,9 +4695,12 @@
 				if found["popDesc"] ~= nil then found["popDesc"].visible = false; end;
 				if found["mcSettings"] ~= nil then found["mcSettings"].visible = false; end;
 				if found["popNote"] ~= nil then found["popNote"].visible = false; end;
+				if found["popSpec"] ~= nil then found["popSpec"].visible = false; end;
 
 				popRow = nil;
 				NOTE.key = nil;
+				SPEC_WIN.key = nil;
+				SPEC_WIN.rows = {};
 			end;
 
 			-- ---- Multiple Characters (SPEC I169, T1071) ----------------------------------------
@@ -4696,7 +4765,6 @@
 				MC_NAMES["mcBlood_" .. mcI] = true;
 				MC_NAMES["mcQuint_" .. mcI] = true;
 				MC_NAMES["mcAv_" .. mcI] = true;
-				MC_NAMES["dynMcWpTag_" .. mcI] = true;
 
 				for mcJ = 1, 10, 1 do
 					MC_NAMES["mcHp_" .. mcI .. "_" .. mcJ] = true;
@@ -4837,11 +4905,6 @@
 								found["mcOn_" .. k].strokeSize = active and 2 or 1;
 								found["mcOn_" .. k].opacity = active and 1 or 0.70;
 							end;
-
-							-- pt "Vontade" beside en "Willpower": two translations of one English
-							-- word, so this label is dyn* and its text lives here, next to the title's
-							-- (SPEC I171e, V502e) - a language switch reaches mcRender the same way.
-							if found["dynMcWpTag_" .. k] ~= nil then found["dynMcWpTag_" .. k].text = (lang == "pt") and "Vontade" or "Willpower"; end;
 
 							-- mcActive's ONE writer (SPEC V490e): only when the shown index
 							-- differs, so an unrelated render does not restamp the NDB.
@@ -5190,6 +5253,10 @@
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
 
 				found["popNote"].visible = true;
+
+				-- AFTER the box is up: focus on a hidden control does not take, and without
+				-- focus Esc never arrives (SPEC V353a, I173c).
+				kbRefocus(from);
 			end;
 
 			-- The ONE writer of a note (SPEC V500c). Anyone who edits the sheet edits its notes
@@ -5198,6 +5265,160 @@
 				if descQuiet or NOTE.key == nil or sheet == nil or form == nil then return; end;
 
 				setField(NOTE.key, form.edtPopNote.text);
+			end;
+
+			-- ---- The ! of a trait: its specialities (SPEC I172e, T1085) ------------------------
+			--
+			-- A VIEW of the speciality rows the sheet already keeps - no field of its own, no
+			-- migration (SPEC I172e): slot k is the k-th row holding this trait's key, and the
+			-- slots past the last one are free. A row the old picker wrote, a gift and a row this
+			-- window wrote all read the same. Buying goes through xpClick and nowhere else, so the
+			-- price, the storyteller's door, the balance, the refusals and the log are today's
+			-- (SPEC V135, V129, V154, V161). Globals, for the reason every root helper is (V347).
+			SPEC_WIN = { key = nil, rows = {} };
+
+			-- What a trait's rows hold (SPEC I172e). A book trait keeps the canonical English name
+			-- it always kept (SPEC_TRAIT); a typed ability row is keyed by its FIELD, so renaming
+			-- the ability keeps its specialities where they are (user 2026-09-24, Q92.3).
+			function specKey(field)
+				local t = SPEC_TRAIT[field];
+
+				if t ~= nil then return t.name; end;
+				if string.match(field, "^custom%a+_%d+$") ~= nil then return field; end;
+
+				return nil;
+			end;
+
+			-- How a key reads (SPEC I172e/f): a typed row reads as the name typed in it NOW, or its
+			-- own key while that is empty; every other key is already its own name. The title, the
+			-- SPECIALTIES list and the log all ask here, so the three cannot drift.
+			function specTraitName(key)
+				if key ~= nil and string.match(key, "^custom%a+_%d+$") ~= nil then
+					local typed = sheet[key];
+
+					if typed ~= nil and typed ~= "" then return typed; end;
+				end;
+
+				return key;
+			end;
+
+			-- The ! beside the dots (SPEC I172c/d). Every ! hands over the field of its row's FIRST
+			-- DOT and this drops the "_1": an ability row is re-bound by the era, so its live dot is
+			-- the only thing that knows which trait it is (SPEC R171c), and dropping an OPTIONAL
+			-- "_1" instead would turn customTalent_1 into customTalent.
+			function specOpen(from, dotField)
+				if from == nil or sheet == nil or dotField == nil then return; end;
+
+				local field = string.match(dotField, "^(.+)_1$");
+				local key = nil;
+
+				if field ~= nil then key = specKey(field); end;
+				if key == nil then return; end;
+
+				-- A typed row with no name has nothing to title the window with - the same empty
+				-- guard noteOpen keeps.
+				if SPEC_TRAIT[field] == nil and (sheet[field] == nil or sheet[field] == "") then return; end;
+
+				local found = xpFind(tabRootOf(from), POP_BOX, {});
+
+				if found["popSpec"] == nil then return; end;
+
+				local rows = specRowsOf(key);
+
+				SPEC_WIN.key = key;
+				SPEC_WIN.rows = {};
+
+				for k = 1, math.min(#rows, SPEC_PER_TRAIT), 1 do SPEC_WIN.rows[k] = rows[k]; end;
+
+				specPaint(found, true);
+
+				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+
+				found["popSpec"].visible = true;
+
+				kbRefocus(from);
+			end;
+
+			-- Title and dots always; the five texts only when the window OPENS - repainting them
+			-- after a click would wipe what the player typed into a slot not bought yet. The texts
+			-- go in under descQuiet, because an edit's onChange cannot tell this write from the
+			-- player's typing (SPEC R170i, the noteOpen pattern).
+			function specPaint(found, withText)
+				local key = SPEC_WIN.key;
+
+				if key == nil or sheet == nil then return; end;
+
+				local n = specTraitName(key);
+
+				if found["dynPopSpecTitle"] ~= nil then
+					if sheet.language == "en" then
+						found["dynPopSpecTitle"].text = n .. " Specialties";
+					else
+						found["dynPopSpecTitle"].text = "Especializações de " .. (translateSheetText(n, "pt") or n);
+					end;
+				end;
+
+				descQuiet = true;
+
+				for k = 1, SPEC_PER_TRAIT, 1 do
+					local i = SPEC_WIN.rows[k];
+					local edt = found["edtPopSpec_" .. k];
+					local dot = found["dotPopSpec_" .. k];
+
+					if withText and edt ~= nil then edt.text = (i ~= nil and sheet["specialityName_" .. i]) or ""; end;
+					if dot ~= nil then dot.checked = (i ~= nil and sheet["speciality_" .. i .. "_1"] == true); end;
+				end;
+
+				descQuiet = false;
+			end;
+
+			-- Typing into a slot that HOLDS a row renames that row; typing into a free slot writes
+			-- nothing - the text waits in the box for the dot (SPEC I172e).
+			function specType(form, k)
+				if descQuiet or sheet == nil or form == nil or SPEC_WIN.key == nil then return; end;
+
+				local i = SPEC_WIN.rows[k];
+				local edt = form["edtPopSpec_" .. k];
+
+				if i == nil or edt == nil then return; end;
+
+				setField("specialityName_" .. i, edt.text);
+				renderSpecialities(form);
+			end;
+
+			-- The dot. A free slot first takes a row - trait key and the typed text, which is what
+			-- choosing the trait in the old picker did - and then EVERY dot goes through xpClick:
+			-- there is no price, refusal or log line here of its own (SPEC I172e, V505d). A refused
+			-- purchase leaves the row held, dot dark and text kept: the state a row picked and not
+			-- bought has always had.
+			function specDot(form, k)
+				if sheet == nil or form == nil or SPEC_WIN.key == nil then return; end;
+
+				local i = SPEC_WIN.rows[k];
+
+				if i == nil then
+					i = specFreeRow();
+
+					if i == nil then
+						xpWarn("No free specialty slot");
+						return;
+					end;
+
+					local edt = form["edtPopSpec_" .. k];
+
+					setField("speciality_" .. i, SPEC_WIN.key);
+					setField("specialityName_" .. i, (edt ~= nil and edt.text) or "");
+
+					SPEC_WIN.rows[k] = i;
+				end;
+
+				xpClick("speciality_" .. i .. "_1", form);
+
+				specPaint(xpFind(tabRootOf(form), POP_BOX, {}), false);
+				renderSpecialities(form);
+
+				-- A click on a dot can take the focus off the slots, and Esc with it (SPEC I173c).
+				kbRefocus(form);
 			end;
 
 			-- The tooltip (SPEC I170h, V501). Runs per pixel while the pointer is over a picker:
@@ -5365,11 +5586,12 @@
 				-- name added above reaches BOTH frames without anybody having to remember the
 				-- second one - which is the memory V439c exists because nobody has.
 				--
-				-- popScrim is the one that stays single: it is already up when the twin opens,
-				-- and a second scrim would be a second thing to take down (SPEC V135).
+				-- popScrim is twinned like the rest since the 27th batch (SPEC I172b, V503c): every
+				-- window darkens what is behind it, and behind the twin is the first box. The write
+				-- mfOpen already makes lands on popScrimB at depth 2 with no line of its own.
 				local tw = {};
 
-				for nm in pairs(n) do if nm ~= "popScrim" then tw[nm .. "B"] = true; end; end;
+				for nm in pairs(n) do tw[nm .. "B"] = true; end;
 				for nm in pairs(tw) do n[nm] = true; end;
 
 				MF.names = n;
@@ -5386,7 +5608,8 @@
 			-- CANONICAL name, so `found["edtMfQuery"]` hands back edtMfQueryB and not one line of
 			-- the fifteen functions below had to learn that a second frame exists.
 			--
-			-- popScrim rides through untouched: it is the one control the twin does not have.
+			-- popScrim is re-keyed like the rest: at depth 2 `found["popScrim"]` is popScrimB, the
+			-- scrim between the two boxes (SPEC I172b).
 			function mfFound(from)
 				local raw = {};
 
@@ -5399,8 +5622,6 @@
 				for nm, c in pairs(raw) do
 					if string.sub(nm, -1) == "B" then out[string.sub(nm, 1, -2)] = c; end;
 				end;
-
-				out["popScrim"] = raw["popScrim"];
 
 				return out;
 			end;
@@ -5469,12 +5690,14 @@
 				if from == nil then return; end;
 
 				-- Depth 2 hands the sheet back to the box UNDERNEATH, which never went away
-				-- (SPEC I153c3, V439f). The scrim stays up because that box is still open, and
-				-- nothing is written: what was marked up there dies with the frame, exactly as a
-				-- cancelled pick does everywhere else (SPEC V333e).
+				-- (SPEC I153c3, V439f). The first scrim stays up because that box is still open;
+				-- the twin's own scrim goes with the twin - at depth 2 `popScrim` IS popScrimB
+				-- (SPEC I172b, V503c). Nothing is written: what was marked up there dies with the
+				-- frame, exactly as a cancelled pick does everywhere else (SPEC V333e).
 				if MF.depth == 2 then
 					local top = mfFound(from);
 
+					if top["popScrim"] ~= nil then top["popScrim"].visible = false; end;
 					if top["mfSearch"] ~= nil then top["mfSearch"].visible = false; end;
 
 					mfPop();
@@ -5500,11 +5723,12 @@
 				-- Left alone it would stay on screen over a sheet with no picker under it and no
 				-- handler to bring it back - B103 one widget down. Hidden even when it was never
 				-- opened: writing false onto a false costs nothing, and a test would be a second
-				-- thing to keep true.
+				-- thing to keep true. Its scrim is a sibling too, and goes the same way (SPEC I172b).
 				local tw = {};
 
-				xpFind(tabRootOf(from), { mfSearchB = true }, tw);
+				xpFind(tabRootOf(from), { mfSearchB = true, popScrimB = true }, tw);
 
+				if tw["popScrimB"] ~= nil then tw["popScrimB"].visible = false; end;
 				if tw["mfSearchB"] ~= nil then tw["mfSearchB"].visible = false; end;
 			end;
 
@@ -7431,35 +7655,43 @@
 				ctrl.left = left + w + 5 + qw + 5;
 			end;
 
+			-- The SPECIALTIES box of the Main tab: a read-only LIST of every speciality the
+			-- character has bought, one line each, "<trait>: <name>", sorted (SPEC I172g, V507d).
+			-- Nothing in the box edits any more - the ! of each trait does, and the old picker left
+			-- with its ten rows (user 2026-09-24, Q92.1). A dark dot is not listed: a row held and
+			-- not bought (SPEC I172e) is not something the character HAS.
+			--
+			-- Same name and same callers as the painter it replaced - onShow and onNodeReady of
+			-- WoD20.1, the xpFree link, the language link, xpClick after a gift - plus the two
+			-- clicks of the ! window (SPEC V164 amended). The lock of a gift did not go with the
+			-- rows: it is the refusal inside xpClick, which the ! window's dot goes through (V161c).
 			function renderSpecialities(from)
 				if sheet == nil or from == nil then return; end;
 
-				-- Only the PICKER rows: the last three are typed, carry no button and are locked by
-				-- nothing (SPEC I50, V255d).
-				local names = {};
+				local found = xpFind(tabRootOf(from), { dynSpecList = true }, {});
 
-				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do names["dynspeciality_" .. i] = true; end;
+				if found["dynSpecList"] == nil then return; end;
 
-				local found = {};
+				local pt = sheet.language ~= "en";
+				local lines = {};
 
-				xpFind(tabRootOf(from), names, found);
+				for i = 1, SPECIALITY_ROWS, 1 do
+					local key = sheet["speciality_" .. i];
 
-				local lang = (sheet.language == "en") and "en" or "pt";
+					if key ~= nil and key ~= "" and sheet["speciality_" .. i .. "_1"] == true then
+						local n = specTraitName(key);
+						local txt = sheet["specialityName_" .. i] or "";
 
-				-- The row used to be a comboBox and this function's whole job was the LOCK. The box of
-				-- I113e wave 2 took the combo away, so the same walk now does what renderBgButtons does
-				-- for the sixteen backgrounds: paint the button from the field, because a button's text
-				-- is not a field and nothing restores it on its own (SPEC I107a2, T842).
-				--
-				-- The LOCK moved and did not disappear (SPEC V161, amended in the 146th). It used to be
-				-- `enabled = false` on the combo, and the reason written for that was "a comboBox has no
-				-- click hook, so this is the only lock available here" - true of the WIDGET, never of the
-				-- gift. A button HAS onClick, so the refusal now sits in the opener, before the box can
-				-- open, and the button stays fully legible: reading WHICH speciality the trait handed
-				-- over is the whole point of showing the row (SPEC I41, V241).
-				for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do
-					mfLabel(found["dynspeciality_" .. i], sheet["speciality_" .. i], "Select Speciality", lang);
+						if pt then n = translateSheetText(n, "pt") or n; end;
+						if txt ~= "" then n = n .. ": " .. txt; else n = n .. ":"; end;
+
+						lines[#lines + 1] = n;
+					end;
 				end;
+
+				table.sort(lines);
+
+				found["dynSpecList"].text = table.concat(lines, "\n");
 			end;
 
 			-- Every dot that costs experience calls this when it is CLICKED (SPEC I13/V99).
@@ -8069,9 +8301,10 @@
 		photo goes, drawn only while there is none - mcBarsRow is its one writer - and it is
 		declared before the image on the same rect, so a photo paints over it. One label
 		column, each label centred on its bar, and all three bars start after the longest
-		label so they share one left and one width. The willpower label is dyn*: pt "Vontade"
-		beside en "Willpower" is a second translation of one English word, which the PT map
-		cannot hold, so mcRender writes it.
+		label so they share one left and one width. 28th batch (SPEC I173a/b, V502d/e, B175):
+		all three bar labels are static and the PT map translates them (Willpower reads
+		"Forca de Vontade", no hyphen - Q94), and Name is wider than the ruler because a short
+		word of wide letters measured on the ruler was cut on screen.
 
 		NOTHING is commented inside a <template> - rdk exits 1 with an empty message and
 		deletes the .rpk (SPEC B19), the same door Willpower and HealthRow (WoD20.1) avoid.
@@ -8081,8 +8314,8 @@
 			<rectangle name="mcBg_$(num)" align="client" color="#00000000" strokeColor="#00000000" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self);"/>
 			<rectangle name="mcOn_$(num)" left="0" top="0" width="346" height="108" color="#00000000" strokeColor="white" strokeSize="1" xradius="8" yradius="8" hitTest="false"/>
 
-			<label left="8" top="8" width="26" height="22" text="Name" vertTextAlign="center" hitTest="false"/>
-			<edit left="40" top="8" width="270" height="22" field="name" onEnter="mcSelect($(num), self);"/>
+			<label left="8" top="8" width="40" height="22" text="Name" vertTextAlign="center" hitTest="false"/>
+			<edit left="54" top="8" width="256" height="22" field="name" onEnter="mcSelect($(num), self);"/>
 			<button name="btnMcRemove_$(num)" left="316" top="8" width="22" height="22" text="X" onClick="mcRemove($(num), self);"/>
 
 			<rectangle name="mcAv_$(num)" left="8" top="38" width="62" height="62" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="false" visible="false"/>
@@ -8119,13 +8352,13 @@
 				<label align="client" field="health_10" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
 
-			<label name="dynMcWpTag_$(num)" left="82" top="59" width="85" height="14" fontSize="12" vertTextAlign="center" hitTest="false"/>
-			<label left="82" top="73" width="85" height="14" text="Blood" fontSize="12" vertTextAlign="center" hitTest="false"/>
-			<label left="82" top="87" width="85" height="14" text="Quintessence" fontSize="12" vertTextAlign="center" hitTest="false"/>
+			<label left="82" top="59" width="110" height="14" text="Willpower" fontSize="12" vertTextAlign="center" hitTest="false"/>
+			<label left="82" top="73" width="110" height="14" text="Blood" fontSize="12" vertTextAlign="center" hitTest="false"/>
+			<label left="82" top="87" width="110" height="14" text="Quintessence" fontSize="12" vertTextAlign="center" hitTest="false"/>
 
-			<progressBar name="mcWp_$(num)" left="173" top="60" width="165" height="12" min="0" max="10" position="0" color="#87CEFA" hitTest="true" cursor="handPoint" onMouseDown="mcSelect($(num), self); mcBarClick($(num), 'wp', self, event);"/>
-			<progressBar name="mcBlood_$(num)" left="173" top="74" width="165" height="12" min="0" max="10" position="0" color="#DC143C" hitTest="true" cursor="handPoint" onMouseDown="mcSelect($(num), self); mcBarClick($(num), 'blood', self, event);"/>
-			<progressBar name="mcQuint_$(num)" left="173" top="88" width="165" height="12" min="0" max="10" position="0" color="#FFD700" hitTest="true" cursor="handPoint" onMouseDown="mcSelect($(num), self); mcBarClick($(num), 'quint', self, event);"/>
+			<progressBar name="mcWp_$(num)" left="198" top="60" width="140" height="12" min="0" max="10" position="0" color="#87CEFA" hitTest="true" cursor="handPoint" onMouseDown="mcSelect($(num), self); mcBarClick($(num), 'wp', self, event);"/>
+			<progressBar name="mcBlood_$(num)" left="198" top="74" width="140" height="12" min="0" max="10" position="0" color="#DC143C" hitTest="true" cursor="handPoint" onMouseDown="mcSelect($(num), self); mcBarClick($(num), 'blood', self, event);"/>
+			<progressBar name="mcQuint_$(num)" left="198" top="88" width="140" height="12" min="0" max="10" position="0" color="#FFD700" hitTest="true" cursor="handPoint" onMouseDown="mcSelect($(num), self); mcBarClick($(num), 'quint', self, event);"/>
 		</dataScopeBox>
 	</template>
 
@@ -8383,8 +8616,9 @@
 		     batch) plus the fixed column, so the fade covers the column too and a click on a row
 		     while the picker is open cannot swap the character under the picker's own field
 		     (SPEC I169f, I170b, V496d). No Lua writes this width any more - the column does not
-		     resize. #66000000 is the 40% black fade the overlays share. -->
-		<rectangle name="popScrim" left="0" top="0" width="2005" height="936" color="#66000000" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
+		     resize. #80000000 is the 50% black every window darkens the sheet with (SPEC I172a,
+		     V503a); popScrimB, its twin under the second picker, carries the same four numbers. -->
+		<rectangle name="popScrim" left="0" top="0" width="2005" height="936" color="#80000000" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
 
 		<layout name="popDesc" left="440" top="150" width="500" height="490" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
@@ -8472,12 +8706,42 @@
 			popOpen/savePopDesc already run, because a textEditor's onChange cannot tell a Lua write
 			from the player's typing (SPEC R170i). No readOnly: whoever edits the sheet edits its
 			notes (SPEC Q90.10). dynPopNoteTitle is dyn* because Lua writes the translated name.
+			28th batch (SPEC I173c/d): the header carries the - and + of popDesc, so edtPopNote is
+			one of DESC_PANES and obeys the one descFontSize; the box grew 40 wide so the title
+			keeps its 280. Esc closes it from the text box, the only control here that holds focus.
 		-->
-		<layout name="popNote" left="510" top="200" width="360" height="260" visible="false">
+		<layout name="popNote" left="490" top="200" width="400" height="260" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label name="dynPopNoteTitle" left="40" top="15" width="280" height="20" horzTextAlign="center"/>
-			<button name="btnPopNoteClose" left="320" top="15" width="20" height="20" text="X" onClick="popClose(self);"/>
-			<textEditor name="edtPopNote" left="20" top="40" width="320" height="205" wordWrap="true" transparent="true" fontSize="12" onChange="savePopNote(self);"/>
+			<label name="dynPopNoteTitle" left="20" top="15" width="280" height="20" horzTextAlign="center"/>
+			<button name="btnFontDownPopNote" left="310" top="15" width="20" height="20" text="-" onClick="fontStep(self, -2);"/>
+			<button name="btnFontUpPopNote" left="335" top="15" width="20" height="20" text="+" onClick="fontStep(self, 2);"/>
+			<button name="btnPopNoteClose" left="360" top="15" width="20" height="20" text="X" onClick="popClose(self);"/>
+			<textEditor name="edtPopNote" left="20" top="40" width="360" height="205" wordWrap="true" transparent="true" fontSize="12" onChange="savePopNote(self);" onKeyDown="escClose(self, event, false);"/>
+		</layout>
+
+		<!--
+			SPEC I172e, T1085 - the ! of a trait: its specialities. Raised the same way as popNote:
+			scrim + box, closed by popClose from the X, the scrim or Esc (SPEC V505b, I173c). The
+			five slots carry NO field=: which row each one shows is decided at open time from the
+			trait's key, because the window is a view of the speciality rows the sheet already
+			keeps (SPEC I172e). An edit writes only into a slot that holds a row; a dot goes through
+			xpClick and nothing else. dynPopSpecTitle is dyn* because Lua writes the translated
+			title. SPEC_PER_TRAIT slots and not one more (SPEC V505a).
+		-->
+		<layout name="popSpec" left="510" top="200" width="360" height="210" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label name="dynPopSpecTitle" left="40" top="15" width="280" height="20" horzTextAlign="center"/>
+			<button name="btnPopSpecClose" left="320" top="15" width="20" height="20" text="X" onClick="popClose(self);"/>
+			<edit name="edtPopSpec_1" left="20" top="45" width="285" height="25" fontSize="12" onChange="specType(self, 1);" onKeyDown="escClose(self, event, false);"/>
+			<imageCheckBox name="dotPopSpec_1" left="315" top="45" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="specDot(self, 1);"/>
+			<edit name="edtPopSpec_2" left="20" top="75" width="285" height="25" fontSize="12" onChange="specType(self, 2);" onKeyDown="escClose(self, event, false);"/>
+			<imageCheckBox name="dotPopSpec_2" left="315" top="75" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="specDot(self, 2);"/>
+			<edit name="edtPopSpec_3" left="20" top="105" width="285" height="25" fontSize="12" onChange="specType(self, 3);" onKeyDown="escClose(self, event, false);"/>
+			<imageCheckBox name="dotPopSpec_3" left="315" top="105" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="specDot(self, 3);"/>
+			<edit name="edtPopSpec_4" left="20" top="135" width="285" height="25" fontSize="12" onChange="specType(self, 4);" onKeyDown="escClose(self, event, false);"/>
+			<imageCheckBox name="dotPopSpec_4" left="315" top="135" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="specDot(self, 4);"/>
+			<edit name="edtPopSpec_5" left="20" top="165" width="285" height="25" fontSize="12" onChange="specType(self, 5);" onKeyDown="escClose(self, event, false);"/>
+			<imageCheckBox name="dotPopSpec_5" left="315" top="165" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="specDot(self, 5);"/>
 		</layout>
 
 		<!--
@@ -8720,8 +8984,12 @@
 		     The price of being a sibling is a second frame to hide, and it is paid in ONE place:
 		     mfClose at depth 1 hides both (SPEC V439f).
 		
-		     popScrim is NOT twinned: it is already up when this opens, and a second scrim would
-		     be a second thing to take down (SPEC V135). -->
+		     popScrimB is the scrim twinned with it (SPEC I172b, V503b, 27th batch): every window
+		     darkens what is behind it, and behind this one is the first box. Declared BETWEEN the
+		     two boxes, so it paints over mfSearch and under this frame, with popScrim's own
+		     left/top/width/height/color. mfOpen raises it through the re-keyed `popScrim` at depth
+		     2; a click on it is a click outside THIS box, so it closes this box only (mfClose). -->
+		<rectangle name="popScrimB" left="0" top="0" width="2005" height="936" color="#80000000" strokeColor="#00000000" visible="false" onClick="mfClose(self);"/>
 		<layout name="mfSearchB" left="340" top="120" width="1000" height="635" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label name="dynMfTitleB" left="60" top="15" width="400" height="20" horzTextAlign="center"/>
@@ -8909,9 +9177,10 @@
 	<dataLink fields="{'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'willpower_c1', 'willpower_c2', 'willpower_c3', 'willpower_c4', 'willpower_c5', 'willpower_c6', 'willpower_c7', 'willpower_c8', 'willpower_c9', 'willpower_c10', 'bloodPool_1', 'bloodPool_2', 'bloodPool_3', 'bloodPool_4', 'bloodPool_5', 'bloodPool_6', 'bloodPool_7', 'bloodPool_8', 'bloodPool_9', 'bloodPool_10', 'bloodPool_11', 'bloodPool_12', 'bloodPool_13', 'bloodPool_14', 'bloodPool_15', 'bloodPool_16', 'bloodPool_17', 'bloodPool_18', 'bloodPool_19', 'bloodPool_20', 'quint_1', 'quint_2', 'quint_3', 'quint_4', 'quint_5', 'quint_6', 'quint_7', 'quint_8', 'quint_9', 'quint_10', 'clanFamily', 'avatar'}" onChange="mcBarsSoon(self);"/>
 
 		<!--
-			Wave 2 of I113e (SPEC T842): the two header buttons and the seven speciality buttons.
-			Speciality rows 8-10 are TYPED and carry no button, so they are not in this list -
-			"picker = total - typed" (SPEC I50, V255).
+			Wave 2 of I113e (SPEC T842): the two header buttons. The SPECIALTIES list below it
+			follows the LANGUAGE only: its rows change through the ! window and xpClick, which
+			repaint it themselves, and a link over 295 rows x 2 fields would be a watcher per
+			field for what those callers already do (SPEC I172g, V507d).
 		-->
 		<dataLink fields="{'language', 'nature', 'demeanor'}">
 			<event name="onChange">
@@ -8919,7 +9188,7 @@
 			</event>
 		</dataLink>
 
-		<dataLink fields="{'language', 'speciality_1', 'speciality_2', 'speciality_3', 'speciality_4', 'speciality_5', 'speciality_6', 'speciality_7'}">
+		<dataLink fields="{'language'}">
 			<event name="onChange">
 				renderSpecialities(self);
 			</event>

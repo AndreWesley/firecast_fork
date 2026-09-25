@@ -1,6 +1,110 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-24, 203ª rodada — 25º lote CONSTRUÍDO & BATIDO)
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-24, 205ª rodada — 28º lote CONSTRUÍDO)
+
+### 28º LOTE CONSTRUÍDO (205ª) — §T1092…§T1095 `x` (`/ck:build --all`)
+Gate `-Build -Quiet` **ALL CHECKS PASSED** (23:12). Bateria §V334/§V353/§V405/§V502: **12/12 mutações VERMELHAS no check
+certo & 1/1 sonda VERDE**, hashes dos 3 arquivos mutados = os de antes. **INSTALADO 23:13:44** (3083711 B = `output/`).
+Se a ficha estava aberta, FECHAR & REABRIR. **PRÓXIMO:** pedir ao user **§T1096** (tela) junto de §T1090/§T1083/§T1080/
+§T1074, que seguem `.`. **Nada commitado.** Backups de antes do build no scratchpad `b3cfaa14…\scratchpad\`:
+`WoD20th.before28.lfm`, `WoD20.6.before28.lfm`, `localization.before28.lang`, `gate.before28.ps1`; bateria: `battery28.ps1`
+(+ `mutfn28.ps1`, log `battery28.log`, hashes `battery28.hashes.txt`).
+
+**O QUE VIROU CÓDIGO**
+- `WoD20th.lfm` — `McRow`: rótulo `Name` 40 & edit 54/256; `dynMcWpTag_` → `<label text="Willpower">` ESTÁTICO; coluna 110;
+  barras 198/140; SAÍRAM a escrita em `mcRender` & a entrada em `MC_NAMES`. Esc: `onKeyDown` em `edtPopNote` &
+  `edtPopSpec_1…5`; `escClose` acha `popNote`/`popSpec` (fecha por `popClose`); `kbRefocus` ganhou os ramos `popNote` →
+  `edtPopNote` & `popSpec` → 1º slot livre (tabela de nomes local c/ laço `SPEC_PER_TRAIT`); `noteOpen`/`specOpen` chamam
+  `kbRefocus(from)` depois do `.visible = true`; `specDot` termina em `kbRefocus(form)`. Zoom: `popNote` 490/400, título 20,
+  `btnFontDownPopNote` 310 & `btnFontUpPopNote` 335, `X` 360, `edtPopNote` 360; `DESC_PANES` + `edtPopNote`.
+- `WoD20.6.lfm:581` & `localization.lang:508` — `Willpower` pt = `Força de Vontade` (sem hífen, §Q94).
+- `verify-hunters-hunted.ps1` — §V334 (`edtPopNote` nomeada nas 2 réguas), §V353 (`$FOCUS_PATHS` 4 + perna "ramo em
+  `kbRefocus`"), §V405 (4 overlays, piso 10, `escClose` nomeia as 2, perna (d) `specDot`), §V502 (d) folga +10 & (e) 3
+  estáticos, 0 `dynMcWpTag_`, valor sem hífen nos 2 lados. `-Literal` do `NeededPx` ficou (§V505 usa).
+- 0 desvio do spec no build ∴ 0 emenda pendente.
+
+### 28º LOTE ESPECIFICADO (205ª) — coluna (`Nome` & `Força-de-Vontade`) + Esc & zoom nas janelas do `!` (§I173)
+`/ck:spec` só: §C (28º lote + §Q94 ABERTA), §I173a…e, §R172, §B175, §V334/§V353/§V405/§V502 EMENDADAS (0 §V nova),
+§T1092…§T1096 (+ nota em §T1083 & marcadores ⚠ em §I171d/§I171e/§Q91). **0 código tocado, nada commitado.** Backup de
+antes: `b3cfaa14…\scratchpad\SPEC.before28.md` & `HANDOFF.before28.md`.
+- **PRÓXIMO:** `/ck:build` §T1092…§T1095 (os 3 primeiros em `WoD20th.lfm`, o 4º no gate) → 1 install no fim → pedir ao
+  user §T1096 (tela) junto de §T1090/§T1083/§T1080/§T1074, que seguem `.`.
+- **O que JÁ existia:** Esc (`escClose`/`isEscKey`/`kbRefocus`, §V405/§V353) & zoom (`fontStep`/`descFontSize`/`DESC_PANES`,
+  §V334) — o lote só ESTENDE as 2 máquinas p/ `popNote` & `popSpec`; 0 função nova.
+- **Armadilhas p/ o build:** (1) §V334 deriva as panes pelo NOME `edt*Desc[B]` — `edtPopNote` ⊥ casa & ! entrar NOMEADA nas
+  2 réguas (XML & `DESC_PANES`), senão o par novo acende "8 botões contra 3 panes"; (2) `kbRefocus` é o ÚNICO `setFocus`
+  (§V353b) — ⊥ chamar `setFocus` em `specDot`/`noteOpen`/`specOpen`; (3) `-Literal` do `NeededPx` FICA (§V505 usa) — só a
+  perna de §V502e que o usava p/ `dynMcWpTag_` sai; (4) a chave `Willpower` JÁ ∃ — ⊥ criar chave; só o VALOR pt muda
+  p/ `Força de Vontade` em `WoD20.6:581` & `.lang:508` (§Q94).
+- **§Q94 RESPONDIDA** (mesma rodada): SEM hífen → opção (c): valor pt da chave `Willpower` = `Força de Vontade` na ficha
+  inteira (`WILLPOWER` já era `FORÇA DE VONTADE`); rótulo da coluna segue estático. Livro (`descNumina_pt.lua`) FORA.
+
+### 27º LOTE CONSTRUÍDO (204ª) — §T1084…§T1089 `x` (`/ck:build --all`)
+Gate `-Build -Quiet` **ALL CHECKS PASSED** (60 s, 21:57). Bateria §V503…§V507: **23/23 mutações VERMELHAS no check
+certo & 5/5 sondas VERDES**, hashes dos 3 arquivos mutados = os de antes. **INSTALADO 21:58:00** (3082312 B = `output/`).
+Se a ficha estava aberta, FECHAR & REABRIR.
+
+**§T1091 `x` (204ª):** exceção de §Q93 DECLARADA — comentário junto de `XP_CUSTOM` + §V507(e) no gate (2/2 mutações
+VERMELHAS, sonda VERDE, hashes = os de antes); `-Build` VERDE; **REINSTALADO 22:14:42** (3082689 B = `output/`).
+**PRÓXIMO:** pedir ao user **§T1090** (tela); §T1080/§T1083/§T1074 seguem `.` (tela, lotes 24-26). Nada commitado.
+
+Código + gate feitos na mesma sessão do spec. **Nada commitado.** Backups de antes do build no scratchpad
+`9b1e1caa…\scratchpad\`: `gate.before27.ps1`, `SPEC.before27b.md`. Bateria: `battery27.ps1` (+ `mutfn27.ps1`, log
+`battery27.log`, hashes de antes `battery27.hashes.txt`).
+
+**O QUE VIROU CÓDIGO**
+- `WoD20th.lfm` — `popScrim` `#80000000`; `popScrimB` entre `mfSearch` & `mfSearchB` (`onClick` `mfClose`); `mfNames` sem a
+  exceção (popScrim gêmeo), `mfFound` sem o override, `mfClose` esconde o scrim nos 2 ramos. `SPECIALITY_ROWS = 325`,
+  `SPEC_PER_TRAIT = 5`; `specFreeRow` & `specRowsOf` (globais) antes de `grantSpeciality`, que recusa o 6º do traço; ledger
+  `specTraitName(slotName(field))`; `POP_BOX` + `popSpec`/título/10 slots (laço por `SPEC_PER_TRAIT`); `popClose` esconde
+  `popSpec` & zera `SPEC_WIN`; `SPEC_WIN` `specKey` `specTraitName` `specOpen` `specPaint(found, withText)` `specType`
+  `specDot` depois de `savePopNote`; XML `popSpec` depois de `popNote`; `renderSpecialities` REESCRITA (lista das acesas,
+  ordenada); `PICKER_LIST["speciality"]` SAIU; o `<dataLink>` do raiz ficou `{'language'}`.
+- `WoD20.1.lfm` — template `Virtue` (= Attribute velho) & as 3 Virtudes nele; `btnSp` em `Attribute`/`AttributeZeroable`
+  (100, rótulo 95), `Ability` (140, rótulo 135, bolinha viva) & `CustomAbility` (140, edit 135); `SpecialityRow` & as 10
+  linhas SAÍRAM → `dynSpecList` (textEditor readOnly, opacity 0.75, 20/36/290/259).
+- `WoD20.2.lfm` — 18 linhas de `FLAWS` viraram TAB de novo (§B173). `WoD20.6.lfm` — `#66000000` fora das 4 paletas,
+  `PT["Select Speciality"]` fora. `localization.lang` — as 2 `wod.Select Speciality` fora.
+- `verify-hunters-hunted.ps1` — §V503…§V507 no fim; §V5 (sem bolinha XML p/ especialidade), §V146 (caixa + 1 lista),
+  §V147 (só a metade Lua), §V148 APOSENTADA, §V161/§V163/§V164/§V165/§V170/§V255/§V287/§V333(5 portas)/§V370/§V374/
+  §V378/§V354/§V365/§V436/§V439c(invertida)/$OVERLAY_BOXES(+popSpec)/tabela de §V204 (sem SPECIALITY_ROWS) ajustados.
+
+**✅ SPEC EM DIA — os 6 pontos abaixo foram EMENDADOS pelo `/ck:spec amend` (204ª; marcador `⚠ EMENDADO no build`;
+§Q93 RESPONDIDA na mesma escrita; gate VERDE; backup de antes `…\scratchpad\SPEC.before27c.md`):**
+1. **47 habilidades, ⊥ 41.** `ABILITY_FIELD` tem 47 (a 154ª pôs 7 & o comentário "41" ficou velho) ∴ `SPEC_TRAIT` = 56,
+   chaves = 65 & `SPECIALITY_ROWS` = **325**, ⊥ 295 (§I172f, §V507a, §Q92 RESPONDIDA, §V147/§V504b/§V505a citam 41/50/295).
+2. **`dynSpecList` em top 36 / height 259, ⊥ 41/254** — a hairline do título é 36 (15 + 20 + 1; as linhas velhas também
+   começavam em 36); & ganhou `opacity="0.75"` (§V111/§V244: texto só-leitura lê apagado) (§I172g, §V507d).
+3. **§B173: 18 linhas, ⊥ 16** — as linhas 16-17 do comentário do topo do `WoD20.2` também tinham `FLAWS`.
+4. **§V507c**: o ledger chama `specTraitName(slotName(field))` — `slotName` fica p/ o fallback da linha vazia (log idêntico
+   ao de hoje p/ livro) & o gate cobra `specTraitName(` como 1º argumento, ⊥ "⊥ slotName(".
+5. **§I172g/§T1088: o tamanho `"list"` do picker (`MF_LIST`, ramo de `mfSize`, `mfCustomPane`, a gravação do custom) FICOU**,
+   sem chamador — tirar mexe em 4 funções do picker compartilhado & §V359/§V436; §V436(b) agora cobra **0** listas sem pane.
+   Rodada própria se o user quiser o código morto fora.
+6. **§I172e/§V505c**: nasceu `specRowsOf(key)` (1 dono p/ "linhas de uma chave": janela & grátis) & `specPaint` recebe
+   `withText` (texto dos slots SÓ ao abrir — repintar depois de um clique apagaria o que foi digitado num slot livre).
+
+### 27º LOTE ESPECIFICADO (204ª) — scrim a 50% & especializações por traço no `!` (§I172)
+`/ck:spec` só: §C (27º lote + §Q92 ABERTA), §I172a…g, §R171, §V503…§V506 (+ §V493 EMENDADA), §T1084…§T1090,
+§B173. Gate `-Quiet` VERDE c/ o spec novo (40 s). **0 código tocado, nada commitado.** Backup do spec de antes:
+`9b1e1caa…\scratchpad\SPEC.before27.md`.
+- **O que JÁ existia** (§R171a): o `popScrim` já escurece (40%) atrás de `?`, `!` de nota, picker & `Settings`.
+  O lote muda o tom p/ 50%, põe 1 scrim gêmeo (`popScrimB`) sob o picker-sobre-picker & sobe o scrim na janela nova.
+- **§Q92 RESPONDIDA** (mesma rodada) & o lote foi REESCRITO no lugar: (1) box = RESUMO só-leitura (`dynSpecList`),
+  o picker de especialização SAI inteiro; (2) `popScrimB` sim; (3) linha digitada GANHA `!` & a chave é o CAMPO
+  (`customTalent_3`), ⊥ o nome; (4) teto só de **5 por traço** — `SPECIALITY_ROWS` 10 → **295** (5 × 59).
+- **Desenho da janela** (§I172e): VISTA das linhas `speciality_N` de hoje — 0 campo novo, 0 migração; slot
+  livre + clique na bolinha = pegar a 1ª linha vazia (`specFreeRow`, extraída de `grantSpeciality`) & chamar o
+  `xpClick` de sempre ∴ custo, recusa & log ⊥ mudam. ∀ `!` passa o campo da BOLINHA 1 & `specOpen` tira o `_1`
+  (tirar um `_1` opcional quebraria `customTalent_1`).
+- **Próximo:** `/ck:build` §T1084 → §T1085 → §T1086 → §T1087 → §T1088 (box → resumo) → §T1089 (gate + bateria;
+  ≥ 8 checks do gate amarram `SpecialityRow`, lista em §R171i) → install → §T1090 (tela). **§T1091 aguarda §Q93.**
+- ⚠ **§B173**: `WoD20.2.lfm:388-403` tem `FLAWS` no lugar do TAB (16 linhas, já no HEAD `8d76c593`); §T1087
+  conserta, §V506 cobre. ⚠ **§B174**: `customTalent_3`/`_4`/`customKnowledge_3` ∉ `XP_CUSTOM` → bolinhas de
+  graça & fora do log; §T1091 conserta SE o user disser sim em §Q93 (muda XP de ficha existente).
+- Gate `-Quiet` VERDE depois da reescrita (73 s). Backup de antes da reescrita: `…\scratchpad\SPEC.before27b.md`.
+
+## (histórico) 203ª rodada — 25º lote CONSTRUÍDO & BATIDO
 
 ### O ESTADO EM UMA LINHA
 25º lote (coluna `Characters List` v2 + nota `!`, §I170) CONSTRUÍDO: **§T1075…§T1079 `x`**. Bateria

@@ -500,7 +500,8 @@ $luaOwned = @('baseline', 'xpTotal', 'xpFree', 'xpManual', 'xpOrder', 'descFontS
 # length, so the exclusion cannot go quiet the way B7 describes.
 # popNote joined in the 25th batch (SPEC I170g): the ! note window floats over the grid the same
 # way the ? box does, with the same black rectangle and a Lua-written title.
-$OVERLAY_BOXES = @('popDesc', 'mfSearch', 'popNote')
+# popSpec, the ! of a trait, joined in the 27th batch (SPEC I172e) for the same reason.
+$OVERLAY_BOXES = @('popDesc', 'mfSearch', 'popNote', 'popSpec')
 foreach ($l in $linkFields) {
     if ($allFields.ContainsKey($l.Field)) { Pass "V8 dataLink '$($l.Field)' observes a real field" }
     elseif ($luaOwned -contains $l.Field) { Pass "V8 dataLink '$($l.Field)' observes a declared Lua-owned field (SPEC I3)" }
@@ -532,6 +533,8 @@ $expect['appearance'] = 5
 'animalKen','crafts','etiquette','firearms','larceny','melee','performance','ride','stealth','survival',
 'academics','enigmas','finance','investigation','law','medicine','occult','politics','science','technology',
 'faith',
+# Six typed rows, not nine: customTalent_3/_4 and customKnowledge_3 are drawn but cost nothing,
+# by the user's decision (SPEC Q93, B174) - V507e holds that exception closed, by name.
 'customTalent_1','customTalent_2','customSkill_1','customSkill_2','customKnowledge_1','customKnowledge_2'  | % { $expect[$_] = 5 }
 $expect['humanity'] = 10
 $expect['willpower'] = 10
@@ -574,7 +577,9 @@ elseif ($psRows -ge 1) { 1..$psRows | ForEach-Object { if (-not $psVac[$_]) { $e
 $spDecl = [regex]::Match($bgRootTxt, '(?m)^\s*SPECIALITY_ROWS = (\d+);')
 $spRows = if ($spDecl.Success) { [int]$spDecl.Groups[1].Value } else { 0 }
 if (-not $spDecl.Success) { Fail "V147 SPECIALITY_ROWS is not declared on the root form - the row count would be a literal in every loop" }
-elseif ($spRows -ge 1) { 1..$spRows | ForEach-Object { $expect["speciality_$_"] = 1 } }
+# NO XML dot is expected for them since the 27th batch (SPEC I172f/g, V147 amended): the rows
+# are a POOL of 295 the ! window of each trait shows a view of, and no box draws them. That
+# they are declared and walked is V507a's to measure, off the same SPECIALITY_ROWS.
 
 foreach ($k in ($expect.Keys | Sort-Object)) {
     $got = DotCount $k
@@ -585,7 +590,7 @@ if ($wb -eq 10) { Pass "V5 willpower = 10 boxes" } else { Fail "V5 willpower = $
 
 # Each numina table is 8 pickers + 2 free rows (SPEC T56/T57); backgrounds are however many
 # BACKGROUND_ROWS says (9 until the 46th round moved the box to the Traits tab, 20 after).
-foreach ($grp in @(@('numina',$nmRows), @('psychic',$psDrawn), @('background',$bgRows), @('health',10), @('speciality',$spRows))) {
+foreach ($grp in @(@('numina',$nmRows), @('psychic',$psDrawn), @('background',$bgRows), @('health',10))) {
     $n = ($allFields.Keys | Where-Object { $_ -match "^$($grp[0])_\d+$" }).Count
     if ($n -eq $grp[1]) { Pass "V5 $($grp[0]) = $n rows" } else { Fail "V5 $($grp[0]) = $n rows, expected $($grp[1])" }
 }
@@ -5401,125 +5406,47 @@ function BoxKids($box) {
 }
 $mainDoc = Doc (Join-Path $dir "WoD20.1.lfm")
 $sb = BoxOf $mainDoc "SPECIALTIES"
-$specTpl = @($mainDoc.SelectNodes("//template[@name='SpecialityRow']"))[0]
+# 27th batch (SPEC I172g, V146 amended): the ten rows left with the old picker and the box is
+# a SUMMARY now - one read-only list. The BOX keeps every rule that measures a box (V375,
+# V376, V393, V402); what this check still owns is that the one list opens on the hairline
+# under the title, closes on the same 20 foot, and edits nothing.
+$specList = @($mainDoc.SelectNodes("//textEditor[@name='dynSpecList']"))
 if (-not $sb) { Fail "V146 WoD20.1 declares no SPECIALTIES box - the tab's map says exactly one" }
-elseif (-not $specTpl) { Fail "V146 SpecialityRow is not declared on WoD20.1" }
+elseif ($specList.Count -ne 1) { Fail "V146 WoD20.1 declares $($specList.Count) dynSpecList - the SPECIALTIES box holds exactly one read-only list since the 27th batch (SPEC I172g, V507d)" }
 else {
-    $sbW = [int]$sb.GetAttribute("width"); $sbH = [int]$sb.GetAttribute("height")
-    # Where the first row opens is DERIVED from the title, not typed (103rd round, SPEC T618):
-    # the hairline under the title band. It read 31 while the margin was 10 and reads 41 under
-    # I73, and a literal here is the third one this check has had to hand-edit.
+    $sbH   = [int]$sb.GetAttribute("height")
     $sTtl  = $sb.SelectSingleNode("label[@text='SPECIALTIES']")
     $sBody = if ($null -ne $sTtl) { [int]$sTtl.GetAttribute("top") + [int]$sTtl.GetAttribute("height") + 1 } else { -1 }
-    $sRows = @($sb.SelectNodes("layout[SpecialityRow] | layout[SpecialityFreeRow]"))
-    $sTops = @($sRows | ForEach-Object { [int]$_.GetAttribute("top") } | Sort-Object)
-    $sLefts = @($sRows | ForEach-Object { [int]$_.GetAttribute("left") } | Sort-Object -Unique)
-    $sWide = @($sRows | ForEach-Object { [int]$_.GetAttribute("width") } | Sort-Object -Unique)
-    $sPitchBad = 0
-    # 25 since T859, and it is V370 that owns WHY - this line only asks that the rows the box
-    # declares still fit down it (SPEC V370, I124c).
-    for ($i = 1; $i -lt $sTops.Count; $i++) { if (($sTops[$i] - $sTops[$i - 1]) -ne $MAIN_ROW_PITCH) { $sPitchBad++ } }
-    # The row is measured as a SUM, not as an extent: with the widgets laid end to end,
-    # each has to start at or after the one before it ends, and the last has to close on
-    # the row. The first cut of this check took the furthest right edge instead, and a
-    # mutation that widened the text field straight through the dot survived it green
-    # (SPEC V20, B7) - the dot was still the right-most thing, it just had the edit
-    # sitting on top of it.
-    $rowCells = @()
-    foreach ($w in $specTpl.ChildNodes) {
-        if ($w.NodeType -ne 'Element') { continue }
-        # The hidden twin of I107a1 occupies NO pixels and is REQUIRED to stand on the button's
-        # own left (SPEC V354a) - measuring it as a cell would make V146 and V354 contradict each
-        # other, and one of them has to be wrong. It is this one: a widget authored visible=false
-        # is not on the row. Keyed on the AUTHORED attribute and not on a name, so a VISIBLE
-        # widget laid over another is still caught (T842, B100).
-        if ($w.GetAttribute("visible") -eq 'false') { continue }
-        $wl = 0; $ww = 0
-        if ([int]::TryParse($w.GetAttribute("left"), [ref]$wl) -and [int]::TryParse($w.GetAttribute("width"), [ref]$ww)) {
-            $rowCells += [pscustomobject]@{ L = $wl; R = $wl + $ww; N = $w.LocalName }
-        }
-    }
-    $rowCells = @($rowCells | Sort-Object L)
-    $rowOverlap = @()
-    for ($i = 1; $i -lt $rowCells.Count; $i++) {
-        if ($rowCells[$i].L -lt $rowCells[$i - 1].R) { $rowOverlap += "$($rowCells[$i - 1].N) ends at $($rowCells[$i - 1].R) but $($rowCells[$i].N) starts at $($rowCells[$i].L)" }
-    }
-    $rowSpan = if ($rowCells.Count -gt 0) { $rowCells[-1].R } else { 0 }
-    if ($sRows.Count -ne $spRows) { Fail "V146 SPECIALTIES draws $($sRows.Count) row(s) with SPECIALITY_ROWS at $spRows" }
-    elseif ($sBody -lt 0) { Fail "V146 the SPECIALTIES box carries no title - the row that opens under it would be measured against nothing (SPEC V209)" }
-    elseif ($sTops[0] -ne $sBody) { Fail "V146 the first speciality row starts at $($sTops[0]), not on the hairline under the title at $sBody - the row opens where the title band ends, whatever margin I73 gives it (SPEC I40, I73, V240)" }
-    elseif ($sPitchBad -gt 0) { Fail "V146 $sPitchBad speciality row(s) break the pitch of $MAIN_ROW_PITCH - the box would not hold $spRows of them" }
-    elseif (($sTops[-1] + 25) -gt $sbH) { Fail "V146 the last speciality row ends at $($sTops[-1] + 25), past a box $sbH tall" }
-    elseif ($sLefts.Count -ne 1 -or $sWide.Count -ne 1) { Fail "V146 the speciality rows do not share one left/width - one row would sit differently from its neighbours" }
-    elseif ($sWide[0] -ne ($sbW - 2 * $sLefts[0])) { Fail "V146 the rows are $($sWide[0]) wide at left $($sLefts[0]) in a $sbW box - the right margin no longer matches the left" }
-    elseif ($rowOverlap.Count -gt 0) { Fail "V146 SpecialityRow widgets sit on each other - $($rowOverlap -join '; ') - a narrower box needs the row refitted, not the widgets stacked" }
-    elseif ($rowSpan -ne $sWide[0]) { Fail "V146 SpecialityRow spans $rowSpan in a row $($sWide[0]) wide - narrowing the box without refitting the row leaves the dot short of the edge or past it" }
-    else { Pass "V146 SPECIALTIES holds $($sRows.Count) rows and its row spans exactly the $rowSpan it is given" }
+    $sl    = $specList[0]
+    $slTop = [int]$sl.GetAttribute("top")
+    $slEnd = $slTop + [int]$sl.GetAttribute("height")
+    if (-not [object]::ReferenceEquals($sl.ParentNode, $sb)) { Fail "V146 dynSpecList is not a child of the SPECIALTIES box - the summary would sit outside the box it summarises" }
+    elseif ($sBody -lt 0) { Fail "V146 the SPECIALTIES box carries no title - the list that opens under it would be measured against nothing (SPEC V209)" }
+    elseif ($slTop -ne $sBody) { Fail "V146 the SPECIALTIES list starts at $slTop, not on the hairline under the title at $sBody" }
+    elseif (($slEnd + 20) -ne $sbH) { Fail "V146 the SPECIALTIES list closes on $slEnd in a box $sbH tall - the foot is 20 (SPEC I172g)" }
+    elseif ($sl.GetAttribute("readOnly") -ne 'true') { Fail "V146 dynSpecList is not readOnly - the box edits nothing since the 27th batch (SPEC I172g)" }
+    else { Pass "V146 SPECIALTIES holds one read-only list from the hairline $sBody to $slEnd, foot 20" }
 }
 
 # ---- V147: three fields and one dot per row, counted in one place --------------------
 # Same shape as BACKGROUND_ROWS (V145): the XML draws the rows and two loops on the root form
 # walk them - one to let experience buy the row, one to price it for the log. A tenth row
 # added to the XML alone would be a speciality nothing charges for and nothing shows.
-$specXmlRows = @()
-foreach ($f in $files) {
-    foreach ($n in (Doc $f.FullName).SelectNodes("//SpecialityRow[@num] | //SpecialityFreeRow[@num]")) { $specXmlRows += [int]$n.GetAttribute("num") }
-}
-$specMax     = if ($specXmlRows.Count -gt 0) { ($specXmlRows | Measure-Object -Maximum).Maximum } else { 0 }
+# EMENDED in the 27th batch (SPEC I172f, V147 amended): no widget owns the rows any more - the
+# ! window binds nothing and the SPECIALTIES box is a list - so the XML half of this check left
+# with the rows. What stays is the Lua half: one declared count, read by every loop that walks
+# the pool, never a literal. The size of the pool is V507a's.
 $specLoops   = @([regex]::Matches($rootTxt, 'for i = 1, SPECIALITY_ROWS, 1 do'))
 $specLiteral = @([regex]::Matches($rootTxt, 'for i = 1, \d+, 1 do[^\r\n]*speciality'))
-$specFldBad  = @()
-if ($spRows -ge 1) {
-    for ($i = 1; $i -le $spRows; $i++) {
-        foreach ($fld in @("speciality_$i", "specialityName_$i", "speciality_${i}_1")) {
-            if (-not $allFields.ContainsKey($fld)) { $specFldBad += "$fld is not owned by any widget" }
-            elseif ($allFields[$fld].Count -ne 1) { $specFldBad += "$fld has $($allFields[$fld].Count) owners (SPEC V1)" }
-        }
-    }
-}
 if ($spRows -lt 1) { Fail "V147 SPECIALITY_ROWS is not declared - the count would be a literal in every loop" }
-elseif ($specLoops.Count -lt 3) { Fail "V147 only $($specLoops.Count) loop(s) read SPECIALITY_ROWS over its full range - the three that walk every row are declareTrait, the ledger and freeRowOf; the lock and the gift stop at the picker rows since the 87th round (SPEC I50, V255d)" }
-elseif ($specLiteral.Count -gt 0) { Fail "V147 a speciality loop still counts to a literal - the XML and the ledger would drift apart" }
-elseif ($specXmlRows.Count -ne $spRows) { Fail "V147 the XML draws $($specXmlRows.Count) speciality row(s) but SPECIALITY_ROWS says $spRows" }
-elseif ($specMax -ne $spRows) { Fail "V147 the speciality rows run up to num=$specMax with SPECIALITY_ROWS at $spRows - the loops walk 1..$spRows and would miss it" }
-elseif (@($specXmlRows | Sort-Object -Unique).Count -ne $spRows) { Fail "V147 two speciality rows carry the same num - they would share their fields (SPEC V1)" }
-elseif ($specFldBad.Count -gt 0) { foreach ($b in $specFldBad) { Fail "V147 $b" } }
-else { Pass "V147 $spRows speciality rows, three owned fields each, one declared count read by both loops" }
+elseif ($specLoops.Count -lt 3) { Fail "V147 only $($specLoops.Count) loop(s) read SPECIALITY_ROWS over its full range - declareTrait, the ledger and freeRowOf walk every row" }
+elseif ($specLiteral.Count -gt 0) { Fail "V147 a speciality loop still counts to a literal - the pool and the ledger would drift apart" }
+else { Pass "V147 $spRows speciality rows, one declared count read by $($specLoops.Count) loops" }
 
-# ---- V148: the trait picker is the two Lua tables, not a third copy of them ----------
-# The grant writes a canonical trait NAME into the combo (V152), so a name the picker does not
-# carry is a value the player would see as blank. Both directions are checked: an era ability
-# added to ABILITY_FIELD and not to the picker, and an item in the picker that names no trait,
-# are the same failure from either end (SPEC B23/B24).
-$attrBlk = [regex]::Match($rootTxt, 'local XP_ATTRS = \{(.*?)\};', 'Singleline')
-$abilBlk = [regex]::Match($rootTxt, 'ABILITY_FIELD = \{(.*?)\n\t\t\t\};', 'Singleline')
-$mainRaw =[System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.1.lfm")))
-$pickBlk = [regex]::Match($mainRaw, '<template name="SpecialityRow">(.*?)</template>', 'Singleline')
-if (-not $attrBlk.Success) { Fail "V148 XP_ATTRS not found on the root form" }
-elseif (-not $abilBlk.Success) { Fail "V148 ABILITY_FIELD not found on the root form" }
-elseif (-not $pickBlk.Success) { Fail "V148 the SpecialityRow template is not in WoD20.1" }
-else {
-    $luaNames = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
-    foreach ($m in [regex]::Matches($attrBlk.Groups[1].Value, '\{"([^"]+)", "[^"]+"\}')) { [void]$luaNames.Add($m.Groups[1].Value) }
-    foreach ($m in [regex]::Matches($abilBlk.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"[^"]+"')) { [void]$luaNames.Add($m.Groups[1].Value) }
-
-    # Lua x Lua now, not XML x Lua: the trait list moved to PICKER_LIST (SPEC I27, V148).
-    # items and values are ONE authored list there, so the pair cannot fall out of step by
-    # construction - what is still worth proving is that it matches the two Lua tables.
-    $pickItems = @($PICKER['speciality'])
-    $pickVals  = @($PICKER['speciality'])
-    $itemsAttr = [pscustomobject]@{ Success = ($pickItems.Count -gt 0) }
-    $valsAttr  = [pscustomobject]@{ Success = ($pickVals.Count -gt 0) }
-    $pickSet   = @($pickItems | Where-Object { $_ -ne '' })
-
-    $missPick = @($luaNames | Where-Object { $pickSet -notcontains $_ })
-    $missLua  = @($pickSet | Where-Object { -not $luaNames.Contains($_) })
-    if (-not $itemsAttr.Success -or -not $valsAttr.Success) { Fail "V148 PICKER_LIST has no 'speciality' list - the trait picker offers nothing (SPEC I27, V211a)" }
-    elseif ($pickItems.Count -ne $pickVals.Count) { Fail "V148 the trait picker shows $($pickItems.Count) items for $($pickVals.Count) values - one of them would save nothing" }
-    elseif ($missPick.Count -gt 0) { foreach ($m in $missPick) { Fail "V148 '$m' is a trait in Lua and not in the picker - a grant on it would write a value the combo cannot show" } }
-    elseif ($missLua.Count -gt 0) { foreach ($m in $missLua) { Fail "V148 '$m' is in the picker and names no trait - picking it would buy a speciality of nothing" } }
-    else { Pass "V148 the trait picker carries exactly the $($pickSet.Count) traits XP_ATTRS and ABILITY_FIELD name" }
-}
+# ---- V148: RETIRED in the 27th batch (SPEC I172g) -----------------------------------------
+# The trait picker of the SPECIALTIES box left with its ten rows, so there is no third list of
+# the fifty names to hold against XP_ATTRS and ABILITY_FIELD. V507d measures that the list is
+# GONE (no 'speciality' key in PICKER_LIST) and V149 still derives SPEC_TRAIT off the two tables.
 
 # ---- V149: which trait gives a speciality, and at which rating ------------------------
 # SPEC_TRAIT is DERIVED from the same two tables the picker is checked against, so the fifty
@@ -5595,13 +5522,18 @@ foreach ($f in $files) {
 # The typed text has exactly ONE writer in the whole sheet, and it is the revoke taking the
 # row away (SPEC V163). Anything else writing it would be Lua typing for the player.
 $rootNameWrites = @([regex]::Matches($rootTxt, 'setField\("specialityName'))
+# EMENDED in the 27th batch (SPEC I172e): the ! window is the player's own hand, and it writes
+# the text in exactly two places - specType renames a held row, specDot carries the typed text
+# into the row it takes. They are counted apart, so the Lua-typing ban still has ONE exception.
+$winNameWrites = @([regex]::Matches((LuaFn $rootTxt 'specType') + (LuaFn $rootTxt 'specDot'), 'setField\("specialityName'))
 if (-not $grantFn) { Fail "V152 grantSpeciality not found on the root form" }
 elseif ($grantFn -notmatch 'setField\("speciality_" \.\. slot, t\.name\);') { Fail "V152 the grant never writes the trait into the row" }
 elseif ($grantFn -notmatch 'markDot\(form, "speciality_" \.\. slot \.\. "_1", true\);') { Fail "V152 the grant never lights the dot - with autoChange off nothing else will (SPEC V134)" }
 elseif ($grantFn -notmatch 'setField\("xpFree", stamps') { Fail "V152 the grant leaves no stamp - the free line would be charged on the next render (SPEC V139)" }
 elseif ($grantFn -match 'specialityName') { Fail "V163 the grant touches specialityName - what the specialty IS is the player's to type" }
 elseif ($nameWrites.Count -gt 0) { Fail "V163 $($nameWrites -join ', ') writes specialityName - only the revoke on the root form may (SPEC V159)" }
-elseif ($rootNameWrites.Count -ne 1) { Fail "V163 specialityName is written in $($rootNameWrites.Count) places - exactly one, the revoke clearing the row it takes away" }
+elseif ($winNameWrites.Count -ne 2) { Fail "V163 the ! window writes specialityName in $($winNameWrites.Count) place(s) - exactly two, specType and specDot (SPEC I172e)" }
+elseif (($rootNameWrites.Count - $winNameWrites.Count) -ne 1) { Fail "V163 specialityName is written in $($rootNameWrites.Count - $winNameWrites.Count) places outside the ! window - exactly one, the revoke clearing the row it takes away" }
 elseif ($revokeFn -notmatch 'setField\("specialityName_" \.\. slot, ""\);') { Fail "V163 the one writer is not the revoke - the text would be cleared by something that is not taking the row away" }
 else { Pass "V152/V163 the gift writes trait, mark and stamp and leaves the text alone; only the revoke clears it" }
 
@@ -5690,9 +5622,9 @@ elseif ($renderSpecFn -match 'c\.enabled') { Fail "V161 renderSpecialities still
 elseif (-not ($mfOpen161 = LuaFn $rootTxt 'mfOpen')) { Fail "V161 mfOpen is gone - the lock of a picker row now lives in the opener and there is no opener left (SPEC V161, V209)" }
 elseif ($mfOpen161 -notmatch 'if sheet ~= nil and isFreeRow\(field\) then return; end;') { Fail "V161 mfOpen does not refuse a stamped row - with the combo gone this is the ONLY thing standing between the player and a gift the trait handed out (SPEC V161, T842)" }
 elseif ($mfOpen161.IndexOf('isFreeRow(field)') -gt $mfOpen161.IndexOf('MF.field = field;')) { Fail "V161 the refusal is tested AFTER the box has taken the field - a box that opens and then refuses is a lock the player finds at the end (SPEC V161)" }
-elseif ($renderSpecFn -notmatch 'mfLabel\(found\["dynspeciality_" \.\. i\]') { Fail "V161 renderSpecialities does not paint the seven buttons - a button's text is not a field, so the granted speciality would show as an empty row (SPEC I107a2, T842)" }
+elseif ($renderSpecFn -notmatch 'found\["dynSpecList"\]\.text = ') { Fail "V161 renderSpecialities does not write the SPECIALTIES list - since the 27th batch it paints the summary and nothing else (SPEC I172g, V507d)" }
 elseif ($renderSpecFn -match 'c\.opacity') { Fail "V162 the speciality row still paints opacity - a locked row has to keep its text readable (SPEC I41, V241)" }
-elseif ($renderSpecFn -match 'specialityName|markDot') { Fail "V163 the renderer touches the text or the dot - it paints the button and nothing else" }
+elseif ($renderSpecFn -match 'setField|markDot') { Fail "V163 the renderer WRITES the sheet - it reads the rows and paints the list, nothing else" }
 else { Pass "V161/V162 a gift row is refused in the opener before the box can open, its button is painted from the field and stays legible, and the dot refuses inside xpClick" }
 
 # ---- V164: the lock is painted from three places, and finds its controls the one way ---
@@ -5703,11 +5635,15 @@ $mainRawTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBy
 $renderCalls = @([regex]::Matches($rootTxt, 'renderSpecialities\('))
 $specLinks2  = @($mainDoc.SelectNodes("//dataLink[@field='xpFree']"))
 if (-not $renderSpecFn) { Fail "V164 renderSpecialities not found on the root form" }
-elseif ($renderSpecFn -notmatch 'xpFind\(tabRootOf\(from\), names, found\);') { Fail "V164 the renderer does not use the one control finder - form.<name> does not cross the import (SPEC V143, B9)" }
+elseif ($renderSpecFn -notmatch 'xpFind\(tabRootOf\(from\), \{ dynSpecList = true \}') { Fail "V164 the renderer does not use the one control finder - form.<name> does not cross the import (SPEC V143, B9)" }
 # 4 since T842: the declaration, the two accepted click paths, and the speciality dataLink the
 # BUTTON needs. The combo painted itself from the field; a button's text is not a field, so the
 # seven rows need the same watcher the sixteen backgrounds have had since T808 (SPEC I107a2).
-elseif ($renderCalls.Count -ne 3) { Fail "V164 renderSpecialities is called from $($renderCalls.Count - 1) place(s) on the root form - the ONE accepted click path (T985 made the click a sequence and the repaint left the loop, SPEC V445) and the speciality dataLink, and no more" }
+# 5 since the 27th batch (SPEC V164 amended, V507d): the declaration, the click path, the
+# LANGUAGE link, and the two clicks of the ! window - specType and specDot - which change the
+# rows the list shows and repaint it themselves.
+elseif ($renderCalls.Count -ne 5) { Fail "V164 renderSpecialities is called from $($renderCalls.Count - 1) place(s) on the root form - the ONE accepted click path (T985 made the click a sequence and the repaint left the loop, SPEC V445), the language dataLink, specType and specDot, and no more" }
+elseif ((LuaFn $rootTxt 'specType') -notmatch 'renderSpecialities\(form\)' -or (LuaFn $rootTxt 'specDot') -notmatch 'renderSpecialities\(form\)') { Fail "V164 a click of the ! window does not repaint the SPECIALTIES list - the summary would lag the window until the tab is shown again (SPEC V507d)" }
 elseif ($specLinks2.Count -ne 1) { Fail "V164 WoD20.1 carries $($specLinks2.Count) xpFree links - one, so a grant made on another client locks the row here too" }
 elseif ($mainRawTxt -notmatch '<dataLink field="xpFree" onChange="renderSpecialities\(self\);"/>') { Fail "V164 the xpFree link does not repaint the lock" }
 elseif ($mainRawTxt -notmatch '(?s)<event name="onNodeReady">.*?renderSpecialities\(self\);.*?</event>') { Fail "V164 opening the sheet does not paint the lock - a saved gift would show as editable" }
@@ -5720,8 +5656,9 @@ else { Pass "V164 the lock is painted on the click, on open and on a remote gran
 $oldStrings = @('SPECIALITIES', 'Speciality', 'Specialities cannot be bought', 'No free speciality slot')
 $staleKeys  = @($oldStrings | Where-Object { $enK.Contains($_) -or $ptK.Contains($_) -or $embedded.ContainsKey($_) })
 $kindPush   = @([regex]::Matches($rootTxt, 'pushRise\(rows, "Specialty"'))
-$fieldsKept = (($allFields.Keys | Where-Object { $_ -match '^speciality_\d+$' }).Count -eq $spRows) -and
-              (($allFields.Keys | Where-Object { $_ -match '^specialityName_\d+$' }).Count -eq $spRows)
+# No widget owns the rows since the 27th batch (SPEC I172f/g), so the names are read where the
+# Lua builds them: the window and the ledger must still address the fields that shipped.
+$fieldsKept = ($rootTxt -match '"speciality_" \.\. i \.\. "_1"') -and ($rootTxt -match 'setField\("specialityName_" \.\. i,')
 if ($staleKeys.Count -gt 0) { foreach ($s in $staleKeys) { Fail "V165 '$s' is still keyed - the old spelling would sit in the .lang and the PT map with nothing reading it" } }
 elseif ($kindPush.Count -ne 1) { Fail "V165 the ledger does not push a 'Specialty' row - the kind and the label must be the same string (SPEC V12)" }
 elseif ($xpCostFn -notmatch 'kind == "Specialty"') { Fail "V165 xpCost prices a kind the ledger never produces - the two halves of the rename came apart" }
@@ -6101,7 +6038,9 @@ $v370Steps = 0
 $hdr370 = @($mainDoc.SelectNodes("/form/scrollBox/layout[layout[Header or HeaderNarrow or HeaderPicker]]"))[0]
 if ($null -eq $hdr370) { $v370Bad += "the header box is not on WoD20.1 - it is one of the four blocks the ruler covers and it went unmeasured (SPEC V20, V370d)" }
 else { $v370Boxes += [pscustomobject]@{ Name = 'the header box'; Node = $hdr370 } }
-foreach ($t in @('VIRTUES', 'SPECIALTIES', 'TALENTS', 'SKILLS', 'KNOWLEDGES')) {
+# SPECIALTIES left this roster in the 27th batch: it has no ROWS any more, one read-only list
+# whose top V146 holds to the same hairline (SPEC I172g).
+foreach ($t in @('VIRTUES', 'TALENTS', 'SKILLS', 'KNOWLEDGES')) {
     $b = BoxOf $mainDoc $t
     if ($null -eq $b) { $v370Bad += "$t is not on WoD20.1 - one of the blocks the ruler covers went unmeasured (SPEC V20, V370d)" }
     else { $v370Boxes += [pscustomobject]@{ Name = $t; Node = $b } }
@@ -6156,7 +6095,8 @@ else { Pass "V370 all $v370Steps step(s) across $($v370Boxes.Count) block(s) of 
 # boundary V370 already drew, cited once here instead of redrawn.
 $v374Bad = @()
 $v374Ok  = 0
-foreach ($t in @('ATTRIBUTES', 'TALENTS', 'SKILLS', 'KNOWLEDGES', 'VIRTUES', 'SPECIALTIES')) {
+# SPECIALTIES is measured by V146 since the 27th batch: its body is one list, not rows (SPEC I172g).
+foreach ($t in @('ATTRIBUTES', 'TALENTS', 'SKILLS', 'KNOWLEDGES', 'VIRTUES')) {
     $bx374 = BoxOf $mainDoc $t
     if ($null -eq $bx374) { $v374Bad += "$t is not on WoD20.1 - a box the hairline covers went unmeasured (SPEC V20, V374e)"; continue }
     $ttl374 = $bx374.SelectSingleNode("label[@text='$t']")
@@ -6210,7 +6150,9 @@ else {
     elseif ($rowW[0] -ne $colInner) { Fail "V170 the rows are $($rowW[0]) wide inside a $($colW[0])px column - $($colW[0] - $rowW[0])px of the column reaches no row" }
     elseif (($aDots[-1] + 25) -ne $rowW[0]) { Fail "V170 the last dot ends at $($aDots[-1] + 25) in a row $($rowW[0]) wide - the leftover is dead margin, not name" }
     elseif ($aInput -gt $aDots[0] -or $cInput -gt $cDots[0]) { Fail "V170 the name field runs under the first dot ($aInput / $cInput against $($aDots[0]))" }
-    elseif (($aDots[0] - $aInput) -gt 3) { Fail "V170 $($aDots[0] - $aInput)px sit between the ability label and its first dot - that width was asked for by the names" }
+    # The ! of the 27th batch lives in that gap by design (SPEC I172d, V504b): 5 + its width + 5
+    # is room the names GAVE, and anything past it is still width the names asked for.
+    elseif (($aDots[0] - $aInput - (@($tplA.SelectNodes("button[starts-with(@name,'btnSp')]") | ForEach-Object { [int]$_.GetAttribute("width") + 10 }) + 0)[0]) -gt 3) { Fail "V170 $($aDots[0] - $aInput)px sit between the ability label and its first dot - past the ! that width was asked for by the names" }
     else { Pass "V170 the $($colW[0])px column hands ${aInput}px to the name and closes on its last dot" }
 }
 
@@ -6644,7 +6586,6 @@ $rowSpec = @(
     @{ Const = 'MAIN_PATH_ROWS'; File = 'WoD20.11.lfm'; Row = 'MainPathRow'; Field = 'mainPath'; Free = '';                   FreeRow = '' },
     @{ Const = 'SEC_PATH_ROWS';  File = 'WoD20.11.lfm'; Row = 'SecPathRow';  Field = 'secPath';  Free = 'SEC_PATH_FREE_ROWS'; FreeRow = 'SecPathFreeRow' },
     @{ Const = 'RITUAL_ROWS';    File = 'WoD20.11.lfm'; Row = 'RitualRow';   Field = 'ritual';   Free = 'RITUAL_FREE_ROWS';   FreeRow = 'RitualFreeRow' },
-	@{ Const = 'SPECIALITY_ROWS'; File = 'WoD20.1.lfm';  Row = 'SpecialityRow'; Field = 'speciality'; Free = 'SPECIALITY_FREE_ROWS'; FreeRow = 'SpecialityFreeRow'; Attr = 'num' },
 	@{ Const = 'BACKGROUND_ROWS'; File = 'WoD20.2.lfm';  Row = 'OpenAbility';   Field = 'background'; Free = 'BACKGROUND_FREE_ROWS'; FreeRow = 'OpenAbilityFreeRow' }
 )
 foreach ($rs in $rowSpec) {
@@ -8121,7 +8062,8 @@ foreach ($f in $files) {
         # the WHOLE sheet, lit on every picker and every ?. Admitted by exact NAME, so the second
         # direction below stays as strict as it was.
         if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -eq 'ornAvatar') { continue }
-        if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("name") -eq 'popScrim') { continue }
+        # popScrimB is popScrim's twin under the second picker (SPEC I172b) - same idiom, same pass.
+        if ($n287.LocalName -eq 'rectangle' -and @('popScrim', 'popScrimB') -contains $n287.GetAttribute("name")) { continue }
         # 24th batch (SPEC I169b, I169c). mcBg_$(num) is the row's click CATCHER (a click
         # anywhere on the row selects it, SPEC V490b) and mcGrip is the drag handle (SPEC
         # I169m) - both fully transparent by design, same idiom as popScrim: a click-catcher
@@ -9270,8 +9212,10 @@ if (-not $v439Bad) {
     if ($nms439 -notmatch 'nm \.\. "B"') {
         $v439Bad += "(c) mfNames does not DERIVE the twin's half of the table - a retyped second list is the roster that goes stale the first time a control is added (SPEC I153b, V135)"
     }
-    if ($nms439 -notmatch 'nm ~= "popScrim"') {
-        $v439Bad += "(c) mfNames twins popScrim as well - the scrim is already up when the twin opens, and a second one would be a second thing to take down (SPEC I153b, V135)"
+    # INVERTED in the 27th batch (SPEC I172b, V503c): popScrim is twinned like every other name,
+    # because every window darkens what is behind it and behind the twin is the first box.
+    if ($nms439 -match '"popScrim"') {
+        $v439Bad += "(c) mfNames still singles popScrim out - the twin would open over a first box that stays lit (SPEC I172b, V503c)"
     }
 
     # (d) ONE set of functions paints both frames. A clone would be a second owner of every
@@ -10231,9 +10175,13 @@ foreach ($gt255 in $V255_RETIRED) {
 }
 if ($typedBad2.Count -gt 0) { foreach ($b in $typedBad2) { Fail "V255 $b" } }
 elseif (-not $renderSpecFn) { Fail "V255 renderSpecialities is gone - nothing locks a granted specialty" }
-elseif ($renderSpecFn -notmatch [regex]::Escape($bound)) { Fail "V255 renderSpecialities still walks every row - it looks for a combo the typed rows do not have (SPEC V255d)" }
+# EMENDED in the 27th batch (SPEC I172g): the renderer paints a LIST of the whole pool now, so
+# it walks every row on purpose - the picker bound it used to stop at left with the pickers.
+elseif ($renderSpecFn -notmatch 'for i = 1, SPECIALITY_ROWS, 1 do') { Fail "V255 renderSpecialities does not walk the whole pool - a speciality bought in a later row would be missing from the SPECIALTIES list (SPEC I172g)" }
 elseif (-not $grantSpecFn) { Fail "V255 grantSpeciality is gone - the gift a trait hands out has nowhere to land" }
-elseif ($grantSpecFn -notmatch [regex]::Escape($bound)) { Fail "V255 the gift can still land in a typed row - nothing there locks it, so the player could type over a granted specialty and keep the stamp (SPEC V255d, V151)" }
+# The gift takes its row from specFreeRow since the 27th batch (SPEC I172e, V505c): the bound
+# moved there, one owner for "a free row", so it is asked of THAT body.
+elseif ($grantSpecFn -notmatch 'specFreeRow\(\)' -or (LuaFn $rootTxt 'specFreeRow') -notmatch [regex]::Escape($bound)) { Fail "V255 the gift can still land in a typed row - nothing there locks it, so the player could type over a granted specialty and keep the stamp (SPEC V255d, V151)" }
 else { Pass "V255 none of the $($V255_RETIRED.Count) retired typed-row template(s) is authored anywhere, and the granted specialty stops at the picker rows" }
 
 # ---- V256 + V417: the darker ground under the SIX XP numbers is a TRIO -------------------
@@ -15448,7 +15396,9 @@ if ($closeNames333 -notcontains 'btnMcSettingsClose') { $v333Bad += "btnMcSettin
 # FOUR since the 25th batch, for the same reason: the ! note window's X closes through the
 # same popClose, and POP_BOX carries popNote (SPEC I170g, V500d). A FIFTH still reddens.
 if ($closeNames333 -cnotcontains 'btnPopNoteClose') { $v333Bad += "btnPopNoteClose does not call popClose - the note window would need a closing function of its own (SPEC V333e, V500d)" }
-if ($close333.Count -ne 4) { $v333Bad += "$($close333.Count) control(s) call popClose, expected btnPopClose, popScrim, btnMcSettingsClose and btnPopNoteClose - a fifth door is a fifth place the visibles can disagree (SPEC V135, V333e)" }
+# FIVE since the 27th batch: the ! of a trait closes the same way (SPEC I172e, V505a/b). A SIXTH still reddens.
+if ($closeNames333 -cnotcontains 'btnPopSpecClose') { $v333Bad += "btnPopSpecClose does not call popClose - the specialities window would need a closing function of its own (SPEC V333e, V505a)" }
+if ($close333.Count -ne 5) { $v333Bad += "$($close333.Count) control(s) call popClose, expected btnPopClose, popScrim, btnMcSettingsClose, btnPopNoteClose and btnPopSpecClose - a sixth door is a sixth place the visibles can disagree (SPEC V135, V333e)" }
 
 # (f) wordWrap is the ONLY thing between this box and the horizontal scrollbar the user ruled
 # out: SDK3 has no scroll property on textEditor, so the fix is to give it nothing to scroll.
@@ -15590,7 +15540,10 @@ foreach ($f334 in $files) {
         # The twin frame's pane is a pane: it carries real text, real zoom buttons and the
         # same descFontSize, so leaving it out here would be the silent skip V334b names, one
         # frame over (SPEC I153b, V439c).
-        if ($nm334 -match '^edt.*DescB?$') { $PANES334 += $nm334 }
+        # The ! note is a pane since the 28th batch and it is NAMED, not matched: its name does
+        # not end in Desc, and renaming it would move noteOpen, savePopNote and V500 (SPEC V334b
+        # amended, I173d). Its pair derives the same way - edtPopNote gives btnFont*PopNote.
+        if ($nm334 -match '^edt.*DescB?$' -or $nm334 -ceq 'edtPopNote') { $PANES334 += $nm334 }
     }
 }
 $PANES334 = @($PANES334 | Sort-Object -Unique)
@@ -15603,7 +15556,7 @@ if ($PANES334.Count -eq 0) { $v334Bad += "no edt*Desc textEditor was found in an
 # XML carries and the table does not is a pane the zoom skips in silence (SPEC V334e, V135).
 $luaPanes334 = @()
 if ($rootTxt -match '(?s)local DESC_PANES = \{(.*?)\};') {
-    $luaPanes334 = @([regex]::Matches($Matches[1], 'edt[A-Za-z]*DescB?') | ForEach-Object { $_.Value } | Sort-Object -Unique)
+    $luaPanes334 = @([regex]::Matches($Matches[1], 'edtPopNote|edt[A-Za-z]*DescB?') | ForEach-Object { $_.Value } | Sort-Object -Unique)
 }
 if ($luaPanes334.Count -eq 0) { $v334Bad += "DESC_PANES is gone or unreadable in WoD20th.lfm - it is the list applyDescFont walks, and without it the Lua half of this roster measures nothing (SPEC V334e, V209)" }
 else {
@@ -16668,7 +16621,8 @@ $V378_KEEP_FIELD = @('specialityName_')
 # The CONVERTED templates, measured as templates and not by field prefix: OpenAbility binds
 # `field="$(field)"`, so a prefix test on `background_` reads right past it and leg (b) went
 # from covering four families to covering two without saying so.
-$V378_PICKED = @('MeritPicked', 'OpenAbility', 'SpecialityRow', 'HeaderPicker')
+# SpecialityRow left in the 27th batch with the box's ten rows (SPEC I172g).
+$V378_PICKED = @('MeritPicked', 'OpenAbility', 'HeaderPicker')
 
 $deadFound378 = @()
 $visEdit378 = @()
@@ -17261,8 +17215,7 @@ $V354_WAVE = @(
     # SpecialityRow still declares none, and never will: Q33 settled it (user 2026-08-30).
     @{ Tpl = 'HeaderPicker'; File = 'WoD20.1.lfm'; Mod = 'Nature'; FieldAttr = '$(field)'; RootArg = '$(field)';
        Roots = @( @{ Root = 'nature'; Form = 'bare'; Rows = 1 }, @{ Root = 'demeanor'; Form = 'bare'; Rows = 1 } ) },
-    @{ Tpl = 'SpecialityRow'; File = 'WoD20.1.lfm'; FieldAttr = 'speciality_$(num)'; RootArg = 'speciality';
-       Roots = @( @{ Root = 'speciality'; Form = 'indirect'; Rows = 10 } ) },
+    # SpecialityRow left the roster in the 27th batch with the box's rows (SPEC I172g).
     # Wave 3 (T872): the three families the picker filter actually prunes. DiscRow is the first
     # template on the roster to carry two NUMBERED roots - one template serves both boxes of
     # WoD20.12 so the clan slots and the open slots cannot offer different lists (V178), and
@@ -18116,7 +18069,7 @@ else { Pass "V364 mfOpen guards the description require with exactly one pcall, 
 # and if that block ever moves, leg (g) below fires loudly instead of this one passing on an
 # empty set.
 $v365Bad = @()
-$V365_EXEMPT = @('SpecialityRow')             # named exception, and it cuts BOTH ways (V365a, B105)
+$V365_EXEMPT = @()                            # EMPTY since the 27th batch: SpecialityRow, the one exception, left with the box's rows (SPEC I172g)
 $V365_BRIGHT = @('edtPopDesc', 'edtMfDesc')   # the ? box and the search pane - the two that stay
 
 # Which templates draw a ?, read off the same XML the opener list comes from.
@@ -19000,9 +18953,13 @@ if ($calls353.Count -eq 0) {
     # What replaces it is what the prose says, and it is STRONGER than the proxy was: the one
     # asker gates on .visible itself, and EVERY opening path calls it after showing its box. The
     # proxy checked one path; this checks both, and it checks the guarantee rather than a place.
+    # The two ! windows joined in the 28th batch (SPEC V353 amended, I173c): Esc reaches only a
+    # focused text control, so a window opened without focus is a window Esc cannot close.
     $FOCUS_PATHS = @(
-        [pscustomobject]@{ Fn = 'mfOpen';  Box = 'mfSearch' }
-        [pscustomobject]@{ Fn = 'popOpen'; Box = 'popDesc' }
+        [pscustomobject]@{ Fn = 'mfOpen';   Box = 'mfSearch' }
+        [pscustomobject]@{ Fn = 'popOpen';  Box = 'popDesc' }
+        [pscustomobject]@{ Fn = 'noteOpen'; Box = 'popNote' }
+        [pscustomobject]@{ Fn = 'specOpen'; Box = 'popSpec' }
     )
     $refoc353 = [regex]::Match($lua353, '(?s)function kbRefocus\([^)]*\)(.*?)\n\t{3}end;')
     if (-not $refoc353.Success) {
@@ -19011,6 +18968,14 @@ if ($calls353.Count -eq 0) {
         $v353Bad += "(a) kbRefocus asks for focus without reading .visible - asking a widget that is not on screen is the one way this cannot work, and it fails SILENTLY (SPEC V353a, I111c)"
     } elseif ($refoc353.Groups[1].Value -notmatch 'setFocus\s*\(') {
         $v353Bad += "(a) the setFocus call is not inside kbRefocus - the ask and the .visible guard are one function, or the guard is optional (SPEC V353a, V135)"
+    } else {
+        # every box an opening path shows has its own branch in the asker, reading ITS .visible:
+        # a box with no branch opens, kbRefocus finds nothing to focus, and Esc is dead in silence.
+        foreach ($path353 in $FOCUS_PATHS) {
+            if ($refoc353.Groups[1].Value -notmatch ('f\[\s*"' + $path353.Box + '"\s*\]\s*\.visible')) {
+                $v353Bad += "(a) kbRefocus has no branch reading $($path353.Box).visible - $($path353.Fn) calls it and gets no focus back, so Esc never reaches that box (SPEC V353a, I173c)"
+            }
+        }
     }
     foreach ($path353 in $FOCUS_PATHS) {
         $fn353 = [regex]::Match($lua353, '(?s)function ' + $path353.Fn + '\([^)]*\)(.*?)\n\t{3}end;')
@@ -19025,7 +18990,7 @@ if ($calls353.Count -eq 0) {
 }
 
 if ($v353Bad) { foreach ($b in $v353Bad) { Fail "V353 $b" } }
-else { Pass "V353 the cursor is handed over from exactly one place - kbRefocus, which gates on .visible - and both opening paths call it after showing their box" }
+else { Pass "V353 the cursor is handed over from exactly one place - kbRefocus, which gates on .visible of every box - and all four opening paths call it after showing their box" }
 
 # ---- V405: Esc closes both overlays -----------------------------------------------------
 # SPEC V405, I140c, I140u, R138, T922/T923, user 2026-09-02 item 2.
@@ -19047,7 +19012,9 @@ else { Pass "V353 the cursor is handed over from exactly one place - kbRefocus, 
 # So the subject is SWEPT: every <edit> and <textEditor> inside either overlay takes focus when
 # it is clicked, therefore every one of them has to answer Esc. A control added to either box
 # tomorrow enters this set by construction (SPEC V209, B7).
-$V405_OVERLAYS = @('mfSearch', 'popDesc')
+# The two ! windows joined in the 28th batch (SPEC V405 amended, I173c): the note's text box and
+# the five speciality slots, six more controls, so the floor below went from 4 to 10.
+$V405_OVERLAYS = @('mfSearch', 'popDesc', 'popNote', 'popSpec')
 $v405Bad = @()
 $doc405 = Doc $rootPath
 $lua405 = CodeOf $rootPath
@@ -19072,7 +19039,7 @@ foreach ($ov405 in $V405_OVERLAYS) {
         }
     }
 }
-if ($seen405 -lt 4) { $v405Bad += "only $seen405 text control(s) were swept across the two overlays, expected at least the 4 they draw - this leg is covering less than the sheet has (SPEC V209)" }
+if ($seen405 -lt 10) { $v405Bad += "only $seen405 text control(s) were swept across the four overlays, expected at least the 10 they draw - this leg is covering less than the sheet has (SPEC V209)" }
 # (b) the closing goes through the SAME doors the X and the scrim use. A second closer is what
 # V333(e) refuses, and it is how one of the two overlays ends up half-shut - box hidden, scrim up.
 $esc405 = [regex]::Match($lua405, '(?s)function escClose\([^)]*\)(.*?)\n\t{3}end;')
@@ -19082,6 +19049,20 @@ else {
         if ($esc405.Groups[1].Value -notmatch ($closer405 + '\s*\(')) { $v405Bad += "escClose never calls $closer405 - Esc would shut one overlay and leave the other, and the scrim belongs to both (SPEC V333e)" }
     }
     if ($esc405.Groups[1].Value -notmatch 'isEscKey\s*\(') { $v405Bad += "escClose does not ask isEscKey - closing on ANY key is not what Esc means, and typing in the filter would shut the box (SPEC I140c)" }
+    # the ! windows have to be LOOKED FOR: a box escClose never finds is a box whose .visible it
+    # never reads, and Esc in its slots would fall through doing nothing (SPEC I173c).
+    foreach ($box405 in @('popNote', 'popSpec')) {
+        if ($esc405.Groups[1].Value -notmatch ($box405 + '\s*=\s*true')) { $v405Bad += "(b) escClose does not look for $box405 - Esc typed in that window finds nothing visible to close (SPEC V405b, I173c)" }
+    }
+}
+# (d) 28th batch (SPEC I173c): a click on a speciality dot can take the focus off the slots, so
+# specDot hands it back - after xpClick, the last thing that can move it.
+$dot405 = [regex]::Match($lua405, '(?s)function specDot\([^)]*\)(.*?)\n\t{3}end;')
+if (-not $dot405.Success) { $v405Bad += "(d) specDot is gone - this leg would measure nothing (SPEC V209)" }
+else {
+    $click405 = [regex]::Match($dot405.Groups[1].Value, 'xpClick\s*\(')
+    $refoc405 = [regex]::Matches($dot405.Groups[1].Value, 'kbRefocus\s*\(')
+    if ($refoc405.Count -eq 0 -or -not $click405.Success -or $refoc405[$refoc405.Count - 1].Index -lt $click405.Index) { $v405Bad += "(d) specDot does not end in kbRefocus after xpClick - one click on a dot and Esc is dead in the window (SPEC V405d, I173c)" }
 }
 # (c) and the measurement itself, kept as a rule: onKeyDown belongs on a control that can hold
 # focus. MEASURED 2026-09-02 - the layout and the rectangle the probe wore never fired once.
@@ -19092,7 +19073,7 @@ foreach ($f in $files) {
     }
 }
 if ($v405Bad) { foreach ($b405 in $v405Bad) { Fail "V405 $b405" } }
-else { Pass "V405 Esc reaches the one focusable control of each overlay and closes it through the door the X already uses" }
+else { Pass "V405 Esc reaches every text control of the four overlays - picker, ?, ! note and ! speciality - and closes them through the door the X already uses" }
 
 # ---- V359: the box has TWO sizes and the CALL picks -------------------------------------
 # SPEC V359, I115, T826, ask 2. Specialties asked for a shorter box: its pane holds no book
@@ -19211,14 +19192,11 @@ if ($v436Bad.Count -eq 0) {
     # A literal width here would be the second owner of the list's right edge (SPEC B69).
     $spec436 = @($open436 | Where-Object { $_.list -eq 'speciality' })
 
-    if ($spec436.Count -eq 0) {
-        $v436Bad += "(a) no opener asks for the 'speciality' list - the one box this rule is about does not exist (SPEC V209)"
-    } else {
-        foreach ($s436 in $spec436) {
-            if ($s436.size -ne 'list') {
-                $v436Bad += "(a) $($s436.file) opens 'speciality' with size '$($s436.size)' and it has to be 'list' - the pane it would otherwise get can only say `"no description available`" and its custom half writes to a field no ? reads back (SPEC I151a, V436a)"
-            }
-        }
+    # RETIRED leg (a) in the 27th batch (SPEC I172g, V436 note): the speciality picker left with
+    # the box's rows, so NO opener may ask for that list any more - one coming back would be the
+    # picker the user asked to drop, with no rows to write into.
+    if ($spec436.Count -gt 0) {
+        $v436Bad += "(a) $($spec436.Count) opener(s) ask for the 'speciality' list again - the trait picker left in the 27th batch; each trait's ! opens its own specialities (SPEC I172g)"
     }
     if ($body436 -notmatch 'size\s*==\s*"list"\s*then\s*w\s*=\s*MF_[A-Z_]+;') {
         $v436Bad += "(a) mfSize does not map the 'list' mode to a declared width constant - a literal here is the second owner of the list's right edge (SPEC V436a, B69)"
@@ -19227,8 +19205,10 @@ if ($v436Bad.Count -eq 0) {
     # (b) EXACTLY ONE list opens without the pane. The other nine still use it, and the count is
     # what turns "a second list lost its pane" into a sentence somebody has to write.
     $paneless436 = @($open436 | Where-Object { $_.size -eq 'list' } | ForEach-Object { $_.list } | Sort-Object -Unique)
-    if ($paneless436.Count -ne 1) {
-        $v436Bad += "(b) $($paneless436.Count) list(s) open with no pane [$($paneless436 -join ', ')], expected exactly 1 - the second one is a decision of a round, not a side effect (SPEC V436b, V316e)"
+    # ZERO since the 27th batch: the one paneless list was the specialities (SPEC I172g, V436 note).
+    # The 'list' width stays in mfSize with no caller for now - its removal is a round of its own.
+    if ($paneless436.Count -ne 0) {
+        $v436Bad += "(b) $($paneless436.Count) list(s) open with no pane [$($paneless436 -join ', ')], expected none since the specialities picker left - a paneless list is a decision of a round, not a side effect (SPEC V436b, V316e)"
     }
 
     # (c) the pane's widgets are still THERE and still authored visible - "list" hides them at
@@ -24234,29 +24214,30 @@ if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -e
         if (($nlR502 + 6) -ne (Int502 $nameEd502 'left')) { $v502Bad += "(d) the Name label closes at $nlR502 and the name edit opens at $(Int502 $nameEd502 'left') - expected a 6px gap (SPEC V502d, I171d)" }
         if ($nl502.GetAttribute('top') -ne $nameEd502.GetAttribute('top') -or $nl502.GetAttribute('height') -ne $nameEd502.GetAttribute('height')) { $v502Bad += "(d) the Name label is not on the name edit's line (same top and height) (SPEC V502d)" }
         if ($nl502.GetAttribute('hitTest') -ne 'false') { $v502Bad += "(d) the Name label does not author hitTest='false' - a click on it would not select the row (SPEC V502d, I170e)" }
+        # 28th batch (SPEC V502d amended, B175): the ruler is an AVERAGE per char, a floor for
+        # overflow and not a size - 'Nome' sized exactly on it (26) was cut on screen, because N
+        # and m are wide letters. So this label keeps 10 over the ruler.
+        $needName502 = (NeededPx 'Name') + 10
+        if ((Int502 $nl502 'width') -lt $needName502) { $v502Bad += "(d) the Name label is $(Int502 $nl502 'width') wide and needs $needName502 - the ruler plus 10, because a label sized on the ruler cut 'Nome' on screen (SPEC V502d, B175)" }
     }
 
     # (e) one label column, each label centred on its bar, three bars on one left and one width
-    # that close where the X closes. The willpower label is dyn*, so V16 never sees its words:
-    # they are read out of mcRender's one write and measured here as shown (NeededPx -Literal).
-    $wpTag502 = @($tpl502.SelectNodes(".//label[starts-with(@name,'dynMcWpTag_')]"))
+    # that close where the X closes. 28th batch (SPEC I173b, Q94, V502e amended): the three labels
+    # are STATIC and the PT map translates them, so there is no dyn* and no Lua write left - and
+    # Willpower's pt value is the user's choice, no hyphen, pinned here by VALUE on both sides.
+    $wpTag502 = @($tpl502.SelectNodes(".//label[@text='Willpower']"))
     $bdLbl502 = @($tpl502.SelectNodes(".//label[@text='Blood']"))
     $qtLbl502 = @($tpl502.SelectNodes(".//label[@text='Quintessence']"))
     $wpBar502 = $tpl502.SelectSingleNode(".//progressBar[starts-with(@name,'mcWp_')]")
     $bdBar502 = $tpl502.SelectSingleNode(".//progressBar[starts-with(@name,'mcBlood_')]")
     $qtBar502 = $tpl502.SelectSingleNode(".//progressBar[starts-with(@name,'mcQuint_')]")
     $xBtn502 = $tpl502.SelectSingleNode(".//button[starts-with(@name,'btnMcRemove_')]")
-    $tagW502 = @([regex]::Matches($root25Code, 'dynMcWpTag_"\s*\.\.\s*\w+\s*\]\.text\s*=')).Count
-    $tagIn502 = [regex]::Match($render502, 'dynMcWpTag_"\s*\.\.\s*\w+\s*\]\.text\s*=([^;\r\n]+)')
+    $tagAll502 = @([regex]::Matches($all25Code, 'dynMcWpTag_')).Count
     if ($wpTag502.Count -ne 1 -or $bdLbl502.Count -ne 1 -or $qtLbl502.Count -ne 1 -or $null -eq $wpBar502 -or $null -eq $bdBar502 -or $null -eq $qtBar502 -or $null -eq $xBtn502) {
-        $v502Bad += "(e) McRow does not carry exactly one dynMcWpTag_, one Blood and one Quintessence label beside its three bars and its X - fewer than 3 bar labels were read (SPEC V502e, V209)"
-    } elseif ($tagW502 -ne 1 -or -not $tagIn502.Success) {
-        $v502Bad += "(e) dynMcWpTag_.text is written $tagW502 time(s), $(if ($tagIn502.Success) { 'one of them' } else { 'none' }) in mcRender - expected exactly one, in mcRender (SPEC V502e, V209)"
+        $v502Bad += "(e) McRow does not carry exactly one Willpower, one Blood and one Quintessence label beside its three bars and its X - fewer than 3 bar labels were read (SPEC V502e, V209)"
     } else {
-        $tagExpr502 = $tagIn502.Groups[1].Value
-        if ($tagExpr502 -notmatch '"Vontade"' -or $tagExpr502 -notmatch '"Willpower"') { $v502Bad += "(e) mcRender writes the willpower label as $($tagExpr502.Trim()) - expected the pair the user asked for, Vontade (pt) and Willpower (en) (SPEC V502e, Q91.1)" }
-        if ($wpTag502[0].HasAttribute('text')) { $v502Bad += "(e) dynMcWpTag_ authors text= - the language traversal skips dyn* and Lua owns it, so an authored text is a second owner (SPEC V502e)" }
-        foreach ($st502 in @($bdLbl502[0], $qtLbl502[0])) { if ($st502.GetAttribute('name') -like 'dyn*') { $v502Bad += "(e) the '$($st502.GetAttribute('text'))' label is dyn* - it would never be translated (SPEC V502e)" } }
+        if ($tagAll502 -ne 0) { $v502Bad += "(e) dynMcWpTag_ is still named $tagAll502 time(s) in the sheet's code - the willpower label is static since the 28th batch and the PT map owns its word (SPEC V502e, I173b)" }
+        foreach ($st502 in @($wpTag502[0], $bdLbl502[0], $qtLbl502[0])) { if ($st502.GetAttribute('name') -like 'dyn*') { $v502Bad += "(e) the '$($st502.GetAttribute('text'))' label is dyn* - it would never be translated (SPEC V502e)" } }
         $lblL502 = Int502 $wpTag502[0] 'left'; $lblW502 = Int502 $wpTag502[0] 'width'
         $barL502 = Int502 $wpBar502 'left'; $barW502 = Int502 $wpBar502 'width'
         $edge502 = (Int502 $xBtn502 'left') + (Int502 $xBtn502 'width')
@@ -24276,13 +24257,263 @@ if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -e
         }
         if ($barL502 -ne ($lblL502 + $lblW502 + 6)) { $v502Bad += "(e) the bars open at $barL502 and the label column closes at $($lblL502 + $lblW502) - expected a 6px gap (SPEC V502e)" }
         if (($barL502 + $barW502) -ne $edge502) { $v502Bad += "(e) the bars close at $($barL502 + $barW502) and the X at $edge502 - the row's right edge is one line (SPEC V502e, I170c)" }
-        $needLbl502 = @((NeededPx 'Blood'), (NeededPx 'Quintessence'))
-        foreach ($w502 in [regex]::Matches($tagExpr502, '(?:and|or)\s+"([^"]+)"')) { $needLbl502 += NeededPx $w502.Groups[1].Value -Literal }
+        $needLbl502 = @((NeededPx 'Willpower'), (NeededPx 'Blood'), (NeededPx 'Quintessence'))
         $needMax502 = ($needLbl502 | Measure-Object -Maximum).Maximum
         if ($lblW502 -lt $needMax502) { $v502Bad += "(e) the label column is $lblW502 wide and its longest word needs $needMax502 (SPEC V502e, V16)" }
+        # The user's word, both halves (SPEC Q94): without this leg the next session "evens it
+        # out" with the book's hyphen. Built from the code point - this file is ASCII (SPEC V384).
+        $wpPt502 = 'For' + [string][char]0x00E7 + 'a de Vontade'
+        if (-not $ptVal.ContainsKey('Willpower') -or $ptVal['Willpower'] -cne $wpPt502) { $v502Bad += "(e) localization.lang [pt] does not read Willpower as the user's 'Forca de Vontade' with no hyphen (SPEC Q94, V502e)" }
+        $wod6Txt502 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.6.lfm")))
+        $map502 = [regex]::Match($wod6Txt502, '\["Willpower"\]\s*=\s*"([^"]*)"')
+        if (-not $map502.Success -or $map502.Groups[1].Value -cne $wpPt502) { $v502Bad += "(e) the PT map in WoD20.6 does not read Willpower as the user's 'Forca de Vontade' with no hyphen (SPEC Q94, V502e)" }
     }
 }
 if ($v502Bad) { foreach ($b in $v502Bad) { Fail "V502 $b" } }
 else { Pass "V502 Add and Settings tile the band, the photo's placeholder is one hidden line written once, the unselected outline alone fades to 0.70, and Name plus the three bar labels sit in their columns with the bars on one left and width" }
+
+# ---- V503: every window darkens the sheet at 50%, the picker on top included -----------------
+# SPEC I172a/b (27th batch). ONE tone and not a transparent one; the twin under the second picker
+# is the same rectangle declared between the two boxes; and (d) is DERIVED, never a typed roster:
+# every hidden window layout over popScrim must be raised by a function that raises popScrim too,
+# so a window born without the fade reddens by NAME.
+$v503Bad   = @()
+$scrim503  = $root25Doc.SelectSingleNode("//rectangle[@name='popScrim']")
+$scrimB503 = $root25Doc.SelectSingleNode("//rectangle[@name='popScrimB']")
+$mfA503    = $root25Doc.SelectSingleNode("//layout[@name='mfSearch']")
+$mfB503    = $root25Doc.SelectSingleNode("//layout[@name='mfSearchB']")
+$close503  = LuaFn $rootTxt 'mfClose'
+if ($null -eq $scrim503 -or $null -eq $mfA503 -or $null -eq $mfB503 -or -not $close503) { $v503Bad += "popScrim, mfSearch, mfSearchB or mfClose is not on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    if ($scrim503.GetAttribute('color') -ne '#80000000') { $v503Bad += "(a) popScrim authors color '$($scrim503.GetAttribute('color'))' - the fade behind every window is #80000000, black at 50% (SPEC I172a)" }
+    foreach ($f503 in $files) {
+        if ([System.IO.File]::ReadAllText($f503.FullName).Contains('#66000000')) { $v503Bad += "(a) $($f503.Name) still carries #66000000 - the 40% fade left in the 27th batch, and a palette key nobody uses does not stay (SPEC I172a)" }
+    }
+    $sib503 = @($mfA503.ParentNode.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
+    $iA503  = [array]::IndexOf($sib503, $mfA503)
+    $iB503  = [array]::IndexOf($sib503, $mfB503)
+    $iS503  = if ($null -ne $scrimB503) { [array]::IndexOf($sib503, $scrimB503) } else { -1 }
+    $nSB503 = @($root25Doc.SelectNodes("//rectangle[@name='popScrimB']")).Count
+    if ($nSB503 -ne 1) { $v503Bad += "(b) popScrimB is declared $nSB503 time(s) - exactly one scrim sits under the second picker (SPEC I172b)" }
+    elseif ($iS503 -lt 0 -or -not ($iA503 -lt $iS503 -and $iS503 -lt $iB503)) { $v503Bad += "(b) popScrimB is not a sibling declared BETWEEN mfSearch and mfSearchB - document order is paint order, so it would not sit over the first box and under the second (SPEC I172b, V439b)" }
+    else {
+        foreach ($at503 in @('left', 'top', 'width', 'height', 'color', 'strokeColor')) {
+            if ($scrimB503.GetAttribute($at503) -cne $scrim503.GetAttribute($at503)) { $v503Bad += "(b) popScrimB authors $at503='$($scrimB503.GetAttribute($at503))' and popScrim '$($scrim503.GetAttribute($at503))' - the twin is the same rectangle (SPEC I172b)" }
+        }
+        if ($scrimB503.GetAttribute('visible') -ne 'false') { $v503Bad += "(b) popScrimB is not authored visible='false' - the second picker's fade would be up with no picker under it" }
+        if ($scrimB503.GetAttribute('onClick') -notmatch '^mfClose\(self\);?$') { $v503Bad += "(b) popScrimB does not call mfClose(self) - a click outside the second picker must close that picker only (SPEC I172b)" }
+    }
+    if ((LuaFn $rootTxt 'mfNames') -match '"popScrim"') { $v503Bad += "(c) mfNames still singles popScrim out by name - the twin would open over a first box that stays lit (SPEC I172b, V439c)" }
+    # The depth-2 branch runs from its own `if` to the first return AFTER it - the guard at the
+    # top of mfClose returns first and would cut the body short.
+    $d2Beg503  = $close503.IndexOf('if MF.depth == 2 then')
+    $d2End503  = if ($d2Beg503 -ge 0) { $close503.IndexOf('return;', $d2Beg503) } else { -1 }
+    $d2Body503 = if ($d2End503 -gt $d2Beg503) { $close503.Substring($d2Beg503, $d2End503 - $d2Beg503) } else { '' }
+    if ($d2Body503 -notmatch 'top\["popScrim"\]\.visible = false') { $v503Bad += "(c) mfClose at depth 2 does not take the twin's scrim down - the sheet would stay dark over the first box (SPEC I172b)" }
+    if ($close503 -notmatch 'tw\["popScrimB"\]\.visible = false') { $v503Bad += "(c) mfClose at depth 1 does not hide popScrimB with mfSearchB (SPEC I172b, V439f)" }
+    $iScrim503 = [array]::IndexOf($sib503, $scrim503)
+    $wins503 = @($sib503 | Where-Object { $_.LocalName -eq 'layout' -and $_.GetAttribute('visible') -eq 'false' -and -not $_.GetAttribute('name').EndsWith('B') -and [array]::IndexOf($sib503, $_) -gt $iScrim503 })
+    if ($wins503.Count -lt 5) { $v503Bad += "(d) only $($wins503.Count) window layout(s) were found over popScrim - popDesc, mcSettings, popNote, popSpec and mfSearch at least (SPEC V209)" }
+    $fns503 = @([regex]::Matches($rootTxt, "(?ms)^\t\t\tfunction\s+\w+\s*\(.*?\r?\n\t\t\tend;") | ForEach-Object { $_.Value })
+    foreach ($w503 in $wins503) {
+        $wn503 = $w503.GetAttribute('name')
+        $raise503 = @($fns503 | Where-Object { $_.Contains('["' + $wn503 + '"].visible = true') })
+        if ($raise503.Count -eq 0) { $v503Bad += "(d) no function raises $wn503 - a window nobody opens (SPEC V209)" }
+        elseif (@($raise503 | Where-Object { $_.Contains('["popScrim"].visible = true') }).Count -eq 0) { $v503Bad += "(d) $wn503 is raised without popScrim - that window would open over a sheet that does not darken (SPEC I172a, V503d)" }
+    }
+}
+if ($v503Bad) { foreach ($b in $v503Bad) { Fail "V503 $b" } }
+else { Pass "V503 one 50% fade behind every window, its twin between the two pickers, and every window raised with it" }
+
+# ---- V504: the ! of a trait - one per attribute, book ability and typed row, none on a virtue ----
+# SPEC I172c/d, Q92.3. The ability's ! reads the LIVE field of its first dot because the era
+# re-binds the row (SPEC R171c); the other three hand over '$(field)_1' and specOpen drops the _1.
+$v504Bad = @()
+$main504 = Doc (Join-Path $dir "WoD20.1.lfm")
+$tpl504  = @{}
+foreach ($tn504 in @('Attribute', 'AttributeZeroable', 'Ability', 'CustomAbility', 'Virtue')) { $tpl504[$tn504] = $main504.SelectSingleNode("//template[@name='$tn504']") }
+if (@($tpl504.Values | Where-Object { $null -eq $_ }).Count -gt 0) { $v504Bad += "Attribute, AttributeZeroable, Ability, CustomAbility or Virtue is not declared on WoD20.1 - this check reads nothing (SPEC V20, V209)" }
+else {
+    $want504 = @{ Attribute = 'specOpen(self, ''$(field)_1'');'; AttributeZeroable = 'specOpen(self, ''$(field)_1'');'; CustomAbility = 'specOpen(self, ''$(field)_1'');'; Ability = 'specOpen(self, self.abil$(col)$(num)_1.field);' }
+    foreach ($tn504 in @('Attribute', 'AttributeZeroable', 'Ability', 'CustomAbility')) {
+        $t504 = $tpl504[$tn504]
+        $b504 = @($t504.SelectNodes("button[starts-with(@name,'btnSp')]"))
+        if ($b504.Count -ne 1) { $v504Bad += "(a) $tn504 carries $($b504.Count) specialities ! - exactly one (SPEC I172c/d)"; continue }
+        $bt504 = $b504[0]
+        if ($bt504.GetAttribute('text') -cne '!') { $v504Bad += "(a) $tn504's btnSp does not read '!'" }
+        if ($bt504.GetAttribute('onClick') -cne $want504[$tn504]) { $v504Bad += "(a) $tn504's ! calls '$($bt504.GetAttribute('onClick'))' - expected '$($want504[$tn504])' (SPEC I172c/d: the field of the row's FIRST dot, the live one on an era-bound ability)" }
+        $dot504  = @($t504.ChildNodes | Where-Object { $_.NodeType -eq 'Element' -and @('image', 'imageCheckBox') -ccontains $_.LocalName } | Sort-Object { [int]$_.GetAttribute('left') })[0]
+        $name504 = @($t504.ChildNodes | Where-Object { $_.NodeType -eq 'Element' -and @('label', 'edit') -ccontains $_.LocalName })[0]
+        $bl504 = [int]$bt504.GetAttribute('left'); $bw504 = [int]$bt504.GetAttribute('width')
+        $ne504 = [int]$name504.GetAttribute('left') + [int]$name504.GetAttribute('width')
+        if (($bl504 + $bw504 + 5) -ne [int]$dot504.GetAttribute('left')) { $v504Bad += "(b) $tn504's ! ends at $($bl504 + $bw504) and its first dot starts at $($dot504.GetAttribute('left')) - the ! sits 5 before the dots (SPEC I172c/d)" }
+        if ($ne504 -gt ($bl504 - 5)) { $v504Bad += "(b) $tn504's name closes at $ne504 and runs into the ! at $bl504 (SPEC I172c/d)" }
+    }
+    $abil504 = @([regex]::Matches(([regex]::Match($rootTxt, 'ABILITY_FIELD = \{(.*?)\n\t\t\t\};', 'Singleline')).Groups[1].Value, '\["([^"]+)"\]\s*=') | ForEach-Object { $_.Groups[1].Value })
+    if ($abil504.Count -lt 1) { $v504Bad += "(b) ABILITY_FIELD reads no name - the ability label would be measured against nothing (SPEC V209)" }
+    else {
+        $needA504 = ($abil504 | ForEach-Object { NeededPx $_ } | Measure-Object -Maximum).Maximum
+        $lblA504  = [int]@($tpl504['Ability'].SelectNodes("label"))[0].GetAttribute('width')
+        if ($lblA504 -lt $needA504) { $v504Bad += "(b) the ability label is $lblA504 wide and the longest ABILITY_FIELD name needs $needA504 - the era rewrites it, so V16 never sees it (SPEC V504b)" }
+    }
+    $attrN504 = @($main504.SelectNodes("//Attribute[@nome] | //AttributeZeroable[@nome]") | ForEach-Object { $_.GetAttribute('nome') })
+    $needT504 = ($attrN504 | ForEach-Object { NeededPx $_ } | Measure-Object -Maximum).Maximum
+    foreach ($tn504 in @('Attribute', 'AttributeZeroable')) {
+        $lw504 = [int]@($tpl504[$tn504].SelectNodes("label"))[0].GetAttribute('width')
+        if ($lw504 -lt $needT504) { $v504Bad += "(b) $tn504's label is $lw504 wide and the longest attribute needs $needT504 (SPEC V504b, V16)" }
+    }
+    foreach ($t504 in @($main504.SelectNodes("//template"))) {
+        $tn504 = $t504.GetAttribute('name')
+        if (@('Attribute', 'AttributeZeroable', 'Ability', 'CustomAbility') -ccontains $tn504) { continue }
+        if (@($t504.SelectNodes(".//button[starts-with(@name,'btnSp')]")).Count -gt 0) { $v504Bad += "(c) template $tn504 carries a specialities ! - only the attribute, ability and typed-ability rows do (SPEC I172c)" }
+    }
+    $virt504 = @($main504.SelectNodes("//Virtue[@field]") | ForEach-Object { $_.GetAttribute('field') } | Sort-Object)
+    if (($virt504 -join ',') -cne 'conscience,courage,selfControl') { $v504Bad += "(c) the Virtue rows are [$($virt504 -join ', ')] - expected conscience, selfControl and courage (SPEC I172c)" }
+    if (@($main504.SelectNodes("//Attribute[@field='conscience' or @field='selfControl' or @field='courage']")).Count -gt 0) { $v504Bad += "(c) a virtue is drawn with the Attribute template again - it would carry a ! (SPEC I172c)" }
+    $nA504 = @($main504.SelectNodes("//Attribute | //AttributeZeroable")).Count
+    $nB504 = @($main504.SelectNodes("//Ability")).Count
+    $nC504 = @($main504.SelectNodes("//CustomAbility")).Count
+    if ($nA504 -ne 9 -or $nB504 -ne 37 -or $nC504 -ne 9) { $v504Bad += "(d) the sheet draws $nA504 attribute, $nB504 ability and $nC504 typed rows - expected 9, 37 and 9, i.e. 55 ! (SPEC V504d)" }
+}
+if ($v504Bad) { foreach ($b in $v504Bad) { Fail "V504 $b" } }
+else { Pass "V504 55 specialities ! - 9 attributes, 37 abilities reading their live dot, 9 typed rows - and none on a virtue" }
+
+# ---- V505: the ! window is a VIEW of today's rows and buys only through xpClick ---------------
+# SPEC I172e. Slots bind no field; one owner per question (free row, key of a field, how a key
+# reads); the window never writes a dot itself; the slot texts go in under descQuiet.
+$v505Bad  = @()
+$pop505   = $root25Doc.SelectSingleNode("//layout[@name='popSpec']")
+$per505M  = [regex]::Match($rootTxt, '(?m)^\s*SPEC_PER_TRAIT = (\d+);')
+$dot505   = LuaFn $rootTxt 'specDot'
+$grant505 = LuaFn $rootTxt 'grantSpeciality'
+if ($null -eq $pop505 -or -not $per505M.Success -or -not $dot505 -or -not $grant505 -or $rootTxt -notmatch 'local POP_BOX = \{') { $v505Bad += "popSpec, SPEC_PER_TRAIT, specDot, grantSpeciality or POP_BOX is not on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    $per505 = [int]$per505M.Groups[1].Value
+    $sib505 = @($pop505.ParentNode.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
+    if ([array]::IndexOf($sib505, $pop505) -lt [array]::IndexOf($sib505, $root25Doc.SelectSingleNode("//rectangle[@name='popScrim']"))) { $v505Bad += "(a) popSpec is declared before popScrim - it would open UNDER the fade (SPEC I172e)" }
+    if ($pop505.GetAttribute('visible') -ne 'false') { $v505Bad += "(a) popSpec is not authored visible='false'" }
+    $ttl505 = $pop505.SelectSingleNode("label[@name='dynPopSpecTitle']")
+    $x505   = $pop505.SelectSingleNode("button[@name='btnPopSpecClose']")
+    if ($null -eq $ttl505) { $v505Bad += "(a) popSpec has no dynPopSpecTitle" }
+    if ($null -eq $x505 -or $x505.GetAttribute('onClick') -notmatch '^popClose\(self\);?$') { $v505Bad += "(a) popSpec has no btnPopSpecClose calling popClose(self) (SPEC V333e)" }
+    $edts505 = @($pop505.SelectNodes("edit[starts-with(@name,'edtPopSpec_')]"))
+    $dots505 = @($pop505.SelectNodes("imageCheckBox[starts-with(@name,'dotPopSpec_')]"))
+    if ($edts505.Count -ne $per505 -or $dots505.Count -ne $per505) { $v505Bad += "(a) popSpec draws $($edts505.Count) slot(s) and $($dots505.Count) dot(s) - SPEC_PER_TRAIT says $per505 (SPEC V505a)" }
+    for ($k505 = 1; $k505 -le $per505; $k505++) {
+        $e505 = $pop505.SelectSingleNode("edit[@name='edtPopSpec_$k505']")
+        $d505 = $pop505.SelectSingleNode("imageCheckBox[@name='dotPopSpec_$k505']")
+        if ($null -eq $e505 -or $null -eq $d505) { $v505Bad += "(a) slot $k505 is missing its edit or its dot"; continue }
+        if ($e505.HasAttribute('field') -or $d505.HasAttribute('field')) { $v505Bad += "(a) slot $k505 binds a field= - which row a slot shows is decided at open time (SPEC I172e)" }
+        if ($e505.GetAttribute('onChange') -cne "specType(self, $k505);") { $v505Bad += "(a) edtPopSpec_$k505 does not call specType(self, $k505);" }
+        if ($d505.GetAttribute('onClick') -cne "specDot(self, $k505);") { $v505Bad += "(a) dotPopSpec_$k505 does not call specDot(self, $k505);" }
+        if ($d505.GetAttribute('autoChange') -ne 'false') { $v505Bad += "(a) dotPopSpec_$k505 is not autoChange='false' - the dot would mark itself before xpClick decides (SPEC V135)" }
+        if ($e505.GetAttribute('top') -ne $d505.GetAttribute('top')) { $v505Bad += "(a) slot $k505's edit and dot are on different tops" }
+    }
+    $names505 = @([regex]::Matches(([regex]::Match($rootTxt, 'local XP_ATTRS = \{(.*?)\};', 'Singleline')).Groups[1].Value, '\{"([^"]+)", "[^"]+"\}') | ForEach-Object { $_.Groups[1].Value })
+    $names505 += @([regex]::Matches(([regex]::Match($rootTxt, 'ABILITY_FIELD = \{(.*?)\n\t\t\t\};', 'Singleline')).Groups[1].Value, '\["([^"]+)"\]\s*=') | ForEach-Object { $_.Groups[1].Value })
+    $pre505 = 'Especializa' + [char]0xE7 + [char]0xF5 + 'es de '
+    if ($names505.Count -lt 10) { $v505Bad += "(a) the SPEC_TRAIT sources read $($names505.Count) names - the title would be measured against next to nothing (SPEC V209)" }
+    elseif ($null -ne $ttl505) {
+        $need505 = 0
+        foreach ($n505 in $names505) {
+            $p505 = if ($ptVal.ContainsKey($n505)) { $ptVal[$n505] } else { $n505 }
+            $need505 = [math]::Max($need505, (NeededPx ($pre505 + $p505) -Literal))
+            $need505 = [math]::Max($need505, (NeededPx ($n505 + ' Specialties') -Literal))
+        }
+        if ([int]$ttl505.GetAttribute('width') -lt $need505) { $v505Bad += "(a) the title is $($ttl505.GetAttribute('width')) wide and the longest title needs $need505 - dyn*, so V16 never sees it (SPEC V505a)" }
+    }
+    $pb505 = [regex]::Match($rootTxt, '(?s)local POP_BOX = \{(.*?)\};\s*for k = 1, SPEC_PER_TRAIT, 1 do(.*?)end;')
+    if (-not $pb505.Success -or $pb505.Groups[1].Value -notmatch 'popSpec = true' -or $pb505.Groups[1].Value -notmatch 'dynPopSpecTitle = true' -or $pb505.Groups[2].Value -notmatch '"edtPopSpec_" \.\. k' -or $pb505.Groups[2].Value -notmatch '"dotPopSpec_" \.\. k') { $v505Bad += "(b) POP_BOX does not carry popSpec, its title and its slots derived from SPEC_PER_TRAIT (SPEC V505b)" }
+    if ((LuaFn $rootTxt 'popClose') -notmatch 'found\["popSpec"\]\.visible = false') { $v505Bad += "(b) popClose does not hide popSpec (SPEC V505b)" }
+    $defFree505  = @([regex]::Matches($rootTxt, 'function specFreeRow\(')).Count
+    $callFree505 = @([regex]::Matches($rootTxt, 'specFreeRow\(\)')).Count - $defFree505
+    $loops505    = @([regex]::Matches($rootTxt, '(?s)for i = 1, SPECIALITY_ROWS[^\r\n]*do\s*\r?\n\s*local v = sheet\["speciality_" \.\. i\];')).Count
+    if ($defFree505 -ne 1 -or $callFree505 -lt 2 -or $grant505 -notmatch 'specFreeRow\(\)' -or $dot505 -notmatch 'specFreeRow\(\)') { $v505Bad += "(c) specFreeRow is defined $defFree505 time(s) and called $callFree505 - one owner of 'a free row', called by the gift and by specDot (SPEC V505c)" }
+    if ($loops505 -ne 1) { $v505Bad += "(c) $loops505 loop(s) look for an empty speciality row - specFreeRow is the one owner (SPEC V505c)" }
+    foreach ($fn505 in @('specKey', 'specTraitName')) { if (@([regex]::Matches($rootTxt, "function $fn505\(")).Count -ne 1) { $v505Bad += "(c) $fn505 is not defined exactly once (SPEC V505c)" } }
+    $open505  = LuaFn $rootTxt 'specOpen'
+    $paint505 = LuaFn $rootTxt 'specPaint'
+    $type505  = LuaFn $rootTxt 'specType'
+    if ($open505 -notmatch 'specKey\(') { $v505Bad += "(c) specOpen does not take the key from specKey" }
+    $win505 = $open505 + $paint505 + $type505 + $dot505
+    if ($win505 -match '(setField|markDot)\([^\r\n]*"_1"') { $v505Bad += "(d) the ! window writes a speciality DOT itself - only xpClick may, or the price, the door and the log are skipped (SPEC V505d, V135)" }
+    if ($dot505 -notmatch 'xpClick\("speciality_" \.\. i \.\. "_1", form\)') { $v505Bad += "(d) specDot does not buy through xpClick (SPEC V505d)" }
+    $key505 = @([regex]::Matches($win505, 'setField\("speciality_" \.\. i,')).Count
+    if ($key505 -ne 1 -or $dot505 -notmatch 'setField\("speciality_" \.\. i,') { $v505Bad += "(d) the window writes the trait key in $key505 place(s) - exactly one, specDot taking a free row (SPEC V505d)" }
+    if ($paint505 -notmatch '(?s)descQuiet = true;.*edt\.text = .*descQuiet = false;') { $v505Bad += "(d) specPaint writes the slot texts outside descQuiet - specType would take the write for typing (SPEC V505d, R170i)" }
+    if (($open505 + $type505 + $dot505) -match '\.text = ') { $v505Bad += "(d) a slot text is written outside specPaint (SPEC V505d)" }
+    if ($type505 -notmatch 'if descQuiet') { $v505Bad += "(d) specType does not return on descQuiet (SPEC V505d)" }
+    if (([regex]::Matches($rootTxt, [regex]::Escape($pre505))).Count -ne 1 -or ([regex]::Matches($paint505, [regex]::Escape($pre505))).Count -ne 1) { $v505Bad += "(e) the pt title prefix is written outside specPaint or more than once (SPEC V505e)" }
+    if (([regex]::Matches($rootTxt, '" Specialties"')).Count -ne 1 -or $paint505 -notmatch '" Specialties"') { $v505Bad += "(e) the en title suffix is written outside specPaint or more than once (SPEC V505e)" }
+}
+if ($v505Bad) { foreach ($b in $v505Bad) { Fail "V505 $b" } }
+else { Pass "V505 the ! window binds no field, shows $per505 slots of the trait's own rows, and buys through xpClick alone" }
+
+# ---- V506: no loose TEXT between tags in any .lfm ---------------------------------------------
+# SPEC B173: the TAB of 18 lines of WoD20.2 became the word FLAWS, rdk compiled it, and every check
+# above stayed green. Parsed as XML: a text node outside <script> (the Lua, in CDATA) and outside
+# <event> (Lua in an event body) is text nobody meant to write.
+$v506Bad = @()
+$n506 = 0
+foreach ($f506 in $files) {
+    $n506++
+    foreach ($t506 in @((Doc $f506.FullName).SelectNodes("//text()[normalize-space()][not(ancestor::script)][not(ancestor::event)]"))) {
+        $s506 = $t506.Value.Trim()
+        if ($s506.Length -gt 30) { $s506 = $s506.Substring(0, 30) }
+        $v506Bad += "$($f506.Name) carries loose text '$s506' inside <$($t506.ParentNode.LocalName)> - rdk compiles it and nothing else sees it (SPEC B173)"
+    }
+}
+if ($n506 -lt 12) { $v506Bad += "only $n506 .lfm file(s) were read, expected 12 (SPEC V20, V209)" }
+if ($v506Bad) { foreach ($b in $v506Bad) { Fail "V506 $b" } }
+else { Pass "V506 no loose text between tags in the $n506 .lfm files" }
+
+# ---- V507: 5 per trait, no ceiling on the total, and the SPECIALTIES summary ------------------
+# SPEC I172f/g, Q92.1, Q92.4. The pool is SIZED from its three sources, so a typed row added to
+# the XML without growing it reddens (V204 from the speciality side); the gift holds the trait to
+# the one ceiling; the ledger names a typed row by what is typed in it; the box is a read-only list.
+$v507Bad  = @()
+$per507M  = [regex]::Match($rootTxt, '(?m)^\s*SPEC_PER_TRAIT = (\d+);')
+$grant507 = LuaFn $rootTxt 'grantSpeciality'
+$main507  = Doc (Join-Path $dir "WoD20.1.lfm")
+$mainRaw507 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.1.lfm")))
+$box507   = BoxOf $main507 "SPECIALTIES"
+if ($spRows -lt 1 -or -not $per507M.Success -or -not $grant507 -or -not $box507) { $v507Bad += "SPECIALITY_ROWS, SPEC_PER_TRAIT, grantSpeciality or the SPECIALTIES box is not found - this check reads nothing (SPEC V20, V209)" }
+else {
+    $per507  = [int]$per507M.Groups[1].Value
+    $nAt507  = @([regex]::Matches(([regex]::Match($rootTxt, 'local XP_ATTRS = \{(.*?)\};', 'Singleline')).Groups[1].Value, '\{"([^"]+)", "[^"]+"\}')).Count
+    $nAb507  = @([regex]::Matches(([regex]::Match($rootTxt, 'ABILITY_FIELD = \{(.*?)\n\t\t\t\};', 'Singleline')).Groups[1].Value, '\["([^"]+)"\]\s*=')).Count
+    $nCu507  = @($main507.SelectNodes("//CustomAbility[@field]")).Count
+    if ($nAt507 -lt 1 -or $nAb507 -lt 1 -or $nCu507 -lt 1) { $v507Bad += "(a) a source of the pool read nothing ($nAt507 attributes, $nAb507 abilities, $nCu507 typed rows) (SPEC V209)" }
+    elseif ($spRows -ne ($per507 * ($nAt507 + $nAb507 + $nCu507))) { $v507Bad += "(a) SPECIALITY_ROWS is $spRows and SPEC_PER_TRAIT x (attributes + abilities + typed rows) is $per507 x ($nAt507 + $nAb507 + $nCu507) = $($per507 * ($nAt507 + $nAb507 + $nCu507)) - a trait could run out of rows before its $per507 (SPEC I172f, V204)" }
+    if ($grant507 -notmatch '#specRowsOf\(t\.name\) < SPEC_PER_TRAIT') { $v507Bad += "(b) the gift does not hold the trait to SPEC_PER_TRAIT - a sixth speciality would land on a trait whose window shows five (SPEC I172f)" }
+    elseif ($grant507.IndexOf('SPEC_PER_TRAIT') -gt $grant507.IndexOf('specFreeRow()')) { $v507Bad += "(b) the gift asks for the ceiling AFTER it takes a free row (SPEC V507b)" }
+    if ($grant507 -match '[<>]=?\s*5\b') { $v507Bad += "(b) grantSpeciality compares against a literal 5 - the ceiling has one owner, SPEC_PER_TRAIT (SPEC V507b)" }
+    if ($rootTxt -notmatch 'pushRise\(rows, "Specialty", specTraitName\(') { $v507Bad += "(c) the Specialty line of the ledger does not read its name through specTraitName - a typed row would reach the log as its field name (SPEC I172f)" }
+    if (@($main507.SelectNodes("//template[@name='SpecialityRow'] | //SpecialityRow")).Count -gt 0 -or $mainRaw507 -match 'dynspeciality_|edtspeciality_') { $v507Bad += "(d) the SPECIALTIES box still draws picker rows - it is a summary since the 27th batch (SPEC I172g)" }
+    $list507 = @($box507.SelectNodes("textEditor[@name='dynSpecList']"))
+    if ($list507.Count -ne 1 -or $list507[0].GetAttribute('readOnly') -ne 'true') { $v507Bad += "(d) the SPECIALTIES box does not hold exactly one read-only dynSpecList (SPEC I172g)" }
+    if ((LuaFn $rootTxt 'renderSpecialities') -notmatch 'found\["dynSpecList"\]\.text = ') { $v507Bad += "(d) renderSpecialities does not write the list (SPEC V507d)" }
+    $mc507 = @([regex]::Matches($mainRaw507, 'renderSpecialities\(self\)')).Count
+    $rc507 = @([regex]::Matches($rootTxt, 'renderSpecialities\(')).Count - 1
+    if ($mc507 -ne 3 -or $rc507 -ne 4) { $v507Bad += "(d) renderSpecialities is called $mc507 time(s) on WoD20.1 and $rc507 on the root - expected onShow, onNodeReady and the xpFree link there, and xpClick, the language link, specType and specDot here (SPEC V507d, V164)" }
+    if ($rootTxt -notmatch '<dataLink fields="\{''language''\}">\s*<event name="onChange">\s*renderSpecialities\(self\);') { $v507Bad += "(d) the language link of the root does not repaint the list (SPEC V507d)" }
+    if ($null -ne $PICKER['speciality']) { $v507Bad += "(d) PICKER_LIST carries a 'speciality' list again - the trait picker left in the 27th batch (SPEC I172g)" }
+    foreach ($p507 in @($files | ForEach-Object { $_.FullName }) + @(Join-Path $plugin 'localization.lang')) {
+        if ([System.IO.File]::ReadAllText($p507).Contains('Select Speciality')) { $v507Bad += "(d) $(Split-Path $p507 -Leaf) still carries 'Select Speciality' - the key left with the picker (SPEC I172h)" }
+    }
+    # (e) the Q93 exception, closed by NAME (user 2026-09-24, "fica como esta hoje"): the typed
+    # rows XP_CUSTOM leaves out are EXACTLY these three, and every XP_CUSTOM name is a drawn row.
+    # Both directions, so a new typed row nobody decided about reddens (SPEC V507e, B174).
+    $xpc507   = @([regex]::Matches(([regex]::Match($rootTxt, 'local XP_CUSTOM = \{([^}]*)\}')).Groups[1].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+    $cust507  = @($main507.SelectNodes("//CustomAbility[@field]") | ForEach-Object { $_.GetAttribute('field') })
+    $free507  = @('customKnowledge_3', 'customTalent_3', 'customTalent_4')
+    $out507   = @($cust507 | Where-Object { $xpc507 -cnotcontains $_ } | Sort-Object)
+    $ghost507 = @($xpc507 | Where-Object { $cust507 -cnotcontains $_ })
+    if ($xpc507.Count -lt 1) { $v507Bad += "(e) XP_CUSTOM is not found on the root form - the exception is measured against nothing (SPEC V209)" }
+    elseif (($out507 -join ',') -cne ($free507 -join ',')) { $v507Bad += "(e) the typed rows outside XP_CUSTOM are [$($out507 -join ', ')] - the user kept EXACTLY customTalent_3, customTalent_4 and customKnowledge_3 free of cost (SPEC Q93, V507e); any other one is B174 again" }
+    if ($ghost507.Count -gt 0) { $v507Bad += "(e) XP_CUSTOM names $($ghost507 -join ', ') and no typed row draws it - a price with no dots (SPEC V507e)" }
+}
+if ($v507Bad) { foreach ($b in $v507Bad) { Fail "V507 $b" } }
+else { Pass "V507 $spRows rows = $per507 x the traits that can hold them, the gift stops at $per507, the log names typed rows by their text, and SPECIALTIES is one read-only list" }
 
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

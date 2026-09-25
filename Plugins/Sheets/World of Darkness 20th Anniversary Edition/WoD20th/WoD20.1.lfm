@@ -165,8 +165,23 @@
 			<button name="dyn$(field)" left="132" top="0" width="195" height="25" text="Select $(nome)" onClick="mfOpen(self, '$(field)', '$(field)', 'Nature');"/>
 			<edit name="edt$(field)" left="132" top="0" width="195" height="25" field="$(field)" visible="false" enabled="false"/>
 		</template>
-		<template name="Attribute">
+		<!-- The ! of a trait opens its specialities (SPEC I172c/d, V504). It sits LEFT of the dots,
+		     5 before the first one, and the label gave the room up: the dots do not move, so every
+		     column still lines up (SPEC V26). Every ! hands over the field of its row's FIRST dot
+		     and specOpen drops the "_1" - here dot 1 is a fixed image with no field, so the
+		     '$(field)_1' is only that convention (SPEC I172c). The three Virtues used this template
+		     and get no ! : they have one of their own, Virtue, which is this row as it was. -->
+		<template name="Virtue">
 			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<image left="125" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
+			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
+			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
+			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
+			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+		</template>
+		<template name="Attribute">
+			<label left="0" top="5" width="95" height="20" text="$(nome)"/>
+			<button name="btnSp$(field)" left="100" top="2" width="20" height="20" text="!" onClick="specOpen(self, '$(field)_1');"/>
 			<image left="125" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
 			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
 			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
@@ -176,7 +191,8 @@
 		<!-- Attribute, but dot 1 is a real checkbox instead of a fixed image, so the rating can
 		     drop to zero. Only Appearance uses it (SPEC T95). -->
 		<template name="AttributeZeroable">
-			<label left="0" top="5" width="125" height="20" text="$(nome)"/>
+			<label left="0" top="5" width="95" height="20" text="$(nome)"/>
+			<button name="btnSp$(field)" left="100" top="2" width="20" height="20" text="!" onClick="specOpen(self, '$(field)_1');"/>
 			<imageCheckBox left="125" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
 			<imageCheckBox left="150" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
 			<imageCheckBox left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
@@ -184,16 +200,21 @@
 			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
 		</template>
 		<template name="Ability">
-			<label name="dynAbil$(col)$(num)" left="0" top="5" width="165" height="20" text="$(nome)"/>
+			<label name="dynAbil$(col)$(num)" left="0" top="5" width="135" height="20" text="$(nome)"/>
+			<button name="btnSp$(col)$(num)" left="140" top="2" width="20" height="20" text="!" onClick="specOpen(self, self.abil$(col)$(num)_1.field);"/>
 			<imageCheckBox name="abil$(col)$(num)_1" left="165" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_1.field, self);"/>
 			<imageCheckBox name="abil$(col)$(num)_2" left="190" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_2.field, self);"/>
 			<imageCheckBox name="abil$(col)$(num)_3" left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_3.field, self);"/>
 			<imageCheckBox name="abil$(col)$(num)_4" left="240" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_4.field, self);"/>
 			<imageCheckBox name="abil$(col)$(num)_5" left="265" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_5.field, self);"/>
 		</template>
-		<!-- Blank rows at the bottom of each ability column, for abilities the book does not list. -->
+		<!-- Blank rows at the bottom of each ability column, for abilities the book does not list.
+		     Their ! keys the specialities by the row's FIELD, not the typed name, so renaming the
+		     ability keeps them in place (SPEC I172d, Q92.3). The Ability row above hands over the
+		     LIVE field of its first dot instead, because the era re-binds it (SPEC R171c). -->
 		<template name="CustomAbility">
-			<edit left="0" top="2" width="162" height="21" field="$(field)" fontSize="12"/>
+			<edit left="0" top="2" width="135" height="21" field="$(field)" fontSize="12"/>
+			<button name="btnSp$(field)" left="140" top="2" width="20" height="20" text="!" onClick="specOpen(self, '$(field)_1');"/>
 			<imageCheckBox left="165" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
 			<imageCheckBox left="190" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
 			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
@@ -241,32 +262,6 @@
 			</rectangle>
 		</template>
 
-		<!--
-			One speciality row (SPEC I14, T388): the trait it belongs to, the speciality the
-			player types, and a single dot that confirms it.
-
-			The dot's field is `speciality_N_1`, not `speciality_N`, because xpClick splits a
-			field into <trait>_<n> to find its rating (SPEC I13): the row is a one-dot trait,
-			exactly the shape `background_3` and `background_3_1` already have. The combo owns
-			`speciality_N` - the trait NAME, canonical English, which is what the free grant
-			writes and what the log reads back (SPEC V147/V152).
-
-			The name starts with `cbo` because that prefix is what the language traversal looks
-			for when it translates a picker's items (SPEC V24, WoD20.6), and it carries the row
-			number because a control name is global across the sheet's files (SPEC B19/V59).
-
-			Fifty items plus the empty one (SPEC V15): the nine attributes and the forty-one
-			abilities, the same names the root form holds in XP_ATTRS and ABILITY_FIELD. The
-			gate derives that list from those two tables rather than keeping a copy, so an era
-			ability added to one side and not the other is a red gate, not a picker that cannot
-			show what Lua wrote (SPEC V148).
-		-->
-		<template name="SpecialityRow">
-			<button name="dynspeciality_$(num)" left="0" top="0" width="150" height="25" text="Select Speciality" onClick="mfOpen(self, 'speciality_$(num)', 'speciality', nil, 'list');"/>
-			<edit name="edtspeciality_$(num)" left="0" top="0" width="150" height="25" field="speciality_$(num)" fontSize="12" visible="false" enabled="false"/>
-			<edit left="155" top="0" width="75" height="25" field="specialityName_$(num)" fontSize="12"/>
-			<imageCheckBox left="235" top="0" width="25" height="25" field="speciality_$(num)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('speciality_$(num)_1', self);"/>
-		</template>
 
 		<!--
 			The last three rows are TYPED, not picked (SPEC I50, V255, user 2026-08-22) - the same
@@ -670,13 +665,13 @@
 			<label left="20" top="15" width="290" height="20" text="VIRTUES" horzTextAlign="center"/>
 
 			<layout left="40" top="36" width="250" height="25" >
-				<Attribute field="conscience" nome="Conscience"/>
+				<Virtue field="conscience" nome="Conscience"/>
 			</layout>
 			<layout left="40" top="61" width="250" height="25" >
-				<Attribute field="selfControl" nome="Self-Control"/>
+				<Virtue field="selfControl" nome="Self-Control"/>
 			</layout>
 			<layout left="40" top="86" width="250" height="25" >
-				<Attribute field="courage" nome="Courage"/>
+				<Virtue field="courage" nome="Courage"/>
 			</layout>
 		</layout>
 
@@ -805,30 +800,19 @@
 			its height is content plus a 20px foot and nothing else, which is the owner ask of
 			2026-09-02 and what V393 pins (SPEC V376, I136d, Q47).
 
-			TEN rows: the first at 41 on the title hairline and a pitch of 25 puts the tenth at
-			266..291, and the 20 under it is the foot - 311 in all. A table with no free slot
-			says so with a pop-up rather than dropping the grant (SPEC V146/V153).
-
-			No column headings: the box has one title and the three columns explain themselves.
-			The row is 270 wide inside a 290 box - 150 for the trait, 85 for the text, 25 for the
-			dot, 5 between each. It was 300 in a 320 box until the 50th round narrowed the box to
-			match KNOWLEDGES; the 30 came out of the free-text field and not out of the picker,
-			which has to show "Empatia com Animais" at 19 characters (SPEC V16).
+			Since the 27th batch it is a SUMMARY and edits nothing (SPEC I172g, V507d, user Q92.1):
+			one read-only list of every speciality the character bought, "<trait>: <name>", which
+			renderSpecialities writes. The ten picker rows left - each trait's ! opens its own five
+			specialities now - and with them the only ceiling on the total (SPEC I172f). The list
+			starts on the title hairline (36) and closes on 295, and the 20 under it is the foot:
+			the box keeps its 315 and every rule that measures the BOX stays where it was.
+			dyn* so the language traversal leaves Lua's text alone (SPEC I108a, V31).
 		-->
 		<layout left="680" top="541" width="330" height="315">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="290" height="20" text="SPECIALTIES" horzTextAlign="center"/>
 
-			<layout left="35" top="36" width="260" height="25"><SpecialityRow num="1"/></layout>
-			<layout left="35" top="61" width="260" height="25"><SpecialityRow num="2"/></layout>
-			<layout left="35" top="86" width="260" height="25"><SpecialityRow num="3"/></layout>
-			<layout left="35" top="111" width="260" height="25"><SpecialityRow num="4"/></layout>
-			<layout left="35" top="136" width="260" height="25"><SpecialityRow num="5"/></layout>
-			<layout left="35" top="161" width="260" height="25"><SpecialityRow num="6"/></layout>
-			<layout left="35" top="186" width="260" height="25"><SpecialityRow num="7"/></layout>
-			<layout left="35" top="211" width="260" height="25"><SpecialityRow num="8"/></layout>
-			<layout left="35" top="236" width="260" height="25"><SpecialityRow num="9"/></layout>
-			<layout left="35" top="261" width="260" height="25"><SpecialityRow num="10"/></layout>
+			<textEditor name="dynSpecList" left="20" top="36" width="290" height="259" readOnly="true" opacity="0.75" wordWrap="true" transparent="true" fontSize="12"/>
 		</layout>
 
 	</scrollBox>
@@ -856,7 +840,8 @@
 		wodTrace("WoD20.1.onShow");
 		renderXPBoxes(self);
 		-- Both events, like renderXPBoxes (SPEC V429b, I146g, T962): onNodeReady alone leaves the
-		-- authored "Select Speciality" on screen whenever the sheet is not bound yet.
+		-- SPECIALTIES list empty whenever the sheet is not bound yet, and showing the tab again
+		-- is what catches a speciality undone from the Experience log (SPEC I172g).
 		renderSpecialities(self);
 	</event>
 
