@@ -1208,7 +1208,8 @@ foreach ($f in $files) {
             # cursor, and it is SUPPOSED to draw over the boxes - that is what a tooltip is. Its
             # authored 0,0 is a placeholder, not a place. Excluded by exact name, like popDesc is
             # from the section-box census (SPEC I76a).
-            if ($bx.GetAttribute('name') -ceq 'noteTip') { continue }
+            # 31st batch (SPEC I176a, V510a): the Main tab's twin, specTip, floats the same way.
+            if (@('noteTip', 'specTip') -ccontains $bx.GetAttribute('name')) { continue }
             $pk = "$($bx.GetAttribute('left'))/$($bx.GetAttribute('top'))/$($bx.GetAttribute('width'))/$($bx.GetAttribute('height'))"
             if ($paneRect.ContainsKey($pk) -and $paneRect[$pk] -gt 1) { $paneByRect++; continue }
             $bl = 0; $bt = 0; $bw = 0; $bh = 0
@@ -5763,6 +5764,9 @@ if (-not $bExp) { $gridMissing += "EXPERIENCE" }
 # children of the scrollBox that carry all four coordinates - the same set V40 overlaps.
 $mainBoxes = @()
 foreach ($bx in $mainDoc.SelectNodes("//scrollBox/layout")) {
+    # 31st batch (SPEC I176a, V510a): the tooltip is a layout on the scrollBox too, but it floats -
+    # placed by Lua at the cursor, drawn over the boxes on purpose - so it has no band and no place.
+    if ($bx.GetAttribute('name') -ceq 'specTip') { continue }
     $bl = 0; $bw = 0
     if ([int]::TryParse($bx.GetAttribute("left"), [ref]$bl) -and
         [int]::TryParse($bx.GetAttribute("width"), [ref]$bw)) {
@@ -8080,7 +8084,7 @@ foreach ($f in $files) {
         # left with it: a name admitted here with no control behind it is the roster that ages.)
         # The ! note's tooltip fill (SPEC I170h, V501a): 50% black with NO outline by the user's
         # own ask - the same align="contents" backdrop construction as mcDock's floor below.
-        if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("align") -eq 'contents' -and $n287.ParentNode.GetAttribute("name") -eq 'noteTip') { continue }
+        if ($n287.LocalName -eq 'rectangle' -and $n287.GetAttribute("align") -eq 'contents' -and @('noteTip', 'specTip') -ccontains $n287.ParentNode.GetAttribute("name")) { continue }
         # mcDock's own floor (SPEC I169b), unnamed like the strip floor above and cut by the
         # SAME construction - align="contents" backdrop of a layout that is not a section box
         # (no black rectangle-with-radius sibling, no title) - so the era's rule has nothing to
@@ -10453,13 +10457,13 @@ if (-not $pi424.Success) {
 # union catches - neither file alone sees it.
 #
 # The parser is V410's, by the same three shapes, so this births no second reader (SPEC V135).
-# §Q are deliberately OUT and it is by FORM, not by oversight: they are BULLETS of §C and never
+# ??Q are deliberately OUT and it is by FORM, not by oversight: they are BULLETS of ??C and never
 # a line head, which is exactly what made Q62 read as vacant in 2026-09-03 - B152 is that same
 # mistake one round later on an id the parser DOES see.
 #
 # Mutation (SPEC V222): duplicate one `V<n>:` line -> red; duplicate one `T<n>|` row -> red; put
 # an id in the live file that already lives in the archive -> red on the union leg. Probe:
-# duplicate a §Q bullet -> GREEN, the scope is line heads.
+# duplicate a ??Q bullet -> GREEN, the scope is line heads.
 $v425Bad = @()
 $v425Seen = 0
 $fam425 = @(
@@ -13031,8 +13035,8 @@ else { Pass "V403 the 20 BLOOD POOL dots are two rows on one pitch, centred betw
 # and the user undid it on 2026-09-05. The exception names the one button, and the two names of
 # the split stay on the refusal roster so a ? cannot come back under them either.
 #
-# ⚠ REVOKED and rewritten 2026-09-06 (SPEC Q71, I151c, T978): the user asked for the ? back and
-# chose the saída that shrinks the BUTTON. So the rule turns over - the ? is now REQUIRED here,
+# ??? REVOKED and rewritten 2026-09-06 (SPEC Q71, I151c, T978): the user asked for the ? back and
+# chose the sa??da that shrinks the BUTTON. So the rule turns over - the ? is now REQUIRED here,
 # and V365(a) has no exception left on the sheet. What the exception used to pay for is paid
 # another way and this check is what proves it: the entry is read as the ? PLUS the button, the
 # same span V297 reads on the affiliation row, so it still opens where <edit field='dominator'>
@@ -13102,7 +13106,7 @@ else { Pass "V407 the Clan/Family picker carries its ? again and the entry still
 #
 #   NO TEXT - the book does not describe that name. It is a statement about the SOURCE.
 #   DEBT    - the book DOES describe it and nobody has extracted it yet. It is a statement about
-#             US, so it has to name an OPEN §T, and this check reads SPEC.md to confirm the §T is
+#             US, so it has to name an OPEN ??T, and this check reads SPEC.md to confirm the ??T is
 #             still open. Close the task without the text and the line stops excusing anything.
 #
 # The roster opened with TWO lines, both DEBT, and both were PAID in the same round: T928
@@ -13190,7 +13194,7 @@ foreach ($k408 in ($v408Pairs.Keys | Sort-Object)) {
         }
         $miss408 = @($miss408 | Where-Object { -not $v408Excused[$list408].Contains($_) })
     }
-    # the §T leg runs whether or not anything is left over: a debt that is doing its whole job is
+    # the ??T leg runs whether or not anything is left over: a debt that is doing its whole job is
     # exactly the debt that must still name an OPEN task, and hanging this off the leftovers is
     # how the leg would go quiet on the day the roster started working (SPEC V20, B7)
     if ($v408Debt.ContainsKey($list408)) {
@@ -18905,7 +18909,7 @@ if ($calls353.Count -eq 0) {
     }
 
     # (a) AMENDED in T923 (SPEC V353 amended, I140u, B138). The prose of leg (a) has always read
-    # "o pedido de foco esta DEPOIS de mfSearch.visible = true - foco em widget invisivel ⊥ pega":
+    # "o pedido de foco esta DEPOIS de mfSearch.visible = true - foco em widget invisivel ??? pega":
     # the requirement is ORDER, and "inside mfOpen" was a PROXY for it that held only while mfOpen
     # was the one opening path. The owner asked for Esc to close the ? as well, popOpen became a
     # second opening path, and a click inside either overlay has to hand the cursor back - so the
@@ -19814,7 +19818,7 @@ else { Pass "V396 popScrim is as wide as the widest tab, swept off every content
 # it. A form dropped into a REGION of another form - a 466x700 column inside a 1408 tab - draws
 # that same edge in the middle of the page, and THAT is the box the user kept reporting.
 #
-# ⚠ the first draft of this rule also demanded a scrollBox and a themePaper of every imported
+# ??? the first draft of this rule also demanded a scrollBox and a themePaper of every imported
 # form, and it was born RED against correct code: WoD20.6 carries no paper and never needed one
 # (SPEC B106). Whether a form paints the Victorian texture is V56's question; this one is only
 # about where a form may be dropped.
@@ -24061,8 +24065,11 @@ else {
     if ($en500 -ne 1 -or $btnFn500 -notmatch '\.enabled\s*=\s*filled;') { $v500Bad += "(e) the ! buttons' enabled is not written once, in noteButton (SPEC V500e)" }
     $nbCalls500 = @([regex]::Matches($root25Code, 'noteButton\(')).Count
     $bgR500 = NoComments (LuaFn $rootTxt 'renderBgButtons'); $mR500 = NoComments (LuaFn $rootTxt 'renderMeritButtons')
-    $inR500 = @([regex]::Matches($bgR500, 'noteButton\(')).Count + @([regex]::Matches($mR500, 'noteButton\(')).Count
-    if ($inR500 -ne 3 -or $nbCalls500 -ne 4) { $v500Bad += "(e) noteButton is called $nbCalls500 time(s), $inR500 from renderBgButtons/renderMeritButtons - expected its definition plus the 3 row-painter calls (SPEC V500e)" }
+    # 31st batch (SPEC I176f, V511): noteButton lights the ? of every valued row too, so the count is
+    # its definition, the 3 ! calls of the two painters and one per ? - read off the code, not written.
+    $inR500 = @([regex]::Matches($bgR500, 'noteButton\(found\["btnN')).Count + @([regex]::Matches($mR500, 'noteButton\(found\["btnN')).Count
+    $nbQ500 = @([regex]::Matches($root25Code, 'noteButton\(found\["btnQ')).Count
+    if ($inR500 -ne 3 -or $nbCalls500 -ne (1 + 3 + $nbQ500)) { $v500Bad += "(e) noteButton is called $nbCalls500 time(s), $inR500 for a ! from renderBgButtons/renderMeritButtons and $nbQ500 for a ? - expected its definition, the 3 ! calls and one per ? (SPEC V500e, V511)" }
     $bgRows500 = [regex]::Match($root25Code, 'BACKGROUND_ROWS\s*=\s*(\d+);'); $mRows500 = [regex]::Match($root25Code, 'MERIT_ROWS\s*=\s*(\d+);')
     if (-not $bgRows500.Success -or -not $mRows500.Success) { $v500Bad += "(e) BACKGROUND_ROWS or MERIT_ROWS is not declared (SPEC V209)" }
     else {
@@ -24107,9 +24114,10 @@ else {
         if ($pk501.GetAttribute('onMouseLeave') -notmatch '^noteTipLeave\(') { $v501Bad += "(b) the $($p501[0]) picker does not report onMouseLeave to noteTipLeave( (SPEC V501b)" }
     }
     if ($tip501.GetAttribute('onMouseEnter') -notmatch '^noteTipHold\(' -or $tip501.GetAttribute('onMouseLeave') -notmatch '^noteTipHide\(') { $v501Bad += "(b) noteTip does not hold on enter and hide on leave (SPEC V501b)" }
-    # (c) one tree walk per instance, never per pixel.
+    # (c) NO tree walk (31st batch, SPEC I176c, V510c): the tip and the control come by name off the
+    # handler's self, the root form (SPEC R176). Was: one walk per instance, cached in NOTE.found.
     $walks501 = @([regex]::Matches($move501, 'xpFind\(')).Count
-    if ($walks501 -ne 1 -or $move501 -notmatch 'NOTE\.found = NOTE\.found or xpFind\(') { $v501Bad += "(c) noteTipMove walks the tree outside 'NOTE.found = NOTE.found or xpFind(' - onMouseMove fires per pixel (SPEC V501c, R170f)" }
+    if ($walks501 -ne 0) { $v501Bad += "(c) noteTipMove walks the tree - onMouseMove fires per pixel, and every control comes by name off the root self (SPEC V501c, R170f, R176)" }
     # (d) leaving only schedules; visible has two writers.
     if (-not $leave501 -or $leave501 -match '\.visible\s*=' -or $leave501 -notmatch 'setTimeout\(' -or $leave501 -notmatch 'NOTE\.hold') { $v501Bad += "(d) noteTipLeave writes visible itself or does not schedule the hide off NOTE.hold (SPEC V501d)" }
     $vis501 = @([regex]::Matches($root25Code, '\btip\.visible\s*=')).Count
@@ -24122,7 +24130,7 @@ else {
     if ($move501 -notmatch 'tip\.top\s*=\s*y\s*-') { $v501Bad += "(e) the tip's top does not follow the cursor's own line (SPEC V501e)" }
 }
 if ($v501Bad) { foreach ($b in $v501Bad) { Fail "V501 $b" } }
-else { Pass "V501 the tip is the last, hidden, frameless 50% overlay of Traits, every picker feeds it, it walks the tree once per instance, leaving only schedules the hide, and it rides to the right of the cursor" }
+else { Pass "V501 the tip is the last, hidden, frameless 50% overlay of Traits, every picker feeds it, it walks no tree, leaving only schedules the hide, and it rides to the right of the cursor" }
 
 # ---- V502: the column's 26th-batch adjustments (SPEC I171a..e, Q91, B172) ----
 # Measured as RELATIONS between controls, never as I171's pixels: those are initial numbers the
@@ -24766,5 +24774,203 @@ if ($null -eq $mcRowTpl509 -or -not $render509 -or -not $add509 -or -not $keep50
 }
 if ($v509Bad) { foreach ($b in $v509Bad) { Fail "V509 $b" } }
 else { Pass "V509 the column's id has one writer on first paint, its order one writer on the root kept by MC_KEEP and watched from the pinned box, the rows' top one owner beside the shared tween, and the whole row is a handle by assignment with the name edit left out" }
+
+# ---- V510: the ! tip covers the WHOLE row, on both tabs, found by name off the root self (SPEC I176a..e, R176) ----
+# Every visible control of the six row templates reports its moves and its exit to the tip, named
+# for itself - the tip is placed off the control under the pointer. The Main tab carries a twin of
+# Traits' noteTip under names of its own: the tabs are <import>ed into ONE form, so a second
+# noteTip would overwrite the first (SPEC R176b).
+$v510Bad = @()
+$main510Doc = Doc (Join-Path $dir "WoD20.1.lfm")
+$spec510 = $main510Doc.SelectSingleNode("//layout[@name='specTip']")
+$note510 = $tr25Doc.SelectSingleNode("//layout[@name='noteTip']")
+$move510 = NoComments (LuaFn $rootTxt 'noteTipMove')
+$hide510 = NoComments (LuaFn $rootTxt 'noteTipHide')
+$text510 = NoComments (LuaFn $rootTxt 'specTipText')
+function Twin510($a, $b, [string]$attrs, [string]$what) {
+    if ($null -eq $a -or $null -eq $b) { return "(a) $what is missing from one of the two tips (SPEC V510a)" }
+    foreach ($at in $attrs.Split(',')) {
+        if ($a.GetAttribute($at) -cne $b.GetAttribute($at)) { return "(a) $what differs on '$at' between specTip and noteTip - the two tips are one design (SPEC V510a)" }
+    }
+    return $null
+}
+if ($null -eq $spec510 -or $null -eq $note510 -or -not $move510 -or -not $text510) { $v510Bad += "specTip, noteTip, noteTipMove or specTipText is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) the Main tab's tip: last child of its scrollBox, the twin of noteTip, names its own and unique.
+    $sb510 = $main510Doc.SelectSingleNode("/form/scrollBox")
+    $last510 = @($sb510.ChildNodes | Where-Object { $_.NodeType -eq 'Element' }) | Select-Object -Last 1
+    if ($null -eq $last510 -or $last510.GetAttribute('name') -cne 'specTip') { $v510Bad += "(a) specTip is not the LAST child of WoD20.1's scrollBox - a box declared after it would paint over the tip (SPEC V510a)" }
+    $tw510 = Twin510 $spec510 $note510 'left,top,width,height,visible,onMouseEnter,onMouseLeave' 'the tip layout'
+    if ($tw510) { $v510Bad += $tw510 }
+    $tw510 = Twin510 $spec510.SelectSingleNode('rectangle') $note510.SelectSingleNode('rectangle') 'align,color,strokeColor,hitTest' 'the fill'
+    if ($tw510) { $v510Bad += $tw510 }
+    $tw510 = Twin510 $spec510.SelectSingleNode('scrollBox') $note510.SelectSingleNode('scrollBox') 'align' 'the scroller'
+    if ($tw510) { $v510Bad += $tw510 }
+    $tw510 = Twin510 $spec510.SelectSingleNode('scrollBox/label') $note510.SelectSingleNode('scrollBox/label') 'left,top,width,height,wordWrap,autoSize' 'the text label'
+    if ($tw510) { $v510Bad += $tw510 }
+    if ($null -eq $spec510.SelectSingleNode("scrollBox[@name='specTipScroll']/label[@name='dynSpecTip']")) { $v510Bad += "(a) specTip does not carry specTipScroll > dynSpecTip - noteTipMove reads the label by that name (SPEC V510a)" }
+    foreach ($nm510 in @('specTip', 'specTipScroll', 'dynSpecTip')) {
+        $c510 = @([regex]::Matches($all25Code, "name=`"$nm510`"")).Count
+        if ($c510 -ne 1) { $v510Bad += "(a) name='$nm510' is authored $c510 time(s) across the sheet - every name is one field of the ONE root form, so a second one overwrites the first (SPEC V510a, R176b)" }
+    }
+    # (b) every visible control of the six templates reports its moves and exit, named for itself.
+    $tpls510 = @(
+        [pscustomobject]@{ D = $main510Doc; T = 'Attribute'; K = 'spec' },
+        [pscustomobject]@{ D = $main510Doc; T = 'AttributeZeroable'; K = 'spec' },
+        [pscustomobject]@{ D = $main510Doc; T = 'Ability'; K = 'spec' },
+        [pscustomobject]@{ D = $main510Doc; T = 'CustomAbility'; K = 'spec' },
+        [pscustomobject]@{ D = $tr25Doc; T = 'OpenAbility'; K = 'note' },
+        [pscustomobject]@{ D = $tr25Doc; T = 'MeritPicked'; K = 'note' }
+    )
+    $seen510 = 0
+    foreach ($s510 in $tpls510) {
+        $t510 = $s510.D.SelectSingleNode("//template[@name='$($s510.T)']")
+        if ($null -eq $t510) { $v510Bad += "(b) the $($s510.T) template is gone (SPEC V209)"; continue }
+        $want4 = $null
+        if ($s510.K -eq 'spec') {
+            $sp510 = $t510.SelectSingleNode("button[starts-with(@name,'btnSp')]")
+            $om510 = if ($null -ne $sp510) { [regex]::Match($sp510.GetAttribute('onClick'), '^specOpen\(self, (.+)\);$') } else { $null }
+            if ($null -eq $om510 -or -not $om510.Success) { $v510Bad += "(b) $($s510.T) has no ! calling specOpen(self, ...) to read the row's key from (SPEC V504a)"; continue }
+            $want4 = $om510.Groups[1].Value
+        }
+        $n510 = 0
+        foreach ($e510 in @($t510.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })) {
+            if ($e510.GetAttribute('visible') -eq 'false') { continue }
+            $n510++; $seen510++
+            $nm = $e510.GetAttribute('name')
+            if (-not $nm) { $v510Bad += "(b) an unnamed <$($e510.LocalName)> in $($s510.T) - the tip is placed off the control named in the call, so every one needs a name (SPEC V510b)"; continue }
+            $mv = $e510.GetAttribute('onMouseMove')
+            $pre510 = if ($e510.HasAttribute('onStartDrag')) { '^if not rowDragMove\(self, event\) then noteTipMove\(' } else { '^noteTipMove\(' }
+            if ($mv -notmatch $pre510) { $v510Bad += "(b) $nm in $($s510.T) does not open its onMouseMove with the call its role needs ($pre510) (SPEC V510b, V508b)"; continue }
+            $a510 = [regex]::Match($mv, "noteTipMove\(self, event, ('[^']*'), (.+), '([^']*)'\);")
+            if (-not $a510.Success) { $v510Bad += "(b) $nm in $($s510.T) does not call noteTipMove(self, event, cat, field, 'name') (SPEC V510b)"; continue }
+            if ($a510.Groups[3].Value -cne $nm) { $v510Bad += "(b) $nm in $($s510.T) hands noteTipMove the name '$($a510.Groups[3].Value)' - the tip would be placed off another control (SPEC V510b)" }
+            if ($s510.K -eq 'spec') {
+                if ($a510.Groups[1].Value -cne "'spec'") { $v510Bad += "(b) $nm in $($s510.T) is a speciality row but hands cat $($a510.Groups[1].Value) (SPEC V510b)" }
+                if ($a510.Groups[2].Value -cne $want4) { $v510Bad += "(b) $nm in $($s510.T) keys the tip by $($a510.Groups[2].Value), not by $want4 as the row's ! does (SPEC V510b, I172d)" }
+            }
+            elseif (@("'background'", "'`$(sub)'") -cnotcontains $a510.Groups[1].Value) { $v510Bad += "(b) $nm in $($s510.T) hands cat $($a510.Groups[1].Value) - a note row is 'background' or its sub (SPEC V510b)" }
+            if ($e510.GetAttribute('onMouseLeave') -cne 'noteTipLeave(self);') { $v510Bad += "(b) $nm in $($s510.T) does not report onMouseLeave to noteTipLeave(self) (SPEC V510b)" }
+        }
+        if ($n510 -lt 5) { $v510Bad += "(b) only $n510 visible control(s) measured in $($s510.T) - the sweep broke (SPEC V20)" }
+    }
+    # (c) no walk, the tip by cat, the text read once per row.
+    if ($move510 -match 'xpFind\(' -or $hide510 -match 'xpFind\(') { $v510Bad += "(c) noteTipMove or noteTipHide walks the tree - the controls come by name off the root self (SPEC V510c, R176)" }
+    if ($move510 -notmatch 'from\[spec and "specTip" or "noteTip"\]' -or $move510 -notmatch 'from\[name\]') { $v510Bad += "(c) noteTipMove does not take its tip by cat and its control by name off from (SPEC V510c)" }
+    if ($hide510 -notmatch '"noteTip"' -or $hide510 -notmatch '"specTip"') { $v510Bad += "(c) noteTipHide does not hide both tips (SPEC V510c)" }
+    if ($root25Code -match 'NOTE\.found' -or $root25Code -match 'NOTE_NAMES') { $v510Bad += "(c) NOTE.found or NOTE_NAMES is still in the sheet - the cache of controls left with the walk (SPEC V510c)" }
+    $blk510 = [regex]::Match($move510, '(?s)if NOTE\.tipKey ~= key then.*?\r?\n\t\t\t\tend;')
+    if (-not $blk510.Success) { $v510Bad += "(c) noteTipMove has no 'if NOTE.tipKey ~= key then' block - the text would be read per pixel (SPEC V510c)" }
+    else {
+        $out510 = $move510.Replace($blk510.Value, '')
+        if ($blk510.Value -notmatch 'specTipText\(' -or $blk510.Value -notmatch 'sheet\[key\]') { $v510Bad += "(c) the tip's text is not read inside 'if NOTE.tipKey ~= key then' (SPEC V510c)" }
+        if ($out510 -match 'specTipText\(' -or $out510 -match 'sheet\[key\]') { $v510Bad += "(c) noteTipMove reads the tip's text outside 'if NOTE.tipKey ~= key then' - the speciality pool would be walked per pixel (SPEC V510c, I176c)" }
+    }
+    # (d) the speciality text: lit dots, named, off the pool, called only by the tip.
+    if (@([regex]::Matches($all25Code, 'function\s+specTipText\s*\(')).Count -ne 1) { $v510Bad += "(d) specTipText is not declared exactly once (SPEC V510d)" }
+    if ($text510 -notmatch '"_1"\] == true' -or $text510 -notmatch '"specialityName_"' -or $text510 -notmatch 'specKey\(' -or $text510 -notmatch 'specRowsOf\(') { $v510Bad += "(d) specTipText does not list the NAMES of the rows whose dot is lit, through specKey and specRowsOf (SPEC V510d, I176d)" }
+    $calls510 = @([regex]::Matches($all25Code, 'specTipText\(')).Count
+    if ($calls510 -ne 2 -or @([regex]::Matches($move510, 'specTipText\(')).Count -ne 1) { $v510Bad += "(d) specTipText is called from somewhere other than noteTipMove, or more than once there (SPEC V510d)" }
+    # (e) opening either window takes the tip down first.
+    foreach ($fn510 in @('specOpen', 'noteOpen')) {
+        if ((NoComments (LuaFn $rootTxt $fn510)) -notmatch 'noteTipHide\(from\);') { $v510Bad += "(e) $fn510 does not call noteTipHide(from) - the tip would stay under the scrim (SPEC V510e, I176e)" }
+    }
+}
+if ($v510Bad) { foreach ($b in $v510Bad) { Fail "V510 $b" } }
+else { Pass "V510 both tabs carry a tip - Main's a twin of Traits' under its own names - every visible control of the six row templates feeds it named for itself, it finds everything by name with no walk, and it reads a row's text once" }
+
+# ---- V511: the ? goes dark on an empty row, by the same hand as the ! (SPEC I176f, I170g) ----
+# Every mfLabel that paints a row's button has, in the SAME function, a noteButton for that row's ?
+# over the same value, and the ? is in the same roster. Paired both ways and counted from the code,
+# so the number is the code's (19 today) and not written here (SPEC B70).
+$v511Bad = @()
+if (@([regex]::Matches($all25Code, 'function\s+noteButton\s*\(')).Count -ne 1) { $v511Bad += "noteButton is not declared exactly once - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) one writer of the ? / ! state.
+    $w511 = @([regex]::Matches($all25Code, 'found\["btn[QN][^"]*"(\s*\.\.\s*i)?\]\s*\.\s*(enabled|opacity)\s*=')).Count
+    if ($w511 -ne 0) { $v511Bad += "(a) $w511 write(s) to enabled/opacity of a ? or ! outside noteButton - the state has one writer (SPEC V511a)" }
+    # (b)+(c) pairs per function, both ways, and the ? in the roster.
+    $pairs511 = 0
+    foreach ($f511 in @('WoD20th.lfm', 'WoD20.3.lfm', 'WoD20.7.lfm', 'WoD20.11.lfm')) {
+        $txt511 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir $f511)))
+        $code511 = Strip25 $txt511
+        $inFns511 = 0; $fp511 = 0
+        # Top-level functions only (three tabs, the indent every one here is written at): a nested
+        # local function's LuaFn would run to its parent's end and read the parent's calls twice.
+        foreach ($fm511 in [regex]::Matches($code511, '(?m)^\t\t\t(?:local )?function\s+([A-Za-z0-9_]+)\s*\(')) {
+            $body511 = LuaFn $code511 $fm511.Groups[1].Value
+            if (-not $body511) { continue }
+            $lab511 = @{}; $nb511 = @{}
+            foreach ($m in [regex]::Matches($body511, 'mfLabel\(found\["dyn([A-Za-z_]+)"( \.\. i)?\], (.+?), "')) {
+                if ($m.Groups[1].Value -ceq 'MfClanDisc_') { continue }
+                $x = $m.Groups[1].Value; $x = $x.Substring(0, 1).ToLower() + $x.Substring(1)
+                $lab511[$x + $m.Groups[2].Value + '|' + $m.Groups[3].Value] = $x
+                $inFns511++
+            }
+            foreach ($m in [regex]::Matches($body511, 'noteButton\(found\["btnQ([A-Za-z_]+)"( \.\. i)?\], (.+?)\);')) {
+                $nb511[$m.Groups[1].Value + $m.Groups[2].Value + '|' + $m.Groups[3].Value] = $m.Groups[1].Value
+            }
+            foreach ($k in $lab511.Keys) {
+                if (-not $nb511.ContainsKey($k)) { $v511Bad += "(b) $f511 $($fm511.Groups[1].Value) paints dyn$($lab511[$k]) with no noteButton for btnQ$($lab511[$k]) over the same value - its ? stays lit on an empty row (SPEC V511b)"; continue }
+                $fp511++
+                $y = $lab511[$k]
+                if ($body511 -notmatch ('names\["btnQ' + [regex]::Escape($y) + '"') -and $body511 -notmatch ('\bbtnQ' + [regex]::Escape($y) + '\s*=\s*true')) { $v511Bad += "(c) $f511 $($fm511.Groups[1].Value) lights btnQ$y but does not put it in its xpFind roster - found[] would be nil and nothing would light (SPEC V511c)" }
+            }
+            foreach ($k in $nb511.Keys) {
+                if (-not $lab511.ContainsKey($k)) { $v511Bad += "(b) $f511 $($fm511.Groups[1].Value) lights btnQ$($nb511[$k]) with no mfLabel of its row over the same value (SPEC V511b)" }
+            }
+        }
+        $all511 = @([regex]::Matches($code511, 'mfLabel\(found\["dyn(?!MfClanDisc_)')).Count
+        if ($all511 -ne $inFns511) { $v511Bad += "(b) $f511 has $all511 row mfLabel call(s) but only $inFns511 were read inside a function - the sweep missed some (SPEC V20)" }
+        if ($fp511 -eq 0) { $v511Bad += "(b) no pair measured in $f511 - the sweep broke (SPEC V20)" }
+        $pairs511 += $fp511
+    }
+    # (d) the ? keyed by a LITERAL is never dark.
+    foreach ($q511 in @(@('WoD20.3.lfm', 'btnQdamage'), @('WoD20.3.lfm', 'btnQconceal'), @('WoD20.7.lfm', 'btnQFaith'))) {
+        $qn511 = (Doc (Join-Path $dir $q511[0])).SelectSingleNode("//button[@name='$($q511[1])']")
+        if ($null -eq $qn511) { $v511Bad += "(d) $($q511[1]) is gone from $($q511[0]) (SPEC V209)"; continue }
+        if ($qn511.HasAttribute('enabled')) { $v511Bad += "(d) $($q511[1]) authors enabled= - its key is a literal and it is never empty (SPEC V511d)" }
+        if ($all25Code -match ('noteButton\(found\["' + $q511[1] + '"')) { $v511Bad += "(d) $($q511[1]) goes through noteButton - its key is a literal, there is no value to be empty (SPEC V511d)" }
+    }
+    # (e) the three ! calls stay, and the count is theirs plus the pairs.
+    $nbAll511 = @([regex]::Matches($all25Code, 'noteButton\(')).Count
+    $nbN511 = @([regex]::Matches($all25Code, 'noteButton\(found\["btnN')).Count
+    if ($nbN511 -ne 3 -or $nbAll511 -ne (1 + 3 + $pairs511)) { $v511Bad += "(e) noteButton appears $nbAll511 time(s) with $nbN511 ! call(s) and $pairs511 pair(s) - expected its definition, the 3 ! calls and one per pair (SPEC V511e, V500e)" }
+}
+if ($v511Bad) { foreach ($b in $v511Bad) { Fail "V511 $b" } }
+else { Pass "V511 every row painter lights its ? beside its label through noteButton over the same value, with the ? in its roster, the literal-keyed ? stay lit, and noteButton is the one writer of both marks" }
+
+# ---- V512: !* marks a speciality bought or given with no name, one painter (SPEC I176h, B179) ----
+$v512Bad = @()
+$lang512 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.6.lfm")))
+$bang512 = NoComments (LuaFn $rootTxt 'specBangPaint')
+$rs512 = NoComments (LuaFn $rootTxt 'renderSpecialities')
+$ral512 = NoComments (LuaFn $lang512 'renderAbilityLabels')
+$al512 = NoComments (LuaFn $lang512 'applyLanguage')
+if (-not $bang512 -or -not $rs512 -or -not $ral512 -or -not $al512) { $v512Bad += "specBangPaint, renderSpecialities, renderAbilityLabels or applyLanguage is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) one painter, the only one to spell the star or write a ! of a trait.
+    if (@([regex]::Matches($all25Code, 'function\s+specBangPaint\s*\(')).Count -ne 1) { $v512Bad += "(a) specBangPaint is not declared exactly once (SPEC V512a)" }
+    $starAll512 = @([regex]::Matches($all25Code, '"!\*"')).Count
+    $starIn512 = @([regex]::Matches($bang512, '"!\*"')).Count
+    if ($starIn512 -lt 1 -or $starAll512 -ne $starIn512) { $v512Bad += "(a) the literal `"!*`" appears $starAll512 time(s) in the sheet, $starIn512 inside specBangPaint - the star has one painter (SPEC V512a)" }
+    $txAll512 = @([regex]::Matches($all25Code, 'btnSp[^\r\n]*\.text\s*=')).Count
+    $txIn512 = @([regex]::Matches($bang512, 'btnSp[^\r\n]*\.text\s*=')).Count
+    if ($txAll512 -ne $txIn512) { $v512Bad += "(a) the text of a ! of a trait is written outside specBangPaint (SPEC V512a)" }
+    # (b) the condition: dot lit, name empty; by name, no walk.
+    if ($bang512 -notmatch '"_1"\] == true' -or $bang512 -notmatch '"specialityName_"' -or $bang512 -notmatch '== ""') { $v512Bad += "(b) specBangPaint does not star a row whose dot is lit and whose name is empty (SPEC V512b, I176h)" }
+    if ($bang512 -match 'xpFind\(') { $v512Bad += "(b) specBangPaint walks the tree - it finds every ! by name off the root self (SPEC V512b, V143)" }
+    # (c) three callers: the list painter, the era, and the translation that rewrites button text.
+    if ($rs512 -notmatch 'specBangPaint\(from\);') { $v512Bad += "(c) renderSpecialities does not call specBangPaint(from) - buying, naming or a gift would not move the star (SPEC V512c)" }
+    if ($ral512 -notmatch 'xpQuiet = false;[\s\S]*specBangPaint\(from\);') { $v512Bad += "(c) renderAbilityLabels does not call specBangPaint(from) after xpQuiet = false - an era change would leave the star on the old row (SPEC V512c)" }
+    if ($al512 -notmatch 'specBangPaint\(from\);\s*\r?\n\t\t\tend;$') { $v512Bad += "(c) specBangPaint(from) is not the last instruction of applyLanguage - the translation would put every ! back to the text it saw first (SPEC V512c, B179)" }
+    $calls512 = @([regex]::Matches($all25Code, 'specBangPaint\(from\);')).Count
+    if ($calls512 -ne 3) { $v512Bad += "(c) specBangPaint(from) is called $calls512 time(s), expected 3 (SPEC V512c)" }
+    # (d) the ability rows: the LIVE first dot, counted by the XML.
+    if ($bang512 -notmatch '"abil" \.\. col \.\. num \.\. "_1"' -or $bang512 -notmatch '\.field' -or $bang512 -notmatch 'specKey\(') { $v512Bad += "(d) specBangPaint does not read an ability row's trait off the live field of its first dot (SPEC V512d, I172d)" }
+    if ($bang512 -match '\b(11|13|37)\b') { $v512Bad += "(d) specBangPaint spells a row count - the rows are counted by the XML, the loop stops at the first missing name (SPEC V512d, R176c)" }
+}
+if ($v512Bad) { foreach ($b in $v512Bad) { Fail "V512 $b" } }
+else { Pass "V512 one painter stars the ! of a trait holding a speciality bought or given with no name, reading ability rows off their live dot, and it runs after the list, the era and the translation" }
 
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

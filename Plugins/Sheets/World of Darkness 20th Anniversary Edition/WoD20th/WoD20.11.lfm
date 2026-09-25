@@ -52,8 +52,8 @@
 
 				-- DERIVED and never a literal: a bound written 12 here goes stale the day the box grows
 				-- a row, and nothing says so - the button simply never gets painted (SPEC V383b, B112).
-				for i = 1, last, 1 do names["dyndisc_" .. i] = true; end;
-				for i = 1, CLAN_DISC_ROWS, 1 do names["dynclanDisc_" .. i] = true; end;
+				for i = 1, last, 1 do names["dyndisc_" .. i] = true; names["btnQdisc_" .. i] = true; end;
+				for i = 1, CLAN_DISC_ROWS, 1 do names["dynclanDisc_" .. i] = true; names["btnQclanDisc_" .. i] = true; end;
 
 				local found = {};
 
@@ -63,10 +63,12 @@
 
 				for i = 1, last, 1 do
 					mfLabel(found["dyndisc_" .. i], sheet["disc_" .. i], "Select Discipline", lang);
+					noteButton(found["btnQdisc_" .. i], sheet["disc_" .. i]);
 				end;
 
 				for i = 1, CLAN_DISC_ROWS, 1 do
 					mfLabel(found["dynclanDisc_" .. i], sheet["clanDisc_" .. i], "Select Discipline", lang);
+					noteButton(found["btnQclanDisc_" .. i], sheet["clanDisc_" .. i]);
 				end;
 			end;
 
@@ -93,8 +95,8 @@
 				-- and nothing says so - the button simply stops being painted (SPEC V383b, B112).
 				local secLast = SEC_PATH_ROWS - SEC_PATH_FREE_ROWS;
 
-				for i = 1, MAIN_PATH_ROWS, 1 do names["dynmainPath_" .. i] = true; end;
-				for i = 1, secLast, 1 do names["dynsecPath_" .. i] = true; end;
+				for i = 1, MAIN_PATH_ROWS, 1 do names["dynmainPath_" .. i] = true; names["btnQmainPath_" .. i] = true; end;
+				for i = 1, secLast, 1 do names["dynsecPath_" .. i] = true; names["btnQsecPath_" .. i] = true; end;
 
 				local found = {};
 
@@ -104,10 +106,12 @@
 
 				for i = 1, MAIN_PATH_ROWS, 1 do
 					mfLabel(found["dynmainPath_" .. i], sheet["mainPath_" .. i], "Select Main Path", lang);
+					noteButton(found["btnQmainPath_" .. i], sheet["mainPath_" .. i]);
 				end;
 
 				for i = 1, secLast, 1 do
 					mfLabel(found["dynsecPath_" .. i], sheet["secPath_" .. i], "Select Secondary Path", lang);
+					noteButton(found["btnQsecPath_" .. i], sheet["secPath_" .. i]);
 				end;
 			end;
 
@@ -134,7 +138,7 @@
 				local last  = RITUAL_ROWS - RITUAL_FREE_ROWS;
 
 				for i = 1, last, 1 do
-					if not RITUAL_VACANT[i] then names["dynritual_" .. i] = true; end;
+					if not RITUAL_VACANT[i] then names["dynritual_" .. i] = true; names["btnQritual_" .. i] = true; end;
 				end;
 
 				local found = {};
@@ -146,6 +150,7 @@
 				for i = 1, last, 1 do
 					if not RITUAL_VACANT[i] then
 						mfLabel(found["dynritual_" .. i], sheet["ritual_" .. i], "Select Ritual", lang);
+						noteButton(found["btnQritual_" .. i], sheet["ritual_" .. i]);
 					end;
 				end;
 			end;

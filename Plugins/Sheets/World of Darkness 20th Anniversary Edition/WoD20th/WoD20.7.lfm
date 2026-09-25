@@ -42,12 +42,13 @@
 				-- form; this is the Numina tab's own, and V383(b) wants every painter to reach
 				-- every button it draws.
 				names["dynhedgeAffiliation"] = true;
+				names["btnQhedgeAffiliation"] = true;
 
-				for i = 1, lastNumina, 1 do names["dynnumina_" .. i] = true; end;
-				for i = 1, lastRitual, 1 do names["dynhedgeRitual_" .. i] = true; end;
+				for i = 1, lastNumina, 1 do names["dynnumina_" .. i] = true; names["btnQnumina_" .. i] = true; end;
+				for i = 1, lastRitual, 1 do names["dynhedgeRitual_" .. i] = true; names["btnQhedgeRitual_" .. i] = true; end;
 
 				for i = 1, lastPsychic, 1 do
-					if not PSYCHIC_VACANT[i] then names["dynpsychic_" .. i] = true; end;
+					if not PSYCHIC_VACANT[i] then names["dynpsychic_" .. i] = true; names["btnQpsychic_" .. i] = true; end;
 				end;
 
 				local found = {};
@@ -57,19 +58,23 @@
 				local lang = (sheet.language == "en") and "en" or "pt";
 
 				mfLabel(found["dynhedgeAffiliation"], sheet.hedgeAffiliation, "Select Affiliation", lang);
+				noteButton(found["btnQhedgeAffiliation"], sheet.hedgeAffiliation);
 
 				for i = 1, lastNumina, 1 do
 					mfLabel(found["dynnumina_" .. i], sheet["numina_" .. i], "Select Hedge Path", lang);
+					noteButton(found["btnQnumina_" .. i], sheet["numina_" .. i]);
 				end;
 
 				for i = 1, lastPsychic, 1 do
 					if not PSYCHIC_VACANT[i] then
 						mfLabel(found["dynpsychic_" .. i], sheet["psychic_" .. i], "Select Phenomenon", lang);
+						noteButton(found["btnQpsychic_" .. i], sheet["psychic_" .. i]);
 					end;
 				end;
 
 				for i = 1, lastRitual, 1 do
 					mfLabel(found["dynhedgeRitual_" .. i], sheet["hedgeRitual_" .. i], "Select Hedge Ritual", lang);
+					noteButton(found["btnQhedgeRitual_" .. i], sheet["hedgeRitual_" .. i]);
 				end;
 
 				-- SPEC V88: numina_1 is the Affinity Path and it is BOLD always, even empty. The

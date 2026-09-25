@@ -78,11 +78,13 @@
 				local names = {};
 
 				names["dynarmorClass"] = true;
+				names["btnQarmorClass"] = true;
 				names["dynshieldClass"] = true;
+				names["btnQshieldClass"] = true;
 				names["dynRateHdr"]     = true;
 				names["dynRateFoot"]    = true;
 
-				for i = 1, ATTACK_ROWS, 1 do names["dynattack_" .. i] = true; end;
+				for i = 1, ATTACK_ROWS, 1 do names["dynattack_" .. i] = true; names["btnQattack_" .. i] = true; end;
 
 				local found = {};
 
@@ -92,10 +94,13 @@
 
 				for i = 1, ATTACK_ROWS, 1 do
 					mfLabel(found["dynattack_" .. i], sheet["attack_" .. i], "Select Weapon", lang);
+					noteButton(found["btnQattack_" .. i], sheet["attack_" .. i]);
 				end;
 
 				mfLabel(found["dynarmorClass"], sheet.armorClass, "Select Armor", lang);
+				noteButton(found["btnQarmorClass"], sheet.armorClass);
 				mfLabel(found["dynshieldClass"], sheet.shieldClass, "Select Shield", lang);
+				noteButton(found["btnQshieldClass"], sheet.shieldClass);
 
 				-- The Rate column and its legend are ONE pair, and the language is the only thing
 				-- that moves them (SPEC I161g, I161i, V471). In pt the header reads CdT* and the

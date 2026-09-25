@@ -4354,7 +4354,7 @@
 			function renderBearing(from)
 				if sheet == nil or from == nil then return; end;
 
-				local names = { dynroad = true, dynBearingName = true };
+				local names = { dynroad = true, dynBearingName = true, btnQroad = true };
 				local found = {};
 
 				xpFind(tabRootOf(from), names, found);
@@ -4417,6 +4417,7 @@
 				-- the fallback text is dead weight the day the migration lands and is kept only
 				-- because mfLabel takes it (SPEC I135a).
 				mfLabel(found["dynroad"], sheet.road, "Select Road", lang);
+				noteButton(found["btnQroad"], sheet.road);
 
 				-- ONE line, centred, name and modifier joined (user 2026-08-29). Two labels each
 				-- centred in their own half never read as one sentence, which is what was asked.
@@ -5274,22 +5275,14 @@
 
 			-- ---- The ! note of a background, merit or flaw (SPEC I170g/I170h, T1076) -----------
 			--
-			-- NOTE.key is the field the open window edits; NOTE.found caches the tooltip's controls
-			-- (the pickers and the tip itself) after ONE walk, because the tooltip runs on
-			-- onMouseMove - per pixel - and xpFind walks the whole tree (SPEC R170f, V501c). The
-			-- controls are built once with the form and never replaced, so the cache cannot go
-			-- stale. NOTE.hold says the pointer is inside the tip; NOTE.tipKey is the note the tip
-			-- shows, so its text and size are rewritten only when that changes. Global for the
-			-- reason every root helper is (SPEC V347).
-			NOTE = { key = nil, found = nil, hold = false, tipKey = nil };
-
-			NOTE_NAMES = { noteTip = true, dynNoteTip = true };
-
-			for noteI = 1, BACKGROUND_ROWS, 1 do NOTE_NAMES["dynbackground_" .. noteI] = true; end;
-			for noteI = 0, MERIT_ROWS, 1 do
-				NOTE_NAMES["dynMerit_m" .. noteI] = true;
-				NOTE_NAMES["dynMerit_f" .. noteI] = true;
-			end;
+			-- NOTE.key is the field the open window edits. The tooltip finds its controls by NAME
+			-- off the handler's self - the ROOT form, where every named control of every tab lives
+			-- (SPEC R176, V143 as amended) - so there is no cache of controls and no walk at all.
+			-- NOTE.hold says the pointer is on the tip or on a row that has one; NOTE.tipKey is the
+			-- row the tip shows and NOTE.tipText what was read there, so the text is read and sized
+			-- once per row entered, never per pixel (SPEC I176c). Global for the reason every root
+			-- helper is (SPEC V347).
+			NOTE = { key = nil, hold = false, tipKey = nil, tipText = nil };
 
 			-- The ONE name a note is stored under (SPEC V500b): keyed by the chosen VALUE, not by
 			-- the row, so the same background in two rows opens the same note and emptying a row's
@@ -5325,6 +5318,8 @@
 					found["edtPopNote"].text = sheet[NOTE.key] or "";
 					descQuiet = false;
 				end;
+
+				noteTipHide(from);
 
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
 
@@ -5378,6 +5373,32 @@
 				return key;
 			end;
 
+			-- What the tip of a trait's row says (SPEC I176d): the NAMES of its specialities, one a
+			-- line, in the order of the ! window's slots - only those whose dot is lit and that carry
+			-- a name. A dark dot is a slot held, not a speciality the character has (user
+			-- 2026-09-25); a bought one with no name has nothing to show, and its ! is starred for it
+			-- instead (SPEC Q97.1, I176h). Called once per row entered, never per pixel: the pool is
+			-- SPECIALITY_ROWS long.
+			function specTipText(dotField)
+				local field = string.match(dotField or "", "^(.+)_1$");
+				local key = nil;
+
+				if field ~= nil then key = specKey(field); end;
+				if key == nil then return ""; end;
+
+				local rows = specRowsOf(key);
+				local names = {};
+
+				for k = 1, #rows, 1 do
+					local i = rows[k];
+					local n = sheet["specialityName_" .. i];
+
+					if sheet["speciality_" .. i .. "_1"] == true and n ~= nil and n ~= "" then names[#names + 1] = n; end;
+				end;
+
+				return table.concat(names, "\n");
+			end;
+
 			-- The ! beside the dots (SPEC I172c/d). Every ! hands over the field of its row's FIRST
 			-- DOT and this drops the "_1": an ability row is re-bound by the era, so its live dot is
 			-- the only thing that knows which trait it is (SPEC R171c), and dropping an OPTIONAL
@@ -5407,6 +5428,8 @@
 				for k = 1, math.min(#rows, SPEC_PER_TRAIT), 1 do SPEC_WIN.rows[k] = rows[k]; end;
 
 				specPaint(found, true);
+
+				noteTipHide(from);
 
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
 
@@ -5497,66 +5520,94 @@
 				kbRefocus(form);
 			end;
 
-			-- The tooltip (SPEC I170h, V501). Runs per pixel while the pointer is over a picker:
-			-- no tree walk after the first, 2 parent hops, and the text rewritten only when the
-			-- note changes. `from` is the FORM, not the button - a handler's self is the form
-			-- (SPEC R170l) - so the button comes by NAME. event.x/y are local to the button
-			-- (SPEC R170m): the tip goes 16px to the RIGHT of the pointer and 8px above its line,
-			-- following both axes (SPEC Q90.9), so the line the pointer is on runs INTO the tip
-			-- and leaving the picker to the right reaches it - where the wheel scrolls it.
+			-- The tooltip (SPEC I170h, I176, V501, V510). Runs per pixel while the pointer is over
+			-- any control of a row that has a ! - the label, the ?, the picker, the ! and the dots.
+			-- The tip and the control come by NAME off `from`, the handler's self, which is the ROOT
+			-- form and holds every named control of every tab (SPEC R176): no walk. Each tab has its
+			-- own tip, picked by `cat`, because names are one namespace for the whole sheet.
+			-- event.x/y are local to the control (SPEC R170m): the tip goes 16px to the RIGHT of the
+			-- pointer and 8px above its line, following both axes (SPEC Q90.9), so the line the
+			-- pointer is on runs INTO the tip and leaving the row to the right reaches it - where
+			-- the wheel scrolls it.
+			--
+			-- The text is read once per ROW entered (SPEC I176c): a speciality row walks the whole
+			-- pool, so NOTE.tipKey keeps the row and NOTE.tipText what it had, empty included.
+			-- Every move also says the pointer is still on the row (NOTE.hold): stepping from one
+			-- control to the next fires the old one's leave FIRST, and its 150ms timer would
+			-- otherwise hide the tip under a pointer that never left the row.
 			function noteTipMove(from, event, cat, field, name)
-				if sheet == nil then return; end;
+				if sheet == nil or from == nil then return; end;
 
-				NOTE.found = NOTE.found or xpFind(tabRootOf(from), NOTE_NAMES, {});
+				local spec = cat == "spec";
+				local tip  = from[spec and "specTip" or "noteTip"];
+				local ctrl = from[name];
 
-				local tip = NOTE.found["noteTip"];
-				local btn = NOTE.found[name];
-				local v   = sheet[field];
+				if tip == nil or ctrl == nil then return; end;
 
-				if tip == nil or btn == nil then return; end;
+				NOTE.hold = true;
 
-				local key = (v ~= nil and v ~= "") and noteKey(cat, v) or nil;
-				local txt = key and sheet[key] or nil;
+				local key = field;
 
-				if txt == nil or txt == "" then
+				if spec ~= true then
+					local v = sheet[field];
+
+					key = (v ~= nil and v ~= "") and noteKey(cat, v) or nil;
+				end;
+
+				if key == nil then
 					tip.visible = false;
 					NOTE.tipKey = nil;
 					return;
 				end;
 
-				local row = btn.parent;
+				if NOTE.tipKey ~= key then
+					NOTE.tipKey = key;
+
+					if spec then
+						NOTE.tipText = specTipText(field);
+					else
+						NOTE.tipText = sheet[key] or "";
+					end;
+
+					local txt = NOTE.tipText;
+
+					if txt ~= "" then
+						-- The fitSize ruler (half the point size per character) sizes the tip to
+						-- its text: at most 300 wide and 160 tall, the rest scrolls (SPEC I170h).
+						local _, cont = string.gsub(txt, "[\128-\191]", "");
+						local chars = #txt - cont;
+						local w = math.min(300, chars * 6 + 24);
+						local lines = 0;
+
+						for para in string.gmatch(txt .. "\n", "([^\n]*)\n") do
+							local _, pc = string.gsub(para, "[\128-\191]", "");
+							lines = lines + math.max(1, math.ceil(((#para - pc) * 6) / (w - 24)));
+						end;
+
+						tip.width = w;
+						tip.height = math.min(160, lines * 16 + 12);
+
+						local lbl = from[spec and "dynSpecTip" or "dynNoteTip"];
+
+						if lbl ~= nil then
+							lbl.width = w - 24;
+							lbl.text = txt;
+						end;
+					end;
+				end;
+
+				if NOTE.tipText == "" then
+					tip.visible = false;
+					return;
+				end;
+
+				local row = ctrl.parent;
 				local box = row and row.parent;
 
 				if box == nil then return; end;
 
-				local x = box.left + row.left + btn.left + ((event and tonumber(event.x)) or 0);
-				local y = box.top + row.top + btn.top + ((event and tonumber(event.y)) or 0);
-
-				if NOTE.tipKey ~= key then
-					-- The fitSize ruler (half the point size per character) sizes the tip to its
-					-- text: at most 300 wide and 160 tall, the rest scrolls (SPEC I170h).
-					local _, cont = string.gsub(txt, "[\128-\191]", "");
-					local chars = #txt - cont;
-					local w = math.min(300, chars * 6 + 24);
-					local lines = 0;
-
-					for para in string.gmatch(txt .. "\n", "([^\n]*)\n") do
-						local _, pc = string.gsub(para, "[\128-\191]", "");
-						lines = lines + math.max(1, math.ceil(((#para - pc) * 6) / (w - 24)));
-					end;
-
-					tip.width = w;
-					tip.height = math.min(160, lines * 16 + 12);
-
-					local lbl = NOTE.found["dynNoteTip"];
-
-					if lbl ~= nil then
-						lbl.width = w - 24;
-						lbl.text = txt;
-					end;
-
-					NOTE.tipKey = key;
-				end;
+				local x = box.left + row.left + ctrl.left + ((event and tonumber(event.x)) or 0);
+				local y = box.top + row.top + ctrl.top + ((event and tonumber(event.y)) or 0);
 
 				tip.left = x + 16;
 				tip.top = y - 8;
@@ -5581,9 +5632,13 @@
 				NOTE.hold = false;
 				NOTE.tipKey = nil;
 
-				local tip = NOTE.found and NOTE.found["noteTip"];
+				if from == nil then return; end;
 
-				if tip ~= nil then tip.visible = false; end;
+				for _, nm in ipairs({ "noteTip", "specTip" }) do
+					local tip = from[nm];
+
+					if tip ~= nil then tip.visible = false; end;
+				end;
 			end;
 
 			-- ---- Drag to reorder the rows of ROW_LISTS (SPEC I174, I175, V508) ------------------
@@ -7642,6 +7697,7 @@
 				for i = 1, last, 1 do
 					names["dynbackground_" .. i] = true;
 					names["btnNbackground_" .. i] = true;
+					names["btnQbackground_" .. i] = true;
 				end;
 
 				local found = {};
@@ -7653,12 +7709,14 @@
 				for i = 1, last, 1 do
 					mfLabel(found["dynbackground_" .. i], sheet["background_" .. i], "Select Background", lang);
 					noteButton(found["btnNbackground_" .. i], sheet["background_" .. i]);
+					noteButton(found["btnQbackground_" .. i], sheet["background_" .. i]);
 				end;
 			end;
 
-			-- The ! beside a picked row is live only while the row HAS a value (SPEC I170g,
-			-- V500e): disabled but still drawn when empty, dimmed the way btnMcAdd is at its
-			-- ceiling (SPEC V82). Written only from the two row painters, which already run on
+			-- The ! beside a picked row, and the ? of every row whose key is its value, are live
+			-- only while the row HAS a value (SPEC I170g, V500e, I176f, V511): disabled but still
+			-- drawn when empty, dimmed the way btnMcAdd is at its ceiling (SPEC V82). Written only
+			-- from the row painters, beside the mfLabel of the same row, which already run on
 			-- every change of every row's field.
 			function noteButton(btn, value)
 				if btn == nil then return; end;
@@ -7682,12 +7740,14 @@
 
 				local found = {};
 
-				xpFind(tabRootOf(from), { dynnature = true, dyndemeanor = true }, found);
+				xpFind(tabRootOf(from), { dynnature = true, dyndemeanor = true, btnQnature = true, btnQdemeanor = true }, found);
 
 				local lang = (sheet.language == "en") and "en" or "pt";
 
 				mfLabel(found["dynnature"], sheet.nature, "Select Nature", lang);
+				noteButton(found["btnQnature"], sheet.nature);
 				mfLabel(found["dyndemeanor"], sheet.demeanor, "Select Demeanor", lang);
+				noteButton(found["btnQdemeanor"], sheet.demeanor);
 			end;
 
 			function renderMeritButtons(from)
@@ -7702,6 +7762,8 @@
 					names["dynMerit_f" .. i] = true;
 					names["btnNmerit_m" .. i] = true;
 					names["btnNmerit_f" .. i] = true;
+					names["btnQmerit_m" .. i] = true;
+					names["btnQmerit_f" .. i] = true;
 				end;
 
 				local found = {};
@@ -7715,6 +7777,8 @@
 					mfLabel(found["dynMerit_f" .. i], sheet["merit_f" .. i], "Select Flaw", lang);
 					noteButton(found["btnNmerit_m" .. i], sheet["merit_m" .. i]);
 					noteButton(found["btnNmerit_f" .. i], sheet["merit_f" .. i]);
+					noteButton(found["btnQmerit_m" .. i], sheet["merit_m" .. i]);
+					noteButton(found["btnQmerit_f" .. i], sheet["merit_f" .. i]);
 				end;
 			end;
 
@@ -8123,10 +8187,11 @@
 					return;
 				end;
 
-				local found = xpFind(tabRootOf(from), { dynclanFamily = true }, {});
+				local found = xpFind(tabRootOf(from), { dynclanFamily = true, btnQclanFamily = true }, {});
 				local lang  = (sheet.language == "en") and "en" or "pt";
 
 				mfLabel(found["dynclanFamily"], sheet.clanFamily, "Select Clan/Family", lang);
+				noteButton(found["btnQclanFamily"], sheet.clanFamily);
 			end;
 
 			function renderClanDisc(from)
@@ -8269,6 +8334,59 @@
 				ctrl.left = left + w + 5 + qw + 5;
 			end;
 
+			-- The ! of a trait is starred while it holds a speciality BOUGHT, or given, with no name,
+			-- and plain again once one is typed (user 2026-09-25, SPEC I176h, V512). One pass over
+			-- the pool, then every ! by NAME off the root form (SPEC R176): the nine attributes by
+			-- their field; the ability rows by column and number until a name is missing - the XML
+			-- counts the rows, not this - with the trait read off the LIVE first dot, because the
+			-- era re-binds it (SPEC I172d); the typed rows are their own key. Written every time,
+			-- so the star goes the way it came.
+			--
+			-- Three callers (SPEC V512c): renderSpecialities, the end of every path that buys,
+			-- refunds, names or gives one; renderAbilityLabels, when the era moves a trait to
+			-- another row; and applyLanguage, which rewrites the text of every button not named
+			-- dyn* from what it saw first (SPEC B179).
+			function specBangPaint(from)
+				if sheet == nil or from == nil then return; end;
+
+				local bare = {};
+
+				for i = 1, SPECIALITY_ROWS, 1 do
+					local key  = sheet["speciality_" .. i];
+					local name = sheet["specialityName_" .. i];
+
+					if key ~= nil and key ~= "" and sheet["speciality_" .. i .. "_1"] == true and (name == nil or name == "") then bare[key] = true; end;
+				end;
+
+				for k = 1, #XP_ATTRS, 1 do
+					local btn = from["btnSp" .. XP_ATTRS[k][2]];
+
+					if btn ~= nil then btn.text = bare[XP_ATTRS[k][1]] and "!*" or "!"; end;
+				end;
+
+				for _, col in ipairs({ "talents", "skills", "knowledges" }) do
+					local num = 1;
+
+					while from["btnSp" .. col .. num] ~= nil do
+						local dot   = from["abil" .. col .. num .. "_1"];
+						local field = dot and string.match(dot.field or "", "^(.+)_1$");
+						local key   = field and specKey(field);
+
+						from["btnSp" .. col .. num].text = (key ~= nil and bare[key]) and "!*" or "!";
+						num = num + 1;
+					end;
+				end;
+
+				for _, pre in ipairs({ "customTalent_", "customSkill_", "customKnowledge_" }) do
+					local k = 1;
+
+					while from["btnSp" .. pre .. k] ~= nil do
+						from["btnSp" .. pre .. k].text = bare[pre .. k] and "!*" or "!";
+						k = k + 1;
+					end;
+				end;
+			end;
+
 			-- The SPECIALTIES box of the Main tab: a read-only LIST of every speciality the
 			-- character has bought, one line each, "<trait>: <name>", sorted (SPEC I172g, V507d).
 			-- Nothing in the box edits any more - the ! of each trait does, and the old picker left
@@ -8281,6 +8399,8 @@
 			-- rows: it is the refusal inside xpClick, which the ! window's dot goes through (V161c).
 			function renderSpecialities(from)
 				if sheet == nil or from == nil then return; end;
+
+				specBangPaint(from);
 
 				local found = xpFind(tabRootOf(from), { dynSpecList = true }, {});
 

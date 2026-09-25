@@ -1,12 +1,70 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-25, 207ª rodada — 30º lote CONSTRUÍDO: §T1102…§T1107 `x`, gate VERDE, `.rpk` INSTALADO 11:08)
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-25, 208ª rodada — 31º lote CONSTRUÍDO: §T1110 §T1111 §T1112 §T1113 §T1115 `x` + §T1116 `x` (209ª), gate VERDE, `.rpk` INSTALADO 14:32:40)
 
-**PRÓXIMO COMANDO:** pedir ao user os testes de TELA **§T1108** (Traits: arrasto pelo host, vigia de ~1,2 s, 0 clique comido) e
-**§T1109** (as 8 listas novas + a coluna: alça na área inteira, `numina_1`/`clanDisc_*` recusam, contorno 0.50, `mcOrder` em 2
-clientes, (g) de quais controles a linha arrasta) — FECHAR & REABRIR a ficha antes. Depois `/ck:spec` p/ as EMENDAS PENDENTES
-abaixo (6 desvios do build + 1 sonda MORTA de §V476). §T1096/§T1101 seguem `.` (tela; §T1101 foi SUBSTITUÍDA por §T1108 no
-texto, a linha segue `.`). Nada há p/ `/ck:build` até a tela responder.
+**PRÓXIMO COMANDO:** pedir ao user os testes de TELA **§T1114** (tooltip na linha inteira, `!*`, `?` apagado) + **§T1108/§T1109**
+(do 30º, ainda `.`) — FECHAR & REABRIR a ficha antes. **§T1116 FEITA na 209ª** (rodada própria, `/ck:build --all`): as 4 chaves `["#55FFFFFF"]` + as 3 linhas de comentário
+delas SAÍRAM de `WoD20.6.lfm` (0 leitor antes, `grep`), gate `-Build -Quiet` VERDE (112 s), INSTALADO 14:32:40 (3131764 B =
+`output/`). **0 §T de CÓDIGO em aberto** — o resto do §T `.` é tela [USER]. (Linha velha, p/ histórico: as 4 chaves
+órfãs de paleta em `WoD20.6.lfm`). §T1096/§T1101 seguem `.` (tela). **Nada commitado** — o working tree tem o 31º inteiro.
+
+### 31º LOTE CONSTRUÍDO (208ª) — §T1110 §T1111 §T1112 §T1113 §T1115 `x` (`/ck:build`)
+Gate `-Build -Quiet` **ALL CHECKS PASSED** (103 s, 14:10). Bateria §V510/§V511/§V512/§V500e/§V501c: **18/18 mutaÃ§Ãµes VERMELHAS no check certo & 3/3 sondas VERDES, 0 erro de setup**, backups
+restaurados (hashes = `after31.hashes.txt`). **INSTALADO 14:12:18** (3132098 B = `output/`). Se a ficha estava aberta, FECHAR &
+REABRIR. Scratchpad `fa7d14ae…\scratchpad\`: `*.before31.lfm` (7), `gate.before31.ps1`, `SPEC.before31*.md`; scripts `t1110.ps1`,
+`t1111-15.ps1` (+ `t1111.lua.txt`), `t1113.ps1` (+ `v510-512.ps1.txt`), `battery31.ps1` (+ `battery31.log`).
+
+**O QUE VIROU CÓDIGO**
+- `WoD20.1.lfm` — `specTip`/`specTipScroll`/`dynSpecTip` (último filho do `<scrollBox>` raiz; ≡ `noteTip` c/ nomes PRÓPRIOS, §R176);
+  `Attribute`/`AttributeZeroable`/`Ability`/`CustomAbility`: nomes `lbl$(field)`, `dot$(field)_k`, `edt$(field)` + `onMouseMove`/
+  `onMouseLeave` em ∀ controle visível (28; `Ability` passa a expressão VIVA `self.abil$(col)$(num)_1.field`).
+- `WoD20.2.lfm` — `OpenAbility`/`MeritPicked`: `dot$(field)_k`, `edtBook_`/`edtType_`/`edtCost_$(num)` + eventos (12); pickers c/ a
+  guarda `rowDragMove` intacta.
+- `WoD20th.lfm` — `NOTE` sem `found`/`NOTE_NAMES` (+ `tipText`); `noteTipMove` acha tip & controle por `from[nome]` (0 `xpFind`),
+  tip do `cat` (`specTip`|`noteTip`), texto 1× por linha, `NOTE.hold = true` a cada mexida; `noteTipHide` esconde os 2 num laço;
+  `specTipText` & `specBangPaint` NOVAS (globais); `noteTipHide(from)` em `specOpen`/`noteOpen`; `specBangPaint(from)` no topo de
+  `renderSpecialities`; `noteButton(found["btnQ…"], v)` + roster em `renderBearing` `renderHeaderButtons` `renderBgButtons`
+  `renderMeritButtons` `renderClanFamilyButton` (7 pares).
+- `WoD20.3.lfm` (3 pares) · `WoD20.7.lfm` (4) · `WoD20.11.lfm` (5) — `noteButton` do `?` ao lado de cada `mfLabel`, `btnQ…` no roster.
+- `WoD20.6.lfm` — `specBangPaint(from)` como última instrução de `applyLanguage` (§B179) & de `renderAbilityLabels`.
+- `verify-hunters-hunted.ps1` — §V510, §V511, §V512 NOVAS; §V500e (definição + 3 `!` + 1 por `?`), §V501c (0 `xpFind`) EMENDADAS;
+  §V40, §V375 & §V287 isentam `specTip` por nome exato (≡ `noteTip`).
+
+**SPEC nesta rodada** (`/ck:spec` 3× + backprop do build): §Q97 RESPONDIDA (+ pedido `!*`), §I176 (a/c/d reescritas, h nova), §R176,
+§V143/§V510/§V512 (+§V476 §V509 §I175h §I174c §I175b §I175e §T1104 — as 6 emendas do 30º), §B178, **§B179** (a tradução de
+`WoD20.6` regrava o texto de ∀ `button` fora de `dyn*` ∴ o `!*` precisa de repintura depois dela), §T1115/§T1116 novas, & notas
+de build em §V511 (par `dynMerit_m` ⇄ `btnQmerit_m`; a sonda "renomear `filled`" era MORTA — §V500e pina — trocada), §I176a
+(isenções do gate), §I176c (`NOTE.hold` & o laço de `noteTipHide`), §I176h (chamada no topo de `renderSpecialities`).
+
+**Armadilhas medidas nesta rodada**
+- As abas são `<import>` INLINE: ∀ controle nomeado de ∀ aba é campo do MESMO `obj` raiz (`WoD20th.lfm.lua:12`, `:14700`) ∴ nome
+  NOVO ! ser único na FICHA (o 2º `obj.<nome> =` sobrescreve) & `from[nome]` acha qualquer controle a partir do `self` de handler
+  (§R176, §V143 EMENDADA).
+- `applyLanguage` regrava texto de botão ⊥ `dyn*` c/ o texto da 1ª passada (§B179) — todo texto de botão pintado por Lua precisa
+  de nome `dyn*` OU de repintura depois dela.
+- PowerShell: `$T`/`$t` & `$P`/`$p` são a MESMA variável — 2 scripts pararam por isso (0 dano, `throw` antes de gravar). O
+  sintoma pareceu `IndexOf` culture-sensitive & ⊥ era (testado: os 2 modos acham).
+- O gate subiu p/ ~66 s por rodada (era ~40) ∴ bateria de 21 rodadas ≈ 25 min em background.
+- §V59 JÁ cobra nome único ENTRE os `.lfm` (o `rdk` morre calado, §B19) — acendeu na M3 da bateria; nome novo repetido é pego
+  pelo gate antes do `rdk`.
+
+### 31º LOTE ESPECIFICADO (208ª) — tooltip da `!` na linha inteira, `!*` & `?` apagado no vazio (§I176)
+`/ck:spec` 2×: (1) §C (31º lote), §Q97 ABERTA, §I176a…g, §V510/§V511, §T1110…§T1114, notas em §V500/§V501/§I170g/§I170h;
+(2) §Q97 RESPONDIDA (*"faça exatamente o que você recomendou"* + pedido NOVO `!*`), §I176 (cabeçalho) & §I176a/c/d REESCRITAS,
+§I176h NOVA, §R176 NOVA, §V143 EMENDADA, §V510 REESCRITA, §V512 NOVA, §T1110/§T1111/§T1113/§T1114 REESCRITAS, §T1115/§T1116
+NOVAS, §B178 NOVA, emendas em §V476 §V509 §I175h §I174c §I175b §I175e §T1104. **Nada commitado.** Backups: scratchpad
+`fa7d14ae…\scratchpad\SPEC.before31.md` (antes da 1ª escrita) & `SPEC.before31b.md` (antes da 2ª).
+- **O pedido (user 2026-09-25):** (1) hover em QUALQUER ponto da linha de um traço c/ `!` (rótulo, `!`, `?`, bolinhas) mostra o conteúdo
+  da janela do `!`; especialização só c/ a bolinha MARCADA & c/ nome; (2) `?` de valor vazio apagado ≡ o `!` de nota; (3) especialização
+  comprada|ganha SEM nome → o `!` do traço vira `!*` até ganhar nome.
+- **Medida que mudou o desenho (§R176):** as abas são `<import>` INLINE — ∀ controle nomeado de ∀ aba é campo do MESMO `obj` raiz &
+  o `self` de ∀ handler é esse `obj` ∴ `from[nome]` acha qualquer controle (precedente `self.abil…_1.field`) & nome ! ser ÚNICO na
+  FICHA: o tip de `WoD20.1` chama `specTip`/`specTipScroll`/`dynSpecTip`, ⊥ `noteTip`. §V143 EMENDADA (2ª forma aceita & fechada).
+- **Armadilhas p/ o build:** (1) 0 comentário dentro de `<template>` (§B19); (2) §V347: `specTipText` & `specBangPaint` GLOBAIS;
+  (3) os pickers `dyn…` de `WoD20.2` MANTÊM `if not rowDragMove(self, event) then noteTipMove(…) end;` (§V508b); (4) o 4º argumento
+  de `Ability` é a expressão VIVA `self.abil$(col)$(num)_1.field` (§I172d); (5) §V501c hoje cobra `NOTE.found = NOTE.found or xpFind(`
+  & §V500e cobra 3 chamadas de `noteButton` — o gate (§T1113) muda JUNTO c/ o Lua; (6) `specTipText` varre 325 linhas ∴ SÓ na troca
+  de chave, ⊥ por pixel (§V510c); (7) nomes novos (`lbl…`, `dot…`, `edt…`, `edtBook_…`) — conferir unicidade no gerado ANTES.
 
 ### 30º LOTE CONSTRUÍDO (207ª) — §T1102…§T1107 `x` (`/ck:build --all`)
 Gate `-Build -Quiet` **ALL CHECKS PASSED** (123 s, 2026-09-25 11:06). Bateria §V508/§V509/§V502c/§V476b/§V489c/§V499c:
@@ -40,7 +98,7 @@ aberta, FECHAR & REABRIR. **Nada commitado.** Backups de antes do build no scrat
   `mcOn_`; conta só `.opacity =`), §V489c `[not(self::dataLink)]`, §V499c + `mcOrder`, §V252/§V253 → 1 nota de
   aposentadoria (0 check), `$luaOwned` + 10, `$LUA_OPACITY` − `0.70`, comentário de §V204 sem `sortRituals`.
 
-**DESVIOS DO SPEC NO BUILD → EMENDAS PENDENTES p/ `/ck:spec`** (o build só vira status de §T):
+**DESVIOS DO SPEC NO BUILD (APLICADOS 2026-09-25 na 208a pelo `/ck:spec`)** (o build só vira status de §T):
 1. §V476 sonda `top="47"` → `48` em `btnXpApply` ! **⊥ é VERDE**: acende §V479d (pina o `top` em 47). Sonda MORTA no
    texto de §V476 — rec.: tirar a sonda de §V476 & apontar p/ a de §V479 (§B novo: sonda herdada sem reconferir).
 2. §V509b/c: `mcRowOrderApply` ⊥ chama `rowOrderRepair(` direto — chama `mcOrderOf()` (que faz `rowOrderRepair(MC.root.mcOrder,

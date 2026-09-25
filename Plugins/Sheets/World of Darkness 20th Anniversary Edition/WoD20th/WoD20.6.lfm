@@ -3049,6 +3049,10 @@
 						cmbItems(c, lang);
 					end;
 				end;
+
+				-- The pass above put every ! of a trait back to the text it saw first; the star is
+				-- Lua's, so it goes back on here (SPEC B179, V512c).
+				specBangPaint(from);
 			end;
 			-- ---- Era abilities (SPEC I7 / V70 / V72 / V74 / V76, rewritten in the 21st) -
 			--
@@ -3210,6 +3214,9 @@
 				end;
 
 				xpQuiet = false;
+
+				-- The era may have moved a trait to another row, and its ! follows (SPEC I176h, V512c).
+				specBangPaint(from);
 			end;
 
 			-- ---- Theme (SPEC I5/I6, 14th round) --------------------------------------
@@ -3240,10 +3247,6 @@
 						["DimGray"]   = "#2A2F3A",
 						["#00000000"] = "#00000000",  -- health mark box: the cut-out IS the effect (SPEC V48)
 						["#80000000"] = "#80000000",  -- the 50% black: popScrim/popScrimB behind every window (SPEC I172a, V503a) and the ! note tooltip (SPEC I170h, V501a)
-						-- The one-second flash on a newly sorted ritual row (SPEC I47, V253). Alpha,
-						-- so the name reads through it, and the period's own accent rather than one
-						-- loose colour outside the theme (SPEC V53).
-						["#55FFFFFF"] = "#55A83232",  -- crimson, the era's dot art
 					},
 					stroke = {
 						["white"]   = "#3A4150",      -- cold graphite
@@ -3314,7 +3317,6 @@
 						["DimGray"]   = "#6B4F2A",
 						["#00000000"] = "#00000000",
 						["#80000000"] = "#80000000",
-						["#55FFFFFF"] = "#55C2A14D",  -- aged gold
 					},
 					stroke = {
 						["white"]   = "#C2A14D",      -- aged gold
@@ -3345,7 +3347,6 @@
 						["DimGray"]   = "#5A4A32",
 						["#00000000"] = "#00000000",
 						["#80000000"] = "#80000000",
-						["#55FFFFFF"] = "#55C0C6CC",  -- polished silver
 					},
 					stroke = {
 						["white"]   = "#C0C6CC",      -- polished silver
@@ -3389,7 +3390,6 @@
 						["DimGray"]   = "#6B2A4A",    -- Tyrian purple on the avatar frame
 						["#00000000"] = "#00000000",
 						["#80000000"] = "#80000000",
-						["#55FFFFFF"] = "#55BFA05A",  -- laurel gold
 					},
 					stroke = {
 						["white"]   = "#BFA05A",      -- laurel gold

@@ -98,13 +98,13 @@
 			deletes the .rpk (SPEC B19).
 		-->
 		<template name="MeritPicked">
-			<button name="btnQmerit_$(num)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Merit', sheet['merit_$(num)'], '$(sub)', 'merit_$(num)');"/>
+			<button name="btnQmerit_$(num)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Merit', sheet['merit_$(num)'], '$(sub)', 'merit_$(num)');" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'btnQmerit_$(num)');" onMouseLeave="noteTipLeave(self);"/>
 			<button name="dynMerit_$(num)" left="20" top="0" width="264" height="24" text="$(lbl)" onClick="mfOpen(self, 'merit_$(num)', '$(sub)', 'Merit');" onStartDrag="rowDragStart(self, drag, x, y, event, '$(sub)', 'merit_$(num)');" onMouseMove="if not rowDragMove(self, event) then noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'dynMerit_$(num)'); end;" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edtMerit_$(num)" left="20" top="0" width="264" height="24" field="merit_$(num)" visible="false" enabled="false"/>
-			<button name="btnNmerit_$(num)" left="284" top="0" width="20" height="20" text="!" onClick="noteOpen(self, '$(sub)', 'merit_$(num)');"/>
-			<edit left="304" top="0" width="117" height="24" field="book_$(num)" readOnly="true" opacity="0.75"/>
-			<edit left="421" top="0" width="45" height="24" field="type_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
-			<edit left="466" top="0" width="50" height="24" field="costy_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
+			<button name="btnNmerit_$(num)" left="284" top="0" width="20" height="20" text="!" onClick="noteOpen(self, '$(sub)', 'merit_$(num)');" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'btnNmerit_$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<edit name="edtBook_$(num)" left="304" top="0" width="117" height="24" field="book_$(num)" readOnly="true" opacity="0.75" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtBook_$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<edit name="edtType_$(num)" left="421" top="0" width="45" height="24" field="type_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtType_$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<edit name="edtCost_$(num)" left="466" top="0" width="50" height="24" field="costy_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtCost_$(num)');" onMouseLeave="noteTipLeave(self);"/>
 		</template>
 		<!--
 			PILOT of SPEC I113 (Q30, T808) - the first family to lose its dropdown for the search
@@ -120,15 +120,15 @@
 			deletes the .rpk (SPEC B19).
 		-->
 		<template name="OpenAbility">
-			<button name="btnQ$(field)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Background', sheet['$(field)'], nil, '$(field)');"/>
+			<button name="btnQ$(field)" left="0" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Background', sheet['$(field)'], nil, '$(field)');" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'btnQ$(field)');" onMouseLeave="noteTipLeave(self);"/>
 			<button name="dyn$(field)" left="20" top="0" width="170" height="25" text="Select Background" onClick="mfOpen(self, '$(field)', 'background', 'Background');" onStartDrag="rowDragStart(self, drag, x, y, event, 'background', '$(field)');" onMouseMove="if not rowDragMove(self, event) then noteTipMove(self, event, 'background', '$(field)', 'dyn$(field)'); end;" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edt$(field)" left="20" top="0" width="170" height="25" field="$(field)" visible="false" enabled="false"/>
-			<button name="btnN$(field)" left="190" top="0" width="20" height="20" text="!" onClick="noteOpen(self, 'background', '$(field)');"/>
-			<imageCheckBox left="215" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
-			<imageCheckBox left="240" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
-			<imageCheckBox left="265" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);"/>
-			<imageCheckBox left="290" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);"/>
-			<imageCheckBox left="315" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);"/>
+			<button name="btnN$(field)" left="190" top="0" width="20" height="20" text="!" onClick="noteOpen(self, 'background', '$(field)');" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'btnN$(field)');" onMouseLeave="noteTipLeave(self);"/>
+			<imageCheckBox name="dot$(field)_1" left="215" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_1');" onMouseLeave="noteTipLeave(self);"/>
+			<imageCheckBox name="dot$(field)_2" left="240" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_2');" onMouseLeave="noteTipLeave(self);"/>
+			<imageCheckBox name="dot$(field)_3" left="265" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_3');" onMouseLeave="noteTipLeave(self);"/>
+			<imageCheckBox name="dot$(field)_4" left="290" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_4');" onMouseLeave="noteTipLeave(self);"/>
+			<imageCheckBox name="dot$(field)_5" left="315" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_5');" onMouseLeave="noteTipLeave(self);"/>
 		</template>
 
 		<!--
@@ -401,7 +401,7 @@
 			SPEC I170h, T1077 - the ! note's tooltip. LAST child of the scrollBox, so it paints over
 			every box and scrolls with them: its left/top are CONTENT coordinates, the same space the
 			box layouts' own left/top live in, and noteTipMove reaches them in two parent hops from
-			the picker (button -> row layout -> box). Black at 50% with NO outline and NO title - the
+			the control under the pointer (control -> row layout -> box). Black at 50% with NO outline and NO title - the
 			text alone (SPEC V501a); contents, not client, for the background, so it does not compete
 			with the scrollBox for the client rect (SPEC V190). The inner scrollBox is what the wheel
 			scrolls once the pointer is inside - there is no wheel event to forward (SPEC R170e) -
