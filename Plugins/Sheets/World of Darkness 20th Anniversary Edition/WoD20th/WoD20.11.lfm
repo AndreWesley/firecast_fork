@@ -117,9 +117,9 @@
 			-- took the 0..20 the radio held (user 2026-08-31, ask B). Entry still at 24, and the
 			-- rituals carry no dots to move (SPEC C).
 			--
-			-- V252d went too, and on purpose: it kept the MARK on its ritual across a re-sort, and
-			-- with no mark on the sheet there is nothing left to keep. The sort itself is untouched -
-			-- it still reorders the rows and still flashes the one that landed (SPEC V252, V253).
+			-- The sort went in the 30th batch (SPEC I175e, Q96.1): the rows are ordered by drag now,
+			-- like every other list, so a value stays in the slot it was picked into and nothing
+			-- flashes (SPEC V252/V253 revoked).
 			function renderRitualButtons(form)
 				if sheet == nil or form == nil then return; end;
 
@@ -130,7 +130,7 @@
 				-- both of them unpainted for good (SPEC B112, V263b). RITUAL_VACANT is what skips
 				-- the hole in the middle - here it only saves a lookup, since a name that no row
 				-- carries finds nothing and mfLabel returns on a nil control, but the same guard
-				-- is load-bearing in sortRituals below and the two read alike on purpose.
+				-- is load-bearing where the root derives the ritual ids for the drag (SPEC I175b).
 				local last  = RITUAL_ROWS - RITUAL_FREE_ROWS;
 
 				for i = 1, last, 1 do
@@ -150,108 +150,6 @@
 				end;
 			end;
 
-			-- ---- The list keeps itself in order (SPEC I47, V252) -------------------------
-			--
-			-- Level first, then name, over the CANONICAL value and never over what the screen
-			-- shows: the era renames what a picker displays (SPEC I22), and sorting by the
-			-- display would make switching theme rewrite fields - data churn for a change of
-			-- paint. The level is read off the prefix, the one place it is ever read from
-			-- (SPEC V184).
-			local function ritualRank(v)
-				return tonumber(string.match(v, "^(%d+)%. ")) or 0, string.lower(v);
-			end;
-
-			-- The flash is a rectangle already sitting on the row, so lighting it writes no
-			-- field and moves no geometry (SPEC V57). setTimeout is the SDK's own one-shot
-			-- timer, milliseconds, self-dismantling (SPEC R99) - no <timer> in the XML and no
-			-- state to keep between two flashes.
-			--
-			-- xpFind and not form.<name>: it is the sheet's one finder (SPEC V143), and the
-			-- name is built at runtime from the field.
-			local function flashRitual(form, field)
-				local nm    = "hl" .. field;
-				local found = xpFind(form, { [nm] = true }, {});
-				local rect  = found[nm];
-
-				if rect == nil then return; end;
-
-				rect.visible = true;
-
-				setTimeout(function() rect.visible = false; end, 1000);
-			end;
-
-			-- Raised while the sort writes its own slots. Every one of those writes comes back
-			-- through the dataLink that called us, and a nested pass would sort a half-written
-			-- list and flash a row for a value that is only passing through (SPEC V107, the
-			-- shape xpQuiet and descQuiet already use).
-			local sortQuiet = false;
-
-			-- SPEC V252: the fifteen PICKED rows are kept in order and the five typed ones are
-			-- left exactly where the storyteller wrote them - the sort moves values between
-			-- slots, and a typed ritual would leave its description behind (SPEC V249).
-			--
-			-- Everything is written through setField, so a list already in order writes nothing
-			-- and the link cannot bounce (SPEC V122).
-			function sortRituals(form, field, value)
-				if sortQuiet or sheet == nil then return; end;
-
-				-- RITUAL_VACANT is NOT optional here, and this is the reader that made it a set
-				-- rather than a count (SPEC V204 amended, V251, I46). The five burned indices still
-				-- hold whatever a sheet saved before the 85th round put in them: without the guard
-				-- the gather below would collect those dead values as if they were rituals on the
-				-- sheet, sort them into the visible rows, and the write-back would put fresh values
-				-- INTO the burned names. Nothing on screen would say so.
-				local last = RITUAL_ROWS - RITUAL_FREE_ROWS;
-				local list = {};
-
-				for i = 1, last, 1 do
-					if not RITUAL_VACANT[i] then
-						local v = sheet["ritual_" .. i];
-
-						if v ~= nil and v ~= "" then list[#list + 1] = v; end;
-					end;
-				end;
-
-				table.sort(list, function(a, b)
-					local la, na = ritualRank(a);
-					local lb, nb = ritualRank(b);
-
-					if la ~= lb then return la < lb; end;
-
-					return na < nb;
-				end);
-
-				sortQuiet = true;
-
-				-- `list` is DENSE and the rows are not, so the write-back carries its own cursor:
-				-- the k-th value gathered lands in the k-th row actually drawn. Indexing list by
-				-- the row number instead would leave two rows empty at the bottom for every
-				-- vacancy passed on the way down.
-				local k = 0;
-
-				for i = 1, last, 1 do
-					if not RITUAL_VACANT[i] then
-						k = k + 1;
-
-						setField("ritual_" .. i, list[k] or "");
-					end;
-				end;
-
-				sortQuiet = false;
-
-
-				-- The flash belongs to the row that ENDED UP with the value just written, which
-				-- is why it is looked up after the sort and not before (SPEC V253d). Clearing a
-				-- row writes an empty value and lights nothing.
-				if value ~= nil and value ~= "" then
-					for i = 1, last, 1 do
-						if not RITUAL_VACANT[i] and sheet["ritual_" .. i] == value then
-							flashRitual(form, "ritual_" .. i);
-							break;
-						end;
-					end;
-				end;
-			end;
 		]]>
 	</script>
 	<!--
@@ -599,10 +497,16 @@
 
 				items/values carry only the empty first entry for now (SPEC V15); the disciplines
 				themselves arrive in SPEC T460, and nothing but items=/values= changes then.
+
+				30th batch (SPEC I175c/d, V508): the rows of DISCIPLINES, MAIN PATHS, SECONDARY PATHS
+				and RITUALS are named dragRow_<field> and the picker of each template is the row's
+				drag handle (onStartDrag into rowDragStart). CLAN DISCIPLINES stay anonymous and in
+				the book's order: DiscRow is shared, and rowDragStart refuses clanDisc_* because its
+				list does not carry them (SPEC V508e) - one template, as V178 asks.
 			-->
 			<template name="DiscRow">
 				<button name="btnQ$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Disc', sheet['$(field)'], nil, '$(field)');"/>
-				<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Discipline" onClick="mfOpen(self, '$(field)', 'disc', 'Disc');"/>
+				<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Discipline" onClick="mfOpen(self, '$(field)', 'disc', 'Disc');" onStartDrag="rowDragStart(self, drag, x, y, event, 'disc', '$(field)');"/>
 				<edit name="edt$(field)" left="25" top="0" width="271" height="25" field="$(field)" visible="false" enabled="false"/>
 				<imageCheckBox left="301" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
 				<imageCheckBox left="326" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
@@ -635,49 +539,49 @@
 			<layout left="0" top="156" width="466" height="445">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="15" width="426" height="20" text="DISCIPLINES" horzTextAlign="center"/>
-				<layout left="20" top="36" width="426" height="25">
+				<layout name="dragRow_disc_1" left="20" top="36" width="426" height="25">
 					<DiscRow field="disc_1"/>
 				</layout>
-				<layout left="20" top="61" width="426" height="25">
+				<layout name="dragRow_disc_2" left="20" top="61" width="426" height="25">
 					<DiscRow field="disc_2"/>
 				</layout>
-				<layout left="20" top="86" width="426" height="25">
+				<layout name="dragRow_disc_3" left="20" top="86" width="426" height="25">
 					<DiscRow field="disc_3"/>
 				</layout>
-				<layout left="20" top="111" width="426" height="25">
+				<layout name="dragRow_disc_4" left="20" top="111" width="426" height="25">
 					<DiscRow field="disc_4"/>
 				</layout>
-				<layout left="20" top="136" width="426" height="25">
+				<layout name="dragRow_disc_5" left="20" top="136" width="426" height="25">
 					<DiscRow field="disc_5"/>
 				</layout>
-				<layout left="20" top="161" width="426" height="25">
+				<layout name="dragRow_disc_6" left="20" top="161" width="426" height="25">
 					<DiscRow field="disc_6"/>
 				</layout>
-				<layout left="20" top="186" width="426" height="25">
+				<layout name="dragRow_disc_7" left="20" top="186" width="426" height="25">
 					<DiscRow field="disc_7"/>
 				</layout>
-				<layout left="20" top="211" width="426" height="25">
+				<layout name="dragRow_disc_8" left="20" top="211" width="426" height="25">
 					<DiscRow field="disc_8"/>
 				</layout>
-				<layout left="20" top="236" width="426" height="25">
+				<layout name="dragRow_disc_9" left="20" top="236" width="426" height="25">
 					<DiscRow field="disc_9"/>
 				</layout>
-				<layout left="20" top="261" width="426" height="25">
+				<layout name="dragRow_disc_10" left="20" top="261" width="426" height="25">
 					<DiscRow field="disc_10"/>
 				</layout>
-				<layout left="20" top="286" width="426" height="25">
+				<layout name="dragRow_disc_11" left="20" top="286" width="426" height="25">
 					<DiscRow field="disc_11"/>
 				</layout>
-				<layout left="20" top="311" width="426" height="25">
+				<layout name="dragRow_disc_12" left="20" top="311" width="426" height="25">
 					<DiscRow field="disc_12"/>
 				</layout>
-				<layout left="20" top="336" width="426" height="25">
+				<layout name="dragRow_disc_13" left="20" top="336" width="426" height="25">
 					<DiscRow field="disc_13"/>
 				</layout>
-				<layout left="20" top="361" width="426" height="25">
+				<layout name="dragRow_disc_14" left="20" top="361" width="426" height="25">
 					<DiscRow field="disc_14"/>
 				</layout>
-				<layout left="20" top="386" width="426" height="25">
+				<layout name="dragRow_disc_15" left="20" top="386" width="426" height="25">
 					<DiscRow field="disc_15"/>
 				</layout>
 			</layout>
@@ -697,7 +601,7 @@
 			-->
 			<template name="MainPathRow">
 				<button name="btnQ$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Path', sheet['$(field)'], nil, '$(field)');"/>
-				<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Main Path" onClick="mfOpen(self, '$(field)', 'mainPath', 'Path');"/>
+				<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Main Path" onClick="mfOpen(self, '$(field)', 'mainPath', 'Path');" onStartDrag="rowDragStart(self, drag, x, y, event, 'mainPath', '$(field)');"/>
 				<edit name="edt$(field)" left="25" top="0" width="271" height="25" field="$(field)" visible="false" enabled="false"/>
 				<imageCheckBox name="ro_$(field)_1" left="301" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
 				<imageCheckBox name="ro_$(field)_2" left="326" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
@@ -710,7 +614,7 @@
 			     sorcery's rating minus one (SPEC V183, enforced in xpClick at SPEC T441). -->
 			<template name="SecPathRow">
 				<button name="btnQ$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Path', sheet['$(field)'], nil, '$(field)');"/>
-				<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Secondary Path" onClick="mfOpen(self, '$(field)', 'secPath', 'Path');"/>
+				<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Secondary Path" onClick="mfOpen(self, '$(field)', 'secPath', 'Path');" onStartDrag="rowDragStart(self, drag, x, y, event, 'secPath', '$(field)');"/>
 				<edit name="edt$(field)" left="25" top="0" width="271" height="25" field="$(field)" visible="false" enabled="false"/>
 				<imageCheckBox left="301" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
 				<imageCheckBox left="326" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
@@ -732,16 +636,16 @@
 			<layout left="0" top="0" width="466" height="151">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="15" width="426" height="20" text="MAIN PATHS" horzTextAlign="center"/>
-				<layout left="20" top="36" width="426" height="25">
+				<layout name="dragRow_mainPath_1" left="20" top="36" width="426" height="25">
 					<MainPathRow field="mainPath_1"/>
 				</layout>
-				<layout left="20" top="61" width="426" height="25">
+				<layout name="dragRow_mainPath_2" left="20" top="61" width="426" height="25">
 					<MainPathRow field="mainPath_2"/>
 				</layout>
-				<layout left="20" top="86" width="426" height="25">
+				<layout name="dragRow_mainPath_3" left="20" top="86" width="426" height="25">
 					<MainPathRow field="mainPath_3"/>
 				</layout>
-				<layout left="20" top="111" width="426" height="25">
+				<layout name="dragRow_mainPath_4" left="20" top="111" width="426" height="25">
 					<MainPathRow field="mainPath_4"/>
 				</layout>
 			</layout>
@@ -749,49 +653,49 @@
 			<layout left="0" top="156" width="466" height="445">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="15" width="426" height="20" text="SECONDARY PATHS" horzTextAlign="center"/>
-				<layout left="20" top="36" width="426" height="25">
+				<layout name="dragRow_secPath_1" left="20" top="36" width="426" height="25">
 					<SecPathRow field="secPath_1"/>
 				</layout>
-				<layout left="20" top="61" width="426" height="25">
+				<layout name="dragRow_secPath_2" left="20" top="61" width="426" height="25">
 					<SecPathRow field="secPath_2"/>
 				</layout>
-				<layout left="20" top="86" width="426" height="25">
+				<layout name="dragRow_secPath_3" left="20" top="86" width="426" height="25">
 					<SecPathRow field="secPath_3"/>
 				</layout>
-				<layout left="20" top="111" width="426" height="25">
+				<layout name="dragRow_secPath_4" left="20" top="111" width="426" height="25">
 					<SecPathRow field="secPath_4"/>
 				</layout>
-				<layout left="20" top="136" width="426" height="25">
+				<layout name="dragRow_secPath_5" left="20" top="136" width="426" height="25">
 					<SecPathRow field="secPath_5"/>
 				</layout>
-				<layout left="20" top="161" width="426" height="25">
+				<layout name="dragRow_secPath_6" left="20" top="161" width="426" height="25">
 					<SecPathRow field="secPath_6"/>
 				</layout>
-				<layout left="20" top="186" width="426" height="25">
+				<layout name="dragRow_secPath_7" left="20" top="186" width="426" height="25">
 					<SecPathRow field="secPath_7"/>
 				</layout>
-				<layout left="20" top="211" width="426" height="25">
+				<layout name="dragRow_secPath_8" left="20" top="211" width="426" height="25">
 					<SecPathRow field="secPath_8"/>
 				</layout>
-				<layout left="20" top="236" width="426" height="25">
+				<layout name="dragRow_secPath_9" left="20" top="236" width="426" height="25">
 					<SecPathRow field="secPath_9"/>
 				</layout>
-				<layout left="20" top="261" width="426" height="25">
+				<layout name="dragRow_secPath_10" left="20" top="261" width="426" height="25">
 					<SecPathRow field="secPath_10"/>
 				</layout>
-				<layout left="20" top="286" width="426" height="25">
+				<layout name="dragRow_secPath_11" left="20" top="286" width="426" height="25">
 					<SecPathRow field="secPath_11"/>
 				</layout>
-				<layout left="20" top="311" width="426" height="25">
+				<layout name="dragRow_secPath_12" left="20" top="311" width="426" height="25">
 					<SecPathRow field="secPath_12"/>
 				</layout>
-				<layout left="20" top="336" width="426" height="25">
+				<layout name="dragRow_secPath_13" left="20" top="336" width="426" height="25">
 					<SecPathRow field="secPath_13"/>
 				</layout>
-				<layout left="20" top="361" width="426" height="25">
+				<layout name="dragRow_secPath_14" left="20" top="361" width="426" height="25">
 					<SecPathRow field="secPath_14"/>
 				</layout>
-				<layout left="20" top="386" width="426" height="25">
+				<layout name="dragRow_secPath_15" left="20" top="386" width="426" height="25">
 					<SecPathRow field="secPath_15"/>
 				</layout>
 			</layout>
@@ -807,19 +711,12 @@
 				Ritual names arrive prefixed with their level - "3. Name" - so the level is read off
 				the item itself and there is no second table to drift from it (SPEC V184, T460).
 
-				The LAST child is the one-second flash a newly added ritual gets once the list has
-				reordered itself (SPEC I47, V253). Last, because the host paints in document order
-				and this one has to paint OVER the row - the same reason dynXpEmpty closes the log
-				box (SPEC I39) - and it carries ALPHA so the name stays readable underneath it.
+				The flash rectangle and the sort that lit it went in the 30th batch (SPEC I175e,
+				Q96.1): a ritual stays in the slot it was picked into, and the rows are ordered by
+				drag like every other list - each row layout is named dragRow_<field> and the picker
+				is the handle (onStartDrag into rowDragStart, list 'ritual').
 
-				hitTest is off: an overlay that ate the click would make the row unusable for the
-				second it is up. It is authored hidden, and the only thing that ever writes its
-				visible is the pair in flashRitual - lit, then put out by setTimeout.
-
-				Its colour has a key in all four palettes (SPEC V53, I5), so the flash is the
-				period's own accent and not one loose colour sitting outside the theme.
-
-				⚠ This paragraph is HERE and not beside the rectangle it describes because an XML
+				⚠ This paragraph is HERE and not inside the template it describes because an XML
 				comment INSIDE a <template> makes rdk -l exit 1 with no message and DELETE the .rpk
 				- the same signature as SPEC B19/B49, through a door nobody had opened before: the
 				sheet has 26 templates and not one of them contained a comment. MEASURED, both ways:
@@ -827,9 +724,8 @@
 			-->
 			<template name="RitualRow">
 				<button name="btnQ$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Ritual', sheet['$(field)'], nil, '$(field)');"/>
-				<button name="dyn$(field)" left="25" top="0" width="401" height="25" text="Select Ritual" onClick="mfOpen(self, '$(field)', 'ritual', 'Ritual');"/>
+				<button name="dyn$(field)" left="25" top="0" width="401" height="25" text="Select Ritual" onClick="mfOpen(self, '$(field)', 'ritual', 'Ritual');" onStartDrag="rowDragStart(self, drag, x, y, event, 'ritual', '$(field)');"/>
 				<edit name="edt$(field)" left="25" top="0" width="401" height="25" field="$(field)" visible="false" enabled="false"/>
-				<rectangle name="hl$(field)" left="0" top="0" width="426" height="25" color="#55FFFFFF" xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
 			</template>
 
 
@@ -848,70 +744,70 @@
 			<layout left="0" top="0" width="466" height="601">
 				<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 				<label left="20" top="15" width="426" height="20" text="RITUALS" horzTextAlign="center"/>
-				<layout left="20" top="36" width="426" height="25">
+				<layout name="dragRow_ritual_1" left="20" top="36" width="426" height="25">
 					<RitualRow field="ritual_1"/>
 				</layout>
-				<layout left="20" top="61" width="426" height="25">
+				<layout name="dragRow_ritual_2" left="20" top="61" width="426" height="25">
 					<RitualRow field="ritual_2"/>
 				</layout>
-				<layout left="20" top="86" width="426" height="25">
+				<layout name="dragRow_ritual_3" left="20" top="86" width="426" height="25">
 					<RitualRow field="ritual_3"/>
 				</layout>
-				<layout left="20" top="111" width="426" height="25">
+				<layout name="dragRow_ritual_4" left="20" top="111" width="426" height="25">
 					<RitualRow field="ritual_4"/>
 				</layout>
-				<layout left="20" top="136" width="426" height="25">
+				<layout name="dragRow_ritual_5" left="20" top="136" width="426" height="25">
 					<RitualRow field="ritual_5"/>
 				</layout>
-				<layout left="20" top="161" width="426" height="25">
+				<layout name="dragRow_ritual_6" left="20" top="161" width="426" height="25">
 					<RitualRow field="ritual_6"/>
 				</layout>
-				<layout left="20" top="186" width="426" height="25">
+				<layout name="dragRow_ritual_7" left="20" top="186" width="426" height="25">
 					<RitualRow field="ritual_7"/>
 				</layout>
-				<layout left="20" top="211" width="426" height="25">
+				<layout name="dragRow_ritual_8" left="20" top="211" width="426" height="25">
 					<RitualRow field="ritual_8"/>
 				</layout>
-				<layout left="20" top="236" width="426" height="25">
+				<layout name="dragRow_ritual_9" left="20" top="236" width="426" height="25">
 					<RitualRow field="ritual_9"/>
 				</layout>
-				<layout left="20" top="261" width="426" height="25">
+				<layout name="dragRow_ritual_10" left="20" top="261" width="426" height="25">
 					<RitualRow field="ritual_10"/>
 				</layout>
-				<layout left="20" top="286" width="426" height="25">
+				<layout name="dragRow_ritual_11" left="20" top="286" width="426" height="25">
 					<RitualRow field="ritual_11"/>
 				</layout>
-				<layout left="20" top="311" width="426" height="25">
+				<layout name="dragRow_ritual_12" left="20" top="311" width="426" height="25">
 					<RitualRow field="ritual_12"/>
 				</layout>
-				<layout left="20" top="336" width="426" height="25">
+				<layout name="dragRow_ritual_13" left="20" top="336" width="426" height="25">
 					<RitualRow field="ritual_13"/>
 				</layout>
-				<layout left="20" top="361" width="426" height="25">
+				<layout name="dragRow_ritual_14" left="20" top="361" width="426" height="25">
 					<RitualRow field="ritual_14"/>
 				</layout>
-				<layout left="20" top="386" width="426" height="25">
+				<layout name="dragRow_ritual_15" left="20" top="386" width="426" height="25">
 					<RitualRow field="ritual_15"/>
 				</layout>
-				<layout left="20" top="411" width="426" height="25">
+				<layout name="dragRow_ritual_16" left="20" top="411" width="426" height="25">
 					<RitualRow field="ritual_16"/>
 				</layout>
-				<layout left="20" top="436" width="426" height="25">
+				<layout name="dragRow_ritual_17" left="20" top="436" width="426" height="25">
 					<RitualRow field="ritual_17"/>
 				</layout>
-				<layout left="20" top="461" width="426" height="25">
+				<layout name="dragRow_ritual_18" left="20" top="461" width="426" height="25">
 					<RitualRow field="ritual_18"/>
 				</layout>
-				<layout left="20" top="486" width="426" height="25">
+				<layout name="dragRow_ritual_19" left="20" top="486" width="426" height="25">
 					<RitualRow field="ritual_19"/>
 				</layout>
-				<layout left="20" top="511" width="426" height="25">
+				<layout name="dragRow_ritual_20" left="20" top="511" width="426" height="25">
 					<RitualRow field="ritual_20"/>
 				</layout>
-				<layout left="20" top="536" width="426" height="25">
+				<layout name="dragRow_ritual_26" left="20" top="536" width="426" height="25">
 					<RitualRow field="ritual_26"/>
 				</layout>
-				<layout left="20" top="561" width="426" height="25">
+				<layout name="dragRow_ritual_27" left="20" top="561" width="426" height="25">
 					<RitualRow field="ritual_27"/>
 				</layout>
 			</layout>
@@ -1000,7 +896,7 @@
 		is it on the sheet at all, and is it high enough - and the two refusals are told
 		apart, because they are different problems with different fixes.
 	-->
-	<dataLink fields="{'ritual_1', 'ritual_2', 'ritual_3', 'ritual_4', 'ritual_5', 'ritual_6', 'ritual_7', 'ritual_8', 'ritual_9', 'ritual_10', 'ritual_11', 'ritual_12', 'ritual_13', 'ritual_14', 'ritual_15', 'ritual_16', 'ritual_17', 'ritual_18', 'ritual_19', 'ritual_20', 'ritual_26', 'ritual_27'}" onChange="guardPick(field, oldValue, newValue); sortRituals(self, field, newValue);"/>
+	<dataLink fields="{'ritual_1', 'ritual_2', 'ritual_3', 'ritual_4', 'ritual_5', 'ritual_6', 'ritual_7', 'ritual_8', 'ritual_9', 'ritual_10', 'ritual_11', 'ritual_12', 'ritual_13', 'ritual_14', 'ritual_15', 'ritual_16', 'ritual_17', 'ritual_18', 'ritual_19', 'ritual_20', 'ritual_26', 'ritual_27'}" onChange="guardPick(field, oldValue, newValue);"/>
 
 	<!-- The description block paints when the tab is SHOWN (SPEC I26 / V206): onNodeReady fires
 	     on every open and dragged the whole 1.1 MB module in with it, the largest of the four

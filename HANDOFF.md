@@ -1,6 +1,103 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-25, 206ª rodada — 29º lote CONSTRUÍDO & INSTALADO)
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-25, 207ª rodada — 30º lote CONSTRUÍDO: §T1102…§T1107 `x`, gate VERDE, `.rpk` INSTALADO 11:08)
+
+**PRÓXIMO COMANDO:** pedir ao user os testes de TELA **§T1108** (Traits: arrasto pelo host, vigia de ~1,2 s, 0 clique comido) e
+**§T1109** (as 8 listas novas + a coluna: alça na área inteira, `numina_1`/`clanDisc_*` recusam, contorno 0.50, `mcOrder` em 2
+clientes, (g) de quais controles a linha arrasta) — FECHAR & REABRIR a ficha antes. Depois `/ck:spec` p/ as EMENDAS PENDENTES
+abaixo (6 desvios do build + 1 sonda MORTA de §V476). §T1096/§T1101 seguem `.` (tela; §T1101 foi SUBSTITUÍDA por §T1108 no
+texto, a linha segue `.`). Nada há p/ `/ck:build` até a tela responder.
+
+### 30º LOTE CONSTRUÍDO (207ª) — §T1102…§T1107 `x` (`/ck:build --all`)
+Gate `-Build -Quiet` **ALL CHECKS PASSED** (123 s, 2026-09-25 11:06). Bateria §V508/§V509/§V502c/§V476b/§V489c/§V499c:
+**18/18 mutações VERMELHAS no check certo & 3/4 sondas VERDES** (P4 = sonda MORTA do SPEC, ver emenda 1), backups restaurados
+(`battery-backups\` vazio, 0 resíduo por grep). **INSTALADO 2026-09-25 11:08:01** (3097777 B = `output/`). Se a ficha estava
+aberta, FECHAR & REABRIR. **Nada commitado.** Backups de antes do build no scratchpad `63daf4d3…\scratchpad\`:
+`WoD20th.before30.lfm`, `WoD20.2.before30.lfm`, `WoD20.7.before30.lfm`, `WoD20.11.before30.lfm`, `WoD20.3.before30.lfm`,
+`gate.before30.ps1`, `SPEC.before30build.md`; hashes `before30.hashes.txt`/`after30.hashes.txt`; bateria `battery30.ps1`
+(+ `mutfn30.ps1`, log `battery30.log`); scripts de edição `t1102.ps1`, `t1103-5.ps1`, `t1106.ps1`, `t1107.ps1` (+ blocos
+`dragblock.lua`, `mcblock.lua`, `v508v509.ps1.txt`).
+
+**O QUE VIROU CÓDIGO**
+- `WoD20th.lfm` — §T1102: sonda FORA (0 `PROBE`/`ROW_PROBE`/`rowDragAte`/`rowDragDown`/`rowDragUp`/`ROW_DRAG_MIN`; `:9118`
+  "PROBE SLICE" é prosa alheia & ficou), `d.hoverId` (memo por linha), vigia em `rowTween` (`ROW_WATCH_TICKS = 20`,
+  `ROW_WATCH_MAX = 4`; lê `ROW_DRAG.live` LITERAL — §V508d cobra o literal, `d.live` acendeu o gate na 1ª M0),
+  `rowDragMove` = `return ROW_DRAG.live == true;`, `rowDragStart` chama `rowTweenStart()`, re-arme em `rowDropEnter` quando
+  a vigia desistiu. §T1106: `ROW_LISTS` c/ 11 entradas MOVIDA p/ depois de `RITUAL_FREE_ROWS` (`:2870` — os laços leem
+  `DISC_ROWS`…`RITUAL_VACANT`, declaradas DEPOIS do lugar velho; o chunk roda de cima p/ baixo), `rowOrderRepair(saved, ids)`
+  extraída, `MC_ROW_TOP0 = 4`/`MC_ROW_PITCH = 114` ao lado de `MC_POOL`, `MC_KEEP` + `mcOrder`, `mcIdOf` `mcOrderOf`
+  `mcAnimTo` `mcRowOrderApply(from, instant, found)` `mcDragInstall` `mcDragStart` `mcDropEnter` `mcDropCommit`
+  (+ `MC_DRAG_INSTALLED`) logo depois do bloco das listas; `mcRender` carimba `mcId` (`if mcIdOf(n) == nil then`), `0.50`
+  no `mcOn_` & termina em `mcRowOrderApply(from, MC_DRAG_INSTALLED ~= true, found)`; `<dataLink field="mcOrder"
+  onChange="mcRowOrderApply(self, false);"/>` dentro de `mcSettingsScope`; o `<dataLink fields>` das ordens c/ os 11.
+- `WoD20.2.lfm` — `onMouseDown`/`onMouseUp` FORA dos 2 pickers, `onClick` = `mfOpen(…)` puro, comentário reescrito.
+- `WoD20.7.lfm` (59 `dragRow_`, `numina_1` anônima) · `WoD20.11.lfm` (56, `clanDisc_*` anônimas; `sortRituals`/`sortQuiet`/
+  `flashRitual`/`ritualRank` & o `<rectangle name="hl$(field)">` FORA; `<dataLink>` dos rituais só `guardPick`) ·
+  `WoD20.3.lfm` (11 `dragRow_attack_<num>`) — `onStartDrag` nos 8 templates, nota FORA de cada template (§B19).
+- `verify-hunters-hunted.ps1` — §V508 REESCRITA (11 listas nos 4 `.lfm`, ids derivados c/ VACANT & `numina` de 2, 10
+  templates de alça, 0 nome aposentado no texto CRU dos `.lfm`, `rowDragMove` literal, `<dataLink>` derivado de
+  `ROW_LISTS`), §V509 NOVA (5 pernas + zero-guard), §V502c → 0.50 & `0.70` proibido, §V476b → 2 donos (`btnXpApply`,
+  `mcOn_`; conta só `.opacity =`), §V489c `[not(self::dataLink)]`, §V499c + `mcOrder`, §V252/§V253 → 1 nota de
+  aposentadoria (0 check), `$luaOwned` + 10, `$LUA_OPACITY` − `0.70`, comentário de §V204 sem `sortRituals`.
+
+**DESVIOS DO SPEC NO BUILD → EMENDAS PENDENTES p/ `/ck:spec`** (o build só vira status de §T):
+1. §V476 sonda `top="47"` → `48` em `btnXpApply` ! **⊥ é VERDE**: acende §V479d (pina o `top` em 47). Sonda MORTA no
+   texto de §V476 — rec.: tirar a sonda de §V476 & apontar p/ a de §V479 (§B novo: sonda herdada sem reconferir).
+2. §V509b/c: `mcRowOrderApply` ⊥ chama `rowOrderRepair(` direto — chama `mcOrderOf()` (que faz `rowOrderRepair(MC.root.mcOrder,
+   ids)`); & o `.top` de `mcRow_` é escrito em `mcAnimTo` (≡ `rowAnimTo`), ⊥ em `mcRowOrderApply`. O gate cobra ASSIM.
+3. §I175h(3): `mcRowOrderApply(from, instant, found)` — 3º parâmetro OPCIONAL (o `found` do `mcRender`, p/ ⊥ andar a árvore
+   2× por pintura); o `<dataLink>` & a vigia chamam c/ 2, `mcDropCommit` c/ 3.
+4. §I174c/§I175b: `ROW_LISTS` mora depois de `RITUAL_FREE_ROWS` (`:2870`), ⊥ "junto de `MERIT_ROWS`" (motivo acima).
+5. §I175e/§T1104: `ritualRank` (`local function`, só o sort lia) saiu junto; as 4 chaves `["#55FFFFFF"]` das paletas de
+   `WoD20.6.lfm` ficaram ÓRFÃS (§V53 só cobra autorado → paleta) — rec.: apagar em rodada própria.
+6. §I175h(4): o dado da coluna é `drag:addData("wodChar", <mcId>)` (chave `wodChar`, valor = o id), ⊥ a string `"wodChar|<mcId>"`;
+   `rowDropEnter` lê `wodRow` & `mcDropEnter` lê `wodChar` — as chaves diferentes SÃO a recusa cruzada (§V509d).
+
+**Armadilhas medidas nesta rodada**
+- `.ps1` do scratchpad SEM BOM: um `⚠` dentro de here-string ⊥ casa (PowerShell 5.1 lê o arquivo como ANSI) — `t1103-5.ps1`
+  parou ANTES de escrever (o `throw` vem antes do `WriteAllText`, 0 dano). Âncoras só ASCII; texto não-ASCII vai num arquivo
+  à parte lido c/ UTF-8 (`dragblock.lua`, `mcblock.lua`, `handoff30.md`).
+- `grep -c $'\r$'` dentro de `$( )` no Bash tool devolve 0 à toa — contar CR c/ `tr -cd '\r' | wc -c`.
+- Bateria: ~38 s por rodada do gate em processo filho ⇒ 5 por chamada cabem no teto de 10 min; 22 rodadas em 5 chamadas.
+
+### 30º LOTE ESPECIFICADO (206ª) — arrasto do host em 9 listas + coluna a 50% (§I175) & §I174/§V508 REESCRITAS (§B176/§B177)
+`/ck:spec` só: §C (30º lote, §Q95 em parte, §Q96 ABERTA c/ 5 perguntas & rec.), §I3 (+10 LUA-OWNED), §I174 REESCRITA (b/d/e/i),
+§I175a…k, §R174 (host drag MEDIDO), §R175 (as 9 listas HOJE), §V508 REESCRITA, §V509 NOVA, §V252 REVOGADA, §V476b & §V502c
+EMENDADAS, §B176, §B177, §T1102…§T1109 (+ §T1101 SUBSTITUÍDA). **Nada commitado por mim** (outra sessão commitou `1d29ca9b`
+01:02 c/ a árvore do momento). Backup de antes: scratchpad `d30d1769…\scratchpad\SPEC.before30.md`.
+- **⚠ O `.rpk` INSTALADO (00:59:48, 3097312 B) é a SONDA do 29º:** arrasto por `onStartDrag` FUNCIONA (9 arrastos medidos), mas
+  carrega 19 `wodTrace("PROBE …")` & a guarda `rowDragAte()` que COME o clique seguinte a cada arrasto (§B177). O gate está
+  VERMELHO nesta árvore (§V508 antiga cobra `onMouseDown`/`rowDragUp`; o gate ainda é o do 29º). **PRÓXIMO:** `/ck:build`
+  §T1102…§T1107 numa rodada (§T1102 & §T1106 os 2 em `WoD20th.lfm` — ⊥ paralelizar; §T1103/§T1104/§T1105 são 1 arquivo cada;
+  §T1107 o gate) → 1 install → pedir ao user §T1108 & §T1109 (tela) + a resposta de §Q96.
+- **O que MUDOU de mecanismo (ler §R174 antes de tocar no Lua):** com o botão apertado o host ⊥ entrega `onMouseMove` (o
+  `TRExtInputHelper` do Firecast é dono do aperto) — arrasto = `onStartDrag` no picker (`drag:addData("wodRow", "<lista>|<id>")`)
+  + `onStartDrop` em ∀ controle de ∀ linha (instalado por atribuição `ctrl.onStartDrop = fn`, recursivo, 1× por ficha) que chega
+  POR PIXEL & por polling (memo `d.hoverId` obrigatório) + `drop:addAction("wodRow", cb)`; o `cb` roda 1× no soltar; 0 gancho de
+  cancelamento (vigia por silêncio em `rowTween`: 20 tiques × 4); 0 `onClick` depois de arrasto (a guarda SAI); 1 `onMouseMove`
+  avulso c/ `y` fora do botão logo após o `onStartDrag` (o portão da dica `rowDragMove` devolve `ROW_DRAG.live`).
+- **Armadilhas p/ o build:** (1) `rowDropInstall` é 1× por ficha (flag) & roda do `onNodeReady` do raiz — ∀ lista nova tem de
+  estar em `ROW_LISTS` ANTES (registro por aba nunca ganha drop site); (2) ids DERIVADOS pulando `PSYCHIC_VACANT` {16…19} &
+  `RITUAL_VACANT` {21…25}, & `numina` começa em 2 c/ `top0 = 61` (`numina_1` pinada); `attack` `top0 = 61` (cabeçalho em 36);
+  (3) `DiscRow` & `HedgePicker` são templates PARTILHADOS c/ linhas que ⊥ arrastam (`clanDisc_*`, `numina_1`) — `rowDragStart`
+  RECUSA por `rowPosOf = nil` ANTES de `addData` (§V508e); ⊥ criar template irmão; (4) §V347: o chunk do raiz está a 3 do teto
+  de locais — tudo global (≡ `ROW_DRAG`); (5) §V242: prosa sem `--` — `if not x then` de 4 palavras acende o check (usar
+  `~= true`); (6) `mcOrder` é escrito em `MC.root` (⊥ `setField`: `sheet` pode ser um filho) & o `<dataLink field="mcOrder">`
+  vai DENTRO de `mcSettingsScope` (pinado à raiz em `mcInit`), ⊥ em `stSharedScope` (§V489c compara o conjunto de `field=`);
+  (7) `0.50` colide c/ §V476b — o gate emenda p/ 2 donos nomeados JUNTO c/ o código (§T1107), senão vermelho; (8) §V252 (auto-
+  ordem dos rituais) SAI c/ `sortRituals`/`sortQuiet`/`flashRitual`/`hl$(field)` — o check do gate vira aposentado c/ nota;
+  (9) comentário DENTRO de `<template>` = `rdk -l` exit 1 mudo (§B19) — 10 templates recebem atributo, 0 comentário;
+  (10) `mcOrder = true` em `MC_KEEP` (senão `mcWipe` apaga ao remover a raiz, §V499c) & `mcId` escrito SÓ em `mcRender` (lazy;
+  `mcAdd` intacto — §V492a proíbe `n.x =` lá) & `rowOrderRepair(saved, ids)` EXTRAÍDA de `rowOrderOf` (soldada a `sheet`);
+  (11) `<rectangle>`/`<image>`/`label`/`dataScopeBox` como fontes de `onStartDrag` ⊥ têm precedente (só `<button>`/`<form>`) —
+  §T1109(g) anota de quais a linha arrastou; se só o `X` arrastar → `<button>` transparente sobre a linha (rodada própria); (12) §V252 & §V253 saem JUNTAS do gate (§V253 lê `flashRitual`/`hl`); §V489c
+  passa a ler só widgets (`[not(self::dataLink)]`); (13) o gate HOJE está 4× VERMELHO em §V508 (esperado: §V508 velha) —
+  reescrever o gate sobre a árvore pronta, M0 VERDE, só então a bateria; sondas = edições estáticas (⊥ cenário de runtime);
+  (14) `ROW_LISTS` c/ chaves NOMEADAS (`order = …, prefix = …`) — forma posicional deixa `L.order` nil.
+- **§Q96 RESPONDIDA pelo user 2026-09-25:** (1) rituais: auto-ordem SAI; (2) CLAN DISCIPLINES ⊥ arrasta; (3) `numina_1` pinada;
+  (5) contorno 0.50 c/ 2 donos do literal — as 4 como recomendadas; **(4) MUDOU:** a alça é QUALQUER ponto da área do personagem
+  (foto inclusive) → `mcDragInstall` põe `onStartDrag` por atribuição em TODO controle da linha (menos o `<edit>` do nome:
+  seleção de texto, ≡ o combat tracker) & `onStartDrop` em todos; **0** `onStartDrag=` no XML de `McRow` (§I175h(4), §V509d).
 
 ### 29º LOTE CONSTRUÍDO (206ª) — §T1097…§T1100 `x` (`/ck:build --all`)
 Gate `-Build -Quiet` **ALL CHECKS PASSED** (61 s, 2026-09-25 00:00). Bateria §V508/§V502e: **11/11 mutações VERMELHAS no check certo & 2/2 sondas VERDES**, hashes dos 4 arquivos mutados = os de antes.

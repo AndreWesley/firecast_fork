@@ -2739,35 +2739,6 @@
 			-- swapping 6 for 10 would be the same literal one conversion later.
 			MERIT_ROWS = 10;
 
-			-- The three lists a drag reorders (SPEC I174c, V508a). The order is VISUAL: a drag
-			-- moves the dragRow_<field> layout by top and never the data, because the experience
-			-- log is worked out PER SLOT - baseline and the background_k#level keys of xpFree,
-			-- xpSunk, xpOrder and xpWhen - so a value moved between slots would change what was
-			-- spent without a word (SPEC R173b, Q95.3). top0/pitch are where WoD20.2 authors the
-			-- rows (the factory order), and the ids come from the row counts above, never a
-			-- literal (SPEC V383b). `prefix` is the slot field minus its id: flaws live in
-			-- merit_f*, so the row of merit_f3 is dragRow_merit_f3.
-			ROW_LISTS = {
-				background = { order = "orderBackground", prefix = "background_", top0 = 36, pitch = 30, ids = {} },
-				merit      = { order = "orderMerit",      prefix = "merit_",      top0 = 36, pitch = 25, ids = {} },
-				flaw       = { order = "orderFlaw",       prefix = "merit_",      top0 = 36, pitch = 25, ids = {} },
-			};
-
-			for rowI = 1, BACKGROUND_ROWS, 1 do ROW_LISTS.background.ids[rowI] = tostring(rowI); end;
-
-			for i = 0, MERIT_ROWS, 1 do
-				ROW_LISTS.merit.ids[i + 1] = "m" .. i;
-				ROW_LISTS.flaw.ids[i + 1]  = "f" .. i;
-			end;
-
-			-- How far the pointer moves before a press is a drag (SPEC Q95.4): below it the press
-			-- is still a click and opens the search box. Then the tween (SPEC I174e): every tick
-			-- a row covers ROW_TWEEN_K of what is left, ~8 ticks, ~120ms. Screen numbers, all
-			-- three - the screen confirms them (SPEC T1101, B166).
-			ROW_DRAG_MIN = 4;
-			ROW_TWEEN_MS = 15;
-			ROW_TWEEN_K  = 0.35;
-
 			-- The search box has TWO widths and never N (SPEC I115a, V359a). A third would be a
 			-- ruler per list, which is the roster I114f refuses: it grows a line every wave, and the
 			-- line nobody remembers to update is the one that is wrong.
@@ -2857,10 +2828,9 @@
 			-- no longer the count - the rewrite V263(a) already took for psychic.
 			--
 			-- The hole is a SET and not a number because a count cannot say WHICH index is
-			-- missing, and both readers need to know. sortRituals is the one that would do
-			-- damage: it reads sheet[...] and writes setField(...) across its whole range, so an
-			-- unguarded walk would pull a pre-85th sheet's dead values into the visible rows and
-			-- write back over the burned names, in silence (SPEC V204 amended, B116).
+			-- missing, and every reader needs to know: renderRitualButtons, the ledger and the
+			-- ids ROW_LISTS derives for the drag (SPEC I175b) all skip it. The sort that read and
+			-- wrote across the whole range went with the 30th batch (SPEC I175e, V204 amended, B116).
 			--
 			-- The BOUND of those walks stays the highest index and is NOT reduced by these five.
 			-- Subtracting them would stop the loops at 22 and leave the two rows this round adds
@@ -2883,6 +2853,68 @@
 			SEC_PATH_FREE_ROWS = 0;
 			RITUAL_FREE_ROWS   = 0;
 
+			-- The lists a drag reorders (SPEC I174c, I175b, V508a): the three of Traits and the
+			-- eight of the 30th batch. The order is VISUAL: a drag moves the dragRow_<field>
+			-- layout by top and never the data, because the experience log is worked out PER
+			-- SLOT - baseline and the background_k#level keys of xpFree, xpSunk, xpOrder and
+			-- xpWhen - so a value moved between slots would change what was spent without a
+			-- word (SPEC R173b, Q95.3, I175g). top0/pitch are where the tab authors the rows (the
+			-- factory order), and the ids come from the row counts and the vacancies above, never
+			-- a literal (SPEC V383b): psychic and ritual skip their holes, numina starts at 2
+			-- (numina_1 is the affinity path, pinned to slot 1 - SPEC Q96.3 - so the first MOVING
+			-- slot sits one pitch down), attack starts at 61 under its column header, and CLAN
+			-- DISCIPLINES are no list at all (SPEC Q96.2). `prefix` is the slot field minus its
+			-- id: flaws live in merit_f*, so the row of merit_f3 is dragRow_merit_f3. Keys are
+			-- NAMED - the Lua reads L.order and L.prefix, and a positional entry would read nil.
+			-- Below every row count on purpose: the loops read them, and a chunk runs top down.
+			ROW_LISTS = {
+				background  = { order = "orderBackground",  prefix = "background_",  top0 = 36, pitch = 30, ids = {} },
+				merit       = { order = "orderMerit",       prefix = "merit_",       top0 = 36, pitch = 25, ids = {} },
+				flaw        = { order = "orderFlaw",        prefix = "merit_",       top0 = 36, pitch = 25, ids = {} },
+				psychic     = { order = "orderPsychic",     prefix = "psychic_",     top0 = 36, pitch = 25, ids = {} },
+				numina      = { order = "orderNumina",      prefix = "numina_",      top0 = 61, pitch = 25, ids = {} },
+				hedgeRitual = { order = "orderHedgeRitual", prefix = "hedgeRitual_", top0 = 36, pitch = 25, ids = {} },
+				disc        = { order = "orderDisc",        prefix = "disc_",        top0 = 36, pitch = 25, ids = {} },
+				mainPath    = { order = "orderMainPath",    prefix = "mainPath_",    top0 = 36, pitch = 25, ids = {} },
+				secPath     = { order = "orderSecPath",     prefix = "secPath_",     top0 = 36, pitch = 25, ids = {} },
+				ritual      = { order = "orderRitual",      prefix = "ritual_",      top0 = 36, pitch = 25, ids = {} },
+				attack      = { order = "orderAttack",      prefix = "attack_",      top0 = 61, pitch = 25, ids = {} },
+			};
+
+			for rowI = 1, BACKGROUND_ROWS, 1 do ROW_LISTS.background.ids[rowI] = tostring(rowI); end;
+
+			for i = 0, MERIT_ROWS, 1 do
+				ROW_LISTS.merit.ids[i + 1] = "m" .. i;
+				ROW_LISTS.flaw.ids[i + 1]  = "f" .. i;
+			end;
+
+			for rowI = 1, PSYCHIC_ROWS, 1 do
+				if not PSYCHIC_VACANT[rowI] then ROW_LISTS.psychic.ids[#ROW_LISTS.psychic.ids + 1] = tostring(rowI); end;
+			end;
+
+			for rowI = 2, NUMINA_ROWS, 1 do ROW_LISTS.numina.ids[rowI - 1] = tostring(rowI); end;
+			for rowI = 1, HEDGE_RITUAL_ROWS, 1 do ROW_LISTS.hedgeRitual.ids[rowI] = tostring(rowI); end;
+			for rowI = 1, DISC_ROWS, 1 do ROW_LISTS.disc.ids[rowI] = tostring(rowI); end;
+			for rowI = 1, MAIN_PATH_ROWS, 1 do ROW_LISTS.mainPath.ids[rowI] = tostring(rowI); end;
+			for rowI = 1, SEC_PATH_ROWS, 1 do ROW_LISTS.secPath.ids[rowI] = tostring(rowI); end;
+
+			for rowI = 1, RITUAL_ROWS, 1 do
+				if not RITUAL_VACANT[rowI] then ROW_LISTS.ritual.ids[#ROW_LISTS.ritual.ids + 1] = tostring(rowI); end;
+			end;
+
+			for rowI = 1, ATTACK_ROWS, 1 do ROW_LISTS.attack.ids[rowI] = tostring(rowI); end;
+
+			-- The tween (SPEC I174e): every tick a row covers ROW_TWEEN_K of what is left, ~8
+			-- ticks, ~120ms. Then the watchdog of a drag the host never finished (SPEC I174d):
+			-- the host has no cancel hook - Esc, or a release off every row, ends the drag in
+			-- silence (SPEC R174c) - so rowTween counts drop enters per window of ROW_WATCH_TICKS
+			-- ticks, and ROW_WATCH_MAX windows without a new one give the rows back to the saved
+			-- order (~1.2 s). Screen numbers, all four - the screen confirms them (SPEC T1108,
+			-- B166). The distance a press travels before it is a drag is the host's own.
+			ROW_TWEEN_MS    = 15;
+			ROW_TWEEN_K     = 0.35;
+			ROW_WATCH_TICKS = 20;
+			ROW_WATCH_MAX   = 4;
 			-- The first typed row of each box, keyed by field root. Built from the two counts
 			-- above rather than typed out again: a row moved in the XML changes one number here
 			-- and every reader follows (SPEC V204).
@@ -4750,6 +4782,11 @@
 			MC_ROW_H = 108;
 			MC_DOCK_W = 370;
 
+			-- Where the XML authors row k - top = MC_ROW_TOP0 + MC_ROW_PITCH * (k - 1), the V497e
+			-- law - mirrored here for the reason MC_ROW_H is: the column's drag puts a row at the
+			-- position its character holds (SPEC I175h(3)) and reads the two numbers here.
+			MC_ROW_TOP0  = 4;
+			MC_ROW_PITCH = 114;
 			-- The settings a CHARACTER owns rather than a FICHA are the 13 mcAdd copies onto a
 			-- blank node and mcShared re-copies on every root write (SPEC I169e, Q88.8/Q88.9).
 			-- `language` stands in for `multipleCharacters` here: the flag lives on the root only
@@ -4760,9 +4797,9 @@
 				"healthLevels", "stSpecCost", "stBackgroundCost" };
 
 			-- What survives when the ROOT character is removed (SPEC I170f, V499c): the FICHA's
-			-- own fields - the 13 shared settings, the flag, the active index and the removal
+			-- own fields - the 13 shared settings, the flag, the active index, the column order and the removal
 			-- mark itself. Everything else on the root is the character, and mcWipe clears it.
-			MC_KEEP = { multipleCharacters = true, mcActive = true, mcRootGone = true };
+			MC_KEEP = { multipleCharacters = true, mcActive = true, mcRootGone = true, mcOrder = true };
 
 			for mcI = 1, #MC_SHARED_FIELDS, 1 do MC_KEEP[MC_SHARED_FIELDS[mcI]] = true; end;
 
@@ -4920,6 +4957,11 @@
 						if n ~= nil then
 							if row.node == nil or ndb.getNodeHandle(row.node) ~= ndb.getNodeHandle(n) then row.node = n; end;
 
+							-- The character's id, stamped on the first paint that shows it (SPEC
+							-- I175h(1), V509a): the column's order names nodes by it. The root has
+							-- none and answers "root"; mcAdd writes nothing here (SPEC V492a).
+							if mcIdOf(n) == nil then n.mcId = Utils.generateUniqueString(); end;
+
 							-- The active row has no Lua variable of its own (SPEC V490d): it is
 							-- read off the handle every time, the same way `sheet == MC.root`
 							-- is read everywhere else on this sheet.
@@ -4927,12 +4969,13 @@
 							local levels = tonumber(n.healthLevels) or 7;
 
 							-- Every row is outlined; the active one is outlined THICKER (SPEC
-							-- I170e, V497d) and the others fade to 70% (SPEC I171c, V502c) - only
-							-- the outline, the row's contents stay at full strength. 0.70 is a NAMED
-							-- runtime number, this outline's and nobody else's (SPEC V244, B172).
+							-- I170e, V497d) and the others fade to 50% (SPEC I175i, V502c) - only
+							-- the outline, the row's contents stay at full strength. 0.50 is a NAMED
+							-- runtime number with two owners, btnXpApply and this outline (SPEC
+							-- V244, V476b, B172).
 							if found["mcOn_" .. k] ~= nil then
 								found["mcOn_" .. k].strokeSize = active and 2 or 1;
-								found["mcOn_" .. k].opacity = active and 1 or 0.70;
+								found["mcOn_" .. k].opacity = active and 1 or 0.50;
 							end;
 
 							-- mcActive's ONE writer (SPEC V490e): only when the shown index
@@ -4952,6 +4995,10 @@
 						end;
 					end;
 				end;
+
+				-- The rows to the order the storyteller dragged them into (SPEC I175h(3)): at
+				-- once on this instance's first paint, a tween after.
+				mcRowOrderApply(from, MC_DRAG_INSTALLED ~= true, found);
 			end;
 
 			-- The ONE place the form's node ever changes (SPEC V490a). `self`, not
@@ -5539,7 +5586,7 @@
 				if tip ~= nil then tip.visible = false; end;
 			end;
 
-			-- ---- Drag to reorder BACKGROUNDS, MERITS and FLAWS (SPEC I174, V508) ------------------
+			-- ---- Drag to reorder the rows of ROW_LISTS (SPEC I174, I175, V508) ------------------
 			--
 			-- Built on the host's own drag-and-drop (onStartDrag / onStartDrop) and NOT on mouse
 			-- events. Measured 2026-09-25 in the Firecast log (SPEC B176, R174): a Lua <button>
@@ -5551,11 +5598,21 @@
 			--
 			-- The picker is the handle: its onStartDrag carries "<list>|<id>". Every control of
 			-- every row is a drop site, installed once at open (rowDropInstall - the combat
-			-- tracker's setDropRecursivo). onStartDrop fires when the drag ENTERS a row: the rows
-			-- tween to the order a drop there would give - the held row rides into the hovered
-			-- row's slot and the rows between step aside (SPEC I174d) - and the row registers the
-			-- action that COMMITS that order on release. The release writes the order ONCE
-			-- (rowDropCommit); nothing writes the node per pixel.
+			-- tracker's setDropRecursivo). onStartDrop fires on the row under the pointer, per
+			-- pixel AND by polling (up to 79 times a second with the pointer still, SPEC R174c),
+			-- so the enter is memoised per row (d.hoverId): the rows tween to the order a drop
+			-- there would give - the held row rides into the hovered row's slot and the rows
+			-- between step aside (SPEC I174d) - and the row registers the action that COMMITS
+			-- that order on release. The release writes the order ONCE (rowDropCommit); nothing
+			-- writes the node per pixel. After a drag the host fires NO onClick (0 in 9, SPEC
+			-- R174e), so the click needs no guard - the one it had ate the next real click
+			-- (SPEC B177).
+			--
+			-- The host has no cancel hook - Esc, or a release off every row, ends the drag in
+			-- silence (SPEC R174c) - so rowTween keeps ticking while a drag is live and watches
+			-- the enters: ROW_WATCH_MAX windows of ROW_WATCH_TICKS ticks without a new one and
+			-- the rows go back to the saved order. A pointer parked off the rows mid-drag gets
+			-- the same, and the next enter re-arms the drag from the saved order (SPEC I174d).
 			--
 			-- ROW_ANIM is keyed by NAME, not by control: every lookup builds a fresh wrapper table
 			-- for the same control (rrpgObjs.lua:493-499), so two lookups would be two keys for
@@ -5569,15 +5626,15 @@
 			ROW_TICKING = false;
 			ROW_DROP_INSTALLED = false;
 
-			-- The saved order, repaired: known ids in the saved order, unknown ones dropped and
-			-- missing ones appended in factory order - so a sheet with no field shows today's
-			-- order, and a row added one day does not wipe the order someone dragged (SPEC I174c).
-			function rowOrderOf(L)
+			-- A saved order, repaired against the ids that exist: known ids in the saved order,
+			-- unknown ones dropped and missing ones appended in `ids` order - so a sheet with no
+			-- field shows today's order, a row added one day does not wipe the order someone
+			-- dragged, and a character removed closes its gap (SPEC I174c, I175h). Shared by the
+			-- lists (rowOrderOf) and the column (mcOrderOf): the one parser of the saved list.
+			function rowOrderRepair(saved, ids)
 				local known, seen, out = {}, {}, {};
 
-				for i = 1, #L.ids, 1 do known[L.ids[i]] = true; end;
-
-				local saved = sheet ~= nil and sheet[L.order] or nil;
+				for i = 1, #ids, 1 do known[ids[i]] = true; end;
 
 				if type(saved) == "string" then
 					for id in string.gmatch(saved, "[^,]+") do
@@ -5588,11 +5645,16 @@
 					end;
 				end;
 
-				for i = 1, #L.ids, 1 do
-					if not seen[L.ids[i]] then out[#out + 1] = L.ids[i]; end;
+				for i = 1, #ids, 1 do
+					if not seen[ids[i]] then out[#out + 1] = ids[i]; end;
 				end;
 
 				return out;
+			end;
+
+			-- The saved order of list L, repaired (SPEC I174c).
+			function rowOrderOf(L)
+				return rowOrderRepair(sheet ~= nil and sheet[L.order] or nil, L.ids);
 			end;
 
 			-- Where `id` sits in `order` (1-based), or nil.
@@ -5618,7 +5680,7 @@
 				return out;
 			end;
 
-			-- The 43 row layouts, in ONE tree walk (SPEC R170f: xpFind walks everything).
+			-- The row layouts of every list, in ONE tree walk (SPEC R170f: xpFind walks everything).
 			function rowFindAll(from)
 				local names = {};
 
@@ -5648,7 +5710,7 @@
 				end;
 			end;
 
-			-- Every row of the three lists to the place its saved order gives it (SPEC I174f).
+			-- Every row of every list to the place its saved order gives it (SPEC I174f).
 			-- instant at open; a tween when the order changes under an open sheet (this client's
 			-- drop, or another client's). A live drag is left alone: its drop writes the order the
 			-- tween is already showing.
@@ -5656,11 +5718,6 @@
 				if sheet == nil or from == nil or ROW_DRAG.live == true then return; end;
 
 				local found = rowFindAll(from);
-
-				-- PROBE (temporary, 29th batch, screen failure): how many rows the walk found.
-				local probeN = 0;
-				for _ in pairs(found) do probeN = probeN + 1; end;
-				wodTrace("PROBE rowOrderApply instant=" .. tostring(instant) .. " found=" .. probeN);
 
 				for _, L in pairs(ROW_LISTS) do
 					rowAnimTo(L, found, rowOrderOf(L), instant);
@@ -5676,7 +5733,7 @@
 			-- Every control of every row becomes a drop site, once per sheet instance: the
 			-- picker covers most of a row and the ?, the !, the dots and the book/page/cost
 			-- cells cover the rest, so a release anywhere on a row lands (the combat tracker's
-			-- setDropRecursivo, SPEC R174). The handler carries the row's list and id.
+			-- setDropRecursivo, SPEC R174g). The handler carries the row's list and id.
 			function rowDropInstall(from, found)
 				if ROW_DROP_INSTALLED then return; end;
 
@@ -5702,37 +5759,37 @@
 			end;
 
 			-- The host starts a drag from the picker (SPEC I174b): the payload names the list
-			-- and the slot, and the live state remembers the order the drag started from.
+			-- and the slot, and the live state remembers the order the drag started from. A
+			-- shared template hands the handle to rows that never move - numina_1, the clan
+			-- disciplines (SPEC I175d): their id is not in the list, so nothing goes on the drag
+			-- and the host has nothing to carry (SPEC V508e).
 			function rowDragStart(from, drag, x, y, event, list, field)
 				local L = ROW_LISTS[list];
-
-				-- PROBE (temporary): what the host hands the drag start.
-				wodTrace("PROBE rowDragStart list=" .. tostring(list) .. " field=" .. tostring(field) .. " x=" .. tostring(x) .. " y=" .. tostring(y) .. " drag=" .. tostring(drag ~= nil) .. " event=" .. tostring(event) .. " button=" .. tostring(type(event) == "table" and event.button));
 
 				if sheet == nil or L == nil or drag == nil then return; end;
 
 				local id    = string.sub(field, #L.prefix + 1);
 				local order = rowOrderOf(L);
-				local o     = rowPosOf(order, id);
 
-				if o == nil then return; end;
+				if rowPosOf(order, id) == nil then return; end;
 
 				drag:addData("wodRow", list .. "|" .. id);
 
-				ROW_DRAG = { L = L, list = list, id = id, o = o, order0 = order, liveOrder = order,
-				             found = rowFindAll(from), live = true };
+				ROW_DRAG = { L = L, list = list, id = id, order0 = order, liveOrder = order, found = rowFindAll(from),
+				             from = from, live = true, enters = 0, seen = 0, quiet = 0, ticks = 0 };
 
 				noteTipHide(from);
+				rowTweenStart();
 			end;
 
-			-- The drag entered a row (SPEC I174d): show the order a drop here would give, and
-			-- register the action that commits it. A drag that is not one of ours - an image
-			-- from the chat, say - registers nothing and the row refuses it.
+			-- The drag is over a row (SPEC I174d) - per pixel and by polling, so the order is
+			-- worked out once per row entered (d.hoverId). Show the order a drop here would give,
+			-- and register the action that commits it. A drag that is not one of ours - an image
+			-- from the chat, a row of another list - registers nothing and the row refuses it.
+			-- Without live state (the watchdog gave the drag up and the pointer came back) the
+			-- drag is re-armed from the saved order, one walk.
 			function rowDropEnter(from, L, id, drop, drag)
 				local v = drag ~= nil and drag:getData("wodRow") or nil;
-
-				-- PROBE (temporary): the enter.
-				wodTrace("PROBE rowDropEnter row=" .. L.prefix .. id .. " data=" .. tostring(v) .. " live=" .. tostring(ROW_DRAG.live));
 
 				if type(v) ~= "string" then return; end;
 
@@ -5742,14 +5799,30 @@
 
 				local d = ROW_DRAG;
 
+				if d.live ~= true or d.L ~= L or d.id ~= src then
+					local order = rowOrderOf(L);
+
+					if rowPosOf(order, src) == nil then return; end;
+
+					d = { L = L, list = list, id = src, order0 = order, liveOrder = order, found = rowFindAll(from),
+					      from = from, live = true, enters = 0, seen = 0, quiet = 0, ticks = 0 };
+					ROW_DRAG = d;
+				end;
+
 				-- Over another row of the same list: the held row takes that row's original
 				-- position and the rows between step aside (1.4 / 1.6). Over the held row itself,
 				-- wherever it rode to: the order stays as shown.
-				if d.live == true and d.L == L and d.id == src and id ~= src then
-					d.liveOrder = rowOrderWith(d.order0, src, rowPosOf(d.order0, id));
-					rowAnimTo(L, d.found, d.liveOrder, false);
-					rowTweenStart();
+				if d.hoverId ~= id then
+					d.hoverId = id;
+
+					if id ~= src then
+						d.liveOrder = rowOrderWith(d.order0, src, rowPosOf(d.order0, id));
+						rowAnimTo(L, d.found, d.liveOrder, false);
+						rowTweenStart();
+					end;
 				end;
+
+				d.enters = d.enters + 1;
 
 				drop:addAction("wodRow", function(value)
 					rowDropCommit(from, L, id, value);
@@ -5763,60 +5836,30 @@
 				local d = ROW_DRAG;
 				local list, src = string.match(tostring(value), "^(%w+)|(.+)$");
 
-				-- PROBE (temporary): the drop.
-				wodTrace("PROBE rowDropCommit row=" .. L.prefix .. id .. " value=" .. tostring(value) .. " live=" .. tostring(d.live));
-
 				if list == nil or ROW_LISTS[list] ~= L then return; end;
 
-				local base = (d.live == true and d.L == L and d.id == src) and d.order0 or rowOrderOf(L);
+				local live = d.live == true and d.L == L and d.id == src;
+				local base = live and d.order0 or rowOrderOf(L);
 				local order;
 
 				if id == src then
-					order = (d.live == true and d.L == L and d.id == src) and d.liveOrder or base;
+					order = live and d.liveOrder or base;
 				else
 					order = rowOrderWith(base, src, rowPosOf(base, id));
 				end;
 
-				-- The click the host fires on the release, if it fires, is not a click (SPEC I174b).
-				ROW_DRAG = { ate = true };
+				ROW_DRAG = {};
 
 				setField(L.order, table.concat(order, ","));
 
 				rowOrderApply(from, false);
 			end;
 
-			-- PROBE (temporary): the press and the release, to learn what the host still fires
-			-- around a drag. Both do nothing.
-			function rowDragDown(from, event, list, field)
-				wodTrace("PROBE rowDragDown list=" .. tostring(list) .. " field=" .. tostring(field) .. " button=" .. tostring(event and event.button) .. " y=" .. tostring(event and event.y) .. " live=" .. tostring(ROW_DRAG.live));
-			end;
-
-			function rowDragUp(from, event)
-				wodTrace("PROBE rowDragUp button=" .. tostring(event and event.button) .. " live=" .. tostring(ROW_DRAG.live) .. " ate=" .. tostring(ROW_DRAG.ate));
-			end;
-
-			-- Hover over a picker. PROBE (temporary): the first 3 hovers ever, and any hover
-			-- while a drag is live (does the host still move the pointer for us mid-drag?).
+			-- The gate of the picker's tip (SPEC I174b): right after onStartDrag the host lets
+			-- one stray onMouseMove through with y off the button (SPEC R174d), which would light
+			-- the tip over a drag. True while a drag is live, and nothing else.
 			function rowDragMove(from, event)
-				ROW_PROBE_MOVES = (ROW_PROBE_MOVES or 0) + 1;
-
-				if ROW_PROBE_MOVES <= 3 or ROW_DRAG.live == true then
-					wodTrace("PROBE rowDragMove y=" .. tostring(event and event.y) .. " live=" .. tostring(ROW_DRAG.live));
-				end;
-
-				return false;
-			end;
-
-			-- The click after a release: eaten once after a drop (SPEC I174b).
-			function rowDragAte()
-				-- PROBE (temporary): the click after the release.
-				wodTrace("PROBE rowDragAte ate=" .. tostring(ROW_DRAG.ate) .. " live=" .. tostring(ROW_DRAG.live));
-
-				local ate = ROW_DRAG.ate == true;
-
-				ROW_DRAG.ate = nil;
-
-				return ate;
+				return ROW_DRAG.live == true;
 			end;
 
 			-- One interval at a time; the SDK drops it when the callback returns false
@@ -5831,11 +5874,12 @@
 
 			-- Each tick every row with a target covers ROW_TWEEN_K of what is left and lands
 			-- when under a pixel remains - the proportional step is the ease-out (SPEC I174e).
+			-- While a drag is live the interval stays up for the watchdog: every ROW_WATCH_TICKS
+			-- ticks the enters are compared with the last window's, and ROW_WATCH_MAX windows
+			-- without a new one mean the host ended the drag without a word - the state goes and
+			-- the rows tween back to the saved order (SPEC I174d).
 			function rowTween()
 				local busy = false;
-
-				-- PROBE (temporary): the interval fires at all.
-				if ROW_PROBE_TICK ~= true then ROW_PROBE_TICK = true; wodTrace("PROBE rowTween first tick"); end;
 
 				for name, a in pairs(ROW_ANIM) do
 					local c = a.ctrl;
@@ -5855,11 +5899,229 @@
 					end;
 				end;
 
+				local d = ROW_DRAG;
+
+				if ROW_DRAG.live == true then
+					d.ticks = d.ticks + 1;
+
+					if d.ticks >= ROW_WATCH_TICKS then
+						d.ticks = 0;
+						d.quiet = (d.enters == d.seen) and (d.quiet + 1) or 0;
+						d.seen  = d.enters;
+					end;
+
+					if d.quiet >= ROW_WATCH_MAX then
+						ROW_DRAG = {};
+
+						if d.mc == true then mcRowOrderApply(d.from, false); else rowOrderApply(d.from, false); end;
+					end;
+
+					busy = true;
+				end;
+
 				if busy then return true; end;
 
 				ROW_TICKING = false;
 
 				return false;
+			end;
+			-- ---- Drag to reorder the COLUMN of characters (SPEC I175h, V509) --------------------
+			--
+			-- The same machine, with the two things the column does differently. (1) The order
+			-- is by character ID and not by slot: row k is pinned to the k-th node of mcNodes()
+			-- on every mcRender and mcActive is that index (SPEC V490e, V491a), so what the drag
+			-- saves is the ids in column order - MC.root.mcOrder, on the ficha's root like
+			-- mcActive - and mcRowOrderApply puts row k at the position its node's id holds. The
+			-- id is stamped by mcRender the first time it paints a node (SPEC V509a); the root
+			-- has none and is "root". (2) The handle is the whole row - background, photo,
+			-- labels, boxes, bars, the X (user, SPEC Q96.4) - so mcDragInstall puts onStartDrag
+			-- on every control of every row by assignment, the name <edit> excepted (pressing
+			-- and moving in an edit selects text - the one exclusion the combat tracker's
+			-- setDraggerRecursivo makes, SPEC R174g), and onStartDrop on all of them. A press
+			-- that does not become a drag is still the click the control had (SPEC R174d).
+			MC_DRAG_INSTALLED = false;
+
+			-- The id the order names a node by: "root" for the ficha's own character, which has
+			-- no field, and mcId for a child (SPEC I175h(1)).
+			function mcIdOf(n)
+				if ndb.getNodeHandle(n) == ndb.getNodeHandle(MC.root) then return "root"; end;
+
+				return n.mcId;
+			end;
+
+			-- The column's saved order, repaired against the nodes that exist today: a removed
+			-- character closes its gap, a new one goes to the end (SPEC I175h(2)).
+			function mcOrderOf()
+				local nodes, ids = mcNodes(), {};
+
+				for k = 1, #nodes, 1 do ids[k] = mcIdOf(nodes[k]); end;
+
+				return rowOrderRepair(MC.root.mcOrder, ids);
+			end;
+
+			-- Every row of the column to the place `order` gives its node's id: written at once,
+			-- or as a tween target for rowTween (SPEC I175h(3)). The one place a position becomes
+			-- a top for the column; a row without a node is hidden and left where it is.
+			function mcAnimTo(found, order, instant)
+				local nodes = mcNodes();
+
+				for k = 1, #nodes, 1 do
+					local name = "mcRow_" .. k;
+					local c    = found[name];
+					local p    = rowPosOf(order, mcIdOf(nodes[k]));
+
+					if c ~= nil and p ~= nil then
+						local top = MC_ROW_TOP0 + MC_ROW_PITCH * (p - 1);
+
+						if instant then
+							c.top = top;
+							ROW_ANIM[name] = nil;
+						else
+							ROW_ANIM[name] = { ctrl = c, top = top };
+						end;
+					end;
+				end;
+			end;
+
+			-- The rows to the saved order (SPEC I175h(3)): at once on the first paint - which is
+			-- also when every row becomes a handle and a drop site - and a tween after (a drop
+			-- here, another client's, the watchdog). A live drag is left alone. `found` is
+			-- mcRender's own walk when it has one; the dataLink and the drop walk once here.
+			function mcRowOrderApply(from, instant, found)
+				if MC.root == nil or ROW_DRAG.live == true then return; end;
+
+				found = found or xpFind(tabRootOf(from), MC_NAMES, {});
+
+				mcAnimTo(found, mcOrderOf(), instant);
+
+				if instant then
+					mcDragInstall(from, found);
+				else
+					rowTweenStart();
+				end;
+			end;
+
+			-- Every control of every row is a drop site, and every one but the name <edit> is a
+			-- handle - once per sheet instance (SPEC I175h(4)/(5), V509d). The handlers carry the
+			-- row's k; the node under it is read when the event comes, off the row control itself,
+			-- because mcRender re-pins the rows as characters come and go.
+			function mcDragInstall(from, found)
+				if MC_DRAG_INSTALLED then return; end;
+
+				MC_DRAG_INSTALLED = true;
+
+				local function install(ctrl, k)
+					ctrl.onStartDrop = function(drop, x, y, drag) mcDropEnter(from, found, k, drop, drag); end;
+
+					if ctrl:getClassName() ~= "edit" then
+						ctrl.onStartDrag = function(drag, x, y, event) mcDragStart(from, found, k, drag); end;
+					end;
+
+					local kids = ctrl:getChildren();
+
+					if kids ~= nil then
+						for i = 1, #kids, 1 do install(kids[i], k); end;
+					end;
+				end;
+
+				for k = 1, MC_POOL, 1 do
+					local c = found["mcRow_" .. k];
+
+					if c ~= nil then install(c, k); end;
+				end;
+			end;
+
+			-- The host starts a drag on row k (SPEC I175h(4)): the payload is the id of the
+			-- character the row shows right now, and the live state remembers the order the drag
+			-- started from - the shape rowDragStart builds, with the column's own apply.
+			function mcDragStart(from, found, k, drag)
+				local row = found["mcRow_" .. k];
+				local n   = row ~= nil and row.node or nil;
+
+				if MC.root == nil or n == nil or drag == nil then return; end;
+
+				local id    = mcIdOf(n);
+				local order = mcOrderOf();
+
+				if id == nil or rowPosOf(order, id) == nil then return; end;
+
+				drag:addData("wodChar", id);
+
+				ROW_DRAG = { mc = true, id = id, order0 = order, liveOrder = order, found = found,
+				             from = from, live = true, enters = 0, seen = 0, quiet = 0, ticks = 0 };
+
+				rowTweenStart();
+			end;
+
+			-- The drag is over row k (SPEC I175h(5)): the enter rowDropEnter makes - memoised by
+			-- the id under the pointer, the held row rides into the hovered row's slot and the
+			-- rows between step aside, the row registers the commit, a dead drag is re-armed.
+			-- Anything that is not a character - a row of a list, an image - is refused.
+			function mcDropEnter(from, found, k, drop, drag)
+				local src = drag ~= nil and drag:getData("wodChar") or nil;
+				local row = found["mcRow_" .. k];
+				local n   = row ~= nil and row.node or nil;
+
+				if type(src) ~= "string" or n == nil then return; end;
+
+				local id = mcIdOf(n);
+				local d  = ROW_DRAG;
+
+				if d.live ~= true or d.mc ~= true or d.id ~= src then
+					local order = mcOrderOf();
+
+					if rowPosOf(order, src) == nil then return; end;
+
+					d = { mc = true, id = src, order0 = order, liveOrder = order, found = found,
+					      from = from, live = true, enters = 0, seen = 0, quiet = 0, ticks = 0 };
+					ROW_DRAG = d;
+				end;
+
+				if d.hoverId ~= id then
+					d.hoverId = id;
+
+					if id ~= src then
+						d.liveOrder = rowOrderWith(d.order0, src, rowPosOf(d.order0, id));
+						mcAnimTo(found, d.liveOrder, false);
+						rowTweenStart();
+					end;
+				end;
+
+				d.enters = d.enters + 1;
+
+				drop:addAction("wodChar", function(value)
+					mcDropCommit(from, found, k, value);
+				end);
+			end;
+
+			-- The release on row k: the ONE write of mcOrder (SPEC V509b), on the ficha's root
+			-- with the guard mcActive has, then the rows tween to what was written.
+			function mcDropCommit(from, found, k, value)
+				local d   = ROW_DRAG;
+				local src = tostring(value);
+				local row = found["mcRow_" .. k];
+				local n   = row ~= nil and row.node or nil;
+
+				if MC.root == nil or n == nil then return; end;
+
+				local id   = mcIdOf(n);
+				local live = d.live == true and d.mc == true and d.id == src;
+				local base = live and d.order0 or mcOrderOf();
+				local order;
+
+				if id == src then
+					order = live and d.liveOrder or base;
+				else
+					order = rowOrderWith(base, src, rowPosOf(base, id));
+				end;
+
+				ROW_DRAG = {};
+
+				local saved = table.concat(order, ",");
+
+				if MC.root.mcOrder ~= saved then MC.root.mcOrder = saved; end;
+
+				mcRowOrderApply(from, false, found);
 			end;
 			-- ---- The merit/flaw search box (SPEC I107) ----------------------------------------
 			--
@@ -8646,7 +8908,7 @@
 		the same door the dots use (SPEC V498c).
 
 		The outline is always drawn: strokeSize 1 idle, 2 active, written by mcRender alone
-		(SPEC I170e, V497d); idle it also fades to 0.70 (SPEC I171c).
+		(SPEC I170e, V497d); idle it also fades to 0.50 (SPEC I175i).
 
 		26th batch (SPEC I171b/d/e, V502): the labels are hitTest="false", so a click on one
 		falls through to mcBg_ and selects the row like anywhere else on it. mcAv_ is where the
@@ -8660,6 +8922,11 @@
 		V502e): the blood label is "Blood Pool" ("Reserva de Sangue", 17 characters, 111 on the
 		ruler), so the label column is 117 - the ruler plus the 6 of slack V502e2 asks - and the
 		bars start at 205 and stay 133 wide, closing at 338 as before.
+
+		30th batch (SPEC I175h, V509): the whole row is a drag handle and a drop site - by
+		assignment in mcDragInstall, nothing authored here (the name edit is the one control
+		that does not start a drag) - and the column's order is by character id, mcOrder on
+		the root, applied by mcRowOrderApply through the lists' own tween.
 
 		NOTHING is commented inside a <template> - rdk exits 1 with an empty message and
 		deletes the .rpk (SPEC B19), the same door Willpower and HealthRow (WoD20.1) avoid.
@@ -9050,6 +9317,13 @@
 				<label left="35" top="419" width="170" height="20" text="Background Cost"/>
 				<comboBox name="cmbBgCostMc" left="210" top="416" width="150" height="25" field="stBackgroundCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5'}" values="{'0','1','2','3','4','5'}"/>
 				<dataLink field="stBackgroundCost" defaultValue="0"/>
+
+				<!-- The column's order, mcOrder on the root (SPEC I175h(6), V509b): the one field of
+				     this box no widget owns - the link observes, Lua writes (SPEC V8) - so the rows
+				     follow another client's drag. Here and not in stSharedScope because this box is
+				     pinned to MC.root in mcInit and the field lives on the root alone; V489c reads
+				     widgets only, so the two boxes still hold the same 13. -->
+				<dataLink field="mcOrder" onChange="mcRowOrderApply(self, false);"/>
 			</dataScopeBox>
 		</layout>
 		<!--
@@ -9520,12 +9794,12 @@
 		</dataLink>
 
 	<!--
-		The three list orders (SPEC I174f, V508c). Lua-owned - no widget carries them, only
-		rowDragUp writes them - so this watcher is the exception V8 declares (SPEC I3). It is
+		The eleven list orders (SPEC I174f, I175b, V508c). Lua-owned - no widget carries them, only
+		rowDropCommit writes them - so this watcher is the exception V8 declares (SPEC I3). It is
 		what moves the rows when the order changes under an open sheet: another client's drop,
 		or a switch to a character with a different order. Tweened, not instant.
 	-->
-	<dataLink fields="{'orderBackground', 'orderMerit', 'orderFlaw'}">
+	<dataLink fields="{'orderBackground', 'orderMerit', 'orderFlaw', 'orderPsychic', 'orderNumina', 'orderHedgeRitual', 'orderDisc', 'orderMainPath', 'orderSecPath', 'orderRitual', 'orderAttack'}">
 		<event name="onChange">
 			rowOrderApply(self, false);
 		</event>
@@ -9657,7 +9931,7 @@
 		-- The sixteen background name buttons, same reason (SPEC I107a2, I113, T808).
 			renderBgButtons(self);
 
-			-- Backgrounds, merits and flaws in the order the player dragged them, at once - no
+			-- The eleven lists in the order the player dragged them, at once - no
 			-- tween on open (SPEC I174f, V508c). Beside renderBgButtons because it is the same
 			-- job: rows the XML authors, placed from fields nothing else restores.
 			rowOrderApply(self, true);

@@ -139,10 +139,16 @@
 			sit on it. It is AUTHORED here and RE-ASSERTED by renderNuminaButtons, because mfLabel
 			writes fontStyle on every paint and cannot know that one row of one box carries a mark
 			older than the picker it now sits on.
+
+			30th batch (SPEC I175c/d, V508): every row layout of the three boxes is named
+			dragRow_<field> - numina_1 stays anonymous, the affinity path is pinned to slot 1 - and
+			the picker of each template is the row's drag handle, onStartDrag into rowDragStart with
+			its list. HedgePicker is shared with numina_1: rowDragStart refuses an id its list does
+			not carry, so the pinned row hands the host nothing (SPEC V508e).
 		-->
 		<template name="HedgePicker">
 			<button name="btnQ$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Numina', sheet['$(field)'], nil, '$(field)');"/>
-			<button name="dyn$(field)" left="25" top="0" width="271" height="25" fontStyle="$(style)" text="Select Hedge Path" onClick="mfOpen(self, '$(field)', 'numina', 'Numina');"/>
+			<button name="dyn$(field)" left="25" top="0" width="271" height="25" fontStyle="$(style)" text="Select Hedge Path" onClick="mfOpen(self, '$(field)', 'numina', 'Numina');" onStartDrag="rowDragStart(self, drag, x, y, event, 'numina', '$(field)');"/>
 			<edit name="edt$(field)" left="25" top="0" width="271" height="25" field="$(field)" visible="false" enabled="false"/>
 			<imageCheckBox left="301" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
 			<imageCheckBox left="326" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
@@ -153,7 +159,7 @@
 
 		<template name="PsychicPicker">
 			<button name="btnQ$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Numina', sheet['$(field)'], nil, '$(field)');"/>
-			<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Phenomenon" onClick="mfOpen(self, '$(field)', 'psychic', 'Numina');"/>
+			<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Phenomenon" onClick="mfOpen(self, '$(field)', 'psychic', 'Numina');" onStartDrag="rowDragStart(self, drag, x, y, event, 'psychic', '$(field)');"/>
 			<edit name="edt$(field)" left="25" top="0" width="271" height="25" field="$(field)" visible="false" enabled="false"/>
 			<imageCheckBox left="301" top="0" width="25" height="25" field="$(field)_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_1', self);"/>
 			<imageCheckBox left="326" top="0" width="25" height="25" field="$(field)_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_2', self);"/>
@@ -166,7 +172,7 @@
 
 		<template name="HedgeRitualPicker">
 			<button name="btnQ$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Numina', sheet['$(field)'], nil, '$(field)');"/>
-			<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Hedge Ritual" onClick="mfOpen(self, '$(field)', 'hedgeRitual', 'Numina');"/>
+			<button name="dyn$(field)" left="25" top="0" width="271" height="25" text="Select Hedge Ritual" onClick="mfOpen(self, '$(field)', 'hedgeRitual', 'Numina');" onStartDrag="rowDragStart(self, drag, x, y, event, 'hedgeRitual', '$(field)');"/>
 			<edit name="edt$(field)" left="25" top="0" width="271" height="25" field="$(field)" visible="false" enabled="false"/>
 			<imageCheckBox name="roHR$(field)_1" left="301" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox name="roHR$(field)_2" left="326" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
@@ -387,64 +393,64 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="426" height="20" text="PSYCHIC PHENOMENA" horzTextAlign="center"/>
 
-			<layout left="20" top="36" width="426" height="25">
+			<layout name="dragRow_psychic_1" left="20" top="36" width="426" height="25">
 				<PsychicPicker field="psychic_1"/>
 			</layout>
-			<layout left="20" top="61" width="426" height="25">
+			<layout name="dragRow_psychic_2" left="20" top="61" width="426" height="25">
 				<PsychicPicker field="psychic_2"/>
 			</layout>
-			<layout left="20" top="86" width="426" height="25">
+			<layout name="dragRow_psychic_3" left="20" top="86" width="426" height="25">
 				<PsychicPicker field="psychic_3"/>
 			</layout>
-			<layout left="20" top="111" width="426" height="25">
+			<layout name="dragRow_psychic_4" left="20" top="111" width="426" height="25">
 				<PsychicPicker field="psychic_4"/>
 			</layout>
-			<layout left="20" top="136" width="426" height="25">
+			<layout name="dragRow_psychic_5" left="20" top="136" width="426" height="25">
 				<PsychicPicker field="psychic_5"/>
 			</layout>
-			<layout left="20" top="161" width="426" height="25">
+			<layout name="dragRow_psychic_6" left="20" top="161" width="426" height="25">
 				<PsychicPicker field="psychic_6"/>
 			</layout>
-			<layout left="20" top="186" width="426" height="25">
+			<layout name="dragRow_psychic_7" left="20" top="186" width="426" height="25">
 				<PsychicPicker field="psychic_7"/>
 			</layout>
-			<layout left="20" top="211" width="426" height="25">
+			<layout name="dragRow_psychic_8" left="20" top="211" width="426" height="25">
 				<PsychicPicker field="psychic_8"/>
 			</layout>
-			<layout left="20" top="236" width="426" height="25">
+			<layout name="dragRow_psychic_9" left="20" top="236" width="426" height="25">
 				<PsychicPicker field="psychic_9"/>
 			</layout>
-			<layout left="20" top="261" width="426" height="25">
+			<layout name="dragRow_psychic_10" left="20" top="261" width="426" height="25">
 				<PsychicPicker field="psychic_10"/>
 			</layout>
-			<layout left="20" top="286" width="426" height="25">
+			<layout name="dragRow_psychic_11" left="20" top="286" width="426" height="25">
 				<PsychicPicker field="psychic_11"/>
 			</layout>
-			<layout left="20" top="311" width="426" height="25">
+			<layout name="dragRow_psychic_12" left="20" top="311" width="426" height="25">
 				<PsychicPicker field="psychic_12"/>
 			</layout>
-			<layout left="20" top="336" width="426" height="25">
+			<layout name="dragRow_psychic_13" left="20" top="336" width="426" height="25">
 				<PsychicPicker field="psychic_13"/>
 			</layout>
-			<layout left="20" top="361" width="426" height="25">
+			<layout name="dragRow_psychic_14" left="20" top="361" width="426" height="25">
 				<PsychicPicker field="psychic_14"/>
 			</layout>
-			<layout left="20" top="386" width="426" height="25">
+			<layout name="dragRow_psychic_15" left="20" top="386" width="426" height="25">
 				<PsychicPicker field="psychic_15"/>
 			</layout>
-			<layout left="20" top="411" width="426" height="25">
+			<layout name="dragRow_psychic_20" left="20" top="411" width="426" height="25">
 				<PsychicPicker field="psychic_20"/>
 			</layout>
-			<layout left="20" top="436" width="426" height="25">
+			<layout name="dragRow_psychic_21" left="20" top="436" width="426" height="25">
 				<PsychicPicker field="psychic_21"/>
 			</layout>
-			<layout left="20" top="461" width="426" height="25">
+			<layout name="dragRow_psychic_22" left="20" top="461" width="426" height="25">
 				<PsychicPicker field="psychic_22"/>
 			</layout>
-			<layout left="20" top="486" width="426" height="25">
+			<layout name="dragRow_psychic_23" left="20" top="486" width="426" height="25">
 				<PsychicPicker field="psychic_23"/>
 			</layout>
-			<layout left="20" top="511" width="426" height="25">
+			<layout name="dragRow_psychic_24" left="20" top="511" width="426" height="25">
 				<PsychicPicker field="psychic_24"/>
 			</layout>
 		</layout>
@@ -456,61 +462,61 @@
 			<layout left="20" top="36" width="426" height="25">
 				<HedgePicker field="numina_1" style="bold"/>
 			</layout>
-			<layout left="20" top="61" width="426" height="25">
+			<layout name="dragRow_numina_2" left="20" top="61" width="426" height="25">
 				<HedgePicker field="numina_2" style=""/>
 			</layout>
-			<layout left="20" top="86" width="426" height="25">
+			<layout name="dragRow_numina_3" left="20" top="86" width="426" height="25">
 				<HedgePicker field="numina_3" style=""/>
 			</layout>
-			<layout left="20" top="111" width="426" height="25">
+			<layout name="dragRow_numina_4" left="20" top="111" width="426" height="25">
 				<HedgePicker field="numina_4" style=""/>
 			</layout>
-			<layout left="20" top="136" width="426" height="25">
+			<layout name="dragRow_numina_5" left="20" top="136" width="426" height="25">
 				<HedgePicker field="numina_5" style=""/>
 			</layout>
-			<layout left="20" top="161" width="426" height="25">
+			<layout name="dragRow_numina_6" left="20" top="161" width="426" height="25">
 				<HedgePicker field="numina_6" style=""/>
 			</layout>
-			<layout left="20" top="186" width="426" height="25">
+			<layout name="dragRow_numina_7" left="20" top="186" width="426" height="25">
 				<HedgePicker field="numina_7" style=""/>
 			</layout>
-			<layout left="20" top="211" width="426" height="25">
+			<layout name="dragRow_numina_8" left="20" top="211" width="426" height="25">
 				<HedgePicker field="numina_8" style=""/>
 			</layout>
-			<layout left="20" top="236" width="426" height="25">
+			<layout name="dragRow_numina_9" left="20" top="236" width="426" height="25">
 				<HedgePicker field="numina_9" style=""/>
 			</layout>
-			<layout left="20" top="261" width="426" height="25">
+			<layout name="dragRow_numina_10" left="20" top="261" width="426" height="25">
 				<HedgePicker field="numina_10" style=""/>
 			</layout>
-			<layout left="20" top="286" width="426" height="25">
+			<layout name="dragRow_numina_11" left="20" top="286" width="426" height="25">
 				<HedgePicker field="numina_11" style=""/>
 			</layout>
-			<layout left="20" top="311" width="426" height="25">
+			<layout name="dragRow_numina_12" left="20" top="311" width="426" height="25">
 				<HedgePicker field="numina_12" style=""/>
 			</layout>
-			<layout left="20" top="336" width="426" height="25">
+			<layout name="dragRow_numina_13" left="20" top="336" width="426" height="25">
 				<HedgePicker field="numina_13" style=""/>
 			</layout>
-			<layout left="20" top="361" width="426" height="25">
+			<layout name="dragRow_numina_14" left="20" top="361" width="426" height="25">
 				<HedgePicker field="numina_14" style=""/>
 			</layout>
-			<layout left="20" top="386" width="426" height="25">
+			<layout name="dragRow_numina_15" left="20" top="386" width="426" height="25">
 				<HedgePicker field="numina_15" style=""/>
 			</layout>
-			<layout left="20" top="411" width="426" height="25">
+			<layout name="dragRow_numina_16" left="20" top="411" width="426" height="25">
 				<HedgePicker field="numina_16" style=""/>
 			</layout>
-			<layout left="20" top="436" width="426" height="25">
+			<layout name="dragRow_numina_17" left="20" top="436" width="426" height="25">
 				<HedgePicker field="numina_17" style=""/>
 			</layout>
-			<layout left="20" top="461" width="426" height="25">
+			<layout name="dragRow_numina_18" left="20" top="461" width="426" height="25">
 				<HedgePicker field="numina_18" style=""/>
 			</layout>
-			<layout left="20" top="486" width="426" height="25">
+			<layout name="dragRow_numina_19" left="20" top="486" width="426" height="25">
 				<HedgePicker field="numina_19" style=""/>
 			</layout>
-			<layout left="20" top="511" width="426" height="25">
+			<layout name="dragRow_numina_20" left="20" top="511" width="426" height="25">
 				<HedgePicker field="numina_20" style=""/>
 			</layout>
 
@@ -520,64 +526,64 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="426" height="20" text="HEDGE MAGIC RITUALS" horzTextAlign="center"/>
 
-			<layout left="20" top="36" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_1" left="20" top="36" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_1"/>
 			</layout>
-			<layout left="20" top="61" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_2" left="20" top="61" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_2"/>
 			</layout>
-			<layout left="20" top="86" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_3" left="20" top="86" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_3"/>
 			</layout>
-			<layout left="20" top="111" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_4" left="20" top="111" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_4"/>
 			</layout>
-			<layout left="20" top="136" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_5" left="20" top="136" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_5"/>
 			</layout>
-			<layout left="20" top="161" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_6" left="20" top="161" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_6"/>
 			</layout>
-			<layout left="20" top="186" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_7" left="20" top="186" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_7"/>
 			</layout>
-			<layout left="20" top="211" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_8" left="20" top="211" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_8"/>
 			</layout>
-			<layout left="20" top="236" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_9" left="20" top="236" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_9"/>
 			</layout>
-			<layout left="20" top="261" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_10" left="20" top="261" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_10"/>
 			</layout>
-			<layout left="20" top="286" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_11" left="20" top="286" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_11"/>
 			</layout>
-			<layout left="20" top="311" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_12" left="20" top="311" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_12"/>
 			</layout>
-			<layout left="20" top="336" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_13" left="20" top="336" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_13"/>
 			</layout>
-			<layout left="20" top="361" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_14" left="20" top="361" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_14"/>
 			</layout>
-			<layout left="20" top="386" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_15" left="20" top="386" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_15"/>
 			</layout>
-			<layout left="20" top="411" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_16" left="20" top="411" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_16"/>
 			</layout>
-			<layout left="20" top="436" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_17" left="20" top="436" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_17"/>
 			</layout>
-			<layout left="20" top="461" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_18" left="20" top="461" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_18"/>
 			</layout>
-			<layout left="20" top="486" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_19" left="20" top="486" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_19"/>
 			</layout>
-			<layout left="20" top="511" width="426" height="25">
+			<layout name="dragRow_hedgeRitual_20" left="20" top="511" width="426" height="25">
 				<HedgeRitualPicker field="hedgeRitual_20"/>
 			</layout>
 		</layout>

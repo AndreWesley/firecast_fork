@@ -489,9 +489,11 @@ else { Pass "V36 all $($mirrors.Count) declared mirrors really are mirrored" }
 # player by having no widget at all, so the usual "some input owns it" test reads it as a dead
 # link (SPEC B25). The list is closed and declared in SPEC I3 - a name has to be put here on
 # purpose, which is not the same as letting any unowned field through.
-# 29th batch (SPEC I174h, V508c): the three drag orders of the Traits lists - written only by
-# rowDragUp, watched by one <dataLink fields=...> on the root.
-$luaOwned = @('baseline', 'xpTotal', 'xpFree', 'xpManual', 'xpOrder', 'descFontSize', 'orderBackground', 'orderMerit', 'orderFlaw')
+# 29th/30th batch (SPEC I174h, I175j, V508c, V509b): the eleven drag orders of the lists - written
+# only by rowDropCommit, watched by one <dataLink fields=...> on the root - the column's order
+# (mcOrder, on the root, written by mcDropCommit, watched from mcSettingsScope) and the id
+# mcRender stamps on each character (mcId).
+$luaOwned = @('baseline', 'xpTotal', 'xpFree', 'xpManual', 'xpOrder', 'descFontSize', 'orderBackground', 'orderMerit', 'orderFlaw', 'orderPsychic', 'orderNumina', 'orderHedgeRitual', 'orderDisc', 'orderMainPath', 'orderSecPath', 'orderRitual', 'orderAttack', 'mcOrder', 'mcId')
 
 # The floating overlays (SPEC I102a, T760). They are <layout> boxes wearing the same black
 # rectangle every section box wears, so V40's neighbour rule and V280/V298's 5px ruler both
@@ -4678,9 +4680,10 @@ if ($fail -eq $imgBefore) { Pass "V111 the fixed dot1 art is dimmed on the mirro
 # is the side door this check was written to shut. A number added here has to earn a clause.
 # 0.50 joined on 2026-09-07 (SPEC V244 as amended, V476, I162j): the DEAD action button, the
 # user's own number, and V476 is the clause that pins it to btnXpApply and nowhere else.
-# 0.70 joined on 2026-09-24 (SPEC V244 as amended, B172, I171c): the unselected character's
-# outline in the column, the user's "70%", and V502c pins it to mcOn_ and nowhere else.
-$LUA_OPACITY = @($DIM_TEXT, '0.80', '0.50', '0.70')
+# 0.70 joined on 2026-09-24 for the column's unselected outline (B172, I171c) and LEFT on
+# 2026-09-25 (SPEC I175i, Q96.5): the outline dims to 0.50 now, the number btnXpApply already
+# owns - V476b closes the list of its owners at those two, and V502c pins mcOn_ to it.
+$LUA_OPACITY = @($DIM_TEXT, '0.80', '0.50')
 $luaDimBad  = @()
 $luaDimSeen = 0
 foreach ($f in $files) {
@@ -6641,11 +6644,11 @@ foreach ($rs in $rowSpec) {
     elseif ($maxIdx -ne $declared) { $filterBad += "V204 $($rs.Const) says $declared and the highest $($rs.Field) row $($rs.File) draws is $($rs.Field)_$maxIdx - the constant IS the highest index, so every loop that reads it walks past the end of the box or stops short of it, in silence (SPEC B46, V204 amended, V263a)" }
     elseif ($unnamed.Count -gt 0) { $filterBad += "V204 $($rs.File) draws no $($rs.Field)_$($unnamed[0]) and '$($rs.Field)_$($unnamed[0])' is in neither list of I3 - a hole is a vacancy only where the name in it was retired on purpose; otherwise the count agrees with $($rs.Const) because another index took its place, which is the swap a size comparison cannot see (SPEC V204 amended, B116, V362b)" }
 
-    # DECLARING the vacancy is half the job; the LOOPS have to skip it. sortRituals is what makes
-    # this leg load-bearing rather than tidy: it reads sheet["ritual_"..i] AND writes
-    # setField("ritual_"..i, ...) across its whole range, so an unguarded walk gathers the dead
-    # values a pre-85th sheet still holds in the burned names, sorts them into the visible rows,
-    # and writes fresh values back INTO the burned names. Silent in both directions (V251, V2, I46).
+    # DECLARING the vacancy is half the job; the LOOPS have to skip it. Until the 30th batch the
+    # load-bearing reader was sortRituals, which read AND wrote across the whole range; it went
+    # with the drag (SPEC I175e), and the readers now are renderRitualButtons, the ledger and the
+    # ids ROW_LISTS derives - a walk that ignored the set would hand the drag a row that does not
+    # exist, and V508a measures that derivation against the XML (V251, V2, I46).
     #
     # The BOUND stays the highest index and is deliberately NOT cut down to the count: cutting it
     # would stop the loops at 22 and leave ritual_26 and ritual_27 with no painter at all, which is
@@ -9923,58 +9926,14 @@ $ritGhost = @($files | Where-Object { (CodeOf $_.FullName) -match 'ritual_2[1-5]
 if ($ritGhost) { foreach ($g in $ritGhost) { Fail "V251 $($g.Name) names one of the five ritual rows that came off in the 85th round - those names are burned, and a new row wearing one would be handed whatever an old sheet left in it (SPEC I46, V2, V251 amended)" } }
 else { Pass "V251 not one of the five burned ritual names (ritual_21..ritual_25) is authored anywhere in the sheet - the two rows T880 added are _26 and _27" }
 
-# ---- V252/V253: the list sorts itself, and what was just added flashes -------------------
-# The fifteen PICKED rows are kept in level-then-name order and the five typed ones are left
-# where the storyteller wrote them: the sort moves values between slots, and a typed ritual
-# would leave its own description behind (SPEC I47, V252a, V249).
-$r14 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.11.lfm")))
-$r14Doc = Doc (Join-Path $dir "WoD20.11.lfm")
-$sortFn = LuaFn $r14 'sortRituals'
-$flashFn = LuaFn $r14 'flashRitual'
-$rankFn = LuaFn $r14 'ritualRank'
-# Keyed on sortRituals and not on guardPick since T909: WoD20.11 carries the path guard AND the
-# ritual guard now that the three column forms were dissolved into it, and "the first dataLink
-# with a guardPick" stopped meaning "the ritual one" the moment they shared a file (SPEC I136j).
-$guardLink = @($r14Doc.SelectNodes("//dataLink[contains(@onChange,'sortRituals')]") | ForEach-Object { $_.GetAttribute("onChange") })
-
-if (-not $sortFn) { Fail "V252 sortRituals not found on WoD20.11 - nothing keeps the list in order" }
-elseif (-not $rankFn) { Fail "V252 ritualRank not found - the sort key would be inline and the level read in a second place (SPEC V184)" }
-elseif ($rankFn -notmatch '\^\(%d\+\)%\. ') { Fail "V252 the sort key does not read the level off the name prefix - a second table for the level is exactly what V184 forbids" }
-elseif ($sortFn -notmatch 'local last = RITUAL_ROWS - RITUAL_FREE_ROWS;') { Fail "V252 the sort does not stop at the picked rows - it would move the typed ones and leave their descriptions behind (SPEC V252a, V249)" }
-# The write-back reads list[k] and not list[i] since T880, and the two indices are the point: the
-# rows are no longer contiguous (ritual_21..25 are burned, V251) so the walk runs over the ROW
-# number while `list` stays dense, and the k-th value gathered belongs in the k-th row drawn.
-# Indexing list by the row number would leave one row empty at the bottom for every vacancy passed
-# on the way down - a ritual dropping off the sheet on a re-sort, with nothing said (SPEC V204
-# amended, V263b). That the walk SKIPS the vacancies at all is V204's leg, not a second copy here.
-elseif ($sortFn -notmatch 'setField\("ritual_" \.\. i, list\[k\] or ""\);') { Fail "V252 the sort does not write through setField with the dense cursor - a list already in order has to write nothing, or the link it hangs on bounces (SPEC V122), and with a hole in the numbering the value's place in `list` is not its row number (SPEC V204 amended)" }
-# LEG (d) RETIRED in the 159th round (SPEC V252 amended, T872, user 2026-08-31 ask B). It
-# charged the mark with following its value across a re-sort so the DESCRIPTION block kept
-# showing the same ritual; wave 3 took the radio AND the block, so there is no mark to carry
-# and no block to mislead - the damage (d) bought does not exist. Replaced by its own guard:
-# a setField on ritualSel coming back would be writing a field nothing reads (V2, V8).
-elseif ($sortFn -match 'ritualSel') { Fail "V252 the sort still writes ritualSel - the radio went out with the DESCRIPTION pane in T872, so this writes a field no widget owns and no reader reads (SPEC V252 amended, V2, V8)" }
-elseif ($sortFn -notmatch 'if sortQuiet or sheet == nil then return; end;') { Fail "V252 the sort does not stand down for its own writes - each one comes back through the same dataLink and would sort a half-written list (SPEC V107)" }
-elseif ($guardLink.Count -lt 1) { Fail "V252 the ritual guard dataLink is gone - the sort has nothing to hang on (SPEC V20)" }
-elseif ($guardLink[0] -notmatch 'guardPick\(field, oldValue, newValue\); sortRituals\(self, field, newValue\);') { Fail "V252 sortRituals does not run right after guardPick on the same link - sorting a value the guard is about to revert is work thrown away (SPEC I47, V186)" }
-else { Pass "V252 the fifteen picked rituals sort by level then name, through setField, standing down for their own writes - leg (d), the mark following its value, retired with the radio in T872" }
-
-$hlTpl = $r14Doc.SelectSingleNode("//template[@name='RitualRow']")
-$hlRect = $null
-if ($hlTpl) { $hlRect = $hlTpl.SelectSingleNode("rectangle[@name='hl`$(field)']") }
-
-if ($null -eq $hlTpl) { Fail "V253 RitualRow is gone from WoD20.11 (SPEC V20)" }
-elseif ($null -eq $hlRect) { Fail "V253 the ritual row carries no highlight rectangle - there is nothing to flash (SPEC I47)" }
-elseif ($hlRect.GetAttribute("visible") -ne 'false') { Fail "V253 the highlight is authored visible - every row would open lit" }
-elseif ($hlRect.GetAttribute("hitTest") -ne 'false') { Fail "V253 the highlight takes the click - the row would be unusable for the second it is up" }
-elseif ((@($hlTpl.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })[-1]).GetAttribute("name") -ne 'hl$(field)') { Fail "V253 the highlight is not the LAST element of the row - the host paints in document order, so it would be painted OVER instead of over (SPEC I39, the reason dynXpEmpty closes the log box)" }
-elseif ($hlRect.GetAttribute("color") -notmatch '^#[0-9A-Fa-f]{8}$') { Fail "V253 the highlight colour carries no alpha channel - a solid band would hide the name it is pointing at (SPEC I47)" }
-elseif (-not $flashFn) { Fail "V253 flashRitual not found - nothing lights the row" }
-elseif ($flashFn -notmatch 'rect\.visible = true;') { Fail "V253 flashRitual never lights the rectangle" }
-elseif ($flashFn -notmatch 'setTimeout\(function\(\) rect\.visible = false; end, 1000\);') { Fail "V253 the flash is not put out after exactly 1000ms - a highlight with no timer is a highlight that stays (SPEC I47, R99)" }
-elseif ($sortFn -notmatch 'flashRitual\(form, "ritual_" \.\. i\);') { Fail "V253 the flash is not fired from the sort - it has to land on the row that ended up with the value (SPEC V253d)" }
-elseif ($sortFn.IndexOf('flashRitual') -lt $sortFn.IndexOf('setField("ritual_"')) { Fail "V253 the flash is looked up BEFORE the sort writes - it would light the row the value came from (SPEC V253d)" }
-else { Pass "V253 the new ritual's row lights in the period's own colour, over the text, and goes out after 1000ms" }
+# ---- V252/V253: RETIRED in the 30th batch (SPEC I175e, Q96.1, user 2026-09-25) ----------------
+# The rituals sorted themselves by level and name on every write (sortRituals, under sortQuiet)
+# and the row the value landed on flashed for a second (flashRitual, the hl$(field) rectangle).
+# Both went with the drag: the eleven lists are ordered by hand now, a ritual stays in the slot
+# it was picked into, and V508 measures the ritual rows like every other list. The two checks
+# read functions and a rectangle that no longer exist, so they leave TOGETHER - V253 read
+# sortRituals as well as the flash, and a V253 kept alone would be a check that reads nothing
+# (SPEC V20). Nothing here is measured; the block is the note the retirement leaves behind.
 
 
 # ---- V254: the specialty price is ONE value, and zero is a price -------------------------
@@ -22845,22 +22804,28 @@ else {
     if ($btn476.GetAttribute("opacity") -ne '0.50') { $v476Bad += "(a) btnXpApply is authored at opacity '$($btn476.GetAttribute('opacity'))' and the user asked for 0.50 (SPEC V476a, Q82.8)" }
     if ($btn476.GetAttribute("text") -ne 'Apply Spent Experience') { $v476Bad += "(a) the button reads '$($btn476.GetAttribute('text'))' and 3.4 of the request says Apply Spent Experience (SPEC I162f)" }
 }
+$own476 = 0
 foreach ($f in $files) {
     $d476 = Doc $f.FullName
     foreach ($n476 in $d476.SelectNodes("//*[@opacity='0.50' or @opacity='0.5']")) { if ($n476.GetAttribute("name") -ne 'btnXpApply') { $v476Bad += "(b) $($f.Name) authors opacity 0.50 on '$($n476.LocalName) $($n476.GetAttribute('name'))' - that number belongs to btnXpApply alone (SPEC V476b, V244)" } }
     $cc476 = NoComments (CodeOf $f.FullName)
     foreach ($m476 in [regex]::Matches($cc476, '(?m)^.*\b0\.50\b.*$')) {
         $line476 = $m476.Value
-        if ($line476 -match 'btnXpApply') { continue }
-        $v476Bad += "(b) $($f.Name) carries the literal 0.50 outside btnXpApply: '$($line476.Trim())' (SPEC V476b)"
+        if ($line476 -match 'btnXpApply' -or $line476 -match 'mcOn_') { if ($line476 -match '\.opacity\s*=') { $own476++ }; continue }
+        $v476Bad += "(b) $($f.Name) carries the literal 0.50 outside its two owners, btnXpApply and mcOn_: '$($line476.Trim())' (SPEC V476b as amended, I175i)"
     }
-    if (([regex]::Matches($cc476, 'opacity = pending and 1 or 0\.50;')).Count -gt 1) { $v476Bad += "(b) $($f.Name) writes the 0.50 dim more than once (SPEC V476b)" }
+    if (([regex]::Matches($cc476, 'opacity = pending and 1 or 0\.50;')).Count -gt 1) { $v476Bad += "(b) $($f.Name) writes the 0.50 dim of btnXpApply more than once (SPEC V476b)" }
     if ($cc476 -match '(?m)\.opacity\s*=.*\b0\.5\b') { $v476Bad += "(b) $($f.Name) writes an opacity of 0.5 with one decimal - the named literal is 0.50, two places like 0.75 and 0.40 (SPEC V476b, V244)" }
 }
+# The list of owners is CLOSED at two since the 30th batch (SPEC I175i, V476b as amended): the
+# apply button's dim (renderXPApply, WoD20.9) and the column's unselected outline (mcRender,
+# mcOn_). A third line carrying 0.50 is a third owner, and the count catches a line that names
+# an owner without being one as much as it catches a missing owner.
+if ($own476 -ne 2) { $v476Bad += "(b) the literal 0.50 is written by $own476 runtime .opacity write(s) that name an owner - the closed list has exactly two, btnXpApply in renderXPApply and mcOn_ in mcRender (SPEC V476b as amended, V502c, I175i)" }
 $st476 = CodeOf (Join-Path $dir "WoD20.10.lfm")
 if ($st476 -notmatch 'btnSaveBaseline\.opacity\s*=\s*saved and 0\.75 or 1;') { $v476Bad += "(c) btnSaveBaseline moved off 0.75 - two dead buttons with two brightnesses is a recorded decision, not a drift to fix here (SPEC V476c, Q82.8)" }
 if ($v476Bad) { foreach ($b in $v476Bad) { Fail "V476 $b" } }
-else { Pass "V476 0.50 is authored on btnXpApply with enabled=false beside it, written once in Lua, and nowhere else on the sheet" }
+else { Pass "V476 0.50 is authored on btnXpApply with enabled=false beside it, and written in Lua by exactly its two owners - btnXpApply and the column outline mcOn_" }
 
 Write-Host ""
 # ---- V477: the empty-log sentence reads as a TRAIT (SPEC V477, I163a, T1045) ------------------
@@ -23524,8 +23489,11 @@ else {
     $mcSetNode489 = $rootDoc488.SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']")
     if ($null -eq $stSharedNode489 -or $null -eq $mcSetNode489) { $v489Bad += "(c) stSharedScope or mcSettingsScope is gone - the twin comparison reads nothing (SPEC V209)" }
     else {
-        $stSharedFields489 = @($stSharedNode489.SelectNodes(".//*[@field]") | ForEach-Object { $_.GetAttribute("field") } | Where-Object { $_ } | Sort-Object -Unique)
-        $mcSetFields489 = @($mcSetNode489.SelectNodes(".//*[@field]") | ForEach-Object { $_.GetAttribute("field") } | Where-Object { $_ } | Sort-Object -Unique)
+        # Widgets only since the 30th batch (SPEC V489c as amended, I175h(6)): a <dataLink field=...>
+        # observes a field and owns nothing (SPEC V8), and mcSettingsScope carries the one that
+        # watches mcOrder - a root field with no widget anywhere - without it becoming a 14th field.
+        $stSharedFields489 = @($stSharedNode489.SelectNodes(".//*[@field][not(self::dataLink)]") | ForEach-Object { $_.GetAttribute("field") } | Where-Object { $_ } | Sort-Object -Unique)
+        $mcSetFields489 = @($mcSetNode489.SelectNodes(".//*[@field][not(self::dataLink)]") | ForEach-Object { $_.GetAttribute("field") } | Where-Object { $_ } | Sort-Object -Unique)
         if (($stSharedFields489 -join ',') -ne ($mcSetFields489 -join ',')) {
             $v489Bad += "(c) stSharedScope holds {$($stSharedFields489 -join ', ')} and mcSettingsScope holds {$($mcSetFields489 -join ', ')} - the window would offer a field the box does not, or hide one it has (SPEC V489c)"
         }
@@ -24022,7 +23990,7 @@ else {
     $keep499 = [regex]::Match($root25Code, '(?s)MC_KEEP\s*=\s*\{(.*?)\};')
     if (-not $keep499.Success) { $v499Bad += "(c) MC_KEEP is not declared (SPEC V209)" }
     else {
-        foreach ($k499 in @('multipleCharacters', 'mcActive', 'mcRootGone')) {
+        foreach ($k499 in @('multipleCharacters', 'mcActive', 'mcRootGone', 'mcOrder')) {
             if ($keep499.Groups[1].Value -notmatch "\b$k499\s*=\s*true") { $v499Bad += "(c) MC_KEEP does not keep $k499 (SPEC V499c)" }
         }
         if ($root25Code -notmatch 'for mcI = 1, #MC_SHARED_FIELDS, 1 do MC_KEEP\[MC_SHARED_FIELDS\[mcI\]\] = true; end;') { $v499Bad += "(c) MC_KEEP does not take every name of MC_SHARED_FIELDS - a wipe would erase the ficha's settings (SPEC V499c)" }
@@ -24200,13 +24168,13 @@ if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -e
     $link502 = $root25Doc.SelectSingleNode("//dataLink[contains(@onChange,'mcBarsSoon(')]")
     if ($null -eq $link502 -or $link502.GetAttribute('fields') -notmatch "'avatar'") { $v502Bad += "(b) the bars trigger does not watch avatar - setting the photo on the Main would leave the placeholder lit (SPEC V502b, V498d)" }
 
-    # (c) the unselected outline fades to 0.70 in mcRender, and 0.70 is that outline's alone.
+    # (c) the unselected outline fades to 0.50 in mcRender (SPEC I175i, 30th batch); 0.70 is retired outright, and 0.50 has two named owners (V476b).
     $opAll502 = @([regex]::Matches($root25Code, 'mcOn_"\s*\.\.\s*\w+\s*\]\.opacity\s*=')).Count
     $opIn502 = [regex]::Match($render502, 'mcOn_"\s*\.\.\s*\w+\s*\]\.opacity\s*=([^;\r\n]+)')
-    if ($opAll502 -ne 1 -or -not $opIn502.Success -or $opIn502.Groups[1].Value -notmatch '\b0\.70\b' -or $opIn502.Groups[1].Value -notmatch '\b1\b') { $v502Bad += "(c) mcOn_.opacity is written $opAll502 time(s) - expected exactly one, in mcRender, naming 0.70 and 1 (SPEC V502c, I171c)" }
+    if ($opAll502 -ne 1 -or -not $opIn502.Success -or $opIn502.Groups[1].Value -notmatch '\b0\.50\b' -or $opIn502.Groups[1].Value -notmatch '\b1\b') { $v502Bad += "(c) mcOn_.opacity is written $opAll502 time(s) - expected exactly one, in mcRender, naming 0.50 and 1 (SPEC V502c, I175i)" }
     $o70Lua502 = @([regex]::Matches($all25Code, '\.opacity\s*=[^;\r\n]*\b0\.70?\b')).Count
     $o70Xml502 = @([regex]::Matches($all25Code, '\sopacity="0\.70?"')).Count
-    if ($o70Lua502 -ne 1 -or $o70Xml502 -ne 0) { $v502Bad += "(c) 0.70 is in $o70Lua502 runtime opacity write(s) and $o70Xml502 authored opacity - it is the column outline's number and nobody else's (SPEC V502c, V244, B172)" }
+    if ($o70Lua502 -ne 0 -or $o70Xml502 -ne 0) { $v502Bad += "(c) 0.70 is in $o70Lua502 runtime opacity write(s) and $o70Xml502 authored opacity - it left with the 30th batch, the outline is 0.50 now (SPEC V502c, I175i, V244)" }
 
     # (d) the Name label sits 6px left of the name edit, on the edit's own line.
     $nameLbl502 = @($tpl502.SelectNodes(".//label[@text='Name']"))
@@ -24297,7 +24265,7 @@ if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -e
     }
 }
 if ($v502Bad) { foreach ($b in $v502Bad) { Fail "V502 $b" } }
-else { Pass "V502 Add and Settings tile the band, the photo's placeholder is one hidden line written once, the unselected outline alone fades to 0.70, and Name plus the three bar labels sit in their columns with the bars on one left and width" }
+else { Pass "V502 Add and Settings tile the band, the photo's placeholder is one hidden line written once, the unselected outline fades to 0.50, and Name plus the three bar labels sit in their columns with the bars on one left and width" }
 
 # ---- V503: every window darkens the sheet at 50%, the picker on top included -----------------
 # SPEC I172a/b (27th batch). ONE tone and not a transparent one; the twin under the second picker
@@ -24543,117 +24511,260 @@ else {
 if ($v507Bad) { foreach ($b in $v507Bad) { Fail "V507 $b" } }
 else { Pass "V507 $spRows rows = $per507 x the traits that can hold them, the gift stops at $per507, the log names typed rows by their text, and SPECIALTIES is one read-only list" }
 
-# ---- V508: drag to reorder BACKGROUNDS, MERITS and FLAWS (SPEC I174a..f, R173, 29th batch) ----
-# The order is VISUAL: a drag moves a named row layout by top and never the data, because the
-# experience log is worked out PER SLOT (SPEC R173b). What this measures is the machine's SHAPE,
-# not the screen's numbers (SPEC B166): (a) every slot of the three lists has ONE named row that
-# holds its own template instance, authored at the top ROW_LISTS reads - the Lua and the XML
-# cannot disagree on where a row lives; (b) the picker is the handle and its click is guarded;
-# (c) the node is written once per drop and never per pixel, and the three orders are declared
-# and watched; (d) one owner of the rows' top and of the interval; (e) left button only, and the
-# threshold has one owner.
+# ---- V508: drag to reorder the rows of ROW_LISTS (SPEC I174a..f, I175b..d, R174, 30th batch) ----
+# The order is VISUAL: a drag moves a named row layout by top and never the data (SPEC R173b).
+# The machine is the host's own drag-and-drop - onStartDrag on the picker, onStartDrop on every
+# control of every row - and NOT mouse events, which the host keeps to itself once a button is
+# down (SPEC B176, R174). What this measures is the machine's SHAPE, not the screen's numbers
+# (SPEC B166): (a) every slot of every list in ROW_LISTS has ONE named row, in one of the four
+# tab files, holding its own template instance, authored at the top ROW_LISTS reads - the ids
+# DERIVED the way the Lua derives them, holes and the pinned first path included; (b) the picker
+# of each of the ten templates is the handle, no mouse handler is left, no probe and no click
+# guard (SPEC B177), and the tip's gate says only whether a drag is live; (c) the node is written
+# once per drop and never per pixel, the eleven orders are declared, watched and applied on open,
+# and the drop sites are installed once, recursively; (d) one owner of the rows' top and of the
+# interval, and the watchdog's two numbers are declared once and read in rowTween alone; (e) a
+# shared handle refuses a row its list does not carry, and a row refuses another list's drag.
 $v508Bad = @()
-$lists508 = [regex]::Match($rootTxt, '(?s)ROW_LISTS = \{(.*?)\r?\n\t\t\t\};')
+$lists508 = [regex]::Match($rootTxt, '(?s)ROW_LISTS\s*=\s*\{(.*?)\r?\n\t\t\t\};')
 $fns508 = [ordered]@{}
-foreach ($n508 in @('rowOrderOf', 'rowOrderApply', 'rowDragDown', 'rowDragMove', 'rowDragUp', 'rowDragAte', 'rowTweenStart', 'rowTween')) { $fns508[$n508] = NoComments (LuaFn $rootTxt $n508) }
+foreach ($n508 in @('rowOrderOf', 'rowOrderRepair', 'rowOrderApply', 'rowAnimTo', 'rowDropInstall', 'rowDragStart', 'rowDropEnter', 'rowDropCommit', 'rowDragMove', 'rowTweenStart', 'rowTween')) { $fns508[$n508] = NoComments (LuaFn $rootTxt $n508) }
 $missFn508 = @($fns508.Keys | Where-Object { -not $fns508[$_] })
-$oa508 = $tr25Doc.SelectSingleNode("//template[@name='OpenAbility']/button[@name='dyn`$(field)']")
-$mp508 = $tr25Doc.SelectSingleNode("//template[@name='MeritPicked']/button[@name='dynMerit_`$(num)']")
-$rows508 = @($tr25Doc.SelectNodes("//layout[starts-with(@name,'dragRow_')]"))
-$bgN508 = [regex]::Match($rootTxt, '(?m)^\s*BACKGROUND_ROWS = (\d+);')
-$mrN508 = [regex]::Match($rootTxt, '(?m)^\s*MERIT_ROWS = (\d+);')
-if (-not $lists508.Success -or $rows508.Count -eq 0 -or $null -eq $oa508 -or $null -eq $mp508 -or -not $bgN508.Success -or -not $mrN508.Success -or $missFn508.Count -gt 0) {
-    $v508Bad += "ROW_LISTS, the dragRow_ layouts, a picker template, a row count or one of the row* functions ($($missFn508 -join ', ')) was not found - this check reads nothing (SPEC V20, V209)"
+$docs508 = [ordered]@{ 'WoD20.2' = $tr25Doc; 'WoD20.7' = (Doc (Join-Path $dir 'WoD20.7.lfm')); 'WoD20.11' = (Doc (Join-Path $dir 'WoD20.11.lfm')); 'WoD20.3' = (Doc (Join-Path $dir 'WoD20.3.lfm')) }
+# The ten handle templates: file, template, the picker button, and what its onStartDrag says.
+$tpl508 = @(
+    ,@('WoD20.2',  'OpenAbility',       'dyn$(field)',      "rowDragStart(self, drag, x, y, event, 'background', '`$(field)');")
+    ,@('WoD20.2',  'MeritPicked',       'dynMerit_$(num)',  "rowDragStart(self, drag, x, y, event, '`$(sub)', 'merit_`$(num)');")
+    ,@('WoD20.7',  'HedgePicker',       'dyn$(field)',      "rowDragStart(self, drag, x, y, event, 'numina', '`$(field)');")
+    ,@('WoD20.7',  'PsychicPicker',     'dyn$(field)',      "rowDragStart(self, drag, x, y, event, 'psychic', '`$(field)');")
+    ,@('WoD20.7',  'HedgeRitualPicker', 'dyn$(field)',      "rowDragStart(self, drag, x, y, event, 'hedgeRitual', '`$(field)');")
+    ,@('WoD20.11', 'DiscRow',           'dyn$(field)',      "rowDragStart(self, drag, x, y, event, 'disc', '`$(field)');")
+    ,@('WoD20.11', 'MainPathRow',       'dyn$(field)',      "rowDragStart(self, drag, x, y, event, 'mainPath', '`$(field)');")
+    ,@('WoD20.11', 'SecPathRow',        'dyn$(field)',      "rowDragStart(self, drag, x, y, event, 'secPath', '`$(field)');")
+    ,@('WoD20.11', 'RitualRow',         'dyn$(field)',      "rowDragStart(self, drag, x, y, event, 'ritual', '`$(field)');")
+    ,@('WoD20.3',  'Attack',            'dynattack_$(num)', "rowDragStart(self, drag, x, y, event, 'attack', 'attack_`$(num)');")
+)
+$tplNode508 = [ordered]@{}
+foreach ($t508 in $tpl508) { $tplNode508[$t508[1]] = $docs508[$t508[0]].SelectSingleNode("//template[@name='$($t508[1])']") }
+$missTpl508 = @($tplNode508.Keys | Where-Object { $null -eq $tplNode508[$_] })
+# The counts and the two holes, read with \s*=\s* because the constants are aligned in columns.
+$cnt508 = @{}
+foreach ($c508 in @('BACKGROUND_ROWS', 'MERIT_ROWS', 'PSYCHIC_ROWS', 'NUMINA_ROWS', 'HEDGE_RITUAL_ROWS', 'DISC_ROWS', 'MAIN_PATH_ROWS', 'SEC_PATH_ROWS', 'RITUAL_ROWS', 'ATTACK_ROWS')) {
+    $cm508 = [regex]::Match($rootTxt, "(?m)^\s*$c508\s*=\s*(\d+);")
+    if ($cm508.Success) { $cnt508[$c508] = [int]$cm508.Groups[1].Value }
+}
+$vac508 = @{}
+foreach ($vn508 in @('PSYCHIC_VACANT', 'RITUAL_VACANT')) {
+    $vm508 = [regex]::Match((NoComments $rootTxt), "(?m)^\s*$vn508\s*=\s*\{([^}]*)\}\s*;")
+    if ($vm508.Success) { $vac508[$vn508] = @([regex]::Matches($vm508.Groups[1].Value, '\[\s*(\d+)\s*\]') | ForEach-Object { [int]$_.Groups[1].Value }) }
+}
+$rows508 = @()
+foreach ($dk508 in $docs508.Keys) { foreach ($r508 in $docs508[$dk508].SelectNodes("//layout[starts-with(@name,'dragRow_')]")) { $rows508 += ,@($dk508, $r508) } }
+if (-not $lists508.Success -or $rows508.Count -eq 0 -or $missTpl508.Count -gt 0 -or $cnt508.Count -ne 10 -or $vac508.Count -ne 2 -or $missFn508.Count -gt 0) {
+    $v508Bad += "ROW_LISTS, the dragRow_ layouts, a picker template ($($missTpl508 -join ', ')), a row count ($($cnt508.Count) of 10), a VACANT set ($($vac508.Count) of 2) or one of the row* functions ($($missFn508 -join ', ')) was not found - this check reads nothing (SPEC V20, V209)"
 } else {
-    # (a) The ids are DERIVED the way the Lua derives them: 1..BACKGROUND_ROWS, m0..mMERIT_ROWS,
-    # f0..fMERIT_ROWS. The Lua loops that fill them are read too, so the two cannot drift.
-    $bgRows508 = [int]$bgN508.Groups[1].Value; $mrRows508 = [int]$mrN508.Groups[1].Value
-    if ($rootTxt -notmatch 'for (\w+) = 1, BACKGROUND_ROWS, 1 do ROW_LISTS\.background\.ids\[\1\] = tostring\(\1\); end;') { $v508Bad += "(a) ROW_LISTS.background.ids is not filled 1..BACKGROUND_ROWS - the ids would stop being derived from the row count (SPEC I174c, V383b)" }
-    if ($rootTxt -notmatch '(?s)for (\w+) = 0, MERIT_ROWS, 1 do\s*ROW_LISTS\.merit\.ids\[\1 \+ 1\] = "m" \.\. \1;\s*ROW_LISTS\.flaw\.ids\[\1 \+ 1\]\s*= "f" \.\. \1;') { $v508Bad += "(a) ROW_LISTS.merit/flaw ids are not filled m0../f0..MERIT_ROWS - the ids would stop being derived from the row count (SPEC I174c, V383b)" }
-    $rule508 = @{
-        background = @{ Pre = '';  From = 1; To = $bgRows508; Tpl = 'OpenAbility' }
-        merit      = @{ Pre = 'm'; From = 0; To = $mrRows508; Tpl = 'MeritPicked' }
-        flaw       = @{ Pre = 'f'; From = 0; To = $mrRows508; Tpl = 'MeritPicked' }
+    # (a) The ids are DERIVED the way the Lua derives them - 1..ROWS minus the VACANT set for psychic
+    # and ritual, 2..ROWS for numina (numina_1 is pinned), m0../f0.. for merit/flaw, 1..ROWS for the
+    # rest - and the Lua loops that fill them are read too, so the two cannot drift (SPEC V383b).
+    $rule508 = [ordered]@{
+        background  = @{ Pre = '';  From = 1; To = 'BACKGROUND_ROWS';   Vac = '';               File = 'WoD20.2';  Tpl = 'OpenAbility' }
+        merit       = @{ Pre = 'm'; From = 0; To = 'MERIT_ROWS';        Vac = '';               File = 'WoD20.2';  Tpl = 'MeritPicked' }
+        flaw        = @{ Pre = 'f'; From = 0; To = 'MERIT_ROWS';        Vac = '';               File = 'WoD20.2';  Tpl = 'MeritPicked' }
+        psychic     = @{ Pre = '';  From = 1; To = 'PSYCHIC_ROWS';      Vac = 'PSYCHIC_VACANT'; File = 'WoD20.7';  Tpl = 'PsychicPicker' }
+        numina      = @{ Pre = '';  From = 2; To = 'NUMINA_ROWS';       Vac = '';               File = 'WoD20.7';  Tpl = 'HedgePicker' }
+        hedgeRitual = @{ Pre = '';  From = 1; To = 'HEDGE_RITUAL_ROWS'; Vac = '';               File = 'WoD20.7';  Tpl = 'HedgeRitualPicker' }
+        disc        = @{ Pre = '';  From = 1; To = 'DISC_ROWS';         Vac = '';               File = 'WoD20.11'; Tpl = 'DiscRow' }
+        mainPath    = @{ Pre = '';  From = 1; To = 'MAIN_PATH_ROWS';    Vac = '';               File = 'WoD20.11'; Tpl = 'MainPathRow' }
+        secPath     = @{ Pre = '';  From = 1; To = 'SEC_PATH_ROWS';     Vac = '';               File = 'WoD20.11'; Tpl = 'SecPathRow' }
+        ritual      = @{ Pre = '';  From = 1; To = 'RITUAL_ROWS';       Vac = 'RITUAL_VACANT';  File = 'WoD20.11'; Tpl = 'RitualRow' }
+        attack      = @{ Pre = '';  From = 1; To = 'ATTACK_ROWS';       Vac = '';               File = 'WoD20.3';  Tpl = 'Attack' }
+    }
+    if ($rootTxt -notmatch 'for (\w+) = 1, BACKGROUND_ROWS, 1 do ROW_LISTS\.background\.ids\[\1\] = tostring\(\1\); end;') { $v508Bad += "(a) ROW_LISTS.background.ids is not filled 1..BACKGROUND_ROWS (SPEC I174c, V383b)" }
+    if ($rootTxt -notmatch '(?s)for (\w+) = 0, MERIT_ROWS, 1 do\s*ROW_LISTS\.merit\.ids\[\1 \+ 1\] = "m" \.\. \1;\s*ROW_LISTS\.flaw\.ids\[\1 \+ 1\]\s*= "f" \.\. \1;') { $v508Bad += "(a) ROW_LISTS.merit/flaw ids are not filled m0../f0..MERIT_ROWS (SPEC I174c, V383b)" }
+    foreach ($hk508 in @('psychic', 'ritual')) {
+        $hc508 = $rule508[$hk508].To; $hv508 = $rule508[$hk508].Vac
+        if ($rootTxt -notmatch "(?s)for (\w+) = 1, $hc508, 1 do\s*if not $hv508\[\1\] then ROW_LISTS\.$hk508\.ids\[#ROW_LISTS\.$hk508\.ids \+ 1\] = tostring\(\1\); end;") { $v508Bad += "(a) ROW_LISTS.$hk508.ids is not filled 1..$hc508 skipping $hv508 - the hole would get a row that does not exist (SPEC I175b, V383b)" }
+    }
+    if ($rootTxt -notmatch 'for (\w+) = 2, NUMINA_ROWS, 1 do ROW_LISTS\.numina\.ids\[\1 - 1\] = tostring\(\1\); end;') { $v508Bad += "(a) ROW_LISTS.numina.ids is not filled 2..NUMINA_ROWS - numina_1 is the pinned affinity path (SPEC I175b, Q96.3)" }
+    foreach ($pk508 in @('hedgeRitual', 'disc', 'mainPath', 'secPath', 'attack')) {
+        $pc508 = $rule508[$pk508].To
+        if ($rootTxt -notmatch "for (\w+) = 1, $pc508, 1 do ROW_LISTS\.$pk508\.ids\[\1\] = tostring\(\1\); end;") { $v508Bad += "(a) ROW_LISTS.$pk508.ids is not filled 1..$pc508 (SPEC I175b, V383b)" }
     }
     $byName508 = @{}
-    foreach ($r508 in $rows508) { $k508 = $r508.GetAttribute('name'); if (-not $byName508.ContainsKey($k508)) { $byName508[$k508] = @() }; $byName508[$k508] += $r508 }
-    $want508 = 0; $listsSeen508 = 0
-    foreach ($e508 in [regex]::Matches($lists508.Groups[1].Value, '(\w+)\s*=\s*\{\s*order = "(\w+)",\s*prefix = "(\w+)",\s*top0 = (\d+),\s*pitch = (\d+),')) {
+    foreach ($rr508 in $rows508) { $k508 = $rr508[1].GetAttribute('name'); if (-not $byName508.ContainsKey($k508)) { $byName508[$k508] = @() }; $byName508[$k508] += ,$rr508 }
+    $want508 = 0; $listsSeen508 = 0; $orders508 = @()
+    foreach ($e508 in [regex]::Matches($lists508.Groups[1].Value, '(\w+)\s*=\s*\{\s*order\s*=\s*"(\w+)",\s*prefix\s*=\s*"(\w+)",\s*top0\s*=\s*(\d+),\s*pitch\s*=\s*(\d+),')) {
         $listsSeen508++
         $key508 = $e508.Groups[1].Value; $ord508 = $e508.Groups[2].Value; $pre508 = $e508.Groups[3].Value
         $top0508 = [int]$e508.Groups[4].Value; $pitch508 = [int]$e508.Groups[5].Value
-        if (-not $rule508.ContainsKey($key508)) { $v508Bad += "(a) ROW_LISTS carries a list '$key508' this check does not know how to derive (SPEC V508a)"; continue }
-        if ($luaOwned -notcontains $ord508) { $v508Bad += "(c) ROW_LISTS.$key508 saves into '$ord508', which is not a declared Lua-owned field (SPEC V8, I3, I174h)" }
+        $orders508 += $ord508
+        if (-not $rule508.Contains($key508)) { $v508Bad += "(a) ROW_LISTS carries a list '$key508' this check does not know how to derive (SPEC V508a)"; continue }
+        if ($luaOwned -notcontains $ord508) { $v508Bad += "(c) ROW_LISTS.$key508 saves into '$ord508', which is not a declared Lua-owned field (SPEC V8, I3, I175j)" }
         $rl508 = $rule508[$key508]
-        for ($k = $rl508.From; $k -le $rl508.To; $k++) {
-            $want508++
+        $skip508 = @(); if ($rl508.Vac) { $skip508 = $vac508[$rl508.Vac] }
+        $pos508 = 0
+        for ($k = $rl508.From; $k -le $cnt508[$rl508.To]; $k++) {
+            if ($skip508 -contains $k) { continue }
+            $want508++; $pos508++
             $id508 = "$($rl508.Pre)$k"
             $field508 = "$pre508$id508"
             $name508 = "dragRow_$field508"
-            $pos508 = $k - $rl508.From + 1
-            if (-not $byName508.ContainsKey($name508)) { $v508Bad += "(a) $name508 is not in WoD20.2 - the $key508 row of $field508 cannot be dragged (SPEC I174a)"; continue }
+            if (-not $byName508.ContainsKey($name508)) { $v508Bad += "(a) $name508 is in none of the four tab files - the $key508 row of $field508 cannot be dragged (SPEC I174a, I175c)"; continue }
             if ($byName508[$name508].Count -ne 1) { $v508Bad += "(a) $name508 is declared $($byName508[$name508].Count) times (SPEC I174a)"; continue }
-            $row508 = $byName508[$name508][0]
-            $inst508 = if ($rl508.Tpl -eq 'OpenAbility') { $row508.SelectSingleNode("OpenAbility[@field='$field508']") } else { $row508.SelectSingleNode("MeritPicked[@num='$id508' and @sub='$key508']") }
-            if ($null -eq $inst508) { $v508Bad += "(a) $name508 does not hold the $($rl508.Tpl) of $field508 (sub '$key508') - the row would move someone else's controls (SPEC I174a)" }
+            $rf508 = $byName508[$name508][0][0]; $row508 = $byName508[$name508][0][1]
+            if ($rf508 -ne $rl508.File) { $v508Bad += "(a) $name508 is in $rf508 and the $key508 list lives in $($rl508.File) (SPEC I175c)" }
+            $inst508 = switch ($rl508.Tpl) {
+                'MeritPicked' { $row508.SelectSingleNode("MeritPicked[@num='$id508' and @sub='$key508']") }
+                'Attack'      { $row508.SelectSingleNode("Attack[@num='$id508']") }
+                default       { $row508.SelectSingleNode("$($rl508.Tpl)[@field='$field508']") }
+            }
+            if ($null -eq $inst508) { $v508Bad += "(a) $name508 does not hold the $($rl508.Tpl) of $field508 - the row would move someone else's controls (SPEC I174a, I175c)" }
             $wantTop508 = $top0508 + $pitch508 * ($pos508 - 1)
-            if ($row508.GetAttribute('top') -ne "$wantTop508") { $v508Bad += "(a) $name508 is authored at top $($row508.GetAttribute('top')) and ROW_LISTS.$key508 puts position $pos508 at $wantTop508 (top0 $top0508 + pitch $pitch508) - the factory order and the Lua disagree (SPEC I174a/c)" }
+            if ($row508.GetAttribute('top') -ne "$wantTop508") { $v508Bad += "(a) $name508 is authored at top $($row508.GetAttribute('top')) and ROW_LISTS.$key508 puts drawn position $pos508 at $wantTop508 (top0 $top0508 + pitch $pitch508) - the factory order and the Lua disagree (SPEC I174a/c, I175c)" }
         }
     }
-    if ($listsSeen508 -ne 3) { $v508Bad += "(a) $listsSeen508 ROW_LISTS entries read, expected 3 - background, merit, flaw (SPEC I174c, V20)" }
-    if ($rows508.Count -ne $want508) { $v508Bad += "(a) WoD20.2 names $($rows508.Count) dragRow_ layouts and the three lists own $want508 - a dragRow_ outside the lists, or a list short of rows (SPEC I174a)" }
+    if ($listsSeen508 -ne 11) { $v508Bad += "(a) $listsSeen508 ROW_LISTS entries read, expected 11 - the three of Traits and the eight of the 30th batch (SPEC I175b, V20)" }
+    if ($rows508.Count -ne $want508) { $v508Bad += "(a) the four tab files name $($rows508.Count) dragRow_ layouts and the lists own $want508 - a dragRow_ outside the lists (clanDisc_*, numina_1), or a list short of rows (SPEC I174a, I175c)" }
 
-    # (b) the picker is the handle; its move feeds the drag before the tip, its click is guarded.
-    $h508 = @(
-        ,@('OpenAbility', $oa508, "rowDragDown(self, event, 'background', '`$(field)');")
-        ,@('MeritPicked', $mp508, "rowDragDown(self, event, '`$(sub)', 'merit_`$(num)');")
-    )
-    foreach ($hh508 in $h508) {
-        $b508 = $hh508[1]
-        if ($b508.GetAttribute('onMouseDown') -cne $hh508[2]) { $v508Bad += "(b) the $($hh508[0]) picker's onMouseDown is '$($b508.GetAttribute('onMouseDown'))', expected '$($hh508[2])' (SPEC I174b)" }
-        if ($b508.GetAttribute('onMouseUp') -cne 'rowDragUp(self, event);') { $v508Bad += "(b) the $($hh508[0]) picker does not release through rowDragUp(self, event); - a drag would never drop (SPEC I174b)" }
-        if ($b508.GetAttribute('onMouseMove') -notmatch '^if not rowDragMove\(self, event\) then noteTipMove\(self, event, [^;]*\); end;$') { $v508Bad += "(b) the $($hh508[0]) picker's onMouseMove does not run rowDragMove first and guard noteTipMove with it (SPEC I174b)" }
-        if ($b508.GetAttribute('onClick') -notmatch '^if not rowDragAte\(\) then mfOpen\(self, [^;]*\); end;$') { $v508Bad += "(b) the $($hh508[0]) picker's onClick does not guard mfOpen with rowDragAte() - every drop would open the search box (SPEC I174b)" }
+    # (b) the picker is the handle, by the host's onStartDrag; no mouse handler, no probe, no guard.
+    foreach ($t508 in $tpl508) {
+        $tn508 = $tplNode508[$t508[1]]
+        $b508 = $tn508.SelectSingleNode("button[@name='$($t508[2])']")
+        if ($null -eq $b508) { $v508Bad += "(b) $($t508[1]) has no picker button named $($t508[2]) (SPEC I175d, V209)"; continue }
+        if ($b508.GetAttribute('onStartDrag') -cne $t508[3]) { $v508Bad += "(b) the $($t508[1]) picker's onStartDrag is '$($b508.GetAttribute('onStartDrag'))', expected '$($t508[3])' (SPEC I174b, I175d)" }
+        if ($b508.GetAttribute('onClick') -notmatch '^mfOpen\(self, [^;]*\);$') { $v508Bad += "(b) the $($t508[1]) picker's onClick is not a bare mfOpen(...) - the host fires no click after a drag, and a guard eats the next real one (SPEC I174b, B177)" }
+        if (@($tn508.SelectNodes(".//*[@onMouseDown or @onMouseUp]")).Count -ne 0) { $v508Bad += "(b) $($t508[1]) still carries onMouseDown/onMouseUp - the host owns the press once a button is down, and a drag written on it never moves (SPEC B176, R174a)" }
+        if ($t508[0] -eq 'WoD20.2') {
+            if ($b508.GetAttribute('onMouseMove') -notmatch '^if not rowDragMove\(self, event\) then noteTipMove\(self, event, [^;]*\); end;$') { $v508Bad += "(b) the $($t508[1]) picker's onMouseMove does not gate noteTipMove with rowDragMove - the stray move after onStartDrag would light the tip (SPEC I174b, R174d)" }
+        } elseif ($b508.HasAttribute('onMouseMove')) { $v508Bad += "(b) the $($t508[1]) picker carries an onMouseMove and has no tip to gate (SPEC I175d)" }
     }
+    $rawAll508 = ''
+    foreach ($f508 in $files) { $rawAll508 += [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f508.FullName)) + "`n" }
+    foreach ($gone508 in @('rowDragAte', 'rowDragDown', 'rowDragUp', 'ROW_DRAG_MIN', 'ROW_PROBE', 'wodTrace("PROBE')) {
+        if ($rawAll508.Contains($gone508)) { $v508Bad += "(b) '$gone508' is still in the sheet, comments included - the mouse machine, its probe and the click guard went with the 30th batch (SPEC I175a, B177)" }
+    }
+    if (($fns508['rowDragMove'] -replace '\s+', ' ').Trim() -notmatch '^function rowDragMove\(from, event\) return ROW_DRAG\.live == true; end;$') { $v508Bad += "(b) rowDragMove is not exactly 'return ROW_DRAG.live == true;' - it is the tip's gate and nothing else (SPEC I174b, V508b)" }
 
-    # (c) the node: one write per drop, none per pixel; the orders are watched and applied on open.
+    # (c) the node: one write per drop, none per pixel; the orders declared, watched, applied on open;
+    # the drop sites installed once, from the instant apply, recursively.
     $sf508 = @([regex]::Matches($root25Code, 'setField\(\s*L\.order\b')).Count
-    if ($sf508 -ne 1 -or $fns508['rowDragUp'] -notmatch 'setField\(\s*L\.order\b') { $v508Bad += "(c) setField(L.order, ...) is written $sf508 time(s) and not once, in rowDragUp - the order has one writer, the drop (SPEC I174d, V508c)" }
-    if ($root25Code -match 'setField\(\s*"order(Background|Merit|Flaw)"' -or $root25Code -match '\bsheet(\.order(Background|Merit|Flaw)|\[\s*"order(Background|Merit|Flaw)"\s*\])\s*=[^=]') { $v508Bad += "(c) an order field is written by name outside rowDragUp's setField(L.order (SPEC V508c)" }
-    foreach ($pp508 in @('rowDragMove', 'rowTween')) {
+    if ($sf508 -ne 1 -or $fns508['rowDropCommit'] -notmatch 'setField\(\s*L\.order\b') { $v508Bad += "(c) setField(L.order, ...) is written $sf508 time(s) and not once, in rowDropCommit - the order has one writer, the drop (SPEC I174d, V508c)" }
+    foreach ($on508 in $orders508) {
+        if ($root25Code -match "setField\(\s*`"$on508`"" -or $root25Code -match "\bsheet(\.$on508|\[\s*`"$on508`"\s*\])\s*=[^=]") { $v508Bad += "(c) $on508 is written by name outside rowDropCommit's setField(L.order (SPEC V508c)" }
+    }
+    foreach ($pp508 in @('rowDropEnter', 'rowTween', 'rowAnimTo')) {
         if ($fns508[$pp508] -match 'setField\(' -or $fns508[$pp508] -match '\bsheet(\.\w+|\[[^\]]+\])\s*=[^=]') { $v508Bad += "(c) $pp508 writes the node - it runs per pixel or per tick, and every write is traffic to the whole table (SPEC I174d, V508c)" }
     }
     $dl508 = $null
     foreach ($d508 in $root25Doc.SelectNodes("/form/dataLink[@fields]")) {
-        $fl508 = @([regex]::Matches($d508.GetAttribute('fields'), "'(\w+)'") | ForEach-Object { $_.Groups[1].Value } | Sort-Object)
-        if (($fl508 -join ',') -eq 'orderBackground,orderFlaw,orderMerit') { $dl508 = $d508 }
+        $ch508 = $d508.SelectSingleNode("event[@name='onChange']")
+        if ($null -ne $ch508 -and $ch508.InnerText -match 'rowOrderApply\(self, false\)') { $dl508 = $d508 }
     }
-    if ($null -eq $dl508) { $v508Bad += "(c) no <dataLink> on the root watches exactly orderBackground, orderMerit and orderFlaw - another client's drop would not move the rows (SPEC I174f)" }
+    if ($null -eq $dl508) { $v508Bad += "(c) no <dataLink fields=...> on the root calls rowOrderApply(self, false) on change - another client's drop would not move the rows (SPEC I174f)" }
     else {
-        $ch508 = $dl508.SelectSingleNode("event[@name='onChange']")
-        if ($null -eq $ch508 -or $ch508.InnerText -notmatch 'rowOrderApply\(self, false\)') { $v508Bad += "(c) the order <dataLink> does not call rowOrderApply(self, false) on change (SPEC I174f)" }
+        $fl508 = @([regex]::Matches($dl508.GetAttribute('fields'), "'(\w+)'") | ForEach-Object { $_.Groups[1].Value } | Sort-Object)
+        $wantFl508 = @($orders508 | Sort-Object)
+        if (($fl508 -join ',') -ne ($wantFl508 -join ',')) { $v508Bad += "(c) the order <dataLink> watches {$($fl508 -join ', ')} and ROW_LISTS saves into {$($wantFl508 -join ', ')} - a list left out would not follow another client (SPEC I174f, I175b)" }
     }
     $nr508 = $root25Doc.SelectSingleNode("/form/event[@name='onNodeReady']")
     if ($null -eq $nr508 -or (NoComments $nr508.InnerText) -notmatch 'rowOrderApply\(self, true\)') { $v508Bad += "(c) the root's onNodeReady does not call rowOrderApply(self, true) - a reopened sheet would show the factory order (SPEC I174f)" }
+    $di508 = @([regex]::Matches($root25Code, '\browDropInstall\(')).Count
+    if ($di508 -ne 2 -or $fns508['rowOrderApply'] -notmatch '(?s)if instant then\s*rowDropInstall\(from, found\);') { $v508Bad += "(c) rowDropInstall( occurs $di508 time(s) (definition plus calls) and not 2, or is not called from rowOrderApply's instant branch alone - the drop sites are installed once, at open (SPEC I174d, V508c)" }
+    if ($fns508['rowDropInstall'] -notmatch '\.onStartDrop = function' -or $fns508['rowDropInstall'] -notmatch 'getChildren\(\)') { $v508Bad += "(c) rowDropInstall does not assign .onStartDrop down getChildren() - a release off the picker would land nowhere (SPEC I174d, R174g)" }
 
-    # (d) one owner of the rows' top: a function that names dragRow_ and writes .top is one of the
-    # three the machine owns; setInterval lives in rowTweenStart alone and rowTween can stop.
-    $own508 = @('rowOrderApply', 'rowDragMove', 'rowTween')
+    # (d) one owner of the rows' top, one interval, and the watchdog lives in rowTween.
     foreach ($fm508 in [regex]::Matches($root25Code, '(?ms)^\t\t\t(?:local\s+)?function\s+(\w+)\s*\(.*?\r?\n\t\t\tend;')) {
         $fnN508 = $fm508.Groups[1].Value
-        if ($own508 -contains $fnN508) { continue }
-        if ($fm508.Value -match 'dragRow_' -and $fm508.Value -match '\.top\s*=[^=]') { $v508Bad += "(d) $fnN508 names dragRow_ and writes .top - the rows' position has three owners, rowOrderApply, rowDragMove and rowTween (SPEC I174f, V508d)" }
+        if (@('rowAnimTo', 'rowTween') -contains $fnN508) { continue }
+        if ($fm508.Value -match 'dragRow_' -and $fm508.Value -match '\.top\s*=[^=]') { $v508Bad += "(d) $fnN508 names dragRow_ and writes .top - the rows' position has two owners, rowAnimTo and rowTween (SPEC I174f, V508d)" }
     }
     $si508 = @([regex]::Matches($all25Code, '\bsetInterval\(')).Count
-    if ($si508 -ne 1 -or $fns508['rowTweenStart'] -notmatch '\bsetInterval\(rowTween, ROW_TWEEN_MS\)') { $v508Bad += "(d) setInterval appears $si508 time(s) and not once, in rowTweenStart - a second interval would move the rows twice per tick (SPEC I174e)" }
-    if ($fns508['rowTween'] -notmatch 'return false;') { $v508Bad += "(d) rowTween never returns false - the interval would tick forever (SPEC I174e, R173c)" }
+    if ($si508 -ne 1 -or $fns508['rowTweenStart'] -notmatch '\bsetInterval\(rowTween, ROW_TWEEN_MS\)') { $v508Bad += "(d) setInterval appears $si508 time(s) and not once, in rowTweenStart - a second interval is a second animator (SPEC I174e, V508d)" }
+    if ($fns508['rowTween'] -notmatch 'return false;' -or $fns508['rowTween'] -notmatch 'ROW_DRAG\.live') { $v508Bad += "(d) rowTween does not return false and read ROW_DRAG.live - it has to stop, and the watchdog of a drag the host never finished lives in it (SPEC I174d/e)" }
+    foreach ($w508 in @('ROW_WATCH_TICKS', 'ROW_WATCH_MAX')) {
+        if (@([regex]::Matches($rootTxt, "(?m)^\s*$w508\s*=\s*\d+;")).Count -ne 1) { $v508Bad += "(d) $w508 is not declared exactly once on the root (SPEC I174e, V508d)" }
+        if (@([regex]::Matches($root25Code, "\b$w508\b")).Count -ne 2 -or $fns508['rowTween'] -notmatch "\b$w508\b") { $v508Bad += "(d) $w508 is read somewhere other than rowTween - the watchdog has one home (SPEC V508d)" }
+    }
 
-    # (e) left button only; the threshold is ROW_DRAG_MIN and no literal beside it.
-    if ($fns508['rowDragDown'] -notmatch 'event\.button ~= "left"') { $v508Bad += "(e) rowDragDown does not refuse a press that is not the left button (SPEC I174d)" }
-    if ($fns508['rowDragMove'] -notmatch '<\s*ROW_DRAG_MIN\b' -or $fns508['rowDragMove'] -match '[<>]=?\s*\d') { $v508Bad += "(e) rowDragMove does not compare the travel with ROW_DRAG_MIN alone - the threshold would have two owners (SPEC Q95.4, V508e)" }
-    if (@([regex]::Matches($rootTxt, '(?m)^\s*ROW_DRAG_MIN = \d+;')).Count -ne 1) { $v508Bad += "(e) ROW_DRAG_MIN is not declared exactly once on the root (SPEC V508e)" }
+    # (e) refusal: a shared handle carries nothing for a row its list does not hold; a row registers
+    # nothing for another list's drag.
+    $iPos508 = $fns508['rowDragStart'].IndexOf('rowPosOf(')
+    $iAdd508 = $fns508['rowDragStart'].IndexOf('drag:addData(')
+    if ($iPos508 -lt 0 -or $iAdd508 -lt 0 -or $iPos508 -gt $iAdd508 -or $fns508['rowDragStart'] -notmatch 'if rowPosOf\(order, id\) == nil then return; end;') { $v508Bad += "(e) rowDragStart does not refuse (rowPosOf == nil, return) BEFORE drag:addData - numina_1 and clanDisc_* share a template with rows that move (SPEC I175d, V508e)" }
+    $iRef508 = $fns508['rowDropEnter'].IndexOf('ROW_LISTS[list] ~= L')
+    $iAct508 = $fns508['rowDropEnter'].IndexOf('addAction(')
+    if ($iRef508 -lt 0 -or $iAct508 -lt 0 -or $iRef508 -gt $iAct508) { $v508Bad += "(e) rowDropEnter does not compare ROW_LISTS[list] ~= L before drop:addAction - a merit could be dropped on a background (SPEC I174d, V508e)" }
 }
 if ($v508Bad) { foreach ($b in $v508Bad) { Fail "V508 $b" } }
-else { Pass "V508 every background, merit and flaw row is one named layout at the top ROW_LISTS reads, the picker is the guarded handle, the order is written once per drop and watched, and the rows' top and the interval have one owner each" }
+else { Pass "V508 every row of the eleven lists is one named layout at the top ROW_LISTS reads, the picker is the host's drag handle with no mouse machine left, the order is written once per drop and watched, the rows' top and the interval have one owner, and a shared handle refuses" }
+
+# ---- V509: the column of characters reorders by character ID and only the top (SPEC I175h, 30th batch) ----
+# Row k is pinned to the k-th node of mcNodes() on every mcRender and mcActive is that index
+# (SPEC V490e, V491a), so the column cannot be ordered by slot: the drag saves the character
+# IDs in column order, on the root, and the apply puts row k at its node's position. (a) the id
+# has one writer, mcRender, on first sight, and mcAdd stays silent (SPEC V492a); (b) the order
+# has one writer, on MC.root, is kept by MC_KEEP, is repaired by the one parser, and is watched
+# from the box pinned to the root; (c) mcNodes stays unsorted, the rows' top has one owner
+# beside rowTween, and the apply runs at the end of mcRender, on the drop and on the link; (d)
+# the handle and the drop sites are assigned, never authored, the name edit excepted, and the
+# node under a row is read when the event comes; (e) the tween is the lists' own.
+$v509Bad = @()
+$mcRowTpl509 = $root25Doc.SelectSingleNode("//template[@name='McRow']")
+$render509 = NoComments (LuaFn $rootTxt 'mcRender')
+$add509 = NoComments (LuaFn $rootTxt 'mcAdd')
+$keep509 = [regex]::Match($root25Code, '(?s)MC_KEEP\s*=\s*\{(.*?)\};')
+$scope509 = $root25Doc.SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']")
+$fns509 = [ordered]@{}
+foreach ($n509 in @('mcIdOf', 'mcOrderOf', 'mcAnimTo', 'mcRowOrderApply', 'mcDragInstall', 'mcDragStart', 'mcDropEnter', 'mcDropCommit', 'mcNodes', 'rowOrderOf', 'rowDropEnter')) { $fns509[$n509] = NoComments (LuaFn $rootTxt $n509) }
+$missFn509 = @($fns509.Keys | Where-Object { -not $fns509[$_] })
+if ($null -eq $mcRowTpl509 -or -not $render509 -or -not $add509 -or -not $keep509.Success -or $null -eq $scope509 -or $missFn509.Count -gt 0) {
+    $v509Bad += "McRow, mcRender, mcAdd, MC_KEEP, mcSettingsScope or one of the column's functions ($($missFn509 -join ', ')) was not found - this check reads nothing (SPEC V20, V209)"
+} else {
+    # (a) the id
+    if ($render509 -notmatch 'if mcIdOf\(n\) == nil then n\.mcId = Utils\.generateUniqueString\(\); end;') { $v509Bad += "(a) mcRender does not stamp n.mcId = Utils.generateUniqueString() under mcIdOf(n) == nil - a node the order cannot name (SPEC I175h(1), V509a)" }
+    $idW509 = @([regex]::Matches($root25Code, '\bmcId\s*=[^=]')).Count
+    if ($idW509 -ne 1) { $v509Bad += "(a) mcId is written $idW509 time(s) in the sheet and not once, in mcRender (SPEC V509a)" }
+    if ($add509 -match 'mcId') { $v509Bad += "(a) mcAdd names mcId - it writes the shared fields and nothing else; the id comes with the first paint (SPEC V492a, V509a)" }
+    if (@([regex]::Matches($root25Code, '"root"')).Count -ne 1 -or $fns509['mcIdOf'] -notmatch 'return "root";') { $v509Bad += "(a) the literal `"root`" is not in exactly one place, mcIdOf (SPEC V509a)" }
+    # (b) the order
+    $ordW509 = @([regex]::Matches($root25Code, 'MC\.root\.mcOrder\s*=[^=]')).Count
+    if ($ordW509 -ne 1 -or $fns509['mcDropCommit'] -notmatch 'MC\.root\.mcOrder\s*=[^=]') { $v509Bad += "(b) MC.root.mcOrder is written $ordW509 time(s) and not once, in mcDropCommit (SPEC V509b)" }
+    if ($root25Code -match 'setField\(\s*"mcOrder"' -or $root25Code -match '\bsheet(\.mcOrder|\[\s*"mcOrder"\s*\])\s*=[^=]') { $v509Bad += "(b) mcOrder is written through setField or sheet - it lives on the root, and sheet may be a child (SPEC I175h(2), V509b)" }
+    if ($keep509.Groups[1].Value -notmatch '\bmcOrder\s*=\s*true') { $v509Bad += "(b) MC_KEEP does not keep mcOrder - mcWipe would erase the column's order with the root character (SPEC V499c, V509b)" }
+    if ($fns509['mcOrderOf'] -notmatch 'rowOrderRepair\(MC\.root\.mcOrder,' -or $fns509['mcRowOrderApply'] -notmatch 'mcOrderOf\(\)') { $v509Bad += "(b) the column's order is not MC.root.mcOrder repaired by rowOrderRepair (mcOrderOf) as mcRowOrderApply reads it (SPEC I175h(2), V509b)" }
+    if ($fns509['rowOrderOf'] -notmatch 'return rowOrderRepair\(') { $v509Bad += "(b) rowOrderOf does not end in return rowOrderRepair( - the lists and the column would repair an order two ways (SPEC I175h(2), V509b)" }
+    $gm509 = @([regex]::Matches($all25Code, 'gmatch\(\s*\w+\s*,\s*"\[\^,\]\+"\s*\)')).Count
+    if ($gm509 -ne 1) { $v509Bad += "(b) the saved-list parser gmatch(..., `"[^,]+`") occurs $gm509 time(s) in the sheet and not once (SPEC V509b)" }
+    $links509 = 0
+    foreach ($f509 in $files) { $links509 += @((Doc $f509.FullName).SelectNodes("//dataLink[@field='mcOrder']")).Count }
+    $inScope509 = $scope509.SelectSingleNode(".//dataLink[@field='mcOrder']")
+    if ($links509 -ne 1 -or $null -eq $inScope509) { $v509Bad += "(b) <dataLink field='mcOrder'> is authored $links509 time(s) in the sheet, expected once, INSIDE mcSettingsScope - the box pinned to the root (SPEC I175h(6), V509b)" }
+    elseif ($inScope509.GetAttribute('onChange') -notmatch 'mcRowOrderApply\(self, false\)') { $v509Bad += "(b) the mcOrder <dataLink> does not call mcRowOrderApply(self, false) on change (SPEC I175h(6))" }
+    foreach ($o509 in @('mcOrder', 'mcId')) { if ($luaOwned -notcontains $o509) { $v509Bad += "(b) $o509 is not a declared Lua-owned field (SPEC V8, I175j)" } }
+    # (c) unsorted nodes, one owner of the top, the apply where it belongs
+    if ($fns509['mcNodes'] -match 'table\.sort') { $v509Bad += "(c) mcNodes sorts - the order is creation order and the column's order is a separate list (SPEC V491a, V509c)" }
+    foreach ($fm509 in [regex]::Matches($root25Code, '(?ms)^\t\t\t(?:local\s+)?function\s+(\w+)\s*\(.*?\r?\n\t\t\tend;')) {
+        $fnN509 = $fm509.Groups[1].Value
+        if (@('mcAnimTo', 'rowTween') -contains $fnN509) { continue }
+        if ($fm509.Value -match 'mcRow_' -and $fm509.Value -match '\.top\s*=[^=]') { $v509Bad += "(c) $fnN509 names mcRow_ and writes .top - the column's position has two owners, mcAnimTo and rowTween (SPEC V509c)" }
+    }
+    if ($fns509['mcAnimTo'] -notmatch 'MC_ROW_TOP0 \+ MC_ROW_PITCH \* \(p - 1\)') { $v509Bad += "(c) mcAnimTo does not place a row at MC_ROW_TOP0 + MC_ROW_PITCH * (p - 1) - the V497e law, mirrored (SPEC I175h(3))" }
+    if ($render509 -notmatch '(?s)mcRowOrderApply\(from, MC_DRAG_INSTALLED ~= true, found\);\s*end;\s*$') { $v509Bad += "(c) mcRender does not end in mcRowOrderApply(from, MC_DRAG_INSTALLED ~= true, found) - the rows would paint in creation order (SPEC I175h(3), V509c)" }
+    if ($fns509['mcDropCommit'] -notmatch 'mcRowOrderApply\(from, false, found\);') { $v509Bad += "(c) mcDropCommit does not apply the order it wrote (SPEC V509c)" }
+    # (d) handle and sites by assignment
+    if (@($mcRowTpl509.SelectNodes(".//*[@onStartDrag or @onStartDrop]")).Count -ne 0) { $v509Bad += "(d) McRow authors onStartDrag/onStartDrop in the XML - the whole row is the handle by assignment, in mcDragInstall alone (SPEC I175h(4), Q96.4, V509d)" }
+    $inst509 = $fns509['mcDragInstall']
+    if ($inst509 -notmatch 'if MC_DRAG_INSTALLED then return; end;' -or $inst509 -notmatch 'getChildren\(\)' -or $inst509 -notmatch 'ctrl\.onStartDrop = function') { $v509Bad += "(d) mcDragInstall is not a once-per-sheet walk down getChildren() assigning .onStartDrop (SPEC I175h(5), V509d)" }
+    if ($inst509 -notmatch '(?s)if ctrl:getClassName\(\) ~= "edit" then\s*ctrl\.onStartDrag = function') { $v509Bad += "(d) mcDragInstall does not assign .onStartDrag under getClassName() ~= `"edit`" - pressing and moving in the name edit selects text (SPEC I175h(4), R174g)" }
+    if (@([regex]::Matches($root25Code, 'getClassName\(\) ~= "edit"')).Count -ne 1) { $v509Bad += "(d) the edit exclusion is not in exactly one place, the walk (SPEC V509d)" }
+    foreach ($rd509 in @('mcDragStart', 'mcDropEnter')) {
+        if ($fns509[$rd509] -notmatch 'found\["mcRow_" \.\. k\]' -or $fns509[$rd509] -notmatch '\.node') { $v509Bad += "(d) $rd509 does not read the node off found[`"mcRow_`" .. k].node when the event comes - a frozen nodes[k] would name the wrong character after a removal (SPEC V509d)" }
+    }
+    if ($fns509['mcDragStart'] -notmatch 'addData\("wodChar", id\)' -or $fns509['mcDropEnter'] -notmatch 'getData\("wodChar"\)' -or $fns509['rowDropEnter'] -notmatch 'getData\("wodRow"\)') { $v509Bad += "(d) the column's drag is not keyed wodChar apart from the lists' wodRow - a row of a list could be dropped on a character (SPEC I175h(4)/(5), V509d)" }
+    # (e) the same tween
+    if ($fns509['mcRowOrderApply'] -notmatch 'rowTweenStart\(\);' -or $fns509['mcAnimTo'] -notmatch 'ROW_ANIM\[name\] = \{ ctrl = c, top = top \};') { $v509Bad += "(e) the column does not animate through ROW_ANIM and rowTweenStart - a second tween is a second interval (SPEC I175h(3), V509e)" }
+}
+if ($v509Bad) { foreach ($b in $v509Bad) { Fail "V509 $b" } }
+else { Pass "V509 the column's id has one writer on first paint, its order one writer on the root kept by MC_KEEP and watched from the pinned box, the rows' top one owner beside the shared tween, and the whole row is a handle by assignment with the name edit left out" }
 
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

@@ -268,11 +268,16 @@
 		     already ship (WoD20.2.lfm:94-96, SPEC R153) - the `field=` stays on all seven, because
 		     a released sheet keeps its data (SPEC V2).
 
+		     30th batch (SPEC I175c/d, V508): the eleven row layouts below are named
+		     dragRow_attack_<num> and the picker is the row's drag handle (onStartDrag into
+		     rowDragStart, list 'attack'); the order is visual, the eight fields of a slot stay
+		     where mfConfirm wrote them (SPEC I175g).
+
 		     NOTHING is commented inside the <template> below: rdk copies the body raw and a
 		     comment in there takes the next line with it (SPEC B19). -->
 		<template name="Attack">
 			<button name="btnQattack_$(num)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Weapon', sheet['attack_$(num)'], nil, 'attack_$(num)');"/>
-			<button name="dynattack_$(num)" left="20" top="0" width="345" height="24" text="Select Weapon" onClick="mfOpen(self, 'attack_$(num)', 'weapon', 'Weapon');"/>
+			<button name="dynattack_$(num)" left="20" top="0" width="345" height="24" text="Select Weapon" onClick="mfOpen(self, 'attack_$(num)', 'weapon', 'Weapon');" onStartDrag="rowDragStart(self, drag, x, y, event, 'attack', 'attack_$(num)');"/>
 			<edit name="edtattack_$(num)" left="20" top="0" width="345" height="24" field="attack_$(num)" visible="false" enabled="false"/>
 			<edit left="365" top="0" width="170" height="24" field="roll_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
 			<edit left="535" top="0" width="50" height="24" field="difficulty_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center"/>
@@ -319,37 +324,37 @@
 			     is the box's content edge (965 - 20, SPEC I73). -->
 			<button name="btnQconceal" left="925" top="36" width="20" height="20" text="?" onClick="popOpen(self, 'Weapon', 'Conceal', nil, nil);"/>
 
-			<layout left="35" top="61" width="895" height="25" >
+			<layout name="dragRow_attack_1" left="35" top="61" width="895" height="25" >
 				<Attack num="1"/>
 			</layout>
-			<layout left="35" top="86" width="895" height="25" >
+			<layout name="dragRow_attack_2" left="35" top="86" width="895" height="25" >
 				<Attack num="2"/>
 			</layout>
-			<layout left="35" top="111" width="895" height="25" >
+			<layout name="dragRow_attack_3" left="35" top="111" width="895" height="25" >
 				<Attack num="3"/>
 			</layout>
-			<layout left="35" top="136" width="895" height="25" >
+			<layout name="dragRow_attack_4" left="35" top="136" width="895" height="25" >
 				<Attack num="4"/>
 			</layout>
-			<layout left="35" top="161" width="895" height="25" >
+			<layout name="dragRow_attack_5" left="35" top="161" width="895" height="25" >
 				<Attack num="5"/>
 			</layout>
-			<layout left="35" top="186" width="895" height="25" >
+			<layout name="dragRow_attack_6" left="35" top="186" width="895" height="25" >
 				<Attack num="6"/>
 			</layout>
-			<layout left="35" top="211" width="895" height="25" >
+			<layout name="dragRow_attack_7" left="35" top="211" width="895" height="25" >
 				<Attack num="7"/>
 			</layout>
-			<layout left="35" top="236" width="895" height="25" >
+			<layout name="dragRow_attack_8" left="35" top="236" width="895" height="25" >
 				<Attack num="8"/>
 			</layout>
-			<layout left="35" top="261" width="895" height="25" >
+			<layout name="dragRow_attack_9" left="35" top="261" width="895" height="25" >
 				<Attack num="9"/>
 			</layout>
-			<layout left="35" top="286" width="895" height="25" >
+			<layout name="dragRow_attack_10" left="35" top="286" width="895" height="25" >
 				<Attack num="10"/>
 			</layout>
-			<layout left="35" top="311" width="895" height="25" >
+			<layout name="dragRow_attack_11" left="35" top="311" width="895" height="25" >
 				<Attack num="11"/>
 			</layout>
 		</layout>
