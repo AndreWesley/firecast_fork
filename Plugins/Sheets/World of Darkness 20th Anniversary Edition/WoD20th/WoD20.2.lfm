@@ -5,14 +5,19 @@
 		<image name="themePaper2" align="client" style="stretch" hitTest="false" visible="false"/>
 		<!--
 			Traits grid (SPEC T45). Numina moved to the Powers tab, so merits/flaws and
-			derangements moved up into the space they left. Everything closes on x=1635.
+			derangements moved up into the space they left. Everything closes on x=1362.
 
-			  BACKGROUNDS 0..384                                          y   0..695
-			  MERITS 389..945  y 0..345      ALLIES 950..1175   MENTOR 1180..1405      y   0..170
-			                                 RESOURCES 950..    GUIDES 1180..          y 175..345
-			                                 DERANGEMENTS 1410..1635                    y   0..345
-			  FLAWS 389..945   y 350..695    CONTACTS 950..  FAME 1180..  ARTIFACTS 1410..  y 350..520
-			                                 INFLUENCE 950.. BASE OF OP 1180..  OTHER 1410.. y 525..695
+			  BACKGROUNDS 0..384      y 0..679
+			  MERITS 389..1132        y   0..337      DERANGEMENTS 1137..1362   y   0..337
+			  FLAWS  389..1132        y 342..679      OTHER        1137..1362   y 342..679
+
+			42nd batch (SPEC I186), on the user's ask: BOOK and PAGE doubled (117 -> 234, 45 -> 90)
+			and COST grew half (50 -> 75), so a row closes on 703 and MERITS/FLAWS on 743. The nine
+			note boxes on the right (ALLIES, MENTOR, RESOURCES, GUIDES, CONTACTS, FAME, ARTIFACTS,
+			INFLUENCE, BASE OF OPERATIONS) left; their fields are ORPHANS, so a saved sheet keeps the
+			text (SPEC I3, V362b). OTHER grew up to where ARTIFACTS opened (342) and both survivors
+			sit 5px right of the tables, the twins of MERITS and FLAWS on the Y axis (SPEC V392b).
+			The paragraphs below are the history of the older layouts.
 			25th batch (SPEC I170g): BACKGROUNDS grew 20 for the ! column between picker and dots,
 			and MERITS/FLAWS grew 20 for theirs between name and BOOK - the widest name with its (N) cost
 			needs all 264 (SPEC V349c, B171). Every box right of each moved with it; the tab closes on 1635.
@@ -107,9 +112,9 @@
 			<button name="dynMerit_$(num)" left="20" top="0" width="264" height="24" text="$(lbl)" onClick="mfOpen(self, 'merit_$(num)', '$(sub)', 'Merit');" onStartDrag="rowDragStart(self, drag, x, y, event, '$(sub)', 'merit_$(num)');" onMouseMove="if not rowDragMove(self, event) then noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'dynMerit_$(num)'); end;" onMouseLeave="noteTipLeave(self);"/>
 			<edit name="edtMerit_$(num)" left="20" top="0" width="264" height="24" field="merit_$(num)" visible="false" enabled="false"/>
 			<button name="btnNmerit_$(num)" left="284" top="0" width="20" height="20" text="!" fontColor="white" onClick="noteOpen(self, '$(sub)', 'merit_$(num)');" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'btnNmerit_$(num)');" onMouseLeave="noteTipLeave(self);"/>
-			<edit name="edtBook_$(num)" left="304" top="0" width="117" height="24" field="book_$(num)" readOnly="true" opacity="0.75" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtBook_$(num)');" onMouseLeave="noteTipLeave(self);"/>
-			<edit name="edtType_$(num)" left="421" top="0" width="45" height="24" field="type_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtType_$(num)');" onMouseLeave="noteTipLeave(self);"/>
-			<edit name="edtCost_$(num)" left="466" top="0" width="50" height="24" field="costy_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtCost_$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<edit name="edtBook_$(num)" left="304" top="0" width="234" height="24" field="book_$(num)" readOnly="true" opacity="0.75" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtBook_$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<edit name="edtType_$(num)" left="538" top="0" width="90" height="24" field="type_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtType_$(num)');" onMouseLeave="noteTipLeave(self);"/>
+			<edit name="edtCost_$(num)" left="628" top="0" width="75" height="24" field="costy_$(num)" readOnly="true" opacity="0.75" horzTextAlign="center" onMouseMove="noteTipMove(self, event, '$(sub)', 'merit_$(num)', 'edtCost_$(num)');" onMouseLeave="noteTipLeave(self);"/>
 		</template>
 		<!--
 			PILOT of SPEC I113 (Q30, T808) - the first family to lose its dropdown for the search
@@ -151,8 +156,8 @@
 		-->
 
 		<!-- The storyteller's backgrounds moved here from the Main tab in the 46th round
-		     (SPEC I3, V145): to the LEFT of the merit table, bottom flush with RESOURCES at
-		     y=640. The height bought eleven more rows - twenty at the same 30px pitch, the
+		     (SPEC I3, V145): to the LEFT of the merit table, bottom flush with FLAWS and OTHER
+		     (y=679 since SPEC I186, V289, V392c). The height bought eleven more rows - twenty at the same 30px pitch, the
 		     twenty-first would need 650 and there is only 640. Every other box on the tab
 		     moved 330 right: 320 wide plus the 10px gutter the tab already keeps.
 
@@ -236,170 +241,109 @@
 			</layout>
 		</layout>
 
-		<layout left="389" top="0" width="556" height="337">
+		<layout left="389" top="0" width="743" height="337">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="40" top="15" width="264" height="20" text="MERITS" horzTextAlign="center"/>
-			<label left="324" top="15" width="117" height="20" text="BOOK" horzTextAlign="center"/>
+			<label left="324" top="15" width="234" height="20" text="BOOK" horzTextAlign="center"/>
 			<!-- Column renamed to Page on request. The field is still type_* : renaming a
 			     field drops what is already saved in existing sheets (SPEC V2). -->
-			<label left="441" top="15" width="45" height="20" text="PAGE" horzTextAlign="center"/>
-			<label left="486" top="15" width="50" height="20" text="COST" horzTextAlign="center"/>
+			<label left="558" top="15" width="90" height="20" text="PAGE" horzTextAlign="center"/>
+			<label left="648" top="15" width="75" height="20" text="COST" horzTextAlign="center"/>
 
-			<layout name="dragRow_merit_m0" left="20" top="36" width="516" height="25" >
+			<layout name="dragRow_merit_m0" left="20" top="36" width="703" height="25" >
 				<MeritPicked sub="merit" num="m0" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m1" left="20" top="61" width="516" height="25" >
+			<layout name="dragRow_merit_m1" left="20" top="61" width="703" height="25" >
 				<MeritPicked sub="merit" num="m1" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m2" left="20" top="86" width="516" height="25" >
+			<layout name="dragRow_merit_m2" left="20" top="86" width="703" height="25" >
 				<MeritPicked sub="merit" num="m2" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m3" left="20" top="111" width="516" height="25" >
+			<layout name="dragRow_merit_m3" left="20" top="111" width="703" height="25" >
 				<MeritPicked sub="merit" num="m3" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m4" left="20" top="136" width="516" height="25" >
+			<layout name="dragRow_merit_m4" left="20" top="136" width="703" height="25" >
 				<MeritPicked sub="merit" num="m4" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m5" left="20" top="161" width="516" height="25" >
+			<layout name="dragRow_merit_m5" left="20" top="161" width="703" height="25" >
 				<MeritPicked sub="merit" num="m5" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m6" left="20" top="186" width="516" height="25" >
+			<layout name="dragRow_merit_m6" left="20" top="186" width="703" height="25" >
 				<MeritPicked sub="merit" num="m6" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m7" left="20" top="211" width="516" height="25" >
+			<layout name="dragRow_merit_m7" left="20" top="211" width="703" height="25" >
 				<MeritPicked sub="merit" num="m7" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m8" left="20" top="236" width="516" height="25" >
+			<layout name="dragRow_merit_m8" left="20" top="236" width="703" height="25" >
 				<MeritPicked sub="merit" num="m8" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m9" left="20" top="261" width="516" height="25" >
+			<layout name="dragRow_merit_m9" left="20" top="261" width="703" height="25" >
 				<MeritPicked sub="merit" num="m9" lbl="Select Merit"/>
 			</layout>
-			<layout name="dragRow_merit_m10" left="20" top="286" width="516" height="25" >
+			<layout name="dragRow_merit_m10" left="20" top="286" width="703" height="25" >
 				<MeritPicked sub="merit" num="m10" lbl="Select Merit"/>
 			</layout>
 		</layout>
 
-		<layout left="389" top="342" width="556" height="337">
+		<layout left="389" top="342" width="743" height="337">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="40" top="15" width="264" height="20" text="FLAWS" horzTextAlign="center"/>
-			<label left="324" top="15" width="117" height="20" text="BOOK" horzTextAlign="center"/>
-			<label left="441" top="15" width="45" height="20" text="PAGE" horzTextAlign="center"/>
-			<label left="486" top="15" width="50" height="20" text="COST" horzTextAlign="center"/>
+			<label left="324" top="15" width="234" height="20" text="BOOK" horzTextAlign="center"/>
+			<label left="558" top="15" width="90" height="20" text="PAGE" horzTextAlign="center"/>
+			<label left="648" top="15" width="75" height="20" text="COST" horzTextAlign="center"/>
 
-			<layout name="dragRow_merit_f0" left="20" top="36" width="516" height="25" >
+			<layout name="dragRow_merit_f0" left="20" top="36" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f0" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f1" left="20" top="61" width="516" height="25" >
+			<layout name="dragRow_merit_f1" left="20" top="61" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f1" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f2" left="20" top="86" width="516" height="25" >
+			<layout name="dragRow_merit_f2" left="20" top="86" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f2" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f3" left="20" top="111" width="516" height="25" >
+			<layout name="dragRow_merit_f3" left="20" top="111" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f3" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f4" left="20" top="136" width="516" height="25" >
+			<layout name="dragRow_merit_f4" left="20" top="136" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f4" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f5" left="20" top="161" width="516" height="25" >
+			<layout name="dragRow_merit_f5" left="20" top="161" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f5" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f6" left="20" top="186" width="516" height="25" >
+			<layout name="dragRow_merit_f6" left="20" top="186" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f6" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f7" left="20" top="211" width="516" height="25" >
+			<layout name="dragRow_merit_f7" left="20" top="211" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f7" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f8" left="20" top="236" width="516" height="25" >
+			<layout name="dragRow_merit_f8" left="20" top="236" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f8" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f9" left="20" top="261" width="516" height="25" >
+			<layout name="dragRow_merit_f9" left="20" top="261" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f9" lbl="Select Flaw"/>
 			</layout>
-			<layout name="dragRow_merit_f10" left="20" top="286" width="516" height="25" >
+			<layout name="dragRow_merit_f10" left="20" top="286" width="703" height="25" >
 				<MeritPicked sub="flaw" num="f10" lbl="Select Flaw"/>
 			</layout>
 		</layout>
 
-		<layout left="1410" top="0" width="225" height="337">
+		<!-- 42nd batch (SPEC I186b/c): the nine note boxes beside these two left on request and their
+		     fields are declared ORPHANS (SPEC I3) - a saved sheet keeps the text, nothing shows it.
+		     DERANGEMENTS and OTHER are the twins of MERITS and FLAWS on the Y axis now (SPEC V392b),
+		     5px right of them. -->
+		<layout left="1137" top="0" width="225" height="337">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="185" height="20" text="DERANGEMENTS" horzTextAlign="center"/>
 
 			<textEditor left="35" top="36" width="155" height="284" field="derangements"/>
 		</layout>
 
-		<layout left="950" top="0" width="225" height="166">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="185" height="20" text="ALLIES" horzTextAlign="center"/>
-
-			<textEditor left="35" top="36" width="155" height="109" field="allies"/>
-		</layout>
-
-		<layout left="1180" top="0" width="225" height="166">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="185" height="20" text="MENTOR" horzTextAlign="center"/>
-
-			<textEditor left="35" top="36" width="155" height="109" field="mentor"/>
-		</layout>
-
-		<layout left="950" top="342" width="225" height="166">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="185" height="20" text="CONTACTS" horzTextAlign="center"/>
-
-			<textEditor left="35" top="36" width="155" height="109" field="contacts"/>
-		</layout>
-
-		<layout left="1180" top="342" width="225" height="166">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="185" height="20" text="FAME" horzTextAlign="center"/>
-
-			<textEditor left="35" top="36" width="155" height="109" field="fame"/>
-		</layout>
-
-		<layout left="1180" top="513" width="225" height="166">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="185" height="20" text="BASE OF OPERATIONS" horzTextAlign="center"/>
-
-			<textEditor left="35" top="36" width="155" height="109" field="baseOfOperation"/>
-		</layout>
-
-		<layout left="950" top="171" width="225" height="166">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="185" height="20" text="RESOURCES" horzTextAlign="center"/>
-
-			<textEditor left="35" top="36" width="155" height="109" field="resources"/>
-		</layout>
-
-		<layout left="1180" top="171" width="225" height="166">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<!-- Retainers was renamed to Guides on request. The field is still `retainers`:
-			     renaming it would drop what is already saved in existing sheets (SPEC V2). -->
-			<label left="20" top="15" width="185" height="20" text="GUIDES" horzTextAlign="center"/>
-
-			<textEditor left="35" top="36" width="155" height="109" field="retainers"/>
-		</layout>
-
-		<layout left="1410" top="342" width="225" height="166">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="185" height="20" text="ARTIFACTS" horzTextAlign="center"/>
-
-			<textEditor left="35" top="36" width="155" height="109" field="status"/>
-		</layout>
-
-		<layout left="950" top="513" width="225" height="166">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="185" height="20" text="INFLUENCE" horzTextAlign="center"/>
-
-			<textEditor left="35" top="36" width="155" height="109" field="influence"/>
-		</layout>
-
-		<layout left="1410" top="513" width="225" height="166">
+		<layout left="1137" top="342" width="225" height="337">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="185" height="20" text="OTHER" horzTextAlign="center"/>
 
 			<!-- ponytail: the plain "other" field name is already owned by WoD20.3.lfm sheet-wide; renamed to bgOther per SPEC V1 -->
-			<textEditor left="35" top="36" width="155" height="109" field="bgOther"/>
+			<textEditor left="35" top="36" width="155" height="284" field="bgOther"/>
 		</layout>
 
 

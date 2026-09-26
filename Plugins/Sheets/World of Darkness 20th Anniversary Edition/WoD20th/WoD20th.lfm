@@ -4868,6 +4868,38 @@
 				return out;
 			end;
 
+			-- The nine note boxes the 42nd batch took off the Traits tab are DELETED BY DECISION,
+			-- not orphans: the user read "deleting has no way back" and chose it (SPEC Q105.1,
+			-- I186g, V362d/f). So the text leaves the NDB too, on every character of the sheet: the
+			-- root ALWAYS - removed from the column or not, it still holds its own copy, and asking
+			-- mcRootGone would make a third reader of that mark (SPEC V499d) - plus every mcChar.
+			-- The `~= nil` is what keeps this from writing 9 x N fields and syncing the sheet on
+			-- every open: after the first open there is nothing left to clear. No dataLink on these
+			-- names: V362(c) forbids watching a deleted one.
+			DELETED_FIELDS = { "allies", "mentor", "resources", "retainers", "contacts", "fame", "status", "influence", "baseOfOperation" };
+
+			function purgeDeleted()
+				if MC.root == nil then return; end;
+
+				local nodes = { MC.root };
+
+				if MC.chars ~= nil then
+					local kids = ndb.getChildNodes(MC.chars);
+
+					for i = 1, #kids, 1 do nodes[#nodes + 1] = kids[i]; end;
+				end;
+
+				for i = 1, #nodes, 1 do
+					local n = nodes[i];
+
+					for j = 1, #DELETED_FIELDS, 1 do
+						local f = DELETED_FIELDS[j];
+
+						if n[f] ~= nil then n[f] = nil; end;
+					end;
+				end;
+			end;
+
 			-- Runs once per open, from the root onNodeReady, BEFORE the reveal timer (SPEC I169d).
 			-- Finds mcChars and mcPreset if a previous session made them; never creates either -
 			-- a ficha opened with the flag OFF must leave the NDB exactly as it was (SPEC V492e).
@@ -10219,5 +10251,9 @@
 		mcInit(self);
 
 		setTimeout(function() sheetReveal(self); end, 1500);
+
+		-- LAST, after the reveal is armed (SPEC I186g): it needs what mcInit found, and a write
+		-- the host refuses to a player who only reads this sheet must not cost the reveal.
+		purgeDeleted();
 	</event>
 </form>
