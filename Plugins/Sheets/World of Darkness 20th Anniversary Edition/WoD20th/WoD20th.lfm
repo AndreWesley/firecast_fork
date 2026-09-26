@@ -4716,10 +4716,37 @@
 				if found["edtPopDesc"] ~= nil then found["edtPopDesc"].text = txt; end;
 
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+				scrimFit(found["popScrim"]);
 
 				found["popDesc"].visible = true;
 				kbEscArmed = true;
 				kbRefocus(from);
+			end;
+
+			-- Sizes a scrim that was just raised to its parent, by hand (SPEC I184f, B186, V525). It
+			-- is born hidden with align="contents", and the five raises only wrote visible: the FIRST
+			-- time it came up it left part of the sheet undarkened. Re-writing align to make the host
+			-- lay it out again did NOT fix that on screen (T1149), so the rect is no longer asked for:
+			-- it is read off the parent - sheetMain, already on screen at its final size when the
+			-- player clicks - and written, and the parent is repainted whole, in case the host had
+			-- only invalidated the rect the scrim used to have. `?` that these two cover it - T1152
+			-- proves it on screen. Every raise, not only the first: six writes per click and no
+			-- state to remember. The XML keeps align="contents"; from the first raise on Lua owns
+			-- the rect, so a host resize under an OPEN window keeps the old size until the next raise.
+			function scrimFit(s)
+				if s == nil then return; end;
+
+				local p = s.parent;
+
+				if p == nil then return; end;
+
+				s.align = "none";
+				s.left = 0;
+				s.top = 0;
+				s.width = p.width;
+				s.height = p.height;
+
+				p:needRepaint();
 			end;
 
 			function popClose(from)
@@ -5121,6 +5148,7 @@
 
 				if found["mcSettingsScope"] ~= nil then found["mcSettingsScope"].node = MC.root; end;
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+				scrimFit(found["popScrim"]);
 				if found["mcSettings"] ~= nil then found["mcSettings"].visible = true; end;
 
 				-- AFTER the box is up, the way popOpen does it: focus on a hidden control does not
@@ -5300,6 +5328,7 @@
 				noteTipHide(from);
 
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+				scrimFit(found["popScrim"]);
 
 				found["popNote"].visible = true;
 
@@ -5414,6 +5443,7 @@
 				noteTipHide(from);
 
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+				scrimFit(found["popScrim"]);
 
 				found["popSpec"].visible = true;
 
@@ -6697,6 +6727,7 @@
 				if found["dynMfTitle"] ~= nil then found["dynMfTitle"].text = title; end;
 				if found["edtMfQuery"] ~= nil then found["edtMfQuery"].text = ""; end;
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
+				scrimFit(found["popScrim"]);
 
 				MF.load = MF.load + 1;
 
@@ -9401,8 +9432,8 @@
 			and on nothing else (SPEC I102a, V333b). It is NOT align=client: a second child claiming
 			the client rect is what V190 refuses, and the one that loses is simply not drawn (B41).
 
-			The scrim's 70% is opacity= over color="black" - the era's box tone, the way the two
-			tooltip backgrounds are built (SPEC I182a). Not "#000000": black and #000000 are ONE
+			The scrim's 80% is opacity= over color="black" - the era's box tone, the way the two
+			tooltip backgrounds are built (SPEC I182a, I184a). Not "#000000": black and #000000 are ONE
 			canonical key to applyTheme, and a second palette entry for it made pairs() decide which
 			value the boxes got (SPEC B185, V524). The host reads an eight-digit colour with the
 			alpha LAST, so the alpha-first literals this scrim carried for eleven batches were
@@ -9417,7 +9448,7 @@
 			V280/V298 collector would sweep it up, and a floating overlay has no neighbour to be 5px
 			from - it is excluded there BY NAME, the way cboRoad is named in V328c (SPEC I73, I76a).
 		-->
-		<rectangle name="popScrim" align="contents" color="black" opacity="0.70" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
+		<rectangle name="popScrim" align="contents" color="black" opacity="0.80" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
 
 		<layout name="popDesc" left="440" top="150" width="500" height="490" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
@@ -9802,7 +9833,7 @@
 		     two boxes, so it paints over mfSearch and under this frame, with popScrim's own
 		     align/color/opacity (SPEC I181a). mfOpen raises it through the re-keyed `popScrim` at
 		     depth 2; a click on it is a click outside THIS box, so it closes this box only (mfClose). -->
-		<rectangle name="popScrimB" align="contents" color="black" opacity="0.70" strokeColor="#00000000" visible="false" onClick="mfClose(self);"/>
+		<rectangle name="popScrimB" align="contents" color="black" opacity="0.80" strokeColor="#00000000" visible="false" onClick="mfClose(self);"/>
 		<layout name="mfSearchB" left="340" top="120" width="1000" height="635" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label name="dynMfTitleB" left="60" top="15" width="400" height="20" horzTextAlign="center"/>

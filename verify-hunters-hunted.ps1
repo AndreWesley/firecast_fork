@@ -1528,7 +1528,7 @@ foreach ($f in $files) {
         # not a box, so no corner. Cut by the PARENT's exact name, as V40/V287 cut the tips.
         if ($r.GetAttribute("align") -eq 'contents' -and $r.ParentNode.GetAttribute("name") -in @('noteTip', 'specTip')) { $tipFloorCut68++; continue }
         # The two scrims (SPEC I182a, 37th batch): black by name so applyTheme gives them the era's
-        # box tone under opacity 0.70, align="contents" inside sheetMain - a fade, not a box, no corner.
+        # box tone under opacity 0.80, align="contents" inside sheetMain - a fade, not a box, no corner.
         if ($r.GetAttribute("align") -eq 'contents' -and @('popScrim', 'popScrimB') -ccontains $r.GetAttribute("name")) { $scrimCut68++; continue }
         if ($r.GetAttribute("align") -eq 'client' -and $r.ParentNode.SelectSingleNode("rectangle[@onClick]")) { $floorCut++; continue }
         if ($r.GetAttribute("align") -eq 'client' -and (IsBandLayout $r.ParentNode)) { $bandCut68++; continue }
@@ -16693,6 +16693,53 @@ if ($maps524 -lt 12) { $v524Bad += "$maps524 palette map(s) read, expected 12 (4
 if ($v524Bad) { foreach ($b in @($v524Bad | Select-Object -Unique)) { Fail "V524 $b" } }
 else { Pass "V524 $maps524 palette maps read, NAMED_COLORS off the source, and no two keys share a canonical form" }
 
+# ---- V525: the scrim re-aligns on EVERY raise ------------------------------------------------------------------
+# SPEC I184b/c/f, B186 (39th-40th batch): born hidden with align="contents", the scrim left part of the sheet
+# undarkened the first time it came up, and re-writing align did not fix it on screen (T1149). (a) scrimFit
+# reads the parent into a local, writes align "none" (never "contents"), left 0, top 0, width and height off
+# that local, and repaints the parent AFTER the geometry; (b) DERIVED like V503(d): every function that
+# raises popScrim calls scrimFit(found["popScrim"]) AFTER that write - a new raise that forgets it reddens
+# by NAME.
+$v525Bad = @()
+$fit525  = NoComments (LuaFn $rootTxt 'scrimFit')
+$up525   = 'if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;'
+$call525 = 'scrimFit(found["popScrim"]);'
+$raise525 = @([regex]::Matches($rootTxt, "(?ms)^\t\t\tfunction\s+\w+\s*\(.*?\r?\n\t\t\tend;") | ForEach-Object { $_.Value } | Where-Object { $_.Contains($up525) })
+if ($fit525 -eq '' -or $raise525.Count -lt 5) { $v525Bad += "scrimFit was not found or only $($raise525.Count) function(s) raise popScrim - expected 5 at least; this check reads nothing (SPEC V209)" }
+else {
+    $par525 = [regex]::Match($fit525, 'local\s+(\w+)\s*=\s*s\.parent\s*;')
+    $pn525 = if ($par525.Success) { $par525.Groups[1].Value } else { '' }
+    $none525 = @([regex]::Matches($fit525, '\.align\s*=\s*"none"'))
+    $cont525 = @([regex]::Matches($fit525, '\.align\s*=\s*"contents"'))
+    if (-not $par525.Success) { $v525Bad += "(a) scrimFit does not read s.parent into a local - the rect has to come off sheetMain, not off the host's realign (SPEC I184f)" }
+    elseif ($none525.Count -ne 1 -or $cont525.Count -ne 0) { $v525Bad += "(a) scrimFit writes align 'none' $($none525.Count) time(s) and 'contents' $($cont525.Count) - once and never: the align rewrite did not fix the first raise on screen (SPEC I184f, T1149)" }
+    else {
+        $geo525 = @(
+            @{ n = 'left';   re = 's\.left\s*=\s*0\s*;' },
+            @{ n = 'top';    re = 's\.top\s*=\s*0\s*;' },
+            @{ n = 'width';  re = ('s\.width\s*=\s*' + $pn525 + '\.width\s*;') },
+            @{ n = 'height'; re = ('s\.height\s*=\s*' + $pn525 + '\.height\s*;') }
+        )
+        $last525 = -1
+        foreach ($g525 in $geo525) {
+            $m525 = @([regex]::Matches($fit525, $g525.re))
+            if ($m525.Count -ne 1) { $v525Bad += "(a) scrimFit writes s.$($g525.n) off the parent $($m525.Count) time(s) - expected exactly one (SPEC I184f)" }
+            elseif ($m525[0].Index -gt $last525) { $last525 = $m525[0].Index }
+        }
+        $rep525 = @([regex]::Matches($fit525, ('\b' + $pn525 + ':needRepaint\(\)\s*;')))
+        if ($rep525.Count -ne 1) { $v525Bad += "(a) scrimFit calls $pn525`:needRepaint() $($rep525.Count) time(s) - once, so the area the scrim now covers is repainted even if the host only invalidated its old rect (SPEC I184f)" }
+        elseif ($rep525[0].Index -lt $last525) { $v525Bad += "(a) scrimFit repaints the parent BEFORE the last geometry write - the repaint would invalidate the old rect (SPEC I184f)" }
+    }
+    foreach ($f525 in $raise525) {
+        $n525 = [regex]::Match($f525, 'function\s+(\w+)').Groups[1].Value
+        $iUp525 = $f525.IndexOf($up525)
+        $iFit525 = $f525.IndexOf($call525, $iUp525)
+        if ($iFit525 -lt 0) { $v525Bad += "(b) $n525 raises popScrim without scrimFit after it - the first time it opens the fade would keep its load-time rect (SPEC I184c, B186)" }
+    }
+}
+if ($v525Bad) { foreach ($b in $v525Bad) { Fail "V525 $b" } }
+else { Pass "V525 scrimFit writes the parent's rect and repaints it, and all $($raise525.Count) raises of popScrim call it after the visible write" }
+
 # ---- V351: the ROAD label rides on the picker's own line -------------------------------
 # SPEC C Q27, I99k-m, T801. The user asked for the label beside the dropdown; what it BUYS is
 # 25px of height off three boxes, and what it COSTS is 51px of picker width - measured, one
@@ -24294,15 +24341,15 @@ if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -e
     $link502 = $root25Doc.SelectSingleNode("//dataLink[contains(@onChange,'mcBarsSoon(')]")
     if ($null -eq $link502 -or $link502.GetAttribute('fields') -notmatch "'avatar'") { $v502Bad += "(b) the bars trigger does not watch avatar - setting the photo on the Main would leave the placeholder lit (SPEC V502b, V498d)" }
 
-    # (c) the unselected outline fades to 0.50 in mcRender (SPEC I175i, 30th batch); 0.70 left the outline with the 30th batch and has
-    # exactly two authored owners since the 36th - the two scrims (SPEC I181a, V502c as amended); 0.50 has two named owners (V476b).
+    # (c) the unselected outline fades to 0.50 in mcRender (SPEC I175i, 30th batch); 0.70 left the outline with the 30th batch, owned
+    # the two scrims from the 36th to the 37th, and has NO owner since the 38th - the scrims are 0.80 since the 39th and V503a/b pins them (SPEC I183b,
+    # V502c as amended); 0.50 has two named owners (V476b).
     $opAll502 = @([regex]::Matches($root25Code, 'mcOn_"\s*\.\.\s*\w+\s*\]\.opacity\s*=')).Count
     $opIn502 = [regex]::Match($render502, 'mcOn_"\s*\.\.\s*\w+\s*\]\.opacity\s*=([^;\r\n]+)')
     if ($opAll502 -ne 1 -or -not $opIn502.Success -or $opIn502.Groups[1].Value -notmatch '\b0\.50\b' -or $opIn502.Groups[1].Value -notmatch '\b1\b') { $v502Bad += "(c) mcOn_.opacity is written $opAll502 time(s) - expected exactly one, in mcRender, naming 0.50 and 1 (SPEC V502c, I175i)" }
     $o70Lua502 = @([regex]::Matches($all25Code, '\.opacity\s*=[^;\r\n]*\b0\.70?\b')).Count
     $o70Xml502 = @([regex]::Matches($all25Code, '\sopacity="0\.70?"')).Count
-    $o70Scrim502 = @([regex]::Matches($all25Code, '<rectangle name="popScrimB?"[^>]*\sopacity="0\.70"')).Count
-    if ($o70Lua502 -ne 0 -or $o70Xml502 -ne 2 -or $o70Scrim502 -ne 2) { $v502Bad += "(c) 0.70 is in $o70Lua502 runtime opacity write(s) and $o70Xml502 authored opacity ($o70Scrim502 of them on the scrims) - its only owners are popScrim and popScrimB since the 36th batch, and the outline is 0.50 (SPEC V502c, I175i, I181a, V244)" }
+    if ($o70Lua502 -ne 0 -or $o70Xml502 -ne 0) { $v502Bad += "(c) 0.70 is in $o70Lua502 runtime opacity write(s) and $o70Xml502 authored opacity - it has no owner since the 38th batch: the scrims are 0.80 and the outline is 0.50 (SPEC V502c, I183b, I175i, V244)" }
 
     # (d) the Name label sits 6px left of the name edit, on the edit's own line.
     $nameLbl502 = @($tpl502.SelectNodes(".//label[@text='Name']"))
@@ -24395,8 +24442,8 @@ if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -e
 if ($v502Bad) { foreach ($b in $v502Bad) { Fail "V502 $b" } }
 else { Pass "V502 Add and Settings tile the band, the photo's placeholder is one hidden line written once, the unselected outline fades to 0.50, and Name plus the three bar labels sit in their columns with the bars on one left and width" }
 
-# ---- V503: every window darkens the tabs at 70% through opacity=, the picker on top included -----------------
-# SPEC I172a/b (27th batch), 70% since I180c (35th batch), opacity= over #000000 and align="contents" inside sheetMain
+# ---- V503: every window darkens the tabs at 80% through opacity=, the picker on top included -----------------
+# SPEC I172a/b (27th batch), 70% since I180c (35th batch), 85% since I183a (38th), 80% since I184a (39th), opacity= over black and align="contents" inside sheetMain
 # since I181a (36th batch, B184: the alpha-first literals never painted). ONE tone and not a transparent one; the twin under the second picker
 # is the same rectangle declared between the two boxes; and (d) is DERIVED, never a typed roster:
 # every hidden window layout over popScrim must be raised by a function that raises popScrim too,
@@ -24412,8 +24459,8 @@ else {
     foreach ($s503 in @($scrim503, $scrimB503)) {
         if ($null -eq $s503) { continue }
         $sn503 = $s503.GetAttribute('name')
-        if ($s503.GetAttribute('color') -ne 'black') { $v503Bad += "(a) $sn503 authors color '$($s503.GetAttribute('color'))' - the fade is color=black, the era's box tone like the tips, and the 70% comes from opacity=; a second key for black collides with it in the palettes (SPEC I182a, B185, B184)" }
-        if ($s503.GetAttribute('opacity') -ne '0.70') { $v503Bad += "(a) $sn503 authors opacity '$($s503.GetAttribute('opacity'))' - the user asked for 70% (SPEC I181a, V503a)" }
+        if ($s503.GetAttribute('color') -ne 'black') { $v503Bad += "(a) $sn503 authors color '$($s503.GetAttribute('color'))' - the fade is color=black, the era's box tone like the tips, and the 85% comes from opacity=; a second key for black collides with it in the palettes (SPEC I182a, B185, B184)" }
+        if ($s503.GetAttribute('opacity') -ne '0.80') { $v503Bad += "(a) $sn503 authors opacity '$($s503.GetAttribute('opacity'))' - the user asked for 80% (SPEC I184a, V503a)" }
         if ($s503.GetAttribute('align') -ne 'contents') { $v503Bad += "(a) $sn503 is not align='contents' - it has to fill sheetMain, the strip and the tabs, and leave the column clear (SPEC I181a, V496d)" }
         foreach ($g503 in @('left', 'top', 'width', 'height')) { if ($s503.HasAttribute($g503)) { $v503Bad += "(a) $sn503 authors $g503= - with align=contents the geometry is the parent's (SPEC I181a)" } }
     }
@@ -24457,7 +24504,7 @@ else {
     }
 }
 if ($v503Bad) { foreach ($b in $v503Bad) { Fail "V503 $b" } }
-else { Pass "V503 one 70% fade by opacity over black with align=contents on both scrims inside sheetMain, the twin between the two pickers, and every window raised with it" }
+else { Pass "V503 one 80% fade by opacity over black with align=contents on both scrims inside sheetMain, the twin between the two pickers, and every window raised with it" }
 
 # ---- V504: the ! of a trait - one per attribute, book ability and typed row, none on a virtue ----
 # SPEC I172c/d, Q92.3. The ability's ! reads the LIVE field of its first dot because the era
