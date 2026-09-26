@@ -4772,15 +4772,17 @@
 			-- ONE Lua environment per form instance (SPEC I168/R168, top of this script) is what
 			-- makes a second `sheet` possible at all: MC.root is the character the sheet was
 			-- OPENED on, MC.chars is its mcChars node (found, never created, until mcAdd needs
-			-- one) and MC.barsDue says a bars repaint is already queued (SPEC I170d). All three
-			-- are per-instance state, same shelf as WP_CLICK above (SPEC V347 - global because the
-			-- chunk-local slot went to the _ENV line, not because it is shared).
+			-- one), MC.preset is the setup the next Add Character copies (found by mcInit, created
+			-- only by mcPreset, SPEC I185d) and MC.barsDue says a bars repaint is already queued
+			-- (SPEC I170d). All four are per-instance state, same shelf as WP_CLICK above (SPEC
+			-- V347 - global because the chunk-local slot went to the _ENV line, not because it is
+			-- shared).
 			--
 			-- MC_POOL is the row ceiling the column authors (SPEC Q88.5 - and it STAYS 10, Q90.6);
 			-- MC_ROW_H/MC_DOCK_W mirror the XML's own row height and dock width so the one true
 			-- number lives here AND there, not just there (SPEC V496b, V497e). The dock is FIXED
 			-- since the 25th batch: no grip, no live width, nothing in Lua writes it (SPEC I170b).
-			MC = { root = nil, chars = nil, barsDue = false };
+			MC = { root = nil, chars = nil, preset = nil, barsDue = false };
 			MC_POOL = 10;
 			MC_ROW_H = 108;
 			MC_DOCK_W = 370;
@@ -4790,21 +4792,25 @@
 			-- position its character holds (SPEC I175h(3)) and reads the two numbers here.
 			MC_ROW_TOP0  = 4;
 			MC_ROW_PITCH = 114;
-			-- The settings a CHARACTER owns rather than a FICHA are the 13 mcAdd copies onto a
-			-- blank node and mcShared re-copies on every root write (SPEC I169e, Q88.8/Q88.9).
-			-- `language` stands in for `multipleCharacters` here: the flag lives on the root only
-			-- and is never mirrored onto a child (SPEC V489c) - a child does not need to know the
-			-- column that shows it exists.
-			MC_SHARED_FIELDS = { "game", "sheetTheme", "language", "stShowNumina", "stShowDisciplines",
+			-- The storyteller settings are the CHARACTER's since the 41st batch (SPEC I185a,
+			-- V526b, user 2026-09-26 - reversing Q88.8's "change one, change all"): each node
+			-- keeps its own twelve, the WoD20.10 box shows the active one's, and the column's
+			-- Settings window holds the twelve the NEXT Add Character copies - MC.preset, never
+			-- a character that already exists. `language` is not here: it is still the FICHA's,
+			-- one for every character, and mcShared is what copies it (SPEC Q104.3). Neither is
+			-- `multipleCharacters`, which lives on the root only (SPEC V488d).
+			MC_PRESET_FIELDS = { "game", "sheetTheme", "stShowNumina", "stShowDisciplines",
 				"stFreeBuy", "stEditClanDisc", "stEditSpentXP", "stManualAffiliation", "stManualClanFamily",
 				"healthLevels", "stSpecCost", "stBackgroundCost" };
 
 			-- What survives when the ROOT character is removed (SPEC I170f, V499c): the FICHA's
-			-- own fields - the 13 shared settings, the flag, the active index, the column order and the removal
-			-- mark itself. Everything else on the root is the character, and mcWipe clears it.
-			MC_KEEP = { multipleCharacters = true, mcActive = true, mcRootGone = true, mcOrder = true };
+			-- own fields - the language, the flag, the active index, the column order and the
+			-- removal mark itself - plus the root's twelve settings, which mcPreset seeds from and
+			-- the sheet falls back on when the flag goes OFF. Everything else on the root is the
+			-- character, and mcWipe clears it.
+			MC_KEEP = { language = true, multipleCharacters = true, mcActive = true, mcRootGone = true, mcOrder = true };
 
-			for mcI = 1, #MC_SHARED_FIELDS, 1 do MC_KEEP[MC_SHARED_FIELDS[mcI]] = true; end;
+			for mcI = 1, #MC_PRESET_FIELDS, 1 do MC_KEEP[MC_PRESET_FIELDS[mcI]] = true; end;
 
 			-- The three bars of a row (SPEC I170d): the control prefix, the dots or boxes that ARE
 			-- the current value, and the label the hint says. The MAXIMUM is not here - it has one
@@ -4823,7 +4829,7 @@
 			MC_NAMES = {
 				mcDock = true, mcRows = true, btnMcAdd = true, btnMcSettings = true, dynMcTitle = true,
 				sheetMain = true, mcSettings = true, mcSettingsScope = true, stSharedScope = true,
-				langScope = true, popScrim = true,
+				langScope = true, mcRootScope = true, popScrim = true,
 			};
 
 			for mcI = 1, MC_POOL, 1 do
@@ -4863,22 +4869,22 @@
 			end;
 
 			-- Runs once per open, from the root onNodeReady, BEFORE the reveal timer (SPEC I169d).
-			-- Finds mcChars if a previous session made one; never creates it - a ficha opened with
-			-- the flag OFF must leave the NDB exactly as it was (SPEC V492e). Pins the three
-			-- root-scoped boxes (storyteller settings, language, the settings window mirror) onto
-			-- MC.root so their field= always reads and writes the FICHA, whichever node is active.
+			-- Finds mcChars and mcPreset if a previous session made them; never creates either -
+			-- a ficha opened with the flag OFF must leave the NDB exactly as it was (SPEC V492e).
+			-- Pins the three boxes that hold the FICHA's own fields (the Multiple Characters flag,
+			-- language, the column order) onto MC.root, whichever node is active. The settings
+			-- window is NOT pinned here: its node is the preset, which may not exist yet, and
+			-- mcSettingsOpen pins it every time it opens (SPEC I185d, V526c).
 			function mcInit(from)
 				if from == nil then return; end;
 				if MC.root == nil then MC.root = sheet; end;
 
-				if MC.chars == nil then
+				if MC.chars == nil or MC.preset == nil then
 					local kids = ndb.getChildNodes(MC.root);
 
 					for i = 1, #kids, 1 do
-						if ndb.getNodeName(kids[i]) == "mcChars" then
-							MC.chars = kids[i];
-							break;
-						end;
+						if ndb.getNodeName(kids[i]) == "mcChars" then MC.chars = MC.chars or kids[i]; end;
+						if ndb.getNodeName(kids[i]) == "mcPreset" then MC.preset = MC.preset or kids[i]; end;
 					end;
 				end;
 
@@ -4886,7 +4892,7 @@
 
 				if found["stSharedScope"] ~= nil then found["stSharedScope"].node = MC.root; end;
 				if found["langScope"] ~= nil then found["langScope"].node = MC.root; end;
-				if found["mcSettingsScope"] ~= nil then found["mcSettingsScope"].node = MC.root; end;
+				if found["mcRootScope"] ~= nil then found["mcRootScope"].node = MC.root; end;
 
 				mcApply(from);
 
@@ -5039,9 +5045,32 @@
 				mcShow(mcNodes()[k], from);
 			end;
 
-			-- A blank node under mcChars, seeded with the 13 shared fields and nothing else
-			-- (SPEC Q88.9) - no baseline, no name, no dots. mcChars is created here, lazily, the
-			-- first time the pool needs one (SPEC I169i). The count is read AGAIN after the create
+			-- The setup the next Add Character copies (SPEC I185d, V526d): a node of its own under
+			-- the root, so what the column's Settings window changes never lands on a character
+			-- that already exists (user 2026-09-26). Created lazily, the first time the window
+			-- opens or a character is added - never by mcInit (SPEC V492e) - and seeded ONCE, from
+			-- the root's own twelve, so the window first opens showing what it showed before this
+			-- node existed (SPEC Q104.2).
+			function mcPreset()
+				if MC.preset == nil then
+					MC.preset = ndb.createChildNode(MC.root, "mcPreset");
+
+					for i = 1, #MC_PRESET_FIELDS, 1 do
+						local f = MC_PRESET_FIELDS[i];
+
+						MC.preset[f] = MC.root[f];
+					end;
+				end;
+
+				return MC.preset;
+			end;
+
+			-- A blank node under mcChars, seeded with the preset's twelve settings and the
+			-- ficha's language and nothing else (SPEC Q88.9, V526e) - no baseline, no name, no
+			-- dots. The language comes from the root because it is not the character's: left nil,
+			-- the root's <dataLink field="language" defaultValue="pt"> would write pt into the new
+			-- character the moment it became active. mcChars is created here, lazily, the first
+			-- time the pool needs one (SPEC I169i). The count is read AGAIN after the create
 			-- because the new node has to be part of it for the select below to land on it, not on
 			-- the row that was last before it.
 			function mcAdd(from)
@@ -5049,13 +5078,16 @@
 
 				MC.chars = MC.chars or ndb.createChildNode(MC.root, "mcChars");
 
+				local p = mcPreset();
 				local n = ndb.createChildNode(MC.chars, "mcChar");
 
-				for i = 1, #MC_SHARED_FIELDS, 1 do
-					local f = MC_SHARED_FIELDS[i];
+				for i = 1, #MC_PRESET_FIELDS, 1 do
+					local f = MC_PRESET_FIELDS[i];
 
-					n[f] = MC.root[f];
+					n[f] = p[f];
 				end;
+
+				n.language = MC.root.language;
 
 				mcSelect(#mcNodes(), from);
 			end;
@@ -5117,23 +5149,19 @@
 				ndb.endUpdate(node);
 			end;
 
-			-- The mirror (SPEC I169e(3)): copies the 13 shared fields from the root onto every
-			-- mcChar, only where they differ, then repaints. The ONLY caller is the <dataLink
-			-- onChange="mcShared(self);"> inside stSharedScope (WoD20.10/T1069) - a dataLink
-			-- watches a FIELD, not a widget, so one link catches the settings box, the settings
-			-- window and the language combo alike, all three pinned to the same root (SPEC V492d).
+			-- The mirror, down to the one field still shared (SPEC I185d, V526f): copies the
+			-- ficha's language from the root onto every mcChar, only where it differs, then
+			-- re-applies the column. The storyteller settings are NOT copied any more - they are
+			-- each character's own, and a change made on one must never reach another (user
+			-- 2026-09-26). The ONLY caller is the <dataLink onChange="mcShared(self);"> inside
+			-- WoD20.10's stSharedScope, pinned to the root and watching `language` and
+			-- `multipleCharacters` (SPEC V526a, V492d).
 			function mcShared(from)
 				if MC.root ~= nil and MC.chars ~= nil then
 					local kids = ndb.getChildNodes(MC.chars);
 
 					for i = 1, #kids, 1 do
-						local n = kids[i];
-
-						for j = 1, #MC_SHARED_FIELDS, 1 do
-							local f = MC_SHARED_FIELDS[j];
-
-							if n[f] ~= MC.root[f] then n[f] = MC.root[f]; end;
-						end;
+						if kids[i].language ~= MC.root.language then kids[i].language = MC.root.language; end;
 					end;
 				end;
 
@@ -5141,12 +5169,13 @@
 			end;
 
 			-- Opens the settings window the same way popOpen opens the ? box (SPEC I169e(4)):
-			-- re-pin, then show scrim and box. Re-pinning here as well as in mcInit costs nothing
-			-- and covers a window opened before the first render ever ran.
+			-- pin, then show scrim and box. The window edits the PRESET - the setup the next Add
+			-- Character copies - never the root or any character that exists (SPEC I185c, V526c),
+			-- and this is the one place it is pinned: mcPreset creates the node on first use.
 			function mcSettingsOpen(from)
 				local found = xpFind(tabRootOf(from), MC_NAMES, {});
 
-				if found["mcSettingsScope"] ~= nil then found["mcSettingsScope"].node = MC.root; end;
+				if found["mcSettingsScope"] ~= nil then found["mcSettingsScope"].node = mcPreset(); end;
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
 				scrimFit(found["popScrim"]);
 				if found["mcSettings"] ~= nil then found["mcSettings"].visible = true; end;
@@ -9468,37 +9497,38 @@
 		</layout>
 
 		<!--
-			SPEC I169e(4)/T1070d - the Storyteller Settings mirror for whichever character is
-			showing. mcSettingsScope pins to MC.root in mcInit/mcSettingsOpen (never the active
-			node), so every field here reads and writes the FICHA's settings even with a child
-			selected (SPEC Q88.8) - the same reason stSharedScope (WoD20.10) exists.
+			SPEC I185c (41st batch, user 2026-09-26) - the SETUP the next Add Character copies,
+			NOT a mirror of any character's settings. mcSettingsScope pins to the preset node
+			(mcPreset, a child of the root) in mcSettingsOpen alone, so nothing changed here
+			ever reaches a character that already exists: each character keeps its own twelve
+			and changes them in its own STORYTELLER SETTINGS box (WoD20.10). The 24th batch had
+			pinned this window to the root as a twin of that box (SPEC I169e(4), Q88.8 - "change
+			one, change all"); the user reversed it.
 
-			Same 13 field= as stSharedScope (SPEC V489c: the gate compares both sides), same
-			labels, same items=/values=/defaultValue and the same x columns (35 label / 210
-			entry, 150 wide, SPEC V243) as the box T1069 grows to 8 flags. Only the control
-			NAME gains the Mc suffix, never _2: fieldRoot (WoD20.6:2416) strips a trailing
-			"_<digits>", not letters, so Mc reads as its own key with no PICKER_LIST entry -
-			pickerItems falls back to the inline items=, and cmbItems still translates by
-			VALUE, so "Purchase Forbidden" reads pt the same way it does in the original box
+			Same 12 field= as the per-character rows of the WoD20.10 box and as MC_PRESET_FIELDS
+			(SPEC V526b: the gate compares all three), same labels, same items=/values=/
+			defaultValue and the same x columns (35 label / 210 entry, 150 wide, SPEC V243).
+			Only the control NAME gains the Mc suffix, never _2: fieldRoot (WoD20.6:2416) strips
+			a trailing "_<digits>", not letters, so Mc reads as its own key with no PICKER_LIST
+			entry - pickerItems falls back to the inline items=, and cmbItems still translates
+			by VALUE, so "Purchase Forbidden" reads pt the same way it does in the original box
 			(SPEC I169e(4), V9).
 
-			No Save button, no notes, no <dataLink onChange> here: this window writes the root
-			and the ONE dataLink that reacts lives inside stSharedScope, already pinned to the
-			same node (SPEC I169e(1), V492d) - a second reactor here would be a second owner
-			of the same event.
-
-			Height is 500, not the 440 first written in I169e(4): the last copied row
-			(Background Cost) ends at 416 + 25 = 441 inside a scope that starts at top=40, and
-			the box wants the same gap under it T1069 leaves under Save. Geometry is not
-			contract (SPEC Q88.10).
+			No Multiple Characters here (SPEC Q104.1): it turns the column on NOW, which is not
+			a setup for a character still to be added - it stays in every character's box, on
+			the root. With it gone the three prices moved up 30 and the window 500 -> 470, so
+			the last row (Background Cost) still ends at 40 + 386 + 25 = 451 and the foot under
+			it is the same 15 (SPEC V514). No Save button, no notes, no <dataLink onChange>:
+			nothing reacts to the preset until mcAdd reads it. Geometry is not contract (SPEC
+			Q88.10).
 		-->
-		<layout name="mcSettings" left="440" top="150" width="445" height="500" visible="false">
+		<layout name="mcSettings" left="440" top="150" width="445" height="470" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<label left="20" top="15" width="405" height="20" text="STORYTELLER SETTINGS" horzTextAlign="center"/>
 			<button name="btnMcSettingsClose" left="405" top="15" width="20" height="20" text="X" onClick="popClose(self);"/>
 
-			<dataScopeBox name="mcSettingsScope" left="0" top="40" width="445" height="450">
+			<dataScopeBox name="mcSettingsScope" left="0" top="40" width="445" height="420">
 				<label left="35" top="54" width="170" height="20" text="Game"/>
 				<comboBox name="cboGameMc" left="210" top="51" width="150" height="25" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}"/>
 
@@ -9512,34 +9542,37 @@
 				<checkBox name="chkEditSpentXPMc" left="35" top="231" width="375" height="25" field="stEditSpentXP" text="Edit Spent XP" onClick="kbRefocus(self);"/>
 				<checkBox name="chkManualAffiliationMc" left="35" top="261" width="375" height="25" field="stManualAffiliation" text="Edit Affiliation" onClick="kbRefocus(self);"/>
 				<checkBox name="chkManualClanFamilyMc" left="35" top="291" width="375" height="25" field="stManualClanFamily" text="Edit Clan/Family" onClick="kbRefocus(self);"/>
-				<checkBox name="chkMultipleCharsMc" left="35" top="321" width="375" height="25" field="multipleCharacters" text="Multiple Characters" onClick="kbRefocus(self);"/>
 
-				<label left="35" top="359" width="170" height="20" text="Health Levels"/>
-				<comboBox name="cmbHealthLevelsMc" left="210" top="356" width="150" height="25" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}" onChange="kbRefocus(self);"/>
+				<label left="35" top="329" width="170" height="20" text="Health Levels"/>
+				<comboBox name="cmbHealthLevelsMc" left="210" top="326" width="150" height="25" field="healthLevels" fontSize="12" horzTextAlign="center" items="{'1','2','3','4','5','6','7','8','9','10'}" values="{'1','2','3','4','5','6','7','8','9','10'}" onChange="kbRefocus(self);"/>
 				<dataLink field="healthLevels" defaultValue="7"/>
 
-				<label left="35" top="389" width="170" height="20" text="Specialty Cost"/>
-				<comboBox name="cmbSpecCostMc" left="210" top="386" width="150" height="25" field="stSpecCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5','Purchase Forbidden'}" values="{'0','1','2','3','4','5','Purchase Forbidden'}" onChange="kbRefocus(self);"/>
+				<label left="35" top="359" width="170" height="20" text="Specialty Cost"/>
+				<comboBox name="cmbSpecCostMc" left="210" top="356" width="150" height="25" field="stSpecCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5','Purchase Forbidden'}" values="{'0','1','2','3','4','5','Purchase Forbidden'}" onChange="kbRefocus(self);"/>
 				<dataLink field="stSpecCost" defaultValue="3"/>
 
-				<label left="35" top="419" width="170" height="20" text="Background Cost"/>
-				<comboBox name="cmbBgCostMc" left="210" top="416" width="150" height="25" field="stBackgroundCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5'}" values="{'0','1','2','3','4','5'}" onChange="kbRefocus(self);"/>
+				<label left="35" top="389" width="170" height="20" text="Background Cost"/>
+				<comboBox name="cmbBgCostMc" left="210" top="386" width="150" height="25" field="stBackgroundCost" fontSize="12" horzTextAlign="center" items="{'0','1','2','3','4','5'}" values="{'0','1','2','3','4','5'}" onChange="kbRefocus(self);"/>
 				<dataLink field="stBackgroundCost" defaultValue="0"/>
+			</dataScopeBox>
 
-				<!-- The column's order, mcOrder on the root (SPEC I175h(6), V509b): the one field of
-				     this box no widget owns - the link observes, Lua writes (SPEC V8) - so the rows
-				     follow another client's drag. Here and not in stSharedScope because this box is
-				     pinned to MC.root in mcInit and the field lives on the root alone; V489c reads
-				     widgets only, so the two boxes still hold the same 13. -->
+			<!-- The column's order, mcOrder on the root (SPEC I175h(6), V509b as amended by I185c):
+			     the one field of this window no widget owns - the link observes, Lua writes (SPEC
+			     V8) - so the rows follow another client's drag. It lived inside mcSettingsScope
+			     while that box was pinned to the root; now that box holds the preset, so the link
+			     has a scope of its own, pinned to MC.root by mcInit. Nothing in it paints - the
+			     explicit 0x0 geometry is SPEC V190's, not a place on screen. Here and not in
+			     WoD20.10's stSharedScope: this window is on the root form every client builds. -->
+			<dataScopeBox name="mcRootScope" left="0" top="0" width="0" height="0">
 				<dataLink field="mcOrder" onChange="mcRowOrderApply(self, false);"/>
 			</dataScopeBox>
 
 			<!-- Esc's receiver (SPEC I177b, V514): a key only reaches the control holding focus and only
 			     a text control takes it (SPEC V405), and this window had none. Read-only like
-			     edtPopDesc, no field=, outside the scope, in the empty band under the last row: 481
-			     to 485, so the box keeps its 15 of foot (SPEC V240, V280) and, read-only, its 0.75
+			     edtPopDesc, no field=, outside the scope, in the empty band under the last row: 451
+			     to 455, so the box keeps its 15 of foot (SPEC V240, V280) and, read-only, its 0.75
 			     (SPEC V111, V244). -->
-			<textEditor name="edtMcSettingsKey" left="20" top="481" width="405" height="4" readOnly="true" transparent="true" opacity="0.75" onKeyDown="escClose(self, event, false);"/>
+			<textEditor name="edtMcSettingsKey" left="20" top="451" width="405" height="4" readOnly="true" transparent="true" opacity="0.75" onKeyDown="escClose(self, event, false);"/>
 		</layout>
 		<!--
 			SPEC I170g, T1075e - the ! note window. Same shape as popDesc and raised the same way:
@@ -10034,6 +10067,18 @@
 		R170f), so twenty writes become one repaint (SPEC V498d).
 	-->
 	<dataLink fields="{'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'willpower_c1', 'willpower_c2', 'willpower_c3', 'willpower_c4', 'willpower_c5', 'willpower_c6', 'willpower_c7', 'willpower_c8', 'willpower_c9', 'willpower_c10', 'bloodPool_1', 'bloodPool_2', 'bloodPool_3', 'bloodPool_4', 'bloodPool_5', 'bloodPool_6', 'bloodPool_7', 'bloodPool_8', 'bloodPool_9', 'bloodPool_10', 'bloodPool_11', 'bloodPool_12', 'bloodPool_13', 'bloodPool_14', 'bloodPool_15', 'bloodPool_16', 'bloodPool_17', 'bloodPool_18', 'bloodPool_19', 'bloodPool_20', 'quint_1', 'quint_2', 'quint_3', 'quint_4', 'quint_5', 'quint_6', 'quint_7', 'quint_8', 'quint_9', 'quint_10', 'clanFamily', 'avatar'}" onChange="mcBarsSoon(self);"/>
+
+	<!--
+		SPEC I185e, T1154c - how many health boxes the ACTIVE character's row shows. mcRender
+		already reads each row's own n.healthLevels; what went away in the 41st batch is the
+		trigger - Health Levels used to be a shared setting, and a change fired mcShared ->
+		mcApply -> mcRender. Now it is the character's own, set in the WoD20.10 box on the
+		active node, so this link watches the active node (the root's scope, outside every
+		dataScopeBox, SPEC V526g) and repaints at once. It also fires on a switch between two
+		characters with different tracks; mcRender is idempotent, so that is one repaint more,
+		not a wrong one.
+	-->
+	<dataLink field="healthLevels" onChange="mcRender(self);"/>
 
 		<!--
 			Wave 2 of I113e (SPEC T842): the two header buttons. The SPECIALTIES list below it

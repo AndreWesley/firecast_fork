@@ -456,7 +456,12 @@ $mirrors = New-Object 'System.Collections.Generic.HashSet[string]' ([StringCompa
 # pinned to the root, never three. `language` is NOT here: it owns one widget, langScope on
 # WoD20.6 (SPEC I169e(2)) - the window has no language combo, so there is no second widget to
 # mirror it with.
-foreach ($sf169 in @('game', 'sheetTheme', 'stShowNumina', 'stShowDisciplines', 'stFreeBuy', 'stEditClanDisc', 'stEditSpentXP', 'stManualAffiliation', 'stManualClanFamily', 'healthLevels', 'stSpecCost', 'stBackgroundCost', 'multipleCharacters')) { [void]$mirrors.Add($sf169) }
+# 41st batch (SPEC I185, V526b): the two are no longer on ONE node - the box writes the ACTIVE
+# character, the window writes the preset the next Add Character copies - but they are still
+# two widgets under one field NAME, each in its own data scope (SPEC V489a), and that is what
+# this list declares. `multipleCharacters` LEFT it: the window no longer carries the flag
+# (SPEC Q104.1), so one widget owns it and listing it would be the stale declaration below.
+foreach ($sf169 in @('game', 'sheetTheme', 'stShowNumina', 'stShowDisciplines', 'stFreeBuy', 'stEditClanDisc', 'stEditSpentXP', 'stManualAffiliation', 'stManualClanFamily', 'healthLevels', 'stSpecCost', 'stBackgroundCost')) { [void]$mirrors.Add($sf169) }
 # The 94th round adds two of a different shape: a PICKER and a typed twin on one field, one
 # visible at a time behind a storyteller flag (SPEC I71, V274b). The NDB is still the single
 # source of truth and still keeps them in step - what the flag changes is which one the reader
@@ -5282,9 +5287,9 @@ else { Pass "V136 the live side is traitLevel plus at most the one dot being cli
 $flagReads = @()
 foreach ($ff in $files) {
     # SPEC V489c spirit, 24th batch: a quote right before the word is a NAME, not a read - the
-    # 'stFreeBuy' inside stSharedScope's <dataLink fields="{...}"> list (WoD20.10, the mirror's
-    # trigger, SPEC I169e) and the "stFreeBuy" inside the Lua table MC_SHARED_FIELDS both name
-    # the field so the mirror can copy it; neither one ASKS what it is set to. A read reads
+    # "stFreeBuy" inside the Lua table MC_PRESET_FIELDS (MC_SHARED_FIELDS until the 41st batch,
+    # SPEC I185d) names the field so mcPreset and mcAdd can copy it; it never ASKS what it is
+    # set to. A read reads
     # sheet.stFreeBuy - preceded by '.', which this lookbehind never excludes. This single
     # lookbehind replaces the old (?<!field=") one: field="stFreeBuy" is quote-preceded too.
     foreach ($m in [regex]::Matches((CodeOf $ff.FullName), '(?<![''"])stFreeBuy')) { $flagReads += $ff.Name }
@@ -5389,7 +5394,8 @@ function BoxOf($doc, $title) { @($doc.SelectNodes("//layout[label/@text='$title'
 # Returns one [pscustomobject] per LOGICAL child, carrying Node (the real element, for
 # anything not surfaced below), LocalName, Name and the EFFECTIVE Left/Top - the scope's own
 # left/top added on, so a caller never has to know whether a given row came through a scope or
-# not. The add is a no-op for stSharedScope and every mcRow_$(num) (both left=0/top=0) and
+# not. The add is a no-op for every mcRow_$(num) (left=0/top=0), load-bearing for stSharedScope
+# since the 41st batch shrank it to the Multiple Characters row at top=321 (SPEC I185b), and
 # load-bearing for mcSettingsScope, which opens at top=40 inside its window (SPEC I169e(4)).
 function BoxKids($box) {
     $out = New-Object System.Collections.Generic.List[object]
@@ -16740,6 +16746,103 @@ else {
 if ($v525Bad) { foreach ($b in $v525Bad) { Fail "V525 $b" } }
 else { Pass "V525 scrimFit writes the parent's rect and repaints it, and all $($raise525.Count) raises of popScrim call it after the visible write" }
 
+# ---- V526: the settings are the CHARACTER's, the column's window sets up a NEW one and touches no existing one (SPEC I185, Q104) ----
+# SPEC I185 (41st batch, user 2026-09-26, reversing Q88.8's "change one, change all"); supersedes V492(a)(c)(d)
+# and V489(c). (a) the WoD20.10 box: every setting sits outside every dataScopeBox (it binds the ACTIVE node);
+# stSharedScope holds exactly one field= widget, chkMultipleChars, and the one mcShared trigger, which watches
+# {language, multipleCharacters} and is the only one in the sheet; (b) MC_PRESET_FIELDS == the box's widgets
+# outside its scopes == mcSettingsScope's widgets, 12 each, language and multipleCharacters out; (c)
+# mcSettingsScope's node is written only in mcSettingsOpen, to mcPreset(), and mcInit pins stSharedScope,
+# langScope and mcRootScope to MC.root; (d) the preset node is created once, in mcPreset, then seeded off
+# MC.root by the MC_PRESET_FIELDS loop, and mcInit never calls mcPreset; (e) mcAdd copies the loop off
+# mcPreset(), never MC.root[, and writes n.language and nothing else by name; (f) mcShared writes only
+# .language, never names MC_PRESET_FIELDS, ends in mcApply(from) and has no caller but the trigger; (g) one
+# root dataLink outside every scope repaints the column (mcRender(self)) on healthLevels.
+$v526Bad = @()
+$st526Doc = Doc (Join-Path $dir "WoD20.10.lfm")
+$root526Doc = Doc $rootPath
+$stBox526 = BoxOf $st526Doc "STORYTELLER SETTINGS"
+$stShared526 = $st526Doc.SelectSingleNode("//dataScopeBox[@name='stSharedScope']")
+$mcSet526 = $root526Doc.SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']")
+$preset526 = NoComments (LuaFn $rootTxt 'mcPreset')
+$add526 = NoComments (LuaFn $rootTxt 'mcAdd')
+$shared526 = NoComments (LuaFn $rootTxt 'mcShared')
+$init526 = NoComments (LuaFn $rootTxt 'mcInit')
+$open526 = NoComments (LuaFn $rootTxt 'mcSettingsOpen')
+$mpf526 = [regex]::Match((NoComments $rootTxt), '(?s)MC_PRESET_FIELDS\s*=\s*\{(.*?)\};')
+if (-not $preset526 -or -not $add526 -or -not $shared526 -or -not $init526 -or -not $open526 -or -not $mpf526.Success -or $null -eq $stBox526 -or $null -eq $stShared526 -or $null -eq $mcSet526) {
+    $v526Bad += "mcPreset, mcAdd, mcShared, mcInit, mcSettingsOpen, MC_PRESET_FIELDS, the STORYTELLER SETTINGS box, stSharedScope or mcSettingsScope was not found - this check reads nothing (SPEC V209)"
+} else {
+    $mpfSet526 = @([regex]::Matches($mpf526.Groups[1].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+
+    # (a) the box follows the active character; only the flag and the trigger stay on the root.
+    if ($null -eq $stShared526.SelectSingleNode("ancestor::layout[label/@text='STORYTELLER SETTINGS']")) { $v526Bad += "(a) stSharedScope is not inside the STORYTELLER SETTINGS box (SPEC I185b)" }
+    $inScope526 = @($stBox526.SelectNodes(".//dataScopeBox//*[@field][not(self::dataLink)]") | ForEach-Object { $_.GetAttribute("field") })
+    if (($inScope526 -join ',') -ne 'multipleCharacters') { $v526Bad += "(a) the box's data scopes hold field= widget(s) {$($inScope526 -join ', ')}, expected only multipleCharacters - a setting inside a scope pinned to the root is the FICHA's again, not the active character's (SPEC V526a, I185b)" }
+    $trig526 = @($stShared526.SelectNodes(".//dataLink[contains(@onChange,'mcShared(self);')]"))
+    if ($trig526.Count -ne 1) { $v526Bad += "(a) stSharedScope holds $($trig526.Count) mcShared trigger(s), expected 1 (SPEC V526a)" }
+    else {
+        $trigF526 = @([regex]::Matches($trig526[0].GetAttribute("fields"), "'([^']+)'") | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+        if (($trigF526 -join ',') -ne 'language,multipleCharacters') { $v526Bad += "(a) the mcShared trigger watches {$($trigF526 -join ', ')}, expected {language, multipleCharacters} - a character's own setting there would be copied onto every other character (SPEC V526a)" }
+    }
+    # Swept over EVERY file: mcShared is declared on the root, its one trigger lives on WoD20.10 (was V492d).
+    $links526 = 0; $calls526 = 0
+    foreach ($f526 in $files) {
+        $c526 = NoComments (CodeOf $f526.FullName)
+        $links526 += @([regex]::Matches($c526, 'onChange="mcShared\(self\);"')).Count
+        $calls526 += @([regex]::Matches($c526, '\bmcShared\(')).Count
+    }
+    if ($links526 -ne 1) { $v526Bad += "(a) onChange=`"mcShared(self);`" appears $links526 time(s) across the sheet, expected exactly 1 (SPEC V526a, V492d)" }
+    # -1 for the declaration ("function mcShared(from)" matches too): what is left are the call sites.
+    if (($calls526 - 1) -ne $links526) { $v526Bad += "(f) mcShared is referenced $($calls526 - 1) time(s) outside its declaration, expected only the $links526 trigger (SPEC V526f, V492d)" }
+
+    # (b) one list of twelve, three places.
+    $boxOut526 = @($stBox526.SelectNodes(".//*[@field][not(self::dataLink)][not(ancestor::dataScopeBox)]") | ForEach-Object { $_.GetAttribute("field") } | Sort-Object -Unique)
+    $win526 = @($mcSet526.SelectNodes(".//*[@field][not(self::dataLink)]") | ForEach-Object { $_.GetAttribute("field") } | Sort-Object -Unique)
+    if (($mpfSet526 -join ',') -ne ($boxOut526 -join ',') -or ($mpfSet526 -join ',') -ne ($win526 -join ',')) { $v526Bad += "(b) MC_PRESET_FIELDS {$($mpfSet526 -join ', ')}, the box's own rows {$($boxOut526 -join ', ')} and the window {$($win526 -join ', ')} differ - the window would set up a field a character does not have, or mcAdd would skip one it shows (SPEC V526b)" }
+    elseif ($mpfSet526.Count -ne 12) { $v526Bad += "(b) the three agree on $($mpfSet526.Count) field(s), expected 12 (SPEC V526b, I185a)" }
+    foreach ($x526 in @('language', 'multipleCharacters')) { if ($mpfSet526 -contains $x526) { $v526Bad += "(b) MC_PRESET_FIELDS names $x526 - that one is the FICHA's, not a character's (SPEC V526b, Q104.3)" } }
+
+    # (c) the window is pinned to the preset in one place; the ficha's own three scopes to the root.
+    $pins526 = 0
+    foreach ($f526c in $files) { $pins526 += @([regex]::Matches((NoComments (CodeOf $f526c.FullName)), 'mcSettingsScope"\]\s*\.node\s*=')).Count }
+    if ($pins526 -ne 1 -or $open526 -notmatch 'found\["mcSettingsScope"\]\.node\s*=\s*mcPreset\(\);') { $v526Bad += "(c) mcSettingsScope's node is written $pins526 time(s), expected once, in mcSettingsOpen, to mcPreset() - pinned anywhere else the window edits the root or the active character (SPEC V526c, I185c)" }
+    foreach ($sc526 in @('stSharedScope', 'langScope', 'mcRootScope')) {
+        if ($init526 -notmatch "found\[`"$sc526`"\][^;]*\.node\s*=\s*MC\.root;") { $v526Bad += "(c) mcInit does not pin $sc526 to MC.root - a field of the FICHA would follow the active character (SPEC V526c)" }
+    }
+    $lang526 = (Doc (Join-Path $dir "WoD20.6.lfm")).SelectSingleNode("//dataScopeBox[@name='langScope']")
+    if ($null -eq $lang526 -or $null -eq $lang526.SelectSingleNode(".//comboBox[@field='language']")) { $v526Bad += "(c) langScope is gone from WoD20.6 or no longer holds the language combo (SPEC V526c, I169e(2))" }
+    if ($null -eq $root526Doc.SelectSingleNode("//dataScopeBox[@name='mcRootScope']")) { $v526Bad += "(c) mcRootScope does not exist on the root form (SPEC V526c, I185c)" }
+
+    # (d) the preset node: created once, where it is seeded, and never on open.
+    $creates526 = 0
+    foreach ($f526d in $files) { $creates526 += @([regex]::Matches((NoComments (CodeOf $f526d.FullName)), 'createChildNode\(MC\.root,\s*"mcPreset"\)')).Count }
+    if ($creates526 -ne 1 -or $preset526 -notmatch '(?s)createChildNode\(MC\.root,\s*"mcPreset"\).*?for\s+\w+\s*=\s*1,\s*#MC_PRESET_FIELDS.*?MC\.root\[') { $v526Bad += "(d) the preset node is created $creates526 time(s), expected once, in mcPreset, followed by the MC_PRESET_FIELDS loop seeding it off MC.root (SPEC V526d, Q104.2)" }
+    if ($init526 -match '\bmcPreset\(') { $v526Bad += "(d) mcInit calls mcPreset( - opening the ficha would create a node (SPEC V526d, V492e)" }
+
+    # (e) a new character: the preset's twelve, the ficha's language, nothing else.
+    $pv526 = [regex]::Match($add526, 'local\s+(\w+)\s*=\s*mcPreset\(\)\s*;')
+    $brk526 = @([regex]::Matches($add526, 'n\[[^\]]+\]\s*=(?!=)'))
+    $dot526 = @([regex]::Matches($add526, '\bn\.(\w+)\s*=(?!=)'))
+    if (-not $pv526.Success) { $v526Bad += "(e) mcAdd does not read the preset into a local off mcPreset() (SPEC V526e)" }
+    elseif ($brk526.Count -ne 1 -or $add526 -notmatch ('n\[f\]\s*=\s*' + $pv526.Groups[1].Value + '\[f\]\s*;') -or $add526 -notmatch 'for\s+\w+\s*=\s*1,\s*#MC_PRESET_FIELDS') { $v526Bad += "(e) mcAdd's copy is not the one MC_PRESET_FIELDS loop writing n[f] off the preset local (SPEC V526e)" }
+    if ($add526 -match 'MC\.root\[') { $v526Bad += "(e) mcAdd reads MC.root[...] - a new character is set up by the window's preset, not by the root character (SPEC V526e, I185d)" }
+    if ($dot526.Count -ne 1 -or $add526 -notmatch 'n\.language\s*=\s*MC\.root\.language\s*;') { $v526Bad += "(e) mcAdd writes $($dot526.Count) field(s) by name, expected only n.language = MC.root.language - a blank character carries no baseline, no name, no dots (SPEC V526e, Q88.9)" }
+
+    # (f) the mirror copies the language alone.
+    $fw526 = @([regex]::Matches($shared526, '\.(\w+)\s*=(?!=)') | ForEach-Object { $_.Groups[1].Value })
+    $bw526 = @([regex]::Matches($shared526, '\]\s*=(?!=)'))
+    if ($fw526.Count -eq 0 -or @($fw526 | Where-Object { $_ -ne 'language' }).Count -gt 0 -or $bw526.Count -gt 0) { $v526Bad += "(f) mcShared writes {$(@($fw526 | Sort-Object -Unique) -join ', ')} and $($bw526.Count) bracketed field(s) - it may copy the language alone; a character's own setting copied here reaches every character (SPEC V526f)" }
+    if ($shared526 -match 'MC_PRESET_FIELDS') { $v526Bad += "(f) mcShared names MC_PRESET_FIELDS - the characters' own settings are never mirrored (SPEC V526f)" }
+    if ($shared526 -notmatch 'mcApply\(from\);') { $v526Bad += "(f) mcShared does not end in mcApply(from) - the Multiple Characters flag would stop showing or hiding the column (SPEC V526f)" }
+
+    # (g) the active row follows its own health track.
+    $hl526 = @($root526Doc.SelectNodes("//dataLink[not(ancestor::dataScopeBox)][contains(@onChange,'mcRender(self)')]") | Where-Object { $_.GetAttribute("field") -eq 'healthLevels' -or $_.GetAttribute("fields") -match "'healthLevels'" })
+    if ($hl526.Count -ne 1) { $v526Bad += "(g) $($hl526.Count) root <dataLink> outside every scope repaint the column (mcRender(self)) on healthLevels, expected 1 - the active character's row would keep its old number of health boxes (SPEC V526g, I185e)" }
+}
+if ($v526Bad) { foreach ($b in $v526Bad) { Fail "V526 $b" } }
+else { Pass "V526 the box binds the active character but for the flag, the window edits a preset only mcAdd reads, the three field lists agree on 12, mcShared copies only the language, and the column repaints on healthLevels" }
+
 # ---- V351: the ROAD label rides on the picker's own line -------------------------------
 # SPEC C Q27, I99k-m, T801. The user asked for the label beside the dropdown; what it BUYS is
 # 25px of height off three boxes, and what it COSTS is 51px of picker width - measured, one
@@ -23603,9 +23706,10 @@ foreach ($f489z in $files) { $dsbCount489 += @((Doc $f489z.FullName).SelectNodes
 if ($dsbCount489 -eq 0) { $v489Bad += "no <dataScopeBox> was found anywhere in the sheet - this whole check reads nothing (SPEC V20, B7)" }
 else {
     # (a) McRow's OWN field list has no internal duplicate (V1's one-owner rule still holds
-    # WITHIN a scope), and each of the 13 shared fields' WoD20th-side owner is INSIDE
-    # mcSettingsScope specifically - not merely somewhere in the settings window.
-    $MC_SHARED_13 = @('game', 'sheetTheme', 'stShowNumina', 'stShowDisciplines', 'stFreeBuy', 'stEditClanDisc', 'stEditSpentXP', 'stManualAffiliation', 'stManualClanFamily', 'healthLevels', 'stSpecCost', 'stBackgroundCost', 'multipleCharacters')
+    # WITHIN a scope), and each of the 12 preset fields' WoD20th-side owner is INSIDE
+    # mcSettingsScope specifically - not merely somewhere in the settings window. 41st batch
+    # (SPEC I185c): 12, not 13 - the window no longer carries multipleCharacters (SPEC Q104.1).
+    $MC_SHARED_13 = @('game', 'sheetTheme', 'stShowNumina', 'stShowDisciplines', 'stFreeBuy', 'stEditClanDisc', 'stEditSpentXP', 'stManualAffiliation', 'stManualClanFamily', 'healthLevels', 'stSpecCost', 'stBackgroundCost')
     $mcRowTpl489 = $rootDoc488.SelectSingleNode("//template[@name='McRow']")
     if ($null -eq $mcRowTpl489) { $v489Bad += "(a) <template name='McRow'> is gone - the row's own field list cannot be measured (SPEC V209)" }
     else {
@@ -23616,7 +23720,7 @@ else {
     }
     foreach ($sf489 in $MC_SHARED_13) {
         if ($null -eq $rootDoc488.SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']//*[@field='$sf489']")) {
-            $v489Bad += "(a) '$sf489' has no owner inside mcSettingsScope - a widget moved out of the scope still shares the name but no longer shares the ROOT node (SPEC V489a, I169e(4))"
+            $v489Bad += "(a) '$sf489' has no owner inside mcSettingsScope - a widget moved out of the scope still shares the name but no longer writes the PRESET node (SPEC V489a, I185c)"
         }
     }
 
@@ -23632,46 +23736,13 @@ else {
         if ($extra489) { $v489Bad += "(b) McRow authors field(s) $($extra489 -join ', ') outside its I3 contract - the row shows something Main/Combat never asked for (SPEC V489b)" }
     }
 
-    # (c) stSharedScope's fields == mcSettingsScope's fields (13 == 13); MC_SHARED_FIELDS ==
-    # (that set - multipleCharacters + language); the trigger dataLink's fields= ==
-    # MC_SHARED_FIELDS union {multipleCharacters}.
-    $stSharedNode489 = (Doc (Join-Path $dir "WoD20.10.lfm")).SelectSingleNode("//dataScopeBox[@name='stSharedScope']")
-    $mcSetNode489 = $rootDoc488.SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']")
-    if ($null -eq $stSharedNode489 -or $null -eq $mcSetNode489) { $v489Bad += "(c) stSharedScope or mcSettingsScope is gone - the twin comparison reads nothing (SPEC V209)" }
-    else {
-        # Widgets only since the 30th batch (SPEC V489c as amended, I175h(6)): a <dataLink field=...>
-        # observes a field and owns nothing (SPEC V8), and mcSettingsScope carries the one that
-        # watches mcOrder - a root field with no widget anywhere - without it becoming a 14th field.
-        $stSharedFields489 = @($stSharedNode489.SelectNodes(".//*[@field][not(self::dataLink)]") | ForEach-Object { $_.GetAttribute("field") } | Where-Object { $_ } | Sort-Object -Unique)
-        $mcSetFields489 = @($mcSetNode489.SelectNodes(".//*[@field][not(self::dataLink)]") | ForEach-Object { $_.GetAttribute("field") } | Where-Object { $_ } | Sort-Object -Unique)
-        if (($stSharedFields489 -join ',') -ne ($mcSetFields489 -join ',')) {
-            $v489Bad += "(c) stSharedScope holds {$($stSharedFields489 -join ', ')} and mcSettingsScope holds {$($mcSetFields489 -join ', ')} - the window would offer a field the box does not, or hide one it has (SPEC V489c)"
-        }
-        if ($stSharedFields489.Count -ne 13) { $v489Bad += "(c) stSharedScope holds $($stSharedFields489.Count) field(s), expected 13 (SPEC V489c, I169e)" }
-
-        $msfMatch489 = [regex]::Match($rootTxt, '(?s)MC_SHARED_FIELDS\s*=\s*\{(.*?)\};')
-        if (-not $msfMatch489.Success) { $v489Bad += "(c) MC_SHARED_FIELDS is not declared on the root form - the mirror has no list to copy (SPEC V209, V492a)" }
-        else {
-            $msfSet489 = @([regex]::Matches($msfMatch489.Groups[1].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
-            $wantMsf489 = @((@($stSharedFields489) | Where-Object { $_ -ne 'multipleCharacters' }) + 'language' | Sort-Object -Unique)
-            if (($msfSet489 -join ',') -ne ($wantMsf489 -join ',')) {
-                $v489Bad += "(c) MC_SHARED_FIELDS is {$($msfSet489 -join ', ')}, expected {$($wantMsf489 -join ', ')} - stSharedScope minus multipleCharacters plus language (SPEC V489c)"
-            }
-
-            $trigLink489 = $stSharedNode489.SelectSingleNode("dataLink[contains(@onChange,'mcShared')]")
-            if ($null -eq $trigLink489) { $v489Bad += "(c) no direct-child <dataLink onChange='mcShared(...)'> was found inside stSharedScope - the mirror's own trigger is gone (SPEC V489c, V492d)" }
-            else {
-                $linkFields489 = @([regex]::Matches($trigLink489.GetAttribute("fields"), "'([^']+)'") | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
-                $wantLink489 = @($msfSet489 + 'multipleCharacters' | Sort-Object -Unique)
-                if (($linkFields489 -join ',') -ne ($wantLink489 -join ',')) {
-                    $v489Bad += "(c) the trigger dataLink watches {$($linkFields489 -join ', ')}, expected MC_SHARED_FIELDS plus multipleCharacters - a field left out would not mirror when the storyteller changes it (SPEC V489c)"
-                }
-            }
-        }
-    }
+    # (c) SUPERSEDED in the 41st batch by V526(b) (SPEC I185, V489c as amended): the box and the
+    # window are no longer twins on one node - the box writes the ACTIVE character, the window the
+    # preset - so the three-way comparison (box, window, MC_PRESET_FIELDS) and the trigger's
+    # fields= are measured there, once.
 }
 if ($v489Bad) { foreach ($b in $v489Bad) { Fail "V489 $b" } }
-else { Pass "V489 field= is namespaced by data scope, McRow's own list matches the I3 contract exactly, and the settings window's 13 fields agree with the storyteller's box, MC_SHARED_FIELDS and the mirror's own trigger" }
+else { Pass "V489 field= is namespaced by data scope, McRow's own list matches the I3 contract exactly, and the settings window owns its 12 preset fields inside mcSettingsScope" }
 
 # ---- V490: the SWAP has one owner, the TOUCH selects, and the index persists what the screen shows (SPEC I169c/I169d, R169a, Q88.3) ----
 $v490Bad = @()
@@ -23779,65 +23850,12 @@ if ($v491Bad) { foreach ($b in $v491Bad) { Fail "V491 $b" } }
 else { Pass "V491 the root opens mcNodes (unless removed) unsorted, a row re-pins only when its node changed, and removal asks first" }
 
 # ---- V492: settings are the FICHA's alone, a new character is born BLANK, and the mirror has ONE trigger (SPEC I169e, Q88.8/Q88.9, R169h) ----
+# 41st batch (SPEC I185, V492 as amended): SUPERSEDED in part - (a) mcAdd's copy, (c) the root pins and
+# (d) the one trigger are measured by V526 (e), (a)(c) and (a)(f), now that the settings are each
+# character's own. (b) and (e) stand as written.
 $v492Bad = @()
-$mcAddFn492 = LuaFn $rootTxt 'mcAdd'
-$mcSharedFn492 = LuaFn $rootTxt 'mcShared'
-if (-not $mcAddFn492 -or -not $mcSharedFn492) { $v492Bad += "mcAdd or mcShared is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
-else {
-    $mcAddBody492 = NoComments $mcAddFn492
-    # (a) mcAdd writes n[f] = MC.root[f] inside the MC_SHARED_FIELDS loop and NOTHING else - a
-    # blank character carries no baseline, no name, no dots (SPEC Q88.9).
-    $dotWrites492 = @([regex]::Matches($mcAddBody492, '\bn\.\w+\s*=(?!=)'))
-    $bracketWrites492 = @([regex]::Matches($mcAddBody492, 'n\[[^\]]+\]\s*=(?!=)'))
-    if ($dotWrites492.Count -gt 0) { $v492Bad += "(a) mcAdd writes n.<field> = with dot notation ($($dotWrites492.Count) time(s)) - the new character must carry only the MC_SHARED_FIELDS loop (SPEC V492a, Q88.9)" }
-    if ($bracketWrites492.Count -ne 1) { $v492Bad += "(a) mcAdd writes n[...] = $($bracketWrites492.Count) time(s), expected exactly the one MC_SHARED_FIELDS loop - anything more is a key the blank character was not supposed to carry (SPEC V492a, Q88.9)" }
-    elseif ($mcAddBody492 -notmatch 'n\[f\]\s*=\s*MC\.root\[f\];') { $v492Bad += "(a) mcAdd's one write is not n[f] = MC.root[f] - the mirror copies by NAME, off the shared list, never a literal key (SPEC V492a)" }
-
-    # (d) exactly ONE <dataLink onChange naming mcShared( in the whole sheet, and it lives
-    # inside stSharedScope; mcShared is called from nowhere else and ends in mcApply(.
-    $mcSharedBody492 = NoComments $mcSharedFn492
-    if ($mcSharedBody492 -notmatch 'mcApply\(from\);') { $v492Bad += "(d) mcShared does not call mcApply(from) - the mirror would leave the column and the settings window unrendered after a change (SPEC V492d)" }
-    $linkCount492 = @([regex]::Matches((NoComments $rootTxt), 'onChange="mcShared\(self\);"')).Count
-    foreach ($f492 in $files) {
-        if ($f492.Name -eq 'WoD20th.lfm') { continue }
-        $linkCount492 += @([regex]::Matches((NoComments (CodeOf $f492.FullName)), 'onChange="mcShared\(self\);"')).Count
-    }
-    if ($linkCount492 -ne 1) { $v492Bad += "(d) onChange=`"mcShared(self);`" appears $linkCount492 time(s) across the sheet, expected exactly 1 - a second trigger is a second place the mirror can fire from, possibly on the wrong node (SPEC V492d)" }
-    else {
-        $stSharedNode492 = (Doc (Join-Path $dir "WoD20.10.lfm")).SelectSingleNode("//dataScopeBox[@name='stSharedScope']")
-        if ($null -eq $stSharedNode492 -or $null -eq $stSharedNode492.SelectSingleNode(".//dataLink[contains(@onChange,'mcShared')]")) { $v492Bad += "(d) the one mcShared trigger is not inside stSharedScope - a dataLink outside the scope watches the ACTIVE node, not the root the mirror is supposed to read (SPEC V492d, R169h)" }
-    }
-    # Swept over EVERY file, not just the root: mcShared is declared on WoD20th.lfm but its one
-    # legitimate caller - the trigger dataLink - lives on WoD20.10.lfm, inside stSharedScope.
-    $mcSharedCallers492 = 0
-    foreach ($f492d in $files) { $mcSharedCallers492 += @([regex]::Matches((NoComments (CodeOf $f492d.FullName)), '\bmcShared\(')).Count }
-    # -1 for the function's own declaration line ("function mcShared(from)" also matches
-    # \bmcShared\() - what is left is real CALL sites, which must be exactly the one trigger.
-    if (($mcSharedCallers492 - 1) -ne $linkCount492) { $v492Bad += "(d) mcShared is referenced $($mcSharedCallers492 - 1) time(s) outside its own declaration, expected exactly the $linkCount492 dataLink trigger - a second caller is a second reason the mirror can fire (SPEC V492d)" }
-}
-
-# (c) the 3 configuration scopes exist, mcInit pins each to MC.root, and stSharedScope holds
-# EVERY field= of the STORYTELLER SETTINGS box - none of them left outside it.
 $mcInitFn492 = NoComments (LuaFn $rootTxt 'mcInit')
 if (-not $mcInitFn492) { $v492Bad += "mcInit is not declared on the root form (SPEC V209)" }
-else {
-    foreach ($sc492 in @('stSharedScope', 'langScope', 'mcSettingsScope')) {
-        if ($mcInitFn492 -notmatch "found\[`"$sc492`"\][^;]*\.node\s*=\s*MC\.root;") { $v492Bad += "(c) mcInit does not pin $sc492 to MC.root - its fields would read and write whichever character is ACTIVE, not the ficha (SPEC V492c, I169e)" }
-    }
-}
-$langScope492x = (Doc (Join-Path $dir "WoD20.6.lfm")).SelectSingleNode("//dataScopeBox[@name='langScope']")
-$mcSetScope492x = (Doc $rootPath).SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']")
-if ($null -eq $langScope492x) { $v492Bad += "(c) langScope does not exist on WoD20.6 (SPEC V492c)" }
-elseif ($null -eq $langScope492x.SelectSingleNode(".//comboBox[@field='language']")) { $v492Bad += "(c) langScope does not contain the language combo (SPEC V492c, I169e(2))" }
-if ($null -eq $mcSetScope492x) { $v492Bad += "(c) mcSettingsScope does not exist on the root form (SPEC V492c)" }
-$stBoxNode492 = BoxOf (Doc (Join-Path $dir "WoD20.10.lfm")) "STORYTELLER SETTINGS"
-if ($null -eq $stBoxNode492) { $v492Bad += "(c) the STORYTELLER SETTINGS box is gone from WoD20.10 (SPEC V209)" }
-else {
-    $allFieldsInBox492 = @($stBoxNode492.SelectNodes(".//*[@field]"))
-    $fieldsInScope492 = @($stBoxNode492.SelectNodes(".//dataScopeBox[@name='stSharedScope']//*[@field]"))
-    if ($allFieldsInBox492.Count -eq 0) { $v492Bad += "(c) no field= widget was read inside the STORYTELLER SETTINGS box - leg (c) verifies nothing (SPEC V209)" }
-    elseif ($allFieldsInBox492.Count -ne $fieldsInScope492.Count) { $v492Bad += "(c) the STORYTELLER SETTINGS box holds $($allFieldsInBox492.Count) field= widget(s) but only $($fieldsInScope492.Count) are inside stSharedScope - a widget outside the scope would read/write whichever character is ACTIVE, not the ficha (SPEC V492c, I169e)" }
-}
 
 # (b) outside mcAdd/mcShared, no write-by-address to a child node (nodes[k][... or a field
 # written straight onto MC.chars). Writing to `sheet` stays free - it is the active node,
@@ -23853,7 +23871,7 @@ if ($mcInitFn492 -match 'createChildNode\(') { $v492Bad += "(e) mcInit calls cre
 if ($rootTxt -match '\bmcDefaults\b') { $v492Bad += "(e) mcDefaults is referenced somewhere in the sheet - that name was never supposed to exist (SPEC V492e)" }
 
 if ($v492Bad) { foreach ($b in $v492Bad) { Fail "V492 $b" } }
-else { Pass "V492 mcAdd writes only the shared fields, the three configuration scopes pin to the root with stSharedScope holding every field of the box, the mirror has one trigger inside it, and mcInit creates no node" }
+else { Pass "V492 no child node is written by address outside mcAdd/mcShared, and mcInit creates no node" }
 
 # ---- V493: ONE scrim for the 3, it DARKENS the tabs and leaves the column CLEAR (SPEC I169f/I169m, R169c, I181a/c, B184; V53 intact) ----
 $v493Bad = @()
@@ -24156,10 +24174,13 @@ else {
     $keep499 = [regex]::Match($root25Code, '(?s)MC_KEEP\s*=\s*\{(.*?)\};')
     if (-not $keep499.Success) { $v499Bad += "(c) MC_KEEP is not declared (SPEC V209)" }
     else {
-        foreach ($k499 in @('multipleCharacters', 'mcActive', 'mcRootGone', 'mcOrder')) {
+        # 41st batch (SPEC I185d, V499c as amended): `language` left the shared table - the
+        # twelve MC_PRESET_FIELDS are the characters' own - so the ficha's language is kept BY
+        # NAME here, and the loop keeps the root's twelve (mcPreset seeds from them).
+        foreach ($k499 in @('language', 'multipleCharacters', 'mcActive', 'mcRootGone', 'mcOrder')) {
             if ($keep499.Groups[1].Value -notmatch "\b$k499\s*=\s*true") { $v499Bad += "(c) MC_KEEP does not keep $k499 (SPEC V499c)" }
         }
-        if ($root25Code -notmatch 'for mcI = 1, #MC_SHARED_FIELDS, 1 do MC_KEEP\[MC_SHARED_FIELDS\[mcI\]\] = true; end;') { $v499Bad += "(c) MC_KEEP does not take every name of MC_SHARED_FIELDS - a wipe would erase the ficha's settings (SPEC V499c)" }
+        if ($root25Code -notmatch 'for mcI = 1, #MC_PRESET_FIELDS, 1 do MC_KEEP\[MC_PRESET_FIELDS\[mcI\]\] = true; end;') { $v499Bad += "(c) MC_KEEP does not take every name of MC_PRESET_FIELDS - a wipe would erase the root's settings, the ones mcPreset seeds from (SPEC V499c, I185d)" }
     }
     # (d) mcRootGone: written in mcRemove only, read in mcNodes only.
     $goneAll499 = @([regex]::Matches($root25Code, 'MC\.root\.mcRootGone')).Count
@@ -24902,12 +24923,14 @@ $mcRowTpl509 = $root25Doc.SelectSingleNode("//template[@name='McRow']")
 $render509 = NoComments (LuaFn $rootTxt 'mcRender')
 $add509 = NoComments (LuaFn $rootTxt 'mcAdd')
 $keep509 = [regex]::Match($root25Code, '(?s)MC_KEEP\s*=\s*\{(.*?)\};')
-$scope509 = $root25Doc.SelectSingleNode("//dataScopeBox[@name='mcSettingsScope']")
+# 41st batch (SPEC I185c, V509b as amended): mcSettingsScope holds the PRESET now, so the link
+# that watches the root's mcOrder moved to mcRootScope, a scope of its own pinned to MC.root.
+$scope509 = $root25Doc.SelectSingleNode("//dataScopeBox[@name='mcRootScope']")
 $fns509 = [ordered]@{}
 foreach ($n509 in @('mcIdOf', 'mcOrderOf', 'mcAnimTo', 'mcRowOrderApply', 'mcDragInstall', 'mcDragStart', 'mcDropEnter', 'mcDropCommit', 'mcNodes', 'rowOrderOf', 'rowDropEnter')) { $fns509[$n509] = NoComments (LuaFn $rootTxt $n509) }
 $missFn509 = @($fns509.Keys | Where-Object { -not $fns509[$_] })
 if ($null -eq $mcRowTpl509 -or -not $render509 -or -not $add509 -or -not $keep509.Success -or $null -eq $scope509 -or $missFn509.Count -gt 0) {
-    $v509Bad += "McRow, mcRender, mcAdd, MC_KEEP, mcSettingsScope or one of the column's functions ($($missFn509 -join ', ')) was not found - this check reads nothing (SPEC V20, V209)"
+    $v509Bad += "McRow, mcRender, mcAdd, MC_KEEP, mcRootScope or one of the column's functions ($($missFn509 -join ', ')) was not found - this check reads nothing (SPEC V20, V209)"
 } else {
     # (a) the id
     if ($render509 -notmatch 'if mcIdOf\(n\) == nil then n\.mcId = Utils\.generateUniqueString\(\); end;') { $v509Bad += "(a) mcRender does not stamp n.mcId = Utils.generateUniqueString() under mcIdOf(n) == nil - a node the order cannot name (SPEC I175h(1), V509a)" }
@@ -24927,7 +24950,7 @@ if ($null -eq $mcRowTpl509 -or -not $render509 -or -not $add509 -or -not $keep50
     $links509 = 0
     foreach ($f509 in $files) { $links509 += @((Doc $f509.FullName).SelectNodes("//dataLink[@field='mcOrder']")).Count }
     $inScope509 = $scope509.SelectSingleNode(".//dataLink[@field='mcOrder']")
-    if ($links509 -ne 1 -or $null -eq $inScope509) { $v509Bad += "(b) <dataLink field='mcOrder'> is authored $links509 time(s) in the sheet, expected once, INSIDE mcSettingsScope - the box pinned to the root (SPEC I175h(6), V509b)" }
+    if ($links509 -ne 1 -or $null -eq $inScope509) { $v509Bad += "(b) <dataLink field='mcOrder'> is authored $links509 time(s) in the sheet, expected once, INSIDE mcRootScope - the box pinned to the root; mcSettingsScope holds the preset since the 41st batch (SPEC I175h(6), V509b, I185c)" }
     elseif ($inScope509.GetAttribute('onChange') -notmatch 'mcRowOrderApply\(self, false\)') { $v509Bad += "(b) the mcOrder <dataLink> does not call mcRowOrderApply(self, false) on change (SPEC I175h(6))" }
     foreach ($o509 in @('mcOrder', 'mcId')) { if ($luaOwned -notcontains $o509) { $v509Bad += "(b) $o509 is not a declared Lua-owned field (SPEC V8, I175j)" } }
     # (c) unsorted nodes, one owner of the top, the apply where it belongs
