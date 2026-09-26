@@ -271,7 +271,7 @@
 		-->
 		<template name="HealthRow">
 			<label name="dynHealth_$(num)" left="0" top="0" width="215" height="20"/>
-			<rectangle left="223" top="0" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="cycleHealthMark($(num));" onMenu="healHealthMark();">
+			<rectangle left="223" top="0" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="cycleHealthMark($(num));" onMenu="healHealthMark();">
 				<label align="client" field="health_$(num)" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
 		</template>

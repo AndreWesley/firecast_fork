@@ -4991,6 +4991,17 @@
 			function mcShow(n, from)
 				if n == nil or ndb.getNodeHandle(n) == ndb.getNodeHandle(sheet) then return; end;
 
+				-- The list stays clickable under an open window since the scrim stopped covering it
+				-- (SPEC I181a): a picker left open across the switch would write its pick into the
+				-- NEW character (mfConfirm -> setField -> sheet). So every window closes first -
+				-- mfClose steps one level at a time, depth 2 then 1, and hiding what is already
+				-- hidden costs nothing (SPEC I181c, V493e, Q102.2). Both return on from == nil.
+				-- Twice with no depth test: `local MF` is declared ~1200 lines BELOW this function,
+				-- so MF here is the nil GLOBAL, and reading MF.depth crashed every mcAdd.
+				mfClose(from);
+				mfClose(from);
+				popClose(from);
+
 				self:setNodeObject(n);
 
 				mcRender(from);
@@ -9129,37 +9140,37 @@
 			<edit left="54" top="8" width="256" height="22" field="name" onEnter="mcSelect($(num), self);"/>
 			<button name="btnMcRemove_$(num)" left="316" top="8" width="22" height="22" text="X" onClick="mcRemove($(num), self);"/>
 
-			<rectangle name="mcAv_$(num)" left="8" top="38" width="62" height="62" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="false" visible="false"/>
+			<rectangle name="mcAv_$(num)" left="8" top="38" width="62" height="62" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="false" visible="false"/>
 			<image left="8" top="38" width="62" height="62" field="avatar" style="autoFit" hitTest="false"/>
 
-			<rectangle name="mcHp_$(num)_1" left="82" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(1);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_1" left="82" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(1);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_1" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
-			<rectangle name="mcHp_$(num)_2" left="108" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(2);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_2" left="108" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(2);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_2" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
-			<rectangle name="mcHp_$(num)_3" left="134" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(3);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_3" left="134" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(3);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_3" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
-			<rectangle name="mcHp_$(num)_4" left="160" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(4);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_4" left="160" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(4);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_4" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
-			<rectangle name="mcHp_$(num)_5" left="186" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(5);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_5" left="186" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(5);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_5" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
-			<rectangle name="mcHp_$(num)_6" left="212" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(6);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_6" left="212" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(6);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_6" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
-			<rectangle name="mcHp_$(num)_7" left="238" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(7);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_7" left="238" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(7);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_7" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
-			<rectangle name="mcHp_$(num)_8" left="264" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(8);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_8" left="264" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(8);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_8" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
-			<rectangle name="mcHp_$(num)_9" left="290" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(9);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_9" left="290" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(9);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_9" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
-			<rectangle name="mcHp_$(num)_10" left="316" top="38" width="22" height="20" color="#00000000" strokeColor="#FFFFFF" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(10);" onMenu="mcSelect($(num), self); healHealthMark();">
+			<rectangle name="mcHp_$(num)_10" left="316" top="38" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="mcSelect($(num), self); cycleHealthMark(10);" onMenu="mcSelect($(num), self); healHealthMark();">
 				<label align="client" field="health_10" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
 
@@ -9364,73 +9375,49 @@
 			<layout name="tabStoryteller" align="client" visible="false">
 				<import file="WoD20.10.lfm"/>
 			</layout>
-		</layout>
 
 		<!--
-			The ? box, the search box, and the scrim that closes them (SPEC I102, I107c, T760).
+			The ? box, the search box, the ! windows, the settings window and the two scrims that
+			close them (SPEC I102, I107c, I181a, T760, T1138).
 
-			They live HERE, on sheetBody, and not on a tab. A tab layout is visible="false"
-			whenever the player is somewhere else, and a child of an invisible parent is invisible
-			no matter what its own flag says - so a box parented to Traits and opened from the ?
-			on Main simply did not appear, and was found later sitting open on Traits. They were
-			also inside that tab's scrollBox, which scrolled the overlay along with the grid it is
-			supposed to float over. Neither symptom is reachable from here: sheetBody is the one
-			parent every tab shares (SPEC B107, I102a).
+			They live HERE, inside sheetMain and after its eleven tabs, and not on a tab. A tab
+			layout is visible="false" whenever the player is somewhere else, and a child of an
+			invisible parent is invisible no matter what its own flag says - so a box parented to
+			Traits and opened from the ? on Main simply did not appear (SPEC B107, I102a). sheetMain
+			is the box the tabs share, visible whenever any tab is (SPEC V496e), and since the 36th
+			batch it holds the overlays too: a scrim sized by align="contents" fills sheetMain and
+			ONLY sheetMain - the strip and the tabs, never the character column beside it, which
+			the user wants clear and clickable under an open window (SPEC I181a, B184; mcShow closes
+			every window before it switches the character, I181c). They lived on sheetBody until
+			then, where a scrim could only cover the column too.
 
-			Nothing in Lua changed for the move. popOpen and mfOpen already walk from
-			tabRootOf(from) - the top of the whole form - so they find these controls from any tab
-			(SPEC B9). One box per sheet stays one box per sheet: a copy per tab would be eleven
-			owners of one text, which is exactly what V135 refuses.
+			Nothing in Lua depends on the parent. popOpen and mfOpen walk from tabRootOf(from) - the
+			top of the whole form - so they find these controls from any tab (SPEC B9). One box per
+			sheet stays one box per sheet: a copy per tab would be eleven owners of one text (V135).
 
-			Authored LAST in sheetBody because file order is paint order: after every tab layout
-			means over whichever tab is showing. The scrim comes first of the three for the same
-			reason - it has to sit between the tabs and the boxes, so a click that misses a box
-			lands on the scrim and on nothing else (SPEC I102a, V333b).
+			Authored LAST in sheetMain because file order is paint order: after every tab layout
+			means over whichever tab is showing. The scrim comes first for the same reason - it has
+			to sit between the tabs and the boxes, so a click that misses a box lands on the scrim
+			and on nothing else (SPEC I102a, V333b). It is NOT align=client: a second child claiming
+			the client rect is what V190 refuses, and the one that loses is simply not drawn (B41).
 
-			The tops are 40 higher than they were: sheetBody's origin sits above the 40px tabStrip,
-			while a tab layout's origin sits below it. The scrim is 1595x936 - as wide as the
-			WIDEST tab, which is TRAITS, and as deep as the strip plus the 896 the DEEPEST tab
-			reaches, which is Main - so a click anywhere outside the box closes it, the tab strip
-			included. Two different tabs own the two axes, which is the whole reason neither is
-			written as a literal.
-
-			⚠ it was 1680x733 until T905, and 733 was the strip plus the 693 the TRAITS grid covers. Main
-			closes at 896, so the bottom 203px of it did not close the overlay and NOTHING said so - the
-			gate was green, because I102a named two axes and only the WIDTH ever became a check (SPEC
-			B124). V389 owns the height now, derived off the deepest tab and the strip's own height, so a
-			tab that grows takes the scrim with it instead of leaving a dead band behind.
-
-			⚠ and the WIDTH had the SAME disease one level down, which is why it is 1408 and not
-			1345: the check compared the scrim to the right edge of Main's EXPERIENCE box - ONE
-			named tab - and was green only while Main happened to be WIDER than the widest, which
-			is not the same thing (SPEC B127). MEASURED while building T908: Traits closes at 1595
-			and has all along, so the 1680 this rectangle carried was 85px of slack the rule read
-			as correct, and taking Main to 1345 would have had the same rule DEMAND 250px less
-			than Traits needs. V396 owns the width now and derives it off the same sweep V389 uses
-			for the height, so NEITHER axis is tied to a tab by name any more.
-
-			strokeColor is AUTHORED and it is not decoration: applyTheme writes the era's rule onto
-			every THEME_SHAPES rectangle that authors nothing, and on a transparent FILL that rule
-			is a contour with no box - here, a 1595x936 frame over the whole sheet, lit every time
-			the picker or the ? opened, because both raise this one scrim (SPEC B136, V404, V287).
-
-			It is sized rather than align=client because a second child claiming the
-			client rect is what V190 refuses. Fully transparent: a hit target, not a tint, and the
-			ONE way a click outside closes the box. There is no second closer - the X and the
-			scrim both call popClose (SPEC V333e).
+			The scrim's 70% is opacity= over color="black" - the era's box tone, the way the two
+			tooltip backgrounds are built (SPEC I182a). Not "#000000": black and #000000 are ONE
+			canonical key to applyTheme, and a second palette entry for it made pairs() decide which
+			value the boxes got (SPEC B185, V524). The host reads an eight-digit colour with the
+			alpha LAST, so the alpha-first literals this scrim carried for eleven batches were
+			fully transparent and it never darkened anything (SPEC B184, V523). strokeColor is
+			AUTHORED because applyTheme writes the era's rule onto every THEME_SHAPES rectangle that
+			authors nothing, and that rule would be a frame over the whole sheet (SPEC B136, V404).
+			Clicking the scrim is the ONE way a click outside closes the box - the X and the scrim
+			both call popClose (SPEC V333e). popScrimB, its twin between the two pickers, is the
+			same rectangle with mfClose on it (SPEC I172b).
 
 			popDesc is NOT a section box. It wears the same black rectangle every box wears, so the
 			V280/V298 collector would sweep it up, and a floating overlay has no neighbour to be 5px
 			from - it is excluded there BY NAME, the way cboRoad is named in V328c (SPEC I73, I76a).
 		-->
-		<!-- 2005 = 1635 + MC_DOCK_W: the widest tab (Traits, 1635 since the ! columns of the 25th
-		     batch) plus the fixed column, so the fade covers the column too and a click on a row
-		     while the picker is open cannot swap the character under the picker's own field
-		     (SPEC I169f, I170b, V496d). No Lua writes this width any more - the column does not
-		     resize. The color is the 70% black (alpha B3 = 179/255) every window darkens the sheet
-		     with since the 35th batch (SPEC I180c, V503a); popScrimB, its twin under the second
-		     picker, carries the same four numbers. -->
-		<rectangle name="popScrim" left="0" top="0" width="2005" height="936" color="#B3000000" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
+		<rectangle name="popScrim" align="contents" color="black" opacity="0.70" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
 
 		<layout name="popDesc" left="440" top="150" width="500" height="490" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
@@ -9813,9 +9800,9 @@
 		     popScrimB is the scrim twinned with it (SPEC I172b, V503b, 27th batch): every window
 		     darkens what is behind it, and behind this one is the first box. Declared BETWEEN the
 		     two boxes, so it paints over mfSearch and under this frame, with popScrim's own
-		     left/top/width/height/color. mfOpen raises it through the re-keyed `popScrim` at depth
-		     2; a click on it is a click outside THIS box, so it closes this box only (mfClose). -->
-		<rectangle name="popScrimB" left="0" top="0" width="2005" height="936" color="#B3000000" strokeColor="#00000000" visible="false" onClick="mfClose(self);"/>
+		     align/color/opacity (SPEC I181a). mfOpen raises it through the re-keyed `popScrim` at
+		     depth 2; a click on it is a click outside THIS box, so it closes this box only (mfClose). -->
+		<rectangle name="popScrimB" align="contents" color="black" opacity="0.70" strokeColor="#00000000" visible="false" onClick="mfClose(self);"/>
 		<layout name="mfSearchB" left="340" top="120" width="1000" height="635" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label name="dynMfTitleB" left="60" top="15" width="400" height="20" horzTextAlign="center"/>
@@ -9899,6 +9886,7 @@
 			<label name="lblMfArm_penaltyB" left="690" top="125" width="160" height="20" text="Penalty" visible="false"/>
 			<edit name="edtMfArm_penaltyB" left="690" top="147" width="160" height="24" visible="false" onKeyDown="escClose(self, event, false);"/>
 			<textEditor name="edtMfDescB" left="520" top="71" width="460" height="549" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onKeyDown="escClose(self, event, true);"/>
+		</layout>
 		</layout>
 	</layout>
 

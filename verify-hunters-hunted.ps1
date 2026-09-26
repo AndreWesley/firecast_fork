@@ -1520,12 +1520,16 @@ $floorCut = 0
 $bandCut68 = 0
 $dockFloorCut68 = 0
 $tipFloorCut68 = 0
+$scrimCut68 = 0
 foreach ($f in $files) {
     foreach ($r in (Doc $f.FullName).SelectNodes("//rectangle[@color='black']")) {
         # The two tip backgrounds (SPEC I177a(iii), 32nd batch): authored black so applyTheme
         # gives them the era's box fill, at opacity 0.50 - a backdrop floating over the boxes,
         # not a box, so no corner. Cut by the PARENT's exact name, as V40/V287 cut the tips.
         if ($r.GetAttribute("align") -eq 'contents' -and $r.ParentNode.GetAttribute("name") -in @('noteTip', 'specTip')) { $tipFloorCut68++; continue }
+        # The two scrims (SPEC I182a, 37th batch): black by name so applyTheme gives them the era's
+        # box tone under opacity 0.70, align="contents" inside sheetMain - a fade, not a box, no corner.
+        if ($r.GetAttribute("align") -eq 'contents' -and @('popScrim', 'popScrimB') -ccontains $r.GetAttribute("name")) { $scrimCut68++; continue }
         if ($r.GetAttribute("align") -eq 'client' -and $r.ParentNode.SelectSingleNode("rectangle[@onClick]")) { $floorCut++; continue }
         if ($r.GetAttribute("align") -eq 'client' -and (IsBandLayout $r.ParentNode)) { $bandCut68++; continue }
         # mcDock's own floor (SPEC I169b, 24th batch): align="contents", not "client" - it is
@@ -1544,6 +1548,7 @@ if ($floorCut -ne 1) { Fail "V68 the strip-floor cut matched $floorCut rectangle
 elseif ($bandCut68 -ne 1) { Fail "V68 the highlight-band cut matched $bandCut68 rectangle(s), expected exactly 1 - the band is xpHiRow's backdrop and nothing else on the sheet is built that way (SPEC I165a, V484f, V209)" }
 elseif ($dockFloorCut68 -ne 1) { Fail "V68 the mcDock-floor cut matched $dockFloorCut68 rectangle(s), expected exactly 1 - mcDock's own backdrop is the only align=contents black rectangle on the sheet besides the two tip backgrounds (SPEC I169b, V209)" }
 elseif ($tipFloorCut68 -ne 2) { Fail "V68 the tip-background cut matched $tipFloorCut68 rectangle(s), expected exactly 2 - noteTip's and specTip's (SPEC I177a, V513f, V209)" }
+elseif ($scrimCut68 -ne 2) { Fail "V68 the scrim cut matched $scrimCut68 rectangle(s), expected exactly 2 - popScrim and popScrimB are the only black align=contents rectangles outside the tips and mcDock (SPEC I182a, V209)" }
 elseif ($boxSeen -lt 60) { Fail "V68 only $boxSeen black section box(es) were read, expected at least 60 - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($corners.Count -eq 0) { Fail "V68 no black section box found - the check has nothing to measure" }
 elseif ($corners.Count -gt 1) {
@@ -12288,7 +12293,9 @@ if ($sbFn316 -and $body316 -notmatch 'sectionBox\(\s*c\s*,\s*fill\s*\)') {
 if ($sbFn316 -and (NoComments $ornFn316) -notmatch 'sectionBox\(\s*c\s*,\s*fill\s*\)') {
     $v316Bad += "ornament() never asks sectionBox - the two callers would each carry their own idea of which rectangles are boxes (SPEC V316d, V67)"
 }
-$dupe316 = [regex]::Matches((NoComments $hh6), 'normColor\(\s*fill\s*\)\s*~=\s*"#FF000000"').Count
+# The canonical black is "#000000FF" since the 36th batch: normColor appends the alpha, the way the
+# host reads an eight-digit colour (SPEC I181g, B184, V523). It was "#FF000000" before.
+$dupe316 = [regex]::Matches((NoComments $hh6), 'normColor\(\s*fill\s*\)\s*~=\s*"#000000FF"').Count
 if ($dupe316 -ne 1) {
     $v316Bad += "the authored-black test appears $dupe316 time(s) in WoD20.6, expected exactly 1 - two copies of the selector drift apart in silence and the pills are what pays (SPEC V316d, V67)"
 }
@@ -16626,6 +16633,66 @@ else {
 if ($v522Bad) { foreach ($b in $v522Bad) { Fail "V522 $b" } }
 else { Pass "V522 edtPopDesc born readOnly with no onChange and no opacity, no Lua flips it, savePopDesc and popRow gone, and descFor still reads custom, override, book in that order" }
 
+# ---- V523: an eight-digit colour literal carries its alpha LAST (#RRGGBBAA) - the host reads it that way (SPEC I181, B184, R181a) ----
+# Firecast's own plugins write '#FFCC66'+'70', '#FFFFFF'+'A0', '#707070'+'80' (Plugins/Core): a known
+# six-digit colour with the alpha appended. This sheet wrote its scrim the other way round
+# (#66000000, #80000000, #B3000000: alpha FIRST) and the host read alpha 00 - invisible for eleven
+# batches while V503(a) measured the literal and passed (SPEC B184). Comments are scanned too: the
+# literal in a comment is the one the next round copies. Two legs:
+#   (a) a literal ending in 00 is exactly #00000000 - transparent on purpose, never by accident;
+#   (b) no '#XX000000' with XX <> 00 - the alpha-first shape of translucent black that B184 is.
+$v523Bad = @()
+$seen523 = 0
+foreach ($f523 in $files) {
+    $txt523 = [System.IO.File]::ReadAllText($f523.FullName)
+    foreach ($m523 in [regex]::Matches($txt523, '#([0-9A-Fa-f]{8})(?![0-9A-Fa-f])')) {
+        $seen523++
+        $hex523 = $m523.Groups[1].Value.ToUpper()
+        if ($hex523.EndsWith('00') -and $hex523 -ne '00000000') { $v523Bad += "(a) $($f523.Name) authors #$hex523 - the LAST pair is the alpha and 00 makes it invisible; only #00000000 may end in 00 (SPEC V523a, B184)" }
+        if ($hex523 -match '^(?!00)[0-9A-F]{2}000000$') { $v523Bad += "(b) $($f523.Name) authors #$hex523 - alpha-first translucent black, the shape the host reads as transparent (SPEC V523b, B184)" }
+    }
+}
+if ($seen523 -eq 0) { $v523Bad += "no eight-digit colour literal was read in the sheet - the check measures nothing, and #00000000 at least exists (SPEC V20, V209)" }
+if ($v523Bad) { foreach ($b in @($v523Bad | Select-Object -Unique)) { Fail "V523 $b" } }
+else { Pass "V523 $seen523 eight-digit colour literal(s) read, none alpha-first, none invisible but #00000000" }
+
+# ---- V524: one CANONICAL key per palette map - black and #000000 are the same key to applyTheme (SPEC I182c, B185) ----
+# normColor re-keys every fill/stroke/font map at load (WoD20.6 ~3517): a named colour becomes its
+# NAMED_COLORS value, six digits gain FF, eight digits pass. Two authored keys with one canonical
+# form write two values into one slot and pairs() picks the winner - which is how every box
+# authored black turned pure black in the 36th batch (SPEC B185). The canonical form is computed
+# HERE the same way, with NAMED_COLORS read off the source, never typed.
+$v524Bad = @()
+$named524 = @{}
+$nc524 = [regex]::Match($hh6, '(?s)NAMED_COLORS\s*=\s*\{(.*?)\};')
+if ($nc524.Success) {
+    foreach ($m524 in [regex]::Matches($nc524.Groups[1].Value, '\["([^"]+)"\]\s*=\s*"(#[0-9A-Fa-f]{8})"')) { $named524[$m524.Groups[1].Value.ToLower()] = $m524.Groups[2].Value.ToUpper() }
+}
+if ($named524.Count -eq 0) { $v524Bad += "NAMED_COLORS was not read from WoD20.6.lfm - the canonical form of a named key cannot be computed (SPEC V20, V209)" }
+$maps524 = 0
+foreach ($map524 in @('fill', 'stroke', 'font')) {
+    $blocks524 = @([regex]::Matches($hh6, "(?m)^\s*$map524\s*=\s*\{(.*?)\}", 'Singleline'))
+    if ($blocks524.Count -lt 4) { $v524Bad += "only $($blocks524.Count) '$map524' map(s) read, expected one per palette (4) - the check would pass on the ones it did not see (SPEC V209)"; continue }
+    $pal524 = 0
+    foreach ($b524 in $blocks524) {
+        $pal524++
+        $maps524++
+        $seen524 = @{}
+        foreach ($k524 in [regex]::Matches($b524.Groups[1].Value, '\["([^"]+)"\]\s*=')) {
+            $key524 = $k524.Groups[1].Value
+            $canon524 = $key524.ToUpper()
+            if ($named524.ContainsKey($key524.ToLower())) { $canon524 = $named524[$key524.ToLower()] }
+            elseif ($key524 -match '^#[0-9A-Fa-f]{6}$') { $canon524 = $key524.ToUpper() + 'FF' }
+            elseif ($key524 -match '^#[0-9A-Fa-f]{8}$') { $canon524 = $key524.ToUpper() }
+            if ($seen524.ContainsKey($canon524)) { $v524Bad += "(a) palette $pal524, map '$map524': keys '$($seen524[$canon524])' and '$key524' are ONE canonical key ($canon524) - two values in one slot, and pairs() decides which the sheet wears (SPEC V524a, B185)" }
+            else { $seen524[$canon524] = $key524 }
+        }
+    }
+}
+if ($maps524 -lt 12) { $v524Bad += "$maps524 palette map(s) read, expected 12 (4 palettes x fill/stroke/font) (SPEC V209)" }
+if ($v524Bad) { foreach ($b in @($v524Bad | Select-Object -Unique)) { Fail "V524 $b" } }
+else { Pass "V524 $maps524 palette maps read, NAMED_COLORS off the source, and no two keys share a canonical form" }
+
 # ---- V351: the ROAD label rides on the picker's own line -------------------------------
 # SPEC C Q27, I99k-m, T801. The user asked for the label beside the dropdown; what it BUYS is
 # 25px of height off three boxes, and what it COSTS is 51px of picker width - measured, one
@@ -18350,21 +18417,23 @@ else { Pass "V366 descNature partitions PICKER_LIST[nature] exactly - $(@($natEn
 # found the controls the whole time (SPEC B9). What was broken is WHERE the controls hang.
 $v367Bad = @()
 # mcSettings (24th batch) and popNote (25th, SPEC I170g) float over the tabs the same way, and
-# hang off sheetBody for the same reason (SPEC I170a).
+# hang off the same parent. Since the 36th batch that parent is sheetMain, the tabs' own box
+# (SPEC I181a, B184): a scrim there fills the strip and the tabs by align="contents" and never
+# reaches the character column beside it. sheetMain is visible whenever any tab is (V496e).
 $OVERLAYS_367 = @('popScrim', 'popDesc', 'mfSearch', 'mcSettings', 'popNote')
 $rootDoc367 = Doc (Join-Path $dir "WoD20th.lfm")
-$body367 = $rootDoc367.SelectSingleNode("//layout[@name='sheetBody']")
+$body367 = $rootDoc367.SelectSingleNode("//layout[@name='sheetMain']")
 
 # (d) zero-guard first: a check that cannot find the body it measures against and passes anyway
 # is B94 - the target slides out from under it and the gate stays green (SPEC V367d, V209, V20).
-if ($null -eq $body367) { $v367Bad += "(d) the root form has no sheetBody layout - there is no shared parent to measure the overlays against (SPEC V367d, I32, V209)" }
+if ($null -eq $body367) { $v367Bad += "(d) the root form has no sheetMain layout - there is no shared parent to measure the overlays against (SPEC V367d, I32, I181a, V209)" }
 else {
-    # (a) DIRECT children of the body every tab shares. Not a grandchild through some wrapper:
+    # (a) DIRECT children of the box every tab shares. Not a grandchild through some wrapper:
     # a wrapper is a second thing that can be hidden, and hiding it hides the box again.
     foreach ($nm367 in $OVERLAYS_367) {
         $direct367 = @($body367.SelectNodes("*[@name='$nm367']"))
         if ($direct367.Count -ne 1) {
-            $v367Bad += "(a) '$nm367' is a direct child of sheetBody $($direct367.Count) time(s), expected 1 - the overlay has to hang off the one parent every tab shares, or it is invisible from the tabs that are not its own (SPEC V367a, I102a, B107)"
+            $v367Bad += "(a) '$nm367' is a direct child of sheetMain $($direct367.Count) time(s), expected 1 - the overlay has to hang off the one parent every tab shares, or it is invisible from the tabs that are not its own (SPEC V367a, I102a, I181a, B107)"
         }
     }
 
@@ -18379,13 +18448,14 @@ else {
         # .LocalName and NOT .Name: PowerShell's XML adapter exposes the `name` ATTRIBUTE as
         # .Name and shadows the element's own, so `.Name -eq 'layout'` was false for every
         # child and leg (b) reported an empty tab list against a body full of tabs.
-        # sheetMain HOLDS the strip and the eleven panes since the 25th batch (SPEC I170a, B170):
-        # it is the tabs' own box among sheetBody's children, so the overlays come after IT.
-        if (($kn367 -like 'tab*' -or $kn367 -ceq 'sheetMain') -and $kids367[$i367].LocalName -eq 'layout') { $lastTab367 = $i367 }
+        # sheetMain HOLDS the strip and the eleven panes since the 25th batch (SPEC I170a, B170)
+        # and the overlays since the 36th (SPEC I181a): the tab layouts are its children, and the
+        # overlays come after the LAST of them.
+        if ($kn367 -like 'tab*' -and $kids367[$i367].LocalName -eq 'layout') { $lastTab367 = $i367 }
         if ($OVERLAYS_367 -contains $kn367 -and $firstOv367 -lt 0) { $firstOv367 = $i367 }
     }
-    if ($lastTab367 -lt 0) { $v367Bad += "(b) sheetBody carries no tab layout - leg (b) has nothing to be after and would pass by vacancy (SPEC V367b, V209, V20)" }
-    elseif ($firstOv367 -lt 0) { $v367Bad += "(b) not one overlay was found among sheetBody's children - leg (b) measured nothing (SPEC V367b, V209, V20)" }
+    if ($lastTab367 -lt 0) { $v367Bad += "(b) sheetMain carries no tab layout - leg (b) has nothing to be after and would pass by vacancy (SPEC V367b, V209, V20)" }
+    elseif ($firstOv367 -lt 0) { $v367Bad += "(b) not one overlay was found among sheetMain's children - leg (b) measured nothing (SPEC V367b, I181a, V209, V20)" }
     elseif ($firstOv367 -lt $lastTab367) { $v367Bad += "(b) an overlay is authored BEFORE the last tab layout - file order is paint order, so the tab would be painted over the box and every click inside it would land on the grid (SPEC V367b, V320, V333b)" }
 }
 
@@ -19816,99 +19886,15 @@ if (-not (Test-Path -LiteralPath $mod409['en'])) {
     if ($v409Bad) { foreach ($b409x in $v409Bad) { Fail "V409 $b409x" } }
     else { Pass "V409 descRoad carries four blocks per entry in both halves, every child shows its mother's full table, and every aura name is the one BEARING prints" }
 }
-# ---- V389: popScrim covers the TALLEST tab, not just the widest ------------------------
-# SPEC V389, B124, I102a. The scrim is the one way a click outside the ? box closes it, and it
-# only closes what it covers. I102a wrote the risk down on 2026-08-31 naming TWO axes - "a strip
-# of the tab that does not close the overlay" - and the check that came out of it (V375) measured
-# the WIDTH. Nothing ever measured the height, and the height was wrong the whole time: the scrim
-# is authored 733 tall, which is the 40px strip plus the 693 the Traits grid covers, while the
-# MAIN tab closes at 888. A click in the bottom 195px of Main did not close the box, and the gate
-# was green (SPEC B124).
-#
-# DERIVED on both terms, because a literal here would be the THIRD owner of a tab's floor - the
-# boxes own it, V376/V69 read it, and this would copy it (SPEC B70). The floor is swept off every
-# content form the same way V286 sweeps them, and the strip's own height comes off the strip.
-$v389Bad = @()
-$rootDoc389 = Doc (Join-Path $dir 'WoD20th.lfm')
-$scrim389 = @($rootDoc389.SelectNodes("//rectangle[@name='popScrim']"))[0]
-$strip389 = $rootDoc389.SelectSingleNode("//layout[@name='tabStrip']")
+# ---- V389: RETIRED in the 36th batch (SPEC I181d, B184) - the scrim is align="client" now, so
+# its height is its parent's and there is no number to measure against the deepest tab. What it
+# measured was the geometry of a rectangle that never painted: its colour was alpha-first
+# (#..000000) and the host reads the alpha LAST (V523). V503(a) charges align="client" and V496(d)
+# the absence of any number. The block was DELETED, not commented out (the V494/V495 precedent).
+# ---- V396: RETIRED in the 36th batch (SPEC I181d, B184) - same as V389 on the other axis: with
+# align="client" there is no width to measure against the widest tab, and V496(d) stopped reading
+# the sweep this block made. DELETED, not commented out.
 
-if ($null -eq $scrim389) { $v389Bad += "popScrim is gone from WoD20th.lfm - there is no scrim to measure and no second closer either (SPEC I102a, V333e, V209)" }
-elseif ($null -eq $strip389) { $v389Bad += "tabStrip is gone from WoD20th.lfm - the scrim's origin sits above it and this leg has no offset to add (SPEC V209, I102a)" }
-else {
-    $stripH389 = 0
-    if (-not [int]::TryParse($strip389.GetAttribute("height"), [ref]$stripH389) -or $stripH389 -le 0) {
-        $v389Bad += "tabStrip declares no usable height - the scrim's offset would be guessed (SPEC V209)"
-    }
-    # The deepest y any tab reaches, over every content form, read off the top-level boxes the
-    # same way V286 reads them. ContentRoot is what makes this survive T895: three of the forms
-    # stopped being scrollBoxes and not one of their boxes moved.
-    $deep389 = 0; $deepFile389 = ''
-    $forms389 = 0
-    foreach ($f389 in $files) {
-        if ($f389.Name -eq 'WoD20th.lfm') { continue }
-        $cr389 = ContentRoot (Doc $f389.FullName)
-        if ($null -eq $cr389) { continue }
-        $forms389++
-        foreach ($b389 in $cr389.SelectNodes("layout")) {
-            $bt389 = 0; $bh389 = 0
-            if (-not [int]::TryParse($b389.GetAttribute("top"), [ref]$bt389)) { continue }
-            [void][int]::TryParse($b389.GetAttribute("height"), [ref]$bh389)
-            if (($bt389 + $bh389) -gt $deep389) { $deep389 = $bt389 + $bh389; $deepFile389 = $f389.Name }
-        }
-    }
-    if ($forms389 -eq 0 -or $deep389 -eq 0) {
-        $v389Bad += "no content form was swept for its floor - this leg would certify a scrim of any height at all (SPEC V209, V20)"
-    } else {
-        $needH389 = $deep389 + $stripH389
-        $haveH389 = 0
-        [void][int]::TryParse($scrim389.GetAttribute("height"), [ref]$haveH389)
-        if ($haveH389 -lt $needH389) {
-            $v389Bad += "popScrim is ${haveH389}px tall against a sheet whose deepest tab closes at $deep389 ($deepFile389) under a ${stripH389}px strip - the bottom $($needH389 - $haveH389)px of that tab do not close the overlay, and a click that only fails in one band of one tab has no symptom anybody reports (SPEC I102a, B124)"
-        }
-    }
-}
-if ($v389Bad) { foreach ($b389 in $v389Bad) { Fail "V389 $b389" } }
-else { Pass "V389 popScrim reaches the floor of the deepest tab plus the strip above it - every click outside the box closes it, on every tab" }
-
-# ---- V396: popScrim covers the WIDEST tab, and not one tab named in the gate ----------
-# SPEC V396, B127, B129, I136g. V375 leg (d) measured the scrim against the right edge of the
-# MAIN tab's EXPERIENCE box. That is a ruler of MAXIMUM written as an equality against ONE
-# member, and it never measured what it claimed: MEASURED while building T908, Traits closes at
-# 1595 and Main carried 1680, so the leg certified 85px of slack as exact. It was green because
-# Main happened to be WIDER than the widest, which is a different sentence. T908 takes Main to
-# 1345, at which point the same leg would DEMAND a scrim 250px too narrow for Traits - B124 on
-# the other axis, and with the same silence. Same sweep as V389 and for the same reason: a
-# literal here would be a third owner of the sheet's own width (SPEC B70).
-$v396Bad = @()
-if ($null -eq $scrim389) { $v396Bad += "popScrim is gone from WoD20th.lfm - there is no scrim to measure (SPEC I102a, V209)" }
-else {
-    $wide396 = 0; $wideFile396 = ''
-    $forms396 = 0
-    foreach ($f396 in $files) {
-        if ($f396.Name -eq 'WoD20th.lfm') { continue }
-        $cr396 = ContentRoot (Doc $f396.FullName)
-        if ($null -eq $cr396) { continue }
-        $forms396++
-        foreach ($b396 in $cr396.SelectNodes("layout")) {
-            $bl396 = 0; $bw396 = 0
-            if (-not [int]::TryParse($b396.GetAttribute("left"), [ref]$bl396)) { continue }
-            [void][int]::TryParse($b396.GetAttribute("width"), [ref]$bw396)
-            if (($bl396 + $bw396) -gt $wide396) { $wide396 = $bl396 + $bw396; $wideFile396 = $f396.Name }
-        }
-    }
-    if ($forms396 -eq 0 -or $wide396 -eq 0) {
-        $v396Bad += "no content form was swept for its right edge - this leg would certify a scrim of any width at all (SPEC V209, V20)"
-    } else {
-        $haveW396 = 0
-        [void][int]::TryParse($scrim389.GetAttribute("width"), [ref]$haveW396)
-        if ($haveW396 -lt $wide396) {
-            $v396Bad += "popScrim is ${haveW396}px wide against a sheet whose widest tab closes at $wide396 ($wideFile396) - the right $($wide396 - $haveW396)px of that tab do not close the overlay, and nothing outside that corner would ever show it (SPEC I102a, B127)"
-        }
-    }
-}
-if ($v396Bad) { foreach ($b396 in $v396Bad) { Fail "V396 $b396" } }
-else { Pass "V396 popScrim is as wide as the widest tab, swept off every content form - the width is tied to no tab by name" }
 # ---- V397: an imported form paints its OWN client rect, or it is not imported ----------
 # SPEC V397, R136, R137, B128, I136h. <import> compiles to _obj_newObject("form") plus
 # setAlign("client") and setTheme("dark"), so an imported form is a REAL form at runtime and
@@ -23822,7 +23808,7 @@ if ($rootTxt -match '\bmcDefaults\b') { $v492Bad += "(e) mcDefaults is reference
 if ($v492Bad) { foreach ($b in $v492Bad) { Fail "V492 $b" } }
 else { Pass "V492 mcAdd writes only the shared fields, the three configuration scopes pin to the root with stSharedScope holding every field of the box, the mirror has one trigger inside it, and mcInit creates no node" }
 
-# ---- V493: ONE scrim for the 3, it DARKENS and COVERS the column at any width (SPEC I169f/I169m, R169c; V53 intact) ----
+# ---- V493: ONE scrim for the 3, it DARKENS the tabs and leaves the column CLEAR (SPEC I169f/I169m, R169c, I181a/c, B184; V53 intact) ----
 $v493Bad = @()
 $popScrimNode493 = (Doc $rootPath).SelectSingleNode("//rectangle[@name='popScrim']")
 if ($null -eq $popScrimNode493) { $v493Bad += "popScrim is not declared on the root form - this check reads nothing (SPEC V20, V209)" }
@@ -23842,8 +23828,8 @@ else {
         }
     }
 
-    # (b) moved to V496d in the 25th batch (SPEC I170b): the column no longer resizes, so the
-    # scrim's width is an AUTHORED literal - widest tab + MC_DOCK_W - with no Lua writer at all.
+    # (b) moved to V496d: since the 36th batch the scrim is align="client" - it takes what the
+    # column leaves and never covers it, with no number and no Lua writer at all (SPEC I181a).
 }
 
 # (c) mcSettings and popNote are in POP_BOX and popClose hides them; mcSettingsOpen shows popScrim.
@@ -23859,8 +23845,22 @@ if ($null -eq $btnClose493) { $v493Bad += "(d) btnMcSettingsClose is not on the 
 elseif ($btnClose493.GetAttribute("onClick") -notmatch 'popClose\(self\);') { $v493Bad += "(d) btnMcSettingsClose does not call popClose(self) - a second closing function is a second place the two visibles can disagree (SPEC V493d, V135)" }
 if ($rootTxt -match 'function\s+mcSettingsClose\s*\(') { $v493Bad += "(d) a function mcSettingsClose exists - the window closes through popClose alone (SPEC V493d)" }
 
+# (e) mcShow closes every window BEFORE it switches the node: the column is clickable under an
+# open window since the scrim stopped covering it, and a picker left open across the switch would
+# write its pick into the NEW character (SPEC I181c, Q102.2). Order by index, comments stripped.
+$show493 = NoComments (LuaFn $rootTxt 'mcShow')
+if (-not $show493) { $v493Bad += "(e) mcShow is not declared on the root form (SPEC V209)" }
+else {
+    $iSet493 = $show493.IndexOf('setNodeObject(')
+    $iPop493 = $show493.IndexOf('popClose(')
+    $iMf493  = $show493.IndexOf('mfClose(')
+    if ($iSet493 -lt 0) { $v493Bad += "(e) mcShow no longer calls setNodeObject - the one place the node changes moved (SPEC V490a, V209)" }
+    if ($iPop493 -lt 0 -or $iPop493 -gt $iSet493) { $v493Bad += "(e) mcShow does not call popClose( before setNodeObject( - a ? or ! window would stay open over a character it was not opened on (SPEC V493e, I181c)" }
+    if ($iMf493 -lt 0 -or $iMf493 -gt $iSet493) { $v493Bad += "(e) mcShow does not call mfClose( before setNodeObject( - a picker left open would write its pick into the NEW character (SPEC V493e, I181c, Q102.2)" }
+}
+
 if ($v493Bad) { foreach ($b in $v493Bad) { Fail "V493 $b" } }
-else { Pass "V493 popScrim darkens with a real tone mapped by all 4 palettes, and the settings window opens and closes through the same doors as every other overlay" }
+else { Pass "V493 popScrim darkens with a real tone mapped by all 4 palettes, the settings window opens and closes through the same doors as every other overlay, and mcShow closes every window before it switches the node" }
 
 # ---- V494: RETIRED in the 25th batch (SPEC I170d) - the row's number fields left and the bars
 # read the dots (V498), so there is no second side left to keep in step with the first. V498e
@@ -23913,21 +23913,23 @@ if ($root25Code -match 'mcDock"\]\.width\s*=' -or $root25Code -match 'mcDock\.wi
 foreach ($gone496 in @('mcGrip', 'mcSetWidth', 'mcGripDown', 'mcGripMove', 'mcGripUp', 'MC_DOCK_MIN', 'MC_DOCK_MAX', 'mcDockWidth')) {
     if ($all25Code -cmatch "\b$gone496\b") { $v496Bad += "(c) '$gone496' still occurs in the sheet's code - the grip left in the 25th batch (SPEC V496c, I170b)" }
 }
-# (d) the scrim is as wide as the widest tab PLUS the column, from the same sweep as V396.
+# (d) the scrim is align="contents" inside sheetMain - it fills the strip and the tabs, never the
+# column beside them, with no number of its own and no Lua writer (SPEC I181a, B184; V396's
+# widest-tab sweep died with it, and align=client would fight sheetMain for one rect, V190).
 $scrim496 = $root25Doc.SelectSingleNode("//rectangle[@name='popScrim']")
-if ($null -eq $scrim496 -or -not $mW496.Success -or -not $wide396) { $v496Bad += "(d) popScrim, MC_DOCK_W or V396's sweep of the widest tab is missing - leg (d) reads nothing (SPEC V20, V209)" }
+if ($null -eq $scrim496) { $v496Bad += "(d) popScrim is missing - leg (d) reads nothing (SPEC V20, V209)" }
 else {
-    $wantScrim496 = $wide396 + [int]$mW496.Groups[1].Value
-    if ($scrim496.GetAttribute('width') -ne "$wantScrim496") { $v496Bad += "(d) popScrim authors width=$($scrim496.GetAttribute('width')), expected the widest tab ($wide396) + MC_DOCK_W = $wantScrim496 (SPEC V496d)" }
+    if ($scrim496.GetAttribute('align') -ne 'contents') { $v496Bad += "(d) popScrim authors align='$($scrim496.GetAttribute('align'))', expected contents - it fills sheetMain, the strip and the tabs, and never the column beside them (SPEC V496d, I181a)" }
+    foreach ($g496 in @('left', 'top', 'width', 'height')) { if ($scrim496.HasAttribute($g496)) { $v496Bad += "(d) popScrim authors $g496= - a number would fight align=contents for the same rectangle (SPEC V496d, I181a)" } }
 }
-if ($root25Code -match 'popScrim"\]\.width\s*=' -or $root25Code -match 'popScrim\.width\s*=') { $v496Bad += "(d) the Lua writes popScrim.width - its width is an authored literal now (SPEC V496d)" }
+if ($root25Code -match 'popScrim"\]\.(width|left|top|height|align)\s*=' -or $root25Code -match 'popScrim\.(width|left|top|height|align)\s*=') { $v496Bad += "(d) the Lua writes popScrim geometry - align=contents is the whole rule (SPEC V496d)" }
 # (e) sheetMain.visible has ONE writer, mcRender.
 $mainVis496 = @([regex]::Matches($root25Code, 'sheetMain"\]\.visible\s*=')).Count
 $render496 = NoComments (LuaFn $rootTxt 'mcRender')
 if ($mainVis496 -ne 1) { $v496Bad += "(e) sheetMain.visible is written $mainVis496 time(s), expected exactly 1 (SPEC V496e)" }
 elseif ($render496 -notmatch 'sheetMain"\]\.visible\s*=') { $v496Bad += "(e) the one writer of sheetMain.visible is not mcRender (SPEC V496e)" }
 if ($v496Bad) { foreach ($b in $v496Bad) { Fail "V496 $b" } }
-else { Pass "V496 the strip and the 11 panes live in sheetMain beside mcDock, the column is a fixed 370 with no grip left, the scrim spans the widest tab plus the column, and mcRender alone empties the right side" }
+else { Pass "V496 the strip and the 11 panes live in sheetMain beside mcDock, the column is a fixed 370 with no grip left, the scrim fills sheetMain by align=contents, and mcRender alone empties the right side" }
 
 # ---- V497: the v2 row - fields, bars, outline and touch (SPEC I170c/I170e) ----
 $v497Bad = @()
@@ -24292,13 +24294,15 @@ if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -e
     $link502 = $root25Doc.SelectSingleNode("//dataLink[contains(@onChange,'mcBarsSoon(')]")
     if ($null -eq $link502 -or $link502.GetAttribute('fields') -notmatch "'avatar'") { $v502Bad += "(b) the bars trigger does not watch avatar - setting the photo on the Main would leave the placeholder lit (SPEC V502b, V498d)" }
 
-    # (c) the unselected outline fades to 0.50 in mcRender (SPEC I175i, 30th batch); 0.70 is retired outright, and 0.50 has two named owners (V476b).
+    # (c) the unselected outline fades to 0.50 in mcRender (SPEC I175i, 30th batch); 0.70 left the outline with the 30th batch and has
+    # exactly two authored owners since the 36th - the two scrims (SPEC I181a, V502c as amended); 0.50 has two named owners (V476b).
     $opAll502 = @([regex]::Matches($root25Code, 'mcOn_"\s*\.\.\s*\w+\s*\]\.opacity\s*=')).Count
     $opIn502 = [regex]::Match($render502, 'mcOn_"\s*\.\.\s*\w+\s*\]\.opacity\s*=([^;\r\n]+)')
     if ($opAll502 -ne 1 -or -not $opIn502.Success -or $opIn502.Groups[1].Value -notmatch '\b0\.50\b' -or $opIn502.Groups[1].Value -notmatch '\b1\b') { $v502Bad += "(c) mcOn_.opacity is written $opAll502 time(s) - expected exactly one, in mcRender, naming 0.50 and 1 (SPEC V502c, I175i)" }
     $o70Lua502 = @([regex]::Matches($all25Code, '\.opacity\s*=[^;\r\n]*\b0\.70?\b')).Count
     $o70Xml502 = @([regex]::Matches($all25Code, '\sopacity="0\.70?"')).Count
-    if ($o70Lua502 -ne 0 -or $o70Xml502 -ne 0) { $v502Bad += "(c) 0.70 is in $o70Lua502 runtime opacity write(s) and $o70Xml502 authored opacity - it left with the 30th batch, the outline is 0.50 now (SPEC V502c, I175i, V244)" }
+    $o70Scrim502 = @([regex]::Matches($all25Code, '<rectangle name="popScrimB?"[^>]*\sopacity="0\.70"')).Count
+    if ($o70Lua502 -ne 0 -or $o70Xml502 -ne 2 -or $o70Scrim502 -ne 2) { $v502Bad += "(c) 0.70 is in $o70Lua502 runtime opacity write(s) and $o70Xml502 authored opacity ($o70Scrim502 of them on the scrims) - its only owners are popScrim and popScrimB since the 36th batch, and the outline is 0.50 (SPEC V502c, I175i, I181a, V244)" }
 
     # (d) the Name label sits 6px left of the name edit, on the edit's own line.
     $nameLbl502 = @($tpl502.SelectNodes(".//label[@text='Name']"))
@@ -24391,8 +24395,9 @@ if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -e
 if ($v502Bad) { foreach ($b in $v502Bad) { Fail "V502 $b" } }
 else { Pass "V502 Add and Settings tile the band, the photo's placeholder is one hidden line written once, the unselected outline fades to 0.50, and Name plus the three bar labels sit in their columns with the bars on one left and width" }
 
-# ---- V503: every window darkens the sheet at 70%, the picker on top included -----------------
-# SPEC I172a/b (27th batch), 70% since I180c (35th batch). ONE tone and not a transparent one; the twin under the second picker
+# ---- V503: every window darkens the tabs at 70% through opacity=, the picker on top included -----------------
+# SPEC I172a/b (27th batch), 70% since I180c (35th batch), opacity= over #000000 and align="contents" inside sheetMain
+# since I181a (36th batch, B184: the alpha-first literals never painted). ONE tone and not a transparent one; the twin under the second picker
 # is the same rectangle declared between the two boxes; and (d) is DERIVED, never a typed roster:
 # every hidden window layout over popScrim must be raised by a function that raises popScrim too,
 # so a window born without the fade reddens by NAME.
@@ -24404,11 +24409,19 @@ $mfB503    = $root25Doc.SelectSingleNode("//layout[@name='mfSearchB']")
 $close503  = LuaFn $rootTxt 'mfClose'
 if ($null -eq $scrim503 -or $null -eq $mfA503 -or $null -eq $mfB503 -or -not $close503) { $v503Bad += "popScrim, mfSearch, mfSearchB or mfClose is not on the root form - this check reads nothing (SPEC V20, V209)" }
 else {
-    if ($scrim503.GetAttribute('color') -ne '#B3000000') { $v503Bad += "(a) popScrim authors color '$($scrim503.GetAttribute('color'))' - the fade behind every window is #B3000000, black at 70% since the 35th batch (SPEC I180c, I172a)" }
+    foreach ($s503 in @($scrim503, $scrimB503)) {
+        if ($null -eq $s503) { continue }
+        $sn503 = $s503.GetAttribute('name')
+        if ($s503.GetAttribute('color') -ne 'black') { $v503Bad += "(a) $sn503 authors color '$($s503.GetAttribute('color'))' - the fade is color=black, the era's box tone like the tips, and the 70% comes from opacity=; a second key for black collides with it in the palettes (SPEC I182a, B185, B184)" }
+        if ($s503.GetAttribute('opacity') -ne '0.70') { $v503Bad += "(a) $sn503 authors opacity '$($s503.GetAttribute('opacity'))' - the user asked for 70% (SPEC I181a, V503a)" }
+        if ($s503.GetAttribute('align') -ne 'contents') { $v503Bad += "(a) $sn503 is not align='contents' - it has to fill sheetMain, the strip and the tabs, and leave the column clear (SPEC I181a, V496d)" }
+        foreach ($g503 in @('left', 'top', 'width', 'height')) { if ($s503.HasAttribute($g503)) { $v503Bad += "(a) $sn503 authors $g503= - with align=contents the geometry is the parent's (SPEC I181a)" } }
+    }
     foreach ($f503 in $files) {
         $txt503 = [System.IO.File]::ReadAllText($f503.FullName)
         if ($txt503.Contains('#66000000')) { $v503Bad += "(a) $($f503.Name) still carries #66000000 - the 40% fade left in the 27th batch, and a palette key nobody uses does not stay (SPEC I172a)" }
         if ($txt503.Contains('#80000000')) { $v503Bad += "(a) $($f503.Name) still carries #80000000 - the 50% fade left in the 35th batch, and a palette key nobody uses does not stay (SPEC I180c, I172a)" }
+        if ($txt503.Contains('#B3000000')) { $v503Bad += "(a) $($f503.Name) still carries #B3000000 - the alpha-first 70% that never painted, left in the 36th batch (SPEC I181a, B184, V523)" }
     }
     $sib503 = @($mfA503.ParentNode.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
     $iA503  = [array]::IndexOf($sib503, $mfA503)
@@ -24418,7 +24431,7 @@ else {
     if ($nSB503 -ne 1) { $v503Bad += "(b) popScrimB is declared $nSB503 time(s) - exactly one scrim sits under the second picker (SPEC I172b)" }
     elseif ($iS503 -lt 0 -or -not ($iA503 -lt $iS503 -and $iS503 -lt $iB503)) { $v503Bad += "(b) popScrimB is not a sibling declared BETWEEN mfSearch and mfSearchB - document order is paint order, so it would not sit over the first box and under the second (SPEC I172b, V439b)" }
     else {
-        foreach ($at503 in @('left', 'top', 'width', 'height', 'color', 'strokeColor')) {
+        foreach ($at503 in @('align', 'color', 'strokeColor', 'opacity')) {
             if ($scrimB503.GetAttribute($at503) -cne $scrim503.GetAttribute($at503)) { $v503Bad += "(b) popScrimB authors $at503='$($scrimB503.GetAttribute($at503))' and popScrim '$($scrim503.GetAttribute($at503))' - the twin is the same rectangle (SPEC I172b)" }
         }
         if ($scrimB503.GetAttribute('visible') -ne 'false') { $v503Bad += "(b) popScrimB is not authored visible='false' - the second picker's fade would be up with no picker under it" }
@@ -24444,7 +24457,7 @@ else {
     }
 }
 if ($v503Bad) { foreach ($b in $v503Bad) { Fail "V503 $b" } }
-else { Pass "V503 one 70% fade behind every window, its twin between the two pickers, and every window raised with it" }
+else { Pass "V503 one 70% fade by opacity over black with align=contents on both scrims inside sheetMain, the twin between the two pickers, and every window raised with it" }
 
 # ---- V504: the ! of a trait - one per attribute, book ability and typed row, none on a virtue ----
 # SPEC I172c/d, Q92.3. The ability's ! reads the LIVE field of its first dot because the era
