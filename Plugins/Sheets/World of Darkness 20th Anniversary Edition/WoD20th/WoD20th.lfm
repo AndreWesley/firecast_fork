@@ -2979,8 +2979,8 @@
 			-- the rows that own a ?: the twenty-two merits and flaws, whose num is `m0`..`f10`
 			-- and not a bare digit, and six standalone pickers with no underscore in their name
 			-- at all - nature, demeanor, road, hedgeAffiliation, hedgeAttr, clanFamily. Nil
-			-- travels to savePopDesc, which returns on it without a word, so the storyteller
-			-- typed into those descriptions and nothing was ever written. It failed exactly
+			-- travelled to savePopDesc (gone with the 35th batch, SPEC I180b), which returned
+			-- on it without a word, so what was typed there was never written. It failed exactly
 			-- where the numbering was unusual and worked everywhere anyone had looked, which is
 			-- why derivation this cheap goes unmeasured until something asks it to spread.
 			function descFieldOf(field)
@@ -4537,14 +4537,6 @@
 				return txt;
 			end;
 
-			-- Which row the ONE box is showing. popOpen sets it, popClose clears it, and
-			-- savePopDesc below is the only reader: a keystroke that arrives with no box open
-			-- writes nothing (SPEC T845, I102i).
-			--
-			-- GLOBAL, like descQuiet beside it, and that is not style: a local at chunk scope
-			-- spends a slot the root does not have - it declares 50 against the 50 V347 allows,
-			-- and over the real 53 rdk -l exits 1, prints nothing and deletes the .rpk (SPEC
-			-- B93, B19, V347).
 			-- ===== Esc fecha os 2 overlays (SPEC V405, I140c, T922/T923) =====
 			--
 			-- MEDIDO no Firecast pelo user 2026-09-02, & é a §T922 inteira: o evento de teclado
@@ -4654,8 +4646,9 @@
 
 				-- ⊥ reconhecida, & só no `?`: 1 caixa por abertura, dizendo o que o `event` TEM.
 				-- É a §T922 se auto-respondendo se o palpite de `isEscKey` estiver errado.
-				-- `from.readOnly` em RUNTIME & ⊥ o atributo: `edtPopDesc` vira editável em item
-				-- CUSTOM (& `edtMfDesc` p/ o narrador), & aí a 1ª letra digitada abria esta caixa.
+				-- `from.readOnly` em RUNTIME & ⊥ o atributo: `edtPopDesc` é só-leitura p/ TODOS desde
+				-- o 35º lote (SPEC I180b, V522), mas `edtMfDesc` chama este MESMO handler & vira
+				-- editável p/ o narrador em linha CUSTOM — lá a 1ª letra digitada abriria esta caixa.
 				if diag ~= true or not kbEscArmed or from.readOnly ~= true then return; end;
 
 				kbEscArmed = false;
@@ -4674,8 +4667,6 @@
 
 				Dialogs.showMessage(msg);
 			end;
-
-			popRow = nil;
 
 			-- popOpen paints the ? box - title, text, scrim, box - and reads the text through descText.
 			--
@@ -4697,13 +4688,10 @@
 
 				if sheet ~= nil and sheet.language == "pt" then lang = "pt"; end;
 
-				popRow = row;
-
-				-- What the storyteller wrote for THIS row wins over the book, read from the field
-				-- savePopDesc writes - one owner for the text, not two (SPEC V135, I102i, I45).
-				-- Without this read the write has no reader: he would type, close, reopen and find
-				-- the book text back, which is the feature erased sideways that I102i exists to
-				-- stop. Empty override falls through to the book, so clearing the box restores it.
+				-- What the storyteller wrote for THIS row wins over the book: the custom text typed
+				-- in the picker's own pane, or an override the ? of before the 35th batch left in
+				-- descFieldOf(row) (SPEC I180b, Q101.1). The ? writes nothing any more - it is
+				-- read-only for everyone (SPEC V522) - so the reader stayed and the writer went.
 				-- ONE reader, and the order lives in it (SPEC V381, I129k). What stood here was
 				-- popOpen's own two-step - override, else book - and mfDesc carried a one-step of
 				-- its own; descFor is now the only place either order is written, and it grew the
@@ -4719,29 +4707,13 @@
 
 				if found["dynPopDescTitle"] ~= nil then found["dynPopDescTitle"].text = key; end;
 
-				-- descQuiet around the write for the reason the five description panes already
-				-- raise it: gui.TextEditor has onChange and no onUserChange (rrpgGUI.lua:667-675),
-				-- so the renderer's own write comes back through the door the storyteller's typing
-				-- uses (SPEC V107, V249d, B39). Without it, opening the ? would SAVE the book text
-				-- onto that row - every row he ever looked at, in silence.
-				--
-				-- readOnly is written ALONE, and that is V111(2) winning over the edtSpentXP shape
-				-- V365f borrowed. edtPopDesc is on the DESC_BRIGHT roster BY NAME: a description
-				-- pane carries no opacity at all, because opacity on a TextControl fades the TEXT
-				-- along with the frame (SPEC V241) - dimming it would charge the player legibility
-				-- of the very thing he opened the box to read. The comboBox left V162's scope on
-				-- exactly this argument in the 2026-08-22 amendment (SPEC I41), and this is the
-				-- same widget class in the same roster: ONE write, so there are no two halves left
-				-- to disagree about the lock.
-				--
-				-- V365f still pairs the two writes for a pane that is FORBIDDEN the second one, so
-				-- it needs amending - flagged for /ck:spec, not decided here (SPEC V111(2), V241).
-				if found["edtPopDesc"] ~= nil then
-					descQuiet = true;
-					found["edtPopDesc"].text = txt;
-					found["edtPopDesc"].readOnly = not isStoryteller();
-					descQuiet = false;
-				end;
+				-- ONE write, and the text only: edtPopDesc is born readOnly in the XML and nothing in
+				-- Lua ever flips it - the ? is a window to READ the book, for the storyteller too
+				-- (SPEC I180b, V522; it revokes I102i). No descQuiet around it either: the pane has
+				-- no onChange left to mute. It stays on the DESC_BRIGHT roster BY NAME with no
+				-- opacity, because opacity on a TextControl fades the TEXT along with the frame
+				-- (SPEC V111(2), V241).
+				if found["edtPopDesc"] ~= nil then found["edtPopDesc"].text = txt; end;
 
 				if found["popScrim"] ~= nil then found["popScrim"].visible = true; end;
 
@@ -4763,7 +4735,6 @@
 				if found["popNote"] ~= nil then found["popNote"].visible = false; end;
 				if found["popSpec"] ~= nil then found["popSpec"].visible = false; end;
 
-				popRow = nil;
 				NOTE.key = nil;
 				SPEC_WIN.key = nil;
 				SPEC_WIN.rows = {};
@@ -5258,30 +5229,6 @@
 				end;
 			end;
 
-			-- What the storyteller types in the ? box lands on the row that OPENED it, read at the
-			-- moment of the write (SPEC V249c, I102i): popRow is set by popOpen and cleared by
-			-- popClose.
-			--
-			-- It asks isStoryteller() again rather than trusting the readOnly popOpen just wrote:
-			-- the flag on the control is a look, and the rule is a rule (SPEC V266b, V80).
-			--
-			-- It does NOT ask isTypedRow, and that is the one place this differs from the five
-			-- panes it copies: the ? lives on PICKER rows only (SPEC I102f, V365b), so their typed
-			-- row test would refuse every write there is.
-			--
-			-- ONE writer, through descFieldOf - the same door saveNuminaDesc uses, so no second
-			-- owner of the text is born (SPEC I45, V135, V365f).
-			function savePopDesc(form)
-				if descQuiet or sheet == nil or form == nil then return; end;
-				if popRow == nil or not isStoryteller() then return; end;
-
-				local fld = descFieldOf(popRow);
-
-				if fld == nil then return; end;
-
-				setField(fld, form.edtPopDesc.text);
-			end;
-
 			-- ---- The ! note of a background, merit or flaw (SPEC I170g/I170h, T1076) -----------
 			--
 			-- NOTE.key is the field the open window edits. The tooltip finds its controls by NAME
@@ -5351,7 +5298,8 @@
 			end;
 
 			-- The ONE writer of a note (SPEC V500c). Anyone who edits the sheet edits its notes
-			-- (SPEC Q90.10) - there is no storyteller test here, unlike savePopDesc above.
+			-- (SPEC Q90.10) - there is no storyteller test here, and no ? writer to compare with
+			-- since the 35th batch made the ? read-only (SPEC I180b).
 			function savePopNote(form)
 				if descQuiet or NOTE.key == nil or sheet == nil or form == nil then return; end;
 
@@ -9479,9 +9427,10 @@
 		     batch) plus the fixed column, so the fade covers the column too and a click on a row
 		     while the picker is open cannot swap the character under the picker's own field
 		     (SPEC I169f, I170b, V496d). No Lua writes this width any more - the column does not
-		     resize. #80000000 is the 50% black every window darkens the sheet with (SPEC I172a,
-		     V503a); popScrimB, its twin under the second picker, carries the same four numbers. -->
-		<rectangle name="popScrim" left="0" top="0" width="2005" height="936" color="#80000000" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
+		     resize. The color is the 70% black (alpha B3 = 179/255) every window darkens the sheet
+		     with since the 35th batch (SPEC I180c, V503a); popScrimB, its twin under the second
+		     picker, carries the same four numbers. -->
+		<rectangle name="popScrim" left="0" top="0" width="2005" height="936" color="#B3000000" strokeColor="#00000000" visible="false" onClick="popClose(self);"/>
 
 		<layout name="popDesc" left="440" top="150" width="500" height="490" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
@@ -9497,7 +9446,7 @@
 			<!-- wordWrap is what kills the horizontal scrollbar the user asked not to see: there is
 			     no scroll property on this control in SDK3, so the only way to have no horizontal
 			     bar is to give it nothing to scroll (SPEC I102c, V333f). -->
-			<textEditor name="edtPopDesc" left="20" top="40" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onChange="savePopDesc(self);" onKeyDown="escClose(self, event, true);"/>
+			<textEditor name="edtPopDesc" left="20" top="40" width="460" height="435" readOnly="true" wordWrap="true" transparent="true" fontSize="12" onKeyDown="escClose(self, event, true);"/>
 		</layout>
 
 		<!--
@@ -9579,9 +9528,9 @@
 			scrim + box, closed by popClose from the X or the scrim (SPEC V500d). The text box has
 			NO field=: the field it edits is named at open time by noteKey from the row's chosen
 			VALUE, so the same background in two rows opens the same note (SPEC I170g). noteOpen
-			writes the text under descQuiet and savePopNote writes it back - the pattern
-			popOpen/savePopDesc already run, because a textEditor's onChange cannot tell a Lua write
-			from the player's typing (SPEC R170i). No readOnly: whoever edits the sheet edits its
+			writes the text under descQuiet and savePopNote writes it back - the pattern the ? ran
+			until the 35th batch made it read-only, because a textEditor's onChange cannot tell a Lua
+			write from the player's typing (SPEC R170i). No readOnly: whoever edits the sheet edits its
 			notes (SPEC Q90.10). dynPopNoteTitle is dyn* because Lua writes the translated name.
 			28th batch (SPEC I173c/d): the header carries the - and + of popDesc, so edtPopNote is
 			one of DESC_PANES and obeys the one descFontSize; the box grew 40 wide so the title
@@ -9866,7 +9815,7 @@
 		     two boxes, so it paints over mfSearch and under this frame, with popScrim's own
 		     left/top/width/height/color. mfOpen raises it through the re-keyed `popScrim` at depth
 		     2; a click on it is a click outside THIS box, so it closes this box only (mfClose). -->
-		<rectangle name="popScrimB" left="0" top="0" width="2005" height="936" color="#80000000" strokeColor="#00000000" visible="false" onClick="mfClose(self);"/>
+		<rectangle name="popScrimB" left="0" top="0" width="2005" height="936" color="#B3000000" strokeColor="#00000000" visible="false" onClick="mfClose(self);"/>
 		<layout name="mfSearchB" left="340" top="120" width="1000" height="635" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label name="dynMfTitleB" left="60" top="15" width="400" height="20" horzTextAlign="center"/>

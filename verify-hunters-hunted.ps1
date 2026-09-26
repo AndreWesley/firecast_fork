@@ -9854,10 +9854,10 @@ else {
 #   * V266 for the Numina panes, which are the same shape. WARNING, and it cost the 157th a
 #     round: saveNuminaDesc writes box.text, NOT form.<Edit>.text - following the subject there
 #     is right, but the FORM has to be read from there too.
-#   * V365(f) for the ? box, where savePopDesc does the four things this check charged -
-#     descQuiet so the renderer's write does not come back as typing, isStoryteller() RE-asked
-#     because readOnly on the control is a look and the rule is the rule, popRow read at the
-#     MOMENT of the write, and the write itself through descFieldOf, the one owner (V135).
+#   * V365(f) for the ? box, where savePopDesc did the four things this check charged -
+#     descQuiet, isStoryteller() RE-asked, popRow read at the MOMENT of the write, and the write
+#     through descFieldOf, the one owner (V135) - UNTIL the 35th batch made the ? read-only for
+#     everyone and removed the write altogether (SPEC I180b, V522).
 #
 # The single leg that does NOT migrate is isTypedRow, and on purpose: the ? lives on PICKER
 # rows (I102f, V365b), so a typed-row test there would refuse every write there is.
@@ -9919,13 +9919,12 @@ foreach ($gf in @('WoD20.11.lfm', 'WoD20.7.lfm')) {
         if ($gt -match [regex]::Escape($ghost)) { $typedBad += "$gf names $ghost again - waves 3 and 4 moved the storyteller's write to savePopDesc (V365f) and a pane back here is a second owner of the same text with no ruler on it (SPEC V135, B98, T872, T874)" }
     }
 }
-# The owner the rule migrated to must still be standing, or the retirement quietly became a
-# deletion. Named by function, not by check id: a check can be renumbered, a missing function
-# cannot be argued with (SPEC V209, V20). It was two until T874 and it is ONE now, which is the
-# whole point of V365(f) - one door, so there are no two halves left to disagree.
-if (-not (LuaFn $rootTxt 'savePopDesc')) { $typedBad += "savePopDesc is gone from the root form - V249 retired INTO it, so the storyteller's write has no owner left anywhere (SPEC V365f, T872, T874)" }
+# The owner the rule migrated to (savePopDesc) was charged here to be standing until the 35th
+# batch, when the user made the ? read-only for everyone and the write itself left with it
+# (SPEC I180b, V522) - so there is no owner to look for any more, and that is a decision, not a
+# deletion by accident: V522(c) charges that savePopDesc stays gone.
 if ($typedBad) { foreach ($b in $typedBad) { Fail "V249/V250 $b" } }
-else { Pass "V249/V250 retired with the seven panes of T872 and T874 - not one of the four areas names a pane, NO_TEXT_YET or saveNuminaDesc, and the one owner the rule moved to (savePopDesc, behind the ?) is standing" }
+else { Pass "V249/V250 retired with the seven panes of T872 and T874 - not one of the four areas names a pane, NO_TEXT_YET or saveNuminaDesc; the write itself left with the 35th batch (V522)" }
 
 # ---- V251: the five ritual rows that came off do not come back ---------------------------
 # The names are burned like every other orphan (SPEC I3, V2): a sheet saved before the 85th
@@ -10970,7 +10969,7 @@ else { Pass "V264 the casting picker is exactly the nine attributes and the ten 
 # what leg (b) measures here - everywhere else a literal key would open one description from every
 # row, which V333(d) refuses; here there is exactly one row and exactly one entry, so the literal
 # IS the fixed key V50 always described. It also hands popOpen no row, so there is no override to
-# write and savePopDesc stands down (SPEC V365f).
+# read either (the ? writes nothing since the 35th batch, SPEC I180b, V522).
 $v265Bad = @()
 # The pane became the third BOX of the top band in T830, where WILLPOWER stood (SPEC I117d,
 # V361c): found by TITLE and not by name, the way V296 found its boxes, because a pane name was
@@ -11015,10 +11014,10 @@ else { Pass "V265 the True Faith box types its religion, selects nothing, and it
 # The RULE is not orphaned, and that is measured rather than assumed - it moved to owners that
 # already exist and already have checks of their own:
 #
-#   * V365(f) for the storyteller's write. savePopDesc does the four things this check charged -
-#     descQuiet so the renderer's write does not come back as typing, isStoryteller() RE-asked
-#     because readOnly on the control is a look, popRow read at the MOMENT of the write, and the
-#     write itself through descFieldOf, the one owner (V135, I45).
+#   * V365(f) for the storyteller's write - savePopDesc did the four things this check charged
+#     (descQuiet, isStoryteller() RE-asked, popRow read at the MOMENT of the write, the write
+#     through descFieldOf) UNTIL the 35th batch made the ? read-only for everyone and removed
+#     the write altogether (SPEC I180b, V522).
 #   * V365(e) for the DATA. The window went, the fields did not: every descFieldOf(<row>) that
 #     existed before exists after, which is the leg that separates "moved" from "eaten".
 #   * V265 for True Faith, where the fixed key is now read by a ? that hands popOpen no row -
@@ -11044,10 +11043,10 @@ foreach ($ghost266 in @('renderNuminaDesc', 'paintNuminaPane', 'numinaText', 'fa
     }
 }
 
-# The owner the rule migrated to has to be standing, or the retirement was a deletion. Named by
-# FUNCTION and not by check id: a check can be renumbered, a missing function cannot be argued
-# with (SPEC V209, V20).
-if (-not (LuaFn $rootTxt 'savePopDesc')) { $v266Bad += "savePopDesc is gone from the root form - V266 retired INTO it, so what the storyteller types on a typed row has no owner left anywhere (SPEC V365f, T874)" }
+# The READ owner the rule migrated to has to be standing, or the retirement was a deletion. Named
+# by FUNCTION and not by check id: a check can be renumbered, a missing function cannot be argued
+# with (SPEC V209, V20). The WRITE owner (savePopDesc) is no longer looked for: the 35th batch
+# made the ? read-only for everyone and removed the write on purpose (SPEC I180b, V522c).
 if (-not (LuaFn $rootTxt 'descFor')) { $v266Bad += "descFor is gone from the root form - it is the ONE reader the ? and the picker pane share, and V266's read half retired into it (SPEC V381, V135, T874)" }
 
 # A dataLink on a description field would repaint the box under the cursor on every keystroke.
@@ -11058,7 +11057,7 @@ foreach ($dl266 in $numDoc266.SelectNodes("//dataLink")) {
 }
 
 if ($v266Bad) { foreach ($b in $v266Bad) { Fail "V266 $b" } }
-else { Pass "V266 retired with the four Numina panes in T874 - not one of the pane readers is back on the tab, nothing watches a description field, and the two owners the rule moved to (savePopDesc for the write, descFor for the read) are standing" }
+else { Pass "V266 retired with the four Numina panes in T874 - not one of the pane readers is back on the tab, nothing watches a description field, and the read owner the rule moved to (descFor) is standing - the write left with the 35th batch (V522)" }
 
 # ---- V267: the top band of tabHedge closes on ONE base -----------------------------------
 # SPEC I63, user 2026-08-23. Leg (b) is not here: it is the named exception inside V240 above,
@@ -16572,6 +16571,61 @@ if ($ns520.Success -and $pairs520 -eq 0) { $v520Bad += "(b) no cboX/cboXMc pair 
 if ($v520Bad) { foreach ($b in $v520Bad) { Fail "V520 $b" } }
 else { Pass "V520 $seen520 sorted cbo* derive their own field, $pairs520 twin pair(s) agree on PICKER_NOSORT, $tpl520 templated name(s) skipped" }
 
+# ---- V521: PAGE reads PAG. in Portuguese on both halves, and Page reads Pag. (SPEC I180a, user 2026-09-25) ----
+# V10/V28 charge that the key EXISTS in localization.lang and in the PT map; this charges the VALUE
+# the user asked for, the way V502e pins 'Forca de Vontade'. Built from code points: this file is
+# ASCII (SPEC V384). Case-sensitive on purpose (-cne): the two keys differ only by case.
+$v521Bad = @()
+$pagUp521 = 'P' + [string][char]0x00C1 + 'G.'
+$pagLo521 = 'P' + [string][char]0x00E1 + 'g.'
+$keys521 = @(@('PAGE', $pagUp521), @('Page', $pagLo521))
+foreach ($k521 in $keys521) {
+    if (-not $ptVal.ContainsKey($k521[0])) { $v521Bad += "(a) localization.lang [pt] has no wod.$($k521[0]) - the key V10 charges is gone, so there is nothing to read (SPEC V521a, V209)" }
+    elseif ($ptVal[$k521[0]] -cne $k521[1]) { $v521Bad += "(a) localization.lang [pt] reads wod.$($k521[0]) as '$($ptVal[$k521[0]])' - the user asked for '$($k521[1])' on the MERITS and FLAWS column (SPEC I180a, V521a)" }
+}
+$wod6Txt521 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.6.lfm")))
+foreach ($k521 in $keys521) {
+    $m521 = [regex]::Match($wod6Txt521, '\["' + $k521[0] + '"\]\s*=\s*"([^"]*)"')
+    if (-not $m521.Success) { $v521Bad += "(b) the PT map in WoD20.6 has no [$($k521[0])] entry - V28 charges the key, this leg has nothing to read (SPEC V521b, V209)" }
+    elseif ($m521.Groups[1].Value -cne $k521[1]) { $v521Bad += "(b) the PT map in WoD20.6 reads $($k521[0]) as '$($m521.Groups[1].Value)' - the user asked for '$($k521[1])', and the map is what translateSheetText reads (SPEC I180a, V521b, V28)" }
+}
+if ($v521Bad) { foreach ($b in $v521Bad) { Fail "V521 $b" } }
+else { Pass "V521 PAGE reads $pagUp521 and Page reads $pagLo521 in localization.lang [pt] and in the PT map of WoD20.6" }
+
+# ---- V522: the ? is read-only for EVERYONE and nothing is written from it (SPEC I180b, Q101.1; revokes I102i; V365(f) retired) ----
+# The pane is born readOnly in the XML and no Lua flips it; savePopDesc and popRow are gone; the
+# READ (descFor: custom -> override -> book) stays, which is what separates "took the write away"
+# from "took the read away" (SPEC V522d). Comments are stripped before the Lua legs (NoComments),
+# so a comment that remembers savePopDesc does not redden the sheet.
+$v522Bad = @()
+$edt522 = $null
+foreach ($f522 in $files) {
+    $n522 = (Doc $f522.FullName).SelectSingleNode("//textEditor[@name='edtPopDesc']")
+    if ($null -ne $n522) { $edt522 = $n522 }
+}
+$pop522  = LuaFn $rootTxt 'popOpen'
+$desc522 = LuaFn $rootTxt 'descFor'
+if ($null -eq $edt522 -or -not $pop522 -or -not $desc522) { $v522Bad += "edtPopDesc, popOpen or descFor is not on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    if ($edt522.GetAttribute('readOnly') -ne 'true') { $v522Bad += "(a) edtPopDesc is not authored readOnly='true' - the ? is a window to read the book, for the storyteller too (SPEC I180b, V522a)" }
+    if ($edt522.HasAttribute('onChange')) { $v522Bad += "(a) edtPopDesc carries onChange='$($edt522.GetAttribute('onChange'))' - nothing typed in the ? has a reader any more, so the attribute is a door to nowhere (SPEC I180b, V522a)" }
+    if ($edt522.HasAttribute('opacity')) { $v522Bad += "(d) edtPopDesc carries opacity '$($edt522.GetAttribute('opacity'))' - it is on the DESC_BRIGHT roster and opacity fades the TEXT with the frame (SPEC V522d, V111(2), V241)" }
+    foreach ($f522 in $files) {
+        $lua522 = NoComments (CodeOf $f522.FullName)
+        if ($lua522 -match 'edtPopDesc"\]\.readOnly|edtPopDesc\.readOnly') { $v522Bad += "(b) $($f522.Name) writes edtPopDesc.readOnly from Lua - the XML is the ONE owner of the lock since the 35th batch (SPEC I180b, V522b)" }
+        if ($lua522 -match '\bpopRow\b') { $v522Bad += "(c) $($f522.Name) still names popRow - the row the ? would write to, and the ? writes nothing (SPEC I180b, V522c)" }
+    }
+    if ((NoComments $pop522) -match 'edtPopDesc"\]\.opacity') { $v522Bad += "(d) popOpen writes opacity on edtPopDesc - a pane of TEXT is never dimmed (SPEC V522d, V111(2), V241)" }
+    if (LuaFn $rootTxt 'savePopDesc') { $v522Bad += "(c) savePopDesc is back on the root form - the ? writer the 35th batch removed (SPEC I180b, V522c)" }
+    $dc522 = NoComments $desc522
+    $iCus522  = $dc522.IndexOf('customDescFieldOf(')
+    $iOvr522  = $dc522.IndexOf('descFieldOf(', [Math]::Max(0, $iCus522 + 1))
+    $iBook522 = $dc522.IndexOf('descText(')
+    if ($iCus522 -lt 0 -or $iOvr522 -lt 0 -or $iBook522 -lt 0 -or -not ($iCus522 -lt $iOvr522 -and $iOvr522 -lt $iBook522)) { $v522Bad += "(d) descFor no longer reads custom (customDescFieldOf) -> override (descFieldOf) -> book (descText) in that order - the 35th batch took the WRITE away, not the read (SPEC V522d, Q101.1, V381)" }
+}
+if ($v522Bad) { foreach ($b in $v522Bad) { Fail "V522 $b" } }
+else { Pass "V522 edtPopDesc born readOnly with no onChange and no opacity, no Lua flips it, savePopDesc and popRow gone, and descFor still reads custom, override, book in that order" }
+
 # ---- V351: the ROAD label rides on the picker's own line -------------------------------
 # SPEC C Q27, I99k-m, T801. The user asked for the label beside the dropdown; what it BUYS is
 # 25px of height off three boxes, and what it COSTS is 51px of picker width - measured, one
@@ -16774,8 +16828,8 @@ else {
         if ((NoComments $fn381.Groups[1].Value) -notmatch 'descFor\(') { $v381Bad += "(a) $rd381 does not read through descFor - it is carrying its own copy of the order (SPEC V381a, V135)" }
     }
 
-    # (b) and NOBODY reads the three sources outside it. Writes are fine - savePopDesc and
-    # mfConfirm both write - so what is looked for is the READ, sheet[<derivation>].
+    # (b) and NOBODY reads the three sources outside it. Writes are fine - mfConfirm writes, and
+    # savePopDesc did until the 35th batch - so what is looked for is the READ, sheet[<derivation>].
     #
     # ONE exception, NAMED and closed: mfCustom. It reads the pair to FILL the editor the player
     # is about to type in - he clicked Custom, so there is no order to apply and no book to fall
@@ -16824,8 +16878,8 @@ else { Pass "V381 descFor is the one reader, popOpen and mfDesc both go through 
 # SPEC V377, B111, I129g, T867. descFieldOf is the ONE derivation of where a row keeps its
 # text, and it answered nil for twenty-eight of the rows that own a ? - the twenty-two merits
 # and flaws, whose num is `m0`..`f10`, and the standalone pickers with no underscore at all.
-# Nil reaches savePopDesc, which returns on it without a word: the storyteller typed and
-# nothing was written, on the rows nobody happened to test.
+# Nil reached savePopDesc (gone since the 35th batch, I180b), which returned on it without a
+# word: the storyteller typed and nothing was written, on the rows nobody happened to test.
 #
 # The pattern is read from the SOURCE and not copied here (leg c): a gate carrying its own
 # copy goes green the day the Lua's own pattern changes under it (SPEC V135).
@@ -18100,7 +18154,8 @@ if ($v364Bad) { foreach ($b in $v364Bad) { Fail "V364 $b" } }
 else { Pass "V364 mfOpen guards the description require with exactly one pcall, behind a nil test so the concatenation cannot raise outside it, hands mod on with no fallback, leaves meritData unguarded, and descText answers empty for a module that is not there so the pane falls to V360c's sentence - with no roster of which lists have one" }
 
 # ---- V365: every picker has a ?, and the ? is the ONE place a description is read and written
-# SPEC V365, I102h, I102i, T845, T846; amended three times in one day by B104, B105 and B106.
+# SPEC V365, I102h, I102i, T845, T846; amended three times in one day by B104, B105 and B106;
+# leg (f) retired 2026-09-25 into V522 (SPEC I180b, 35th batch).
 #
 # The roster is CODE on BOTH sides, the shape V354i settled: asking the XML which templates open
 # the box is what stops a converted family from passing by VACANCY. It reuses $v354Opens on
@@ -18120,13 +18175,12 @@ foreach ($f365 in $files) {
 }
 $q365 = @($q365 | Sort-Object -Unique)
 $pop365 = LuaFn $rootTxt 'popOpen'
-$sav365 = LuaFn $rootTxt 'savePopDesc'
 
 # (g) zero-guard FIRST: every leg under this compares two SETS, and a comparison over an empty
 # set is the check that measures nothing and says PASS (SPEC V365g, V20, B7, B92).
 if (@($v354Opens).Count -eq 0) { $v365Bad += "(g) not one template that opens a picker was found - legs (a) and (d) would compare against an empty set (SPEC V365g, V209, V20)" }
 if ($q365.Count -eq 0) { $v365Bad += "(g) not one template draws a ? - the sheet has no description door at all and leg (a) would pass by vacancy (SPEC V365g, V209, V20)" }
-if (-not $pop365) { $v365Bad += "(g) popOpen is gone - legs (c) and (f) have nothing to read (SPEC V365g, V209)" }
+if (-not $pop365) { $v365Bad += "(g) popOpen is gone - leg (c) has nothing to read (SPEC V365g, V209)" }
 
 # (a) the family in scope is the one ALREADY CONVERTED, and converting means calling mfOpen(
 # (SPEC B106). A comboBox still waiting on its wave of I113e is NOT a violation - it is a family
@@ -18190,37 +18244,13 @@ foreach ($f365 in $files) {
 }
 if ($lit365.Count -gt 0) { $v365Bad += "(e) $($lit365.Count) description field(s) written as a LITERAL ($($lit365 -join ', ')) - descFieldOf derives the name from the row, and a hand-pinned one survives the row moving while the data does not (SPEC V365e, I45)" }
 
-# (f) the storyteller's WRITE survives the move, and the pane stays BRIGHT while it does.
-# V162 pairs readOnly with opacity for a widget of VALUE (edtSpentXP, I8). edtPopDesc is a pane
-# of TEXT on the DESC_BRIGHT roster, where opacity fades the text with the frame (V241) - so the
-# pair is REFUSED here, and the comboBox left V162's scope on this same argument in 2026-08-22
-# (I41). One write, so there are no two halves to disagree (SPEC V365f, V111(2), B104).
-$edt365 = $null
-foreach ($f365 in $files) {
-    $n365 = (Doc $f365.FullName).SelectSingleNode("//textEditor[@name='edtPopDesc']")
-    if ($null -ne $n365) { $edt365 = $n365 }
-}
-if ($null -eq $edt365) { $v365Bad += "(f) edtPopDesc is gone - the ? box has nothing to write into (SPEC V365f, V209)" }
-else {
-    if ($edt365.GetAttribute("readOnly") -ne 'true') { $v365Bad += "(f) edtPopDesc is not born readOnly - a player would type over the book text in the moment before popOpen runs (SPEC V365f, V333)" }
-    if ($edt365.HasAttribute("opacity")) { $v365Bad += "(f) edtPopDesc carries opacity '$($edt365.GetAttribute('opacity'))' - it is on the DESC_BRIGHT roster and opacity fades the TEXT with the frame, so dimming it charges the player legibility of the thing he opened the box to read (SPEC V365f, V111(2), V241, B104)" }
-    if ($edt365.GetAttribute("onChange") -notmatch 'savePopDesc') { $v365Bad += "(f) edtPopDesc has no savePopDesc on change - what the storyteller types would have no reader, the feature erased sideways I102i exists to stop (SPEC V365f)" }
-}
-if ($pop365) {
-    $pc365 = NoComments $pop365
-    if ($pc365 -notmatch 'readOnly = not isStoryteller\(\)') { $v365Bad += "(f) popOpen does not write readOnly = not isStoryteller() - a readOnly pinned true IS the storyteller's write erased sideways (SPEC V365f, I102i)" }
-    if ($pc365 -match 'edtPopDesc"\]\.opacity') { $v365Bad += "(f) popOpen writes opacity on edtPopDesc - the V162 pair is for a widget of VALUE and this is a pane of TEXT (SPEC V365f, V111(2), V241, B104)" }
-}
-if (-not $sav365) { $v365Bad += "(f) savePopDesc is gone - the ? box would open editable for the storyteller and save nowhere (SPEC V365f, I102i)" }
-else {
-    $sb365 = NoComments $sav365
-    if ($sb365 -notmatch 'descFieldOf\(') { $v365Bad += "(f) savePopDesc does not write through descFieldOf - a second path to the text is a second owner (SPEC V365f, V135, I45)" }
-    if ($sb365 -notmatch 'isStoryteller\(\)') { $v365Bad += "(f) savePopDesc does not ask isStoryteller() again - the flag on the control is a look, and the rule is a rule (SPEC V266b, V80)" }
-    if ($sb365 -notmatch 'descQuiet') { $v365Bad += "(f) savePopDesc does not check descQuiet - the renderer's own write comes back through the door the typing uses, so opening the ? would SAVE the book text onto that row in silence (SPEC V107, V249d, B39)" }
-}
+# (f) RETIRED 2026-09-25 (35th batch, SPEC I180b): the ? is read-only for everyone now, so the
+# legs that charged savePopDesc, its onChange and `readOnly = not isStoryteller()` became the
+# opposite of the rule and left. What survives of (f) - born readOnly, no opacity on either side,
+# and the READ order inside descFor - is charged by V522, right after V520 (SPEC V522, V333f).
 
 if ($v365Bad) { foreach ($b in $v365Bad) { Fail "V365 $b" } }
-else { Pass "V365 $(@($v354Opens).Count) converted picker template(s) read from the code, $($q365.Count) carrying a ? and SpecialityRow named out of it, no ? on a typed row, popOpen falling to V360c's sentence through the one descText, no description pane left in a file whose family converted, every description field still derived by descFieldOf, and edtPopDesc born readOnly with no opacity on either side while savePopDesc writes through descFieldOf behind descQuiet" }
+else { Pass "V365 $(@($v354Opens).Count) converted picker template(s) read from the code, $($q365.Count) carrying a ? and SpecialityRow named out of it, no ? on a typed row, popOpen falling to V360c's sentence through the one descText, no description pane left in a file whose family converted, every description field still derived by descFieldOf, and (f) retired into V522 with the 35th batch" }
 
 # ---- V366: descNature covers 46, and the 22 with no text are NAMED ------------------
 # SPEC V366, T838, R135, I102e, V210, V24. Every other module rule charges the WHOLE list -
@@ -24361,8 +24391,8 @@ if ($null -eq $tpl502 -or $null -eq $title502 -or $null -eq $add502 -or $null -e
 if ($v502Bad) { foreach ($b in $v502Bad) { Fail "V502 $b" } }
 else { Pass "V502 Add and Settings tile the band, the photo's placeholder is one hidden line written once, the unselected outline fades to 0.50, and Name plus the three bar labels sit in their columns with the bars on one left and width" }
 
-# ---- V503: every window darkens the sheet at 50%, the picker on top included -----------------
-# SPEC I172a/b (27th batch). ONE tone and not a transparent one; the twin under the second picker
+# ---- V503: every window darkens the sheet at 70%, the picker on top included -----------------
+# SPEC I172a/b (27th batch), 70% since I180c (35th batch). ONE tone and not a transparent one; the twin under the second picker
 # is the same rectangle declared between the two boxes; and (d) is DERIVED, never a typed roster:
 # every hidden window layout over popScrim must be raised by a function that raises popScrim too,
 # so a window born without the fade reddens by NAME.
@@ -24374,9 +24404,11 @@ $mfB503    = $root25Doc.SelectSingleNode("//layout[@name='mfSearchB']")
 $close503  = LuaFn $rootTxt 'mfClose'
 if ($null -eq $scrim503 -or $null -eq $mfA503 -or $null -eq $mfB503 -or -not $close503) { $v503Bad += "popScrim, mfSearch, mfSearchB or mfClose is not on the root form - this check reads nothing (SPEC V20, V209)" }
 else {
-    if ($scrim503.GetAttribute('color') -ne '#80000000') { $v503Bad += "(a) popScrim authors color '$($scrim503.GetAttribute('color'))' - the fade behind every window is #80000000, black at 50% (SPEC I172a)" }
+    if ($scrim503.GetAttribute('color') -ne '#B3000000') { $v503Bad += "(a) popScrim authors color '$($scrim503.GetAttribute('color'))' - the fade behind every window is #B3000000, black at 70% since the 35th batch (SPEC I180c, I172a)" }
     foreach ($f503 in $files) {
-        if ([System.IO.File]::ReadAllText($f503.FullName).Contains('#66000000')) { $v503Bad += "(a) $($f503.Name) still carries #66000000 - the 40% fade left in the 27th batch, and a palette key nobody uses does not stay (SPEC I172a)" }
+        $txt503 = [System.IO.File]::ReadAllText($f503.FullName)
+        if ($txt503.Contains('#66000000')) { $v503Bad += "(a) $($f503.Name) still carries #66000000 - the 40% fade left in the 27th batch, and a palette key nobody uses does not stay (SPEC I172a)" }
+        if ($txt503.Contains('#80000000')) { $v503Bad += "(a) $($f503.Name) still carries #80000000 - the 50% fade left in the 35th batch, and a palette key nobody uses does not stay (SPEC I180c, I172a)" }
     }
     $sib503 = @($mfA503.ParentNode.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
     $iA503  = [array]::IndexOf($sib503, $mfA503)
@@ -24412,7 +24444,7 @@ else {
     }
 }
 if ($v503Bad) { foreach ($b in $v503Bad) { Fail "V503 $b" } }
-else { Pass "V503 one 50% fade behind every window, its twin between the two pickers, and every window raised with it" }
+else { Pass "V503 one 70% fade behind every window, its twin between the two pickers, and every window raised with it" }
 
 # ---- V504: the ! of a trait - one per attribute, book ability and typed row, none on a virtue ----
 # SPEC I172c/d, Q92.3. The ability's ! reads the LIVE field of its first dot because the era
