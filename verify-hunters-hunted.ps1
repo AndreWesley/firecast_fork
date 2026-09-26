@@ -16478,15 +16478,17 @@ else {
     elseif ($cmb350 -match 'table\.sort') { $v350Bad += "(e) cmbItems sorts its items - a value combo's order is its meaning, and cmbHealthLevels would come out 10, 7, 8, 9 (SPEC I110d)" }
 }
 
-# the two cbo* whose order IS the answer, named and counted: a third name here is a combo
-# quietly opting out of Q26, and a wildcard would take the whole rule with it.
+# the four cbo* whose order IS the answer - the two STATE combos and their settings-window
+# twins (SPEC I169e(4), B183) - named and counted: a fifth name here is a combo quietly opting
+# out of Q26, and a wildcard would take the whole rule with it. The twin RELATION (X in the
+# list iff XMc is) is V520's leg (b); this leg keeps the list closed.
 $ns350 = [regex]::Match($w6code350, '(?m)^\s*PICKER_NOSORT\s*=\s*\{(.*?)\};')
 if (-not $ns350.Success) { $v350Bad += "(e) PICKER_NOSORT is gone - every cbo* would be sorted, including the roster V109 pins (SPEC I110d)" }
 else {
     $names350 = @([regex]::Matches($ns350.Groups[1].Value, '(\w+)\s*=\s*true') | ForEach-Object { $_.Groups[1].Value } | Sort-Object)
-    $want350 = @('cboGame', 'cboSheetTheme')
+    $want350 = @('cboGame', 'cboGameMc', 'cboSheetTheme', 'cboSheetThemeMc')
     if (($names350 -join ',') -ne ($want350 -join ',')) {
-        $v350Bad += "(e) PICKER_NOSORT names $($names350.Count) combo(s) [$($names350 -join ', ')], expected exactly cboGame and cboSheetTheme - the opt-out is a named list, not a door (SPEC I110d, V15)"
+        $v350Bad += "(e) PICKER_NOSORT names $($names350.Count) combo(s) [$($names350 -join ', ')], expected exactly cboGame, cboGameMc, cboSheetTheme and cboSheetThemeMc - the opt-out is a named list, not a door, and a twin inherits its original's entry (SPEC I110d, V15, V520b, B183)"
     }
 }
 
@@ -16511,6 +16513,64 @@ else {
 }
 if ($v350Bad) { foreach ($b in $v350Bad) { Fail "V350 $b" } }
 else { Pass "V350 pickerItems sorts the value/item pair by one permutation, after the orphan and with the blank row pinned, through a fold of $($accent350.Count) accented letters, and only cboGame and cboSheetTheme opt out" }
+
+# ---- V520: a cbo* that pickerItems may REORDER has the V424 net armed, and an Mc twin inherits its original's roster (SPEC I179a-c, B183) ----
+# pickerItems sorts every cbo* it serves unless PICKER_NOSORT names it (WoD20.6.lfm ~2761), and
+# the one thing that puts the selection back after the pair is rewritten is `c.value = current`
+# (~2830), where current = sheet[field] and field is DERIVED FROM THE CONTROL NAME (fieldRoot,
+# ~2416: drop `cbo`, drop a trailing _<n>, lower the first letter, put the _<n> back). A cbo*
+# whose derived field is not its field= has current == nil, the restore never runs, and the first
+# reordered values write leaves the HOST deciding what the field holds - which is how
+# cboSheetThemeMc (derived `sheetThemeMc`, bound `sheetTheme`) walked the era one step per open
+# and cboGameMc walked game Vampire<->Mage (SPEC B183). Two legs, both case-sensitive on purpose
+# (-cmatch / -ccontains / -cne): Lua compares bytes and PowerShell does not by default.
+#   (a) every cbo* OUTSIDE PICKER_NOSORT derives exactly its own field= - the net is armed;
+#   (b) cboX and cboXMc agree on PICKER_NOSORT membership - one field, one order.
+# The census is the XML itself (Doc), NOT filtered by visible=: the twins live in the hidden
+# settings window and collect() walks it anyway. Names carrying $( are templates and are skipped
+# and counted, so a templated picker arriving later is visible in the Pass line.
+$v520Bad = @()
+$code520 = CodeOf (Join-Path $dir 'WoD20.6.lfm')
+$ns520 = [regex]::Match($code520, '(?s)PICKER_NOSORT\s*=\s*\{(.*?)\};')
+$nosort520 = @()
+if (-not $ns520.Success) { $v520Bad += "PICKER_NOSORT was not found in WoD20.6.lfm - both legs read nothing (SPEC V20, V209)" }
+else { $nosort520 = @([regex]::Matches($ns520.Groups[1].Value, '(\w+)\s*=\s*true') | ForEach-Object { $_.Groups[1].Value }) }
+$names520 = @()
+$seen520 = 0
+$tpl520 = 0
+foreach ($f in $files) {
+    foreach ($cb in (Doc $f.FullName).SelectNodes('//comboBox[@name]')) {
+        $nm520 = $cb.GetAttribute('name')
+        if ($nm520 -cnotmatch '^cbo') { continue }
+        if ($nm520 -match '\$\(') { $tpl520++; continue }
+        $names520 += $nm520
+        if ($nosort520 -ccontains $nm520) { continue }
+        $seen520++
+        $root520 = $nm520.Substring(3) -replace '_?\d+$', ''
+        $root520 = $root520.Substring(0, 1).ToLower() + $root520.Substring(1)
+        $num520 = [regex]::Match($nm520, '_?(\d+)$')
+        $derived520 = $root520
+        if ($num520.Success) { $derived520 = $root520 + '_' + $num520.Groups[1].Value }
+        $field520 = $cb.GetAttribute('field')
+        if ($derived520 -cne $field520) {
+            $v520Bad += "(a) $($f.Name)/$nm520 is sorted by pickerItems and derives field '$derived520' from its name but binds field='$field520' - current reads nil, the V424 restore never runs, and a reordered values write leaves the host deciding what the field holds (SPEC V520a, V424, B183)"
+        }
+    }
+}
+if ($ns520.Success -and $seen520 -eq 0) { $v520Bad += "(a) no sorted cbo* was examined - the leg verifies nothing (SPEC V20, B7)" }
+$pairs520 = 0
+foreach ($nm520 in $names520) {
+    if ($nm520 -cnotmatch 'Mc$') { continue }
+    $base520 = $nm520.Substring(0, $nm520.Length - 2)
+    if ($names520 -cnotcontains $base520) { continue }
+    $pairs520++
+    if (($nosort520 -ccontains $base520) -ne ($nosort520 -ccontains $nm520)) {
+        $v520Bad += "(b) $base520 and its twin $nm520 disagree on PICKER_NOSORT - one field, two orders (SPEC V520b, I169e(4), B183)"
+    }
+}
+if ($ns520.Success -and $pairs520 -eq 0) { $v520Bad += "(b) no cboX/cboXMc pair was found - the leg read nothing (SPEC V20, B7)" }
+if ($v520Bad) { foreach ($b in $v520Bad) { Fail "V520 $b" } }
+else { Pass "V520 $seen520 sorted cbo* derive their own field, $pairs520 twin pair(s) agree on PICKER_NOSORT, $tpl520 templated name(s) skipped" }
 
 # ---- V351: the ROAD label rides on the picker's own line -------------------------------
 # SPEC C Q27, I99k-m, T801. The user asked for the label beside the dropdown; what it BUYS is

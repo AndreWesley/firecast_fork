@@ -1,6 +1,30 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-25, fim da 212ª rodada — 33º lote CONSTRUÍDO: §T1122…§T1126 `x`)
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-09-25, fim da 213ª rodada — 34º lote CONSTRUÍDO: §T1128 §T1129 `x`; §T1130 CANCELADA; §T1131/§T1132 TELA [USER] `.`)
+
+**Estado:** gate `-Build -Quiet` **ALL CHECKS PASSED** (147 s, 21:30). Bateria **4/4** (`battery34.ps1`, child process ~90 s/rodada): M1 (twin fora de `PICKER_NOSORT`) VERMELHA em §V350e + §V520a + §V520b · M2 (`cboHedgeAttr` → `cboHedgeattr`) VERMELHA em §V520a — & TAMBÉM em §V297/§V312 (checks por nome; ⊥ §V421/§V211 como §V520 previa → emenda abaixo) · P1 (`cboGame` fora do roster) VERMELHA em §V350e + §V520b c/ §V520a VERDE (a perna mede a REDE, ⊥ o roster) · P2 (`cboGameMc = "leading"` em `PICKER_ANCHOR`) só §V419, §V520 INTEIRA VERDE. Hashes de `WoD20.6`/`WoD20.7` = os de antes da bateria. **INSTALADO 21:39:02** (3157291 B = `output/`). Se a ficha estava aberta, FECHAR & REABRIR. **Nada commitado**: `SPEC.md` `HANDOFF.md` `WoD20.6.lfm` `verify-hunters-hunted.ps1` & o `.rpk` de `output/` modificados. Scratchpad `9d217500…\scratchpad\`: `SPEC.before34.md`, `HANDOFF.before34.md`, `battery34.ps1` + `battery34.log`, `battery-backups\*.pre-battery34.lfm` + `pre-battery34.hashes.txt`, `edit-file.ps1` + `lua-edit-T1128.txt` + `gate-edit-T1129.txt` (as edições exatas).
+
+**PRÓXIMO:** pedir ao user os testes de tela §T1131 (flag OFF, pt: 4 aberturas → box == tela & a época ⊥ anda; `Game` de ficha `Vampire` — anotar se leu `Mage`/`Mago`, reparo só MANUAL, §Q100) & §T1132 (flag ON + 2 personagens). Se §T1131 achar ficha em `Mage` → abrir §Q p/ o reparo (rec. destravar `cboGame` p/ o Mestre por 1 rodada). Se a época AINDA andar depois do fix → §I179e(iii) (pinagem do scope) & §B183 reabre.
+
+**O QUE VIROU CÓDIGO**
+- `WoD20.6.lfm:2504` — `PICKER_NOSORT = { cboGame = true, cboSheetTheme = true, cboGameMc = true, cboSheetThemeMc = true };` (1 linha) + comentário `:2492-2503` (4 nomes, §B183, por que o twin herda ∀ roster & por que fica em 1 linha).
+- `verify-hunters-hunted.ps1` — §V350e (`:16489` `$want350` c/ os 4; FAIL text `:16491`; comentário `:16481-16484`); **§V520 NOVA** `:16517-16574` (depois de §V350, antes de §V351): `(?s)` no literal, ARRAY + `-ccontains`/`-cmatch`/`-cne`, censo `//comboBox[@name]` SEM filtro de `visible`, `$(` pulado & contado; hoje examina 2 (`cboClan` `cboHedgeAttr`) & 2 pares.
+
+**EMENDA PENDENTE p/ `/ck:spec`:** §V520 diz em M2 "anotar se §V421/§V211 também acendem" — MEDIDO: acendem **§V297** & **§V312** (contam `cboHedgeAttr` por nome em `WoD20.7`), ⊥ §V421/§V211. Registrar como fato na linha.
+
+**⚠ SESSÃO CONCORRENTE (medido nesta rodada):** outra sessão (`scratchpad ba7ad769…`) especificou & construiu um §B183/§V520 DIFERENTE p/ o mesmo bug (teoria MC ON: `current = MC.root[field]` em `pickerItems` + `mcShared` no `mcInit`) entre 19:49 & 20:06, INSTALOU às 20:08 (3157389 B) & o repo foi REVERTIDO às 20:25 (código, gate & SPEC voltaram ao HEAD `e9652f89`) — mas o `.rpk` INSTALADO continuou sendo o dela até este install (21:39). Se o user relatou sintoma entre 20:08 & 21:39, era essa versão na tela. Os ids §B183/§V520 no SPEC de HOJE são os desta rodada (1 de cada, conferido). Antes de nascer id novo: `grep -c "^B<n>|"` & `grep -c "^V<n>:"` no SPEC & olhar `ls Temp\claude\*\scratchpad\battery*.ps1` das outras sessões.
+
+## ANTERIOR (2026-09-25, 213ª rodada — 34º lote ESPECIFICADO: §B183, §I179, §R179, §V520, §T1128…§T1132, §Q100 RESPONDIDA)
+
+**PRÓXIMO COMANDO:** `/ck:build §T1128 §T1129` — ⚠ ⊥ `--all` (os `.` restantes são TELA [USER]). **§T1128 ANTES de §T1129** (o gate de hoje, §V350e, cobra `PICKER_NOSORT` == exatamente `cboGame` & `cboSheetTheme` ∴ o Lua novo fica VERMELHO até o gate ser emendado — os 2 na MESMA rodada); §T1130 CANCELADA (§Q100 respondida: 0 semente, 0 escrita automática em `game`). Depois: 1 `rdk -i` & pedir ao user §T1131/§T1132 (tela). Ler ANTES: `.\spec-slice.ps1 I179` (a…f), `.\spec-slice.ps1 V520`, `.\spec-slice.ps1 B183`, `grep -n "^R179|" SPEC.md` (spec-slice.ps1 so le T/B/V/I, nao R).
+
+**Bug do user (2026-09-25):** ficha abre num tema & o box da aba Storyteller mostra OUTRO; reabrir → tela = o que estava no box, box = outro; c/ `multipleCharacters` OFF. Causa MEDIDA no fonte (§B183): os twins `cboGameMc`/`cboSheetThemeMc` da janela de settings da coluna (24º lote) ⊥ estão em `PICKER_NOSORT` ∴ `pickerItems` grava neles a lista ORDENADA 1× por abertura, & a rede de §V424 ⊥ os alcança (`fieldRoot` → `sheetThemeMc`, `current` nil). O host (`?`, §R179e) grava o valor do índice antigo ∴ `sheetTheme` anda 1 posição por abertura (pt: MN→VA→CA→MN, Dark Ages fixa) & `game` alterna `Vampire ⇄ Mage` (combo travado, sem conserto na tela → §Q100 RESPONDIDA: *"não é para elas mudarem sozinhas"* ∴ 0 semente; ficha em `Mage` só por reparo MANUAL, a decidir se §T1131 achar alguma). Verificado por 5 leitores independentes (0 refutação). Backup do spec de antes: scratchpad `9d217500…\SPEC.before34.md` (& `HANDOFF.before34.md`).
+
+**Armadilhas p/ o build:** (1) o literal `PICKER_NOSORT` FICA em **1** linha (§V350e o lê c/ `(?m)…(.*?)\};`); (2) §V520 lê o literal c/ `(?s)`, usa `-cmatch`/`-ccontains`/`-cne` (PowerShell ignora caixa por padrão) & um ARRAY, ⊥ `@{}`; censo XML SEM filtro de `visible` (o twin mora em `mcSettings` `visible="false"` — §V421 filtra, ⊥ copiar); 0 `$` de fim de linha sobre texto de arquivo (CRLF); (3) mutações M1 M2 P1 P2 de §V520 RODADAS, ≤3 por chamada, `*>&1`, reverso único; (4) ⊥ mexer em `fieldRoot`/`pickerItems` (§I179b explica por quê); (5) o comentário `WoD20.6:2492-2495` diz "two combos" — vira 4; (6) §T1130 CANCELADA — 0 mudança em §V110 nem no bloco `WoD20th:10152-10160`; (7) commit só sob pedido — a árvore estava LIMPA (`e9652f89`, 19:08) & esta rodada só tocou `SPEC.md` & `HANDOFF.md`.
+
+**Gate `-Quiet` VERDE c/ o spec novo** (checado ao fim desta escrita). **0 §T de CÓDIGO construída nesta rodada.** **Nada commitado.**
+
+## ANTERIOR (2026-09-25, fim da 212ª rodada — 33º lote CONSTRUÍDO: §T1122…§T1126 `x`)
 
 **TELA OK (user 2026-09-25, "todos os testes estão ok, pode fechar todos"):** as **102** linhas abertas do §T (72 `[USER]` + 30
 testes/sondas de tela sem a marca, §T114…§T1127) → `x`. **§T tem 0 linha aberta.** Backup de antes: scratchpad

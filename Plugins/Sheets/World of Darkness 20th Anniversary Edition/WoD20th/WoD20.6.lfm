@@ -2489,11 +2489,19 @@
 				return (string.gsub(string.lower(s), "[\194-\197][\128-\191]", function(c) return FOLD_MAP[c] or c; end));
 			end;
 
-			-- The two combos whose order IS the answer, named one by one (SPEC I110d). A wildcard
-			-- here would sort cboGame into `Mage, Mortal, Vampire` and quietly break the roster
-			-- V109 pins. The `cmb*` combos never reach this function at all - pickerItems opens
-			-- with a `cbo` test - so they need no entry.
-			PICKER_NOSORT = { cboGame = true, cboSheetTheme = true };
+			-- The combos whose order IS the answer, named one by one (SPEC I110d): the two STATE
+			-- combos of the Storyteller tab and their twins in the settings window (SPEC I169e(4)).
+			-- A wildcard here would sort cboGame into `Mage, Mortal, Vampire` and quietly break the
+			-- roster V109 pins. The `cmb*` combos never reach this function at all - pickerItems
+			-- opens with a `cbo` test - so they need no entry.
+			--
+			-- A twin inherits EVERY roster its original is in, not only the one that was seen to
+			-- break (SPEC B183): the 24th batch put cboGameMc/cboSheetThemeMc in PICKER_ANCHOR and
+			-- not here, so pickerItems sorted their values on every open - and fieldRoot reads the
+			-- `Mc` suffix as part of the field name, so `current` was nil and the V424 restore never
+			-- ran for them; the host then walked sheetTheme (and game) one position per open.
+			-- ONE line, on purpose: the gate reads this literal with a single-line regex (SPEC V350e).
+			PICKER_NOSORT = { cboGame = true, cboSheetTheme = true, cboGameMc = true, cboSheetThemeMc = true };
 
 			-- Two lists are the SAME when they are the same length with the same bytes in the same
 			-- order. It exists so a write that changes nothing never reaches the host (SPEC V122,
