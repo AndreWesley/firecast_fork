@@ -1681,17 +1681,16 @@ $closers = @("HEALTH")
 # other box takes now, so ROAD ends at 856 and HEALTH plus the avatar close the line at 866. The
 # rule of B131 did not change shape - only which side ROAD stands on (SPEC B131, I138c, Q49).
 $V393_PINNED = @("VIRTUES", "ROAD")
-# SPECIALTIES left the PINNED roster on 2026-09-02 and did NOT become a closer: the owner asked it
-# to end where ROAD ends (856), which is neither the tab line nor its own content plus a foot
-# (SPEC V402, I139a, I139m, Q49). The two rosters are read as a UNION just below, so the promise
-# V393 and V376 share - every bottom-row box is a closer, or is named in a roster - is untouched,
-# and a box that quietly stops closing the line while standing in NEITHER list still reddens.
-$V402_ALIGNED = @("SPECIALTIES")
-# The AVATAR left the closing side on 2026-09-04: the owner asked it to end where ROAD ends (856),
-# which is V402's answer wearing another face, and V415 below is what pins it there (SPEC V415,
-# I144a, T939, Q63). It is named here rather than inferred because it is the one bottom-row thing
-# that is NOT a `<layout>` box - the sweep below cannot see it, so a roster that left it out would
-# be a roster that shrank without anybody noticing.
+# SPECIALTIES had a roster of its own here ($V402_ALIGNED, closing where ROAD closed) until the
+# 44th batch took the box out of the sheet, V402 with it (SPEC I187a, V376 amended). The rosters
+# are still read as a UNION just below, so the promise V393 and V376 share - every bottom-row box
+# is a closer, or is named in a roster - is untouched.
+#
+# The AVATAR left the closing side on 2026-09-04 and since the 44th batch it ends where HEALTH
+# ends at SEVEN levels (785), which V415 below pins (SPEC V415, I187c, user 2026-09-26). It is
+# named here rather than inferred because it is the one bottom-row thing that is NOT a `<layout>`
+# box - the sweep below cannot see it, so a roster that left it out would be a roster that shrank
+# without anybody noticing.
 $V415_AVATAR = @("avatar")
 # The zero-guard MOVED with it, and this is the whole reason V376 had to be re-formed in the same
 # commit rather than left alone (SPEC Q63, B7, B145). Closers fell to ONE. An equality over one
@@ -1699,8 +1698,8 @@ $V415_AVATAR = @("avatar")
 # closers - would have gone on passing while measuring nothing at all. What cannot go vacuous is
 # the ROSTER: every bottom-row thing is a closer or is NAMED, so if the names drain away the
 # sweep below has nothing left to excuse and this floor is what says so. THREE is a floor and not
-# an equality - four are named today (VIRTUES, ROAD, SPECIALTIES, avatar) and a fifth is welcome.
-$v376Roster = @($V393_PINNED) + @($V402_ALIGNED) + @($V415_AVATAR)
+# an equality - three are named since the 44th batch (VIRTUES, ROAD, avatar) and a fourth is welcome.
+$v376Roster = @($V393_PINNED) + @($V415_AVATAR)
 $missing = @($closers | Where-Object { -not $mainBottom.ContainsKey($_) })
 if (-not $mapY.Success) { Fail "V376 the tab's grid comment no longer says where the tab closes - the ruler would be a literal in the gate again (SPEC V20)" }
 elseif ($missing.Count -gt 0) { Fail "V376 $($missing -join '/') not found on WoD20.1 - the check measured nothing (SPEC V20)" }
@@ -1721,20 +1720,20 @@ else {
         $ttl376 = $bx376.SelectSingleNode("label[@text]")
         $nm376 = if ($null -ne $ttl376) { $ttl376.GetAttribute("text") } else { "an untitled box at top=$bt376" }
         if ($closers -contains $nm376) { continue }
-        if ($V393_PINNED -contains $nm376 -or $V402_ALIGNED -contains $nm376) { continue }
+        if ($V393_PINNED -contains $nm376) { continue }
         $unaccounted += "$nm376 ends at $($bt376 + $bh376)"
     }
     if ($v376Roster.Count -lt 3) { Fail "V376 the bottom row names only $($v376Roster.Count) box(es) off the closing line and three were measured there on 2026-09-04 - closers fell to one when the avatar left, so the roster is the only half of this rule that can still go empty, and an empty one excuses the whole row (SPEC Q63, V20, B7)" }
     elseif ($off.Count -gt 0) { Fail "V376 the map says the tab closes on y=$line but $($off -join ', ') - the Main bottom row must close on ONE line" }
     elseif ($unaccounted.Count -gt 0) { Fail "V376 $($unaccounted -join ', ') - on the bottom row of Main, off the y=$line line, and named in no V393 pinned roster (SPEC V393, I136d)" }
     elseif (($mainBottom["HEALTH"] - $line) -ne $HEALTH_TEN_ROW_OVERHANG) { Fail "V376 HEALTH sits $($mainBottom['HEALTH'] - $line)px off the line, not the $HEALTH_TEN_ROW_OVERHANG px declared - below the line its sign FLIPS and it starts overhanging (SPEC V49, I126h)" }
-    else { Pass "V376 HEALTH closes the tab on y=$line and the $($v376Roster.Count) box(es) off it are each named - $($V393_PINNED -join ', ') pinned by V393, $($V402_ALIGNED -join ', ') aligned to ROAD by V402, $($V415_AVATAR -join ', ') pinned to ROAD by V415 - and HEALTH's declared overhang is $HEALTH_TEN_ROW_OVERHANG" }
+    else { Pass "V376 HEALTH closes the tab on y=$line and the $($v376Roster.Count) box(es) off it are each named - $($V393_PINNED -join ', ') pinned by V393, $($V415_AVATAR -join ', ') pinned to HEALTH's seven-row floor by V415 - and HEALTH's declared overhang is $HEALTH_TEN_ROW_OVERHANG" }
 }
 
 # ---- V393: the pinned boxes of the Main bottom row are their own content -------------
-# SPEC V393, I134l, I136c, I138c, Q47, Q49. Three boxes are held to LAST CONTENT plus a BOX_PAD_Y foot and no
-# more: VIRTUES and ROAD, the stack the TALENTS band has carried since T904, and SPECIALTIES,
-# which the owner took back out of the grid row in T908 and asked to fit its content. BY NAME
+# SPEC V393, I134l, I136c, I138c, Q47, Q49. Two boxes are held to LAST CONTENT plus a BOX_PAD_Y foot and no
+# more: VIRTUES and ROAD - a stack in the TALENTS band from T904 until the 44th batch moved ROAD
+# under SKILLS, where SPECIALTIES was (SPEC I187b). The foot is what stayed. BY NAME
 # and not every box on the tab: HEALTH is authored at its ten-row case (V49), so a general
 # minimum-foot ruler would be born red against correct code (SPEC B106).
 #
@@ -1780,39 +1779,17 @@ if ($v393Seen -lt $V393_PINNED.Count) { $v393Bad += "only $v393Seen of the $($V3
 if ($v393Bad) { foreach ($b393 in $v393Bad) { Fail "V393 $b393" } }
 else { Pass "V393 $($V393_PINNED -join ', ') are each their own content plus a ${BOX_PAD_Y}px foot - the roster V376 reads to know who is off the closing line" }
 
-# ---- V402: SPECIALTIES closes where ROAD closes ---------------------------------------
-# SPEC V402, I139a, I139m, Q49, user 2026-09-02 item 1. The owner asked for the two bottom-row
-# boxes that are NOT the tab line to end together, so SPECIALTIES gained a 29px foot and left the
-# V393 foot roster in the same commit - a 29px foot is not "content plus BOX_PAD_Y", and pretending
-# it was would have cost V393 the only thing it promises.
-#
-# NEITHER y is typed here. Both are read off the two boxes, so the day ROAD moves again SPECIALTIES
-# has to move with it or this reddens - which is the whole of what the owner asked for. A literal
-# would be the second owner of 856 and the first to age (SPEC B112, B70).
-$v402Bad = @()
-if ($V402_ALIGNED.Count -eq 0) { $v402Bad += "the aligned roster is empty - this rule would certify any height at all (SPEC V20, V209)" }
-elseif (-not $mainBottom.ContainsKey("ROAD")) { $v402Bad += "the ROAD box was not found on WoD20.1 - the y this rule aligns to cannot be read (SPEC V20)" }
-else {
-    foreach ($nm402 in $V402_ALIGNED) {
-        if (-not $mainBottom.ContainsKey($nm402)) {
-            $v402Bad += "$nm402 was not found on WoD20.1 - the roster outlived the box (SPEC V20, V209)"
-            continue
-        }
-        if ($mainBottom[$nm402] -ne $mainBottom["ROAD"]) {
-            $v402Bad += "$nm402 ends at $($mainBottom[$nm402]) and ROAD at $($mainBottom['ROAD']) - the two boxes V376 lets off the tab line close together, or neither is aligned to anything (SPEC V402, I139a)"
-        }
-    }
-}
-if ($v402Bad) { foreach ($b402 in $v402Bad) { Fail "V402 $b402" } }
-else { Pass "V402 $($V402_ALIGNED -join ', ') closes on y=$($mainBottom['ROAD']) with ROAD - the two bottom-row boxes V376 lets off the tab line end together" }
+# ---- V402: RETIRED in the 44th batch - SPECIALTIES, the box it aligned to ROAD, left the sheet
+# (SPEC V402, I187a). V376 no longer reads its roster.
 
-# ---- V415: the AVATAR closes where ROAD closes (SPEC V415, I144a, T939, Q63) -----------
-# The owner's ask of 2026-09-04, item 1, and it is V402 wearing the avatar's face: a bottom-row
-# thing that is neither on the tab line nor on its own content, but tied to another box.
+# ---- V415: the AVATAR closes where HEALTH closes at SEVEN levels (SPEC V415, I187c) ---------
+# The owner's ask of 2026-09-26, item 4 - it closed where ROAD closed from 2026-09-04 (I144a)
+# until ROAD moved under SKILLS in the same batch. "As if HEALTH had 7 levels", and HEALTH is
+# only READ: its top from the XML and the two constants from the root Lua, the same pair V49
+# welds to the rows. So HEALTH_BOX_PAD moving alone reddens this - which is the ask.
 #
-# NEITHER y is typed here, for the same reason V402 types neither: a literal 856 would be the
-# second owner of a number the XML already holds, and the first of the two to age (SPEC B70,
-# B112). Move ROAD and the avatar has to move with it or this reddens - which is the ask.
+# SEVEN is the one literal and it is the OWNER's number, not the `or 7` of renderHealthTrack:
+# changing the default track length does not move the photo (SPEC V415 amended).
 #
 # The avatar is THREE controls carrying the same four numbers (avatarFrame, the image, ornAvatar)
 # and this rule deliberately does NOT re-check that they agree: V309 owns that sentence and has
@@ -1822,16 +1799,25 @@ else { Pass "V402 $($V402_ALIGNED -join ', ') closes on y=$($mainBottom['ROAD'])
 #
 # It reads the IMAGE because $avatarBottom already does, one line, no second parse.
 #
-# Mutation (SPEC V20, V222): height back to 455 on the image -> RED here AND on V309 - ROAD
-# growing 5 without the avatar -> RED. Probe: move all three to 445 together -> GREEN on both.
+# Mutation (SPEC V20, V222): height 374 -> 375 on all three -> RED here (V309 GREEN) -
+# HEALTH_BOX_PAD 55 -> 56 without the avatar -> RED. Probe: all three at 374 -> GREEN.
+$V415_HEALTH_ROWS = 7
 $v415Bad = @()
+$hBox415 = $mainDocV69.SelectSingleNode("//layout[@name='dynHealth_box']")
+$hTop415 = 0; $pitch415 = 0; $pad415 = 0
+if ($null -ne $hBox415) { [void][int]::TryParse($hBox415.GetAttribute("top"), [ref]$hTop415) }
+if ($root -match 'HEALTH_ROW_PITCH\s*=\s*(\d+)') { $pitch415 = [int]$Matches[1] }
+if ($root -match 'HEALTH_BOX_PAD\s*=\s*(\d+)')   { $pad415   = [int]$Matches[1] }
 if ($avatarBottom -lt 0) { $v415Bad += "the avatar image was not found on WoD20.1 - the edge this rule pins cannot be read, and a rule that cannot find its subject must not pass (SPEC V20, B94)" }
-elseif (-not $mainBottom.ContainsKey("ROAD")) { $v415Bad += "the ROAD box was not found on WoD20.1 - the y this rule aligns to cannot be read (SPEC V20)" }
-elseif ($avatarBottom -ne $mainBottom["ROAD"]) {
-    $v415Bad += "the avatar ends at $avatarBottom and ROAD at $($mainBottom['ROAD']) - the owner asked the photo to close where that box closes, and off the line it is a grey tail hanging under the column (SPEC V415, I144a)"
+elseif ($hTop415 -le 0 -or $pitch415 -le 0 -or $pad415 -le 0) { $v415Bad += "dynHealth_box top, HEALTH_ROW_PITCH or HEALTH_BOX_PAD was not found - the y this rule aligns to cannot be read (SPEC V20)" }
+else {
+    $want415 = $hTop415 + $V415_HEALTH_ROWS * $pitch415 + $pad415
+    if ($avatarBottom -ne $want415) {
+        $v415Bad += "the avatar ends at $avatarBottom and HEALTH at $V415_HEALTH_ROWS levels at $want415 ($hTop415 + $V415_HEALTH_ROWS x $pitch415 + $pad415) - the owner asked the photo to close where that box closes (SPEC V415, I187c)"
+    }
 }
 if ($v415Bad) { foreach ($b415 in $v415Bad) { Fail "V415 $b415" } }
-else { Pass "V415 the avatar closes on y=$avatarBottom with ROAD - the left column ends on one edge, and V309 keeps the frame and the ornament on it" }
+else { Pass "V415 the avatar closes on y=$avatarBottom, HEALTH's floor at $V415_HEALTH_ROWS levels - HEALTH only read, and V309 keeps the frame and the ornament on it" }
 
 # ---- V416: the six EXPERIENCE edits take WHOLE NUMBERS only (SPEC V416, I144d, I144f) --
 # The owner's ask of 2026-09-04, item 2, and the ask names the spread explicitly: "e isso deve se
@@ -4767,7 +4753,9 @@ else { Pass "V244 all $luaDimSeen runtime opacity writes use one of the named nu
 $v429Bad = @()
 $show429 = @(
     [pscustomobject]@{ F = 'WoD20.11.lfm'; Fn = 'renderClanFamilyButton'; Leg = 'a' }
-    [pscustomobject]@{ F = 'WoD20.1.lfm';  Fn = 'renderSpecialities';     Leg = 'b' }
+    # 44th batch (SPEC V429b amended, I187d): the specialities list left, and what the Main tab
+    # paints on show is the ! of each trait.
+    [pscustomobject]@{ F = 'WoD20.1.lfm';  Fn = 'specBangPaint';          Leg = 'b' }
 )
 foreach ($r429 in $show429) {
     $t429 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir $r429.F)))
@@ -5222,7 +5210,8 @@ else { Pass "V444 the click walks one level at a time and the first refusal stop
 $iLoop445 = $clickOnly.IndexOf('while lvl ~= alvo do')
 $iEnd445  = if ($iLoop445 -ge 0) { $clickOnly.IndexOf("`n`t`t`t`tend;", $iLoop445) } else { -1 }
 $paintBad = @()
-foreach ($p445 in @('renderSpecialities(', 'renderAllXPBoxes(', 'xpLedgerRefresh(')) {
+# specBangPaint took renderSpecialities' place in the 44th batch (SPEC V445 amended, I187d).
+foreach ($p445 in @('specBangPaint(', 'renderAllXPBoxes(', 'xpLedgerRefresh(')) {
     $nClick = @([regex]::Matches($clickOnly, [regex]::Escape($p445))).Count
     $nStep  = @([regex]::Matches($stepOnly,  [regex]::Escape($p445))).Count
     if ($nStep -ne 0) { $paintBad += "$p445 is called from xpStep - it would paint once per level" }
@@ -5467,28 +5456,8 @@ function BoxKids($box) {
     , $out.ToArray()
 }
 $mainDoc = Doc (Join-Path $dir "WoD20.1.lfm")
-$sb = BoxOf $mainDoc "SPECIALTIES"
-# 27th batch (SPEC I172g, V146 amended): the ten rows left with the old picker and the box is
-# a SUMMARY now - one read-only list. The BOX keeps every rule that measures a box (V375,
-# V376, V393, V402); what this check still owns is that the one list opens on the hairline
-# under the title, closes on the same 20 foot, and edits nothing.
-$specList = @($mainDoc.SelectNodes("//textEditor[@name='dynSpecList']"))
-if (-not $sb) { Fail "V146 WoD20.1 declares no SPECIALTIES box - the tab's map says exactly one" }
-elseif ($specList.Count -ne 1) { Fail "V146 WoD20.1 declares $($specList.Count) dynSpecList - the SPECIALTIES box holds exactly one read-only list since the 27th batch (SPEC I172g, V507d)" }
-else {
-    $sbH   = [int]$sb.GetAttribute("height")
-    $sTtl  = $sb.SelectSingleNode("label[@text='SPECIALTIES']")
-    $sBody = if ($null -ne $sTtl) { [int]$sTtl.GetAttribute("top") + [int]$sTtl.GetAttribute("height") + 1 } else { -1 }
-    $sl    = $specList[0]
-    $slTop = [int]$sl.GetAttribute("top")
-    $slEnd = $slTop + [int]$sl.GetAttribute("height")
-    if (-not [object]::ReferenceEquals($sl.ParentNode, $sb)) { Fail "V146 dynSpecList is not a child of the SPECIALTIES box - the summary would sit outside the box it summarises" }
-    elseif ($sBody -lt 0) { Fail "V146 the SPECIALTIES box carries no title - the list that opens under it would be measured against nothing (SPEC V209)" }
-    elseif ($slTop -ne $sBody) { Fail "V146 the SPECIALTIES list starts at $slTop, not on the hairline under the title at $sBody" }
-    elseif (($slEnd + 20) -ne $sbH) { Fail "V146 the SPECIALTIES list closes on $slEnd in a box $sbH tall - the foot is 20 (SPEC I172g)" }
-    elseif ($sl.GetAttribute("readOnly") -ne 'true') { Fail "V146 dynSpecList is not readOnly - the box edits nothing since the 27th batch (SPEC I172g)" }
-    else { Pass "V146 SPECIALTIES holds one read-only list from the hairline $sBody to $slEnd, foot 20" }
-}
+# ---- V146: RETIRED in the 44th batch - the SPECIALTIES box left the sheet, and V527(a) owns
+# its ABSENCE now (SPEC V146, I187a).
 
 # ---- V147: three fields and one dot per row, counted in one place --------------------
 # Same shape as BACKGROUND_ROWS (V145): the XML draws the rows and two loops on the root form
@@ -5662,12 +5631,13 @@ else { Pass "V159 a revoked gift gives back trait, text, dot and stamp in one st
 #
 # The lock is settled BEFORE the baseline test: a gift is never the player's to take off,
 # not even while the character is being built.
-$renderSpecFn = LuaFn $rootTxt 'renderSpecialities'
+# 44th batch (SPEC I187d): renderSpecialities left with the SPECIALTIES list, and with it the
+# legs that read it (the list write, and the V162/V163 halves about what that painter touched).
+# The lock never lived there - it is the refusal in xpClick and in mfOpen, both still measured.
 $iSpecGuard   = $cc.IndexOf('if string.match(trait, "^speciality_%d+$")')
 $iBaseTest    = $cc.IndexOf('if base == nil then')
 $specDotOpacity = @($mainDoc.SelectNodes("//template[@name='SpecialityRow']//imageCheckBox[@opacity]"))
-if (-not $renderSpecFn) { Fail "V161 renderSpecialities not found on the root form" }
-elseif ($iSpecGuard -lt 0) { Fail "V161 xpClick has no speciality branch - the gift could be taken off with a click" }
+if ($iSpecGuard -lt 0) { Fail "V161 xpClick has no speciality branch - the gift could be taken off with a click" }
 elseif ($iSpecGuard -gt $iBaseTest) { Fail "V161 the lock is tested after the baseline check - the gift would be the player's to remove while the character is being built" }
 elseif ($specGuard.Groups[1].Value -notmatch 'if not want and isFreeRow\(trait\) then') { Fail "V161 selling a stamped row is not refused - the gift would go with one click" }
 elseif ($specGuard.Groups[1].Value -notmatch 'xpWarn\("Free specialties are lost only by lowering the trait"\);') { Fail "V161 the locked dot refuses in silence" }
@@ -5680,36 +5650,13 @@ elseif ($specDotOpacity.Count -gt 0) { Fail "V161 the speciality dot carries opa
 # row, which is the same answer at the same moment the disabled combo gave. The button stays
 # fully legible - reading WHICH speciality the trait handed over is the point of the row
 # (SPEC V161 amended in the 146th, I41, V241).
-elseif ($renderSpecFn -match 'c\.enabled') { Fail "V161 renderSpecialities still writes enabled on a control - the combo it locked is gone, and a lock left behind on a widget nobody draws is a lock that stopped locking (SPEC V161, T842)" }
 elseif (-not ($mfOpen161 = LuaFn $rootTxt 'mfOpen')) { Fail "V161 mfOpen is gone - the lock of a picker row now lives in the opener and there is no opener left (SPEC V161, V209)" }
 elseif ($mfOpen161 -notmatch 'if sheet ~= nil and isFreeRow\(field\) then return; end;') { Fail "V161 mfOpen does not refuse a stamped row - with the combo gone this is the ONLY thing standing between the player and a gift the trait handed out (SPEC V161, T842)" }
 elseif ($mfOpen161.IndexOf('isFreeRow(field)') -gt $mfOpen161.IndexOf('MF.field = field;')) { Fail "V161 the refusal is tested AFTER the box has taken the field - a box that opens and then refuses is a lock the player finds at the end (SPEC V161)" }
-elseif ($renderSpecFn -notmatch 'found\["dynSpecList"\]\.text = ') { Fail "V161 renderSpecialities does not write the SPECIALTIES list - since the 27th batch it paints the summary and nothing else (SPEC I172g, V507d)" }
-elseif ($renderSpecFn -match 'c\.opacity') { Fail "V162 the speciality row still paints opacity - a locked row has to keep its text readable (SPEC I41, V241)" }
-elseif ($renderSpecFn -match 'setField|markDot') { Fail "V163 the renderer WRITES the sheet - it reads the rows and paints the list, nothing else" }
 else { Pass "V161/V162 a gift row is refused in the opener before the box can open, its button is painted from the field and stays legible, and the dot refuses inside xpClick" }
 
-# ---- V164: the lock is painted from three places, and finds its controls the one way ---
-# The click covers the sheet in front of the player; onNodeReady covers the sheet being
-# opened; the xpFree link covers a grant made on ANOTHER client at the table. `form.<name>`
-# does not cross the <import>, which is why this walks with the one finder (V143).
-$mainRawTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.1.lfm")))
-$renderCalls = @([regex]::Matches($rootTxt, 'renderSpecialities\('))
-$specLinks2  = @($mainDoc.SelectNodes("//dataLink[@field='xpFree']"))
-if (-not $renderSpecFn) { Fail "V164 renderSpecialities not found on the root form" }
-elseif ($renderSpecFn -notmatch 'xpFind\(tabRootOf\(from\), \{ dynSpecList = true \}') { Fail "V164 the renderer does not use the one control finder - form.<name> does not cross the import (SPEC V143, B9)" }
-# 4 since T842: the declaration, the two accepted click paths, and the speciality dataLink the
-# BUTTON needs. The combo painted itself from the field; a button's text is not a field, so the
-# seven rows need the same watcher the sixteen backgrounds have had since T808 (SPEC I107a2).
-# 5 since the 27th batch (SPEC V164 amended, V507d): the declaration, the click path, the
-# LANGUAGE link, and the two clicks of the ! window - specType and specDot - which change the
-# rows the list shows and repaint it themselves.
-elseif ($renderCalls.Count -ne 5) { Fail "V164 renderSpecialities is called from $($renderCalls.Count - 1) place(s) on the root form - the ONE accepted click path (T985 made the click a sequence and the repaint left the loop, SPEC V445), the language dataLink, specType and specDot, and no more" }
-elseif ((LuaFn $rootTxt 'specType') -notmatch 'renderSpecialities\(form\)' -or (LuaFn $rootTxt 'specDot') -notmatch 'renderSpecialities\(form\)') { Fail "V164 a click of the ! window does not repaint the SPECIALTIES list - the summary would lag the window until the tab is shown again (SPEC V507d)" }
-elseif ($specLinks2.Count -ne 1) { Fail "V164 WoD20.1 carries $($specLinks2.Count) xpFree links - one, so a grant made on another client locks the row here too" }
-elseif ($mainRawTxt -notmatch '<dataLink field="xpFree" onChange="renderSpecialities\(self\);"/>') { Fail "V164 the xpFree link does not repaint the lock" }
-elseif ($mainRawTxt -notmatch '(?s)<event name="onNodeReady">.*?renderSpecialities\(self\);.*?</event>') { Fail "V164 opening the sheet does not paint the lock - a saved gift would show as editable" }
-else { Pass "V164 the lock is painted on the click, on open and on a remote grant, through the one finder" }
+# ---- V164: RETIRED in the 44th batch - renderSpecialities left with the SPECIALTIES list, and
+# its callers call specBangPaint directly; V527(b)(c) owns that list now (SPEC V164, I187d).
 
 # ---- V165: the rename is text, never a field ------------------------------------------
 # speciality_N and specialityName_N shipped in 4.6, so they stay whatever the label says
@@ -5802,9 +5749,11 @@ $BANDS = @(0, 340, 345, 675, 680, 1010, 1015, 1345)
 # column, which is what keeps a stack a stack instead of two boxes that happen to be near each
 # other. That round left the SKILLS band EMPTY (Q44, a decision and not a pending move) and T908
 # filled it with SPECIALTIES, which is where V168 had it before the fifth band existed.
+# 44th batch (SPEC I187b, V375 amended): SPECIALTIES left the sheet and ROAD took its place, so
+# the stack is gone - VIRTUES stands alone under TALENTS and ROAD under SKILLS.
 $GRID = @(
-    @{ col = "TALENTS";     under = @("VIRTUES", "ROAD") },
-    @{ col = "SKILLS";      under = @("SPECIALTIES") },
+    @{ col = "TALENTS";     under = @("VIRTUES") },
+    @{ col = "SKILLS";      under = @("ROAD") },
     @{ col = "KNOWLEDGES";  under = @("HEALTH") }
 )
 $colW = @(); $abilRowOk = $false
@@ -5848,7 +5797,8 @@ foreach ($mb in $mainBoxes) {
 # uses for the height, so neither axis is tied to a tab by name.
 
 if ($gridMissing.Count -gt 0) { Fail "V375 not a titled box on WoD20.1: $($gridMissing -join ', ')" }
-elseif ($mainBoxes.Count -lt 10) { Fail "V375 only $($mainBoxes.Count) box(es) read off WoD20.1 - the sweep broke and the band rule measured nothing (SPEC V20)" }
+# 9 since the 44th batch took SPECIALTIES off the tab (SPEC I187a) - it was the tenth box.
+elseif ($mainBoxes.Count -lt 9) { Fail "V375 only $($mainBoxes.Count) box(es) read off WoD20.1 - the sweep broke and the band rule measured nothing (SPEC V20)" }
 else {
     $offGrid = @()
     foreach ($g in $GRID) {
@@ -10190,7 +10140,6 @@ foreach ($ts in $typedSpec) {
         if ($entT -ne $entP) { $typedBad2 += "$($ts.Tpl) starts its entry at x=$entT and $($ts.Pick) at x=$entP (SPEC V26, B12)" }
     }
 }
-$renderSpecFn = LuaFn $rootTxt 'renderSpecialities'
 $grantSpecFn  = LuaFn $rootTxt 'grantSpeciality'
 $bound = 'for i = 1, SPECIALITY_ROWS - SPECIALITY_FREE_ROWS, 1 do'
 foreach ($gt255 in $V255_RETIRED) {
@@ -10201,10 +10150,8 @@ foreach ($gt255 in $V255_RETIRED) {
     }
 }
 if ($typedBad2.Count -gt 0) { foreach ($b in $typedBad2) { Fail "V255 $b" } }
-elseif (-not $renderSpecFn) { Fail "V255 renderSpecialities is gone - nothing locks a granted specialty" }
-# EMENDED in the 27th batch (SPEC I172g): the renderer paints a LIST of the whole pool now, so
-# it walks every row on purpose - the picker bound it used to stop at left with the pickers.
-elseif ($renderSpecFn -notmatch 'for i = 1, SPECIALITY_ROWS, 1 do') { Fail "V255 renderSpecialities does not walk the whole pool - a speciality bought in a later row would be missing from the SPECIALTIES list (SPEC I172g)" }
+# 44th batch (SPEC I187d): the two legs that read renderSpecialities left with it - the list it
+# painted is gone, and the lock of a gift never lived there (V161: xpClick and mfOpen refuse).
 elseif (-not $grantSpecFn) { Fail "V255 grantSpeciality is gone - the gift a trait hands out has nowhere to land" }
 # The gift takes its row from specFreeRow since the 27th batch (SPEC I172e, V505c): the bound
 # moved there, one owner for "a free row", so it is asked of THAT body.
@@ -12745,7 +12692,7 @@ foreach ($f in $files) {
     }
 }
 if ($v280Apply -ne 1) { Fail "V280 $v280Apply titleless one-button box(es) were cut, expected the 1 the Apply box is (SPEC I163f, V479c, V209, B7)" }
-elseif ($v280Boxes.Count -ne 62) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 62 I73 measures (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
+elseif ($v280Boxes.Count -ne 61) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 61 I73 measures (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
 else {
     # (a) TWO numbers since T913: 20 on the X sides, 15 on the Y ones (SPEC I137c, user
     # 2026-09-02). The X pair is a FLOOR and always was. The Y pair splits: the FOOT is a floor,
@@ -12892,7 +12839,7 @@ else { Pass "V280 (d) the $($colBottoms.Count) Ghoul columns all close at $(@($c
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
 # (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
 # on them would be a false alarm on numbers this round agreed not to touch.
-if ($v280Boxes.Count -ne 62) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 62 I73 measures (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
+if ($v280Boxes.Count -ne 61) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 61 I73 measures (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
 else {
     # The declared HOLE is GONE with T908 and the 5px rule is whole again. T904 had left the
     # 680..1010 band of the Main grid with no bottom box, so two boxes faced each other a whole
@@ -16627,23 +16574,25 @@ if ($ns520.Success -and $pairs520 -eq 0) { $v520Bad += "(b) no cboX/cboXMc pair 
 if ($v520Bad) { foreach ($b in $v520Bad) { Fail "V520 $b" } }
 else { Pass "V520 $seen520 sorted cbo* derive their own field, $pairs520 twin pair(s) agree on PICKER_NOSORT, $tpl520 templated name(s) skipped" }
 
-# ---- V521: PAGE reads PAG. in Portuguese on both halves, and Page reads Pag. (SPEC I180a, user 2026-09-25) ----
+# ---- V521: PAGE reads PAGINA in Portuguese on both halves, and Page reads Pagina (SPEC I187e, user 2026-09-26) ----
 # V10/V28 charge that the key EXISTS in localization.lang and in the PT map; this charges the VALUE
 # the user asked for, the way V502e pins 'Forca de Vontade'. Built from code points: this file is
 # ASCII (SPEC V384). Case-sensitive on purpose (-cne): the two keys differ only by case.
+# The owner asked for 'PAG.' on 2026-09-25 (I180a, a 45px column) and REVERTED it on 2026-09-26,
+# after the 42nd batch doubled the column to 90 - an informed choice, not drift (SPEC B188, V362b).
 $v521Bad = @()
-$pagUp521 = 'P' + [string][char]0x00C1 + 'G.'
-$pagLo521 = 'P' + [string][char]0x00E1 + 'g.'
+$pagUp521 = 'P' + [string][char]0x00C1 + 'GINA'
+$pagLo521 = 'P' + [string][char]0x00E1 + 'gina'
 $keys521 = @(@('PAGE', $pagUp521), @('Page', $pagLo521))
 foreach ($k521 in $keys521) {
     if (-not $ptVal.ContainsKey($k521[0])) { $v521Bad += "(a) localization.lang [pt] has no wod.$($k521[0]) - the key V10 charges is gone, so there is nothing to read (SPEC V521a, V209)" }
-    elseif ($ptVal[$k521[0]] -cne $k521[1]) { $v521Bad += "(a) localization.lang [pt] reads wod.$($k521[0]) as '$($ptVal[$k521[0]])' - the user asked for '$($k521[1])' on the MERITS and FLAWS column (SPEC I180a, V521a)" }
+    elseif ($ptVal[$k521[0]] -cne $k521[1]) { $v521Bad += "(a) localization.lang [pt] reads wod.$($k521[0]) as '$($ptVal[$k521[0]])' - the user asked for '$($k521[1])' on the MERITS and FLAWS column (SPEC I187e, V521a)" }
 }
 $wod6Txt521 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.6.lfm")))
 foreach ($k521 in $keys521) {
     $m521 = [regex]::Match($wod6Txt521, '\["' + $k521[0] + '"\]\s*=\s*"([^"]*)"')
     if (-not $m521.Success) { $v521Bad += "(b) the PT map in WoD20.6 has no [$($k521[0])] entry - V28 charges the key, this leg has nothing to read (SPEC V521b, V209)" }
-    elseif ($m521.Groups[1].Value -cne $k521[1]) { $v521Bad += "(b) the PT map in WoD20.6 reads $($k521[0]) as '$($m521.Groups[1].Value)' - the user asked for '$($k521[1])', and the map is what translateSheetText reads (SPEC I180a, V521b, V28)" }
+    elseif ($m521.Groups[1].Value -cne $k521[1]) { $v521Bad += "(b) the PT map in WoD20.6 reads $($k521[0]) as '$($m521.Groups[1].Value)' - the user asked for '$($k521[1])', and the map is what translateSheetText reads (SPEC I187e, V521b, V28)" }
 }
 if ($v521Bad) { foreach ($b in $v521Bad) { Fail "V521 $b" } }
 else { Pass "V521 PAGE reads $pagUp521 and Page reads $pagLo521 in localization.lang [pt] and in the PT map of WoD20.6" }
@@ -16885,6 +16834,46 @@ if (-not $preset526 -or -not $add526 -or -not $shared526 -or -not $init526 -or -
 }
 if ($v526Bad) { foreach ($b in $v526Bad) { Fail "V526 $b" } }
 else { Pass "V526 the box binds the active character but for the flag, the window edits a preset only mcAdd reads, the three field lists agree on 12, mcShared copies only the language, and the column repaints on healthLevels" }
+
+# ---- V527: Main has no SPECIALTIES, and the ! is painted DIRECTLY (SPEC I187a/d/e, 44th batch) ----
+# The owner's ask of 2026-09-26: the SPECIALTIES box leaves the Main tab. With its list gone,
+# renderSpecialities was a synonym of specBangPaint (same guard, one call) and left too, so its
+# six callers call the painter directly. This rule owns the ABSENCE - a box, list or renderer
+# that comes back reddens - and the six callers, which V164 counted until the 44th batch. The
+# VALUE of Page/PAGE is V521's, not this rule's (SPEC B70, B188).
+#
+# Mutation (SPEC V222): dynSpecList back on WoD20.1 -> RED (a) - specDot calling
+# renderSpecialities(form) -> RED (b) and (c) - specBangPaint(self) out of onShow -> RED (c) -
+# wod.SPECIALTIES back in the en half -> RED (d). Probe: fontSize of dynSpecTip 12 -> 11 -> GREEN.
+$v527Bad = @()
+$n527 = 0
+foreach ($f527 in $files) {
+    $c527 = CodeOf $f527.FullName
+    $n527++
+    if ($c527 -match 'text="SPECIALTIES"' -or $c527 -match 'name="dynSpecList"') { $v527Bad += "(a) $($f527.Name) draws the SPECIALTIES box or its list again - the owner took it out on 2026-09-26 (SPEC I187a)" }
+    if ($c527 -match 'renderSpecialities') { $v527Bad += "(b) $($f527.Name) names renderSpecialities outside a comment - it left with the list, so a caller of it calls nothing (SPEC I187d)" }
+}
+if ($n527 -lt 12) { $v527Bad += "only $n527 .lfm file(s) were read, expected 12 (SPEC V20, V209)" }
+$main527  = CodeOf (Join-Path $dir "WoD20.1.lfm")
+$root527  = CodeOf (Join-Path $dir "WoD20th.lfm")
+$show527  = [regex]::Match($main527, '(?s)<event name="onShow">(.*?)</event>')
+$ready527 = [regex]::Match($main527, '(?s)<event name="onNodeReady">(.*?)</event>')
+$type527  = NoComments (LuaFn $rootTxt 'specType')
+$dot527   = NoComments (LuaFn $rootTxt 'specDot')
+$click527 = NoComments (LuaFn $rootTxt 'xpClick')
+if (-not $show527.Success -or -not $ready527.Success -or -not $type527 -or -not $dot527 -or -not $click527) { $v527Bad += "the onShow or onNodeReady of WoD20.1, specType, specDot or xpClick is not found - leg (c) reads nothing (SPEC V20, V209)" }
+else {
+    if ($show527.Groups[1].Value -notmatch 'specBangPaint\(self\);') { $v527Bad += "(c) the onShow of WoD20.1 does not call specBangPaint(self) - a speciality undone from the log would leave its ! starred (SPEC V527c, V429b)" }
+    if ($ready527.Groups[1].Value -notmatch 'specBangPaint\(self\);') { $v527Bad += "(c) the onNodeReady of WoD20.1 does not call specBangPaint(self) - a saved sheet would open with every ! plain (SPEC V527c)" }
+    if ($main527 -notmatch '<dataLink field="xpFree" onChange="specBangPaint\(self\);"/>') { $v527Bad += "(c) the xpFree link of WoD20.1 does not call specBangPaint(self) - a gift granted on another client would not star here (SPEC V527c)" }
+    if ($type527 -notmatch 'specBangPaint\(form\);') { $v527Bad += "(c) specType does not call specBangPaint(form) - naming a speciality would leave its ! starred (SPEC V527c)" }
+    if ($dot527 -notmatch 'specBangPaint\(form\);') { $v527Bad += "(c) specDot does not call specBangPaint(form) - buying one in the ! window would not star it (SPEC V527c)" }
+    if ($click527 -notmatch 'if moved then specBangPaint\(form\); end;') { $v527Bad += "(c) xpClick does not call specBangPaint(form) under 'if moved' - a gift would not star its trait (SPEC V527c, V445)" }
+}
+if ($root527 -match '<dataLink fields="\{''language''\}">') { $v527Bad += "(c) the root carries a language-only dataLink again - it repainted the list, and a language change already repaints every ! through applyLanguage (SPEC I187d, V512c)" }
+if ($enK.Contains('SPECIALTIES') -or $ptK.Contains('SPECIALTIES') -or $embedded.ContainsKey('SPECIALTIES')) { $v527Bad += "(d) the SPECIALTIES key is still in localization.lang or in the PT map - the only label that read it left with the box (SPEC I187e)" }
+if ($v527Bad) { foreach ($b in $v527Bad) { Fail "V527 $b" } }
+else { Pass "V527 no SPECIALTIES box, list or renderSpecialities in the $n527 .lfm files, the six paths that buy, name or give paint the ! directly, and the SPECIALTIES key is gone" }
 
 # ---- V351: the ROAD label rides on the picker's own line -------------------------------
 # SPEC C Q27, I99k-m, T801. The user asked for the label beside the dropdown; what it BUYS is
@@ -24714,8 +24703,10 @@ $per507M  = [regex]::Match($rootTxt, '(?m)^\s*SPEC_PER_TRAIT = (\d+);')
 $grant507 = LuaFn $rootTxt 'grantSpeciality'
 $main507  = Doc (Join-Path $dir "WoD20.1.lfm")
 $mainRaw507 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.1.lfm")))
-$box507   = BoxOf $main507 "SPECIALTIES"
-if ($spRows -lt 1 -or -not $per507M.Success -or -not $grant507 -or -not $box507) { $v507Bad += "SPECIALITY_ROWS, SPEC_PER_TRAIT, grantSpeciality or the SPECIALTIES box is not found - this check reads nothing (SPEC V20, V209)" }
+# 44th batch (SPEC V507 amended, I187a/d): the SPECIALTIES box, its list and renderSpecialities
+# left the sheet, so the (d) legs that read them left too - V527 owns their absence. The (d)
+# legs that guard the 27th batch's removals (picker rows, PICKER_LIST, 'Select Speciality') stay.
+if ($spRows -lt 1 -or -not $per507M.Success -or -not $grant507) { $v507Bad += "SPECIALITY_ROWS, SPEC_PER_TRAIT or grantSpeciality is not found - this check reads nothing (SPEC V20, V209)" }
 else {
     $per507  = [int]$per507M.Groups[1].Value
     $nAt507  = @([regex]::Matches(([regex]::Match($rootTxt, 'local XP_ATTRS = \{(.*?)\};', 'Singleline')).Groups[1].Value, '\{"([^"]+)", "[^"]+"\}')).Count
@@ -24727,14 +24718,7 @@ else {
     elseif ($grant507.IndexOf('SPEC_PER_TRAIT') -gt $grant507.IndexOf('specFreeRow()')) { $v507Bad += "(b) the gift asks for the ceiling AFTER it takes a free row (SPEC V507b)" }
     if ($grant507 -match '[<>]=?\s*5\b') { $v507Bad += "(b) grantSpeciality compares against a literal 5 - the ceiling has one owner, SPEC_PER_TRAIT (SPEC V507b)" }
     if ($rootTxt -notmatch 'pushRise\(rows, "Specialty", specTraitName\(') { $v507Bad += "(c) the Specialty line of the ledger does not read its name through specTraitName - a typed row would reach the log as its field name (SPEC I172f)" }
-    if (@($main507.SelectNodes("//template[@name='SpecialityRow'] | //SpecialityRow")).Count -gt 0 -or $mainRaw507 -match 'dynspeciality_|edtspeciality_') { $v507Bad += "(d) the SPECIALTIES box still draws picker rows - it is a summary since the 27th batch (SPEC I172g)" }
-    $list507 = @($box507.SelectNodes("textEditor[@name='dynSpecList']"))
-    if ($list507.Count -ne 1 -or $list507[0].GetAttribute('readOnly') -ne 'true') { $v507Bad += "(d) the SPECIALTIES box does not hold exactly one read-only dynSpecList (SPEC I172g)" }
-    if ((LuaFn $rootTxt 'renderSpecialities') -notmatch 'found\["dynSpecList"\]\.text = ') { $v507Bad += "(d) renderSpecialities does not write the list (SPEC V507d)" }
-    $mc507 = @([regex]::Matches($mainRaw507, 'renderSpecialities\(self\)')).Count
-    $rc507 = @([regex]::Matches($rootTxt, 'renderSpecialities\(')).Count - 1
-    if ($mc507 -ne 3 -or $rc507 -ne 4) { $v507Bad += "(d) renderSpecialities is called $mc507 time(s) on WoD20.1 and $rc507 on the root - expected onShow, onNodeReady and the xpFree link there, and xpClick, the language link, specType and specDot here (SPEC V507d, V164)" }
-    if ($rootTxt -notmatch '<dataLink fields="\{''language''\}">\s*<event name="onChange">\s*renderSpecialities\(self\);') { $v507Bad += "(d) the language link of the root does not repaint the list (SPEC V507d)" }
+    if (@($main507.SelectNodes("//template[@name='SpecialityRow'] | //SpecialityRow")).Count -gt 0 -or $mainRaw507 -match 'dynspeciality_|edtspeciality_') { $v507Bad += "(d) WoD20.1 still draws speciality picker rows - they left in the 27th batch (SPEC I172g)" }
     if ($null -ne $PICKER['speciality']) { $v507Bad += "(d) PICKER_LIST carries a 'speciality' list again - the trait picker left in the 27th batch (SPEC I172g)" }
     foreach ($p507 in @($files | ForEach-Object { $_.FullName }) + @(Join-Path $plugin 'localization.lang')) {
         if ([System.IO.File]::ReadAllText($p507).Contains('Select Speciality')) { $v507Bad += "(d) $(Split-Path $p507 -Leaf) still carries 'Select Speciality' - the key left with the picker (SPEC I172h)" }
@@ -24752,7 +24736,7 @@ else {
     if ($ghost507.Count -gt 0) { $v507Bad += "(e) XP_CUSTOM names $($ghost507 -join ', ') and no typed row draws it - a price with no dots (SPEC V507e)" }
 }
 if ($v507Bad) { foreach ($b in $v507Bad) { Fail "V507 $b" } }
-else { Pass "V507 $spRows rows = $per507 x the traits that can hold them, the gift stops at $per507, the log names typed rows by their text, and SPECIALTIES is one read-only list" }
+else { Pass "V507 $spRows rows = $per507 x the traits that can hold them, the gift stops at $per507, the log names typed rows by their text, and no speciality picker came back" }
 
 # ---- V508: drag to reorder the rows of ROW_LISTS (SPEC I174a..f, I175b..d, R174, 30th batch) ----
 # The order is VISUAL: a drag moves a named row layout by top and never the data (SPEC R173b).
@@ -25185,10 +25169,9 @@ else { Pass "V511 every row painter lights its ? beside its label through noteBu
 $v512Bad = @()
 $lang512 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20.6.lfm")))
 $bang512 = NoComments (LuaFn $rootTxt 'specBangPaint')
-$rs512 = NoComments (LuaFn $rootTxt 'renderSpecialities')
 $ral512 = NoComments (LuaFn $lang512 'renderAbilityLabels')
 $al512 = NoComments (LuaFn $lang512 'applyLanguage')
-if (-not $bang512 -or -not $rs512 -or -not $ral512 -or -not $al512) { $v512Bad += "specBangPaint, renderSpecialities, renderAbilityLabels or applyLanguage is not declared - this check reads nothing (SPEC V20, V209)" }
+if (-not $bang512 -or -not $ral512 -or -not $al512) { $v512Bad += "specBangPaint, renderAbilityLabels or applyLanguage is not declared - this check reads nothing (SPEC V20, V209)" }
 else {
     # (a) one painter, the only one to spell the star or write a ! of a trait.
     if (@([regex]::Matches($all25Code, 'function\s+specBangPaint\s*\(')).Count -ne 1) { $v512Bad += "(a) specBangPaint is not declared exactly once (SPEC V512a)" }
@@ -25201,8 +25184,9 @@ else {
     # (b) the condition: dot lit, name empty; by name, no walk.
     if ($bang512 -notmatch '"_1"\] == true' -or $bang512 -notmatch '"specialityName_"' -or $bang512 -notmatch '== ""') { $v512Bad += "(b) specBangPaint does not star a row whose dot is lit and whose name is empty (SPEC V512b, I176h)" }
     if ($bang512 -match 'xpFind\(') { $v512Bad += "(b) specBangPaint walks the tree - it finds every ! by name off the root self (SPEC V512b, V143)" }
-    # (c) three callers: the list painter, the era, and the translation that rewrites button text.
-    if ($rs512 -notmatch 'specBangPaint\(from\);') { $v512Bad += "(c) renderSpecialities does not call specBangPaint(from) - buying, naming or a gift would not move the star (SPEC V512c)" }
+    # (c) the era and the translation that rewrites button text. The list painter was the third
+    # until the 44th batch took it out: the paths that buy, name or give call specBangPaint
+    # DIRECTLY now, with form or self, and V527(c) owns that list (SPEC V512c amended, I187d).
     if ($ral512 -notmatch 'xpQuiet = false;[\s\S]*specBangPaint\(from\);') { $v512Bad += "(c) renderAbilityLabels does not call specBangPaint(from) after xpQuiet = false - an era change would leave the star on the old row (SPEC V512c)" }
     if ($al512 -notmatch 'specBangPaint\(from\);\s*\r?\n\t\t\tend;$') { $v512Bad += "(c) specBangPaint(from) is not the last instruction of applyLanguage - the translation would put every ! back to the text it saw first (SPEC V512c, B179)" }
     # A fourth caller since the 32nd batch (SPEC V512c as amended, I177c): applyTheme repaints the
@@ -25211,13 +25195,13 @@ else {
     $at512 = NoComments (LuaFn $lang512 'applyTheme')
     if ($at512 -notmatch 'specBangPaint\(from\);') { $v512Bad += "(c) applyTheme does not call specBangPaint(from) - an era change would put every accented ! back to plain (SPEC V512c, V515d)" }
     $calls512 = @([regex]::Matches($all25Code, 'specBangPaint\(from\);')).Count
-    if ($calls512 -ne 4) { $v512Bad += "(c) specBangPaint(from) is called $calls512 time(s), expected 4 (SPEC V512c as amended)" }
+    if ($calls512 -ne 3) { $v512Bad += "(c) specBangPaint(from) is called $calls512 time(s), expected 3 - renderAbilityLabels, applyLanguage, applyTheme (SPEC V512c as amended in the 44th batch)" }
     # (d) the ability rows: the LIVE first dot, counted by the XML.
     if ($bang512 -notmatch '"abil" \.\. col \.\. num \.\. "_1"' -or $bang512 -notmatch '\.field' -or $bang512 -notmatch 'specKey\(') { $v512Bad += "(d) specBangPaint does not read an ability row's trait off the live field of its first dot (SPEC V512d, I172d)" }
     if ($bang512 -match '\b(11|13|37)\b') { $v512Bad += "(d) specBangPaint spells a row count - the rows are counted by the XML, the loop stops at the first missing name (SPEC V512d, R176c)" }
 }
 if ($v512Bad) { foreach ($b in $v512Bad) { Fail "V512 $b" } }
-else { Pass "V512 one painter stars the ! of a trait holding a speciality bought or given with no name, reading ability rows off their live dot, and it runs after the list, the era, the translation and the theme" }
+else { Pass "V512 one painter stars the ! of a trait holding a speciality bought or given with no name, reading ability rows off their live dot, and it runs after every buy, the era, the translation and the theme" }
 
 # ---- V513: the tip fits its WHOLE text plus the bar (SPEC I177a, R177e, Q98.1) ----
 # The width comes from the LONGEST paragraph at the worst per-character width MEASURED at the

@@ -45,10 +45,9 @@
 			  header  0..1010      EXPERIENCE 1015..1345                y   0..105
 			  ATTRIBUTES 0..340                                        y 110..406
 			                       TALENTS 345..675 | SKILLS 680..1010 | KNOWLEDGES 1015..1345   y 110..536
-			  avatar     0..340                                   y 411..856
+			  avatar     0..340                                   y 411..785
 			                       VIRTUES 345..675                    y 541..667
-			                       ROAD + BEARING + WILLPOWER 345..675  y 672..856
-			                       SPECIALTIES 680..1010               y 541..842
+			                       ROAD + BEARING + WILLPOWER 680..1010 y 541..725
 			                       HEALTH  1015..1345                  y 541..866 at ten rows
 
 			Read it as a FOUR-BAND GRID, which is what V375 measures since T908: every box on
@@ -56,16 +55,20 @@
 			a 5px gutter between bands, and each box on the bottom row shares both x edges with
 			the column above it. The FIFTH band lasted two days: the 157th round moved
 			SPECIALTIES into the grid row beside KNOWLEDGES (SPEC I126) and T908 put it back
-			under SKILLS, which is where V168 had it. Its height is no longer its own content:
-			the owner aligned its floor to ROAD on 2026-09-02 (SPEC I136c, V402, I139a).
+			under SKILLS, which is where V168 had it.
 
-			The bottom row no longer closes on ONE line, and that is the ask rather than drift:
-			SPECIALTIES, ROAD and the AVATAR all end at 856 - ROAD on its own content plus the
-			15px foot (SPEC V393), SPECIALTIES ALIGNED to it on a 29px one (SPEC V402, user
-			2026-09-02 item 1), the avatar PINNED to it since 2026-09-04 (SPEC V415, I144a, user
-			item 1) - while HEALTH alone ends at 866. Which box does NOT close the line is DERIVED
-			from the V393, V402 and V415 rosters and never typed into the gate - a box that
-			quietly stops closing it leaves no other trace (SPEC V376, I136d, I139a, Q47, Q49).
+			44th batch (SPEC I187, user 2026-09-26): SPECIALTIES is GONE and ROAD took its place
+			under SKILLS, at its own 184 - so VIRTUES stands alone in its band and the space under
+			it is empty on purpose (SPEC Q106.1). The avatar closes where HEALTH closes at SEVEN
+			levels - 541 + 7 * HEALTH_ROW_PITCH + HEALTH_BOX_PAD = 785 - and HEALTH itself is only
+			READ for it, never moved (SPEC V415, I187c).
+
+			The bottom row does not close on ONE line, and that is the ask rather than drift:
+			VIRTUES and ROAD end on their own content plus the 15px foot (SPEC V393), the avatar
+			on HEALTH's seven-row floor (SPEC V415) - while HEALTH alone ends at 866. Which box
+			does NOT close the line is DERIVED from the V393 and V415 rosters and never typed into
+			the gate - a box that quietly stops closing it leaves no other trace (SPEC V376,
+			I136d, Q47, Q49).
 
 			HEALTH being the ONLY closer is why V376 had to be re-formed in the same commit that
 			moved the avatar (SPEC Q63, T939): an equality over one element is true for whatever
@@ -96,14 +99,9 @@
 			I125 measured all ten, box by box - the other two were already at the floor, 20px of
 			margin on four sides and rows that touch.
 
-			SPECIALTIES used to carry that difference as FOLGA under its last row, and then as
-			145px of it once the 157th round put it in the grid row at 436 tall. The owner
-			revoked the slack on 2026-09-02 and then spent 14px of it back the same day: the box
-			is 315 now - ten rows from 36 at a pitch of 25 close at 286, plus a 29px foot - and
-			what holds it there is V402, not V393. The foot is not a number anybody chose: it is
-			ROAD floor minus this box last row, so the two end together (user 2026-09-02 item 1).
-			An invariant does not veto an informed choice by the owner, it records which one was
-			made (SPEC V362b, V402; Q43 answered 2026-08-31 and reversed by the same owner).
+			SPECIALTIES used to carry that difference as FOLGA under its last row, until the owner
+			aligned its floor to ROAD (SPEC V402) - and the 44th batch took the box out of the
+			sheet altogether, V402 with it (SPEC I187a).
 
 			The columns are 436 tall, not 340: fifteen rows from 41 at a pitch of 25 close at
 			416, and the 20px under the last one is the margin ATTRIBUTES sets (SPEC V171). The
@@ -425,8 +423,8 @@
 			</layout>
 		</layout>
 
-		<!-- The picture closes the left column on the line the map above declares, with HUMANITY
-		     and SPECIALTIES (SPEC T134, V69). It has followed that line since the 50th round.
+		<!-- The picture closes the left column where HEALTH closes at SEVEN levels, the y the map
+		     above declares (SPEC V415, I187c, user 2026-09-26) - HEALTH is only read for it.
 
 		     The FRAME is the rectangle below, and it carries the same four numbers as the image
 		     on purpose (SPEC V309, B71): it is a loose <rectangle>, so the box collector of I73
@@ -437,8 +435,8 @@
 		     It keeps color="DimGray" and is the only carrier of that key in the four palettes
 		     (SPEC V53, T653). The radius matches the section boxes so the corner reads as one
 		     frame family. -->
-		<rectangle name="avatarFrame" left="0" top="411" width="340" height="445" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
-		<image left="0" top="411" width="340" height="445" field="avatar" editable="true" style="autoFit"/>
+		<rectangle name="avatarFrame" left="0" top="411" width="340" height="374" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
+		<image left="0" top="411" width="340" height="374" field="avatar" editable="true" style="autoFit"/>
 
 		<!-- The ornament CARRIER (SPEC I84d, I92, V309, V287, V320). Transparent in both senses
 		      and holding no content of its own: it exists so the era's drawing has somewhere to hang
@@ -459,7 +457,7 @@
 		      THREE palettes declare ornament - Victorian filigree, Dark Ages filete, Modern Nights
 		      corrente - so the Classical Age shows no drawing here and that is correct (SPEC V277,
 		      V320f). -->
-		<rectangle name="ornAvatar" left="0" top="411" width="340" height="445" color="#00000000" strokeColor="#00000000" xradius="14" yradius="14" cornerType="innerRound" hitTest="false"/>
+		<rectangle name="ornAvatar" left="0" top="411" width="340" height="374" color="#00000000" strokeColor="#00000000" xradius="14" yradius="14" cornerType="innerRound" hitTest="false"/>
 
 		<!--
 			The three ability columns stand loose (SPEC T407, V168, V169). Until the 49th round
@@ -653,14 +651,14 @@
 		</layout>
 
 		<!--
-			Bottom row, two columns now, ending at y=760 (SPEC T78/T79, V69):
-			  VIRTUES (310-600, y 460-586) over HUMANITY & WILLPOWER (310-600, y 596-760)
-			  SPECIALTIES (615-905, y 460-760, SPEC I14) | HEALTH (920-1210)
+			Bottom row, three boxes side by side since the 44th batch (SPEC I187b) - the map at
+			the top of the file has the numbers: VIRTUES | ROAD + BEARING + WILLPOWER | HEALTH.
 
 			Every one of them takes its x from the column above it since the 50th round
-			(SPEC V168): Virtues and Humanity from TALENTS, SPECIALTIES from SKILLS, HEALTH
-			from KNOWLEDGES. They rose 50 with the same round, which is what the ability
-			columns gave back when they stopped carrying a black tail (SPEC V171).
+			(SPEC V168, V375): VIRTUES from TALENTS, ROAD from SKILLS (the place SPECIALTIES
+			held until the 44th batch), HEALTH from KNOWLEDGES. They rose 50 with the 50th
+			round, which is what the ability columns gave back when they stopped carrying a
+			black tail (SPEC V171).
 
 			Virtues and Humanity are 290 wide, not 410: their content is a 250px track (a 125px
 			label plus 5 dots, or 10 bare dots), so 410 left a wide empty margin and made the
@@ -689,7 +687,9 @@
 			</layout>
 		</layout>
 
-		<layout left="345" top="672" width="330" height="184">
+		<!-- Under SKILLS, where SPECIALTIES was, since the 44th batch (SPEC I187b, user
+		     2026-09-26): the box kept its size and its children, only left/top moved. -->
+		<layout left="680" top="541" width="330" height="184">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<!--
@@ -807,30 +807,6 @@
 		</layout>
 
 		<!--
-			SPECIALTIES (SPEC I14, T388) took the corner the 46th round emptied when BACKGROUNDS
-			moved to the Traits tab. It takes both x edges from the column above it - SKILLS, the
-			way V168 had it before the 157th round put it beside KNOWLEDGES and T908 brought it
-			back (SPEC V375, I136c). What it does NOT do any more is close on the bottom line:
-			its height is content plus a 20px foot and nothing else, which is the owner ask of
-			2026-09-02 and what V393 pins (SPEC V376, I136d, Q47).
-
-			Since the 27th batch it is a SUMMARY and edits nothing (SPEC I172g, V507d, user Q92.1):
-			one read-only list of every speciality the character bought, "<trait>: <name>", which
-			renderSpecialities writes. The ten picker rows left - each trait's ! opens its own five
-			specialities now - and with them the only ceiling on the total (SPEC I172f). The list
-			starts on the title hairline (36) and closes on 295, and the 20 under it is the foot:
-			the box keeps its 315 and every rule that measures the BOX stays where it was.
-			dyn* so the language traversal leaves Lua's text alone (SPEC I108a, V31).
-		-->
-		<layout left="680" top="541" width="330" height="315">
-			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="290" height="20" text="SPECIALTIES" horzTextAlign="center"/>
-
-			<textEditor name="dynSpecList" left="20" top="36" width="290" height="259" readOnly="true" opacity="0.75" wordWrap="true" transparent="true" fontSize="12"/>
-		</layout>
-
-
-		<!--
 			SPEC I176a, T1110 - the Main tab's own tooltip, the twin of WoD20.2's noteTip attribute
 			for attribute. Its NAMES are its own: the tabs are <import>ed into ONE form, and every
 			named control of every tab is a field of that one root object (SPEC R176) - a second
@@ -857,27 +833,27 @@
 	     number, and every dot on this tab redraws it through the guard. -->
 	<dataLink field="xpTotal" onChange="renderXPBoxes(self);"/>
 
-	<!-- A free speciality is locked (SPEC V161/V164), and which rows are free is written in
-	     the stamps. Watching them covers the grant that happened on ANOTHER client at the
-	     table: the field arrives over the NDB, and the row locks here too.
+	<!-- A gift writes the stamps, and the ! of its trait stars (SPEC V512, V527c). Watching them
+	     covers the grant that happened on ANOTHER client at the table: the field arrives over
+	     the NDB, and the ! repaints here too.
 
 	     `xpFree` carries no widget by design - it is Lua-owned, the declared exception to
 	     V8 (SPEC I3, B25). -->
-	<dataLink field="xpFree" onChange="renderSpecialities(self);"/>
+	<dataLink field="xpFree" onChange="specBangPaint(self);"/>
 
 	<event name="onShow">
 		wodTrace("WoD20.1.onShow");
 		renderXPBoxes(self);
 		-- Both events, like renderXPBoxes (SPEC V429b, I146g, T962): onNodeReady alone leaves the
-		-- SPECIALTIES list empty whenever the sheet is not bound yet, and showing the tab again
-		-- is what catches a speciality undone from the Experience log (SPEC I172g).
-		renderSpecialities(self);
+		-- ! unpainted whenever the sheet is not bound yet, and showing the tab again is what
+		-- catches a speciality undone from the Experience log (SPEC V527c).
+		specBangPaint(self);
 	</event>
 
 	<event name="onNodeReady">
 		renderHealthTrack(self, 'dynHealth_');
 		renderRoadPair(self);
 		renderXPBoxes(self);
-		renderSpecialities(self);
+		specBangPaint(self);
 	</event>
 </form>

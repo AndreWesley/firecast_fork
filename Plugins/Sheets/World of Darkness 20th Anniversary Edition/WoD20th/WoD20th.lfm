@@ -135,7 +135,8 @@
 					"Tyrant", "Visionary",
 				},
 				-- No "speciality" list since the 27th batch: the trait picker of the SPECIALTIES box
-				-- left with its rows, and each trait's ! opens its own specialities (SPEC I172g, V148
+				-- (gone itself since the 44th, SPEC I187a) left with its rows, and each trait's !
+				-- opens its own specialities (SPEC I172g, V148
 				-- retired). The fifty names live on in SPEC_TRAIT, which the ! window reads.
 				-- Fifty-nine items since T998, which re-measured every source on the ERA axis and
 				-- rewrote research/bg_essence.tsv. Until then the list held 47 and deduped by GAME
@@ -2710,8 +2711,9 @@
 			-- prices them for the log read this, so a row used and not declared would be a dot
 			-- nothing charges for and nothing shows.
 			--
-			-- No box draws them any more: the ! window of each trait shows that trait's rows and
-			-- the SPECIALTIES box lists the bought ones (SPEC I172e/g). The ONLY ceiling is
+			-- No box draws them any more: the ! window of each trait shows that trait's rows, and
+			-- the SPECIALTIES box that listed the bought ones left in the 44th batch (SPEC I172e,
+			-- I187a). The ONLY ceiling is
 			-- SPEC_PER_TRAIT per trait (user 2026-09-24, Q92.4), so the pool is sized to never
 			-- run out: 5 x 65 keys - the 9 attributes, the 47 abilities of ABILITY_FIELD (every
 			-- era's, since the 154th round) and the 9 typed ability rows of WoD20.1. The gate
@@ -5433,8 +5435,8 @@
 			end;
 
 			-- How a key reads (SPEC I172e/f): a typed row reads as the name typed in it NOW, or its
-			-- own key while that is empty; every other key is already its own name. The title, the
-			-- SPECIALTIES list and the log all ask here, so the three cannot drift.
+			-- own key while that is empty; every other key is already its own name. The title and
+			-- the log both ask here, so the two cannot drift.
 			function specTraitName(key)
 				if key ~= nil and string.match(key, "^custom%a+_%d+$") ~= nil then
 					local typed = sheet[key];
@@ -5555,7 +5557,7 @@
 				if i == nil or edt == nil then return; end;
 
 				setField("specialityName_" .. i, edt.text);
-				renderSpecialities(form);
+				specBangPaint(form);
 			end;
 
 			-- The dot. A free slot first takes a row - trait key and the typed text, which is what
@@ -5587,7 +5589,7 @@
 				xpClick("speciality_" .. i .. "_1", form);
 
 				specPaint(xpFind(tabRootOf(form), POP_BOX, {}), false);
-				renderSpecialities(form);
+				specBangPaint(form);
 
 				-- A click on a dot can take the focus off the slots, and Esc with it (SPEC I173c).
 				kbRefocus(form);
@@ -8485,8 +8487,10 @@
 			-- era re-binds it (SPEC I172d); the typed rows are their own key. Written every time,
 			-- so the star goes the way it came.
 			--
-			-- Four callers (SPEC V512c): renderSpecialities, the end of every path that buys,
-			-- refunds, names or gives one; renderAbilityLabels, when the era moves a trait to
+			-- Its callers (SPEC V512c, V527c): the end of every path that buys, refunds, names or
+			-- gives one - specType, specDot, xpClick, the xpFree link and the two events of the
+			-- Main tab - since the SPECIALTIES list and its renderSpecialities left in the 44th
+			-- batch (SPEC I187d); renderAbilityLabels, when the era moves a trait to
 			-- another row; applyLanguage, which rewrites the text of every button not named
 			-- dyn* from what it saw first (SPEC B179); and applyTheme, which repaints the colour
 			-- of every text from its original, the accent included (SPEC I177c).
@@ -8557,47 +8561,6 @@
 					BANG_BLINK.ticking = true;
 					setInterval(bangBlink, BANG_BLINK_MS);
 				end;
-			end;
-
-			-- The SPECIALTIES box of the Main tab: a read-only LIST of every speciality the
-			-- character has bought, one line each, "<trait>: <name>", sorted (SPEC I172g, V507d).
-			-- Nothing in the box edits any more - the ! of each trait does, and the old picker left
-			-- with its ten rows (user 2026-09-24, Q92.1). A dark dot is not listed: a row held and
-			-- not bought (SPEC I172e) is not something the character HAS.
-			--
-			-- Same name and same callers as the painter it replaced - onShow and onNodeReady of
-			-- WoD20.1, the xpFree link, the language link, xpClick after a gift - plus the two
-			-- clicks of the ! window (SPEC V164 amended). The lock of a gift did not go with the
-			-- rows: it is the refusal inside xpClick, which the ! window's dot goes through (V161c).
-			function renderSpecialities(from)
-				if sheet == nil or from == nil then return; end;
-
-				specBangPaint(from);
-
-				local found = xpFind(tabRootOf(from), { dynSpecList = true }, {});
-
-				if found["dynSpecList"] == nil then return; end;
-
-				local pt = sheet.language ~= "en";
-				local lines = {};
-
-				for i = 1, SPECIALITY_ROWS, 1 do
-					local key = sheet["speciality_" .. i];
-
-					if key ~= nil and key ~= "" and sheet["speciality_" .. i .. "_1"] == true then
-						local n = specTraitName(key);
-						local txt = sheet["specialityName_" .. i] or "";
-
-						if pt then n = translateSheetText(n, "pt") or n; end;
-						if txt ~= "" then n = n .. ": " .. txt; else n = n .. ":"; end;
-
-						lines[#lines + 1] = n;
-					end;
-				end;
-
-				table.sort(lines);
-
-				found["dynSpecList"].text = table.concat(lines, "\n");
 			end;
 
 			-- Every dot that costs experience calls this when it is CLICKED (SPEC I13/V99).
@@ -9020,7 +8983,7 @@
 				-- sheet as it now stands without a walk of their own (SPEC V125), and they climb
 				-- to the sheet root, so a purchase made on any tab moves every box that is on
 				-- screen (SPEC V133, B39).
-				if moved then renderSpecialities(form); end;
+				if moved then specBangPaint(form); end;
 
 				renderAllXPBoxes(form, spent);
 
@@ -10113,20 +10076,14 @@
 	<dataLink field="healthLevels" onChange="mcRender(self);"/>
 
 		<!--
-			Wave 2 of I113e (SPEC T842): the two header buttons. The SPECIALTIES list below it
-			follows the LANGUAGE only: its rows change through the ! window and xpClick, which
-			repaint it themselves, and a link over 295 rows x 2 fields would be a watcher per
-			field for what those callers already do (SPEC I172g, V507d).
+			Wave 2 of I113e (SPEC T842): the two header buttons. The language-only link that
+			sat below it repainted the SPECIALTIES list and left with it in the 44th batch: a
+			language change already repaints every ! through applyLanguage and
+			renderAbilityLabels (SPEC I187d, V512c, V527c).
 		-->
 		<dataLink fields="{'language', 'nature', 'demeanor'}">
 			<event name="onChange">
 				renderHeaderButtons(self);
-			</event>
-		</dataLink>
-
-		<dataLink fields="{'language'}">
-			<event name="onChange">
-				renderSpecialities(self);
 			</event>
 		</dataLink>
 
