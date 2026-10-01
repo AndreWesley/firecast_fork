@@ -2594,12 +2594,15 @@
 
 			local XP_VIRTUES = { {"Conscience", "conscience"}, {"Self-Control", "selfControl"}, {"Courage", "courage"} };
 
-			-- SIX of the nine typed ability rows, and the three left out are left out ON PURPOSE:
-			-- customTalent_3, customTalent_4 and customKnowledge_3 (the 154th round's rows, SPEC
-			-- I123a) cost no experience and reach no log line - the user's decision of 2026-09-24,
-			-- "fica como está hoje" (SPEC Q93, B174). Not an oversight to fix: the gate names the
-			-- three and reddens on a typed row that is in neither list (SPEC V507e).
-			local XP_CUSTOM = { "customTalent_1", "customTalent_2", "customSkill_1", "customSkill_2", "customKnowledge_1", "customKnowledge_2" };
+			-- ALL nine typed ability rows. customTalent_3, customTalent_4 and customKnowledge_3
+			-- (the 154th round's rows, SPEC I123a) were left out on purpose from 2026-09-24 until
+			-- the user reversed that on 2026-10-01 (SPEC Q93, B174, B189): they cost and log like
+			-- the other six. The gate reddens on a typed row missing from this list (SPEC V507e).
+			local XP_CUSTOM = {
+				"customTalent_1", "customTalent_2", "customTalent_3", "customTalent_4",
+				"customSkill_1", "customSkill_2",
+				"customKnowledge_1", "customKnowledge_2", "customKnowledge_3",
+			};
 
 			-- The 41 ability names, sorted so the ledger is in the same order every render.
 			-- ABILITY_FIELD is a bijection (SPEC V74), so the name identifies the trait no

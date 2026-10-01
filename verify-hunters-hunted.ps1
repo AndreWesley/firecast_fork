@@ -542,9 +542,10 @@ $expect['appearance'] = 5
 'animalKen','crafts','etiquette','firearms','larceny','melee','performance','ride','stealth','survival',
 'academics','enigmas','finance','investigation','law','medicine','occult','politics','science','technology',
 'faith',
-# Six typed rows, not nine: customTalent_3/_4 and customKnowledge_3 are drawn but cost nothing,
-# by the user's decision (SPEC Q93, B174) - V507e holds that exception closed, by name.
-'customTalent_1','customTalent_2','customSkill_1','customSkill_2','customKnowledge_1','customKnowledge_2'  | % { $expect[$_] = 5 }
+# All nine typed rows: customTalent_3/_4 and customKnowledge_3 cost experience since the user
+# reversed Q93 on 2026-10-01 (SPEC B189) - V507e holds the typed rows and XP_CUSTOM equal.
+'customTalent_1','customTalent_2','customTalent_3','customTalent_4','customSkill_1','customSkill_2',
+'customKnowledge_1','customKnowledge_2','customKnowledge_3'  | % { $expect[$_] = 5 }
 $expect['humanity'] = 10
 $expect['willpower'] = 10
 # SPEC V5 says "backgrounds 5" dots, but only the ROW count was ever checked - a background
@@ -24723,16 +24724,15 @@ else {
     foreach ($p507 in @($files | ForEach-Object { $_.FullName }) + @(Join-Path $plugin 'localization.lang')) {
         if ([System.IO.File]::ReadAllText($p507).Contains('Select Speciality')) { $v507Bad += "(d) $(Split-Path $p507 -Leaf) still carries 'Select Speciality' - the key left with the picker (SPEC I172h)" }
     }
-    # (e) the Q93 exception, closed by NAME (user 2026-09-24, "fica como esta hoje"): the typed
-    # rows XP_CUSTOM leaves out are EXACTLY these three, and every XP_CUSTOM name is a drawn row.
-    # Both directions, so a new typed row nobody decided about reddens (SPEC V507e, B174).
+    # (e) every typed row costs experience: the <CustomAbility> fields of WoD20.1 and XP_CUSTOM
+    # are the same set, both directions. The Q93 exception (three rows free of cost) was reversed
+    # by the user on 2026-10-01 - a free typed row again needs a new Q (SPEC V507e, B174, B189).
     $xpc507   = @([regex]::Matches(([regex]::Match($rootTxt, 'local XP_CUSTOM = \{([^}]*)\}')).Groups[1].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
     $cust507  = @($main507.SelectNodes("//CustomAbility[@field]") | ForEach-Object { $_.GetAttribute('field') })
-    $free507  = @('customKnowledge_3', 'customTalent_3', 'customTalent_4')
     $out507   = @($cust507 | Where-Object { $xpc507 -cnotcontains $_ } | Sort-Object)
     $ghost507 = @($xpc507 | Where-Object { $cust507 -cnotcontains $_ })
-    if ($xpc507.Count -lt 1) { $v507Bad += "(e) XP_CUSTOM is not found on the root form - the exception is measured against nothing (SPEC V209)" }
-    elseif (($out507 -join ',') -cne ($free507 -join ',')) { $v507Bad += "(e) the typed rows outside XP_CUSTOM are [$($out507 -join ', ')] - the user kept EXACTLY customTalent_3, customTalent_4 and customKnowledge_3 free of cost (SPEC Q93, V507e); any other one is B174 again" }
+    if ($xpc507.Count -lt 1) { $v507Bad += "(e) XP_CUSTOM is not found on the root form - the typed rows are measured against nothing (SPEC V209)" }
+    elseif ($out507.Count -gt 0) { $v507Bad += "(e) the typed rows $($out507 -join ', ') are outside XP_CUSTOM - their dots toggle for free and never reach the log (SPEC V507e, B174, B189)" }
     if ($ghost507.Count -gt 0) { $v507Bad += "(e) XP_CUSTOM names $($ghost507 -join ', ') and no typed row draws it - a price with no dots (SPEC V507e)" }
 }
 if ($v507Bad) { foreach ($b in $v507Bad) { Fail "V507 $b" } }
