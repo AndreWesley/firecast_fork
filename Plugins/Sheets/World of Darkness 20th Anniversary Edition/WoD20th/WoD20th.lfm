@@ -870,7 +870,7 @@
 			-- from these mechanically - pane `tab<X>`, button `btnTab<X>`, fill `tabOn<X>` - so the
 			-- list and the sheet cannot drift into disagreeing about which tabs exist.
 			TAB_LIST = {
-				"Main", "Traits", "Numina", "Disciplines", "Combat", "Inventory",
+				"Main", "Traits", "Numina", "Disciplines", "Vampire", "Combat", "Inventory",
 				"Background", "Progress", "Notes", "Settings", "Storyteller",
 			};
 			-- <<< TAB_LIST_END
@@ -888,8 +888,10 @@
 			-- invalid left across twenty-two rectangles in silence, and the fallback that would
 			-- guard against it costs the very second copy this table already is. The gate welds
 			-- the table to the XML instead, the same weld V49 puts on HEALTH_ROW_PITCH.
+			-- Vampire (45th batch, SPEC I188e) sits right after Ghoul and is as wide: the two never
+			-- show together, so the bar keeps the length it always had.
 			TAB_W = {
-				99, 79, 79, 92, 86, 105, 105, 112, 99, 125, 112,
+				99, 79, 79, 92, 92, 86, 105, 105, 112, 99, 125, 112,
 			};
 			STRIP_X0  = 30;
 			STRIP_GAP = 4;
@@ -924,10 +926,55 @@
 			};
 			-- <<< GEN_MAX_END
 
+			-- A VAMPIRE's own generation, the table the user handed over on 2026-10-01 (SPEC I188c,
+			-- V529): blood pool, Discipline ceiling and blood per turn, keyed by the value cmbGeneration
+			-- stores ("4".."15"). ONE table for the four readers - the ceiling xpClick refuses by, the
+			-- pool bloodClick caps, the column's blood bar and the faded dots of the Vampire tab - so
+			-- the number shown and the number enforced cannot drift apart (the reason GEN_MAX is one map).
+			VAMP_GEN = {
+				["4"]  = { pool = 50, disc = 9, turn = 10 },
+				["5"]  = { pool = 40, disc = 8, turn = 8 },
+				["6"]  = { pool = 30, disc = 7, turn = 6 },
+				["7"]  = { pool = 20, disc = 6, turn = 4 },
+				["8"]  = { pool = 15, disc = 5, turn = 3 },
+				["9"]  = { pool = 14, disc = 5, turn = 2 },
+				["10"] = { pool = 13, disc = 5, turn = 1 },
+				["11"] = { pool = 12, disc = 5, turn = 1 },
+				["12"] = { pool = 11, disc = 5, turn = 1 },
+				["13"] = { pool = 10, disc = 5, turn = 1 },
+				["14"] = { pool = 10, disc = 4, turn = 1 },
+				["15"] = { pool = 10, disc = 3, turn = 1 },
+			};
+
+			-- The ONE reader of VAMP_GEN (SPEC V529b). `n` is a node - the column paints rows that are
+			-- not the active sheet - and nil means the active one. A generation nobody picked reads as
+			-- the thirteenth, the default the user asked for: the seed in onNodeReady writes it, and
+			-- this covers a column character whose node never went through that seed.
+			function vampGen(n)
+				n = n or sheet;
+
+				local g = (n ~= nil) and n.generation or nil;
+
+				return VAMP_GEN[tostring(g)] or VAMP_GEN["13"];
+			end;
+
+			-- The ceiling on the blood pool, for the dots and for the column's bar alike (SPEC I188c).
+			-- A vampire's comes from the generation; anyone else's from the revenant family, as before.
+			function bloodCap(n)
+				n = n or sheet;
+
+				if n ~= nil and n.game == "Vampire" then return vampGen(n).pool; end;
+
+				return familyCap("bloodPool", n);
+			end;
+
 			-- nil means NO ceiling, and that is not the same as zero: a mortal with no domitor is not a
-			-- ghoul with a fourteenth-generation one (SPEC V220a).
+			-- ghoul with a fourteenth-generation one (SPEC V220a). A vampire is asked first and always
+			-- has one - his own generation, never the domitor's (SPEC I188c, V529d).
 			function maxDiscLevel()
 				if sheet == nil then return nil; end;
+
+				if sheet.game == "Vampire" then return vampGen().disc; end;
 
 				local g = sheet.dominatorGen;
 
@@ -2161,12 +2208,60 @@
 				return v;
 			end;
 
+			-- The GAME's own lists, where it has them (user 2026-10-01, SPEC I188d, I189a, V531). A
+			-- vampire drops Arts, Martial Arts, Meditation, Research, Cosmology and Esoterica in every
+			-- era - and Enigmas too in Modern Nights and the Classical Age, the eras the user named it
+			-- for (SPEC Q108.1, Q109.4). What is left keeps the era's own order. `typed` is how many
+			-- typed rows follow the names of each column: two since the 50th batch (user 2026-10-02,
+			-- SPEC I193a), so a column shows its names plus two and the rows past that go. Every column
+			-- of every era is ten names now, so a vampire's ability box is twelve rows in all four -
+			-- which is what lets VAMP_GEOM be one fixed table (SPEC I190c, V534c). Every era of any other game is ERA_ABILITIES exactly as before.
+			VAMPIRE_ABILITIES = {
+				["Modern Nights"] = {
+					talents    = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Streetwise", "Subterfuge"},
+					skills     = {"Animal Ken", "Crafts", "Drive", "Etiquette", "Firearms", "Larceny", "Melee", "Performance", "Stealth", "Survival"},
+					knowledges = {"Academics", "Computer", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
+					typed      = 2,
+				},
+				["Victorian Age"] = {
+					talents    = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Streetwise", "Subterfuge"},
+					skills     = {"Animal Ken", "Crafts", "Etiquette", "Firearms", "Larceny", "Melee", "Performance", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Enigmas", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science", "Technology"},
+					typed      = 2,
+				},
+				["Dark Ages"] = {
+					talents    = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Legerdemain", "Subterfuge"},
+					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Melee", "Performance", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Enigmas", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Politics", "Seneschal", "Theology"},
+					typed      = 2,
+				},
+				["Classical Age"] = {
+					talents    = {"Alertness", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Streetwise", "Subterfuge"},
+					skills     = {"Animal Ken", "Archery", "Commerce", "Crafts", "Etiquette", "Melee", "Performance", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Philosophy", "Politics", "Religion", "Ritual"},
+					typed      = 2,
+				},
+			};
+
+			-- The lists in force: the game's own for this era if it has them, the era's otherwise. The
+			-- one place that choice is made (SPEC V531a) - renderAbilityLabels and eraRangedName both
+			-- read through here.
+			function eraAbilities()
+				local era = currentTheme();
+
+				if sheet ~= nil and sheet.game == "Vampire" and VAMPIRE_ABILITIES[era] ~= nil then
+					return VAMPIRE_ABILITIES[era];
+				end;
+
+				return ERA_ABILITIES[era];
+			end;
+
 			-- The ranged skill of the era in force. Read off the era's own list rather than
 			-- from a second table, so there is nothing to fall out of step with it (the same
 			-- reason HEALTH_MARKS is declared once, SPEC V41). Dark Ages and the Classical Age
 			-- fight with Archery; the other two carry Firearms.
 			function eraRangedName()
-				local list = ERA_ABILITIES[currentTheme()].skills;
+				local list = eraAbilities().skills;
 
 				for i = 1, #list, 1 do
 					if list[i] == "Firearms" or list[i] == "Archery" then return list[i]; end;
@@ -2237,9 +2332,16 @@
 				-- window that Mage-only content was never going to fill on a mortal sheet, so
 				-- the user had it removed. `stShowMagika` is a burned name from here on
 				-- (SPEC I3, orphans) - nothing reads it and nothing may reuse it.
+				--
+				-- FOUR since the 45th batch (SPEC I188e, V530f): Vampire opens with the game, and Ghoul
+				-- closes then whatever its flag says - both tabs edit the same Disciplines, paths,
+				-- rituals and blood, under different ceilings, so the two open would be one set of data
+				-- shown twice under two rules (SPEC Q107.1).
+				local vamp = sheet.game == "Vampire";
 				local shown = {
 					tabNumina      = sheet.stShowNumina ~= false,
-					tabDisciplines = sheet.stShowDisciplines == true,
+					tabDisciplines = sheet.stShowDisciplines == true and not vamp,
+					tabVampire     = vamp,
 					tabStoryteller = isStoryteller(),
 				};
 
@@ -2312,6 +2414,295 @@
 			function selectTab(name, from)
 				activeTab = name;
 				applyTabVisibility(from);
+			end;
+
+			-- Column three of the Main header answers to the GAME (user 2026-10-01, SPEC I188b, V528):
+			-- each row is a mortal/vampire pair on one rectangle and exactly one of the two shows. The
+			-- hidden row keeps its field, so going back to Mortal finds the three as they were.
+			-- The Main's BLOOD POOL answers to the game too, alone (SPEC I189e, V532d): a mortal has no
+			-- blood, and a ghoul's lives on the Ghoul tab. The three group labels of ATTRIBUTES were
+			-- pairs in the 47th batch and are not any more (SPEC I191a, user 2026-10-01): the rotated
+			-- names stand in every game, and VAMP_GEOM puts each one before its third of the band.
+			GAME_PAIRS = {
+				{ "hdrMotivation",   "hdrClan" },
+				{ "hdrOccupation",   "hdrGeneration" },
+				{ "hdrResidence",    "hdrSire" },
+			};
+
+			-- A VAMPIRE's boxes (user 2026-10-01, SPEC I190c, V534): the XML is the MORTAL sheet, and
+			-- these are the rects - left, top, width, height - a vampire's named boxes take instead.
+			-- ATTRIBUTES becomes a band over the abilities; each ability column grows by four dots
+			-- (330 -> 430) and pushes the next one along (SPEC Q109.2); the bottom row follows them
+			-- down, ROAD stacked under VIRTUES and the BLOOD POOL beside them. Traits widens BACKGROUNDS
+			-- by four dots and moves the rest; Combat widens COMBAT TRAITS. Children that span a box
+			-- carry anchors="left top right" and stretch on their own, so no row is listed here.
+			-- HEALTH has no height: the renderer owns it (SPEC V49).
+			--
+			-- 48th batch (SPEC I191, user 2026-10-01): each rotated group name stands 75 left of its
+			-- third, as it does in the XML, and the band is 25 lower without the headings, so
+			-- everything under it rises 25. EXPERIENCE and HEALTH close on KNOWLEDGES' edge at 285;
+			-- what they hold does not stretch, so it is re-centred here - a fixed child left behind in
+			-- a box that changes shape is B191, and V537a turns it red.
+			--
+			-- 50th batch (SPEC I193, user 2026-10-02): two typed rows a column, so the ability boxes
+			-- are 351 and the bottom row rises 25 to 597. The avatar went up beside EXPERIENCE at twice
+			-- its height (2 x 244); VIRTUES took its slot under TALENTS, ten wider, so its three rows
+			-- are re-centred here; ROAD is no longer a stack and closes up on the abilities.
+			VAMP_GEOM = {
+				boxExperience        = { 1015, 0, 285, 105 },
+				bgCurrentXPMain      = { 97, 53, 90, 25 },
+				edtCurrentXPMain     = { 97, 53, 90, 25 },
+				boxAttributes        = { 0, 110, 1300, 126 },
+				attrRotPhysical      = { -15, 63, 100, 20 },
+				attrRotSocial        = { 420, 63, 100, 20 },
+				attrRotMental        = { 855, 63, 100, 20 },
+				attrRow_strength     = { 60, 36, 350, 25 },
+				attrRow_dexterity    = { 60, 61, 350, 25 },
+				attrRow_stamina      = { 60, 86, 350, 25 },
+				attrRow_charisma     = { 495, 36, 350, 25 },
+				attrRow_manipulation = { 495, 61, 350, 25 },
+				attrRow_appearance   = { 495, 86, 350, 25 },
+				attrRow_perception   = { 930, 36, 350, 25 },
+				attrRow_inteligence  = { 930, 61, 350, 25 },
+				attrRow_wits         = { 930, 86, 350, 25 },
+				boxTalents           = { 0, 241, 430, 351 },
+				boxSkills            = { 435, 241, 430, 351 },
+				boxKnowledges        = { 870, 241, 430, 351 },
+				avatarFrame          = { 1305, 0, 340, 488 },
+				avatarImage          = { 1305, 0, 340, 488 },
+				ornAvatar            = { 1305, 0, 340, 488 },
+				boxVirtues           = { 0, 597, 340, 126 },
+				virtueRow_conscience = { 45, 36, 250, 25 },
+				virtueRow_selfControl = { 45, 61, 250, 25 },
+				virtueRow_courage    = { 45, 86, 250, 25 },
+				boxRoad              = { 345, 597, 330, 184 },
+				mainBloodPool        = { 680, 597, 330, 244 },
+				dynHealth_box        = { 1015, 597, 285 },
+				dynHealth_row1       = { 20, 47, 246, 20 },
+				dynHealth_row2       = { 20, 74, 246, 20 },
+				dynHealth_row3       = { 20, 101, 246, 20 },
+				dynHealth_row4       = { 20, 128, 246, 20 },
+				dynHealth_row5       = { 20, 155, 246, 20 },
+				dynHealth_row6       = { 20, 182, 246, 20 },
+				dynHealth_row7       = { 20, 209, 246, 20 },
+				dynHealth_row8       = { 20, 236, 246, 20 },
+				dynHealth_row9       = { 20, 263, 246, 20 },
+				dynHealth_row10      = { 20, 290, 246, 20 },
+				boxBackgrounds       = { 0, 0, 484, 679 },
+				boxMerits            = { 489, 0, 743, 337 },
+				boxFlaws             = { 489, 342, 743, 337 },
+				boxDerangements      = { 1237, 0, 225, 337 },
+				boxOther             = { 1237, 342, 225, 337 },
+				boxCombatTraits      = { 970, 0, 420, 351 },
+			};
+
+			-- The XML's own numbers, read off a box the first time it is seen and before anything moves
+			-- it. The XML is the same for every sheet, so one copy serves them all and the mortal
+			-- numbers keep ONE owner (SPEC I190c).
+			GEOM_XML = {};
+
+			function renderGameMode(from)
+				if sheet == nil or from == nil then return; end;
+
+				local vamp  = sheet.game == "Vampire";
+				local names = { mainBloodPool = true, attrSepSocial = true, attrSepMental = true, chkShowNumina = true, chkShowDisciplines = true };
+
+				for i = 1, #GAME_PAIRS, 1 do
+					names[GAME_PAIRS[i][1]] = true;
+					names[GAME_PAIRS[i][2]] = true;
+				end;
+
+				for nm in pairs(VAMP_GEOM) do names[nm] = true; end;
+
+				local found = xpFind(tabRootOf(from), names, {});
+
+				for i = 1, #GAME_PAIRS, 1 do
+					local mortal  = found[GAME_PAIRS[i][1]];
+					local vampire = found[GAME_PAIRS[i][2]];
+
+					if mortal  ~= nil and mortal.visible  == vamp then mortal.visible  = not vamp; end;
+					if vampire ~= nil and vampire.visible ~= vamp then vampire.visible = vamp; end;
+				end;
+
+				local pool = found["mainBloodPool"];
+
+				if pool ~= nil and pool.visible ~= vamp then pool.visible = vamp; end;
+
+				-- The two white rules between the attribute groups are a MORTAL column's: left where the
+				-- XML puts them, one cuts the Stamina row of a vampire's band (user 2026-10-01, SPEC
+				-- I191c, B191, V537a).
+				for _, nm in ipairs({ "attrSepSocial", "attrSepMental" }) do
+					local c = found[nm];
+
+					if c ~= nil and c.visible == vamp then c.visible = not vamp; end;
+				end;
+
+				-- The ONE writer of a box's geometry (SPEC V534a). Only what differs is written, and a
+				-- rect with no height leaves the height alone.
+				local function placeBox(c, r)
+					if c.left  ~= r[1] then c.left  = r[1]; end;
+					if c.top   ~= r[2] then c.top   = r[2]; end;
+					if c.width ~= r[3] then c.width = r[3]; end;
+					if r[4] ~= nil and c.height ~= r[4] then c.height = r[4]; end;
+				end;
+
+				-- Any game that is not Vampire reads the XML - Mage included (SPEC Q109.1).
+				for nm, r in pairs(VAMP_GEOM) do
+					local c = found[nm];
+
+					if c ~= nil then
+						if GEOM_XML[nm] == nil then GEOM_XML[nm] = { c.left, c.top, c.width, (r[4] ~= nil) and c.height or nil }; end;
+
+						placeBox(c, vamp and r or GEOM_XML[nm]);
+					end;
+				end;
+
+				-- Show Numina and Show Ghoul mean nothing to a vampire (SPEC I190d, V536d): locked, and
+				-- dimmed by the same 0.40 as every read-only widget (SPEC V111). vampFlagsOff is what
+				-- turns them off; this only paints.
+				for _, nm in ipairs({ "chkShowNumina", "chkShowDisciplines" }) do
+					local c  = found[nm];
+					local op = vamp and 0.40 or 1;
+
+					if c ~= nil then
+						if c.enabled == vamp then c.enabled = not vamp; end;
+						if c.opacity ~= op then c.opacity = op; end;
+					end;
+				end;
+			end;
+
+			-- Show Numina and Show Ghoul go OFF the moment a sheet is a vampire's (user 2026-10-01,
+			-- SPEC I190k, V536d), and on open for one saved before that - the same idempotent kind of
+			-- write as the stShowNumina seed in onNodeReady. Going back to Mortal turns nothing on
+			-- again: the storyteller does that (SPEC Q109.7).
+			function vampFlagsOff()
+				if sheet == nil or sheet.game ~= "Vampire" then return; end;
+
+				if sheet.stShowNumina ~= false then setField("stShowNumina", false); end;
+				if sheet.stShowDisciplines ~= false then setField("stShowDisciplines", false); end;
+			end;
+
+			-- The ceiling of the VAMPIRE tab, painted (SPEC I188h, V530f). Every live dot of a row of
+			-- nine has a faded twin on the same spot; the generation decides which of the two shows,
+			-- so a dot out of reach reads as marked at 30% and takes no click. The twin COVERS and
+			-- never erases: a dot bought above a ceiling that came down later stays in the sheet
+			-- (SPEC V220c, V187). Each row kind names its LIVE dot: `vdot` on a bought row, `ro_V` on a
+			-- main path, whose read-only dots renderMainPaths lights from the Discipline.
+			VAMP_CAP_ROWS = { { "vdot", "clanDisc_", 4 }, { "vdot", "disc_", 15 }, { "ro_V", "mainPath_", 4 }, { "vdot", "secPath_", 15 } };
+
+			function renderVampCaps(from)
+				if sheet == nil or from == nil then return; end;
+
+				local g     = vampGen();
+				local names = { dynBloodTurn = true };
+
+				for r = 1, #VAMP_CAP_ROWS, 1 do
+					for i = 1, VAMP_CAP_ROWS[r][3], 1 do
+						for k = 1, 9, 1 do
+							names[VAMP_CAP_ROWS[r][1] .. VAMP_CAP_ROWS[r][2] .. i .. "_" .. k] = true;
+							names["vcap" .. VAMP_CAP_ROWS[r][2] .. i .. "_" .. k] = true;
+						end;
+					end;
+				end;
+
+				-- The pool is drawn twice, on this tab and on the Main (SPEC I189d/e, V532d): one
+				-- field, two dots, the same ceiling.
+				for n = 1, 50, 1 do
+					names["vdotbloodPool_" .. n] = true;
+					names["vcapbloodPool_" .. n] = true;
+					names["mdotbloodPool_" .. n] = true;
+					names["mcapbloodPool_" .. n] = true;
+				end;
+
+				-- NINE dots on the Main's traits since the 47th batch (SPEC I190e/f, V535e): the nine
+				-- attributes, the ability rows and the typed rows. Dots 4..9 are the ones a ceiling can
+				-- reach (the 15th generation's is 3); a vampire sees the live dot up to it and the faded
+				-- twin above it, anyone else the five they always had. The rows are MAIN_NINE (built
+				-- below XP_ATTRS, which it reads). Backgrounds go to nine for a vampire, with no ceiling
+				-- at all (SPEC Q109.5).
+				local vamp = sheet.game == "Vampire";
+
+				for i = 1, #MAIN_NINE, 1 do
+					for k = 4, 9, 1 do
+						names[MAIN_NINE[i][1] .. "_" .. k] = true;
+						names["mcap" .. MAIN_NINE[i][2] .. "_" .. k] = true;
+					end;
+				end;
+
+				for i = 1, BACKGROUND_ROWS, 1 do
+					for k = 6, 9, 1 do names["dotbackground_" .. i .. "_" .. k] = true; end;
+				end;
+
+				names["dynBloodTurnMain"] = true;
+				names["dynMaxTraitV"]     = true;
+
+				local found = xpFind(tabRootOf(from), names, {});
+
+				local function pair(live, cap, reach)
+					if live ~= nil and live.visible ~= reach then live.visible = reach; end;
+
+					if cap ~= nil then
+						if cap.visible == reach then cap.visible = not reach; end;
+						if not reach and cap.checked ~= true then cap.checked = true; end;
+					end;
+				end;
+
+				for r = 1, #VAMP_CAP_ROWS, 1 do
+					for i = 1, VAMP_CAP_ROWS[r][3], 1 do
+						local base = VAMP_CAP_ROWS[r][2] .. i .. "_";
+
+						for k = 1, 9, 1 do
+							pair(found[VAMP_CAP_ROWS[r][1] .. base .. k], found["vcap" .. base .. k], k <= g.disc);
+						end;
+					end;
+				end;
+
+				for n = 1, 50, 1 do
+					pair(found["vdotbloodPool_" .. n], found["vcapbloodPool_" .. n], n <= g.pool);
+					pair(found["mdotbloodPool_" .. n], found["mcapbloodPool_" .. n], n <= g.pool);
+				end;
+
+				local turn = found["dynBloodTurn"];
+
+				if turn ~= nil then turn.text = tostring(g.turn); end;
+
+				local top = vamp and g.disc or 5;
+
+				for i = 1, #MAIN_NINE, 1 do
+					for k = 4, 9, 1 do
+						local live = found[MAIN_NINE[i][1] .. "_" .. k];
+						local cap  = found["mcap" .. MAIN_NINE[i][2] .. "_" .. k];
+						local on   = k <= top;
+						local off  = vamp and not on;
+
+						if live ~= nil and live.visible ~= on then live.visible = on; end;
+						if cap ~= nil and cap.visible ~= off then cap.visible = off; end;
+					end;
+				end;
+
+				for i = 1, BACKGROUND_ROWS, 1 do
+					for k = 6, 9, 1 do
+						local d = found["dotbackground_" .. i .. "_" .. k];
+
+						if d ~= nil and d.visible ~= vamp then d.visible = vamp; end;
+					end;
+				end;
+
+				-- The faded line under the Main pool's title, and the Vampire tab's second number
+				-- (SPEC I190h/i, V536a/b): both off vampGen(), the one reader of VAMP_GEN (SPEC V529b).
+				local lang = (sheet.language == "en") and "en" or "pt";
+				local per  = found["dynBloodTurnMain"];
+				local maxT = found["dynMaxTraitV"];
+
+				if per ~= nil then
+					local word = "Blood per Turn";
+
+					if translateSheetText ~= nil then word = translateSheetText(word, lang) or word; end;
+
+					per.text = word .. " " .. tostring(g.turn);
+				end;
+
+				if maxT ~= nil then maxT.text = tostring(g.disc); end;
 			end;
 			-- Aqui, e nao la em cima ao lado de GEN_MAX e maxDiscLevel onde ele LERIA melhor, por um
 			-- motivo so (SPEC B51, V223): ele chama `tabRootOf`, `local function` declarada ACIMA
@@ -2598,11 +2989,36 @@
 			-- (the 154th round's rows, SPEC I123a) were left out on purpose from 2026-09-24 until
 			-- the user reversed that on 2026-10-01 (SPEC Q93, B174, B189): they cost and log like
 			-- the other six. The gate reddens on a typed row missing from this list (SPEC V507e).
+			--
+			-- FIFTEEN since the 45th batch: the six typed rows Vampire + Modern Nights opens in place
+			-- of the names it drops (SPEC I188d, V531d) cost and log like the other nine.
 			local XP_CUSTOM = {
-				"customTalent_1", "customTalent_2", "customTalent_3", "customTalent_4",
-				"customSkill_1", "customSkill_2",
-				"customKnowledge_1", "customKnowledge_2", "customKnowledge_3",
+				"customTalent_1", "customTalent_2", "customTalent_3", "customTalent_4", "customTalent_5",
+				"customSkill_1", "customSkill_2", "customSkill_3", "customSkill_4", "customSkill_5",
+				"customKnowledge_1", "customKnowledge_2", "customKnowledge_3", "customKnowledge_4", "customKnowledge_5",
 			};
+
+			-- The Main's rows that go to NINE for a vampire (47th batch, SPEC I190e/f, V535e): the nine
+			-- attributes, the ability rows by position and the typed rows - each as the live dot's
+			-- prefix and the faded twin's. GLOBAL and built HERE, under the two locals it reads:
+			-- renderVampCaps sits ~400 lines up, and a local named in its body would compile as a
+			-- global and read nil (SPEC B51, V223).
+			MAIN_NINE = {};
+
+			for i = 1, #XP_ATTRS, 1 do MAIN_NINE[#MAIN_NINE + 1] = { "dot" .. XP_ATTRS[i][2], XP_ATTRS[i][2] }; end;
+			for i = 1, #XP_CUSTOM, 1 do MAIN_NINE[#MAIN_NINE + 1] = { "dot" .. XP_CUSTOM[i], XP_CUSTOM[i] }; end;
+
+			for _, col in ipairs({ "talents", "skills", "knowledges" }) do
+				for i = 1, 13, 1 do MAIN_NINE[#MAIN_NINE + 1] = { "abil" .. col .. i, col .. i }; end;
+			end;
+
+			-- The same rows by TRAIT, for the ceiling xpClick asks (SPEC V535d): the ability rows are
+			-- re-bound by era, so the set is every ability field and not the row positions.
+			MAIN_NINE_TRAIT = {};
+
+			for i = 1, #XP_ATTRS, 1 do MAIN_NINE_TRAIT[XP_ATTRS[i][2]] = true; end;
+			for i = 1, #XP_CUSTOM, 1 do MAIN_NINE_TRAIT[XP_CUSTOM[i]] = true; end;
+			for _, field in pairs(ABILITY_FIELD) do MAIN_NINE_TRAIT[field] = true; end;
 
 			-- The 41 ability names, sorted so the ledger is in the same order every render.
 			-- ABILITY_FIELD is a bijection (SPEC V74), so the name identifies the trait no
@@ -2718,11 +3134,11 @@
 			-- the SPECIALTIES box that listed the bought ones left in the 44th batch (SPEC I172e,
 			-- I187a). The ONLY ceiling is
 			-- SPEC_PER_TRAIT per trait (user 2026-09-24, Q92.4), so the pool is sized to never
-			-- run out: 5 x 65 keys - the 9 attributes, the 47 abilities of ABILITY_FIELD (every
-			-- era's, since the 154th round) and the 9 typed ability rows of WoD20.1. The gate
-			-- re-derives the product from those three sources (SPEC V507a); this literal is the
-			-- one owner.
-			SPECIALITY_ROWS = 325;
+			-- run out: 5 x 71 keys - the 9 attributes, the 47 abilities of ABILITY_FIELD (every
+			-- era's, since the 154th round) and the 15 typed ability rows of WoD20.1 (nine, plus the
+			-- six of the 45th batch, SPEC I188d). The gate re-derives the product from those three
+			-- sources (SPEC V507a); this literal is the one owner.
+			SPECIALITY_ROWS = 355;
 
 			-- The ! window's slots, and the most rows one trait may hold (SPEC I172e/f). The XML
 			-- draws exactly this many slots (SPEC V505a), and the free grant refuses a sixth.
@@ -3115,19 +3531,22 @@
 				XP_TRAIT[field] = { first = first, last = last, fixed = fixed };
 			end;
 
-			for i = 1, #XP_ATTRS, 1 do declareTrait(XP_ATTRS[i][2], 2, 5, 1); end;
+			-- NINE since the 47th batch (SPEC I190g, V535c): a vampire's attributes, abilities, typed
+			-- rows and backgrounds draw nine dots; a mortal's 6..9 are authored hidden and never lit,
+			-- so the wider range changes nothing for him. The generation caps the vampire in xpClick.
+			for i = 1, #XP_ATTRS, 1 do declareTrait(XP_ATTRS[i][2], 2, 9, 1); end;
 
 			-- Appearance is the attribute whose first dot can be switched off (SPEC I3).
-			declareTrait("appearance", 1, 5, 0);
+			declareTrait("appearance", 1, 9, 0);
 
-			for name, field in pairs(ABILITY_FIELD) do declareTrait(field, 1, 5, 0); end;
-			for i = 1, #XP_CUSTOM, 1 do declareTrait(XP_CUSTOM[i], 1, 5, 0); end;
+			for name, field in pairs(ABILITY_FIELD) do declareTrait(field, 1, 9, 0); end;
+			for i = 1, #XP_CUSTOM, 1 do declareTrait(XP_CUSTOM[i], 1, 9, 0); end;
 			for i = 1, #XP_VIRTUES, 1 do declareTrait(XP_VIRTUES[i][2], 2, 5, 1); end;
 
 			declareTrait("humanity", 1, 10, 0);
 			declareTrait("willpower", 1, 10, 0);
 
-			for i = 1, BACKGROUND_ROWS, 1 do declareTrait("background_" .. i, 1, 5, 0); end;
+			for i = 1, BACKGROUND_ROWS, 1 do declareTrait("background_" .. i, 1, 9, 0); end;
 
 			-- One dot per row, so first and last are both 1 (SPEC V147). The row is a trait like
 			-- any other from here on: the same click path prices it, refuses it and sells it.
@@ -3153,9 +3572,12 @@
 			-- not exist and leave V99/V134 measuring a ghost.
 			for i = TYPED_ROW_FROM.hedgeRitual, HEDGE_RITUAL_ROWS, 1 do declareTrait("hedgeRitual_" .. i, 1, 5, 0); end;
 
-			for i = 1, CLAN_DISC_ROWS, 1 do declareTrait("clanDisc_" .. i, 1, 5, 0); end;
-			for i = 1, DISC_ROWS, 1 do declareTrait("disc_" .. i, 1, 5, 0); end;
-			for i = 1, SEC_PATH_ROWS, 1 do declareTrait("secPath_" .. i, 1, 5, 0); end;
+			-- NINE dots since the 45th batch (SPEC I188i): the Vampire tab draws nine and a vampire's
+			-- generation caps them (VAMP_GEN, up to 9 at the 4th). The Ghoul tab draws five, and
+			-- GEN_MAX never lets a ghoul past five, so nothing changes for the carniçal.
+			for i = 1, CLAN_DISC_ROWS, 1 do declareTrait("clanDisc_" .. i, 1, 9, 0); end;
+			for i = 1, DISC_ROWS, 1 do declareTrait("disc_" .. i, 1, 9, 0); end;
+			for i = 1, SEC_PATH_ROWS, 1 do declareTrait("secPath_" .. i, 1, 9, 0); end;
 
 			-- The vacant set travels with the count for the reason declareTrait reads it one screen up: a
 			-- pre-T830 sheet still holds dots on psychic_16.._19, and counting a BURNED row as "the
@@ -3282,9 +3704,11 @@
 					-- (SPEC I3), so it counts from _1 with nothing fixed.
 					if field == "appearance" then first, fixed = 1, 0; end;
 
+					-- Up to NINE since the 47th batch (SPEC I190g, V535c): a vampire's rows reach nine,
+					-- and a mortal's dots 6..9 are never on screen, so the wider read costs him nothing.
 					pushRise(rows, "Attribute", nome,
-						traitLevel(base, field, first, 5, fixed),
-						liveLevel(field, first, 5, fixed), ctx, field, 5);
+						traitLevel(base, field, first, 9, fixed),
+						liveLevel(field, first, 9, fixed), ctx, field, 9);
 				end;
 
 				for i = 1, #XP_ABILITIES, 1 do
@@ -3292,16 +3716,16 @@
 					local field = ABILITY_FIELD[nome];
 
 					pushRise(rows, "Ability", nome,
-						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field, 5);
+						traitLevel(base, field, 1, 9, 0),
+						liveLevel(field, 1, 9, 0), ctx, field, 9);
 				end;
 
 				for i = 1, #XP_CUSTOM, 1 do
 					local field = XP_CUSTOM[i];
 
 					pushRise(rows, "Ability", slotName(field),
-						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field, 5);
+						traitLevel(base, field, 1, 9, 0),
+						liveLevel(field, 1, 9, 0), ctx, field, 9);
 				end;
 
 				for i = 1, #XP_VIRTUES, 1 do
@@ -3324,8 +3748,8 @@
 					local field = "background_" .. i;
 
 					pushRise(rows, "Background", slotName(field),
-						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field, 5);
+						traitLevel(base, field, 1, 9, 0),
+						liveLevel(field, 1, 9, 0), ctx, field, 9);
 				end;
 
 				-- Which kinds the character already had when the storyteller froze the sheet.
@@ -3418,6 +3842,10 @@
 				-- clan slots (SPEC C). Read once, off the live sheet, so the same discipline picked
 				-- in an open slot is priced the same as in its clan slot - it is one discipline,
 				-- and which box it was typed into is not what the book charges for.
+				--
+				-- Up to NINE since the 49th batch (SPEC I192a, B192, V538): declareTrait has let a
+				-- vampire's Disciplines and paths reach nine since the 45th, and the guard prices a
+				-- click off THIS ledger - a level read here only to five was a free, unlogged dot.
 				local inClan = {};
 
 				for i = 1, CLAN_DISC_ROWS, 1 do
@@ -3431,8 +3859,8 @@
 					ctx.inClan = true;
 
 					pushRise(rows, "Discipline", slotName(field),
-						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field, 5);
+						traitLevel(base, field, 1, 9, 0),
+						liveLevel(field, 1, 9, 0), ctx, field, 9);
 				end;
 
 				for i = 1, DISC_ROWS, 1 do
@@ -3442,8 +3870,8 @@
 					ctx.inClan = (v ~= nil and v ~= "" and inClan[v] == true);
 
 					pushRise(rows, "Discipline", slotName(field),
-						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field, 5);
+						traitLevel(base, field, 1, 9, 0),
+						liveLevel(field, 1, 9, 0), ctx, field, 9);
 				end;
 
 				-- Only the secondary paths: a main path rides its blood sorcery and was paid for
@@ -3452,8 +3880,8 @@
 					local field = "secPath_" .. i;
 
 					pushRise(rows, "Path", slotName(field),
-						traitLevel(base, field, 1, 5, 0),
-						liveLevel(field, 1, 5, 0), ctx, field, 5);
+						traitLevel(base, field, 1, 9, 0),
+						liveLevel(field, 1, 9, 0), ctx, field, 9);
 				end;
 
 				-- Specialities close the order (SPEC I10). The Trait column carries the TRAIT
@@ -3561,7 +3989,8 @@
 			-- edtTotalXPMain and edtSpentXPMain left this roster in the same commit as the XML.
 			-- Both writes were nil-guarded and would have stayed silent forever; a name here with
 			-- no widget there is the orphan of V2 one floor up (SPEC I136f, B111, B123).
-			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true, edtCurrentXPGhoul = true, edtCurrentXPNumina = true };
+			-- The Vampire tab shows Spent too since the 48th batch (SPEC I191g/h, user 2026-10-01).
+			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true, edtCurrentXPGhoul = true, edtCurrentXPVampire = true, edtCurrentXPNumina = true, edtSpentXPVampire = true };
 
 			-- The painting itself. No xpQuiet here (SPEC V142): the flag exists to keep the
 			-- sheet's OWN writes from dragging a repaint along (SPEC V107), and a flag left
@@ -3603,18 +4032,24 @@
 				-- key is the lie those two exist to stop. 0.75 because an edit is TEXT
 				-- (SPEC V244).
 				--
-				-- There is ONE Spent box again since T908 (SPEC I136e): the Main tab shows the
-				-- balance alone, so the paired dance I127c asked for - two views of one number
-				-- that must agree about being locked - has only one dancer left.
+				-- There were TWO Spent boxes until T908 (SPEC I136e) and there are two again since
+				-- the 48th batch (SPEC I191h, user 2026-10-01): the Vampire tab mirrors the
+				-- Progress one, lock included, so both dancers of I127c are back and each takes
+				-- the same line.
 				local stEdit = (sheet.stEditSpentXP == true);
 
 				if box.edtSpentXP ~= nil then
 					box.edtSpentXP.text = tostring(spent);
 					box.edtSpentXP.readOnly = not stEdit; box.edtSpentXP.opacity = stEdit and 1 or 0.75;
 				end;
+				if box.edtSpentXPVampire ~= nil then
+					box.edtSpentXPVampire.text = tostring(spent);
+					box.edtSpentXPVampire.readOnly = not stEdit; box.edtSpentXPVampire.opacity = stEdit and 1 or 0.75;
+				end;
 				if box.edtCurrentXP     ~= nil then box.edtCurrentXP.text     = tostring(total - spent); end;
 				if box.edtCurrentXPMain   ~= nil then box.edtCurrentXPMain.text   = tostring(total - spent); end;
 				if box.edtCurrentXPGhoul  ~= nil then box.edtCurrentXPGhoul.text  = tostring(total - spent); end;
+				if box.edtCurrentXPVampire ~= nil then box.edtCurrentXPVampire.text = tostring(total - spent); end;
 				if box.edtCurrentXPNumina ~= nil then box.edtCurrentXPNumina.text = tostring(total - spent); end;
 			end;
 
@@ -3995,7 +4430,9 @@
 
 					if name == nil or name == "" then return; end;
 
-					local n = traitLevel(sheet, f, 1, 5, 0);
+					-- Nine, the dots a vampire can hold (SPEC I188i): a main path stands at its
+					-- Discipline's level, and that level goes past five at the 7th generation.
+					local n = traitLevel(sheet, f, 1, 9, 0);
 
 					if levels[name] == nil or n > levels[name] then levels[name] = n; end;
 				end;
@@ -4079,10 +4516,17 @@
 			function renderMainPaths(from)
 				if sheet == nil or from == nil then return; end;
 
+				-- Both tabs since the 45th batch (SPEC I188g): Ghoul's five ro_ dots and Vampire's nine
+				-- ro_V ones, in ONE walk. Ghoul has no 6..9, so those names find nothing and are skipped.
+				-- A Vampire dot past the generation's ceiling is covered by its faded twin, which is
+				-- renderVampCaps' to show - this writes `checked` and nothing else (SPEC V244).
 				local names = {};
 
 				for i = 1, MAIN_PATH_ROWS, 1 do
-					for d = 1, 5, 1 do names["ro_mainPath_" .. i .. "_" .. d] = true; end;
+					for d = 1, 9, 1 do
+						names["ro_mainPath_" .. i .. "_" .. d]  = true;
+						names["ro_VmainPath_" .. i .. "_" .. d] = true;
+					end;
 				end;
 
 				local found = {};
@@ -4096,10 +4540,12 @@
 				for i = 1, MAIN_PATH_ROWS, 1 do
 					local n = pathLevel(sheet["mainPath_" .. i], levels);
 
-					for d = 1, 5, 1 do
+					for d = 1, 9, 1 do
 						local c = found["ro_mainPath_" .. i .. "_" .. d];
+						local v = found["ro_VmainPath_" .. i .. "_" .. d];
 
 						if c ~= nil then c.checked = (d <= n); end;
+						if v ~= nil then v.checked = (d <= n); end;
 					end;
 				end;
 			end;
@@ -4822,7 +5268,7 @@
 			-- reader, mcBarMax, because each bar takes it from somewhere else (SPEC V498a).
 			MC_BARS = {
 				wp    = { name = "mcWp_",    base = "willpower_c", count = 10, label = "Willpower" },
-				blood = { name = "mcBlood_", base = "bloodPool_",  count = 20, label = "Blood Pool" },
+				blood = { name = "mcBlood_", base = "bloodPool_",  count = 50, label = "Blood Pool" },
 				quint = { name = "mcQuint_", base = "quint_",      count = 10, label = "Quintessence" },
 			};
 
@@ -5239,11 +5685,12 @@
 
 			-- The ONE reader of a bar's MAXIMUM (SPEC V498a), for the painter and the click alike.
 			-- Willpower's ceiling is the PERMANENT dots, bought with XP - the bar never raises it,
-			-- only buying a dot does (pedido 6). Blood is twenty, or the family's cap (SPEC I108c).
+			-- only buying a dot does (pedido 6). Blood is twenty, or the family's cap (SPEC I108c) - or,
+			-- for a vampire, the generation's pool (SPEC I188c), all three through bloodCap.
 			-- Quintessence is its ten dots.
 			function mcBarMax(bar, n)
 				if bar == "wp" then return mcCount(n, "willpower_", 10); end;
-				if bar == "blood" then return familyCap("bloodPool", n) or 20; end;
+				if bar == "blood" then return bloodCap(n) or 20; end;
 
 				return 10;
 			end;
@@ -5823,12 +6270,21 @@
 				return out;
 			end;
 
+			-- The two copies a row can have (SPEC I188f/g): the Ghoul tab's `dragRow_disc_3` and the
+			-- Vampire tab's `dragRow_Vdisc_3` are the same row of the same list, one order for both,
+			-- and `dyndisc_3`/`dynVdisc_3` are one field painted twice. ONE table for every walker
+			-- of the two tabs - the drag here and the three painters of WoD20.11. A list with no
+			-- Vampire copy finds nothing under the V name and skips it.
+			DISC_TAB_INFIX = { "", "V" };
+
 			-- The row layouts of every list, in ONE tree walk (SPEC R170f: xpFind walks everything).
 			function rowFindAll(from)
 				local names = {};
 
 				for _, L in pairs(ROW_LISTS) do
-					for i = 1, #L.ids, 1 do names["dragRow_" .. L.prefix .. L.ids[i]] = true; end;
+					for i = 1, #L.ids, 1 do
+						for v = 1, #DISC_TAB_INFIX, 1 do names["dragRow_" .. DISC_TAB_INFIX[v] .. L.prefix .. L.ids[i]] = true; end;
+					end;
 				end;
 
 				return xpFind(tabRootOf(from), names, {});
@@ -5838,16 +6294,19 @@
 			-- target (SPEC I174e/f). The one place that turns a position into a top.
 			function rowAnimTo(L, found, order, instant)
 				for p = 1, #order, 1 do
-					local name = "dragRow_" .. L.prefix .. order[p];
-					local c    = found[name];
-					local top  = L.top0 + L.pitch * (p - 1);
+					local top = L.top0 + L.pitch * (p - 1);
 
-					if c ~= nil then
-						if instant then
-							c.top = top;
-							ROW_ANIM[name] = nil;
-						else
-							ROW_ANIM[name] = { ctrl = c, top = top };
+					for v = 1, #DISC_TAB_INFIX, 1 do
+						local name = "dragRow_" .. DISC_TAB_INFIX[v] .. L.prefix .. order[p];
+						local c    = found[name];
+
+						if c ~= nil then
+							if instant then
+								c.top = top;
+								ROW_ANIM[name] = nil;
+							else
+								ROW_ANIM[name] = { ctrl = c, top = top };
+							end;
 						end;
 					end;
 				end;
@@ -5894,9 +6353,11 @@
 
 				for _, L in pairs(ROW_LISTS) do
 					for i = 1, #L.ids, 1 do
-						local c = found["dragRow_" .. L.prefix .. L.ids[i]];
+						for v = 1, #DISC_TAB_INFIX, 1 do
+							local c = found["dragRow_" .. DISC_TAB_INFIX[v] .. L.prefix .. L.ids[i]];
 
-						if c ~= nil then install(c, L, L.ids[i]); end;
+							if c ~= nil then install(c, L, L.ids[i]); end;
+						end;
 					end;
 				end;
 			end;
@@ -8135,8 +8596,12 @@
 			-- The twenty blood dots (SPEC I108c). The ceiling is read HERE and handed over, so the
 			-- pool that has one and the pool that does not walk the same code (SPEC V337c). A click
 			-- on the column's blood bar comes through this same door (SPEC I170d, V498c).
+			--
+			-- FIFTY since the 45th batch (SPEC I188c, V529c): the Vampire tab draws fifty and the
+			-- generation caps them through bloodCap; the Ghoul tab still draws twenty, and the thirty
+			-- it never draws are nil and count as unlit.
 			function bloodClick(field, ctrl)
-				poolClick("bloodPool_", 20, field, familyCap("bloodPool"));
+				poolClick("bloodPool_", 50, field, bloodCap());
 			end;
 
 			-- The ten quintessence dots (SPEC I155i, V264b, T987). No family caps quintessence, so
@@ -8304,11 +8769,15 @@
 					return;
 				end;
 
-				local found = xpFind(tabRootOf(from), { dynclanFamily = true, btnQclanFamily = true }, {});
+				-- The vampire's Clan on the Main header writes the SAME field (SPEC I188b) and is
+				-- painted here with it: one field, one painter, two buttons.
+				local found = xpFind(tabRootOf(from), { dynclanFamily = true, btnQclanFamily = true, dynmainClan = true, btnQmainClan = true }, {});
 				local lang  = (sheet.language == "en") and "en" or "pt";
 
 				mfLabel(found["dynclanFamily"], sheet.clanFamily, "Select Clan/Family", lang);
 				noteButton(found["btnQclanFamily"], sheet.clanFamily);
+				mfLabel(found["dynmainClan"], sheet.clanFamily, "Select Clan", lang);
+				noteButton(found["btnQmainClan"], sheet.clanFamily);
 			end;
 
 			function renderClanDisc(from)
@@ -8335,11 +8804,16 @@
 					--
 					-- Everything below reads THIS list, `#fixed` in the choice branch included, so the
 					-- picked slot lands after the ghoul's and not on top of it.
-					local fixed = { GHOUL_DISC };
+					--
+					-- A VAMPIRE is not a ghoul (SPEC I188j): the clan's own list, as the book gives it,
+					-- with no Potence put in front. Switching the game rewrites the slots whose name
+					-- changes and zeroes their dots, by the same rule as any other rename (SPEC Q107.8).
+					local vamp    = sheet.game == "Vampire";
+					local fixed   = vamp and {} or { GHOUL_DISC };
 					local settled = entry.fixed or {};
 
 					for f = 1, #settled, 1 do
-						if settled[f] ~= GHOUL_DISC then fixed[#fixed + 1] = settled[f]; end;
+						if vamp or settled[f] ~= GHOUL_DISC then fixed[#fixed + 1] = settled[f]; end;
 					end;
 
 					for i = 1, CLAN_DISC_ROWS, 1 do
@@ -8382,7 +8856,7 @@
 								-- under Auspex is not a dot of Celerity, and the ledger prices by the
 								-- name it finds (SPEC I9, I10b) - so leaving them would surface weeks
 								-- later as an experience total nobody can account for.
-								for d = 1, 5, 1 do setField(field .. "_" .. d, false); end;
+								for d = 1, 9, 1 do setField(field .. "_" .. d, false); end;
 							end;
 						end;
 					end;
@@ -8703,7 +9177,25 @@
 					local genCap = maxDiscLevel();
 
 					if genCap ~= nil and (level + 1) > genCap then
-						xpWarn("That Discipline is above what the domitor's generation allows");
+						-- A vampire's ceiling is his OWN generation (SPEC I188c), so the refusal says so.
+						if sheet.game == "Vampire" then
+							xpWarn("That Discipline is above what your generation allows");
+						else
+							xpWarn("That Discipline is above what the domitor's generation allows");
+						end;
+
+						return false;
+					end;
+				end;
+
+				-- A VAMPIRE's attributes and abilities answer to the same ceiling since the 47th batch
+				-- (user 2026-10-01, SPEC I190g, V535d): the generation's Max Trait Level, the number
+				-- that locks the Disciplines above. Same shape and same place - asked BEFORE anything
+				-- is written, and it speaks. A mortal's rows stop at five by having five dots.
+				if want and sheet.game == "Vampire" and MAIN_NINE_TRAIT[trait] then
+					if (level + 1) > vampGen().disc then
+						xpWarn("That trait is above what your generation allows");
+
 						return false;
 					end;
 				end;
@@ -9333,57 +9825,65 @@
 					<label left="0" top="0" width="92" height="20" text="Ghoul" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnCombat" left="395" top="5" width="86" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnVampire" left="395" top="5" width="92" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabCombat" left="395" top="5" width="86" height="30" color="#00000000"
+				<rectangle name="btnTabVampire" left="395" top="5" width="92" height="30" color="#00000000" visible="false"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabVampire', self);">
+					<label left="0" top="0" width="92" height="20" text="Vampire" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
+
+				<rectangle name="tabOnCombat" left="491" top="5" width="86" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabCombat" left="491" top="5" width="86" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabCombat', self);">
 					<label left="0" top="0" width="86" height="20" text="Combat" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnInventory" left="485" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnInventory" left="581" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabInventory" left="485" top="5" width="105" height="30" color="#00000000"
+				<rectangle name="btnTabInventory" left="581" top="5" width="105" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabInventory', self);">
 					<label left="0" top="0" width="105" height="20" text="Inventory" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnBackground" left="594" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnBackground" left="690" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabBackground" left="594" top="5" width="105" height="30" color="#00000000"
+				<rectangle name="btnTabBackground" left="690" top="5" width="105" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabBackground', self);">
 					<label left="0" top="0" width="105" height="20" text="Background" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnProgress" left="703" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnProgress" left="799" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabProgress" left="703" top="5" width="112" height="30" color="#00000000"
+				<rectangle name="btnTabProgress" left="799" top="5" width="112" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabProgress', self);">
 					<label left="0" top="0" width="112" height="20" text="Experience" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnNotes" left="819" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnNotes" left="915" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabNotes" left="819" top="5" width="99" height="30" color="#00000000"
+				<rectangle name="btnTabNotes" left="915" top="5" width="99" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabNotes', self);">
 					<label left="0" top="0" width="99" height="20" text="Notes" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnSettings" left="922" top="5" width="125" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnSettings" left="1018" top="5" width="125" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabSettings" left="922" top="5" width="125" height="30" color="#00000000"
+				<rectangle name="btnTabSettings" left="1018" top="5" width="125" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabSettings', self);">
 					<label left="0" top="0" width="125" height="20" text="Settings" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnStoryteller" left="1147" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabStoryteller" left="1051" top="5" width="112" height="30" color="#00000000" visible="false"
+				<rectangle name="btnTabStoryteller" left="1147" top="5" width="112" height="30" color="#00000000" visible="false"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabStoryteller', self);">
 					<label left="0" top="0" width="112" height="20" text="Storyteller" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
@@ -9404,6 +9904,10 @@
 
 			<layout name="tabDisciplines" align="client" visible="false">
 				<import file="WoD20.11.lfm"/>
+			</layout>
+
+			<layout name="tabVampire" align="client" visible="false">
+				<import file="WoD20.15.lfm"/>
 			</layout>
 
 			<layout name="tabCombat" align="client" visible="false">
@@ -9528,7 +10032,7 @@
 
 			<dataScopeBox name="mcSettingsScope" left="0" top="40" width="445" height="420">
 				<label left="35" top="54" width="170" height="20" text="Game"/>
-				<comboBox name="cboGameMc" left="210" top="51" width="150" height="25" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}"/>
+				<comboBox name="cboGameMc" left="210" top="51" width="150" height="25" field="game" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}" onChange="kbRefocus(self);"/>
 
 				<label left="35" top="84" width="170" height="20" text="Era"/>
 				<comboBox name="cboSheetThemeMc" left="210" top="81" width="150" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" onChange="kbRefocus(self);"/>
@@ -10058,13 +10562,14 @@
 		SPEC I170d, T1075f - the ONE trigger of the column's bars. It watches the ACTIVE node
 		(this is the root's scope, so `sheet`): only the active character's dots ever change - a
 		bar selects its row before it writes, and mcShared never touches a dot - so repainting
-		the active row is enough. The 52 fields are written out, not prefixed, for the reason the
-		name watchers above give; `avatar` is the 52nd, so setting the photo on the Main clears
+		the active row is enough. The 84 fields are written out, not prefixed, for the reason the
+		name watchers above give - fifty blood dots since the 45th batch, and `game`/`generation`
+		because they move a vampire's blood maximum (SPEC I188c); `avatar` is the last, so setting the photo on the Main clears
 		the row's photo placeholder at once (SPEC I171b). mcBarsSoon DEFERS: a prefix write lights up to twenty fields and
 		a dataLink fires once per field, and each repaint walks the whole control tree (SPEC
 		R170f), so twenty writes become one repaint (SPEC V498d).
 	-->
-	<dataLink fields="{'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'willpower_c1', 'willpower_c2', 'willpower_c3', 'willpower_c4', 'willpower_c5', 'willpower_c6', 'willpower_c7', 'willpower_c8', 'willpower_c9', 'willpower_c10', 'bloodPool_1', 'bloodPool_2', 'bloodPool_3', 'bloodPool_4', 'bloodPool_5', 'bloodPool_6', 'bloodPool_7', 'bloodPool_8', 'bloodPool_9', 'bloodPool_10', 'bloodPool_11', 'bloodPool_12', 'bloodPool_13', 'bloodPool_14', 'bloodPool_15', 'bloodPool_16', 'bloodPool_17', 'bloodPool_18', 'bloodPool_19', 'bloodPool_20', 'quint_1', 'quint_2', 'quint_3', 'quint_4', 'quint_5', 'quint_6', 'quint_7', 'quint_8', 'quint_9', 'quint_10', 'clanFamily', 'avatar'}" onChange="mcBarsSoon(self);"/>
+	<dataLink fields="{'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'willpower_c1', 'willpower_c2', 'willpower_c3', 'willpower_c4', 'willpower_c5', 'willpower_c6', 'willpower_c7', 'willpower_c8', 'willpower_c9', 'willpower_c10', 'bloodPool_1', 'bloodPool_2', 'bloodPool_3', 'bloodPool_4', 'bloodPool_5', 'bloodPool_6', 'bloodPool_7', 'bloodPool_8', 'bloodPool_9', 'bloodPool_10', 'bloodPool_11', 'bloodPool_12', 'bloodPool_13', 'bloodPool_14', 'bloodPool_15', 'bloodPool_16', 'bloodPool_17', 'bloodPool_18', 'bloodPool_19', 'bloodPool_20', 'bloodPool_21', 'bloodPool_22', 'bloodPool_23', 'bloodPool_24', 'bloodPool_25', 'bloodPool_26', 'bloodPool_27', 'bloodPool_28', 'bloodPool_29', 'bloodPool_30', 'bloodPool_31', 'bloodPool_32', 'bloodPool_33', 'bloodPool_34', 'bloodPool_35', 'bloodPool_36', 'bloodPool_37', 'bloodPool_38', 'bloodPool_39', 'bloodPool_40', 'bloodPool_41', 'bloodPool_42', 'bloodPool_43', 'bloodPool_44', 'bloodPool_45', 'bloodPool_46', 'bloodPool_47', 'bloodPool_48', 'bloodPool_49', 'bloodPool_50', 'quint_1', 'quint_2', 'quint_3', 'quint_4', 'quint_5', 'quint_6', 'quint_7', 'quint_8', 'quint_9', 'quint_10', 'clanFamily', 'game', 'generation', 'avatar'}" onChange="mcBarsSoon(self);"/>
 
 	<!--
 		SPEC I185e, T1154c - how many health boxes the ACTIVE character's row shows. mcRender
@@ -10097,6 +10602,25 @@
 	</dataLink>
 
 	<!--
+		The GAME, a choice since the 45th batch (user 2026-10-01, SPEC I188). It opens Vampire and
+		closes Ghoul, swaps column three of the Main header, takes Potence off the front of the
+		clan Disciplines and moves every ceiling the generation sets. The ability lists answer to
+		it too, from WoD20.6, where renderAbilityLabels lives. The generation moves only the
+		ceilings, so its link repaints only those.
+	-->
+	<dataLink field="game">
+		<event name="onChange">
+			vampFlagsOff();
+			applyTabVisibility(self);
+			renderGameMode(self);
+			renderClanDisc(self);
+			renderVampCaps(self);
+		</event>
+	</dataLink>
+
+	<dataLink field="generation" onChange="renderVampCaps(self);"/>
+
+	<!--
 		Shown again, asked again (SPEC V96). Nothing tells the sheet that its reader's role in
 		the room changed - neither `jogador` nor `mesa` publishes an event, they are getters
 		only (SPEC R34) - so the single answer taken at load would freeze: a storyteller who
@@ -10121,6 +10645,9 @@
 		-- nil as visible (SPEC V89), and this keeps the checkbox from reading unticked beside
 		-- a tab that is plainly there.
 		if sheet ~= nil and sheet.stShowNumina == nil then setField("stShowNumina", true); end;
+
+		-- ...and a vampire's two flags go off, the seed's own kind of write (SPEC I190k, V536d).
+		vampFlagsOff();
 
 		-- Appearance is the one attribute drawn without a fixed first dot, so that a character
 		-- can be at zero (SPEC I3). Zero is not the DEFAULT though - a new sheet starts at one
@@ -10147,15 +10674,21 @@
 		-- change that was asked for, not a side effect (SPEC V420).
 		if sheet ~= nil and sheet.dominatorGen == nil then setField("dominatorGen", "13"); end;
 
+		-- A vampire is of the thirteenth generation until somebody says otherwise (user 2026-10-01,
+		-- SPEC I188b). Same seed, same key on nil and the same reason as the domitor's above; it
+		-- costs a mortal sheet nothing, since only the Vampire header and tab read it.
+		if sheet ~= nil and sheet.generation == nil then setField("generation", "13"); end;
+
 		-- T957 renamed the theme's VALUE (SPEC I146b, V52e): a sheet saved on the old key would
 		-- fall to the DEFAULT palette by V52 and grow a fifth item in the combo (SPEC C). Rewritten
 		-- once, here, and this line is the one place the old spelling is still allowed to exist.
 		if sheet ~= nil and sheet.sheetTheme == "Victorian Era" then setField("sheetTheme", "Victorian Age"); end;
 
-		-- The Game box is locked (SPEC V109), so a value outside its three would sit there
-		-- with nobody able to clear it: one of the four longer names this sheet used to offer,
-		-- or nothing at all (SPEC V110). It runs here rather than on the Settings tab because
-		-- that tab may never be opened - the same reason V95 moved the tab switch up here.
+		-- A value outside the Game box's three would sit there as nothing the box can show: one
+		-- of the four longer names this sheet used to offer, or nothing at all (SPEC V110). The
+		-- box is a choice since the 45th batch (SPEC I188a) and the rule did not change with it.
+		-- It runs here rather than on the Settings tab because that tab may never be opened -
+		-- the same reason V95 moved the tab switch up here.
 		if sheet ~= nil then
 			local g = sheet.game;
 
@@ -10172,6 +10705,11 @@
 		xpQuiet = false;
 
 		applyTabVisibility(self);
+
+		-- What the GAME decides on screen, at open (SPEC I188b/h): the Main header's column three
+		-- and the Vampire tab's ceilings. Both only paint - the fields are read, never written.
+		renderGameMode(self);
+		renderVampCaps(self);
 
 		-- The font the player last chose, put back on all eight description panes (SPEC I103c,
 		-- V334e). One walk, at open, and it writes nothing: the field is READ here and only

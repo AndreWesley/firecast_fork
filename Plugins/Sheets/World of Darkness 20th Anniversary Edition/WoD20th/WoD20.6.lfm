@@ -22,6 +22,7 @@
 				["Select Hedge Path"] = "Selecionar Caminho de Magia Estática",
 				["Select Road"] = "Selecionar Estrada",
 				["Select Clan/Family"] = "Selecionar Clã/Família",
+				["Select Clan"] = "Selecionar Clã",
 				["Select Phenomenon"] = "Selecionar Fenômeno",
 				["Select Hedge Ritual"] = "Selecionar Ritual de Magia Estática",
 				["Select Flaw"] = "Selecionar Defeito",
@@ -142,8 +143,16 @@
 				["!"] = "!",
 				["X"] = "X",
 				["Clan/Family"] = "Clã/Família",
+				["Clan"] = "Clã",
 				["BLOOD POOL"] = "RESERVA DE SANGUE",
+				["BLOOD PER TURN"] = "SANGUE POR TURNO",
 				["REVENANT WEAKNESS"] = "FRAQUEZA DE REVENANTE",
+				["CLAN/BLOODLINE WEAKNESS"] = "FRAQUEZA DO CLÃ/LINHAGEM",
+				["Blood per Turn"] = "Sangue por Turno",
+				["That trait is above what your generation allows"] = "Esse traço passa do que a sua geração permite",
+				["MAX TRAIT LEVEL"] = "NÍVEL MÁX. DE CARACTERÍSTICA",
+				["CURRENT EXPERIENCE"] = "EXPERIÊNCIA ATUAL",
+				["SPENT EXPERIENCE"] = "EXPERIÊNCIA GASTA",
 				["Courage"] = "Coragem",
 				["Crafts"] = "Ofícios",
 				["CREDITS"] = "CRÉDITOS",
@@ -242,6 +251,7 @@
 				["Game"] = "Jogo",
 				["GEAR (CARRIED)"] = "EQUIPAMENTO (CARREGADO)",
 				["Generation"] = "Geração",
+				["Sire"] = "Senhor",
 				["Generation (Classical Age)"] = "Geração (Idade Clássica)",
 				["Generation (Dark Ages)"] = "Geração (Idade das Trevas)",
 				["Generation (Modern Nights)"] = "Geração (Noites Modernas)",
@@ -525,6 +535,7 @@
 				["Telepathy"] = "Telepatia",
 				["That blood sorcery already has a main path"] = "Essa feitiçaria de sangue já tem uma trilha principal",
 				["That Discipline is above what the domitor's generation allows"] = "Essa Disciplina passa do que a geração do domitor permite",
+				["That Discipline is above what your generation allows"] = "Essa Disciplina passa do que a sua geração permite",
 				["That path is above what its blood sorcery allows"] = "Essa trilha passa do que a feitiçaria de sangue dela permite",
 				["That family caps this trait"] = "Essa família limita esse traço",
 				["That path needs its blood sorcery on the sheet"] = "Essa trilha precisa da feitiçaria de sangue dela na ficha",
@@ -2966,7 +2977,9 @@
 			-- a cmb* whose items differ and is not named here turns red, and a name here whose
 			-- items match turns red as a dead exception (SPEC V257c). A combo added later can
 			-- neither be born mute nor sit in this list unnoticed.
-			local CMB_DISPLAY_MAP = { cmbDominatorGen = true };
+			-- `cmbGeneration`, the vampire's own on the Main header (SPEC I188b, Q107.6), is the same
+			-- case: `4th`..`15th` shown, "4".."15" stored, VAMP_GEN keyed by the number.
+			local CMB_DISPLAY_MAP = { cmbDominatorGen = true, cmbGeneration = true };
 
 			local function cmbItems(c, lang)
 				local nm = c:getName();
@@ -3074,13 +3087,17 @@
 
 			local function renderAbilityLabels(lang, from)
 				local era = currentTheme();
-				local memo = era .. "|" .. tostring(lang);
+
+				-- The GAME is the third thing it depends on since the 45th batch (SPEC I188d, V531c):
+				-- a vampire reads lists of its own in every era, through eraAbilities (SPEC I189a).
+				local game = (sheet ~= nil) and tostring(sheet.game) or "";
+				local memo = era .. "|" .. game .. "|" .. tostring(lang);
 
 				if abilityMemo == memo then return; end;
 
 				abilityMemo = memo;
 
-				local lists = ERA_ABILITIES[era];
+				local lists = eraAbilities();
 
 				-- field -> name, rebuilt here rather than at load: this file is a tab, and the
 				-- root form's tables are not guaranteed to be in place while it parses.
@@ -3201,10 +3218,27 @@
 						-- never with a name borrowed from another book (SPEC I123b, V371b, Q34). Two
 						-- tops instead of one would leave a 25px hole in the era that hides the upper
 						-- row - the same hidden pair MeritPicked already runs (SPEC V354a).
+						--
+						-- A typed row is still a typed row, so the Tail's cut below applies to it too:
+						-- a vampire keeps two after his ten names, and row 13 of skills and knowledges
+						-- is a Fill (user 2026-10-02, SPEC I193a, V531c).
 						local col, num = string.match(string.sub(nm, 13), "^(%a+)_(%d+)$");
 
 						if col ~= nil and lists[col] ~= nil then
-							local want = lists[col][tonumber(num)] == nil;
+							local n    = tonumber(num);
+							local want = lists[col][n] == nil and (lists.typed == nil or n <= #lists[col] + lists.typed);
+
+							if c.visible ~= want then c.visible = want; end;
+						end;
+					elseif string.sub(nm, 1, 12) == "dynAbilTail_" then
+						-- The rows past the list's own length (SPEC I188d, I189b, V531c): a vampire's
+						-- column keeps its names plus `typed` rows - ten and two in every column since
+						-- the 50th batch (SPEC I193a) - and the typed rows past that
+						-- go. Every other list has no `typed`, so all fifteen stay.
+						local col, num = string.match(string.sub(nm, 13), "^(%a+)_(%d+)$");
+
+						if col ~= nil and lists[col] ~= nil then
+							local want = lists.typed == nil or tonumber(num) <= #lists[col] + lists.typed;
 
 							if c.visible ~= want then c.visible = want; end;
 						end;
@@ -3639,13 +3673,15 @@
 			local ORN_OUT   = 5;       -- outer rule, in from the box edge
 			local ORN_IN    = 9;       -- inner rule
 
-			-- The six frames under the XP numbers (SPEC V417, I144e) wear the palette's CORNER but
+			-- The eight frames under the XP numbers (SPEC V417, I144e) wear the palette's CORNER but
 			-- never its radius as declared: 18 on a 25px-high frame would eat the frame. Named, the
 			-- way sectionBox names the avatar pair, and never by fill - the frames are #0A0A0A and
 			-- not the box black, which is exactly why sectionBox passes them over (SPEC V427a, V427d).
+			-- The seventh is the Vampire tab's (SPEC I188f), and so is the eighth, its Spent (I191h).
 			local XP_FRAME = {
 				bgTotalXP = true, bgSpentXP = true, bgCurrentXP = true,
 				bgCurrentXPMain = true, bgCurrentXPNumina = true, bgCurrentXPGhoul = true,
+				bgCurrentXPVampire = true, bgSpentXPVampire = true,
 			};
 			local ORN_ARM   = 40;      -- corner reach along each edge
 			local ORN_FLEUR = 150;     -- an edge run shorter than this carries no centre motif
@@ -5434,6 +5470,8 @@
 					if sheet == nil then return end;
 					applyLanguage(sheet.language or "pt", self);
 					renderAbilityLabels(sheet.language or "pt", self);
+					-- The Main pool's "Blood per Turn X" is written in the sheet's language (SPEC I190f).
+					renderVampCaps(self);
 				</event>
 			</dataLink>
 
@@ -5449,10 +5487,21 @@
 				ROLE and a player never opens it (SPEC V79), so hanging the reveal there would
 				bet the whole sheet on the root form's 1500ms net (SPEC V95, B26, I156c).
 			-->
-			<dataLink field="game" defaultValue="Mortal"/>
+			<!-- The game picks the ability lists too since the 45th batch (SPEC I188d, V531c): a
+			     vampire in Modern Nights reads ten a column. The memo carries the game, so a
+			     change of game repaints and anything else returns at once. -->
+			<dataLink field="game" defaultValue="Mortal">
+				<event name="onChange">
+					if sheet == nil then return end;
+					renderAbilityLabels(sheet.language or "pt", self);
+				</event>
+			</dataLink>
 			<dataLink field="sheetTheme" defaultValue="Modern Nights">
 				<event name="onChange">
 					if sheet == nil then return end;
+					-- A vampire's boxes are moved BEFORE the theme paints them, so the first paint is
+					-- already the one the player keeps (SPEC I190d, V166/V167).
+					renderGameMode(self);
 					applyTheme(sheet.sheetTheme or THEME_DEFAULT, self);
 					renderAbilityLabels(sheet.language or "pt", self);
 

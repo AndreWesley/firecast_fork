@@ -131,10 +131,12 @@
 				item in either language is `Idade das Trevas`, 16 characters on the body ruler
 				plus the arrow, which is 128 (SPEC V196, V16).
 
-				`Game` says what the table is playing and NOTHING reads it - no content is
-				filtered by it, on purpose (SPEC C, T75). It is NOT editable: the value is
-				information, not a choice (SPEC V109), and a sheet holding one of the older,
-				longer names is normalised on load by the ROOT form (SPEC V110). Both are named
+				`Game` is a CHOICE since the 45th batch (user 2026-10-01, SPEC I188a, V528): it
+				was locked as information until then (SPEC V109, T75). `Mortal` is the sheet as
+				it always was; `Vampire` swaps three header rows on Main, gives Modern Nights its
+				own ability lists and opens the Vampire tab in place of Ghoul (SPEC I188). A
+				sheet holding a value outside the three is still normalised on load by the ROOT
+				form (SPEC V110). Both are named
 				cbo* so the language switch rebuilds what they SHOW while `values` stay English
 				(SPEC V24), and both are the declared exception to V15 - a state combo with a
 				real default has no empty first row to clear.
@@ -145,7 +147,7 @@
 				saved from the Mage plugin still carry theme="Dark" (SPEC V2).
 			-->
 			<label left="35" top="54" width="170" height="20" text="Game"/>
-			<comboBox name="cboGame" left="210" top="51" width="150" height="25" field="game" enabled="false" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}"/>
+			<comboBox name="cboGame" left="210" top="51" width="150" height="25" field="game" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}"/>
 
 			<label left="35" top="84" width="170" height="20" text="Era"/>
 			<comboBox name="cboSheetTheme" left="210" top="81" width="150" height="25" field="sheetTheme" fontColor="white" horzTextAlign="center" items="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}" values="{'Modern Nights', 'Victorian Age', 'Dark Ages', 'Classical Age'}"/>

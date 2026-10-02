@@ -15,10 +15,10 @@
 			function renderRevWeakness(form)
 				if sheet == nil or form == nil then return; end;
 
-				local found = xpFind(tabRootOf(form), { dynRevWeakness = true }, {});
-				local ctrl  = found["dynRevWeakness"];
+				-- The Vampire tab carries a copy of the box (SPEC I188f), so the sentence goes to both.
+				local found = xpFind(tabRootOf(form), { dynRevWeakness = true, dynRevWeaknessV = true }, {});
 
-				if ctrl == nil then return; end;
+				if found["dynRevWeakness"] == nil and found["dynRevWeaknessV"] == nil then return; end;
 
 				local lang = (sheet.language == "en") and "en" or "pt";
 				local txt  = familyWeakness();
@@ -29,10 +29,36 @@
 				-- (SPEC V9, V10); the typed one is the player's own words and has none, so the host
 				-- hands it straight back - which is why the fallback is the text itself and not a
 				-- second branch that would have to know which of the two it was holding.
-				if translateSheetText ~= nil then txt = translateSheetText(txt, lang) or txt; end;
+				-- The Vampire tab's box is the CLAN's since the 47th batch (user 2026-10-01, SPEC I190j,
+				-- V536c): the typed clan's own words when the player typed one (familyWeakness answers
+				-- that), else the Weakness paragraph of the clan's entry in descClan_<lang>.lua - 61 of
+				-- 61 carry one, already in the sheet's language, so nothing new is translated. A ghoul
+				-- does not suffer his domitor's clan weakness, so the Ghoul tab keeps the FAMILY's.
+				local txtV = familyWeakness();
+				local clan = sheet.clanFamily;
 
-				ctrl.text = txt;
+				if (txtV == nil or txtV == "") and clan ~= nil and clan ~= "" and descText ~= nil then
+					local body = descText("Clan", clan, nil, lang) or "";
+
+					txtV = string.match(body, "\n" .. ((lang == "en") and "Weakness" or "Fraqueza") .. ": (.*)$");
+				end;
+
+				if txtV == nil or txtV == "" then txtV = "-- no weakness --"; end;
+
+				if translateSheetText ~= nil then
+					txt  = translateSheetText(txt, lang) or txt;
+					txtV = translateSheetText(txtV, lang) or txtV;
+				end;
+
+				if found["dynRevWeakness"]  ~= nil then found["dynRevWeakness"].text  = txt; end;
+				if found["dynRevWeaknessV"] ~= nil then found["dynRevWeaknessV"].text = txtV; end;
 			end;
+
+			-- The two copies of every picker row since the 45th batch (SPEC I188f/g): this tab's
+			-- `dyndisc_3` and the Vampire tab's `dynVdisc_3` show the same field. The three painters
+			-- below name both, the Vampire twin on the line under its Ghoul original, in ONE xpFind
+			-- each; the Vampire tab has no painter of its own. Written out and not looped over an
+			-- infix: the gate reads these names to prove painter and sheet agree (SPEC V383, V511).
 
 			-- ===== Disciplines, from WoD20.12.lfm until T909 (SPEC I136i, V397) =====
 			-- The DESCRIPTION pane is gone with this wave (SPEC V365d, I118d): the family gained its
@@ -53,7 +79,9 @@
 				-- DERIVED and never a literal: a bound written 12 here goes stale the day the box grows
 				-- a row, and nothing says so - the button simply never gets painted (SPEC V383b, B112).
 				for i = 1, last, 1 do names["dyndisc_" .. i] = true; names["btnQdisc_" .. i] = true; end;
+				for i = 1, last, 1 do names["dynVdisc_" .. i] = true; names["btnQVdisc_" .. i] = true; end;
 				for i = 1, CLAN_DISC_ROWS, 1 do names["dynclanDisc_" .. i] = true; names["btnQclanDisc_" .. i] = true; end;
+				for i = 1, CLAN_DISC_ROWS, 1 do names["dynVclanDisc_" .. i] = true; names["btnQVclanDisc_" .. i] = true; end;
 
 				local found = {};
 
@@ -64,11 +92,15 @@
 				for i = 1, last, 1 do
 					mfLabel(found["dyndisc_" .. i], sheet["disc_" .. i], "Select Discipline", lang);
 					noteButton(found["btnQdisc_" .. i], sheet["disc_" .. i]);
+					mfLabel(found["dynVdisc_" .. i], sheet["disc_" .. i], "Select Discipline", lang);
+					noteButton(found["btnQVdisc_" .. i], sheet["disc_" .. i]);
 				end;
 
 				for i = 1, CLAN_DISC_ROWS, 1 do
 					mfLabel(found["dynclanDisc_" .. i], sheet["clanDisc_" .. i], "Select Discipline", lang);
 					noteButton(found["btnQclanDisc_" .. i], sheet["clanDisc_" .. i]);
+					mfLabel(found["dynVclanDisc_" .. i], sheet["clanDisc_" .. i], "Select Discipline", lang);
+					noteButton(found["btnQVclanDisc_" .. i], sheet["clanDisc_" .. i]);
 				end;
 			end;
 
@@ -96,7 +128,9 @@
 				local secLast = SEC_PATH_ROWS - SEC_PATH_FREE_ROWS;
 
 				for i = 1, MAIN_PATH_ROWS, 1 do names["dynmainPath_" .. i] = true; names["btnQmainPath_" .. i] = true; end;
+				for i = 1, MAIN_PATH_ROWS, 1 do names["dynVmainPath_" .. i] = true; names["btnQVmainPath_" .. i] = true; end;
 				for i = 1, secLast, 1 do names["dynsecPath_" .. i] = true; names["btnQsecPath_" .. i] = true; end;
+				for i = 1, secLast, 1 do names["dynVsecPath_" .. i] = true; names["btnQVsecPath_" .. i] = true; end;
 
 				local found = {};
 
@@ -107,11 +141,15 @@
 				for i = 1, MAIN_PATH_ROWS, 1 do
 					mfLabel(found["dynmainPath_" .. i], sheet["mainPath_" .. i], "Select Main Path", lang);
 					noteButton(found["btnQmainPath_" .. i], sheet["mainPath_" .. i]);
+					mfLabel(found["dynVmainPath_" .. i], sheet["mainPath_" .. i], "Select Main Path", lang);
+					noteButton(found["btnQVmainPath_" .. i], sheet["mainPath_" .. i]);
 				end;
 
 				for i = 1, secLast, 1 do
 					mfLabel(found["dynsecPath_" .. i], sheet["secPath_" .. i], "Select Secondary Path", lang);
 					noteButton(found["btnQsecPath_" .. i], sheet["secPath_" .. i]);
+					mfLabel(found["dynVsecPath_" .. i], sheet["secPath_" .. i], "Select Secondary Path", lang);
+					noteButton(found["btnQVsecPath_" .. i], sheet["secPath_" .. i]);
 				end;
 			end;
 
@@ -139,6 +177,7 @@
 
 				for i = 1, last, 1 do
 					if not RITUAL_VACANT[i] then names["dynritual_" .. i] = true; names["btnQritual_" .. i] = true; end;
+					if not RITUAL_VACANT[i] then names["dynVritual_" .. i] = true; names["btnQVritual_" .. i] = true; end;
 				end;
 
 				local found = {};
@@ -151,6 +190,8 @@
 					if not RITUAL_VACANT[i] then
 						mfLabel(found["dynritual_" .. i], sheet["ritual_" .. i], "Select Ritual", lang);
 						noteButton(found["btnQritual_" .. i], sheet["ritual_" .. i]);
+						mfLabel(found["dynVritual_" .. i], sheet["ritual_" .. i], "Select Ritual", lang);
+						noteButton(found["btnQVritual_" .. i], sheet["ritual_" .. i]);
 					end;
 				end;
 			end;

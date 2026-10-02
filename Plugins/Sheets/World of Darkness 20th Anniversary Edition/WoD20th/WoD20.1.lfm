@@ -50,6 +50,29 @@
 			                       ROAD + BEARING + WILLPOWER 680..1010 y 541..725
 			                       HEALTH  1015..1345                  y 541..866 at ten rows
 
+			That is the sheet AS AUTHORED, and since the 47th batch it is the MORTAL sheet (SPEC
+			I190a, user 2026-10-01): ROAD sits between VIRTUES and HEALTH again. A VAMPIRE gets a
+			different Main, and the XML cannot hold two - renderGameMode on the root moves the named
+			boxes to VAMP_GEOM and back to these numbers (SPEC I190c, V534):
+
+			  header  0..1010      EXPERIENCE 1015..1300                y   0..105   avatar 1305..1645  y 0..488
+			  ATTRIBUTES 0..1300 (Physical | Social | Mental)          y 110..236
+			  TALENTS 0..430 | SKILLS 435..865 | KNOWLEDGES 870..1300  y 241..592
+			  VIRTUES 0..340 | ROAD 345..675 | BLOOD POOL 680..1010 | HEALTH 1015..1300   y 597..
+
+			The 48th batch (SPEC I191, user 2026-10-01) put the rotated group names back, each one
+			before its third of the band, and took the 25px the headings used off the band; and the
+			Main closes on KNOWLEDGES' edge, so EXPERIENCE and HEALTH are 285 there.
+
+			The 50th batch (SPEC I193, user 2026-10-02) took one typed row off each ability column -
+			ten names and two - so everything under them rose 25; the avatar went up beside
+			EXPERIENCE at twice its height, VIRTUES took its place under TALENTS (ten wider, its rows
+			re-centred by VAMP_GEOM) and ROAD, no longer stacked, closes up on the abilities.
+
+			Nine dots a row is why the ability boxes are 430 there: the row grows by four dots and the
+			box with it, pushing the next one along (SPEC Q109.2). Titles and rows that span a box
+			carry anchors="left top right", so they stretch with it and no Lua walks them.
+
 			Read it as a FOUR-BAND GRID, which is what V375 measures since T908: every box on
 			the tab starts and ends on a band edge - 0/340, 345/675, 680/1010, 1015/1345 - with
 			a 5px gutter between bands, and each box on the bottom row shares both x edges with
@@ -58,10 +81,14 @@
 			under SKILLS, which is where V168 had it.
 
 			44th batch (SPEC I187, user 2026-09-26): SPECIALTIES is GONE and ROAD took its place
-			under SKILLS, at its own 184 - so VIRTUES stands alone in its band and the space under
-			it is empty on purpose (SPEC Q106.1). The avatar closes where HEALTH closes at SEVEN
-			levels - 541 + 7 * HEALTH_ROW_PITCH + HEALTH_BOX_PAD = 785 - and HEALTH itself is only
-			READ for it, never moved (SPEC V415, I187c).
+			under SKILLS, at its own 184. The avatar closes where HEALTH closes at SEVEN levels -
+			541 + 7 * HEALTH_ROW_PITCH + HEALTH_BOX_PAD = 785 - and HEALTH itself is only READ for
+			it, never moved (SPEC V415, I187c).
+
+			46th batch (SPEC I189c/d, user 2026-10-01): ROAD went back UNDER VIRTUES, a stack in
+			the 345..675 band again (SPEC V393), and the band under SKILLS holds the BLOOD POOL of
+			a vampire - shown only when the game is Vampire, closing on the same seven-level line
+			as the avatar (SPEC V532). Any other game sees that band empty.
 
 			The bottom row does not close on ONE line, and that is the ask rather than drift:
 			VIRTUES and ROAD end on their own content plus the 15px foot (SPEC V393), the avatar
@@ -193,6 +220,16 @@
 			<imageCheckBox name="dot$(field)_3" left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_3');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_4" left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_4');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_5" left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_5');" onMouseLeave="noteTipLeave(self);"/>
+			<imageCheckBox name="dot$(field)_6" left="250" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_6', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_6');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_7" left="275" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_8" left="300" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_9" left="325" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="mcap$(field)_4" left="200" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_5" left="225" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_6" left="250" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_7" left="275" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_8" left="300" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_9" left="325" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<!-- Attribute, but dot 1 is a real checkbox instead of a fixed image, so the rating can
 		     drop to zero. Only Appearance uses it (SPEC T95). -->
@@ -206,6 +243,16 @@
 			<imageCheckBox name="dot$(field)_3" left="175" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_3');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_4" left="200" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_4');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_5" left="225" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_5');" onMouseLeave="noteTipLeave(self);"/>
+			<imageCheckBox name="dot$(field)_6" left="250" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_6', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_6');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_7" left="275" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_8" left="300" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_9" left="325" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="mcap$(field)_4" left="200" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_5" left="225" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_6" left="250" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_7" left="275" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_8" left="300" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_9" left="325" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<template name="Ability">
 			<rectangle name="hit$(col)$(num)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'hit$(col)$(num)');" onMouseLeave="noteTipLeave(self);"/>
@@ -217,6 +264,16 @@
 			<imageCheckBox name="abil$(col)$(num)_3" left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_3.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_3');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="abil$(col)$(num)_4" left="240" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_4.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_4');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="abil$(col)$(num)_5" left="265" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_5.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_5');" onMouseLeave="noteTipLeave(self);"/>
+			<imageCheckBox name="abil$(col)$(num)_6" left="290" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_6.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_6');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="abil$(col)$(num)_7" left="315" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_7.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="abil$(col)$(num)_8" left="340" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_8.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="abil$(col)$(num)_9" left="365" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_9.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_4" left="240" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_5" left="265" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_6" left="290" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_7" left="315" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_8" left="340" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_9" left="365" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<!-- Blank rows at the bottom of each ability column, for abilities the book does not list.
 		     Their ! keys the specialities by the row's FIELD, not the typed name, so renaming the
@@ -232,6 +289,16 @@
 			<imageCheckBox name="dot$(field)_3" left="215" top="0" width="25" height="25" field="$(field)_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_3', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_3');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_4" left="240" top="0" width="25" height="25" field="$(field)_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_4', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_4');" onMouseLeave="noteTipLeave(self);"/>
 			<imageCheckBox name="dot$(field)_5" left="265" top="0" width="25" height="25" field="$(field)_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_5', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_5');" onMouseLeave="noteTipLeave(self);"/>
+			<imageCheckBox name="dot$(field)_6" left="290" top="0" width="25" height="25" field="$(field)_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_6', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_6');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_7" left="315" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_8" left="340" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_9" left="365" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="mcap$(field)_4" left="240" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_5" left="265" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_6" left="290" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_7" left="315" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_8" left="340" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_9" left="365" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<!-- No label: HUMANITY / WILLPOWER are titled above the track, so "FORCA DE VONTADE"
 		     cannot be clipped.
@@ -322,8 +389,27 @@
 			<layout left="326" top="15" width="327" height="25" >
 				<HeaderPicker field="nature" nome="Nature"/>
 			</layout>
-			<layout left="663" top="15" width="327" height="25" >
+			<!-- Column three answers to the GAME (user 2026-10-01, SPEC I188b, V528): each of its
+			     three rows is a PAIR on one rectangle, and renderGameMode on the root shows the
+			     mortal row or the vampire row. The hidden one keeps its field - switching back
+			     to Mortal finds Motivation, Occupation and Residence as they were.
+
+			     The clan is `clanFamily`, the field the Ghoul tab's picker writes: renderClanDisc,
+			     clanEntry, the ? and the custom clan all read it already, so a second field would
+			     be a second truth. The list is `clan` - clans only, no revenant families. The row
+			     has no hidden twin: the Ghoul tab's edtClanFamily is the one widget bound to the
+			     field, and a second would be a double V274 refuses (SPEC V1, V2).
+
+			     `cmbGeneration` stores "4".."15" and shows `4th`..`15th`, like the domitor's
+			     combo (SPEC I30, Q107.6), and it has no empty first row: a state combo with a
+			     real default, the exception V15 already declares for the era. -->
+			<layout name="hdrMotivation" left="663" top="15" width="327" height="25" >
 				<Header field="motivation" nome="Motivation"/>
+			</layout>
+			<layout name="hdrClan" left="663" top="15" width="327" height="25" visible="false">
+				<label left="0" top="5" width="105" height="20" text="Clan" horzTextAlign="trailing"/>
+				<button name="btnQmainClan" left="108" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Clan', sheet['clanFamily'], nil, 'clanFamily');"/>
+				<button name="dynmainClan" left="132" top="0" width="195" height="25" text="Select Clan" onClick="mfOpen(self, 'clanFamily', 'clan', 'Clan');"/>
 			</layout>
 
 			<layout left="20" top="40" width="297" height="25" >
@@ -332,8 +418,14 @@
 			<layout left="326" top="40" width="327" height="25" >
 				<HeaderPicker field="demeanor" nome="Demeanor"/>
 			</layout>
-			<layout left="663" top="40" width="327" height="25" >
+			<layout name="hdrOccupation" left="663" top="40" width="327" height="25" >
 				<Header field="occupation" nome="Occupation"/>
+			</layout>
+			<layout name="hdrGeneration" left="663" top="40" width="327" height="25" visible="false">
+				<label left="0" top="5" width="105" height="20" text="Generation" horzTextAlign="trailing"/>
+				<comboBox name="cmbGeneration" left="132" top="0" width="195" height="25" field="generation"
+				          items="{'4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th', '15th'}"
+				          values="{'4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}"/>
 			</layout>
 
 			<layout left="20" top="65" width="297" height="25" >
@@ -342,8 +434,11 @@
 			<layout left="326" top="65" width="327" height="25" >
 				<Header field="concept" nome="Concept"/>
 			</layout>
-			<layout left="663" top="65" width="327" height="25" >
+			<layout name="hdrResidence" left="663" top="65" width="327" height="25" >
 				<Header field="residence" nome="Residence"/>
+			</layout>
+			<layout name="hdrSire" left="663" top="65" width="327" height="25" visible="false">
+				<Header field="sire" nome="Sire"/>
 			</layout>
 		</layout>
 
@@ -366,59 +461,65 @@
 		     writes were nil-guarded, so the box would have looked right without touching one line
 		     of Lua - which is exactly why they had to go: a widget name in a Lua roster with no
 		     widget in the XML is the orphan field of V2 one floor up, and it makes no sound
-		     (SPEC B111, B123). -->
-		<layout left="1015" top="0" width="330" height="105">
+		     (SPEC B111, B123).
+
+		     Named since the 48th batch (SPEC I191d, user 2026-10-01): a vampire's EXPERIENCE closes
+		     where KNOWLEDGES closes, 285 wide. The title stretches with the box; the number is moved
+		     by VAMP_GEOM, since a fixed child of a box that changes shape is what B191 was made of. -->
+		<layout name="boxExperience" left="1015" top="0" width="330" height="105">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="290" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+			<label left="20" top="15" width="290" height="20" text="EXPERIENCE" horzTextAlign="center" anchors="left top right"/>
 
 			<rectangle name="bgCurrentXPMain" left="120" top="53" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
 			<edit name="edtCurrentXPMain" type="number" decimalPlaces="0" left="120" top="53" width="90" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPMain.text);" transparent="true"/>
 		</layout>
 
-		<layout left="0" top="110" width="340" height="296">
+		<layout name="boxAttributes" left="0" top="110" width="340" height="296">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="300" height="20" text="ATTRIBUTES" horzTextAlign="center"/>
+			<label left="20" top="15" width="300" height="20" text="ATTRIBUTES" horzTextAlign="center" anchors="left top right"/>
 
-			<label left="-20" top="63" width="100" height="20" text="Physical" horzTextAlign="center" rotationAngle="270"/>
+			<label name="attrRotPhysical" left="-20" top="63" width="100" height="20" text="Physical" horzTextAlign="center" rotationAngle="270"/>
 
-			<layout left="55" top="36" width="250" height="25" >
+			<layout name="attrRow_strength" left="55" top="36" width="250" height="25" >
 				<Attribute field="strength" nome="Strength"/>
 			</layout>
-			<layout left="55" top="61" width="250" height="25" >
+			<layout name="attrRow_dexterity" left="55" top="61" width="250" height="25" >
 				<Attribute field="dexterity" nome="Dexterity"/>
 			</layout>
-			<layout left="55" top="86" width="250" height="25" >
+			<layout name="attrRow_stamina" left="55" top="86" width="250" height="25" >
 				<Attribute field="stamina" nome="Stamina"/>
 			</layout>
 
-			<horzLine left="30" top="116" width="280" strokeColor="white"/>
+			<!-- The two rules between the groups are a MORTAL column's: across a vampire's band they
+			     would cut the rows, so renderGameMode hides them there (SPEC I191c, B191, V537a). -->
+			<horzLine name="attrSepSocial" left="30" top="116" width="280" strokeColor="white"/>
 
-			<label left="-20" top="148" width="100" height="20" text="Social" horzTextAlign="center" rotationAngle="270"/>
+			<label name="attrRotSocial" left="-20" top="148" width="100" height="20" text="Social" horzTextAlign="center" rotationAngle="270"/>
 
-			<layout left="55" top="121" width="250" height="25" >
+			<layout name="attrRow_charisma" left="55" top="121" width="250" height="25" >
 				<Attribute field="charisma" nome="Charisma"/>
 			</layout>
-			<layout left="55" top="146" width="250" height="25" >
+			<layout name="attrRow_manipulation" left="55" top="146" width="250" height="25" >
 				<Attribute field="manipulation" nome="Manipulation"/>
 			</layout>
 			<!-- Appearance is the one attribute whose first dot can be switched off, by request
 			     (SPEC T95). Every other attribute keeps dot 1 as a fixed <image>. Same x for
 			     the first dot as the Attribute template, so the column still lines up (V26). -->
-			<layout left="55" top="171" width="250" height="25" >
+			<layout name="attrRow_appearance" left="55" top="171" width="250" height="25" >
 				<AttributeZeroable field="appearance" nome="Appearance"/>
 			</layout>
 
-			<horzLine left="30" top="201" width="280" strokeColor="white"/>
+			<horzLine name="attrSepMental" left="30" top="201" width="280" strokeColor="white"/>
 
-			<label left="-20" top="233" width="100" height="20" text="Mental" horzTextAlign="center" rotationAngle="270"/>
+			<label name="attrRotMental" left="-20" top="233" width="100" height="20" text="Mental" horzTextAlign="center" rotationAngle="270"/>
 
-			<layout left="55" top="206" width="250" height="25" >
+			<layout name="attrRow_perception" left="55" top="206" width="250" height="25" >
 				<Attribute field="perception" nome="Perception"/>
 			</layout>
-			<layout left="55" top="231" width="250" height="25" >
+			<layout name="attrRow_inteligence" left="55" top="231" width="250" height="25" >
 				<Attribute field="inteligence" nome="Intelligence"/>
 			</layout>
-			<layout left="55" top="256" width="250" height="25" >
+			<layout name="attrRow_wits" left="55" top="256" width="250" height="25" >
 				<Attribute field="wits" nome="Wits"/>
 			</layout>
 		</layout>
@@ -436,7 +537,7 @@
 		     (SPEC V53, T653). The radius matches the section boxes so the corner reads as one
 		     frame family. -->
 		<rectangle name="avatarFrame" left="0" top="411" width="340" height="374" color="DimGray" xradius="14" yradius="14" cornerType="innerRound"/>
-		<image left="0" top="411" width="340" height="374" field="avatar" editable="true" style="autoFit"/>
+		<image name="avatarImage" left="0" top="411" width="340" height="374" field="avatar" editable="true" style="autoFit"/>
 
 		<!-- The ornament CARRIER (SPEC I84d, I92, V309, V287, V320). Transparent in both senses
 		      and holding no content of its own: it exists so the era's drawing has somewhere to hang
@@ -478,147 +579,172 @@
 			a column is 290 wide at left=20 - the width the column gained arrives as NAME, never as air
 			between the last dot and the border (SPEC V170, I73).
 		-->
-		<layout left="345" top="110" width="330" height="426">
+		<layout name="boxTalents" left="345" top="110" width="330" height="426">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="290" height="20" text="TALENTS" horzTextAlign="center"/>
+			<label left="20" top="15" width="290" height="20" text="TALENTS" horzTextAlign="center" anchors="left top right"/>
 
-			<layout left="20" top="36" width="290" height="25" >
+			<layout left="20" top="36" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="1" field="alertness" nome="Alertness"/>
 			</layout>
-			<layout left="20" top="61" width="290" height="25" >
+			<layout left="20" top="61" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="2" field="arts" nome="Arts"/>
 			</layout>
-			<layout left="20" top="86" width="290" height="25" >
+			<layout left="20" top="86" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="3" field="athletics" nome="Athletics"/>
 			</layout>
-			<layout left="20" top="111" width="290" height="25" >
+			<layout left="20" top="111" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="4" field="awareness" nome="Awareness"/>
 			</layout>
-			<layout left="20" top="136" width="290" height="25" >
+			<layout left="20" top="136" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="5" field="brawl" nome="Brawl"/>
 			</layout>
-			<layout left="20" top="161" width="290" height="25" >
+			<layout left="20" top="161" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="6" field="empathy" nome="Empathy"/>
 			</layout>
-			<layout left="20" top="186" width="290" height="25" >
+			<layout left="20" top="186" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="7" field="expression" nome="Expression"/>
 			</layout>
-			<layout left="20" top="211" width="290" height="25" >
+			<layout left="20" top="211" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="8" field="intimidation" nome="Intimidation"/>
 			</layout>
-			<layout left="20" top="236" width="290" height="25" >
+			<layout left="20" top="236" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="9" field="leadership" nome="Leadership"/>
 			</layout>
-			<layout left="20" top="261" width="290" height="25" >
+			<layout left="20" top="261" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="10" field="streetwise" nome="Streetwise"/>
 			</layout>
-			<layout left="20" top="286" width="290" height="25" >
+			<!-- A vampire names ten a column in every era - eleven in the Classical knowledges
+			     (user 2026-10-01, SPEC I188d, I189a/b, V531): the slot a list does not fill shows its
+			     typed twin on the same top - the pair the 154th round authored for knowledges_13
+			     (SPEC I123b, V371) - and rows 14 and 15 are the TAIL the list cuts past its names plus
+			     two (`typed = 2` since the 50th batch, SPEC I193a): row 13 goes too, by its Tail name
+			     here and by the Fill branch in the two columns where it is a pair. Authored visibility is the Victorian list of a mortal, the base
+			     era the XML draws (SPEC V19); every other game shows exactly what it did. -->
+			<layout name="dynAbilRow_talents_11" left="20" top="286" width="290" height="25" anchors="left top right" >
 				<Ability col="talents" num="11" field="subterfuge" nome="Subterfuge"/>
 			</layout>
-			<layout left="20" top="311" width="290" height="25" >
+			<layout name="dynAbilFill_talents_11" visible="false" left="20" top="286" width="290" height="25" anchors="left top right" >
+				<CustomAbility field="customTalent_5"/>
+			</layout>
+			<layout left="20" top="311" width="290" height="25" anchors="left top right" >
 				<CustomAbility field="customTalent_1"/>
 			</layout>
-			<layout left="20" top="336" width="290" height="25" >
+			<layout name="dynAbilTail_talents_13" left="20" top="336" width="290" height="25" anchors="left top right" >
 				<CustomAbility field="customTalent_2"/>
 			</layout>
-			<layout left="20" top="361" width="290" height="25" >
+			<layout name="dynAbilTail_talents_14" left="20" top="361" width="290" height="25" anchors="left top right" >
 				<CustomAbility field="customTalent_3"/>
 			</layout>
-			<layout left="20" top="386" width="290" height="25" >
+			<layout name="dynAbilTail_talents_15" left="20" top="386" width="290" height="25" anchors="left top right" >
 				<CustomAbility field="customTalent_4"/>
 			</layout>
 		</layout>
 
-		<layout left="680" top="110" width="330" height="426">
+		<layout name="boxSkills" left="680" top="110" width="330" height="426">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="290" height="20" text="SKILLS" horzTextAlign="center"/>
+			<label left="20" top="15" width="290" height="20" text="SKILLS" horzTextAlign="center" anchors="left top right"/>
 
-			<layout left="20" top="36" width="290" height="25" >
+			<layout left="20" top="36" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="1" field="animalKen" nome="Animal Ken"/>
 			</layout>
-			<layout left="20" top="61" width="290" height="25" >
+			<layout left="20" top="61" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="2" field="crafts" nome="Crafts"/>
 			</layout>
-			<layout left="20" top="86" width="290" height="25" >
+			<layout left="20" top="86" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="3" field="etiquette" nome="Etiquette"/>
 			</layout>
-			<layout left="20" top="111" width="290" height="25" >
+			<layout left="20" top="111" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="4" field="firearms" nome="Firearms"/>
 			</layout>
-			<layout left="20" top="136" width="290" height="25" >
+			<layout left="20" top="136" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="5" field="larceny" nome="Larceny"/>
 			</layout>
-			<layout left="20" top="161" width="290" height="25" >
+			<layout left="20" top="161" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="6" field="martialArts" nome="Martial Arts"/>
 			</layout>
-			<layout left="20" top="186" width="290" height="25" >
+			<layout left="20" top="186" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="7" field="meditation" nome="Meditation"/>
 			</layout>
-			<layout left="20" top="211" width="290" height="25" >
+			<layout left="20" top="211" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="8" field="melee" nome="Melee"/>
 			</layout>
-			<layout left="20" top="236" width="290" height="25" >
+			<layout left="20" top="236" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="9" field="performance" nome="Performance"/>
 			</layout>
-			<layout left="20" top="261" width="290" height="25" >
+			<layout left="20" top="261" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="10" field="research" nome="Research"/>
 			</layout>
-			<layout left="20" top="286" width="290" height="25" >
+			<layout name="dynAbilRow_skills_11" left="20" top="286" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="11" field="ride" nome="Ride"/>
 			</layout>
-			<layout left="20" top="311" width="290" height="25" >
+			<layout name="dynAbilFill_skills_11" visible="false" left="20" top="286" width="290" height="25" anchors="left top right" >
+				<CustomAbility field="customSkill_3"/>
+			</layout>
+			<layout name="dynAbilRow_skills_12" left="20" top="311" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="12" field="stealth" nome="Stealth"/>
 			</layout>
-			<layout left="20" top="336" width="290" height="25" >
+			<layout name="dynAbilFill_skills_12" visible="false" left="20" top="311" width="290" height="25" anchors="left top right" >
+				<CustomAbility field="customSkill_4"/>
+			</layout>
+			<layout name="dynAbilRow_skills_13" left="20" top="336" width="290" height="25" anchors="left top right" >
 				<Ability col="skills" num="13" field="survival" nome="Survival"/>
 			</layout>
-			<layout left="20" top="361" width="290" height="25" >
+			<layout name="dynAbilFill_skills_13" visible="false" left="20" top="336" width="290" height="25" anchors="left top right" >
+				<CustomAbility field="customSkill_5"/>
+			</layout>
+			<layout name="dynAbilTail_skills_14" left="20" top="361" width="290" height="25" anchors="left top right" >
 				<CustomAbility field="customSkill_1"/>
 			</layout>
-			<layout left="20" top="386" width="290" height="25" >
+			<layout name="dynAbilTail_skills_15" left="20" top="386" width="290" height="25" anchors="left top right" >
 				<CustomAbility field="customSkill_2"/>
 			</layout>
 		</layout>
 
-		<layout left="1015" top="110" width="330" height="426">
+		<layout name="boxKnowledges" left="1015" top="110" width="330" height="426">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="290" height="20" text="KNOWLEDGES" horzTextAlign="center"/>
+			<label left="20" top="15" width="290" height="20" text="KNOWLEDGES" horzTextAlign="center" anchors="left top right"/>
 
-			<layout left="20" top="36" width="290" height="25" >
+			<layout left="20" top="36" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="1" field="academics" nome="Academics"/>
 			</layout>
-			<layout left="20" top="61" width="290" height="25" >
+			<layout left="20" top="61" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="2" field="cosmology" nome="Cosmology"/>
 			</layout>
-			<layout left="20" top="86" width="290" height="25" >
+			<layout left="20" top="86" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="3" field="enigmas" nome="Enigmas"/>
 			</layout>
-			<layout left="20" top="111" width="290" height="25" >
+			<layout left="20" top="111" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="4" field="esoterica" nome="Esoterica"/>
 			</layout>
-			<layout left="20" top="136" width="290" height="25" >
+			<layout left="20" top="136" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="5" field="finance" nome="Finance"/>
 			</layout>
-			<layout left="20" top="161" width="290" height="25" >
+			<layout left="20" top="161" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="6" field="investigation" nome="Investigation"/>
 			</layout>
-			<layout left="20" top="186" width="290" height="25" >
+			<layout left="20" top="186" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="7" field="law" nome="Law"/>
 			</layout>
-			<layout left="20" top="211" width="290" height="25" >
+			<layout left="20" top="211" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="8" field="medicine" nome="Medicine"/>
 			</layout>
-			<layout left="20" top="236" width="290" height="25" >
+			<layout left="20" top="236" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="9" field="occult" nome="Occult"/>
 			</layout>
-			<layout left="20" top="261" width="290" height="25" >
+			<layout left="20" top="261" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="10" field="politics" nome="Politics"/>
 			</layout>
-			<layout left="20" top="286" width="290" height="25" >
+			<layout name="dynAbilRow_knowledges_11" left="20" top="286" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="11" field="science" nome="Science"/>
 			</layout>
-			<layout left="20" top="311" width="290" height="25" >
+			<layout name="dynAbilFill_knowledges_11" visible="false" left="20" top="286" width="290" height="25" anchors="left top right" >
+				<CustomAbility field="customKnowledge_4"/>
+			</layout>
+			<layout name="dynAbilRow_knowledges_12" left="20" top="311" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="12" field="technology" nome="Technology"/>
+			</layout>
+			<layout name="dynAbilFill_knowledges_12" visible="false" left="20" top="311" width="290" height="25" anchors="left top right" >
+				<CustomAbility field="customKnowledge_5"/>
 			</layout>
 			<!--
 				The thirteenth knowledge and a typed row on ONE top, and the renderer shows exactly
@@ -636,27 +762,28 @@
 				because that is the one knowledge no twelve-name era lists: the authored column
 				stays one field per row even with the hidden one counted.
 			-->
-			<layout name="dynAbilRow_knowledges_13" visible="false" left="20" top="336" width="290" height="25" >
+			<layout name="dynAbilRow_knowledges_13" visible="false" left="20" top="336" width="290" height="25" anchors="left top right" >
 				<Ability col="knowledges" num="13" field="computer" nome="Computer"/>
 			</layout>
-			<layout name="dynAbilFill_knowledges_13" left="20" top="336" width="290" height="25" >
+			<layout name="dynAbilFill_knowledges_13" left="20" top="336" width="290" height="25" anchors="left top right" >
 				<CustomAbility field="customKnowledge_3"/>
 			</layout>
-			<layout left="20" top="361" width="290" height="25" >
+			<layout name="dynAbilTail_knowledges_14" left="20" top="361" width="290" height="25" anchors="left top right" >
 				<CustomAbility field="customKnowledge_1"/>
 			</layout>
-			<layout left="20" top="386" width="290" height="25" >
+			<layout name="dynAbilTail_knowledges_15" left="20" top="386" width="290" height="25" anchors="left top right" >
 				<CustomAbility field="customKnowledge_2"/>
 			</layout>
 		</layout>
 
 		<!--
-			Bottom row, three boxes side by side since the 44th batch (SPEC I187b) - the map at
-			the top of the file has the numbers: VIRTUES | ROAD + BEARING + WILLPOWER | HEALTH.
+			Bottom row since the 46th batch (SPEC I189c/d) - the map at the top of the file has
+			the numbers: VIRTUES over ROAD + BEARING + WILLPOWER | BLOOD POOL | HEALTH.
 
 			Every one of them takes its x from the column above it since the 50th round
-			(SPEC V168, V375): VIRTUES from TALENTS, ROAD from SKILLS (the place SPECIALTIES
-			held until the 44th batch), HEALTH from KNOWLEDGES. They rose 50 with the 50th
+			(SPEC V168, V375): VIRTUES and ROAD from TALENTS, BLOOD POOL from SKILLS (the place
+			SPECIALTIES held until the 44th batch, and ROAD until the 46th), HEALTH from
+			KNOWLEDGES. They rose 50 with the 50th
 			round, which is what the ability columns gave back when they stopped carrying a
 			black tail (SPEC V171).
 
@@ -672,24 +799,31 @@
 			Faith is gone from this tab on purpose: `faith_1`..`_5` are now the dots of the
 			TRUE FAITH row on the Powers tab, so a saved sheet keeps its rating (SPEC V35).
 		-->
-		<layout left="345" top="541" width="330" height="126">
+		<layout name="boxVirtues" left="345" top="541" width="330" height="126">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="290" height="20" text="VIRTUES" horzTextAlign="center"/>
+			<label left="20" top="15" width="290" height="20" text="VIRTUES" horzTextAlign="center" anchors="left top right"/>
 
-			<layout left="40" top="36" width="250" height="25" >
+			<!-- Named for a vampire (SPEC I193d, V537a): there the box is 340 wide, under TALENTS,
+			     and VAMP_GEOM re-centres the three rows - a fixed child left behind in a box that
+			     changes shape is B191. -->
+			<layout name="virtueRow_conscience" left="40" top="36" width="250" height="25" >
 				<Virtue field="conscience" nome="Conscience"/>
 			</layout>
-			<layout left="40" top="61" width="250" height="25" >
+			<layout name="virtueRow_selfControl" left="40" top="61" width="250" height="25" >
 				<Virtue field="selfControl" nome="Self-Control"/>
 			</layout>
-			<layout left="40" top="86" width="250" height="25" >
+			<layout name="virtueRow_courage" left="40" top="86" width="250" height="25" >
 				<Virtue field="courage" nome="Courage"/>
 			</layout>
 		</layout>
 
-		<!-- Under SKILLS, where SPECIALTIES was, since the 44th batch (SPEC I187b, user
-		     2026-09-26): the box kept its size and its children, only left/top moved. -->
-		<layout left="680" top="541" width="330" height="184">
+		<!-- Between VIRTUES and HEALTH, under SKILLS, for a mortal (47th batch, SPEC I190a, user
+		     2026-10-01) - where the 44th batch had put it. A vampire's BLOOD POOL needs that band, so
+		     for a vampire renderGameMode moves this box to 345..675 instead (VAMP_GEOM, SPEC V534c):
+		     the box keeps its size and its children, only left/top move. Since the 50th batch it is
+		     not stacked under VIRTUES any more - VIRTUES went under TALENTS - and closes up on the
+		     abilities (SPEC I193e). -->
+		<layout name="boxRoad" left="680" top="541" width="330" height="184">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<!--
@@ -763,6 +897,123 @@
 			</layout>
 		</layout>
 
+		<!-- The vampire's BLOOD POOL on the Main (user 2026-10-01, SPEC I189d, V532): the same block
+		     as the Vampire tab's - the same fifty fields, the same 26 x 30 step, the same faded twin
+		     above the generation's pool, painted by renderVampCaps - in the band under SKILLS, between
+		     VIRTUES and HEALTH. It closes where HEALTH closes at SEVEN levels, the avatar's line
+		     (SPEC V415): 541 + 7 * 27 + 55 = 785, so the box is 244 tall and the 259 x 145 grid sits
+		     CENTRED under the title (first row at 67, a 32 foot). Hidden unless the game is Vampire
+		     (renderGameMode, SPEC Q108.3). Since the 47th batch the XML spot is the MORTAL sheet's,
+		     shared with ROAD and never seen; a vampire's Main moves the box to VAMP_GEOM, still
+		     closing on the seven-level line (SPEC I190c, V534c). dynBloodTurnMain is the faded
+		     "Blood per Turn X" between title and dots, written by renderVampCaps (SPEC I190h). Names carry m where the tab's carry v: the imports are
+		     pasted into one constructor, so a repeated name would be one self.<name> (SPEC V530e). -->
+		<layout name="mainBloodPool" left="680" top="541" width="330" height="244" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="290" height="20" text="BLOOD POOL" horzTextAlign="center"/>
+			<label name="dynBloodTurnMain" left="20" top="40" width="290" height="20" horzTextAlign="center" opacity="0.80"/>
+			<imageCheckBox name="mdotbloodPool_1" left="35" top="67" width="25" height="25" field="bloodPool_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_1', self);"/>
+			<imageCheckBox name="mdotbloodPool_2" left="61" top="67" width="25" height="25" field="bloodPool_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_2', self);"/>
+			<imageCheckBox name="mdotbloodPool_3" left="87" top="67" width="25" height="25" field="bloodPool_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_3', self);"/>
+			<imageCheckBox name="mdotbloodPool_4" left="113" top="67" width="25" height="25" field="bloodPool_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_4', self);"/>
+			<imageCheckBox name="mdotbloodPool_5" left="139" top="67" width="25" height="25" field="bloodPool_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_5', self);"/>
+			<imageCheckBox name="mdotbloodPool_6" left="165" top="67" width="25" height="25" field="bloodPool_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_6', self);"/>
+			<imageCheckBox name="mdotbloodPool_7" left="191" top="67" width="25" height="25" field="bloodPool_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_7', self);"/>
+			<imageCheckBox name="mdotbloodPool_8" left="217" top="67" width="25" height="25" field="bloodPool_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_8', self);"/>
+			<imageCheckBox name="mdotbloodPool_9" left="243" top="67" width="25" height="25" field="bloodPool_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_9', self);"/>
+			<imageCheckBox name="mdotbloodPool_10" left="269" top="67" width="25" height="25" field="bloodPool_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_10', self);"/>
+			<imageCheckBox name="mdotbloodPool_11" left="35" top="97" width="25" height="25" field="bloodPool_11" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_11', self);"/>
+			<imageCheckBox name="mdotbloodPool_12" left="61" top="97" width="25" height="25" field="bloodPool_12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_12', self);"/>
+			<imageCheckBox name="mdotbloodPool_13" left="87" top="97" width="25" height="25" field="bloodPool_13" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_13', self);"/>
+			<imageCheckBox name="mdotbloodPool_14" left="113" top="97" width="25" height="25" field="bloodPool_14" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_14', self);"/>
+			<imageCheckBox name="mdotbloodPool_15" left="139" top="97" width="25" height="25" field="bloodPool_15" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_15', self);"/>
+			<imageCheckBox name="mdotbloodPool_16" left="165" top="97" width="25" height="25" field="bloodPool_16" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_16', self);"/>
+			<imageCheckBox name="mdotbloodPool_17" left="191" top="97" width="25" height="25" field="bloodPool_17" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_17', self);"/>
+			<imageCheckBox name="mdotbloodPool_18" left="217" top="97" width="25" height="25" field="bloodPool_18" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_18', self);"/>
+			<imageCheckBox name="mdotbloodPool_19" left="243" top="97" width="25" height="25" field="bloodPool_19" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_19', self);"/>
+			<imageCheckBox name="mdotbloodPool_20" left="269" top="97" width="25" height="25" field="bloodPool_20" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_20', self);"/>
+			<imageCheckBox name="mdotbloodPool_21" left="35" top="127" width="25" height="25" field="bloodPool_21" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_21', self);"/>
+			<imageCheckBox name="mdotbloodPool_22" left="61" top="127" width="25" height="25" field="bloodPool_22" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_22', self);"/>
+			<imageCheckBox name="mdotbloodPool_23" left="87" top="127" width="25" height="25" field="bloodPool_23" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_23', self);"/>
+			<imageCheckBox name="mdotbloodPool_24" left="113" top="127" width="25" height="25" field="bloodPool_24" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_24', self);"/>
+			<imageCheckBox name="mdotbloodPool_25" left="139" top="127" width="25" height="25" field="bloodPool_25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_25', self);"/>
+			<imageCheckBox name="mdotbloodPool_26" left="165" top="127" width="25" height="25" field="bloodPool_26" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_26', self);"/>
+			<imageCheckBox name="mdotbloodPool_27" left="191" top="127" width="25" height="25" field="bloodPool_27" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_27', self);"/>
+			<imageCheckBox name="mdotbloodPool_28" left="217" top="127" width="25" height="25" field="bloodPool_28" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_28', self);"/>
+			<imageCheckBox name="mdotbloodPool_29" left="243" top="127" width="25" height="25" field="bloodPool_29" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_29', self);"/>
+			<imageCheckBox name="mdotbloodPool_30" left="269" top="127" width="25" height="25" field="bloodPool_30" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_30', self);"/>
+			<imageCheckBox name="mdotbloodPool_31" left="35" top="157" width="25" height="25" field="bloodPool_31" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_31', self);"/>
+			<imageCheckBox name="mdotbloodPool_32" left="61" top="157" width="25" height="25" field="bloodPool_32" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_32', self);"/>
+			<imageCheckBox name="mdotbloodPool_33" left="87" top="157" width="25" height="25" field="bloodPool_33" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_33', self);"/>
+			<imageCheckBox name="mdotbloodPool_34" left="113" top="157" width="25" height="25" field="bloodPool_34" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_34', self);"/>
+			<imageCheckBox name="mdotbloodPool_35" left="139" top="157" width="25" height="25" field="bloodPool_35" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_35', self);"/>
+			<imageCheckBox name="mdotbloodPool_36" left="165" top="157" width="25" height="25" field="bloodPool_36" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_36', self);"/>
+			<imageCheckBox name="mdotbloodPool_37" left="191" top="157" width="25" height="25" field="bloodPool_37" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_37', self);"/>
+			<imageCheckBox name="mdotbloodPool_38" left="217" top="157" width="25" height="25" field="bloodPool_38" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_38', self);"/>
+			<imageCheckBox name="mdotbloodPool_39" left="243" top="157" width="25" height="25" field="bloodPool_39" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_39', self);"/>
+			<imageCheckBox name="mdotbloodPool_40" left="269" top="157" width="25" height="25" field="bloodPool_40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_40', self);"/>
+			<imageCheckBox name="mdotbloodPool_41" left="35" top="187" width="25" height="25" field="bloodPool_41" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_41', self);"/>
+			<imageCheckBox name="mdotbloodPool_42" left="61" top="187" width="25" height="25" field="bloodPool_42" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_42', self);"/>
+			<imageCheckBox name="mdotbloodPool_43" left="87" top="187" width="25" height="25" field="bloodPool_43" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_43', self);"/>
+			<imageCheckBox name="mdotbloodPool_44" left="113" top="187" width="25" height="25" field="bloodPool_44" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_44', self);"/>
+			<imageCheckBox name="mdotbloodPool_45" left="139" top="187" width="25" height="25" field="bloodPool_45" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_45', self);"/>
+			<imageCheckBox name="mdotbloodPool_46" left="165" top="187" width="25" height="25" field="bloodPool_46" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_46', self);"/>
+			<imageCheckBox name="mdotbloodPool_47" left="191" top="187" width="25" height="25" field="bloodPool_47" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_47', self);"/>
+			<imageCheckBox name="mdotbloodPool_48" left="217" top="187" width="25" height="25" field="bloodPool_48" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_48', self);"/>
+			<imageCheckBox name="mdotbloodPool_49" left="243" top="187" width="25" height="25" field="bloodPool_49" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_49', self);"/>
+			<imageCheckBox name="mdotbloodPool_50" left="269" top="187" width="25" height="25" field="bloodPool_50" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_50', self);"/>
+			<imageCheckBox name="mcapbloodPool_1" left="35" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_2" left="61" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_3" left="87" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_4" left="113" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_5" left="139" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_6" left="165" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_7" left="191" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_8" left="217" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_9" left="243" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_10" left="269" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_11" left="35" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_12" left="61" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_13" left="87" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_14" left="113" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_15" left="139" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_16" left="165" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_17" left="191" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_18" left="217" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_19" left="243" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_20" left="269" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_21" left="35" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_22" left="61" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_23" left="87" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_24" left="113" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_25" left="139" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_26" left="165" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_27" left="191" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_28" left="217" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_29" left="243" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_30" left="269" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_31" left="35" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_32" left="61" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_33" left="87" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_34" left="113" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_35" left="139" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_36" left="165" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_37" left="191" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_38" left="217" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_39" left="243" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_40" left="269" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_41" left="35" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_42" left="61" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_43" left="87" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_44" left="113" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_45" left="139" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_46" left="165" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_47" left="191" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_48" left="217" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_49" left="243" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_50" left="269" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+		</layout>
+
 		<!--
 			HEALTH is positional now (SPEC T96): row N is the Nth damage box, `health_1`..`_10`.
 			The old semantic names (bruised/hurt/injured/...) are gone - they could not express a
@@ -792,7 +1043,7 @@
 			     V234): it was never the player's call, and it was the last thing on this sheet
 			     held by two widgets on one field. The title spans the whole box now that it no
 			     longer shares the row with a combo, so horzTextAlign centres it on the BOX. -->
-			<label left="20" top="15" width="290" height="20" text="HEALTH" horzTextAlign="center"/>
+			<label left="20" top="15" width="290" height="20" text="HEALTH" horzTextAlign="center" anchors="left top right"/>
 
 			<layout name="dynHealth_row1" left="42" top="47" width="246" height="20"><HealthRow num="1"/></layout>
 			<layout name="dynHealth_row2" left="42" top="74" width="246" height="20"><HealthRow num="2"/></layout>
