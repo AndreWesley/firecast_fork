@@ -1,6 +1,24 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-10-02, 226ª rodada — 50º lote ESPECIFICADO, CONSTRUÍDO & INSTALADO: §I193 (a…k), §V539 NOVA, §V371 §V531 §V533 §V534 §V536 EMENDADAS, §B193, §T1202…§T1206 `x`, §T1207 (tela [USER]) `.`; §Q111 RESPONDIDA = rec.; §T1198 `x`)
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-10-02, 226ª rodada — 52º lote ESPECIFICADO, CONSTRUÍDO & INSTALADO: §I195 (a…h), §V541 NOVA, §V540 RE-FORMADA, §V257 §V393 §V376 §V528 §V537 EMENDADAS no gate, §T1212…§T1215 `x`, §T1216 (tela [USER]) `.`, §Q113 RESPONDIDA — (2) = SIM: o domitor também `4ª…`)
+
+**Construído (2026-10-02):** 1º run **9 FAIL** = previstos + §V393 (prendia `ROAD` em conteúdo + 15 → `ROAD`/`WILLPOWER` viraram rol próprio de §V376, presos por §V541) — tudo em §I195g. **ALL CHECKS PASSED** (`-Build` incluso). Bateria §V222 **10/10**: `a29f8eb8…\scratchpad\b52.ps1`/`b52.log`. **INSTALADO 11:29:40** (3473187 B = `output/`). **Pendente:** telas [USER] §T1216 (52º + resto do 51º), §T1207 (50º), §T1201 (49º); §T1211 fica SUPERADA por §T1216. Próximos ids: **§I196 §V542 §T1217 §B194 §Q114**. **Nada commitado** (47º…52º no working tree). O texto abaixo é o do momento da spec.
+
+**Pedido do user:** `ROAD` + `WILLPOWER` juntos = altura da pool da Main (244) nos 2 jogos & o `Mortal` também em 2 boxes; geração em pt `4ª…15ª`. **Desenho (§I195a):** o XML passa a ter os 2 boxes ∀ jogo (`boxRoad` 122 + 5 + `boxWillpower` 117, corpo centrado) ∴ a cópia duplicada do willpower do 51º SAI (`roadWpTitle`/`roadWpRow` apagados, `renderGameMode` ⊥ toca `boxWillpower`, `VAMP_GEOM` só move). Geração: `CMB_DISPLAY_MAP` `cmbGeneration = "ª"` & `cmbItems` monta o sufixo.
+
+**Próximo passo:** `/ck:build` §T1212 (`WoD20.1`) · §T1213 (root) · §T1214 (`WoD20.6`) → §T1215 (gate; §I195g lista o que acende — boa parte é DESFAZER desvios do 51º) → install → §T1216 (tela [USER], cobre o resto de §T1211). Ler `.\spec-slice.ps1 I195` + `Select-String -Path SPEC.md -Pattern '^  - I195'`. §Q113 (3 perguntas c/ rec.) — construir PELA recomendação. Próximos ids: **§I196 §V542 §T1217 §B194 §Q114**. **Nada commitado** (47º…52º no working tree).
+
+## ANTERIOR (2026-10-02, 226ª rodada — 51º lote ESPECIFICADO, CONSTRUÍDO & INSTALADO: §I194 (a…g), §V540 NOVA, §V1 §V298 §V376 §V534 §V537 EMENDADAS no gate, §T1208…§T1210 `x`, §T1211 (tela [USER]) `.`, §Q112 RESPONDIDA = rec.)
+
+**Construído (2026-10-02):** 1º run **22 FAIL** = previstos + 3 famílias ⊥ previstas (§V1 `willpower_1…10` c/ 2 donos; §V298/§V376 viam `boxWillpower` no `Mortal`; §V532d regex literal) — tudo em §I194f. **ALL CHECKS PASSED** (`-Build` incluso). Bateria §V222 **8/8**: `a29f8eb8…\scratchpad\b51.ps1`/`b51.log`. **INSTALADO 10:42:20** (3475804 B = `output/`). **Pendente:** telas [USER] §T1211 (51º), §T1207 (50º), §T1201 (49º). Próximos ids: **§I195 §V541 §T1212 §B194 §Q113**. **Nada commitado** (47º…51º no working tree). O texto abaixo é o do momento da spec.
+
+**Pedido do user (jogo `Vampire`):** o box `ROAD` + `WILLPOWER` vira 2 — `ROAD` (picker, bolinhas, postura) em `{345,597,330,104}` & `WILLPOWER` (bolinhas + checkboxes) numa caixa NOVA `boxWillpower` `{345,706,330,96}` logo abaixo. `Mortal` ≡ hoje.
+
+**Desenho (§I194a):** caixa nova só-`Vampire` (≡ `mainBloodPool`) c/ uma 2ª cópia de `<Willpower field="willpower"/>` — ⊥ trocar `parent` em runtime. 2 cópias no mesmo campo já ∃ (espelho da aba `Combat`) & `wpSpentChange` é guardado por `WP_CLICK`. Em `boxRoad` o título & a linha de willpower ganham nome (`roadWpTitle`/`roadWpRow`) & somem no `Vampire`.
+
+**Próximo passo:** `/ck:build` §T1208 (`WoD20.1`) & §T1209 (root) → §T1210 (gate; §I194f lista o que acende) → install → §T1211 (tela [USER]). Ler `.\spec-slice.ps1 I194` + `Select-String -Path SPEC.md -Pattern '^  - I194'`. §Q112 (2 perguntas c/ rec.) — construir PELA recomendação. Próximos ids: **§I195 §V541 §T1212 §B194 §Q113**. Telas abertas: §T1201, §T1207. **Nada commitado** (47º…51º no working tree).
+
+## ANTERIOR (2026-10-02, 226ª rodada — 50º lote ESPECIFICADO, CONSTRUÍDO & INSTALADO: §I193 (a…k), §V539 NOVA, §V371 §V531 §V533 §V534 §V536 EMENDADAS, §B193, §T1202…§T1206 `x`, §T1207 (tela [USER]) `.`; §Q111 RESPONDIDA = rec.; §T1198 `x`)
 
 **Construído (2026-10-02):** §T1202…§T1206 `x`. 1º run **90 FAIL** = os previstos + 1 ⊥ previsto (§V371b exigia o ramo Fill sem o corte de `typed`) — tudo em §I193j. **ALL CHECKS PASSED** (`-Build` incluso). Bateria §V222 **14/14**: `a29f8eb8…\scratchpad\b50.ps1`/`b50.log`. **INSTALADO 01:30:15** (3471967 B = `output/`). **Pendente:** §T1207 & §T1201 — tela [USER] (FECHAR & REABRIR a ficha). Próximos ids: **§I194 §V540 §T1208 §B194 §Q112**. **Nada commitado** (47º…50º no working tree). O texto abaixo é o do momento da spec (antes do build).
 

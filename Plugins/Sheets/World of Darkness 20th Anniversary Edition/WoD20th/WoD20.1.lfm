@@ -47,7 +47,8 @@
 			                       TALENTS 345..675 | SKILLS 680..1010 | KNOWLEDGES 1015..1345   y 110..536
 			  avatar     0..340                                   y 411..785
 			                       VIRTUES 345..675                    y 541..667
-			                       ROAD + BEARING + WILLPOWER 680..1010 y 541..725
+			                       ROAD + BEARING 680..1010            y 541..663
+			                       WILLPOWER 680..1010                 y 668..785 (52nd batch)
 			                       HEALTH  1015..1345                  y 541..866 at ten rows
 
 			That is the sheet AS AUTHORED, and since the 47th batch it is the MORTAL sheet (SPEC
@@ -59,6 +60,7 @@
 			  ATTRIBUTES 0..1300 (Physical | Social | Mental)          y 110..236
 			  TALENTS 0..430 | SKILLS 435..865 | KNOWLEDGES 870..1300  y 241..592
 			  VIRTUES 0..340 | ROAD 345..675 | BLOOD POOL 680..1010 | HEALTH 1015..1300   y 597..
+			                   ROAD y 597..719, WILLPOWER (boxWillpower) y 724..841 under it
 
 			The 48th batch (SPEC I191, user 2026-10-01) put the rotated group names back, each one
 			before its third of the band, and took the 25px the headings used off the band; and the
@@ -822,8 +824,14 @@
 		     for a vampire renderGameMode moves this box to 345..675 instead (VAMP_GEOM, SPEC V534c):
 		     the box keeps its size and its children, only left/top move. Since the 50th batch it is
 		     not stacked under VIRTUES any more - VIRTUES went under TALENTS - and closes up on the
-		     abilities (SPEC I193e). -->
-		<layout name="boxRoad" left="680" top="541" width="330" height="184">
+		     abilities (SPEC I193e).
+
+		     Since the 52nd batch (user 2026-10-02, SPEC I195, V541) ROAD holds the road alone and
+		     WILLPOWER is boxWillpower under it, in BOTH games: the two together are as tall as the
+		     Main's BLOOD POOL box (122 + 5 + 117 = 244), so a mortal's close on HEALTH's seven-level
+		     line with the avatar and a vampire's with the pool. Each box CENTRES what sits under its
+		     top line - here the dots and the bearing line, 19 above and 19 below. -->
+		<layout name="boxRoad" left="680" top="541" width="330" height="122">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<!--
@@ -870,7 +878,7 @@
 			     Authored state IS the flag off - visible AND enabled - because invisible-and-enabled
 			     still takes Tab focus, which no screenshot shows (SPEC V274c, V274d). -->
 			<edit name="edtRoad" left="140" top="15" width="160" height="24" field="road" visible="false" enabled="false"/>
-			<layout left="40" top="44" width="250" height="25" >
+			<layout left="40" top="58" width="250" height="25" >
 				<Advantages field="humanity"/>
 			</layout>
 			<!-- ONE label and not two (user 2026-08-29): the bearing and its modifier read as a
@@ -882,17 +890,19 @@
 			     0.80 is neither of the two dimming numbers of I43/V244 and is not trying to be:
 			     those two say "read-only", this one is the emphasis the user asked for on a line
 			     that was never editable. Authored, so no runtime write reaches V244. -->
-			<label name="dynBearingName" left="20" top="69" width="290" height="20" horzTextAlign="center" opacity="0.80"/>
+			<label name="dynBearingName" left="20" top="83" width="290" height="20" horzTextAlign="center" opacity="0.80"/>
+		</layout>
 
-			<!-- 99 and not 94: the bearing line closes on 89, so the gap is 10 (SPEC I128a, T864,
-			     user 2026-08-31 ask 4). It was 20 until I124d took it to 5 on a "shrink it a lot,
-			     but still a small space" - and 5 is the hairline a box title gets, which read as
-			     no space at all under a line of text. Half way back is what the ask asked for.
-			     The box does not grow for it. The foot under the willpower row is the 15 every
-			     box on the sheet takes since T913, and T914 is what brought this one to it
-			     (SPEC I138, V393, user 2026-09-02). -->
-			<label left="20" top="99" width="290" height="20" text="WILLPOWER" horzTextAlign="center"/>
-			<layout left="40" top="124" width="250" height="45" >
+		<!-- WILLPOWER, a box of its own under ROAD in every game since the 52nd batch (user 2026-10-02,
+		     SPEC I195, V540, V541): the 51st had split it for a vampire only, with a second copy of the
+		     row hidden inside ROAD for a mortal; once the mortal split too there was nothing left for
+		     the copy to do, and this is again the ONE willpower row of the tab (SPEC V1). For a
+		     vampire VAMP_GEOM moves it with ROAD. The dots and the checkboxes sit CENTRED under the
+		     title, 18 above and 19 below, the odd pixel under (SPEC V399). -->
+		<layout name="boxWillpower" left="680" top="668" width="330" height="117">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="290" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<layout left="40" top="53" width="250" height="45" >
 				<Willpower field="willpower"/>
 			</layout>
 		</layout>

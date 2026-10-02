@@ -2448,6 +2448,10 @@
 			-- are 351 and the bottom row rises 25 to 597. The avatar went up beside EXPERIENCE at twice
 			-- its height (2 x 244); VIRTUES took its slot under TALENTS, ten wider, so its three rows
 			-- are re-centred here; ROAD is no longer a stack and closes up on the abilities.
+			--
+			-- 52nd batch (SPEC I195, user 2026-10-02): ROAD and WILLPOWER are two boxes in every game,
+			-- together as tall as the Main's BLOOD POOL box - so the XML owns their heights and this
+			-- table only MOVES them (no height), WILLPOWER 5 under ROAD, closing with the pool.
 			VAMP_GEOM = {
 				boxExperience        = { 1015, 0, 285, 105 },
 				bgCurrentXPMain      = { 97, 53, 90, 25 },
@@ -2475,7 +2479,8 @@
 				virtueRow_conscience = { 45, 36, 250, 25 },
 				virtueRow_selfControl = { 45, 61, 250, 25 },
 				virtueRow_courage    = { 45, 86, 250, 25 },
-				boxRoad              = { 345, 597, 330, 184 },
+				boxRoad              = { 345, 597, 330 },
+				boxWillpower         = { 345, 724, 330 },
 				mainBloodPool        = { 680, 597, 330, 244 },
 				dynHealth_box        = { 1015, 597, 285 },
 				dynHealth_row1       = { 20, 47, 246, 20 },

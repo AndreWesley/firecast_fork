@@ -2979,24 +2979,33 @@
 			-- neither be born mute nor sit in this list unnoticed.
 			-- `cmbGeneration`, the vampire's own on the Main header (SPEC I188b, Q107.6), is the same
 			-- case: `4th`..`15th` shown, "4".."15" stored, VAMP_GEN keyed by the number.
-			local CMB_DISPLAY_MAP = { cmbDominatorGen = true, cmbGeneration = true };
+			--
+			-- Since the 52nd batch (user 2026-10-02, SPEC I195e, Q113.2) both ARE translated: the
+			-- entry is the pt ordinal suffix and the item is built off the stored number - `13ª` in
+			-- pt, `13th` in en, which is what the XML authors for every one of 4..15. The empty first
+			-- row of the domitor's stays empty. The value is still only read (SPEC V2, V257b).
+			local CMB_DISPLAY_MAP = { cmbDominatorGen = "ª", cmbGeneration = "ª" };
 
 			local function cmbItems(c, lang)
 				local nm = c:getName();
 
 				if nm == nil or string.sub(nm, 1, 3) ~= "cmb" then return; end;
-				if CMB_DISPLAY_MAP[nm] then return; end;
 
 				local vals = c.values;
 
 				if vals == nil then return; end;
 
-				local shown = {};
+				local suffix = CMB_DISPLAY_MAP[nm];
+				local shown  = {};
 
 				for i = 1, #vals, 1 do
 					local v = vals[i];
 
-					shown[i] = (lang == "pt") and (PT[v] or v) or v;
+					if suffix ~= nil then
+						shown[i] = (v == "") and "" or (v .. ((lang == "pt") and suffix or "th"));
+					else
+						shown[i] = (lang == "pt") and (PT[v] or v) or v;
+					end;
 				end;
 
 				-- Same two rules pickerItems carries, for the same reason and the same three
