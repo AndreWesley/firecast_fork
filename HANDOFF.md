@@ -1,6 +1,12 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-10-03 — 69º lote CONSTRUÍDO & INSTALADO: §B197, §I212 (a…h), §R185, §V550 NOVA no gate, §V549 §V513 §V501 EMENDADAS, §T1287 §T1288 `x`, §T1289 (tela [USER]) `.`)
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-10-03 — 70º lote CONSTRUÍDO & INSTALADO: versão 0.3.0; §I213, §T1290 `x`, §T1291 (tela [USER]) `.`)
+
+**Construído (2026-10-03):** 5 sítios em `0.3.0`, **ALL CHECKS PASSED** (`-Build` incluso), sondas 2/2, **INSTALADO 12:40:22** (3493036 B = `output/`). **Pendente:** telas §T1291 (versão) & §T1289 (tooltips, 69º) & as antigas. Pendente de commit: 65º…70º. Próximos ids: **§I214 §V551 §T1292 §B198 §Q127 §R186**. O texto abaixo é o do momento da spec.
+
+**Pedido do user:** *"mude a version para 0.3.0"*. **5** sítios (§I213a): `WoD20.6.lfm` rótulo ~5614 & mapa `PT` ~591; `localization.lang` [pt] ~175 & [en] ~2480; `module.xml` `<version>`. Gate ⊥ muda (§V363/§V450e comparam os sítios). **Armadilhas:** `Edit`, NUNCA `sed` (CRLF, §B74 — 3 reincidências); conferir CR por `[IO.File]::ReadAllText` c/ caminho ABSOLUTO; ⊥ `rdk -p`. **COMANDO:** `/ck:build §T1290` → `rdk -i` (1×) → §T1291 (tela [USER]). Pendentes de tela de antes: §T1289 (tooltips, 69º) & as antigas. Próximos ids: **§I214 §V551 §T1292 §B198 §Q127 §R186**. Pendente de commit: 65º…70º.
+
+## ANTERIOR (2026-10-03 — 69º lote CONSTRUÍDO & INSTALADO: §B197, §I212 (a…h), §R185, §V550 NOVA no gate, §V549 §V513 §V501 EMENDADAS, §T1287 §T1288 `x`, §T1289 (tela [USER]) `.`)
 
 **Construído (2026-10-03):** **ALL CHECKS PASSED** (`-Build` incluso) depois de reconverter `WoD20.1`/`.2` p/ CRLF (o `sed -i` comeu os CR & o `grep -c $'\r$'` do Git Bash MENTIU — conferir CR com `[IO.File]::ReadAllText` no PowerShell); lógica provada no Lua do Firecast (`scratchpad\luatest69.ps1`); bateria §V222 **11/11** (2 checks apertados, ver §I212g). **INSTALADO 12:27:51** (3493035 B = `output/`). **Pendente:** tela §T1289 (absorve §T1286 §T1283 §T1280 §T1276) — quebras visíveis c/ o fundo junto, justo à linha mais larga, palavra só partida c/ `-` se maior que a linha, ≤ 480×270; se a quebra sair TORTA → a medida do host ⊥ é síncrona (§I212f(i)) → print. Pendente de commit: 65º…69º. Próximos ids: **§I213 §V551 §T1290 §B198 §Q127 §R186**. O texto abaixo é o do momento da spec.
 

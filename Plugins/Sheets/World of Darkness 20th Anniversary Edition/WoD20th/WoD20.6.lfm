@@ -588,7 +588,7 @@
 				["Tyrant"] = "Tirano",
 				["Update"] = "Atualizar",
 				["Version"] = "Versão Atual",
-				["Version: 0.2.0"] = "Versão: 0.2.0",
+				["Version: 0.3.0"] = "Versão: 0.3.0",
 				["Victorian Age"] = "Era Vitoriana",
 				-- Latin, and the book leaves it Latin inside English prose - so the entry is the SAME
 				-- string on both sides (SPEC I17). The key still has to exist: V10 collects every picker
@@ -5611,7 +5611,7 @@
 		<layout name="boxVersion" left="0" top="275" width="420" height="68">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<label left="20" top="24" width="380" height="20" text="Version: 0.2.0" horzTextAlign="center"/>
+			<label left="20" top="24" width="380" height="20" text="Version: 0.3.0" horzTextAlign="center"/>
 		</layout>
 	</scrollBox>
 </form>
