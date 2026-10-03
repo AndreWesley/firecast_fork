@@ -156,23 +156,30 @@
 		     it - the generation's ceiling, the same number that locks the Disciplines and, for a
 		     vampire, the attributes and abilities too; both come off vampGen() through renderVampCaps
 		     (SPEC V529b, V536a). The titles that cannot hold one line at these widths wrap to two:
-		     wordWrap, and "leading" so a one-line title still sits on the same y as its neighbours'
-		     (SPEC V16). -->
+		     wordWrap, centred in a rect tall enough for two lines (SPEC V16).
+
+		     In both boxes title and number are ONE object centred in the box (user 2026-10-02, SPEC
+		     I204b, V547), and since the 63rd batch (user 2026-10-03, SPEC I206) the number sits 70%
+		     closer to its title AS SEEN: the rects overlap by 8 (gap -8), the letters do not - a 22
+		     number in its 30 rect leaves ~9 blank above the digits and a title leaves ~4-5 under its
+		     last line, so ~6 shows between them where ~19 did. Font-model numbers, not measured -
+		     the screen decides (SPEC Q123.3). -->
 		<layout left="312" top="10" width="200" height="85">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="160" height="20" text="BLOOD PER TURN" horzTextAlign="center"/>
-			<label name="dynBloodTurn" left="20" top="40" width="160" height="30" fontSize="22" horzTextAlign="center" vertTextAlign="center"/>
+			<label left="20" top="21" width="160" height="20" text="BLOOD PER TURN" horzTextAlign="center"/>
+			<label name="dynBloodTurn" left="20" top="33" width="160" height="30" fontSize="22" horzTextAlign="center" vertTextAlign="center"/>
 		</layout>
 
 		<layout left="312" top="100" width="200" height="86">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="8" width="160" height="34" text="MAX TRAIT LEVEL" wordWrap="true" horzTextAlign="center" vertTextAlign="center"/>
+			<label name="lblMaxTraitV" left="20" top="15" width="160" height="34" text="MAX TRAIT LEVEL" wordWrap="true" horzTextAlign="center" vertTextAlign="center"/>
 			<!-- Both numbers are 22 since the 53rd batch (SPEC I196d, Q114.3): a 30 rect holds the ~29
-			     line. Title and number are ONE object centred in the box since the 61st batch (user
-			     2026-10-02, SPEC I204b, V547): the title is one line in en and two in pt, so its rect is
-			     34 with the text centred in it, 5 above the number - 34 + 5 + 30 = 69 in 86, 8 above and
-			     9 below. BLOOD PER TURN above already is (20 + 5 + 30 in 85). -->
-			<label name="dynMaxTraitV" left="20" top="47" width="160" height="30" fontSize="22" horzTextAlign="center" vertTextAlign="center"/>
+			     line. The title is two lines in pt, so this is pt's object: a 34 rect with the text
+			     centred in it, 34 - 8 + 30 = 56 in 86, 15 above and under (SPEC I206c). In en it is one
+			     line, and renderVampCaps on the root gives it BLOOD PER TURN's 20 rect and re-centres
+			     both off MAXT_GEOM (user 2026-10-03, SPEC I207) - named for that, not dyn* so
+			     applyLanguage still translates it. -->
+			<label name="dynMaxTraitV" left="20" top="41" width="160" height="30" fontSize="22" horzTextAlign="center" vertTextAlign="center"/>
 		</layout>
 
 		<!-- WILLPOWER on the Vampire tab (user 2026-10-02, SPEC I200c, V545b), the Combat tab's box:

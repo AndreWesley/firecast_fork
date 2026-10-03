@@ -2678,6 +2678,12 @@
 			-- main path, whose read-only dots renderMainPaths lights from the Discipline.
 			VAMP_CAP_ROWS = { { "vdot", "clanDisc_", 4 }, { "vdot", "disc_", 15 }, { "ro_V", "mainPath_", 4 }, { "vdot", "secPath_", 15 } };
 
+			-- MAX TRAIT LEVEL on the Vampire tab, per language (user 2026-10-03, SPEC I207, V547b): the
+			-- title is two lines in pt and one in en, so the centred object (title, gap -8, the 30 number)
+			-- differs - { title top, title height, number top } in its 86 box. pt is the XML's; en is
+			-- BLOOD PER TURN's shape, a 20 title. renderVampCaps runs on a language change too (WoD20.6).
+			MAXT_GEOM = { en = { 22, 20, 34 }, pt = { 15, 34, 41 } };
+
 			function renderVampCaps(from)
 				if sheet == nil or from == nil then return; end;
 
@@ -2723,6 +2729,7 @@
 
 				names["dynBloodTurnMain"] = true;
 				names["dynMaxTraitV"]     = true;
+				names["lblMaxTraitV"]     = true;
 
 				local found = xpFind(tabRootOf(from), names, {});
 
@@ -2793,6 +2800,18 @@
 				end;
 
 				if maxT ~= nil then maxT.text = tostring(g.disc); end;
+
+				-- MAX TRAIT LEVEL's title and number to the language's centred object (SPEC I207, V547b);
+				-- only what differs is written, as placeBox does.
+				local mg     = MAXT_GEOM[lang];
+				local maxTtl = found["lblMaxTraitV"];
+
+				if maxTtl ~= nil then
+					if maxTtl.top ~= mg[1] then maxTtl.top = mg[1]; end;
+					if maxTtl.height ~= mg[2] then maxTtl.height = mg[2]; end;
+				end;
+
+				if maxT ~= nil and maxT.top ~= mg[3] then maxT.top = mg[3]; end;
 			end;
 			-- Aqui, e nao la em cima ao lado de GEN_MAX e maxDiscLevel onde ele LERIA melhor, por um
 			-- motivo so (SPEC B51, V223): ele chama `tabRootOf`, `local function` declarada ACIMA

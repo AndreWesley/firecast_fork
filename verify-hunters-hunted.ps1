@@ -9651,9 +9651,11 @@ else { Pass "V400 all $v400Seen box backdrops cover their box exactly - none cli
 # Main's WILLPOWER, SPEC Q121.6). QUINTESSENCE and TRUE FAITH were the tabHedge band's two
 # STRETCHED boxes (SPEC I63, V267b), centring their row under the title; they centre title and
 # row together now, and the stretched arm went with them.
+# The Vampire tab's stack is -8 since the 63rd batch (user 2026-10-03, SPEC I206a, V547 as amended):
+# "70% closer" is the distance the eye sees between the letters, so the two rects overlap by 8.
 $OBJ_V547 = @(
-    [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'BLOOD PER TURN';     G = 5 }
-    [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'MAX TRAIT LEVEL';    G = 5 }
+    [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'BLOOD PER TURN';     G = -8 }
+    [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'MAX TRAIT LEVEL';    G = -8 }
     [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'WILLPOWER';          G = 8 }
     [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'CURRENT EXPERIENCE'; G = 5 }
     [pscustomobject]@{ F = 'WoD20.1.lfm';  T = 'WILLPOWER';          G = 8 }
@@ -17901,18 +17903,13 @@ else {
         $bw536 = [int]$bx536.GetAttribute('width')
         $kids536 = @($bx536.SelectNodes('label') | Sort-Object { [int]$_.GetAttribute('top') })
         if ($kids536.Count -ne 2) { $v536Bad += "(a) the box at top $($bx536.GetAttribute('top')) holds $($kids536.Count) label(s), not a title and its number (SPEC V536a as amended)" }
-        $prev536 = 0
         foreach ($k in $kids536) {
-            $l = [int]$k.GetAttribute('left'); $t = [int]$k.GetAttribute('top'); $w = [int]$k.GetAttribute('width'); $h = [int]$k.GetAttribute('height')
-            # The lower title is 34 tall to hold two lines, and its number sits where the upper one
-            # sits (50th batch, SPEC I193g): the number may cover the EMPTY tail of that rect, never
-            # its first line.
-            $floor536 = $prev536
-            if ($bx536 -eq $lo536 -and $k -ne $kids536[0]) { $floor536 = [int]$kids536[0].GetAttribute('top') + 16 }
-            if ($t -lt $floor536) { $v536Bad += "(a) '$($k.GetAttribute('text'))$($k.GetAttribute('name'))' at top $t overlaps the label above it (SPEC V536a)" }
+            $l = [int]$k.GetAttribute('left'); $w = [int]$k.GetAttribute('width')
             # X only since the 61st batch: the Y of title and number is V547's centred object (SPEC I204b).
+            # The "no overlap" leg left in the 63rd (SPEC I206e, V536a as amended): the number's rect
+            # enters the title's by 8 on purpose - the letters do not touch, the rects do - and V547
+            # fixes both tops to the pixel.
             if ($l -lt 15 -or ($l + $w) -gt ($bw536 - 15)) { $v536Bad += "(a) '$($k.GetAttribute('text'))$($k.GetAttribute('name'))' leaves the box's 15px margin (SPEC V536a)" }
-            $prev536 = $t + $h
         }
     }
     # The two numbers are ONE look (SPEC V536a as amended, I193g, user 2026-10-02 item 7): same rect,
@@ -18318,11 +18315,13 @@ else { Pass "V542 the Vampire tab's Current stands in one box as tall as the poo
 # SPEC V547, user 2026-10-02: "pegar o titulo e o conteudo dele e considerar um bloco unico e esse bloco
 # ficar centralizado". For every box of $OBJ_V547 (the roster V240/V280 skip): the title T is 20 tall, or
 # 34 with vertTextAlign="center" when it wraps in one of the two languages; the gap G is the roster's (5 over
-# a number or a field, 8 over dots); the body B runs from its first child's top to its last child's bottom.
+# a number or a field, 8 over dots, -8 in the Vampire tab's stack since the 63rd batch); the body B runs
+# from its first child's top to its last child's bottom.
 # T.top = floor((H - (T.h + G + B.h)) / 2) - the odd pixel under - and B.top = T.top + T.h + G. H, T and B
 # READ off the XML, and for a box VAMP_GEOM gives a height (a vampire's EXPERIENCE) off VAMP_GEOM too.
 #
-# Mutation (SPEC V222): dynMaxTraitV top 41 -> RED - the Combat tab's WILLPOWER title at 16 -> RED -
+# Mutation (SPEC V222): dynMaxTraitV back at 47 (the old gap of 5) -> RED - dynBloodTurn back at 40 -> RED
+# (63rd batch; "dynMaxTraitV top 41" was the 61st's and is the right value now) - the Combat tab's WILLPOWER title at 16 -> RED -
 # lblXPMain at 27 in VAMP_GEOM -> RED - MAX TRAIT LEVEL with vertTextAlign="leading" -> RED - QUINTESSENCE's
 # title at 15 -> RED - DOMITOR's second line at 82 -> RED. Probe: a fontSize on dynBloodTurn -> GREEN.
 $v547Bad = @()
@@ -18359,6 +18358,36 @@ foreach ($f547 in $files) {
             if ($tt547.T -ne $wantT547 -or $bTop547 -ne $wantB547) { $v547Bad += "$at547 title at $($tt547.T) and body at $bTop547 - $($tt547.H) + $($row547.G) + $bh547 centred in $H547 is title $wantT547, body $wantB547 (SPEC V547a, I204)" }
         }
     }
+}
+# (b) 64th batch (user 2026-10-03, SPEC I207, V547b): MAX TRAIT LEVEL per language. The title is one line
+# in en and two in pt, so the root's MAXT_GEOM holds { title top, title height, number top } for each and
+# renderVampCaps writes them on a language change. Each entry is the centred object of (a); the title
+# height is the language's line count by the V16 ruler (20 for one line, 34 for two); pt is the XML's.
+# Mutation: MAXT_GEOM.en title at 15 -> RED (b) - MAXT_GEOM.pt number at 47 -> RED (b) - renderVampCaps
+# without the title write -> RED (b). Probe: a fontSize on dynMaxTraitV -> (b) stays GREEN.
+$mg547b = [regex]::Match($rootTxt, '(?m)^\s*MAXT_GEOM = \{ en = \{ (\d+), (\d+), (\d+) \}, pt = \{ (\d+), (\d+), (\d+) \} \};')
+$d15547b = Doc (Join-Path $dir 'WoD20.15.lfm')
+$ttl547b = $d15547b.SelectSingleNode("//label[@name='lblMaxTraitV']")
+$num547b = $d15547b.SelectSingleNode("//label[@name='dynMaxTraitV']")
+if (-not $mg547b.Success -or $null -eq $ttl547b -or $null -eq $num547b -or -not $ptVal.ContainsKey('MAX TRAIT LEVEL')) { $v547Bad += "(b) MAXT_GEOM, lblMaxTraitV, dynMaxTraitV or the pt of MAX TRAIT LEVEL was not found (SPEC V547b, V20)" }
+else {
+    $boxH547b = [int]$ttl547b.ParentNode.GetAttribute('height')
+    $numH547b = [int]$num547b.GetAttribute('height')
+    $ttlW547b = [int]$ttl547b.GetAttribute('width')
+    $gap547b = @($OBJ_V547 | Where-Object { $_.F -eq 'WoD20.15.lfm' -and $_.T -eq 'MAX TRAIT LEVEL' })[0].G
+    foreach ($lang547b in @(@('en', 1, 'MAX TRAIT LEVEL'), @('pt', 4, $ptVal['MAX TRAIT LEVEL']))) {
+        $ttlTop547b = [int]$mg547b.Groups[$lang547b[1]].Value
+        $ttlHgt547b = [int]$mg547b.Groups[$lang547b[1] + 1].Value
+        $numTop547b = [int]$mg547b.Groups[$lang547b[1] + 2].Value
+        $wantHgt547b = if (($lang547b[2].Length * $PX_PER_CHAR) -gt $ttlW547b) { 34 } else { 20 }
+        if ($ttlHgt547b -ne $wantHgt547b) { $v547Bad += "(b) MAXT_GEOM.$($lang547b[0]) gives the title $ttlHgt547b - '$($lang547b[2])' is $(if ($wantHgt547b -eq 34) { 'two lines' } else { 'one line' }) in $ttlW547b at the V16 ruler, so $wantHgt547b (SPEC V547b, I207c)" }
+        $wantTtl547b = [math]::Floor(($boxH547b - ($ttlHgt547b + $gap547b + $numH547b)) / 2)
+        $wantNum547b = $wantTtl547b + $ttlHgt547b + $gap547b
+        if ($ttlTop547b -ne $wantTtl547b -or $numTop547b -ne $wantNum547b) { $v547Bad += "(b) MAXT_GEOM.$($lang547b[0]) puts the title at $ttlTop547b and the number at $numTop547b - $ttlHgt547b + $gap547b + $numH547b centred in $boxH547b is $wantTtl547b / $wantNum547b (SPEC V547b, I207c)" }
+    }
+    if ([int]$mg547b.Groups[4].Value -ne [int]$ttl547b.GetAttribute('top') -or [int]$mg547b.Groups[5].Value -ne [int]$ttl547b.GetAttribute('height') -or [int]$mg547b.Groups[6].Value -ne [int]$num547b.GetAttribute('top')) { $v547Bad += "(b) MAXT_GEOM.pt is not the XML's lblMaxTraitV top/height and dynMaxTraitV top - the pt geometry has one owner, the XML (SPEC V547b)" }
+    $vc547b = NoComments (LuaFn $rootTxt 'renderVampCaps')
+    if ($vc547b -notmatch 'names\["lblMaxTraitV"\]\s*=\s*true' -or $vc547b -notmatch 'MAXT_GEOM\[lang\]' -or $vc547b -notmatch 'maxTtl\.top = mg\[1\]' -or $vc547b -notmatch 'maxTtl\.height = mg\[2\]' -or $vc547b -notmatch 'maxT\.top = mg\[3\]') { $v547Bad += "(b) renderVampCaps does not find lblMaxTraitV and write its top and height and dynMaxTraitV's top off MAXT_GEOM[lang] - en would keep pt's geometry (SPEC V547b, I207c)" }
 }
 if ($seen547 -ne $OBJ_V547.Count) { Fail "V547 $seen547 box(es) answered to the roster, expected its $($OBJ_V547.Count) - a title renamed drops its box out of the rule without a sound (SPEC V547, V209, B7)" }
 elseif ($v547Bad) { foreach ($b in ($v547Bad | Select-Object -Unique)) { Fail "V547 $b" } }
