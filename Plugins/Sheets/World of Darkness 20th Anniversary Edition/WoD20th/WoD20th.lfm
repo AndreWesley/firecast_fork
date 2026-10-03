@@ -5917,16 +5917,16 @@
 			-- helper is (SPEC V347).
 			NOTE = { key = nil, hold = false, tipKey = nil, tipText = nil };
 
-			-- The tip's ruler (SPEC I177a, V513), one owner each. TIP_CHAR_W is px per character
-			-- at the fontSize="12" both tip labels author: the WORST measured (`Nome` is about 33
-			-- px in 4 chars, SPEC R172b) rounded up, so real text runs under it and the tip is
-			-- wide enough rather than cut. TIP_TEXT_MAX caps the text column (user, Q98.1),
-			-- TIP_PAD is the label's authored left, TIP_BAR the scrollBox's vertical bar (SPEC
-			-- R170b) - always added, so the text never runs under it, bar shown or not.
-			TIP_CHAR_W   = 8.5;
-			TIP_TEXT_MAX = 400;
-			TIP_PAD      = 8;
-			TIP_BAR      = 16;
+			-- The tip's limits (SPEC I209, I211, V513), one owner each: at most TIP_W_MAX wide and
+			-- TIP_H_MAX tall - wider text wraps by word, taller text is cut with "...", never
+			-- scrolled (user 2026-10-03). TIP_PAD is the margin on all four sides and the label's
+			-- authored left and top.
+			TIP_W_MAX = 480;
+			TIP_H_MAX = 270;
+			TIP_PAD   = 5;
+
+			-- True while tipLayout measures pieces of text in the tip's own label (SPEC I212b).
+			TIP_MEASURING = false;
 
 			-- The ONE name a note is stored under (SPEC V500b): keyed by the chosen VALUE, not by
 			-- the row, so the same background in two rows opens the same note and emptying a row's
@@ -6170,6 +6170,99 @@
 				kbRefocus(form);
 			end;
 
+			-- The text a tip shows, already broken into lines (SPEC I212b, V550, B197). The breaking
+			-- is OURS, the measuring is the HOST's: each piece goes into the tip's own label, which
+			-- never wraps by itself, and its autoSize gives the width the host draws - a ruler of
+			-- our own split words (SPEC B196), and letting the label wrap left it one line tall and
+			-- as wide as the column (SPEC B197). A line takes words while they fit the column; a
+			-- word wider than the whole line is split with "-" at the end of the line and goes on
+			-- below. Past the lines TIP_H_MAX holds - measured as the height of one line and of two
+			-- - the last line kept ends in "...". TIP_MEASURING keeps the label's onResize from
+			-- sizing the tip on every piece measured.
+			function tipLayout(lbl, txt)
+				local col = TIP_W_MAX - TIP_PAD - TIP_PAD;
+				local lines = {};
+
+				TIP_MEASURING = true;
+
+				local function fits(s)
+					lbl.text = s;
+					return lbl.width <= col;
+				end;
+
+				for para in string.gmatch(txt .. "\n", "([^\r\n]*)\r?\n") do
+					local line = "";
+
+					for word in string.gmatch(para, "%S+") do
+						local try = (line == "") and word or (line .. " " .. word);
+
+						if fits(try) then
+							line = try;
+						else
+							if line ~= "" then lines[#lines + 1] = line; end;
+
+							line = word;
+
+							while not fits(line) do
+								local chars = {};
+
+								for ch in string.gmatch(line, "[^\128-\191][\128-\191]*") do chars[#chars + 1] = ch; end;
+
+								local lo, hi = 1, #chars - 1;
+
+								while lo < hi do
+									local mid = math.floor((lo + hi + 1) / 2);
+
+									if fits(table.concat(chars, "", 1, mid) .. "-") then lo = mid; else hi = mid - 1; end;
+								end;
+
+								lines[#lines + 1] = table.concat(chars, "", 1, lo) .. "-";
+								line = table.concat(chars, "", lo + 1);
+							end;
+						end;
+					end;
+
+					lines[#lines + 1] = line;
+				end;
+
+				lbl.text = "Ag";
+				local h1 = lbl.height;
+				lbl.text = "Ag\nAg";
+				local step = lbl.height - h1;
+				local maxLines = math.max(1, math.floor((TIP_H_MAX - TIP_PAD - TIP_PAD - h1) / math.max(1, step)) + 1);
+
+				if #lines > maxLines then
+					local last = lines[maxLines];
+
+					while last ~= "" and not fits(last .. "...") do last = string.match(last, "^(.*)%s") or ""; end;
+
+					lines[maxLines] = last .. "...";
+
+					for k = #lines, maxLines + 1, -1 do lines[k] = nil; end;
+				end;
+
+				TIP_MEASURING = false;
+
+				return table.concat(lines, "\n");
+			end;
+
+			-- Where the tip's background goes (SPEC I210b, I212c, V549): TIP_PAD around the label
+			-- the host laid out, at most TIP_W_MAX x TIP_H_MAX - the text arrives already broken
+			-- and cut by tipLayout, so the label's autoSize is the text's own size. Called by
+			-- noteTipMove after the text goes in and by the label's onResize - the way the host's
+			-- own FireDriveNavigatorItem reads labNome.height - but not while tipLayout measures.
+			-- Names, never walks.
+			function noteTipFit(from, tipName, lblName)
+				local tip = from[tipName];
+				local lbl = from[lblName];
+
+				if tip == nil or lbl == nil then return; end;
+				if TIP_MEASURING then return; end;
+
+				tip.width = math.min(TIP_W_MAX, lbl.left + lbl.width + TIP_PAD);
+				tip.height = math.min(TIP_H_MAX, lbl.top + lbl.height + TIP_PAD);
+			end;
+
 			-- The tooltip (SPEC I170h, I176, V501, V510). Runs per pixel while the pointer is over
 			-- any control of a row that has a ! - the label, the ?, the picker, the ! and the dots.
 			-- The tip and the control come by NAME off `from`, the handler's self, which is the ROOT
@@ -6177,8 +6270,7 @@
 			-- own tip, picked by `cat`, because names are one namespace for the whole sheet.
 			-- event.x/y are local to the control (SPEC R170m): the tip goes 16px to the RIGHT of the
 			-- pointer and 8px above its line, following both axes (SPEC Q90.9), so the line the
-			-- pointer is on runs INTO the tip and leaving the row to the right reaches it - where
-			-- the wheel scrolls it.
+			-- pointer is on runs INTO the tip and leaving the row to the right reaches it.
 			--
 			-- The text is read once per ROW entered (SPEC I176c): a speciality row walks the whole
 			-- pool, so NOTE.tipKey keeps the row and NOTE.tipText what it had, empty included.
@@ -6222,36 +6314,14 @@
 					local txt = NOTE.tipText;
 
 					if txt ~= "" then
-						-- Sized by the LONGEST paragraph, not by the whole text (SPEC I177a): three
-						-- short lines make a tip as wide as the widest of them. Characters, not
-						-- bytes - UTF-8 continuation bytes are no letters. At most TIP_TEXT_MAX of
-						-- text and 160 tall, the rest scrolls; `longest` starts at 1 so a note of
-						-- blank lines still has a column to wrap in.
-						local lens = {};
-						local longest = 1;
-
-						for para in string.gmatch(txt .. "\n", "([^\n]*)\n") do
-							local _, pc = string.gsub(para, "[\128-\191]", "");
-
-							lens[#lens + 1] = #para - pc;
-							longest = math.max(longest, #para - pc);
-						end;
-
-						local tw = math.min(TIP_TEXT_MAX, math.ceil(longest * TIP_CHAR_W));
-						local lines = 0;
-
-						for k = 1, #lens, 1 do
-							lines = lines + math.max(1, math.ceil(lens[k] * TIP_CHAR_W / tw));
-						end;
-
-						tip.width = TIP_PAD + tw + TIP_PAD + TIP_BAR;
-						tip.height = math.min(160, lines * 16 + 12);
-
+						-- The text goes in already broken and cut by tipLayout, measured by the host (SPEC
+						-- I212d, B196, B197); noteTipFit then sizes the background from the label. It runs
+						-- now and again on every onResize, which covers a label that kept its size.
 						local lbl = from[spec and "dynSpecTip" or "dynNoteTip"];
 
 						if lbl ~= nil then
-							lbl.width = tw;
-							lbl.text = txt;
+							lbl.text = tipLayout(lbl, txt);
+							noteTipFit(from, spec and "specTip" or "noteTip", spec and "dynSpecTip" or "dynNoteTip");
 						end;
 					end;
 				end;

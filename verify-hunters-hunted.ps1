@@ -13647,9 +13647,10 @@ foreach ($f300 in $files) {
     foreach ($n300 in (Doc $f300.FullName).SelectNodes("//*[starts-with(@name,'note')]")) {
         $nn300 = $n300.GetAttribute("name")
         if ($nn300 -eq 'noteHedgePaths') { continue }
-        # 25th batch (SPEC I170h): the ! note's tooltip and its scroller are named for the NOTE
-        # they show, not for a pane - admitted by exact name, so a note<X> caption still reddens.
-        if ($nn300 -ceq 'noteTip' -or $nn300 -ceq 'noteTipScroll') { continue }
+        # 25th batch (SPEC I170h): the ! note's tooltip is named for the NOTE it shows, not for a
+        # pane - admitted by exact name, so a note<X> caption still reddens. Its scroller left in
+        # the 66th batch (SPEC I209a, V300 as amended): noteTipScroll is no longer admitted.
+        if ($nn300 -ceq 'noteTip') { continue }
         $v300Bad += "$($f300.Name) declares '$nn300' - note<X> paired a caption with a PANE, T830 took the last pane, and a caption named for one is named for something that does not exist (SPEC I76c, I117, B98)"
     }
 }
@@ -17957,15 +17958,15 @@ else {
     # AMENDED (57th batch, SPEC V536c as amended, I200d, Q117.3): the text SCROLLS, so there is no
     # cut left to measure and the capacity leaves. What is measured is the user's other sentence -
     # the text never runs under the bar and the bar never covers text: dynRevWeaknessV is the ONLY
-    # child of the scrollBox weakScrollV, word-wrapped and autoSized, opening TIP_PAD + TIP_BAR in
-    # and closing TIP_PAD + TIP_BAR before the scrollBox's edge (both READ off the root, 8 and 16,
-    # the note tooltip's bands - SPEC V513e), and renderRevWeakness centres a text that fits.
-    $pad536 = [regex]::Match($rootTxt, 'TIP_PAD\s*=\s*(\d+);'); $bar536 = [regex]::Match($rootTxt, 'TIP_BAR\s*=\s*(\d+);')
+    # child of the scrollBox weakScrollV, word-wrapped and autoSized, opening 24 in and closing 24
+    # before the scrollBox's edge: a gap of 8 + the bar's 16 (SPEC I200d). Since the 66th batch
+    # (SPEC I209d) these are this box's own literals - they were READ off the note tooltip's
+    # TIP_PAD and TIP_BAR, and the tooltip no longer has either number to lend. renderRevWeakness
+    # centres a text that fits.
     $sv536 = $wv536.ParentNode
-    if (-not $pad536.Success -or -not $bar536.Success) { $v536Bad += "(c) TIP_PAD or TIP_BAR was not read off the root - the bands are unmeasurable (SPEC V20, V209)" }
-    elseif ($sv536.LocalName -ne 'scrollBox' -or $sv536.GetAttribute('name') -ne 'weakScrollV') { $v536Bad += "(c) dynRevWeaknessV does not sit in the scrollBox weakScrollV - the text cannot scroll (SPEC V536c as amended, I200d)" }
+    if ($sv536.LocalName -ne 'scrollBox' -or $sv536.GetAttribute('name') -ne 'weakScrollV') { $v536Bad += "(c) dynRevWeaknessV does not sit in the scrollBox weakScrollV - the text cannot scroll (SPEC V536c as amended, I200d)" }
     else {
-        $gut536 = [int]$pad536.Groups[1].Value + [int]$bar536.Groups[1].Value
+        $gut536 = 8 + 16
         $kids536 = @($sv536.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
         if ($kids536.Count -ne 1) { $v536Bad += "(c) weakScrollV holds $($kids536.Count) children - the label must be its only one (SPEC V536c as amended)" }
         if ($wv536.GetAttribute('wordWrap') -ne 'true' -or $wv536.GetAttribute('autoSize') -ne 'true') { $v536Bad += "(c) dynRevWeaknessV is not wordWrap + autoSize - a long text would not grow into the scroll (SPEC V536c as amended, I200d)" }
@@ -26067,7 +26068,9 @@ else {
     # 33rd batch (user, SPEC I178c).
     if ($null -eq $fill501 -or $fill501.GetAttribute('color') -ne 'black' -or $fill501.GetAttribute('opacity') -ne '0.80' -or $fill501.GetAttribute('strokeColor') -ne '#00000000') { $v501Bad += "(a) noteTip's fill is not color='black' opacity='0.80' with strokeColor='#00000000' - the era's box colour at 80%, no outline (SPEC V501a as amended, I178c)" }
     if (@($tip501.SelectNodes(".//label[@text]")).Count -ne 0) { $v501Bad += "(a) noteTip carries a label with static text - the tip has no title (SPEC V501a)" }
-    if ($null -eq $tip501.SelectSingleNode("scrollBox/label[@name='dynNoteTip' and @wordWrap='true']")) { $v501Bad += "(a) dynNoteTip (wordWrap) is not inside a scrollBox of noteTip - a long note could not scroll (SPEC V501a)" }
+    # 66th batch (SPEC I209a, V501a as amended): the label sits straight in the tip and the tip has NO scrollBox - a long note is cut, never scrolled.
+    if ($null -eq $tip501.SelectSingleNode("label[@name='dynNoteTip' and @wordWrap='false']")) { $v501Bad += "(a) dynNoteTip is not a direct child of noteTip authoring wordWrap='false' - the text arrives already broken by tipLayout (SPEC V501a as amended, I209a, I212a)" }
+    if ($null -ne $tip501.SelectSingleNode(".//scrollBox")) { $v501Bad += "(a) noteTip carries a scrollBox - the tip never scrolls, a long note is cut (SPEC V501a as amended, I209a)" }
     # (b) every picker reports its moves and its exit; the tip holds and hides.
     foreach ($p501 in @(@('OpenAbility', 'dyn$(field)'), @('MeritPicked', 'dynMerit_$(num)'))) {
         $pk501 = $tr25Doc.SelectSingleNode("//template[@name='$($p501[0])']/button[@name='$($p501[1])']")
@@ -26781,12 +26784,12 @@ else {
     # opacity and fontSize joined the two pairs in the 32nd batch (SPEC V510a as amended, I177a).
     $tw510 = Twin510 $spec510.SelectSingleNode('rectangle') $note510.SelectSingleNode('rectangle') 'align,color,opacity,strokeColor,hitTest' 'the fill'
     if ($tw510) { $v510Bad += $tw510 }
-    $tw510 = Twin510 $spec510.SelectSingleNode('scrollBox') $note510.SelectSingleNode('scrollBox') 'align' 'the scroller'
+    # 66th batch (SPEC I209a, V510a as amended): no scroller in either tip, the label is a direct child.
+    foreach ($tip510 in @($spec510, $note510)) { if ($null -ne $tip510.SelectSingleNode('.//scrollBox')) { $v510Bad += "(a) $($tip510.GetAttribute('name')) carries a scrollBox - the tips never scroll, a long text is cut (SPEC V510a as amended, I209a)" } }
+    $tw510 = Twin510 $spec510.SelectSingleNode('label') $note510.SelectSingleNode('label') 'left,top,width,height,fontSize,wordWrap,autoSize,textTrimming' 'the text label'
     if ($tw510) { $v510Bad += $tw510 }
-    $tw510 = Twin510 $spec510.SelectSingleNode('scrollBox/label') $note510.SelectSingleNode('scrollBox/label') 'left,top,width,height,fontSize,wordWrap,autoSize' 'the text label'
-    if ($tw510) { $v510Bad += $tw510 }
-    if ($null -eq $spec510.SelectSingleNode("scrollBox[@name='specTipScroll']/label[@name='dynSpecTip']")) { $v510Bad += "(a) specTip does not carry specTipScroll > dynSpecTip - noteTipMove reads the label by that name (SPEC V510a)" }
-    foreach ($nm510 in @('specTip', 'specTipScroll', 'dynSpecTip')) {
+    if ($null -eq $spec510.SelectSingleNode("label[@name='dynSpecTip']")) { $v510Bad += "(a) specTip does not carry dynSpecTip as a direct child - noteTipMove reads the label by that name (SPEC V510a as amended)" }
+    foreach ($nm510 in @('specTip', 'dynSpecTip')) {
         $c510 = @([regex]::Matches($all25Code, "name=`"$nm510`"")).Count
         if ($c510 -ne 1) { $v510Bad += "(a) name='$nm510' is authored $c510 time(s) across the sheet - every name is one field of the ONE root form, so a second one overwrites the first (SPEC V510a, R176b)" }
     }
@@ -26955,48 +26958,55 @@ else {
 if ($v512Bad) { foreach ($b in $v512Bad) { Fail "V512 $b" } }
 else { Pass "V512 one painter stars the ! of a trait holding a speciality bought or given with no name, reading ability rows off their live dot, and it runs after every buy, the era, the translation and the theme" }
 
-# ---- V513: the tip fits its WHOLE text plus the bar (SPEC I177a, R177e, Q98.1) ----
-# The width comes from the LONGEST paragraph at the worst per-character width MEASURED at the
-# fontSize both labels author, and the scrollBox's bar is ALWAYS added, so the text stops TIP_PAD
-# short of it whether the bar shows or not. The background is the era's box colour at 50%: no
-# radius, so it is no section box and draws no ornament.
+# ---- V513: the tip is sized to its text BY THE HOST, margin TIP_PAD on all four sides, never scrolls - a long text is CUT (SPEC I177a, I208, I209, I211, R177e, Q98.1) ----
+# Since the 68th batch (SPEC I211, B196) the HOST measures: a ruler of our own split words the
+# host drew wider, so it left. noteTipMove only turns the wrap off, puts the text in and calls
+# noteTipFit (SPEC V549), which wraps past TIP_W_MAX, cuts past TIP_H_MAX with "..." and sizes
+# the background from the label - at most 480 x 270, 5 px around (user 2026-10-03, revoking the
+# 320 px / 10 lines of Q125.2). The background is the era's box colour at 80%: no radius, so it
+# is no section box and draws no ornament.
 $v513Bad = @()
 $move513 = NoComments (LuaFn $rootTxt 'noteTipMove')
-$lbl513 = @($tr25Doc.SelectSingleNode("//layout[@name='noteTip']/scrollBox/label[@name='dynNoteTip']"), $main510Doc.SelectSingleNode("//layout[@name='specTip']/scrollBox/label[@name='dynSpecTip']"))
+$lbl513 = @($tr25Doc.SelectSingleNode("//layout[@name='noteTip']/label[@name='dynNoteTip']"), $main510Doc.SelectSingleNode("//layout[@name='specTip']/label[@name='dynSpecTip']"))
 $bg513 = @($tr25Doc.SelectSingleNode("//layout[@name='noteTip']/rectangle"), $main510Doc.SelectSingleNode("//layout[@name='specTip']/rectangle"))
 $val513 = @{}
-foreach ($c513 in @('TIP_CHAR_W', 'TIP_TEXT_MAX', 'TIP_PAD', 'TIP_BAR')) {
+foreach ($c513 in @('TIP_W_MAX', 'TIP_H_MAX', 'TIP_PAD')) {
     $d513 = [regex]::Matches($all25Code, "(?m)^\s*(local\s+)?$c513\s*=\s*([0-9.]+)\s*;")
     if ($d513.Count -ne 1) { $v513Bad += "(b) $c513 is declared $($d513.Count) time(s) across the sheet, expected 1 - one owner per number (SPEC V513b, V347)"; continue }
     if ($d513[0].Groups[1].Value -ne '') { $v513Bad += "(b) $c513 is a local - the tip's ruler is a global of the root, like every root helper (SPEC V513b, V347)" }
     if ($root25Code -notmatch "(?m)^\s*$c513\s*=") { $v513Bad += "(b) $c513 is not declared on the root form - noteTipMove lives there (SPEC V513b)" }
     $val513[$c513] = [double]::Parse($d513[0].Groups[2].Value, [System.Globalization.CultureInfo]::InvariantCulture)
 }
-if (-not $move513 -or $val513.Count -ne 4 -or $null -eq $lbl513[0] -or $null -eq $lbl513[1] -or $null -eq $bg513[0] -or $null -eq $bg513[1]) { $v513Bad += "noteTipMove, one of the four TIP_ constants or one of the two tip labels or backgrounds is not declared - this check reads nothing (SPEC V20, V209)" }
+if (-not $move513 -or $val513.Count -ne 3 -or $null -eq $lbl513[0] -or $null -eq $lbl513[1] -or $null -eq $bg513[0] -or $null -eq $bg513[1]) { $v513Bad += "noteTipMove, one of the three TIP_ constants or one of the two tip labels (direct children of their tips) or backgrounds is not declared - this check reads nothing (SPEC V20, V209)" }
 else {
     # (a) both labels author the size the ruler was measured at
     foreach ($l513 in $lbl513) { if ($l513.GetAttribute('fontSize') -ne '12') { $v513Bad += "(a) $($l513.GetAttribute('name')) authors fontSize '$($l513.GetAttribute('fontSize'))', expected 12 - otherwise the ruler measures a size nobody fixed (SPEC V513a)" } }
-    # (b) the ruler is at least the worst measured, and the bar is the scrollBox's
-    if ($val513['TIP_CHAR_W'] -lt 8.25) { $v513Bad += "(b) TIP_CHAR_W is $($val513['TIP_CHAR_W']), under the 8.25 px per character MEASURED at fontSize 12 - the tip would cut its own text (SPEC V513b, R172b)" }
-    if ($val513['TIP_BAR'] -ne 16) { $v513Bad += "(b) TIP_BAR is $($val513['TIP_BAR']), not the 16 of the scrollBox's vertical bar (SPEC V513b, R170b)" }
-    # (c) sized once per row entered, by the longest paragraph, with the bar always added
+    # (b) the three numbers are the user's; the ruler, the bar and the old caps are gone
+    if ($val513['TIP_PAD'] -ne 5) { $v513Bad += "(b) TIP_PAD is $($val513['TIP_PAD']), not the 5 px margin the user set on all four sides (SPEC V513b, I209)" }
+    if ($val513['TIP_W_MAX'] -ne 480) { $v513Bad += "(b) TIP_W_MAX is $($val513['TIP_W_MAX']), not the 480 px the user set as the tip's widest (SPEC V513b, I211)" }
+    if ($val513['TIP_H_MAX'] -ne 270) { $v513Bad += "(b) TIP_H_MAX is $($val513['TIP_H_MAX']), not the 270 px the user set as the tip's tallest (SPEC V513b, I211)" }
+    foreach ($gone513 in @('TIP_MAX_LINES', 'TIP_TEXT_MAX', 'TIP_BAR', 'TIP_GLYPH_W', 'TIP_GLYPH_MAX', 'tipTextW', 'tipLines', 'tipClamp')) { if ($all25Code -match "\b$gone513\b") { $v513Bad += "(b) $gone513 is still in the sheet - the host measures the tip now, a ruler of our own split words (SPEC V513b, I211, B196)" } }
+    # (c) sized once per row entered: widest paragraph, cut to the lines allowed, column measured again, margin on all sides
     $blk513 = [regex]::Match($move513, '(?s)if NOTE\.tipKey ~= key then(.*?)\r?\n\t{4}end;')
     if (-not $blk513.Success) { $v513Bad += "(c) noteTipMove has no 'if NOTE.tipKey ~= key then' block - the tip would be measured per pixel, or never (SPEC V513c, I176c)" }
     else {
         $b513 = $blk513.Groups[1].Value
-        $para513 = [regex]::Match($b513, '(?s)for para in (.*?)end;')
-        if (-not $para513.Success -or $para513.Groups[1].Value -notmatch 'longest = math\.max\(longest, ') { $v513Bad += "(c) the paragraph loop does not keep the LONGEST paragraph with math.max - the width would follow the whole text again (SPEC V513c)" }
-        if ($b513 -notmatch 'local tw = math\.min\(TIP_TEXT_MAX, math\.ceil\(longest \* TIP_CHAR_W\)\);') { $v513Bad += "(c) the text column is not math.min(TIP_TEXT_MAX, math.ceil(longest * TIP_CHAR_W)) (SPEC V513c, I177a)" }
-        $tw513 = [regex]::Match($b513, '(?m)^(\t+)local tw = ')
-        $w513 = [regex]::Match($b513, '(?m)^(\t+)tip\.width = TIP_PAD \+ tw \+ TIP_PAD \+ TIP_BAR;\s*$')
-        if (-not $w513.Success) { $v513Bad += "(c) tip.width is not TIP_PAD + tw + TIP_PAD + TIP_BAR - the bar is added always, so the text never runs under it (SPEC V513c, V513e)" }
-        elseif (-not $tw513.Success -or $tw513.Groups[1].Value -ne $w513.Groups[1].Value) { $v513Bad += "(c) tip.width is not written at the depth tw is - the bar sits under a condition (SPEC V513c)" }
-        if ($b513 -notmatch 'lbl\.width = tw;') { $v513Bad += "(c) the label is not written tw wide - it would run past the pad into the bar (SPEC V513c, V513e)" }
+        $textAt513 = $b513.IndexOf('lbl.text = tipLayout(lbl, txt);')
+        $fitAt513 = $b513.IndexOf('noteTipFit(from, ')
+        if ($textAt513 -lt 0 -or $fitAt513 -lt 0 -or $textAt513 -gt $fitAt513) { $v513Bad += "(c) the row's block does not put in the text tipLayout broke and then call noteTipFit - the label would get the raw text or the tip the old size (SPEC V513c, I212d)" }
+        if ($b513 -match 'lbl\.wordWrap') { $v513Bad += "(c) noteTipMove writes lbl.wordWrap - the label never wraps by itself, the text arrives broken (SPEC V513c, V550c)" }
+        if ($b513 -match '\btip\.(width|height)\s*=') { $v513Bad += "(c) noteTipMove writes tip.width or tip.height - only noteTipFit sizes the tip, from what the host laid out (SPEC V513c, V549c)" }
     }
     if ($move513 -match '\*\s*6\b') { $v513Bad += "(c) noteTipMove still spells the old ruler '* 6' (SPEC V513c)" }
-    # (d)(e) the label starts at TIP_PAD, so it closes TIP_PAD short of the bar
-    foreach ($l513 in $lbl513) { if ($l513.GetAttribute('left') -ne [string]$val513['TIP_PAD']) { $v513Bad += "(d) $($l513.GetAttribute('name')) authors left '$($l513.GetAttribute('left'))', not TIP_PAD $($val513['TIP_PAD']) (SPEC V513d, V513e)" } }
-    # (f) the era's box colour at 50%, and no box
+    if ($move513 -match '\b160\b') { $v513Bad += "(c) noteTipMove spells 160 - the height cap is TIP_H_MAX's, in noteTipFit (SPEC V513c)" }
+    if ($move513 -match 'TIP_CHAR_W') { $v513Bad += "(c) noteTipMove still reads the flat ruler TIP_CHAR_W (SPEC V513c, V548c)" }
+    # (d) the label opens TIP_PAD from the left AND from the top: the margin is TIP_PAD on all four sides
+    foreach ($l513 in $lbl513) {
+        foreach ($side513 in @('left', 'top')) { if ($l513.GetAttribute($side513) -ne [string]$val513['TIP_PAD']) { $v513Bad += "(d) $($l513.GetAttribute('name')) authors $side513 '$($l513.GetAttribute($side513))', not TIP_PAD $($val513['TIP_PAD']) (SPEC V513d, I209)" } }
+    }
+    # (e) the tip never scrolls: no scrollBox anywhere in either tip
+    foreach ($l513 in $lbl513) { if ($null -ne $l513.ParentNode.SelectSingleNode('.//scrollBox')) { $v513Bad += "(e) $($l513.ParentNode.GetAttribute('name')) carries a scrollBox - the tip never scrolls, a long text is cut (SPEC V513e, I209a)" } }
+    # (f) the era's box colour at 80%, and no box
     foreach ($r513 in $bg513) {
         $who513 = $r513.ParentNode.GetAttribute('name')
         # 0.80 since the 33rd batch (user, SPEC I178c, V513f as amended).
@@ -27005,8 +27015,93 @@ else {
     }
 }
 if ($v513Bad) { foreach ($b in $v513Bad) { Fail "V513 $b" } }
-else { Pass "V513 both tips are sized by their longest paragraph at $($val513['TIP_CHAR_W']) px per char at fontSize 12, capped at $($val513['TIP_TEXT_MAX']), the bar always added, the text TIP_PAD short of it, on the era's box colour at 80%" }
+else { Pass "V513 both tips are sized by the host - at most $($val513['TIP_W_MAX']) wide and $($val513['TIP_H_MAX']) tall, wrapped by word past that width and cut with '...' past that height, a $($val513['TIP_PAD']) px margin on all four sides, no ruler of our own, no scrollBox, on the era's box colour at 80%" }
 
+# ---- V548: RETIRED in the 68th batch (SPEC I211, B196) - the glyph ruler it charged was measured on THIS
+# machine's Segoe UI and the host draws wider, so the ruler split words and left the sheet. V513b
+# charges its absence. The check was DELETED, not commented out (SPEC T1079).
+
+# ---- V549: the HOST sizes the tip, and noteTipFit is the one writer of its size (SPEC I210, I211, B195, B196, R183, R184) ----
+# The 66th batch took the scrollBox out and the 67th hung the background on the label's onResize
+# (B195); the 68th let the host measure the WIDTH too (B196): no wrap, the natural width, wrap by word
+# past the column, cut past the height with "...", and the background TIP_PAD around the label -
+# the host's own pattern (FireDriveNavigatorItem). V513 charges the call; this charges the steps.
+#
+$v549Bad = @()
+$fit549 = NoComments (LuaFn $rootTxt 'noteTipFit')
+$moveFit549 = NoComments (LuaFn $rootTxt 'noteTipMove')
+$pairs549 = @(
+    [pscustomobject]@{ Lbl = $tr25Doc.SelectSingleNode("//layout[@name='noteTip']/label[@name='dynNoteTip']"); Tip = 'noteTip'; Name = 'dynNoteTip' },
+    [pscustomobject]@{ Lbl = $main510Doc.SelectSingleNode("//layout[@name='specTip']/label[@name='dynSpecTip']"); Tip = 'specTip'; Name = 'dynSpecTip' }
+)
+if (-not $fit549 -or -not $moveFit549 -or $null -eq $pairs549[0].Lbl -or $null -eq $pairs549[1].Lbl) { $v549Bad += "noteTipFit, noteTipMove or one of the two tip labels is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) each label hands its height over, naming its own tip and itself, and the host may not trim its text
+    foreach ($pair549 in $pairs549) {
+        $want549 = "noteTipFit(self, '$($pair549.Tip)', '$($pair549.Name)');"
+        if ($pair549.Lbl.GetAttribute('onResize') -cne $want549) { $v549Bad += "(a) $($pair549.Name) onResize is '$($pair549.Lbl.GetAttribute('onResize'))', expected $want549 - the tip would not follow the label the host sized (SPEC V549a, I210a)" }
+        if ($pair549.Lbl.GetAttribute('textTrimming') -cne 'none') { $v549Bad += "(a) $($pair549.Name) does not author textTrimming='none' - the host could swap the end of the text for its own ellipsis (SPEC V549a, R183b)" }
+    }
+    # (b) one global function: two guards, then the background around the label the host laid out
+    if (@([regex]::Matches($all25Code, 'function\s+noteTipFit\s*\(')).Count -ne 1) { $v549Bad += "(b) noteTipFit is defined more than once across the sheet - the newest would win (SPEC V549b)" }
+    $steps549 = @(
+        'if tip == nil or lbl == nil then return; end;',
+        'if TIP_MEASURING then return; end;',
+        'tip.width = math.min(TIP_W_MAX, lbl.left + lbl.width + TIP_PAD);',
+        'tip.height = math.min(TIP_H_MAX, lbl.top + lbl.height + TIP_PAD);'
+    )
+    $lastAt549 = -1
+    foreach ($step549 in $steps549) {
+        $at549 = $fit549.IndexOf($step549)
+        if ($at549 -lt 0) { $v549Bad += "(b) noteTipFit lacks '$step549' - it would size the tip while tipLayout measures, or not from the label (SPEC V549b, I212c)" }
+        elseif ($at549 -lt $lastAt549) { $v549Bad += "(b) noteTipFit has '$step549' out of order - the guards, then the size (SPEC V549b, I212c)" }
+        else { $lastAt549 = $at549 }
+    }
+    foreach ($need549 in @('from[tipName]', 'from[lblName]')) { if (-not $fit549.Contains($need549)) { $v549Bad += "(b) noteTipFit lacks '$need549' - it reads its tip and label by the names it is handed (SPEC V549b)" } }
+    if (@([regex]::Matches($fit549, '\breturn\b')).Count -ne 2) { $v549Bad += "(b) noteTipFit has $(@([regex]::Matches($fit549, '\breturn\b')).Count) return(s), expected the 2 guards - the size is written on every other call (SPEC V549b, I212c)" }
+    foreach ($ban549 in @('xpFind\(', '\.visible', 'NOTE\.', '\b16\b', 'wordWrap', 'lbl\.text', 'lbl\.width\s*=')) { if ($fit549 -match $ban549) { $v549Bad += "(b) noteTipFit matches '$ban549' - it walks the tree, shows or hides the tip, reads the note, spells a line height or touches the label; breaking and cutting are tipLayout's (SPEC V549b, V550, V501d)" } }    # (c) noteTipFit is the ONE writer of the tip's width and height
+    foreach ($dim549 in @('width', 'height')) {
+        $all549 = @([regex]::Matches($all25Code, "\btip\.$dim549\s*=")).Count
+        $own549 = @([regex]::Matches($fit549, "\btip\.$dim549\s*=")).Count
+        if ($all549 -ne 1 -or $own549 -ne 1) { $v549Bad += "(c) tip.$dim549 is written $all549 time(s) in the sheet, $own549 in noteTipFit - expected exactly 1, there (SPEC V549c, I211c)" }
+    }
+}
+if ($v549Bad) { foreach ($b in $v549Bad) { Fail "V549 $b" } }
+else { Pass "V549 both tip labels hand their size over in onResize with textTrimming none, and noteTipFit - the one writer of the tip's size, idle while tipLayout measures - closes the background TIP_PAD around the label the host laid out" }
+
+# ---- V550: the tip's line BREAKING is ours, its MEASURING is the host's (SPEC I212b, B197, R185) ----
+# Letting the label wrap left it one line tall (the host's autoSize recomputes only when the TEXT
+# changes) and as wide as the column (the host does not report the widest wrapped line) - B197.
+# So the label never wraps by itself: tipLayout measures each piece IN the tip's own label (its
+# autoSize gives the width the host draws, B196) and hands it the text already broken, a word wider
+# than the whole line split with "-", cut with "..." past the lines TIP_H_MAX holds.
+$v550Bad = @()
+$lay550 = NoComments (LuaFn $rootTxt 'tipLayout')
+$lbls550 = @($tr25Doc.SelectSingleNode("//layout[@name='noteTip']/label[@name='dynNoteTip']"), $main510Doc.SelectSingleNode("//layout[@name='specTip']/label[@name='dynSpecTip']"))
+if (-not $lay550 -or $null -eq $lbls550[0] -or $null -eq $lbls550[1]) { $v550Bad += "tipLayout or one of the two tip labels is not declared - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) one global; the measuring flag goes up first and back down after every measure; only the label is touched
+    if (@([regex]::Matches($all25Code, 'function\s+tipLayout\s*\(')).Count -ne 1) { $v550Bad += "(a) tipLayout is defined more than once across the sheet - the newest would win (SPEC V550a)" }
+    $up550 = $lay550.IndexOf('TIP_MEASURING = true;')
+    $down550 = $lay550.LastIndexOf('TIP_MEASURING = false;')
+    $lastMeasure550 = [Math]::Max($lay550.LastIndexOf('lbl.text = '), $lay550.LastIndexOf('lbl.height'))
+    $ret550 = $lay550.LastIndexOf('return table.concat(lines, "\n");')
+    if ($up550 -lt 0 -or $down550 -lt 0 -or $ret550 -lt 0 -or $down550 -lt $lastMeasure550 -or $down550 -gt $ret550) { $v550Bad += "(a) tipLayout does not raise TIP_MEASURING before measuring and lower it after the last measure, before it returns - the tip would be sized on every piece, or never again (SPEC V550a)" }
+    if (-not $lay550.Contains('local col = TIP_W_MAX - TIP_PAD - TIP_PAD;') -or -not $lay550.Contains('lbl.width <= col')) { $v550Bad += "(a) tipLayout does not measure against the column TIP_W_MAX less the two pads with lbl.width <= col (SPEC V550a)" }
+    foreach ($ban550 in @('xpFind\(', '\.visible', '\btip\.')) { if ($lay550 -match $ban550) { $v550Bad += "(a) tipLayout matches '$ban550' - it measures in the label only; the tip is noteTipFit's (SPEC V550a)" } }
+    # (b) the breaking: paragraphs, words, "-" on a word wider than the line, the height cap with "..."
+    foreach ($need550 in @('"([^\r\n]*)\r?\n"', '"%S+"', '"[^\128-\191][\128-\191]*"', 'lines[#lines + 1] = table.concat(chars, "", 1, lo) .. "-";', 'lbl.text = "Ag";', 'lbl.text = "Ag\nAg";', 'TIP_H_MAX', '"^(.*)%s"', 'lines[maxLines] = last .. "...";', 'return table.concat(lines, "\n");')) {
+        if (-not $lay550.Contains($need550)) { $v550Bad += "(b) tipLayout lacks '$need550' - it would not break by word as the user asked, split an over-long word with '-', or cut at the height (SPEC V550b, I212b)" }
+    }
+    # (c) the label never wraps by itself; the flag is one global
+    foreach ($l550 in $lbls550) { if ($l550.GetAttribute('wordWrap') -cne 'false') { $v550Bad += "(c) $($l550.GetAttribute('name')) authors wordWrap='$($l550.GetAttribute('wordWrap'))', not 'false' - a label that wraps by itself stays one line tall and column wide (SPEC V550c, B197)" } }
+    if ($all25Code -match '\bwordWrap\s*=\s*(true|false)\s*;') { $v550Bad += "(c) the sheet writes wordWrap in Lua - nobody turns the tip label's wrap on or off (SPEC V550c)" }
+    $flag550 = [regex]::Matches($all25Code, '(?m)^\s*(local\s+)?TIP_MEASURING\s*=\s*false\s*;\s*$')
+    $flagDecl550 = @($flag550 | Where-Object { $_.Value -match '^\t{3}TIP' -or $_.Value -match '^\r?\n?\t{3}TIP' }).Count
+    if (@([regex]::Matches($root25Code, '(?m)^\t{3}TIP_MEASURING = false;')).Count -ne 1) { $v550Bad += "(c) TIP_MEASURING is not declared once, global, false, on the root (SPEC V550c, V347)" }
+}
+if ($v550Bad) { foreach ($b in $v550Bad) { Fail "V550 $b" } }
+else { Pass "V550 tipLayout breaks the tip's text by word, splits only a word wider than the line with '-', cuts with '...' at the lines TIP_H_MAX holds, measuring every piece in the label the host lays out, and the label never wraps by itself" }
 # ---- V514: Esc closes the settings window through the others' door (SPEC I177b, V405, R177c) ----
 # A key only reaches the control holding focus and only a text control takes it, so the window
 # carries one that only listens, opening gives it the focus, and every live control of the

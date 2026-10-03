@@ -364,15 +364,14 @@
 			the control under the pointer (control -> row layout -> box). The era's box colour at 80% -
 			authored black, which applyTheme maps to the fill of every box, plus opacity - with NO
 			outline and NO title, the text alone (SPEC V501a, I177a, I178c); no xradius, so it is no box; contents, not client, for the background, so it does not compete
-			with the scrollBox for the client rect (SPEC V190). The inner scrollBox is what the wheel
-			scrolls once the pointer is inside - there is no wheel event to forward (SPEC R170e) -
-			and entering holds the tip open while leaving hides it (SPEC V501b/d).
+			with the scrollBox for the client rect (SPEC V190). Since the 66th batch (user 2026-10-03,
+			SPEC I209) it has NO scrollBox: the label sits straight in the tip, 5 from each edge, and
+			a long note is broken and cut by tipLayout (at most 480 x 270, "...") instead of scrolling. Entering holds
+			the tip open while leaving hides it (SPEC V501b/d).
 		-->
 		<layout name="noteTip" left="0" top="0" width="300" height="60" visible="false" onMouseEnter="noteTipHold(self);" onMouseLeave="noteTipHide(self);">
 			<rectangle align="contents" color="black" opacity="0.80" strokeColor="#00000000" hitTest="false"/>
-			<scrollBox name="noteTipScroll" align="client">
-				<label name="dynNoteTip" left="8" top="4" width="276" height="20" fontSize="12" wordWrap="true" autoSize="true"/>
-			</scrollBox>
+			<label name="dynNoteTip" left="5" top="5" width="276" height="20" fontSize="12" wordWrap="false" autoSize="true" textTrimming="none" onResize="noteTipFit(self, 'noteTip', 'dynNoteTip');"/>
 		</layout>
 	</scrollBox>
 </form>

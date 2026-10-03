@@ -232,7 +232,7 @@
 		     Since the 57th batch (user 2026-10-02, SPEC I200d, Q117.3, V536c) the box gives 295 to
 		     WILLPOWER and the text SCROLLS, built like the note tooltip (noteTip): a scrollBox with an
 		     autoSized, word-wrapped label in it, in three bands kept apart whether the bar shows or not -
-		     the text 24..396, TIP_PAD (8), the bar's TIP_BAR (16) at 404..420 - so the text never runs
+		     the text 24..396, a gap of 8, the bar's 16 at 404..420 - so the text never runs
 		     under the bar and the bar never covers text. 24 = 8 + 16 keeps the column centred in the
 		     box. renderRevWeakness centres a text that fits and leaves one that scrolls at the top. -->
 		<layout left="812" top="10" width="460" height="176">

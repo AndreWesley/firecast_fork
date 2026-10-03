@@ -1092,9 +1092,7 @@
 		-->
 		<layout name="specTip" left="0" top="0" width="300" height="60" visible="false" onMouseEnter="noteTipHold(self);" onMouseLeave="noteTipHide(self);">
 			<rectangle align="contents" color="black" opacity="0.80" strokeColor="#00000000" hitTest="false"/>
-			<scrollBox name="specTipScroll" align="client">
-				<label name="dynSpecTip" left="8" top="4" width="276" height="20" fontSize="12" wordWrap="true" autoSize="true"/>
-			</scrollBox>
+			<label name="dynSpecTip" left="5" top="5" width="276" height="20" fontSize="12" wordWrap="false" autoSize="true" textTrimming="none" onResize="noteTipFit(self, 'specTip', 'dynSpecTip');"/>
 		</layout>
 	</scrollBox>
 
