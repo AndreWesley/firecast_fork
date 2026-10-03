@@ -47,8 +47,8 @@
 			                       TALENTS 345..675 | SKILLS 680..1010 | KNOWLEDGES 1015..1345   y 110..536
 			  avatar     0..340                                   y 411..785
 			                       VIRTUES 345..675                    y 541..667
-			                       ROAD + BEARING 680..1010            y 541..663
-			                       WILLPOWER 680..1010                 y 668..785 (52nd batch)
+			                       ROAD + BEARING 680..1010            y 541..667
+			                       WILLPOWER 680..1010                 y 672..785 (52nd batch; 56th: ROAD as tall as VIRTUES)
 			                       HEALTH  1015..1345                  y 541..866 at ten rows
 
 			That is the sheet AS AUTHORED, and since the 47th batch it is the MORTAL sheet (SPEC
@@ -56,11 +56,11 @@
 			different Main, and the XML cannot hold two - renderGameMode on the root moves the named
 			boxes to VAMP_GEOM and back to these numbers (SPEC I190c, V534):
 
-			  header  0..1010      EXPERIENCE 1015..1300                y   0..105   avatar 1305..1645  y 0..488
+			  header  0..1010      EXPERIENCE 1015..1300                y   0..105   avatar 1305..1543  y 0..236
 			  ATTRIBUTES 0..1300 (Physical | Social | Mental)          y 110..236
 			  TALENTS 0..430 | SKILLS 435..865 | KNOWLEDGES 870..1300  y 241..592
 			  VIRTUES 0..340 | ROAD 345..675 | BLOOD POOL 680..1010 | HEALTH 1015..1300   y 597..
-			                   ROAD y 597..719, WILLPOWER (boxWillpower) y 724..841 under it
+			                   ROAD y 597..723, WILLPOWER (boxWillpower) y 728..841 under it
 
 			The 48th batch (SPEC I191, user 2026-10-01) put the rotated group names back, each one
 			before its third of the band, and took the 25px the headings used off the band; and the
@@ -212,6 +212,8 @@
 		     blinkSp* sits right AFTER the !, over it, hidden and deaf to the mouse: the red that
 		     specBangPaint and bangBlink flash while the ! is starred - a <button> has no
 		     background colour of its own (SPEC I178b, V518, R178b). -->
+		<!-- The numbers below are the MORTAL's. In a vampire's Main the root tightens each row - label 79,
+		     ? and dots 16 to the left - through VAMP_GEOM (SPEC I202a, V546), so this template does not move. -->
 		<template name="Attribute">
 			<rectangle name="hit$(field)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'hit$(field)');" onMouseLeave="noteTipLeave(self);"/>
 			<label name="lbl$(field)" left="0" top="5" width="95" height="20" text="$(nome)" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'lbl$(field)');" onMouseLeave="noteTipLeave(self);"/>
@@ -226,12 +228,12 @@
 			<imageCheckBox name="dot$(field)_7" left="275" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_8" left="300" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_9" left="325" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
-			<imageCheckBox name="mcap$(field)_4" left="200" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_5" left="225" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_6" left="250" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_7" left="275" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_8" left="300" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_9" left="325" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_4" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_5" left="225" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_6" left="250" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_7" left="275" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_8" left="300" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_9" left="325" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<!-- Attribute, but dot 1 is a real checkbox instead of a fixed image, so the rating can
 		     drop to zero. Only Appearance uses it (SPEC T95). -->
@@ -249,12 +251,12 @@
 			<imageCheckBox name="dot$(field)_7" left="275" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_8" left="300" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_9" left="325" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
-			<imageCheckBox name="mcap$(field)_4" left="200" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_5" left="225" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_6" left="250" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_7" left="275" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_8" left="300" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_9" left="325" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_4" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_5" left="225" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_6" left="250" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_7" left="275" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_8" left="300" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_9" left="325" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<template name="Ability">
 			<rectangle name="hit$(col)$(num)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'hit$(col)$(num)');" onMouseLeave="noteTipLeave(self);"/>
@@ -270,12 +272,12 @@
 			<imageCheckBox name="abil$(col)$(num)_7" left="315" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_7.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="abil$(col)$(num)_8" left="340" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_8.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="abil$(col)$(num)_9" left="365" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_9.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
-			<imageCheckBox name="mcap$(col)$(num)_4" left="240" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(col)$(num)_5" left="265" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(col)$(num)_6" left="290" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(col)$(num)_7" left="315" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(col)$(num)_8" left="340" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(col)$(num)_9" left="365" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_4" left="240" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_5" left="265" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_6" left="290" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_7" left="315" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_8" left="340" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_9" left="365" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<!-- Blank rows at the bottom of each ability column, for abilities the book does not list.
 		     Their ! keys the specialities by the row's FIELD, not the typed name, so renaming the
@@ -295,12 +297,12 @@
 			<imageCheckBox name="dot$(field)_7" left="315" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_8" left="340" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_9" left="365" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
-			<imageCheckBox name="mcap$(field)_4" left="240" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_5" left="265" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_6" left="290" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_7" left="315" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_8" left="340" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcap$(field)_9" left="365" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_4" left="240" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_5" left="265" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_6" left="290" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_7" left="315" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_8" left="340" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_9" left="365" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<!-- No label: HUMANITY / WILLPOWER are titled above the track, so "FORCA DE VONTADE"
 		     cannot be clipped.
@@ -369,26 +371,29 @@
 			<imageCheckBox left="200" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);"/>
 			<imageCheckBox left="225" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_10', self);"/>
 
-			<checkBox left="2" top="20" width="25" height="25" field="$(field)_c1" onClick="wpSpentClick('$(field)_c1');" onChange="wpSpentChange('$(field)_c1');"/>
-			<checkBox left="27" top="20" width="25" height="25" field="$(field)_c2" onClick="wpSpentClick('$(field)_c2');" onChange="wpSpentChange('$(field)_c2');"/>
-			<checkBox left="52" top="20" width="25" height="25" field="$(field)_c3" onClick="wpSpentClick('$(field)_c3');" onChange="wpSpentChange('$(field)_c3');"/>
-			<checkBox left="77" top="20" width="25" height="25" field="$(field)_c4" onClick="wpSpentClick('$(field)_c4');" onChange="wpSpentChange('$(field)_c4');"/>
-			<checkBox left="102" top="20" width="25" height="25" field="$(field)_c5" onClick="wpSpentClick('$(field)_c5');" onChange="wpSpentChange('$(field)_c5');"/>
-			<checkBox left="127" top="20" width="25" height="25" field="$(field)_c6" onClick="wpSpentClick('$(field)_c6');" onChange="wpSpentChange('$(field)_c6');"/>
-			<checkBox left="152" top="20" width="25" height="25" field="$(field)_c7" onClick="wpSpentClick('$(field)_c7');" onChange="wpSpentChange('$(field)_c7');"/>
-			<checkBox left="177" top="20" width="25" height="25" field="$(field)_c8" onClick="wpSpentClick('$(field)_c8');" onChange="wpSpentChange('$(field)_c8');"/>
-			<checkBox left="202" top="20" width="25" height="25" field="$(field)_c9" onClick="wpSpentClick('$(field)_c9');" onChange="wpSpentChange('$(field)_c9');"/>
-			<checkBox left="227" top="20" width="25" height="25" field="$(field)_c10" onClick="wpSpentClick('$(field)_c10');" onChange="wpSpentChange('$(field)_c10');"/>
+			<checkBox left="2" top="27" width="25" height="25" field="$(field)_c1" onClick="wpSpentClick('$(field)_c1');" onChange="wpSpentChange('$(field)_c1');"/>
+			<checkBox left="27" top="27" width="25" height="25" field="$(field)_c2" onClick="wpSpentClick('$(field)_c2');" onChange="wpSpentChange('$(field)_c2');"/>
+			<checkBox left="52" top="27" width="25" height="25" field="$(field)_c3" onClick="wpSpentClick('$(field)_c3');" onChange="wpSpentChange('$(field)_c3');"/>
+			<checkBox left="77" top="27" width="25" height="25" field="$(field)_c4" onClick="wpSpentClick('$(field)_c4');" onChange="wpSpentChange('$(field)_c4');"/>
+			<checkBox left="102" top="27" width="25" height="25" field="$(field)_c5" onClick="wpSpentClick('$(field)_c5');" onChange="wpSpentChange('$(field)_c5');"/>
+			<checkBox left="127" top="27" width="25" height="25" field="$(field)_c6" onClick="wpSpentClick('$(field)_c6');" onChange="wpSpentChange('$(field)_c6');"/>
+			<checkBox left="152" top="27" width="25" height="25" field="$(field)_c7" onClick="wpSpentClick('$(field)_c7');" onChange="wpSpentChange('$(field)_c7');"/>
+			<checkBox left="177" top="27" width="25" height="25" field="$(field)_c8" onClick="wpSpentClick('$(field)_c8');" onChange="wpSpentChange('$(field)_c8');"/>
+			<checkBox left="202" top="27" width="25" height="25" field="$(field)_c9" onClick="wpSpentClick('$(field)_c9');" onChange="wpSpentChange('$(field)_c9');"/>
+			<checkBox left="227" top="27" width="25" height="25" field="$(field)_c10" onClick="wpSpentClick('$(field)_c10');" onChange="wpSpentChange('$(field)_c10');"/>
 		</template>
 
 
-		<layout left="0" top="0" width="1010" height="105">
+		<!-- The header box has a name since the 58th batch (SPEC I201d, user 2026-10-02): a vampire's slides
+		     right to open on ATTRIBUTES' edge (VAMP_GEOM) and its six unnamed cells are named so the table
+		     can spread them. A mortal reads the numbers below. -->
+		<layout name="boxHeader" left="0" top="0" width="1010" height="105">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
-			<layout left="20" top="15" width="297" height="25" >
+			<layout name="hdrName" left="20" top="15" width="297" height="25" >
 				<HeaderNarrow field="name" nome="Name"/>
 			</layout>
-			<layout left="326" top="15" width="327" height="25" >
+			<layout name="hdrNature" left="326" top="15" width="327" height="25" >
 				<HeaderPicker field="nature" nome="Nature"/>
 			</layout>
 			<!-- Column three answers to the GAME (user 2026-10-01, SPEC I188b, V528): each of its
@@ -414,10 +419,10 @@
 				<button name="dynmainClan" left="132" top="0" width="195" height="25" text="Select Clan" onClick="mfOpen(self, 'clanFamily', 'clan', 'Clan');"/>
 			</layout>
 
-			<layout left="20" top="40" width="297" height="25" >
+			<layout name="hdrPlayer" left="20" top="40" width="297" height="25" >
 				<HeaderNarrow field="player" nome="Player"/>
 			</layout>
-			<layout left="326" top="40" width="327" height="25" >
+			<layout name="hdrDemeanor" left="326" top="40" width="327" height="25" >
 				<HeaderPicker field="demeanor" nome="Demeanor"/>
 			</layout>
 			<layout name="hdrOccupation" left="663" top="40" width="327" height="25" >
@@ -430,10 +435,10 @@
 				          values="{'4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}"/>
 			</layout>
 
-			<layout left="20" top="65" width="297" height="25" >
+			<layout name="hdrChronicle" left="20" top="65" width="297" height="25" >
 				<HeaderNarrow field="chronicle" nome="Chronicle"/>
 			</layout>
-			<layout left="326" top="65" width="327" height="25" >
+			<layout name="hdrConcept" left="326" top="65" width="327" height="25" >
 				<Header field="concept" nome="Concept"/>
 			</layout>
 			<layout name="hdrResidence" left="663" top="65" width="327" height="25" >
@@ -465,15 +470,18 @@
 		     widget in the XML is the orphan field of V2 one floor up, and it makes no sound
 		     (SPEC B111, B123).
 
-		     Named since the 48th batch (SPEC I191d, user 2026-10-01): a vampire's EXPERIENCE closes
-		     where KNOWLEDGES closes, 285 wide. The title stretches with the box; the number is moved
-		     by VAMP_GEOM, since a fixed child of a box that changes shape is what B191 was made of. -->
+		     Named since the 48th batch (SPEC I191d, user 2026-10-01): a vampire's EXPERIENCE stood where
+		     KNOWLEDGES closes, 285 wide; since the 58th batch (SPEC I201c) it sits under VIRTUES, 340 x 113.
+		     The title stretches with the box; the number is moved by VAMP_GEOM, since a fixed child of a box that changes shape is what B191 was made of.
+		     Title and number are ONE object centred in the box since the 61st batch (user 2026-10-02,
+		     SPEC I204e, V547): 20 + 5 + 25 = 50, so 27/52 in this 105 and 31/56 in a vampire's 113 -
+		     which is why the title is named now, VAMP_GEOM moves it too. -->
 		<layout name="boxExperience" left="1015" top="0" width="330" height="105">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="290" height="20" text="EXPERIENCE" horzTextAlign="center" anchors="left top right"/>
+			<label name="lblXPMain" left="20" top="27" width="290" height="20" text="EXPERIENCE" horzTextAlign="center" anchors="left top right"/>
 
-			<rectangle name="bgCurrentXPMain" left="120" top="53" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
-			<edit name="edtCurrentXPMain" type="number" decimalPlaces="0" left="120" top="53" width="90" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPMain.text);" transparent="true"/>
+			<rectangle name="bgCurrentXPMain" left="120" top="52" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtCurrentXPMain" type="number" decimalPlaces="0" left="120" top="52" width="90" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPMain.text);" transparent="true"/>
 		</layout>
 
 		<layout name="boxAttributes" left="0" top="110" width="340" height="296">
@@ -828,10 +836,14 @@
 
 		     Since the 52nd batch (user 2026-10-02, SPEC I195, V541) ROAD holds the road alone and
 		     WILLPOWER is boxWillpower under it, in BOTH games: the two together are as tall as the
-		     Main's BLOOD POOL box (122 + 5 + 117 = 244), so a mortal's close on HEALTH's seven-level
-		     line with the avatar and a vampire's with the pool. Each box CENTRES what sits under its
-		     top line - here the dots and the bearing line, 19 above and 19 below. -->
-		<layout name="boxRoad" left="680" top="541" width="330" height="122">
+		     Main's BLOOD POOL box (126 + 5 + 113 = 244), so a mortal's close on HEALTH's seven-level
+		     line with the avatar and a vampire's with the pool. Since the 56th batch (user 2026-10-02,
+		     SPEC I199a, V541a) ROAD is as tall as VIRTUES beside it, and WILLPOWER paid the 4.
+
+		     Inside (56th batch, SPEC I199b, V541c): the dots sit at the box's vertical CENTRE, 50
+		     above and 51 under (the odd pixel under, SPEC V399), and the picker line and the bearing
+		     line come in to 6 of them - half the 11 / 12 the 53rd batch spaced them by. -->
+		<layout name="boxRoad" left="680" top="541" width="330" height="126">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 
 			<!--
@@ -871,14 +883,14 @@
 			     letting the renderer shrink it is what HEALTH already does with its ten-row
 			     height (SPEC V49) - the file says the biggest it can ever be, and Lua takes it
 			     down. Nothing is measured against the English case except the screen. -->
-			<label name="lblRoad" left="30" top="15" width="80" height="24" text="ROAD" horzTextAlign="trailing" vertTextAlign="center"/>
-			<button name="btnQroad" left="115" top="15" width="20" height="24" text="?" onClick="popOpen(self, 'Road', sheet['road'], nil, 'road');"/>
-			<button name="dynroad" left="140" top="15" width="160" height="24" fontSize="12" text="Select Road" onClick="mfOpen(self, 'road', 'road', 'Road');"/>
+			<label name="lblRoad" left="30" top="20" width="80" height="24" text="ROAD" horzTextAlign="trailing" vertTextAlign="center"/>
+			<button name="btnQroad" left="115" top="20" width="20" height="24" text="?" onClick="popOpen(self, 'Road', sheet['road'], nil, 'road');"/>
+			<button name="dynroad" left="140" top="20" width="160" height="24" fontSize="12" text="Select Road" onClick="mfOpen(self, 'road', 'road', 'Road');"/>
 			<!-- The typed twin, one field and two widgets with exactly one visible (SPEC I71, V274).
 			     Authored state IS the flag off - visible AND enabled - because invisible-and-enabled
 			     still takes Tab focus, which no screenshot shows (SPEC V274c, V274d). -->
-			<edit name="edtRoad" left="140" top="15" width="160" height="24" field="road" visible="false" enabled="false"/>
-			<layout left="40" top="58" width="250" height="25" >
+			<edit name="edtRoad" left="140" top="20" width="160" height="24" field="road" visible="false" enabled="false"/>
+			<layout left="40" top="50" width="250" height="25" >
 				<Advantages field="humanity"/>
 			</layout>
 			<!-- ONE label and not two (user 2026-08-29): the bearing and its modifier read as a
@@ -890,19 +902,22 @@
 			     0.80 is neither of the two dimming numbers of I43/V244 and is not trying to be:
 			     those two say "read-only", this one is the emphasis the user asked for on a line
 			     that was never editable. Authored, so no runtime write reaches V244. -->
-			<label name="dynBearingName" left="20" top="83" width="290" height="20" horzTextAlign="center" opacity="0.80"/>
+			<label name="dynBearingName" left="20" top="81" width="290" height="20" horzTextAlign="center" opacity="0.80"/>
 		</layout>
 
 		<!-- WILLPOWER, a box of its own under ROAD in every game since the 52nd batch (user 2026-10-02,
 		     SPEC I195, V540, V541): the 51st had split it for a vampire only, with a second copy of the
 		     row hidden inside ROAD for a mortal; once the mortal split too there was nothing left for
 		     the copy to do, and this is again the ONE willpower row of the tab (SPEC V1). For a
-		     vampire VAMP_GEOM moves it with ROAD. The dots and the checkboxes sit CENTRED under the
-		     title, 18 above and 19 below, the odd pixel under (SPEC V399). -->
-		<layout name="boxWillpower" left="680" top="668" width="330" height="117">
+		     vampire VAMP_GEOM moves it with ROAD. Title, dots and checkboxes: 8 from the title to the
+		     dots and 2 from the dots to the checkboxes in the template - the user's 2px, the same on
+		     the Combat tab and on the Vampire tab's copy (57th batch, user 2026-10-02, SPEC I200a,
+		     V545a). The three are ONE object centred in the box since the 61st batch (user
+		     2026-10-02, SPEC I204c, V547): 20 + 8 + 52 = 80 in the 113 of V541a, 16 above and 17 under. -->
+		<layout name="boxWillpower" left="680" top="672" width="330" height="113">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="290" height="20" text="WILLPOWER" horzTextAlign="center"/>
-			<layout left="40" top="53" width="250" height="45" >
+			<label left="20" top="16" width="290" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<layout left="40" top="44" width="250" height="52" >
 				<Willpower field="willpower"/>
 			</layout>
 		</layout>
@@ -972,56 +987,56 @@
 			<imageCheckBox name="mdotbloodPool_48" left="217" top="187" width="25" height="25" field="bloodPool_48" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_48', self);"/>
 			<imageCheckBox name="mdotbloodPool_49" left="243" top="187" width="25" height="25" field="bloodPool_49" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_49', self);"/>
 			<imageCheckBox name="mdotbloodPool_50" left="269" top="187" width="25" height="25" field="bloodPool_50" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_50', self);"/>
-			<imageCheckBox name="mcapbloodPool_1" left="35" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_2" left="61" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_3" left="87" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_4" left="113" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_5" left="139" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_6" left="165" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_7" left="191" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_8" left="217" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_9" left="243" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_10" left="269" top="67" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_11" left="35" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_12" left="61" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_13" left="87" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_14" left="113" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_15" left="139" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_16" left="165" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_17" left="191" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_18" left="217" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_19" left="243" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_20" left="269" top="97" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_21" left="35" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_22" left="61" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_23" left="87" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_24" left="113" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_25" left="139" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_26" left="165" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_27" left="191" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_28" left="217" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_29" left="243" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_30" left="269" top="127" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_31" left="35" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_32" left="61" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_33" left="87" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_34" left="113" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_35" left="139" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_36" left="165" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_37" left="191" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_38" left="217" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_39" left="243" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_40" left="269" top="157" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_41" left="35" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_42" left="61" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_43" left="87" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_44" left="113" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_45" left="139" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_46" left="165" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_47" left="191" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_48" left="217" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_49" left="243" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-			<imageCheckBox name="mcapbloodPool_50" left="269" top="187" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_1" left="35" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_2" left="61" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_3" left="87" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_4" left="113" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_5" left="139" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_6" left="165" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_7" left="191" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_8" left="217" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_9" left="243" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_10" left="269" top="67" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_11" left="35" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_12" left="61" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_13" left="87" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_14" left="113" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_15" left="139" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_16" left="165" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_17" left="191" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_18" left="217" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_19" left="243" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_20" left="269" top="97" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_21" left="35" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_22" left="61" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_23" left="87" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_24" left="113" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_25" left="139" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_26" left="165" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_27" left="191" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_28" left="217" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_29" left="243" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_30" left="269" top="127" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_31" left="35" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_32" left="61" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_33" left="87" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_34" left="113" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_35" left="139" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_36" left="165" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_37" left="191" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_38" left="217" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_39" left="243" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_40" left="269" top="157" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_41" left="35" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_42" left="61" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_43" left="87" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_44" left="113" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_45" left="139" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_46" left="165" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_47" left="191" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_48" left="217" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_49" left="243" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcapbloodPool_50" left="269" top="187" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</layout>
 
 		<!--

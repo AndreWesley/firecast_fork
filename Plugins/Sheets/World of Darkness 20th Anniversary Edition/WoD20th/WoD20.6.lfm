@@ -10,7 +10,33 @@
 				["Remove"] = "Remover",
 				["Description"] = "Descrição",
 				["Ritual Level"] = "Nível do Ritual",
+				["Repelled by garlic and holy symbols: presented with either, a Willpower roll or they must remove themselves from its presence."] = "Repelidos por alho e por símbolos sagrados: diante de qualquer um dos dois, um teste de Força de Vontade ou têm de se afastar.",
+				["Given over to their own savagery, they suffer the same frenzy effects as the Brujah."] = "Entregues à própria selvageria, sofrem os mesmos efeitos de frenesi que os Brujah.",
+				["+2 difficulty on every roll to resist frenzy. They may not spend Willpower to avoid a frenzy, only to end one."] = "+2 de dificuldade em todo teste para resistir ao frenesi. Não podem gastar Força de Vontade para evitar um frenesi, apenas para encerrá-lo.",
+				["Broken by centuries of infernal servitude, they are extraordinarily suggestible: +2 difficulty on all Willpower rolls."] = "Quebrados por séculos de servidão infernal, são extraordinariamente sugestionáveis: +2 de dificuldade em todo teste de Força de Vontade.",
+				["They take aggravated damage from silver."] = "Sofrem dano agravado por prata.",
+				["Centuries under the Tremere left them far from their human side: no Ducheski may ever have a Social Attribute above 2."] = "Séculos sob os Tremere os afastaram do lado humano: nenhum Ducheski pode ter um Atributo Social acima de 2.",
+				["Centuries of moral decay: they may not have Humanity higher than 3, nor Conscience higher than 2."] = "Séculos de decadência moral: não podem ter Humanidade acima de 3, nem Consciência acima de 2.",
+				["Tzimisce blood runs thin in this family, which has no native ties to the Voivodate: they have only eight blood points."] = "O sangue Tzimisce é fraco nesta família, que não tem laços nativos com o Voivodato: têm apenas oito pontos de sangue.",
+				["Family arrogance: whenever there is a chance to boast of the family, a Willpower roll at difficulty 7 to hold back their scorn."] = "Arrogância de família: sempre que houver ocasião de gabar-se da família, um teste de Força de Vontade a dificuldade 7 para conter o desprezo.",
+				["Years of genetic manipulation: every member suffers the Slow Healing Flaw (V20 p. 483)."] = "Anos de manipulação genética: todo membro sofre o Defeito Cura Lenta (V20 p. 483).",
+				["All Keskinen share their patron's obsession with blotting out the sun, which manifests as a Derangement."] = "Todos os Keskinen compartilham a obsessão de sua patrona por apagar o sol, que se manifesta como uma Perturbação.",
+				["Vulnerable to sunlight: they take sunlight damage as a Cainite would, but bashing rather than aggravated, and may soak it with Stamina and Fortitude."] = "Vulneráveis à luz do sol: sofrem dano solar como um Cainita, mas contundente em vez de agravado, e podem absorvê-lo com Vigor e Fortitude.",
+				["Krevcheski are distrusted by the Tzimisce, and thus have only learned two family Disciplines instead of the normal three."] = "Os Krevcheski são vistos com desconfiança pelos Tzimisce e, por isso, aprenderam apenas duas Disciplinas de família em vez das três normais.",
+				["Quite susceptible to the blood bond: they become Bound to a vampire after a single drink."] = "Bastante suscetíveis ao laço de sangue: ficam presos a um vampiro após um único gole.",
+				["Bred for intellect and prone to psychological disorders: the vast majority suffer the Obsessive-Compulsive Derangement (V20 pp. 291-292)."] = "Criados para o intelecto e propensos a distúrbios psicológicos: a grande maioria sofre da Perturbação Obsessivo-Compulsiva (V20 p. 291-292).",
+				["Members of the resurging Narov line are afflicted with the Megalomania Derangement instead (V20 pp. 291-292)."] = "Os membros da linhagem Narov ressurgente são afligidos pela Perturbação Megalomania (V20 p. 291-292).",
+				["Cursed for their founders' crimes: they suffer the Haunted Flaw (V20 p. 495) permanently, and banishing one ghost only brings another."] = "Amaldiçoados pelos crimes dos fundadores: sofrem o Defeito Assombrado (V20 p. 495) em definitivo, e banir um fantasma só traz outro.",
+				["Cursed by the moon: +2 difficulty to use Disciplines at the new moon, +1 waxing and waning, -1 at the full moon. Their blood rejects the Embrace, which has always killed them."] = "Amaldiçoados pela lua: +2 de dificuldade para usar Disciplinas na lua nova, +1 na crescente e na minguante, -1 na cheia. O sangue deles rejeita o Abraço, que sempre os matou.",
+				["All of them suffer the Deathsight Flaw (V20 p. 494): -2 difficulty to resist Appearance-based rolls, +2 difficulty on Perception rolls and +1 on Social rolls."] = "Todos sofrem o Defeito Visão da Morte (V20 p. 494): -2 de dificuldade para resistir a testes de Aparência, +2 de dificuldade em testes de Percepção e +1 em testes Sociais.",
+				["In the presence of a vampire descended from Anushin-Rawan they are compelled to protect that Ventrue as if blood bound, for 10 nights minus their Willpower."] = "Na presença de um vampiro descendente de Anushin-Rawan, são compelidos a proteger aquele Ventrue como se estivessem sob laço de sangue, por 10 noites menos a Força de Vontade.",
+				["Addictive personalities: exposed to a sensual experience that has weakened them, a Willpower roll to do anything but pursue it, and Willpower may not be spent to resist the addiction."] = "Personalidades viciantes: expostos a uma experiência sensual que os enfraqueceu, faça um teste de Força de Vontade para fazer qualquer outra coisa, e não podem gastar Força de Vontade para resistir ao vício.",
+				["Every Vlaszy swears a Blood Oath to a Fiend upon reaching the age of majority."] = "Todo Vlaszy jura um Juramento de Sangue a um Demônio ao atingir a maioridade.",
+				["Exposed to a pleasurable experience, a Willpower roll or they become obsessed with it. They may not spend Willpower to resist a supernatural power that entices them to a new pleasure."] = "Diante de uma experiência prazerosa, um teste de Força de Vontade ou ficam obcecados por ela. Não podem gastar Força de Vontade para resistir a um poder sobrenatural que os atraia a um novo prazer.",
+				["-- no weakness --"] = "-- sem fraqueza --",
 				["No description available"] = "Nenhuma descrição disponível",
+				["-- Custom --"] = "-- Personalizado --",
+				["custom description"] = "descrição personalizada",
 				["Select Background"] = "Selecionar Antecedente",
 				["Select Nature"] = "Selecionar Natureza",
 				["Select Demeanor"] = "Selecionar Comportamento",
@@ -21,6 +47,7 @@
 				["Select Affiliation"] = "Selecionar Afiliação",
 				["Select Hedge Path"] = "Selecionar Caminho de Magia Estática",
 				["Select Road"] = "Selecionar Estrada",
+				["-- No Aura --"] = "-- Sem Aura --",
 				["Select Clan/Family"] = "Selecionar Clã/Família",
 				["Select Clan"] = "Selecionar Clã",
 				["Select Phenomenon"] = "Selecionar Fenômeno",
@@ -152,7 +179,6 @@
 				["That trait is above what your generation allows"] = "Esse traço passa do que a sua geração permite",
 				["MAX TRAIT LEVEL"] = "NÍVEL MÁX. DE CARACTERÍSTICA",
 				["CURRENT EXPERIENCE"] = "EXPERIÊNCIA ATUAL",
-				["SPENT EXPERIENCE"] = "EXPERIÊNCIA GASTA",
 				["Courage"] = "Coragem",
 				["Crafts"] = "Ofícios",
 				["CREDITS"] = "CRÉDITOS",
@@ -248,7 +274,7 @@
 				["Free specialties are lost only by lowering the trait"] = "Especializações gratuitas só são perdidas ao baixar o traço",
 				["Gallant"] = "Galante",
 				["Gambler"] = "Jogador",
-				["Game"] = "Jogo",
+				["Character Sheet"] = "Ficha de Personagem",
 				["GEAR (CARRIED)"] = "EQUIPAMENTO (CARREGADO)",
 				["Generation"] = "Geração",
 				["Sire"] = "Senhor",
@@ -3682,15 +3708,15 @@
 			local ORN_OUT   = 5;       -- outer rule, in from the box edge
 			local ORN_IN    = 9;       -- inner rule
 
-			-- The eight frames under the XP numbers (SPEC V417, I144e) wear the palette's CORNER but
+			-- The seven frames under the XP numbers (SPEC V417, I144e) wear the palette's CORNER but
 			-- never its radius as declared: 18 on a 25px-high frame would eat the frame. Named, the
 			-- way sectionBox names the avatar pair, and never by fill - the frames are #0A0A0A and
 			-- not the box black, which is exactly why sectionBox passes them over (SPEC V427a, V427d).
-			-- The seventh is the Vampire tab's (SPEC I188f), and so is the eighth, its Spent (I191h).
+			-- The seventh is the Vampire tab's (SPEC I188f); its Spent left in the 61st batch (I204f).
 			local XP_FRAME = {
 				bgTotalXP = true, bgSpentXP = true, bgCurrentXP = true,
 				bgCurrentXPMain = true, bgCurrentXPNumina = true, bgCurrentXPGhoul = true,
-				bgCurrentXPVampire = true, bgSpentXPVampire = true,
+				bgCurrentXPVampire = true,
 			};
 			local ORN_ARM   = 40;      -- corner reach along each edge
 			local ORN_FLEUR = 150;     -- an edge run shorter than this carries no centre motif

@@ -728,7 +728,7 @@ else { Pass "I3 $($watched.Count) distinct field name(s) are watched by a dataLi
 # all four panes out of WoD20.7, and the ? took the 0..20 the radioButtons were holding. ORPHANS,
 # not DELETED - a sheet saved before this round still carries which row was marked, and the name
 # stays burned so nothing new can wear it (SPEC V2, V176 retired, V362b, T874).
-$I3_ORPHANS = @('stShowMagika','transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated','personalidade','natureza','experience','spentXP','stFreeDots','freeDots','ritual_21','ritual_22','ritual_23','ritual_24','ritual_25','stBackgroundsXP','discSel','pathSel','ritualSel','mainPath_5','xpLog','numinaSel','psychicSel','hedgeRitualSel')
+$I3_ORPHANS = @('stShowMagika','transportation','other','bruised','hurt','injured','wounded','mauled','crippled','incapacitated','personalidade','natureza','experience','spentXP','stFreeDots','freeDots','ritual_21','ritual_22','ritual_23','ritual_24','ritual_25','stBackgroundsXP','discSel','pathSel','ritualSel','mainPath_5','ritual_27','xpLog','numinaSel','psychicSel','hedgeRitualSel')
 # The OTHER exit, and it is not the same one (SPEC V362b, B99): here the DATA goes too. Closed by
 # V362(d), and every batch of names needs its own Q - without the ceiling, "deleted by decision"
 # becomes the door every field leaves through. The four psychic_* are Q32's (T830); the nine after
@@ -1928,8 +1928,9 @@ else { Pass "V415 the avatar closes on y=$avatarBottom, HEALTH's floor at $V415_
 # Mutation (SPEC V20, V222): drop decimalPlaces from one of the six -> RED - add min="0" to one
 # -> RED - rename one of the six -> RED on the count. Probe: put type="number" on an edit that is
 # NOT an XP box -> GREEN, the subject is the six and not the attribute.
-# edtSpentXPVampire joined in the 48th batch (SPEC I191g, V416 as amended).
-$V416_XP = @('edtCurrentXPMain', 'edtCurrentXPNumina', 'edtCurrentXPGhoul', 'edtTotalXP', 'edtSpentXP', 'edtCurrentXP', 'edtSpentXPVampire')
+# edtSpentXPVampire joined in the 48th batch (SPEC I191g, V416 as amended) and left with its widget
+# in the 61st (user 2026-10-02, SPEC I204f).
+$V416_XP = @('edtCurrentXPMain', 'edtCurrentXPNumina', 'edtCurrentXPGhoul', 'edtTotalXP', 'edtSpentXP', 'edtCurrentXP')
 $v416Bad = @()
 $v416Seen = @{}
 foreach ($f416 in $files) {
@@ -5362,7 +5363,7 @@ foreach ($f in $files) {
 $wpClickFn  = NoComments (LuaFn $rootTxt 'wpSpentClick')
 $wpChangeFn = NoComments (LuaFn $rootTxt 'wpSpentChange')
 $wpBad = @()
-if ($wpBoxes.Count -ne 20) { Fail "V447 $($wpBoxes.Count) willpower spent box(es) were read, expected 20 - ten on Main and ten on the WoD20.3 mirror (SPEC V36, V209)" }
+if ($wpBoxes.Count -ne 30) { Fail "V447 $($wpBoxes.Count) willpower spent box(es) were read, expected 30 - ten on Main, ten on the WoD20.3 mirror and ten on the Vampire tab's copy since the 57th batch (SPEC I200c, V36, V209)" }
 else {
     foreach ($w in $wpBoxes) {
         if ($w.click  -ne "wpSpentClick('$($w.field)');")  { $wpBad += "$($w.file) $($w.field) runs '$($w.click)' on the click, expected wpSpentClick('$($w.field)'); - the box that does not announce the click leaves the player clicking into nothing (SPEC V447a)" }
@@ -5384,7 +5385,7 @@ else {
         }
     }
     if ($wpBad) { foreach ($b in $wpBad) { Fail "V447 $b" } }
-    else { Pass "V447 the twenty willpower spent boxes carry the click stamp and the change that writes the prefix, and the write costs nothing" }
+    else { Pass "V447 the thirty willpower spent boxes carry the click stamp and the change that writes the prefix, and the write costs nothing" }
 }
 
 # ---- V136: pricing a click writes nothing ---------------------------------------------
@@ -9642,20 +9643,55 @@ else { Pass "V400 all $v400Seen box backdrops cover their box exactly - none cli
 # The exclusions are V239's, for V239's reasons: the backdrop is the box, not something in
 # it, and a rotated child's `top` is its PRE-rotation box. Both checks have to cut the same
 # way or a box could pass one and fail the other for no reason a reader could see.
-# The two boxes of the tabHedge band that are stretched to the height of HEDGE MAGIC beside
-# them (SPEC I63, V267b). NAMED, and by title inside ONE file: WILLPOWER is also the name of a
-# box on WoD20.1 and another on WoD20.3, and neither of those is stretched.
-# TRUE FAITH replaced WILLPOWER in T830 (SPEC I117d, V361c) and inherits the exception with the
-# rect: the box is the same 407x146 stretched to the band's base, so it pays CENTRING in place of
-# the gap under its last row, exactly as the one beside it does.
-$STRETCHED_BAND = @('QUINTESSENCE', 'TRUE FAITH')
+# The "centred object" boxes (user 2026-10-02, SPEC I204, V547): title + gap + body as ONE object
+# in the box's vertical centre, so their head and foot are V547's and not the house's 15/15 -
+# skipped by V240 entirely and by V280's head and Y floors, measured by V547 below. By file and
+# TITLE TEXT, since most of them carry no name and a title of 91 in a 131 box is not one V240's
+# detector can see. G is the gap title -> body: 5 over a number or a field, 8 over dots (the
+# Main's WILLPOWER, SPEC Q121.6). QUINTESSENCE and TRUE FAITH were the tabHedge band's two
+# STRETCHED boxes (SPEC I63, V267b), centring their row under the title; they centre title and
+# row together now, and the stretched arm went with them.
+$OBJ_V547 = @(
+    [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'BLOOD PER TURN';     G = 5 }
+    [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'MAX TRAIT LEVEL';    G = 5 }
+    [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'WILLPOWER';          G = 8 }
+    [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'CURRENT EXPERIENCE'; G = 5 }
+    [pscustomobject]@{ F = 'WoD20.1.lfm';  T = 'WILLPOWER';          G = 8 }
+    [pscustomobject]@{ F = 'WoD20.1.lfm';  T = 'EXPERIENCE';         G = 5 }
+    [pscustomobject]@{ F = 'WoD20.3.lfm';  T = 'WILLPOWER';          G = 8 }
+    [pscustomobject]@{ F = 'WoD20.7.lfm';  T = 'QUINTESSENCE';       G = 8 }
+    [pscustomobject]@{ F = 'WoD20.7.lfm';  T = 'TRUE FAITH';         G = 8 }
+    [pscustomobject]@{ F = 'WoD20.7.lfm';  T = 'EXPERIENCE';         G = 5 }
+    [pscustomobject]@{ F = 'WoD20.11.lfm'; T = 'DOMITOR';            G = 5 }
+    [pscustomobject]@{ F = 'WoD20.11.lfm'; T = 'BLOOD POOL';         G = 8 }
+    [pscustomobject]@{ F = 'WoD20.11.lfm'; T = 'EXPERIENCE';         G = 5 }
+)
+# The roster row a box answers to, or $null: a direct child label whose text is the row's title.
+function ObjRowV547([string]$fileName547, $boxNode547) {
+    foreach ($kid547 in $boxNode547.ChildNodes) {
+        if ($kid547.NodeType -ne 'Element' -or $kid547.LocalName -ne 'label') { continue }
+        foreach ($row547 in $OBJ_V547) {
+            if ($row547.F -eq $fileName547 -and $row547.T -eq $kid547.GetAttribute('text')) { return $row547 }
+        }
+    }
+    return $null
+}
 # The two the ORNAMENT stretched, on the Settings tab (SPEC I156j, T997). Named in the XML,
 # because neither has a title this check could key on - see the block below.
 $CENTRED_BY_FLOOR = @('boxLanguage', 'boxVersion')
+# ROAD's head and foot are V541(c)'s since the 56th batch (user 2026-10-02, SPEC I199b, V240/V280 as
+# amended): the user put the DOTS at the box's centre and the two lines 6 from them, so the picker
+# opens at 20 and the bearing line leaves 25 - neither is the house's 15/15 pair, and both are
+# measured, to the pixel, there. The floors of 15 still apply here; only the head EQUALITY moves.
+# One owner per number (SPEC B70): the pair is skipped here and nowhere else.
+$HEAD_BY_V541 = @('boxRoad')
+$headSeen240 = 0
+$headSeen280 = 0
+$objSeen280 = 0
 $centredSeen = 0
 $vpadBad = @()
 $vpadSeen = 0
-$stretchSeen = 0
+$objSeen240 = 0
 $applyBoxSeen = 0
 $bandSeen240 = 0
 foreach ($f in $files) {
@@ -9734,21 +9770,11 @@ foreach ($f in $files) {
             $ttl = $k.GetAttribute("text"); $ttlNode = $k; break
         }
 
-        # The band across the top of tabHedge closes on ONE base (SPEC I63, user 2026-08-23),
-        # so the two boxes on the right are STRETCHED past what their content needs and cannot
-        # leave 10 under it. They are this check's one NAMED exception - by file and title, the
-        # way $DESC_BRIGHT and bloodPool_* are named - because loosening the rule for every box
-        # would let any box grow a hole under its last row and call it a design (SPEC B38).
-        #
-        # They do not escape a ruler, they SWAP one: the content below the title band has to be
-        # CENTRED in the body, top gap equal to bottom gap, which is V239 turned 90 degrees
-        # (SPEC V267b). The body opens at 41 - the title band plus the 10 V240 asks under it,
-        # the same 41 the list boxes count with (466 = 41 + 25*17).
         # The two Settings boxes the ORNAMENT stretched (user 2026-09-07, SPEC I156j). Their
         # content asks for 55 and 50; V314e's filete needs 68 of shortest side to hold its
         # crosses, so both were born taller than anything in them - and the head/foot pair put
-        # all of that slack UNDER the content, which is what the owner saw. They pay the same
-        # swap the tabHedge band pays: centred, top gap EQUAL to bottom gap (SPEC V267b).
+        # all of that slack UNDER the content, which is what the owner saw. They SWAP a ruler
+        # instead of escaping one: centred, top gap EQUAL to bottom gap (SPEC V267b).
         #
         # By NAME and not by title, which is the other difference from the band: one of them has
         # no title at all and the only label in the other IS its content - the detector above
@@ -9760,50 +9786,15 @@ foreach ($f in $files) {
             continue
         }
 
-        if ($f.Name -eq 'WoD20.7.lfm' -and $STRETCHED_BAND -contains $ttl) {
-            $stretchSeen++
-
-            $hiC = [int]::MaxValue
-            $loC = [int]::MinValue
-            foreach ($k in $box.ChildNodes) {
-                if ($k.NodeType -ne 'Element') { continue }
-                if ($k -eq $back -or $k -eq $ttlNode) { continue }
-                if ($k.LocalName -in @('dataLink', 'script', 'event', 'template')) { continue }
-                if ($k.HasAttribute("rotationAngle")) { continue }
-                if ($k.GetAttribute("align") -eq 'client') { continue }
-                $kt = 0; $kh = 0
-                if (-not [int]::TryParse($k.GetAttribute("top"), [ref]$kt)) { continue }
-                [void][int]::TryParse($k.GetAttribute("height"), [ref]$kh)
-                if ($kt -lt $hiC) { $hiC = $kt }
-                if (($kt + $kh) -gt $loC) { $loC = $kt + $kh }
-            }
-
-            # Where the body opens, and the 114th round MOVED it (SPEC I86b, V267b, user
-            # 2026-08-26). It used to be the hairline under the title band plus the margin I73
-            # asks under it - title.bottom + 1 + 20, which read 41 while that margin was 10 and
-            # 61 after. That charges the title's margin TWICE: it is a FLOOR for content stacked
-            # under a title, not a band reserved from the box, and counting it as both pushed a
-            # single centred row 21px low. The eye caught it on the Numina tab before any check
-            # did, because both boxes were passing this arm the whole time.
-            #
-            # It opens on the BOX's own margin now - the same 20 V280a charges on four sides -
-            # so the title takes no band of its own. Still DERIVED, not typed: 20 is read from
-            # the one margin the sheet uses everywhere, and the title node is still what proves
-            # this is the titled arm.
-            $bodyTop = 20
-            if ($hiC -eq [int]::MaxValue) { $vpadBad += "$($f.Name) '$ttl' is stretched and holds nothing under its title - the exception is for a box that pays centring, not for an empty one (SPEC V267b)" }
-            elseif ($hi -ne $BOX_PAD_Y) { $vpadBad += "$($f.Name) '$ttl' opens with $hi above its title, not the $BOX_PAD_Y the head takes - stretched or not, the head is an equality (SPEC I40, V267b, I137c)" }
-            # The content still clears the title band by the sheet's own margin (SPEC I86c). This
-            # leg is what makes the 114th round's move a CEILING and not a direction: WILLPOWER,
-            # the taller of the two, lands at exactly 20 under its title, so one more pixel up
-            # reddens here. Without it the centring formula alone would happily walk the content
-            # into the title as the box shrank.
-            elseif (($hiC - ([int]$ttlNode.GetAttribute("top") + [int]$ttlNode.GetAttribute("height"))) -lt 20) { $vpadBad += "$($f.Name) '$ttl' leaves $($hiC - ([int]$ttlNode.GetAttribute('top') + [int]$ttlNode.GetAttribute('height')))px between the title and the content, under the 20 every box on this sheet keeps (SPEC I86c, V280a)" }
-            # Centring is DERIVED and not a tolerance: the top gap is the floor of the halved
-            # remainder, so the odd pixel always falls BELOW (SPEC I86c, V267b). Written as one
-            # expected `top` rather than as two gaps compared loosely - a `-le 1` slack would
-            # accept the odd pixel on either side and stop measuring which.
-            elseif ($hiC -ne ($bodyTop + [math]::Floor(($bh - $bodyTop - ($loC - $hiC)) / 2))) { $vpadBad += "$($f.Name) '$ttl' ($($bh)px tall) opens its content at $hiC, not the $($bodyTop + [math]::Floor(($bh - $bodyTop - ($loC - $hiC)) / 2)) that centres it in the body with the odd pixel below - a stretched box pays CENTRING in place of the 20 (SPEC V267b, I73)" }
+        # The V547 boxes: title + gap + body centred as one object (SPEC I204, V547) - their head and
+        # foot are measured THERE, to the pixel, so neither the head equality nor the foot floor
+        # reaches them here. Counted, so the exception cannot stop matching and go on passing (B7).
+        if ($null -ne (ObjRowV547 $f.Name $box)) {
+            $objSeen240++
+        }
+        elseif ($HEAD_BY_V541 -contains $box.GetAttribute("name")) {
+            $headSeen240++
+            if ($hi -lt $BOX_PAD_Y -or $gapB -lt $BOX_PAD_Y) { $vpadBad += "$($f.Name) '$($box.GetAttribute("name"))' leaves $hi above its first child and $gapB under its last - its pair is V541(c)'s, but the floor of $BOX_PAD_Y still holds (SPEC V240 as amended, I199b)" }
         }
         elseif ($hi -ne $BOX_PAD_Y -or $gapB -lt $BOX_PAD_Y) {
             $vpadBad += "$($f.Name) '$ttl' ($($bh)px tall) opens with $hi above its first child and leaves $gapB under its last - the head is exactly $BOX_PAD_Y and the foot never drops under it (SPEC I40, I73, V280a, I137c)"
@@ -9813,10 +9804,11 @@ foreach ($f in $files) {
 if ($applyBoxSeen -ne 1) { Fail "V240 $applyBoxSeen titleless one-button box(es) were cut, expected the 1 the Apply box is - the construction that excuses it stopped matching, and either a box slipped out or the Apply box slipped back in (SPEC I163f, V479c, V209, B7)" }
 elseif ($bandSeen240 -ne 1) { Fail "V240 $bandSeen240 highlight band(s) were cut, expected the 1 xpHiRow is - the construction that excuses it stopped matching (SPEC I165a, V484f, V209, B7)" }
 elseif (($vpadSeen + $applyBoxSeen) -lt 61) { Fail "V240 only $vpadSeen box(es) were measured beside the $applyBoxSeen cut, expected the 61 the sheet draws (70 until SPEC I186b) - this check is covering less than the sheet has (SPEC V209)" }
-elseif ($centredSeen -ne 2) { Fail "V240 $centredSeen box(es) stretched by the ornament took the centring rule, expected the 2 of the Settings tab - an exception nothing reaches is an exception that stopped measuring (SPEC V209, I156j)" }
-elseif ($stretchSeen -ne 2) { Fail "V240 $stretchSeen stretched box(es) took the centring rule, expected the 2 of the tabHedge band - an exception nothing reaches is an exception that stopped measuring (SPEC V209, V267b)" }
+elseif ($headSeen240 -ne 1) { Fail "V240 $headSeen240 box(es) took the V541 head exception, expected the 1 boxRoad is - an exception nothing reaches is an exception that stopped measuring (SPEC V240 as amended, V209, B7)" }
+elseif ($centredSeen -ne 2) { Fail "V240$centredSeen box(es) stretched by the ornament took the centring rule, expected the 2 of the Settings tab - an exception nothing reaches is an exception that stopped measuring (SPEC V209, I156j)" }
+elseif ($objSeen240 -ne $OBJ_V547.Count) { Fail "V240 $objSeen240 box(es) took the V547 exception, expected the $($OBJ_V547.Count) of its roster - an exception nothing reaches is an exception that stopped measuring (SPEC V547, V209, B7)" }
 elseif ($vpadBad) { foreach ($b in $vpadBad) { Fail "V240 $b" } }
-else { Pass "V240 all $vpadSeen boxes breathe at least 20 above their title and 20 under their last row, and the $stretchSeen stretched ones centre their content instead" }
+else { Pass "V240 all $vpadSeen boxes breathe at least 20 above their title and 20 under their last row, and the $objSeen240 of V547 centre title and body as one object instead" }
 
 # ---- V243: the storyteller box closes on a column, and the state sentence is gone --------
 # (a) the box is checkboxes plus a short column of entry widgets - cmbHealthLevels, cmbSpecCost,
@@ -10318,8 +10310,7 @@ $V417_XP = @(
     [pscustomobject]@{ F = 'WoD20.7.lfm';  E = 'edtCurrentXPNumina' }
     [pscustomobject]@{ F = 'WoD20.11.lfm'; E = 'edtCurrentXPGhoul' }
     [pscustomobject]@{ F = 'WoD20.15.lfm'; E = 'edtCurrentXPVampire' }
-    # The Vampire tab's Spent, locked by authoring like edtSpentXP (SPEC I191g, V417 as amended).
-    [pscustomobject]@{ F = 'WoD20.15.lfm'; E = 'edtSpentXPVampire' }
+    # The Vampire tab's Spent (SPEC I191g) left with its widget in the 61st batch (SPEC I204f).
 )
 $xpBad = @()
 $xpSeen = 0
@@ -12829,7 +12820,7 @@ foreach ($f in $files) {
     }
 }
 if ($v280Apply -ne 1) { Fail "V280 $v280Apply titleless one-button box(es) were cut, expected the 1 the Apply box is (SPEC I163f, V479c, V209, B7)" }
-elseif ($v280Boxes.Count -ne 74) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 74 I73 measures (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
+elseif ($v280Boxes.Count -ne 74) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 74 I73 measures (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
 else {
     # (a) TWO numbers since T913: 20 on the X sides, 15 on the Y ones (SPEC I137c, user
     # 2026-09-02). The X pair is a FLOOR and always was. The Y pair splits: the FOOT is a floor,
@@ -12866,9 +12857,22 @@ else {
         # margin (SPEC V209, I156j).
         $isCentred280 = $CENTRED_BY_FLOOR -contains $b.Node.GetAttribute("name")
         if ($isCentred280) { $v280Centred++ }
+        # Same as the line above and for the same reason: counted on membership, before the chain.
+        $isHead280 = $HEAD_BY_V541 -contains $b.Node.GetAttribute("name")
+        if ($isHead280) { $headSeen280++ }
+        # The V547 boxes (SPEC I204, V547): title and body centred as one object, so the head and
+        # the foot are V547's to the pixel and only the X floors are left here.
+        $isObj280 = $null -ne (ObjRowV547 $b.F $b.Node)
+        if ($isObj280) { $objSeen280++ }
         if ($ml -eq [int]::MaxValue) { $v280Bad += "$($b.F) '$($b.N)' holds nothing this leg can measure - a box with no placed child is a box with no margin to read (SPEC V209)"; continue }
-        if ($ml -lt $BOX_PAD_X -or $mr -lt $BOX_PAD_X -or $mt -lt $BOX_PAD_Y -or $mb -lt $BOX_PAD_Y) {
+        if ($isObj280) {
+            if ($ml -lt $BOX_PAD_X -or $mr -lt $BOX_PAD_X) { $v280Bad += "$($b.F) '$($b.N)' ($($b.W)x$($b.H)) leaves L=$ml R=$mr - a section box clears $BOX_PAD_X on the X sides; its Y is V547's (SPEC I73, V280a, V547)" }
+        }
+        elseif ($ml -lt $BOX_PAD_X -or $mr -lt $BOX_PAD_X -or $mt -lt $BOX_PAD_Y -or $mb -lt $BOX_PAD_Y) {
             $v280Bad += "$($b.F) '$($b.N)' ($($b.W)x$($b.H)) leaves L=$ml R=$mr T=$mt B=$mb - a section box clears $BOX_PAD_X on the X sides and $BOX_PAD_Y on the Y ones (SPEC I73, V280a, I137c)"
+        }
+        elseif ($isHead280) {
+            # boxRoad: the floors above held; the head equality is V541(c)'s (SPEC V280 as amended, I199b).
         }
         elseif ($isCentred280) {
             # The two the ornament stretched (SPEC I156j, V240 amended): they pay CENTRING in
@@ -12886,6 +12890,8 @@ else {
     if ($v280Overlay -ne $OVERLAY_BOXES.Count) { $v280Bad += "$v280Overlay overlay box(es) were skipped, expected $($OVERLAY_BOXES.Count) - the exclusion is reading a name nothing carries, and a floating box would be measured for a margin and a neighbour it does not have (SPEC V20, B7)" }
     if ($v280Rot -eq 0) { $v280Bad += "no rotated child was skipped by (a) - the cut V27/V239/V240 make is not firing here, and the next rotated label would be read as a margin it is not (SPEC V209, V280c, B61)" }
 
+    if ($headSeen280 -ne 1) { Fail "V280 $headSeen280 box(es) skipped the head equality for V541, expected the 1 boxRoad is - an exception nothing reaches is an exception that stopped measuring (SPEC V280 as amended, I199b, V209, B7)" }
+    if ($objSeen280 -ne $OBJ_V547.Count) { Fail "V280 $objSeen280 box(es) left their Y to V547, expected the $($OBJ_V547.Count) of its roster - an exception nothing reaches is an exception that stopped measuring (SPEC V547, V209, B7)" }
     if ($v280Centred -ne 2) { Fail "V280 $v280Centred box(es) skipped the head equality for centring, expected the 2 the ornament stretched on the Settings tab - an exception nothing reaches is an exception that stopped measuring (SPEC V209, I156j)" }
 elseif ($v280Bad) { foreach ($b in $v280Bad) { Fail "V280 $b" } }
     else { Pass "V280 all $($v280Boxes.Count) section boxes clear 20 on four sides, and $v280Rot rotated child(ren) were cut out of the margin" }
@@ -12977,7 +12983,7 @@ else { Pass "V280 (d) the $($colBottoms.Count) Ghoul columns all close at $(@($c
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
 # (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
 # on them would be a false alarm on numbers this round agreed not to touch.
-if ($v280Boxes.Count -ne 74) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 74 I73 measures (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
+if ($v280Boxes.Count -ne 74) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 74 I73 measures (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
 else {
     # The declared HOLE is GONE with T908 and the 5px rule is whole again. T904 had left the
     # 680..1010 band of the Main grid with no bottom box, so two boxes faced each other a whole
@@ -13134,41 +13140,28 @@ $doc403 = Doc (Join-Path $dir "WoD20.11.lfm")
 $box403 = @($doc403.SelectNodes("//layout[label/@text='BLOOD POOL']"))[0]
 if ($null -eq $box403) { $v403Bad += "the BLOOD POOL box is gone from WoD20.11 - this rule measured nothing (SPEC V20, V209)" }
 else {
-    $bh403 = [int]$box403.GetAttribute("height")
-    $ttl403 = $box403.SelectSingleNode("label[@text='BLOOD POOL']")
-    $tb403 = [int]$ttl403.GetAttribute("top") + [int]$ttl403.GetAttribute("height")
     $rows403 = @{}
-    $dh403 = 0
     foreach ($k403 in $box403.ChildNodes) {
         if ($k403.NodeType -ne 'Element' -or $k403.LocalName -ne 'imageCheckBox') { continue }
         if ($k403.GetAttribute("field") -notlike 'bloodPool_*') { continue }
         $kt403 = [int]$k403.GetAttribute("top")
         $rows403[$kt403] = ($rows403[$kt403] + 1)
-        $dh403 = [int]$k403.GetAttribute("height")
     }
     $tops403 = @($rows403.Keys | Sort-Object)
     if ($tops403.Count -ne 2) { $v403Bad += "the dots sit on $($tops403.Count) row(s), expected 2 - twenty dots in two rows is the shape the box has drawn since it was written (SPEC V219, V209)" }
     elseif ($rows403[$tops403[0]] -ne $rows403[$tops403[1]]) { $v403Bad += "the two rows hold $($rows403[$tops403[0]]) and $($rows403[$tops403[1]]) dots - a block is two EQUAL rows, or the centring below is measuring a staircase" }
     else {
         $pitch403 = $tops403[1] - $tops403[0]
-        $blk403 = $pitch403 + $dh403
-        # The datum below is the INNER RULE of the filete and not the box edge (SPEC V403 as amended
-        # 2026-09-04, T961, I146f): three of the four palettes draw ORN_IN px inward and the owner's
-        # screenshot showed the second row sitting on that rule. ORN_IN is READ off WoD20.6 by V317
-        # ($in317) - a 9 typed here would be its second owner (SPEC B70).
-        $in403 = if ($in317.Success) { [int]$in317.Groups[1].Value } else { -1 }
-        $want403 = $tb403 + [math]::Floor(($bh403 - $in403 - $tb403 - $blk403) / 2)
-        if ($in403 -lt 0) { $v403Bad += "ORN_IN could not be read out of WoD20.6 - the datum of the centring is unmeasurable (SPEC V403, B70, V209)" }
-        elseif ($pitch403 -ne 30) {
+        # The block's y was centred between the title and the filete's inner rule (SPEC V403 as
+        # amended 2026-09-04, T961, I146f) until the 61st batch: title and block are ONE object
+        # centred in the box now (user 2026-10-02, SPEC I204j), and V547 owns that y.
+        if ($pitch403 -ne 30) {
             $v403Bad += "the two rows are ${pitch403}px apart and the owner set the pitch at 30 - it was 35 until T924, and 'a little less space between them' is the whole of the ask (SPEC I140f)"
-        }
-        elseif ($tops403[0] -ne $want403) {
-            $v403Bad += "the block opens at $($tops403[0]) in a ${bh403}px box whose title closes at $tb403 and whose inner rule sits ORN_IN=$in403 up from the edge - centred between the two a ${blk403}px block opens at $want403 (SPEC V403 as amended, I146f)"
         }
     }
 }
 if ($v403Bad) { foreach ($b403 in $v403Bad) { Fail "V403 $b403" } }
-else { Pass "V403 the 20 BLOOD POOL dots are two rows on one pitch, centred between the title and the inner rule of the filete (ORN_IN=$in403)" }
+else { Pass "V403 the 20 BLOOD POOL dots are two equal rows on one pitch of 30; V547 centres them with the title" }
 
 # ---- V407: clanFamily is the NAMED exception to the picker's ? ------------------------
 # SPEC V407, I140g, I140h, V365a, V333g, user 2026-09-02 item 5 - his own word, "e uma excecao".
@@ -13425,9 +13418,8 @@ else { Pass "V406 the band is defined once, in BandTop, and $($calls406.Count) r
 $XP_ONE_BOX = @(
     [pscustomobject]@{ F = 'WoD20.1.lfm';  E = 'edtCurrentXPMain' }
     [pscustomobject]@{ F = 'WoD20.11.lfm'; E = 'edtCurrentXPGhoul' }
-    [pscustomobject]@{ F = 'WoD20.15.lfm'; E = 'edtCurrentXPVampire' }
-    # The Vampire tab's Spent box is one title and one number too since the 48th batch (SPEC I191g).
-    [pscustomobject]@{ F = 'WoD20.15.lfm'; E = 'edtSpentXPVampire' }
+    # The Vampire tab's two left the roster in the 53rd batch (SPEC I196f): Current and Spent share ONE
+    # box with two titles, and V542 owns its geometry.
     [pscustomobject]@{ F = 'WoD20.7.lfm';  E = 'edtCurrentXPNumina' }
 )
 $v399Bad = @()
@@ -13442,22 +13434,13 @@ foreach ($row399 in $XP_ONE_BOX) {
     if ($lbls399.Count -ne 1) { $v399Bad += "the box holding $($row399.E) on $($row399.F) carries $($lbls399.Count) label(s), expected 1 - the title. The 'Current Experience' name is what the owner asked out of these boxes (SPEC I139h)" ; continue }
     $eds399 = @($box399.SelectNodes("edit"))
     if ($eds399.Count -ne 1) { $v399Bad += "the box holding $($row399.E) on $($row399.F) carries $($eds399.Count) edit(s), expected 1 - a second number here is a second owner of a computed value (SPEC V1, I11)"; continue }
-    $tb399 = [int]$lbls399[0].GetAttribute("top") + [int]$lbls399[0].GetAttribute("height")
-    $eh399 = [int]$ed399.GetAttribute("height")
-    # The datum below is the INNER RULE of the filete, the same one V403 reads for the blood pool
-    # (SPEC V399 as amended 2026-09-04, T965, Q67): ORN_IN is READ off WoD20.6 by V317 ($in317)
-    # and never typed here (SPEC B70).
-    $in399 = if ($in317.Success) { [int]$in317.Groups[1].Value } else { -1 }
-    if ($in399 -lt 0) { $v399Bad += "ORN_IN could not be read out of WoD20.6 - the datum of the centring is unmeasurable (SPEC V399, B70, V209)"; continue }
-    $want399 = $tb399 + [math]::Floor(($bh399 - $in399 - $tb399 - $eh399) / 2)
-    $got399 = [int]$ed399.GetAttribute("top")
-    if ($got399 -ne $want399) {
-        $v399Bad += "$($row399.E) opens at top=$got399 in a ${bh399}px box whose title closes at $tb399 and whose inner rule sits ORN_IN=$in399 up from the edge - centred between the two it opens at $want399 (SPEC V399 as amended, Q67)"
-    }
+    # The number's y was centred between the title and the filete's inner rule (SPEC V399 as amended
+    # 2026-09-04, Q67) until the 61st batch: title and number are ONE object centred in the box now
+    # (user 2026-10-02, SPEC I204e/j), and V547 owns that y for all three.
 }
-if ($XP_ONE_BOX.Count -lt 2) { Fail "V399 the roster names $($XP_ONE_BOX.Count) box(es) - a centring rule over one box is true of every box ever drawn (SPEC V20, B7)" }
+if ($XP_ONE_BOX.Count -lt 2) { Fail "V399 the roster names $($XP_ONE_BOX.Count) box(es) - a rule over one box is true of every box ever drawn (SPEC V20, B7)" }
 elseif ($v399Bad) { foreach ($b399 in $v399Bad) { Fail "V399 $b399" } }
-else { Pass "V399 the $($XP_ONE_BOX.Count) EXPERIENCE boxes each carry a title and ONE edit, with the number centred between the title and the inner rule of the filete" }
+else { Pass "V399 the $($XP_ONE_BOX.Count) EXPERIENCE boxes each carry a title and ONE edit; V547 centres the two" }
 
 # ---- V390: the COLUMN boxes of Numina and Ghoul are one width -------------------------
 # SPEC V390, I134a, I134h, I139n, B134, B112. The user asked for every box of the two rearranged
@@ -15549,8 +15532,8 @@ else {
 # Attack joined in T1005 (13th batch): the eleven Weapon/Attack rows of WoD20.3 became pickers
 # and each one carries its own ?, keyed on the weapon the row holds (SPEC I157a, V455a).
 # The Vampire tab's four joined in the 45th batch (SPEC I188f): the Ghoul tab's rows, copied
-# under their own names, the same 19/4/15/22.
-$V333_SRC   = @{ MeritPicked = 22; OpenAbility = 21; HeaderPicker = 2; DiscRow = 19; MainPathRow = 4; SecPathRow = 15; RitualRow = 22; VDiscRow = 19; VMainPathRow = 4; VSecPathRow = 15; VRitualRow = 22; HedgePicker = 20; PsychicPicker = 20; HedgeRitualPicker = 20; Attack = 11 }
+# under their own names, the same 19/4/15/22 - 21 rituals since the 61st batch (SPEC I204d).
+$V333_SRC   = @{ MeritPicked = 22; OpenAbility = 21; HeaderPicker = 2; DiscRow = 19; MainPathRow = 4; SecPathRow = 15; RitualRow = 21; VDiscRow = 19; VMainPathRow = 4; VSecPathRow = 15; VRitualRow = 21; HedgePicker = 20; PsychicPicker = 20; HedgeRitualPicker = 20; Attack = 11 }
 $q333       = @{}
 $qCalls333  = 0
 $qOpen333   = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
@@ -15589,7 +15572,7 @@ else {
     foreach ($k333 in $V333_SRC.Keys) {
         if (-not $q333.ContainsKey($k333)) { $v333Bad += "'$k333' carries no ? button - the $($V333_SRC[$k333]) rows it draws lost their description door (SPEC I102b, V333g)" }
     }
-    if ($qCalls333 -ne 236) { $v333Bad += "$qCalls333 ? button(s) in a TEMPLATE on the sheet, expected the 236 of I102b/I102h - 60 on the Vampire tab since the 45th batch, the Ghoul tab's 60 under their own names (SPEC I188f) - 11 on the Weapon/Attack rows since T1005 (SPEC I157a) - 22 on the merit/flaw rows, 21 on the background rows, 2 on the nature/demeanor headers, the 60 the Ghoul tab carries after T879 and T880 (19 discipline, 4 main path, 15 secondary path, 22 ritual) and the 52 the Numina tab carries after T875 (20 hedge path, 20 psychic, and 12 hedge ritual - seventeen after T892 converted the last five and TWENTY since T912 squared the box with HEDGE MAGIC PATHS, SPEC V269b, I136m) (SPEC V333g, T846, T872, T873, T874, T830, T875)" }
+    if ($qCalls333 -ne 234) { $v333Bad += "$qCalls333 ? button(s) in a TEMPLATE on the sheet, expected the 234 of I102b/I102h - 59 on the Vampire tab since the 61st batch (60 from the 45th; its ritual_27 left, SPEC I204d), the Ghoul tab's 60 under their own names (SPEC I188f) - 11 on the Weapon/Attack rows since T1005 (SPEC I157a) - 22 on the merit/flaw rows, 21 on the background rows, 2 on the nature/demeanor headers, the 59 the Ghoul tab carries after T879, T880 and the 62nd batch (19 discipline, 4 main path, 15 secondary path, 21 ritual) and the 52 the Numina tab carries after T875 (20 hedge path, 20 psychic, and 12 hedge ritual - seventeen after T892 converted the last five and TWENTY since T912 squared the box with HEDGE MAGIC PATHS, SPEC V269b, I136m) (SPEC V333g, T846, T872, T873, T874, T830, T875)" }
     # The ? buttons authored OUTSIDE a template, which the walk above cannot see: it reads
     # templates because that is where 148 buttons come from two dozen <button> elements. T874 made
     # this a real category for the first time - btnQFaith is a ? on a row that is not drawn by a
@@ -17080,7 +17063,7 @@ $pairsTbl528 = [regex]::Match($rootTxt, '(?s)GAME_PAIRS = \{(.*?)\};')
 foreach ($n528 in @('hdrMotivation', 'hdrClan', 'hdrOccupation', 'hdrGeneration', 'hdrResidence', 'hdrSire')) {
     if (-not $pairsTbl528.Success -or $pairsTbl528.Groups[1].Value -notmatch "`"$n528`"") { $v528Bad += "(c) GAME_PAIRS does not name $n528 - renderGameMode could never reach it (SPEC V528c)" }
 }
-if ($pairsTbl528.Success -and $pairsTbl528.Groups[1].Value -match 'attrRot|attrHead') { $v528Bad += "(c) GAME_PAIRS still names an ATTRIBUTES group label - a vampire would lose the rotated names the user asked back (SPEC V528 as amended, I191a)" }
+if ($pairsTbl528.Success -and $pairsTbl528.Groups[1].Value -match 'attrRot|attrHead') { $v528Bad += "(c) GAME_PAIRS still names an ATTRIBUTES group label - the rotated names are hidden by renderGameMode's rule loop, never paired (SPEC V528 as amended, I201b)" }
 foreach ($f528 in (Get-ChildItem $dir -Filter '*.lfm')) {
     if ((Get-Content $f528.FullName -Raw) -match 'name="attrHead') { $v528Bad += "(c) $($f528.Name) still carries an attrHead* label - the 48th batch deleted the three headings (SPEC I191a)" }
 }
@@ -17472,6 +17455,12 @@ else { Pass "V532 the Main's BLOOD POOL closes on HEALTH's seven-level line with
 # of the BLOOD POOL title and the box's floor, the odd pixel falling below (as V399 does). The box's
 # height is the band's now (b), so it is read, not derived from the grid.
 #
+# AMENDED (53rd batch, SPEC V533 as amended, I196c/d/f/g, user item 4 - "tight"): the grid opens 1
+# under the title, like every titled box (SPEC Q112.2), and the box's height is DERIVED from it again -
+# T0 + 4 steps + 25 + the foot of 15 (SPEC V393) = 176. Only the SECOND column is a stack now; the
+# fourth is the one EXPERIENCE box of V542. Mutations: vdotbloodPool_1 at top=40 -> RED (a) - a
+# second EXPERIENCE box back at 1277,100 -> RED (b) - the middle column at top=233 -> RED (c).
+#
 # Mutation (SPEC V222): vdotbloodPool_11 at top=49 -> RED (a) - vdotbloodPool_21 at top=124 (a step
 # of 30 from 64) -> RED (a) - the upper BLOOD PER TURN box 106 -> 107 -> RED (b) (48th batch; was
 # 218 -> 128) - the middle column at top=143 -> RED (c). Probe: a fontSize on dynRevWeaknessV -> GREEN.
@@ -17488,7 +17477,7 @@ if ($null -ne $first533) {
     $ttl533 = $first533.ParentNode.SelectSingleNode("label[@text='BLOOD POOL']")
     if ($null -ne $ttl533) {
         $tb533 = [int]$ttl533.GetAttribute('top') + [int]$ttl533.GetAttribute('height')
-        $t0533 = $tb533 + [math]::Floor(([int]$first533.ParentNode.GetAttribute('height') - $tb533 - (4 * $step533 + 25)) / 2)
+        $t0533 = $tb533 + 1
     }
 }
 if ($step533 -le 0 -or $t0533 -le 0) { $v533Bad += "(a) the ability row step ($step533) or the pool's title was not read - the grid would be measured against nothing (SPEC V20, V209)" }
@@ -17506,21 +17495,22 @@ $pool533 = $d533.SelectSingleNode("//imageCheckBox[@name='vdotbloodPool_1']")
 if ($dots533 -lt 50 -or $null -eq $pool533) { $v533Bad += "only $dots533 of the fifty vdotbloodPool dots were read (SPEC V20, V209)" }
 else {
     $pb533 = $pool533.ParentNode
-    # The width is still the grid's; the height is the band's since the 50th batch, and (b) holds the
-    # other three columns to it.
+    # Width AND height are the grid's again since the 53rd batch (SPEC V533a as amended): the
+    # height is read here only to be held to T0 + 4 steps + 25 + 15, and (b) holds the band to it.
     $ww533 = 24 + 9 * 26 + 25 + 24; $wh533 = [int]$pb533.GetAttribute('height')
+    if ($wh533 -ne ($t0533 + 4 * $step533 + 25 + 15)) { $v533Bad += "(a) the pool box is $wh533 tall - its grid asks for $($t0533 + 4 * $step533 + 25 + 15): the first row 1 under the title, five rows, the foot of 15 (SPEC V533a as amended, I196c, V393)" }
     if ($pb533.GetAttribute('left') -ne '0' -or $pb533.GetAttribute('top') -ne '10' -or [int]$pb533.GetAttribute('width') -ne $ww533) { $v533Bad += "(a) the pool box is $($pb533.GetAttribute('left')),$($pb533.GetAttribute('top')) $($pb533.GetAttribute('width')) wide - its grid asks for 0,10 and $ww533 (SPEC V533a)" }
-    # (b) the band: four COLUMNS opening at top=10 (SPEC V533b as amended, 48th batch, I191f/g). The
-    # second and the fourth are STACKS of two boxes - the lower one at the same left and width, 5 under
-    # the upper, closing where the pool closes - so the band still ends on one y.
+    # (b) the band: four COLUMNS opening at top=10 (SPEC V533b as amended, 48th and 53rd batches). The
+    # SECOND is a STACK of two boxes - the lower one at the same left and width, 5 under the upper,
+    # closing where the pool closes; the other three are one box each, as tall as the pool.
     $band533 = @($d533.SelectNodes("//scrollBox/layout[@top='10']") | Sort-Object { [int]$_.GetAttribute('left') })
     $under533 = @()
-    if ($band533.Count -ne 4) { $v533Bad += "(b) $($band533.Count) box(es) stand on the top band, not the four columns (pool, blood per turn, weakness, experience) (SPEC V533b, V20)" }
+    if ($band533.Count -ne 5) { $v533Bad += "(b) $($band533.Count) box(es) stand on the top band, not the five columns (pool, blood per turn, WILLPOWER, weakness, experience) since the 57th batch (SPEC V533b as amended, I200f, V20)" }
     else {
         $edge533 = 0
-        for ($i533 = 0; $i533 -lt 4; $i533++) {
+        for ($i533 = 0; $i533 -lt 5; $i533++) {
             $bx533 = $band533[$i533]; $bl533 = $bx533.GetAttribute('left'); $bh533 = [int]$bx533.GetAttribute('height')
-            if ($i533 -eq 1 -or $i533 -eq 3) {
+            if ($i533 -eq 1) {
                 $lo533 = @($d533.SelectNodes("//scrollBox/layout[@left='$bl533'][@width='$($bx533.GetAttribute('width'))']") | Where-Object { $_.GetAttribute('top') -ne '10' -and [int]$_.GetAttribute('top') -lt (10 + $wh533) })
                 if ($lo533.Count -ne 1) { $v533Bad += "(b) the band column at left $bl533 is not a stack of two boxes - the user split it in two (SPEC V533b as amended, I191f/g)" }
                 else {
@@ -17633,6 +17623,12 @@ $abilFirst534 = 0
 $tplA534 = $docs534.Main.SelectSingleNode("//template[@name='Ability']")
 if ($tplA534) { $d1 = $tplA534.SelectSingleNode("imageCheckBox[@name='abil`$(col)`$(num)_1']"); if ($d1) { $abilFirst534 = [int]$d1.GetAttribute('left') } }
 $tplT534 = $docs534.Main.SelectSingleNode("//template[@name='Attribute']")
+# 59th batch (SPEC I202a, V534d as amended, V546): a vampire's attribute row starts its dots after the
+# label the root generates - ATTR_LABEL_W + 5 + 25 - not at the template's 125 (the mortal's).
+$attrLabelW534 = 0
+if ($rootTxt -match '(?m)^\s*ATTR_LABEL_W = (\d+);') { $attrLabelW534 = [int]$Matches[1] }
+$attrFirstV534 = 0
+if ($attrLabelW534 -gt 0) { $attrFirstV534 = $attrLabelW534 + 5 + 25 }
 $attrFirst534 = 0
 if ($tplT534) { $d1 = $tplT534.SelectSingleNode("image[@name='dot`$(field)_1']"); if ($d1) { $attrFirst534 = [int]$d1.GetAttribute('left') } }
 $abil534 = @('boxTalents', 'boxSkills', 'boxKnowledges') | ForEach-Object { $geo534[$_] }
@@ -17646,11 +17642,14 @@ else {
         if ($i -gt 0 -and $abil534[$i].L -ne ($abil534[$i - 1].L + $abil534[$i - 1].W + 5)) { $v534Bad += "(b) ability box $i opens at $($abil534[$i].L) - the box before it pushes it to $($abil534[$i - 1].L + $abil534[$i - 1].W + 5) (SPEC V534b, Q109.2)" }
     }
     $ga534 = $geo534['boxAttributes']
-    if ($null -eq $ga534 -or $ga534.L -ne 0 -or ($ga534.L + $ga534.W) -ne ($abil534[2].L + $abil534[2].W)) { $v534Bad += "(b) ATTRIBUTES does not span the three ability boxes, 0..$($abil534[2].L + $abil534[2].W) (SPEC V534b, item 2.10)" }
+    # 58th batch (SPEC I201b/d, V534b as amended): ATTRIBUTES and the header open on ONE edge - the
+    # avatar takes the corner at their left - and both close on KNOWLEDGES' edge.
+    $gh534 = $geo534['boxHeader']
+    if ($null -eq $ga534 -or $null -eq $gh534 -or $ga534.L -ne $gh534.L -or $ga534.W -ne $gh534.W -or ($ga534.L + $ga534.W) -ne ($abil534[2].L + $abil534[2].W)) { $v534Bad += "(b) ATTRIBUTES and the header must open on one edge and close on KNOWLEDGES' edge, $($abil534[2].L + $abil534[2].W) (SPEC V534b as amended, I201d)" }
     # 48th batch (SPEC I191d, V534b as amended): EXPERIENCE and HEALTH close on KNOWLEDGES' edge, and
     # what they hold is placed by the table INSIDE the narrower box - the XP number centred.
     $edge534 = $abil534[2].L + $abil534[2].W
-    foreach ($nm in @('boxExperience', 'dynHealth_box')) {
+    foreach ($nm in @('dynHealth_box')) {
         $g = $geo534[$nm]
         if ($null -eq $g -or ($g.L + $g.W) -ne $edge534) { $v534Bad += "(b) $nm does not close on KNOWLEDGES' edge at $edge534 - the user's item 4 of 2026-10-01 (SPEC V534b as amended, I191d)" }
     }
@@ -17664,9 +17663,28 @@ else {
         $g = $geo534[$nm]; $gb = $geo534['boxExperience']
         if ($null -ne $g -and $null -ne $gb -and $g.L -ne [math]::Floor(($gb.W - $g.W) / 2)) { $v534Bad += "(b) $nm opens at $($g.L) - centred in the $($gb.W)px EXPERIENCE it opens at $([math]::Floor(($gb.W - $g.W) / 2)) (SPEC I191d)" }
     }
+    # 58th batch (SPEC I201d, V534b as amended): the header's twelve cells are placed by the table -
+    # column 0 where the XML puts it, column 1 half the width gained to the right, column 2 all of it -
+    # and every cell keeps the XML's top, width and height; each pair of column 2 shares one rect.
+    if ($null -ne $gh534 -and $node534.ContainsKey('boxHeader')) {
+        $dW534 = $gh534.W - [int]$node534['boxHeader'].Node.GetAttribute('width')
+        $cells534 = @('hdrName', 'hdrPlayer', 'hdrChronicle', 'hdrNature', 'hdrDemeanor', 'hdrConcept', 'hdrMotivation', 'hdrClan', 'hdrOccupation', 'hdrGeneration', 'hdrResidence', 'hdrSire')
+        $nCells534 = 0
+        foreach ($nm in $cells534) {
+            $g = $geo534[$nm]
+            if ($null -eq $g -or -not $node534.ContainsKey($nm)) { $v534Bad += "(b) $nm is not placed by VAMP_GEOM inside the header (SPEC V534b as amended, I201d, V537a)"; continue }
+            $nCells534++
+            $xn = $node534[$nm].Node; $xl = [int]$xn.GetAttribute('left')
+            $col = if ($xl -lt 300) { 0 } elseif ($xl -lt 600) { 1 } else { 2 }
+            $wantL = $xl + [int][math]::Floor($dW534 * $col / 2)
+            if ($g.L -ne $wantL -or $g.T -ne [int]$xn.GetAttribute('top') -or $g.W -ne [int]$xn.GetAttribute('width') -or $g.H -ne [int]$xn.GetAttribute('height')) { $v534Bad += "(b) $nm is $($g.L),$($g.T) $($g.W)x$($g.H) - column $col of the header opens at $wantL with the XML's top, width and height (SPEC V534b as amended, I201d)" }
+        }
+        if ($nCells534 -lt 12) { $v534Bad += "(b) only $nCells534 of the header's 12 cells are placed (SPEC V534b, V20)" }
+    }
+    else { $v534Bad += "(b) boxHeader is not in VAMP_GEOM and in the XML (SPEC V534a, V20)" }
 }
 # (c) the y chain, the row count, the stack and the seven-level line
-$hdr534 = @($prj534.Main | Where-Object { $_.T -eq 0 -and $_.L -eq 0 })
+$hdr534 = @($prj534.Main | Where-Object { $_.Name -eq 'boxHeader' })
 $R534 = @()
 $va534 = [regex]::Match($rootTxt, '(?s)VAMPIRE_ABILITIES = \{(.*?)\n\t\t\t\};')
 if ($va534.Success) {
@@ -17715,6 +17733,10 @@ else {
     $line534 = $T534 + $V415_HEALTH_ROWS * $pitch534 + $pad534
     $gp = $geo534['mainBloodPool']
     if ($null -ne $gp -and ($gp.T + $gp.H) -ne $line534) { $v534Bad += "(c) mainBloodPool closes at $($gp.T + $gp.H) - the seven-level HEALTH line is $line534 (SPEC V534c, V415)" }
+    # 58th batch (SPEC I201c, V534c as amended): EXPERIENCE stands under VIRTUES - its left and width, 5
+    # below it - and closes where the pool closes.
+    $gx = $geo534['boxExperience']
+    if ($null -eq $gx -or $null -eq $gv -or $null -eq $gp -or $gx.L -ne $gv.L -or $gx.W -ne $gv.W -or $gx.T -ne ($gv.T + $gv.H + 5) -or ($gx.T + $gx.H) -ne ($gp.T + $gp.H)) { $v534Bad += "(c) EXPERIENCE is $($gx.L),$($gx.T) $($gx.W)x$($gx.H) - under VIRTUES it opens at $($gv.L),$($gv.T + $gv.H + 5) and closes with the pool at $($gp.T + $gp.H) (SPEC V534c as amended, I201c)" }
     $av = @('avatarFrame', 'avatarImage', 'ornAvatar') | ForEach-Object { $g = $geo534[$_]; if ($g) { "$($g.L)/$($g.T)/$($g.W)/$($g.H)" } }
     if (@($av).Count -ne 3) { $v534Bad += "(c) VAMP_GEOM places $(@($av).Count) of the avatar's three controls (SPEC V534c, V20)" }
     elseif (@($av | Sort-Object -Unique).Count -ne 1) { $v534Bad += "(c) the avatar's three controls do not share one rect (SPEC V534c, V309)" }
@@ -17722,40 +17744,51 @@ else {
         # Beside EXPERIENCE, on the header's top, the XML's width and TWICE the height it had when it
         # closed on the seven-level line - the user's "o dobro da altura" (SPEC I193c).
         $ga = $geo534['avatarFrame']; $ge = $geo534['boxExperience']
-        $hAv534 = 2 * ($V415_HEALTH_ROWS * $pitch534 + $pad534)
-        if ($null -eq $ge -or $null -eq $xAv534 -or $ga.T -ne $ge.T -or $ga.L -ne ($ge.L + $ge.W + 5) -or $ga.W -ne [int]$xAv534.GetAttribute('width') -or $ga.H -ne $hAv534) { $v534Bad += "(c) the avatar is $($ga.L),$($ga.T) $($ga.W)x$($ga.H) - beside EXPERIENCE it is $($ge.L + $ge.W + 5),$($ge.T) $($xAv534.GetAttribute('width'))x$hAv534 (SPEC V534c as amended, I193c)" }
+        # 54th batch (SPEC V534c as amended, I197a): both 30% smaller - 0.7 x the XML's width and 0.7 x
+        # that doubled height, each to the nearest pixel (238 x 342). 0.7 is the user's number, not
+        # derived. Mutation: the three back at {1305,0,340,488} -> RED (c) - {1305,0,238,341} -> RED (c).
+        # 56th batch (SPEC V534c as amended, I199d, user item 5): the HEIGHT closes on the foot of the
+        # ATTRIBUTES band - read off VAMP_GEOM - and no longer on 0.7 x the doubled seven-level box.
+        # Mutation: the three back at {1305,0,238,342} -> RED (c).
+        $atr534 = $geo534['boxAttributes']
+        $hAv534 = -1
+        if ($null -ne $atr534 -and $null -ne $ga) { $hAv534 = $atr534.T + $atr534.H - $ga.T }
+        # 58th batch (SPEC I201e, V534c as amended): the avatar takes the corner at the header's top and
+        # is as wide as the room left of ATTRIBUTES, 5 short of its edge. Mutation: width 166 -> RED (c).
+        $wAv534 = -1
+        if ($null -ne $atr534) { $wAv534 = $atr534.L - 5 }
+        if ($null -eq $atr534 -or $ga.T -ne $hdr534[0].T -or $ga.L -ne 0 -or $ga.W -ne $wAv534 -or $ga.H -ne $hAv534) { $v534Bad += "(c) the avatar is $($ga.L),$($ga.T) $($ga.W)x$($ga.H) - in the corner it is 0,$($hdr534[0].T) ${wAv534}x$hAv534 (SPEC V534c as amended, I193c, I197a, I199d, I201e)" }
     }
 }
 # (d) the attribute band: three per third, dots in the ability column below, heading over its row
 $third534 = @(@('strength', 'dexterity', 'stamina', 'Physical'), @('charisma', 'manipulation', 'appearance', 'Social'), @('perception', 'inteligence', 'wits', 'Mental'))
-if ($null -ne $abil534[2] -and $attrFirst534 -gt 0 -and $abilFirst534 -gt 0) {
+if ($null -ne $abil534[2] -and $attrFirstV534 -gt 0 -and $abilFirst534 -gt 0) {
     for ($c = 0; $c -lt 3; $c++) {
         $colL534 = $abil534[$c].L
         foreach ($f in $third534[$c][0..2]) {
             $g = $geo534["attrRow_$f"]
             if ($null -eq $g) { $v534Bad += "(d) VAMP_GEOM does not place attrRow_$f (SPEC V534d)"; continue }
-            if (($g.L + $attrFirst534) -ne ($colL534 + 20 + $abilFirst534)) { $v534Bad += "(d) attrRow_$f puts its first dot at $($g.L + $attrFirst534) - the ability column under it starts its dots at $($colL534 + 20 + $abilFirst534) (SPEC V534d)" }
-            if ($g.W -ne ($attrFirst534 + 9 * 25)) { $v534Bad += "(d) attrRow_$f is $($g.W) wide, not $attrFirst534 + 9 x 25 (SPEC V534d)" }
+            # 58th batch (SPEC I201b, V534d as amended): no rotated names, so the thirds close up - 20 apart
+            # inside a band that opens 20 in - and the first dot no longer sits over the ability column.
+            if ($g.L -ne (20 + $c * ($attrFirstV534 + 9 * 25 + 18))) { $v534Bad += "(d) attrRow_$f opens at $($g.L) - third $c of the band opens at $(20 + $c * ($attrFirstV534 + 9 * 25 + 18)), 18 after the one before (SPEC V534d as amended, I201b, I203a)" }
+            if ($g.W -ne ($attrFirstV534 + 9 * 25)) { $v534Bad += "(d) attrRow_$f is $($g.W) wide, not $attrFirstV534 + 9 x 25 (SPEC V534d as amended, I202b)" }
         }
-        # 48th batch (SPEC I191a, V534d as amended): no heading over the third; its ROTATED name stands
-        # before it, in the same relation to its first row as the XML draws it for a mortal, and the
-        # three rows of every third open where the XML's first third opens.
+        # 58th batch (SPEC I201b, V534d as amended): the rotated names are a MORTAL's - they stay in the
+        # XML, hide for a vampire (V537a) and are NOT in VAMP_GEOM; the three rows of every third open
+        # where the XML's first third opens.
         $nmR = "attrRot$($third534[$c][3])"
-        $xr = $docs534.Main.SelectSingleNode("//label[@name='$nmR']")
-        $x0 = $docs534.Main.SelectSingleNode("//layout[@name='attrRow_$($third534[$c][0])']")
-        $g0 = $geo534["attrRow_$($third534[$c][0])"]; $gR = $geo534[$nmR]
-        if ($null -eq $xr -or $null -eq $x0 -or $null -eq $g0 -or $null -eq $gR) { $v534Bad += "(d) $nmR or its first row is not in the XML and in VAMP_GEOM (SPEC V534d, V20)" }
-        else {
-            $dx = [int]$xr.GetAttribute('left') - [int]$x0.GetAttribute('left'); $dy = [int]$xr.GetAttribute('top') - [int]$x0.GetAttribute('top')
-            if (($gR.L - $g0.L) -ne $dx -or ($gR.T - $g0.T) -ne $dy) { $v534Bad += "(d) $nmR sits at ($($gR.L), $($gR.T)) - $dx, $dy from its first row as the XML draws it puts it at ($($g0.L + $dx), $($g0.T + $dy)) (SPEC V534d as amended, I191a)" }
-        }
-        for ($k = 0; $k -lt 3; $k++) {
+        if ($null -eq $docs534.Main.SelectSingleNode("//label[@name='$nmR']")) { $v534Bad += "(d) $nmR is not in the XML (SPEC V534d, V20)" }
+        if ($geo534.ContainsKey($nmR)) { $v534Bad += "(d) VAMP_GEOM places $nmR - a vampire's band has no rotated names; renderGameMode hides it (SPEC V534d as amended, I201b, V537a)" }        for ($k = 0; $k -lt 3; $k++) {
             $gk = $geo534["attrRow_$($third534[$c][$k])"]; $xk = $docs534.Main.SelectSingleNode("//layout[@name='attrRow_$($third534[0][$k])']")
             if ($null -ne $gk -and $null -ne $xk -and $gk.T -ne [int]$xk.GetAttribute('top')) { $v534Bad += "(d) attrRow_$($third534[$c][$k]) opens at $($gk.T) - the band's rows open where the XML's first third does, $($xk.GetAttribute('top')) (SPEC I191b)" }
         }
     }
 }
-# (e) Traits and Combat: four dots more, and the rest of Traits moves by the same
+# 58th batch (SPEC I201b, V534d as amended): the band is 20 + 3 thirds + 2 gaps of 20 + 20 wide - DERIVED
+# from the template's dots - and closes on KNOWLEDGES' edge, so it opens 170 in. Mutation: attrRow_charisma
+# in 395 -> RED (d).
+$gaB534 = $geo534['boxAttributes']
+if ($null -ne $gaB534 -and $attrFirstV534 -gt 0 -and $gaB534.W -ne (20 + 3 * ($attrFirstV534 + 9 * 25) + 2 * 18 + 20)) { $v534Bad += "(d) ATTRIBUTES is $($gaB534.W) wide - 3 thirds of $($attrFirstV534 + 9 * 25), two gaps of 18 and a margin of 20 a side make $(20 + 3 * ($attrFirstV534 + 9 * 25) + 2 * 18 + 20) (SPEC V534d as amended, I201b)" }# (e) Traits and Combat: four dots more, and the rest of Traits moves by the same
 $xmlW534 = { param($nm) if ($node534.ContainsKey($nm)) { [int]$node534[$nm].Node.GetAttribute('width') } else { 0 } }
 $xmlL534 = { param($nm) if ($node534.ContainsKey($nm)) { [int]$node534[$nm].Node.GetAttribute('left') } else { 0 } }
 if ($null -eq $geo534['boxBackgrounds'] -or $null -eq $geo534['boxCombatTraits']) { $v534Bad += "(e) VAMP_GEOM does not place BACKGROUNDS or COMBAT TRAITS (SPEC V534e)" }
@@ -17765,7 +17798,9 @@ else {
     foreach ($nm in @('boxMerits', 'boxFlaws', 'boxDerangements', 'boxOther')) {
         if ($null -eq $geo534[$nm] -or $geo534[$nm].L -ne ((& $xmlL534 $nm) + $dBg534)) { $v534Bad += "(e) $nm does not move right by the $dBg534 BACKGROUNDS grew (SPEC V534e, Q109.9)" }
     }
-    if (($geo534['boxCombatTraits'].W - (& $xmlW534 'boxCombatTraits')) -ne 100 -or $geo534['boxCombatTraits'].L -ne (& $xmlL534 'boxCombatTraits')) { $v534Bad += "(e) COMBAT TRAITS does not grow by four dots in place (SPEC V534e, Q109.8)" }
+    # 61st batch (SPEC I204g): the width is no longer XML + four dots - the names shrink to what they
+    # need (COMBAT_LABEL_W) - and V546(d) owns it; what stays here is IN PLACE.
+    if ($geo534['boxCombatTraits'].L -ne (& $xmlL534 'boxCombatTraits')) { $v534Bad += "(e) COMBAT TRAITS does not stay in place (SPEC V534e, Q109.8)" }
 }
 # zero-guard
 if ($geo534.Count -lt 20) { $v534Bad += "only $($geo534.Count) rect(s) read off VAMP_GEOM - the projection is a fraction of the sheet (SPEC V20)" }
@@ -17815,7 +17850,9 @@ foreach ($s535 in $spec535) {
         if ($k -lt $K535) { if ($null -ne $cp) { $v535Bad += "(b) $($s535[3])_$k exists - no generation's ceiling is below $K535 (SPEC V535b)" }; continue }
         if ($null -eq $cp) { $v535Bad += "(b) $($s535[1]) has no faded twin $($s535[3])_$k (SPEC V535b)"; continue }
         if ($cp.GetAttribute('left') -ne $lv.GetAttribute('left') -or $cp.GetAttribute('top') -ne $lv.GetAttribute('top')) { $v535Bad += "(b) $($s535[3])_$k is not on its live dot's spot (SPEC V535b)" }
-        if ($cp.HasAttribute('field') -or $cp.HasAttribute('onClick') -or $cp.GetAttribute('checked') -ne 'true' -or $cp.GetAttribute('visible') -ne 'false' -or $cp.GetAttribute('opacity') -ne $s535[4]) { $v535Bad += "(b) $($s535[3])_$k is not the hidden, lit, field-less twin at $($s535[4]) (SPEC V535b)" }
+        # checked left this leg in the 54th batch: the twin is EMPTY and V543(a) is its one owner
+        # (SPEC V535b as amended, I197b, B70).
+        if ($cp.HasAttribute('field') -or $cp.HasAttribute('onClick') -or $cp.GetAttribute('visible') -ne 'false' -or $cp.GetAttribute('opacity') -ne $s535[4]) { $v535Bad += "(b) $($s535[3])_$k is not the hidden, field-less twin at $($s535[4]) (SPEC V535b)" }
     }
     if ($s535[3] -eq '' -and @($t535.SelectNodes("*[contains(@name,'cap')]")).Count -gt 0) { $v535Bad += "(b) $($s535[1]) carries a faded twin - backgrounds have no ceiling (SPEC V535b, Q109.5)" }
 }
@@ -17846,8 +17883,9 @@ else { Pass "V535 nine dots on a vampire's attributes, abilities, backgrounds an
 # ---- V536: the double BLOOD PER TURN box, the Main's faded line, the clan's weakness, the two flags ----
 # Mutation (SPEC V222): dynBloodTurnMain at top=60 -> RED (b) - one clan weakness doubled -> RED (c) -
 # vampFlagsOff without its game test -> RED (d) - dynMaxTraitV back at 20,52 160x40 -> RED (a) (50th
-# batch). Probe: a fontSize change on dynRevWeaknessV -> GREEN (dynMaxTraitV's fontSize is measured
-# since the 50th batch, so it cannot be the probe any more).
+# batch; the 61st moved the y to V547) - dynRevWeaknessV back at fontSize 12 with height 121 -> RED (c) (53rd batch: 833 < 949).
+# Probe: horzTextAlign on dynRevWeaknessV -> GREEN (its fontSize is measured since the 53rd batch, and
+# dynMaxTraitV's since the 50th).
 $v536Bad = @()
 $d15536 = Doc (Join-Path $dir 'WoD20.15.lfm')
 # (a) TWO boxes since the 48th batch (SPEC V536a as amended, I191f): BLOOD PER TURN over its number,
@@ -17860,7 +17898,7 @@ else {
     if ($null -eq $up536.SelectSingleNode("label[@name='dynBloodTurn']") -or $null -eq $lo536.SelectSingleNode("label[@name='dynMaxTraitV']")) { $v536Bad += "(a) dynBloodTurn and dynMaxTraitV do not each sit under their own title (SPEC V536a as amended)" }
     if ($up536 -eq $lo536 -or $up536.GetAttribute('left') -ne $lo536.GetAttribute('left') -or [int]$lo536.GetAttribute('top') -ne ([int]$up536.GetAttribute('top') + [int]$up536.GetAttribute('height') + 5)) { $v536Bad += "(a) MAX TRAIT LEVEL is not the box 5 under BLOOD PER TURN in the same column (SPEC V536a as amended, I191f)" }
     foreach ($bx536 in @($up536, $lo536)) {
-        $bw536 = [int]$bx536.GetAttribute('width'); $bh536 = [int]$bx536.GetAttribute('height')
+        $bw536 = [int]$bx536.GetAttribute('width')
         $kids536 = @($bx536.SelectNodes('label') | Sort-Object { [int]$_.GetAttribute('top') })
         if ($kids536.Count -ne 2) { $v536Bad += "(a) the box at top $($bx536.GetAttribute('top')) holds $($kids536.Count) label(s), not a title and its number (SPEC V536a as amended)" }
         $prev536 = 0
@@ -17872,7 +17910,8 @@ else {
             $floor536 = $prev536
             if ($bx536 -eq $lo536 -and $k -ne $kids536[0]) { $floor536 = [int]$kids536[0].GetAttribute('top') + 16 }
             if ($t -lt $floor536) { $v536Bad += "(a) '$($k.GetAttribute('text'))$($k.GetAttribute('name'))' at top $t overlaps the label above it (SPEC V536a)" }
-            if ($l -lt 15 -or ($l + $w) -gt ($bw536 - 15) -or $t -lt 15 -or ($t + $h) -gt ($bh536 - 15)) { $v536Bad += "(a) '$($k.GetAttribute('text'))$($k.GetAttribute('name'))' leaves the box's 15px margin (SPEC V536a)" }
+            # X only since the 61st batch: the Y of title and number is V547's centred object (SPEC I204b).
+            if ($l -lt 15 -or ($l + $w) -gt ($bw536 - 15)) { $v536Bad += "(a) '$($k.GetAttribute('text'))$($k.GetAttribute('name'))' leaves the box's 15px margin (SPEC V536a)" }
             $prev536 = $t + $h
         }
     }
@@ -17883,9 +17922,8 @@ else {
         foreach ($at536 in @('left', 'width', 'height', 'fontSize', 'horzTextAlign', 'vertTextAlign')) {
             if ($nu536.GetAttribute($at536) -cne $nl536.GetAttribute($at536)) { $v536Bad += "(a) dynMaxTraitV has $at536='$($nl536.GetAttribute($at536))' and dynBloodTurn '$($nu536.GetAttribute($at536))' - the number sits where the one above sits (SPEC V536a as amended, I193g)" }
         }
-        $fu536 = [int]$up536.GetAttribute('height') - [int]$nu536.GetAttribute('top') - [int]$nu536.GetAttribute('height')
-        $fl536 = [int]$lo536.GetAttribute('height') - [int]$nl536.GetAttribute('top') - [int]$nl536.GetAttribute('height')
-        if ($fu536 -ne $fl536) { $v536Bad += "(a) dynMaxTraitV stands $fl536 off its floor and dynBloodTurn $fu536 - one foot (SPEC V536a as amended, I193g)" }
+        # The two stood on one foot (SPEC I193g) until the 61st batch: each title + number is a centred
+        # object now (SPEC I204b, V547), and a two-line title gives the lower one a different foot.
     }
 }
 $vc536 = NoComments (LuaFn $rootTxt 'renderVampCaps')
@@ -17919,8 +17957,26 @@ foreach ($lg536 in @(@('en', 'Weakness'), @('pt', 'Fraqueza'))) {
 }
 if ($null -eq $wv536) { $v536Bad += "(c) dynRevWeaknessV is gone (SPEC V20)" }
 else {
-    $cap536 = [math]::Floor([int]$wv536.GetAttribute('width') / 6.0) * [math]::Floor([int]$wv536.GetAttribute('height') / 16)
-    if ($long536 -gt $cap536) { $v536Bad += "(c) the longest clan weakness is $long536 chars and dynRevWeaknessV holds $cap536 - it would be cut (SPEC V536c)" }
+    # AMENDED (57th batch, SPEC V536c as amended, I200d, Q117.3): the text SCROLLS, so there is no
+    # cut left to measure and the capacity leaves. What is measured is the user's other sentence -
+    # the text never runs under the bar and the bar never covers text: dynRevWeaknessV is the ONLY
+    # child of the scrollBox weakScrollV, word-wrapped and autoSized, opening TIP_PAD + TIP_BAR in
+    # and closing TIP_PAD + TIP_BAR before the scrollBox's edge (both READ off the root, 8 and 16,
+    # the note tooltip's bands - SPEC V513e), and renderRevWeakness centres a text that fits.
+    $pad536 = [regex]::Match($rootTxt, 'TIP_PAD\s*=\s*(\d+);'); $bar536 = [regex]::Match($rootTxt, 'TIP_BAR\s*=\s*(\d+);')
+    $sv536 = $wv536.ParentNode
+    if (-not $pad536.Success -or -not $bar536.Success) { $v536Bad += "(c) TIP_PAD or TIP_BAR was not read off the root - the bands are unmeasurable (SPEC V20, V209)" }
+    elseif ($sv536.LocalName -ne 'scrollBox' -or $sv536.GetAttribute('name') -ne 'weakScrollV') { $v536Bad += "(c) dynRevWeaknessV does not sit in the scrollBox weakScrollV - the text cannot scroll (SPEC V536c as amended, I200d)" }
+    else {
+        $gut536 = [int]$pad536.Groups[1].Value + [int]$bar536.Groups[1].Value
+        $kids536 = @($sv536.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
+        if ($kids536.Count -ne 1) { $v536Bad += "(c) weakScrollV holds $($kids536.Count) children - the label must be its only one (SPEC V536c as amended)" }
+        if ($wv536.GetAttribute('wordWrap') -ne 'true' -or $wv536.GetAttribute('autoSize') -ne 'true') { $v536Bad += "(c) dynRevWeaknessV is not wordWrap + autoSize - a long text would not grow into the scroll (SPEC V536c as amended, I200d)" }
+        $l536 = [int]$wv536.GetAttribute('left'); $w536 = [int]$wv536.GetAttribute('width')
+        if ($l536 -ne $gut536 -or ($l536 + $w536 + $gut536) -ne [int]$sv536.GetAttribute('width')) { $v536Bad += "(c) dynRevWeaknessV runs $l536..$($l536 + $w536) in a $($sv536.GetAttribute('width')) scrollBox - it must open $gut536 in and close $gut536 before the edge (TIP_PAD + TIP_BAR), or the text runs under the bar (SPEC V536c as amended, I200d)" }
+    }
+    $rw536 = NoComments (LuaFn ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.11.lfm')))) 'renderRevWeakness')
+    if ($rw536 -notmatch 'lv\.top = math\.max\(0,' -or $rw536 -notmatch 'weakScrollV') { $v536Bad += "(c) renderRevWeakness does not centre a weakness that fits (lv.top = math.max(0, ...) off weakScrollV) (SPEC V536c as amended, I200d)" }
 }
 # (d)
 $vf536 = NoComments (LuaFn $rootTxt 'vampFlagsOff')
@@ -17932,7 +17988,7 @@ $rd536 = @([regex]::Matches($rootTxt, '(?s)<event name="onNodeReady">(.*?)</even
 if ($rd536.Count -ne 1 -or $rd536[0].Groups[1].Value -notmatch '(?s)setField\("stShowNumina", true\).*?vampFlagsOff\(\);') { $v536Bad += "(d) the root's onNodeReady does not call vampFlagsOff after the stShowNumina seed (SPEC V536d)" }
 if ($gm534 -notmatch '"chkShowNumina"' -or $gm534 -notmatch '"chkShowDisciplines"' -or $gm534 -notmatch "vamp and $([regex]::Escape($DIM_ART)) or 1" -or $gm534 -notmatch 'c\.enabled = not vamp') { $v536Bad += "(d) renderGameMode does not lock and dim Show Numina and Show Ghoul by the game, at $DIM_ART (SPEC V536d, V111)" }
 if ($v536Bad) { foreach ($b in ($v536Bad | Select-Object -Unique)) { Fail "V536 $b" } }
-else { Pass "V536 the BLOOD PER TURN box is double, the Main's faded Blood per Turn sits between title and dots, the Vampire tab shows the clan's weakness (the longest, $long536 chars, fits) and a vampire's Show Numina/Show Ghoul go off and lock" }
+else { Pass "V536 the BLOOD PER TURN box is double, the Main's faded Blood per Turn sits between title and dots, the Vampire tab shows the clan's weakness (the longest, $long536 chars, scrolls clear of the bar) and a vampire's Show Numina/Show Ghoul go off and lock" }
 
 # ---- V537: the rest of the 48th batch - no loose child in a box that changes shape, Spent on the Vampire tab, the words ----
 # SPEC V537, I191c/g/h/e/i, B191, user 2026-10-01. (a) is the backprop of B191: the 47th batch turned
@@ -17941,9 +17997,8 @@ else { Pass "V536 the BLOOD PER TURN box is double, the Main's faded Blood per T
 # boxes and anchored children only; a fixed child in a box whose shape changes went unseen.
 #
 # Mutation (SPEC V222): attrSepMental unnamed -> RED (a) - renderGameMode without attrSepSocial -> RED
-# (a) - dynHealth_row4 out of VAMP_GEOM -> RED (a) - edtSpentXPVampire without readOnly -> RED (b) -
-# xpPaint without the edtSpentXPVampire block -> RED (b) - the old pt of MAX TRAIT LEVEL back in the
-# .lang -> RED (c). Probe: a fontSize change on dynMaxTraitV -> GREEN.
+# (a) - dynHealth_row4 out of VAMP_GEOM -> RED (a) - the old pt of MAX TRAIT LEVEL back in the
+# .lang -> RED (c). Probe: a fontSize change on dynMaxTraitV -> GREEN. (b) RETIRED in the 61st batch.
 #
 # AMENDED (51st batch, SPEC V537a as amended, I194f): a box that changes HEIGHT only - ROAD, 184 ->
 # 104 for a vampire - moves nothing in x, so its children are not asked to be placed or anchored;
@@ -17953,7 +18008,9 @@ else { Pass "V536 the BLOOD PER TURN box is double, the Main's faded Blood per T
 # height only any more. The height-only branch stays, a rule for the next box that does.
 $v537Bad = @()
 $SEP537 = @('attrSepSocial', 'attrSepMental')
-$HIDE537 = @($SEP537)
+# 58th batch (SPEC I201b, V537a as amended): the three rotated names hide for a vampire too.
+$ROT537 = @('attrRotPhysical', 'attrRotSocial', 'attrRotMental')
+$HIDE537 = @($SEP537) + @($ROT537)
 # (a)
 $shaped537 = 0
 foreach ($nm537 in $geo534.Keys) {
@@ -17988,25 +18045,17 @@ foreach ($s537 in $HIDE537) {
 }
 if ($gm534 -notmatch 'if c ~= nil and c\.visible == vamp then c\.visible = not vamp; end;') { $v537Bad += "(a) renderGameMode does not hide the rules for a vampire (visible = not vamp) (SPEC V537a)" }
 if ($shaped537 -eq 0) { $v537Bad += "(a) no box in VAMP_GEOM changes shape - the rule reads nothing (SPEC V20)" }
-# (b)
-$sp537 = (Doc (Join-Path $dir 'WoD20.15.lfm')).SelectSingleNode("//edit[@name='edtSpentXPVampire']")
-if ($null -eq $sp537) { $v537Bad += "(b) edtSpentXPVampire is not on the Vampire tab (SPEC V537b, V20)" }
-else {
-    $want537 = @{ readOnly = 'true'; opacity = '0.75'; type = 'number'; decimalPlaces = '0'; transparent = 'true' }
-    foreach ($a537 in $want537.Keys) { if ($sp537.GetAttribute($a537) -ne $want537[$a537]) { $v537Bad += "(b) edtSpentXPVampire has $a537='$($sp537.GetAttribute($a537))', the Progress tab's Spent has '$($want537[$a537])' (SPEC V537b, V245)" } }
-    if ($sp537.GetAttribute('field')) { $v537Bad += "(b) edtSpentXPVampire owns a field - Spent is derived from the log (SPEC V100, V245)" }
-    if ($sp537.GetAttribute('onUserChange') -notmatch 'xpSetSpent\(self, self\.edtSpentXPVampire\.text\)') { $v537Bad += "(b) edtSpentXPVampire does not hand what is typed to xpSetSpent (SPEC V537b, V246)" }
-    $pv537 = $sp537.PreviousSibling; while ($null -ne $pv537 -and $pv537.NodeType -ne 'Element') { $pv537 = $pv537.PreviousSibling }
-    if ($null -eq $pv537 -or $pv537.GetAttribute('name') -ne 'bgSpentXPVampire') { $v537Bad += "(b) bgSpentXPVampire is not declared right before edtSpentXPVampire (SPEC V537b, V417)" }
-}
-if ($rootTxt -notmatch 'local XP_BOXES = \{[^}]*edtSpentXPVampire = true') { $v537Bad += "(b) XP_BOXES does not name edtSpentXPVampire - xpPaint would never find it (SPEC V537b)" }
-if ($paintFn -notmatch 'box\.edtSpentXPVampire\.text = tostring\(spent\);' -or $paintFn -notmatch '(?m)^\s*box\.edtSpentXPVampire\.readOnly = not stEdit; box\.edtSpentXPVampire\.opacity = stEdit and 1 or 0\.75;') { $v537Bad += "(b) xpPaint does not paint edtSpentXPVampire with the number and the lock on one line, as edtSpentXP (SPEC V537b, V245)" }
-# (c) the words; the gate is ASCII, so the accented letters are built from their code points
+# (b) RETIRED (61st batch, user 2026-10-02, SPEC I204f): the Vampire tab's Spent left on the user's
+# word - title, frame and edit, its XP_BOXES entry and its xpPaint block. Spent lives on the Progress
+# tab alone, where V256/V416/V417 still measure it. What stays is the absence: a Spent brought back
+# to this tab would be a box nobody asked for.
+if ((Doc (Join-Path $dir 'WoD20.15.lfm')).SelectSingleNode("//*[@name='edtSpentXPVampire' or @name='bgSpentXPVampire']") -or $rootTxt -match 'edtSpentXPVampire') { $v537Bad += "(b) edtSpentXPVampire / bgSpentXPVampire is back on the Vampire tab or in the root - the user took Spent off this tab (SPEC I204f, V537b RETIRED)" }
+# (c) the words; the gate is ASCII, so the accented letters are built from their code points.
+# SPENT EXPERIENCE left with its label (SPEC I204f).
 $I537 = [string][char]0xCD; $A537 = [string][char]0xC1; $E537 = [string][char]0xCA; $C537 = [string][char]0xC7
 $pt537 = [ordered]@{
     'MAX TRAIT LEVEL'    = "N${I537}VEL M${A537}X. DE CARACTER${I537}STICA"
     'CURRENT EXPERIENCE' = "EXPERI${E537}NCIA ATUAL"
-    'SPENT EXPERIENCE'   = "EXPERI${E537}NCIA GASTA"
 }
 $old537 = "N${I537}VEL M${A537}X. DE TRA${C537}O"
 $lang537 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path (Split-Path $dir) 'localization.lang')))
@@ -18020,7 +18069,7 @@ foreach ($f537 in @(Get-ChildItem $dir -Filter '*.lfm') + @(Get-Item (Join-Path 
     if ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($f537.FullName)).Contains($old537)) { $v537Bad += "(c) $($f537.Name) still carries the old pt of MAX TRAIT LEVEL (SPEC V537c, I191e)" }
 }
 if ($v537Bad) { foreach ($b in ($v537Bad | Select-Object -Unique)) { Fail "V537 $b" } }
-else { Pass "V537 every child of the $shaped537 box(es) a vampire reshapes is placed, anchored or hidden; the Vampire tab's Spent mirrors the Progress one, lock included; MAX TRAIT LEVEL, CURRENT and SPENT EXPERIENCE read as asked" }
+else { Pass "V537 every child of the $shaped537 box(es) a vampire reshapes is placed, anchored or hidden; no Spent on the Vampire tab; MAX TRAIT LEVEL and CURRENT EXPERIENCE read as asked" }
 
 # ---- V538: the guard and the ledger read every trait to the SAME top (49th batch) ----
 # SPEC V538, I192, B192. The guard prices a click off the ledger itself (xpLedgerRows with the click
@@ -18083,18 +18132,26 @@ else { Pass "V538 the guard and the ledger read all $matched538 trait families t
 #
 # Mutation (SPEC V222): 680 back on one column -> RED (a) - the middle column at 600 (cuts SECONDARY
 # PATHS) -> RED (a). Probe: a fontSize on dynRevWeaknessV -> GREEN.
+# AMENDED (62nd batch, user 2026-10-03, SPEC V539 as amended, I205a): the Ghoul tab, the tab the Vampire
+# one was copied from, reads the same - its columns went 680 -> 582 and a probe at 680 passed green while
+# this rule read WoD20.15 alone. Zero-guard per file. Mutation: the Ghoul's rituals column at 680 -> RED
+# (a) - the Ghoul's middle column at 581 -> RED (a).
 $v539Bad = @()
-$d539 = Doc (Join-Path $dir 'WoD20.15.lfm')
-$cols539 = @($d539.SelectNodes("//scrollBox/layout") | Where-Object { $null -eq $_.SelectSingleNode("rectangle[@align='client']") })
-if ($cols539.Count -lt 3) { $v539Bad += "only $($cols539.Count) column container(s) read off WoD20.15 - three stand under the band (SPEC V20, V209)" }
-foreach ($c539 in $cols539) {
-    $kids539 = @($c539.ChildNodes | Where-Object { $_ -is [System.Xml.XmlElement] -and $_.HasAttribute('top') -and $_.HasAttribute('height') })
-    if ($kids539.Count -eq 0) { $v539Bad += "the column at left $($c539.GetAttribute('left')) holds nothing with a geometry - measured against nothing (SPEC V20)"; continue }
-    $low539 = ($kids539 | ForEach-Object { [int]$_.GetAttribute('top') + [int]$_.GetAttribute('height') } | Measure-Object -Maximum).Maximum
-    if ([int]$c539.GetAttribute('height') -ne $low539) { $v539Bad += "(a) the column at left $($c539.GetAttribute('left')) is $($c539.GetAttribute('height')) tall and what it holds closes at $low539 - the tab scrolls the difference (SPEC V539a, B193)" }
+$colsSeen539 = 0
+foreach ($fn539 in @('WoD20.15.lfm', 'WoD20.11.lfm')) {
+    $d539 = Doc (Join-Path $dir $fn539)
+    $cols539 = @($d539.SelectNodes("//scrollBox/layout") | Where-Object { $null -eq $_.SelectSingleNode("rectangle[@align='client']") })
+    if ($cols539.Count -lt 3) { $v539Bad += "only $($cols539.Count) column container(s) read off $fn539 - three stand under the band (SPEC V20, V209)" }
+    $colsSeen539 += $cols539.Count
+    foreach ($c539 in $cols539) {
+        $kids539 = @($c539.ChildNodes | Where-Object { $_ -is [System.Xml.XmlElement] -and $_.HasAttribute('top') -and $_.HasAttribute('height') })
+        if ($kids539.Count -eq 0) { $v539Bad += "the column at left $($c539.GetAttribute('left')) of $fn539 holds nothing with a geometry - measured against nothing (SPEC V20)"; continue }
+        $low539 = ($kids539 | ForEach-Object { [int]$_.GetAttribute('top') + [int]$_.GetAttribute('height') } | Measure-Object -Maximum).Maximum
+        if ([int]$c539.GetAttribute('height') -ne $low539) { $v539Bad += "(a) the column at left $($c539.GetAttribute('left')) of $fn539 is $($c539.GetAttribute('height')) tall and what it holds closes at $low539 - the tab scrolls the difference (SPEC V539a, B193)" }
+    }
 }
 if ($v539Bad) { foreach ($b in ($v539Bad | Select-Object -Unique)) { Fail "V539 $b" } }
-else { Pass "V539 the Vampire tab's $($cols539.Count) columns close on what they hold - no scroll past the content" }
+else { Pass "V539 the $colsSeen539 columns of the Vampire and Ghoul tabs close on what they hold - no scroll past the content" }
 
 # ---- V540: ROAD and WILLPOWER are two boxes with ONE willpower row (51st batch, re-formed in the 52nd) ----
 # The 51st batch split them for a vampire only, with a hidden copy of the willpower row inside ROAD
@@ -18140,6 +18197,15 @@ else { Pass "V540 ROAD and WILLPOWER are two boxes of every game with one willpo
 # Mutation (SPEC V222): boxWillpower height 118 -> RED (a) - a height on boxRoad in VAMP_GEOM -> RED
 # (b) - boxWillpower at {345,729,330} -> RED (b) - ROAD's dots back at 40,44 -> RED (c). Probe: a
 # fontSize on boxWillpower's title -> GREEN.
+#
+# AMENDED (53rd batch, SPEC V541c as amended, I196b, user items 2 and 3): (c) is no longer one body
+# centred under the top line. Each box holds THREE rows - ROAD: the picker line, the dots, the
+# bearing line; WILLPOWER: the title, the dots, the checkboxes, the last two read out of the
+# Willpower template - with 15 above the first and 15 under the last (WILLPOWER's head and foot are
+# V547's since the 61st batch), and the two gaps between them
+# equal give or take 1, the larger one BELOW (as V399). Mutation: the checkboxes back at top=20 ->
+# RED (c), they overlap the dots - dynBearingName at 20,88 (gaps 11/13, foot 14) -> RED (c) - ROAD's
+# dots at 40,51 (gaps 12/11) -> RED (c).
 $v541Bad = @()
 $pool541 = $m540.SelectSingleNode("//layout[@name='mainBloodPool']")
 if ($null -eq $wb540 -or $null -eq $rb540 -or $null -eq $pool541 -or $null -eq $m540.SelectSingleNode("//label[@name='dynBearingName']")) { $v541Bad += "boxRoad, boxWillpower, mainBloodPool or dynBearingName was not found on WoD20.1 (SPEC V20, V209)" }
@@ -18148,6 +18214,8 @@ else {
     # (a)
     if ($R541.L -ne $W541.L -or $R541.W -ne $W541.W -or $W541.T -ne ($R541.T + $R541.H + 5)) { $v541Bad += "(a) WILLPOWER is not 5 under ROAD at its left and width in the XML (SPEC V541a)" }
     if (($R541.H + 5 + $W541.H) -ne $P541.H) { $v541Bad += "(a) ROAD + 5 + WILLPOWER = $($R541.H + 5 + $W541.H) - the Main's BLOOD POOL box is $($P541.H) (SPEC V541a, I195b)" }
+    $vir541 = $m540.SelectSingleNode("//layout[@name='boxVirtues']")
+    if ($null -eq $vir541 -or $R541.H -ne [int]$vir541.GetAttribute('height')) { $v541Bad += "(a) ROAD is $($R541.H) tall and VIRTUES $(if ($vir541) { $vir541.GetAttribute('height') } else { 'missing' }) - the user asked them alike, WILLPOWER paying the difference (SPEC V541a as amended, I199a)" }
     if ($R541.T -ne $P541.T) { $v541Bad += "(a) ROAD opens at $($R541.T) in the XML and the pool's box at $($P541.T) - the stack would not close on the pool's line (SPEC V541a)" }
     # (b)
     $gR541 = $geo534['boxRoad']; $gW541 = $geo534['boxWillpower']; $gP541 = $geo534['mainBloodPool']
@@ -18157,33 +18225,346 @@ else {
         if ($gR541.T -ne $gP541.T) { $v541Bad += "(b) a vampire's ROAD opens at $($gR541.T) and the pool at $($gP541.T) (SPEC V541b)" }
         if ($gW541.L -ne $gR541.L -or $gW541.W -ne $gR541.W -or $gW541.T -ne ($gR541.T + $R541.H + 5)) { $v541Bad += "(b) a vampire's WILLPOWER is at $($gW541.L),$($gW541.T) $($gW541.W) wide - 5 under ROAD it is $($gR541.L),$($gR541.T + $R541.H + 5) $($gR541.W) wide (SPEC V541b)" }
     }
-    # (c)
-    $marg541 = @()
+    # (c) RE-FORMED in the 56th batch (SPEC V541c as amended, I199b/c, user items 2-4). ROAD: the dots'
+    # rect at the box's vertical centre (odd pixel under, as V399) and the picker line and the bearing
+    # line 6 from it. WILLPOWER: 15 above the title and 15 under the checkboxes, 8 title -> dots and
+    # 5 dots -> checkboxes, the last two rows read out of the Willpower template. 6, 8 and 5 are the
+    # user's halves of the 53rd batch's 11/12 and 9 (Q116.2/3) and are literal on purpose: without
+    # them ROAD back at 11/12 around centred dots would pass.
+    $tpl541 = $m540.SelectSingleNode("//template[@name='Willpower']")
+    $tdot541 = $null; $tchk541 = $null
+    if ($null -ne $tpl541) { $tdot541 = $tpl541.SelectSingleNode("imageCheckBox"); $tchk541 = $tpl541.SelectSingleNode("checkBox") }
+    if ($null -eq $tdot541 -or $null -eq $tchk541) { $v541Bad += "(c) the Willpower template has no dot or no checkbox to read - WILLPOWER's rows are unmeasurable (SPEC V20, V209)" }
+    $gaps541 = @()
     foreach ($bx541 in @($rb540, $wb540)) {
-        $h541 = [int]$bx541.GetAttribute('height')
-        $line541 = 0; $bt541 = [int]::MaxValue; $bb541 = 0
+        $nm541 = $bx541.GetAttribute('name'); $h541 = [int]$bx541.GetAttribute('height')
+        # The first row is whatever opens HIGHEST - ROAD's picker line no longer opens at 15.
+        $first541 = [int]::MaxValue
+        foreach ($ch541 in $bx541.ChildNodes) {
+            if ($ch541.NodeType -ne 'Element' -or $ch541.GetAttribute('align') -eq 'client') { continue }
+            if (-not ($ch541.HasAttribute('top') -and $ch541.HasAttribute('height'))) { continue }
+            if ([int]$ch541.GetAttribute('top') -lt $first541) { $first541 = [int]$ch541.GetAttribute('top') }
+        }
+        if ($first541 -eq [int]::MaxValue) { $v541Bad += "(c) $nm541 holds nothing this leg can measure (SPEC V20)"; continue }
+        $line541 = 0; $body541 = @()
         foreach ($ch541 in $bx541.ChildNodes) {
             if ($ch541.NodeType -ne 'Element' -or $ch541.GetAttribute('align') -eq 'client') { continue }
             if (-not ($ch541.HasAttribute('top') -and $ch541.HasAttribute('height'))) { continue }
             $t541 = [int]$ch541.GetAttribute('top'); $b541 = $t541 + [int]$ch541.GetAttribute('height')
-            if ($t541 -eq 15) { if ($b541 -gt $line541) { $line541 = $b541 } }
-            else { if ($t541 -lt $bt541) { $bt541 = $t541 }; if ($b541 -gt $bb541) { $bb541 = $b541 } }
+            if ($t541 -eq $first541) { if ($b541 -gt $line541) { $line541 = $b541 }; continue }
+            if ($null -ne $ch541.SelectSingleNode("Willpower") -and $null -ne $tdot541 -and $null -ne $tchk541) {
+                foreach ($tc541 in @($tdot541, $tchk541)) {
+                    $tt541 = $t541 + [int]$tc541.GetAttribute('top')
+                    $body541 += [pscustomobject]@{ T = $tt541; B = $tt541 + [int]$tc541.GetAttribute('height') }
+                }
+            }
+            else { $body541 += [pscustomobject]@{ T = $t541; B = $b541 } }
         }
-        if ($line541 -eq 0 -or $bb541 -eq 0) { $v541Bad += "(c) $($bx541.GetAttribute('name')) has no top line or no body (SPEC V20)"; continue }
-        $want541 = $line541 + [math]::Floor(($h541 - $line541 - ($bb541 - $bt541)) / 2)
-        if ($bt541 -ne $want541) { $v541Bad += "(c) $($bx541.GetAttribute('name'))'s body opens at $bt541 - centred under its top line ($line541) it opens at $want541 (SPEC V541c, I195b)" }
-        $marg541 += ($bt541 - $line541); $marg541 += ($h541 - $bb541)
-    }
-    if ($marg541.Count -eq 4) {
-        $ms541 = @($marg541 | Sort-Object)
-        if (($ms541[3] - $ms541[0]) -gt 1) { $v541Bad += "(c) the margins of ROAD and WILLPOWER are $($marg541 -join '/') - they differ by more than 1 (SPEC V541c)" }
+        $rows541 = @([pscustomobject]@{ T = $first541; B = $line541 }) + @($body541 | Sort-Object T)
+        if ($rows541.Count -ne 3) { $v541Bad += "(c) $nm541 holds $($rows541.Count) row(s), not the three the user named (SPEC V541c, I196b)"; continue }
+        $ga541 = $rows541[1].T - $rows541[0].B; $gb541 = $rows541[2].T - $rows541[1].B
+        $hd541 = $rows541[0].T; $ft541 = $h541 - $rows541[2].B
+        if ($ga541 -lt 0 -or $gb541 -lt 0) { $v541Bad += "(c) $nm541's rows overlap (gaps $ga541/$gb541) (SPEC V541c)"; continue }
+        if ($nm541 -eq 'boxRoad') {
+            $want541 = [math]::Floor(($h541 - ($rows541[1].B - $rows541[1].T)) / 2)
+            if ($rows541[1].T -ne $want541) { $v541Bad += "(c) boxRoad's dots open at $($rows541[1].T) - at the box's vertical centre they open at $want541, the odd pixel under (SPEC V541c as amended, I199b)" }
+            if ($ga541 -ne 6 -or $gb541 -ne 6) { $v541Bad += "(c) boxRoad's picker and bearing lines sit $ga541/$gb541 from the dots, not the 6/6 the user halved 11/12 to (SPEC V541c as amended, Q116.2)" }
+        }
+        else {
+            # 61st batch (SPEC I204c, V547): the head and foot are the centred object's, measured by V547
+            # to the pixel; the 15/15 left here.
+            # 57th batch (SPEC V541c as amended, I200a): the dots -> checkboxes gap is V545(a)'s, the one owner for the three rows; here the title -> dots 8 and the floors.
+            if ($ga541 -ne 8) { $v541Bad += "(c) boxWillpower opens its dots $ga541 under the title, not 8 (SPEC V541c as amended)" }
+        }
+        $gaps541 += "$nm541 $hd541/$ga541/$gb541/$ft541"
     }
 }
 if ($v541Bad) { foreach ($b in ($v541Bad | Select-Object -Unique)) { Fail "V541 $b" } }
-else { Pass "V541 ROAD and WILLPOWER stack to the Main's BLOOD POOL height in the XML and for a vampire, each centring its body ($($marg541 -join '/'))" }
+else { Pass "V541 ROAD and WILLPOWER stack to the Main's BLOOD POOL height in the XML and for a vampire, ROAD as tall as VIRTUES, ROAD's dots centred with its two lines 6 from them and WILLPOWER at 15 over the title and 8 to the dots (head/gap/gap/foot: $($gaps541 -join '; '))" }
 
+# ---- V542: the Vampire tab's EXPERIENCE is ONE box of the band (SPEC I196f, 53rd batch) ----
+# SPEC V542, user 2026-10-02 item 4.3: Current in one box as tall as the pool. (a) the edit, its frame
+# and its title share ONE parent, a band box (top 10, its own client rectangle) as tall as the BLOOD
+# POOL box - read, never typed; the frame on its edit's rect.
+# AMENDED (61st batch, user 2026-10-02, SPEC I204f): Spent left this box, so (b) and (c) - the four-row
+# stack, its 15/15 and its two pairs - left with it; title and field are V547's object now, measured
+# there to the pixel.
+#
+# Mutation (SPEC V222): the title in a second box -> RED (a) - the box at height 170 -> RED (a) -
+# bgCurrentXPVampire 1px under its edit -> RED (a). Probe: a fontSize on edtCurrentXPVampire -> GREEN.
+$v542Bad = @()
+$d542 = Doc (Join-Path $dir 'WoD20.15.lfm')
+$ec542 = $d542.SelectSingleNode("//edit[@name='edtCurrentXPVampire']")
+$fc542 = $d542.SelectSingleNode("//rectangle[@name='bgCurrentXPVampire']")
+$tc542 = $d542.SelectSingleNode("//label[@text='CURRENT EXPERIENCE']")
+$pl542 = $d542.SelectSingleNode("//label[@text='BLOOD POOL']")
+$all542 = @($ec542, $fc542, $tc542, $pl542)
+if (@($all542 | Where-Object { $null -eq $_ }).Count -gt 0) { $v542Bad += "the edit, its frame, its title or the pool's title is not on WoD20.15 - this check reads nothing (SPEC V20, V209)" }
+else {
+    $box542 = $ec542.ParentNode
+    $odd542 = @(@($fc542, $tc542) | Where-Object { -not [object]::ReferenceEquals($_.ParentNode, $box542) })
+    if ($odd542.Count -gt 0) { $v542Bad += "(a) $($odd542.Count) of the title and frame stand outside the box that holds edtCurrentXPVampire - the user asked for ONE box (SPEC V542a, I196f)" }
+    if ($box542.GetAttribute('top') -ne '10' -or $null -eq $box542.SelectSingleNode("rectangle[@align='client']")) { $v542Bad += "(a) the box holding edtCurrentXPVampire is not a band box - top 10 and its own black rectangle (SPEC V542a, V533b)" }
+    $bh542 = [int]$box542.GetAttribute('height'); $ph542 = [int]$pl542.ParentNode.GetAttribute('height')
+    if ($bh542 -ne $ph542) { $v542Bad += "(a) the experience box is $bh542 tall and the BLOOD POOL box $ph542 - the user asked it to follow the pool (SPEC V542a)" }
+    foreach ($at542 in @('left', 'top', 'width', 'height')) {
+        if ($fc542.GetAttribute($at542) -ne $ec542.GetAttribute($at542)) { $v542Bad += "(a) bgCurrentXPVampire is not on edtCurrentXPVampire's rect ($at542 $($fc542.GetAttribute($at542)) against $($ec542.GetAttribute($at542))) (SPEC V542a, V417)" }
+    }
+}
+if ($v542Bad) { foreach ($b in ($v542Bad | Select-Object -Unique)) { Fail "V542 $b" } }
+else { Pass "V542 the Vampire tab's Current stands in one box as tall as the pool, its frame on its rect" }
 
-# ---- V351: the ROAD label rides on the picker's own line -------------------------------
+# ---- V547: "centred object" - title + gap + body as ONE object in the box's vertical centre (SPEC I204, 61st batch) ----
+# SPEC V547, user 2026-10-02: "pegar o titulo e o conteudo dele e considerar um bloco unico e esse bloco
+# ficar centralizado". For every box of $OBJ_V547 (the roster V240/V280 skip): the title T is 20 tall, or
+# 34 with vertTextAlign="center" when it wraps in one of the two languages; the gap G is the roster's (5 over
+# a number or a field, 8 over dots); the body B runs from its first child's top to its last child's bottom.
+# T.top = floor((H - (T.h + G + B.h)) / 2) - the odd pixel under - and B.top = T.top + T.h + G. H, T and B
+# READ off the XML, and for a box VAMP_GEOM gives a height (a vampire's EXPERIENCE) off VAMP_GEOM too.
+#
+# Mutation (SPEC V222): dynMaxTraitV top 41 -> RED - the Combat tab's WILLPOWER title at 16 -> RED -
+# lblXPMain at 27 in VAMP_GEOM -> RED - MAX TRAIT LEVEL with vertTextAlign="leading" -> RED - QUINTESSENCE's
+# title at 15 -> RED - DOMITOR's second line at 82 -> RED. Probe: a fontSize on dynBloodTurn -> GREEN.
+$v547Bad = @()
+$seen547 = 0
+foreach ($f547 in $files) {
+    foreach ($box547 in (Doc $f547.FullName).SelectNodes("//layout[@height]")) {
+        $row547 = ObjRowV547 $f547.Name $box547
+        if ($null -eq $row547) { continue }
+        $seen547++
+        $legs547 = @($null)
+        $bn547 = $box547.GetAttribute('name')
+        if ($bn547 -and $geo534.ContainsKey($bn547) -and $null -ne $geo534[$bn547].H) { $legs547 += $geo534[$bn547] }
+        foreach ($leg547 in $legs547) {
+            $tag547 = if ($null -eq $leg547) { 'XML' } else { 'VAMP_GEOM' }
+            $H547 = if ($null -eq $leg547) { [int]$box547.GetAttribute('height') } else { $leg547.H }
+            $tt547 = $null; $bTop547 = [int]::MaxValue; $bBot547 = [int]::MinValue
+            foreach ($k547 in $box547.ChildNodes) {
+                if ($k547.NodeType -ne 'Element' -or $k547.GetAttribute('align') -eq 'client') { continue }
+                if ($k547.LocalName -in @('dataLink', 'script', 'event', 'template')) { continue }
+                $kt547 = [int]$k547.GetAttribute('top'); $kh547 = [int]$k547.GetAttribute('height')
+                $kn547 = $k547.GetAttribute('name')
+                if ($null -ne $leg547 -and $kn547 -and $geo534.ContainsKey($kn547)) { $kt547 = $geo534[$kn547].T; if ($null -ne $geo534[$kn547].H) { $kh547 = $geo534[$kn547].H } }
+                if ($k547.LocalName -eq 'label' -and $k547.GetAttribute('text') -eq $row547.T) { $tt547 = [pscustomobject]@{ T = $kt547; H = $kh547; Node = $k547 }; continue }
+                if ($kt547 -lt $bTop547) { $bTop547 = $kt547 }
+                if (($kt547 + $kh547) -gt $bBot547) { $bBot547 = $kt547 + $kh547 }
+            }
+            $at547 = "$($f547.Name) '$($row547.T)' ($tag547, H $H547)"
+            if ($null -eq $tt547 -or $bTop547 -eq [int]::MaxValue) { $v547Bad += "$at547 has no title or no body to read (SPEC V547, V20)"; continue }
+            if ($tt547.H -ne 20 -and $tt547.H -ne 34) { $v547Bad += "$at547 title is $($tt547.H) tall - one line is 20, a title that wraps is 34 (SPEC V547a)" }
+            if ($tt547.H -eq 34 -and $tt547.Node.GetAttribute('vertTextAlign') -ne 'center') { $v547Bad += "$at547 title is a 34 rect with vertTextAlign='$($tt547.Node.GetAttribute('vertTextAlign'))' - a one-line title would sit off the object's centre (SPEC V547a)" }
+            $bh547 = $bBot547 - $bTop547
+            $wantT547 = [math]::Floor(($H547 - ($tt547.H + $row547.G + $bh547)) / 2)
+            $wantB547 = $wantT547 + $tt547.H + $row547.G
+            if ($tt547.T -ne $wantT547 -or $bTop547 -ne $wantB547) { $v547Bad += "$at547 title at $($tt547.T) and body at $bTop547 - $($tt547.H) + $($row547.G) + $bh547 centred in $H547 is title $wantT547, body $wantB547 (SPEC V547a, I204)" }
+        }
+    }
+}
+if ($seen547 -ne $OBJ_V547.Count) { Fail "V547 $seen547 box(es) answered to the roster, expected its $($OBJ_V547.Count) - a title renamed drops its box out of the rule without a sound (SPEC V547, V209, B7)" }
+elseif ($v547Bad) { foreach ($b in ($v547Bad | Select-Object -Unique)) { Fail "V547 $b" } }
+else { Pass "V547 the $seen547 boxes of the roster centre title + gap + body as one object, the odd pixel under" }
+
+# ---- V543: every ceiling twin on the sheet is an EMPTY faded dot (SPEC I197b/c, 54th batch) ----
+# SPEC V543, user 2026-10-02 item 2 and Q115.1: a dot out of reach reads like a trait never bought,
+# at the transparency it had. (a) every twin - mcap of the Main's four templates and mcapbloodPool
+# (WoD20.1), rocap of ReadOnlyTrait (WoD20.3), vcap of the three row templates and vcapbloodPool
+# (WoD20.15) - authors checked="false"; opacity and the rest are other lines' (V535b, V530, V532).
+# (b) renderVampCaps writes cap.checked = false and holds no .checked = true - that runtime write is
+# what used to paint the twins full over whatever the XML said.
+#
+# Mutation (SPEC V222): one VDiscRow vcap back at checked="true" -> RED (a) - rocap_$(field)_9
+# without checked -> RED (a) - mcapbloodPool_1 checked="true" -> RED (a) - cap.checked = true back
+# in pair -> RED (b). Probe: the opacity of vdotbloodPool_1 -> GREEN.
+$v543Bad = @()
+$tw543 = 0; $pool543 = 0
+foreach ($f543 in @('WoD20.1.lfm', 'WoD20.3.lfm', 'WoD20.15.lfm')) {
+    $d543 = Doc (Join-Path $dir $f543)
+    foreach ($c543 in $d543.SelectNodes("//imageCheckBox[starts-with(@name,'mcap') or starts-with(@name,'vcap') or starts-with(@name,'rocap_')]")) {
+        $n543 = $c543.GetAttribute('name')
+        if ($n543 -match 'bloodPool_') { $pool543++ } else { $tw543++ }
+        if ($c543.GetAttribute('checked') -ne 'false') { $v543Bad += "(a) $n543 on $f543 authors checked='$($c543.GetAttribute('checked'))' - a twin is an EMPTY dot, like a trait never bought (SPEC V543a, I197b, Q115.1)" }
+    }
+}
+if ($tw543 -lt 57 -or $pool543 -lt 100) { $v543Bad += "only $tw543 ceiling twin(s) and $pool543 pool twin(s) were read, expected 57 and 100 - the rule would be true over a sweep that broke (SPEC V20, V209)" }
+$vc543 = NoComments (LuaFn $rootTxt 'renderVampCaps')
+if (-not $vc543) { $v543Bad += "(b) renderVampCaps is not on the root form (SPEC V20, V209)" }
+else {
+    if ($vc543 -notmatch 'cap\.checked\s*=\s*false') { $v543Bad += "(b) renderVampCaps does not write cap.checked = false - the XML's empty twin is not held at runtime (SPEC V543b, I197c)" }
+    if ($vc543 -match '\.checked\s*=\s*true') { $v543Bad += "(b) renderVampCaps writes .checked = true - a twin would be painted full over the XML (SPEC V543b, I197c)" }
+}
+if ($v543Bad) { foreach ($b in ($v543Bad | Select-Object -Unique)) { Fail "V543 $b" } }
+else { Pass "V543 all $tw543 ceiling twins and $pool543 pool twins author an empty dot, and renderVampCaps keeps them empty at runtime" }
+
+# ---- V544: the PT map IS the [pt] half of localization.lang (SPEC I198, B194, 55th batch) ----
+# translateSheetText reads the PT map embedded in WoD20.6, never the .lang. V22 holds map -> [pt] and
+# V28 holds the XML's visible text -> map, so a phrase LUA writes, with a [pt] key and no map entry,
+# passed green and read English on a Portuguese sheet - 26 of them (B194), the custom button of every
+# picker among them. This is V22's other direction: every [pt] key is in the map with the same value,
+# so the two are one set.
+#
+# Mutation (SPEC V222): ["-- Custom --"] out of the map -> RED - a new key only in the .lang [pt]
+# -> RED (V22 stays green) - one FAMILY_WEAKNESS value changed in the map -> RED (and V22). Probe:
+# two map entries swapped in order -> GREEN.
+$v544Bad = @()
+if (-not $mapBlock.Success -or $ptVal.Count -lt 2000) { $v544Bad += "the PT map or the .lang [pt] half was not read ($($ptVal.Count) key(s)) - this check reads nothing (SPEC V20, V209)" }
+else {
+    foreach ($k544 in $ptVal.Keys) {
+        $s544 = if ($k544.Length -gt 60) { $k544.Substring(0, 60) + '...' } else { $k544 }
+        if (-not $embedded.ContainsKey($k544)) { $v544Bad += "'$s544' has a [pt] key in localization.lang and no entry in the PT map of WoD20.6 - translateSheetText reads the map, so the Portuguese sheet shows it in English (SPEC V544, B194)" }
+        elseif ($embedded[$k544] -cne $ptVal[$k544]) { $v544Bad += "'$s544' reads differently in the PT map and in the [pt] half (SPEC V544, V22)" }
+    }
+}
+if ($v544Bad) { foreach ($b in $v544Bad) { Fail "V544 $b" } }
+else { Pass "V544 the PT map holds every one of the $($ptVal.Count) [pt] keys of localization.lang with the same value - the map translateSheetText reads IS the [pt] half" }
+
+# ---- V545: three willpower rows, one gap, and the Vampire tab's WILLPOWER box (SPEC I200, 57th batch) ----
+# SPEC V545, user 2026-10-02 items 1-3 and Q117.1: the checkboxes 2px under the dots on the Main,
+# the Combat tab and the Vampire tab's copy - literal, the user's number. (b) the copy is a band box
+# as tall as the pool, and VWillpowerMirror is WillpowerMirror line for line (read-only dots, boxes
+# that own willpower_c*); its y is V547's since the 61st batch. (c) WoD20.3's paintWillpower paints the
+# copy through xpFind and the Vampire tab's onShow calls renderCombatTraits for the first paint.
+#
+# Mutation (SPEC V222): the Combat checkBox back at top="20" -> RED (a) - roVWp_3 with field
+# "willpower_3" -> RED (b) - paintWillpower without the roVWp_ xpFind -> RED (c). Probe: a fontSize on
+# the new box's title -> GREEN.
+$v545Bad = @()
+$gaps545 = @()
+foreach ($tp545 in @(@('WoD20.1.lfm', 'Willpower'), @('WoD20.3.lfm', 'WillpowerMirror'), @('WoD20.15.lfm', 'VWillpowerMirror'))) {
+    $t545 = (Doc (Join-Path $dir $tp545[0])).SelectSingleNode("//template[@name='$($tp545[1])']")
+    $d545 = if ($t545) { $t545.SelectSingleNode("imageCheckBox") } else { $null }
+    $c545 = if ($t545) { $t545.SelectSingleNode("checkBox") } else { $null }
+    if ($null -eq $d545 -or $null -eq $c545) { $v545Bad += "(a) the $($tp545[1]) template on $($tp545[0]) has no dot or no checkbox to read (SPEC V20, V209)"; continue }
+    $g545 = [int]$c545.GetAttribute('top') - ([int]$d545.GetAttribute('top') + [int]$d545.GetAttribute('height'))
+    $gaps545 += "$($tp545[1]) $g545"
+    if ($g545 -ne 2) { $v545Bad += "(a) $($tp545[1]) ($($tp545[0])) opens its checkboxes $g545 under the dots, not the user's 2 (SPEC V545a, Q117.1)" }
+}
+$d15545 = Doc (Join-Path $dir 'WoD20.15.lfm')
+$use545 = $d15545.SelectSingleNode("//VWillpowerMirror")
+$wm545 = (Doc (Join-Path $dir 'WoD20.3.lfm')).SelectSingleNode("//template[@name='WillpowerMirror']")
+$vm545 = $d15545.SelectSingleNode("//template[@name='VWillpowerMirror']")
+$pool545 = $d15545.SelectSingleNode("//label[@text='BLOOD POOL']")
+if ($null -eq $use545 -or $null -eq $wm545 -or $null -eq $vm545 -or $null -eq $pool545) { $v545Bad += "(b) the Vampire tab's WILLPOWER row, a template or the pool's title was not found (SPEC V20, V209)" }
+else {
+    $row545 = $use545.ParentNode; $box545 = $row545.ParentNode
+    $ttl545 = $box545.SelectSingleNode("label[@text='WILLPOWER']")
+    if ($box545.GetAttribute('top') -ne '10' -or $null -eq $box545.SelectSingleNode("rectangle[@align='client']") -or $null -eq $ttl545) { $v545Bad += "(b) the WILLPOWER copy does not sit in a titled band box of its own (SPEC V545b)" }
+    elseif ([int]$box545.GetAttribute('height') -ne [int]$pool545.ParentNode.GetAttribute('height')) { $v545Bad += "(b) the WILLPOWER box is $($box545.GetAttribute('height')) tall and the band $($pool545.ParentNode.GetAttribute('height')) (SPEC V545b)" }
+    # The row's y was centred in the box alone in the 58th batch (SPEC I201a); since the 61st (SPEC
+    # I204c) the title, the 8 and the row are ONE centred object and V547 owns that number.
+    for ($k545 = 1; $k545 -le 10; $k545++) {
+        $a545 = $wm545.SelectSingleNode("imageCheckBox[@name='roWp_$k545']"); $v545 = $vm545.SelectSingleNode("imageCheckBox[@name='roVWp_$k545']")
+        $ab545 = $wm545.SelectSingleNode("checkBox[@field='willpower_c$k545']"); $vb545 = $vm545.SelectSingleNode("checkBox[@field='willpower_c$k545']")
+        if ($null -eq $a545 -or $null -eq $v545 -or $null -eq $ab545 -or $null -eq $vb545) { $v545Bad += "(b) dot or box $k545 is missing from one of the two mirrors (SPEC V545b)"; continue }
+        if ($v545.HasAttribute('field')) { $v545Bad += "(b) roVWp_$k545 carries field='$($v545.GetAttribute('field'))' - the copy's dots are read-only, painted (SPEC V545b, V1)" }
+        foreach ($at545 in @('left', 'top', 'width', 'height', 'opacity', 'autoChange')) { if ($v545.GetAttribute($at545) -ne $a545.GetAttribute($at545)) { $v545Bad += "(b) roVWp_$k545 $at545='$($v545.GetAttribute($at545))' and roWp_$k545 '$($a545.GetAttribute($at545))' (SPEC V545b)"; break } }
+        foreach ($at545 in @('left', 'top', 'width', 'height', 'onClick', 'onChange')) { if ($vb545.GetAttribute($at545) -ne $ab545.GetAttribute($at545)) { $v545Bad += "(b) the copy's box $k545 $at545 differs from the Combat tab's (SPEC V545b)"; break } }
+    }
+}
+$pw545 = NoComments (LuaFn ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.3.lfm')))) 'paintWillpower')
+if (-not $pw545) { $v545Bad += "(c) paintWillpower was not found on WoD20.3 (SPEC V20, V209)" }
+elseif ($pw545 -notmatch '"roVWp_"' -or $pw545 -notmatch 'xpFind\(tabRootOf\(form\)' -or $pw545 -notmatch 'vdot\.checked = on') { $v545Bad += "(c) paintWillpower does not paint roVWp_ through xpFind - the Vampire tab's dots would never light (SPEC V545c, V143)" }
+$show545 = [regex]::Match([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.15.lfm'))), '(?s)<event name="onShow">(.*?)</event>')
+if (-not $show545.Success -or $show545.Groups[1].Value -notmatch 'renderCombatTraits\(self\);') { $v545Bad += "(c) the Vampire tab's onShow does not call renderCombatTraits - the copy's dots stay dark until willpower changes (SPEC V545c)" }
+if ($v545Bad) { foreach ($b in ($v545Bad | Select-Object -Unique)) { Fail "V545 $b" } }
+else { Pass "V545 the three willpower rows open their checkboxes 2 under the dots ($($gaps545 -join ', ')), and the Vampire tab's WILLPOWER box mirrors the Combat tab's, painted through xpFind" }# ---- V351: the ROAD label rides on the picker's own line -------------------------------
+# SPEC V546 (59th batch, I202a, user 2026-10-02, Q119): in a VAMPIRE's Main the attribute names sit closer to
+# their dots. The XML templates are the MORTAL's and stay at 95 / 100 / 125 (leg c); the root generates the
+# vampire's numbers off ATTR_LABEL_W, which is the longest name of the nine in either language at the body
+# ruler of V16 (leg a), and a generator that covers the nine fields and every child of a row (leg b).
+# Mutation: ATTR_LABEL_W 77 -> RED (a) - wits out of the loop -> RED (b) - btnSp at W + 4 -> RED (b) -
+# attrRow_wits width 350 -> RED (b) - the template label at 78 -> RED (c). Probe: the nine fields in another
+# order -> GREEN.
+$v546Bad = @()
+$rows546 = @($docs534.Main.SelectNodes("//layout[starts-with(@name,'attrRow_')]"))
+$fields546 = @(); $longest546 = 0
+foreach ($row546 in $rows546) {
+    $fields546 += ($row546.GetAttribute('name') -replace '^attrRow_', '')
+    foreach ($ch546 in $row546.ChildNodes) {
+        if ($ch546.NodeType -ne 'Element') { continue }
+        $nome546 = $ch546.GetAttribute('nome')
+        if ($nome546 -eq '') { continue }
+        if ($nome546.Length -gt $longest546) { $longest546 = $nome546.Length }
+        if ($ptVal.ContainsKey($nome546) -and $ptVal[$nome546].Length -gt $longest546) { $longest546 = $ptVal[$nome546].Length }
+    }
+}
+$tplA546 = $docs534.Main.SelectSingleNode("//template[@name='Attribute']")
+$tplZ546 = $docs534.Main.SelectSingleNode("//template[@name='AttributeZeroable']")
+if ($rows546.Count -lt 9 -or $longest546 -le 0 -or $null -eq $tplA546 -or $null -eq $tplZ546 -or $PX_PER_CHAR -le 0 -or $attrLabelW534 -le 0) { $v546Bad += "(a) fewer than 9 attribute rows, no name length, a template, the ruler or ATTR_LABEL_W was not read (SPEC V546, V20)" }
+else {
+    # 60th batch (SPEC I203a, V546a as amended, Q120.1): the 4 px the two 18 gaps gave back (2 x 2), shared whole
+# over the three labels - 1 each; the odd px stays with the avatar.
+$want546 = [int][math]::Ceiling($longest546 * $PX_PER_CHAR) + [int][math]::Floor(2 * 2 / 3)
+    if ($attrLabelW534 -ne $want546) { $v546Bad += "(a) ATTR_LABEL_W is $attrLabelW534 - the longest attribute name has $longest546 letters in en or pt, $longest546 x $PX_PER_CHAR + 1 = $want546 (SPEC V546a as amended, I203a)" }
+    $gen546 = [regex]::Match($rootTxt, '(?s)ATTR_LABEL_W = \d+;\s*for _, f in ipairs\(\{([^}]*)\}\) do(.*?)\n\t\t\tend;')
+    if (-not $gen546.Success) { $v546Bad += "(b) the generator loop after VAMP_GEOM was not found (SPEC V546b, V20)" }
+    else {
+        $got546 = @([regex]::Matches($gen546.Groups[1].Value, '"(\w+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object)
+        if (($got546 -join ',') -ne (@($fields546 | Sort-Object) -join ',')) { $v546Bad += "(b) the generator covers [$($got546 -join ',')], the sheet's attribute rows are [$(@($fields546 | Sort-Object) -join ',')] (SPEC V546b)" }
+        $body546 = $gen546.Groups[2].Value
+        foreach ($frag546 in @('VAMP_GEOM["lbl" .. f]    = { 0, 5, ATTR_LABEL_W, 20 };', 'VAMP_GEOM["btnSp" .. f]  = { ATTR_LABEL_W + 5, 2, 20, 20 };', 'VAMP_GEOM["blinkSp" .. f] = { ATTR_LABEL_W + 5, 2, 20, 20 };', 'for k = 1, 9, 1 do', 'VAMP_GEOM["dot" .. f .. "_" .. k] = { ATTR_LABEL_W + 5 + 25 * k, 0, 25, 25 };', 'if k >= 4 then VAMP_GEOM["mcap" .. f .. "_" .. k] = { ATTR_LABEL_W + 5 + 25 * k, 0, 25, 25 }; end;')) {
+            if (-not $body546.Contains($frag546)) { $v546Bad += "(b) the generator lacks [$frag546] (SPEC V546b, I202a)" }
+        }
+    }
+    foreach ($f546 in $fields546) {
+        $gr546 = $geo534["attrRow_$f546"]
+        if ($null -eq $gr546 -or $gr546.W -ne ($attrLabelW534 + 5 + 25 + 9 * 25)) { $v546Bad += "(b) attrRow_$f546 is not ATTR_LABEL_W + 5 + 25 + 9 x 25 = $($attrLabelW534 + 5 + 25 + 9 * 25) wide (SPEC V546b)" }
+    }
+    foreach ($tpl546 in @($tplA546, $tplZ546)) {
+        $tn546 = $tpl546.GetAttribute('name')
+        $lb546 = $tpl546.SelectSingleNode("label[@name='lbl`$(field)']"); $bt546 = $tpl546.SelectSingleNode("button[@name='btnSp`$(field)']"); $d1546 = $tpl546.SelectSingleNode("*[@name='dot`$(field)_1']")
+        if ($null -eq $lb546 -or $null -eq $bt546 -or $null -eq $d1546) { $v546Bad += "(c) template $tn546 lacks lbl / btnSp / dot_1 (SPEC V546c, V20)"; continue }
+        if ($lb546.GetAttribute('left') -ne '0' -or $lb546.GetAttribute('width') -ne '95' -or $bt546.GetAttribute('left') -ne '100' -or $d1546.GetAttribute('left') -ne '125') { $v546Bad += "(c) template $tn546 is no longer the mortal's 95 / 100 / 125 - a vampire's tightening rides VAMP_GEOM, the XML does not move (SPEC V546c, Q119.1)" }
+    }
+}
+# (d) 61st batch (SPEC I204g, V546d, user 2026-10-02): a vampire's COMBAT TRAITS the same way. W =
+# COMBAT_LABEL_W = the longest of the eleven `nome` of the box's ReadOnlyTrait rows (WoD20.3) or their pt,
+# at the V16 ruler; the generator covers the eleven fields and places dynRo / ro_k / rocap_k with the
+# user's 2 between the name and dot 1; the box is the XML's row margins + W + 2 + 9 dots, and HEALTH under
+# it as wide with its rows re-centred. Mutation: COMBAT_LABEL_W = 84 -> RED (d) - ranged out of the loop
+# -> RED (d) - dynHealth3_box 420 -> RED (d).
+$box546d = $docs534.Combat.SelectSingleNode("//layout[@name='boxCombatTraits']")
+$rows546d = if ($box546d) { @($box546d.SelectNodes("layout[ReadOnlyTrait]")) } else { @() }
+$cw546d = 0
+if ($rootTxt -match '(?m)^\s*COMBAT_LABEL_W = (\d+);') { $cw546d = [int]$Matches[1] }
+if ($rows546d.Count -lt 11 -or $cw546d -le 0 -or $PX_PER_CHAR -le 0) { $v546Bad += "(d) fewer than 11 COMBAT TRAITS rows, or COMBAT_LABEL_W, was read (SPEC V546d, V20)" }
+else {
+    $fields546d = @(); $longest546d = 0
+    foreach ($rw546d in $rows546d) {
+        $rt546d = $rw546d.SelectSingleNode('ReadOnlyTrait')
+        $fields546d += $rt546d.GetAttribute('field')
+        $nm546d = $rt546d.GetAttribute('nome')
+        if ($nm546d.Length -gt $longest546d) { $longest546d = $nm546d.Length }
+        if ($ptVal.ContainsKey($nm546d) -and $ptVal[$nm546d].Length -gt $longest546d) { $longest546d = $ptVal[$nm546d].Length }
+    }
+    $wantW546d = [int][math]::Ceiling($longest546d * $PX_PER_CHAR)
+    if ($cw546d -ne $wantW546d) { $v546Bad += "(d) COMBAT_LABEL_W is $cw546d - the longest COMBAT TRAITS name has $longest546d letters in en or pt, x $PX_PER_CHAR = $wantW546d (SPEC V546d, I204g)" }
+    $gen546d = [regex]::Match($rootTxt, '(?s)COMBAT_LABEL_W = \d+;\s*for _, f in ipairs\(\{([^}]*)\}\) do(.*?)\n\t\t\tend;')
+    if (-not $gen546d.Success) { $v546Bad += "(d) the COMBAT TRAITS generator loop was not found after COMBAT_LABEL_W (SPEC V546d, V20)" }
+    else {
+        $got546d = @([regex]::Matches($gen546d.Groups[1].Value, '"(\w+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object)
+        if (($got546d -join ',') -ne (@($fields546d | Sort-Object) -join ',')) { $v546Bad += "(d) the generator covers [$($got546d -join ',')], COMBAT TRAITS draws [$(@($fields546d | Sort-Object) -join ',')] (SPEC V546d)" }
+        foreach ($frag546d in @('VAMP_GEOM["dynRo" .. f] = { 0, 5, COMBAT_LABEL_W, 20 };', 'for k = 1, 9, 1 do', 'VAMP_GEOM["ro_" .. f .. "_" .. k] = { COMBAT_LABEL_W + 2 + 25 * (k - 1), 0, 25, 25 };', 'if k >= 4 then VAMP_GEOM["rocap_" .. f .. "_" .. k] = { COMBAT_LABEL_W + 2 + 25 * (k - 1), 0, 25, 25 }; end;')) {
+            if (-not $gen546d.Groups[2].Value.Contains($frag546d)) { $v546Bad += "(d) the COMBAT TRAITS generator lacks [$frag546d] (SPEC V546d, I204g)" }
+        }
+    }
+    # The margins are the XML's: the rows open 35 in and the mortal box closes 35 after them.
+    $r0546d = $rows546d[0]
+    $padL546d = [int]$r0546d.GetAttribute('left'); $padR546d = [int]$box546d.GetAttribute('width') - $padL546d - [int]$r0546d.GetAttribute('width')
+    $wantBox546d = $padL546d + $cw546d + 2 + 9 * 25 + $padR546d
+    $gb546d = $geo534['boxCombatTraits']; $gh546d = $geo534['dynHealth3_box']
+    if ($null -eq $gb546d -or $gb546d.W -ne $wantBox546d) { $v546Bad += "(d) a vampire's boxCombatTraits is $(if ($gb546d) { $gb546d.W } else { 'not' }) wide - $padL546d + COMBAT_LABEL_W + 2 + 9 x 25 + $padR546d = $wantBox546d (SPEC V546d, I204g)" }
+    elseif ($null -eq $gh546d -or $gh546d.W -ne $gb546d.W -or $gh546d.L -ne $gb546d.L -or $null -ne $gh546d.H) { $v546Bad += "(d) a vampire's dynHealth3_box is not COMBAT TRAITS' left and width, without a height (SPEC V546d, V49)" }
+    else {
+        for ($k546d = 1; $k546d -le 10; $k546d++) {
+            $hx546d = $docs534.Combat.SelectSingleNode("//layout[@name='dynHealth3_row$k546d']"); $hg546d = $geo534["dynHealth3_row$k546d"]
+            if ($null -eq $hx546d -or $null -eq $hg546d) { $v546Bad += "(d) dynHealth3_row$k546d is not in the XML or not in VAMP_GEOM (SPEC V546d)"; continue }
+            $wantL546d = [math]::Floor(($gh546d.W - [int]$hx546d.GetAttribute('width')) / 2)
+            if ($hg546d.L -ne $wantL546d -or $hg546d.T -ne [int]$hx546d.GetAttribute('top') -or $hg546d.W -ne [int]$hx546d.GetAttribute('width')) { $v546Bad += "(d) a vampire's dynHealth3_row$k546d is at $($hg546d.L),$($hg546d.T) $($hg546d.W) wide - centred in $($gh546d.W) it is $wantL546d,$($hx546d.GetAttribute('top')) $($hx546d.GetAttribute('width')) (SPEC V546d)" }
+        }
+    }
+}
+if ($v546Bad) { foreach ($b in ($v546Bad | Select-Object -Unique)) { Fail "V546 $b" } }
+else { Pass "V546 a vampire's attribute names sit $($attrLabelW534 + 5 + 25) from their row's edge to the first dot (label $attrLabelW534 = the longest of $($fields546.Count) names, $longest546 letters), generated off ATTR_LABEL_W; the mortal's templates stay 95 / 100 / 125" }
 # SPEC C Q27, I99k-m, T801. The user asked for the label beside the dropdown; what it BUYS is
 # 25px of height off three boxes, and what it COSTS is 51px of picker width - measured, one
 # road name of fifty-five clips, and the next longest wants 204 against 239.
@@ -18900,9 +19281,9 @@ $V354_WAVE = @(
     @{ Tpl = 'SecPathRow'; File = 'WoD20.11.lfm'; Mod = 'Path'; FieldAttr = '$(field)'; RootArg = 'secPath';
        Roots = @( @{ Root = 'secPath'; Form = 'numbered'; Rows = 15 } ) },
     @{ Tpl = 'RitualRow'; File = 'WoD20.11.lfm'; Mod = 'Ritual'; FieldAttr = '$(field)'; RootArg = 'ritual';
-    # Rows is what the box DRAWS (22 since T880), never RITUAL_ROWS - that constant is the highest
-    # index (27) and carries the five burned vacancies inside it (SPEC V204 amended, V251).
-       Roots = @( @{ Root = 'ritual'; Form = 'numbered'; Rows = 22 } ) },
+    # Rows is what the box DRAWS (21 since the 62nd batch, SPEC I205), never RITUAL_ROWS - that constant is the highest
+    # index (26) and carries the five burned vacancies inside it (SPEC V204 amended, V251).
+       Roots = @( @{ Root = 'ritual'; Form = 'numbered'; Rows = 21 } ) },
     # Wave 4 (T874): the three families the AFFILIATION prunes, and the one tab where all three
     # description panes left in one round (SPEC I131b, V365d). All three declare the SAME module,
     # Numina, because there is one book behind the tab - descNumina_en/_pt carried the text for
@@ -18957,7 +19338,7 @@ $V354_WAVE = @(
     @{ Tpl = 'VSecPathRow'; File = 'WoD20.15.lfm'; Mod = 'Path'; FieldAttr = '$(field)'; RootArg = 'secPath';
        Roots = @( @{ Root = 'secPath'; Form = 'numbered'; Rows = 15 } ) },
     @{ Tpl = 'VRitualRow'; File = 'WoD20.15.lfm'; Mod = 'Ritual'; FieldAttr = '$(field)'; RootArg = 'ritual';
-       Roots = @( @{ Root = 'ritual'; Form = 'numbered'; Rows = 22 } ) }
+       Roots = @( @{ Root = 'ritual'; Form = 'numbered'; Rows = 21 } ) }   # 21 since the 61st batch (SPEC I204d)
 )
 
 # Templates allowed to open the box WITHOUT being a wave of I113e. NAMED, never a generic skip:
@@ -19221,8 +19602,14 @@ else {
 $fsRoot355 = @([regex]::Matches((CodeOf (Join-Path $dir "WoD20th.lfm")), '\.fontStyle\s*='))
 $fsFn355   = LuaFn $rootTxt 'mfLabel'
 $fsIn355   = if ($fsFn355) { @([regex]::Matches((NoComments $fsFn355), '\.fontStyle\s*=')).Count } else { 0 }
+# AMENDED (53rd batch, SPEC V355c as amended, I196a): renderBearing is the SECOND named writer - the
+# aura's roman and the italic of -- No Aura --. mfLabel cannot paint it: its filled branch writes
+# opacity 1 and the line's authored 0.80 is the emphasis the user asked for. A third writer is red.
+$fsBrFn355 = LuaFn $rootTxt 'renderBearing'
+$fsBr355   = if ($fsBrFn355) { @([regex]::Matches((NoComments $fsBrFn355), '\.fontStyle\s*=')).Count } else { 0 }
 if (-not $fsFn355) { $v355Bad += "(c) mfLabel is gone - the ONE writer of fontStyle the exception is for does not exist, so the count below is struck over nothing (SPEC V209, B7)" }
-elseif ($fsRoot355.Count -ne $fsIn355) { $v355Bad += "(c) the root form writes fontStyle $($fsRoot355.Count) time(s) and $fsIn355 of them are inside mfLabel - the exception I114e bought is for ONE writer, and a second is the blanket ban coming back with a reason (SPEC I114e, V135)" }
+elseif ($fsBr355 -ne 2) { $v355Bad += "(c) renderBearing writes fontStyle $fsBr355 time(s), expected 2 - the aura's roman and the italic of -- No Aura -- (SPEC V355c as amended, I196a)" }
+elseif ($fsRoot355.Count -ne ($fsIn355 + $fsBr355)) { $v355Bad += "(c) the root form writes fontStyle $($fsRoot355.Count) time(s), $fsIn355 inside mfLabel and $fsBr355 inside renderBearing - those are the two NAMED writers, and a third is the blanket ban coming back with a reason (SPEC V355c as amended, I114e, V135)" }
 
 # (d) the way OUT of a row is offered only when there is something to get out of, and mfConfirm
 # lets the blank THROUGH. The old guard refused "" as if it were "nothing marked": nil is
@@ -26682,23 +27069,44 @@ else {
 if ($v515Bad) { foreach ($b in $v515Bad) { Fail "V515 $b" } }
 else { Pass "V515 the ! is accented through paint by bangAccent alone, while its tip has content, repainted after the list, a note, a row and the theme walk" }
 
-# ---- V516: the road's text shows for Show Ghoul or a vampire (SPEC I177d, B180; REWRITTEN I178d, B181) ----
+# ---- V516: the road's text shows on EVERY sheet and says what it holds (SPEC I177d, B180; I178d, B181; REWRITTEN I196a) ----
 # T876 turned cboRoad into the dynroad picker and the clanFamily gate stayed half alive: the lock
 # wrote into a nil and the text hid on a sheet with no clan. The gate is gone, and what is
 # measured is its absence - including the dead name, which is how a lock goes on writing nowhere.
+#
+# REWRITTEN in the 53rd batch (user 2026-10-02, SPEC V516 as rewritten, I196a): the line never hides.
+# The strict test of B181 now picks WHAT it says - the aura with its modifier in roman for Show
+# Ghoul or a vampire, "-- No Aura --" in italics for anyone else - and both branches write the
+# style, or the italic sticks when the game turns Vampire. The 0.80 stays authored: no .opacity.
+#
+# Mutation (SPEC V222): nm.visible back -> RED (b) - fontStyle = "" out of the true branch -> RED (b)
+# - "== true" out of the test -> RED (b) - the [pt] key deleted -> RED (e) - 'game' out of the
+# dataLink -> RED (d). Probe: noteButton before mfLabel in renderBearing -> GREEN.
 $v516Bad = @()
 $rb516 = NoComments (LuaFn $rootTxt 'renderBearing')
 $nm516 = $main510Doc.SelectSingleNode("//label[@name='dynBearingName']")
 if (-not $rb516 -or $null -eq $nm516) { $v516Bad += "renderBearing or dynBearingName (WoD20.1) is not declared - this check reads nothing (SPEC V20, V209)" }
 else {
     if ($nm516.HasAttribute('visible')) { $v516Bad += "(a) dynBearingName authors visible='$($nm516.GetAttribute('visible'))' - whether the line shows is renderBearing's to decide (SPEC V516a, I178d)" }
-    # (b) REWRITTEN in the 33rd batch (user, SPEC B181, I178d): the line has a gate again - Show
-    # Ghoul or a vampire, strict like applyTabVisibility (SPEC B103) - and clanFamily stays out.
-    $vis516 = @([regex]::Matches($rb516, '\.visible\s*=\s*([^\r\n;]*);'))
-    if ($vis516.Count -ne 1) { $v516Bad += "(b) renderBearing writes .visible $($vis516.Count) time(s), expected 1 - the bearing line's one gate (SPEC V516b, I178d)" }
-    elseif ($vis516[0].Groups[1].Value.Trim() -cne 'sheet.stShowDisciplines == true or sheet.game == "Vampire"') { $v516Bad += "(b) the bearing line is gated on '$($vis516[0].Groups[1].Value.Trim())' and not on sheet.stShowDisciplines == true or sheet.game == `"Vampire`" - Show Ghoul or a vampire, strict (SPEC V516b, B181, B103)" }
+    # (b) REWRITTEN in the 53rd batch (SPEC V516b, I196a): no .visible and no .opacity at all; the
+    # strict test opens two branches and EACH writes .text and .fontStyle.
+    $vis516 = @([regex]::Matches($rb516, '\.visible\s*='))
+    if ($vis516.Count -ne 0) { $v516Bad += "(b) renderBearing writes .visible $($vis516.Count) time(s) - the line shows on every sheet since the 53rd batch and says -- No Aura -- where it used to hide (SPEC V516b, I196a)" }
+    if ($rb516 -match '\.opacity\s*=') { $v516Bad += "(b) renderBearing writes .opacity - the line's 0.80 is authored and holds for both texts (SPEC V516b, V244)" }
+    $br516 = [regex]::Match($rb516, '(?s)if sheet\.stShowDisciplines == true or sheet\.game == "Vampire" then(?<t>.*?)\r?\n\s*else\r?\n(?<f>.*?)\r?\n\s*end;\r?\n\s*end;')
+    if (-not $br516.Success) { $v516Bad += "(b) renderBearing does not branch on sheet.stShowDisciplines == true or sheet.game == `"Vampire`" - Show Ghoul or a vampire, strict (SPEC V516b, B181, B103)" }
+    else {
+        $tb516 = $br516.Groups['t'].Value; $fb516 = $br516.Groups['f'].Value
+        if ($tb516 -notmatch '\.text\s*=\s*bear \.\. " \(" \.\. bearingMod\(dots\) \.\. "\)"' -or $tb516 -notmatch '\.fontStyle\s*=\s*""') { $v516Bad += "(b) the vampire/ghoul branch does not write the aura with its modifier AND clear the italic - the italic of -- No Aura -- would stick when the game turns Vampire (SPEC V516b)" }
+        if ($fb516 -notmatch '"-- No Aura --"' -or $fb516 -notmatch 'translateSheetText\(' -or $fb516 -notmatch '\.text\s*=' -or $fb516 -notmatch '\.fontStyle\s*=\s*"italic"') { $v516Bad += "(b) the other branch does not write the translated -- No Aura -- in italics (SPEC V516b, I196a)" }
+    }
     if ($rb516 -match 'clanFamily') { $v516Bad += "(b) renderBearing reads clanFamily - the road is open on every sheet (SPEC V516b, Q98.3)" }
-    if ($rb516 -notmatch '\.text\s*=') { $v516Bad += "(b) renderBearing no longer writes the bearing line's text (SPEC V516b)" }
+    # (e) the absence sentence has a key in both halves of the .lang AND an entry in the PT map that
+    # translateSheetText actually reads (WoD20.6): V28 covers XML text only, so a Lua literal with a
+    # [pt] key and no map entry reads English on a Portuguese sheet with the gate green.
+    if (-not $ptK.Contains('-- No Aura --') -or $ptVal['-- No Aura --'] -cne '-- Sem Aura --') { $v516Bad += "(e) localization.lang [pt] does not read -- No Aura -- as the user's -- Sem Aura -- (SPEC V516e)" }
+    if (-not $enK.Contains('-- No Aura --')) { $v516Bad += "(e) localization.lang has no [en] key for -- No Aura -- (SPEC V516e, V10)" }
+    if (-not $embedded.ContainsKey('-- No Aura --')) { $v516Bad += "(e) the PT map of WoD20.6 has no -- No Aura -- - translateSheetText reads the map, not the .lang, so the Portuguese sheet would read it in English (SPEC V516e, V22)" }
 }
 # (d) the gate's two inputs reach it: the one dataLink that watches road and calls renderBearing
 # watches game and stShowDisciplines too, or ticking Show Ghoul leaves the line as it was.
@@ -26707,7 +27115,7 @@ if ($dl516.Count -ne 1) { $v516Bad += "(d) $($dl516.Count) dataLink(s) watch roa
 else { foreach ($fld516 in @('game', 'stShowDisciplines')) { if ($dl516[0].GetAttribute('fields') -notmatch "'$fld516'") { $v516Bad += "(d) the road dataLink does not watch '$fld516' - changing it would not repaint the bearing line (SPEC V516d, I178d)" } } }
 if ($all25Code -match 'cboRoad') { $v516Bad += "(c) cboRoad is named in the sheet's code - it has not existed since T876, and a dead name in Lua is a lock writing into nil, silently (SPEC V516c, B180)" }
 if ($v516Bad) { foreach ($b in $v516Bad) { Fail "V516 $b" } }
-else { Pass "V516 the road's bearing line shows for Show Ghoul or a vampire, one strict gate in renderBearing on a link that watches both, no clanFamily and no dead cboRoad anywhere in code" }
+else { Pass "V516 the road's bearing line shows on every sheet - the aura in roman for Show Ghoul or a vampire, -- No Aura -- in italics for anyone else, from one strict test on a link that watches both, keyed in both halves and in the PT map, no clanFamily and no dead cboRoad anywhere in code" }
 
 # ---- V517: the ! with content wears the COMPLEMENT of the era's palette (SPEC I178a, Q99.1, R178a) ----
 # One `bang` value per palette. Three are the exact hue complement (+180, same S and L) of the
@@ -26801,7 +27209,9 @@ else {
         if ($sbp518 -notmatch 'local starred = key ~= nil and bare\[key\] == true;' -or $sbp518 -notmatch 'btn\.text = starred and "!\*" or "!";') { $v518Bad += "(c) the blink and the star are not decided by one test (starred off bare[key]) - they could disagree (SPEC V518c)" }
         if ($sbp518 -notmatch ('(?s)if starred then\s*BANG_BLINK\.rects\[' + $rv518 + '\] = true;\s*' + $rv518 + '\.visible = BANG_BLINK\.on;\s*else\s*BANG_BLINK\.rects\[' + $rv518 + '\] = nil;\s*' + $rv518 + '\.visible = false;')) { $v518Bad += "(c) specBangPaint does not put a starred ! into the set and take a plain one out AND hide its red at once (SPEC V518c, I178b)" }
     }
-    $lit518 = @([regex]::Matches($all25Code, '"blinkSp"')).Count
+    # 59th batch (SPEC I202f, V518c as amended): the vampire's attribute generator names blinkSp to MOVE it
+# (VAMP_GEOM["blinkSp" .. f], V546b) - a placement, not a writer of the red; those lines do not count.
+$lit518 = @([regex]::Matches($all25Code, '"blinkSp"')).Count - @([regex]::Matches($all25Code, 'VAMP_GEOM\["blinkSp"')).Count
     if ($lit518 -ne @([regex]::Matches($sbp518, '"blinkSp"')).Count) { $v518Bad += "(c) blinkSp is reached by name outside specBangPaint - the red has one writer besides the timer (SPEC V518c)" }
     $set518 = @([regex]::Matches($all25Code, 'BANG_BLINK\.rects\[')).Count
     if ($set518 -ne (@([regex]::Matches($sbp518, 'BANG_BLINK\.rects\[')).Count + @([regex]::Matches($blk518, 'BANG_BLINK\.rects\[')).Count)) { $v518Bad += "(c) BANG_BLINK.rects is written outside specBangPaint and bangBlink (SPEC V518c)" }

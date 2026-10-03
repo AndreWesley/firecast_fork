@@ -19,6 +19,7 @@
 			-- shows. Dots 4..9 answer to the same rule as there - a vampire sees the live dot up to
 			-- the generation's ceiling and the faded twin above it, anyone else sees five. The twin
 			-- is 0.12 because the live dot here is already 0.40 (SPEC V111): the Main's 0.30 ratio.
+			-- It is an EMPTY dot since the 54th batch (user 2026-10-02, SPEC I197b, V543).
 			local function paintAs(form, widget, field, firstDot)
 				local vamp = sheet.game == "Vampire";
 				local top  = vamp and vampGen().disc or 5;
@@ -52,13 +53,25 @@
 			-- Willpower has ten dots, so it does not fit paint()'s five-dot loop. Only the dots
 			-- are painted here: the boxes under them own `willpower_c*` and stay editable, which
 			-- is the whole point of putting willpower on this tab (SPEC V51).
+			--
+			-- The Vampire tab carries a copy since the 57th batch (user 2026-10-02, SPEC I200c/e,
+			-- V545c): roVWp_1..10, painted HERE because that tab has no script of its own (SPEC
+			-- V530b). Found through xpFind from the tab root, the one finder of the cross-tab
+			-- painters (SPEC V143), the way renderVampCaps finds the Vampire tab's dots.
 			local function paintWillpower(form)
-				for d = 1, 10, 1 do
-					local dot = form["roWp_" .. d];
+				local names = {};
 
-					if dot ~= nil then
-						dot.checked = sheet["willpower_" .. d] == true;
-					end;
+				for d = 1, 10, 1 do names["roVWp_" .. d] = true; end;
+
+				local found = xpFind(tabRootOf(form), names, {});
+
+				for d = 1, 10, 1 do
+					local on  = sheet["willpower_" .. d] == true;
+					local dot = form["roWp_" .. d];
+					local vdot = found["roVWp_" .. d];
+
+					if dot ~= nil then dot.checked = on; end;
+					if vdot ~= nil then vdot.checked = on; end;
 				end;
 			end;
 
@@ -228,12 +241,12 @@
 			<imageCheckBox name="ro_$(field)_7" left="275" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="ro_$(field)_8" left="300" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="ro_$(field)_9" left="325" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
-			<imageCheckBox name="rocap_$(field)_4" left="200" top="0" width="25" height="25" checked="true" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
-			<imageCheckBox name="rocap_$(field)_5" left="225" top="0" width="25" height="25" checked="true" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
-			<imageCheckBox name="rocap_$(field)_6" left="250" top="0" width="25" height="25" checked="true" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
-			<imageCheckBox name="rocap_$(field)_7" left="275" top="0" width="25" height="25" checked="true" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
-			<imageCheckBox name="rocap_$(field)_8" left="300" top="0" width="25" height="25" checked="true" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
-			<imageCheckBox name="rocap_$(field)_9" left="325" top="0" width="25" height="25" checked="true" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
+			<imageCheckBox name="rocap_$(field)_4" left="200" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
+			<imageCheckBox name="rocap_$(field)_5" left="225" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
+			<imageCheckBox name="rocap_$(field)_6" left="250" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
+			<imageCheckBox name="rocap_$(field)_7" left="275" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
+			<imageCheckBox name="rocap_$(field)_8" left="300" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
+			<imageCheckBox name="rocap_$(field)_9" left="325" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 		</template>
 
 		<!-- Ten read-only dots over ten real boxes (SPEC V51). The dots carry no `field=` and
@@ -243,7 +256,11 @@
 		     user's ask: "cada checkbox de willpower deve ter o centro alinhado com o centro de
 		     cada bolinha que esta em cima". Both controls are 25 wide, so one left IS one centre
 		     and the rule needs no number of its own - the boxes used to open at 2 and hung two
-		     pixels right of every dot (SPEC I161c, V470b, Q81.3). -->
+		     pixels right of every dot (SPEC I161c, V470b, Q81.3).
+
+		     The boxes open 2 under the dots since the 57th batch (user 2026-10-02, SPEC I200b,
+		     V545a) - the same 2 as the Main's row and the Vampire tab's copy; at 20 they used to
+		     sit 5 INTO the dots' rect. -->
 		<template name="WillpowerMirror">
 			<imageCheckBox name="roWp_1" left="0" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox name="roWp_2" left="25" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
@@ -256,16 +273,16 @@
 			<imageCheckBox name="roWp_9" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 			<imageCheckBox name="roWp_10" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
 
-			<checkBox left="0" top="20" width="25" height="25" field="willpower_c1" onClick="wpSpentClick('willpower_c1');" onChange="wpSpentChange('willpower_c1');"/>
-			<checkBox left="25" top="20" width="25" height="25" field="willpower_c2" onClick="wpSpentClick('willpower_c2');" onChange="wpSpentChange('willpower_c2');"/>
-			<checkBox left="50" top="20" width="25" height="25" field="willpower_c3" onClick="wpSpentClick('willpower_c3');" onChange="wpSpentChange('willpower_c3');"/>
-			<checkBox left="75" top="20" width="25" height="25" field="willpower_c4" onClick="wpSpentClick('willpower_c4');" onChange="wpSpentChange('willpower_c4');"/>
-			<checkBox left="100" top="20" width="25" height="25" field="willpower_c5" onClick="wpSpentClick('willpower_c5');" onChange="wpSpentChange('willpower_c5');"/>
-			<checkBox left="125" top="20" width="25" height="25" field="willpower_c6" onClick="wpSpentClick('willpower_c6');" onChange="wpSpentChange('willpower_c6');"/>
-			<checkBox left="150" top="20" width="25" height="25" field="willpower_c7" onClick="wpSpentClick('willpower_c7');" onChange="wpSpentChange('willpower_c7');"/>
-			<checkBox left="175" top="20" width="25" height="25" field="willpower_c8" onClick="wpSpentClick('willpower_c8');" onChange="wpSpentChange('willpower_c8');"/>
-			<checkBox left="200" top="20" width="25" height="25" field="willpower_c9" onClick="wpSpentClick('willpower_c9');" onChange="wpSpentChange('willpower_c9');"/>
-			<checkBox left="225" top="20" width="25" height="25" field="willpower_c10" onClick="wpSpentClick('willpower_c10');" onChange="wpSpentChange('willpower_c10');"/>
+			<checkBox left="0" top="27" width="25" height="25" field="willpower_c1" onClick="wpSpentClick('willpower_c1');" onChange="wpSpentChange('willpower_c1');"/>
+			<checkBox left="25" top="27" width="25" height="25" field="willpower_c2" onClick="wpSpentClick('willpower_c2');" onChange="wpSpentChange('willpower_c2');"/>
+			<checkBox left="50" top="27" width="25" height="25" field="willpower_c3" onClick="wpSpentClick('willpower_c3');" onChange="wpSpentChange('willpower_c3');"/>
+			<checkBox left="75" top="27" width="25" height="25" field="willpower_c4" onClick="wpSpentClick('willpower_c4');" onChange="wpSpentChange('willpower_c4');"/>
+			<checkBox left="100" top="27" width="25" height="25" field="willpower_c5" onClick="wpSpentClick('willpower_c5');" onChange="wpSpentChange('willpower_c5');"/>
+			<checkBox left="125" top="27" width="25" height="25" field="willpower_c6" onClick="wpSpentClick('willpower_c6');" onChange="wpSpentChange('willpower_c6');"/>
+			<checkBox left="150" top="27" width="25" height="25" field="willpower_c7" onClick="wpSpentClick('willpower_c7');" onChange="wpSpentChange('willpower_c7');"/>
+			<checkBox left="175" top="27" width="25" height="25" field="willpower_c8" onClick="wpSpentClick('willpower_c8');" onChange="wpSpentChange('willpower_c8');"/>
+			<checkBox left="200" top="27" width="25" height="25" field="willpower_c9" onClick="wpSpentClick('willpower_c9');" onChange="wpSpentChange('willpower_c9');"/>
+			<checkBox left="225" top="27" width="25" height="25" field="willpower_c10" onClick="wpSpentClick('willpower_c10');" onChange="wpSpentChange('willpower_c10');"/>
 		</template>
 
 		<!--
@@ -526,12 +543,15 @@
 			underneath carry `field="willpower_c*"` and are a declared mirror of the Main tab
 			(SPEC I3 ESPELHOS, V36). Spending willpower is what a player does mid-fight; raising
 			the permanent rating is not.
+
+			Title, the Main's 8 and the 52 of dots and boxes are ONE object centred in the box since
+			the 61st batch (user 2026-10-02, SPEC I204c, V547): 20 + 8 + 52 = 80 in 110, 15 above.
 		-->
 		<layout left="650" top="487" width="315" height="110">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="275" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
-			<layout left="32" top="41" width="250" height="45">
+			<layout left="32" top="43" width="250" height="52">
 				<WillpowerMirror/>
 			</layout>
 		</layout>
@@ -558,8 +578,9 @@
 		<layout name="dynHealth3_box" left="970" top="356" width="320" height="325">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- The track length lives on the storyteller's tab since the 82nd round (SPEC I35,
-			     V234). The title spans the box now, so it is centred on the box. -->
-			<label left="20" top="15" width="280" height="20" text="HEALTH" horzTextAlign="center"/>
+			     V234). The title spans the box now, so it is centred on the box - and stretches with
+			     it, since a vampire's box is as wide as COMBAT TRAITS above it (SPEC I204g). -->
+			<label left="20" top="15" width="280" height="20" text="HEALTH" horzTextAlign="center" anchors="left top right"/>
 
 			<layout name="dynHealth3_row1" left="37" top="47" width="246" height="20"><HealthRowMirror num="1"/></layout>
 			<layout name="dynHealth3_row2" left="37" top="74" width="246" height="20"><HealthRowMirror num="2"/></layout>
@@ -613,8 +634,11 @@
 
 			NINE for a vampire since the 47th batch (SPEC I190, Q109.8): dots 6..9 and the faded
 			twins rocap_*_4..9 are authored hidden, and renderGameMode on the root widens this box
-			by four dots (320 -> 420, VAMP_GEOM) - the title, the line and the rows carry
-			anchors="left top right" and stretch with it. Nothing sits to the right to push.
+			(VAMP_GEOM) - the title, the line and the rows carry anchors="left top right" and
+			stretch with it. Nothing sits to the right to push. Since the 61st batch (user
+			2026-10-02, SPEC I204g, V546d) a vampire's names are as wide as the longest of the
+			eleven needs and the dots start 2 after them: the root's generator places each row's
+			name, dots and twins, and the box is 382.
 		-->
 		<layout name="boxCombatTraits" left="970" top="0" width="320" height="351">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>

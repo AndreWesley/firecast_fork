@@ -146,7 +146,7 @@
 				the same commit (SPEC V12). The field is `sheetTheme` and NOT `theme`: sheets
 				saved from the Mage plugin still carry theme="Dark" (SPEC V2).
 			-->
-			<label left="35" top="54" width="170" height="20" text="Game"/>
+			<label left="35" top="54" width="170" height="20" text="Character Sheet"/>
 			<comboBox name="cboGame" left="210" top="51" width="150" height="25" field="game" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}"/>
 
 			<label left="35" top="84" width="170" height="20" text="Era"/>

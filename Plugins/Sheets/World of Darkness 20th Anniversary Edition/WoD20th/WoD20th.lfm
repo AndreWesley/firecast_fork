@@ -2422,7 +2422,8 @@
 			-- The Main's BLOOD POOL answers to the game too, alone (SPEC I189e, V532d): a mortal has no
 			-- blood, and a ghoul's lives on the Ghoul tab. The three group labels of ATTRIBUTES were
 			-- pairs in the 47th batch and are not any more (SPEC I191a, user 2026-10-01): the rotated
-			-- names stand in every game, and VAMP_GEOM puts each one before its third of the band.
+			-- names stood in every game, and VAMP_GEOM put each one before its third of the band; since the
+			-- 58th batch (SPEC I201b) they are a mortal's and renderGameMode hides them for a vampire.
 			GAME_PAIRS = {
 				{ "hdrMotivation",   "hdrClan" },
 				{ "hdrOccupation",   "hdrGeneration" },
@@ -2449,38 +2450,71 @@
 			-- its height (2 x 244); VIRTUES took its slot under TALENTS, ten wider, so its three rows
 			-- are re-centred here; ROAD is no longer a stack and closes up on the abilities.
 			--
+			-- 54th batch (SPEC I197a, user 2026-10-02): the avatar is 30% smaller in both directions,
+			-- 340 x 488 -> 238 x 342 (341.6 to the nearest pixel), on the same corner beside EXPERIENCE,
+			-- so a vampire's Main closes on 1543. 56th batch (SPEC I199d): its foot is the foot of the
+			-- ATTRIBUTES band (110 + 126 = 236), the width stays 238; and ROAD is as tall as VIRTUES
+			-- (126), so WILLPOWER opens 4 lower (SPEC I199a).
+			--
+			-- 59th batch (SPEC I202, user 2026-10-02): the attribute names sit closer to their dots (label 95 -> 79,
+			-- generated below the table), so each third is 334 wide with 18 between (60th batch, SPEC I203a), ATTRIBUTES and the header lose the 52 they gave
+			-- back on the left (222 .. 1300) and the avatar takes all of it: 217 wide (222 - 5).
+			--
+			-- 58th batch (SPEC I201, user 2026-10-02): the rotated group names are a MORTAL's and hide for a
+			-- vampire, so ATTRIBUTES shrinks to 1130 (20 + 3 x 350 + 2 x 20 + 20) and closes on 1300, leaving 170 on
+			-- its left. The header slides to the same edge and spreads its three columns over the 120 it gained;
+			-- its cells are named so the table can place them. The avatar takes the corner (165 = 170 - 5, 236
+			-- tall) and EXPERIENCE goes under VIRTUES, closing with WILLPOWER and the pool at 841. A vampire's
+			-- Main closes on 1300.
+			--
 			-- 52nd batch (SPEC I195, user 2026-10-02): ROAD and WILLPOWER are two boxes in every game,
 			-- together as tall as the Main's BLOOD POOL box - so the XML owns their heights and this
 			-- table only MOVES them (no height), WILLPOWER 5 under ROAD, closing with the pool.
+			--
+			-- 61st batch (SPEC I204, user 2026-10-02): EXPERIENCE's title and number are one object
+			-- centred in a vampire's 113 (31 / 56, SPEC V547), so the title is named and listed; COMBAT
+			-- TRAITS is as wide as its longest name needs (382, generated below) and HEALTH under it
+			-- takes the same width, its ten rows re-centred.
 			VAMP_GEOM = {
-				boxExperience        = { 1015, 0, 285, 105 },
-				bgCurrentXPMain      = { 97, 53, 90, 25 },
-				edtCurrentXPMain     = { 97, 53, 90, 25 },
-				boxAttributes        = { 0, 110, 1300, 126 },
-				attrRotPhysical      = { -15, 63, 100, 20 },
-				attrRotSocial        = { 420, 63, 100, 20 },
-				attrRotMental        = { 855, 63, 100, 20 },
-				attrRow_strength     = { 60, 36, 350, 25 },
-				attrRow_dexterity    = { 60, 61, 350, 25 },
-				attrRow_stamina      = { 60, 86, 350, 25 },
-				attrRow_charisma     = { 495, 36, 350, 25 },
-				attrRow_manipulation = { 495, 61, 350, 25 },
-				attrRow_appearance   = { 495, 86, 350, 25 },
-				attrRow_perception   = { 930, 36, 350, 25 },
-				attrRow_inteligence  = { 930, 61, 350, 25 },
-				attrRow_wits         = { 930, 86, 350, 25 },
+				boxHeader            = { 222, 0, 1078, 105 },
+				hdrName              = { 20, 15, 297, 25 },
+				hdrPlayer            = { 20, 40, 297, 25 },
+				hdrChronicle         = { 20, 65, 297, 25 },
+				hdrNature            = { 360, 15, 327, 25 },
+				hdrDemeanor          = { 360, 40, 327, 25 },
+				hdrConcept           = { 360, 65, 327, 25 },
+				hdrMotivation        = { 731, 15, 327, 25 },
+				hdrClan              = { 731, 15, 327, 25 },
+				hdrOccupation        = { 731, 40, 327, 25 },
+				hdrGeneration        = { 731, 40, 327, 25 },
+				hdrResidence         = { 731, 65, 327, 25 },
+				hdrSire              = { 731, 65, 327, 25 },
+				boxExperience        = { 0, 728, 340, 113 },
+				lblXPMain            = { 20, 31, 300, 20 },
+				bgCurrentXPMain      = { 125, 56, 90, 25 },
+				edtCurrentXPMain     = { 125, 56, 90, 25 },
+				boxAttributes        = { 222, 110, 1078, 126 },
+				attrRow_strength     = { 20, 36, 334, 25 },
+				attrRow_dexterity    = { 20, 61, 334, 25 },
+				attrRow_stamina      = { 20, 86, 334, 25 },
+				attrRow_charisma     = { 372, 36, 334, 25 },
+				attrRow_manipulation = { 372, 61, 334, 25 },
+				attrRow_appearance   = { 372, 86, 334, 25 },
+				attrRow_perception   = { 724, 36, 334, 25 },
+				attrRow_inteligence  = { 724, 61, 334, 25 },
+				attrRow_wits         = { 724, 86, 334, 25 },
 				boxTalents           = { 0, 241, 430, 351 },
 				boxSkills            = { 435, 241, 430, 351 },
 				boxKnowledges        = { 870, 241, 430, 351 },
-				avatarFrame          = { 1305, 0, 340, 488 },
-				avatarImage          = { 1305, 0, 340, 488 },
-				ornAvatar            = { 1305, 0, 340, 488 },
+				avatarFrame          = { 0, 0, 217, 236 },
+				avatarImage          = { 0, 0, 217, 236 },
+				ornAvatar            = { 0, 0, 217, 236 },
 				boxVirtues           = { 0, 597, 340, 126 },
 				virtueRow_conscience = { 45, 36, 250, 25 },
 				virtueRow_selfControl = { 45, 61, 250, 25 },
 				virtueRow_courage    = { 45, 86, 250, 25 },
 				boxRoad              = { 345, 597, 330 },
-				boxWillpower         = { 345, 724, 330 },
+				boxWillpower         = { 345, 728, 330 },
 				mainBloodPool        = { 680, 597, 330, 244 },
 				dynHealth_box        = { 1015, 597, 285 },
 				dynHealth_row1       = { 20, 47, 246, 20 },
@@ -2498,8 +2532,54 @@
 				boxFlaws             = { 489, 342, 743, 337 },
 				boxDerangements      = { 1237, 0, 225, 337 },
 				boxOther             = { 1237, 342, 225, 337 },
-				boxCombatTraits      = { 970, 0, 420, 351 },
+				boxCombatTraits      = { 970, 0, 382, 351 },
+				dynHealth3_box       = { 970, 356, 382 },
+				dynHealth3_row1      = { 68, 47, 246, 20 },
+				dynHealth3_row2      = { 68, 74, 246, 20 },
+				dynHealth3_row3      = { 68, 101, 246, 20 },
+				dynHealth3_row4      = { 68, 128, 246, 20 },
+				dynHealth3_row5      = { 68, 155, 246, 20 },
+				dynHealth3_row6      = { 68, 182, 246, 20 },
+				dynHealth3_row7      = { 68, 209, 246, 20 },
+				dynHealth3_row8      = { 68, 236, 246, 20 },
+				dynHealth3_row9      = { 68, 263, 246, 20 },
+				dynHealth3_row10     = { 68, 290, 246, 20 },
 			};
+
+			-- 59th batch (SPEC I202a, V546, user 2026-10-02, Q119): in a VAMPIRE's Main the attribute names sit
+			-- closer to their dots - the label is as wide as the longest name needs, ceil(12 letters x 6.5) + 1 (a third of the 4 px the two 18 gaps gave back, SPEC I203a), and
+			-- the ? and the dots slide left by what it gave back (95 -> 79, so 16). The two XML templates are the
+			-- MORTAL's and stay as they are; these entries ride VAMP_GEOM, so placeBox is still the one writer and
+			-- GEOM_XML puts a mortal back. 12 is Manipulation / Intelligence (en) and Inteligencia (pt); 6.5 is the
+			-- gate's body ruler (V16). 5 is the gap label -> ?, 25 is a dot, as in the template. No attribute has
+			-- a ceiling twin below dot 4 (the mcap rows start there).
+			ATTR_LABEL_W = 79;
+
+			for _, f in ipairs({ "strength", "dexterity", "stamina", "charisma", "manipulation", "appearance", "perception", "inteligence", "wits" }) do
+				VAMP_GEOM["lbl" .. f]    = { 0, 5, ATTR_LABEL_W, 20 };
+				VAMP_GEOM["btnSp" .. f]  = { ATTR_LABEL_W + 5, 2, 20, 20 };
+				VAMP_GEOM["blinkSp" .. f] = { ATTR_LABEL_W + 5, 2, 20, 20 };
+
+				for k = 1, 9, 1 do
+					VAMP_GEOM["dot" .. f .. "_" .. k] = { ATTR_LABEL_W + 5 + 25 * k, 0, 25, 25 };
+					if k >= 4 then VAMP_GEOM["mcap" .. f .. "_" .. k] = { ATTR_LABEL_W + 5 + 25 * k, 0, 25, 25 }; end;
+				end;
+			end;
+
+			-- 61st batch (SPEC I204g, V546d, user 2026-10-02): the same for a vampire's COMBAT TRAITS. The
+			-- name is as wide as the longest of the eleven needs, ceil(13 letters x 6.5) - Armas de Fogo,
+			-- Armas Brancas, Sensitividade - and the dots start 2 after it (the user's 2, no ? on this row),
+			-- so the box is 35 + 85 + 2 + 9 x 25 + 35 = 382. The XML template (WoD20.3) is the MORTAL's.
+			COMBAT_LABEL_W = 85;
+
+			for _, f in ipairs({ "strength", "dexterity", "stamina", "perception", "alertness", "athletics", "awareness", "brawl", "ranged", "melee", "stealth" }) do
+				VAMP_GEOM["dynRo" .. f] = { 0, 5, COMBAT_LABEL_W, 20 };
+
+				for k = 1, 9, 1 do
+					VAMP_GEOM["ro_" .. f .. "_" .. k] = { COMBAT_LABEL_W + 2 + 25 * (k - 1), 0, 25, 25 };
+					if k >= 4 then VAMP_GEOM["rocap_" .. f .. "_" .. k] = { COMBAT_LABEL_W + 2 + 25 * (k - 1), 0, 25, 25 }; end;
+				end;
+			end;
 
 			-- The XML's own numbers, read off a box the first time it is seen and before anything moves
 			-- it. The XML is the same for every sheet, so one copy serves them all and the mortal
@@ -2510,7 +2590,7 @@
 				if sheet == nil or from == nil then return; end;
 
 				local vamp  = sheet.game == "Vampire";
-				local names = { mainBloodPool = true, attrSepSocial = true, attrSepMental = true, chkShowNumina = true, chkShowDisciplines = true };
+				local names = { mainBloodPool = true, attrSepSocial = true, attrSepMental = true, attrRotPhysical = true, attrRotSocial = true, attrRotMental = true, chkShowNumina = true, chkShowDisciplines = true };
 
 				for i = 1, #GAME_PAIRS, 1 do
 					names[GAME_PAIRS[i][1]] = true;
@@ -2533,10 +2613,11 @@
 
 				if pool ~= nil and pool.visible ~= vamp then pool.visible = vamp; end;
 
-				-- The two white rules between the attribute groups are a MORTAL column's: left where the
+				-- The three rotated names go the same way (SPEC I201b, V537a). The two white rules between the
+			-- attribute groups are a MORTAL column's: left where the
 				-- XML puts them, one cuts the Stamina row of a vampire's band (user 2026-10-01, SPEC
 				-- I191c, B191, V537a).
-				for _, nm in ipairs({ "attrSepSocial", "attrSepMental" }) do
+				for _, nm in ipairs({ "attrSepSocial", "attrSepMental", "attrRotPhysical", "attrRotSocial", "attrRotMental" }) do
 					local c = found[nm];
 
 					if c ~= nil and c.visible == vamp then c.visible = not vamp; end;
@@ -2589,7 +2670,9 @@
 
 			-- The ceiling of the VAMPIRE tab, painted (SPEC I188h, V530f). Every live dot of a row of
 			-- nine has a faded twin on the same spot; the generation decides which of the two shows,
-			-- so a dot out of reach reads as marked at 30% and takes no click. The twin COVERS and
+			-- so a dot out of reach reads as an EMPTY dot at 30% and takes no click - empty, like a
+			-- trait never bought, since the 54th batch (user 2026-10-02, SPEC I197b, V543), and the
+			-- pool's twins the same (SPEC Q115.1). The twin COVERS and
 			-- never erases: a dot bought above a ceiling that came down later stays in the sheet
 			-- (SPEC V220c, V187). Each row kind names its LIVE dot: `vdot` on a bought row, `ro_V` on a
 			-- main path, whose read-only dots renderMainPaths lights from the Discipline.
@@ -2648,7 +2731,9 @@
 
 					if cap ~= nil then
 						if cap.visible == reach then cap.visible = not reach; end;
-						if not reach and cap.checked ~= true then cap.checked = true; end;
+						-- Every twin is EMPTY since the 54th batch (SPEC I197c, V543b). The write stays:
+						-- it is what keeps a twin from ever being painted full.
+						if not reach and cap.checked ~= false then cap.checked = false; end;
 					end;
 				end;
 
@@ -3238,7 +3323,7 @@
 			DISC_ROWS      = 15;
 			MAIN_PATH_ROWS = 4;
 			SEC_PATH_ROWS  = 15;
-			RITUAL_ROWS    = 27;
+			RITUAL_ROWS    = 26;
 
 			-- The Discipline EVERY ghoul has, whatever the domitor's clan teaches (user
 			-- 2026-09-06, SPEC I152). ONE literal: two copies of a name are two owners and the
@@ -3251,7 +3336,9 @@
 			-- _26 and _27, NOT _21 and _22: the five names that came off in the 85th round are
 			-- burned, and a sheet saved before it still carries what was in them (SPEC I46, V251,
 			-- V2). So the numbering keeps a HOLE, and RITUAL_ROWS above is the highest INDEX and
-			-- no longer the count - the rewrite V263(a) already took for psychic.
+			-- no longer the count - the rewrite V263(a) already took for psychic. The 62nd batch
+			-- (user 2026-10-02, SPEC I205) took _27 off both tabs and burned its name too: 21 rows,
+			-- the highest index 26.
 			--
 			-- The hole is a SET and not a number because a count cannot say WHICH index is
 			-- missing, and every reader needs to know: renderRitualButtons, the ledger and the
@@ -3259,7 +3346,7 @@
 			-- wrote across the whole range went with the 30th batch (SPEC I175e, V204 amended, B116).
 			--
 			-- The BOUND of those walks stays the highest index and is NOT reduced by these five.
-			-- Subtracting them would stop the loops at 22 and leave the two rows this round adds
+			-- Subtracting them would stop the loops short and leave the rows after the hole
 			-- with no painter at all, which is B112 exactly (SPEC V263b - a count drops the
 			-- vacancies, an index does not).
 			RITUAL_VACANT  = { [21] = true, [22] = true, [23] = true, [24] = true, [25] = true };
@@ -3994,8 +4081,9 @@
 			-- edtTotalXPMain and edtSpentXPMain left this roster in the same commit as the XML.
 			-- Both writes were nil-guarded and would have stayed silent forever; a name here with
 			-- no widget there is the orphan of V2 one floor up (SPEC I136f, B111, B123).
-			-- The Vampire tab shows Spent too since the 48th batch (SPEC I191g/h, user 2026-10-01).
-			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true, edtCurrentXPGhoul = true, edtCurrentXPVampire = true, edtCurrentXPNumina = true, edtSpentXPVampire = true };
+			-- The Vampire tab showed Spent too from the 48th batch (SPEC I191g/h) until the 61st (SPEC
+			-- I204f, user 2026-10-02): its Spent left this roster with the XML.
+			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true, edtCurrentXPGhoul = true, edtCurrentXPVampire = true, edtCurrentXPNumina = true };
 
 			-- The painting itself. No xpQuiet here (SPEC V142): the flag exists to keep the
 			-- sheet's OWN writes from dragging a repaint along (SPEC V107), and a flag left
@@ -4046,10 +4134,6 @@
 				if box.edtSpentXP ~= nil then
 					box.edtSpentXP.text = tostring(spent);
 					box.edtSpentXP.readOnly = not stEdit; box.edtSpentXP.opacity = stEdit and 1 or 0.75;
-				end;
-				if box.edtSpentXPVampire ~= nil then
-					box.edtSpentXPVampire.text = tostring(spent);
-					box.edtSpentXPVampire.readOnly = not stEdit; box.edtSpentXPVampire.opacity = stEdit and 1 or 0.75;
 				end;
 				if box.edtCurrentXP     ~= nil then box.edtCurrentXP.text     = tostring(total - spent); end;
 				if box.edtCurrentXPMain   ~= nil then box.edtCurrentXPMain.text   = tostring(total - spent); end;
@@ -4806,8 +4890,9 @@
 			-- No gate on `clanFamily` any more (SPEC I177d, B180, V516): T876 turned the combo into
 			-- the dynroad picker and the lock kept writing into a control that no longer existed,
 			-- while the bearing line kept hiding on a sheet with no clan. The picker and the dots are
-			-- open on every sheet (Q98.3); the bearing LINE is shown for a vampire or a ghoul only
-			-- (33rd batch, SPEC I178d, B181) - its dataLink watches game and stShowDisciplines.
+			-- open on every sheet (Q98.3); the bearing LINE names an aura for a vampire or a ghoul
+			-- only (33rd batch, SPEC I178d, B181) and says "-- No Aura --" for anyone else (53rd
+			-- batch, SPEC I196a) - its dataLink watches game and stShowDisciplines.
 			function renderBearing(from)
 				if sheet == nil or from == nil then return; end;
 
@@ -4875,12 +4960,28 @@
 				-- centred in their own half never read as one sentence, which is what was asked.
 				local nm = found["dynBearingName"];
 
-				-- Shown for a vampire or a ghoul and nobody else - the road is theirs (user, SPEC
-				-- I178d, B181, V516). Strict, like applyTabVisibility: loosening to ~= false would
-				-- show it on every sheet saved before the flag existed (SPEC B103).
+				-- Shown on EVERY sheet since the 53rd batch (user 2026-10-02, SPEC I196a, V516): the
+				-- aura is a vampire's or a ghoul's (SPEC I178d, B181), so anyone else reads
+				-- "-- No Aura --" in italics where the line used to hide. Strict, like
+				-- applyTabVisibility: loosening to ~= false would hand the aura to every sheet saved
+				-- before the flag existed (SPEC B103).
+				--
+				-- BOTH branches write fontStyle, or the italic sticks when the game turns Vampire.
+				-- This is the second writer of fontStyle on the root and is named as such (SPEC
+				-- V355c): mfLabel would do the italic, but its filled branch writes opacity 1 and
+				-- the 0.80 authored on the label is the emphasis the user asked for.
 				if nm ~= nil then
-					nm.visible = sheet.stShowDisciplines == true or sheet.game == "Vampire";
-					nm.text    = bear .. " (" .. bearingMod(dots) .. ")";
+					if sheet.stShowDisciplines == true or sheet.game == "Vampire" then
+						nm.text      = bear .. " (" .. bearingMod(dots) .. ")";
+						nm.fontStyle = "";
+					else
+						local none = "-- No Aura --";
+
+						if translateSheetText ~= nil then none = translateSheetText(none, lang) or none; end;
+
+						nm.text      = none;
+						nm.fontStyle = "italic";
+					end;
 				end;
 			end;
 
@@ -10036,7 +10137,7 @@
 			<button name="btnMcSettingsClose" left="405" top="15" width="20" height="20" text="X" onClick="popClose(self);"/>
 
 			<dataScopeBox name="mcSettingsScope" left="0" top="40" width="445" height="420">
-				<label left="35" top="54" width="170" height="20" text="Game"/>
+				<label left="35" top="54" width="170" height="20" text="Character Sheet"/>
 				<comboBox name="cboGameMc" left="210" top="51" width="150" height="25" field="game" fontColor="white" horzTextAlign="center" items="{'Vampire', 'Mortal', 'Mage'}" values="{'Vampire', 'Mortal', 'Mage'}" onChange="kbRefocus(self);"/>
 
 				<label left="35" top="84" width="170" height="20" text="Era"/>

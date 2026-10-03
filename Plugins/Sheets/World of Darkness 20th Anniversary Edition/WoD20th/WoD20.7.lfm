@@ -300,21 +300,26 @@
 
 		     Pitch 29 and not 28: the row spans 9*pitch + 25, and 286 leaves an integer gap on
 		     both sides of the 460-wide box I73 left it in - 87 and 87 (SPEC V239).
-		     At 28 the span is 277 and the two gaps come out 71 and 72. -->
+		     At 28 the span is 277 and the two gaps come out 71 and 72.
+
+		     Title and dots are ONE object centred in the box since the 61st batch (user 2026-10-02,
+		     SPEC I204j, V547): 20 + 8 + 25 = 53 in 131, the title at 39 and the dots at 67. TRUE
+		     FAITH beside it is the same object on the same y, and EXPERIENCE (a number, so a 5 gap)
+		     is 20 + 5 + 25 = 50: the title at 40 and the number at 65. -->
 		<layout left="471" top="10" width="326" height="131">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="286" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
+			<label left="20" top="39" width="286" height="20" text="QUINTESSENCE" horzTextAlign="center"/>
 
-			<imageCheckBox left="20" top="63" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_1', self);"/>
-			<imageCheckBox left="49" top="63" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_2', self);"/>
-			<imageCheckBox left="78" top="63" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_3', self);"/>
-			<imageCheckBox left="107" top="63" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_4', self);"/>
-			<imageCheckBox left="136" top="63" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_5', self);"/>
-			<imageCheckBox left="165" top="63" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_6', self);"/>
-			<imageCheckBox left="194" top="63" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_7', self);"/>
-			<imageCheckBox left="223" top="63" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_8', self);"/>
-			<imageCheckBox left="252" top="63" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_9', self);"/>
-			<imageCheckBox left="281" top="63" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_10', self);"/>
+			<imageCheckBox left="20" top="67" width="25" height="25" field="quint_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_1', self);"/>
+			<imageCheckBox left="49" top="67" width="25" height="25" field="quint_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_2', self);"/>
+			<imageCheckBox left="78" top="67" width="25" height="25" field="quint_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_3', self);"/>
+			<imageCheckBox left="107" top="67" width="25" height="25" field="quint_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_4', self);"/>
+			<imageCheckBox left="136" top="67" width="25" height="25" field="quint_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_5', self);"/>
+			<imageCheckBox left="165" top="67" width="25" height="25" field="quint_6" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_6', self);"/>
+			<imageCheckBox left="194" top="67" width="25" height="25" field="quint_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_7', self);"/>
+			<imageCheckBox left="223" top="67" width="25" height="25" field="quint_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_8', self);"/>
+			<imageCheckBox left="252" top="67" width="25" height="25" field="quint_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_9', self);"/>
+			<imageCheckBox left="281" top="67" width="25" height="25" field="quint_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="quintClick('quint_10', self);"/>
 		</layout>
 
 		<!--
@@ -337,20 +342,21 @@
 			`faith_1`..`_5` are the dots that used to live on the Main tab; they moved here in the
 			same change that removed them there, so a saved sheet keeps its rating (SPEC V35). The
 			five are CENTRED in the body - 113 of air on each side - which is the same answer V239
-			asks of the quintessence row beside it.
+			asks of the quintessence row beside it. Vertically the title and the row are one object
+			centred in the box (SPEC V547): title 39, row 67, the ? 2 under the row's top.
 		-->
 		<layout left="802" top="10" width="358" height="131">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="318" height="20" text="TRUE FAITH" horzTextAlign="center"/>
+			<label left="20" top="39" width="318" height="20" text="TRUE FAITH" horzTextAlign="center"/>
 
-			<button name="btnQFaith" left="20" top="65" width="20" height="20" text="?" onClick="popOpen(self, 'Numina', 'True Faith', nil, nil);"/>
-			<label left="45" top="63" width="52" height="24" text="Religion"/>
-			<edit left="102" top="63" width="90" height="24" field="faith" fontSize="12"/>
-			<imageCheckBox left="197" top="63" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_1', self);"/>
-			<imageCheckBox left="226" top="63" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_2', self);"/>
-			<imageCheckBox left="255" top="63" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_3', self);"/>
-			<imageCheckBox left="284" top="63" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_4', self);"/>
-			<imageCheckBox left="313" top="63" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_5', self);"/>
+			<button name="btnQFaith" left="20" top="69" width="20" height="20" text="?" onClick="popOpen(self, 'Numina', 'True Faith', nil, nil);"/>
+			<label left="45" top="67" width="52" height="24" text="Religion"/>
+			<edit left="102" top="67" width="90" height="24" field="faith" fontSize="12"/>
+			<imageCheckBox left="197" top="67" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_1', self);"/>
+			<imageCheckBox left="226" top="67" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_2', self);"/>
+			<imageCheckBox left="255" top="67" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_3', self);"/>
+			<imageCheckBox left="284" top="67" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_4', self);"/>
+			<imageCheckBox left="313" top="67" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('faith_5', self);"/>
 		</layout>
 
 		<!--
@@ -366,10 +372,10 @@
 		-->
 		<layout left="1165" top="10" width="243" height="131">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="203" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+			<label left="20" top="40" width="203" height="20" text="EXPERIENCE" horzTextAlign="center"/>
 
-			<rectangle name="bgCurrentXPNumina" left="76" top="66" width="91" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
-			<edit name="edtCurrentXPNumina" type="number" decimalPlaces="0" left="76" top="66" width="91" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPNumina.text);" transparent="true"/>
+			<rectangle name="bgCurrentXPNumina" left="76" top="65" width="91" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtCurrentXPNumina" type="number" decimalPlaces="0" left="76" top="65" width="91" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPNumina.text);" transparent="true"/>
 		</layout>
 
 		<!--
