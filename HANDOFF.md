@@ -1,6 +1,14 @@
 # HANDOFF — estado antes do próximo `/ck:build`
 
-## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-10-03 — 70º lote CONSTRUÍDO & INSTALADO: versão 0.3.0; §I213, §T1290 `x`, §T1291 (tela [USER]) `.`)
+## COMECE AQUI - CHAT NOVO, SEM CONTEXTO (2026-10-06 — 72º lote CONSTRUÍDO & INSTALADO: ornamentos seguem o `placeBox`; §B199, §I215, §V552, §T1296 §T1297 `x`, §T1298 (tela [USER]) `.`)
+
+**Bug do user (tela do 71º):** ligar/desligar `True Faith` redimensionava WILLPOWER/fraqueza/`TRUE FAITH` mas a filigrana ficava no tamanho velho. **Causa (§B199):** `placeBox` escrevia `.width`/`.height` sem `refreshOrnament` (§B163 pela porta do escritor genérico; o censo §V482c só via `form.X.width =`); `boxVFaith` nasce oculto & ninguém o medía de novo ao aparecer. **Conserto (§I215):** `placeBox` chama `refreshOrnament(c, r[3], r[4] or c.height)` quando o TAMANHO muda (vale p/ `VAMP_GEOM` também, Mortal ↔ Vampire c/ a ficha aberta); `renderGameMode` re-mede `boxVFaith` ao mostrar. **ALL CHECKS PASSED** (`-Build`), bateria §V552 6/6, **INSTALADO 19:55:19** (3498747 B). **Pendente:** telas §T1298 (& §T1295 §T1291 §T1289 & as antigas). Se o `TRUE FAITH` aparecer LISO → o memo ⊥ nasceu escondido (§I215c(i)) → print. Pendente de commit: 65º…72º. Próximos ids: **§I216 §V553 §T1299 §B200 §Q128 §R186**.
+
+## ANTERIOR (2026-10-06 — 71º lote CONSTRUÍDO & INSTALADO: aba Vampire + merit True Faith; §I214, §V551, §B198, §T1292…§T1294 `x`, §T1295 (tela [USER]) `.`)
+
+**Pedido do user:** com `game == "Vampire"` & o merit `True Faith`, a aba Vampire divide o WILLPOWER: ele fica c/ a altura da Main (113) & um box `TRUE FAITH` (a linha da Numina) entra embaixo; sem a condição, nada muda. §Q127 FECHADA: faixa 176 → 204, coluna 290 → 358 (a fraqueza cede 68), fé EDITÁVEL & **GRÁTIS** (`poolClick` + o ledger pula `True Faith` p/ vampiro). **Construído:** `WoD20.15` (nomes + `boxVFaith` oculto), root (`vampFaith`, `VTF_GEOM` pelo `placeBox`, `dataLink` dos merits → `renderGameMode`, guarda no ledger), `WoD20.11` (`renderRevWeakness` tira a largura do rolo). **§B198:** o embrulho `bodyV*` de §I214b acendeu 5 checks (o gate lê caixa = layout c/ `rectangle` + título filhos diretos) → §I214k move os filhos nomeados. **ALL CHECKS PASSED** (`-Build`), bateria §V551 11/11, **INSTALADO 19:04:10** (3498248 B). **Pendente:** tela §T1295 (& §T1291 §T1289 & as antigas). Pendente de commit: 65º…71º. Próximos ids: **§I215 §V552 §T1296 §B199 §Q128 §R186**. Armadilha nova: `sed -i` no SPEC.md p/ virar status COMEU os CR do arquivo inteiro (restaurado via `[IO.File]`) — status SÓ por `Edit`.
+
+## ANTERIOR (2026-10-03 — 70º lote CONSTRUÍDO & INSTALADO: versão 0.3.0; §I213, §T1290 `x`, §T1291 (tela [USER]) `.`)
 
 **Construído (2026-10-03):** 5 sítios em `0.3.0`, **ALL CHECKS PASSED** (`-Build` incluso), sondas 2/2, **INSTALADO 12:40:22** (3493036 B = `output/`). **Pendente:** telas §T1291 (versão) & §T1289 (tooltips, 69º) & as antigas. Pendente de commit: 65º…70º. Próximos ids: **§I214 §V551 §T1292 §B198 §Q127 §R186**. O texto abaixo é o do momento da spec.
 

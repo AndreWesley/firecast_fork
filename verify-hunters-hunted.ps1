@@ -503,6 +503,14 @@ foreach ($k1 in $allFields.Keys) {
         elseif ($own1.Count -eq 2 -and $o11 -and $o15) { [void]$mirrors.Add($k1) }
     }
 }
+# 71st batch (SPEC I214c/g, V551, user 2026-10-06): a vampire with the True Faith merit edits
+# faith and faith_1..5 on the Vampire tab too - the Numina tab's box drawn a second time, off for
+# a vampire (SPEC V536d). Declared by exact shape: owned by exactly WoD20.7 and WoD20.15.
+foreach ($k1 in @('faith', 'faith_1', 'faith_2', 'faith_3', 'faith_4', 'faith_5')) {
+    if (-not $allFields.ContainsKey($k1)) { continue }
+    $jn1 = @($allFields[$k1]) -join ' '
+    if (@($allFields[$k1]).Count -eq 2 -and $jn1 -match 'WoD20\.7\.lfm' -and $jn1 -match 'WoD20\.15\.lfm') { [void]$mirrors.Add($k1) }
+}
 
 $dupes = @($allFields.GetEnumerator() | Where-Object { $_.Value.Count -gt 1 })
 $undeclared = @($dupes | Where-Object { -not $mirrors.Contains($_.Key) })
@@ -671,7 +679,10 @@ foreach ($newFile in $movedTo.Keys) {
         }
         $owners = @($allFields[$fld])
         $where  = @($owners | ForEach-Object { ($_ -split ':')[0] } | Sort-Object -Unique)
-        if ($owners.Count -gt 1) { $movedBad += "'$fld' has $($owners.Count) owners ($($owners -join ', ')) - the move duplicated it" }
+        # The faith dots' second owner is the Vampire tab's declared mirror (SPEC I214g, V36) -
+        # exactly WoD20.7 + WoD20.15, nothing else excused.
+        $faithMirror = $fld -like 'faith_*' -and $owners.Count -eq 2 -and (($where -join ',') -eq 'WoD20.15.lfm,WoD20.7.lfm')
+        if ($owners.Count -gt 1 -and -not $faithMirror) { $movedBad += "'$fld' has $($owners.Count) owners ($($owners -join ', ')) - the move duplicated it" }
         if ($where -contains $oldFile) { $movedBad += "'$fld' is still declared in $oldFile" }
         if ($where -notcontains $newFile) { $movedBad += "'$fld' lives in {$($where -join ', ')}, expected $newFile" }
     }
@@ -1324,7 +1335,10 @@ foreach ($f in $files) {
             if (@('noteTip', 'specTip') -ccontains $bx.GetAttribute('name')) { continue }
             # The mortal projection (SPEC V534f): a vampire-only box is measured by V534b.
             if ($VAMP_ONLY.ContainsKey($bx.GetAttribute('name'))) { continue }
-            $pk = "$($bx.GetAttribute('left'))/$($bx.GetAttribute('top'))/$($bx.GetAttribute('width'))/$($bx.GetAttribute('height'))"
+            # TRUE FAITH on the Vampire tab (SPEC I214c, V551c): hidden in the XML and shown only in
+            # the VTF_GEOM projection, where V551(c) weighs it - by exact name, nothing wider.
+            if ($bx.GetAttribute('name') -ceq 'boxVFaith') { continue }
+            $pk ="$($bx.GetAttribute('left'))/$($bx.GetAttribute('top'))/$($bx.GetAttribute('width'))/$($bx.GetAttribute('height'))"
             if ($paneRect.ContainsKey($pk) -and $paneRect[$pk] -gt 1) { $paneByRect++; continue }
             $bl = 0; $bt = 0; $bw = 0; $bh = 0
             if (-not ([int]::TryParse($bx.GetAttribute("left"), [ref]$bl) -and
@@ -4472,6 +4486,9 @@ foreach ($f in $files) {
         if (-not $n.GetAttribute("field")) { continue }   # display-only mirror (V51): owns nothing, buys nothing
         if ($n.GetAttribute("field") -match '^bloodPool_\d+$') { continue }   # free resource, not a rating (V219)
         if ($n.GetAttribute("field") -match '^quint_\d+$') { continue }       # free resource, not a rating (V264b)
+        # A vampire's True Faith is FREE by the user's word (2026-10-06, SPEC Q127.3, I214j): the
+        # Vampire tab's five only, and V551(b) asks that they call poolClick instead.
+        if ($f.Name -eq 'WoD20.15.lfm' -and $n.GetAttribute("field") -match '^faith_[1-5]$') { continue }
         $dots += $n
         if ($n.GetAttribute("onClick") -notmatch 'xpClick\(') { $dotsUnguarded += "$($f.Name) $($n.GetAttribute('field'))" }
     }
@@ -9658,6 +9675,7 @@ $OBJ_V547 = @(
     [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'MAX TRAIT LEVEL';    G = -8 }
     [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'WILLPOWER';          G = 8 }
     [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'CURRENT EXPERIENCE'; G = 5 }
+    [pscustomobject]@{ F = 'WoD20.15.lfm'; T = 'TRUE FAITH';         G = 8 }
     [pscustomobject]@{ F = 'WoD20.1.lfm';  T = 'WILLPOWER';          G = 8 }
     [pscustomobject]@{ F = 'WoD20.1.lfm';  T = 'EXPERIENCE';         G = 5 }
     [pscustomobject]@{ F = 'WoD20.3.lfm';  T = 'WILLPOWER';          G = 8 }
@@ -12803,6 +12821,9 @@ foreach ($f in $files) {
         $bl = 0; $bt = 0; $bw = 0; $bh = 0
         if (-not ([int]::TryParse($box.GetAttribute("width"), [ref]$bw) -and [int]::TryParse($box.GetAttribute("height"), [ref]$bh))) { continue }
         if ($OVERLAY_BOXES -contains $box.GetAttribute("name")) { $v280Overlay++; continue }
+        # TRUE FAITH on the Vampire tab is hidden in the XML and lives in the VTF_GEOM projection,
+        # where V551(c) measures it (SPEC I214c) - by exact name.
+        if ($box.GetAttribute("name") -ceq 'boxVFaith') { continue }
         # The Apply box is titleless from the 19th batch on and therefore not a section box
         # (SPEC V48 as amended, I163f, V479c). Cut BY CONSTRUCTION - one <button> and no <label>
         # beside the backdrop - and counted, so a box that forgot its title cannot leave the
@@ -12893,7 +12914,9 @@ else {
     if ($v280Rot -eq 0) { $v280Bad += "no rotated child was skipped by (a) - the cut V27/V239/V240 make is not firing here, and the next rotated label would be read as a margin it is not (SPEC V209, V280c, B61)" }
 
     if ($headSeen280 -ne 1) { Fail "V280 $headSeen280 box(es) skipped the head equality for V541, expected the 1 boxRoad is - an exception nothing reaches is an exception that stopped measuring (SPEC V280 as amended, I199b, V209, B7)" }
-    if ($objSeen280 -ne $OBJ_V547.Count) { Fail "V280 $objSeen280 box(es) left their Y to V547, expected the $($OBJ_V547.Count) of its roster - an exception nothing reaches is an exception that stopped measuring (SPEC V547, V209, B7)" }
+    # Less ONE: the Vampire tab's TRUE FAITH is on the roster but not in this census - hidden in the
+    # XML, measured in the VTF_GEOM projection by V551(c) (SPEC I214c).
+    if ($objSeen280 -ne ($OBJ_V547.Count - 1)) { Fail "V280 $objSeen280 box(es) left their Y to V547, expected the $($OBJ_V547.Count - 1) of its roster (all but boxVFaith) - an exception nothing reaches is an exception that stopped measuring (SPEC V547, V209, B7)" }
     if ($v280Centred -ne 2) { Fail "V280 $v280Centred box(es) skipped the head equality for centring, expected the 2 the ornament stretched on the Settings tab - an exception nothing reaches is an exception that stopped measuring (SPEC V209, I156j)" }
 elseif ($v280Bad) { foreach ($b in $v280Bad) { Fail "V280 $b" } }
     else { Pass "V280 all $($v280Boxes.Count) section boxes clear 20 on four sides, and $v280Rot rotated child(ren) were cut out of the margin" }
@@ -15599,7 +15622,9 @@ else {
     # is no <template> for the walk above to find them in (SPEC I158d, I159a, V464a).
     # btnQmainClan joined in the 45th batch: the vampire's Clan on the Main header, an inline row
     # like the clan/family one on Ghoul (SPEC I188b).
-    $BARE_Q333 = @('btnQFaith', 'btnQroad', 'btnQhedgeAffiliation', 'btnQclanFamily', 'btnQmainClan', 'btnQconceal', 'btnQdamage', 'btnQarmorClass', 'btnQshieldClass')
+    # btnQVFaith joined in the 71st batch (SPEC I214c/g, V551): the Vampire tab's TRUE FAITH box
+    # draws the Numina's inline row a second time, the same fixed key.
+    $BARE_Q333 = @('btnQFaith', 'btnQVFaith', 'btnQroad', 'btnQhedgeAffiliation', 'btnQclanFamily', 'btnQmainClan', 'btnQconceal', 'btnQdamage', 'btnQarmorClass', 'btnQshieldClass')
     $bareSeen333 = @()
     foreach ($f333c in $files) {
         foreach ($b333c in (Doc $f333c.FullName).SelectNodes("//button[@text='?']")) {
@@ -17529,7 +17554,8 @@ else {
         if (($edge533 - 5) -ne 1408) { $v533Bad += "(b) the band closes on $($edge533 - 5), not on 1408, the third column's edge (SPEC V533b)" }
     }
     # (c) the three columns - every box that is neither on the band nor the lower half of a stack
-    $cols533 = @($d533.SelectNodes("//scrollBox/layout") | Where-Object { $_.GetAttribute('top') -ne '10' -and $under533 -notcontains $_ })
+    # boxVFaith is not a column: hidden, the True Faith projection's (SPEC I214c, V551c).
+    $cols533 = @($d533.SelectNodes("//scrollBox/layout") | Where-Object { $_.GetAttribute('top') -ne '10' -and $under533 -notcontains $_ -and $_.GetAttribute('name') -cne 'boxVFaith' })
     if ($cols533.Count -ne 3) { $v533Bad += "(c) $($cols533.Count) column(s) under the band, not three (SPEC V533c, V20)" }
     foreach ($col533 in $cols533) {
         if ([int]$col533.GetAttribute('top') -ne (10 + $wh533 + 5)) { $v533Bad += "(c) the column at left $($col533.GetAttribute('left')) starts at top $($col533.GetAttribute('top')), not 5 under the band at $(10 + $wh533 + 5) (SPEC V533c)" }
@@ -17577,7 +17603,8 @@ if ($gm534 -notmatch 'local function placeBox\(c, r\)' -or $gm534 -notmatch 'pla
 # would leave the root's count at two.
 $pb534 = 0
 foreach ($lf534 in Get-ChildItem -Path $dir -Filter '*.lfm') { $pb534 += @([regex]::Matches((NoComments ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf534.FullName)))), 'placeBox\(')).Count }
-if ($pb534 -ne 2) { $v534Bad += "(a) placeBox appears $pb534 time(s) across the sheet - its definition and the one call in renderGameMode; it is the ONE writer of a vampire's geometry (SPEC V534a, V57)" }
+# THREE since the 71st batch (SPEC I214e, V551d): the second call places VTF_GEOM, in renderGameMode too.
+if ($pb534 -ne 3) { $v534Bad += "(a) placeBox appears $pb534 time(s) across the sheet - its definition and the two calls in renderGameMode (VAMP_GEOM, VTF_GEOM); it is the ONE writer of a vampire's geometry (SPEC V534a, V551d, V57)" }
 $at534 = NoComments (LuaFn ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.6.lfm')))) 'applyTheme')
 if ($at534 -eq '') { $v534Bad += "(a) applyTheme was not found on WoD20.6 - the leg would read nothing (SPEC V20)" }
 elseif ($at534 -match 'placeBox|VAMP_GEOM|renderGameMode') { $v534Bad += "(a) applyTheme moves boxes - the theme paints, it never places (SPEC V57, V534a)" }
@@ -25061,6 +25088,16 @@ foreach ($f482 in $files) {
 foreach ($n482 in $written482.Keys) {
     if ($n482 -ne 'xpLogBox' -and $n482 -ne 'xpApplyBox') { $v482Bad += "(c) '$n482' is an ornamented box whose size is written from Lua and it is not one of the two xpLogWidth redraws - its filigree would keep the size it was painted at (SPEC V482c, I72d, B163)" }
 }
+# (c) the GENERIC writer (72nd batch, SPEC B199, V552c): placeBox sizes boxes named in VAMP_GEOM and
+# VTF_GEOM through a variable `c`, so the form.X census above is blind to it. Every ornamented layout
+# those tables name is written by placeBox, and placeBox has to carry the redraw.
+$geo482 = @{}
+foreach ($g482 in [regex]::Matches((NoComments $rootTxt), '(?m)^\s*(\w+)\s*=\s*\{\s*\d+,\s*\d+,\s*\d+,\s*(?:\d+|nil)\s*\}')) {
+    if ($orn482.ContainsKey($g482.Groups[1].Value)) { $geo482[$g482.Groups[1].Value] = $true }
+}
+$pb482 = [regex]::Match((NoComments (LuaFn $rootTxt 'renderGameMode')), '(?s)local function placeBox\(c, r\).*?\r?\n\t{4}end;').Value
+if ($geo482.Count -lt 8) { $v482Bad += "(c) only $($geo482.Count) ornamented box(es) named in VAMP_GEOM/VTF_GEOM - the generic leg reads less than the tables hold (SPEC V209, V552c)" }
+elseif ($pb482 -notmatch 'refreshOrnament\(') { $v482Bad += "(c) placeBox writes the size of $($geo482.Count) ornamented boxes ($(($geo482.Keys | Sort-Object | Select-Object -First 4) -join ', ')...) and never calls refreshOrnament - their filigree keeps the size it was drawn at (SPEC B199, V552c)" }
 foreach ($n482 in @('xpLogBox', 'xpApplyBox')) {
     if (-not $written482.ContainsKey($n482)) { $v482Bad += "(c) '$n482' is no longer resized from Lua by name - if the role width is gone this whole check is measuring nothing (SPEC V209)" }
 }
@@ -27388,5 +27425,152 @@ foreach ($p519 in $tpl519) {
 }
 if ($v519Bad) { foreach ($b in $v519Bad) { Fail "V519 $b" } }
 else { Pass "V519 the six templates with a ! start with a transparent hit rectangle filling the row, reporting the same row and key as their !, and it is no drag handle" }
+
+# ---- V551: a vampire with the True Faith merit - WILLPOWER 113 and TRUE FAITH under it, a band of 204 (SPEC I214) ----
+# User 2026-10-06 (71st batch): without the condition the Vampire tab is the XML of today; with it,
+# VTF_GEOM projects the band to 204, WILLPOWER to the Main's 113 and 358 wide, and shows boxVFaith
+# under it. The XML sweeps (V40, V280, V533...) read only the OFF state, so the ON state is
+# measured HERE, as V534 measures a vampire's Main - or the Lua could lay a box over a box green.
+$v551Bad = @()
+$d551 = Doc (Join-Path $dir 'WoD20.15.lfm')
+$n7551 = Doc (Join-Path $dir 'WoD20.7.lfm')
+$m1551 = Doc (Join-Path $dir 'WoD20.1.lfm')
+$rc551 = NoComments $rootTxt
+$tf551 = $d551.SelectSingleNode("//layout[@name='boxVFaith']")
+$geoTxt551 = [regex]::Match($rc551, '(?ms)^\t{3}VTF_GEOM = \{(.*?)\r?\n\t{3}\};').Groups[1].Value
+$vtf551 = @{}
+foreach ($e551 in [regex]::Matches($geoTxt551, '(\w+)\s*=\s*\{\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+|nil)\s*\}')) {
+    $vtf551[$e551.Groups[1].Value] = @([int]$e551.Groups[2].Value, [int]$e551.Groups[3].Value, [int]$e551.Groups[4].Value, $(if ($e551.Groups[5].Value -eq 'nil') { $null } else { [int]$e551.Groups[5].Value }))
+}
+$band551 = @($d551.SelectNodes("//scrollBox/layout[@top='10']"))
+if ($vtf551.Count -lt 18 -or $null -eq $tf551 -or $band551.Count -lt 5) { $v551Bad += "VTF_GEOM has $($vtf551.Count) name(s), boxVFaith found: $($null -ne $tf551), $($band551.Count) band box(es) - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) the condition, and who asks it again when a merit changes
+    $vf551 = NoComments (LuaFn $rootTxt 'vampFaith')
+    foreach ($need551 in @('sheet.game ~= "Vampire"', 'MERIT_ROWS', 'sheet["merit_m" .. i] == "True Faith"')) { if (-not $vf551.Contains($need551)) { $v551Bad += "(a) vampFaith lacks '$need551' - the condition is the game AND a merit named True Faith (SPEC I214a)" } }
+    if ($vf551.Contains('merit_f')) { $v551Bad += "(a) vampFaith reads merit_f - a flaw never counts (SPEC I214a)" }
+    if (@([regex]::Matches($rc551, 'function\s+vampFaith\s*\(')).Count -ne 1) { $v551Bad += "(a) vampFaith is not defined exactly once on the root (SPEC I214a)" }
+    $dl551 = [regex]::Match($rc551, "(?s)<dataLink fields=""\{'language', 'merit_m0'.*?</dataLink>").Value
+    if ($dl551 -notmatch 'renderGameMode\(self\);') { $v551Bad += "(a) the merits' dataLink does not call renderGameMode(self) - taking the merit on or off would change nothing until the game changes (SPEC I214f)" }
+
+    # (b) the XML: the hidden box with the Numina's row x for x, FREE dots, and the OFF state untouched
+    if (@($d551.SelectNodes("//layout[@name='boxVFaith']")).Count -ne 1 -or $tf551.GetAttribute('visible') -cne 'false' -or $tf551.GetAttribute('width') -ne '358' -or $tf551.GetAttribute('height') -ne '86') { $v551Bad += "(b) boxVFaith is not one hidden 358 x 86 box (SPEC I214c)" }
+    if ($null -eq $tf551.SelectSingleNode("label[@text='TRUE FAITH']") -or $null -eq $tf551.SelectSingleNode("button[@name='btnQVFaith']") -or $null -eq $tf551.SelectSingleNode("edit[@field='faith']")) { $v551Bad += "(b) boxVFaith lacks its title, btnQVFaith or the faith edit (SPEC I214c)" }
+    for ($k551 = 1; $k551 -le 5; $k551++) {
+        $dot551 = $tf551.SelectSingleNode("imageCheckBox[@field='faith_$k551']")
+        $num551 = $n7551.SelectSingleNode("//imageCheckBox[@field='faith_$k551']")
+        if ($null -eq $dot551 -or $null -eq $num551) { $v551Bad += "(b) faith_$k551 is missing on the Vampire tab or the Numina tab (SPEC I214c)"; continue }
+        if ($dot551.GetAttribute('onClick') -cne "poolClick('faith_', 5, 'faith_$k551', nil);") { $v551Bad += "(b) the Vampire tab's faith_$k551 clicks '$($dot551.GetAttribute('onClick'))', not the FREE poolClick - the user's faith costs nothing here (SPEC Q127.3, I214j)" }
+        if ($dot551.GetAttribute('left') -ne $num551.GetAttribute('left')) { $v551Bad += "(b) faith_$k551 stands at left $($dot551.GetAttribute('left')), the Numina's at $($num551.GetAttribute('left')) - the row is the Numina's x for x (SPEC I214c)" }
+    }
+    $off551 = @{ boxVPool = '0,10,307,176'; boxVTurn = '312,10,200,85'; boxVMaxT = '312,100,200,86'; boxVWillpower = '517,10,290,176'; boxVWeak = '812,10,460,176'; boxVXP = '1277,10,131,176'; boxVDisc = '0,191,466,582'; boxVPaths = '471,191,466,582'; boxVRituals = '942,191,466,582' }
+    foreach ($o551 in $off551.Keys) {
+        $x551 = $d551.SelectSingleNode("//layout[@name='$o551']")
+        $g551 = if ($x551) { "$($x551.GetAttribute('left')),$($x551.GetAttribute('top')),$($x551.GetAttribute('width')),$($x551.GetAttribute('height'))" } else { 'missing' }
+        if ($g551 -ne $off551[$o551]) { $v551Bad += "(b) $o551 is authored $g551, not today's $($off551[$o551]) - without the merit nothing may move (SPEC I214)" }
+    }
+
+    # (c) the ON projection: XML + VTF_GEOM over the tab's first-level boxes
+    function Proj551($node) {
+        $nm = $node.GetAttribute('name')
+        $xr = @([int]$node.GetAttribute('left'), [int]$node.GetAttribute('top'), [int]$node.GetAttribute('width'), [int]$node.GetAttribute('height'))
+        if ($nm -and $vtf551.ContainsKey($nm)) { $v = $vtf551[$nm]; return @($v[0], $v[1], $v[2], $(if ($null -eq $v[3]) { $xr[3] } else { $v[3] })) }
+        return $xr
+    }
+    $p551 = @{}
+    $boxes551 = @()
+    foreach ($bx551 in $d551.SelectNodes("//scrollBox/layout")) {
+        $r551 = Proj551 $bx551
+        $boxes551 += [pscustomobject]@{ N = $bx551.GetAttribute('name'); L = $r551[0]; T = $r551[1]; R = $r551[0] + $r551[2]; B = $r551[1] + $r551[3]; W = $r551[2]; H = $r551[3] }
+        if ($bx551.GetAttribute('name')) { $p551[$bx551.GetAttribute('name')] = $boxes551[-1] }
+    }
+    for ($i551 = 0; $i551 -lt $boxes551.Count; $i551++) {
+        for ($j551 = $i551 + 1; $j551 -lt $boxes551.Count; $j551++) {
+            $a = $boxes551[$i551]; $b = $boxes551[$j551]
+            if (-not ($a.R + 5 -le $b.L -or $b.R + 5 -le $a.L -or $a.B + 5 -le $b.T -or $b.B + 5 -le $a.T)) { $v551Bad += "(c) '$($a.N)' ($($a.L),$($a.T))-($($a.R),$($a.B)) and '$($b.N)' ($($b.L),$($b.T))-($($b.R),$($b.B)) are less than 5 apart with the merit (SPEC I214d, V40)" }
+        }
+    }
+    $wp551 = $p551['boxVWillpower']; $fa551 = $p551['boxVFaith']
+    $mainWp551 = [int]$m1551.SelectSingleNode("//layout[@name='boxWillpower']").GetAttribute('height')
+    if ($wp551.H -ne $mainWp551) { $v551Bad += "(c) WILLPOWER is $($wp551.H) tall with the merit, the Main's is $mainWp551 - the user asked the same height (SPEC I214)" }
+    if ($wp551.T -ne 10 -or $fa551.T -ne ($wp551.B + 5) -or $fa551.L -ne $wp551.L -or $fa551.W -ne $wp551.W) { $v551Bad += "(c) TRUE FAITH is not 5 under WILLPOWER in the same column (SPEC I214)" }
+    $bottom551 = $fa551.B
+    if ($bottom551 -ne 214) { $v551Bad += "(c) the band closes on $bottom551 with the merit, not 10 + 204 (SPEC I214d)" }
+    foreach ($e551 in @('boxVPool', 'boxVMaxT', 'boxVWeak', 'boxVXP')) { if ($p551[$e551].B -ne $bottom551) { $v551Bad += "(c) $e551 closes on $($p551[$e551].B), not on the band's $bottom551 (SPEC I214d)" } }
+    if ($p551['boxVTurn'].T -ne 10 -or $p551['boxVMaxT'].T -ne ($p551['boxVTurn'].B + 5) -or $p551['boxVMaxT'].H -ne 86) { $v551Bad += "(c) the stack is not BLOOD PER TURN from 10 and MAX TRAIT LEVEL 5 under it at its own 86 (SPEC I214k)" }
+    if ($p551['boxVXP'].R -ne 1408) { $v551Bad += "(c) the band closes on $($p551['boxVXP'].R), not on 1408 (SPEC I214d)" }
+    foreach ($c551 in @('boxVDisc', 'boxVPaths', 'boxVRituals')) { if ($p551[$c551].T -ne ($bottom551 + 5)) { $v551Bad += "(c) $c551 starts at $($p551[$c551].T), not 5 under the band (SPEC I214d)" } }
+    # V547 in the projection: title + gap + body as one object centred in the box
+    function Obj551($what, $h, $tTop, $tH, $g, $bTop, $bH) {
+        $want = [Math]::Floor(($h - ($tH + $g + $bH)) / 2)
+        if ($tTop -ne $want -or $bTop -ne ($tTop + $tH + $g)) { return "(c) $what is title $tTop / body $bTop in $h, not $want / $($want + $tH + $g) - one object centred (SPEC V547, I214d)" }
+        return $null
+    }
+    $obj551 = @(
+        (Obj551 'BLOOD PER TURN' $p551['boxVTurn'].H $vtf551['lblVTurn'][1] 20 -8 $vtf551['dynBloodTurn'][1] 30),
+        (Obj551 'WILLPOWER' $wp551.H $vtf551['lblVWillpower'][1] 20 8 $vtf551['bodyVWpDots'][1] 52),
+        (Obj551 'CURRENT EXPERIENCE' $p551['boxVXP'].H $vtf551['lblVXP'][1] 34 5 $vtf551['bgCurrentXPVampire'][1] 25),
+        (Obj551 'TRUE FAITH' $fa551.H ([int]$tf551.SelectSingleNode("label[@text='TRUE FAITH']").GetAttribute('top')) 20 8 ([int]$tf551.SelectSingleNode("imageCheckBox[@field='faith_1']").GetAttribute('top')) 25)
+    )
+    foreach ($o551 in $obj551) { if ($o551) { $v551Bad += $o551 } }
+    if ($vtf551['edtCurrentXPVampire'][1] -ne $vtf551['bgCurrentXPVampire'][1]) { $v551Bad += "(c) the XP field and its ground part ways with the merit (SPEC I214k)" }
+    if ($vtf551['lblVWillpower'][0] -ne 20 -or $vtf551['lblVWillpower'][2] -ne ($wp551.W - 40) -or $vtf551['bodyVWpDots'][0] -ne (($wp551.W - 250) / 2)) { $v551Bad += "(c) WILLPOWER's title or dots are not centred across the 358 (SPEC I214d)" }
+    $wk551 = $p551['boxVWeak']
+    if ($vtf551['lblVWeak'][2] -ne ($wk551.W - 40) -or $vtf551['weakScrollV'][2] -ne ($wk551.W - 40) -or ($vtf551['weakScrollV'][1] + $vtf551['weakScrollV'][3]) -ne ($wk551.H - 15)) { $v551Bad += "(c) the weakness title or scroll do not fill the new box to its 20 sides and 15 foot (SPEC I214d)" }
+    # the pool: every dot and the title down by half the growth, generated off the XML's grid
+    $dy551 = ($p551['boxVPool'].H - 176) / 2
+    if ($vtf551['lblVPool'][1] -ne (15 + $dy551)) { $v551Bad += "(c) BLOOD POOL's title is not down by $dy551 with its dots (SPEC I214k)" }
+    if (-not $rc551.Contains('local r = { 24 + 26 * ((n - 1) % 10), 50 + 25 * math.floor((n - 1) / 10), 25, 25 };') -or -not $rc551.Contains('VTF_GEOM["vdotbloodPool_" .. n] = r;') -or -not $rc551.Contains('VTF_GEOM["vcapbloodPool_" .. n] = r;')) { $v551Bad += "(c) the pool's fifty dots and twins are not generated into VTF_GEOM (SPEC I214k)" }
+    else {
+        for ($n551 = 1; $n551 -le 50; $n551++) {
+            foreach ($pre551 in @('vdot', 'vcap')) {
+                $pd551 = $d551.SelectSingleNode("//imageCheckBox[@name='${pre551}bloodPool_$n551']")
+                $wl551 = 24 + 26 * (($n551 - 1) % 10); $wt551 = 50 + 25 * [Math]::Floor(($n551 - 1) / 10)
+                if ($null -eq $pd551 -or [int]$pd551.GetAttribute('left') -ne $wl551 -or ([int]$pd551.GetAttribute('top') + $dy551) -ne $wt551) { $v551Bad += "(c) ${pre551}bloodPool_$n551 does not land $dy551 under its XML spot with the merit (SPEC I214k)" }
+            }
+        }
+    }
+
+    # (d) one writer: renderGameMode alone reads VTF_GEOM, through placeBox, and the weakness re-centres after it
+    $gm551 = NoComments (LuaFn $rootTxt 'renderGameMode')
+    $pl551 = $gm551.IndexOf('placeBox(c, faith and r or GEOM_XML[nm]);')
+    if (-not $gm551.Contains('local faith = vampFaith();') -or $pl551 -lt 0 -or -not $gm551.Contains('tf.visible = faith')) { $v551Bad += "(d) renderGameMode does not place VTF_GEOM through placeBox off vampFaith and show boxVFaith with it (SPEC I214e)" }
+    elseif ($gm551.IndexOf('renderRevWeakness(from);') -lt $pl551) { $v551Bad += "(d) renderRevWeakness runs before the boxes move - the weakness would centre in the old box (SPEC I214e)" }
+    $all551 = ''
+    foreach ($lf551 in Get-ChildItem -Path $dir -Filter '*.lfm') { $all551 += NoComments ([regex]::Replace([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf551.FullName)), '(?s)<!--.*?-->', '')) }
+    if (@([regex]::Matches($all551, 'VTF_GEOM')).Count -ne 5) { $v551Bad += "(d) VTF_GEOM is named $(@([regex]::Matches($all551, 'VTF_GEOM')).Count) time(s), not 5 (the table, the two generated lines, the two loops in renderGameMode) - a second reader is a second writer (SPEC I214e, V534a)" }
+    if (-not (NoComments (LuaFn $rootTxt 'xpLedgerRows')).Contains('if sheet.game ~= "Vampire" and (ft > ff')) { $v551Bad += "(d) xpLedgerRows prices a vampire's True Faith - the user's faith is free on the Vampire tab (SPEC Q127.3, I214j)" }
+    $rw551 = NoComments (LuaFn ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.11.lfm')))) 'renderRevWeakness')
+    if (-not $rw551.Contains('local w = sv.width - 48;') -or -not $rw551.Contains('if lv.width ~= w then lv.width = w; end;')) { $v551Bad += "(d) renderRevWeakness does not take the text's width off the scroll - the 304 column would keep the 372 (SPEC I214k)" }
+}
+if ($v551Bad) { foreach ($b in $v551Bad) { Fail "V551 $b" } }
+else { Pass "V551 a vampire with True Faith gets WILLPOWER at the Main's height and TRUE FAITH under it, the band at 204 with nothing closer than 5, every object centred, free faith dots, one writer - and without it the XML of today" }
+
+# ---- V552: the ornament follows the size placeBox writes, and TRUE FAITH when it appears (SPEC I215, B199) ----
+# User 2026-10-06 (72nd batch): taking True Faith on and off resized WILLPOWER, the weakness and the
+# rest, and the filigree stayed drawn at the old size - placeBox wrote width/height and never asked
+# for the redraw (B163 again, through the generic writer). boxVFaith never changes size but is born
+# hidden, so its ornament was measured hidden and nobody measured it again when it showed.
+$v552Bad = @()
+$gm552 = NoComments (LuaFn $rootTxt 'renderGameMode')
+$pb552 = [regex]::Match($gm552, '(?s)local function placeBox\(c, r\).*?\r?\n\t{4}end;').Value
+$tf552 = [regex]::Match($gm552, '(?s)if tf ~= nil and tf\.visible ~= faith then.*?\r?\n\t{4}end;').Value
+if (-not $pb552 -or -not $tf552) { $v552Bad += "placeBox or the boxVFaith block was not found in renderGameMode - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) resized only by the two SIZE writes; the redraw after all four, handed the values written
+    foreach ($need552 in @('if c.width ~= r[3] then c.width = r[3]; resized = true; end;', 'if r[4] ~= nil and c.height ~= r[4] then c.height = r[4]; resized = true; end;', 'if resized and refreshOrnament ~= nil then refreshOrnament(c, r[3], r[4] or c.height); end;')) {
+        if (-not $pb552.Contains($need552)) { $v552Bad += "(a) placeBox lacks '$need552' - a resized box keeps the filigree of its old size (SPEC I215a, B199)" }
+    }
+    if (@([regex]::Matches($pb552, 'resized = true')).Count -ne 2) { $v552Bad += "(a) placeBox marks 'resized' $(@([regex]::Matches($pb552, 'resized = true')).Count) time(s), not on the 2 size writes alone - a move is not a resize (SPEC I215a)" }
+    if ($pb552.IndexOf('refreshOrnament(') -lt $pb552.LastIndexOf('c.height = r[4]')) { $v552Bad += "(a) placeBox redraws before it writes the size - the frame would be drawn to the measure the box is leaving (SPEC V285c)" }
+    if ($pb552 -match 'refreshOrnament\(c, c\.width') { $v552Bad += "(a) placeBox reads the width back off the box it just wrote (SPEC V285c, I215a)" }
+    # (b) TRUE FAITH measured again when it shows, after it shows
+    $vis552 = $tf552.IndexOf('tf.visible = faith;')
+    $ref552 = $tf552.IndexOf('if faith and refreshOrnament ~= nil then refreshOrnament(tf, tf.width, tf.height); end;')
+    if ($vis552 -lt 0 -or $ref552 -lt 0) { $v552Bad += "(b) boxVFaith is not measured again when it shows - its ornament keeps the measure taken while hidden (SPEC I215b, B199)" }
+    elseif ($ref552 -lt $vis552) { $v552Bad += "(b) boxVFaith is measured before it is shown - the same hidden measure again (SPEC I215b)" }
+}
+if ($v552Bad) { foreach ($b in $v552Bad) { Fail "V552 $b" } }
+else { Pass "V552 placeBox redraws the ornament of every box whose size it writes, from the size written, and TRUE FAITH is measured again when it shows" }
 
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

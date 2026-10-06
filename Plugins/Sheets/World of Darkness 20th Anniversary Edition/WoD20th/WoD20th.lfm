@@ -2581,6 +2581,47 @@
 				end;
 			end;
 
+			-- 71st batch (user 2026-10-06, SPEC I214d, V551): a VAMPIRE with the True Faith merit splits
+			-- the Vampire tab's WILLPOWER into the Main's 113 and TRUE FAITH (boxVFaith, 86) under it, so
+			-- the band is 113 + 5 + 86 = 204, 28 over the XML's 176. The pool and EXPERIENCE take the 28
+			-- and their contents move down 14 to stay centred (SPEC V547); in the stack BLOOD PER TURN
+			-- takes it, row for row with WILLPOWER, and MAX TRAIT LEVEL only moves, so renderVampCaps
+			-- stays the one writer inside it. WILLPOWER widens to 358, the Numina row's width, and the
+			-- weakness gives those 68; the three columns stand 28 lower. The children move one by one
+			-- (SPEC B198): the gate reads a box as the layout holding its rectangle and title. Without
+			-- the merit GEOM_XML puts everything back. The weakness label is not here: renderRevWeakness
+			-- owns it, and takes its width off the scroll's and re-centres it after the boxes move.
+			VTF_GEOM = {
+				boxVPool        = { 0, 10, 307, 204 },
+				lblVPool        = { 20, 29, 267, 20 },
+				boxVTurn        = { 312, 10, 200, 113 },
+				lblVTurn        = { 20, 35, 160, 20 },
+				dynBloodTurn    = { 20, 47, 160, 30 },
+				boxVMaxT        = { 312, 128, 200, nil },
+				boxVWillpower   = { 517, 10, 358, 113 },
+				lblVWillpower   = { 20, 16, 318, 20 },
+				bodyVWpDots     = { 54, 44, 250, 52 },
+				boxVWeak        = { 880, 10, 392, 204 },
+				lblVWeak        = { 20, 15, 352, 20 },
+				weakScrollV     = { 20, 40, 352, 149 },
+				boxVXP          = { 1277, 10, 131, 204 },
+				lblVXP          = { 20, 70, 91, 34 },
+				bgCurrentXPVampire  = { 20, 109, 91, 25 },
+				edtCurrentXPVampire = { 20, 109, 91, 25 },
+				boxVDisc        = { 0, 219, 466, nil },
+				boxVPaths       = { 471, 219, 466, nil },
+				boxVRituals     = { 942, 219, 466, nil },
+			};
+
+			-- The pool's fifty dots and their fifty faded twins, 14 lower: the XML's grid (36 down, 25
+			-- a row, 26 a dot from 24, SPEC I193f) plus the 14.
+			for n = 1, 50, 1 do
+				local r = { 24 + 26 * ((n - 1) % 10), 50 + 25 * math.floor((n - 1) / 10), 25, 25 };
+
+				VTF_GEOM["vdotbloodPool_" .. n] = r;
+				VTF_GEOM["vcapbloodPool_" .. n] = r;
+			end;
+
 			-- The XML's own numbers, read off a box the first time it is seen and before anything moves
 			-- it. The XML is the same for every sheet, so one copy serves them all and the mortal
 			-- numbers keep ONE owner (SPEC I190c).
@@ -2598,6 +2639,8 @@
 				end;
 
 				for nm in pairs(VAMP_GEOM) do names[nm] = true; end;
+				for nm in pairs(VTF_GEOM) do names[nm] = true; end;
+				names.boxVFaith = true;
 
 				local found = xpFind(tabRootOf(from), names, {});
 
@@ -2625,11 +2668,21 @@
 
 				-- The ONE writer of a box's geometry (SPEC V534a). Only what differs is written, and a
 				-- rect with no height leaves the height alone.
+				--
+				-- A box whose SIZE moved has its ornament redrawn here, in the writer (user
+				-- 2026-10-06, SPEC I215a, B199, V552): the path is drawn for one size, and the border
+				-- followed the box while the filigree stayed at the old one. The size goes in as
+				-- the value WRITTEN - read back in the same tick it can answer the size the box is
+				-- leaving (SPEC V285c). A node with no ornament is a no-op in refreshOrnament.
 				local function placeBox(c, r)
+					local resized = false;
+
 					if c.left  ~= r[1] then c.left  = r[1]; end;
 					if c.top   ~= r[2] then c.top   = r[2]; end;
-					if c.width ~= r[3] then c.width = r[3]; end;
-					if r[4] ~= nil and c.height ~= r[4] then c.height = r[4]; end;
+					if c.width ~= r[3] then c.width = r[3]; resized = true; end;
+					if r[4] ~= nil and c.height ~= r[4] then c.height = r[4]; resized = true; end;
+
+					if resized and refreshOrnament ~= nil then refreshOrnament(c, r[3], r[4] or c.height); end;
 				end;
 
 				-- Any game that is not Vampire reads the XML - Mage included (SPEC Q109.1).
@@ -2642,6 +2695,33 @@
 						placeBox(c, vamp and r or GEOM_XML[nm]);
 					end;
 				end;
+
+				-- The Vampire tab with the True Faith merit (SPEC I214e, V551), through the same
+				-- writer and the same XML cache. The weakness re-centres in its new box afterwards:
+				-- renderRevWeakness reads the scroll's height and the label's width as they stand.
+				local faith = vampFaith();
+
+				for nm, r in pairs(VTF_GEOM) do
+					local c = found[nm];
+
+					if c ~= nil then
+						if GEOM_XML[nm] == nil then GEOM_XML[nm] = { c.left, c.top, c.width, (r[4] ~= nil) and c.height or nil }; end;
+
+						placeBox(c, faith and r or GEOM_XML[nm]);
+					end;
+				end;
+
+				local tf = found["boxVFaith"];
+
+				-- Shown, it is measured again (SPEC I215b, B199): the load measured its ornament while
+				-- it was hidden. Its size is the XML's and was never written, so reading it is safe.
+				if tf ~= nil and tf.visible ~= faith then
+					tf.visible = faith;
+
+					if faith and refreshOrnament ~= nil then refreshOrnament(tf, tf.width, tf.height); end;
+				end;
+
+				renderRevWeakness(from);
 
 				-- Show Numina and Show Ghoul mean nothing to a vampire (SPEC I190d, V536d): locked, and
 				-- dimmed by the same 0.40 as every read-only widget (SPEC V111). vampFlagsOff is what
@@ -2666,6 +2746,18 @@
 
 				if sheet.stShowNumina ~= false then setField("stShowNumina", false); end;
 				if sheet.stShowDisciplines ~= false then setField("stShowDisciplines", false); end;
+			end;
+
+			-- A vampire with the True Faith MERIT (user 2026-10-06, SPEC I214a): the field keeps the
+			-- English key, whatever language the button shows. A flaw never counts.
+			function vampFaith()
+				if sheet == nil or sheet.game ~= "Vampire" then return false; end;
+
+				for i = 0, MERIT_ROWS, 1 do
+					if sheet["merit_m" .. i] == "True Faith" then return true; end;
+				end;
+
+				return false;
 			end;
 
 			-- The ceiling of the VAMPIRE tab, painted (SPEC I188h, V530f). Every live dot of a row of
@@ -3902,10 +3994,14 @@
 
 				-- True Faith is a numina like the others; the combo beside it picks a religion,
 				-- not a power (SPEC V50), so the ledger names the numina.
+				--
+				-- A VAMPIRE's faith is free (user 2026-10-06, SPEC I214j, Q127.3): the Vampire tab marks
+				-- it with poolClick, and the line stays out of the ledger - the game decides, not the
+				-- merit, so taking the merit off never bills the dots it left.
 				local ff = traitLevel(base, "faith", 1, 5, 0);
 				local ft = liveLevel("faith", 1, 5, 0);
 
-				if ft > ff or string.find(ctx.sunk, "|faith#", 1, true) ~= nil then
+				if sheet.game ~= "Vampire" and (ft > ff or string.find(ctx.sunk, "|faith#", 1, true) ~= nil) then
 					ctx.affinity = false;
 					ctx.newType  = (ff == 0) and not unlocked.faith;
 
@@ -10725,6 +10821,7 @@
 	<dataLink fields="{'language', 'merit_m0', 'merit_m1', 'merit_m2', 'merit_m3', 'merit_m4', 'merit_m5', 'merit_m6', 'merit_m7', 'merit_m8', 'merit_m9', 'merit_m10', 'merit_f0', 'merit_f1', 'merit_f2', 'merit_f3', 'merit_f4', 'merit_f5', 'merit_f6', 'merit_f7', 'merit_f8', 'merit_f9', 'merit_f10'}">
 		<event name="onChange">
 			renderMeritButtons(self);
+			renderGameMode(self);
 		</event>
 	</dataLink>
 

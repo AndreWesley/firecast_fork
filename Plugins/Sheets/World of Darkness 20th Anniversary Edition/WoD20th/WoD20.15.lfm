@@ -39,10 +39,14 @@
 
 		     Since the 53rd batch (user 2026-10-02, SPEC I196c, V533a) the box is TIGHT on the grid:
 		     first row 1 below the title, like every titled box (SPEC Q112.2), and the house foot of
-		     15 (SPEC V393) - 36 + 125 + 15 = 176, and the whole band came down to 176 with it. -->
-		<layout left="0" top="10" width="307" height="176">
+		     15 (SPEC V393) - 36 + 125 + 15 = 176, and the whole band came down to 176 with it.
+
+		     A vampire with the True Faith merit takes a band of 204 (user 2026-10-06, SPEC I214, V551):
+		     VTF_GEOM grows the box and moves the title and the hundred dots down 14, so the block stays
+		     centred. Without the merit GEOM_XML puts them back where they stand here. -->
+		<layout name="boxVPool" left="0" top="10" width="307" height="176">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="267" height="20" text="BLOOD POOL" horzTextAlign="center"/>
+			<label name="lblVPool" left="20" top="15" width="267" height="20" text="BLOOD POOL" horzTextAlign="center"/>
 			<imageCheckBox name="vdotbloodPool_1" left="24" top="36" width="25" height="25" field="bloodPool_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_1', self);"/>
 			<imageCheckBox name="vdotbloodPool_2" left="50" top="36" width="25" height="25" field="bloodPool_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_2', self);"/>
 			<imageCheckBox name="vdotbloodPool_3" left="76" top="36" width="25" height="25" field="bloodPool_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="bloodClick('bloodPool_3', self);"/>
@@ -163,14 +167,18 @@
 		     closer to its title AS SEEN: the rects overlap by 8 (gap -8), the letters do not - a 22
 		     number in its 30 rect leaves ~9 blank above the digits and a title leaves ~4-5 under its
 		     last line, so ~6 shows between them where ~19 did. Font-model numbers, not measured -
-		     the screen decides (SPEC Q123.3). -->
-		<layout left="312" top="10" width="200" height="85">
+		     the screen decides (SPEC Q123.3).
+
+		     With True Faith (SPEC I214d, B198) the stack is 113 + 5 + 86, row for row with WILLPOWER and
+		     TRUE FAITH beside it: BLOOD PER TURN takes the 28 and its object moves down 14; MAX TRAIT
+		     LEVEL only moves, so renderVampCaps keeps writing the same numbers inside it. -->
+		<layout name="boxVTurn" left="312" top="10" width="200" height="85">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="21" width="160" height="20" text="BLOOD PER TURN" horzTextAlign="center"/>
+			<label name="lblVTurn" left="20" top="21" width="160" height="20" text="BLOOD PER TURN" horzTextAlign="center"/>
 			<label name="dynBloodTurn" left="20" top="33" width="160" height="30" fontSize="22" horzTextAlign="center" vertTextAlign="center"/>
 		</layout>
 
-		<layout left="312" top="100" width="200" height="86">
+		<layout name="boxVMaxT" left="312" top="100" width="200" height="86">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label name="lblMaxTraitV" left="20" top="15" width="160" height="34" text="MAX TRAIT LEVEL" wordWrap="true" horzTextAlign="center" vertTextAlign="center"/>
 			<!-- Both numbers are 22 since the 53rd batch (SPEC I196d, Q114.3): a 30 rect holds the ~29
@@ -189,8 +197,12 @@
 		     side (SPEC Q117.2); as tall as the band; the boxes 2 under the dots as on the Main and the
 		     Combat tab (SPEC V545a). Title, the Main's 8 and the 52 of dots and boxes are ONE object
 		     centred in the box since the 61st batch (user 2026-10-02, SPEC I204c, V547): 20 + 8 + 52 =
-		     80 in 176, 48 above and below. -->
-		<layout left="517" top="10" width="290" height="176">
+		     80 in 176, 48 above and below.
+
+		     With True Faith (user 2026-10-06, SPEC I214) VTF_GEOM makes this box the Main's 113 and 358
+		     wide - TRUE FAITH's width under it - title at 16 and the dots at 54,44: the same 16 above
+		     and 17 under as the Main's boxWillpower. -->
+		<layout name="boxVWillpower" left="517" top="10" width="290" height="176">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<template name="VWillpowerMirror">
 				<imageCheckBox name="roVWp_1" left="0" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
@@ -215,10 +227,30 @@
 				<checkBox left="200" top="27" width="25" height="25" field="willpower_c9" onClick="wpSpentClick('willpower_c9');" onChange="wpSpentChange('willpower_c9');"/>
 				<checkBox left="225" top="27" width="25" height="25" field="willpower_c10" onClick="wpSpentClick('willpower_c10');" onChange="wpSpentChange('willpower_c10');"/>
 			</template>
-			<label left="20" top="48" width="250" height="20" text="WILLPOWER" horzTextAlign="center"/>
-			<layout left="20" top="76" width="250" height="52">
+			<label name="lblVWillpower" left="20" top="48" width="250" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<layout name="bodyVWpDots" left="20" top="76" width="250" height="52">
 				<VWillpowerMirror/>
 			</layout>
+		</layout>
+
+		<!-- TRUE FAITH under WILLPOWER, for a vampire with the True Faith merit only (user 2026-10-06,
+		     SPEC I214c, V551): hidden here, and renderGameMode shows it when vampFaith() says so. The
+		     row is the Numina tab's (WoD20.7) x for x in the same 358, the title 16 + 20 + 8 above it,
+		     16 above and 17 under like the Main's WILLPOWER. faith and faith_1..5 are a declared mirror
+		     of the Numina's (SPEC V36). The dots are FREE here (user, SPEC Q127.3): poolClick marks
+		     them without a price, and xpLedgerRows leaves True Faith out of a vampire's ledger. -->
+		<layout name="boxVFaith" left="517" top="128" width="358" height="86" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="16" width="318" height="20" text="TRUE FAITH" horzTextAlign="center"/>
+
+			<button name="btnQVFaith" left="20" top="46" width="20" height="20" text="?" onClick="popOpen(self, 'Numina', 'True Faith', nil, nil);"/>
+			<label left="45" top="44" width="52" height="24" text="Religion"/>
+			<edit left="102" top="44" width="90" height="24" field="faith" fontSize="12"/>
+			<imageCheckBox left="197" top="44" width="25" height="25" field="faith_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="poolClick('faith_', 5, 'faith_1', nil);"/>
+			<imageCheckBox left="226" top="44" width="25" height="25" field="faith_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="poolClick('faith_', 5, 'faith_2', nil);"/>
+			<imageCheckBox left="255" top="44" width="25" height="25" field="faith_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="poolClick('faith_', 5, 'faith_3', nil);"/>
+			<imageCheckBox left="284" top="44" width="25" height="25" field="faith_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="poolClick('faith_', 5, 'faith_4', nil);"/>
+			<imageCheckBox left="313" top="44" width="25" height="25" field="faith_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="poolClick('faith_', 5, 'faith_5', nil);"/>
 		</layout>
 
 		<!-- The weakness of the vampire's CLAN since the 47th batch (SPEC I190j, user 2026-10-01): the
@@ -234,10 +266,13 @@
 		     autoSized, word-wrapped label in it, in three bands kept apart whether the bar shows or not -
 		     the text 24..396, a gap of 8, the bar's 16 at 404..420 - so the text never runs
 		     under the bar and the bar never covers text. 24 = 8 + 16 keeps the column centred in the
-		     box. renderRevWeakness centres a text that fits and leaves one that scrolls at the top. -->
-		<layout left="812" top="10" width="460" height="176">
+		     box. renderRevWeakness centres a text that fits and leaves one that scrolls at the top.
+
+		     With True Faith (SPEC I214d) the box gives 68 more to WILLPOWER and takes the band's 28:
+		     392 x 204, the scroll 352 x 149 and the text 304 - the same three bands, 24 + 304 + 8 + 16. -->
+		<layout name="boxVWeak" left="812" top="10" width="460" height="176">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="420" height="20" text="CLAN/BLOODLINE WEAKNESS" horzTextAlign="center"/>
+			<label name="lblVWeak" left="20" top="15" width="420" height="20" text="CLAN/BLOODLINE WEAKNESS" horzTextAlign="center"/>
 
 			<scrollBox name="weakScrollV" left="20" top="40" width="420" height="121">
 				<label name="dynRevWeaknessV" left="24" top="0" width="372" height="20" wordWrap="true" autoSize="true" fontSize="11" horzTextAlign="center"/>
@@ -249,10 +284,11 @@
 
 		     As tall as the pool (SPEC I196f): the title is two lines in en and pt, so its rect is 34
 		     with the text centred in it, 5 above the field - 34 + 5 + 25 = 64 in 176, one object
-		     centred in the box (SPEC V547). -->
-		<layout left="1277" top="10" width="131" height="176">
+		     centred in the box (SPEC V547). With True Faith the box is 204 and its three move down 14
+		     (SPEC I214d). -->
+		<layout name="boxVXP" left="1277" top="10" width="131" height="176">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="56" width="91" height="34" text="CURRENT EXPERIENCE" wordWrap="true" horzTextAlign="center" vertTextAlign="center"/>
+			<label name="lblVXP" left="20" top="56" width="91" height="34" text="CURRENT EXPERIENCE" wordWrap="true" horzTextAlign="center" vertTextAlign="center"/>
 
 			<rectangle name="bgCurrentXPVampire" left="20" top="95" width="91" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
 			<edit name="edtCurrentXPVampire" type="number" decimalPlaces="0" left="20" top="95" width="91" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPVampire.text);" transparent="true"/>
@@ -267,8 +303,11 @@
 		     I193h, V539, B193) - the copy of the Ghoul tab brought 680, and the scroll box scrolled the
 		     79 nobody could see. 582 since the 61st batch (user 2026-10-02, SPEC I204d, Q121.2): two
 		     boxes of 151 + 5 + 426, fifteen rows with the 15 foot, and RITUALS down to 21 rows (the
-		     27th left this tab; the field and the Ghoul tab's row stay) with a 21 foot. -->
-		<layout left="0" top="191" width="466" height="582">
+		     27th left this tab; the field and the Ghoul tab's row stay) with a 21 foot.
+
+		     With True Faith the band is 204 and the three stand at 219, the tab closing on 801 (SPEC
+		     I214d). -->
+		<layout name="boxVDisc" left="0" top="191" width="466" height="582">
 			<template name="VDiscRow">
 				<button name="btnQV$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Disc', sheet['$(field)'], nil, '$(field)');"/>
 				<button name="dynV$(field)" left="25" top="0" width="171" height="25" fontSize="12" text="Select Discipline" onClick="mfOpen(self, '$(field)', 'disc', 'Disc');" onStartDrag="rowDragStart(self, drag, x, y, event, 'disc', '$(field)');"/>
@@ -361,7 +400,7 @@
 			</layout>
 		</layout>
 
-		<layout left="471" top="191" width="466" height="582">
+		<layout name="boxVPaths" left="471" top="191" width="466" height="582">
 			<template name="VMainPathRow">
 				<button name="btnQV$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Path', sheet['$(field)'], nil, '$(field)');"/>
 				<button name="dynV$(field)" left="25" top="0" width="171" height="25" fontSize="12" text="Select Main Path" onClick="mfOpen(self, '$(field)', 'mainPath', 'Path');" onStartDrag="rowDragStart(self, drag, x, y, event, 'mainPath', '$(field)');"/>
@@ -478,7 +517,7 @@
 			</layout>
 		</layout>
 
-		<layout left="942" top="191" width="466" height="582">
+		<layout name="boxVRituals" left="942" top="191" width="466" height="582">
 			<template name="VRitualRow">
 				<button name="btnQV$(field)" left="0" top="2" width="20" height="20" text="?" onClick="popOpen(self, 'Ritual', sheet['$(field)'], nil, '$(field)');"/>
 				<button name="dynV$(field)" left="25" top="0" width="401" height="25" text="Select Ritual" onClick="mfOpen(self, '$(field)', 'ritual', 'Ritual');" onStartDrag="rowDragStart(self, drag, x, y, event, 'ritual', '$(field)');"/>

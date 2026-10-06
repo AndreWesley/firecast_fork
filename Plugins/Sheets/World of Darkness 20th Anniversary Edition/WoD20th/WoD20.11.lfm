@@ -62,6 +62,12 @@
 				local sv = found["weakScrollV"];
 
 				if lv ~= nil and sv ~= nil then
+					-- The text column follows the scroll: 24 + text + 8 + the bar's 16, so 372 in the
+					-- XML's 420 and 304 in the 352 a vampire with True Faith gets (SPEC I214d).
+					local w = sv.width - 48;
+
+					if lv.width ~= w then lv.width = w; end;
+
 					local _, cont = string.gsub(txtV, "[\128-\191]", "");
 					local fs      = lv.fontSize or 11;
 					local perLine = math.max(1, math.floor(lv.width / (fs * 0.5)));
