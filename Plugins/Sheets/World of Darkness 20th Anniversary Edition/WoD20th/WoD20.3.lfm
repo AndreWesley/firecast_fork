@@ -91,6 +91,9 @@
 				paintAs(form, "ranged", ABILITY_FIELD[eraRangedName()], 1);
 
 				paintWillpower(form);
+
+				-- The mage's ARETE / SPHERES copy (SPEC I221k): the root's one writer paints it.
+				renderSpheres(form);
 			end;
 
 			-- SPEC I157g, T1005, I159c. The THIRTEEN picker buttons of this tab - eleven Attack
@@ -298,9 +301,13 @@
 
 			Nothing here syncs the two tabs by hand: both mark labels carry `field="health_N"`,
 			so the NDB is the single source and a click on either side updates both (SPEC V36).
+
+			Name and "(-N)" are two labels since the 80th batch, as on Main (SPEC I223c, V563): the
+			penalty is right-aligned 2 before the box, the name ends 4 before it.
 		-->
 		<template name="HealthRowMirror">
-			<label name="dynHealth3_$(num)" left="0" top="0" width="215" height="20"/>
+			<label name="dynHealth3_$(num)" left="0" top="0" width="191" height="20"/>
+			<label name="dynHealth3_pen$(num)" left="195" top="0" width="26" height="20" horzTextAlign="trailing"/>
 			<rectangle left="223" top="0" width="22" height="20" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="cycleHealthMark($(num));" onMenu="healHealthMark();">
 				<label align="client" field="health_$(num)" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
@@ -560,6 +567,138 @@
 
 			<layout name="bodyWillpower3" left="32" top="43" width="250" height="52">
 				<WillpowerMirror/>
+			</layout>
+		</layout>
+
+		<!-- A MAGE's ARETE / SPHERES, read-only here (user 2026-10-06, SPEC I221k, V560d): the Main's box
+		     spot for spot, under the Rate of Fire foot (607 + 20, 5 between). Like WILLPOWER above, the
+		     dots own no field and take no click - renderSpheres (root) paints them from the Main's
+		     fields and swaps each sphere dot for its faded twin over Arete. 0.40 live and 0.12 twin, the
+		     Main's 0.30 ratio (SPEC V111). Hidden here: renderGameMode shows it to a mage only.
+		     664 wide with ability-sized sphere rows since the 80th batch, the Main's numbers (SPEC I223f). -->
+		<layout name="boxArete3" left="0" top="632" width="664" height="244" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="624" height="20" text="ARETE" horzTextAlign="center"/>
+			<layout left="207" top="45" width="250" height="25">
+				<imageCheckBox name="roArete_1" left="0" top="0" width="25" height="25" checked="true" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roArete_2" left="25" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roArete_3" left="50" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roArete_4" left="75" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roArete_5" left="100" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roArete_6" left="125" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roArete_7" left="150" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roArete_8" left="175" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roArete_9" left="200" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roArete_10" left="225" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+			</layout>
+			<label left="20" top="95" width="624" height="20" text="SPHERES" horzTextAlign="center"/>
+			<layout left="20" top="125" width="225" height="25">
+				<label left="0" top="5" width="98" height="20" text="Correspondence"/>
+				<imageCheckBox name="roSph_correspondence_1" left="100" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_correspondence_2" left="125" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_correspondence_3" left="150" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_correspondence_4" left="175" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_correspondence_5" left="200" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="rocapSph_correspondence_2" left="125" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_correspondence_3" left="150" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_correspondence_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_correspondence_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+			</layout>
+			<layout left="20" top="155" width="225" height="25">
+				<label left="0" top="5" width="98" height="20" text="Entropy"/>
+				<imageCheckBox name="roSph_entropy_1" left="100" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_entropy_2" left="125" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_entropy_3" left="150" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_entropy_4" left="175" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_entropy_5" left="200" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="rocapSph_entropy_2" left="125" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_entropy_3" left="150" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_entropy_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_entropy_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+			</layout>
+			<layout left="20" top="185" width="225" height="25">
+				<label left="0" top="5" width="98" height="20" text="Forces"/>
+				<imageCheckBox name="roSph_forces_1" left="100" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_forces_2" left="125" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_forces_3" left="150" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_forces_4" left="175" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_forces_5" left="200" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="rocapSph_forces_2" left="125" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_forces_3" left="150" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_forces_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_forces_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+			</layout>
+			<layout left="265" top="125" width="173" height="25">
+				<label left="0" top="5" width="46" height="20" text="Life"/>
+				<imageCheckBox name="roSph_life_1" left="48" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_life_2" left="73" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_life_3" left="98" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_life_4" left="123" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_life_5" left="148" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="rocapSph_life_2" left="73" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_life_3" left="98" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_life_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_life_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+			</layout>
+			<layout left="265" top="155" width="173" height="25">
+				<label left="0" top="5" width="46" height="20" text="Matter"/>
+				<imageCheckBox name="roSph_matter_1" left="48" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_matter_2" left="73" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_matter_3" left="98" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_matter_4" left="123" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_matter_5" left="148" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="rocapSph_matter_2" left="73" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_matter_3" left="98" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_matter_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_matter_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+			</layout>
+			<layout left="265" top="185" width="173" height="25">
+				<label left="0" top="5" width="46" height="20" text="Mind"/>
+				<imageCheckBox name="roSph_mind_1" left="48" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_mind_2" left="73" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_mind_3" left="98" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_mind_4" left="123" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_mind_5" left="148" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="rocapSph_mind_2" left="73" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_mind_3" left="98" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_mind_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_mind_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+			</layout>
+			<layout left="458" top="125" width="186" height="25">
+				<label left="0" top="5" width="59" height="20" text="Prime"/>
+				<imageCheckBox name="roSph_prime_1" left="61" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_prime_2" left="86" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_prime_3" left="111" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_prime_4" left="136" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_prime_5" left="161" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="rocapSph_prime_2" left="86" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_prime_3" left="111" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_prime_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_prime_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+			</layout>
+			<layout left="458" top="155" width="186" height="25">
+				<label left="0" top="5" width="59" height="20" text="Spirit"/>
+				<imageCheckBox name="roSph_spirit_1" left="61" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_spirit_2" left="86" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_spirit_3" left="111" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_spirit_4" left="136" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_spirit_5" left="161" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="rocapSph_spirit_2" left="86" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_spirit_3" left="111" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_spirit_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_spirit_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+			</layout>
+			<layout left="458" top="185" width="186" height="25">
+				<label left="0" top="5" width="59" height="20" text="Time"/>
+				<imageCheckBox name="roSph_time_1" left="61" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_time_2" left="86" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_time_3" left="111" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_time_4" left="136" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="roSph_time_5" left="161" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
+				<imageCheckBox name="rocapSph_time_2" left="86" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_time_3" left="111" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_time_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
+				<imageCheckBox name="rocapSph_time_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 			</layout>
 		</layout>
 

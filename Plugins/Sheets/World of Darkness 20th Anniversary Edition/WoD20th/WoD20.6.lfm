@@ -352,7 +352,7 @@
 				["Martial Arts"] = "Artes Marciais",
 				["Martyr"] = "Mártir",
 				["Masochist"] = "Masoquista",
-				["Mauled (-2)"] = " Espancado (-2)",
+				["Mauled (-2)"] = "Espancado (-2)",
 				["Max"] = "Máximo",
 				["Mediator"] = "Mediador",
 				["Medicine"] = "Medicina",
@@ -396,6 +396,26 @@
 				["HEDGE MAGIC"] = "MAGIA ESTÁTICA",
 				["QUINTESSENCE"] = "QUINTESSÊNCIA",
 				["PARADOX"] = "PARADOXO",
+				["Magick"] = "Mágika",
+				["FOCI"] = "FOCI",
+				["ROTES"] = "ROTINAS",
+				["WONDERS"] = "MARAVILHAS",
+				["Add"] = "Adicionar",
+				["Remove this item from the list?"] = "Remover este item da lista?",
+				["ARETE"] = "ARETE",
+				["Arete"] = "Arete",
+				["SPHERES"] = "ESFERAS",
+				["Correspondence"] = "Correspondência",
+				["Entropy"] = "Entropia",
+				["Forces"] = "Forças",
+				["Life"] = "Vida",
+				["Matter"] = "Matéria",
+				["Mind"] = "Mente",
+				["Prime"] = "Primórdio",
+				["Spirit"] = "Espírito",
+				["Time"] = "Tempo",
+				["Sphere"] = "Esfera",
+				["That sphere is above your Arete"] = "Essa esfera passa do seu Arete",
 				["Essence"] = "Essência",
 				["Affiliation"] = "Afiliação",
 				-- The mage's Main header (user 2026-10-06, SPEC I216f/h, R186): Sect is "Facção" by the
@@ -5464,6 +5484,11 @@
 						end;
 					end;
 				end;
+
+				-- The same for the mage's wheel (SPEC I223a, V562d): the walk put every mark back to its
+				-- authored clear fill, and gold / purple are Lua's. Before the two below, which V515d
+				-- keeps last.
+				renderQpWheel(from);
 
 				-- The walk above put every ! back to its era's plain colour; the accent is Lua's, so
 				-- it goes back on here, last (SPEC I177c, V515d - B179 again, for colour).

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmWoD20_17" width="296" height="152" margins="{top=4}">
+<!--
+	One item of the Magick tab's three lists - a Focus, a Rote or a Wonder (user 2026-10-07, SPEC
+	I223i, V565c). 296 wide: its recordList is 316, and the 20 left over are the scrollbar's 16 and 4
+	between, so neither covers the other. A name, a description of about five lines that scrolls on
+	its own, and an X on the right edge that asks before it removes the item (the Mage20th item's
+	shape, SPEC R187).
+
+	This form is a recordList's template, not an <import>: it is built apart from the root, so the
+	root's translateSheetText is out of its reach and the WoD20.6 traversal is not what keeps it in
+	the player's language. It translates its own three texts when its node arrives, from the
+	language on the ficha's root node; the labels are named dyn* so the traversal leaves them alone.
+	The pt strings are written as byte escapes so this file stays ASCII.
+-->
+	<script><![CDATA[
+		local function itemLang()
+			local root = ndb.getRoot(sheet);
+
+			if root ~= nil and root.language == "en" then return "en"; end;
+
+			return "pt";
+		end;
+
+		local ITEM_PT = {
+			["Name"]                            = "Nome",
+			["Description"]                     = "Descri\195\167\195\163o",
+			["Remove this item from the list?"] = "Remover este item da lista?",
+		};
+
+		local function itemText(txt)
+			if itemLang() == "pt" then return ITEM_PT[txt] or txt; end;
+
+			return txt;
+		end;
+	]]></script>
+
+	<rectangle align="client" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound">
+		<label name="dynItemName" left="6" top="4" width="32" height="20" text="Name"/>
+		<edit left="42" top="2" width="223" height="25" field="itemName"/>
+		<button left="271" top="0" width="25" height="25" text="X">
+			<event name="onClick">
+				Dialogs.confirmOkCancel(itemText("Remove this item from the list?"),
+					function(confirmed)
+						if confirmed then ndb.deleteNode(sheet); end;
+					end);
+			</event>
+		</button>
+
+		<label name="dynItemDesc" left="6" top="31" width="284" height="20" text="Description"/>
+		<textEditor left="6" top="52" width="284" height="94" field="itemDesc"/>
+	</rectangle>
+
+	<event name="onNodeReady">
+		self.dynItemName.text = itemText("Name");
+		self.dynItemDesc.text = itemText("Description");
+	</event>
+</form>

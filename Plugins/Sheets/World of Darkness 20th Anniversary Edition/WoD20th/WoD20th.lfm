@@ -900,7 +900,7 @@
 			-- from these mechanically - pane `tab<X>`, button `btnTab<X>`, fill `tabOn<X>` - so the
 			-- list and the sheet cannot drift into disagreeing about which tabs exist.
 			TAB_LIST = {
-				"Main", "Traits", "Numina", "Disciplines", "Vampire", "Combat", "Inventory",
+				"Main", "Traits", "Numina", "Disciplines", "Vampire", "Magick", "Combat", "Inventory",
 				"Background", "Progress", "Notes", "Settings", "Storyteller",
 			};
 			-- <<< TAB_LIST_END
@@ -920,8 +920,10 @@
 			-- the table to the XML instead, the same weld V49 puts on HEALTH_ROW_PITCH.
 			-- Vampire (45th batch, SPEC I188e) sits right after Ghoul and is as wide: the two never
 			-- show together, so the bar keeps the length it always had.
+			-- Magick (80th batch, SPEC I223g) sits right after Vampire: a mage's own tab, so it never
+			-- shows beside Vampire either.
 			TAB_W = {
-				99, 79, 79, 92, 92, 86, 105, 105, 112, 99, 125, 112,
+				99, 79, 79, 92, 92, 86, 86, 105, 105, 112, 99, 125, 112,
 			};
 			STRIP_X0  = 30;
 			STRIP_GAP = 4;
@@ -1083,7 +1085,7 @@
 				["Hurt (-1)"]      = "Machucado (-1)",
 				["Injured (-1)"]   = "Ferido (-1)",
 				["Wounded (-2)"]   = "Ferido Gravemente (-2)",
-				["Mauled (-2)"]    = " Espancado (-2)",
+				["Mauled (-2)"]    = "Espancado (-2)",
 				["Crippled (-5)"]  = "Aleijado (-5)",
 				["Incapacitated"]  = "Incapacitado",
 			};
@@ -2094,7 +2096,15 @@
 			-- comes down to fit (Q133.1: 15 and 15 make 5 and 15; 25 and 0 make 20). A
 			-- negative or broken number reads as 0 and is written back (Q133.4). Only what differs is
 			-- written; the numbers' dataLink calls this, and the writes back come round once, equal.
-			function renderQpWheel()
+			--
+			-- Since the 80th batch (user 2026-10-07, SPEC I223a, V562) the ring is PAINTED: the marks
+			-- lost the label that drew the symbol, and this is the one writer of their colour - gold for
+			-- "/", dark purple for "X", clear for empty - in the same loop that writes qpWheel_N, so the
+			-- field and the paint cannot disagree. Six digits: eight are #RRGGBBAA here (SPEC V523).
+			QP_GOLD   = "#D4AF37";
+			QP_PURPLE = "#4A148C";
+
+			function renderQpWheel(from)
 				if sheet == nil then return; end;
 
 				-- A sheet marked in the 75th batch has marks and no numbers: they are counted ONCE,
@@ -2123,6 +2133,16 @@
 				if sheet.qpQuint ~= nil and tonumber(sheet.qpQuint) ~= q then setField("qpQuint", q); end;
 				if sheet.qpParadox ~= nil and tonumber(sheet.qpParadox) ~= p then setField("qpParadox", p); end;
 
+				local marks = {};
+
+				if from ~= nil then
+					local names = {};
+
+					for n = 1, 20, 1 do names["qpMark_" .. n] = true; end;
+
+					xpFind(tabRootOf(from), names, marks);
+				end;
+
 				for n = 1, 20, 1 do
 					local want = "";
 
@@ -2133,7 +2153,36 @@
 					end;
 
 					if (sheet["qpWheel_" .. n] or "") ~= want then setField("qpWheel_" .. n, want); end;
+
+					local mark = marks["qpMark_" .. n];
+
+					if mark ~= nil then
+						if want == "/" then
+							mark.color = QP_GOLD;
+						elseif want == "X" then
+							mark.color = QP_PURPLE;
+						else
+							mark.color = "#00000000";
+						end;
+					end;
 				end;
+			end;
+
+
+			-- A mage starts with seven empty Foci (user 2026-10-07, SPEC I223j, Q137.6, V565d). ONCE per
+			-- character, keyed on a flag and not on the list being empty: the seven are ordinary items,
+			-- the player adds and removes at will - all of them if they like - and nothing comes back.
+			-- Rotes and Wonders start empty, so only the Foci list is ever appended to from here.
+			function seedFoci(from)
+				if sheet == nil or from == nil or sheet.game ~= "Mage" or sheet.fociSeeded == true then return; end;
+
+				local found = xpFind(tabRootOf(from), { rclFoci = true }, {});
+
+				if found.rclFoci == nil then return; end;
+
+				for i = 1, 7, 1 do found.rclFoci:append(); end;
+
+				setField("fociSeeded", true);
 			end;
 
 
@@ -2202,11 +2251,23 @@
 						else
 							row.visible = true;
 
-							if lang == "pt" then
-								text.text = HEALTH_PT[canon] or canon;
-							else
-								text.text = canon;
-							end;
+							local full = canon;
+
+							if lang == "pt" then full = HEALTH_PT[canon] or canon; end;
+
+							-- Name and "(-N)" on two labels since the 80th batch (user 2026-10-07,
+							-- SPEC I223c, V563): the name starts on the row's edge in every row and the
+							-- penalty sits right-aligned against its box. A level with no penalty
+							-- (Bruised, Incapacitated) leaves the second label empty.
+							local name, pen = string.match(full, "^(.-)%s*(%(%-?%d+%))$");
+
+							if name == nil then name, pen = full, ""; end;
+
+							text.text = name;
+
+							local penLabel = form[prefix .. "pen" .. i];
+
+							if penLabel ~= nil then penLabel.text = pen; end;
 						end;
 					end;
 				end;
@@ -2466,6 +2527,7 @@
 					tabNumina      = sheet.stShowNumina ~= false,
 					tabDisciplines = sheet.stShowDisciplines == true and not vamp,
 					tabVampire     = vamp,
+					tabMagick      = sheet.game == "Mage",
 					tabStoryteller = isStoryteller(),
 				};
 
@@ -2721,6 +2783,14 @@
 			-- further. Combat follows the Main (SPEC I217k): COMBAT TRAITS and its HEALTH 407, the
 			-- VIRTUES mirror gone and the WILLPOWER mirror in its 315 x 126. Ability, background and
 			-- combat rows stretch with their box; the attribute rows are placed, so their tenth dot is.
+			--
+			-- The bottom row has no slack since the 78th batch (user 2026-10-06, SPEC I221a/d, V558):
+			-- WILLPOWER and EXPERIENCE are their 250 / 90 of content and 20 a side (290), so the
+			-- wheel (200) and ARETE (659 since HEALTH shrank, its rect in the XML) fit before HEALTH. A ghoul mage's
+			-- pool leaves that slot for the line under ARETE.
+			-- 80th batch (user 2026-10-07, SPEC I223c/f, Q137.1b): ARETE 664 with ability-sized spheres and
+			-- HEALTH 206 - rows of 166, the name (111, "Ferido Gravemente") and "(-N)" on two labels - so
+			-- the row still closes on 1375.
 			MAGE_GEOM = {
 				boxHeader        = { 222, 0, 1153, 105 },
 				hdrNature        = { 398, 15, 327, 25 },
@@ -2733,10 +2803,27 @@
 				boxTalents       = { 0, 241, 455, 351 },
 				boxSkills        = { 460, 241, 455, 351 },
 				boxKnowledges    = { 920, 241, 455, 351 },
-				boxWillpower     = { 0, 597, 340, 126 },
-				lblWillpower     = { 20, 23, 300, 20 },
-				bodyWillpower    = { 45, 51, 250, 52 },
-				dynHealth_box    = { 1090, 597, 285 },
+				boxWillpower     = { 0, 597, 290, 126 },
+				lblWillpower     = { 20, 23, 250, 20 },
+				bodyWillpower    = { 20, 51, 250, 52 },
+				boxExperience    = { 0, 728, 290, 113 },
+				lblXPMain        = { 20, 31, 250, 20 },
+				bgCurrentXPMain  = { 100, 56, 90, 25 },
+				edtCurrentXPMain = { 100, 56, 90, 25 },
+				mainBloodPool    = { 500, 846, 330, 244 },
+				-- HEALTH as narrow as its longest name (user 2026-10-07, SPEC I222b, V561b): Ferido Gravemente
+				-- (-2) ~143 + 5 + the 22 box = 171 a row, 20 a side; ARETE takes the 74 it gave up.
+				dynHealth_box    = { 1169, 597, 206 },
+				dynHealth_row1   = { 20, 47, 166, 20 },
+				dynHealth_row2   = { 20, 74, 166, 20 },
+				dynHealth_row3   = { 20, 101, 166, 20 },
+				dynHealth_row4   = { 20, 128, 166, 20 },
+				dynHealth_row5   = { 20, 155, 166, 20 },
+				dynHealth_row6   = { 20, 182, 166, 20 },
+				dynHealth_row7   = { 20, 209, 166, 20 },
+				dynHealth_row8   = { 20, 236, 166, 20 },
+				dynHealth_row9   = { 20, 263, 166, 20 },
+				dynHealth_row10  = { 20, 290, 166, 20 },
 				boxBackgrounds   = { 0, 0, 509, 679 },
 				boxMerits        = { 514, 0, 743, 337 },
 				boxFlaws         = { 514, 342, 743, 337 },
@@ -2836,6 +2923,8 @@
 				names.boxVirtues = true;
 				names.boxVirtues3 = true;
 				names.boxQuintParadox = true;
+				names.boxArete = true;
+				names.boxArete3 = true;
 
 				local found = xpFind(tabRootOf(from), names, {});
 
@@ -2932,10 +3021,13 @@
 					if c ~= nil and c.visible == mage then c.visible = not mage; end;
 				end;
 
-				-- The Quintessence / Paradox wheel takes ROAD's slot, a mage's alone (SPEC I218a).
-				local wheel = found["boxQuintParadox"];
+				-- The Quintessence / Paradox wheel takes ROAD's slot, a mage's alone (SPEC I218a), and so
+				-- are ARETE / SPHERES beside it and their read-only copy on the Combat tab (SPEC I221c/k).
+				for _, nm in ipairs({ "boxQuintParadox", "boxArete", "boxArete3" }) do
+					local c = found[nm];
 
-				if wheel ~= nil and wheel.visible ~= mage then wheel.visible = mage; end;
+					if c ~= nil and c.visible ~= mage then c.visible = mage; end;
+				end;
 
 				-- The Vampire tab with the True Faith merit (SPEC I214e, V551), through the same
 				-- writer and the same XML cache. The weakness re-centres in its new box afterwards:
@@ -3002,6 +3094,65 @@
 				end;
 
 				return false;
+			end;
+
+			-- A mage's Arete: 1 for the fixed first dot plus the nine bought after it (SPEC I221e).
+			function areteLevel()
+				if sheet == nil then return 1; end;
+
+				return traitLevel(sheet, "arete", 2, 10, 1);
+			end;
+
+			-- No sphere over Arete (user 2026-10-06, SPEC I221j/k, Q135.3, V560): each sphere dot from the
+			-- 2nd has a faded EMPTY twin on its spot, as an attribute's over its ceiling, and Arete
+			-- decides which of the two shows - on the Main and on the Combat tab's read-only copy, whose
+			-- dots are painted here from the fields (they own none, SPEC V1). The one writer of both.
+			function renderSpheres(from)
+				if sheet == nil or from == nil then return; end;
+
+				local names = {};
+
+				for k = 2, 10, 1 do names["roArete_" .. k] = true; end;
+
+				for i = 1, #XP_SPHERES, 1 do
+					local s = XP_SPHERES[i][2];
+
+					for k = 1, 5, 1 do
+						names[s .. "_" .. k] = true;
+						names["scap_" .. string.sub(s, 8) .. "_" .. k] = true;
+						names["roSph_" .. string.sub(s, 8) .. "_" .. k] = true;
+						names["rocapSph_" .. string.sub(s, 8) .. "_" .. k] = true;
+					end;
+				end;
+
+				local found = xpFind(tabRootOf(from), names, {});
+				local a     = areteLevel();
+
+				for k = 2, 10, 1 do
+					local ro = found["roArete_" .. k];
+
+					if ro ~= nil then ro.checked = sheet["arete_" .. k] == true; end;
+				end;
+
+				for i = 1, #XP_SPHERES, 1 do
+					local s, short = XP_SPHERES[i][2], string.sub(XP_SPHERES[i][2], 8);
+
+					for k = 1, 5, 1 do
+						local on = k <= a;
+
+						for _, p in ipairs({ { s, "scap_" .. short }, { "roSph_" .. short, "rocapSph_" .. short } }) do
+							local live = found[p[1] .. "_" .. k];
+							local twin = found[p[2] .. "_" .. k];
+
+							if live ~= nil and live.visible ~= on then live.visible = on; end;
+							if twin ~= nil and twin.visible == on then twin.visible = not on; end;
+						end;
+
+						local ro = found["roSph_" .. short .. "_" .. k];
+
+						if ro ~= nil then ro.checked = sheet[s .. "_" .. k] == true; end;
+					end;
+				end;
 			end;
 
 			-- The ceiling of the VAMPIRE tab, painted (SPEC I188h, V530f). Every live dot of a row of
@@ -3284,10 +3435,10 @@
 				return n;
 			end;
 
-			-- SPEC I9. Every ACTIVE rule sits here exactly once (SPEC V86). The dormant ones -
-			-- Discipline, Path, Sphere, Arete - are in the spec but deliberately NOT written:
-			-- the Disciplines tab is empty and Magika is gone altogether (SPEC V128), so no
-			-- field can produce that row and a cost nothing can reach is dead code.
+			-- SPEC I9. Every ACTIVE rule sits here exactly once (SPEC V86). Sphere and Arete woke
+			-- in the 78th batch with the mage's ARETE box (user 2026-10-06, SPEC I221f); the one
+			-- still dormant is the AFFINITY sphere (n x 7) - no field says which sphere it is yet
+			-- (SPEC Q135.4), and a cost nothing can reach is dead code.
 			-- What a speciality costs at this moment (SPEC I9/I49/V154/V254). ONE field carries both
 			-- halves of the storyteller's answer: a number 0..5 is the price and the door is open,
 			-- the sentinel is the door shut.
@@ -3336,6 +3487,11 @@
 				if kind == "Virtue"    then return from * 2; end;
 				if kind == "Humanity"  then return from * 2; end;
 				if kind == "Willpower" then return from; end;
+
+				-- A mage's (SPEC I221f): a new sphere costs 10 flat, every later dot and every Arete
+				-- dot costs the rating it is bought from times 8.
+				if kind == "Sphere" then if from == 0 then return 10; end; return from * 8; end;
+				if kind == "Arete"  then return from * 8; end;
 
 				if kind == "Background" then
 					-- A PRICE since the 88th round, where a flag used to sit (SPEC I51, I9).
@@ -3444,6 +3600,14 @@
 			};
 
 			local XP_VIRTUES = { {"Conscience", "conscience"}, {"Self-Control", "selfControl"}, {"Courage", "courage"} };
+
+			-- A mage's nine spheres, in the order the ARETE box draws them (SPEC I221e/f). GLOBAL:
+			-- renderSpheres sits far above and reads it (SPEC B51, V223).
+			XP_SPHERES = {
+				{"Correspondence", "sphere_correspondence"}, {"Entropy", "sphere_entropy"}, {"Forces", "sphere_forces"},
+				{"Life", "sphere_life"}, {"Matter", "sphere_matter"}, {"Mind", "sphere_mind"},
+				{"Prime", "sphere_prime"}, {"Spirit", "sphere_spirit"}, {"Time", "sphere_time"},
+			};
 
 			-- ALL nine typed ability rows. customTalent_3, customTalent_4 and customKnowledge_3
 			-- (the 154th round's rows, SPEC I123a) were left out on purpose from 2026-09-24 until
@@ -4008,6 +4172,11 @@
 			declareTrait("humanity", 1, 10, 0);
 			declareTrait("willpower", 1, 10, 0);
 
+			-- A mage's (SPEC I221e): Arete 1..10 off a fixed first dot, a sphere 0..5 under Arete.
+			declareTrait("arete", 2, 10, 1);
+
+			for i = 1, #XP_SPHERES, 1 do declareTrait(XP_SPHERES[i][2], 1, 5, 0); end;
+
 			-- TEN since the 74th batch (user 2026-10-06, SPEC I217g): a mage's background row draws a
 			-- tenth live dot. Nobody else has a widget for `_10`, so the field stays nil for them.
 			for i = 1, BACKGROUND_ROWS, 1 do declareTrait("background_" .. i, 1, 10, 0); end;
@@ -4207,6 +4376,19 @@
 				pushRise(rows, "Willpower", "Willpower",
 					traitLevel(base, "willpower", 1, 10, 0),
 					liveLevel("willpower", 1, 10, 0), ctx, "willpower", 10);
+
+				-- Arete starts at 1, its first dot fixed art like a Virtue's (SPEC I221e/f).
+				pushRise(rows, "Arete", "Arete",
+					traitLevel(base, "arete", 2, 10, 1),
+					liveLevel("arete", 2, 10, 1), ctx, "arete", 10);
+
+				for i = 1, #XP_SPHERES, 1 do
+					local nome, field = XP_SPHERES[i][1], XP_SPHERES[i][2];
+
+					pushRise(rows, "Sphere", nome,
+						traitLevel(base, field, 1, 5, 0),
+						liveLevel(field, 1, 5, 0), ctx, field, 5);
+				end;
 
 				for i = 1, BACKGROUND_ROWS, 1 do
 					local field = "background_" .. i;
@@ -9779,6 +9961,14 @@
 					end;
 				end;
 
+				-- A mage's sphere stops at Arete (user 2026-10-06, SPEC I221j, Q135.3, V560c). The dots over
+				-- it are hidden behind faded twins already; this is the rule itself, for a click that
+				-- crosses several levels at once. A sphere already over a lowered Arete stays lit.
+				if want and string.match(trait, "^sphere_") ~= nil and (level + 1) > areteLevel() then
+					xpWarn("That sphere is above your Arete");
+					return false;
+				end;
+
 				-- The FAMILY ceiling, third in the row and the same shape as the two above (SPEC I106,
 				-- V337, T781). It caps a TRAIT rather than a Discipline, so it reads the trait name itself
 				-- instead of a pattern: `humanity` is the road track whatever road the character walks,
@@ -10412,57 +10602,65 @@
 					<label left="0" top="0" width="92" height="20" text="Vampire" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnCombat" left="491" top="5" width="86" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnMagick" left="491" top="5" width="86" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabCombat" left="491" top="5" width="86" height="30" color="#00000000"
+				<rectangle name="btnTabMagick" left="491" top="5" width="86" height="30" color="#00000000" visible="false"
+				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
+				           onClick="selectTab('tabMagick', self);">
+					<label left="0" top="0" width="86" height="20" text="Magick" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
+				</rectangle>
+
+				<rectangle name="tabOnCombat" left="581" top="5" width="86" height="30" color="#00000000" strokeColor="#00000000"
+				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
+				<rectangle name="btnTabCombat" left="581" top="5" width="86" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabCombat', self);">
 					<label left="0" top="0" width="86" height="20" text="Combat" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnInventory" left="581" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnInventory" left="671" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabInventory" left="581" top="5" width="105" height="30" color="#00000000"
+				<rectangle name="btnTabInventory" left="671" top="5" width="105" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabInventory', self);">
 					<label left="0" top="0" width="105" height="20" text="Inventory" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnBackground" left="690" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnBackground" left="780" top="5" width="105" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabBackground" left="690" top="5" width="105" height="30" color="#00000000"
+				<rectangle name="btnTabBackground" left="780" top="5" width="105" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabBackground', self);">
 					<label left="0" top="0" width="105" height="20" text="Background" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnProgress" left="799" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnProgress" left="889" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabProgress" left="799" top="5" width="112" height="30" color="#00000000"
+				<rectangle name="btnTabProgress" left="889" top="5" width="112" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabProgress', self);">
 					<label left="0" top="0" width="112" height="20" text="Experience" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnNotes" left="915" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnNotes" left="1005" top="5" width="99" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabNotes" left="915" top="5" width="99" height="30" color="#00000000"
+				<rectangle name="btnTabNotes" left="1005" top="5" width="99" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabNotes', self);">
 					<label left="0" top="0" width="99" height="20" text="Notes" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnSettings" left="1018" top="5" width="125" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnSettings" left="1108" top="5" width="125" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabSettings" left="1018" top="5" width="125" height="30" color="#00000000"
+				<rectangle name="btnTabSettings" left="1108" top="5" width="125" height="30" color="#00000000"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabSettings', self);">
 					<label left="0" top="0" width="125" height="20" text="Settings" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
 				</rectangle>
 
-				<rectangle name="tabOnStoryteller" left="1147" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
+				<rectangle name="tabOnStoryteller" left="1237" top="5" width="112" height="30" color="#00000000" strokeColor="#00000000"
 				           xradius="14" yradius="14" cornerType="innerRound" visible="false" hitTest="false"/>
-				<rectangle name="btnTabStoryteller" left="1147" top="5" width="112" height="30" color="#00000000" visible="false"
+				<rectangle name="btnTabStoryteller" left="1237" top="5" width="112" height="30" color="#00000000" visible="false"
 				           strokeColor="#00000000" strokeSize="1" xradius="14" yradius="14" cornerType="innerRound" hitTest="true" cursor="handPoint"
 				           onClick="selectTab('tabStoryteller', self);">
 					<label left="0" top="0" width="112" height="20" text="Storyteller" horzTextAlign="center" vertTextAlign="center" hitTest="false"/>
@@ -10487,6 +10685,10 @@
 
 			<layout name="tabVampire" align="client" visible="false">
 				<import file="WoD20.15.lfm"/>
+			</layout>
+
+			<layout name="tabMagick" align="client" visible="false">
+				<import file="WoD20.16.lfm"/>
 			</layout>
 
 			<layout name="tabCombat" align="client" visible="false">
@@ -11186,7 +11388,10 @@
 	-->
 	<!-- The mage's Quintessence and Paradox (user 2026-10-06, SPEC I219b, V556b): the numbers draw
 	     the ring, typed or moved by a click on it. -->
-	<dataLink fields="{'qpQuint', 'qpParadox'}" onChange="renderQpWheel();"/>
+	<dataLink fields="{'qpQuint', 'qpParadox'}" onChange="renderQpWheel(self);"/>
+
+	<!-- The mage's Arete caps the spheres, and the Combat tab's copy shows both (SPEC I221j/k, V560b). -->
+	<dataLink fields="{'arete_2', 'arete_3', 'arete_4', 'arete_5', 'arete_6', 'arete_7', 'arete_8', 'arete_9', 'arete_10', 'sphere_correspondence_1', 'sphere_correspondence_2', 'sphere_correspondence_3', 'sphere_correspondence_4', 'sphere_correspondence_5', 'sphere_entropy_1', 'sphere_entropy_2', 'sphere_entropy_3', 'sphere_entropy_4', 'sphere_entropy_5', 'sphere_forces_1', 'sphere_forces_2', 'sphere_forces_3', 'sphere_forces_4', 'sphere_forces_5', 'sphere_life_1', 'sphere_life_2', 'sphere_life_3', 'sphere_life_4', 'sphere_life_5', 'sphere_matter_1', 'sphere_matter_2', 'sphere_matter_3', 'sphere_matter_4', 'sphere_matter_5', 'sphere_mind_1', 'sphere_mind_2', 'sphere_mind_3', 'sphere_mind_4', 'sphere_mind_5', 'sphere_prime_1', 'sphere_prime_2', 'sphere_prime_3', 'sphere_prime_4', 'sphere_prime_5', 'sphere_spirit_1', 'sphere_spirit_2', 'sphere_spirit_3', 'sphere_spirit_4', 'sphere_spirit_5', 'sphere_time_1', 'sphere_time_2', 'sphere_time_3', 'sphere_time_4', 'sphere_time_5'}" onChange="renderSpheres(self);"/>
 
 	<dataLink fields="{'stShowNumina', 'stShowDisciplines'}">
 		<event name="onChange">
@@ -11210,6 +11415,7 @@
 			renderGameMode(self);
 			renderClanDisc(self);
 			renderVampCaps(self);
+			seedFoci(self);
 		</event>
 	</dataLink>
 
@@ -11307,8 +11513,14 @@
 		renderVampCaps(self);
 
 		-- The mage's wheel at open (user 2026-10-06, SPEC I219b/d): it counts a 75th-batch sheet's
-		-- marks into the numbers first, then draws.
-		renderQpWheel();
+		-- marks into the numbers first, then draws - and paints (SPEC I223a).
+		renderQpWheel(self);
+
+		-- The mage's sphere ceiling at open (SPEC I221j): it only paints.
+		renderSpheres(self);
+
+		-- A mage's seven first Foci, once (SPEC I223j).
+		seedFoci(self);
 
 		-- The font the player last chose, put back on all eight description panes (SPEC I103c,
 		-- V334e). One walk, at open, and it writes nothing: the field is READ here and only

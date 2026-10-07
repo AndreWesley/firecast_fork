@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form name="frmWoD20_16" align="client" theme="dark">
+	<scrollBox align="client">
+		<!-- Theme backdrop, same arrangement as WoD20.1 (SPEC T158, V56, V57). -->
+		<image name="themePaper16" align="client" style="stretch" hitTest="false" visible="false"/>
+
+		<!--
+			The Magick tab, a MAGE's alone (user 2026-10-07, SPEC I223g/h, V565): FOCI, ROTES and WONDERS,
+			three lists the player grows and shrinks. Each box is 70% of a mage's BACKGROUNDS (509 -> 356)
+			and as tall (679), 5 between. The list is a recordList - the "delete of a recordList" SPEC C
+			has allowed since the first round, after the Mage20th sheet's WONDERS (SPEC R187): the Add
+			button appends an item, the item's X asks and deletes itself. All three share one item form,
+			frmWoD20_17 (WoD20.17), and the list is 20 wider than it: 16 for the scrollbar and 4 between,
+			so the bar never covers an item and an item never runs under the bar.
+			Seven empty Foci are seeded once per mage by seedFoci (root, SPEC I223j); Rotes and Wonders
+			start empty.
+		-->
+		<layout name="boxFoci" left="0" top="0" width="356" height="679">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="316" height="20" text="FOCI" horzTextAlign="center" hitTest="false"/>
+			<button name="btnAddFocus" left="256" top="15" width="80" height="20" text="Add" onClick="self.rclFoci:append();"/>
+			<recordList name="rclFoci" left="20" top="45" width="316" height="614" field="magickFoci" templateForm="frmWoD20_17" layout="vertical"/>
+		</layout>
+
+		<layout name="boxRotes" left="361" top="0" width="356" height="679">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="316" height="20" text="ROTES" horzTextAlign="center" hitTest="false"/>
+			<button name="btnAddRote" left="256" top="15" width="80" height="20" text="Add" onClick="self.rclRotes:append();"/>
+			<recordList name="rclRotes" left="20" top="45" width="316" height="614" field="magickRotes" templateForm="frmWoD20_17" layout="vertical"/>
+		</layout>
+
+		<layout name="boxWonders" left="722" top="0" width="356" height="679">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="316" height="20" text="WONDERS" horzTextAlign="center" hitTest="false"/>
+			<button name="btnAddWonder" left="256" top="15" width="80" height="20" text="Add" onClick="self.rclWonders:append();"/>
+			<recordList name="rclWonders" left="20" top="45" width="316" height="614" field="magickWonders" templateForm="frmWoD20_17" layout="vertical"/>
+		</layout>
+	</scrollBox>
+</form>
