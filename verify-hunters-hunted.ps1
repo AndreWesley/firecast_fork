@@ -1283,7 +1283,11 @@ else { Pass "V37 no sibling row draws over its neighbour ($twinByRect twin row(s
 # typed here: a pair added there leaves the mortal sweep by construction. The vampire side is
 # measured on its own projection by V534. boxWillpower was here for the 51st batch only: since the
 # 52nd it is a box of every game (SPEC I195a).
-$VAMP_ONLY = @{ 'mainBloodPool' = $true }
+# boxQuintParadox since the 75th batch (SPEC I218a): the MAGE's wheel, hidden in the XML on the
+# mage's rect, which a mortal's VIRTUES occupy - not the mortal's, so not in his projection. Nor in
+# the vampire's: $MAGE_ONLY is skipped by V534(b) and measured on the mage's own by V554/V555.
+$VAMP_ONLY = @{ 'mainBloodPool' = $true; 'boxQuintParadox' = $true }
+$MAGE_ONLY = @{ 'boxQuintParadox' = $true }
 $gpRoot = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20th.lfm")))
 $gpTbl = [regex]::Match($gpRoot, '(?s)GAME_ROWS = \{(.*?)\n\t\t\t\};')
 if (-not $gpTbl.Success) { Fail "V534 (f) GAME_ROWS was not found on the root form - the mortal projection cannot be built (SPEC V534f, V553d, V20)" }
@@ -1803,7 +1807,10 @@ $V532_POOL = @("BLOOD POOL")
 # ROAD and WILLPOWER since the 52nd batch: the stack ends on the pool's line, which V541 pins
 # (SPEC I195, V541).
 $V541_STACK = @("ROAD", "WILLPOWER")
-$v376Roster = @($V393_PINNED) + @($V415_AVATAR) + @($V532_POOL) + @($V541_STACK)
+# The MAGE's Quintessence / Paradox wheel since the 75th batch (SPEC I218a): hidden in the mortal
+# XML and placed for the mage, where it closes on EXPERIENCE's foot - V555(a) pins that line.
+$V555_WHEEL = @("QUINTESSENCE")
+$v376Roster = @($V393_PINNED) + @($V415_AVATAR) + @($V532_POOL) + @($V541_STACK) + @($V555_WHEEL)
 $missing = @($closers | Where-Object { -not $mainBottom.ContainsKey($_) })
 if (-not $mapY.Success) { Fail "V376 the tab's grid comment no longer says where the tab closes - the ruler would be a literal in the gate again (SPEC V20)" }
 elseif ($missing.Count -gt 0) { Fail "V376 $($missing -join '/') not found on WoD20.1 - the check measured nothing (SPEC V20)" }
@@ -1826,6 +1833,7 @@ else {
         if ($closers -contains $nm376) { continue }
         if ($V393_PINNED -contains $nm376) { continue }
         if ($V532_POOL -contains $nm376) { continue }
+        if ($V555_WHEEL -contains $nm376) { continue }
         if ($V541_STACK -contains $nm376) { continue }
         $unaccounted += "$nm376 ends at $($bt376 + $bh376)"
     }
@@ -12850,7 +12858,7 @@ foreach ($f in $files) {
     }
 }
 if ($v280Apply -ne 1) { Fail "V280 $v280Apply titleless one-button box(es) were cut, expected the 1 the Apply box is (SPEC I163f, V479c, V209, B7)" }
-elseif ($v280Boxes.Count -ne 74) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 74 I73 measures (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
+elseif ($v280Boxes.Count -ne 75) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 75 I73 measures (74 until the 75th batch gave a mage the Quintessence / Paradox wheel, SPEC I218a) (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
 else {
     # (a) TWO numbers since T913: 20 on the X sides, 15 on the Y ones (SPEC I137c, user
     # 2026-09-02). The X pair is a FLOOR and always was. The Y pair splits: the FOOT is a floor,
@@ -13015,7 +13023,7 @@ else { Pass "V280 (d) the $($colBottoms.Count) Ghoul columns all close at $(@($c
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
 # (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
 # on them would be a false alarm on numbers this round agreed not to touch.
-if ($v280Boxes.Count -ne 74) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 74 I73 measures (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
+if ($v280Boxes.Count -ne 75) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 75 I73 measures (74 until the 75th batch gave a mage the Quintessence / Paradox wheel, SPEC I218a) (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
 else {
     # The declared HOLE is GONE with T908 and the 5px rule is whole again. T904 had left the
     # 680..1010 band of the Main grid with no bottom box, so two boxes faced each other a whole
@@ -17633,6 +17641,7 @@ foreach ($k534 in $docs534.Keys) {
     $boxes534 = @()
     foreach ($bx534 in $docs534[$k534].SelectNodes("//scrollBox/layout")) {
         $nm = $bx534.GetAttribute('name')
+        if ($MAGE_ONLY.ContainsKey($nm)) { continue }
         if ($nm -ne '' -and -not $geo534.ContainsKey($nm) -and $nm -notlike 'dynHealth*' -and -not $nm.StartsWith('box')) { continue }
         if ($bx534.GetAttribute('left') -notmatch '^\d+$' -or $bx534.GetAttribute('height') -notmatch '^\d+$') { continue }
         $ttl534 = $bx534.SelectSingleNode('label'); $tt534 = if ($ttl534) { $ttl534.GetAttribute('text') } else { $nm }
@@ -27750,7 +27759,7 @@ else {
     if ($MG554.Count -lt 12) { $v554Bad += "(a) MAGE_GEOM names only $($MG554.Count) rect(s) in its table - fewer than the boxes the request moves (SPEC V20)" }
     # (b) the projection: per tab, the named boxes a mage sees
     $tabs554 = [ordered]@{
-        'WoD20.1.lfm' = @{ Names = @('avatarFrame', 'boxHeader', 'boxAttributes', 'boxTalents', 'boxSkills', 'boxKnowledges', 'boxWillpower', 'boxExperience', 'mainBloodPool', 'dynHealth_box'); Right = 1375 }
+        'WoD20.1.lfm' = @{ Names = @('avatarFrame', 'boxHeader', 'boxAttributes', 'boxTalents', 'boxSkills', 'boxKnowledges', 'boxWillpower', 'boxExperience', 'mainBloodPool', 'dynHealth_box', 'boxQuintParadox'); Right = 1375 }
         'WoD20.2.lfm' = @{ Names = @('boxBackgrounds', 'boxMerits', 'boxFlaws', 'boxDerangements', 'boxOther'); Right = 1487 }
         'WoD20.3.lfm' = @{ Names = @('boxCombatTraits', 'dynHealth3_box', 'boxWillpower3'); Right = 0 }
     }
@@ -27862,5 +27871,185 @@ else {
 }
 if ($v554Bad) { foreach ($b in $v554Bad) { Fail "V554 $b" } }
 else { Pass "V554 a mage's Main closes on 1375 and its Traits on 1487 with nothing closer than 5, WILLPOWER in VIRTUES' place on Main and Combat, ten dots that fit their rows and only a mage sees" }
+
+# ---- V555: a MAGE's Quintessence / Paradox wheel (SPEC I218) ----
+# User 2026-10-06 (75th batch): twenty Health-like marks on a circle beside WILLPOWER, as tall as
+# WILLPOWER and EXPERIENCE together; 1 at the left a touch up, clockwise to 20 just under it;
+# "/" grows clockwise, "X" counter-clockwise, and an "X" next clockwise turns a "/" into one.
+# Radius 73 and the ring as a layout of its own since the build (SPEC I218f): V240 wants the titles
+# 15 from the edges and V68/V280 want no clickable rectangle beside the box's ground; 16 x 16 since
+# B200 - on the diagonals an upright 20 overlapped its neighbour, and this check is what saw it.
+$v555Bad = @()
+$m555 = Doc (Join-Path $dir 'WoD20.1.lfm')
+$box555 = @($m555.SelectNodes("//layout[@name='boxQuintParadox']"))
+$ring555 = $m555.SelectSingleNode("//layout[@name='boxQuintParadox']/layout[@name='qpRing']")
+$fn555 = NoComments (LuaFn $rootTxt 'cycleQpMark')
+if ($box555.Count -ne 1 -or $null -eq $ring555 -or -not $fn555) { $v555Bad += "boxQuintParadox, its qpRing or cycleQpMark was not found exactly once - this check reads nothing (SPEC V20, V209)" }
+else {
+    $b555 = $box555[0]
+    # (a) the box: hidden, on the mage's rect, WILLPOWER's top and EXPERIENCE's foot, shown for a mage
+    if ($b555.GetAttribute('visible') -ne 'false' -or ('{0},{1},{2},{3}' -f $b555.GetAttribute('left'), $b555.GetAttribute('top'), $b555.GetAttribute('width'), $b555.GetAttribute('height')) -ne '345,597,330,244') { $v555Bad += "(a) boxQuintParadox is not hidden on {345, 597, 330, 244} (SPEC I218a, Q132.2/3)" }
+    $mgW555 = [regex]::Match($rootTxt, 'boxWillpower\s*=\s*\{\s*0,\s*(\d+),\s*\d+,\s*(\d+)\s*\}')
+    if (-not $mgW555.Success -or [int]$mgW555.Groups[1].Value -ne 597 -or 597 + 244 -ne [int]$mgW555.Groups[1].Value + [int]$mgW555.Groups[2].Value + 5 + 113) { $v555Bad += "(a) the wheel does not run from a mage's WILLPOWER top to EXPERIENCE's foot (SPEC I218a)" }
+    $gm555 = NoComments (LuaFn $rootTxt 'renderGameMode')
+    if (-not $gm555.Contains('local wheel = found["boxQuintParadox"];') -or -not $gm555.Contains('if wheel ~= nil and wheel.visible ~= mage then wheel.visible = mage; end;') -or -not $gm555.Contains('names.boxQuintParadox = true;')) { $v555Bad += "(a) renderGameMode does not show the wheel to a mage and only a mage (SPEC I218a)" }
+    # (b) the geometry, recomputed here
+    $rl555 = [int]$ring555.GetAttribute('left'); $rt555 = [int]$ring555.GetAttribute('top')
+    $marks555 = @{}
+    foreach ($q555 in $ring555.SelectNodes("rectangle")) { $marks555[$q555.GetAttribute('name')] = $q555 }
+    if ($marks555.Count -ne 20) { $v555Bad += "(b) the ring holds $($marks555.Count) rectangle(s), not 20 (SPEC I218b)" }
+    $abs555 = @{}
+    for ($n = 1; $n -le 20; $n++) {
+        $q = $marks555["qpMark_$n"]
+        if ($null -eq $q) { $v555Bad += "(b) qpMark_$n is missing (SPEC I218b)"; continue }
+        $th = (171 - 18 * ($n - 1)) * [Math]::PI / 180
+        $el = [Math]::Round(165 + 73 * [Math]::Cos($th), [MidpointRounding]::AwayFromZero) - 8
+        $et = [Math]::Round(122 - 73 * [Math]::Sin($th), [MidpointRounding]::AwayFromZero) - 8
+        $al = $rl555 + [int]$q.GetAttribute('left'); $at = $rt555 + [int]$q.GetAttribute('top')
+        if ($al -ne $el -or $at -ne $et -or $q.GetAttribute('width') -ne '16' -or $q.GetAttribute('height') -ne '16') { $v555Bad += "(b) qpMark_$n sits at ($al,$at) $($q.GetAttribute('width'))x$($q.GetAttribute('height')) in the box, not ($el,$et) 16x16 - the clock is off (SPEC I218b)" }
+        $abs555[$n] = @($al, $at)
+        if ($al -lt 20 -or $al + 16 -gt 310) { $v555Bad += "(b) qpMark_$n is closer than 20 to a side of the box (SPEC I73)" }
+        if ($n -le 10 -and $at + 8 -ge 122) { $v555Bad += "(b) qpMark_$n is not on the upper half (SPEC I218b)" }
+        if ($n -gt 10 -and $at + 8 -le 122) { $v555Bad += "(b) qpMark_$n is not on the lower half (SPEC I218b)" }
+    }
+    if ($abs555.Count -eq 20) {
+        if ($abs555[20][0] -ne $abs555[1][0] -or $abs555[20][1] -le $abs555[1][1]) { $v555Bad += "(b) the twentieth mark is not straight under the first (SPEC I218b)" }
+        for ($n = 1; $n -le 20; $n++) {
+            $o = if ($n -eq 20) { 1 } else { $n + 1 }
+            $a = $abs555[$n]; $b = $abs555[$o]
+            if ([Math]::Abs($a[0] - $b[0]) -lt 16 -and [Math]::Abs($a[1] - $b[1]) -lt 16) { $v555Bad += "(b) qpMark_$n and qpMark_$o overlap (SPEC I218b)" }
+        }
+    }
+    # (c) each mark clicks its own number and shows its own field; no other widget holds the fields
+    foreach ($nm in $marks555.Keys) {
+        $n = $nm -replace '^qpMark_', ''
+        $q = $marks555[$nm]
+        $lb = @($q.SelectNodes("label"))
+        if ($q.GetAttribute('hitTest') -ne 'true' -or $q.GetAttribute('onClick') -ne "cycleQpMark($n);" -or $lb.Count -ne 1 -or $lb[0].GetAttribute('field') -ne "qpWheel_$n") { $v555Bad += "(c) $nm does not click cycleQpMark($n) and show qpWheel_$n through one label (SPEC I218b)" }
+    }
+    $fc555 = 0
+    foreach ($lf555 in Get-ChildItem -Path $dir -Filter '*.lfm') { $fc555 += @([regex]::Matches([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf555.FullName)), 'field="qpWheel_\d+"')).Count }
+    if ($fc555 -ne 20) { $v555Bad += "(c) qpWheel_* is bound $fc555 time(s) across the sheet, not 20 (SPEC I218d, V1)" }
+    # (d) the two titles, centred, clear of the marks; PARADOX translated
+    $q555 = $b555.SelectSingleNode("label[@text='QUINTESSENCE']"); $p555 = $b555.SelectSingleNode("label[@text='PARADOX']")
+    if ($null -eq $q555 -or $null -eq $p555) { $v555Bad += "(d) the box lacks its QUINTESSENCE or PARADOX title (SPEC I218c)" }
+    elseif ($abs555.Count -eq 20) {
+        $topMarks = [Math]::Min($abs555[5][1], $abs555[6][1]); $footMarks = [Math]::Max($abs555[15][1], $abs555[16][1]) + 16
+        if ([int]$q555.GetAttribute('top') + [int]$q555.GetAttribute('height') + 5 -gt $topMarks) { $v555Bad += "(d) QUINTESSENCE is closer than 5 to the top marks (SPEC I218c)" }
+        if ([int]$p555.GetAttribute('top') -lt $footMarks + 5) { $v555Bad += "(d) PARADOX is closer than 5 to the bottom marks (SPEC I218c)" }
+        foreach ($t555 in @($q555, $p555)) {
+            # Since the 76th batch (SPEC I219a, Q133.2) each title shares its line with its number:
+            # centred in the stretch from the box's 20 to 5 short of the edit on the same line.
+            $ed555 = @($b555.SelectNodes("edit") | Where-Object { $_.GetAttribute('top') -eq $t555.GetAttribute('top') })
+            $end555 = if ($ed555.Count -eq 1) { [int]$ed555[0].GetAttribute('left') - 5 } else { 310 }
+            # Right-aligned and CLOSE to its number since the 77th batch (SPEC I220, V557a).
+            if ($t555.GetAttribute('horzTextAlign') -ne 'trailing' -or [int]$t555.GetAttribute('left') -ne 20 -or [int]$t555.GetAttribute('left') + [int]$t555.GetAttribute('width') -ne $end555) { $v555Bad += "(d) '$($t555.GetAttribute('text'))' does not run from 20 to 5 short of its number, right-aligned (SPEC I218c, I220)" }
+        }
+    }
+    $pt555 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.6.lfm')))
+    $lg555 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path (Split-Path $dir -Parent) 'localization.lang')))
+    if (-not $pt555.Contains('["PARADOX"] = "PARADOXO"') -or @([regex]::Matches($lg555, '(?m)^wod\.PARADOX=')).Count -ne 2) { $v555Bad += "(d) PARADOX has no PT line in the map or not both .lang lines (SPEC I218c, B57)" }
+    # (e) the rule
+    if (@([regex]::Matches((NoComments $rootTxt), 'function cycleQpMark\(')).Count -ne 1) { $v555Bad += "(e) cycleQpMark is not declared exactly once (SPEC I218e)" }
+    foreach ($need555 in @('local nextX = n < 20 and sheet["qpWheel_" .. (n + 1)] == "X";', 'if v == "X" then', 'new = nextX and "X" or "";', 'elseif n == 1 or sheet["qpWheel_" .. (n - 1)] == "/" then', 'elseif n == 20 or nextX then')) {
+        if (-not $fn555.Contains($need555)) { $v555Bad += "(e) cycleQpMark lacks '$need555' (SPEC I218e)" }
+    }
+    $tail555 = [regex]::Match($fn555, '(?s)elseif n == 20 or nextX then\s*new = "X";\s*else\s*new = "(.)";\s*end;')
+    if (-not $tail555.Success -or $tail555.Groups[1].Value -ne '/') { $v555Bad += "(e) an isolated empty mark does not take '/' (SPEC I218e, Q132.1)" }
+    # Since the 76th batch (SPEC I219c, V556d) the click writes the two NUMBERS, never a mark.
+    if (@([regex]::Matches($fn555, 'setField\(')).Count -ne 2 -or $fn555.Contains('setField("qpWheel_')) { $v555Bad += "(e) cycleQpMark does not write exactly the two numbers - the ring is renderQpWheel's to draw (SPEC I218e, I219c)" }
+}
+if ($v555Bad) { foreach ($b in $v555Bad) { Fail "V555 $b" } }
+else { Pass "V555 a mage's wheel: twenty marks on the clock beside WILLPOWER, QUINTESSENCE over and PARADOX under, '/' clockwise and 'X' counter-clockwise by the user's rule" }
+
+# ---- V556: the mage's Quintessence and Paradox NUMBERS draw the wheel (SPEC I219) ----
+# User 2026-10-06 (76th batch): type Quintessence and Paradox beside their titles; the wheel shows
+# Q "/" from the first mark and P "X" on the last, X first, Q at most 20 - min(P, 20), P with no
+# ceiling. The numbers are the truth: renderQpWheel is the one writer of the marks, and a click
+# on the ring moves the numbers by what it changed.
+$v556Bad = @()
+$m556 = Doc (Join-Path $dir 'WoD20.1.lfm')
+$box556 = $m556.SelectSingleNode("//layout[@name='boxQuintParadox']")
+$rw556 = NoComments (LuaFn $rootTxt 'renderQpWheel')
+$cq556 = NoComments (LuaFn $rootTxt 'cycleQpMark')
+if ($null -eq $box556 -or -not $rw556 -or -not $cq556) { $v556Bad += "boxQuintParadox, renderQpWheel or cycleQpMark was not found - this check reads nothing (SPEC V20, V209)" }
+else {
+    # (a) the two numbers, each on its title's line and right of it
+    foreach ($pr556 in @(@('edtQpQuint', 'qpQuint', 'QUINTESSENCE'), @('edtQpParadox', 'qpParadox', 'PARADOX'))) {
+        $e556 = $box556.SelectSingleNode("edit[@name='$($pr556[0])']"); $t556 = $box556.SelectSingleNode("label[@text='$($pr556[2])']")
+        if ($null -eq $e556 -or $null -eq $t556) { $v556Bad += "(a) $($pr556[0]) or its title $($pr556[2]) is not in the wheel's box (SPEC I219a)"; continue }
+        if ($e556.GetAttribute('field') -ne $pr556[1] -or $e556.GetAttribute('type') -ne 'number' -or $e556.GetAttribute('decimalPlaces') -ne '0') { $v556Bad += "(a) $($pr556[0]) is not a whole-number edit on $($pr556[1]) (SPEC I219a)" }
+        if ($e556.GetAttribute('top') -ne $t556.GetAttribute('top') -or [int]$e556.GetAttribute('left') -lt [int]$t556.GetAttribute('left') + [int]$t556.GetAttribute('width') + 5 -or [int]$e556.GetAttribute('left') + [int]$e556.GetAttribute('width') -gt 310) { $v556Bad += "(a) $($pr556[0]) is not on $($pr556[2])'s line, right of it and 20 inside the box (SPEC I219a)" }
+        $n556 = 0
+        foreach ($lf556 in Get-ChildItem -Path $dir -Filter '*.lfm') { $n556 += @([regex]::Matches([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf556.FullName)), "field=`"$($pr556[1])`"")).Count }
+        if ($n556 -ne 1) { $v556Bad += "(a) $($pr556[1]) is bound $n556 time(s), not once (SPEC V1)" }
+    }
+    # (b) one writer of the marks, drawn from the numbers, on their dataLink and at open
+    if (@([regex]::Matches((NoComments $rootTxt), 'function renderQpWheel\(')).Count -ne 1) { $v556Bad += "(b) renderQpWheel is not declared exactly once (SPEC I219b)" }
+    $ncAll556 = ''
+    foreach ($lf556 in Get-ChildItem -Path $dir -Filter '*.lfm') { $ncAll556 += NoComments ([regex]::Replace([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf556.FullName)), '(?s)<!--.*?-->', '')) }
+    if (@([regex]::Matches($ncAll556.Replace($rw556, ''), 'setField\("qpWheel_')).Count -ne 0) { $v556Bad += "(b) a mark is written outside renderQpWheel - the ring has one writer, the numbers (SPEC I219b/c)" }
+    foreach ($need556 in @('local x = math.min(p, 20);', 'if q > 20 - x then q = 20 - x; end;', 'setField("qpQuint", q);', 'setField("qpParadox", p);', 'tonumber(sheet.qpQuint)', 'tonumber(sheet.qpParadox)')) {
+        if (-not $rw556.Contains($need556)) { $v556Bad += "(b) renderQpWheel lacks '$need556' (SPEC I219b)" }
+    }
+    if ($rootTxt -notmatch "<dataLink fields=`"\{'qpQuint', 'qpParadox'\}`" onChange=`"renderQpWheel\(\);`"/>") { $v556Bad += "(b) no dataLink on qpQuint and qpParadox draws the ring (SPEC I219b)" }
+    $rd556 = @([regex]::Matches($rootTxt, '(?s)<event name="onNodeReady">(.*?)</event>') | Where-Object { $_.Groups[1].Value -match 'root\.onNodeReady' })
+    if ($rd556.Count -ne 1 -or $rd556[0].Groups[1].Value -notmatch 'renderQpWheel\(\);') { $v556Bad += "(b) the root's onNodeReady does not draw the ring (SPEC I219b)" }
+    # (c) the RULE as written, run on the user's five examples (SPEC I219e). The cap and the two
+    # mark conditions are READ off the Lua and translated, so a change there changes this run.
+    $cap556 = [regex]::Match($rw556, 'local x = math\.min\(p, (\d+)\);')
+    $c1 = [regex]::Match($rw556, 'if (n [<>=]+ [^\r\n]+?) then\s*want = "/";')
+    $c2 = [regex]::Match($rw556, 'elseif (n [<>=]+ [^\r\n]+?) then\s*want = "X";')
+    if (-not ($cap556.Success -and $c1.Success -and $c2.Success)) { $v556Bad += "(c) the cap or the two mark conditions were not read off renderQpWheel - the rule is not run (SPEC V20)" }
+    else {
+        function Ps556([string]$lua) { $s = $lua -replace '\b([nqxp])\b', '$$$1'; $s = $s.Replace('<=', ' -le ').Replace('>=', ' -ge ').Replace('==', ' -eq ').Replace('<', ' -lt ').Replace('>', ' -gt '); return [scriptblock]::Create($s) }
+        $sb1 = Ps556 $c1.Groups[1].Value; $sb2 = Ps556 $c2.Groups[1].Value; $capN = [int]$cap556.Groups[1].Value
+        $cases556 = @(@(5, 4, '/////           XXXX', 5), @(15, 15, '/////XXXXXXXXXXXXXXX', 5), @(25, 0, '////////////////////', 20), @(3, 25, 'XXXXXXXXXXXXXXXXXXXX', 0), @(9, 18, '//XXXXXXXXXXXXXXXXXX', 2))
+        foreach ($cs in $cases556) {
+            $p = $cs[1]; $x = [Math]::Min($p, $capN); $q = $cs[0]; if ($q -gt 20 - $x) { $q = 20 - $x }
+            $ring = ''
+            for ($n = 1; $n -le 20; $n++) { $ring += if (& $sb1) { '/' } elseif (& $sb2) { 'X' } else { ' ' } }
+            if ($ring -ne $cs[2] -or $q -ne $cs[3]) { $v556Bad += "(c) Q $($cs[0]) P $($cs[1]) draws '$ring' with Q $q, not '$($cs[2])' with Q $($cs[3]) (SPEC I219e)" }
+        }
+    }
+    # (d) the click moves the numbers, never a mark
+    if ($cq556.Contains('setField("qpWheel_')) { $v556Bad += "(d) cycleQpMark writes a mark - the numbers are the truth (SPEC I219c)" }
+    foreach ($need556 in @('local q  = math.max(0, math.floor(tonumber(sheet.qpQuint) or 0));', 'local p  = math.max(0, math.floor(tonumber(sheet.qpParadox) or 0));', 'if dq ~= 0 then setField("qpQuint", math.max(0, q + dq)); end;', 'if dx ~= 0 then setField("qpParadox", math.max(0, p + dx)); end;')) {
+        if (-not $cq556.Contains($need556)) { $v556Bad += "(d) cycleQpMark lacks '$need556' - the click moves the numbers by what it changed (SPEC I219c)" }
+    }
+    # (e) the 75th batch's marks are counted before anything is drawn from the numbers
+    $mig556 = $rw556.IndexOf('if sheet.qpQuint == nil and sheet.qpParadox == nil then')
+    $read556 = $rw556.IndexOf('local p = math.max(0, math.floor(tonumber(sheet.qpParadox) or 0));')
+    if ($mig556 -lt 0 -or $read556 -lt 0 -or $mig556 -gt $read556 -or -not $rw556.Contains('setField("qpQuint", slash);') -or -not $rw556.Contains('setField("qpParadox", cross);')) { $v556Bad += "(e) renderQpWheel does not count a 75th-batch sheet's marks into the numbers before drawing (SPEC I219d, Q133.5)" }
+}
+if ($v556Bad) { foreach ($b in $v556Bad) { Fail "V556 $b" } }
+else { Pass "V556 the mage's two numbers draw the wheel - Paradox first and without ceiling, Quintessence in what is left - the user's five examples hold, and a click moves the numbers" }
+
+# ---- V557: each number of the mage's wheel sits close to its title (SPEC I220) ----
+# User 2026-10-06 (77th batch): the Quintessence number by the word Quintessence, the Paradox
+# number by Paradox. The title is right-aligned and ends exactly 5 before its 40-wide number, and
+# the pair stands about the box's middle - measured here on the gate's ruler (NeededPx, the PT
+# name when longer), within 10 of 165.
+$v557Bad = @()
+$box557 = (Doc (Join-Path $dir 'WoD20.1.lfm')).SelectSingleNode("//layout[@name='boxQuintParadox']")
+$seen557 = 0
+foreach ($pr557 in @(@('QUINTESSENCE', 'edtQpQuint'), @('PARADOX', 'edtQpParadox'))) {
+    $t557 = if ($null -ne $box557) { $box557.SelectSingleNode("label[@text='$($pr557[0])']") } else { $null }
+    $e557 = if ($null -ne $box557) { $box557.SelectSingleNode("edit[@name='$($pr557[1])']") } else { $null }
+    if ($null -eq $t557 -or $null -eq $e557) { continue }
+    $seen557++
+    $tl = [int]$t557.GetAttribute('left'); $tw = [int]$t557.GetAttribute('width'); $el = [int]$e557.GetAttribute('left'); $ew = [int]$e557.GetAttribute('width')
+    # (a) the line
+    if ($t557.GetAttribute('top') -ne $e557.GetAttribute('top') -or $tl -ne 20 -or $t557.GetAttribute('horzTextAlign') -ne 'trailing' -or $tl + $tw + 5 -ne $el -or $ew -ne 40 -or $el + $ew -gt 310) {
+        $v557Bad += "(a) $($pr557[0]) and $($pr557[1]) are not one line - a right-aligned title from 20 ending 5 before a 40-wide number inside the box (SPEC I220a/b/c)"
+    }
+    # (b) the pair about the middle
+    $need557 = NeededPx $pr557[0] $null
+    $start557 = $el - 5 - $need557; $end557 = $el + $ew
+    if ([Math]::Abs(($start557 + $end557) - 330) / 2 -gt 10) { $v557Bad += "(b) the $($pr557[0]) pair runs $start557..$end557 on the gate's ruler - its middle is more than 10 from the box's 165 (SPEC I220a/b, Q134.1)" }
+}
+if ($seen557 -ne 2) { $v557Bad += "only $seen557 of the 2 title/number pairs found in boxQuintParadox - this check reads nothing (SPEC V20, V209)" }
+if ($v557Bad) { foreach ($b in $v557Bad) { Fail "V557 $b" } }
+else { Pass "V557 the mage's two numbers sit 5 after their right-aligned titles, each pair about the wheel box's middle" }
 
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

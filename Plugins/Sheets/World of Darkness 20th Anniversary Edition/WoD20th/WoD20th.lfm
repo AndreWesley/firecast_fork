@@ -2051,6 +2051,91 @@
 				regroupHealthMarks();
 			end;
 
+			-- A MAGE's Quintessence / Paradox wheel (user 2026-10-06, SPEC I218e, V555e): twenty marks,
+			-- 1 to 20 clockwise, each "", "/" or "X". Quintessence ("/") grows clockwise from 1 and
+			-- Paradox ("X") counter-clockwise from 20, so an empty mark takes "/" after a "/" (or as
+			-- the first), "X" before an "X" (or as the last), and "/" when it touches neither. An "X"
+			-- clears; a "/" turns "X" when the next mark clockwise is one - Paradox eating
+			-- Quintessence - and clears otherwise. The wheel does not wrap: 20 is the end (Q132.5).
+			function cycleQpMark(n)
+				if sheet == nil then return; end;
+
+				local v     = sheet["qpWheel_" .. n] or "";
+				local nextX = n < 20 and sheet["qpWheel_" .. (n + 1)] == "X";
+				local new;
+
+				if v == "X" then
+					new = "";
+				elseif v == "/" then
+					new = nextX and "X" or "";
+				elseif n == 1 or sheet["qpWheel_" .. (n - 1)] == "/" then
+					new = "/";
+				elseif n == 20 or nextX then
+					new = "X";
+				else
+					new = "/";
+				end;
+
+				-- The NUMBERS are the truth since the 76th batch (user 2026-10-06, SPEC I219c, V556d):
+				-- the click moves them by what it changed, on the numbers and not on a count of the
+				-- ring, so a Paradox over 20 loses one and the ring stays full. renderQpWheel redraws.
+				local q  = math.max(0, math.floor(tonumber(sheet.qpQuint) or 0));
+				local p  = math.max(0, math.floor(tonumber(sheet.qpParadox) or 0));
+				local dq = (new == "/" and 1 or 0) - (v == "/" and 1 or 0);
+				local dx = (new == "X" and 1 or 0) - (v == "X" and 1 or 0);
+
+				if dq ~= 0 then setField("qpQuint", math.max(0, q + dq)); end;
+				if dx ~= 0 then setField("qpParadox", math.max(0, p + dx)); end;
+			end;
+
+			-- The ring drawn from the two numbers (user 2026-10-06, SPEC I219b, V556b) - the ONE writer
+			-- of qpWheel_*. Paradox comes first and has no ceiling: its "X" fill the LAST marks, twenty
+			-- at most. Quintessence takes what is left from the first mark on, so the number itself
+			-- comes down to fit (Q133.1: 15 and 15 make 5 and 15; 25 and 0 make 20). A
+			-- negative or broken number reads as 0 and is written back (Q133.4). Only what differs is
+			-- written; the numbers' dataLink calls this, and the writes back come round once, equal.
+			function renderQpWheel()
+				if sheet == nil then return; end;
+
+				-- A sheet marked in the 75th batch has marks and no numbers: they are counted ONCE,
+				-- before the numbers redraw the ring - the other order would wipe what the player
+				-- marked (SPEC I219d, Q133.5). With both numbers nil and no mark, nothing is written.
+				if sheet.qpQuint == nil and sheet.qpParadox == nil then
+					local slash, cross = 0, 0;
+
+					for n = 1, 20, 1 do
+						if sheet["qpWheel_" .. n] == "/" then slash = slash + 1; end;
+						if sheet["qpWheel_" .. n] == "X" then cross = cross + 1; end;
+					end;
+
+					if slash + cross > 0 then
+						setField("qpQuint", slash);
+						setField("qpParadox", cross);
+					end;
+				end;
+
+				local p = math.max(0, math.floor(tonumber(sheet.qpParadox) or 0));
+				local x = math.min(p, 20);
+				local q = math.max(0, math.floor(tonumber(sheet.qpQuint) or 0));
+
+				if q > 20 - x then q = 20 - x; end;
+
+				if sheet.qpQuint ~= nil and tonumber(sheet.qpQuint) ~= q then setField("qpQuint", q); end;
+				if sheet.qpParadox ~= nil and tonumber(sheet.qpParadox) ~= p then setField("qpParadox", p); end;
+
+				for n = 1, 20, 1 do
+					local want = "";
+
+					if n <= q then
+						want = "/";
+					elseif n > 20 - x then
+						want = "X";
+					end;
+
+					if (sheet["qpWheel_" .. n] or "") ~= want then setField("qpWheel_" .. n, want); end;
+				end;
+			end;
+
 
 			-- `form` is the tab form; `prefix` names its ten rows: the layout `<prefix>rowN`
 			-- holds the level label `<prefix>N` and the clickable mark box.
@@ -2750,6 +2835,7 @@
 				names.boxRoad = true;
 				names.boxVirtues = true;
 				names.boxVirtues3 = true;
+				names.boxQuintParadox = true;
 
 				local found = xpFind(tabRootOf(from), names, {});
 
@@ -2845,6 +2931,11 @@
 
 					if c ~= nil and c.visible == mage then c.visible = not mage; end;
 				end;
+
+				-- The Quintessence / Paradox wheel takes ROAD's slot, a mage's alone (SPEC I218a).
+				local wheel = found["boxQuintParadox"];
+
+				if wheel ~= nil and wheel.visible ~= mage then wheel.visible = mage; end;
 
 				-- The Vampire tab with the True Faith merit (SPEC I214e, V551), through the same
 				-- writer and the same XML cache. The weakness re-centres in its new box afterwards:
@@ -11093,6 +11184,10 @@
 		Ghoul brings the Main's pool and its ceiling. No vampFlagsOff here - it would turn a mage's
 		Show Ghoul back off the moment it went on.
 	-->
+	<!-- The mage's Quintessence and Paradox (user 2026-10-06, SPEC I219b, V556b): the numbers draw
+	     the ring, typed or moved by a click on it. -->
+	<dataLink fields="{'qpQuint', 'qpParadox'}" onChange="renderQpWheel();"/>
+
 	<dataLink fields="{'stShowNumina', 'stShowDisciplines'}">
 		<event name="onChange">
 			applyTabVisibility(self);
@@ -11210,6 +11305,10 @@
 		-- and the Vampire tab's ceilings. Both only paint - the fields are read, never written.
 		renderGameMode(self);
 		renderVampCaps(self);
+
+		-- The mage's wheel at open (user 2026-10-06, SPEC I219b/d): it counts a 75th-batch sheet's
+		-- marks into the numbers first, then draws.
+		renderQpWheel();
 
 		-- The font the player last chose, put back on all eight description panes (SPEC I103c,
 		-- V334e). One walk, at open, and it writes nothing: the field is READ here and only
