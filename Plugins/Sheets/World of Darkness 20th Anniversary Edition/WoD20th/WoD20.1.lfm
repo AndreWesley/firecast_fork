@@ -351,10 +351,12 @@
 		     vampire's and mortal's 246 nothing on screen moves - the name is left-aligned. -->
 		<!-- Name and penalty are two labels since the 80th batch (user 2026-10-07, SPEC I223c, V563): the
 		     name starts on the row's left edge in every row, and "(-N)" is right-aligned 2 before its box,
-		     4 after the name. renderHealthTrack splits the text it used to write whole. -->
+		     4 after the name. renderHealthTrack splits the text it used to write whole. Since the 83rd
+		     batch (user 2026-10-07, SPEC I226e, V568d) the number sits 5 from its box: the label is 23, not
+		     26 - the 3 come off the room left of "-5", and the row keeps its width. -->
 		<template name="HealthRow">
 			<label name="dynHealth_$(num)" left="0" top="0" width="191" height="20" anchors="left top right"/>
-			<label name="dynHealth_pen$(num)" left="195" top="0" width="26" height="20" anchors="top right" horzTextAlign="trailing"/>
+			<label name="dynHealth_pen$(num)" left="195" top="0" width="23" height="20" anchors="top right" horzTextAlign="trailing"/>
 			<rectangle left="223" top="0" width="22" height="20" anchors="top right" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" hitTest="true" cursor="handPoint" onClick="cycleHealthMark($(num));" onMenu="healHealthMark();">
 				<label align="client" field="health_$(num)" horzTextAlign="center" vertTextAlign="center"/>
 			</rectangle>
@@ -983,33 +985,34 @@
 			<label left="20" top="15" width="107" height="20" text="QUINTESSENCE" horzTextAlign="trailing"/>
 			<edit name="edtQpQuint" field="qpQuint" type="number" decimalPlaces="0" left="132" top="15" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
 			<layout name="qpRing" left="20" top="42" width="160" height="160">
-				<rectangle name="qpMark_1" left="0" top="61" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="279" hitTest="true" cursor="handPoint" onClick="cycleQpMark(1);"/>
-				<rectangle name="qpMark_2" left="7" top="39" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="297" hitTest="true" cursor="handPoint" onClick="cycleQpMark(2);"/>
-				<rectangle name="qpMark_3" left="20" top="20" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="315" hitTest="true" cursor="handPoint" onClick="cycleQpMark(3);"/>
-				<rectangle name="qpMark_4" left="39" top="7" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="333" hitTest="true" cursor="handPoint" onClick="cycleQpMark(4);"/>
-				<rectangle name="qpMark_5" left="61" top="0" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="351" hitTest="true" cursor="handPoint" onClick="cycleQpMark(5);"/>
-				<rectangle name="qpMark_6" left="83" top="0" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="9" hitTest="true" cursor="handPoint" onClick="cycleQpMark(6);"/>
-				<rectangle name="qpMark_7" left="105" top="7" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="27" hitTest="true" cursor="handPoint" onClick="cycleQpMark(7);"/>
-				<rectangle name="qpMark_8" left="124" top="20" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="45" hitTest="true" cursor="handPoint" onClick="cycleQpMark(8);"/>
-				<rectangle name="qpMark_9" left="137" top="39" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="63" hitTest="true" cursor="handPoint" onClick="cycleQpMark(9);"/>
-				<rectangle name="qpMark_10" left="144" top="61" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="81" hitTest="true" cursor="handPoint" onClick="cycleQpMark(10);"/>
-				<rectangle name="qpMark_11" left="144" top="83" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="99" hitTest="true" cursor="handPoint" onClick="cycleQpMark(11);"/>
-				<rectangle name="qpMark_12" left="137" top="105" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="117" hitTest="true" cursor="handPoint" onClick="cycleQpMark(12);"/>
-				<rectangle name="qpMark_13" left="124" top="124" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="135" hitTest="true" cursor="handPoint" onClick="cycleQpMark(13);"/>
-				<rectangle name="qpMark_14" left="105" top="137" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="153" hitTest="true" cursor="handPoint" onClick="cycleQpMark(14);"/>
-				<rectangle name="qpMark_15" left="83" top="144" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="171" hitTest="true" cursor="handPoint" onClick="cycleQpMark(15);"/>
-				<rectangle name="qpMark_16" left="61" top="144" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="189" hitTest="true" cursor="handPoint" onClick="cycleQpMark(16);"/>
-				<rectangle name="qpMark_17" left="39" top="137" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="207" hitTest="true" cursor="handPoint" onClick="cycleQpMark(17);"/>
-				<rectangle name="qpMark_18" left="20" top="124" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="225" hitTest="true" cursor="handPoint" onClick="cycleQpMark(18);"/>
-				<rectangle name="qpMark_19" left="7" top="105" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="243" hitTest="true" cursor="handPoint" onClick="cycleQpMark(19);"/>
-				<rectangle name="qpMark_20" left="0" top="83" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="1" xradius="2" yradius="2" rotationAngle="261" hitTest="true" cursor="handPoint" onClick="cycleQpMark(20);"/>
+				<rectangle name="qpMark_1" left="0" top="61" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="279" hitTest="true" cursor="handPoint" onClick="cycleQpMark(1);"/>
+				<rectangle name="qpMark_2" left="7" top="39" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="297" hitTest="true" cursor="handPoint" onClick="cycleQpMark(2);"/>
+				<rectangle name="qpMark_3" left="20" top="20" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="315" hitTest="true" cursor="handPoint" onClick="cycleQpMark(3);"/>
+				<rectangle name="qpMark_4" left="39" top="7" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="333" hitTest="true" cursor="handPoint" onClick="cycleQpMark(4);"/>
+				<rectangle name="qpMark_5" left="61" top="0" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="351" hitTest="true" cursor="handPoint" onClick="cycleQpMark(5);"/>
+				<rectangle name="qpMark_6" left="83" top="0" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="9" hitTest="true" cursor="handPoint" onClick="cycleQpMark(6);"/>
+				<rectangle name="qpMark_7" left="105" top="7" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="27" hitTest="true" cursor="handPoint" onClick="cycleQpMark(7);"/>
+				<rectangle name="qpMark_8" left="124" top="20" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="45" hitTest="true" cursor="handPoint" onClick="cycleQpMark(8);"/>
+				<rectangle name="qpMark_9" left="137" top="39" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="63" hitTest="true" cursor="handPoint" onClick="cycleQpMark(9);"/>
+				<rectangle name="qpMark_10" left="144" top="61" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="81" hitTest="true" cursor="handPoint" onClick="cycleQpMark(10);"/>
+				<rectangle name="qpMark_11" left="144" top="83" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="99" hitTest="true" cursor="handPoint" onClick="cycleQpMark(11);"/>
+				<rectangle name="qpMark_12" left="137" top="105" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="117" hitTest="true" cursor="handPoint" onClick="cycleQpMark(12);"/>
+				<rectangle name="qpMark_13" left="124" top="124" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="135" hitTest="true" cursor="handPoint" onClick="cycleQpMark(13);"/>
+				<rectangle name="qpMark_14" left="105" top="137" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="153" hitTest="true" cursor="handPoint" onClick="cycleQpMark(14);"/>
+				<rectangle name="qpMark_15" left="83" top="144" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="171" hitTest="true" cursor="handPoint" onClick="cycleQpMark(15);"/>
+				<rectangle name="qpMark_16" left="61" top="144" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="189" hitTest="true" cursor="handPoint" onClick="cycleQpMark(16);"/>
+				<rectangle name="qpMark_17" left="39" top="137" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="207" hitTest="true" cursor="handPoint" onClick="cycleQpMark(17);"/>
+				<rectangle name="qpMark_18" left="20" top="124" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="225" hitTest="true" cursor="handPoint" onClick="cycleQpMark(18);"/>
+				<rectangle name="qpMark_19" left="7" top="105" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="243" hitTest="true" cursor="handPoint" onClick="cycleQpMark(19);"/>
+				<rectangle name="qpMark_20" left="0" top="83" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="261" hitTest="true" cursor="handPoint" onClick="cycleQpMark(20);"/>
 			</layout>
 			<label left="20" top="209" width="87" height="20" text="PARADOX" horzTextAlign="trailing"/>
 			<edit name="edtQpParadox" field="qpParadox" type="number" decimalPlaces="0" left="112" top="209" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
 		</layout>
 
 		<!-- ARETE over SPHERES, a MAGE's alone (user 2026-10-06, SPEC I221c, V559, V560): the slot between
-		     the wheel and HEALTH, 664 x 244 since the 80th batch (SPEC I223f) - the wheel's height, the "double box". Arete's first dot is
+		     the wheel and HEALTH, 664 x 244 since the 80th batch (SPEC I223f) - the wheel's height, the "double box". Two boxes
+		     since the 82nd batch (user 2026-10-07, SPEC I225e, V567e): ARETE 89 over SPHERES 150, 5 between. Arete's first dot is
 		     a fixed image, as a Virtue's (it starts at 1); the nine after it buy with XP. Since the 80th
 		     batch (user 2026-10-07, SPEC I223e/f, Q137.1b, V564) a sphere row is an ability's: body font
 		     and 25px dots. Each column is as wide as its longest name (98, 46, 59 by the gate's ruler) +
@@ -1017,10 +1020,10 @@
 		     is what closes the bottom row on 1375 with HEALTH at 206. Each dot from the 2nd has a
 		     faded EMPTY twin (scap_) for the levels over Arete, the mcap pair of the attributes, swapped
 		     by renderSpheres (SPEC I221j). Hidden here: renderGameMode shows it to a mage only. -->
-		<layout name="boxArete" left="500" top="597" width="664" height="244" visible="false">
+		<layout name="boxArete" left="500" top="597" width="664" height="89" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="624" height="20" text="ARETE" horzTextAlign="center"/>
-			<layout name="areteRow" left="207" top="45" width="250" height="25">
+			<layout name="areteRow" left="207" top="44" width="250" height="25">
 				<image left="0" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
 				<imageCheckBox name="arete_2" left="25" top="0" width="25" height="25" field="arete_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('arete_2', self);"/>
 				<imageCheckBox name="arete_3" left="50" top="0" width="25" height="25" field="arete_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('arete_3', self);"/>
@@ -1032,8 +1035,12 @@
 				<imageCheckBox name="arete_9" left="200" top="0" width="25" height="25" field="arete_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('arete_9', self);"/>
 				<imageCheckBox name="arete_10" left="225" top="0" width="25" height="25" field="arete_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('arete_10', self);"/>
 			</layout>
-			<label left="20" top="95" width="624" height="20" text="SPHERES" horzTextAlign="center"/>
-			<layout name="sphRow_correspondence" left="20" top="125" width="225" height="25">
+		</layout>
+
+		<layout name="boxSpheres" left="500" top="691" width="664" height="150" visible="false">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label left="20" top="15" width="624" height="20" text="SPHERES" horzTextAlign="center"/>
+			<layout name="sphRow_correspondence" left="20" top="44" width="225" height="25">
 				<label left="0" top="5" width="98" height="20" text="Correspondence"/>
 				<imageCheckBox name="sphere_correspondence_1" left="100" top="0" width="25" height="25" field="sphere_correspondence_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_correspondence_1', self);"/>
 				<imageCheckBox name="sphere_correspondence_2" left="125" top="0" width="25" height="25" field="sphere_correspondence_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_correspondence_2', self);"/>
@@ -1045,7 +1052,7 @@
 				<imageCheckBox name="scap_correspondence_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_correspondence_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_entropy" left="20" top="155" width="225" height="25">
+			<layout name="sphRow_entropy" left="20" top="74" width="225" height="25">
 				<label left="0" top="5" width="98" height="20" text="Entropy"/>
 				<imageCheckBox name="sphere_entropy_1" left="100" top="0" width="25" height="25" field="sphere_entropy_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_entropy_1', self);"/>
 				<imageCheckBox name="sphere_entropy_2" left="125" top="0" width="25" height="25" field="sphere_entropy_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_entropy_2', self);"/>
@@ -1057,7 +1064,7 @@
 				<imageCheckBox name="scap_entropy_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_entropy_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_forces" left="20" top="185" width="225" height="25">
+			<layout name="sphRow_forces" left="20" top="104" width="225" height="25">
 				<label left="0" top="5" width="98" height="20" text="Forces"/>
 				<imageCheckBox name="sphere_forces_1" left="100" top="0" width="25" height="25" field="sphere_forces_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_forces_1', self);"/>
 				<imageCheckBox name="sphere_forces_2" left="125" top="0" width="25" height="25" field="sphere_forces_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_forces_2', self);"/>
@@ -1069,7 +1076,7 @@
 				<imageCheckBox name="scap_forces_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_forces_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_life" left="265" top="125" width="173" height="25">
+			<layout name="sphRow_life" left="265" top="44" width="173" height="25">
 				<label left="0" top="5" width="46" height="20" text="Life"/>
 				<imageCheckBox name="sphere_life_1" left="48" top="0" width="25" height="25" field="sphere_life_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_1', self);"/>
 				<imageCheckBox name="sphere_life_2" left="73" top="0" width="25" height="25" field="sphere_life_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_2', self);"/>
@@ -1081,7 +1088,7 @@
 				<imageCheckBox name="scap_life_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_life_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_matter" left="265" top="155" width="173" height="25">
+			<layout name="sphRow_matter" left="265" top="74" width="173" height="25">
 				<label left="0" top="5" width="46" height="20" text="Matter"/>
 				<imageCheckBox name="sphere_matter_1" left="48" top="0" width="25" height="25" field="sphere_matter_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_1', self);"/>
 				<imageCheckBox name="sphere_matter_2" left="73" top="0" width="25" height="25" field="sphere_matter_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_2', self);"/>
@@ -1093,7 +1100,7 @@
 				<imageCheckBox name="scap_matter_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_matter_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_mind" left="265" top="185" width="173" height="25">
+			<layout name="sphRow_mind" left="265" top="104" width="173" height="25">
 				<label left="0" top="5" width="46" height="20" text="Mind"/>
 				<imageCheckBox name="sphere_mind_1" left="48" top="0" width="25" height="25" field="sphere_mind_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_1', self);"/>
 				<imageCheckBox name="sphere_mind_2" left="73" top="0" width="25" height="25" field="sphere_mind_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_2', self);"/>
@@ -1105,7 +1112,7 @@
 				<imageCheckBox name="scap_mind_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_mind_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_prime" left="458" top="125" width="186" height="25">
+			<layout name="sphRow_prime" left="458" top="44" width="186" height="25">
 				<label left="0" top="5" width="59" height="20" text="Prime"/>
 				<imageCheckBox name="sphere_prime_1" left="61" top="0" width="25" height="25" field="sphere_prime_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_1', self);"/>
 				<imageCheckBox name="sphere_prime_2" left="86" top="0" width="25" height="25" field="sphere_prime_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_2', self);"/>
@@ -1117,7 +1124,7 @@
 				<imageCheckBox name="scap_prime_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_prime_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_spirit" left="458" top="155" width="186" height="25">
+			<layout name="sphRow_spirit" left="458" top="74" width="186" height="25">
 				<label left="0" top="5" width="59" height="20" text="Spirit"/>
 				<imageCheckBox name="sphere_spirit_1" left="61" top="0" width="25" height="25" field="sphere_spirit_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_1', self);"/>
 				<imageCheckBox name="sphere_spirit_2" left="86" top="0" width="25" height="25" field="sphere_spirit_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_2', self);"/>
@@ -1129,7 +1136,7 @@
 				<imageCheckBox name="scap_spirit_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_spirit_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_time" left="458" top="185" width="186" height="25">
+			<layout name="sphRow_time" left="458" top="104" width="186" height="25">
 				<label left="0" top="5" width="59" height="20" text="Time"/>
 				<imageCheckBox name="sphere_time_1" left="61" top="0" width="25" height="25" field="sphere_time_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_1', self);"/>
 				<imageCheckBox name="sphere_time_2" left="86" top="0" width="25" height="25" field="sphere_time_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_2', self);"/>

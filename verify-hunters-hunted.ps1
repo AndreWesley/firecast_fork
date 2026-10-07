@@ -1290,8 +1290,8 @@ else { Pass "V37 no sibling row draws over its neighbour ($twinByRect twin row(s
 # the vampire's: $MAGE_ONLY is skipped by V534(b) and measured on the mage's own by V554/V555.
 # boxArete since the 78th batch (SPEC I221c): ARETE / SPHERES, the same kind of box beside the wheel;
 # boxArete3 its Combat copy, 5 under the Rate of Fire foot and not under ARMOR - V560d holds its rect.
-$VAMP_ONLY = @{ 'mainBloodPool' = $true; 'boxQuintParadox' = $true; 'boxArete' = $true; 'boxArete3' = $true }
-$MAGE_ONLY = @{ 'boxQuintParadox' = $true; 'boxArete' = $true; 'boxArete3' = $true }
+$VAMP_ONLY = @{ 'mainBloodPool' = $true; 'boxQuintParadox' = $true; 'boxArete' = $true; 'boxArete3' = $true; 'boxSpheres' = $true; 'boxSpheres3' = $true }
+$MAGE_ONLY = @{ 'boxQuintParadox' = $true; 'boxArete' = $true; 'boxArete3' = $true; 'boxSpheres' = $true; 'boxSpheres3' = $true }   # boxSpheres* since the 82nd batch (SPEC I225e)
 $gpRoot = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20th.lfm")))
 $gpTbl = [regex]::Match($gpRoot, '(?s)GAME_ROWS = \{(.*?)\n\t\t\t\};')
 if (-not $gpTbl.Success) { Fail "V534 (f) GAME_ROWS was not found on the root form - the mortal projection cannot be built (SPEC V534f, V553d, V20)" }
@@ -1665,9 +1665,12 @@ $floorCut = 0
 $bandCut68 = 0
 $dockFloorCut68 = 0
 $tipFloorCut68 = 0
-$scrimCut68 = 0
+$scrimCut68 = 0; $itemCut68 = 0
 foreach ($f in $files) {
     foreach ($r in (Doc $f.FullName).SelectNodes("//rectangle[@color='black']")) {
+        # The Magick list item is the box black but a SUB-box (SPEC I225a, B204): sectionBox names it
+        # out and XP_FRAME gives it the era's corner at its own small radius. Cut by name and counted.
+        if ($r.GetAttribute("name") -eq 'magickItemFrame') { $itemCut68++; continue }
         # The two tip backgrounds (SPEC I177a(iii), 32nd batch): authored black so applyTheme
         # gives them the era's box fill, at opacity 0.50 - a backdrop floating over the boxes,
         # not a box, so no corner. Cut by the PARENT's exact name, as V40/V287 cut the tips.
@@ -1693,6 +1696,7 @@ if ($floorCut -ne 1) { Fail "V68 the strip-floor cut matched $floorCut rectangle
 elseif ($bandCut68 -ne 1) { Fail "V68 the highlight-band cut matched $bandCut68 rectangle(s), expected exactly 1 - the band is xpHiRow's backdrop and nothing else on the sheet is built that way (SPEC I165a, V484f, V209)" }
 elseif ($dockFloorCut68 -ne 1) { Fail "V68 the mcDock-floor cut matched $dockFloorCut68 rectangle(s), expected exactly 1 - mcDock's own backdrop is the only align=contents black rectangle on the sheet besides the two tip backgrounds (SPEC I169b, V209)" }
 elseif ($tipFloorCut68 -ne 2) { Fail "V68 the tip-background cut matched $tipFloorCut68 rectangle(s), expected exactly 2 - noteTip's and specTip's (SPEC I177a, V513f, V209)" }
+elseif ($itemCut68 -ne 1) { Fail "V68 the Magick-item cut matched $itemCut68 rectangle(s), expected exactly 1 - WoD20.17's magickItemFrame (SPEC I225a, V209)" }
 elseif ($scrimCut68 -ne 2) { Fail "V68 the scrim cut matched $scrimCut68 rectangle(s), expected exactly 2 - popScrim and popScrimB are the only black align=contents rectangles outside the tips and mcDock (SPEC I182a, V209)" }
 elseif ($boxSeen -lt 60) { Fail "V68 only $boxSeen black section box(es) were read, expected at least 60 - this check is covering less than the sheet has (SPEC V209)" }
 elseif ($corners.Count -eq 0) { Fail "V68 no black section box found - the check has nothing to measure" }
@@ -1813,7 +1817,7 @@ $V532_POOL = @("BLOOD POOL")
 $V541_STACK = @("ROAD", "WILLPOWER")
 # The MAGE's Quintessence / Paradox wheel since the 75th batch (SPEC I218a): hidden in the mortal
 # XML and placed for the mage, where it closes on EXPERIENCE's foot - V555(a) pins that line.
-$V555_WHEEL = @("QUINTESSENCE", "ARETE")   # ARETE since the 78th batch: the wheel's height beside it (SPEC I221c, V559a)
+$V555_WHEEL = @("QUINTESSENCE", "ARETE", "SPHERES")   # SPHERES since the 82nd batch: its own box under ARETE (SPEC I225e)   # ARETE since the 78th batch: the wheel's height beside it (SPEC I221c, V559a)
 $v376Roster = @($V393_PINNED) + @($V415_AVATAR) + @($V532_POOL) + @($V541_STACK) + @($V555_WHEEL)
 $missing = @($closers | Where-Object { -not $mainBottom.ContainsKey($_) })
 if (-not $mapY.Success) { Fail "V376 the tab's grid comment no longer says where the tab closes - the ruler would be a literal in the gate again (SPEC V20)" }
@@ -2761,7 +2765,7 @@ $themeKeys = @([regex]::Matches($themesBlock, '(?m)^\t{4}\["([^"]+)"\] = \{') | 
 if ($themeKeys.Count -eq 0) { Fail "V52/V53/V63 no palette found inside THEMES" }
 else { Pass "V52 THEMES declares $($themeKeys.Count) palettes: $($themeKeys -join ', ')" }
 
-$themeFn = [regex]::Match($hh6, 'local function applyTheme\(v, from\)(.*?)\n\t\t\tend;', 'Singleline')
+$themeFn = [regex]::Match($hh6, 'local function applyTheme\(v, from(?:, only)?\)(.*?)\n\t\t\tend;', 'Singleline')
 if (-not $themeFn.Success) { Fail "V52..V58 applyTheme not found in WoD20.6.lfm - every theme check below is a no-op" }
 else {
     $body = $themeFn.Groups[1].Value
@@ -2883,7 +2887,7 @@ else {
         # The fallback is still THEME_STROKE and the authored value is still the way back out
         # (V316c): drop either and the eras that declare nothing lose their outline the moment the
         # Classical has been on, with rdk -l exiting 0 and this gate green (B58, B62).
-        $hairRe = 'paint\(c, "strokeSize", \(hair and t\.outline\) or THEME_STROKE, authored\(c, "strokeSize"\)\);'
+        $hairRe = 'paint\(c, "strokeSize", (?:\(wheel and authored\(c, "strokeSize"\)\) or )?\(hair and t\.outline\) or THEME_STROKE, authored\(c, "strokeSize"\)\);'   # the wheel's own 1px since the 82nd batch (SPEC I225c, V567c)
         $fenceRe = 'local hair = t\.outline ~= nil and sectionBox\(c, fill\);'
         $outlines = [regex]::Matches($themesBlock, '(?m)^\s+outline\s*=\s*([0-9.]+),')
 
@@ -12374,7 +12378,7 @@ $v316Bad = @()
 
 $sbFn316   = LuaFn $hh6 'sectionBox'
 $ornFn316  = LuaFn $hh6 'ornament'
-$themeM316 = [regex]::Match($hh6, 'local function applyTheme\(v, from\)(.*?)\n\t\t\tend;', 'Singleline')
+$themeM316 = [regex]::Match($hh6, 'local function applyTheme\(v, from(?:, only)?\)(.*?)\n\t\t\tend;', 'Singleline')
 $body316   = if ($themeM316.Success) { NoComments $themeM316.Groups[1].Value } else { '' }
 $boxr316   = [regex]::Match($hh6, '(?m)^\s*local ORN_BOXR\s*=\s*([0-9.]+);')
 $props316  = @('cornerType', 'xradius', 'yradius')
@@ -12493,7 +12497,7 @@ $v427Bad = @()
 $roster427 = [regex]::Match($hh6, '(?s)local XP_FRAME\s*=\s*\{(.*?)\};')
 $names427 = @()
 if ($roster427.Success) { $names427 = @([regex]::Matches($roster427.Groups[1].Value, '(\w+)\s*=\s*true') | ForEach-Object { $_.Groups[1].Value } | Sort-Object) }
-$want427 = @($V417_XP | ForEach-Object { $_.E -replace '^edt', 'bg' } | Sort-Object)
+$want427 = @(@($V417_XP | ForEach-Object { $_.E -replace '^edt', 'bg' }) + @('magickItemFrame') | Sort-Object)   # + the Magick list item since the 82nd batch (SPEC I225a)
 if (-not $roster427.Success) { $v427Bad += "(a) XP_FRAME is not declared in WoD20.6 - the six frames have no roster and the corner never reaches them (SPEC V427a, V209)" }
 elseif (Compare-Object $names427 $want427) { $v427Bad += "(a) XP_FRAME names [$($names427 -join ', ')] and the six frames of V417 are [$($want427 -join ', ')] - a frame off the roster stays round in one era only, the shape of B6 (SPEC V427a)" }
 $blk427 = [regex]::Match($body316, '(?s)if XP_FRAME\[nm\] then(.*?)\n\s*end;')
@@ -12619,7 +12623,7 @@ if ($boxr317.Success) {
     $xr317 = @{}
     $seen317 = 0
     foreach ($f in $files) {
-        foreach ($r317 in (Doc $f.FullName).SelectNodes("//rectangle[@color='black'][@xradius]")) {
+        foreach ($r317 in (Doc $f.FullName).SelectNodes("//rectangle[@color='black'][@xradius][not(@name='magickItemFrame')]")) {
             $seen317++
             $xr317[$r317.GetAttribute("xradius")] = $true
         }
@@ -12871,7 +12875,7 @@ foreach ($f in $files) {
     }
 }
 if ($v280Apply -ne 1) { Fail "V280 $v280Apply titleless one-button box(es) were cut, expected the 1 the Apply box is (SPEC I163f, V479c, V209, B7)" }
-elseif ($v280Boxes.Count -ne 80) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 80 I73 measures (77 until the 80th batch gave a mage the Magick tab, SPEC I223h) (75 until the 78th batch gave a mage ARETE / SPHERES and its Combat copy, SPEC I221c/k) (74 until the 75th batch gave a mage the Quintessence / Paradox wheel, SPEC I218a) (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
+elseif ($v280Boxes.Count -ne 82) { Fail "V280 $($v280Boxes.Count) section box(es) were collected, expected the 82 I73 measures (80 until the 82nd batch split ARETE and SPHERES, SPEC I225e) (77 until the 80th batch gave a mage the Magick tab, SPEC I223h) (75 until the 78th batch gave a mage ARETE / SPHERES and its Combat copy, SPEC I221c/k) (74 until the 75th batch gave a mage the Quintessence / Paradox wheel, SPEC I218a) (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - the construction filter stopped matching and both legs below would be reading a fraction of the sheet (SPEC V209, I73). Was 73 until T872 took the three Ghoul DESCRIPTION boxes away and 70 until T874 took the four Numina ones (SPEC V365d)" }
 else {
     # (a) TWO numbers since T913: 20 on the X sides, 15 on the Y ones (SPEC I137c, user
     # 2026-09-02). The X pair is a FLOOR and always was. The Y pair splits: the FOOT is a floor,
@@ -13036,7 +13040,7 @@ else { Pass "V280 (d) the $($colBottoms.Count) Ghoul columns all close at $(@($c
 # box standing between them. Scope is box-to-box ONLY - button-to-button (4) and bar-to-pane
 # (12 and 4) belong to V281/V299 and V232, and I76a names them as staying out, so reddening
 # on them would be a false alarm on numbers this round agreed not to touch.
-if ($v280Boxes.Count -ne 80) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 80 I73 measures (77 until the 80th batch gave a mage the Magick tab, SPEC I223h) (75 until the 78th batch gave a mage ARETE / SPHERES and its Combat copy, SPEC I221c/k) (74 until the 75th batch gave a mage the Quintessence / Paradox wheel, SPEC I218a) (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
+if ($v280Boxes.Count -ne 82) { Fail "V298 $($v280Boxes.Count) section box(es) were collected, expected the 82 I73 measures (80 until the 82nd batch split ARETE and SPHERES, SPEC I225e) (77 until the 80th batch gave a mage the Magick tab, SPEC I223h) (75 until the 78th batch gave a mage ARETE / SPHERES and its Combat copy, SPEC I221c/k) (74 until the 75th batch gave a mage the Quintessence / Paradox wheel, SPEC I218a) (73 until the 57th batch gave the Vampire tab a WILLPOWER box, SPEC I200c) (74 until the 53rd batch made the Vampire tab's two EXPERIENCE boxes one, SPEC I196f) (73 until the 51st batch gave a vampire's WILLPOWER a box of its own, SPEC I194b) (71 until the 48th batch split BLOOD PER TURN and EXPERIENCE of the Vampire tab in two each, SPEC I191f/g) (70 until the 46th batch added the Main's BLOOD POOL, SPEC I189d) (61 until the 45th batch added the nine boxes of the Vampire tab, SPEC I188f) (62 until the 44th batch took the SPECIALTIES box, SPEC I187a) (71 until the 42nd batch took the nine Traits note boxes, SPEC I186d) (70 before the 24th batch gave the storyteller settings a window over the scrim, SPEC I169e(4)) (71 until T1045 took the title off APPLY and made it a declared exception, SPEC I163f, V479c - the gap to EXPERIENCE is measured by V247 now) (70 until T1037 gave APPLY its own box on the Experience tab, SPEC I162f) (71 until T1027 merged ARMOR and SHIELD into ONE box with two columns) (70 until T1021 gave SHIELD its own box) (69 until T992 gave the version its own box) (68 until T982 gave mfSearchB its own ground) - with the collector broken this leg reads a fraction of the sheet (SPEC V209, I73). One collector serves both this and V280 (B70), so the number moves once" }
 else {
     # The declared HOLE is GONE with T908 and the 5px rule is whole again. T904 had left the
     # 680..1010 band of the Main grid with no bottom box, so two boxes faced each other a whole
@@ -14734,7 +14738,7 @@ $ornFn320   = LuaFn $hh6 'ornament'
 $sbBody320  = if ($sbFn320)  { NoComments $sbFn320 }  else { '' }
 $ornBody320 = if ($ornFn320) { NoComments $ornFn320 } else { '' }
 
-$themeM320  = [regex]::Match($hh6, 'local function applyTheme\(v, from\)(.*?)\n\t\t\tend;', 'Singleline')
+$themeM320  = [regex]::Match($hh6, 'local function applyTheme\(v, from(?:, only)?\)(.*?)\n\t\t\tend;', 'Singleline')
 $themeB320  = if ($themeM320.Success) { NoComments $themeM320.Groups[1].Value } else { '' }
 
 $roster320  = @('avatarFrame', 'ornAvatar')
@@ -14758,7 +14762,7 @@ if ($tabOn320 -lt 11)       { $v320Bad += "only $tabOn320 tabOn<X> carriers were
 # (a) the arm cites EXACTLY the two names, and both are in the XML above. A roster that names a
 # control nobody authored is green over a hole; a roster that grew a third name quietly is a
 # selector nobody declared.
-$cited320 = @([regex]::Matches($sbBody320, 'nm\s*==\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+$cited320 = @([regex]::Matches($sbBody320, 'nm\s*==\s*"([^"]+)"\s*then\s+return\s+true') | ForEach-Object { $_.Groups[1].Value })
 if ((($cited320 | Sort-Object) -join ',') -ne (($roster320 | Sort-Object) -join ',')) {
     $v320Bad += "sectionBox's name arm cites [$($cited320 -join ', ')] and the declared roster is [$($roster320 -join ', ')] - the two sides have to be the same list, or the selector answers for a control the spec never let in (SPEC V320a, I92a)"
 }
@@ -27907,7 +27911,7 @@ else {
     $mgW555 = [regex]::Match($rootTxt, 'boxWillpower\s*=\s*\{\s*0,\s*(\d+),\s*\d+,\s*(\d+)\s*\}')
     if (-not $mgW555.Success -or [int]$mgW555.Groups[1].Value -ne 597 -or 597 + 244 -ne [int]$mgW555.Groups[1].Value + [int]$mgW555.Groups[2].Value + 5 + 113) { $v555Bad += "(a) the wheel does not run from a mage's WILLPOWER top to EXPERIENCE's foot (SPEC I218a)" }
     $gm555 = NoComments (LuaFn $rootTxt 'renderGameMode')
-    if (-not $gm555.Contains('for _, nm in ipairs({ "boxQuintParadox", "boxArete", "boxArete3" }) do') -or -not $gm555.Contains('if c ~= nil and c.visible ~= mage then c.visible = mage; end;') -or -not $gm555.Contains('names.boxQuintParadox = true;')) { $v555Bad += "(a) renderGameMode does not show the wheel to a mage and only a mage (SPEC I218a)" }
+    if (-not $gm555.Contains('for _, nm in ipairs({ "boxQuintParadox", "boxArete", "boxArete3", "boxSpheres", "boxSpheres3" }) do') -or -not $gm555.Contains('if c ~= nil and c.visible ~= mage then c.visible = mage; end;') -or -not $gm555.Contains('names.boxQuintParadox = true;')) { $v555Bad += "(a) renderGameMode does not show the wheel to a mage and only a mage (SPEC I218a)" }
     # (b) the geometry, recomputed here
     $rl555 = [int]$ring555.GetAttribute('left'); $rt555 = [int]$ring555.GetAttribute('top')
     $marks555 = @{}
@@ -28147,14 +28151,15 @@ $boxes559 = @($main558.SelectNodes("//layout[@name='boxArete']"))
 if ($boxes559.Count -ne 1) { $v559Bad += "boxArete is in WoD20.1 $($boxes559.Count) time(s), not once - this check reads nothing (SPEC V20)" }
 else {
     $bx559 = $boxes559[0]
+    $sbx559 = $main558.SelectSingleNode("//layout[@name='boxSpheres']")   # the spheres' own box since the 82nd batch (SPEC I225e)
     # (a) hidden on the mage's rect, shown to a mage, the ghoul mage's pool under it
-    if ($bx559.GetAttribute('visible') -ne 'false' -or ((XmlRect558 $bx559) -join ',') -ne '500,597,664,244') { $v559Bad += "(a) boxArete is not hidden on {500,597,664,244} - 664 since the 80th batch (SPEC I221c, I223f)" }
+    if ($bx559.GetAttribute('visible') -ne 'false' -or ((XmlRect558 $bx559) -join ',') -ne '500,597,664,89') { $v559Bad += "(a) boxArete is not hidden on {500,597,664,89} - ARETE alone since the 82nd batch (SPEC I221c, I225e)" }
     $gm559 = NoComments (LuaFn $rootTxt 'renderGameMode')
     if (-not $gm559.Contains('names.boxArete = true;') -or -not $gm559.Contains('"boxArete"') -or -not $gm559.Contains('if c ~= nil and c.visible ~= mage then c.visible = mage; end;')) { $v559Bad += "(a) renderGameMode does not show ARETE to a mage and only a mage (SPEC I221c)" }
     $pool559 = if ($geomTbl558.Success) { Rect558 $geomTbl558.Groups[1].Value 'mainBloodPool' } else { $null }
     if ($null -eq $pool559 -or ($pool559 -join ',') -ne '500,846,330,244') { $v559Bad += "(a) a ghoul mage's pool is not {500,846,330,244} under ARETE - it would sit on the box (SPEC I221d)" }
     # (b) the content: titles, Arete's track, the nine rows in the user's column order
-    if (@($bx559.SelectNodes("label[@text='ARETE']")).Count -ne 1 -or @($bx559.SelectNodes("label[@text='SPHERES']")).Count -ne 1) { $v559Bad += "(b) ARETE and SPHERES are not one title each (SPEC I221c)" }
+    if (@($bx559.SelectNodes("label[@text='ARETE']")).Count -ne 1 -or $null -eq $sbx559 -or @($sbx559.SelectNodes("label[@text='SPHERES']")).Count -ne 1) { $v559Bad += "(b) ARETE and SPHERES are not one title each (SPEC I221c)" }
     $row559 = $bx559.SelectSingleNode("layout[@name='areteRow']")
     if ($null -eq $row559) { $v559Bad += "(b) areteRow is missing (SPEC I221c)" }
     else {
@@ -28168,9 +28173,9 @@ else {
     $dots559 = 0
     for ($i559 = 0; $i559 -lt 9; $i559++) {
         $s559 = $SPHERES558[$i559]
-        $sr559 = $bx559.SelectSingleNode("layout[@name='sphRow_$s559']")
+        $sr559 = if ($null -eq $sbx559) { $null } else { $sbx559.SelectSingleNode("layout[@name='sphRow_$s559']") }
         if ($null -eq $sr559) { $v559Bad += "(b) sphRow_$s559 is missing (SPEC I221c)"; continue }
-        $wantL559 = @(20, 265, 458)[[math]::Floor($i559 / 3)]; $wantT559 = @(125, 155, 185)[$i559 % 3]   # 44 between the columns since the 79th batch (SPEC I222c)
+        $wantL559 = @(20, 265, 458)[[math]::Floor($i559 / 3)]; $wantT559 = @(44, 74, 104)[$i559 % 3]   # 44 between the columns since the 79th batch (SPEC I222c)
         if ([int]$sr559.GetAttribute('left') -ne $wantL559 -or [int]$sr559.GetAttribute('top') -ne $wantT559) { $v559Bad += "(b) $s559 is not in its column at ($wantL559,$wantT559) - the user's order runs down the three columns (SPEC I221c)" }
         if ([int]$sr559.GetAttribute('left') + [int]$sr559.GetAttribute('width') -gt 644) { $v559Bad += "(b) sphRow_$s559 closes nearer than 20 to the box's right (SPEC V280a)" }
         for ($k559 = 1; $k559 -le 5; $k559++) {
@@ -28220,23 +28225,25 @@ else { Pass "V559 ARETE over SPHERES beside a mage's wheel - ten dots over a fix
 $v560Bad = @()
 $box560 = @($cmb558.SelectNodes("//layout[@name='boxArete3']"))
 $main560 = $main558.SelectSingleNode("//layout[@name='boxArete']")
+$sm560 = $main558.SelectSingleNode("//layout[@name='boxSpheres']"); $sc560 = $cmb558.SelectSingleNode("//layout[@name='boxSpheres3']")   # 82nd batch (SPEC I225e)
 $twins560 = 0; $mirror560 = 0
-if ($box560.Count -ne 1 -or $null -eq $main560) { $v560Bad += "boxArete3 in WoD20.3 or boxArete in WoD20.1 was not found exactly once - this check reads nothing (SPEC V20)" }
+if ($box560.Count -ne 1 -or $null -eq $main560 -or $null -eq $sm560 -or $null -eq $sc560) { $v560Bad += "boxArete3 in WoD20.3 or boxArete in WoD20.1 was not found exactly once - this check reads nothing (SPEC V20)" }
 else {
     $b560 = $box560[0]
-    if ($b560.GetAttribute('visible') -ne 'false' -or ((XmlRect558 $b560) -join ',') -ne '0,632,664,244') { $v560Bad += "(d) boxArete3 is not hidden on {0,632,664,244} (SPEC I221k, I222d)" }
+    if ($b560.GetAttribute('visible') -ne 'false' -or ((XmlRect558 $b560) -join ',') -ne '0,632,664,89') { $v560Bad += "(d) boxArete3 is not hidden on {0,632,664,89} (SPEC I221k, I225e)" }
+    if ($sc560.GetAttribute('visible') -ne 'false' -or ((XmlRect558 $sc560) -join ',') -ne '0,726,664,150') { $v560Bad += "(d) boxSpheres3 is not hidden on {0,726,664,150} (SPEC I225e)" }
     function Abs560($node) { $par560 = $node.ParentNode; return @(([int]$par560.GetAttribute('left') + [int]$node.GetAttribute('left')), ([int]$par560.GetAttribute('top') + [int]$node.GetAttribute('top'))) }
     foreach ($s560 in $SPHERES558) {
         for ($k560 = 1; $k560 -le 5; $k560++) {
-            $live560 = $main560.SelectSingleNode(".//imageCheckBox[@name='sphere_$($s560)_$k560']")
-            $ro560   = $b560.SelectSingleNode(".//imageCheckBox[@name='roSph_$($s560)_$k560']")
+            $live560 = $sm560.SelectSingleNode(".//imageCheckBox[@name='sphere_$($s560)_$k560']")
+            $ro560   = $sc560.SelectSingleNode(".//imageCheckBox[@name='roSph_$($s560)_$k560']")
             if ($null -eq $live560 -or $null -eq $ro560) { $v560Bad += "(d) sphere_$($s560)_$k560 or its copy roSph_$($s560)_$k560 is missing (SPEC I221k)"; continue }
             $mirror560++
             if ($ro560.HasAttribute('field') -or $ro560.HasAttribute('onClick') -or $ro560.GetAttribute('autoChange') -ne 'false') { $v560Bad += "(d) roSph_$($s560)_$k560 owns a field or takes a click - the copy only shows (SPEC I221k, V1)" }
             if (((Abs560 $live560) -join ',') -ne ((Abs560 $ro560) -join ',')) { $v560Bad += "(d) roSph_$($s560)_$k560 is not on the Main dot's spot (SPEC I221k)" }
             if ($k560 -lt 2) { continue }
             # (a) the twins: same spot, empty, no field, no click, hidden
-            foreach ($pr560 in @(@($main560, "scap_$($s560)_$k560", '0.30', $live560), @($b560, "rocapSph_$($s560)_$k560", '0.12', $ro560))) {
+            foreach ($pr560 in @(@($sm560, "scap_$($s560)_$k560", '0.30', $live560), @($sc560, "rocapSph_$($s560)_$k560", '0.12', $ro560))) {
                 $tw560 = $pr560[0].SelectSingleNode(".//imageCheckBox[@name='$($pr560[1])']")
                 if ($null -eq $tw560) { $v560Bad += "(a) $($pr560[1]) is missing (SPEC I221j)"; continue }
                 $twins560++
@@ -28290,10 +28297,10 @@ else {
     if ($null -eq $lb561 -or $null -eq $pn561 -or $null -eq $bx561) { $v561Bad += "(a) HealthRow lacks its name label, its penalty label or its box (SPEC I223c)" }
     else {
         if (((XmlRect558 $lb561) -join ',') -ne '0,0,191,20' -or $lb561.GetAttribute('anchors') -ne 'left top right') { $v561Bad += "(a) the health name is not {0,0,191,20} anchored left top right (SPEC I223c)" }
-        if (((XmlRect558 $pn561) -join ',') -ne '195,0,26,20' -or $pn561.GetAttribute('anchors') -ne 'top right' -or $pn561.GetAttribute('horzTextAlign') -ne 'trailing') { $v561Bad += "(a) the health penalty is not {195,0,26,20} right-aligned and anchored top right (SPEC I223c)" }
+        if (((XmlRect558 $pn561) -join ',') -ne '195,0,23,20' -or $pn561.GetAttribute('anchors') -ne 'top right' -or $pn561.GetAttribute('horzTextAlign') -ne 'trailing') { $v561Bad += "(a) the health penalty is not {195,0,23,20} right-aligned and anchored top right (SPEC I223c, I226e)" }
         if (((XmlRect558 $bx561) -join ',') -ne '223,0,22,20' -or $bx561.GetAttribute('anchors') -ne 'top right') { $v561Bad += "(a) the health box is not {223,0,22,20} anchored top right (SPEC I222a)" }
         if ([int]$pn561.GetAttribute('left') - ([int]$lb561.GetAttribute('left') + [int]$lb561.GetAttribute('width')) -ne 4) { $v561Bad += "(a) the name does not end 4 before its penalty (SPEC I223c)" }
-        if ([int]$bx561.GetAttribute('left') - ([int]$pn561.GetAttribute('left') + [int]$pn561.GetAttribute('width')) -ne 2) { $v561Bad += "(a) the penalty does not end 2 before its box (SPEC I223c)" }
+        if ([int]$bx561.GetAttribute('left') - ([int]$pn561.GetAttribute('left') + [int]$pn561.GetAttribute('width')) -ne 5) { $v561Bad += "(a) the penalty does not end 5 before its box (SPEC I223c, I226e)" }
     }
 }
 # (b) the mage's rows: 166, the name they leave fits the longest level NAME and wastes no more than 6
@@ -28319,11 +28326,11 @@ else {
     $left561 = 166 - 55
     if ($left561 -lt $need561) { $v561Bad += "(b) a mage's health name gets $left561 px and the longest level name needs ~$need561 - it would be swallowed (SPEC I223c)" }
     elseif ($left561 -ge $need561 + 7) { $v561Bad += "(b) a mage's health name gets $left561 px for a longest level name of ~$need561 - HEALTH could be narrower (SPEC I223c)" }
-    if ((NeededPx '(-5)' $null -Literal) -gt 26) { $v561Bad += "(b) '(-5)' needs more than the penalty label's 26 (SPEC I223c)" }
+    if ((NeededPx '-5' $null -Literal) -gt 23) { $v561Bad += "(b) '-5' needs more than the penalty label's 23 (SPEC I223c, I225d, I226e)" }
 }
 # (c) ARETE 664 on both tabs, its three columns as wide as their names, the four gaps equal to the margin
 $cols561 = 0
-foreach ($bxN561 in @(@($main558, 'boxArete', 'sphere_'), @($cmb558, 'boxArete3', 'roSph_'))) {
+foreach ($bxN561 in @(@($main558, 'boxSpheres', 'sphere_'), @($cmb558, 'boxSpheres3', 'roSph_'))) {   # the spheres' own boxes since the 82nd batch (SPEC I225e)
     $b561 = $bxN561[0].SelectSingleNode("//layout[@name='$($bxN561[1])']")
     if ($null -eq $b561) { $v561Bad += "(c) $($bxN561[1]) was not found (SPEC V20)"; continue }
     $bw561 = [int]$b561.GetAttribute('width')
@@ -28405,7 +28412,7 @@ if ($null -eq $hm563) { $v563Bad += "(a) the HealthRowMirror template was not fo
 else {
     $lb563 = $hm563.SelectSingleNode("label[@name='dynHealth3_`$(num)']"); $pn563 = $hm563.SelectSingleNode("label[@name='dynHealth3_pen`$(num)']"); $bx563 = $hm563.SelectSingleNode("rectangle")
     if ($null -eq $lb563 -or $null -eq $pn563 -or $null -eq $bx563) { $v563Bad += "(a) HealthRowMirror lacks its name, its penalty or its box (SPEC I223c)" }
-    elseif (((XmlRect558 $lb563) -join ',') -ne '0,0,191,20' -or ((XmlRect558 $pn563) -join ',') -ne '195,0,26,20' -or $pn563.GetAttribute('horzTextAlign') -ne 'trailing' -or [int]$bx563.GetAttribute('left') -ne 223) { $v563Bad += "(a) the Combat row is not name {0,0,191,20}, right-aligned penalty {195,0,26,20}, box at 223 (SPEC I223c)" }
+    elseif (((XmlRect558 $lb563) -join ',') -ne '0,0,191,20' -or ((XmlRect558 $pn563) -join ',') -ne '195,0,23,20' -or $pn563.GetAttribute('horzTextAlign') -ne 'trailing' -or [int]$bx563.GetAttribute('left') -ne 223) { $v563Bad += "(a) the Combat row is not name {0,0,191,20}, right-aligned penalty {195,0,23,20}, box at 223 (SPEC I223c, I226e)" }
 }
 # (b) the split, read off renderHealthTrack and run on three levels
 $ht563 = NoComments (LuaFn $rootTxt 'renderHealthTrack')
@@ -28413,7 +28420,7 @@ $pat563 = [regex]::Match($ht563, 'string\.match\(full, "([^"]+)"\)')
 if (-not $pat563.Success -or -not $ht563.Contains('text.text = name;') -or -not $ht563.Contains('form[prefix .. "pen" .. i]') -or -not $ht563.Contains('if name == nil then name, pen = full, ""; end;')) { $v563Bad += "(b) renderHealthTrack does not split the level into name and penalty on their two labels (SPEC I223c)" }
 else {
     $net563 = $pat563.Groups[1].Value.Replace('.-', '.*?').Replace('%s', '\s').Replace('%(', '\(').Replace('%)', '\)').Replace('%-', '-').Replace('%d', '\d')
-    $cases563 = @(@('Ferido Gravemente (-2)', 'Ferido Gravemente', '(-2)'), @('Escoriado', 'Escoriado', ''), @('Incapacitated', 'Incapacitated', ''), @('Crippled (-5)', 'Crippled', '(-5)'))
+    $cases563 = @(@('Ferido Gravemente (-2)', 'Ferido Gravemente', '-2'), @('Escoriado', 'Escoriado', ''), @('Incapacitated', 'Incapacitated', ''), @('Crippled (-5)', 'Crippled', '-5'))
     foreach ($cs563 in $cases563) {
         $mt563 = [regex]::Match($cs563[0], $net563)
         $nm563 = if ($mt563.Success) { $mt563.Groups[1].Value } else { $cs563[0] }
@@ -28440,7 +28447,7 @@ $abl564 = $main558.SelectSingleNode("//template[@name='Ability']/imageCheckBox")
 $dot564 = if ($null -eq $abl564) { 0 } else { [int]$abl564.GetAttribute('width') }
 if ($dot564 -le 0 -or [int]$abl564.GetAttribute('height') -ne $dot564) { $v564Bad += "(a) the Ability template's dot was not read (SPEC V20)" }
 $rows564 = 0
-foreach ($bxN564 in @(@($main558, 'boxArete', 'sphere_'), @($cmb558, 'boxArete3', 'roSph_'))) {
+foreach ($bxN564 in @(@($main558, 'boxSpheres', 'sphere_'), @($cmb558, 'boxSpheres3', 'roSph_'))) {
     $b564 = $bxN564[0].SelectSingleNode("//layout[@name='$($bxN564[1])']")
     if ($null -eq $b564) { continue }
     $byCol564 = @{}
@@ -28491,13 +28498,16 @@ $bg565 = if ($geomTbl558.Success) { Rect558 $geomTbl558.Groups[1].Value 'boxBack
 $lists565 = 0
 if ($null -eq $bg565) { $v565Bad += "(b) a mage's boxBackgrounds was not read off MAGE_GEOM (SPEC V20)" }
 else {
-    $w565 = [int][Math]::Round(0.7 * $bg565[2]); $h565 = $bg565[3]
+    $w565 = [int][Math]::Round(0.7 * $bg565[2])
+    # As tall as the Main's Avatar + Skills + Arete since the 81st batch (SPEC I224a, V566a), not BACKGROUNDS.
+    $vg565 = [regex]::Match($rootTxt, '(?s)VAMP_GEOM = \{(.*?)\n\t\t\t\};'); $av565 = Rect558 $vg565.Groups[1].Value 'avatarFrame'; $sk565 = Rect558 $geomTbl558.Groups[1].Value 'boxSkills'; $ar565 = $main558.SelectSingleNode("//layout[@name='boxArete']")
+    $h565 = $av565[3] + $sk565[3] + [int]$ar565.GetAttribute('height') + 5 + [int]$main558.SelectSingleNode("//layout[@name='boxSpheres']").GetAttribute('height')   # ARETE + SPHERES: the one "Arete" box of the 81st batch, split in the 82nd (SPEC I225e)
     $l2565 = $w565 + 5; $l3565 = 2 * ($w565 + 5)   # computed first: a comma binds tighter than * in a PowerShell list
     $want565 = @(@('boxFoci', 0, 'magickFoci'), @('boxRotes', $l2565, 'magickRotes'), @('boxWonders', $l3565, 'magickWonders'))
     foreach ($wb565 in $want565) {
         $bx565 = $tab565.SelectSingleNode("//layout[@name='$($wb565[0])']")
         if ($null -eq $bx565) { $v565Bad += "(b) $($wb565[0]) is missing (SPEC I223h)"; continue }
-        if (((XmlRect558 $bx565) -join ',') -ne "$($wb565[1]),0,$w565,$h565") { $v565Bad += "(b) $($wb565[0]) is not {$($wb565[1]),0,$w565,$h565} - 70% of a mage's BACKGROUNDS ($($bg565[2])) and as tall (SPEC I223h)" }
+        if (((XmlRect558 $bx565) -join ',') -ne "$($wb565[1]),0,$w565,$h565") { $v565Bad += "(b) $($wb565[0]) is not {$($wb565[1]),0,$w565,$h565} - 70% of a mage's BACKGROUNDS ($($bg565[2])) and Avatar + Skills + Arete tall (SPEC I223h, I224a)" }
         $rl565 = @($bx565.SelectNodes("recordList"))
         if ($rl565.Count -ne 1) { $v565Bad += "(b) $($wb565[0]) holds $($rl565.Count) list(s), not 1 (SPEC I223h)"; continue }
         $lists565++
@@ -28518,9 +28528,9 @@ else {
     $fw565 = [int]$fm565.GetAttribute('width')
     if (@($it565.SelectNodes("//edit[@field='itemName']")).Count -ne 1) { $v565Bad += "(c) the item has no one name edit (SPEC I223i)" }
     $te565 = @($it565.SelectNodes("//textEditor[@field='itemDesc']"))
-    if ($te565.Count -ne 1 -or [int]$te565[0].GetAttribute('height') -lt 85) { $v565Bad += "(c) the item's description is not one textEditor of about five lines (85 or more) (SPEC I223i)" }
+    if ($te565.Count -ne 1 -or [int]$te565[0].GetAttribute('height') -lt 55) { $v565Bad += "(c) the item's description is not one textEditor of about three lines (55 or more) (SPEC I223i, I224d)" }
     $x565 = @($it565.SelectNodes("//button[@text='X']"))
-    if ($x565.Count -ne 1 -or [int]$x565[0].GetAttribute('left') + [int]$x565[0].GetAttribute('width') -ne $fw565) { $v565Bad += "(c) the item's X is not one button on its right edge (SPEC I223i)" }
+    if ($x565.Count -ne 1 -or [int]$x565[0].GetAttribute('left') + [int]$x565[0].GetAttribute('width') -ne $fw565 - 10) { $v565Bad += "(c) the item's X is not one button on its right edge, inside the 10 of padding (SPEC I223i, I225b)" }
     else {
         $xc565 = $x565[0].InnerText
         if ($xc565 -notmatch '(?s)confirmOkCancel\(.*function\s*\((\w+)\)\s*if \1 then ndb\.deleteNode\(sheet\); end;' -or @([regex]::Matches($xc565, 'deleteNode')).Count -ne 1) { $v565Bad += "(c) the X deletes outside the confirmed answer - an item would go without asking (SPEC I223i)" }
@@ -28546,5 +28556,207 @@ if (-not $lg565.Contains("wod.Magick=M$([char]0xE1)gika")) { $v565Bad += "(e) Ma
 if ($lists565 -lt 3) { $v565Bad += "only $lists565 of the 3 lists were read (SPEC V20)" }
 if ($v565Bad) { foreach ($b in $v565Bad) { Fail "V565 $b" } }
 else { Pass "V565 the Magick tab opens for a mage only, after Vampire - FOCI, ROTES and WONDERS at 70% of BACKGROUNDS, each an Add and a list of name + description items whose X asks first; seven Foci once" }
+# ---- V566: the Magick tab as tall as Avatar + Skills + Arete, and every item in the era from the moment it is built (SPEC I224, B203) ----
+# User 2026-10-07 (81st batch). The theme paints by walking the controls that exist; a recordList
+# builds its items after that walk, so each list hands its new item to magickItemPaint, which
+# names it, translates it and paints just that subtree (applyTheme's third argument).
+$v566Bad = @()
+$tab566 = Doc (Join-Path $dir 'WoD20.16.lfm')
+$tab566Txt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.16.lfm')))
+# (a) the height, read off the three boxes it adds up
+$vg566 = [regex]::Match($rootTxt, '(?s)VAMP_GEOM = \{(.*?)\n\t\t\t\};')
+$av566 = if ($vg566.Success) { Rect558 $vg566.Groups[1].Value 'avatarFrame' } else { $null }
+$sk566 = if ($geomTbl558.Success) { Rect558 $geomTbl558.Groups[1].Value 'boxSkills' } else { $null }
+$ar566 = $main558.SelectSingleNode("//layout[@name='boxArete']")
+$boxes566 = 0
+if ($null -eq $av566 -or $null -eq $sk566 -or $null -eq $ar566) { $v566Bad += "(a) the avatar, SKILLS or ARETE height was not read (SPEC V20)" }
+else {
+    $sum566 = $av566[3] + $sk566[3] + [int]$ar566.GetAttribute('height') + 5 + [int]$main558.SelectSingleNode("//layout[@name='boxSpheres']").GetAttribute('height')   # ARETE + 5 + SPHERES since the 82nd batch (SPEC I225e)
+    foreach ($bn566 in @('boxFoci', 'boxRotes', 'boxWonders')) {
+        $bx566 = $tab566.SelectSingleNode("//layout[@name='$bn566']")
+        if ($null -eq $bx566) { continue }
+        $boxes566++
+        if ([int]$bx566.GetAttribute('height') -ne $sum566) { $v566Bad += "(a) $bn566 is $($bx566.GetAttribute('height')) tall, not Avatar + Skills + Arete = $sum566 (SPEC I224a)" }
+        $rl566 = $bx566.SelectSingleNode("recordList")
+        if ($null -eq $rl566 -or [int]$rl566.GetAttribute('top') + [int]$rl566.GetAttribute('height') -ne $sum566 - 20) { $v566Bad += "(a) $bn566's list does not close 20 above the box's foot (SPEC I224a, V280a)" }
+    }
+}
+# (b) each list paints the item it builds; the language repaints the words of those already built
+$evs566 = 0
+foreach ($pr566 in @(@('rclFoci', 'Focus'), @('rclRotes', 'Rote'), @('rclWonders', 'Name'))) {
+    $ev566 = $tab566.SelectSingleNode("//recordList[@name='$($pr566[0])']/event[@name='onItemAdded']")
+    if ($null -eq $ev566) { $v566Bad += "(b) $($pr566[0]) has no onItemAdded - its items would be built raw (SPEC I224c, B203)"; continue }
+    $evs566++
+    if ($ev566.InnerText.Trim() -cne "magickItemPaint(form, `"$($pr566[1])`");") { $v566Bad += "(b) $($pr566[0])'s onItemAdded does not call magickItemPaint(form, `"$($pr566[1])`") (SPEC I224c, Q138.2)" }
+}
+$mp566 = NoComments ([regex]::Match($tab566Txt, '(?s)function magickItemPaint\(.*?\n\t\tend;').Value)
+if (@([regex]::Matches((NoComments $tab566Txt), 'function magickItemPaint\(')).Count -ne 1) { $v566Bad += "(b) magickItemPaint is not declared exactly once (SPEC I224c)" }
+foreach ($need566 in @('translateSheetText(nameText, lang)', 'translateSheetText("Description", lang)', 'form.confirmText = translateSheetText("Remove this item from the list?", lang);', 'themeItem(form);')) {
+    if (-not $mp566.Contains($need566)) { $v566Bad += "(b) magickItemPaint lacks '$need566' (SPEC I224c)" }
+}
+$rl566Fn = NoComments ([regex]::Match($tab566Txt, '(?s)function magickRelabel\(.*?\n\t\tend;').Value)
+foreach ($need566 in @('from.rclFoci, "Focus"', 'from.rclRotes, "Rote"', 'from.rclWonders, "Name"', ':getChildren()', 'magickItemPaint(items[i], pair[2]);')) {
+    if (-not $rl566Fn.Contains($need566)) { $v566Bad += "(b) magickRelabel lacks '$need566' - a language switch would leave built items in the old words (SPEC I224c)" }
+}
+if ($tab566Txt -notmatch '<dataLink field="language" onChange="magickRelabel\(self\);"/>') { $v566Bad += "(b) no language dataLink calls magickRelabel (SPEC I224c)" }
+# (c) applyTheme paints a subtree when asked, and only themeItem asks
+$code566 = ''
+foreach ($lf566 in Get-ChildItem -Path $dir -Filter '*.lfm') { $code566 += NoComments ([regex]::Replace([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf566.FullName)), '(?s)<!--.*?-->', '')) }
+$at566 = NoComments (LuaFn ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.6.lfm')))) 'applyTheme')
+if ($at566 -notmatch '^function\s+applyTheme\(v, from, only\)' -or -not $at566.Contains('local root = only or rootOf(from);')) { $v566Bad += "(c) applyTheme does not walk from `only` when it is given (SPEC I224b)" }
+$ret566 = $at566.IndexOf('if only ~= nil then return; end;'); $qp566 = $at566.IndexOf('renderQpWheel(from);')
+if ($ret566 -lt 0 -or $qp566 -lt 0 -or $ret566 -gt $qp566) { $v566Bad += "(c) a subtree walk does not stop before the whole-sheet repaints at its end (SPEC I224b)" }
+$ti566 = NoComments (LuaFn ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.6.lfm')))) 'themeItem')
+if (@([regex]::Matches($code566, 'function themeItem\(')).Count -ne 1 -or -not $ti566.Contains('applyTheme(sheet.sheetTheme or THEME_DEFAULT, form, form);')) { $v566Bad += "(c) themeItem is not one global that paints the item's own subtree (SPEC I224b)" }
+$three566 = @([regex]::Matches($code566, '(?<!function )applyTheme\(([^;]*)\);') | Where-Object { @($_.Groups[1].Value.ToCharArray() | Where-Object { $_ -eq ',' }).Count -ge 2 })
+if ($three566.Count -ne 1) { $v566Bad += "(c) $($three566.Count) call(s) hand applyTheme a subtree, not themeItem's one - a whole-sheet repaint must not shrink to a subtree (SPEC I224b)" }
+# (d) the item: the name label fits the longest of the three words in both languages, the edit takes the rest, three lines of description
+$it566 = Doc (Join-Path $dir 'WoD20.17.lfm')
+$fm566 = $it566.SelectSingleNode('/form')
+$nl566 = $it566.SelectSingleNode("//label[@name='dynItemName']"); $ed566 = $it566.SelectSingleNode("//edit[@field='itemName']"); $x566 = $it566.SelectSingleNode("//button[@text='X']"); $te566 = $it566.SelectSingleNode("//textEditor[@field='itemDesc']")
+if ($null -eq $fm566 -or $null -eq $nl566 -or $null -eq $ed566 -or $null -eq $x566 -or $null -eq $te566) { $v566Bad += "(d) the item lacks its name label, name edit, X or description (SPEC V20)" }
+else {
+    $need566d = (@('Focus', 'Rote', 'Name') | ForEach-Object { NeededPx $_ } | Measure-Object -Maximum).Maximum
+    $nw566 = [int]$nl566.GetAttribute('width')
+    if ($nw566 -lt $need566d -or $nw566 -ge $need566d + 7) { $v566Bad += "(d) the name label is $nw566 for a longest word of ~$need566d (Focus / Rote / Name, en and pt) - swallowed or slack (SPEC I224d)" }
+    if ([int]$ed566.GetAttribute('left') -ne [int]$nl566.GetAttribute('left') + $nw566 + 4) { $v566Bad += "(d) the name edit does not open 4 after its label (SPEC I224d)" }
+    if ([int]$ed566.GetAttribute('left') + [int]$ed566.GetAttribute('width') -gt [int]$x566.GetAttribute('left') - 6) { $v566Bad += "(d) the name edit runs closer than 6 to the X (SPEC I224d)" }
+    if ([int]$te566.GetAttribute('height') -ne 60) { $v566Bad += "(d) the description is $($te566.GetAttribute('height')) tall, not the 60 of three lines (SPEC I224d)" }
+    if ([int]$fm566.GetAttribute('height') -ne [int]$te566.GetAttribute('top') + [int]$te566.GetAttribute('height') + 10) { $v566Bad += "(d) the item is not its description's foot + 10 tall (SPEC I224d, I225b)" }
+}
+# (e) one translation source: no map of the item's own; the new words in both .lang halves and the PT map
+$itTxt566 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.17.lfm')))
+if ($itTxt566.Contains('ITEM_PT') -or $itTxt566.Contains('\195')) { $v566Bad += "(e) WoD20.17 still carries its own translations - the sheet keeps one source (SPEC I224d)" }
+if ($null -ne $x566 -and -not $x566.InnerText.Contains('self.confirmText or "Remove this item from the list?"')) { $v566Bad += "(e) the X does not ask in the words the tab set (SPEC I224d)" }
+$lg566 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path (Split-Path $dir -Parent) 'localization.lang')))
+$pt566 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.6.lfm')))
+foreach ($w566 in @('Focus', 'Rote')) {
+    if (-not $pt566.Contains("[`"$w566`"] = ") -or @([regex]::Matches($lg566, "(?m)^wod\.$w566=")).Count -ne 2) { $v566Bad += "(e) '$w566' is missing from the PT map or from a .lang half (SPEC I224e, V544)" }
+}
+if (-not $lg566.Contains('wod.FOCI=FOCOS') -or -not $pt566.Contains('["FOCI"] = "FOCOS"')) { $v566Bad += "(e) FOCI is not FOCOS in pt (SPEC Q138.3)" }
+if ($boxes566 -lt 3 -or $evs566 -lt 3) { $v566Bad += "only $boxes566 of the 3 boxes and $evs566 of the 3 onItemAdded were read (SPEC V20)" }
+if ($v566Bad) { foreach ($b in $v566Bad) { Fail "V566 $b" } }
+else { Pass "V566 the Magick tab is Avatar + Skills + Arete tall ($sum566), and every item is named, translated and painted in the era as its list builds it - Focus / Rote / Name, three lines of description" }
+
+# ---- V567: the Magick item a sub-box of the era, the wheel's thin outline, HEALTH without brackets, ARETE and SPHERES apart (SPEC I225, B204) ----
+# User 2026-10-07 (82nd batch). The theme gives the era's corner only to section boxes and the
+# XP_FRAME roster, and THEME_STROKE (3) to every other rectangle - over the 1 the wheel authors.
+$v567Bad = @()
+$hh567 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.6.lfm')))
+# (a) the item: the box black, named, out of sectionBox before its fill rule, in XP_FRAME
+$it567 = Doc (Join-Path $dir 'WoD20.17.lfm')
+$fr567 = $it567.SelectSingleNode("//rectangle[@name='magickItemFrame']")
+if ($null -eq $fr567 -or $fr567.GetAttribute('color') -ne 'black') { $v567Bad += "(a) WoD20.17 has no black rectangle named magickItemFrame (SPEC I225a)" }
+$sb567 = [regex]::Match($hh567, '(?s)local function sectionBox\(c, fill\)(.*?)\n\t\t\tend;')
+$out567 = if ($sb567.Success) { $sb567.Groups[1].Value.IndexOf('if nm == "magickItemFrame" then return; end;') } else { -1 }
+$fill567 = if ($sb567.Success) { $sb567.Groups[1].Value.IndexOf('if normColor(fill) ~= "#000000FF" then return; end;') } else { -1 }
+if ($out567 -lt 0 -or $fill567 -lt 0 -or $out567 -gt $fill567) { $v567Bad += "(a) sectionBox does not turn magickItemFrame away before its fill rule - every item would grow the filigree (SPEC I225a, B204)" }
+$xf567 = [regex]::Match($hh567, '(?s)local XP_FRAME\s*=\s*\{(.*?)\};')
+if (-not $xf567.Success -or $xf567.Groups[1].Value -notmatch 'magickItemFrame\s*=\s*true') { $v567Bad += "(a) XP_FRAME does not carry magickItemFrame - the item stays round in every era (SPEC I225a, B204)" }
+# (b) 10 from every edge, the X included
+$fm567 = $it567.SelectSingleNode('/form')
+$kids567 = 0
+if ($null -ne $fm567 -and $null -ne $fr567) {
+    $fw567 = [int]$fm567.GetAttribute('width'); $fh567 = [int]$fm567.GetAttribute('height')
+    foreach ($k567 in $fr567.ChildNodes) {
+        if ($k567.NodeType -ne 'Element') { continue }
+        $kids567++
+        $kl567 = [int]$k567.GetAttribute('left'); $kt567 = [int]$k567.GetAttribute('top'); $kw567 = [int]$k567.GetAttribute('width'); $kh567 = [int]$k567.GetAttribute('height')
+        if ($kl567 -lt 10 -or $kt567 -lt 10 -or $kl567 + $kw567 -gt $fw567 - 10 -or $kt567 + $kh567 -gt $fh567 - 10) { $v567Bad += "(b) the item's <$($k567.LocalName)> at ($kl567,$kt567,$kw567,$kh567) comes nearer than 10 to an edge of $fw567 x $fh567 (SPEC I225b)" }
+    }
+}
+if ($kids567 -lt 5) { $v567Bad += "(b) only $kids567 of the item's 5 children were read (SPEC V20)" }
+# (c) the wheel keeps its authored 1px: read the branch, run it for qpMark_7 and for a plain rectangle
+$at567 = [regex]::Match($hh567, '(?s)local function applyTheme\(v, from(?:, only)?\)(.*?)\n\t\t\tend;')
+$wheelLine567 = 'local wheel = nm ~= nil and string.sub(nm, 1, 7) == "qpMark_";'
+$writeLine567 = 'paint(c, "strokeSize", (wheel and authored(c, "strokeSize")) or (hair and t.outline) or THEME_STROKE, authored(c, "strokeSize"));'
+if (-not $at567.Success -or -not $at567.Groups[1].Value.Contains($wheelLine567) -or -not $at567.Groups[1].Value.Contains($writeLine567)) { $v567Bad += "(c) applyTheme does not keep a qpMark_'s authored outline - THEME_STROKE paints the wheel at 3 (SPEC I225c, B204)" }
+else {
+    foreach ($case567 in @(@('qpMark_7', 1, 1), @('somethingElse', 1, 3))) {
+        $isWheel567 = $case567[0].Length -ge 7 -and $case567[0].Substring(0, 7) -eq 'qpMark_'
+        $got567 = if ($isWheel567) { $case567[1] } else { 3 }
+        if ($got567 -ne $case567[2]) { $v567Bad += "(c) $($case567[0]) would be painted $got567, not $($case567[2]) (SPEC I225c)" }
+    }
+}
+$marks567 = @($main558.SelectNodes("//rectangle[starts-with(@name,'qpMark_')]"))
+if ($marks567.Count -ne 20 -or @($marks567 | Where-Object { $_.GetAttribute('strokeSize') -ne '2' }).Count) { $v567Bad += "(c) the 20 marks do not all author strokeSize 2 (SPEC I225c, I226b)" }
+# (d) HEALTH: the number only, its minus kept
+if (-not (NoComments (LuaFn $rootTxt 'renderHealthTrack')).Contains('string.match(full, "^(.-)%s*%((%-?%d+)%)$")')) { $v567Bad += "(d) renderHealthTrack does not keep the number without its brackets (SPEC I225d)" }
+# (e) ARETE and SPHERES apart, stacked in the wheel's 244, on both tabs
+$rows567 = 0
+foreach ($pr567 in @(@($main558, 'boxArete', '500,597,664,89', 'boxSpheres', '500,691,664,150', 'sphere_'), @($cmb558, 'boxArete3', '0,632,664,89', 'boxSpheres3', '0,726,664,150', 'roSph_'))) {
+    $ab567 = $pr567[0].SelectSingleNode("//layout[@name='$($pr567[1])']"); $sb567n = $pr567[0].SelectSingleNode("//layout[@name='$($pr567[3])']")
+    if ($null -eq $ab567 -or $null -eq $sb567n) { $v567Bad += "(e) $($pr567[1]) or $($pr567[3]) is missing (SPEC I225e)"; continue }
+    if ($ab567.GetAttribute('visible') -ne 'false' -or ((XmlRect558 $ab567) -join ',') -ne $pr567[2]) { $v567Bad += "(e) $($pr567[1]) is not hidden on {$($pr567[2])} (SPEC I225e)" }
+    if ($sb567n.GetAttribute('visible') -ne 'false' -or ((XmlRect558 $sb567n) -join ',') -ne $pr567[4]) { $v567Bad += "(e) $($pr567[3]) is not hidden on {$($pr567[4])} (SPEC I225e)" }
+    if ([int]$ab567.GetAttribute('height') + 5 + [int]$sb567n.GetAttribute('height') -ne 244 -or [int]$sb567n.GetAttribute('top') -ne [int]$ab567.GetAttribute('top') + [int]$ab567.GetAttribute('height') + 5) { $v567Bad += "(e) $($pr567[1]) + 5 + $($pr567[3]) do not stack into the wheel's 244 (SPEC I225e)" }
+    if (@($ab567.SelectNodes(".//imageCheckBox[starts-with(@name,'$($pr567[5])')]")).Count) { $v567Bad += "(e) a sphere dot is still in $($pr567[1]) (SPEC I225e)" }
+    foreach ($sr567 in $sb567n.SelectNodes("layout[imageCheckBox[starts-with(@name,'$($pr567[5])')]]")) {
+        $rows567++
+        if (@('44', '74', '104') -notcontains $sr567.GetAttribute('top')) { $v567Bad += "(e) a sphere row of $($pr567[3]) sits at top $($sr567.GetAttribute('top')), not 44 / 74 / 104 (SPEC I225e)" }
+    }
+}
+if ($rows567 -lt 18) { $v567Bad += "only $rows567 of the 18 sphere rows were read in the two SPHERES boxes (SPEC V20)" }
+if ($v567Bad) { foreach ($b in $v567Bad) { Fail "V567 $b" } }
+else { Pass "V567 the Magick item is a black sub-box with the era's corner and no filigree, 10 from every edge; the wheel keeps its 1px; HEALTH shows -N; ARETE (89) and SPHERES (150) are two boxes on Main and Combat" }
+
+# ---- V568: the Magick item keeps 10 on all four sides at any width, in all three lists; the wheel at 2px; HEALTH's number 5 from its box (SPEC I226, B205) ----
+# User 2026-10-07 (83rd batch). A recordList may widen its item past the authored 296 (B205, unconfirmed):
+# with every control pinned left, the right would take the slack. The right-hand controls ride the
+# right edge, and this leg runs the anchors at the three widths the host can hand the item.
+$v568Bad = @()
+$it568 = Doc (Join-Path $dir 'WoD20.17.lfm')
+$fm568 = $it568.SelectSingleNode('/form'); $fr568 = $it568.SelectSingleNode("//rectangle[@name='magickItemFrame']")
+$kids568 = @()
+if ($null -ne $fr568) { $kids568 = @($fr568.ChildNodes | Where-Object { $_.NodeType -eq 'Element' }) }
+if ($null -eq $fm568 -or $kids568.Count -lt 5) { $v568Bad += "(a) the item form or its 5 controls were not read (SPEC V20)" }
+else {
+    # (a) the anchors: right-hand controls ride the right edge, the name label does not
+    $want568 = @{ "button|X" = 'top right'; "edit|itemName" = 'left top right'; "label|dynItemDesc" = 'left top right'; "textEditor|itemDesc" = 'left top right'; "label|dynItemName" = '' }
+    foreach ($k568 in $kids568) {
+        $id568 = if ($k568.LocalName -eq 'button') { 'button|' + $k568.GetAttribute('text') } elseif ($k568.HasAttribute('field')) { $k568.LocalName + '|' + $k568.GetAttribute('field') } else { $k568.LocalName + '|' + $k568.GetAttribute('name') }
+        if (-not $want568.ContainsKey($id568)) { $v568Bad += "(a) the item carries a control this leg does not know ($id568) (SPEC I226a)"; continue }
+        if ($k568.GetAttribute('anchors') -ne $want568[$id568]) { $v568Bad += "(a) $id568 anchors '$($k568.GetAttribute('anchors'))', not '$($want568[$id568])' (SPEC I226a)" }
+    }
+    # the four margins at 296, 300 and 316
+    $aw568 = [int]$fm568.GetAttribute('width'); $ah568 = [int]$fm568.GetAttribute('height')
+    foreach ($w568 in @($aw568, 300, 316)) {
+        $l568 = 9999; $t568 = 9999; $r568 = 0; $b568 = 0
+        foreach ($k568 in $kids568) {
+            $an568 = $k568.GetAttribute('anchors'); $dx568 = $w568 - $aw568
+            $kl568 = [int]$k568.GetAttribute('left'); $kw568 = [int]$k568.GetAttribute('width')
+            if ($an568 -match '\bright\b' -and $an568 -match '\bleft\b') { $kw568 += $dx568 } elseif ($an568 -match '\bright\b') { $kl568 += $dx568 }
+            $kt568 = [int]$k568.GetAttribute('top'); $kh568 = [int]$k568.GetAttribute('height')
+            $l568 = [Math]::Min($l568, $kl568); $t568 = [Math]::Min($t568, $kt568); $r568 = [Math]::Max($r568, $kl568 + $kw568); $b568 = [Math]::Max($b568, $kt568 + $kh568)
+        }
+        $m568 = @($l568, $t568, ($w568 - $r568), ($ah568 - $b568))
+        if (@($m568 | Where-Object { $_ -ne 10 }).Count) { $v568Bad += "(a) at width $w568 the item's left / top / right / bottom are $($m568 -join ' / '), not 10 each (SPEC I226a, Q140.2)" }
+    }
+}
+# (b) one item form for the three lists
+$tab568 = Doc (Join-Path $dir 'WoD20.16.lfm')
+$tpl568 = @($tab568.SelectNodes("//recordList") | ForEach-Object { $_.GetAttribute('templateForm') })
+if ($tpl568.Count -ne 3 -or @($tpl568 | Sort-Object -Unique).Count -ne 1 -or $tpl568[0] -cne 'frmWoD20_17') { $v568Bad += "(b) the three lists do not share frmWoD20_17 - their items' margins could differ (SPEC I226a, Q140.2)" }
+# (c) the wheel at 2px
+$mk568 = @($main558.SelectNodes("//rectangle[starts-with(@name,'qpMark_')]"))
+if ($mk568.Count -ne 20 -or @($mk568 | Where-Object { $_.GetAttribute('strokeSize') -ne '2' }).Count) { $v568Bad += "(c) the 20 marks do not all author strokeSize 2 (SPEC I226b)" }
+# (d) HEALTH: the number 5 from its box, 4 after the name, the row as wide as before
+$tplOk568 = 0
+foreach ($pr568 in @(@($main558, 'HealthRow', 'dynHealth_'), @($cmb558, 'HealthRowMirror', 'dynHealth3_'))) {
+    $hr568 = $pr568[0].SelectSingleNode("//template[@name='$($pr568[1])']")
+    if ($null -eq $hr568) { continue }
+    $nm568 = $hr568.SelectSingleNode("label[@name='$($pr568[2])`$(num)']"); $pn568 = $hr568.SelectSingleNode("label[@name='$($pr568[2])pen`$(num)']"); $bx568 = $hr568.SelectSingleNode("rectangle")
+    if ($null -eq $nm568 -or $null -eq $pn568 -or $null -eq $bx568) { continue }
+    $tplOk568++
+    if (((XmlRect558 $pn568) -join ',') -ne '195,0,23,20' -or $pn568.GetAttribute('horzTextAlign') -ne 'trailing') { $v568Bad += "(d) $($pr568[1])'s number is not {195,0,23,20} right-aligned (SPEC I226e)" }
+    if ([int]$bx568.GetAttribute('left') - ([int]$pn568.GetAttribute('left') + [int]$pn568.GetAttribute('width')) -ne 5) { $v568Bad += "(d) $($pr568[1])'s number does not end 5 before its box (SPEC I226e)" }
+    if ([int]$pn568.GetAttribute('left') - ([int]$nm568.GetAttribute('left') + [int]$nm568.GetAttribute('width')) -ne 4) { $v568Bad += "(d) $($pr568[1])'s name does not end 4 before the number (SPEC I226e)" }
+}
+if ((NeededPx '-5' $null -Literal) -gt 23) { $v568Bad += "(d) '-5' needs more than the number's 23 (SPEC I226e)" }
+$hb568 = if ($geomTbl558.Success) { Rect558 $geomTbl558.Groups[1].Value 'dynHealth_box' } else { $null }
+if ($null -eq $hb568 -or $hb568[2] -ne 206) { $v568Bad += "(d) a mage's HEALTH is no longer 206 wide - the gap must come out of the number's own room (SPEC I226e)" }
+if ($tplOk568 -lt 2) { $v568Bad += "only $tplOk568 of the 2 HEALTH templates were read (SPEC V20)" }
+if ($v568Bad) { foreach ($b in $v568Bad) { Fail "V568 $b" } }
+else { Pass "V568 the Magick item keeps 10 on all four sides at 296, 300 and 316, one form for the three lists; the wheel at 2px; HEALTH's number 5 from its box with the row as wide as before" }
 
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

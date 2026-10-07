@@ -397,7 +397,9 @@
 				["QUINTESSENCE"] = "QUINTESSÊNCIA",
 				["PARADOX"] = "PARADOXO",
 				["Magick"] = "Mágika",
-				["FOCI"] = "FOCI",
+				["FOCI"] = "FOCOS",
+				["Focus"] = "Foco",
+				["Rote"] = "Rotina",
 				["ROTES"] = "ROTINAS",
 				["WONDERS"] = "MARAVILHAS",
 				["Add"] = "Adicionar",
@@ -3767,10 +3769,12 @@
 			-- way sectionBox names the avatar pair, and never by fill - the frames are #0A0A0A and
 			-- not the box black, which is exactly why sectionBox passes them over (SPEC V427a, V427d).
 			-- The seventh is the Vampire tab's (SPEC I188f); its Spent left in the 61st batch (I204f).
+			-- magickItemFrame (82nd batch, SPEC I225a, B204) is every Magick list item: black like its
+			-- box, so sectionBox names it out, and the era's corner reaches it from here.
 			local XP_FRAME = {
 				bgTotalXP = true, bgSpentXP = true, bgCurrentXP = true,
 				bgCurrentXPMain = true, bgCurrentXPNumina = true, bgCurrentXPGhoul = true,
-				bgCurrentXPVampire = true,
+				bgCurrentXPVampire = true, magickItemFrame = true,
 			};
 			local ORN_ARM   = 40;      -- corner reach along each edge
 			local ORN_FLEUR = 150;     -- an edge run shorter than this carries no centre motif
@@ -4941,6 +4945,10 @@
 				if nm == "ornAvatar" then return true, false; end;
 				if nm == "avatarFrame" then return true, false; end;
 
+				-- A Magick list item is the box's black but a SUB-box (user 2026-10-07, SPEC I225a,
+				-- B204): the era's corner comes from XP_FRAME, and no filigree on every item.
+				if nm == "magickItemFrame" then return; end;
+
 				if normColor(fill) ~= "#000000FF" then return; end;
 
 				local rad = c.xradius;
@@ -5273,13 +5281,16 @@
 				return ((f ~= nil and pending[f]) and t.dotPending) or t.dotOn;
 			end;
 
-			local function applyTheme(v, from)
+			-- `only` (81st batch, SPEC I224b, B203): a SUBTREE to paint instead of the whole sheet - a
+			-- Magick list item, which the recordList builds after this walk has run. Nothing else
+			-- passes it, so every other call paints exactly what it always did.
+			local function applyTheme(v, from, only)
 				-- Every value the combo offers has a palette since the 16th round, so this never
 				-- resolves to nil: a sheet carrying something else - "Present Day" from before
 				-- the rename, or plain rubbish - lands on the default rather than on an
 				-- unpainted sheet (SPEC V52).
 				local t = THEMES[v] or THEMES[THEME_DEFAULT];
-				local root = rootOf(from);
+				local root = only or rootOf(from);
 				local all = {root};
 
 				-- Kept for refreshOrnament, which runs outside this traversal (SPEC I72d, V284).
@@ -5365,7 +5376,13 @@
 							-- the `and` short-circuits and they never even ask the selector.
 							local hair = t.outline ~= nil and sectionBox(c, fill);
 
-							paint(c, "strokeSize", (hair and t.outline) or THEME_STROKE, authored(c, "strokeSize"));
+							-- The mage's wheel keeps the outline it authors in every era - 2px since the 83rd batch, SPEC I226b (user 2026-10-07,
+							-- SPEC I225c, B204): THEME_STROKE drew its twenty squares at 3, thicker
+							-- than the dots they sit beside. Its colour still follows the era above.
+							-- One write still (V485f): the wheel only picks what goes into it.
+							local wheel = nm ~= nil and string.sub(nm, 1, 7) == "qpMark_";
+
+							paint(c, "strokeSize", (wheel and authored(c, "strokeSize")) or (hair and t.outline) or THEME_STROKE, authored(c, "strokeSize"));
 						end;
 
 						-- The CORNER, and only on the 73 that the SAME selector the ornament uses
@@ -5485,6 +5502,9 @@
 					end;
 				end;
 
+				-- A list item has no wheel and no !, and the three below walk the whole sheet.
+				if only ~= nil then return; end;
+
 				-- The same for the mage's wheel (SPEC I223a, V562d): the walk put every mark back to its
 				-- authored clear fill, and gold / purple are Lua's. Before the two below, which V515d
 				-- keeps last.
@@ -5494,6 +5514,14 @@
 				-- it goes back on here, last (SPEC I177c, V515d - B179 again, for colour).
 				specBangPaint(from);
 				noteBangPaint(from);
+			end;
+
+			-- One Magick list item, in the era in force (81st batch, SPEC I224b, B203): called by the
+			-- Magick tab as the item is built. Global because the tab is another file's script.
+			function themeItem(form)
+				if sheet == nil or form == nil then return; end;
+
+				applyTheme(sheet.sheetTheme or THEME_DEFAULT, form, form);
 			end;
 
 			-- The pending dots, repainted without the whole theme walk (SPEC I163h, V480e).

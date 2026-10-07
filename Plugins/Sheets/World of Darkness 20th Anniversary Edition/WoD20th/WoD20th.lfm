@@ -2258,8 +2258,9 @@
 							-- Name and "(-N)" on two labels since the 80th batch (user 2026-10-07,
 							-- SPEC I223c, V563): the name starts on the row's edge in every row and the
 							-- penalty sits right-aligned against its box. A level with no penalty
-							-- (Bruised, Incapacitated) leaves the second label empty.
-							local name, pen = string.match(full, "^(.-)%s*(%(%-?%d+%))$");
+							-- (Bruised, Incapacitated) leaves the second label empty. The number only,
+							-- its minus kept, since the 82nd batch (user 2026-10-07, SPEC I225d): -2, not (-2).
+							local name, pen = string.match(full, "^(.-)%s*%((%-?%d+)%)$");
 
 							if name == nil then name, pen = full, ""; end;
 
@@ -2925,6 +2926,8 @@
 				names.boxQuintParadox = true;
 				names.boxArete = true;
 				names.boxArete3 = true;
+				names.boxSpheres = true;
+				names.boxSpheres3 = true;
 
 				local found = xpFind(tabRootOf(from), names, {});
 
@@ -3022,8 +3025,9 @@
 				end;
 
 				-- The Quintessence / Paradox wheel takes ROAD's slot, a mage's alone (SPEC I218a), and so
-				-- are ARETE / SPHERES beside it and their read-only copy on the Combat tab (SPEC I221c/k).
-				for _, nm in ipairs({ "boxQuintParadox", "boxArete", "boxArete3" }) do
+				-- are ARETE / SPHERES beside it and their read-only copy on the Combat tab (SPEC I221c/k) -
+				-- two boxes each since the 82nd batch (SPEC I225e).
+				for _, nm in ipairs({ "boxQuintParadox", "boxArete", "boxArete3", "boxSpheres", "boxSpheres3" }) do
 					local c = found[nm];
 
 					if c ~= nil and c.visible ~= mage then c.visible = mage; end;
