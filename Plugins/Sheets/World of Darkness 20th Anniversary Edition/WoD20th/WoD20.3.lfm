@@ -19,12 +19,15 @@
 			-- shows. Dots 4..9 answer to the same rule as there - a vampire sees the live dot up to
 			-- the generation's ceiling and the faded twin above it, anyone else sees five. The twin
 			-- is 0.12 because the live dot here is already 0.40 (SPEC V111): the Main's 0.30 ratio.
-			-- It is an EMPTY dot since the 54th batch (user 2026-10-02, SPEC I197b, V543).
+			-- It is an EMPTY dot since the 54th batch (user 2026-10-02, SPEC I197b, V543). A MAGE
+			-- wears the nine under a ceiling of 5 (user 2026-10-06, SPEC I216c, Q129.1), and a TENTH
+			-- since the 74th batch - a twin only a mage sees, as on the Main (SPEC I217k, V554f).
 			local function paintAs(form, widget, field, firstDot)
-				local vamp = sheet.game == "Vampire";
-				local top  = vamp and vampGen().disc or 5;
+				local vamp = vampLayout();
+				local mage = sheet.game == "Mage";
+				local top  = (sheet.game == "Vampire") and vampGen().disc or 5;
 
-				for d = 1, 9, 1 do
+				for d = 1, 10, 1 do
 					local dot = form["ro_" .. widget .. "_" .. d];
 
 					if dot ~= nil then
@@ -37,7 +40,7 @@
 						if d >= 4 then
 							local twin = form["rocap_" .. widget .. "_" .. d];
 							local live = d <= top;
-							local cap  = vamp and not live;
+							local cap  = vamp and not live and (d <= 9 or mage);
 
 							if dot.visible ~= live then dot.visible = live; end;
 							if twin ~= nil and twin.visible ~= cap then twin.visible = cap; end;
@@ -241,12 +244,14 @@
 			<imageCheckBox name="ro_$(field)_7" left="275" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="ro_$(field)_8" left="300" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="ro_$(field)_9" left="325" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
+			<imageCheckBox name="ro_$(field)_10" left="350" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="rocap_$(field)_4" left="200" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="rocap_$(field)_5" left="225" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="rocap_$(field)_6" left="250" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="rocap_$(field)_7" left="275" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="rocap_$(field)_8" left="300" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 			<imageCheckBox name="rocap_$(field)_9" left="325" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
+			<imageCheckBox name="rocap_$(field)_10" left="350" top="0" width="25" height="25" checked="false" autoChange="false" opacity="0.12" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" visible="false"/>
 		</template>
 
 		<!-- Ten read-only dots over ten real boxes (SPEC V51). The dots carry no `field=` and
@@ -547,11 +552,13 @@
 			Title, the Main's 8 and the 52 of dots and boxes are ONE object centred in the box since
 			the 61st batch (user 2026-10-02, SPEC I204c, V547): 20 + 8 + 52 = 80 in 110, 15 above.
 		-->
-		<layout left="650" top="487" width="315" height="110">
+		<!-- Named in the 74th batch (user 2026-10-06, SPEC I217k): a MAGE's mirror follows the Main -
+		     no VIRTUES, and WILLPOWER in their place, re-centred by MAGE_GEOM. -->
+		<layout name="boxWillpower3" left="650" top="487" width="315" height="110">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="275" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<label name="lblWillpower3" left="20" top="15" width="275" height="20" text="WILLPOWER" horzTextAlign="center"/>
 
-			<layout left="32" top="43" width="250" height="52">
+			<layout name="bodyWillpower3" left="32" top="43" width="250" height="52">
 				<WillpowerMirror/>
 			</layout>
 		</layout>
@@ -606,7 +613,7 @@
 			the closest 315 allows, and it is why V470(a) charges a difference of at most 1 and
 			not an equality - 314 would have been exact, and the user chose 10px over 11.
 		-->
-		<layout left="650" top="356" width="315" height="126">
+		<layout name="boxVirtues3" left="650" top="356" width="315" height="126">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="275" height="20" text="VIRTUES" horzTextAlign="center"/>
 

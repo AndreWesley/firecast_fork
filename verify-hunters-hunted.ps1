@@ -568,12 +568,14 @@ function BoxCount($base) { ($allFields.Keys | Where-Object { $_ -match "^$([rege
 $expect = @{}
 # NINE dots on the Main's traits and the backgrounds since the 47th batch (SPEC I190e, V535a): a
 # vampire's rows go to nine, dots 6..9 authored hidden for everyone else. Dot 1 of an attribute is
-# still a fixed image, so the attribute owns eight; the virtues stay at four.
-'strength','dexterity','stamina','charisma','manipulation','perception','inteligence','wits' | % { $expect[$_] = 8 }  # dot 1 is a fixed image
+# still a fixed image, so the attribute owns eight; the virtues stay at four. TEN since the 74th
+# batch (SPEC I217, V554c): a MAGE's rows draw a tenth, authored hidden for everyone else - so
+# the attribute owns nine, a typed or ability row ten, a background ten.
+'strength','dexterity','stamina','charisma','manipulation','perception','inteligence','wits' | % { $expect[$_] = 9 }  # dot 1 is a fixed image
 'conscience','selfControl','courage'                                                          | % { $expect[$_] = 4 }  # dot 1 is a fixed image
 # Appearance is the exception: its dot 1 is a real checkBox so the rating can drop to zero
 # (SPEC T95), which makes it the only attribute that owns every dot it draws.
-$expect['appearance'] = 9
+$expect['appearance'] = 10
 $expect['faith'] = 5
 'alertness','athletics','awareness','brawl','empathy','expression','intimidation','leadership','streetwise','subterfuge',
 'animalKen','crafts','etiquette','firearms','larceny','melee','performance','ride','stealth','survival',
@@ -581,7 +583,7 @@ $expect['faith'] = 5
 # All nine typed rows: customTalent_3/_4 and customKnowledge_3 cost experience since the user
 # reversed Q93 on 2026-10-01 (SPEC B189) - V507e holds the typed rows and XP_CUSTOM equal.
 'customTalent_1','customTalent_2','customTalent_3','customTalent_4','customSkill_1','customSkill_2',
-'customKnowledge_1','customKnowledge_2','customKnowledge_3'  | % { $expect[$_] = 9 }
+'customKnowledge_1','customKnowledge_2','customKnowledge_3'  | % { $expect[$_] = 10 }
 $expect['humanity'] = 10
 $expect['willpower'] = 10
 # SPEC V5 says "backgrounds 5" dots, but only the ROW count was ever checked - a background
@@ -594,7 +596,7 @@ $bgRootTxt = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllByt
 $bgDecl = [regex]::Match($bgRootTxt, '(?m)^\s*BACKGROUND_ROWS = (\d+);')
 $bgRows = if ($bgDecl.Success) { [int]$bgDecl.Groups[1].Value } else { 0 }
 if (-not $bgDecl.Success) { Fail "V145 BACKGROUND_ROWS is not declared on the root form - the row count would be a literal in every loop again" }
-1..$bgRows | ForEach-Object { $expect["background_$_"] = 9 }
+1..$bgRows | ForEach-Object { $expect["background_$_"] = 10 }
 # Numina tab: hedge rows + psychic rows, 5 dots each (SPEC V5 after T56/T57). The two counts
 # stopped being a literal `10` in the 90th round: each list declares its own on the root form
 # and every loop reads it, so a row drawn in the XML and walked by no loop cannot pass as a
@@ -1283,12 +1285,17 @@ else { Pass "V37 no sibling row draws over its neighbour ($twinByRect twin row(s
 # 52nd it is a box of every game (SPEC I195a).
 $VAMP_ONLY = @{ 'mainBloodPool' = $true }
 $gpRoot = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir "WoD20th.lfm")))
-$gpTbl = [regex]::Match($gpRoot, '(?s)GAME_PAIRS = \{(.*?)\n\t\t\t\};')
-if (-not $gpTbl.Success) { Fail "V534 (f) GAME_PAIRS was not found on the root form - the mortal projection cannot be built (SPEC V534f, V20)" }
+$gpTbl = [regex]::Match($gpRoot, '(?s)GAME_ROWS = \{(.*?)\n\t\t\t\};')
+if (-not $gpTbl.Success) { Fail "V534 (f) GAME_ROWS was not found on the root form - the mortal projection cannot be built (SPEC V534f, V553d, V20)" }
 else {
-    foreach ($gpM in [regex]::Matches($gpTbl.Groups[1].Value, '\{\s*"(\w+)",\s*"(\w+)"\s*\}')) { $VAMP_ONLY[$gpM.Groups[2].Value] = $true }
-    # Three pairs since the 48th batch (SPEC I191a, V528 amended): the ATTRIBUTES headings are gone.
-    if ($VAMP_ONLY.Count -lt 4) { Fail "V534 (f) only $($VAMP_ONLY.Count - 1) vampire name(s) read off GAME_PAIRS - the mortal projection would keep what a mortal never sees (SPEC V534f, V20)" }
+    # Rows of THREE since the 73rd batch (SPEC I216g, V553d): mortal, vampire, mage - every name
+    # after the first is one a mortal never sees. The mage's third row has no third name.
+    foreach ($gpM in [regex]::Matches($gpTbl.Groups[1].Value, '\{\s*"\w+"((?:,\s*"\w+")+)\s*\}')) {
+        foreach ($gpN in [regex]::Matches($gpM.Groups[1].Value, '"(\w+)"')) { $VAMP_ONLY[$gpN.Groups[1].Value] = $true }
+    }
+    # Three rows since the 48th batch (SPEC I191a, V528 amended): the ATTRIBUTES headings are gone.
+    # Five non-mortal names since the 73rd (three vampire, two mage).
+    if ($VAMP_ONLY.Count -lt 6) { Fail "V534 (f) only $($VAMP_ONLY.Count - 1) non-mortal name(s) read off GAME_ROWS - the mortal projection would keep what a mortal never sees (SPEC V534f, V553d, V20)" }
 }
 
 # ---- V40: and two BOXES on one tab must not overlap either (SPEC V40, T112) --------
@@ -5088,7 +5095,7 @@ else {
     # the sale refusal of V103 growing one.
     $buyWarns = @([regex]::Matches($buy.Groups[1].Value, 'xpWarn\("([^"]*)"\)'))
     if (-not $buy.Success) { Fail "V129 xpClick has no purchase branch" }
-    elseif ($warns.Count -ne 11) { Fail "V129 xpClick raises $($warns.Count) pop-ups - eleven refusals speak (ten until the 47th batch put a vampire's attributes and abilities under his generation's Max Trait Level, SPEC I190g, V535d; nine until the 45th batch gave the generation refusal a second voice for a vampire, whose ceiling is his OWN generation, SPEC I188c): the applied floor (SPEC V475c, 18th batch), the balance, the empty trait, the closed door, the generation ceiling (SPEC V220), the gift that is not the player's to take off (SPEC V161), the secondary path row with nothing picked in it, the secondary path above what its blood sorcery allows (SPEC V183), and the family ceiling on a trait (SPEC V337, T781)" }
+    elseif ($warns.Count -ne 12) { Fail "V129 xpClick raises $($warns.Count) pop-ups - twelve refusals speak (eleven until the 73rd batch gave the Main's trait ceiling a second voice for a MAGE, whose nine dots stop at five, SPEC I216c, V553b; ten until the 47th batch put a vampire's attributes and abilities under his generation's Max Trait Level, SPEC I190g, V535d; nine until the 45th batch gave the generation refusal a second voice for a vampire, whose ceiling is his OWN generation, SPEC I188c): the applied floor (SPEC V475c, 18th batch), the balance, the empty trait, the closed door, the generation ceiling (SPEC V220), the gift that is not the player's to take off (SPEC V161), the secondary path row with nothing picked in it, the secondary path above what its blood sorcery allows (SPEC V183), and the family ceiling on a trait (SPEC V337, T781)" }
     elseif ($buyWarns.Count -ne 1) { Fail "V129 the balance branch raises $($buyWarns.Count) pop-ups - only the refusal for want of experience may speak there" }
     elseif ($buy.Groups[1].Value -notmatch 'xpWarn\(') { Fail "V129 the refusal for want of experience says nothing" }
     elseif ($buy.Groups[1].Value -match 'markDot\(') { Fail "V129 the refused purchase marks the dot anyway (SPEC V135)" }
@@ -17087,11 +17094,12 @@ else {
 # GAME_PAIRS since the 47th batch (SPEC I190d, V528 amended): the six header names. The three
 # ATTRIBUTES group labels were pairs in the 47th and are not since the 48th (SPEC I191a, V528 amended
 # again): the headings are GONE and the rotated names stand in every game, moved by VAMP_GEOM.
-$pairsTbl528 = [regex]::Match($rootTxt, '(?s)GAME_PAIRS = \{(.*?)\};')
-foreach ($n528 in @('hdrMotivation', 'hdrClan', 'hdrOccupation', 'hdrGeneration', 'hdrResidence', 'hdrSire')) {
-    if (-not $pairsTbl528.Success -or $pairsTbl528.Groups[1].Value -notmatch "`"$n528`"") { $v528Bad += "(c) GAME_PAIRS does not name $n528 - renderGameMode could never reach it (SPEC V528c)" }
+# GAME_ROWS since the 73rd batch (SPEC I216g, V553d): rows of three, the mage's two names added.
+$pairsTbl528 = [regex]::Match($rootTxt, '(?s)GAME_ROWS = \{(.*?)\};')
+foreach ($n528 in @('hdrMotivation', 'hdrClan', 'hdrOccupation', 'hdrGeneration', 'hdrResidence', 'hdrSire', 'hdrAffiliation', 'hdrSect')) {
+    if (-not $pairsTbl528.Success -or $pairsTbl528.Groups[1].Value -notmatch "`"$n528`"") { $v528Bad += "(c) GAME_ROWS does not name $n528 - renderGameMode could never reach it (SPEC V528c, V553d)" }
 }
-if ($pairsTbl528.Success -and $pairsTbl528.Groups[1].Value -match 'attrRot|attrHead') { $v528Bad += "(c) GAME_PAIRS still names an ATTRIBUTES group label - the rotated names are hidden by renderGameMode's rule loop, never paired (SPEC V528 as amended, I201b)" }
+if ($pairsTbl528.Success -and $pairsTbl528.Groups[1].Value -match 'attrRot|attrHead') { $v528Bad += "(c) GAME_ROWS still names an ATTRIBUTES group label - the rotated names are hidden by renderGameMode's rule loop, never paired (SPEC V528 as amended, I201b)" }
 foreach ($f528 in (Get-ChildItem $dir -Filter '*.lfm')) {
     if ((Get-Content $f528.FullName -Raw) -match 'name="attrHead') { $v528Bad += "(c) $($f528.Name) still carries an attrHead* label - the 48th batch deleted the three headings (SPEC I191a)" }
 }
@@ -17339,7 +17347,8 @@ else {
     if ($vb531 -match '\bslots\s*=') { $v531Bad += "(a) a vampire list still carries slots - the tail reads typed since the 46th batch (SPEC V531a)" }
 }
 $era531 = NoComments (LuaFn $rootTxt 'eraAbilities')
-if ($era531 -notmatch 'sheet\.game == "Vampire"' -or $era531 -notmatch 'VAMPIRE_ABILITIES\[era\]') { $v531Bad += "(a) eraAbilities does not hand a vampire the game's own lists (SPEC V531a)" }
+# vampLayout() since the 73rd batch (SPEC I216b, V553b): a mage wears the vampire's lists.
+if ($era531 -notmatch 'vampLayout\(\) and VAMPIRE_ABILITIES\[era\] ~= nil' -or $era531 -notmatch 'VAMPIRE_ABILITIES\[era\]') { $v531Bad += "(a) eraAbilities does not hand a vampire the game's own lists (SPEC V531a)" }
 # (b) The authored state is the Victorian list, the base era the XML draws (SPEC V19): talents 11,
 # skills 13, knowledges 12 - so every Row shows but knowledges_13's, whose Fill shows instead.
 $m531 = Doc (Join-Path $dir 'WoD20.1.lfm')
@@ -17459,9 +17468,10 @@ else {
 }
 # (d)
 $gm532 = NoComments (LuaFn $rootTxt 'renderGameMode')
-if ($gm532 -notmatch 'mainBloodPool = true' -or $gm532 -notmatch 'found\["mainBloodPool"\]' -or $gm532 -notmatch 'pool\.visible = vamp') { $v532Bad += "(d) renderGameMode does not show mainBloodPool by the game (SPEC V532d, I189e)" }
+# By the game AND, for a mage, Show Ghoul since the 73rd batch (SPEC I216e, V553f).
+if ($gm532 -notmatch 'mainBloodPool = true' -or $gm532 -notmatch 'found\["mainBloodPool"\]' -or $gm532 -notmatch 'local hasBlood = sheet\.game == "Vampire" or \(mage and sheet\.stShowDisciplines == true\);' -or $gm532 -notmatch 'pool\.visible = hasBlood') { $v532Bad += "(d) renderGameMode does not show mainBloodPool by the game (SPEC V532d, I189e)" }
 $vc532 = NoComments (LuaFn $rootTxt 'renderVampCaps')
-if ($vc532 -notmatch 'names\["mdotbloodPool_" \.\. n\] = true' -or $vc532 -notmatch 'names\["mcapbloodPool_" \.\. n\] = true' -or $vc532 -notmatch 'pair\(found\["mdotbloodPool_" \.\. n\], found\["mcapbloodPool_" \.\. n\], n <= g\.pool\)') { $v532Bad += "(d) renderVampCaps does not paint the Main's pool by the generation (SPEC V532d, I189e)" }
+if ($vc532 -notmatch 'names\["mdotbloodPool_" \.\. n\] = true' -or $vc532 -notmatch 'names\["mcapbloodPool_" \.\. n\] = true' -or $vc532 -notmatch 'local mainPool = isVamp and g\.pool or \(bloodCap\(\) or 20\);' -or $vc532 -notmatch 'pair\(found\["mdotbloodPool_" \.\. n\], found\["mcapbloodPool_" \.\. n\], n <= mainPool\)') { $v532Bad += "(d) renderVampCaps does not paint the Main's pool by the generation (SPEC V532d, I189e)" }
 # (e)
 foreach ($of532 in Get-ChildItem -Path $dir -Filter '*.lfm') {
     if ($of532.Name -eq 'WoD20.1.lfm') { continue }
@@ -17598,13 +17608,16 @@ foreach ($nm534 in $geo534.Keys) {
     if ($hits534.Count -ne 1) { $v534Bad += "(a) $nm534 is named $($hits534.Count) time(s) on Main/Traits/Combat, not once (SPEC V534a)" } else { $node534[$nm534] = $hits534[0] }
 }
 $gm534 = NoComments (LuaFn $rootTxt 'renderGameMode')
-if ($gm534 -notmatch 'local function placeBox\(c, r\)' -or $gm534 -notmatch 'placeBox\(c, vamp and r or GEOM_XML\[nm\]\)') { $v534Bad += "(a) renderGameMode does not place the boxes through its placeBox from VAMP_GEOM and GEOM_XML (SPEC V534a)" }
+# `rect` since the 73rd batch (SPEC I216g, V553d), out of MAGE_GEOM since the 74th (SPEC I217a,
+# V554a): a mage's rect where MAGE_GEOM has one, the XML's height back for a vampire.
+if ($gm534 -notmatch 'local function placeBox\(c, r\)' -or $gm534 -notmatch 'if mage and m ~= nil then' -or $gm534 -notmatch 'rect = \{ r\[1\], r\[2\], r\[3\], GEOM_XML\[nm\]\[4\] \};' -or $gm534 -notmatch 'placeBox\(c, vamp and rect or GEOM_XML\[nm\]\)' -or $gm534 -notmatch 'placeBox\(c, mage and r or GEOM_XML\[nm\]\)') { $v534Bad += "(a) renderGameMode does not place the boxes through its placeBox from VAMP_GEOM and GEOM_XML (SPEC V534a)" }
 # Counted over EVERY .lfm, not the root alone: applyTheme lives on WoD20.6, and a call planted there
 # would leave the root's count at two.
 $pb534 = 0
 foreach ($lf534 in Get-ChildItem -Path $dir -Filter '*.lfm') { $pb534 += @([regex]::Matches((NoComments ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf534.FullName)))), 'placeBox\(')).Count }
 # THREE since the 71st batch (SPEC I214e, V551d): the second call places VTF_GEOM, in renderGameMode too.
-if ($pb534 -ne 3) { $v534Bad += "(a) placeBox appears $pb534 time(s) across the sheet - its definition and the two calls in renderGameMode (VAMP_GEOM, VTF_GEOM); it is the ONE writer of a vampire's geometry (SPEC V534a, V551d, V57)" }
+# FOUR since the 74th (SPEC I217a, V554a): the third places the names only MAGE_GEOM moves.
+if ($pb534 -ne 4) { $v534Bad += "(a) placeBox appears $pb534 time(s) across the sheet - its definition and the three calls in renderGameMode (VAMP_GEOM, MAGE_GEOM, VTF_GEOM); it is the ONE writer of a vampire's and a mage's geometry (SPEC V534a, V551d, V554a, V57)" }
 $at534 = NoComments (LuaFn ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.6.lfm')))) 'applyTheme')
 if ($at534 -eq '') { $v534Bad += "(a) applyTheme was not found on WoD20.6 - the leg would read nothing (SPEC V20)" }
 elseif ($at534 -match 'placeBox|VAMP_GEOM|renderGameMode') { $v534Bad += "(a) applyTheme moves boxes - the theme paints, it never places (SPEC V57, V534a)" }
@@ -17888,7 +17901,7 @@ foreach ($s535 in $spec535) {
 }
 # (c) the declared range and the ledger read nine
 $nc535 = NoComments $rootTxt
-foreach ($re535 in @('declareTrait\(XP_ATTRS\[i\]\[2\], 2, 9, 1\)', 'declareTrait\("appearance", 1, 9, 0\)', 'pairs\(ABILITY_FIELD\) do declareTrait\(field, 1, 9, 0\)', 'declareTrait\(XP_CUSTOM\[i\], 1, 9, 0\)', 'declareTrait\("background_" \.\. i, 1, 9, 0\)')) {
+foreach ($re535 in @('declareTrait\(XP_ATTRS\[i\]\[2\], 2, 9, 1\)', 'declareTrait\("appearance", 1, 9, 0\)', 'pairs\(ABILITY_FIELD\) do declareTrait\(field, 1, 9, 0\)', 'declareTrait\(XP_CUSTOM\[i\], 1, 9, 0\)', 'declareTrait\("background_" \.\. i, 1, 10, 0\)')) {
     if ($nc535 -notmatch $re535) { $v535Bad += "(c) the root does not declare $re535 - the guard would stop at five (SPEC V535c, V86)" }
 }
 foreach ($pr535 in [regex]::Matches($nc535, '(?s)pushRise\(rows, "(Attribute|Ability|Background)".*?\);')) {
@@ -17896,14 +17909,15 @@ foreach ($pr535 in [regex]::Matches($nc535, '(?s)pushRise\(rows, "(Attribute|Abi
 }
 # (d) the refusal
 $st535 = NoComments (LuaFn $rootTxt 'xpStep')
-if ($st535 -notmatch 'want and sheet\.game == "Vampire" and MAIN_NINE_TRAIT\[trait\]' -or $st535 -notmatch '\(level \+ 1\) > vampGen\(\)\.disc' -or $st535 -notmatch 'xpWarn\("That trait is above what your generation allows"\)') { $v535Bad += "(d) xpStep does not refuse a vampire's trait above his generation's ceiling, by its own words (SPEC V535d)" }
+# The mage's nine since the 73rd batch (SPEC I216c, V553b): the same refusal, ceiling 5, own words.
+if ($st535 -notmatch 'want and vampLayout\(\) and MAIN_NINE_TRAIT\[trait\]' -or $st535 -notmatch 'local top    = isVamp and vampGen\(\)\.disc or 5;' -or $st535 -notmatch '\(level \+ 1\) > top' -or $st535 -notmatch 'xpWarn\("That trait is above what your generation allows"\)' -or $st535 -notmatch 'xpWarn\("That trait is above 5"\)') { $v535Bad += "(d) xpStep does not refuse a vampire's trait above his generation's ceiling, by its own words (SPEC V535d)" }
 if (-not ($ptK.Contains('That trait is above what your generation allows') -and $enK.Contains('That trait is above what your generation allows'))) { $v535Bad += "(d) the refusal has no key in both halves of localization.lang (SPEC V535d, V10)" }
 # (e) the painters
 $vc535 = NoComments (LuaFn $rootTxt 'renderVampCaps')
 if ($vc535 -notmatch 'MAIN_NINE' -or $vc535 -notmatch '"mcap" \.\. MAIN_NINE' -or $vc535 -notmatch 'dotbackground_' -or $vc535 -notmatch 'vamp and g\.disc or 5') { $v535Bad += "(e) renderVampCaps does not paint the Main's nine-dot rows and the backgrounds by the game and the ceiling (SPEC V535e)" }
 $w3535 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.3.lfm')))
 $pa535 = NoComments (LuaFn $w3535 'paintAs')
-if ($pa535 -notmatch 'for d = 1, 9, 1 do' -or $pa535 -notmatch '"rocap_"' -or $pa535 -notmatch 'vampGen\(\)\.disc') { $v535Bad += "(e) paintAs on the Combat tab does not mirror nine dots with the ceiling (SPEC V535e, Q109.8)" }
+if ($pa535 -notmatch 'for d = 1, 10, 1 do' -or $pa535 -notmatch '"rocap_"' -or $pa535 -notmatch 'vampGen\(\)\.disc') { $v535Bad += "(e) paintAs on the Combat tab does not mirror nine dots with the ceiling (SPEC V535e, Q109.8)" }
 $dl535 = [regex]::Match($w3535, "<dataLink fields=`"\{'sheetTheme', 'strength_2'[^}]*\}")
 foreach ($f535 in @("'strength_9'", "'archery_9'", "'stealth_9'", "'game'", "'generation'")) { if ($dl535.Value -notmatch [regex]::Escape($f535)) { $v535Bad += "(e) the Combat mirror's dataLink does not watch $f535 (SPEC V535e)" } }
 if ($tpl535 -lt 6) { $v535Bad += "only $tpl535 of the six nine-dot templates were read (SPEC V20)" }
@@ -18006,12 +18020,16 @@ else {
 # (d)
 $vf536 = NoComments (LuaFn $rootTxt 'vampFlagsOff')
 $sets536 = @([regex]::Matches($vf536, 'setField\("(\w+)", false\)') | ForEach-Object { $_.Groups[1].Value })
-if ($vf536 -notmatch 'sheet\.game ~= "Vampire" then return' -or (($sets536 | Sort-Object) -join ',') -ne 'stShowDisciplines,stShowNumina' -or $vf536 -notmatch 'sheet\.stShowNumina ~= false' -or $vf536 -notmatch 'sheet\.stShowDisciplines ~= false') { $v536Bad += "(d) vampFlagsOff does not turn exactly Show Numina and Show Ghoul off, only for a vampire and only when they are not off (SPEC V536d)" }
+# A mage since the 73rd batch (SPEC I216d, V553c): Numina off for the vampire's sheet, Show Ghoul
+# off for a VAMPIRE only - a mage can be a ghoul.
+if ($vf536 -notmatch 'if not vampLayout\(\) then return' -or (($sets536 | Sort-Object) -join ',') -ne 'stShowDisciplines,stShowNumina' -or $vf536 -notmatch 'sheet\.stShowNumina ~= false' -or $vf536 -notmatch 'sheet\.game == "Vampire" and sheet\.stShowDisciplines ~= false') { $v536Bad += "(d) vampFlagsOff does not turn exactly Show Numina and Show Ghoul off, only for a vampire and only when they are not off (SPEC V536d)" }
 $gl536 = [regex]::Match($rootTxt, '(?s)<dataLink field="game">(.*?)</dataLink>')
 if (-not $gl536.Success -or $gl536.Groups[1].Value -notmatch 'vampFlagsOff\(\);') { $v536Bad += "(d) the game's dataLink does not call vampFlagsOff (SPEC V536d)" }
 $rd536 = @([regex]::Matches($rootTxt, '(?s)<event name="onNodeReady">(.*?)</event>') | Where-Object { $_.Groups[1].Value -match 'root\.onNodeReady' })
 if ($rd536.Count -ne 1 -or $rd536[0].Groups[1].Value -notmatch '(?s)setField\("stShowNumina", true\).*?vampFlagsOff\(\);') { $v536Bad += "(d) the root's onNodeReady does not call vampFlagsOff after the stShowNumina seed (SPEC V536d)" }
-if ($gm534 -notmatch '"chkShowNumina"' -or $gm534 -notmatch '"chkShowDisciplines"' -or $gm534 -notmatch "vamp and $([regex]::Escape($DIM_ART)) or 1" -or $gm534 -notmatch 'c\.enabled = not vamp') { $v536Bad += "(d) renderGameMode does not lock and dim Show Numina and Show Ghoul by the game, at $DIM_ART (SPEC V536d, V111)" }
+# Two locks since the 73rd batch (SPEC I216d, V553c): Numina by the vampire's SHEET (a mage's too),
+# Show Ghoul by the game Vampire alone.
+if ($gm534 -notmatch 'chkShowNumina = vamp' -or $gm534 -notmatch 'chkShowDisciplines = sheet\.game == "Vampire"' -or $gm534 -notmatch "lock and $([regex]::Escape($DIM_ART)) or 1" -or $gm534 -notmatch 'c\.enabled = not lock') { $v536Bad += "(d) renderGameMode does not lock and dim Show Numina and Show Ghoul by the game, at $DIM_ART (SPEC V536d, V111)" }
 if ($v536Bad) { foreach ($b in ($v536Bad | Select-Object -Unique)) { Fail "V536 $b" } }
 else { Pass "V536 the BLOOD PER TURN box is double, the Main's faded Blood per Turn sits between title and dots, the Vampire tab shows the clan's weakness (the longest, $long536 chars, scrolls clear of the bar) and a vampire's Show Numina/Show Ghoul go off and lock" }
 
@@ -20915,7 +20933,9 @@ if ($v383Bad.Count -eq 0) {
 # label+entry grid row, not a template-drawn list row, so its button is authored inline the way
 # the affiliation one is.
 # dynmainClan joined in the 45th batch: the vampire's Clan on the Main header, one inline row (SPEC I188b).
-$BARE_DYN = @('dynhedgeAffiliation', 'dynroad', 'dynclanFamily', 'dynmainClan', 'dynarmorClass', 'dynshieldClass')
+# dynmainAffiliation & dynmainSect joined in the 73rd batch: the mage's two pickers on the Main
+# header, inline like dynmainClan (SPEC I216f); renderHeaderButtons paints them.
+$BARE_DYN = @('dynhedgeAffiliation', 'dynroad', 'dynclanFamily', 'dynmainClan', 'dynarmorClass', 'dynshieldClass', 'dynmainAffiliation', 'dynmainSect')
 $bareSeen383 = @()
 foreach ($f383b in $files) {
     foreach ($b383b in (Doc $f383b.FullName).SelectNodes("//button")) {
@@ -26034,7 +26054,8 @@ else {
         if ($spec500[0] -eq 'OpenAbility') {
             $dots500 = @($t500.SelectNodes("imageCheckBox") | ForEach-Object { [int]$_.GetAttribute('left') } | Sort-Object)
             # NINE since the 47th batch: a vampire's backgrounds draw dots 6..9 (SPEC I190e, V535a).
-            if ($dots500.Count -ne 9 -or $dots500[0] -ne ($bl500 + $bw500 + 5)) { $v500Bad += "(a) the first background dot is not 5px right of the ! (SPEC V500a)" }
+            # TEN since the 74th: a mage's draw a tenth (SPEC I217e, V554c).
+            if ($dots500.Count -ne 10 -or $dots500[0] -ne ($bl500 + $bw500 + 5)) { $v500Bad += "(a) the first background dot is not 5px right of the ! (SPEC V500a)" }
         } else {
             $book500 = $t500.SelectSingleNode("edit[starts-with(@field,'book_')]")
             if ($null -eq $book500 -or [int]$book500.GetAttribute('left') -ne ($bl500 + $bw500)) { $v500Bad += "(a) the BOOK column does not start where the merit ! ends (SPEC V500a, B171)" }
@@ -26928,6 +26949,10 @@ else {
                 $nb511[$m.Groups[1].Value + $m.Groups[2].Value + '|' + $m.Groups[3].Value] = $m.Groups[1].Value
             }
             foreach ($k in $lab511.Keys) {
+                # NAMED exception, 73rd batch (SPEC I216f, Q129.5): the mage's Affiliation and Sect
+                # have no ? yet - no module describes them, and a ? on "No description available"
+                # is the empty pane V360 exists for. A third picker without a ? still reddens here.
+                if ($lab511[$k] -ceq 'mainAffiliation' -or $lab511[$k] -ceq 'mainSect') { continue }
                 if (-not $nb511.ContainsKey($k)) { $v511Bad += "(b) $f511 $($fm511.Groups[1].Value) paints dyn$($lab511[$k]) with no noteButton for btnQ$($lab511[$k]) over the same value - its ? stays lit on an empty row (SPEC V511b)"; continue }
                 $fp511++
                 $y = $lab511[$k]
@@ -27572,5 +27597,270 @@ else {
 }
 if ($v552Bad) { foreach ($b in $v552Bad) { Fail "V552 $b" } }
 else { Pass "V552 placeBox redraws the ornament of every box whose size it writes, from the size written, and TRUE FAITH is measured again when it shows" }
+
+# ---- V553: Mage = the Vampire's sheet with no Vampire tab, Show Ghoul free, a mage's header (SPEC I216) ----
+# User 2026-10-06 (73rd batch): "a base inicial sera a ficha de Vampire, mas o checkbox de Ghoul nao
+# ficara desativada" and, answering Q128, "Mage nao tera a aba Vampire" plus the header swap
+# (Concept -> Essence, Clan -> Affiliation, Generation -> Sect, Sire -> Concept). ONE predicate,
+# vampLayout, says "the vampire's sheet"; every RULE still asks for "Vampire" by name, so a mage plays
+# as a mortal and, with Show Ghoul on, as a ghoul.
+$v553Bad = @()
+$fn553 = @([regex]::Matches($rootTxt, '(?m)^\t\t\tfunction vampLayout\(\)'))
+$vl553 = NoComments (LuaFn $rootTxt 'vampLayout')
+# (a) one global definition, the body of I216a, and no second predicate
+if ($fn553.Count -ne 1 -or -not $vl553) { $v553Bad += "(a) vampLayout is defined $($fn553.Count) time(s) at the root's top level, not once (SPEC V553a, V20)" }
+elseif (-not $vl553.Contains('return sheet ~= nil and (sheet.game == "Vampire" or sheet.game == "Mage");')) { $v553Bad += "(a) vampLayout is not 'Vampire or Mage' - the mage would read the mortal's sheet, or another game the vampire's (SPEC I216a)" }
+$code553 = ''
+foreach ($lf553 in Get-ChildItem -Path $dir -Filter '*.lfm') { $code553 += NoComments ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf553.FullName))) }
+if ($code553 -match '\bvampRules\b') { $v553Bad += "(a) vampRules exists - the user ruled the mage has no Vampire tab, so the rules stay the vampire's by name (SPEC Q128.1, I216a)" }
+# (b) the sheet's sites read vampLayout; the three ceilings read 5 for anyone but a vampire
+$c3Txt553 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.3.lfm')))
+$sites553 = [ordered]@{
+    renderGameMode = NoComments (LuaFn $rootTxt 'renderGameMode')
+    eraAbilities   = NoComments (LuaFn $rootTxt 'eraAbilities')
+    renderVampCaps = NoComments (LuaFn $rootTxt 'renderVampCaps')
+    xpStep         = NoComments (LuaFn $rootTxt 'xpStep')
+    paintAs        = NoComments (LuaFn $c3Txt553 'paintAs')
+    vampFlagsOff   = NoComments (LuaFn $rootTxt 'vampFlagsOff')
+}
+$found553 = @($sites553.Keys | Where-Object { $sites553[$_] })
+if ($found553.Count -lt 6) { $v553Bad += "only $($found553.Count) of the 6 sites of I216b were found - this check reads less than the sheet holds (SPEC V20, V209)" }
+foreach ($s553 in $found553) {
+    if ($sites553[$s553] -notmatch 'vampLayout\(\)') { $v553Bad += "(b) $s553 does not read vampLayout() - a mage would get the mortal's $s553 under the vampire's boxes (SPEC I216b)" }
+}
+$ceil553 = @{
+    renderVampCaps = 'local top = isVamp and g.disc or 5;'
+    xpStep         = 'local top    = isVamp and vampGen().disc or 5;'
+    paintAs        = 'local top  = (sheet.game == "Vampire") and vampGen().disc or 5;'
+}
+foreach ($s553 in $ceil553.Keys) {
+    if ($sites553[$s553] -and -not $sites553[$s553].Contains($ceil553[$s553])) { $v553Bad += "(b) $s553 lacks '$($ceil553[$s553])' - the mage's ceiling is 5, the vampire's his generation's (SPEC I216c, Q129.1)" }
+}
+if ($sites553['renderVampCaps'] -and -not $sites553['renderVampCaps'].Contains('local isVamp   = sheet.game == "Vampire";')) { $v553Bad += "(b) renderVampCaps does not take its ceiling off the game Vampire (SPEC I216c)" }
+if ($sites553['xpStep'] -and -not $sites553['xpStep'].Contains('local isVamp = sheet.game == "Vampire";')) { $v553Bad += "(b) xpStep does not take its ceiling off the game Vampire (SPEC I216c)" }
+# (c) Vampire alone: the Show Ghoul lock, its turn-off, the Vampire tab
+if ($sites553['renderGameMode'] -and -not $sites553['renderGameMode'].Contains('local locks = { chkShowNumina = vamp, chkShowDisciplines = sheet.game == "Vampire" };')) { $v553Bad += "(c) renderGameMode does not lock Numina by the sheet and Show Ghoul by the game Vampire - a mage could not be a ghoul (SPEC I216d)" }
+if ($sites553['vampFlagsOff'] -and -not $sites553['vampFlagsOff'].Contains('if sheet.game == "Vampire" and sheet.stShowDisciplines ~= false then setField("stShowDisciplines", false); end;')) { $v553Bad += "(c) vampFlagsOff turns Show Ghoul off for a mage too (SPEC I216d)" }
+$tv553 = NoComments (LuaFn $rootTxt 'applyTabVisibility')
+if (-not $tv553 -or -not $tv553.Contains('local vamp = sheet.game == "Vampire";') -or $tv553 -match 'vampLayout') { $v553Bad += "(c) applyTabVisibility does not open the Vampire tab by the game Vampire alone - the user ruled a mage has none (SPEC Q128.1)" }
+# (d) the header: three new cells, one Concept, the rows of three, the moved rect
+$m553 = Doc (Join-Path $dir 'WoD20.1.lfm')
+foreach ($h553 in @('hdrEssence', 'hdrAffiliation', 'hdrSect')) {
+    $hn553 = @($m553.SelectNodes("//layout[@name='$h553']"))
+    if ($hn553.Count -ne 1 -or $hn553[0].GetAttribute('visible') -ne 'false') { $v553Bad += "(d) $h553 is drawn $($hn553.Count) time(s) or not hidden in the XML - the mortal sheet is the XML (SPEC I216f)" }
+}
+$es553 = $m553.SelectSingleNode("//comboBox[@name='cmbMageEssence']")
+if ($null -eq $es553 -or $es553.GetAttribute('field') -ne 'mageEssence' -or ($es553.GetAttribute('values') -replace '\s', '') -ne "{'','Dynamic','Pattern','Primordial','Questing'}") { $v553Bad += "(d) cmbMageEssence is not the mageEssence combo of the four Essences, empty row first (SPEC I216f, R186c)" }
+foreach ($b553 in @(@('dynmainAffiliation', "mfOpen(self, 'mageAffiliation', 'affiliation', 'Affiliation');"), @('dynmainSect', "mfOpen(self, 'mageSect', 'sect', 'Sect');"))) {
+    $bn553 = $m553.SelectSingleNode("//button[@name='$($b553[0])']")
+    if ($null -eq $bn553 -or $bn553.GetAttribute('onClick') -ne $b553[1]) { $v553Bad += "(d) $($b553[0]) does not open $($b553[1]) (SPEC I216f)" }
+}
+$cc553 = 0
+foreach ($lf553 in Get-ChildItem -Path $dir -Filter '*.lfm') { $cc553 += @([regex]::Matches([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf553.FullName)), 'field="concept"')).Count }
+if ($cc553 -ne 1) { $v553Bad += "(d) field=`"concept`" is bound $cc553 time(s), not once - the mage's Concept MOVES, it is never doubled (SPEC I216g, V1, V2)" }
+$gr553 = [regex]::Match($rootTxt, '(?s)GAME_ROWS = \{(.*?)\n\t\t\t\};')
+$rows553 = @()
+if ($gr553.Success) { $rows553 = @([regex]::Matches($gr553.Groups[1].Value, '\{([^}]*)\}') | ForEach-Object { (@([regex]::Matches($_.Groups[1].Value, '"(\w+)"') | ForEach-Object { $_.Groups[1].Value })) -join ',' }) }
+if (-not $gr553.Success) { $v553Bad += "GAME_ROWS was not found on the root form - this check reads nothing (SPEC V20, V209)" }
+elseif (($rows553 -join '|') -ne 'hdrMotivation,hdrClan,hdrAffiliation|hdrOccupation,hdrGeneration,hdrSect|hdrResidence,hdrSire') { $v553Bad += "(d) GAME_ROWS reads '$($rows553 -join ' | ')', not the three rows of I216g (SPEC I216g)" }
+foreach ($pr553 in @(@('hdrEssence', 'hdrConcept'), @('hdrAffiliation', 'hdrClan'), @('hdrSect', 'hdrGeneration'))) {
+    $a553 = [regex]::Match($rootTxt, "(?m)^\t{4}$($pr553[0])\s*=\s*(\{[^}]*\})")
+    $o553 = [regex]::Match($rootTxt, "(?m)^\t{4}$($pr553[1])\s*=\s*(\{[^}]*\})")
+    if (-not $a553.Success -or -not $o553.Success -or $a553.Groups[1].Value -ne $o553.Groups[1].Value) { $v553Bad += "(d) VAMP_GEOM does not put $($pr553[0]) on $($pr553[1])'s rect (SPEC I216g)" }
+}
+# Since the 74th batch the move lives in MAGE_GEOM (SPEC I217a): Concept on the mage's third column
+# (Affiliation's left) and Sire's row (Sire's top), no name test left in the loop.
+$mgBlk553 = [regex]::Match($rootTxt, '(?s)MAGE_GEOM = \{(.*?)\n\t\t\t\};').Groups[1].Value
+$mgC553 = [regex]::Match($mgBlk553, 'hdrConcept\s*=\s*\{\s*(\d+),\s*(\d+),')
+$mgA553 = [regex]::Match($mgBlk553, 'hdrAffiliation\s*=\s*\{\s*(\d+),')
+$vsS553 = [regex]::Match($rootTxt, '(?m)^\t{4}hdrSire\s*=\s*\{\s*\d+,\s*(\d+),')
+if (-not $mgC553.Success -or -not $mgA553.Success -or -not $vsS553.Success -or $mgC553.Groups[1].Value -ne $mgA553.Groups[1].Value -or $mgC553.Groups[2].Value -ne $vsS553.Groups[1].Value) { $v553Bad += "(d) MAGE_GEOM does not put a mage's Concept in Sire's row of the third column (SPEC I216g, I217a)" }
+if ($sites553['renderGameMode'] -and $sites553['renderGameMode'].Contains('nm == "hdrConcept"')) { $v553Bad += "(d) renderGameMode still tests hdrConcept by name - the move belongs to MAGE_GEOM (SPEC I217a)" }
+# (e) the lists, read off the book (SPEC R186)
+$AFF553 = @('Traditions', 'Technocracy', 'Disparates')
+$SECT553 = [ordered]@{
+    Traditions  = @('Akashic Brotherhood', 'Celestial Chorus', 'Cult of Ecstasy', 'Dreamspeakers', 'Euthanatos', 'Order of Hermes', 'Society of Ether', 'Verbena', 'Virtual Adepts')
+    Technocracy = @('Iteration X', 'New World Order', 'Progenitors', 'Syndicate', 'Void Engineers')
+    Disparates  = @('Ahl-i-Batin', "Bata'a", 'Children of Knowledge', 'Hollow Ones', 'Kopa Loei', 'Ngoma', 'Orphans', 'Sisters of Hippolyta', 'Taftani', 'Templar Knights', 'Wu Lung')
+}
+$allSect553 = @($SECT553.Values | ForEach-Object { $_ })
+function List553([string]$key) {
+    $lm = [regex]::Match($rootTxt, '(?s)\["' + $key + '"\] = \{(.*?)\},')
+    if (-not $lm.Success) { return $null }
+    return ,@([regex]::Matches($lm.Groups[1].Value, '"([^"]*)"') | ForEach-Object { $_.Groups[1].Value })
+}
+$aL553 = List553 'affiliation'
+$sL553 = List553 'sect'
+if ($null -eq $aL553 -or ($aL553 -join '|') -ne ('|' + ($AFF553 -join '|'))) { $v553Bad += "(e) PICKER_LIST['affiliation'] is not the empty row and the three playable affiliations (SPEC I216h, R186a)" }
+if ($null -eq $sL553 -or $sL553.Count -lt 26) { $v553Bad += "(e) PICKER_LIST['sect'] holds $(@($sL553).Count - 1) sect(s), fewer than the book's 25 (SPEC R186b)" }
+elseif (($sL553 -join '|') -ne ('|' + ($allSect553 -join '|'))) { $v553Bad += "(e) PICKER_LIST['sect'] is not the book's 25 in the book's order (SPEC I216h, R186b)" }
+foreach ($a553 in $SECT553.Keys) {
+    foreach ($s553 in $SECT553[$a553]) {
+        if (-not $rootTxt.Contains('["' + $s553 + '"] = "' + $a553 + '"')) { $v553Bad += "(e) SECT_AFFILIATION does not put $s553 under $a553 (SPEC I216h)" }
+    }
+}
+$pa553 = NoComments (LuaFn $rootTxt 'pickAllowed')
+if (-not $pa553 -or -not $pa553.Contains('if field == "mageSect" then') -or -not $pa553.Contains('return not own or SECT_AFFILIATION[value] == aff;')) { $v553Bad += "(e) pickAllowed does not filter the mage's sect by the affiliation saved (SPEC I216h, Q129.3)" }
+$pt553 = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.6.lfm')))
+# The names M20 PT keeps as they are need no line in the map (the picker falls back to the key).
+$SAME553 = @('Verbena', 'Ahl-i-Batin', "Bata'a", 'Kopa Loei', 'Ngoma', 'Wu Lung')
+foreach ($n553 in @($AFF553 + $allSect553 + @('Dynamic', 'Pattern', 'Primordial', 'Questing', 'Sect', 'Select Sect'))) {
+    if ($SAME553 -contains $n553) { continue }
+    if (-not $pt553.Contains('["' + $n553 + '"] = "')) { $v553Bad += "(e) the PT map has no line for '$n553' - it would show in English on a Portuguese sheet (SPEC I216h, B57)" }
+}
+# (f) Show Ghoul repaints the mage's sheet and never turns itself off
+$fl553 = [regex]::Match($rootTxt, "(?s)<dataLink fields=`"\{'stShowNumina', 'stShowDisciplines'\}`">(.*?)</dataLink>")
+if (-not $fl553.Success -or $fl553.Groups[1].Value -notmatch 'renderGameMode\(self\);' -or $fl553.Groups[1].Value -notmatch 'renderVampCaps\(self\);') { $v553Bad += "(f) the Show flags' dataLink does not call renderGameMode and renderVampCaps - a mage's Show Ghoul would not bring the pool (SPEC I216e)" }
+elseif ($fl553.Groups[1].Value -match 'vampFlagsOff\(\);') { $v553Bad += "(f) the Show flags' dataLink calls vampFlagsOff - Show Ghoul would turn itself off (SPEC I216e)" }
+if ($v553Bad) { foreach ($b in $v553Bad) { Fail "V553 $b" } }
+else { Pass "V553 a mage wears the vampire's sheet with no Vampire tab, Show Ghoul free, its own header (Essence, Affiliation, Sect, Concept moved) and the book's lists, under a ceiling of 5" }
+
+# ---- V554: a MAGE's Main, Traits and Combat = XML + VAMP_GEOM + MAGE_GEOM (SPEC I217) ----
+# User 2026-10-06 (74th batch): no ROAD and no VIRTUES, WILLPOWER in VIRTUES' place, ten dots on
+# attributes, abilities and backgrounds; and the Combat tab follows (Q131.5). Every row is 25
+# wider, so the mage gets its own rects over the vampire's. The vampire projection (V534) never
+# reads MAGE_GEOM - this check builds the mage's and measures it.
+$v554Bad = @()
+$vgBlk554 = [regex]::Match($rootTxt, '(?s)\n\t\t\tVAMP_GEOM = \{(.*?)\n\t\t\t\};')
+$mgBlk554 = [regex]::Match($rootTxt, '(?s)\n\t\t\tMAGE_GEOM = \{(.*?)\n\t\t\t\};')
+function Geom554([string]$blk) {
+    $g = @{}
+    foreach ($m in [regex]::Matches($blk, '(?m)^\t{4}(\w+)\s*=\s*\{\s*(-?\d+),\s*(-?\d+),\s*(\d+)(?:,\s*(\d+))?\s*\}')) {
+        $g[$m.Groups[1].Value] = @([int]$m.Groups[2].Value, [int]$m.Groups[3].Value, [int]$m.Groups[4].Value, $(if ($m.Groups[5].Success) { [int]$m.Groups[5].Value } else { $null }))
+    }
+    return $g
+}
+if (-not $vgBlk554.Success -or -not $mgBlk554.Success) { $v554Bad += "VAMP_GEOM or MAGE_GEOM was not found on the root form - this check reads nothing (SPEC V20, V209)" }
+else {
+    $VG554 = Geom554 $vgBlk554.Groups[1].Value
+    $MG554 = Geom554 $mgBlk554.Groups[1].Value
+    # (a) one table, one reader, no name test
+    $ncAll554 = ''
+    foreach ($lf554 in Get-ChildItem -Path $dir -Filter '*.lfm') { $ncAll554 += NoComments ([regex]::Replace([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($lf554.FullName)), '(?s)<!--.*?-->', '')) }
+    if (@([regex]::Matches($ncAll554, '(?m)^\s*MAGE_GEOM = \{')).Count -ne 1) { $v554Bad += "(a) MAGE_GEOM is not declared exactly once (SPEC I217a)" }
+    $gm554 = NoComments (LuaFn $rootTxt 'renderGameMode')
+    # Every mention outside renderGameMode is the declaration or a generated line WRITING the
+    # table (`MAGE_GEOM[...] = {`); anything else reads it from a second place.
+    $rest554 = $ncAll554.Replace($gm554, '')
+    $all554 = @([regex]::Matches($rest554, 'MAGE_GEOM')).Count
+    $writes554 = @([regex]::Matches($rest554, 'MAGE_GEOM\[[^\]]+\]\s*=\s*\{')).Count
+    if ($all554 - $writes554 -ne 1) { $v554Bad += "(a) MAGE_GEOM is read outside renderGameMode ($($all554 - $writes554 - 1) time(s)) - the geometry has one writer (SPEC I217a, V534a)" }
+    if ($gm554 -notmatch 'for nm, r in pairs\(MAGE_GEOM\) do' -or $gm554 -notmatch 'local m = MAGE_GEOM\[nm\];') { $v554Bad += "(a) renderGameMode does not apply MAGE_GEOM in its placing loops (SPEC I217a)" }
+    if ($gm554 -match 'nm == "') { $v554Bad += "(a) renderGameMode tests a box by name in the placing loop - a mage's rect belongs in MAGE_GEOM (SPEC I217a)" }
+    if ($MG554.Count -lt 12) { $v554Bad += "(a) MAGE_GEOM names only $($MG554.Count) rect(s) in its table - fewer than the boxes the request moves (SPEC V20)" }
+    # (b) the projection: per tab, the named boxes a mage sees
+    $tabs554 = [ordered]@{
+        'WoD20.1.lfm' = @{ Names = @('avatarFrame', 'boxHeader', 'boxAttributes', 'boxTalents', 'boxSkills', 'boxKnowledges', 'boxWillpower', 'boxExperience', 'mainBloodPool', 'dynHealth_box'); Right = 1375 }
+        'WoD20.2.lfm' = @{ Names = @('boxBackgrounds', 'boxMerits', 'boxFlaws', 'boxDerangements', 'boxOther'); Right = 1487 }
+        'WoD20.3.lfm' = @{ Names = @('boxCombatTraits', 'dynHealth3_box', 'boxWillpower3'); Right = 0 }
+    }
+    $docs554 = @{}
+    foreach ($tf554 in $tabs554.Keys) { $docs554[$tf554] = Doc (Join-Path $dir $tf554) }
+    function Xml554($doc, [string]$nm) {
+        $n = $doc.SelectSingleNode("//*[@name='$nm']")
+        if ($null -eq $n) { return $null }
+        return @([int]$n.GetAttribute('left'), [int]$n.GetAttribute('top'), [int]$n.GetAttribute('width'), [int]$n.GetAttribute('height'))
+    }
+    function Mage554($doc, [string]$nm) {
+        $x = Xml554 $doc $nm
+        if ($null -eq $x) { return $null }
+        $r = if ($MG554.ContainsKey($nm)) { $MG554[$nm] } elseif ($VG554.ContainsKey($nm)) { $VG554[$nm] } else { $x }
+        $h = if ($null -ne $r[3]) { $r[3] } elseif ($VG554.ContainsKey($nm) -and $null -ne $VG554[$nm][3]) { $VG554[$nm][3] } else { $x[3] }
+        return @($r[0], $r[1], $r[2], $h)
+    }
+    $seen554 = 0
+    foreach ($tf554 in $tabs554.Keys) {
+        $rects = [ordered]@{}
+        foreach ($nm554 in $tabs554[$tf554].Names) {
+            $r554 = Mage554 $docs554[$tf554] $nm554
+            if ($null -eq $r554) { $v554Bad += "(b) $nm554 is not named on $tf554 - the projection reads less than the tab holds (SPEC V209)"; continue }
+            $rects[$nm554] = $r554; $seen554++
+        }
+        $keys554 = @($rects.Keys)
+        for ($i = 0; $i -lt $keys554.Count; $i++) {
+            for ($j = $i + 1; $j -lt $keys554.Count; $j++) {
+                $a = $rects[$keys554[$i]]; $b = $rects[$keys554[$j]]
+                if ($a[0] -lt $b[0] + $b[2] + 5 -and $b[0] -lt $a[0] + $a[2] + 5 -and $a[1] -lt $b[1] + $b[3] + 5 -and $b[1] -lt $a[1] + $a[3] + 5) {
+                    $v554Bad += "(b) $tf554 on a mage: $($keys554[$i]) {$($a -join ',')} and $($keys554[$j]) {$($b -join ',')} are closer than 5 (SPEC I217, V40)"
+                }
+            }
+        }
+        if ($tabs554[$tf554].Right -gt 0) {
+            $right554 = ($rects.Values | ForEach-Object { $_[0] + $_[2] } | Measure-Object -Maximum).Maximum
+            if ($right554 -ne $tabs554[$tf554].Right) { $v554Bad += "(b) $tf554 closes on $right554 for a mage, not $($tabs554[$tf554].Right) (SPEC I217b/c/e)" }
+        }
+    }
+    if ($seen554 -lt 15) { $v554Bad += "only $seen554 box(es) projected - this check reads less than the three tabs hold (SPEC V20, V209)" }
+    $main554 = $docs554['WoD20.1.lfm']; $cmb554 = $docs554['WoD20.3.lfm']
+    $wp554 = Mage554 $main554 'boxWillpower'; $xp554 = Mage554 $main554 'boxExperience'
+    # HEALTH, ATTRIBUTES and the abilities close on ONE edge (SPEC I217b/c/d) - the tab's max alone
+    # would pass a HEALTH left behind at the vampire's 1300.
+    foreach ($edge554 in @('dynHealth_box', 'boxAttributes', 'boxKnowledges', 'boxHeader')) {
+        $er554 = Mage554 $main554 $edge554
+        if ($null -ne $er554 -and $er554[0] + $er554[2] -ne 1375) { $v554Bad += "(b) a mage's $edge554 closes on $($er554[0] + $er554[2]), not on the Main's 1375 (SPEC I217b/c/d)" }
+    }
+    $vh554 = $VG554['boxVirtues']
+    if ($null -eq $wp554 -or $null -eq $vh554 -or ($wp554 -join ',') -ne ($vh554 -join ',')) { $v554Bad += "(b) a mage's WILLPOWER {$($wp554 -join ',')} is not VIRTUES' rect {$($vh554 -join ',')} (SPEC I217d, Q131.2)" }
+    elseif ($xp554[1] -ne $wp554[1] + $wp554[3] + 5) { $v554Bad += "(b) EXPERIENCE does not stand 5 under a mage's WILLPOWER (SPEC I217d)" }
+    $v3x554 = Xml554 $cmb554 'boxVirtues3'; $w3554 = Mage554 $cmb554 'boxWillpower3'
+    if ($null -eq $v3x554 -or $null -eq $w3554 -or ($w3554 -join ',') -ne ($v3x554 -join ',')) { $v554Bad += "(f) a mage's WILLPOWER mirror is not the VIRTUES mirror's rect (SPEC I217k)" }
+    # A PLACED row holds its tenth dot: the attribute row and its dot, and the Combat dot, come
+    # out of MAGE_GEOM's generated lines, so their numbers are read off those lines and the
+    # label widths the root declares.
+    $alw554 = [regex]::Match($rootTxt, '(?m)^\t{3}ATTR_LABEL_W = (\d+);'); $clw554 = [regex]::Match($rootTxt, '(?m)^\t{3}COMBAT_LABEL_W = (\d+);')
+    $arw554 = [regex]::Match($rootTxt, 'MAGE_GEOM\["attrRow_" \.\. f\]\s*=\s*\{[^,]+,[^,]+,\s*(\d+),')
+    $adl554 = [regex]::Match($rootTxt, 'MAGE_GEOM\["dot" \.\. f \.\. "_10"\]\s*=\s*\{ ATTR_LABEL_W \+ (\d+) \+ (\d+), 0, 25, 25 \};')
+    $rol554 = [regex]::Match($rootTxt, 'MAGE_GEOM\["ro_" \.\. f \.\. "_10"\]\s*=\s*\{ COMBAT_LABEL_W \+ (\d+) \+ (\d+), 0, 25, 25 \};')
+    if (-not ($alw554.Success -and $clw554.Success -and $arw554.Success -and $adl554.Success -and $rol554.Success)) { $v554Bad += "(b) the generated attribute/Combat rects of MAGE_GEOM were not found - the fit is not measured (SPEC V20)" }
+    else {
+        $aEnd554 = [int]$alw554.Groups[1].Value + [int]$adl554.Groups[1].Value + [int]$adl554.Groups[2].Value + 25
+        if ($aEnd554 -gt [int]$arw554.Groups[1].Value) { $v554Bad += "(b) the tenth attribute dot ends at $aEnd554, past a mage's $($arw554.Groups[1].Value) attribute row (SPEC I217b)" }
+        $cEnd554 = [int]$clw554.Groups[1].Value + [int]$rol554.Groups[1].Value + [int]$rol554.Groups[2].Value + 25
+        $cRow554 = $cmb554.SelectSingleNode("//layout[@name='boxCombatTraits']/layout[ReadOnlyTrait]")
+        $cW554 = [int]$cRow554.GetAttribute('width') + (Mage554 $cmb554 'boxCombatTraits')[2] - [int]$cmb554.SelectSingleNode("//layout[@name='boxCombatTraits']").GetAttribute('width')
+        if ($cEnd554 -gt $cW554) { $v554Bad += "(b) the tenth Combat dot ends at $cEnd554, past its $cW554 row in a mage's COMBAT TRAITS (SPEC I217k)" }
+    }
+    foreach ($st554 in @(@('WoD20.1.lfm', 'boxTalents', 'Ability', 'abil$(col)$(num)_10'), @('WoD20.2.lfm', 'boxBackgrounds', 'OpenAbility', 'dot$(field)_10'))) {
+        $d554 = $docs554[$st554[0]]
+        $box554 = $d554.SelectSingleNode("//layout[@name='$($st554[1])']")
+        $row554 = if ($null -ne $box554) { $box554.SelectSingleNode(".//layout[$($st554[2])]") } else { $null }
+        $dot554 = $d554.SelectSingleNode("//template[@name='$($st554[2])']//*[@name='$($st554[3])']")
+        if ($null -eq $row554 -or $null -eq $dot554) { $v554Bad += "(b) no $($st554[2]) row or tenth dot found in $($st554[1]) - the fit is not measured (SPEC V20)"; continue }
+        $grow554 = (Mage554 $d554 $st554[1])[2] - [int]$box554.GetAttribute('width')
+        $rw554 = [int]$row554.GetAttribute('width') + $grow554
+        if ([int]$dot554.GetAttribute('left') + 25 -gt $rw554) { $v554Bad += "(b) the tenth dot of $($st554[2]) ends at $([int]$dot554.GetAttribute('left') + 25), past its $rw554 row in a mage's $($st554[1]) (SPEC I217c/e/k)" }
+    }
+    # (c) the XML: every tenth dot hidden, 25 right of the ninth, its own field and click
+    foreach ($tp554 in @(@('WoD20.1.lfm', 'Attribute', 'dot$(field)_', $true), @('WoD20.1.lfm', 'AttributeZeroable', 'dot$(field)_', $true), @('WoD20.1.lfm', 'Ability', 'abil$(col)$(num)_', $true), @('WoD20.1.lfm', 'CustomAbility', 'dot$(field)_', $true), @('WoD20.2.lfm', 'OpenAbility', 'dot$(field)_', $false), @('WoD20.3.lfm', 'ReadOnlyTrait', 'ro_$(field)_', $true))) {
+        $t554 = $docs554[$tp554[0]].SelectSingleNode("//template[@name='$($tp554[1])']")
+        if ($null -eq $t554) { $v554Bad += "(c) template $($tp554[1]) not found (SPEC V20)"; continue }
+        $n9 = $t554.SelectSingleNode("*[@name='$($tp554[2])9']"); $n10 = $t554.SelectSingleNode("*[@name='$($tp554[2])10']")
+        if ($null -eq $n9 -or $null -eq $n10) { $v554Bad += "(c) $($tp554[1]) has no tenth dot $($tp554[2])10 (SPEC I217b/c/e/k)"; continue }
+        if ($n10.GetAttribute('visible') -ne 'false') { $v554Bad += "(c) $($tp554[1])'s tenth dot is not authored hidden - a vampire and a mortal would see it (SPEC I217h)" }
+        if ([int]$n10.GetAttribute('left') -ne [int]$n9.GetAttribute('left') + 25) { $v554Bad += "(c) $($tp554[1])'s tenth dot is not 25 right of the ninth (SPEC I217b)" }
+        if ($n9.GetAttribute('field') -and $n10.GetAttribute('field') -ne $n9.GetAttribute('field').Replace('_9', '_10')) { $v554Bad += "(c) $($tp554[1])'s tenth dot does not bind the _10 field (SPEC I217)" }
+        if ($n9.GetAttribute('onClick') -and $n10.GetAttribute('onClick') -ne ([regex]::Replace($n9.GetAttribute('onClick'), '_9(?=[''.)])', '_10'))) { $v554Bad += "(c) $($tp554[1])'s tenth dot does not click as the ninth does, on its own field (SPEC I217)" }
+        if ($tp554[3]) {
+            $cap = if ($tp554[1] -eq 'ReadOnlyTrait') { 'rocap_$(field)_' } elseif ($tp554[1] -eq 'Ability') { 'mcap$(col)$(num)_' } else { 'mcap$(field)_' }
+            $c9 = $t554.SelectSingleNode("*[@name='$($cap)9']"); $c10 = $t554.SelectSingleNode("*[@name='$($cap)10']")
+            if ($null -eq $c10 -or $null -eq $c9 -or $c10.GetAttribute('opacity') -ne $c9.GetAttribute('opacity') -or $c10.GetAttribute('left') -ne $n10.GetAttribute('left') -or $c10.GetAttribute('visible') -ne 'false') { $v554Bad += "(c) $($tp554[1]) has no hidden faded twin $($cap)10 on the tenth dot, as the ninth has (SPEC I217)" }
+        }
+    }
+    # (d) who sees it
+    $vc554 = NoComments (LuaFn $rootTxt 'renderVampCaps')
+    foreach ($need554 in @('for k = 4, 10, 1 do', 'local off  = vamp and not on and (k <= 9 or mage);', 'for k = 6, 10, 1 do', 'local shown = (k <= 9 and vamp) or mage;', 'local mage = sheet.game == "Mage";')) {
+        if (-not $vc554.Contains($need554)) { $v554Bad += "(d) renderVampCaps lacks '$need554' - the tenth dot is a mage's alone (SPEC I217f)" }
+    }
+    foreach ($need554 in @('for _, nm in ipairs({ "boxRoad", "boxVirtues", "boxVirtues3" }) do', 'if c ~= nil and c.visible == mage then c.visible = not mage; end;')) {
+        if (-not $gm554.Contains($need554)) { $v554Bad += "(d) renderGameMode lacks '$need554' - ROAD and VIRTUES go for a mage and only a mage (SPEC I217d/k)" }
+    }
+    # (e) the ledger reads a background to ten
+    if (-not (NoComments $rootTxt).Contains('liveLevel(field, 1, 10, 0), ctx, field, 10);')) { $v554Bad += "(e) the ledger does not read a background to ten - a mage's tenth dot would cost nothing (SPEC I217g)" }
+    # (f) the Combat mirror paints the tenth for a mage only
+    $pa554 = NoComments (LuaFn ([System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes((Join-Path $dir 'WoD20.3.lfm')))) 'paintAs')
+    if (-not $pa554 -or -not $pa554.Contains('for d = 1, 10, 1 do') -or -not $pa554.Contains('local cap  = vamp and not live and (d <= 9 or mage);')) { $v554Bad += "(f) paintAs does not mirror the tenth dot for a mage only (SPEC I217k)" }
+}
+if ($v554Bad) { foreach ($b in $v554Bad) { Fail "V554 $b" } }
+else { Pass "V554 a mage's Main closes on 1375 and its Traits on 1487 with nothing closer than 5, WILLPOWER in VIRTUES' place on Main and Combat, ten dots that fit their rows and only a mage sees" }
 
 if ($fail -eq 0) { Write-Host "ALL CHECKS PASSED"; exit 0 } else { Write-Host "$fail CHECK(S) FAILED"; exit 1 }

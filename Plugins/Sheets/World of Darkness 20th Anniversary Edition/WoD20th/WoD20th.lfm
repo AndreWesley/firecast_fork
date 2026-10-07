@@ -665,6 +665,21 @@
 				["shield"] = {
 					"", "Metal Shield", "Riot Shield", "Trash Can Lid", "Wooden Shield",
 				},
+				-- A MAGE's Affiliation and Sect on the Main header (user 2026-10-06, SPEC I216h, R186):
+				-- the three playable affiliations of M20 (Marauders and Nephandi through Custom,
+				-- SPEC Q129.4) and their twenty-five sects, in the book's order - nine Traditions, five
+				-- Conventions, eleven Disparate crafts. SECT_AFFILIATION filters the sect by the
+				-- affiliation (SPEC Q129.3).
+				["affiliation"] = {
+					"", "Traditions", "Technocracy", "Disparates",
+				},
+				["sect"] = {
+					"", "Akashic Brotherhood", "Celestial Chorus", "Cult of Ecstasy", "Dreamspeakers", "Euthanatos",
+					"Order of Hermes", "Society of Ether", "Verbena", "Virtual Adepts",
+					"Iteration X", "New World Order", "Progenitors", "Syndicate", "Void Engineers",
+					"Ahl-i-Batin", "Bata'a", "Children of Knowledge", "Hollow Ones", "Kopa Loei", "Ngoma",
+					"Orphans", "Sisters of Hippolyta", "Taftani", "Templar Knights", "Wu Lung",
+				},
 				-- <<< PICKER_LIST_END
 			};
 
@@ -706,6 +721,21 @@
 
 			PICKER_LIST["clanFamily"] = clanFamilyUnion;
 			-- <<< CLANFAMILY_UNION_END
+
+			-- Which affiliation each sect of PICKER_LIST["sect"] belongs to (user 2026-10-06, SPEC
+			-- I216h, R186b), the book's three parts. pickAllowed reads it: a mage of a playable
+			-- affiliation is offered its sects, one with none or a custom one all twenty-five.
+			SECT_AFFILIATION = {
+				["Akashic Brotherhood"] = "Traditions", ["Celestial Chorus"] = "Traditions", ["Cult of Ecstasy"] = "Traditions",
+				["Dreamspeakers"] = "Traditions", ["Euthanatos"] = "Traditions", ["Order of Hermes"] = "Traditions",
+				["Society of Ether"] = "Traditions", ["Verbena"] = "Traditions", ["Virtual Adepts"] = "Traditions",
+				["Iteration X"] = "Technocracy", ["New World Order"] = "Technocracy", ["Progenitors"] = "Technocracy",
+				["Syndicate"] = "Technocracy", ["Void Engineers"] = "Technocracy",
+				["Ahl-i-Batin"] = "Disparates", ["Bata'a"] = "Disparates", ["Children of Knowledge"] = "Disparates",
+				["Hollow Ones"] = "Disparates", ["Kopa Loei"] = "Disparates", ["Ngoma"] = "Disparates",
+				["Orphans"] = "Disparates", ["Sisters of Hippolyta"] = "Disparates", ["Taftani"] = "Disparates",
+				["Templar Knights"] = "Disparates", ["Wu Lung"] = "Disparates",
+			};
 
 			-- Which hedge paths an affiliation FAVOURS, and it is the same block of the book the
 			-- casting attribute comes from - `Favored Attributes:` and `Favored Paths:` are two
@@ -956,6 +986,14 @@
 				local g = (n ~= nil) and n.generation or nil;
 
 				return VAMP_GEN[tostring(g)] or VAMP_GEN["13"];
+			end;
+
+			-- The vampire's SHEET - boxes, nine dots, ability lists, Numina locked - and not its rules
+			-- (user 2026-10-06, SPEC I216a, V553a). A mage wears it too, with no Vampire tab: the rules
+			-- (generation, clan, blood) still ask for "Vampire" by name, so a mage plays as a mortal
+			-- and, with Show Ghoul on, as a ghoul (SPEC Q128.1).
+			function vampLayout()
+				return sheet ~= nil and (sheet.game == "Vampire" or sheet.game == "Mage");
 			end;
 
 			-- The ceiling on the blood pool, for the dots and for the column's bar alike (SPEC I188c).
@@ -2245,11 +2283,12 @@
 
 			-- The lists in force: the game's own for this era if it has them, the era's otherwise. The
 			-- one place that choice is made (SPEC V531a) - renderAbilityLabels and eraRangedName both
-			-- read through here.
+			-- read through here. A MAGE reads the vampire's lists (SPEC I216b, Q129.7): VAMP_GEOM is one
+			-- fixed table for ten names and two typed rows a column, and the mage wears that sheet.
 			function eraAbilities()
 				local era = currentTheme();
 
-				if sheet ~= nil and sheet.game == "Vampire" and VAMPIRE_ABILITIES[era] ~= nil then
+				if vampLayout() and VAMPIRE_ABILITIES[era] ~= nil then
 					return VAMPIRE_ABILITIES[era];
 				end;
 
@@ -2424,9 +2463,12 @@
 			-- pairs in the 47th batch and are not any more (SPEC I191a, user 2026-10-01): the rotated
 			-- names stood in every game, and VAMP_GEOM put each one before its third of the band; since the
 			-- 58th batch (SPEC I201b) they are a mortal's and renderGameMode hides them for a vampire.
-			GAME_PAIRS = {
-				{ "hdrMotivation",   "hdrClan" },
-				{ "hdrOccupation",   "hdrGeneration" },
+			-- Rows of THREE since the 73rd batch (user 2026-10-06, SPEC I216g, V553d): mortal, vampire,
+			-- mage, and only the game's own shows. The mage's third row is empty on purpose: Concept
+			-- moves into it (VAMP_GEOM's loop) and Essence takes Concept's place.
+			GAME_ROWS = {
+				{ "hdrMotivation",   "hdrClan",       "hdrAffiliation" },
+				{ "hdrOccupation",   "hdrGeneration", "hdrSect" },
 				{ "hdrResidence",    "hdrSire" },
 			};
 
@@ -2489,6 +2531,9 @@
 				hdrGeneration        = { 731, 40, 327, 25 },
 				hdrResidence         = { 731, 65, 327, 25 },
 				hdrSire              = { 731, 65, 327, 25 },
+				hdrEssence           = { 360, 65, 327, 25 },
+				hdrAffiliation       = { 731, 15, 327, 25 },
+				hdrSect              = { 731, 40, 327, 25 },
 				boxExperience        = { 0, 728, 340, 113 },
 				lblXPMain            = { 20, 31, 300, 20 },
 				bgCurrentXPMain      = { 125, 56, 90, 25 },
@@ -2581,6 +2626,61 @@
 				end;
 			end;
 
+			-- A MAGE's rects (user 2026-10-06, SPEC I217, V554), over VAMP_GEOM: what the mage takes
+			-- instead, and the names only the mage moves. Ten dots on every trait row, so each row is
+			-- 25 wider: the three ability boxes 455 (closing on 1375), the ATTRIBUTES thirds 359 (222 +
+			-- 20 + 3 x 359 + 2 x 18 + 20 = 1375, the same edge, the avatar untouched), the header
+			-- spread over the same 1153, HEALTH slid to close there. No ROAD and no VIRTUES:
+			-- WILLPOWER takes VIRTUES' 340 x 126 with its title and body one centred object (80 in
+			-- 126, 23 above; 250 in 340, 45 aside - SPEC V547). Traits: BACKGROUNDS 509, the rest 25
+			-- further. Combat follows the Main (SPEC I217k): COMBAT TRAITS and its HEALTH 407, the
+			-- VIRTUES mirror gone and the WILLPOWER mirror in its 315 x 126. Ability, background and
+			-- combat rows stretch with their box; the attribute rows are placed, so their tenth dot is.
+			MAGE_GEOM = {
+				boxHeader        = { 222, 0, 1153, 105 },
+				hdrNature        = { 398, 15, 327, 25 },
+				hdrDemeanor      = { 398, 40, 327, 25 },
+				hdrEssence       = { 398, 65, 327, 25 },
+				hdrAffiliation   = { 806, 15, 327, 25 },
+				hdrSect          = { 806, 40, 327, 25 },
+				hdrConcept       = { 806, 65, 327, 25 },
+				boxAttributes    = { 222, 110, 1153, 126 },
+				boxTalents       = { 0, 241, 455, 351 },
+				boxSkills        = { 460, 241, 455, 351 },
+				boxKnowledges    = { 920, 241, 455, 351 },
+				boxWillpower     = { 0, 597, 340, 126 },
+				lblWillpower     = { 20, 23, 300, 20 },
+				bodyWillpower    = { 45, 51, 250, 52 },
+				dynHealth_box    = { 1090, 597, 285 },
+				boxBackgrounds   = { 0, 0, 509, 679 },
+				boxMerits        = { 514, 0, 743, 337 },
+				boxFlaws         = { 514, 342, 743, 337 },
+				boxDerangements  = { 1262, 0, 225, 337 },
+				boxOther         = { 1262, 342, 225, 337 },
+				boxCombatTraits  = { 970, 0, 407, 351 },
+				dynHealth3_box   = { 970, 356, 407 },
+				boxWillpower3    = { 650, 356, 315, 126 },
+				lblWillpower3    = { 20, 23, 275, 20 },
+				bodyWillpower3   = { 32, 51, 250, 52 },
+			};
+
+			-- The nine attribute rows, a third (t) and a line (r) each: 359 wide, 18 between thirds.
+			for i, f in ipairs({ "strength", "dexterity", "stamina", "charisma", "manipulation", "appearance", "perception", "inteligence", "wits" }) do
+				local t, r = math.floor((i - 1) / 3), (i - 1) % 3;
+
+				MAGE_GEOM["attrRow_" .. f]      = { 20 + 377 * t, 36 + 25 * r, 359, 25 };
+				MAGE_GEOM["dot" .. f .. "_10"]  = { ATTR_LABEL_W + 5 + 250, 0, 25, 25 };
+				MAGE_GEOM["mcap" .. f .. "_10"] = { ATTR_LABEL_W + 5 + 250, 0, 25, 25 };
+			end;
+
+			for _, f in ipairs({ "strength", "dexterity", "stamina", "perception", "alertness", "athletics", "awareness", "brawl", "ranged", "melee", "stealth" }) do
+				MAGE_GEOM["ro_" .. f .. "_10"]    = { COMBAT_LABEL_W + 2 + 225, 0, 25, 25 };
+				MAGE_GEOM["rocap_" .. f .. "_10"] = { COMBAT_LABEL_W + 2 + 225, 0, 25, 25 };
+			end;
+
+			-- The ten HEALTH rows of the Combat tab, centred in its 407 as VAMP_GEOM centres them in 382.
+			for n = 1, 10, 1 do MAGE_GEOM["dynHealth3_row" .. n] = { 80, 20 + 27 * n, 246, 20 }; end;
+
 			-- 71st batch (user 2026-10-06, SPEC I214d, V551): a VAMPIRE with the True Faith merit splits
 			-- the Vampire tab's WILLPOWER into the Main's 113 and TRUE FAITH (boxVFaith, 86) under it, so
 			-- the band is 113 + 5 + 86 = 204, 28 over the XML's 176. The pool and EXPERIENCE take the 28
@@ -2630,31 +2730,48 @@
 			function renderGameMode(from)
 				if sheet == nil or from == nil then return; end;
 
-				local vamp  = sheet.game == "Vampire";
+				-- `vamp` is the vampire's SHEET, which a mage wears too (SPEC I216b); `col` is the
+				-- GAME_ROWS column that shows.
+				local vamp  = vampLayout();
+				local mage  = sheet.game == "Mage";
+				local col   = (sheet.game == "Vampire") and 2 or (mage and 3 or 1);
 				local names = { mainBloodPool = true, attrSepSocial = true, attrSepMental = true, attrRotPhysical = true, attrRotSocial = true, attrRotMental = true, chkShowNumina = true, chkShowDisciplines = true };
 
-				for i = 1, #GAME_PAIRS, 1 do
-					names[GAME_PAIRS[i][1]] = true;
-					names[GAME_PAIRS[i][2]] = true;
+				for i = 1, #GAME_ROWS, 1 do
+					for c = 1, 3, 1 do
+						if GAME_ROWS[i][c] ~= nil then names[GAME_ROWS[i][c]] = true; end;
+					end;
 				end;
 
 				for nm in pairs(VAMP_GEOM) do names[nm] = true; end;
+				for nm in pairs(MAGE_GEOM) do names[nm] = true; end;
 				for nm in pairs(VTF_GEOM) do names[nm] = true; end;
 				names.boxVFaith = true;
+				names.boxRoad = true;
+				names.boxVirtues = true;
+				names.boxVirtues3 = true;
 
 				local found = xpFind(tabRootOf(from), names, {});
 
-				for i = 1, #GAME_PAIRS, 1 do
-					local mortal  = found[GAME_PAIRS[i][1]];
-					local vampire = found[GAME_PAIRS[i][2]];
+				for i = 1, #GAME_ROWS, 1 do
+					for c = 1, 3, 1 do
+						local cell = (GAME_ROWS[i][c] ~= nil) and found[GAME_ROWS[i][c]] or nil;
+						local show = c == col;
 
-					if mortal  ~= nil and mortal.visible  == vamp then mortal.visible  = not vamp; end;
-					if vampire ~= nil and vampire.visible ~= vamp then vampire.visible = vamp; end;
+						if cell ~= nil and cell.visible ~= show then cell.visible = show; end;
+					end;
 				end;
 
-				local pool = found["mainBloodPool"];
+				local essence = found["hdrEssence"];
 
-				if pool ~= nil and pool.visible ~= vamp then pool.visible = vamp; end;
+				if essence ~= nil and essence.visible ~= mage then essence.visible = mage; end;
+
+				-- A mage has blood only as a ghoul (SPEC I216e, Q129.2): the same bloodPool the Ghoul
+				-- tab draws, under the ghoul's ceiling. Without Show Ghoul the slot stays empty.
+				local pool     = found["mainBloodPool"];
+				local hasBlood = sheet.game == "Vampire" or (mage and sheet.stShowDisciplines == true);
+
+				if pool ~= nil and pool.visible ~= hasBlood then pool.visible = hasBlood; end;
 
 				-- The three rotated names go the same way (SPEC I201b, V537a). The two white rules between the
 			-- attribute groups are a MORTAL column's: left where the
@@ -2685,15 +2802,48 @@
 					if resized and refreshOrnament ~= nil then refreshOrnament(c, r[3], r[4] or c.height); end;
 				end;
 
-				-- Any game that is not Vampire reads the XML - Mage included (SPEC Q109.1).
+				-- Mortal reads the XML; Vampire and, since the 73rd batch, Mage read this table
+				-- (SPEC I216b - Q109.1 is revoked for Mage).
+				--
+				-- A MAGE reads MAGE_GEOM over it (SPEC I217a, V554a): its own rect where it has one, and
+				-- the names only it moves in the second loop. A height only the mage writes (WILLPOWER's
+				-- 126) is cached from the XML too, so a vampire gets the XML's back.
 				for nm, r in pairs(VAMP_GEOM) do
 					local c = found[nm];
 
 					if c ~= nil then
+						local m = MAGE_GEOM[nm];
+
+						if GEOM_XML[nm] == nil then GEOM_XML[nm] = { c.left, c.top, c.width, (r[4] ~= nil or (m ~= nil and m[4] ~= nil)) and c.height or nil }; end;
+
+						local rect = r;
+
+						if mage and m ~= nil then
+							rect = m;
+						elseif r[4] == nil and GEOM_XML[nm][4] ~= nil then
+							rect = { r[1], r[2], r[3], GEOM_XML[nm][4] };
+						end;
+
+						placeBox(c, vamp and rect or GEOM_XML[nm]);
+					end;
+				end;
+
+				for nm, r in pairs(MAGE_GEOM) do
+					local c = (VAMP_GEOM[nm] == nil) and found[nm] or nil;
+
+					if c ~= nil then
 						if GEOM_XML[nm] == nil then GEOM_XML[nm] = { c.left, c.top, c.width, (r[4] ~= nil) and c.height or nil }; end;
 
-						placeBox(c, vamp and r or GEOM_XML[nm]);
+						placeBox(c, mage and r or GEOM_XML[nm]);
 					end;
+				end;
+
+				-- No ROAD and no VIRTUES on a mage's sheet, nor their mirror on the Combat tab (user
+				-- 2026-10-06, SPEC I217d/k). Their fields stay: Vampire and Mortal show them again.
+				for _, nm in ipairs({ "boxRoad", "boxVirtues", "boxVirtues3" }) do
+					local c = found[nm];
+
+					if c ~= nil and c.visible == mage then c.visible = not mage; end;
 				end;
 
 				-- The Vampire tab with the True Faith merit (SPEC I214e, V551), through the same
@@ -2725,13 +2875,16 @@
 
 				-- Show Numina and Show Ghoul mean nothing to a vampire (SPEC I190d, V536d): locked, and
 				-- dimmed by the same 0.40 as every read-only widget (SPEC V111). vampFlagsOff is what
-				-- turns them off; this only paints.
-				for _, nm in ipairs({ "chkShowNumina", "chkShowDisciplines" }) do
+				-- turns them off; this only paints. A MAGE locks Numina and keeps Show Ghoul free - a
+				-- mage can be a ghoul (user 2026-10-06, SPEC I216d, V553c).
+				local locks = { chkShowNumina = vamp, chkShowDisciplines = sheet.game == "Vampire" };
+
+				for nm, lock in pairs(locks) do
 					local c  = found[nm];
-					local op = vamp and 0.40 or 1;
+					local op = lock and 0.40 or 1;
 
 					if c ~= nil then
-						if c.enabled == vamp then c.enabled = not vamp; end;
+						if c.enabled == lock then c.enabled = not lock; end;
 						if c.opacity ~= op then c.opacity = op; end;
 					end;
 				end;
@@ -2740,12 +2893,12 @@
 			-- Show Numina and Show Ghoul go OFF the moment a sheet is a vampire's (user 2026-10-01,
 			-- SPEC I190k, V536d), and on open for one saved before that - the same idempotent kind of
 			-- write as the stShowNumina seed in onNodeReady. Going back to Mortal turns nothing on
-			-- again: the storyteller does that (SPEC Q109.7).
+			-- again: the storyteller does that (SPEC Q109.7). A mage loses Numina only (SPEC I216d).
 			function vampFlagsOff()
-				if sheet == nil or sheet.game ~= "Vampire" then return; end;
+				if not vampLayout() then return; end;
 
 				if sheet.stShowNumina ~= false then setField("stShowNumina", false); end;
-				if sheet.stShowDisciplines ~= false then setField("stShowDisciplines", false); end;
+				if sheet.game == "Vampire" and sheet.stShowDisciplines ~= false then setField("stShowDisciplines", false); end;
 			end;
 
 			-- A vampire with the True Faith MERIT (user 2026-10-06, SPEC I214a): the field keeps the
@@ -2805,18 +2958,24 @@
 				-- reach (the 15th generation's is 3); a vampire sees the live dot up to it and the faded
 				-- twin above it, anyone else the five they always had. The rows are MAIN_NINE (built
 				-- below XP_ATTRS, which it reads). Backgrounds go to nine for a vampire, with no ceiling
-				-- at all (SPEC Q109.5).
-				local vamp = sheet.game == "Vampire";
+				-- at all (SPEC Q109.5). A MAGE wears the nine (SPEC I216b/c, Q129.1) under a ceiling of 5:
+				-- no generation reaches a mage's sheet, so it reads as a thirteenth's five and four twins.
+				--
+				-- TEN on a mage's rows since the 74th batch (user 2026-10-06, SPEC I217f, V554d): the tenth
+				-- follows the ninth - a faded twin over the ceiling of 5 on a trait, a live dot with no
+				-- ceiling on a background - and only a mage ever sees it.
+				local vamp = vampLayout();
+				local mage = sheet.game == "Mage";
 
 				for i = 1, #MAIN_NINE, 1 do
-					for k = 4, 9, 1 do
+					for k = 4, 10, 1 do
 						names[MAIN_NINE[i][1] .. "_" .. k] = true;
 						names["mcap" .. MAIN_NINE[i][2] .. "_" .. k] = true;
 					end;
 				end;
 
 				for i = 1, BACKGROUND_ROWS, 1 do
-					for k = 6, 9, 1 do names["dotbackground_" .. i .. "_" .. k] = true; end;
+					for k = 6, 10, 1 do names["dotbackground_" .. i .. "_" .. k] = true; end;
 				end;
 
 				names["dynBloodTurnMain"] = true;
@@ -2846,23 +3005,28 @@
 					end;
 				end;
 
+				-- The Main's pool on a MAGE is a ghoul's (SPEC I216e): bloodCap's ceiling, and twenty
+				-- where no family sets one - the column bar's own fallback.
+				local isVamp   = sheet.game == "Vampire";
+				local mainPool = isVamp and g.pool or (bloodCap() or 20);
+
 				for n = 1, 50, 1 do
 					pair(found["vdotbloodPool_" .. n], found["vcapbloodPool_" .. n], n <= g.pool);
-					pair(found["mdotbloodPool_" .. n], found["mcapbloodPool_" .. n], n <= g.pool);
+					pair(found["mdotbloodPool_" .. n], found["mcapbloodPool_" .. n], n <= mainPool);
 				end;
 
 				local turn = found["dynBloodTurn"];
 
 				if turn ~= nil then turn.text = tostring(g.turn); end;
 
-				local top = vamp and g.disc or 5;
+				local top = isVamp and g.disc or 5;
 
 				for i = 1, #MAIN_NINE, 1 do
-					for k = 4, 9, 1 do
+					for k = 4, 10, 1 do
 						local live = found[MAIN_NINE[i][1] .. "_" .. k];
 						local cap  = found["mcap" .. MAIN_NINE[i][2] .. "_" .. k];
 						local on   = k <= top;
-						local off  = vamp and not on;
+						local off  = vamp and not on and (k <= 9 or mage);
 
 						if live ~= nil and live.visible ~= on then live.visible = on; end;
 						if cap ~= nil and cap.visible ~= off then cap.visible = off; end;
@@ -2870,10 +3034,11 @@
 				end;
 
 				for i = 1, BACKGROUND_ROWS, 1 do
-					for k = 6, 9, 1 do
-						local d = found["dotbackground_" .. i .. "_" .. k];
+					for k = 6, 10, 1 do
+						local d     = found["dotbackground_" .. i .. "_" .. k];
+						local shown = (k <= 9 and vamp) or mage;
 
-						if d ~= nil and d.visible ~= vamp then d.visible = vamp; end;
+						if d ~= nil and d.visible ~= shown then d.visible = shown; end;
 					end;
 				end;
 
@@ -2882,6 +3047,9 @@
 				local lang = (sheet.language == "en") and "en" or "pt";
 				local per  = found["dynBloodTurnMain"];
 				local maxT = found["dynMaxTraitV"];
+
+				-- The line is the GENERATION's, so a mage-ghoul's pool goes without it (SPEC I216e).
+				if per ~= nil and per.visible ~= isVamp then per.visible = isVamp; end;
 
 				if per ~= nil then
 					local word = "Blood per Turn";
@@ -3749,7 +3917,9 @@
 			declareTrait("humanity", 1, 10, 0);
 			declareTrait("willpower", 1, 10, 0);
 
-			for i = 1, BACKGROUND_ROWS, 1 do declareTrait("background_" .. i, 1, 9, 0); end;
+			-- TEN since the 74th batch (user 2026-10-06, SPEC I217g): a mage's background row draws a
+			-- tenth live dot. Nobody else has a widget for `_10`, so the field stays nil for them.
+			for i = 1, BACKGROUND_ROWS, 1 do declareTrait("background_" .. i, 1, 10, 0); end;
 
 			-- One dot per row, so first and last are both 1 (SPEC V147). The row is a trait like
 			-- any other from here on: the same click path prices it, refuses it and sells it.
@@ -3951,8 +4121,8 @@
 					local field = "background_" .. i;
 
 					pushRise(rows, "Background", slotName(field),
-						traitLevel(base, field, 1, 9, 0),
-						liveLevel(field, 1, 9, 0), ctx, field, 9);
+						traitLevel(base, field, 1, 10, 0),
+						liveLevel(field, 1, 10, 0), ctx, field, 10);
 				end;
 
 				-- Which kinds the character already had when the storyteller froze the sheet.
@@ -4965,6 +5135,20 @@
 			function pickAllowed(field, value, levels, hedge)
 				if field == "numina_1" then return hedgeAllows(AFFINITY, value); end;
 				if field == "hedgeAttr" then return hedgeAllows(CASTING_ATTR, value); end;
+
+				-- A mage's sect, by the affiliation saved (SPEC I216h, Q129.3). An affiliation that
+				-- owns no sect - none, or a custom one - filters nothing; changing it keeps the sect,
+				-- which the pool offers back as the row's own value.
+				if field == "mageSect" then
+					local aff = (sheet ~= nil) and sheet.mageAffiliation or nil;
+					local own = false;
+
+					for _, a in pairs(SECT_AFFILIATION) do
+						if a == aff then own = true; break; end;
+					end;
+
+					return not own or SECT_AFFILIATION[value] == aff;
+				end;
 				if field ~= nil and string.match(field, "^hedgeRitual_%d+$") ~= nil then
 					return hedgeRitualAllows(value, hedge);
 				end;
@@ -8607,7 +8791,7 @@
 
 				local found = {};
 
-				xpFind(tabRootOf(from), { dynnature = true, dyndemeanor = true, btnQnature = true, btnQdemeanor = true }, found);
+				xpFind(tabRootOf(from), { dynnature = true, dyndemeanor = true, btnQnature = true, btnQdemeanor = true, dynmainAffiliation = true, dynmainSect = true }, found);
 
 				local lang = (sheet.language == "en") and "en" or "pt";
 
@@ -8615,6 +8799,11 @@
 				noteButton(found["btnQnature"], sheet.nature);
 				mfLabel(found["dyndemeanor"], sheet.demeanor, "Select Demeanor", lang);
 				noteButton(found["btnQdemeanor"], sheet.demeanor);
+
+				-- The mage's two pickers on the Main header (user 2026-10-06, SPEC I216f), no ? yet
+				-- (SPEC Q129.5).
+				mfLabel(found["dynmainAffiliation"], sheet.mageAffiliation, "Select Affiliation", lang);
+				mfLabel(found["dynmainSect"], sheet.mageSect, "Select Sect", lang);
 			end;
 
 			function renderMeritButtons(from)
@@ -9483,9 +9672,17 @@
 				-- (user 2026-10-01, SPEC I190g, V535d): the generation's Max Trait Level, the number
 				-- that locks the Disciplines above. Same shape and same place - asked BEFORE anything
 				-- is written, and it speaks. A mortal's rows stop at five by having five dots.
-				if want and sheet.game == "Vampire" and MAIN_NINE_TRAIT[trait] then
-					if (level + 1) > vampGen().disc then
-						xpWarn("That trait is above what your generation allows");
+				-- A MAGE wears the same nine dots under a ceiling of 5 (SPEC I216c, Q129.1).
+				if want and vampLayout() and MAIN_NINE_TRAIT[trait] then
+					local isVamp = sheet.game == "Vampire";
+					local top    = isVamp and vampGen().disc or 5;
+
+					if (level + 1) > top then
+						if isVamp then
+							xpWarn("That trait is above what your generation allows");
+						else
+							xpWarn("That trait is above 5");
+						end;
 
 						return false;
 					end;
@@ -10767,12 +10964,16 @@
 		and changes only the trio leaves the NAME alone, so clanFamily never moves and the link
 		would never fire. The box would close over four slots that did not change, with nothing
 		raised - the silent shape of B58 and B62.
+
+		renderVampCaps since the 73rd batch (SPEC I216e): a mage-ghoul's pool on the Main takes the
+		family's ceiling, so the family moves its dots.
 	-->
 	<dataLink fields="{'language', 'clanFamily', 'clanFamilyCustomDisc_1', 'clanFamilyCustomDisc_2', 'clanFamilyCustomDisc_3'}">
 		<event name="onChange">
 			renderClanDisc(self);
 			renderClanFamilyButton(self);
 			renderBearing(self);
+			renderVampCaps(self);
 		</event>
 	</dataLink>
 
@@ -10881,15 +11082,22 @@
 			language change already repaints every ! through applyLanguage and
 			renderAbilityLabels (SPEC I187d, V512c, V527c).
 		-->
-		<dataLink fields="{'language', 'nature', 'demeanor'}">
+		<dataLink fields="{'language', 'nature', 'demeanor', 'mageAffiliation', 'mageSect'}">
 			<event name="onChange">
 				renderHeaderButtons(self);
 			</event>
 		</dataLink>
 
+	<!--
+		renderGameMode and renderVampCaps since the 73rd batch (SPEC I216e, V553f): a MAGE's Show
+		Ghoul brings the Main's pool and its ceiling. No vampFlagsOff here - it would turn a mage's
+		Show Ghoul back off the moment it went on.
+	-->
 	<dataLink fields="{'stShowNumina', 'stShowDisciplines'}">
 		<event name="onChange">
 			applyTabVisibility(self);
+			renderGameMode(self);
+			renderVampCaps(self);
 		</event>
 	</dataLink>
 

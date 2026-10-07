@@ -150,6 +150,7 @@
 			<imageCheckBox name="dot$(field)_7" left="365" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_8" left="390" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_9" left="415" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_10" left="440" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_10', self);" onMouseMove="noteTipMove(self, event, 'background', '$(field)', 'dot$(field)_10');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 		</template>
 
 		<!--

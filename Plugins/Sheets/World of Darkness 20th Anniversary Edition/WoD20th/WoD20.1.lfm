@@ -228,12 +228,14 @@
 			<imageCheckBox name="dot$(field)_7" left="275" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_8" left="300" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_9" left="325" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_10" left="350" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_10', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_10');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="mcap$(field)_4" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_5" left="225" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_6" left="250" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_7" left="275" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_8" left="300" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_9" left="325" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_10" left="350" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<!-- Attribute, but dot 1 is a real checkbox instead of a fixed image, so the rating can
 		     drop to zero. Only Appearance uses it (SPEC T95). -->
@@ -251,12 +253,14 @@
 			<imageCheckBox name="dot$(field)_7" left="275" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_8" left="300" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_9" left="325" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_10" left="350" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_10', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_10');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="mcap$(field)_4" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_5" left="225" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_6" left="250" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_7" left="275" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_8" left="300" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_9" left="325" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_10" left="350" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<template name="Ability">
 			<rectangle name="hit$(col)$(num)" align="contents" color="#00000000" strokeColor="#00000000" hitTest="true" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'hit$(col)$(num)');" onMouseLeave="noteTipLeave(self);"/>
@@ -272,12 +276,14 @@
 			<imageCheckBox name="abil$(col)$(num)_7" left="315" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_7.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="abil$(col)$(num)_8" left="340" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_8.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="abil$(col)$(num)_9" left="365" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_9.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="abil$(col)$(num)_10" left="390" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick(self.abil$(col)$(num)_10.field, self);" onMouseMove="noteTipMove(self, event, 'spec', self.abil$(col)$(num)_1.field, 'abil$(col)$(num)_10');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="mcap$(col)$(num)_4" left="240" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(col)$(num)_5" left="265" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(col)$(num)_6" left="290" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(col)$(num)_7" left="315" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(col)$(num)_8" left="340" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(col)$(num)_9" left="365" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(col)$(num)_10" left="390" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<!-- Blank rows at the bottom of each ability column, for abilities the book does not list.
 		     Their ! keys the specialities by the row's FIELD, not the typed name, so renaming the
@@ -297,12 +303,14 @@
 			<imageCheckBox name="dot$(field)_7" left="315" top="0" width="25" height="25" field="$(field)_7" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_7', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_7');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_8" left="340" top="0" width="25" height="25" field="$(field)_8" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_8', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_8');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="dot$(field)_9" left="365" top="0" width="25" height="25" field="$(field)_9" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_9', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_9');" onMouseLeave="noteTipLeave(self);" visible="false"/>
+			<imageCheckBox name="dot$(field)_10" left="390" top="0" width="25" height="25" field="$(field)_10" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('$(field)_10', self);" onMouseMove="noteTipMove(self, event, 'spec', '$(field)_1', 'dot$(field)_10');" onMouseLeave="noteTipLeave(self);" visible="false"/>
 			<imageCheckBox name="mcap$(field)_4" left="240" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_5" left="265" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_6" left="290" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_7" left="315" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_8" left="340" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			<imageCheckBox name="mcap$(field)_9" left="365" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<imageCheckBox name="mcap$(field)_10" left="390" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 		</template>
 		<!-- No label: HUMANITY / WILLPOWER are titled above the track, so "FORCA DE VONTADE"
 		     cannot be clipped.
@@ -418,6 +426,13 @@
 				<button name="btnQmainClan" left="108" top="0" width="20" height="20" text="?" onClick="popOpen(self, 'Clan', sheet['clanFamily'], nil, 'clanFamily');"/>
 				<button name="dynmainClan" left="132" top="0" width="195" height="25" text="Select Clan" onClick="mfOpen(self, 'clanFamily', 'clan', 'Clan');"/>
 			</layout>
+			<!-- The MAGE's column three (user 2026-10-06, SPEC I216f/g): Affiliation, Sect, then
+			     Concept moved in from column two, where Essence takes its place. Hidden here like
+			     the vampire's; renderGameMode shows the game's own. No ? yet (SPEC Q129.5). -->
+			<layout name="hdrAffiliation" left="663" top="15" width="327" height="25" visible="false">
+				<label left="0" top="5" width="105" height="20" text="Affiliation" horzTextAlign="trailing"/>
+				<button name="dynmainAffiliation" left="132" top="0" width="195" height="25" text="Select Affiliation" onClick="mfOpen(self, 'mageAffiliation', 'affiliation', 'Affiliation');"/>
+			</layout>
 
 			<layout name="hdrPlayer" left="20" top="40" width="297" height="25" >
 				<HeaderNarrow field="player" nome="Player"/>
@@ -434,12 +449,22 @@
 				          items="{'4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th', '15th'}"
 				          values="{'4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}"/>
 			</layout>
+			<layout name="hdrSect" left="663" top="40" width="327" height="25" visible="false">
+				<label left="0" top="5" width="105" height="20" text="Sect" horzTextAlign="trailing"/>
+				<button name="dynmainSect" left="132" top="0" width="195" height="25" text="Select Sect" onClick="mfOpen(self, 'mageSect', 'sect', 'Sect');"/>
+			</layout>
 
 			<layout name="hdrChronicle" left="20" top="65" width="297" height="25" >
 				<HeaderNarrow field="chronicle" nome="Chronicle"/>
 			</layout>
 			<layout name="hdrConcept" left="326" top="65" width="327" height="25" >
 				<Header field="concept" nome="Concept"/>
+			</layout>
+			<layout name="hdrEssence" left="326" top="65" width="327" height="25" visible="false">
+				<label left="0" top="5" width="105" height="20" text="Essence" horzTextAlign="trailing"/>
+				<comboBox name="cmbMageEssence" left="132" top="0" width="195" height="25" field="mageEssence"
+				          items="{'', 'Dynamic', 'Pattern', 'Primordial', 'Questing'}"
+				          values="{'', 'Dynamic', 'Pattern', 'Primordial', 'Questing'}"/>
 			</layout>
 			<layout name="hdrResidence" left="663" top="65" width="327" height="25" >
 				<Header field="residence" nome="Residence"/>
@@ -914,10 +939,12 @@
 		     the Combat tab and on the Vampire tab's copy (57th batch, user 2026-10-02, SPEC I200a,
 		     V545a). The three are ONE object centred in the box since the 61st batch (user
 		     2026-10-02, SPEC I204c, V547): 20 + 8 + 52 = 80 in the 113 of V541a, 16 above and 17 under. -->
+		<!-- Title and body named in the 74th batch (user 2026-10-06, SPEC I217d): a MAGE's WILLPOWER
+		     takes VIRTUES' 340 x 126 and MAGE_GEOM re-centres the two as one object. -->
 		<layout name="boxWillpower" left="680" top="672" width="330" height="113">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="16" width="290" height="20" text="WILLPOWER" horzTextAlign="center"/>
-			<layout left="40" top="44" width="250" height="52" >
+			<label name="lblWillpower" left="20" top="16" width="290" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<layout name="bodyWillpower" left="40" top="44" width="250" height="52" >
 				<Willpower field="willpower"/>
 			</layout>
 		</layout>
