@@ -99,6 +99,10 @@ $DMG_PT = (@(
     'fogo = Dano de Fogo: ver a tabela de Explosivos'
     ('- = O livro n' + [char]0xE3 + 'o d' + [char]0xE1 + ' valor')
 ) -join $SEP)
+# A legenda do ? de Rate (user 2026-10-07, SPEC I230d): o que CdT abrevia - so isso, a frase
+# que a legenda em italico sob o ARMOR dizia antes do 87o lote.
+$RATE_EN = 'Rate of Fire'
+$RATE_PT = ('Cad' + [char]0xEA + 'ncia de Tiro')
 
 # ReadAllLines com UTF8 explicito: Get-Content do PS 5.1 cai em ANSI e devolveria os acentos
 # das colunas _pt como mojibake, sem erro. A 1a linha nomeia as colunas - nenhuma
@@ -263,14 +267,15 @@ foreach ($kind in @('Weapon', 'Armor')) {
             $o.Add(("`t`t`t`t`t{0} = [==[{1}]==]," -f $lang, (Blocks $it.book $it.page $it.name $lang $body)))
             $o.Add("`t`t`t`t},")
         }
-        # As 2 chaves EXTRA de descWeapon_*: as LEGENDAS dos ? de cabecalho Conceal e Damage
-        # (SPEC I157p, I158e, V461b, V464c). Sao as UNICAS 2 chaves dos 2 modulos fora de
+        # As 3 chaves EXTRA de descWeapon_*: as LEGENDAS dos ? de cabecalho Conceal, Damage e Rate
+        # (SPEC I157p, I158e, I230d, V461b, V464c, V571c). Sao as UNICAS 3 chaves dos 2 modulos fora de
         # PICKER_LIST["weapon"] - um ? de cabecalho nao tem linha atras dele, entao a chave e
         # FIXA e nao um nome de arma. descArmor_* segue com ZERO delas.
         if ($kind -eq 'Weapon') {
             $fixed = @(
                 @{ Key = 'Conceal'; En = $LEGEND_EN; Pt = $LEGEND_PT; BkEn = 'core'; PgEn = '281'; BkPt = 'ca';   PgPt = '330' },
-                @{ Key = 'Damage';  En = $DMG_EN;    Pt = $DMG_PT;    BkEn = 'core'; PgEn = '279'; BkPt = 'core'; PgPt = '279' }
+                @{ Key = 'Damage';  En = $DMG_EN;    Pt = $DMG_PT;    BkEn = 'core'; PgEn = '279'; BkPt = 'core'; PgPt = '279' },
+                @{ Key = 'Rate';    En = $RATE_EN;   Pt = $RATE_PT;   BkEn = 'core'; PgEn = '279'; BkPt = 'core'; PgPt = '279' }
             )
             foreach ($f in $fixed) {
                 $lg = if ($lang -eq 'en') { $f.En }   else { $f.Pt }
@@ -286,7 +291,7 @@ foreach ($kind in @('Weapon', 'Armor')) {
         # LF, a forma da CASA dos modulos de descricao, inclusive DENTRO do literal [==[ ]==]
         # (SPEC V345, B87). Misturar CRLF aqui nao muda 1 char de texto e faz o diff mentir.
         [IO.File]::WriteAllText("$OutDir\desc$($kind)_$lang.lua", (($o -join "`n") + "`n"), $U8)
-        "desc$($kind)_$lang.lua : $($list.Count) entradas$(if ($kind -eq 'Weapon') { ' + Conceal + Damage' } else { '' })"
+        "desc$($kind)_$lang.lua : $($list.Count) entradas$(if ($kind -eq 'Weapon') { ' + Conceal + Damage + Rate' } else { '' })"
     }
 }
 

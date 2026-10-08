@@ -2055,36 +2055,40 @@
 
 			-- A MAGE's Quintessence / Paradox wheel (user 2026-10-06, SPEC I218e, V555e): twenty marks,
 			-- 1 to 20 clockwise, each "", "/" or "X". Quintessence ("/") grows clockwise from 1 and
-			-- Paradox ("X") counter-clockwise from 20, so an empty mark takes "/" after a "/" (or as
-			-- the first), "X" before an "X" (or as the last), and "/" when it touches neither. An "X"
-			-- clears; a "/" turns "X" when the next mark clockwise is one - Paradox eating
-			-- Quintessence - and clears otherwise. The wheel does not wrap: 20 is the end (Q132.5).
+			-- Paradox ("X") counter-clockwise from 20. An "X" clears; a "/" turns "X" when the next
+			-- mark clockwise is one - Paradox eating Quintessence - and clears otherwise. The wheel
+			-- does not wrap: 20 is the end (Q132.5).
+			--
+			-- An EMPTY mark goes to the nearer end since the 84th batch (user 2026-10-07, SPEC I227c,
+			-- V569c): Quintessence fills 1..q clockwise and Paradox 20..21-p counter-clockwise, so the
+			-- clicked mark is n - q marks from one and (21 - n) - p from the other, and the nearer
+			-- fills up to it; a tie is Quintessence's. Mark 20 is Paradox's first, so mark 8 counts
+			-- 13 from that side and not 12 - with 12 the clicked mark would stay empty (Q141.3). The
+			-- user's example: 3 and 11, a click on 8 is 5 against 2, and Paradox goes to 13. Next to
+			-- either end this is the old rule: one away, and the one tie between them is "/".
 			function cycleQpMark(n)
 				if sheet == nil then return; end;
 
 				local v     = sheet["qpWheel_" .. n] or "";
 				local nextX = n < 20 and sheet["qpWheel_" .. (n + 1)] == "X";
-				local new;
-
-				if v == "X" then
-					new = "";
-				elseif v == "/" then
-					new = nextX and "X" or "";
-				elseif n == 1 or sheet["qpWheel_" .. (n - 1)] == "/" then
-					new = "/";
-				elseif n == 20 or nextX then
-					new = "X";
-				else
-					new = "/";
-				end;
 
 				-- The NUMBERS are the truth since the 76th batch (user 2026-10-06, SPEC I219c, V556d):
 				-- the click moves them by what it changed, on the numbers and not on a count of the
 				-- ring, so a Paradox over 20 loses one and the ring stays full. renderQpWheel redraws.
 				local q  = math.max(0, math.floor(tonumber(sheet.qpQuint) or 0));
 				local p  = math.max(0, math.floor(tonumber(sheet.qpParadox) or 0));
-				local dq = (new == "/" and 1 or 0) - (v == "/" and 1 or 0);
-				local dx = (new == "X" and 1 or 0) - (v == "X" and 1 or 0);
+				local dq, dx = 0, 0;
+
+				if v == "X" then
+					dx = -1;
+				elseif v == "/" then
+					dq = -1;
+					if nextX then dx = 1; end;
+				elseif n - q <= (21 - n) - p then
+					dq = n - q;
+				else
+					dx = (21 - n) - p;
+				end;
 
 				if dq ~= 0 then setField("qpQuint", math.max(0, q + dq)); end;
 				if dx ~= 0 then setField("qpParadox", math.max(0, p + dx)); end;
@@ -2726,6 +2730,7 @@
 				boxDerangements      = { 1237, 0, 225, 337 },
 				boxOther             = { 1237, 342, 225, 337 },
 				boxCombatTraits      = { 970, 0, 382, 351 },
+				boxCombatAbils3      = { 970, 115, 382, 236 },
 				dynHealth3_box       = { 970, 356, 382 },
 				dynHealth3_row1      = { 68, 47, 246, 20 },
 				dynHealth3_row2      = { 68, 74, 246, 20 },
@@ -2792,6 +2797,12 @@
 			-- 80th batch (user 2026-10-07, SPEC I223c/f, Q137.1b): ARETE 664 with ability-sized spheres and
 			-- HEALTH 206 - rows of 166, the name (111, "Ferido Gravemente") and "(-N)" on two labels - so
 			-- the row still closes on 1375.
+			-- 88th batch (user 2026-10-08, SPEC I231b/e, V572, Q145): an ability shows five dots since the
+			-- 87th (SPEC I230c), so the three ability boxes are the mortal's 330 (20 + 135 + 5 + 20 + 5 +
+			-- 5 x 25 + 20), side by side from the left and closing on 1000 - ATTRIBUTES and HEALTH still
+			-- close on 1375. On the Combat tab COMBAT TRAITS splits: ATTRIBUTES 407 x 151 (title at 15,
+			-- four rows, 15 under), ABILITIES 282 x 226 under it (seven rows of five dots), and HEALTH
+			-- 5 under that at 387.
 			MAGE_GEOM = {
 				boxHeader        = { 222, 0, 1153, 105 },
 				hdrNature        = { 398, 15, 327, 25 },
@@ -2801,9 +2812,9 @@
 				hdrSect          = { 806, 40, 327, 25 },
 				hdrConcept       = { 806, 65, 327, 25 },
 				boxAttributes    = { 222, 110, 1153, 126 },
-				boxTalents       = { 0, 241, 455, 351 },
-				boxSkills        = { 460, 241, 455, 351 },
-				boxKnowledges    = { 920, 241, 455, 351 },
+				boxTalents       = { 0, 241, 330, 351 },
+				boxSkills        = { 335, 241, 330, 351 },
+				boxKnowledges    = { 670, 241, 330, 351 },
 				boxWillpower     = { 0, 597, 290, 126 },
 				lblWillpower     = { 20, 23, 250, 20 },
 				bodyWillpower    = { 20, 51, 250, 52 },
@@ -2830,8 +2841,9 @@
 				boxFlaws         = { 514, 342, 743, 337 },
 				boxDerangements  = { 1262, 0, 225, 337 },
 				boxOther         = { 1262, 342, 225, 337 },
-				boxCombatTraits  = { 970, 0, 407, 351 },
-				dynHealth3_box   = { 970, 356, 407 },
+				boxCombatTraits  = { 970, 0, 407, 151 },
+				boxCombatAbils3  = { 970, 156, 282, 226 },
+				dynHealth3_box   = { 970, 387, 407 },
 				boxWillpower3    = { 650, 356, 315, 126 },
 				lblWillpower3    = { 20, 23, 275, 20 },
 				bodyWillpower3   = { 32, 51, 250, 52 },
@@ -2928,6 +2940,11 @@
 				names.boxArete3 = true;
 				names.boxSpheres = true;
 				names.boxSpheres3 = true;
+				names.lblCombatTraits3 = true;
+				names.lineCombatTraits3 = true;
+				names.lblCombatAttrs3 = true;
+				names.rectCombatAbils3 = true;
+				names.lblCombatAbils3 = true;
 
 				local found = xpFind(tabRootOf(from), names, {});
 
@@ -3031,6 +3048,24 @@
 					local c = found[nm];
 
 					if c ~= nil and c.visible ~= mage then c.visible = mage; end;
+				end;
+
+				-- A mage's COMBAT TRAITS is two boxes (user 2026-10-08, SPEC I231c, V572b): its title says
+				-- ATTRIBUTES and loses the line, and the ability rows' box shows its backdrop and title.
+				for nm, want in pairs({ lblCombatTraits3 = not mage, lineCombatTraits3 = not mage, lblCombatAttrs3 = mage, lblCombatAbils3 = mage }) do
+					local c = found[nm];
+
+					if c ~= nil and c.visible ~= want then c.visible = want; end;
+				end;
+
+				-- Shown, the backdrop's ornament is measured again (SPEC I215b, B199): the load measured
+				-- it hidden. The size goes in as MAGE_GEOM's, the value placeBox just WROTE (SPEC V285c).
+				local abilsRect = found["rectCombatAbils3"];
+
+				if abilsRect ~= nil and abilsRect.visible ~= mage then
+					abilsRect.visible = mage;
+
+					if mage and refreshOrnament ~= nil then refreshOrnament(found["boxCombatAbils3"], MAGE_GEOM.boxCombatAbils3[3], MAGE_GEOM.boxCombatAbils3[4]); end;
 				end;
 
 				-- The Vampire tab with the True Faith merit (SPEC I214e, V551), through the same
@@ -3209,7 +3244,9 @@
 				--
 				-- TEN on a mage's rows since the 74th batch (user 2026-10-06, SPEC I217f, V554d): the tenth
 				-- follows the ninth - a faded twin over the ceiling of 5 on a trait, a live dot with no
-				-- ceiling on a background - and only a mage ever sees it.
+				-- ceiling on a background - and only a mage ever sees it. A mage's ABILITY rows show
+				-- their five and no twin at all since the 87th batch (user 2026-10-07, SPEC I230c,
+				-- V571b): MAIN_NINE marks them; its attributes keep the ten.
 				local vamp = vampLayout();
 				local mage = sheet.game == "Mage";
 
@@ -3272,7 +3309,7 @@
 						local live = found[MAIN_NINE[i][1] .. "_" .. k];
 						local cap  = found["mcap" .. MAIN_NINE[i][2] .. "_" .. k];
 						local on   = k <= top;
-						local off  = vamp and not on and (k <= 9 or mage);
+						local off  = vamp and not on and (k <= 9 or mage) and not (mage and MAIN_NINE[i][3]);
 
 						if live ~= nil and live.visible ~= on then live.visible = on; end;
 						if cap ~= nil and cap.visible ~= off then cap.visible = off; end;
@@ -3630,14 +3667,15 @@
 			-- attributes, the ability rows by position and the typed rows - each as the live dot's
 			-- prefix and the faded twin's. GLOBAL and built HERE, under the two locals it reads:
 			-- renderVampCaps sits ~400 lines up, and a local named in its body would compile as a
-			-- global and read nil (SPEC B51, V223).
+			-- global and read nil (SPEC B51, V223). The third field marks an ABILITY row - typed or
+			-- by position - which a mage keeps at five since the 87th batch (SPEC I230c, V571b).
 			MAIN_NINE = {};
 
 			for i = 1, #XP_ATTRS, 1 do MAIN_NINE[#MAIN_NINE + 1] = { "dot" .. XP_ATTRS[i][2], XP_ATTRS[i][2] }; end;
-			for i = 1, #XP_CUSTOM, 1 do MAIN_NINE[#MAIN_NINE + 1] = { "dot" .. XP_CUSTOM[i], XP_CUSTOM[i] }; end;
+			for i = 1, #XP_CUSTOM, 1 do MAIN_NINE[#MAIN_NINE + 1] = { "dot" .. XP_CUSTOM[i], XP_CUSTOM[i], true }; end;
 
 			for _, col in ipairs({ "talents", "skills", "knowledges" }) do
-				for i = 1, 13, 1 do MAIN_NINE[#MAIN_NINE + 1] = { "abil" .. col .. i, col .. i }; end;
+				for i = 1, 13, 1 do MAIN_NINE[#MAIN_NINE + 1] = { "abil" .. col .. i, col .. i, true }; end;
 			end;
 
 			-- The same rows by TRAIT, for the ceiling xpClick asks (SPEC V535d): the ability rows are

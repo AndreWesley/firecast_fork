@@ -48,14 +48,20 @@
 			frmWoD20_17 (WoD20.17), and the list is 20 wider than it: 16 for the scrollbar and 4 between,
 			so the bar never covers an item and an item never runs under the bar. Each list paints the
 			item it builds (onItemAdded, magickItemPaint above).
+			Since the 85th batch (user 2026-10-07, SPEC I228b, V570b) the cards keep ONE gap, 24, from the
+			box's left, from its right and from each other: the list opens at 24, the card is 308 (356 -
+			2 x 24), and the 20 of the scrollbar's lane fall inside the right-hand 24, 4 either side of the
+			bar. The Add button closes where the cards close (332). Since the 86th batch (SPEC I229b) each
+			card's 24 is above it, so the list opens on the title row's foot (35) and the first card sits
+			24 under it, like every other gap.
 			Seven empty Foci are seeded once per mage by seedFoci (root, SPEC I223j); Rotes and Wonders
 			start empty.
 		-->
 		<layout name="boxFoci" left="0" top="0" width="356" height="831">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="316" height="20" text="FOCI" horzTextAlign="center" hitTest="false"/>
-			<button name="btnAddFocus" left="256" top="15" width="80" height="20" text="Add" onClick="self.rclFoci:append();"/>
-			<recordList name="rclFoci" left="20" top="45" width="316" height="766" field="magickFoci" templateForm="frmWoD20_17" layout="vertical">
+			<button name="btnAddFocus" left="252" top="15" width="80" height="20" text="Add" onClick="self.rclFoci:append();"/>
+			<recordList name="rclFoci" left="24" top="35" width="328" height="776" field="magickFoci" templateForm="frmWoD20_17" layout="vertical">
 				<event name="onItemAdded">magickItemPaint(form, "Focus");</event>
 			</recordList>
 		</layout>
@@ -63,8 +69,8 @@
 		<layout name="boxRotes" left="361" top="0" width="356" height="831">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="316" height="20" text="ROTES" horzTextAlign="center" hitTest="false"/>
-			<button name="btnAddRote" left="256" top="15" width="80" height="20" text="Add" onClick="self.rclRotes:append();"/>
-			<recordList name="rclRotes" left="20" top="45" width="316" height="766" field="magickRotes" templateForm="frmWoD20_17" layout="vertical">
+			<button name="btnAddRote" left="252" top="15" width="80" height="20" text="Add" onClick="self.rclRotes:append();"/>
+			<recordList name="rclRotes" left="24" top="35" width="328" height="776" field="magickRotes" templateForm="frmWoD20_17" layout="vertical">
 				<event name="onItemAdded">magickItemPaint(form, "Rote");</event>
 			</recordList>
 		</layout>
@@ -72,8 +78,8 @@
 		<layout name="boxWonders" left="722" top="0" width="356" height="831">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="316" height="20" text="WONDERS" horzTextAlign="center" hitTest="false"/>
-			<button name="btnAddWonder" left="256" top="15" width="80" height="20" text="Add" onClick="self.rclWonders:append();"/>
-			<recordList name="rclWonders" left="20" top="45" width="316" height="766" field="magickWonders" templateForm="frmWoD20_17" layout="vertical">
+			<button name="btnAddWonder" left="252" top="15" width="80" height="20" text="Add" onClick="self.rclWonders:append();"/>
+			<recordList name="rclWonders" left="24" top="35" width="328" height="776" field="magickWonders" templateForm="frmWoD20_17" layout="vertical">
 				<event name="onItemAdded">magickItemPaint(form, "Name");</event>
 			</recordList>
 		</layout>

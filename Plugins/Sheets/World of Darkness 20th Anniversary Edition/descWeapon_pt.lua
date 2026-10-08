@@ -3185,5 +3185,14 @@ fogo = Dano de Fogo: ver a tabela de Explosivos
 
 - = O livro não dá valor]==],
 				},
+				["Rate"] = {
+					pt = [==[Vampire: The Masquerade 20th Anniversary Edition, pág. 279
+
+
+Rate
+
+
+Cadência de Tiro]==],
+				},
 				-- <<< WEAPON_DESC_END
 };

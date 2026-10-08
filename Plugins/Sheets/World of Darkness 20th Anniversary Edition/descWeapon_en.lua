@@ -3189,5 +3189,14 @@ fire = Fire damage: see the Explosives chart
 
 - = The book gives no value]==],
 				},
+				["Rate"] = {
+					en = [==[Vampire: The Masquerade 20th Anniversary Edition, p. 279
+
+
+Rate
+
+
+Rate of Fire]==],
+				},
 				-- <<< WEAPON_DESC_END
 };
