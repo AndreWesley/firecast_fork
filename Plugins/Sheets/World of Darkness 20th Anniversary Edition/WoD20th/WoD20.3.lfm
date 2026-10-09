@@ -4,12 +4,14 @@
 		<![CDATA[
 			-- Display-only trait dots (SPEC T101). Two groups because attributes have no `_1`
 			-- field - dot 1 is a fixed image in the Attribute template - while abilities do.
-			local RO_ATTRS     = {"strength", "dexterity", "stamina", "perception"};
+			local RO_ATTRS     = {"strength", "dexterity", "stamina", "perception", "wits"};
+			-- wits is a MAGE's fifth row since the 91st batch (SPEC I234a); hidden for anyone else, painted all the same.
 
 			-- Six ability rows mirror a fixed field. The seventh is the era's ranged skill: with
 			-- one field per name (SPEC V74), Archery is `archery` and Firearms is `firearms`, so
 			-- the row is a slot again and the era's own list decides which one it shows.
-			local RO_ABILITIES = {"alertness", "athletics", "awareness", "brawl", "melee", "stealth"};
+			local RO_ABILITIES = {"alertness", "athletics", "awareness", "brawl", "melee", "stealth", "martialArts"};
+			-- martialArts is a MAGE's row after the ranged one since the 91st batch (SPEC I234a, Q149.1).
 
 			-- Virtues joined the display-only side in the 12th round (SPEC V51). Their dot 1 is
 			-- a fixed image, like an attribute, so they take the same firstDot = 2.
@@ -588,7 +590,7 @@
 			</layout>
 		</layout>
 
-		<layout name="boxSpheres3" left="0" top="602" width="645" height="150" visible="false">
+		<layout name="boxSpheres3" left="0" top="602" width="645" height="140" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="605" height="20" text="SPHERES" horzTextAlign="center"/>
 			<layout left="20" top="44" width="225" height="25">
@@ -603,7 +605,7 @@
 				<imageCheckBox name="rocapSph_correspondence_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 				<imageCheckBox name="rocapSph_correspondence_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 			</layout>
-			<layout left="20" top="74" width="225" height="25">
+			<layout left="20" top="69" width="225" height="25">
 				<label left="0" top="5" width="98" height="20" text="Entropy"/>
 				<imageCheckBox name="roSph_entropy_1" left="100" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
 				<imageCheckBox name="roSph_entropy_2" left="125" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
@@ -615,7 +617,7 @@
 				<imageCheckBox name="rocapSph_entropy_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 				<imageCheckBox name="rocapSph_entropy_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 			</layout>
-			<layout left="20" top="104" width="225" height="25">
+			<layout left="20" top="94" width="225" height="25">
 				<label left="0" top="5" width="98" height="20" text="Forces"/>
 				<imageCheckBox name="roSph_forces_1" left="100" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
 				<imageCheckBox name="roSph_forces_2" left="125" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
@@ -639,7 +641,7 @@
 				<imageCheckBox name="rocapSph_life_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 				<imageCheckBox name="rocapSph_life_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 			</layout>
-			<layout left="255" top="74" width="173" height="25">
+			<layout left="255" top="69" width="173" height="25">
 				<label left="0" top="5" width="46" height="20" text="Matter"/>
 				<imageCheckBox name="roSph_matter_1" left="48" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
 				<imageCheckBox name="roSph_matter_2" left="73" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
@@ -651,7 +653,7 @@
 				<imageCheckBox name="rocapSph_matter_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 				<imageCheckBox name="rocapSph_matter_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 			</layout>
-			<layout left="255" top="104" width="173" height="25">
+			<layout left="255" top="94" width="173" height="25">
 				<label left="0" top="5" width="46" height="20" text="Mind"/>
 				<imageCheckBox name="roSph_mind_1" left="48" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
 				<imageCheckBox name="roSph_mind_2" left="73" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
@@ -675,7 +677,7 @@
 				<imageCheckBox name="rocapSph_prime_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 				<imageCheckBox name="rocapSph_prime_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 			</layout>
-			<layout left="439" top="74" width="186" height="25">
+			<layout left="439" top="69" width="186" height="25">
 				<label left="0" top="5" width="59" height="20" text="Spirit"/>
 				<imageCheckBox name="roSph_spirit_1" left="61" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
 				<imageCheckBox name="roSph_spirit_2" left="86" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
@@ -687,7 +689,7 @@
 				<imageCheckBox name="rocapSph_spirit_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 				<imageCheckBox name="rocapSph_spirit_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.12" visible="false"/>
 			</layout>
-			<layout left="439" top="104" width="186" height="25">
+			<layout left="439" top="94" width="186" height="25">
 				<label left="0" top="5" width="59" height="20" text="Time"/>
 				<imageCheckBox name="roSph_time_1" left="61" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
 				<imageCheckBox name="roSph_time_2" left="86" top="0" width="25" height="25" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.40"/>
@@ -798,6 +800,8 @@
 			<layout left="35" top="61" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="dexterity" nome="Dexterity"/></layout>
 			<layout left="35" top="86" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="stamina" nome="Stamina"/></layout>
 			<layout left="35" top="111" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="perception" nome="Perception"/></layout>
+			<!-- A MAGE's fifth combat attribute (user 2026-10-08, SPEC I234a, V575a): hidden for anyone else, where it would sit on the line below. -->
+			<layout name="roRowWits3" left="35" top="136" width="250" height="25" anchors="left top right" visible="false"><ReadOnlyTrait field="wits" nome="Wits"/></layout>
 
 			<horzLine name="lineCombatTraits3" left="30" top="141" width="260" strokeColor="white" anchors="left top right"/>
 		</layout>
@@ -807,7 +811,7 @@
 		     era's fill and ornament, and a loose rectangle inside COMBAT TRAITS would carry none.
 		     Everyone else sees no box: backdrop and title are hidden and the layout sits exactly where
 		     the rows always were (115 + 36 = 151), as wide as COMBAT TRAITS (VAMP_GEOM widens both),
-		     so Vampire and Mortal look as before. A mage's is 282: 35 + 85 + 2 + 5 x 25 + 35. -->
+		     so Vampire and Mortal look as before. A mage's is 288 since the 91st batch: 35 + 91 + 2 + 5 x 25 + 35 (SPEC I234f). -->
 		<layout name="boxCombatAbils3" left="970" top="115" width="320" height="236">
 			<rectangle name="rectCombatAbils3" align="client" color="black" xradius="14" yradius="14" cornerType="innerRound" visible="false"/>
 			<label name="lblCombatAbils3" left="20" top="15" width="280" height="20" text="COMBAT ABILITIES" horzTextAlign="center" anchors="left top right" visible="false"/>
@@ -817,8 +821,11 @@
 			<layout left="35" top="86" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="awareness" nome="Awareness"/></layout>
 			<layout left="35" top="111" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="brawl" nome="Brawl"/></layout>
 			<layout left="35" top="136" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="ranged" nome="Firearms"/></layout>
-			<layout left="35" top="161" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="melee" nome="Melee"/></layout>
-			<layout left="35" top="186" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="stealth" nome="Stealth"/></layout>
+			<!-- A MAGE's MARTIAL ARTS right after the ranged row (user 2026-10-08, SPEC I234a, Q149.1, V575a): hidden for anyone
+			     else, on MELEE's authored spot; for a mage renderGameMode moves MELEE and STEALTH 25 down (their top only). -->
+			<layout name="roRowMartialArts3" left="35" top="161" width="250" height="25" anchors="left top right" visible="false"><ReadOnlyTrait field="martialArts" nome="Martial Arts"/></layout>
+			<layout name="roRowMelee3" left="35" top="161" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="melee" nome="Melee"/></layout>
+			<layout name="roRowStealth3" left="35" top="186" width="250" height="25" anchors="left top right" ><ReadOnlyTrait field="stealth" nome="Stealth"/></layout>
 		</layout>
 	</scrollBox>
 
@@ -833,7 +840,7 @@
 		everything hanging off THEM. That cascade is what froze a saved sheet on open (SPEC B34).
 	-->
 	<dataLink fields="{'healthLevels', 'language'}" onChange="renderHealthTrack(self, 'dynHealth3_');"/>
-	<dataLink fields="{'sheetTheme', 'strength_2', 'strength_3', 'strength_4', 'strength_5', 'dexterity_2', 'dexterity_3', 'dexterity_4', 'dexterity_5', 'stamina_2', 'stamina_3', 'stamina_4', 'stamina_5', 'perception_2', 'perception_3', 'perception_4', 'perception_5', 'alertness_1', 'alertness_2', 'alertness_3', 'alertness_4', 'alertness_5', 'athletics_1', 'athletics_2', 'athletics_3', 'athletics_4', 'athletics_5', 'awareness_1', 'awareness_2', 'awareness_3', 'awareness_4', 'awareness_5', 'brawl_1', 'brawl_2', 'brawl_3', 'brawl_4', 'brawl_5', 'firearms_1', 'firearms_2', 'firearms_3', 'firearms_4', 'firearms_5', 'melee_1', 'melee_2', 'melee_3', 'melee_4', 'melee_5', 'stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'stealth_5', 'archery_1', 'archery_2', 'archery_3', 'archery_4', 'archery_5', 'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'conscience_2', 'conscience_3', 'conscience_4', 'conscience_5', 'selfControl_2', 'selfControl_3', 'selfControl_4', 'selfControl_5', 'courage_2', 'courage_3', 'courage_4', 'courage_5', 'strength_6', 'strength_7', 'strength_8', 'strength_9', 'dexterity_6', 'dexterity_7', 'dexterity_8', 'dexterity_9', 'stamina_6', 'stamina_7', 'stamina_8', 'stamina_9', 'perception_6', 'perception_7', 'perception_8', 'perception_9', 'alertness_6', 'alertness_7', 'alertness_8', 'alertness_9', 'athletics_6', 'athletics_7', 'athletics_8', 'athletics_9', 'awareness_6', 'awareness_7', 'awareness_8', 'awareness_9', 'brawl_6', 'brawl_7', 'brawl_8', 'brawl_9', 'melee_6', 'melee_7', 'melee_8', 'melee_9', 'stealth_6', 'stealth_7', 'stealth_8', 'stealth_9', 'firearms_6', 'firearms_7', 'firearms_8', 'firearms_9', 'archery_6', 'archery_7', 'archery_8', 'archery_9', 'game', 'generation'}" onChange="renderCombatTraits(self);"/>
+	<dataLink fields="{'sheetTheme', 'strength_2', 'strength_3', 'strength_4', 'strength_5', 'dexterity_2', 'dexterity_3', 'dexterity_4', 'dexterity_5', 'stamina_2', 'stamina_3', 'stamina_4', 'stamina_5', 'perception_2', 'perception_3', 'perception_4', 'perception_5', 'alertness_1', 'alertness_2', 'alertness_3', 'alertness_4', 'alertness_5', 'athletics_1', 'athletics_2', 'athletics_3', 'athletics_4', 'athletics_5', 'awareness_1', 'awareness_2', 'awareness_3', 'awareness_4', 'awareness_5', 'brawl_1', 'brawl_2', 'brawl_3', 'brawl_4', 'brawl_5', 'firearms_1', 'firearms_2', 'firearms_3', 'firearms_4', 'firearms_5', 'melee_1', 'melee_2', 'melee_3', 'melee_4', 'melee_5', 'stealth_1', 'stealth_2', 'stealth_3', 'stealth_4', 'stealth_5', 'archery_1', 'archery_2', 'archery_3', 'archery_4', 'archery_5', 'willpower_1', 'willpower_2', 'willpower_3', 'willpower_4', 'willpower_5', 'willpower_6', 'willpower_7', 'willpower_8', 'willpower_9', 'willpower_10', 'conscience_2', 'conscience_3', 'conscience_4', 'conscience_5', 'selfControl_2', 'selfControl_3', 'selfControl_4', 'selfControl_5', 'courage_2', 'courage_3', 'courage_4', 'courage_5', 'strength_6', 'strength_7', 'strength_8', 'strength_9', 'dexterity_6', 'dexterity_7', 'dexterity_8', 'dexterity_9', 'stamina_6', 'stamina_7', 'stamina_8', 'stamina_9', 'perception_6', 'perception_7', 'perception_8', 'perception_9', 'alertness_6', 'alertness_7', 'alertness_8', 'alertness_9', 'athletics_6', 'athletics_7', 'athletics_8', 'athletics_9', 'awareness_6', 'awareness_7', 'awareness_8', 'awareness_9', 'brawl_6', 'brawl_7', 'brawl_8', 'brawl_9', 'melee_6', 'melee_7', 'melee_8', 'melee_9', 'stealth_6', 'stealth_7', 'stealth_8', 'stealth_9', 'firearms_6', 'firearms_7', 'firearms_8', 'firearms_9', 'archery_6', 'archery_7', 'archery_8', 'archery_9', 'wits_2', 'wits_3', 'wits_4', 'wits_5', 'wits_6', 'wits_7', 'wits_8', 'wits_9', 'martialArts_1', 'martialArts_2', 'martialArts_3', 'martialArts_4', 'martialArts_5', 'martialArts_6', 'martialArts_7', 'martialArts_8', 'martialArts_9', 'game', 'generation'}" onChange="renderCombatTraits(self);"/>
 
 	<!-- The twelve picker buttons of this tab (SPEC I157g, I107a2, V455e). A THIRD link and not
 	     a row added to either of the two above, for the reason the comment up there gives: the

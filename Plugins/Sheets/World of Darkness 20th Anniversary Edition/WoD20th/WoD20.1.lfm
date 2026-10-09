@@ -974,7 +974,7 @@
 		     base to the ring's centre: rotationAngle = (18 N - 99) mod 360, generated; the host turns a
 		     control about its own centre, so the positions above do not move (SPEC B61).
 		     Hidden here: renderGameMode shows it to a mage only. -->
-		<layout name="boxQuintParadox" left="295" top="597" width="200" height="244" visible="false">
+		<layout name="boxQuintParadox" left="295" top="622" width="200" height="244" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- Each title shares its line with the number it names (user 2026-10-06, SPEC I219a): the
 			     numbers are the truth and the ring draws them (renderQpWheel). Since the 77th batch
@@ -1019,11 +1019,16 @@
 		     2 + 125 = 225, 173, 186, and the four gaps - edge, between, between, edge - are 20 each, which
 		     is what closes the bottom row on 1375 with HEALTH at 206. Each dot from the 2nd has a
 		     faded EMPTY twin (scap_) for the levels over Arete, the mcap pair of the attributes, swapped
-		     by renderSpheres (SPEC I221j). Hidden here: renderGameMode shows it to a mage only. -->
-		<layout name="boxArete" left="500" top="597" width="664" height="89" visible="false">
+		     by renderSpheres (SPEC I221j). Hidden here: renderGameMode shows it to a mage only. Since the 90th batch (user 2026-10-08,
+		     SPEC I233b, V574b) the two stack under WILLPOWER right of KNOWLEDGES, 1005 to ATTRIBUTES' edge at 1375 (370),
+		     and the nine spheres are ONE column: every name 98 wide, the row 225 centred at 72, 25 a row from 44 (30 until the 92nd batch, SPEC I235b - the abilities' step). Since
+		     the 91st batch (SPEC I234c) WILLPOWER is back under TALENTS and the two rise to KNOWLEDGES' top. Since the 93rd batch
+		     (user 2026-10-08, SPEC I236a, V577) ARETE is 81 (the track at 41, 15 under it - SPEC V240) so SPHERES closes on 617,
+		     the foot of TALENTS and SKILLS in every era. -->
+		<layout name="boxArete" left="1005" top="241" width="370" height="81" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="624" height="20" text="ARETE" horzTextAlign="center"/>
-			<layout name="areteRow" left="207" top="44" width="250" height="25">
+			<label left="20" top="15" width="330" height="20" text="ARETE" horzTextAlign="center"/>
+			<layout name="areteRow" left="60" top="41" width="250" height="25">
 				<image left="0" top="0" width="25" height="25" style="autoFit" src="images/prime_on.png"/>
 				<imageCheckBox name="arete_2" left="25" top="0" width="25" height="25" field="arete_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('arete_2', self);"/>
 				<imageCheckBox name="arete_3" left="50" top="0" width="25" height="25" field="arete_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('arete_3', self);"/>
@@ -1037,10 +1042,10 @@
 			</layout>
 		</layout>
 
-		<layout name="boxSpheres" left="500" top="691" width="664" height="150" visible="false">
+		<layout name="boxSpheres" left="1005" top="327" width="370" height="290" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
-			<label left="20" top="15" width="624" height="20" text="SPHERES" horzTextAlign="center"/>
-			<layout name="sphRow_correspondence" left="20" top="44" width="225" height="25">
+			<label left="20" top="15" width="330" height="20" text="SPHERES" horzTextAlign="center"/>
+			<layout name="sphRow_correspondence" left="72" top="44" width="225" height="25">
 				<label left="0" top="5" width="98" height="20" text="Correspondence"/>
 				<imageCheckBox name="sphere_correspondence_1" left="100" top="0" width="25" height="25" field="sphere_correspondence_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_correspondence_1', self);"/>
 				<imageCheckBox name="sphere_correspondence_2" left="125" top="0" width="25" height="25" field="sphere_correspondence_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_correspondence_2', self);"/>
@@ -1052,7 +1057,7 @@
 				<imageCheckBox name="scap_correspondence_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_correspondence_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_entropy" left="20" top="74" width="225" height="25">
+			<layout name="sphRow_entropy" left="72" top="69" width="225" height="25">
 				<label left="0" top="5" width="98" height="20" text="Entropy"/>
 				<imageCheckBox name="sphere_entropy_1" left="100" top="0" width="25" height="25" field="sphere_entropy_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_entropy_1', self);"/>
 				<imageCheckBox name="sphere_entropy_2" left="125" top="0" width="25" height="25" field="sphere_entropy_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_entropy_2', self);"/>
@@ -1064,7 +1069,7 @@
 				<imageCheckBox name="scap_entropy_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_entropy_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_forces" left="20" top="104" width="225" height="25">
+			<layout name="sphRow_forces" left="72" top="94" width="225" height="25">
 				<label left="0" top="5" width="98" height="20" text="Forces"/>
 				<imageCheckBox name="sphere_forces_1" left="100" top="0" width="25" height="25" field="sphere_forces_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_forces_1', self);"/>
 				<imageCheckBox name="sphere_forces_2" left="125" top="0" width="25" height="25" field="sphere_forces_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_forces_2', self);"/>
@@ -1076,77 +1081,77 @@
 				<imageCheckBox name="scap_forces_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 				<imageCheckBox name="scap_forces_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_life" left="265" top="44" width="173" height="25">
-				<label left="0" top="5" width="46" height="20" text="Life"/>
-				<imageCheckBox name="sphere_life_1" left="48" top="0" width="25" height="25" field="sphere_life_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_1', self);"/>
-				<imageCheckBox name="sphere_life_2" left="73" top="0" width="25" height="25" field="sphere_life_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_2', self);"/>
-				<imageCheckBox name="sphere_life_3" left="98" top="0" width="25" height="25" field="sphere_life_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_3', self);"/>
-				<imageCheckBox name="sphere_life_4" left="123" top="0" width="25" height="25" field="sphere_life_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_4', self);"/>
-				<imageCheckBox name="sphere_life_5" left="148" top="0" width="25" height="25" field="sphere_life_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_5', self);"/>
-				<imageCheckBox name="scap_life_2" left="73" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_life_3" left="98" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_life_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_life_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<layout name="sphRow_life" left="72" top="119" width="225" height="25">
+				<label left="0" top="5" width="98" height="20" text="Life"/>
+				<imageCheckBox name="sphere_life_1" left="100" top="0" width="25" height="25" field="sphere_life_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_1', self);"/>
+				<imageCheckBox name="sphere_life_2" left="125" top="0" width="25" height="25" field="sphere_life_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_2', self);"/>
+				<imageCheckBox name="sphere_life_3" left="150" top="0" width="25" height="25" field="sphere_life_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_3', self);"/>
+				<imageCheckBox name="sphere_life_4" left="175" top="0" width="25" height="25" field="sphere_life_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_4', self);"/>
+				<imageCheckBox name="sphere_life_5" left="200" top="0" width="25" height="25" field="sphere_life_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_life_5', self);"/>
+				<imageCheckBox name="scap_life_2" left="125" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_life_3" left="150" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_life_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_life_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_matter" left="265" top="74" width="173" height="25">
-				<label left="0" top="5" width="46" height="20" text="Matter"/>
-				<imageCheckBox name="sphere_matter_1" left="48" top="0" width="25" height="25" field="sphere_matter_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_1', self);"/>
-				<imageCheckBox name="sphere_matter_2" left="73" top="0" width="25" height="25" field="sphere_matter_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_2', self);"/>
-				<imageCheckBox name="sphere_matter_3" left="98" top="0" width="25" height="25" field="sphere_matter_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_3', self);"/>
-				<imageCheckBox name="sphere_matter_4" left="123" top="0" width="25" height="25" field="sphere_matter_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_4', self);"/>
-				<imageCheckBox name="sphere_matter_5" left="148" top="0" width="25" height="25" field="sphere_matter_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_5', self);"/>
-				<imageCheckBox name="scap_matter_2" left="73" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_matter_3" left="98" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_matter_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_matter_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<layout name="sphRow_matter" left="72" top="144" width="225" height="25">
+				<label left="0" top="5" width="98" height="20" text="Matter"/>
+				<imageCheckBox name="sphere_matter_1" left="100" top="0" width="25" height="25" field="sphere_matter_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_1', self);"/>
+				<imageCheckBox name="sphere_matter_2" left="125" top="0" width="25" height="25" field="sphere_matter_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_2', self);"/>
+				<imageCheckBox name="sphere_matter_3" left="150" top="0" width="25" height="25" field="sphere_matter_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_3', self);"/>
+				<imageCheckBox name="sphere_matter_4" left="175" top="0" width="25" height="25" field="sphere_matter_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_4', self);"/>
+				<imageCheckBox name="sphere_matter_5" left="200" top="0" width="25" height="25" field="sphere_matter_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_matter_5', self);"/>
+				<imageCheckBox name="scap_matter_2" left="125" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_matter_3" left="150" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_matter_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_matter_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_mind" left="265" top="104" width="173" height="25">
-				<label left="0" top="5" width="46" height="20" text="Mind"/>
-				<imageCheckBox name="sphere_mind_1" left="48" top="0" width="25" height="25" field="sphere_mind_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_1', self);"/>
-				<imageCheckBox name="sphere_mind_2" left="73" top="0" width="25" height="25" field="sphere_mind_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_2', self);"/>
-				<imageCheckBox name="sphere_mind_3" left="98" top="0" width="25" height="25" field="sphere_mind_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_3', self);"/>
-				<imageCheckBox name="sphere_mind_4" left="123" top="0" width="25" height="25" field="sphere_mind_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_4', self);"/>
-				<imageCheckBox name="sphere_mind_5" left="148" top="0" width="25" height="25" field="sphere_mind_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_5', self);"/>
-				<imageCheckBox name="scap_mind_2" left="73" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_mind_3" left="98" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_mind_4" left="123" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_mind_5" left="148" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<layout name="sphRow_mind" left="72" top="169" width="225" height="25">
+				<label left="0" top="5" width="98" height="20" text="Mind"/>
+				<imageCheckBox name="sphere_mind_1" left="100" top="0" width="25" height="25" field="sphere_mind_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_1', self);"/>
+				<imageCheckBox name="sphere_mind_2" left="125" top="0" width="25" height="25" field="sphere_mind_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_2', self);"/>
+				<imageCheckBox name="sphere_mind_3" left="150" top="0" width="25" height="25" field="sphere_mind_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_3', self);"/>
+				<imageCheckBox name="sphere_mind_4" left="175" top="0" width="25" height="25" field="sphere_mind_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_4', self);"/>
+				<imageCheckBox name="sphere_mind_5" left="200" top="0" width="25" height="25" field="sphere_mind_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_mind_5', self);"/>
+				<imageCheckBox name="scap_mind_2" left="125" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_mind_3" left="150" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_mind_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_mind_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_prime" left="458" top="44" width="186" height="25">
-				<label left="0" top="5" width="59" height="20" text="Prime"/>
-				<imageCheckBox name="sphere_prime_1" left="61" top="0" width="25" height="25" field="sphere_prime_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_1', self);"/>
-				<imageCheckBox name="sphere_prime_2" left="86" top="0" width="25" height="25" field="sphere_prime_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_2', self);"/>
-				<imageCheckBox name="sphere_prime_3" left="111" top="0" width="25" height="25" field="sphere_prime_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_3', self);"/>
-				<imageCheckBox name="sphere_prime_4" left="136" top="0" width="25" height="25" field="sphere_prime_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_4', self);"/>
-				<imageCheckBox name="sphere_prime_5" left="161" top="0" width="25" height="25" field="sphere_prime_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_5', self);"/>
-				<imageCheckBox name="scap_prime_2" left="86" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_prime_3" left="111" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_prime_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_prime_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<layout name="sphRow_prime" left="72" top="194" width="225" height="25">
+				<label left="0" top="5" width="98" height="20" text="Prime"/>
+				<imageCheckBox name="sphere_prime_1" left="100" top="0" width="25" height="25" field="sphere_prime_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_1', self);"/>
+				<imageCheckBox name="sphere_prime_2" left="125" top="0" width="25" height="25" field="sphere_prime_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_2', self);"/>
+				<imageCheckBox name="sphere_prime_3" left="150" top="0" width="25" height="25" field="sphere_prime_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_3', self);"/>
+				<imageCheckBox name="sphere_prime_4" left="175" top="0" width="25" height="25" field="sphere_prime_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_4', self);"/>
+				<imageCheckBox name="sphere_prime_5" left="200" top="0" width="25" height="25" field="sphere_prime_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_prime_5', self);"/>
+				<imageCheckBox name="scap_prime_2" left="125" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_prime_3" left="150" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_prime_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_prime_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_spirit" left="458" top="74" width="186" height="25">
-				<label left="0" top="5" width="59" height="20" text="Spirit"/>
-				<imageCheckBox name="sphere_spirit_1" left="61" top="0" width="25" height="25" field="sphere_spirit_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_1', self);"/>
-				<imageCheckBox name="sphere_spirit_2" left="86" top="0" width="25" height="25" field="sphere_spirit_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_2', self);"/>
-				<imageCheckBox name="sphere_spirit_3" left="111" top="0" width="25" height="25" field="sphere_spirit_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_3', self);"/>
-				<imageCheckBox name="sphere_spirit_4" left="136" top="0" width="25" height="25" field="sphere_spirit_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_4', self);"/>
-				<imageCheckBox name="sphere_spirit_5" left="161" top="0" width="25" height="25" field="sphere_spirit_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_5', self);"/>
-				<imageCheckBox name="scap_spirit_2" left="86" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_spirit_3" left="111" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_spirit_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_spirit_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<layout name="sphRow_spirit" left="72" top="219" width="225" height="25">
+				<label left="0" top="5" width="98" height="20" text="Spirit"/>
+				<imageCheckBox name="sphere_spirit_1" left="100" top="0" width="25" height="25" field="sphere_spirit_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_1', self);"/>
+				<imageCheckBox name="sphere_spirit_2" left="125" top="0" width="25" height="25" field="sphere_spirit_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_2', self);"/>
+				<imageCheckBox name="sphere_spirit_3" left="150" top="0" width="25" height="25" field="sphere_spirit_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_3', self);"/>
+				<imageCheckBox name="sphere_spirit_4" left="175" top="0" width="25" height="25" field="sphere_spirit_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_4', self);"/>
+				<imageCheckBox name="sphere_spirit_5" left="200" top="0" width="25" height="25" field="sphere_spirit_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_spirit_5', self);"/>
+				<imageCheckBox name="scap_spirit_2" left="125" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_spirit_3" left="150" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_spirit_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_spirit_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
-			<layout name="sphRow_time" left="458" top="104" width="186" height="25">
-				<label left="0" top="5" width="59" height="20" text="Time"/>
-				<imageCheckBox name="sphere_time_1" left="61" top="0" width="25" height="25" field="sphere_time_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_1', self);"/>
-				<imageCheckBox name="sphere_time_2" left="86" top="0" width="25" height="25" field="sphere_time_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_2', self);"/>
-				<imageCheckBox name="sphere_time_3" left="111" top="0" width="25" height="25" field="sphere_time_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_3', self);"/>
-				<imageCheckBox name="sphere_time_4" left="136" top="0" width="25" height="25" field="sphere_time_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_4', self);"/>
-				<imageCheckBox name="sphere_time_5" left="161" top="0" width="25" height="25" field="sphere_time_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_5', self);"/>
-				<imageCheckBox name="scap_time_2" left="86" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_time_3" left="111" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_time_4" left="136" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
-				<imageCheckBox name="scap_time_5" left="161" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+			<layout name="sphRow_time" left="72" top="244" width="225" height="25">
+				<label left="0" top="5" width="98" height="20" text="Time"/>
+				<imageCheckBox name="sphere_time_1" left="100" top="0" width="25" height="25" field="sphere_time_1" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_1', self);"/>
+				<imageCheckBox name="sphere_time_2" left="125" top="0" width="25" height="25" field="sphere_time_2" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_2', self);"/>
+				<imageCheckBox name="sphere_time_3" left="150" top="0" width="25" height="25" field="sphere_time_3" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_3', self);"/>
+				<imageCheckBox name="sphere_time_4" left="175" top="0" width="25" height="25" field="sphere_time_4" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_4', self);"/>
+				<imageCheckBox name="sphere_time_5" left="200" top="0" width="25" height="25" field="sphere_time_5" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" onClick="xpClick('sphere_time_5', self);"/>
+				<imageCheckBox name="scap_time_2" left="125" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_time_3" left="150" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_time_4" left="175" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
+				<imageCheckBox name="scap_time_5" left="200" top="0" width="25" height="25" checked="false" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png" autoChange="false" opacity="0.30" visible="false"/>
 			</layout>
 		</layout>
 

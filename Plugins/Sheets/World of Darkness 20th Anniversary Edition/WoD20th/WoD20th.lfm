@@ -2137,14 +2137,23 @@
 				if sheet.qpQuint ~= nil and tonumber(sheet.qpQuint) ~= q then setField("qpQuint", q); end;
 				if sheet.qpParadox ~= nil and tonumber(sheet.qpParadox) ~= p then setField("qpParadox", p); end;
 
+				-- The Magick tab's copy (SPEC I233d) is painted with the Main's: its marks the same colour,
+				-- its two numbers as text (it owns no field, SPEC V1).
 				local marks = {};
 
 				if from ~= nil then
-					local names = {};
+					local names = { lblMkQuint = true, lblMkParadox = true };
 
-					for n = 1, 20, 1 do names["qpMark_" .. n] = true; end;
+					for n = 1, 20, 1 do
+						names["qpMark_" .. n] = true;
+						names["mkQpMark_" .. n] = true;
+					end;
 
 					xpFind(tabRootOf(from), names, marks);
+				end;
+
+				for nm, v in pairs({ lblMkQuint = tostring(q), lblMkParadox = tostring(p) }) do
+					if marks[nm] ~= nil and marks[nm].text ~= v then marks[nm].text = v; end;
 				end;
 
 				for n = 1, 20, 1 do
@@ -2158,15 +2167,17 @@
 
 					if (sheet["qpWheel_" .. n] or "") ~= want then setField("qpWheel_" .. n, want); end;
 
-					local mark = marks["qpMark_" .. n];
+					for _, pre in ipairs({ "qpMark_", "mkQpMark_" }) do
+						local mark = marks[pre .. n];
 
-					if mark ~= nil then
-						if want == "/" then
-							mark.color = QP_GOLD;
-						elseif want == "X" then
-							mark.color = QP_PURPLE;
-						else
-							mark.color = "#00000000";
+						if mark ~= nil then
+							if want == "/" then
+								mark.color = QP_GOLD;
+							elseif want == "X" then
+								mark.color = QP_PURPLE;
+							else
+								mark.color = "#00000000";
+							end;
 						end;
 					end;
 				end;
@@ -2432,12 +2443,48 @@
 				},
 			};
 
+			-- A MAGE's lists (user 2026-10-08, SPEC I232a, V573a): the mortal's of each era, less Animal
+			-- Ken, Performance and Larceny, with Technology moved from knowledges to the end of skills
+			-- where the era has it. A removed row goes rather than turning into a typed one, and every
+			-- column keeps two typed rows (user 2026-10-08, SPEC I233a, V574a), so each ability box is as
+			-- tall as its rows (SPEC I232c).
+			MAGE_ABILITIES = {
+				["Modern Nights"] = {
+					talents    = BASE_TALENTS,
+					skills     = {"Crafts", "Drive", "Etiquette", "Firearms", "Martial Arts", "Meditation", "Melee", "Research", "Stealth", "Survival", "Technology"},
+					knowledges = {"Academics", "Computer", "Cosmology", "Enigmas", "Esoterica", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science"},
+					typed      = 2,
+				},
+				["Victorian Age"] = {
+					talents    = BASE_TALENTS,
+					skills     = {"Crafts", "Etiquette", "Firearms", "Martial Arts", "Meditation", "Melee", "Research", "Ride", "Stealth", "Survival", "Technology"},
+					knowledges = {"Academics", "Cosmology", "Enigmas", "Esoterica", "Finance", "Investigation", "Law", "Medicine", "Occult", "Politics", "Science"},
+					typed      = 2,
+				},
+				["Dark Ages"] = {
+					talents    = {"Alertness", "Arts", "Athletics", "Awareness", "Brawl", "Empathy", "Expression", "Intimidation", "Leadership", "Legerdemain", "Subterfuge"},
+					skills     = {"Archery", "Commerce", "Crafts", "Etiquette", "Martial Arts", "Meditation", "Melee", "Research", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Cosmology", "Enigmas", "Esoterica", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Politics", "Seneschal", "Theology"},
+					typed      = 2,
+				},
+				["Classical Age"] = {
+					talents    = BASE_TALENTS,
+					skills     = {"Archery", "Commerce", "Crafts", "Etiquette", "Martial Arts", "Meditation", "Melee", "Research", "Ride", "Stealth", "Survival"},
+					knowledges = {"Academics", "Cosmology", "Enigmas", "Esoterica", "Hearth Wisdom", "Investigation", "Law", "Medicine", "Occult", "Philosophy", "Politics", "Religion", "Ritual"},
+					typed      = 2,
+				},
+			};
+
 			-- The lists in force: the game's own for this era if it has them, the era's otherwise. The
 			-- one place that choice is made (SPEC V531a) - renderAbilityLabels and eraRangedName both
-			-- read through here. A MAGE reads the vampire's lists (SPEC I216b, Q129.7): VAMP_GEOM is one
-			-- fixed table for ten names and two typed rows a column, and the mage wears that sheet.
+			-- read through here. A MAGE reads its own (SPEC I232a) and still wears the vampire's sheet
+			-- for everything else (SPEC I216b).
 			function eraAbilities()
 				local era = currentTheme();
+
+				if sheet ~= nil and sheet.game == "Mage" and MAGE_ABILITIES[era] ~= nil then
+					return MAGE_ABILITIES[era];
+				end;
 
 				if vampLayout() and VAMPIRE_ABILITIES[era] ~= nil then
 					return VAMPIRE_ABILITIES[era];
@@ -2770,7 +2817,7 @@
 			-- so the box is 35 + 85 + 2 + 9 x 25 + 35 = 382. The XML template (WoD20.3) is the MORTAL's.
 			COMBAT_LABEL_W = 85;
 
-			for _, f in ipairs({ "strength", "dexterity", "stamina", "perception", "alertness", "athletics", "awareness", "brawl", "ranged", "melee", "stealth" }) do
+			for _, f in ipairs({ "strength", "dexterity", "stamina", "perception", "wits", "alertness", "athletics", "awareness", "brawl", "ranged", "martialArts", "melee", "stealth" }) do
 				VAMP_GEOM["dynRo" .. f] = { 0, 5, COMBAT_LABEL_W, 20 };
 
 				for k = 1, 9, 1 do
@@ -2803,29 +2850,61 @@
 			-- close on 1375. On the Combat tab COMBAT TRAITS splits: ATTRIBUTES 407 x 151 (title at 15,
 			-- four rows, 15 under), ABILITIES 282 x 226 under it (seven rows of five dots), and HEALTH
 			-- 5 under that at 387.
+			--
+			-- 89th batch (user 2026-10-08, SPEC I232c/d, V573c): a mage's ability rows are the mortal's of
+			-- the era less the ones the user cut (MAGE_ABILITIES), so each box is 51 + 25 a row. The
+			-- heights below are the tallest; renderGameMode writes the era's.
+			--
+			-- 90th batch (user 2026-10-08, SPEC I233, V574, Q147): two typed rows a column - TALENTS and
+			-- SKILLS 13 rows (376), KNOWLEDGES 13 to 15 by era, 426 in the Classical Age, so what stays
+			-- under the abilities (EXPERIENCE, the wheel, a ghoul's pool) stands at 241 + 426 + 5 = 672.
+			-- WILLPOWER, ARETE and SPHERES stack right of KNOWLEDGES, 1005 to ATTRIBUTES' edge at 1375
+			-- (370 wide, ARETE and SPHERES move in the XML: only a mage shows them), and HEALTH goes 5
+			-- under the stack.
+			--
+			-- 91st batch (user 2026-10-08, SPEC I234, V575, Q149): WILLPOWER back under TALENTS, glued at
+			-- 617 + 5 = 622 with EXPERIENCE 5 under it and the wheel beside them (622 to 866, as in the 78th);
+			-- ARETE and SPHERES rise to KNOWLEDGES' top and HEALTH follows SPHERES at 670. On the Combat tab
+			-- ATTRIBUTES gains WITS (176) and ABILITIES MARTIAL ARTS (251), so HEALTH stands at 437.
+			--
+			-- 92nd batch (user 2026-10-08, SPEC I235, V576, Q150): the avatar goes right of HEADER and ATTRIBUTES,
+			-- which open on 0; the spheres run 25 a row like the abilities, so SPHERES is 290 and HEALTH 630.
+			--
+			-- 93rd batch (user 2026-10-08, SPEC I236, V577, Q151): ARETE gives 8 (81 in the XML) so SPHERES
+			-- closes on 617 with TALENTS and SKILLS in every era, and HEALTH follows 5 under it at 622.
+			--
+			-- 94th batch (user 2026-10-08, SPEC I237, V578, Q152): HEADER shrinks to the mortal's 1010 - its
+			-- cells back on the XML's 20 / 326 / 663, 9 and 10 apart - and EXPERIENCE leaves the bottom row for
+			-- the slot beside it, 1015 to ATTRIBUTES' edge at 1153 (138), title and number centred in its 105.
+			-- WILLPOWER and the wheel stay where they were.
 			MAGE_GEOM = {
-				boxHeader        = { 222, 0, 1153, 105 },
-				hdrNature        = { 398, 15, 327, 25 },
-				hdrDemeanor      = { 398, 40, 327, 25 },
-				hdrEssence       = { 398, 65, 327, 25 },
-				hdrAffiliation   = { 806, 15, 327, 25 },
-				hdrSect          = { 806, 40, 327, 25 },
-				hdrConcept       = { 806, 65, 327, 25 },
-				boxAttributes    = { 222, 110, 1153, 126 },
-				boxTalents       = { 0, 241, 330, 351 },
-				boxSkills        = { 335, 241, 330, 351 },
-				boxKnowledges    = { 670, 241, 330, 351 },
-				boxWillpower     = { 0, 597, 290, 126 },
+				boxHeader        = { 0, 0, 1010, 105 },
+				hdrNature        = { 326, 15, 327, 25 },
+				hdrDemeanor      = { 326, 40, 327, 25 },
+				hdrEssence       = { 326, 65, 327, 25 },
+				hdrAffiliation   = { 663, 15, 327, 25 },
+				hdrSect          = { 663, 40, 327, 25 },
+				hdrConcept       = { 663, 65, 327, 25 },
+				boxAttributes    = { 0, 110, 1153, 126 },
+				-- The avatar right of HEADER and ATTRIBUTES since the 92nd batch (user 2026-10-08, SPEC I235a,
+				-- V576a): they open on the Main's left edge and it closes on 1375, the size the vampire's.
+				avatarFrame      = { 1158, 0, 217, 236 },
+				avatarImage      = { 1158, 0, 217, 236 },
+				ornAvatar        = { 1158, 0, 217, 236 },
+				boxTalents       = { 0, 241, 330, 376 },
+				boxSkills        = { 335, 241, 330, 376 },
+				boxKnowledges    = { 670, 241, 330, 426 },
+				boxWillpower     = { 0, 622, 290, 126 },
 				lblWillpower     = { 20, 23, 250, 20 },
 				bodyWillpower    = { 20, 51, 250, 52 },
-				boxExperience    = { 0, 728, 290, 113 },
-				lblXPMain        = { 20, 31, 250, 20 },
-				bgCurrentXPMain  = { 100, 56, 90, 25 },
-				edtCurrentXPMain = { 100, 56, 90, 25 },
-				mainBloodPool    = { 500, 846, 330, 244 },
+				boxExperience    = { 1015, 0, 138, 105 },
+				lblXPMain        = { 20, 27, 98, 20 },
+				bgCurrentXPMain  = { 24, 52, 90, 25 },
+				edtCurrentXPMain = { 24, 52, 90, 25 },
+				mainBloodPool    = { 500, 672, 330, 244 },
 				-- HEALTH as narrow as its longest name (user 2026-10-07, SPEC I222b, V561b): Ferido Gravemente
 				-- (-2) ~143 + 5 + the 22 box = 171 a row, 20 a side; ARETE takes the 74 it gave up.
-				dynHealth_box    = { 1169, 597, 206 },
+				dynHealth_box    = { 1169, 622, 206 },
 				dynHealth_row1   = { 20, 47, 166, 20 },
 				dynHealth_row2   = { 20, 74, 166, 20 },
 				dynHealth_row3   = { 20, 101, 166, 20 },
@@ -2841,9 +2920,9 @@
 				boxFlaws         = { 514, 342, 743, 337 },
 				boxDerangements  = { 1262, 0, 225, 337 },
 				boxOther         = { 1262, 342, 225, 337 },
-				boxCombatTraits  = { 970, 0, 407, 151 },
-				boxCombatAbils3  = { 970, 156, 282, 226 },
-				dynHealth3_box   = { 970, 387, 407 },
+				boxCombatTraits  = { 970, 0, 407, 176 },
+				boxCombatAbils3  = { 970, 181, 288, 251 },
+				dynHealth3_box   = { 970, 437, 407 },
 				boxWillpower3    = { 650, 356, 315, 126 },
 				lblWillpower3    = { 20, 23, 275, 20 },
 				bodyWillpower3   = { 32, 51, 250, 52 },
@@ -2858,9 +2937,24 @@
 				MAGE_GEOM["mcap" .. f .. "_10"] = { ATTR_LABEL_W + 5 + 250, 0, 25, 25 };
 			end;
 
-			for _, f in ipairs({ "strength", "dexterity", "stamina", "perception", "alertness", "athletics", "awareness", "brawl", "ranged", "melee", "stealth" }) do
+			for _, f in ipairs({ "strength", "dexterity", "stamina", "perception", "wits", "alertness", "athletics", "awareness", "brawl", "ranged", "martialArts", "melee", "stealth" }) do
 				MAGE_GEOM["ro_" .. f .. "_10"]    = { COMBAT_LABEL_W + 2 + 225, 0, 25, 25 };
 				MAGE_GEOM["rocap_" .. f .. "_10"] = { COMBAT_LABEL_W + 2 + 225, 0, 25, 25 };
+			end;
+
+			-- A mage's ABILITY rows carry MARTIAL ARTS since the 91st batch (Artes Marciais, 14 letters), so
+			-- their names get the V16 ruler's 91 where the attributes keep COMBAT_LABEL_W's 85 (SPEC I234f,
+			-- V575b): the vampire never shows the row, and his combat box stays as it was. COMBAT ABILITIES
+			-- is 35 + 91 + 2 + 5 x 25 + 35 = 288.
+			MAGE_ABIL_LABEL_W = 91;
+
+			for _, f in ipairs({ "alertness", "athletics", "awareness", "brawl", "ranged", "martialArts", "melee", "stealth" }) do
+				MAGE_GEOM["dynRo" .. f] = { 0, 5, MAGE_ABIL_LABEL_W, 20 };
+
+				for k = 1, 10, 1 do
+					MAGE_GEOM["ro_" .. f .. "_" .. k] = { MAGE_ABIL_LABEL_W + 2 + 25 * (k - 1), 0, 25, 25 };
+					if k >= 4 then MAGE_GEOM["rocap_" .. f .. "_" .. k] = { MAGE_ABIL_LABEL_W + 2 + 25 * (k - 1), 0, 25, 25 }; end;
+				end;
 			end;
 
 			-- The ten HEALTH rows of the Combat tab, centred in its 407 as VAMP_GEOM centres them in 382.
@@ -2945,6 +3039,10 @@
 				names.lblCombatAttrs3 = true;
 				names.rectCombatAbils3 = true;
 				names.lblCombatAbils3 = true;
+				names.roRowWits3 = true;
+				names.roRowMartialArts3 = true;
+				names.roRowMelee3 = true;
+				names.roRowStealth3 = true;
 
 				local found = xpFind(tabRootOf(from), names, {});
 
@@ -3003,6 +3101,12 @@
 				-- A MAGE reads MAGE_GEOM over it (SPEC I217a, V554a): its own rect where it has one, and
 				-- the names only it moves in the second loop. A height only the mage writes (WILLPOWER's
 				-- 126) is cached from the XML too, so a vampire gets the XML's back.
+				--
+				-- A mage's ability box is as tall as the era's rows, 51 + 25 a row (SPEC I232c, V573c):
+				-- the era's link calls here, so this is still the one writer of the height.
+				local abilCol = { boxTalents = "talents", boxSkills = "skills", boxKnowledges = "knowledges" };
+				local lists   = eraAbilities();
+
 				for nm, r in pairs(VAMP_GEOM) do
 					local c = found[nm];
 
@@ -3015,6 +3119,10 @@
 
 						if mage and m ~= nil then
 							rect = m;
+
+							local k = abilCol[nm];
+
+							if k ~= nil then rect = { m[1], m[2], m[3], 51 + 25 * (#lists[k] + lists.typed) }; end;
 						elseif r[4] == nil and GEOM_XML[nm][4] ~= nil then
 							rect = { r[1], r[2], r[3], GEOM_XML[nm][4] };
 						end;
@@ -3052,10 +3160,19 @@
 
 				-- A mage's COMBAT TRAITS is two boxes (user 2026-10-08, SPEC I231c, V572b): its title says
 				-- ATTRIBUTES and loses the line, and the ability rows' box shows its backdrop and title.
-				for nm, want in pairs({ lblCombatTraits3 = not mage, lineCombatTraits3 = not mage, lblCombatAttrs3 = mage, lblCombatAbils3 = mage }) do
+				-- WITS and MARTIAL ARTS are a mage's rows alone (user 2026-10-08, SPEC I234a, V575a).
+				for nm, want in pairs({ lblCombatTraits3 = not mage, lineCombatTraits3 = not mage, lblCombatAttrs3 = mage, lblCombatAbils3 = mage, roRowWits3 = mage, roRowMartialArts3 = mage }) do
 					local c = found[nm];
 
 					if c ~= nil and c.visible ~= want then c.visible = want; end;
+				end;
+
+				-- MARTIAL ARTS takes MELEE's spot, so MELEE and STEALTH go 25 down for a mage (SPEC I234a,
+				-- Q149.1). Only the top moves: the width is the anchors', and placeBox keeps it as it stands.
+				for nm, tops in pairs({ roRowMelee3 = { 161, 186 }, roRowStealth3 = { 186, 211 } }) do
+					local c = found[nm];
+
+					if c ~= nil then placeBox(c, { c.left, mage and tops[2] or tops[1], c.width }); end;
 				end;
 
 				-- Shown, the backdrop's ornament is measured again (SPEC I215b, B199): the load measured
@@ -3146,12 +3263,16 @@
 			-- 2nd has a faded EMPTY twin on its spot, as an attribute's over its ceiling, and Arete
 			-- decides which of the two shows - on the Main and on the Combat tab's read-only copy, whose
 			-- dots are painted here from the fields (they own none, SPEC V1). The one writer of both.
+			-- The Magick tab's copy (mkArete_, mkSph_ / mkcapSph_, SPEC I233d) is painted the same way.
 			function renderSpheres(from)
 				if sheet == nil or from == nil then return; end;
 
 				local names = {};
 
-				for k = 2, 10, 1 do names["roArete_" .. k] = true; end;
+				for k = 2, 10, 1 do
+					names["roArete_" .. k] = true;
+					names["mkArete_" .. k] = true;
+				end;
 
 				for i = 1, #XP_SPHERES, 1 do
 					local s = XP_SPHERES[i][2];
@@ -3161,6 +3282,8 @@
 						names["scap_" .. string.sub(s, 8) .. "_" .. k] = true;
 						names["roSph_" .. string.sub(s, 8) .. "_" .. k] = true;
 						names["rocapSph_" .. string.sub(s, 8) .. "_" .. k] = true;
+						names["mkSph_" .. string.sub(s, 8) .. "_" .. k] = true;
+						names["mkcapSph_" .. string.sub(s, 8) .. "_" .. k] = true;
 					end;
 				end;
 
@@ -3168,9 +3291,11 @@
 				local a     = areteLevel();
 
 				for k = 2, 10, 1 do
-					local ro = found["roArete_" .. k];
+					for _, pre in ipairs({ "roArete_", "mkArete_" }) do
+						local ro = found[pre .. k];
 
-					if ro ~= nil then ro.checked = sheet["arete_" .. k] == true; end;
+						if ro ~= nil then ro.checked = sheet["arete_" .. k] == true; end;
+					end;
 				end;
 
 				for i = 1, #XP_SPHERES, 1 do
@@ -3179,7 +3304,7 @@
 					for k = 1, 5, 1 do
 						local on = k <= a;
 
-						for _, p in ipairs({ { s, "scap_" .. short }, { "roSph_" .. short, "rocapSph_" .. short } }) do
+						for _, p in ipairs({ { s, "scap_" .. short }, { "roSph_" .. short, "rocapSph_" .. short }, { "mkSph_" .. short, "mkcapSph_" .. short } }) do
 							local live = found[p[1] .. "_" .. k];
 							local twin = found[p[2] .. "_" .. k];
 
@@ -3187,9 +3312,11 @@
 							if twin ~= nil and twin.visible == on then twin.visible = not on; end;
 						end;
 
-						local ro = found["roSph_" .. short .. "_" .. k];
+						for _, pre in ipairs({ "roSph_", "mkSph_" }) do
+							local ro = found[pre .. short .. "_" .. k];
 
-						if ro ~= nil then ro.checked = sheet[s .. "_" .. k] == true; end;
+							if ro ~= nil then ro.checked = sheet[s .. "_" .. k] == true; end;
+						end;
 					end;
 				end;
 			end;
