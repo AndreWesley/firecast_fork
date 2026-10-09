@@ -973,8 +973,11 @@
 		     child; renderQpWheel colours it gold for "/" and dark purple for "X". Each mark turns its
 		     base to the ring's centre: rotationAngle = (18 N - 99) mod 360, generated; the host turns a
 		     control about its own centre, so the positions above do not move (SPEC B61).
-		     Hidden here: renderGameMode shows it to a mage only. -->
-		<layout name="boxQuintParadox" left="295" top="622" width="200" height="244" visible="false">
+		     Hidden here: renderGameMode shows it to a mage only. Since the 95th batch (user 2026-10-08,
+		     SPEC I238c, V579c) it swaps places with WILLPOWER: on the Main's left edge, under SPHERES. Since the
+		     96th batch (user 2026-10-08, SPEC I239b, V580b) it is SPHERES' 370 wide and its five children
+		     stand 85 right of the 200 they were drawn for, centred on 185. -->
+		<layout name="boxQuintParadox" left="0" top="622" width="370" height="244" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<!-- Each title shares its line with the number it names (user 2026-10-06, SPEC I219a): the
 			     numbers are the truth and the ring draws them (renderQpWheel). Since the 77th batch
@@ -982,9 +985,9 @@
 			     sits about the box's middle - centred on the pt name, the longer: QUINTESSENCIA ~98 +
 			     5 + 40 = 143 from 29, PARADOXO ~60 + 5 + 40 = 105 from 47 (centre 100 since the 78th batch,
 			     SPEC I221b). -->
-			<label left="20" top="15" width="107" height="20" text="QUINTESSENCE" horzTextAlign="trailing"/>
-			<edit name="edtQpQuint" field="qpQuint" type="number" decimalPlaces="0" left="132" top="15" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
-			<layout name="qpRing" left="20" top="42" width="160" height="160">
+			<label left="105" top="15" width="107" height="20" text="QUINTESSENCE" horzTextAlign="trailing"/>
+			<edit name="edtQpQuint" field="qpQuint" type="number" decimalPlaces="0" left="217" top="15" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
+			<layout name="qpRing" left="105" top="42" width="160" height="160">
 				<rectangle name="qpMark_1" left="0" top="61" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="279" hitTest="true" cursor="handPoint" onClick="cycleQpMark(1);"/>
 				<rectangle name="qpMark_2" left="7" top="39" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="297" hitTest="true" cursor="handPoint" onClick="cycleQpMark(2);"/>
 				<rectangle name="qpMark_3" left="20" top="20" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="315" hitTest="true" cursor="handPoint" onClick="cycleQpMark(3);"/>
@@ -1006,8 +1009,8 @@
 				<rectangle name="qpMark_19" left="7" top="105" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="243" hitTest="true" cursor="handPoint" onClick="cycleQpMark(19);"/>
 				<rectangle name="qpMark_20" left="0" top="83" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="261" hitTest="true" cursor="handPoint" onClick="cycleQpMark(20);"/>
 			</layout>
-			<label left="20" top="209" width="87" height="20" text="PARADOX" horzTextAlign="trailing"/>
-			<edit name="edtQpParadox" field="qpParadox" type="number" decimalPlaces="0" left="112" top="209" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
+			<label left="105" top="209" width="87" height="20" text="PARADOX" horzTextAlign="trailing"/>
+			<edit name="edtQpParadox" field="qpParadox" type="number" decimalPlaces="0" left="197" top="209" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
 		</layout>
 
 		<!-- ARETE over SPHERES, a MAGE's alone (user 2026-10-06, SPEC I221c, V559, V560): the slot between
@@ -1024,8 +1027,9 @@
 		     and the nine spheres are ONE column: every name 98 wide, the row 225 centred at 72, 25 a row from 44 (30 until the 92nd batch, SPEC I235b - the abilities' step). Since
 		     the 91st batch (SPEC I234c) WILLPOWER is back under TALENTS and the two rise to KNOWLEDGES' top. Since the 93rd batch
 		     (user 2026-10-08, SPEC I236a, V577) ARETE is 81 (the track at 41, 15 under it - SPEC V240) so SPHERES closes on 617,
-		     the foot of TALENTS and SKILLS in every era. -->
-		<layout name="boxArete" left="1005" top="241" width="370" height="81" visible="false">
+		     the foot of TALENTS and SKILLS in every era. Since the 95th batch (user 2026-10-08, SPEC I238b, V579b)
+		     the two stand on the Main's left edge, before TALENTS. -->
+		<layout name="boxArete" left="0" top="241" width="370" height="81" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="330" height="20" text="ARETE" horzTextAlign="center"/>
 			<layout name="areteRow" left="60" top="41" width="250" height="25">
@@ -1042,7 +1046,7 @@
 			</layout>
 		</layout>
 
-		<layout name="boxSpheres" left="1005" top="327" width="370" height="290" visible="false">
+		<layout name="boxSpheres" left="0" top="327" width="370" height="290" visible="false">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="330" height="20" text="SPHERES" horzTextAlign="center"/>
 			<layout name="sphRow_correspondence" left="72" top="44" width="225" height="25">

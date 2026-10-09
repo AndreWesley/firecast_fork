@@ -65,10 +65,12 @@
 			-- V545c): roVWp_1..10, painted HERE because that tab has no script of its own (SPEC
 			-- V530b). Found through xpFind from the tab root, the one finder of the cross-tab
 			-- painters (SPEC V143), the way renderVampCaps finds the Vampire tab's dots.
+			-- The Magick tab carries the fourth since the 97th batch (user 2026-10-09, SPEC I240b, V581b):
+			-- mkWp_1..10, found the same way.
 			local function paintWillpower(form)
 				local names = {};
 
-				for d = 1, 10, 1 do names["roVWp_" .. d] = true; end;
+				for d = 1, 10, 1 do names["roVWp_" .. d] = true; names["mkWp_" .. d] = true; end;
 
 				local found = xpFind(tabRootOf(form), names, {});
 
@@ -76,9 +78,11 @@
 					local on  = sheet["willpower_" .. d] == true;
 					local dot = form["roWp_" .. d];
 					local vdot = found["roVWp_" .. d];
+					local mdot = found["mkWp_" .. d];
 
 					if dot ~= nil then dot.checked = on; end;
 					if vdot ~= nil then vdot.checked = on; end;
+					if mdot ~= nil then mdot.checked = on; end;
 				end;
 			end;
 

@@ -53,7 +53,9 @@
 			2 x 24), and the 20 of the scrollbar's lane fall inside the right-hand 24, 4 either side of the
 			bar. The Add button closes where the cards close (332). Since the 86th batch (SPEC I229b) each
 			card's 24 is above it, so the list opens on the title row's foot (35) and the first card sits
-			24 under it, like every other gap.
+			24 under it, like every other gap. Since the 98th batch (user 2026-10-09, SPEC I241, V582) the
+			gap between cards is 7 (30% of 24) and the list opens 17 lower (52), so the first card keeps
+			its 24 from the title row (SPEC Q154).
 			Seven empty Foci are seeded once per mage by seedFoci (root, SPEC I223j); Rotes and Wonders
 			start empty.
 		-->
@@ -61,7 +63,7 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="316" height="20" text="FOCI" horzTextAlign="center" hitTest="false"/>
 			<button name="btnAddFocus" left="252" top="15" width="80" height="20" text="Add" onClick="self.rclFoci:append();"/>
-			<recordList name="rclFoci" left="24" top="35" width="328" height="801" field="magickFoci" templateForm="frmWoD20_17" layout="vertical">
+			<recordList name="rclFoci" left="24" top="52" width="328" height="784" field="magickFoci" templateForm="frmWoD20_17" layout="vertical">
 				<event name="onItemAdded">magickItemPaint(form, "Focus");</event>
 			</recordList>
 		</layout>
@@ -70,7 +72,7 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="316" height="20" text="ROTES" horzTextAlign="center" hitTest="false"/>
 			<button name="btnAddRote" left="252" top="15" width="80" height="20" text="Add" onClick="self.rclRotes:append();"/>
-			<recordList name="rclRotes" left="24" top="35" width="328" height="801" field="magickRotes" templateForm="frmWoD20_17" layout="vertical">
+			<recordList name="rclRotes" left="24" top="52" width="328" height="784" field="magickRotes" templateForm="frmWoD20_17" layout="vertical">
 				<event name="onItemAdded">magickItemPaint(form, "Rote");</event>
 			</recordList>
 		</layout>
@@ -79,7 +81,7 @@
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="316" height="20" text="WONDERS" horzTextAlign="center" hitTest="false"/>
 			<button name="btnAddWonder" left="252" top="15" width="80" height="20" text="Add" onClick="self.rclWonders:append();"/>
-			<recordList name="rclWonders" left="24" top="35" width="328" height="801" field="magickWonders" templateForm="frmWoD20_17" layout="vertical">
+			<recordList name="rclWonders" left="24" top="52" width="328" height="784" field="magickWonders" templateForm="frmWoD20_17" layout="vertical">
 				<event name="onItemAdded">magickItemPaint(form, "Name");</event>
 			</recordList>
 		</layout>
@@ -88,8 +90,21 @@
 		     stacked 5 apart, as wide as WONDERS (356); the spheres 25 a row since the 92nd batch (SPEC I235b). They are COPIES of the Main's and own no field - a field
 		     has one input on the sheet (SPEC V1) - so renderSpheres and renderQpWheel paint them from the
 		     fields, and a click goes where the Main's goes: xpClick by the FIELD's name, cycleQpMark by the
-		     mark (SPEC Q148.1). The two numbers are read-only here; they are edited on the Main. -->
-		<layout name="boxMkArete" left="1083" top="0" width="356" height="89">
+		     mark (SPEC Q148.1). The two numbers are read-only here; they are edited on the Main.
+		     Since the 99th batch (user 2026-10-09, SPEC I242, V583) the two numbers are edits on qpQuint /
+		     qpParadox, the Main's twins (a declared mirror, SPEC V36), and EXPERIENCE heads the column: it is
+		     103 tall so the column, 108 lower, closes WILLPOWER on the cards' 856. -->
+		<!-- EXPERIENCE as on the Main (SPEC I242b): title and balance ONE object of 50 centred in the box
+		     (SPEC V547), the balance an edit with no field that xpPaint writes and xpSetCurrent reads, like
+		     the Vampire tab's copy. -->
+		<layout name="boxMkXP" left="1083" top="0" width="356" height="103">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<label name="lblMkXP" left="20" top="26" width="316" height="20" text="EXPERIENCE" horzTextAlign="center"/>
+			<rectangle name="bgCurrentXPMagick" left="133" top="51" width="90" height="25" color="#0A0A0A" xradius="6" yradius="6" cornerType="innerRound" hitTest="false"/>
+			<edit name="edtCurrentXPMagick" type="number" decimalPlaces="0" left="133" top="51" width="90" height="25" horzTextAlign="center" vertTextAlign="center" fontSize="14" onUserChange="xpSetCurrent(self, self.edtCurrentXPMagick.text);" transparent="true"/>
+		</layout>
+
+		<layout name="boxMkArete" left="1083" top="108" width="356" height="89">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="316" height="20" text="ARETE" horzTextAlign="center" hitTest="false"/>
 			<layout name="mkAreteRow" left="53" top="44" width="250" height="25">
@@ -106,7 +121,7 @@
 			</layout>
 		</layout>
 
-		<layout name="boxMkSpheres" left="1083" top="94" width="356" height="290">
+		<layout name="boxMkSpheres" left="1083" top="202" width="356" height="290">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="20" top="15" width="316" height="20" text="SPHERES" horzTextAlign="center" hitTest="false"/>
 			<layout name="mkSphRow_correspondence" left="65" top="44" width="225" height="25">
@@ -219,10 +234,10 @@
 			</layout>
 		</layout>
 
-		<layout name="boxMkQp" left="1083" top="389" width="356" height="244">
+		<layout name="boxMkQp" left="1083" top="497" width="356" height="244">
 			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
 			<label left="98" top="15" width="107" height="20" text="QUINTESSENCE" horzTextAlign="trailing"/>
-			<label name="lblMkQuint" left="210" top="15" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
+			<edit name="edtMkQuint" field="qpQuint" type="number" decimalPlaces="0" left="210" top="15" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
 			<layout name="mkQpRing" left="98" top="42" width="160" height="160">
 				<rectangle name="mkQpMark_1" left="0" top="61" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="279" hitTest="true" cursor="handPoint" onClick="cycleQpMark(1);"/>
 				<rectangle name="mkQpMark_2" left="7" top="39" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="297" hitTest="true" cursor="handPoint" onClick="cycleQpMark(2);"/>
@@ -246,9 +261,54 @@
 				<rectangle name="mkQpMark_20" left="0" top="83" width="16" height="16" color="#00000000" strokeColor="white" strokeSize="2" xradius="2" yradius="2" rotationAngle="261" hitTest="true" cursor="handPoint" onClick="cycleQpMark(20);"/>
 			</layout>
 			<label left="98" top="209" width="87" height="20" text="PARADOX" horzTextAlign="trailing"/>
-			<label name="lblMkParadox" left="190" top="209" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
+			<edit name="edtMkParadox" field="qpParadox" type="number" decimalPlaces="0" left="190" top="209" width="40" height="20" horzTextAlign="center" vertTextAlign="center"/>
+		</layout>
+
+		<!-- WILLPOWER under QUINTESSENCE / PARADOX (user 2026-10-09, SPEC I240a, V581a): the Combat tab's
+		     mirror, the fourth on the sheet. Its dots carry no field and are painted by WoD20.3's
+		     paintWillpower through xpFind, like the Vampire tab's copy; its boxes own willpower_c1..c10, a
+		     declared mirror of the Main's (SPEC V36). Title, the Main's 8 and the 52 of dots and boxes are
+		     ONE object centred in the Combat's 110 (SPEC V547), here 356 wide like the column. The names
+		     carry mk, since this form is pasted into the root (SPEC V530e). -->
+		<layout name="boxMkWillpower" left="1083" top="746" width="356" height="110">
+			<rectangle align="client" color="black" xradius="14" yradius="14" cornerType="innerRound"/>
+			<template name="MkWillpowerMirror">
+				<imageCheckBox name="mkWp_1" left="0" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox name="mkWp_2" left="25" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox name="mkWp_3" left="50" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox name="mkWp_4" left="75" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox name="mkWp_5" left="100" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox name="mkWp_6" left="125" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox name="mkWp_7" left="150" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox name="mkWp_8" left="175" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox name="mkWp_9" left="200" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+				<imageCheckBox name="mkWp_10" left="225" top="0" width="25" height="25" autoChange="false" opacity="0.40" checkedImage="images/prime_on.png" uncheckedImage="images/prime_off.png"/>
+
+				<checkBox left="0" top="27" width="25" height="25" field="willpower_c1" onClick="wpSpentClick('willpower_c1');" onChange="wpSpentChange('willpower_c1');"/>
+				<checkBox left="25" top="27" width="25" height="25" field="willpower_c2" onClick="wpSpentClick('willpower_c2');" onChange="wpSpentChange('willpower_c2');"/>
+				<checkBox left="50" top="27" width="25" height="25" field="willpower_c3" onClick="wpSpentClick('willpower_c3');" onChange="wpSpentChange('willpower_c3');"/>
+				<checkBox left="75" top="27" width="25" height="25" field="willpower_c4" onClick="wpSpentClick('willpower_c4');" onChange="wpSpentChange('willpower_c4');"/>
+				<checkBox left="100" top="27" width="25" height="25" field="willpower_c5" onClick="wpSpentClick('willpower_c5');" onChange="wpSpentChange('willpower_c5');"/>
+				<checkBox left="125" top="27" width="25" height="25" field="willpower_c6" onClick="wpSpentClick('willpower_c6');" onChange="wpSpentChange('willpower_c6');"/>
+				<checkBox left="150" top="27" width="25" height="25" field="willpower_c7" onClick="wpSpentClick('willpower_c7');" onChange="wpSpentChange('willpower_c7');"/>
+				<checkBox left="175" top="27" width="25" height="25" field="willpower_c8" onClick="wpSpentClick('willpower_c8');" onChange="wpSpentChange('willpower_c8');"/>
+				<checkBox left="200" top="27" width="25" height="25" field="willpower_c9" onClick="wpSpentClick('willpower_c9');" onChange="wpSpentChange('willpower_c9');"/>
+				<checkBox left="225" top="27" width="25" height="25" field="willpower_c10" onClick="wpSpentClick('willpower_c10');" onChange="wpSpentChange('willpower_c10');"/>
+			</template>
+			<label name="lblMkWillpower" left="20" top="15" width="316" height="20" text="WILLPOWER" horzTextAlign="center"/>
+			<layout name="bodyMkWillpower" left="53" top="43" width="250" height="52">
+				<MkWillpowerMirror/>
+			</layout>
 		</layout>
 	</scrollBox>
 
 	<dataLink field="language" onChange="magickRelabel(self);"/>
+
+	<!-- The WILLPOWER copy's first paint (user 2026-10-09, SPEC I240b, V581b): its dots are WoD20.3's
+	     to paint, on willpower's dataLinks there; this covers a sheet opened on this tab, as the Vampire
+	     tab's onShow does (SPEC V545c). -->
+	<event name="onShow">
+		renderXPBoxes(self);
+		renderCombatTraits(self);
+	</event>
 </form>

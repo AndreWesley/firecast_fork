@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form name="frmWoD20_17" width="308" height="156">
+<form name="frmWoD20_17" width="308" height="139">
 <!--
 	One item of the Magick tab's three lists - a Focus, a Rote or a Wonder (user 2026-10-07, SPEC
 	I223i, V565c). 308 wide since the 85th batch: its recordList is 328, and the 20 left over are the
@@ -25,9 +25,10 @@
 	is 24 taller than the card - the same 24 the list keeps from the box's left and right
 	(WoD20.16) - and since the 86th batch (user 2026-10-07, SPEC I229b) those 24 are ABOVE the card
 	and nothing is under it: the next card's 24 are the gap, and the first card keeps 24 from the
-	title row.
+	title row. Since the 98th batch (user 2026-10-09, SPEC I241a, V582) the gap is 7 - 30% of 24 -
+	and the form 7 taller than the card; the list opens 17 lower so the first card stays put.
 -->
-	<rectangle name="magickItemFrame" left="0" top="24" width="308" height="132" color="black" xradius="6" yradius="6" cornerType="innerRound">
+	<rectangle name="magickItemFrame" left="0" top="7" width="308" height="132" color="black" xradius="6" yradius="6" cornerType="innerRound">
 		<label name="dynItemName" left="10" top="12" width="40" height="20" text="Name"/>
 		<edit left="54" top="10" width="213" height="25" field="itemName"/>
 		<button left="273" top="10" width="25" height="25" text="X">

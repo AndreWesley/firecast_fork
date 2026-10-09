@@ -2137,12 +2137,13 @@
 				if sheet.qpQuint ~= nil and tonumber(sheet.qpQuint) ~= q then setField("qpQuint", q); end;
 				if sheet.qpParadox ~= nil and tonumber(sheet.qpParadox) ~= p then setField("qpParadox", p); end;
 
-				-- The Magick tab's copy (SPEC I233d) is painted with the Main's: its marks the same colour,
-				-- its two numbers as text (it owns no field, SPEC V1).
+				-- The Magick tab's copy (SPEC I233d) is painted with the Main's: its marks the same colour.
+				-- Its two numbers are edits on the fields since the 99th batch (user 2026-10-09, SPEC I242a):
+				-- they show themselves.
 				local marks = {};
 
 				if from ~= nil then
-					local names = { lblMkQuint = true, lblMkParadox = true };
+					local names = {};
 
 					for n = 1, 20, 1 do
 						names["qpMark_" .. n] = true;
@@ -2150,10 +2151,6 @@
 					end;
 
 					xpFind(tabRootOf(from), names, marks);
-				end;
-
-				for nm, v in pairs({ lblMkQuint = tostring(q), lblMkParadox = tostring(p) }) do
-					if marks[nm] ~= nil and marks[nm].text ~= v then marks[nm].text = v; end;
 				end;
 
 				for n = 1, 20, 1 do
@@ -2877,44 +2874,53 @@
 			-- cells back on the XML's 20 / 326 / 663, 9 and 10 apart - and EXPERIENCE leaves the bottom row for
 			-- the slot beside it, 1015 to ATTRIBUTES' edge at 1153 (138), title and number centred in its 105.
 			-- WILLPOWER and the wheel stay where they were.
+			--
+			-- 95th batch (user 2026-10-08, SPEC I238, V579, Q153): the Main is mirrored - the avatar back on
+			-- the left with HEADER / EXPERIENCE / ATTRIBUTES 222 to its right, ARETE / SPHERES (XML) on the left
+			-- with the abilities at 375 / 710 / 1045, the wheel (XML) and WILLPOWER swapped, the ghoul's pool
+			-- up to their 622, and HEALTH under KNOWLEDGES at 672 (5 under its tallest era).
+			--
+			-- 96th batch (user 2026-10-08, SPEC I239, V580): HEALTH takes KNOWLEDGES' left and 330 - the mortal's
+			-- HEALTH, rows and all - and renderGameMode glues it 5 under the era's KNOWLEDGES (672 here is the
+			-- tallest era's); the wheel (XML) grows to SPHERES' 370, so WILLPOWER moves to 375 and the pool to 670.
 			MAGE_GEOM = {
-				boxHeader        = { 0, 0, 1010, 105 },
+				boxHeader        = { 222, 0, 1010, 105 },
 				hdrNature        = { 326, 15, 327, 25 },
 				hdrDemeanor      = { 326, 40, 327, 25 },
 				hdrEssence       = { 326, 65, 327, 25 },
 				hdrAffiliation   = { 663, 15, 327, 25 },
 				hdrSect          = { 663, 40, 327, 25 },
 				hdrConcept       = { 663, 65, 327, 25 },
-				boxAttributes    = { 0, 110, 1153, 126 },
-				-- The avatar right of HEADER and ATTRIBUTES since the 92nd batch (user 2026-10-08, SPEC I235a,
-				-- V576a): they open on the Main's left edge and it closes on 1375, the size the vampire's.
-				avatarFrame      = { 1158, 0, 217, 236 },
-				avatarImage      = { 1158, 0, 217, 236 },
-				ornAvatar        = { 1158, 0, 217, 236 },
-				boxTalents       = { 0, 241, 330, 376 },
-				boxSkills        = { 335, 241, 330, 376 },
-				boxKnowledges    = { 670, 241, 330, 426 },
-				boxWillpower     = { 0, 622, 290, 126 },
+				boxAttributes    = { 222, 110, 1153, 126 },
+				-- The avatar left of HEADER and ATTRIBUTES again since the 95th batch (user 2026-10-08, SPEC
+				-- I238a, V579a; right of them in the 92nd-94th): the vampire's rect, written here all the same.
+				avatarFrame      = { 0, 0, 217, 236 },
+				avatarImage      = { 0, 0, 217, 236 },
+				ornAvatar        = { 0, 0, 217, 236 },
+				boxTalents       = { 375, 241, 330, 376 },
+				boxSkills        = { 710, 241, 330, 376 },
+				boxKnowledges    = { 1045, 241, 330, 426 },
+				boxWillpower     = { 375, 622, 290, 126 },
 				lblWillpower     = { 20, 23, 250, 20 },
 				bodyWillpower    = { 20, 51, 250, 52 },
-				boxExperience    = { 1015, 0, 138, 105 },
+				boxExperience    = { 1237, 0, 138, 105 },
 				lblXPMain        = { 20, 27, 98, 20 },
 				bgCurrentXPMain  = { 24, 52, 90, 25 },
 				edtCurrentXPMain = { 24, 52, 90, 25 },
-				mainBloodPool    = { 500, 672, 330, 244 },
-				-- HEALTH as narrow as its longest name (user 2026-10-07, SPEC I222b, V561b): Ferido Gravemente
-				-- (-2) ~143 + 5 + the 22 box = 171 a row, 20 a side; ARETE takes the 74 it gave up.
-				dynHealth_box    = { 1169, 622, 206 },
-				dynHealth_row1   = { 20, 47, 166, 20 },
-				dynHealth_row2   = { 20, 74, 166, 20 },
-				dynHealth_row3   = { 20, 101, 166, 20 },
-				dynHealth_row4   = { 20, 128, 166, 20 },
-				dynHealth_row5   = { 20, 155, 166, 20 },
-				dynHealth_row6   = { 20, 182, 166, 20 },
-				dynHealth_row7   = { 20, 209, 166, 20 },
-				dynHealth_row8   = { 20, 236, 166, 20 },
-				dynHealth_row9   = { 20, 263, 166, 20 },
-				dynHealth_row10  = { 20, 290, 166, 20 },
+				mainBloodPool    = { 670, 622, 330, 244 },
+				-- HEALTH as wide as KNOWLEDGES over it since the 96th batch (user 2026-10-08, SPEC I239a, V580a;
+				-- narrowed to its longest name, 206, from the 80th): the mortal's 330 and its centred rows.
+				dynHealth_box    = { 1045, 672, 330 },
+				dynHealth_row1   = { 42, 47, 246, 20 },
+				dynHealth_row2   = { 42, 74, 246, 20 },
+				dynHealth_row3   = { 42, 101, 246, 20 },
+				dynHealth_row4   = { 42, 128, 246, 20 },
+				dynHealth_row5   = { 42, 155, 246, 20 },
+				dynHealth_row6   = { 42, 182, 246, 20 },
+				dynHealth_row7   = { 42, 209, 246, 20 },
+				dynHealth_row8   = { 42, 236, 246, 20 },
+				dynHealth_row9   = { 42, 263, 246, 20 },
+				dynHealth_row10  = { 42, 290, 246, 20 },
 				boxBackgrounds   = { 0, 0, 509, 679 },
 				boxMerits        = { 514, 0, 743, 337 },
 				boxFlaws         = { 514, 342, 743, 337 },
@@ -3107,6 +3113,11 @@
 				local abilCol = { boxTalents = "talents", boxSkills = "skills", boxKnowledges = "knowledges" };
 				local lists   = eraAbilities();
 
+				-- A box glued 5 under an ability box follows that box's era height (user 2026-10-08, SPEC
+				-- I239a, V580a): HEALTH under KNOWLEDGES. Its left and width stay MAGE_GEOM's; its height is
+				-- renderHealthTrack's.
+				local gluedUnder = { dynHealth_box = "boxKnowledges" };
+
 				for nm, r in pairs(VAMP_GEOM) do
 					local c = found[nm];
 
@@ -3123,6 +3134,10 @@
 							local k = abilCol[nm];
 
 							if k ~= nil then rect = { m[1], m[2], m[3], 51 + 25 * (#lists[k] + lists.typed) }; end;
+
+							local u = gluedUnder[nm];
+
+							if u ~= nil then rect = { m[1], MAGE_GEOM[u][2] + 51 + 25 * (#lists[abilCol[u]] + lists.typed) + 5, m[3] }; end;
 						elseif r[4] == nil and GEOM_XML[nm][4] ~= nil then
 							rect = { r[1], r[2], r[3], GEOM_XML[nm][4] };
 						end;
@@ -4810,7 +4825,7 @@
 			-- no widget there is the orphan of V2 one floor up (SPEC I136f, B111, B123).
 			-- The Vampire tab showed Spent too from the 48th batch (SPEC I191g/h) until the 61st (SPEC
 			-- I204f, user 2026-10-02): its Spent left this roster with the XML.
-			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true, edtCurrentXPGhoul = true, edtCurrentXPVampire = true, edtCurrentXPNumina = true };
+			local XP_BOXES = { edtTotalXP = true, edtSpentXP = true, edtCurrentXP = true, edtCurrentXPMain = true, edtCurrentXPGhoul = true, edtCurrentXPVampire = true, edtCurrentXPNumina = true, edtCurrentXPMagick = true };   -- the Magick tab's since the 99th batch (SPEC I242b)
 
 			-- The painting itself. No xpQuiet here (SPEC V142): the flag exists to keep the
 			-- sheet's OWN writes from dragging a repaint along (SPEC V107), and a flag left
@@ -4867,6 +4882,7 @@
 				if box.edtCurrentXPGhoul  ~= nil then box.edtCurrentXPGhoul.text  = tostring(total - spent); end;
 				if box.edtCurrentXPVampire ~= nil then box.edtCurrentXPVampire.text = tostring(total - spent); end;
 				if box.edtCurrentXPNumina ~= nil then box.edtCurrentXPNumina.text = tostring(total - spent); end;
+				if box.edtCurrentXPMagick ~= nil then box.edtCurrentXPMagick.text = tostring(total - spent); end;
 			end;
 
 			-- What a dataLink, an onShow or an onNodeReady calls: it paints its own tab, and
